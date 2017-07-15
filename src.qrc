@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/iconapp">
+        <file>akira.icns</file>
+    </qresource>
+</RCC>
