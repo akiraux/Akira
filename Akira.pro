@@ -33,4 +33,4 @@ FORMS += \
         mainwindow.ui
 
 RESOURCES += \
-    src.qrc
+    resources.qrc

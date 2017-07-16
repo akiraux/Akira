@@ -130,7 +130,7 @@
              <x>0</x>
              <y>0</y>
              <width>760</width>
-             <height>707</height>
+             <height>685</height>
             </rect>
            </property>
            <property name="styleSheet">
@@ -197,13 +197,16 @@
    <property name="minimumSize">
     <size>
      <width>0</width>
-     <height>50</height>
+     <height>72</height>
     </size>
    </property>
    <property name="styleSheet">
     <string notr="true">#mainToolBar {
 	background-color: #DBDBDB;
 	border-bottom: 1px solid #ADABAD;
+	background-image: url(:/resources/images/toolbar-bg.png);
+	background-repeat: no-repeat;
+	background-position: left center;
 }</string>
    </property>
    <property name="movable">

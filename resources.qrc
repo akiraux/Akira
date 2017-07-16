@@ -1,0 +1,16 @@
+<RCC>
+    <qresource prefix="/">
+        <file>resources/appicons/akira.icns</file>
+        <file>resources/appicons/akira.iconset/icon_16x16.png</file>
+        <file>resources/appicons/akira.iconset/icon_16x16@2x.png</file>
+        <file>resources/appicons/akira.iconset/icon_32x32.png</file>
+        <file>resources/appicons/akira.iconset/icon_32x32@2x.png</file>
+        <file>resources/appicons/akira.iconset/icon_128x128.png</file>
+        <file>resources/appicons/akira.iconset/icon_128x128@2x.png</file>
+        <file>resources/appicons/akira.iconset/icon_256x256.png</file>
+        <file>resources/appicons/akira.iconset/icon_256x256@2x.png</file>
+        <file>resources/appicons/akira.iconset/icon_512x512.png</file>
+        <file>resources/appicons/akira.iconset/icon_512x512@2x.png</file>
+        <file>resources/images/toolbar-bg.png</file>
+    </qresource>
+</RCC>
