@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright (c) 2017 Alessandro Castellani (https://github.com/Alecaddd/akira) -->
+<component type="desktop">
+  <id>com.github.alecaddd.akira.desktop</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0+</project_license>
+  <name>Akira</name>
+  <summary>The Linux Design Tool</summary>
+  <description>
+    <p>
+      A modern UX Design Application for Graphic Designers
+    </p>
+    <p>
+     Akira is a native Linux Design application built in Vala and Gtk. Akira focuses on offering a modern and fast approach to UI and UX Design, mainly targeting web designers and graphic designers. The main goal is to offer a valid and professional solution for designers who want to use Linux as their main OS.
+    </p>
+    <p>
+      Features Include:
+    </p>
+    <ul>
+      <li>Fully vector canvas for infinite resizing without quality loss</li>
+      <li>Modern interface for quick UI prototyping</li>
+      <li>Free hand tool for scribbling and notes</li>
+    </ul>
+  </description>
+  <provides>
+    <binary>com.github.alecaddd.akira</binary>
+  </provides>
+  <releases>
+    <release version="0.1.4" date="2017-12-24">
+      <description>
+        <p>Initial Release</p>
+        <ul>
+          <li>Create Artboards and nested basic shapes</li>
+          <li>Manage the fill and border properties of shapes</li>
+          <li>Infinite canvas with zoom options</li>
+        </ul>
+      </description>
+    </release>
+  </releases>
+  <screenshots>
+    <screenshot type="default">
+      <image>https://raw.githubusercontent.com/Alecaddd/akira/master/akira-screenshot.png</image>
+    </screenshot>
+    <screenshot>
+      <image>https://raw.githubusercontent.com/Alecaddd/akira/master/akira-screenshot1.png</image>
+    </screenshot>
+    <screenshot>
+      <image>https://raw.githubusercontent.com/Alecaddd/akira/master/akira-screenshot2.png</image>
+    </screenshot>
+    <screenshot>
+      <image>https://raw.githubusercontent.com/Alecaddd/akira/master/akira-screenshot3.png</image>
+    </screenshot>
+  </screenshots>
+  <developer_name>Alessandro Castellani</developer_name>
+  <url type="homepage">https://github.com/Alecaddd/akira</url>
+  <url type="bugtracker">https://github.com/Alecaddd/akira/issues</url>
+  <url type="help">https://github.com/Alecaddd/akira/issues</url>
+  <update_contact>castellani.ale@gmail.com</update_contact>
+  <custom>
+    <value key="x-appcenter-color-primary">#3f3f3f</value>
+    <value key="x-appcenter-color-primary-text">#ffffff</value>
+    <value key="x-appcenter-suggested-price">15</value>
+  </custom>
+</component>
