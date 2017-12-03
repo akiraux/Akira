@@ -1,0 +1,10 @@
+find_program (gresources_executable glib-compile-resources)
+
+if (gresources_executable)
+	set (gresources_FOUND true)
+else ()
+	set (gresources_FOUND false)
+	if (gresources_FIND_REQUIRED)
+		message (FATAL_ERROR "glib-compile-resources not found")
+	endif ()
+endif ()
