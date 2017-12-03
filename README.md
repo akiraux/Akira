@@ -11,7 +11,7 @@ The main goal is offering a valid and professional solution for designers who wa
 ## Get it from the elementary OS AppCenter!
 Akira, is primarly availabe from the AppCenter of elementary OS. Download it from there!
 
-[![Get it on AppCenter](https://appcenter.elementary.io/badge.svg)](https://appcenter.elementary.io/com.github.akira.sequeler)
+[![Get it on AppCenter](https://appcenter.elementary.io/badge.svg)](https://appcenter.elementary.io/com.github.alecaddd.akira)
 
 ## Install it from source
 You can install Akira by compiling it from the source, here's the list of dependecies required:
