@@ -4,7 +4,7 @@
 ### WARNING!!! AKIRA IS CURRENTLY IN PRE-ALPHA, NOT READY FOR PRODUCTION. USE IT AT YOUR OWN RISK!
 
 Akira is a native Linux Design application built in Vala and Gtk. Akira focuses on offering a modern and fast approach to UI and UX Design, mainly targeting web designers and graphic designers.
-The main goal is offering a valid and professional solution for designers who want to use Linux as their main OS.
+The main goal is to offer a valid and professional solution for designers who want to use Linux as their main OS.
 
 ![](akira-screenshot.png)
 
