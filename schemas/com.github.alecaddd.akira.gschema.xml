@@ -15,13 +15,13 @@
         <key name="window-width" type="i">
             <default>1000</default>
             <summary>The saved width of the window.</summary>
-            <description>The saved width of the window. Must be greater than 750, or it will not take effect.</description>
+            <description>The saved width of the window. Must be greater than 1000, or it will not take effect.</description>
         </key>
 
         <key name="window-height" type="i">
             <default>800</default>
             <summary>The saved height of the window.</summary>
-            <description>The saved height of the window. Must be greater than 500, or it will not take effect.</description>
+            <description>The saved height of the window. Must be greater than 800, or it will not take effect.</description>
         </key>
 
         <key name="dark-theme" type="b">
