@@ -1,1 +1,8 @@
 /* akira stylesheet */
+@define-color colorPrimary #eeeeee;
+@define-color textColorPrimary shade (@colorPrimary, 0.3);
+
+.headerbar {
+    background-color: @colorPrimary;
+    color: @textColorPrimary;
+}

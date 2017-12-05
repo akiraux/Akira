@@ -28,7 +28,8 @@ namespace Akira {
             set_title (APP_NAME);
             set_show_close_button (true);
 
-            //  get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
+            get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
+            get_style_context ().add_class ("headerbar");
 
             build_ui ();
         }
