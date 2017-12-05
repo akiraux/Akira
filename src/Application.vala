@@ -22,6 +22,7 @@
 namespace Akira {
     public Window window;
     public Settings settings;
+    public HeaderBar headerbar;
 
     public class Application : Granite.Application {
         public bool running = false;

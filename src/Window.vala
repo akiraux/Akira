@@ -18,6 +18,7 @@
 *
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
+
 namespace Akira {
     public class Window : Gtk.ApplicationWindow {
 
@@ -42,6 +43,8 @@ namespace Akira {
             Gtk.StyleContext.add_provider_for_screen (
                 Gdk.Screen.get_default (), css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
             );
+
+            set_titlebar (HeaderBar.get_instance ());
 
             set_border_width (0);
             destroy.connect (Gtk.main_quit);

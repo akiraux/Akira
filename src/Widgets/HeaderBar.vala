@@ -18,26 +18,38 @@
 *
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
+
 namespace Akira { 
-    public class Settings : Granite.Services.Settings {
-        private static Settings? instance = null;
+    public class HeaderBar : Gtk.HeaderBar {
+        private static HeaderBar? instance = null;
+        public bool toggled { get; set; default = true; }
 
-        public int pos_x { get; set; }
-        public int pos_y { get; set; }
-        public int window_width { get; set; default = 1000; }
-        public int window_height { get; set; default = 600; }
-        public bool dark_theme { get; set; }
+        private HeaderBar () {
+            set_title (APP_NAME);
+            set_show_close_button (true);
 
-        public static Settings get_instance () {
+            //  get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
+
+            build_ui ();
+        }
+
+        public static HeaderBar get_instance () {
             if (instance == null) {
-                instance = new Settings ();
+                instance = new HeaderBar ();
             }
 
             return instance;
         }
 
-        private Settings () {
-            base ("com.github.alecaddd.akira");
+        private void build_ui () {
+            
+        }
+
+        public void toggle () {
+            visible = !toggled;
+            no_show_all = !toggled;
+            
+            toggled = !toggled;
         }
     }
 }

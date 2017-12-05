@@ -50,6 +50,7 @@ vala_precompile(VALA_C ${EXEC_NAME}
     src/Window.vala
 
     src/Widgets/Welcome.vala
+    src/Widgets/HeaderBar.vala
 
     src/Services/Settings.vala
     src/Services/Shortcuts.vala

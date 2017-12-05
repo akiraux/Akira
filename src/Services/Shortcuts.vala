@@ -18,6 +18,7 @@
 *
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
+
 namespace Akira {
     public class Shortcuts : Object {
         private static Shortcuts? instance = null;
@@ -45,7 +46,7 @@ namespace Akira {
                         handled = true;
                         break;
                     case Gdk.Key.period:
-                        // toggle_ui ();
+                        HeaderBar.get_instance ().toggle ();
                         handled = true;
                         break;
                     default:
