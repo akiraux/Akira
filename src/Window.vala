@@ -25,7 +25,7 @@ namespace Akira {
             Object (application: app);
 
             build_ui ();
-            shortcuts ();
+            this.key_press_event.connect ( (e) => Akira.Shortcuts.get_instance ().handle (e));
 
             move (settings.pos_x, settings.pos_y);
             resize (settings.window_width, settings.window_height);
@@ -45,30 +45,6 @@ namespace Akira {
 
             set_border_width (0);
             destroy.connect (Gtk.main_quit);
-        }
-
-        private void shortcuts () {
-            this.key_press_event.connect ( (e) => {
-                bool handled = false;
-
-                // Was the control key pressed?
-                if((e.state & Gdk.ModifierType.CONTROL_MASK) != 0) {
-                    switch (e.keyval) {
-                        case Gdk.Key.q:
-                            this.destroy();
-                            handled = true;
-                            break;
-                        case Gdk.Key.comma:
-                            //  open_preference ();
-                            handled = true;
-                            break;
-                        default:
-                            break;
-                    }
-                }
-
-                return handled;
-            });
         }
 
         protected override bool delete_event (Gdk.EventAny event) {
