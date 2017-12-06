@@ -19,62 +19,59 @@
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
 
-namespace Akira { 
-    public class HeaderBar : Gtk.Box {
-        private static HeaderBar? instance = null;
-        public Gtk.HeaderBar headerbar;
-        public Gtk.Box toolbar;
-        public bool toggled { get; set; default = true; }
+public class Akira.HeaderBar : Gtk.Box {
+    private static HeaderBar? instance = null;
+    private Gtk.HeaderBar headerbar;
+    private Gtk.Box toolbar;
+    public bool toggled {
+        get {
+            return visible;
+        } set {
+            visible = value;
+            no_show_all = !value;
+        }
+    }
 
-        private HeaderBar () {
-            orientation = Gtk.Orientation.VERTICAL;
+    private HeaderBar () {
+        Object (orientation: Gtk.Orientation.VERTICAL, toggled: true);
+    }
 
-            build_headerbar ();
-            build_toolbar ();
+    public static HeaderBar get_instance () {
+        if (instance == null) {
+            instance = new HeaderBar ();
         }
 
-        public static HeaderBar get_instance () {
-            if (instance == null) {
-                instance = new HeaderBar ();
-            }
+        return instance;
+    }
 
-            return instance;
-        }
+    construct {
+        headerbar = new Gtk.HeaderBar ();
 
-        public void build_headerbar () {
-            headerbar = new Gtk.HeaderBar ();
+        headerbar.set_title (APP_NAME);
+        headerbar.set_show_close_button (true);
 
-            headerbar.set_title (APP_NAME);
-            headerbar.set_show_close_button (true);
+        pack_start (headerbar, true, true, 0);
 
-            pack_start (headerbar, true, true, 0);
+        //  headerbar.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
+        //  headerbar.get_style_context ().add_class ("headerbar");
 
-            //  headerbar.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
-            //  headerbar.get_style_context ().add_class ("headerbar");
-        }
+        toolbar = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
+        toolbar.margin_start = 20;
+        toolbar.margin_end = 20;
+        toolbar.margin_top = 10;
+        toolbar.margin_bottom = 20;
 
-        private void build_toolbar () {
-            toolbar = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
-            toolbar.margin_start = 20;
-            toolbar.margin_end = 20;
-            toolbar.margin_top = 10;
-            toolbar.margin_bottom = 20;
+        var icon_mode = new Granite.Widgets.ModeButton ();
+        icon_mode.append_icon ("view-grid-symbolic", Gtk.IconSize.BUTTON);
+        icon_mode.append_icon ("view-list-symbolic", Gtk.IconSize.BUTTON);
+        icon_mode.append_icon ("view-column-symbolic", Gtk.IconSize.BUTTON);
 
-            var icon_mode = new Granite.Widgets.ModeButton ();
-            icon_mode.append_icon ("view-grid-symbolic", Gtk.IconSize.BUTTON);
-            icon_mode.append_icon ("view-list-symbolic", Gtk.IconSize.BUTTON);
-            icon_mode.append_icon ("view-column-symbolic", Gtk.IconSize.BUTTON);
-            
-            toolbar.add (icon_mode);
+        toolbar.add (icon_mode);
 
-            pack_start (toolbar, true, true, 0);
-        }
+        pack_start (toolbar, true, true, 0);
+    }
 
-        public void toggle () {
-            visible = !toggled;
-            no_show_all = !toggled;
-            
-            toggled = !toggled;
-        }
+    public void toggle () {
+        toggled = !toggled;
     }
 }
