@@ -45,6 +45,7 @@ namespace Akira {
             );
 
             set_titlebar (HeaderBar.get_instance ());
+            add (MainWindow.get_instance ());
 
             set_border_width (0);
             destroy.connect (Gtk.main_quit);

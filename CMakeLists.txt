@@ -49,8 +49,12 @@ vala_precompile(VALA_C ${EXEC_NAME}
     src/Application.vala
     src/Window.vala
 
-    src/Widgets/Welcome.vala
+    src/Widgets/MainWindow.vala
+    src/Widgets/MainCanvas.vala
     src/Widgets/HeaderBar.vala
+    src/Widgets/StatusBar.vala
+    src/Widgets/LeftSideBar.vala
+    src/Widgets/RightSideBar.vala
 
     src/Services/Settings.vala
     src/Services/Shortcuts.vala

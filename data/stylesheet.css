@@ -1,8 +1,26 @@
 /* akira stylesheet */
-@define-color colorPrimary #eeeeee;
-@define-color textColorPrimary shade (@colorPrimary, 0.3);
+@define-color statusBg #dadada;
+@define-color statusText #5e5e5e;
+@define-color statusBorder #adabad;
 
-.headerbar {
-    background-color: @colorPrimary;
-    color: @textColorPrimary;
+@define-color sideLBg #ececec;
+@define-color sideLText #363636;
+@define-color sideLBorder #d0d0d0;
+
+.statusbar {
+    background-color: @statusBg;
+    color: @statusText;
+    border-top: 1px solid @statusBorder;
+}
+
+.sidebar-l {
+    background-color: @sideLBg;
+    color: @sideLText;
+    border-right: 1px solid @sideLBorder;
+}
+
+.sidebar-r {
+    background-color: @sideLBg;
+    color: @sideLText;
+    border-left: 1px solid @sideLBorder;
 }

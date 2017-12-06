@@ -18,14 +18,42 @@
 *
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
+
 namespace Akira { 
-    public class Welcome : Gtk.Box {
+    public class LeftSideBar : Gtk.Box {
+        private static LeftSideBar? instance = null;
+        public bool toggled { get; set; default = true; }
 
-        public Welcome () {
+        private LeftSideBar () {
             orientation = Gtk.Orientation.HORIZONTAL;
+            get_style_context ().add_class ("sidebar-l");
+            width_request = 220;
 
-            width_request = 1000;
-            height_request = 800;
+            build_sidebar ();
+        }
+
+        public static LeftSideBar get_instance () {
+            if (instance == null) {
+                instance = new LeftSideBar ();
+            }
+
+            return instance;
+        }
+
+        public void build_sidebar () {
+            var label = new Gtk.Label ("Sidebar L");
+            label.halign = Gtk.Align.CENTER;
+            label.expand = true;
+            label.margin = 10;
+
+            add (label);
+        }
+
+        public void toggle () {
+            visible = !toggled;
+            no_show_all = !toggled;
+            
+            toggled = !toggled;
         }
     }
 }

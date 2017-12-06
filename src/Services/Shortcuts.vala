@@ -47,6 +47,9 @@ namespace Akira {
                         break;
                     case Gdk.Key.period:
                         HeaderBar.get_instance ().toggle ();
+                        StatusBar.get_instance ().toggle ();
+                        LeftSideBar.get_instance ().toggle ();
+                        RightSideBar.get_instance ().toggle ();
                         handled = true;
                         break;
                     default:
