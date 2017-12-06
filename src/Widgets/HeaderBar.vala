@@ -20,18 +20,17 @@
 */
 
 namespace Akira { 
-    public class HeaderBar : Gtk.HeaderBar {
+    public class HeaderBar : Gtk.Box {
         private static HeaderBar? instance = null;
+        public Gtk.HeaderBar headerbar;
+        public Gtk.Box toolbar;
         public bool toggled { get; set; default = true; }
 
         private HeaderBar () {
-            set_title (APP_NAME);
-            set_show_close_button (true);
+            orientation = Gtk.Orientation.VERTICAL;
 
-            get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
-            get_style_context ().add_class ("headerbar");
-
-            build_ui ();
+            build_headerbar ();
+            build_toolbar ();
         }
 
         public static HeaderBar get_instance () {
@@ -42,8 +41,33 @@ namespace Akira {
             return instance;
         }
 
-        private void build_ui () {
+        public void build_headerbar () {
+            headerbar = new Gtk.HeaderBar ();
+
+            headerbar.set_title (APP_NAME);
+            headerbar.set_show_close_button (true);
+
+            pack_start (headerbar, true, true, 0);
+
+            //  headerbar.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
+            //  headerbar.get_style_context ().add_class ("headerbar");
+        }
+
+        private void build_toolbar () {
+            toolbar = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
+            toolbar.margin_start = 20;
+            toolbar.margin_end = 20;
+            toolbar.margin_top = 10;
+            toolbar.margin_bottom = 20;
+
+            var icon_mode = new Granite.Widgets.ModeButton ();
+            icon_mode.append_icon ("view-grid-symbolic", Gtk.IconSize.BUTTON);
+            icon_mode.append_icon ("view-list-symbolic", Gtk.IconSize.BUTTON);
+            icon_mode.append_icon ("view-column-symbolic", Gtk.IconSize.BUTTON);
             
+            toolbar.add (icon_mode);
+
+            pack_start (toolbar, true, true, 0);
         }
 
         public void toggle () {
