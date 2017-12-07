@@ -35,6 +35,8 @@ namespace Akira {
         }
 
         private void build_ui () {
+            headerbar = new HeaderBar ();
+
             Gtk.Settings.get_default ().gtk_application_prefer_dark_theme = settings.dark_theme;
 
             var css_provider = new Gtk.CssProvider ();
@@ -44,7 +46,7 @@ namespace Akira {
                 Gdk.Screen.get_default (), css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
             );
 
-            set_titlebar (HeaderBar.get_instance ());
+            set_titlebar (headerbar);
             add (MainWindow.get_instance ());
 
             set_border_width (0);

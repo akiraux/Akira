@@ -43,15 +43,9 @@ namespace Akira {
         }
 
         protected override void activate () {
-            if (!running) {
-                settings = Settings.get_instance ();
-                window = new Window (this);
-                this.add_window (window);
-
-                running = true;
-                return;
-            }
-            window.show_app ();
+            settings = Settings.get_instance ();
+            window = new Window (this);
+            this.add_window (window);
         }
     }
 }
