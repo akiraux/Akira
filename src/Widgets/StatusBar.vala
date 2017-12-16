@@ -18,40 +18,31 @@
 *
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
-
-namespace Akira { 
-    public class StatusBar : Gtk.Box {
-        private static StatusBar? instance = null;
-        public bool toggled { get; set; default = true; }
-
-        private StatusBar () {
-            orientation = Gtk.Orientation.HORIZONTAL;
-            get_style_context ().add_class ("statusbar");
-
-            build_statusbar ();
+public class Akira.StatusBar : Gtk.Box {
+    public bool toggled {
+        get {
+            return visible;
+        } set {
+            visible = value;
+            no_show_all = !value;
         }
+    }
 
-        public static StatusBar get_instance () {
-            if (instance == null) {
-                instance = new StatusBar ();
-            }
+    public StatusBar () {
+        Object (orientation: Gtk.Orientation.HORIZONTAL, toggled: true);
+    }
 
-            return instance;
-        }
+    construct {
+        get_style_context ().add_class ("statusbar");
+        
+        var label = new Gtk.Label ("Status Bar");
+        label.halign = Gtk.Align.CENTER;
+        label.margin = 8;
 
-        public void build_statusbar () {
-            var label = new Gtk.Label ("Status bar");
-            label.halign = Gtk.Align.START;
-            label.margin = 10;
+        add (label);
+    }
 
-            add (label);
-        }
-
-        public void toggle () {
-            visible = !toggled;
-            no_show_all = !toggled;
-            
-            toggled = !toggled;
-        }
+    public void toggle () {
+        toggled = !toggled;
     }
 }

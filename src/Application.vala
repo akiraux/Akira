@@ -22,7 +22,13 @@
 namespace Akira {
     public Window window;
     public Settings settings;
+    public Shortcuts shortcuts;
     public HeaderBar headerbar;
+    public MainWindow main_window;
+    public MainCanvas main_canvas;
+    public LeftSideBar left_sidebar;
+    public RightSideBar right_sidebar;
+    public StatusBar statusbar;
 
     public class Application : Granite.Application {
         public bool running = false;

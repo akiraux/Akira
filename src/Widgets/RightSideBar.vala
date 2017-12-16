@@ -18,42 +18,33 @@
 *
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
-
-namespace Akira { 
-    public class RightSideBar : Gtk.Box {
-        private static RightSideBar? instance = null;
-        public bool toggled { get; set; default = true; }
-
-        private RightSideBar () {
-            orientation = Gtk.Orientation.HORIZONTAL;
-            get_style_context ().add_class ("sidebar-r");
-            width_request = 220;
-
-            build_sidebar ();
+public class Akira.RightSideBar : Gtk.Box {
+    public bool toggled {
+        get {
+            return visible;
+        } set {
+            visible = value;
+            no_show_all = !value;
         }
+    }
 
-        public static RightSideBar get_instance () {
-            if (instance == null) {
-                instance = new RightSideBar ();
-            }
+    public RightSideBar () {
+        Object (orientation: Gtk.Orientation.HORIZONTAL, toggled: true);
+    }
 
-            return instance;
-        }
+    construct {
+        get_style_context ().add_class ("sidebar-r");
+        width_request = 220;
+        
+        var label = new Gtk.Label ("Sidebar R");
+        label.halign = Gtk.Align.CENTER;
+        label.expand = true;
+        label.margin = 10;
 
-        public void build_sidebar () {
-            var label = new Gtk.Label ("Sidebar R");
-            label.halign = Gtk.Align.CENTER;
-            label.expand = true;
-            label.margin = 10;
+        add (label);
+    }
 
-            add (label);
-        }
-
-        public void toggle () {
-            visible = !toggled;
-            no_show_all = !toggled;
-            
-            toggled = !toggled;
-        }
+    public void toggle () {
+        toggled = !toggled;
     }
 }

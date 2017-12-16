@@ -18,43 +18,30 @@
 *
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
-namespace Akira { 
-    public class MainWindow : Gtk.Box {
-        private static MainWindow? instance = null;
-        public Gtk.Box box;
-        public Gtk.Paned pane;
-        public Gtk.Paned pane2;
+public class Akira.MainWindow : Gtk.Box {
+    public Gtk.Box box;
+    public Gtk.Paned pane;
+    public Gtk.Paned pane2;
 
-        private MainWindow () {
-            orientation = Gtk.Orientation.VERTICAL;
+    public MainWindow () {
+        Object (orientation: Gtk.Orientation.VERTICAL);
+    }
 
-            build_ui ();
-        }
+    construct {
+        box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
+        pane = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);
+        pane2 = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);
+        pane.set_position (220);
+        pane2.set_position (2000);
+        box.pack_start (pane2, true, true, 0);
 
-        public static MainWindow get_instance () {
-            if (instance == null) {
-                instance = new MainWindow ();
-            }
+        pane.pack1 (left_sidebar, true, false);
+        pane.pack2 (box, true, false);
 
-            return instance;
-        }
+        pane2.pack1 (main_canvas, true, false);
+        pane2.pack2 (right_sidebar, true, false);
 
-        public void build_ui () {
-            box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
-            pane = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);
-            pane2 = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);
-            pane.set_position (220);
-            pane2.set_position (2000);
-            box.pack_start (pane2, true, true, 0);
-
-            pane.pack1 (LeftSideBar.get_instance (), true, false);
-            pane.pack2 (box, true, false);
-
-            pane2.pack1 (MainCanvas.get_instance (), true, false);
-            pane2.pack2 (RightSideBar.get_instance (), true, false);
-
-            pack_start (pane, true, true, 0);
-            pack_end (StatusBar.get_instance (), false, false, 0);
-        }
+        pack_start (pane, true, true, 0);
+        pack_end (statusbar, false, false, 0);
     }
 }

@@ -24,9 +24,10 @@ namespace Akira {
 
         public Window (Gtk.Application app) {
             Object (application: app);
+            shortcuts = new Shortcuts ();
 
             build_ui ();
-            this.key_press_event.connect ( (e) => Akira.Shortcuts.get_instance ().handle (e));
+            this.key_press_event.connect ( (e) => shortcuts.handle (e));
 
             move (settings.pos_x, settings.pos_y);
             resize (settings.window_width, settings.window_height);
@@ -36,6 +37,11 @@ namespace Akira {
 
         private void build_ui () {
             headerbar = new HeaderBar ();
+            left_sidebar = new LeftSideBar ();
+            right_sidebar = new RightSideBar ();
+            statusbar = new StatusBar ();
+            main_canvas = new MainCanvas ();
+            main_window = new MainWindow ();
 
             Gtk.Settings.get_default ().gtk_application_prefer_dark_theme = settings.dark_theme;
 
@@ -47,7 +53,7 @@ namespace Akira {
             );
 
             set_titlebar (headerbar);
-            add (MainWindow.get_instance ());
+            add (main_window);
 
             set_border_width (0);
             destroy.connect (Gtk.main_quit);

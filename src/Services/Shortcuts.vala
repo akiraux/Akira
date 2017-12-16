@@ -18,46 +18,34 @@
 *
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
+public class Akira.Shortcuts : Object {
+    public bool handled;
 
-namespace Akira {
-    public class Shortcuts : Object {
-        private static Shortcuts? instance = null;
-        public bool handled;
+    public bool handle (Gdk.EventKey e) {
+        handled = false;
 
-        public static Shortcuts get_instance () {
-            if (instance == null) {
-                instance = new Shortcuts ();
+        if((e.state & Gdk.ModifierType.CONTROL_MASK) != 0) {
+            switch (e.keyval) {
+                case Gdk.Key.q:
+                    window.destroy();
+                    handled = true;
+                    break;
+                case Gdk.Key.comma:
+                    //  open_preference ();
+                    handled = true;
+                    break;
+                case Gdk.Key.period:
+                    headerbar.toggle ();
+                    statusbar.toggle ();
+                    left_sidebar.toggle ();
+                    right_sidebar.toggle ();
+                    handled = true;
+                    break;
+                default:
+                    break;
             }
-
-            return instance;
         }
 
-        public bool handle (Gdk.EventKey e) {
-            handled = false;
-
-            if((e.state & Gdk.ModifierType.CONTROL_MASK) != 0) {
-                switch (e.keyval) {
-                    case Gdk.Key.q:
-                        window.destroy();
-                        handled = true;
-                        break;
-                    case Gdk.Key.comma:
-                        //  open_preference ();
-                        handled = true;
-                        break;
-                    case Gdk.Key.period:
-                        headerbar.toggle ();
-                        StatusBar.get_instance ().toggle ();
-                        LeftSideBar.get_instance ().toggle ();
-                        RightSideBar.get_instance ().toggle ();
-                        handled = true;
-                        break;
-                    default:
-                        break;
-                }
-            }
-
-            return handled;
-        }
+        return handled;
     }
 }

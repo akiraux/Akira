@@ -18,33 +18,20 @@
 *
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
-namespace Akira { 
-    public class MainCanvas : Gtk.Box {
-        private static MainCanvas? instance = null;
-        public Gtk.Paned pane;
-        public Gtk.Paned pane2;
+public class Akira.MainCanvas : Gtk.Box {
+    public Gtk.Paned pane;
+    public Gtk.Paned pane2;
 
-        private MainCanvas () {
-            orientation = Gtk.Orientation.VERTICAL;
+    public MainCanvas () {
+        Object (orientation: Gtk.Orientation.VERTICAL);
+    }
 
-            build_ui ();
-        }
+    construct {
+        var label = new Gtk.Label ("Main Canvas");
+        label.halign = Gtk.Align.CENTER;
+        label.expand = true;
+        label.margin = 10;
 
-        public static MainCanvas get_instance () {
-            if (instance == null) {
-                instance = new MainCanvas ();
-            }
-
-            return instance;
-        }
-
-        public void build_ui () {
-            var label = new Gtk.Label ("Main Canvas");
-            label.halign = Gtk.Align.CENTER;
-            label.expand = true;
-            label.margin = 10;
-
-            add (label);
-        }
+        add (label);
     }
 }

@@ -20,7 +20,6 @@
 */
 
 public class Akira.HeaderBar : Gtk.Box {
-    //  private static HeaderBar? instance = null;
     private Gtk.HeaderBar headerbar;
     private Gtk.Box toolbar;
     public bool toggled {
@@ -35,14 +34,6 @@ public class Akira.HeaderBar : Gtk.Box {
     public HeaderBar () {
         Object (orientation: Gtk.Orientation.VERTICAL, toggled: true);
     }
-
-    //  public static HeaderBar get_instance () {
-    //      if (instance == null) {
-    //          instance = new HeaderBar ();
-    //      }
-
-    //      return instance;
-    //  }
 
     construct {
         headerbar = new Gtk.HeaderBar ();
