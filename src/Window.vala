@@ -18,65 +18,54 @@
 *
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
+public class Akira.Window : Gtk.ApplicationWindow {
+    public Window (Gtk.Application app) {
+        Object (application: app);
+        shortcuts = new Shortcuts ();
 
-namespace Akira {
-    public class Window : Gtk.ApplicationWindow {
+        build_ui ();
+        this.key_press_event.connect ( (e) => shortcuts.handle (e));
 
-        public Window (Gtk.Application app) {
-            Object (application: app);
-            shortcuts = new Shortcuts ();
+        move (settings.pos_x, settings.pos_y);
+        resize (settings.window_width, settings.window_height);
 
-            build_ui ();
-            this.key_press_event.connect ( (e) => shortcuts.handle (e));
+        show_app ();
+    }
 
-            move (settings.pos_x, settings.pos_y);
-            resize (settings.window_width, settings.window_height);
+    private void build_ui () {
+        Gtk.Settings.get_default ().gtk_application_prefer_dark_theme = settings.dark_theme;
 
-            show_app ();
-        }
+        var css_provider = new Gtk.CssProvider ();
+        css_provider.load_from_resource ("/com/github/alecaddd/akira/stylesheet.css");
+        
+        Gtk.StyleContext.add_provider_for_screen (
+            Gdk.Screen.get_default (), css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
+        );
 
-        private void build_ui () {
-            headerbar = new HeaderBar ();
-            left_sidebar = new LeftSideBar ();
-            right_sidebar = new RightSideBar ();
-            statusbar = new StatusBar ();
-            main_canvas = new MainCanvas ();
-            main_window = new MainWindow ();
+        set_titlebar (headerbar);
+        add (main_window);
 
-            Gtk.Settings.get_default ().gtk_application_prefer_dark_theme = settings.dark_theme;
+        set_border_width (0);
+        destroy.connect (Gtk.main_quit);
+    }
 
-            var css_provider = new Gtk.CssProvider ();
-            css_provider.load_from_resource ("/com/github/alecaddd/akira/stylesheet.css");
-            
-            Gtk.StyleContext.add_provider_for_screen (
-                Gdk.Screen.get_default (), css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
-            );
+    protected override bool delete_event (Gdk.EventAny event) {
+        int width, height, x, y;
 
-            set_titlebar (headerbar);
-            add (main_window);
+        get_size (out width, out height);
+        get_position (out x, out y);
 
-            set_border_width (0);
-            destroy.connect (Gtk.main_quit);
-        }
+        settings.pos_x = x;
+        settings.pos_y = y;
+        settings.window_width = width;
+        settings.window_height = height;
 
-        protected override bool delete_event (Gdk.EventAny event) {
-            int width, height, x, y;
+        return false;
+    }
 
-            get_size (out width, out height);
-            get_position (out x, out y);
-
-            settings.pos_x = x;
-            settings.pos_y = y;
-            settings.window_width = width;
-            settings.window_height = height;
-
-            return false;
-        }
-
-        public void show_app () {
-            show_all ();
-            show ();
-            present ();
-        }
+    public void show_app () {
+        show_all ();
+        show ();
+        present ();
     }
 }

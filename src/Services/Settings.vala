@@ -18,26 +18,14 @@
 *
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
-namespace Akira { 
-    public class Settings : Granite.Services.Settings {
-        private static Settings? instance = null;
+public class Akira.Settings : Granite.Services.Settings {
+    public int pos_x { get; set; }
+    public int pos_y { get; set; }
+    public int window_width { get; set; default = 1000; }
+    public int window_height { get; set; default = 600; }
+    public bool dark_theme { get; set; }
 
-        public int pos_x { get; set; }
-        public int pos_y { get; set; }
-        public int window_width { get; set; default = 1000; }
-        public int window_height { get; set; default = 600; }
-        public bool dark_theme { get; set; }
-
-        public static Settings get_instance () {
-            if (instance == null) {
-                instance = new Settings ();
-            }
-
-            return instance;
-        }
-
-        private Settings () {
-            base ("com.github.alecaddd.akira");
-        }
+    public Settings () {
+        base ("com.github.alecaddd.akira");
     }
 }

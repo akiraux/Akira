@@ -31,6 +31,8 @@ namespace Akira {
     public StatusBar statusbar;
 
     public class Application : Granite.Application {
+        private GLib.List <Window> windows;
+
         public bool running = false;
 
         construct {
@@ -41,16 +43,38 @@ namespace Akira {
             build_version = Constants.VERSION;
             build_version_info = Constants.VERSION_INFO;
 
+            windows = new GLib.List <Window> ();
+
             program_name = "Akira";
             exec_name = "com.github.alecaddd.akira";
-            app_icon = "com.github.alecaddd.akira";
             app_launcher = "com.github.alecaddd.akira.desktop";
             application_id = "com.github.alecaddd.akira";
         }
 
+        public void new_window () {
+            new Window (this).present ();
+        }
+
+        public override void window_added (Gtk.Window window) {
+            windows.append (window as Window);
+            base.window_added (window);
+        }
+
+        public override void window_removed (Gtk.Window window) {
+            windows.remove (window as Window);
+            base.window_removed (window);
+        }
+
         protected override void activate () {
-            settings = Settings.get_instance ();
+            settings = new Settings ();
+            headerbar = new HeaderBar ();
+            left_sidebar = new LeftSideBar ();
+            right_sidebar = new RightSideBar ();
+            statusbar = new StatusBar ();
+            main_canvas = new MainCanvas ();
+            main_window = new MainWindow ();
             window = new Window (this);
+
             this.add_window (window);
         }
     }

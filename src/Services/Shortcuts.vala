@@ -26,8 +26,11 @@ public class Akira.Shortcuts : Object {
 
         if((e.state & Gdk.ModifierType.CONTROL_MASK) != 0) {
             switch (e.keyval) {
+                case Gdk.Key.n:
+                    handled = true;
+                    break;
                 case Gdk.Key.q:
-                    window.destroy();
+                    window.destroy ();
                     handled = true;
                     break;
                 case Gdk.Key.comma:
