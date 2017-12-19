@@ -18,7 +18,6 @@
 *
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
-
 public const string APP_NAME = "Akira";
 public const string TERMINAL_NAME = "akira";
 

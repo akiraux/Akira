@@ -19,6 +19,7 @@
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
 namespace Akira {
+    public Application app;
     public Window window;
     public Settings settings;
     public Shortcuts shortcuts;
@@ -30,7 +31,7 @@ namespace Akira {
     public StatusBar statusbar;
 
     public class Application : Granite.Application {
-        private GLib.List <Window> windows;
+        public GLib.List <Window> windows;
 
         public bool running = false;
 
@@ -42,6 +43,7 @@ namespace Akira {
             build_version = Constants.VERSION;
             build_version_info = Constants.VERSION_INFO;
 
+            app = this;
             windows = new GLib.List <Window> ();
 
             program_name = "Akira";
@@ -66,7 +68,6 @@ namespace Akira {
 
         protected override void activate () {
             window = new Window (this);
-
             this.add_window (window);
         }
     }
