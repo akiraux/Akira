@@ -18,6 +18,7 @@
 *
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
+
 namespace Akira {
     public Application app;
     public Window window;
@@ -33,8 +34,6 @@ namespace Akira {
     public class Application : Granite.Application {
         public GLib.List <Window> windows;
 
-        public bool running = false;
-
         construct {
             flags |= ApplicationFlags.HANDLES_OPEN;
             build_data_dir = Constants.DATADIR;
@@ -44,7 +43,9 @@ namespace Akira {
             build_version_info = Constants.VERSION_INFO;
 
             app = this;
+            settings = new Settings ();
             windows = new GLib.List <Window> ();
+            shortcuts = new Shortcuts ();
 
             program_name = "Akira";
             exec_name = "com.github.alecaddd.akira";
