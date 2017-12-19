@@ -18,7 +18,6 @@
 *
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
-
 namespace Akira {
     public Window window;
     public Settings settings;
@@ -66,13 +65,6 @@ namespace Akira {
         }
 
         protected override void activate () {
-            settings = new Settings ();
-            headerbar = new HeaderBar ();
-            left_sidebar = new LeftSideBar ();
-            right_sidebar = new RightSideBar ();
-            statusbar = new StatusBar ();
-            main_canvas = new MainCanvas ();
-            main_window = new MainWindow ();
             window = new Window (this);
 
             this.add_window (window);

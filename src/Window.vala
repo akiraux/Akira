@@ -19,9 +19,23 @@
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
 public class Akira.Window : Gtk.ApplicationWindow {
+    public Akira.Application app {
+        get {
+            return application as Akira.Application;
+        }
+    }
+
     public Window (Gtk.Application app) {
         Object (application: app);
+
         shortcuts = new Shortcuts ();
+        settings = new Settings ();
+        headerbar = new HeaderBar ();
+        left_sidebar = new LeftSideBar ();
+        right_sidebar = new RightSideBar ();
+        statusbar = new StatusBar ();
+        main_canvas = new MainCanvas ();
+        main_window = new MainWindow ();
 
         build_ui ();
         this.key_press_event.connect ( (e) => shortcuts.handle (e));

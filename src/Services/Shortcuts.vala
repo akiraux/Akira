@@ -27,6 +27,7 @@ public class Akira.Shortcuts : Object {
         if((e.state & Gdk.ModifierType.CONTROL_MASK) != 0) {
             switch (e.keyval) {
                 case Gdk.Key.n:
+                    window.app.new_window ();
                     handled = true;
                     break;
                 case Gdk.Key.q:
