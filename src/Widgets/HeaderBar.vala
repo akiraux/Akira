@@ -19,7 +19,7 @@
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
 
-public class Akira.HeaderBar : Gtk.Box {
+public class Akira.Widgets.HeaderBar : Gtk.Box {
     private Gtk.HeaderBar headerbar;
     private Gtk.Box toolbar;
     public bool toggled {

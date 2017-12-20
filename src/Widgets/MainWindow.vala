@@ -18,7 +18,12 @@
 *
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
-public class Akira.MainWindow : Gtk.Box {
+public class Akira.Widgets.MainWindow : Gtk.Box {
+    public Akira.Widgets.MainCanvas main_canvas;
+    public Akira.Widgets.LeftSideBar left_sidebar;
+    public Akira.Widgets.RightSideBar right_sidebar;
+    public Akira.Widgets.StatusBar statusbar;
+
     public Gtk.Box box;
     public Gtk.Paned pane;
     public Gtk.Paned pane2;
@@ -28,6 +33,11 @@ public class Akira.MainWindow : Gtk.Box {
     }
 
     construct {
+        left_sidebar = new Akira.Widgets.LeftSideBar ();
+        right_sidebar = new Akira.Widgets.RightSideBar ();
+        statusbar = new Akira.Widgets.StatusBar ();
+        main_canvas = new Akira.Widgets.MainCanvas ();
+
         box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
         pane = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);
         pane2 = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);

@@ -19,15 +19,21 @@
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
 public class Akira.Window : Gtk.ApplicationWindow {
-    public Window (Gtk.Application app) {
-        Object (application: app);
+    private Akira.Application app;
 
-        headerbar = new HeaderBar ();
-        left_sidebar = new LeftSideBar ();
-        right_sidebar = new RightSideBar ();
-        statusbar = new StatusBar ();
-        main_canvas = new MainCanvas ();
-        main_window = new MainWindow ();
+    public Akira.Services.Shortcuts shortcuts;
+    public Akira.Widgets.HeaderBar headerbar;
+    public Akira.Widgets.MainWindow main_window;
+
+    public Window (Akira.Application app) {
+        Object (application: app);
+        this.app = app;
+    }
+
+    construct {
+        headerbar = new Akira.Widgets.HeaderBar ();
+        main_window = new Akira.Widgets.MainWindow ();
+        shortcuts = new Akira.Services.Shortcuts (this);
 
         build_ui ();
         key_press_event.connect ( (e) => shortcuts.handle (e));
@@ -55,9 +61,12 @@ public class Akira.Window : Gtk.ApplicationWindow {
         destroy.connect (on_destroy);
     }
 
-    public void on_destroy ()
-    {
+    public void on_destroy () {
         app.get_active_window ().destroy ();
+    }
+
+    public void new_window () {
+        app.new_window ();
     }
 
     protected override bool delete_event (Gdk.EventAny event) {

@@ -18,7 +18,7 @@
 *
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
-public class Akira.LeftSideBar : Gtk.Box {
+public class Akira.Widgets.LeftSideBar : Gtk.Box {
     public bool toggled {
         get {
             return visible;

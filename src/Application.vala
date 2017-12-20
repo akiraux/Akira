@@ -20,56 +20,32 @@
 */
 
 namespace Akira {
-    public Application app;
-    public Window window;
-    public Settings settings;
-    public Shortcuts shortcuts;
-    public HeaderBar headerbar;
-    public MainWindow main_window;
-    public MainCanvas main_canvas;
-    public LeftSideBar left_sidebar;
-    public RightSideBar right_sidebar;
-    public StatusBar statusbar;
+    public Akira.Services.Settings settings;
+}
 
-    public class Application : Granite.Application {
-        public GLib.List <Window> windows;
+public class Akira.Application : Granite.Application {
+    construct {
+        flags |= ApplicationFlags.HANDLES_OPEN;
+        build_data_dir = Constants.DATADIR;
+        build_pkg_data_dir = Constants.PKGDATADIR;
+        build_release_name = Constants.RELEASE_NAME;
+        build_version = Constants.VERSION;
+        build_version_info = Constants.VERSION_INFO;
 
-        construct {
-            flags |= ApplicationFlags.HANDLES_OPEN;
-            build_data_dir = Constants.DATADIR;
-            build_pkg_data_dir = Constants.PKGDATADIR;
-            build_release_name = Constants.RELEASE_NAME;
-            build_version = Constants.VERSION;
-            build_version_info = Constants.VERSION_INFO;
+        settings = new Akira.Services.Settings ();
 
-            app = this;
-            settings = new Settings ();
-            windows = new GLib.List <Window> ();
-            shortcuts = new Shortcuts ();
+        program_name = "Akira";
+        exec_name = "com.github.alecaddd.akira";
+        app_launcher = "com.github.alecaddd.akira.desktop";
+        application_id = "com.github.alecaddd.akira";
+    }
 
-            program_name = "Akira";
-            exec_name = "com.github.alecaddd.akira";
-            app_launcher = "com.github.alecaddd.akira.desktop";
-            application_id = "com.github.alecaddd.akira";
-        }
+    public void new_window () {
+        new Akira.Window (this).present ();
+    }
 
-        public void new_window () {
-            new Window (this).present ();
-        }
-
-        public override void window_added (Gtk.Window window) {
-            windows.append (window as Window);
-            base.window_added (window);
-        }
-
-        public override void window_removed (Gtk.Window window) {
-            windows.remove (window as Window);
-            base.window_removed (window);
-        }
-
-        protected override void activate () {
-            window = new Window (this);
-            this.add_window (window);
-        }
+    protected override void activate () {
+        var window = new Akira.Window (this);
+        this.add_window (window);
     }
 }

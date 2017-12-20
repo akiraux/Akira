@@ -18,7 +18,7 @@
 *
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
-public class Akira.MainCanvas : Gtk.Box {
+public class Akira.Widgets.MainCanvas : Gtk.Box {
     public Gtk.Paned pane;
     public Gtk.Paned pane2;
 

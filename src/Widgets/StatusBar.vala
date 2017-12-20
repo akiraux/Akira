@@ -18,7 +18,7 @@
 *
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
-public class Akira.StatusBar : Gtk.Box {
+public class Akira.Widgets.StatusBar : Gtk.Box {
     public bool toggled {
         get {
             return visible;

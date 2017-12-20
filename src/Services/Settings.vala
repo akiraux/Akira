@@ -18,7 +18,7 @@
 *
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
-public class Akira.Settings : Granite.Services.Settings {
+public class Akira.Services.Settings : Granite.Services.Settings {
     public int pos_x { get; set; }
     public int pos_y { get; set; }
     public int window_width { get; set; default = 1000; }

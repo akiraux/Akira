@@ -18,8 +18,14 @@
 *
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
-public class Akira.Shortcuts : Object {
+public class Akira.Services.Shortcuts : Object {
+    private Akira.Window window;
+
     public bool handled;
+
+    public Shortcuts (Akira.Window window) {
+        this.window = window;
+    }
 
     public bool handle (Gdk.EventKey e) {
         handled = false;
@@ -27,7 +33,7 @@ public class Akira.Shortcuts : Object {
         if((e.state & Gdk.ModifierType.CONTROL_MASK) != 0) {
             switch (e.keyval) {
                 case Gdk.Key.n:
-                    app.new_window ();
+                    window.new_window ();
                     handled = true;
                     break;
                 case Gdk.Key.q:
@@ -39,10 +45,10 @@ public class Akira.Shortcuts : Object {
                     handled = true;
                     break;
                 case Gdk.Key.period:
-                    headerbar.toggle ();
-                    statusbar.toggle ();
-                    left_sidebar.toggle ();
-                    right_sidebar.toggle ();
+                    window.headerbar.toggle ();
+                    window.main_window.statusbar.toggle ();
+                    window.main_window.left_sidebar.toggle ();
+                    window.main_window.right_sidebar.toggle ();
                     handled = true;
                     break;
                 default:
