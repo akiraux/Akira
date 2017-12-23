@@ -45,11 +45,11 @@ public class Akira.Widgets.MainWindow : Gtk.Box {
         pane2.set_position (2000);
         box.pack_start (pane2, true, true, 0);
 
-        pane.pack1 (left_sidebar, true, false);
+        pane.pack1 (left_sidebar, false, false);
         pane.pack2 (box, true, false);
 
         pane2.pack1 (main_canvas, true, false);
-        pane2.pack2 (right_sidebar, true, false);
+        pane2.pack2 (right_sidebar, false, false);
 
         pack_start (pane, true, true, 0);
         pack_end (statusbar, false, false, 0);

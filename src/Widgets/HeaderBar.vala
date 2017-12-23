@@ -43,9 +43,6 @@ public class Akira.Widgets.HeaderBar : Gtk.Box {
 
         pack_start (headerbar, true, true, 0);
 
-        //  headerbar.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
-        //  headerbar.get_style_context ().add_class ("headerbar");
-
         toolbar = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
         toolbar.margin_start = 20;
         toolbar.margin_end = 20;

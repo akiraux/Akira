@@ -25,6 +25,8 @@ public class Akira.Window : Gtk.ApplicationWindow {
     public Akira.Widgets.HeaderBar headerbar;
     public Akira.Widgets.MainWindow main_window;
 
+    public bool edited { get; set; default = false; }
+
     public Window (Akira.Application app) {
         Object (application: app);
         this.app = app;
