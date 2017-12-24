@@ -59,6 +59,8 @@ vala_precompile(VALA_C ${EXEC_NAME}
     src/Services/Settings.vala
     src/Services/Shortcuts.vala
 
+    src/Utils/Dialogs.vala
+
     src/config.vala
 
 # tell what libraries to use when compiling

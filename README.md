@@ -15,13 +15,15 @@ Akira, is primarly available from the AppCenter for elementary OS. Download it f
 
 ## Install it from source
 You can install Akira by compiling it from the source, here's the list of dependecies required:
- - `gtk+-3.0>=3.9.10`
+ - `gtk+-3.0>=3.18`
  - `granite>=0.5.0`
  - `glib-2.0`
  - `gee-0.8`
  - `gobject-2.0`
  - `libxml-2.0`
  - `gtksourceview-3.0`
+ - `clutter`
+ - `cairo`
 
 ## Building
 ```

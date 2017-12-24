@@ -37,7 +37,7 @@ public class Akira.Services.Shortcuts : Object {
                     handled = true;
                     break;
                 case Gdk.Key.q:
-                    window.on_destroy ();
+                    window.before_destroy ();
                     handled = true;
                     break;
                 case Gdk.Key.comma:

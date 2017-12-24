@@ -24,6 +24,7 @@ public class Akira.Window : Gtk.ApplicationWindow {
     public Akira.Services.Shortcuts shortcuts;
     public Akira.Widgets.HeaderBar headerbar;
     public Akira.Widgets.MainWindow main_window;
+    public Akira.Utils.Dialogs dialogs;
 
     public bool edited { get; set; default = false; }
 
@@ -36,6 +37,7 @@ public class Akira.Window : Gtk.ApplicationWindow {
         headerbar = new Akira.Widgets.HeaderBar ();
         main_window = new Akira.Widgets.MainWindow ();
         shortcuts = new Akira.Services.Shortcuts (this);
+        dialogs = new Akira.Utils.Dialogs (this);
 
         build_ui ();
         key_press_event.connect ( (e) => shortcuts.handle (e));
@@ -60,10 +62,16 @@ public class Akira.Window : Gtk.ApplicationWindow {
         add (main_window);
 
         set_border_width (0);
-        destroy.connect (on_destroy);
+        destroy.connect (before_destroy);
     }
 
-    public void on_destroy () {
+    public void before_destroy () {
+        if (!edited) {
+            bool confirmed = dialogs.message_dialog (_("Are you sure you want to quit?"), _("All unsaved data will be lost and impossible to recover."), "dialog-warning", _("Yes, Quit!"));
+            if (!confirmed) {
+                return;
+            }
+        }
         app.get_active_window ().destroy ();
     }
 
