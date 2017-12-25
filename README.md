@@ -24,6 +24,8 @@ You can install Akira by compiling it from the source, here's the list of depend
  - `gtksourceview-3.0`
  - `clutter`
  - `cairo`
+ 
+**For non-elementary distros, (such as Arch, Debian etc) you are required to install "vala" as additional dependency.**
 
 ## Building
 ```
