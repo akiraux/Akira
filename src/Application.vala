@@ -24,6 +24,8 @@ namespace Akira {
 }
 
 public class Akira.Application : Granite.Application {
+    public GLib.List <Window> windows;
+
     construct {
         flags |= ApplicationFlags.HANDLES_OPEN;
         build_data_dir = Constants.DATADIR;
@@ -33,6 +35,7 @@ public class Akira.Application : Granite.Application {
         build_version_info = Constants.VERSION_INFO;
 
         settings = new Akira.Services.Settings ();
+        windows = new GLib.List <Window> ();
 
         program_name = "Akira";
         exec_name = "com.github.alecaddd.akira";
@@ -42,6 +45,16 @@ public class Akira.Application : Granite.Application {
 
     public void new_window () {
         new Akira.Window (this).present ();
+    }
+
+    public override void window_added (Gtk.Window window) {
+        windows.append (window as Window);
+        base.window_added (window);
+    }
+
+    public override void window_removed (Gtk.Window window) {
+        windows.remove (window as Window);
+        base.window_removed (window);
     }
 
     protected override void activate () {

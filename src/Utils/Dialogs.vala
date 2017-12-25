@@ -22,21 +22,11 @@
 public class Akira.Utils.Dialogs : Object {
     private Akira.Window window;
 
-    private string title { get; set; default = _("Dialog Title"); }
-    private string description { get; set; default = _("Dialog Description, like, what the hell is this for?"); }
-    private string icon { get; set; default = "dialog_warning"; }
-    private string primary_button { get; set; default = "Confirm"; }
-
     public Dialogs (Akira.Window window) {
         this.window = window;
     }
 
     public bool message_dialog (string title, string description, string icon, string primary_button) {
-        this.title = title;
-        this.description = description;
-        this.icon = icon;
-        this.primary_button = primary_button;
-
         var dialog = new Granite.MessageDialog.with_image_from_icon_name (title, description, icon, Gtk.ButtonsType.CANCEL);
         dialog.transient_for = window;
         
@@ -46,6 +36,7 @@ public class Akira.Utils.Dialogs : Object {
 
         dialog.show_all ();
         if (dialog.run () == Gtk.ResponseType.ACCEPT) {
+            dialog.destroy ();
             return true;
         }
         

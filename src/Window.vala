@@ -27,6 +27,7 @@ public class Akira.Window : Gtk.ApplicationWindow {
     public Akira.Utils.Dialogs dialogs;
 
     public bool edited { get; set; default = false; }
+    public bool confirmed { get; set; default = false; }
 
     public Window (Akira.Application app) {
         Object (application: app);
@@ -62,17 +63,29 @@ public class Akira.Window : Gtk.ApplicationWindow {
         add (main_window);
 
         set_border_width (0);
-        destroy.connect (before_destroy);
+
+        delete_event.connect ((e) => {
+            return before_destroy ();
+        });
     }
 
-    public void before_destroy () {
-        if (!edited) {
-            bool confirmed = dialogs.message_dialog (_("Are you sure you want to quit?"), _("All unsaved data will be lost and impossible to recover."), "dialog-warning", _("Yes, Quit!"));
-            if (!confirmed) {
-                return;
-            }
+    public bool before_destroy () {
+        if (edited) {
+            confirmed = dialogs.message_dialog (_("Are you sure you want to quit?"), _("All unsaved data will be lost and impossible to recover."), "dialog-warning", _("Yes, Quit!"));
         }
-        app.get_active_window ().destroy ();
+        if (confirmed) {
+            app.get_active_window ().destroy ();
+            on_destroy ();
+        }
+        return true;
+    }
+
+    public void on_destroy () {
+        uint length = app.windows.length ();
+
+        if (length == 0) {
+            Gtk.main_quit ();
+        }
     }
 
     public void new_window () {
