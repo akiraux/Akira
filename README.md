@@ -8,6 +8,19 @@ The main goal is to offer a valid and professional solution for designers who wa
 
 ![](akira-screenshot.png)
 
+## Official Mascot
+![](akira-mascot-akari.png)
+**Akari the Cyber Phoenix** is a perfectionist. She is tidy, collected and has a sharp eye for detail. Her name Akari (灯理、) means *"the enlightenment of a sophisticated order"*. Her costume resembles the project's icon.
+
+**License**: GNU GPLv3 / Creative Commons BY-SA
+Copyright © 2017 Akira Project.
+
+Download the hi-res of Akari [HERE](/mascot/mascot_akira_akari.zip)
+
+Mascot character designed by **Tyson Tan**.
+Tyson Tan offers mascot design service for free and open source software, free of charge, under free license.
+Contact: [http://tysontan.com](http://tysontan.com)  / [tysontan@mail.com](mailto:tysontan@mail.com)
+
 ## Get it from the elementary OS AppCenter!
 Akira, is primarly available from the AppCenter for elementary OS. Download it from there!
 
