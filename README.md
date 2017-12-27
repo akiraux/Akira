@@ -10,6 +10,7 @@ The main goal is to offer a valid and professional solution for designers who wa
 
 ## Official Mascot
 ![](akira-mascot-akari.png)
+
 **Akari the Cyber Phoenix** is a perfectionist. She is tidy, collected and has a sharp eye for detail. Her name Akari (灯理、) means *"the enlightenment of a sophisticated order"*. Her costume resembles the project's icon.
 
 **License**: GNU GPLv3 / Creative Commons BY-SA
@@ -35,6 +36,7 @@ You can install Akira by compiling it from the source, here's the list of depend
  - `gobject-2.0`
  - `libxml-2.0`
  - `gtksourceview-3.0`
+ - `clutter-gtk`
  - `clutter`
  - `cairo`
  
