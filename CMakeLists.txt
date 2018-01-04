@@ -61,6 +61,9 @@ vala_precompile(VALA_C ${EXEC_NAME}
 
     src/Utils/Dialogs.vala
 
+    src/Partials/HeaderBarButton.vala
+    src/Partials/Spacer.vala
+
     src/config.vala
 
 # tell what libraries to use when compiling

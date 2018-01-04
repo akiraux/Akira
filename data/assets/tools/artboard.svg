@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="18px" height="18px" viewBox="0 0 18 18" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 47.1 (45422) - http://www.bohemiancoding.com/sketch -->
+    <title>artboard</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <path d="M13.5,13 L16,13 L16,14 L14,14 L14,16 L13,16 L13,13 L13.5,13 Z" id="path-1"></path>
+        <path d="M13.5,0 L16,0 L16,1 L14,1 L14,3 L13,3 L13,0 L13.5,0 Z" id="path-2"></path>
+        <path d="M0.5,13 L3,13 L3,14 L1,14 L1,16 L0,16 L0,13 L0.5,13 Z" id="path-3"></path>
+        <path d="M0.5,0 L3,0 L3,1 L1,1 L1,3 L0,3 L0,0 L0.5,0 Z" id="path-4"></path>
+    </defs>
+    <g id="Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Artboard" transform="translate(-87.000000, -400.000000)">
+            <g id="artboard" transform="translate(88.000000, 401.000000)">
+                <rect id="Rectangle-4" stroke="#5E5E5E" x="2.5" y="2.5" width="11" height="11"></rect>
+                <g id="Combined-Shape">
+                    <use fill="#5E5E5E" fill-rule="evenodd" xlink:href="#path-1"></use>
+                    <path stroke="#F2F2F2" stroke-width="1" d="M14.5,14.5 L14.5,16.5 L12.5,16.5 L12.5,12.5 L16.5,12.5 L16.5,14.5 L14.5,14.5 Z"></path>
+                </g>
+                <g id="Combined-Shape-Copy" transform="translate(14.500000, 1.500000) rotate(-90.000000) translate(-14.500000, -1.500000) ">
+                    <use fill="#5E5E5E" fill-rule="evenodd" xlink:href="#path-2"></use>
+                    <path stroke="#F2F2F2" stroke-width="1" d="M14.5,1.5 L14.5,3.5 L12.5,3.5 L12.5,-0.5 L16.5,-0.5 L16.5,1.5 L14.5,1.5 Z"></path>
+                </g>
+                <g id="Combined-Shape-Copy-3" transform="translate(1.500000, 14.500000) scale(-1, 1) translate(-1.500000, -14.500000) ">
+                    <use fill="#5E5E5E" fill-rule="evenodd" xlink:href="#path-3"></use>
+                    <path stroke="#F2F2F2" stroke-width="1" d="M1.5,14.5 L1.5,16.5 L-0.5,16.5 L-0.5,12.5 L3.5,12.5 L3.5,14.5 L1.5,14.5 Z"></path>
+                </g>
+                <g id="Combined-Shape-Copy-2" transform="translate(1.500000, 1.500000) scale(-1, 1) rotate(-90.000000) translate(-1.500000, -1.500000) ">
+                    <use fill="#5E5E5E" fill-rule="evenodd" xlink:href="#path-4"></use>
+                    <path stroke="#F2F2F2" stroke-width="1" d="M1.5,1.5 L1.5,3.5 L-0.5,3.5 L-0.5,-0.5 L3.5,-0.5 L3.5,1.5 L1.5,1.5 Z"></path>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

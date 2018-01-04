@@ -41,6 +41,7 @@ public class Akira.Window : Gtk.ApplicationWindow {
         dialogs = new Akira.Utils.Dialogs (this);
 
         build_ui ();
+        handle_signals ();
         key_press_event.connect ( (e) => shortcuts.handle (e));
 
         move (settings.pos_x, settings.pos_y);
@@ -67,6 +68,10 @@ public class Akira.Window : Gtk.ApplicationWindow {
         delete_event.connect ((e) => {
             return before_destroy ();
         });
+    }
+
+    public void handle_signals () {
+        headerbar.new_window.connect (new_window);
     }
 
     public bool before_destroy () {

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="16px" height="16px" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 47.1 (45422) - http://www.bohemiancoding.com/sketch -->
+    <title>pencil</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Artboard" transform="translate(-154.000000, -401.000000)">
+            <g id="pencil" transform="translate(154.000000, 401.000000)">
+                <path d="M2.49237935,9.9126441 L1.20648699,14.4156291 L5.99382269,13.3945983 L15.1417704,4.42373682 C15.3367381,4.2325433 15.3373295,3.91555528 15.1453486,3.72438758 L12.2631963,0.854444133 C12.0658532,0.657936916 11.7468693,0.658154145 11.5499581,0.85506533 L2.49237935,9.9126441 Z" id="Path-4" stroke="#5E5E5E"></path>
+                <path d="M5.55555556,9.86048297 L12.0827052,3.33333333" id="Path-12" stroke="#5E5E5E"></path>
+                <polygon id="Path-14" fill="#5E5E5E" points="2.46142578 11.4663086 4.2444458 13.3782959 1.67022705 13.968811"></polygon>
+            </g>
+        </g>
+    </g>
+</svg>
