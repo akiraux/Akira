@@ -18,6 +18,7 @@
 *
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
+
 public class Akira.Widgets.StatusBar : Gtk.Box {
     public bool toggled {
         get {
@@ -37,7 +38,7 @@ public class Akira.Widgets.StatusBar : Gtk.Box {
         
         var label = new Gtk.Label ("Status Bar");
         label.halign = Gtk.Align.CENTER;
-        label.margin = 8;
+        label.margin = 6;
 
         add (label);
     }

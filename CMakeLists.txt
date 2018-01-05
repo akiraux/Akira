@@ -15,7 +15,7 @@ list (APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/src)
 set (DATADIR "${CMAKE_INSTALL_PREFIX}/share")
 
 # what to call that directory where we install data too
-set (PKGDATADIR "${DATADIR}/com.github.alecaddd.akira")
+set (PKGDATADIR "${DATADIR}/${CMAKE_PROJECT_NAME}")
 
 set (EXEC_NAME "com.github.alecaddd.akira")
 set (RELEASE_NAME "Akira")

@@ -24,8 +24,9 @@ public class Akira.Widgets.HeaderBar : Gtk.Box {
     private Gtk.Box toolbar;
     private Gee.ArrayList<Gtk.Button> buttons;
 
-    public Gtk.Button save_file;
-    public Gtk.Button new_document;
+    private Gtk.Button new_document;
+    private Gtk.Button save_file;
+    private Gtk.Button save_file_as;
 
     public bool toggled {
         get {
@@ -57,14 +58,14 @@ public class Akira.Widgets.HeaderBar : Gtk.Box {
         toolbar.margin_bottom = 15;
 
         buttons = new Gee.ArrayList<Gtk.Button> ();
-        buttons.add (new_document = new Akira.Partials.HeaderBarButton ("document-new-symbolic", _("New Empty Document")));
-        buttons.add (save_file = new Akira.Partials.HeaderBarButton ("document-save-symbolic", _("Save File")));
-        buttons.add (new Akira.Partials.HeaderBarButton ("document-save-as-symbolic", _("Save File As")));
+        buttons.add (new_document = new Akira.Partials.HeaderBarButton ("document-new", _("New Document (Ctrl+n)")));
+        buttons.add (save_file = new Akira.Partials.HeaderBarButton ("document-save", _("Save (Ctrl+s)")));
+        buttons.add (save_file_as = new Akira.Partials.HeaderBarButton ("document-save-as", _("Save As (Ctrl+⇧+s)")));
 
         foreach (Gtk.Button button in buttons) {
             toolbar.add (button);
         }
-        toolbar.add (new Akira.Partials.Spacer (50));
+        toolbar.add (new Akira.Partials.Spacer (40));
 
         save_file.sensitive = false;
 
@@ -80,10 +81,14 @@ public class Akira.Widgets.HeaderBar : Gtk.Box {
         build_signals ();
     }
 
-    public void build_signals () {
+    private void build_signals () {
         new_document.clicked.connect (() => {
             new_window ();
         });
+    }
+
+    public void button_sensitivity () {
+        // dinamically toggle button sensitivity based on document status or actor selected.
     }
 
     public void toggle () {
