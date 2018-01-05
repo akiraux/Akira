@@ -3,4 +3,31 @@
   <gresource prefix="/com/github/alecaddd/akira">
     <file alias="stylesheet.css" compressed="true">stylesheet.css</file>
   </gresource>
+  <gresource prefix="/com/github/alecaddd/akira/tools">
+    <file alias="artboard.svg" compressed="true" preprocess="xml-stripblanks">assets/tools/artboard.svg</file>
+    <file alias="bool-difference.svg" compressed="true" preprocess="xml-stripblanks">assets/tools/bool-difference.svg</file>
+    <file alias="bool-interesect.svg" compressed="true" preprocess="xml-stripblanks">assets/tools/bool-intersect.svg</file>
+    <file alias="bool-subtract.svg" compressed="false" preprocess="">assets/tools/bool-subtract.svg</file>
+    <file alias="bool-union.svg" compressed="false" preprocess="xml-stripblanks">assets/tools/bool-union.svg</file>
+    <file alias="eye.svg" compressed="false" preprocess="xml-stripblanks">assets/tools/eye.svg</file>
+    <file alias="gear.svg" compressed="false" preprocess="xml-stripblanks">assets/tools/gear.svg</file>
+    <file alias="grid.svg" compressed="false" preprocess="xml-stripblanks">assets/tools/grid.svg</file>
+    <file alias="group.svg" compressed="false" preprocess="xml-stripblanks">assets/tools/group.svg</file>
+    <file alias="image.svg" compressed="false" preprocess="xml-stripblanks">assets/tools/image.svg</file>
+    <file alias="knife.svg" compressed="false" preprocess="xml-stripblanks">assets/tools/knife.svg</file>
+    <file alias="move-above.svg" compressed="false" preprocess="xml-stripblanks">assets/tools/move-above.svg</file>
+    <file alias="move-below.svg" compressed="false" preprocess="xml-stripblanks">assets/tools/move-below.svg</file>
+    <file alias="pen.svg" compressed="false" preprocess="xml-stripblanks">assets/tools/pen.svg</file>
+    <file alias="pencil-alt.svg" compressed="false" preprocess="xml-stripblanks">assets/tools/pencil-alt.svg</file>
+    <file alias="pencil-alt2.svg" compressed="false" preprocess="xml-stripblanks">assets/tools/pencil-alt2.svg</file>
+    <file alias="pencil.svg" compressed="false" preprocess="xml-stripblanks">assets/tools/pencil.svg</file>
+    <file alias="pixels.svg" compressed="false" preprocess="xml-stripblanks">assets/tools/pixels.svg</file>
+    <file alias="plus.svg" compressed="false" preprocess="xml-stripblanks">assets/tools/plus.svg</file>
+    <file alias="pointer-alt.svg" compressed="false" preprocess="xml-stripblanks">assets/tools/pointer-alt.svg</file>
+    <file alias="pointer.svg" compressed="false" preprocess="xml-stripblanks">assets/tools/pointer.svg</file>
+    <file alias="shapes.svg" compressed="false" preprocess="xml-stripblanks">assets/tools/shapes.svg</file>
+    <file alias="text.svg" compressed="false" preprocess="xml-stripblanks">assets/tools/text.svg</file>
+    <file alias="ui-panels.svg" compressed="false" preprocess="xml-stripblanks">assets/tools/ui-panels.svg</file>
+    <file alias="ungroup.svg" compressed="false" preprocess="xml-stripblanks">assets/tools/ungroup.svg</file>
+  </gresource>
 </gresources>

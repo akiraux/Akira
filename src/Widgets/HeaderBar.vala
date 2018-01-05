@@ -70,9 +70,10 @@ public class Akira.Widgets.HeaderBar : Gtk.Box {
         save_file.sensitive = false;
 
         var icon_mode = new Granite.Widgets.ModeButton ();
-        icon_mode.append_icon ("view-grid-symbolic", Gtk.IconSize.BUTTON);
-        icon_mode.append_icon ("view-list-symbolic", Gtk.IconSize.BUTTON);
-        icon_mode.append_icon ("view-column-symbolic", Gtk.IconSize.BUTTON);
+        icon_mode.get_style_context ().add_class ("toolbar");
+        icon_mode.append_pixbuf (new Gdk.Pixbuf.from_resource ("/com/github/alecaddd/akira/tools/pointer.svg"));
+        icon_mode.append_pixbuf (new Gdk.Pixbuf.from_resource ("/com/github/alecaddd/akira/tools/artboard.svg"));
+        icon_mode.append_pixbuf (new Gdk.Pixbuf.from_resource ("/com/github/alecaddd/akira/tools/shapes.svg"));
 
         toolbar.add (icon_mode);
 

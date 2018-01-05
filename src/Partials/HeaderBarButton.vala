@@ -28,7 +28,7 @@ public class Akira.Partials.HeaderBarButton : Gtk.Button {
         if (icon_name.contains ("/")) {
             image = new Gtk.Image.from_resource (icon_name);
         } else {
-            image = new Gtk.Image.from_icon_name (icon_name, Gtk.IconSize.BUTTON);
+            image = new Gtk.Image.from_icon_name (icon_name, Gtk.IconSize.LARGE_TOOLBAR);
         }
 
         image.margin = 0;

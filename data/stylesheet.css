@@ -24,3 +24,35 @@
     color: @sideLText;
     border-left: 1px solid @sideLBorder;
 }
+
+.toolbar {
+    background: #f2f2f2;
+    border-bottom-color: #b6b4b6;
+    border-top-color: #ffffff;
+    outline-color: transparent;
+    border-bottom-width: 1px;
+    box-shadow: none;
+    outline: none;
+}
+
+.toolbar GtkImage {
+    padding-top: 3px;
+    padding-bottom: 3px;
+    padding-right: 3px;
+    padding-left: 3px;
+}
+
+.toolbar GtkWidget {
+    border-color: rgba(0,0,0,0.1);
+    border-top: none;
+    border-left: none;
+    border-bottom: none;
+}
+
+.toolbar GtkWidget:last-child {
+    border-right: none;
+}
+
+.toolbar GtkWidget:checked {
+    background-color: rgba(0,0,0,0.2);
+}
