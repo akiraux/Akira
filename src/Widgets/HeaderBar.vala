@@ -20,6 +20,8 @@
 */
 
 public class Akira.Widgets.HeaderBar : Gtk.Box {
+    private const string TOOLS_DIR = "/com/github/alecaddd/akira/tools/";
+
     private Gtk.HeaderBar headerbar;
     private Gtk.Box toolbar;
     private Gee.ArrayList<Gtk.Button> buttons;
@@ -69,13 +71,13 @@ public class Akira.Widgets.HeaderBar : Gtk.Box {
 
         save_file.sensitive = false;
 
-        var icon_mode = new Granite.Widgets.ModeButton ();
-        icon_mode.get_style_context ().add_class ("toolbar");
-        icon_mode.append_pixbuf (new Gdk.Pixbuf.from_resource ("/com/github/alecaddd/akira/tools/pointer.svg"));
-        icon_mode.append_pixbuf (new Gdk.Pixbuf.from_resource ("/com/github/alecaddd/akira/tools/artboard.svg"));
-        icon_mode.append_pixbuf (new Gdk.Pixbuf.from_resource ("/com/github/alecaddd/akira/tools/shapes.svg"));
+        var toolset = new Granite.Widgets.ModeButton ();
+        toolset.get_style_context ().add_class ("toolbar");
+        toolset.append (new Akira.Partials.Icon (TOOLS_DIR + "pointer.svg", _("Select (S)")));
+        toolset.append (new Akira.Partials.Icon (TOOLS_DIR + "artboard.svg", _("Artboard (A)")));
+        toolset.append (new Akira.Partials.Icon (TOOLS_DIR + "shapes.svg", _("Shapes")));
 
-        toolbar.add (icon_mode);
+        toolbar.add (toolset);
 
         pack_start (toolbar, true, true, 0);
 
