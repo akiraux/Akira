@@ -19,14 +19,22 @@
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
 
-public class Akira.Partials.Icon : Gtk.Box {
-    public Icon (string source, string tooltip) {
-        halign = Gtk.Align.CENTER;
+public class Akira.Partials.MenuButton : Gtk.MenuButton {
+    public MenuButton (string icon_name, string tooltip) {
+        can_focus = false;
 
-        var image = new Gtk.Image.from_resource (source);
-        image.set_tooltip_text (tooltip);
-        image.margin = 4;
+        Gtk.Image image;
 
+        if (icon_name.contains ("/")) {
+            image = new Gtk.Image.from_resource (icon_name);
+        } else {
+            image = new Gtk.Image.from_icon_name (icon_name, Gtk.IconSize.LARGE_TOOLBAR);
+        }
+
+        image.margin = 0;
+
+        get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
+        set_tooltip_text (tooltip);
         add (image);
     }
 }

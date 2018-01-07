@@ -79,6 +79,21 @@ public class Akira.Widgets.HeaderBar : Gtk.Box {
 
         toolbar.add (toolset);
 
+        var key_group = new Gtk.AccelGroup();
+
+        Gtk.Menu menu_items = new Gtk.Menu ();
+        menu_items.add (new Gtk.MenuItem.with_label(_("Open")));
+        menu_items.add (new Gtk.MenuItem.with_label(_("Save")));
+        menu_items.add (new Gtk.MenuItem.with_label(_("Save As")));
+        menu_items.add (new Gtk.SeparatorMenuItem ());
+        menu_items.add (new Gtk.MenuItem.with_label(_("Quit")));
+        menu_items.show_all ();
+
+        Gtk.MenuButton menu = new Akira.Partials.MenuButton ("open-menu", _("Open Menu"));
+        menu.popup = menu_items;
+
+        toolbar.pack_end (menu, false, false, 0);
+
         pack_start (toolbar, true, true, 0);
 
         build_signals ();
