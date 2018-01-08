@@ -26,9 +26,13 @@ public class Akira.Widgets.HeaderBar : Gtk.Box {
     private Gtk.Box toolbar;
     private Gee.ArrayList<Gtk.Button> buttons;
 
-    private Gtk.Button new_document;
-    private Gtk.Button save_file;
-    private Gtk.Button save_file_as;
+    public Akira.Partials.HeaderBarButton new_document;
+    public Akira.Partials.HeaderBarButton save_file;
+    public Akira.Partials.HeaderBarButton save_file_as;
+
+    public Akira.Partials.MenuButton menu;
+    public Akira.Partials.HeaderBarButton layout;
+    public Akira.Partials.HeaderBarButton ruler;
 
     public bool toggled {
         get {
@@ -60,9 +64,9 @@ public class Akira.Widgets.HeaderBar : Gtk.Box {
         toolbar.margin_bottom = 15;
 
         buttons = new Gee.ArrayList<Gtk.Button> ();
-        buttons.add (new_document = new Akira.Partials.HeaderBarButton ("document-new", _("New Document (Ctrl+n)")));
-        buttons.add (save_file = new Akira.Partials.HeaderBarButton ("document-save", _("Save (Ctrl+s)")));
-        buttons.add (save_file_as = new Akira.Partials.HeaderBarButton ("document-save-as", _("Save As (Ctrl+⇧+s)")));
+        buttons.add (new_document = new Akira.Partials.HeaderBarButton ("document-new", _("New"), _("New Document (Ctrl+n)")));
+        buttons.add (save_file = new Akira.Partials.HeaderBarButton ("document-save",  _("Save"), _("Save (Ctrl+s)")));
+        buttons.add (save_file_as = new Akira.Partials.HeaderBarButton ("document-save-as",  _("Save As"), _("Save As (Ctrl+⇧+s)")));
 
         foreach (Gtk.Button button in buttons) {
             toolbar.add (button);
@@ -79,7 +83,7 @@ public class Akira.Widgets.HeaderBar : Gtk.Box {
 
         toolbar.add (toolset);
 
-        var key_group = new Gtk.AccelGroup();
+        var key_group = new Gtk.AccelGroup ();
 
         Gtk.Menu menu_items = new Gtk.Menu ();
         menu_items.add (new Gtk.MenuItem.with_label(_("Open")));
@@ -89,10 +93,16 @@ public class Akira.Widgets.HeaderBar : Gtk.Box {
         menu_items.add (new Gtk.MenuItem.with_label(_("Quit")));
         menu_items.show_all ();
 
-        Gtk.MenuButton menu = new Akira.Partials.MenuButton ("open-menu", _("Open Menu"));
+        menu = new Akira.Partials.MenuButton ("open-menu", _("Menu"), _("Open Menu"));
         menu.popup = menu_items;
 
+        layout = new Akira.Partials.HeaderBarButton ("preferences-system-windows", _("Layout"), _("Toggle Layout (Ctrl+.)"));
+        ruler = new Akira.Partials.HeaderBarButton ("applications-accessories", _("Ruler"), _("Toggle Ruler (Ctrl+⇧+R)"));
+
         toolbar.pack_end (menu, false, false, 0);
+        toolbar.pack_end (new Akira.Partials.Spacer (40), false, false, 0);
+        toolbar.pack_end (layout, false, false, 0);
+        toolbar.pack_end (ruler, false, false, 0);
 
         pack_start (toolbar, true, true, 0);
 

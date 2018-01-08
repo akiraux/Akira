@@ -20,21 +20,41 @@
 */
 
 public class Akira.Partials.MenuButton : Gtk.MenuButton {
-    public MenuButton (string icon_name, string tooltip) {
+    public bool labelled {
+        get {
+            return label_btn.visible;
+        } set {
+            label_btn.visible = value;
+            label_btn.no_show_all = !value;
+        }
+    }
+
+    private Gtk.Label label_btn;
+
+    public MenuButton (string icon_name, string name, string tooltip) {
         can_focus = false;
 
         Gtk.Image image;
+        Gtk.Box box = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
+        label_btn = new Gtk.Label (name);
 
         if (icon_name.contains ("/")) {
             image = new Gtk.Image.from_resource (icon_name);
         } else {
             image = new Gtk.Image.from_icon_name (icon_name, Gtk.IconSize.LARGE_TOOLBAR);
         }
-
         image.margin = 0;
 
+        box.add (image);
+        box.add (label_btn);
+        add (box);
+
         get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
+        get_style_context ().add_class ("headerbar-button");
         set_tooltip_text (tooltip);
-        add (image);
+    }
+
+    public void toggle () {
+        labelled = !labelled;
     }
 }

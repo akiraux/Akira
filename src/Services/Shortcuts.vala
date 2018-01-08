@@ -51,6 +51,15 @@ public class Akira.Services.Shortcuts : Object {
                     window.main_window.right_sidebar.toggle ();
                     handled = true;
                     break;
+                case Gdk.Key.l:
+                    window.headerbar.menu.toggle ();
+                    window.headerbar.layout.toggle ();
+                    window.headerbar.ruler.toggle ();
+                    window.headerbar.new_document.toggle ();
+                    window.headerbar.save_file.toggle ();
+                    window.headerbar.save_file_as.toggle ();
+                    handled = true;
+                    break;
                 default:
                     break;
             }

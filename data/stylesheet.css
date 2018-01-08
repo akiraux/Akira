@@ -25,6 +25,15 @@
     border-left: 1px solid @sideLBorder;
 }
 
+/* .headerbar-button:checked,
+.headerbar-button:active {
+    background: none;
+} */
+
+.headerbar-button {
+    border-radius: 2px;
+}
+
 .toolbar {
     background: #f2f2f2;
     border-bottom-color: #b6b4b6;
