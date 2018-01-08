@@ -37,6 +37,7 @@ public class Akira.Partials.HeaderBarButton : Gtk.Button {
         Gtk.Image image;
         Gtk.Box box = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
         label_btn = new Gtk.Label (name);
+        label_btn.margin_top = 2;
 
         if (icon_name.contains ("/")) {
             image = new Gtk.Image.from_resource (icon_name);

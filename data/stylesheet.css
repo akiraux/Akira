@@ -25,13 +25,9 @@
     border-left: 1px solid @sideLBorder;
 }
 
-/* .headerbar-button:checked,
+.headerbar-button:checked,
 .headerbar-button:active {
     background: none;
-} */
-
-.headerbar-button {
-    border-radius: 2px;
 }
 
 .toolbar {

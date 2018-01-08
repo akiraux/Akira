@@ -32,6 +32,7 @@ public class Akira.Window : Gtk.ApplicationWindow {
     public Window (Akira.Application app) {
         Object (application: app);
         this.app = app;
+        //  install_ctrl_actions (this);
     }
 
     construct {
@@ -121,4 +122,30 @@ public class Akira.Window : Gtk.ApplicationWindow {
         show ();
         present ();
     }
+
+    //  private void install_ctrl_actions (Akira.Window win) {
+    //      Gee.HashMap<string,VoidFunc> actions = new Gee.HashMap<string,VoidFunc> ();
+    //      fill_actions (ref actions, win);
+    //      int i = 0;
+    //      int sz = actions.size;
+
+    //      while (i < sz) {
+    //          string k = actions.keys.to_array ()[i];
+    //          var f = actions[k];
+    //          var action_name = "win." + k;
+
+    //          var action = new GLib.SimpleAction (action_name, null);
+    //          action.activate.connect (() => warning ("IT WORKS!"));
+    //          app.add_action (action);
+
+    //          var accel_name = Gtk.accelerator_name (k.data[0], Gdk.ModifierType.CONTROL_MASK);
+    //          app.add_accelerator (accel_name, action_name, null);
+
+    //          i++;
+    //      }
+    //  }
+
+    //  private void fill_actions (ref Gee.HashMap<string,VoidFunc> actions, Akira.Window win) {
+    //      actions["q"] = () => warning ("IT WORKS!");
+    //  }
 }

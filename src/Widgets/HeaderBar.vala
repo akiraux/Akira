@@ -83,8 +83,6 @@ public class Akira.Widgets.HeaderBar : Gtk.Box {
 
         toolbar.add (toolset);
 
-        var key_group = new Gtk.AccelGroup ();
-
         Gtk.Menu menu_items = new Gtk.Menu ();
         menu_items.add (new Gtk.MenuItem.with_label(_("Open")));
         menu_items.add (new Gtk.MenuItem.with_label(_("Save")));
