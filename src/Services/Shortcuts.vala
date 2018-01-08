@@ -33,7 +33,7 @@ public class Akira.Services.Shortcuts : Object {
         if((e.state & Gdk.ModifierType.CONTROL_MASK) != 0) {
             switch (e.keyval) {
                 case Gdk.Key.n:
-                    window.new_window ();
+                    window.action_new_window ();
                     handled = true;
                     break;
                 case Gdk.Key.q:

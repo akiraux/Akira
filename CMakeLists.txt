@@ -57,7 +57,6 @@ vala_precompile(VALA_C ${EXEC_NAME}
     src/Widgets/RightSideBar.vala
 
     src/Services/Settings.vala
-    src/Services/Shortcuts.vala
 
     src/Utils/Dialogs.vala
 
@@ -74,6 +73,9 @@ PACKAGES
     granite
     glib-2.0
     gee-0.8
+    libpeas-1.0
+    libpeas-gtk-1.0
+    gio-2.0
     gobject-2.0
     libxml-2.0
     gtksourceview-3.0

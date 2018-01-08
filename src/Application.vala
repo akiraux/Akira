@@ -60,32 +60,5 @@ public class Akira.Application : Granite.Application {
     protected override void activate () {
         var window = new Akira.Window (this);
         this.add_window (window);
-        //  install_ctrl_actions ();
     }
-
-    //  private void install_ctrl_actions () {
-    //      Gee.HashMap<string,VoidFunc> actions = new Gee.HashMap<string,VoidFunc> ();
-    //      fill_actions (ref actions);
-    //      int i = 0;
-    //      int sz = actions.size;
-
-    //      while (i < sz) {
-    //          string k = actions.keys.to_array ()[i];
-    //          var f = actions[k];
-    //          var action_name = k;
-
-    //          var action = new GLib.SimpleAction (action_name, null);
-    //          action.activate.connect (() => warning ("close"));
-    //          this.add_action (action);
-
-    //          var accel_name = Gtk.accelerator_name (k.data[0], Gdk.ModifierType.CONTROL_MASK);
-    //          this.add_accelerator (accel_name, action_name, null);
-
-    //          i++;
-    //      }
-    //  }
-
-    //  private void fill_actions (ref Gee.HashMap<string,VoidFunc> actions) {
-    //      actions["q"] = () => warning ("close");
-    //  }
 }

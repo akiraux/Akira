@@ -31,7 +31,7 @@ public class Akira.Utils.Dialogs : Object {
         dialog.transient_for = window;
         
         var button = new Gtk.Button.with_label (primary_button);
-        button.get_style_context ().add_class (Gtk.STYLE_CLASS_SUGGESTED_ACTION);
+        button.get_style_context ().add_class (Gtk.STYLE_CLASS_DESTRUCTIVE_ACTION);
         dialog.add_action_widget (button, Gtk.ResponseType.ACCEPT);
 
         dialog.show_all ();
