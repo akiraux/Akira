@@ -18,53 +18,53 @@
 *
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
-public class Akira.Services.Shortcuts : Object {
-    private Akira.Window window;
+//  public class Akira.Services.Shortcuts : Object {
+//      private Akira.Window window;
 
-    public bool handled;
+//      public bool handled;
 
-    public Shortcuts (Akira.Window window) {
-        this.window = window;
-    }
+//      public Shortcuts (Akira.Window window) {
+//          this.window = window;
+//      }
 
-    public bool handle (Gdk.EventKey e) {
-        handled = false;
+//      public bool handle (Gdk.EventKey e) {
+//          handled = false;
 
-        if((e.state & Gdk.ModifierType.CONTROL_MASK) != 0) {
-            switch (e.keyval) {
-                case Gdk.Key.n:
-                    window.action_new_window ();
-                    handled = true;
-                    break;
-                case Gdk.Key.q:
-                    window.before_destroy ();
-                    handled = true;
-                    break;
-                case Gdk.Key.comma:
-                    //  open_preference ();
-                    handled = true;
-                    break;
-                case Gdk.Key.period:
-                    window.headerbar.toggle ();
-                    window.main_window.statusbar.toggle ();
-                    window.main_window.left_sidebar.toggle ();
-                    window.main_window.right_sidebar.toggle ();
-                    handled = true;
-                    break;
-                case Gdk.Key.l:
-                    window.headerbar.menu.toggle ();
-                    window.headerbar.layout.toggle ();
-                    window.headerbar.ruler.toggle ();
-                    window.headerbar.new_document.toggle ();
-                    window.headerbar.save_file.toggle ();
-                    window.headerbar.save_file_as.toggle ();
-                    handled = true;
-                    break;
-                default:
-                    break;
-            }
-        }
+//          if((e.state & Gdk.ModifierType.CONTROL_MASK) != 0) {
+//              switch (e.keyval) {
+//                  case Gdk.Key.n:
+//                      window.action_new_window ();
+//                      handled = true;
+//                      break;
+//                  case Gdk.Key.q:
+//                      window.before_destroy ();
+//                      handled = true;
+//                      break;
+//                  case Gdk.Key.comma:
+//                      //  open_preference ();
+//                      handled = true;
+//                      break;
+//                  case Gdk.Key.period:
+//                      window.headerbar.toggle ();
+//                      window.main_window.statusbar.toggle ();
+//                      window.main_window.left_sidebar.toggle ();
+//                      window.main_window.right_sidebar.toggle ();
+//                      handled = true;
+//                      break;
+//                  case Gdk.Key.l:
+//                      window.headerbar.menu.toggle ();
+//                      window.headerbar.layout.toggle ();
+//                      window.headerbar.ruler.toggle ();
+//                      window.headerbar.new_document.toggle ();
+//                      window.headerbar.save_file.toggle ();
+//                      window.headerbar.save_file_as.toggle ();
+//                      handled = true;
+//                      break;
+//                  default:
+//                      break;
+//              }
+//          }
 
-        return handled;
-    }
-}
+//          return handled;
+//      }
+//  }

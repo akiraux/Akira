@@ -24,13 +24,14 @@ public class Akira.Widgets.HeaderBar : Gtk.Box {
 
     private Gtk.HeaderBar headerbar;
     private Gtk.Box toolbar;
-    private Gee.ArrayList<Gtk.Button> buttons;
 
     public Akira.Partials.HeaderBarButton new_document;
     public Akira.Partials.HeaderBarButton save_file;
     public Akira.Partials.HeaderBarButton save_file_as;
 
     public Akira.Partials.MenuButton menu;
+    public Akira.Partials.MenuButton toolset;
+    public Akira.Partials.MenuButton settings;
     public Akira.Partials.HeaderBarButton layout;
     public Akira.Partials.HeaderBarButton ruler;
 
@@ -63,26 +64,6 @@ public class Akira.Widgets.HeaderBar : Gtk.Box {
         toolbar.margin_top = 5;
         toolbar.margin_bottom = 15;
 
-        buttons = new Gee.ArrayList<Gtk.Button> ();
-        buttons.add (new_document = new Akira.Partials.HeaderBarButton ("document-new", _("New"), _("New Document (Ctrl+n)")));
-        buttons.add (save_file = new Akira.Partials.HeaderBarButton ("document-save",  _("Save"), _("Save (Ctrl+s)")));
-        buttons.add (save_file_as = new Akira.Partials.HeaderBarButton ("document-save-as",  _("Save As"), _("Save As (Ctrl+⇧+s)")));
-
-        foreach (Gtk.Button button in buttons) {
-            toolbar.add (button);
-        }
-        toolbar.add (new Akira.Partials.Spacer (40));
-
-        save_file.sensitive = false;
-
-        var toolset = new Granite.Widgets.ModeButton ();
-        toolset.get_style_context ().add_class ("toolbar");
-        toolset.append (new Akira.Partials.Icon (TOOLS_DIR + "pointer.svg", _("Select (S)")));
-        toolset.append (new Akira.Partials.Icon (TOOLS_DIR + "artboard.svg", _("Artboard (A)")));
-        toolset.append (new Akira.Partials.Icon (TOOLS_DIR + "shapes.svg", _("Shapes")));
-
-        toolbar.add (toolset);
-
         Gtk.Menu menu_items = new Gtk.Menu ();
         menu_items.add (new Gtk.MenuItem.with_label(_("Open")));
         menu_items.add (new Gtk.MenuItem.with_label(_("Save")));
@@ -91,14 +72,36 @@ public class Akira.Widgets.HeaderBar : Gtk.Box {
         menu_items.add (new Gtk.MenuItem.with_label(_("Quit")));
         menu_items.show_all ();
 
-        menu = new Akira.Partials.MenuButton ("open-menu", _("Menu"), _("Open Menu"));
+        menu = new Akira.Partials.MenuButton ("folder", _("Menu"), _("Open Menu"));
         menu.popup = menu_items;
+
+        toolbar.add (menu);
+        toolbar.add (new Akira.Partials.Spacer (35));
+
+        Gtk.Menu tools = new Gtk.Menu ();
+        tools.add (new Gtk.MenuItem.with_label(_("Artboard")));
+        tools.add (new Gtk.SeparatorMenuItem ());
+        tools.add (new Gtk.MenuItem.with_label(_("Vector")));
+        tools.add (new Gtk.MenuItem.with_label(_("Pencil")));
+        tools.add (new Gtk.MenuItem.with_label(_("Shapes")));
+        tools.add (new Gtk.SeparatorMenuItem ());
+        tools.add (new Gtk.MenuItem.with_label(_("Text")));
+        tools.add (new Gtk.MenuItem.with_label(_("Image")));
+        tools.show_all ();
+
+        toolset = new Akira.Partials.MenuButton ("insert-object", _("Add"), _("Add a New Object"));
+        toolset.popup = tools;
+
+        toolbar.add (toolset);
+        toolbar.add (new Akira.Partials.Spacer (35));
+
+        settings = new Akira.Partials.MenuButton ("open-menu", _("Settings"), _("Open Settings"));
 
         layout = new Akira.Partials.HeaderBarButton ("preferences-system-windows", _("Layout"), _("Toggle Layout (Ctrl+.)"));
         ruler = new Akira.Partials.HeaderBarButton ("applications-accessories", _("Ruler"), _("Toggle Ruler (Ctrl+⇧+R)"));
 
-        toolbar.pack_end (menu, false, false, 0);
-        toolbar.pack_end (new Akira.Partials.Spacer (40), false, false, 0);
+        toolbar.pack_end (settings, false, false, 0);
+        toolbar.pack_end (new Akira.Partials.Spacer (35), false, false, 0);
         toolbar.pack_end (layout, false, false, 0);
         toolbar.pack_end (ruler, false, false, 0);
 

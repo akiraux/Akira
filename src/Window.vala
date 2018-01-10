@@ -99,7 +99,7 @@ public class Akira.Window : Gtk.ApplicationWindow {
         });
     }
 
-    public void handle_signals () {
+    private void handle_signals () {
         headerbar.new_window.connect (action_new_window);
     }
 
