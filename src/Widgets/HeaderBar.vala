@@ -19,11 +19,8 @@
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
 
-public class Akira.Widgets.HeaderBar : Gtk.Box {
+public class Akira.Widgets.HeaderBar : Gtk.HeaderBar {
     private const string TOOLS_DIR = "/com/github/alecaddd/akira/tools/";
-
-    private Gtk.HeaderBar headerbar;
-    private Gtk.Box toolbar;
 
     public Akira.Partials.HeaderBarButton new_document;
     public Akira.Partials.HeaderBarButton save_file;
@@ -47,24 +44,14 @@ public class Akira.Widgets.HeaderBar : Gtk.Box {
     public signal void new_window ();
 
     public HeaderBar () {
-        Object (orientation: Gtk.Orientation.VERTICAL, toggled: true);
+        Object (toggled: true);
     }
 
     construct {
-        headerbar = new Gtk.HeaderBar ();
+        set_title (APP_NAME);
+        set_show_close_button (true);
 
-        headerbar.set_title (APP_NAME);
-        headerbar.set_show_close_button (true);
-
-        pack_start (headerbar, true, true, 0);
-
-        toolbar = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
-        toolbar.margin_start = 15;
-        toolbar.margin_end = 15;
-        toolbar.margin_top = 5;
-        toolbar.margin_bottom = 15;
-
-        Gtk.Menu menu_items = new Gtk.Menu ();
+        var menu_items = new Gtk.Menu ();
         menu_items.add (new Gtk.MenuItem.with_label(_("Open")));
         menu_items.add (new Gtk.MenuItem.with_label(_("Save")));
         menu_items.add (new Gtk.MenuItem.with_label(_("Save As")));
@@ -72,13 +59,10 @@ public class Akira.Widgets.HeaderBar : Gtk.Box {
         menu_items.add (new Gtk.MenuItem.with_label(_("Quit")));
         menu_items.show_all ();
 
-        menu = new Akira.Partials.MenuButton ("folder", _("Menu"), _("Open Menu"));
+        menu = new Akira.Partials.MenuButton ("document-open", _("Menu"), _("Open Menu"));
         menu.popup = menu_items;
 
-        toolbar.add (menu);
-        toolbar.add (new Akira.Partials.Spacer (35));
-
-        Gtk.Menu tools = new Gtk.Menu ();
+        var tools = new Gtk.Menu ();
         tools.add (new Gtk.MenuItem.with_label(_("Artboard")));
         tools.add (new Gtk.SeparatorMenuItem ());
         tools.add (new Gtk.MenuItem.with_label(_("Vector")));
@@ -92,20 +76,19 @@ public class Akira.Widgets.HeaderBar : Gtk.Box {
         toolset = new Akira.Partials.MenuButton ("insert-object", _("Add"), _("Add a New Object"));
         toolset.popup = tools;
 
-        toolbar.add (toolset);
-        toolbar.add (new Akira.Partials.Spacer (35));
-
         settings = new Akira.Partials.MenuButton ("open-menu", _("Settings"), _("Open Settings"));
 
         layout = new Akira.Partials.HeaderBarButton ("preferences-system-windows", _("Layout"), _("Toggle Layout (Ctrl+.)"));
         ruler = new Akira.Partials.HeaderBarButton ("applications-accessories", _("Ruler"), _("Toggle Ruler (Ctrl+⇧+R)"));
 
-        toolbar.pack_end (settings, false, false, 0);
-        toolbar.pack_end (new Akira.Partials.Spacer (35), false, false, 0);
-        toolbar.pack_end (layout, false, false, 0);
-        toolbar.pack_end (ruler, false, false, 0);
-
-        pack_start (toolbar, true, true, 0);
+        add (menu);
+        add (new Gtk.Separator (Gtk.Orientation.VERTICAL));
+        add (toolset);
+        add (new Gtk.Separator (Gtk.Orientation.VERTICAL));
+        pack_end (settings);
+        pack_end (new Gtk.Separator (Gtk.Orientation.VERTICAL));
+        pack_end (layout);
+        pack_end (ruler);
 
         build_signals ();
     }
