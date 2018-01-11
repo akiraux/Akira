@@ -62,8 +62,6 @@ vala_precompile(VALA_C ${EXEC_NAME}
 
     src/Partials/HeaderBarButton.vala
     src/Partials/MenuButton.vala
-    src/Partials/Spacer.vala
-    src/Partials/Icon.vala
 
     src/config.vala
 

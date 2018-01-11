@@ -28,7 +28,7 @@ public class Akira.Widgets.HeaderBar : Gtk.HeaderBar {
 
     public Akira.Partials.MenuButton menu;
     public Akira.Partials.MenuButton toolset;
-    public Akira.Partials.MenuButton settings;
+    public Akira.Partials.HeaderBarButton settings;
     public Akira.Partials.HeaderBarButton layout;
     public Akira.Partials.HeaderBarButton ruler;
 
@@ -76,7 +76,7 @@ public class Akira.Widgets.HeaderBar : Gtk.HeaderBar {
         toolset = new Akira.Partials.MenuButton ("insert-object", _("Add"), _("Add a New Object"));
         toolset.popup = tools;
 
-        settings = new Akira.Partials.MenuButton ("open-menu", _("Settings"), _("Open Settings"));
+        settings = new Akira.Partials.HeaderBarButton ("preferences-other", _("Preferences"), _("Open Preferences (Ctrl+,)"));
 
         layout = new Akira.Partials.HeaderBarButton ("preferences-system-windows", _("Layout"), _("Toggle Layout (Ctrl+.)"));
         ruler = new Akira.Partials.HeaderBarButton ("applications-accessories", _("Ruler"), _("Toggle Ruler (Ctrl+⇧+R)"));

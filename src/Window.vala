@@ -30,6 +30,7 @@ public class Akira.Window : Gtk.ApplicationWindow {
     public const string ACTION_PREFIX = "win.";
     public const string ACTION_NEW_WINDOW = "action_new_window";
     public const string ACTION_PRESENTATION = "action_presentation";
+    public const string ACTION_LABELS = "action_labels";
     public const string ACTION_QUIT = "action_quit";
 
     public static Gee.MultiMap<string, string> action_accelerators = new Gee.HashMultiMap<string, string> ();
@@ -37,6 +38,7 @@ public class Akira.Window : Gtk.ApplicationWindow {
     private const ActionEntry[] action_entries = {
         { ACTION_NEW_WINDOW, action_new_window },
         { ACTION_PRESENTATION, action_presentation },
+        { ACTION_LABELS, action_labels },
         { ACTION_QUIT, action_quit }
     };
 
@@ -54,6 +56,7 @@ public class Akira.Window : Gtk.ApplicationWindow {
     static construct {
         action_accelerators.set (ACTION_NEW_WINDOW, "<Control>n");
         action_accelerators.set (ACTION_PRESENTATION, "<Control>period");
+        action_accelerators.set (ACTION_LABELS, "<Control>l");
         action_accelerators.set (ACTION_QUIT, "<Control>q");
     }
 
@@ -126,6 +129,18 @@ public class Akira.Window : Gtk.ApplicationWindow {
             Gtk.main_quit ();
         }
     }
+
+    // This is a test, TBR!
+    private void action_labels () {
+        headerbar.toggle ();
+        headerbar.menu.toggle ();
+        headerbar.layout.toggle ();
+        headerbar.ruler.toggle ();
+        headerbar.toolset.toggle ();
+        headerbar.settings.toggle ();
+        headerbar.toggle ();
+    }
+    // END of test
 
     private void action_quit () {
         before_destroy ();
