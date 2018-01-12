@@ -54,7 +54,13 @@ public class Akira.Widgets.HeaderBar : Gtk.HeaderBar {
         menu_items.add (new Gtk.MenuItem.with_label(_("Save")));
         menu_items.add (new Gtk.MenuItem.with_label(_("Save As")));
         menu_items.add (new Gtk.SeparatorMenuItem ());
-        menu_items.add (new Gtk.MenuItem.with_label(_("Quit")));
+        var quit = new Gtk.ImageMenuItem.with_label(_("Quit"));
+        var image = new Gtk.Image.from_icon_name ("window-close-symbolic", Gtk.IconSize.MENU);
+		quit.always_show_image = true;
+		quit.set_image (image);
+        quit.action_name = Akira.Window.ACTION_PREFIX + Akira.Window.ACTION_QUIT;
+        quit.accel_path = Akira.Window.ACTION_QUIT;
+        menu_items.add (quit);
         menu_items.show_all ();
 
         menu = new Akira.Partials.MenuButton ("document-open", _("Menu"), _("Open Menu"));

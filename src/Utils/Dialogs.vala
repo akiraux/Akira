@@ -20,10 +20,12 @@
 */
 
 public class Akira.Utils.Dialogs : Object {
-    private Akira.Window window;
+    public weak Akira.Window window { get; construct; }
 
-    public Dialogs (Akira.Window window) {
-        this.window = window;
+    public Dialogs (Akira.Window main_window) {
+        Object (
+            window: main_window
+        );
     }
 
     public bool message_dialog (string title, string description, string icon, string primary_button) {
