@@ -26,6 +26,12 @@ public class Akira.Partials.HeaderBarButton : Gtk.Button {
         } set {
             label_btn.visible = value;
             label_btn.no_show_all = !value;
+
+            if (value) {
+                get_style_context ().add_class ("headerbar-button");
+            } else {
+                get_style_context ().remove_class ("headerbar-button");
+            }
         }
     }
 

@@ -74,7 +74,6 @@ public class Akira.Window : Gtk.ApplicationWindow {
         dialogs = new Akira.Utils.Dialogs (this);
 
         build_ui ();
-        handle_signals ();
 
         move (settings.pos_x, settings.pos_y);
         resize (settings.window_width, settings.window_height);
@@ -100,10 +99,6 @@ public class Akira.Window : Gtk.ApplicationWindow {
         delete_event.connect ((e) => {
             return before_destroy ();
         });
-    }
-
-    private void handle_signals () {
-        headerbar.new_window.connect (action_new_window);
     }
 
     public bool before_destroy () {

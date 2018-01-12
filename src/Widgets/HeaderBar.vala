@@ -41,8 +41,6 @@ public class Akira.Widgets.HeaderBar : Gtk.HeaderBar {
         }
     }
 
-    public signal void new_window ();
-
     public HeaderBar () {
         Object (toggled: true);
     }
@@ -94,9 +92,7 @@ public class Akira.Widgets.HeaderBar : Gtk.HeaderBar {
     }
 
     private void build_signals () {
-        new_document.clicked.connect (() => {
-            new_window ();
-        });
+        // deal with signals not part of accelerators
     }
 
     public void button_sensitivity () {
