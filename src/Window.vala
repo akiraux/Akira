@@ -26,9 +26,13 @@ public class Akira.Window : Gtk.ApplicationWindow {
     public Akira.Utils.Dialogs dialogs;
 
     public SimpleActionGroup actions { get; construct; }
+    public Gtk.AccelGroup accel_group { get; construct; }
 
     public const string ACTION_PREFIX = "win.";
     public const string ACTION_NEW_WINDOW = "action_new_window";
+    public const string ACTION_OPEN = "action_open";
+    public const string ACTION_SAVE = "action_save";
+    public const string ACTION_SAVE_AS = "action_save_as";
     public const string ACTION_PRESENTATION = "action_presentation";
     public const string ACTION_LABELS = "action_labels";
     public const string ACTION_QUIT = "action_quit";
@@ -37,6 +41,9 @@ public class Akira.Window : Gtk.ApplicationWindow {
 
     private const ActionEntry[] action_entries = {
         { ACTION_NEW_WINDOW, action_new_window },
+        { ACTION_OPEN, action_open },
+        { ACTION_SAVE, action_save },
+        { ACTION_SAVE_AS, action_save_as },
         { ACTION_PRESENTATION, action_presentation },
         { ACTION_LABELS, action_labels },
         { ACTION_QUIT, action_quit }
@@ -55,6 +62,9 @@ public class Akira.Window : Gtk.ApplicationWindow {
 
     static construct {
         action_accelerators.set (ACTION_NEW_WINDOW, "<Control>n");
+        action_accelerators.set (ACTION_OPEN, "<Control>o");
+        action_accelerators.set (ACTION_SAVE, "<Control>s");
+        action_accelerators.set (ACTION_SAVE_AS, "<Control><Shift>s");
         action_accelerators.set (ACTION_PRESENTATION, "<Control>period");
         action_accelerators.set (ACTION_LABELS, "<Control>l");
         action_accelerators.set (ACTION_QUIT, "<Control>q");
@@ -68,8 +78,11 @@ public class Akira.Window : Gtk.ApplicationWindow {
         foreach (var action in action_accelerators.get_keys ()) {
             app.set_accels_for_action (ACTION_PREFIX + action, action_accelerators[action].to_array ());
         }
+        
+        accel_group = new Gtk.AccelGroup ();
+        add_accel_group (accel_group);
 
-        headerbar = new Akira.Widgets.HeaderBar ();
+        headerbar = new Akira.Widgets.HeaderBar (this);
         main_window = new Akira.Widgets.MainWindow ();
         dialogs = new Akira.Utils.Dialogs (this);
 
@@ -150,6 +163,18 @@ public class Akira.Window : Gtk.ApplicationWindow {
 
     private void action_new_window () {
         app.new_window ();
+    }
+
+    private void action_open () {
+        warning ("open");
+    }
+
+    private void action_save () {
+        warning ("save");
+    }
+
+    private void action_save_as () {
+        warning ("save_as");
     }
 
     protected override bool delete_event (Gdk.EventAny event) {

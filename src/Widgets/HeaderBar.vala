@@ -20,6 +20,8 @@
 */
 
 public class Akira.Widgets.HeaderBar : Gtk.HeaderBar {
+    public weak Akira.Window window { get; construct; }
+
     private const string TOOLS_DIR = "/com/github/alecaddd/akira/tools/";
 
     public Akira.Partials.HeaderBarButton new_document;
@@ -41,8 +43,11 @@ public class Akira.Widgets.HeaderBar : Gtk.HeaderBar {
         }
     }
 
-    public HeaderBar () {
-        Object (toggled: true);
+    public HeaderBar (Akira.Window main_window) {
+        Object (
+            toggled: true,
+            window: main_window
+        );
     }
 
     construct {
@@ -50,17 +55,35 @@ public class Akira.Widgets.HeaderBar : Gtk.HeaderBar {
         set_show_close_button (true);
 
         var menu_items = new Gtk.Menu ();
-        menu_items.add (new Gtk.MenuItem.with_label(_("Open")));
-        menu_items.add (new Gtk.MenuItem.with_label(_("Save")));
-        menu_items.add (new Gtk.MenuItem.with_label(_("Save As")));
+
+        var new_window = new Gtk.MenuItem.with_label (_("New Window"));
+        new_window.action_name = Akira.Window.ACTION_PREFIX + Akira.Window.ACTION_NEW_WINDOW;
+        new_window.add_accelerator ("activate", window.accel_group, Gdk.keyval_from_name("N"), Gdk.ModifierType.CONTROL_MASK, Gtk.AccelFlags.VISIBLE);
+        menu_items.add (new_window);
         menu_items.add (new Gtk.SeparatorMenuItem ());
-        var quit = new Gtk.ImageMenuItem.with_label(_("Quit"));
-        var image = new Gtk.Image.from_icon_name ("window-close-symbolic", Gtk.IconSize.MENU);
-		quit.always_show_image = true;
-		quit.set_image (image);
+
+        var open = new Gtk.MenuItem.with_label (_("Open"));
+        open.action_name = Akira.Window.ACTION_PREFIX + Akira.Window.ACTION_OPEN;
+        open.add_accelerator ("activate", window.accel_group, Gdk.keyval_from_name("O"), Gdk.ModifierType.CONTROL_MASK, Gtk.AccelFlags.VISIBLE);
+        menu_items.add (open);
+
+        var save = new Gtk.MenuItem.with_label (_("Save"));
+        save.action_name = Akira.Window.ACTION_PREFIX + Akira.Window.ACTION_SAVE;
+        save.add_accelerator ("activate", window.accel_group, Gdk.keyval_from_name("S"), Gdk.ModifierType.CONTROL_MASK, Gtk.AccelFlags.VISIBLE);
+        menu_items.add (save);
+
+        var save_as = new Gtk.MenuItem.with_label (_("Save As"));
+        save_as.action_name = Akira.Window.ACTION_PREFIX + Akira.Window.ACTION_SAVE_AS;
+        save_as.add_accelerator ("activate", window.accel_group, Gdk.keyval_from_name("S"), Gdk.ModifierType.CONTROL_MASK + Gdk.ModifierType.SHIFT_MASK, Gtk.AccelFlags.VISIBLE);
+        menu_items.add (save_as);
+
+        menu_items.add (new Gtk.SeparatorMenuItem ());
+
+        var quit = new Gtk.MenuItem.with_label(_("Quit"));
         quit.action_name = Akira.Window.ACTION_PREFIX + Akira.Window.ACTION_QUIT;
-        quit.accel_path = Akira.Window.ACTION_QUIT;
+        quit.add_accelerator ("activate", window.accel_group, Gdk.keyval_from_name("Q"), Gdk.ModifierType.CONTROL_MASK, Gtk.AccelFlags.VISIBLE);
         menu_items.add (quit);
+
         menu_items.show_all ();
 
         menu = new Akira.Partials.MenuButton ("document-open", _("Menu"), _("Open Menu"));
@@ -83,6 +106,7 @@ public class Akira.Widgets.HeaderBar : Gtk.HeaderBar {
         settings = new Akira.Partials.HeaderBarButton ("preferences-other", _("Preferences"), _("Open Preferences (Ctrl+,)"));
 
         layout = new Akira.Partials.HeaderBarButton ("preferences-system-windows", _("Layout"), _("Toggle Layout (Ctrl+.)"));
+        layout.action_name = Akira.Window.ACTION_PREFIX + Akira.Window.ACTION_PRESENTATION;
         ruler = new Akira.Partials.HeaderBarButton ("applications-accessories", _("Ruler"), _("Toggle Ruler (Ctrl+⇧+R)"));
 
         add (menu);
