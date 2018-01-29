@@ -1,9 +1,11 @@
 # project name and programming language
-project('com.github.alecadd.akira', 'vala', 'c')
+project('com.github.alecaddd.akira', 'vala', 'c')
 
 # Include the translations module
 i18n = import('i18n')
 
+# Include the gnome module
+gnome = import('gnome')
 asresources = gnome.compile_resources(
     'as-resources', 'data/assets.gresource.xml',
     source_dir: 'data',
