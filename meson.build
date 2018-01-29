@@ -15,12 +15,14 @@ asresources = gnome.compile_resources(
 # Set our translation domain
 add_global_arguments('-DGETTEXT_PACKAGE="@0@"'.format (meson.project_name()), language:'c')
 
+subdir('src')
 # Create a new executable, list the files we want to compile, list the dependencies we need, and install
 executable(
     meson.project_name(),
     'src/Main.vala',
     'src/Application.vala',
     'src/Window.vala',
+    'src/config.vala',
     'src/Services/Settings.vala',
     'src/Services/Shortcuts.vala',
     'src/Utils/Dialogs.vala',
