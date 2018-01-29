@@ -17,7 +17,6 @@ foreach i : icon_sizes
         join_paths('assets/icons', i, meson.project_name() + '.svg'),
         install_dir: join_paths(get_option('datadir'), 'icons', 'hicolor', i + 'x' + i, 'mimetypes')
     )
-
 endforeach
 
 install_data(
