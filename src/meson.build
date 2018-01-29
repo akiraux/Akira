@@ -5,7 +5,7 @@ conf_data.set('GETTEXT_PACKAGE', meson.project_name())
 conf_data.set('RELEASE_NAME', 'Akira')
 conf_data.set('VERSION', '0.0.1')
 conf_data.set('VERSION_INFO', 'The Linux Design Tool')
-conf_data.set('INSTALL_PREFIX', '')
+conf_data.set('PREFIX', get_option('prefix'))
 configure_file(
     input: 'config.vala.in',
     output: 'config.vala',
