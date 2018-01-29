@@ -39,14 +39,15 @@ You can install Akira by compiling it from the source, here's the list of depend
  - `clutter-gtk`
  - `clutter`
  - `cairo`
- 
+ - `meson`
+
 **For non-elementary distros, (such as Arch, Debian etc) you are required to install "vala" as additional dependency.**
 
 ## Building
 ```
-mkdir build/ && cd build
-cmake -DCMAKE_INSTALL_PREFIX=/usr ../
-make && sudo make install
+meson build --prefix=/usr
+cd build
+ninja && sudo ninja install
 ```
 
 ### Donations
