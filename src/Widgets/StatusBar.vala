@@ -18,7 +18,7 @@
 *
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
-public class Akira.Widgets.StatusBar : Gtk.Box {
+public class Akira.Widgets.StatusBar : Gtk.ActionBar {
     public bool toggled {
         get {
             return visible;
@@ -29,7 +29,7 @@ public class Akira.Widgets.StatusBar : Gtk.Box {
     }
 
     public StatusBar () {
-        Object (orientation: Gtk.Orientation.HORIZONTAL, toggled: true);
+        Object (toggled: true);
     }
 
     construct {
