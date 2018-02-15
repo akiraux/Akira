@@ -32,6 +32,7 @@ executable(
     'src/Widgets/MainWindow.vala',
     'src/Widgets/RightSideBar.vala',
     'src/Widgets/StatusBar.vala',
+    asresources,
     dependencies: [
         dependency('gtk+-3.0'),
         dependency('granite'),
