@@ -19,29 +19,74 @@
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
 public class Akira.Window : Gtk.ApplicationWindow {
-    private Akira.Application app;
+    public weak Akira.Application app { get; construct; }
 
-    public Akira.Services.Shortcuts shortcuts;
     public Akira.Widgets.HeaderBar headerbar;
     public Akira.Widgets.MainWindow main_window;
     public Akira.Utils.Dialogs dialogs;
 
+    public SimpleActionGroup actions { get; construct; }
+    public Gtk.AccelGroup accel_group { get; construct; }
+
+    public const string ACTION_PREFIX = "win.";
+    public const string ACTION_NEW_WINDOW = "action_new_window";
+    public const string ACTION_OPEN = "action_open";
+    public const string ACTION_SAVE = "action_save";
+    public const string ACTION_SAVE_AS = "action_save_as";
+    public const string ACTION_PRESENTATION = "action_presentation";
+    public const string ACTION_LABELS = "action_labels";
+    public const string ACTION_QUIT = "action_quit";
+
+    public static Gee.MultiMap<string, string> action_accelerators = new Gee.HashMultiMap<string, string> ();
+
+    private const ActionEntry[] action_entries = {
+        { ACTION_NEW_WINDOW, action_new_window },
+        { ACTION_OPEN, action_open },
+        { ACTION_SAVE, action_save },
+        { ACTION_SAVE_AS, action_save_as },
+        { ACTION_PRESENTATION, action_presentation },
+        { ACTION_LABELS, action_labels },
+        { ACTION_QUIT, action_quit }
+    };
+
     public bool edited { get; set; default = false; }
     public bool confirmed { get; set; default = false; }
 
-    public Window (Akira.Application app) {
-        Object (application: app);
-        this.app = app;
+    public Window (Akira.Application akira_app) {
+        Object (
+            application: akira_app,
+            app: akira_app,
+            icon_name: "com.github.alecaddd.akira"
+        );
+    }
+
+    static construct {
+        action_accelerators.set (ACTION_NEW_WINDOW, "<Control>n");
+        action_accelerators.set (ACTION_OPEN, "<Control>o");
+        action_accelerators.set (ACTION_SAVE, "<Control>s");
+        action_accelerators.set (ACTION_SAVE_AS, "<Control><Shift>s");
+        action_accelerators.set (ACTION_PRESENTATION, "<Control>period");
+        action_accelerators.set (ACTION_LABELS, "<Control>l");
+        action_accelerators.set (ACTION_QUIT, "<Control>q");
     }
 
     construct {
-        headerbar = new Akira.Widgets.HeaderBar ();
+        actions = new SimpleActionGroup ();
+        actions.add_action_entries (action_entries, this);
+        insert_action_group ("win", actions);
+
+        foreach (var action in action_accelerators.get_keys ()) {
+            app.set_accels_for_action (ACTION_PREFIX + action, action_accelerators[action].to_array ());
+        }
+        
+        accel_group = new Gtk.AccelGroup ();
+        add_accel_group (accel_group);
+
+        headerbar = new Akira.Widgets.HeaderBar (this);
         main_window = new Akira.Widgets.MainWindow ();
-        shortcuts = new Akira.Services.Shortcuts (this);
         dialogs = new Akira.Utils.Dialogs (this);
 
         build_ui ();
-        key_press_event.connect ( (e) => shortcuts.handle (e));
 
         move (settings.pos_x, settings.pos_y);
         resize (settings.window_width, settings.window_height);
@@ -93,8 +138,43 @@ public class Akira.Window : Gtk.ApplicationWindow {
         }
     }
 
-    public void new_window () {
+    // This is a test, TBR!
+    private void action_labels () {
+        headerbar.toggle ();
+        headerbar.menu.toggle ();
+        headerbar.layout.toggle ();
+        headerbar.ruler.toggle ();
+        headerbar.toolset.toggle ();
+        headerbar.settings.toggle ();
+        headerbar.toggle ();
+    }
+    // END of test
+
+    private void action_quit () {
+        before_destroy ();
+    }
+
+    private void action_presentation () {
+        headerbar.toggle ();
+        main_window.statusbar.toggle ();
+        main_window.left_sidebar.toggle ();
+        main_window.right_sidebar.toggle ();
+    }
+
+    private void action_new_window () {
         app.new_window ();
+    }
+
+    private void action_open () {
+        warning ("open");
+    }
+
+    private void action_save () {
+        warning ("save");
+    }
+
+    private void action_save_as () {
+        warning ("save_as");
     }
 
     protected override bool delete_event (Gdk.EventAny event) {

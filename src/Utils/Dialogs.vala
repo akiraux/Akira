@@ -20,10 +20,12 @@
 */
 
 public class Akira.Utils.Dialogs : Object {
-    private Akira.Window window;
+    public weak Akira.Window window { get; construct; }
 
-    public Dialogs (Akira.Window window) {
-        this.window = window;
+    public Dialogs (Akira.Window main_window) {
+        Object (
+            window: main_window
+        );
     }
 
     public bool message_dialog (string title, string description, string icon, string primary_button) {
@@ -31,7 +33,7 @@ public class Akira.Utils.Dialogs : Object {
         dialog.transient_for = window;
         
         var button = new Gtk.Button.with_label (primary_button);
-        button.get_style_context ().add_class (Gtk.STYLE_CLASS_SUGGESTED_ACTION);
+        button.get_style_context ().add_class (Gtk.STYLE_CLASS_DESTRUCTIVE_ACTION);
         dialog.add_action_widget (button, Gtk.ResponseType.ACCEPT);
 
         dialog.show_all ();

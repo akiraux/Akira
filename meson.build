@@ -24,7 +24,6 @@ executable(
     'src/Window.vala',
     'src/config.vala',
     'src/Services/Settings.vala',
-    'src/Services/Shortcuts.vala',
     'src/Utils/Dialogs.vala',
     'src/Widgets/HeaderBar.vala',
     'src/Widgets/LeftSideBar.vala',
@@ -32,6 +31,8 @@ executable(
     'src/Widgets/MainWindow.vala',
     'src/Widgets/RightSideBar.vala',
     'src/Widgets/StatusBar.vala',
+    'src/Partials/HeaderBarButton.vala',
+    'src/Partials/MenuButton.vala',
     asresources,
     dependencies: [
         dependency('gtk+-3.0'),
