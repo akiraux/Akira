@@ -34,6 +34,7 @@ executable(
     'src/Layouts/StatusBar.vala',
     'src/Partials/HeaderBarButton.vala',
     'src/Partials/MenuButton.vala',
+    'src/Widgets/SettingsDialog.vala',
     asresources,
     dependencies: [
         dependency('gtk+-3.0'),

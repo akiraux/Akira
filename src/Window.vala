@@ -25,6 +25,7 @@ public class Akira.Window : Gtk.ApplicationWindow {
 	public Akira.Services.ActionManager action_manager;
 	public Akira.Layouts.HeaderBar headerbar;
 	public Akira.Layouts.MainWindow main_window;
+	public Akira.Widgets.SettingsDialog? settings_dialog = null;
 	public Akira.Utils.Dialogs dialogs;
 
 	public SimpleActionGroup actions { get; construct; }
@@ -59,6 +60,17 @@ public class Akira.Window : Gtk.ApplicationWindow {
 	}
 
 	private void build_ui () {
+		set_titlebar (headerbar);
+		set_border_width (0);
+
+		delete_event.connect ((e) => {
+			return before_destroy ();
+		});
+
+		add (main_window);
+	}
+
+	private void apply_user_settings () {
 		Gtk.Settings.get_default ().gtk_application_prefer_dark_theme = settings.dark_theme;
 
 		var css_provider = new Gtk.CssProvider ();
@@ -68,15 +80,9 @@ public class Akira.Window : Gtk.ApplicationWindow {
 			Gdk.Screen.get_default (), css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
 		);
 
-		set_titlebar (headerbar);
-
-		set_border_width (0);
-
-		delete_event.connect ((e) => {
-			return before_destroy ();
-		});
-
-		add (main_window);
+		if (!settings.show_label) {
+			Akira.Services.ActionManager.action_from_group (Akira.Services.ActionManager.ACTION_LABELS, get_action_group ("win"));
+		}
 	}
 
 	public bool before_destroy () {
@@ -121,6 +127,8 @@ public class Akira.Window : Gtk.ApplicationWindow {
 
 	public void show_app () {
 		show_all ();
+		apply_user_settings ();
+
 		show ();
 		present ();
 	}

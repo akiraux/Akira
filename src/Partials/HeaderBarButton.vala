@@ -64,4 +64,12 @@ public class Akira.Partials.HeaderBarButton : Gtk.Button {
 	public void toggle () {
 		labelled = !labelled;
 	}
+
+	public void show_labels () {
+		labelled = true;
+	}
+
+	public void hide_labels () {
+		labelled = false;
+	}
 }

@@ -1,11 +1,11 @@
 /* akira stylesheet */
-@define-color statusBg #dadada;
-@define-color statusText #5e5e5e;
-@define-color statusBorder #adabad;
+@define-color statusBg rgba(0,0,0,0.05);
+@define-color statusText rgba(0,0,0,0.4);
+@define-color statusBorder rgba(0,0,0,0.1);
 
-@define-color sideLBg #ececec;
-@define-color sideLText #363636;
-@define-color sideLBorder #d0d0d0;
+@define-color sideLBg rgba(0,0,0,0.02);
+@define-color sideLText rgba(0,0,0,0.6);
+@define-color sideLBorder rgba(0,0,0,0.05);
 
 .statusbar {
     background-color: @statusBg;
@@ -15,13 +15,11 @@
 
 .sidebar-l {
     background-color: @sideLBg;
-    color: @sideLText;
     border-right: 1px solid @sideLBorder;
 }
 
 .sidebar-r {
     background-color: @sideLBg;
-    color: @sideLText;
     border-left: 1px solid @sideLBorder;
 }
 
