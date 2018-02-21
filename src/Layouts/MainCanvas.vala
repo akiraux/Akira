@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2011-2017 Alecaddd (http://alecaddd.com)
+* Copyright (c) 2018 Alecaddd (http://alecaddd.com)
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public
@@ -18,20 +18,21 @@
 *
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
-public class Akira.Layouts.MainCanvas : Gtk.Box {
-    public Gtk.Paned pane;
-    public Gtk.Paned pane2;
+public class Akira.Layouts.MainCanvas : Gtk.Grid {
+	public Gtk.Paned pane;
+	public Gtk.Paned pane2;
 
-    public MainCanvas () {
-        Object (orientation: Gtk.Orientation.VERTICAL);
-    }
+	public MainCanvas () {
+		Object (orientation: Gtk.Orientation.VERTICAL);
+	}
 
-    construct {
-        var label = new Gtk.Label ("Main Canvas");
-        label.halign = Gtk.Align.CENTER;
-        label.expand = true;
-        label.margin = 10;
+	construct {
+		var label = new Gtk.Label ("Main Canvas");
+		label.halign = Gtk.Align.CENTER;
+		label.expand = true;
+		label.margin = 10;
+		label.expand = true;
 
-        add (label);
-    }
+		attach (label, 0, 0, 1, 1);
+	}
 }

@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2011-2017 Alecaddd (http://alecaddd.com)
+* Copyright (c) 2018 Alecaddd (http://alecaddd.com)
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public
@@ -18,33 +18,38 @@
 *
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
-public class Akira.Layouts.RightSideBar : Gtk.Box {
-    public bool toggled {
-        get {
-            return visible;
-        } set {
-            visible = value;
-            no_show_all = !value;
-        }
-    }
+public class Akira.Layouts.RightSideBar : Gtk.Grid {
+	public bool toggled {
+		get {
+			return visible;
+		} set {
+			visible = value;
+			no_show_all = !value;
+		}
+	}
 
-    public RightSideBar () {
-        Object (orientation: Gtk.Orientation.HORIZONTAL, toggled: true);
-    }
+	public RightSideBar () {
+		Object (
+			orientation: Gtk.Orientation.VERTICAL,
+			column_homogeneous: true,
+			toggled: true
+		);
+	}
 
-    construct {
-        get_style_context ().add_class ("sidebar-r");
-        width_request = 220;
-        
-        var label = new Gtk.Label ("Sidebar R");
-        label.halign = Gtk.Align.CENTER;
-        label.expand = true;
-        label.margin = 10;
+	construct {
+		get_style_context ().add_class ("sidebar-r");
+		width_request = 220;
+		
+		var label = new Gtk.Label ("Sidebar R");
+		label.halign = Gtk.Align.CENTER;
+		label.expand = true;
+		label.margin = 10;
+		label.expand = true;
 
-        add (label);
-    }
+		attach (label, 0, 0, 1, 1);
+	}
 
-    public void toggle () {
-        toggled = !toggled;
-    }
+	public void toggle () {
+		toggled = !toggled;
+	}
 }

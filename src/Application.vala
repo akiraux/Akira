@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2011-2017 Alecaddd (http://alecaddd.com)
+* Copyright (c) 2018 Alecaddd (http://alecaddd.com)
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public
@@ -20,45 +20,45 @@
 */
 
 namespace Akira {
-    public Akira.Services.Settings settings;
+	public Akira.Services.Settings settings;
 }
 
 public class Akira.Application : Granite.Application {
-    public GLib.List <Window> windows;
+	public GLib.List <Window> windows;
 
-    construct {
-        flags |= ApplicationFlags.HANDLES_OPEN;
-        build_data_dir = Constants.DATADIR;
-        build_pkg_data_dir = Constants.PKGDATADIR;
-        build_release_name = Constants.RELEASE_NAME;
-        build_version = Constants.VERSION;
-        build_version_info = Constants.VERSION_INFO;
+	construct {
+		flags |= ApplicationFlags.HANDLES_OPEN;
+		build_data_dir = Constants.DATADIR;
+		build_pkg_data_dir = Constants.PKGDATADIR;
+		build_release_name = Constants.RELEASE_NAME;
+		build_version = Constants.VERSION;
+		build_version_info = Constants.VERSION_INFO;
 
-        settings = new Akira.Services.Settings ();
-        windows = new GLib.List <Window> ();
+		settings = new Akira.Services.Settings ();
+		windows = new GLib.List <Window> ();
 
-        program_name = "Akira";
-        exec_name = "com.github.alecaddd.akira";
-        app_launcher = "com.github.alecaddd.akira.desktop";
-        application_id = "com.github.alecaddd.akira";
-    }
+		program_name = "Akira";
+		exec_name = "com.github.alecaddd.akira";
+		app_launcher = "com.github.alecaddd.akira.desktop";
+		application_id = "com.github.alecaddd.akira";
+	}
 
-    public void new_window () {
-        new Akira.Window (this).present ();
-    }
+	public void new_window () {
+		new Akira.Window (this).present ();
+	}
 
-    public override void window_added (Gtk.Window window) {
-        windows.append (window as Window);
-        base.window_added (window);
-    }
+	public override void window_added (Gtk.Window window) {
+		windows.append (window as Window);
+		base.window_added (window);
+	}
 
-    public override void window_removed (Gtk.Window window) {
-        windows.remove (window as Window);
-        base.window_removed (window);
-    }
+	public override void window_removed (Gtk.Window window) {
+		windows.remove (window as Window);
+		base.window_removed (window);
+	}
 
-    protected override void activate () {
-        var window = new Akira.Window (this);
-        this.add_window (window);
-    }
+	protected override void activate () {
+		var window = new Akira.Window (this);
+		this.add_window (window);
+	}
 }

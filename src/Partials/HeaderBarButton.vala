@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2011-2017 Alecaddd (http://alecaddd.com)
+* Copyright (c) 2018 Alecaddd (http://alecaddd.com)
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public
@@ -20,48 +20,48 @@
 */
 
 public class Akira.Partials.HeaderBarButton : Gtk.Button {
-    public bool labelled {
-        get {
-            return label_btn.visible;
-        } set {
-            label_btn.visible = value;
-            label_btn.no_show_all = !value;
+	public bool labelled {
+		get {
+			return label_btn.visible;
+		} set {
+			label_btn.visible = value;
+			label_btn.no_show_all = !value;
 
-            if (value) {
-                get_style_context ().add_class ("headerbar-button");
-            } else {
-                get_style_context ().remove_class ("headerbar-button");
-            }
-        }
-    }
+			if (value) {
+				get_style_context ().add_class ("headerbar-button");
+			} else {
+				get_style_context ().remove_class ("headerbar-button");
+			}
+		}
+	}
 
-    private Gtk.Label label_btn;
+	private Gtk.Label label_btn;
 
-    public HeaderBarButton (string icon_name, string name, string tooltip) {
-        can_focus = false;
+	public HeaderBarButton (string icon_name, string name, string tooltip) {
+		can_focus = false;
 
-        Gtk.Image image;
-        Gtk.Box box = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
-        label_btn = new Gtk.Label (name);
-        label_btn.margin_top = 2;
+		Gtk.Image image;
+		var grid = new Gtk.Grid ();
+		label_btn = new Gtk.Label (name);
+		label_btn.margin_top = 2;
 
-        if (icon_name.contains ("/")) {
-            image = new Gtk.Image.from_resource (icon_name);
-        } else {
-            image = new Gtk.Image.from_icon_name (icon_name, Gtk.IconSize.LARGE_TOOLBAR);
-        }
-        image.margin = 0;
+		if (icon_name.contains ("/")) {
+			image = new Gtk.Image.from_resource (icon_name);
+		} else {
+			image = new Gtk.Image.from_icon_name (icon_name, Gtk.IconSize.LARGE_TOOLBAR);
+		}
+		image.margin = 0;
 
-        box.add (image);
-        box.add (label_btn);
-        add (box);
+		grid.attach (image, 0, 0, 1, 1);
+		grid.attach (label_btn, 0, 1, 1, 1);
+		add (grid);
 
-        get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
-        get_style_context ().add_class ("headerbar-button");
-        set_tooltip_text (tooltip);
-    }
+		get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
+		get_style_context ().add_class ("headerbar-button");
+		set_tooltip_text (tooltip);
+	}
 
-    public void toggle () {
-        labelled = !labelled;
-    }
+	public void toggle () {
+		labelled = !labelled;
+	}
 }

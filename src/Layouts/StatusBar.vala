@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2011-2017 Alecaddd (http://alecaddd.com)
+* Copyright (c) 2018 Alecaddd (http://alecaddd.com)
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public
@@ -20,30 +20,30 @@
 */
 
 public class Akira.Layouts.StatusBar : Gtk.ActionBar {
-    public bool toggled {
-        get {
-            return visible;
-        } set {
-            visible = value;
-            no_show_all = !value;
-        }
-    }
+	public bool toggled {
+		get {
+			return visible;
+		} set {
+			visible = value;
+			no_show_all = !value;
+		}
+	}
 
-    public StatusBar () {
-        Object (toggled: true);
-    }
+	public StatusBar () {
+		Object (toggled: true);
+	}
 
-    construct {
-        get_style_context ().add_class ("statusbar");
-        
-        var label = new Gtk.Label ("Status Bar");
-        label.halign = Gtk.Align.CENTER;
-        label.margin = 6;
+	construct {
+		get_style_context ().add_class ("statusbar");
+		
+		var label = new Gtk.Label ("Status Bar");
+		label.halign = Gtk.Align.CENTER;
+		label.margin = 6;
 
-        add (label);
-    }
+		add (label);
+	}
 
-    public void toggle () {
-        toggled = !toggled;
-    }
+	public void toggle () {
+		toggled = !toggled;
+	}
 }
