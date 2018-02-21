@@ -18,6 +18,7 @@
 *
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
+
 public class Akira.Window : Gtk.ApplicationWindow {
 	public weak Akira.Application app { get; construct; }
 
@@ -68,20 +69,24 @@ public class Akira.Window : Gtk.ApplicationWindow {
 		);
 
 		set_titlebar (headerbar);
-		add (main_window);
 
 		set_border_width (0);
 
 		delete_event.connect ((e) => {
 			return before_destroy ();
 		});
+
+		add (main_window);
 	}
 
 	public bool before_destroy () {
+		update_status ();
+
 		if (!edited) {
 			app.get_active_window ().destroy ();
 			on_destroy ();
 		}
+
 		if (edited) {
 			confirmed = dialogs.message_dialog (_("Are you sure you want to quit?"), _("All unsaved data will be lost and impossible to recover."), "system-shutdown", _("Yes, Quit!"));
 
@@ -90,6 +95,7 @@ public class Akira.Window : Gtk.ApplicationWindow {
 				on_destroy ();
 			}
 		}
+
 		return true;
 	}
 
@@ -101,18 +107,16 @@ public class Akira.Window : Gtk.ApplicationWindow {
 		}
 	}
 
-	protected override bool delete_event (Gdk.EventAny event) {
+	private void update_status () {
 		int width, height, x, y;
 
-		get_size (out width, out height);
-		get_position (out x, out y);
+        get_size (out width, out height);
+        get_position (out x, out y);
 
-		settings.pos_x = x;
-		settings.pos_y = y;
-		settings.window_width = width;
-		settings.window_height = height;
-
-		return false;
+        settings.pos_x = x;
+        settings.pos_y = y;
+        settings.window_width = width;
+        settings.window_height = height;
 	}
 
 	public void show_app () {
