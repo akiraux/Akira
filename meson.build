@@ -24,6 +24,7 @@ executable(
     'src/Window.vala',
     'src/config.vala',
     'src/Services/Settings.vala',
+    'src/Services/ActionManager.vala',
     'src/Utils/Dialogs.vala',
     'src/Layouts/HeaderBar.vala',
     'src/Layouts/LeftSideBar.vala',

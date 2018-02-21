@@ -57,30 +57,30 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
 		var menu_items = new Gtk.Menu ();
 
 		var new_window = new Gtk.MenuItem.with_label (_("New Window"));
-		new_window.action_name = Akira.Window.ACTION_PREFIX + Akira.Window.ACTION_NEW_WINDOW;
+		new_window.action_name = Akira.Services.ActionManager.ACTION_PREFIX + Akira.Services.ActionManager.ACTION_NEW_WINDOW;
 		new_window.add_accelerator ("activate", window.accel_group, Gdk.keyval_from_name("N"), Gdk.ModifierType.CONTROL_MASK, Gtk.AccelFlags.VISIBLE);
 		menu_items.add (new_window);
 		menu_items.add (new Gtk.SeparatorMenuItem ());
 
 		var open = new Gtk.MenuItem.with_label (_("Open"));
-		open.action_name = Akira.Window.ACTION_PREFIX + Akira.Window.ACTION_OPEN;
+		open.action_name = Akira.Services.ActionManager.ACTION_PREFIX + Akira.Services.ActionManager.ACTION_OPEN;
 		open.add_accelerator ("activate", window.accel_group, Gdk.keyval_from_name("O"), Gdk.ModifierType.CONTROL_MASK, Gtk.AccelFlags.VISIBLE);
 		menu_items.add (open);
 
 		var save = new Gtk.MenuItem.with_label (_("Save"));
-		save.action_name = Akira.Window.ACTION_PREFIX + Akira.Window.ACTION_SAVE;
+		save.action_name = Akira.Services.ActionManager.ACTION_PREFIX + Akira.Services.ActionManager.ACTION_SAVE;
 		save.add_accelerator ("activate", window.accel_group, Gdk.keyval_from_name("S"), Gdk.ModifierType.CONTROL_MASK, Gtk.AccelFlags.VISIBLE);
 		menu_items.add (save);
 
 		var save_as = new Gtk.MenuItem.with_label (_("Save As"));
-		save_as.action_name = Akira.Window.ACTION_PREFIX + Akira.Window.ACTION_SAVE_AS;
+		save_as.action_name = Akira.Services.ActionManager.ACTION_PREFIX + Akira.Services.ActionManager.ACTION_SAVE_AS;
 		save_as.add_accelerator ("activate", window.accel_group, Gdk.keyval_from_name("S"), Gdk.ModifierType.CONTROL_MASK + Gdk.ModifierType.SHIFT_MASK, Gtk.AccelFlags.VISIBLE);
 		menu_items.add (save_as);
 
 		menu_items.add (new Gtk.SeparatorMenuItem ());
 
 		var quit = new Gtk.MenuItem.with_label(_("Quit"));
-		quit.action_name = Akira.Window.ACTION_PREFIX + Akira.Window.ACTION_QUIT;
+		quit.action_name = Akira.Services.ActionManager.ACTION_PREFIX + Akira.Services.ActionManager.ACTION_QUIT;
 		quit.add_accelerator ("activate", window.accel_group, Gdk.keyval_from_name("Q"), Gdk.ModifierType.CONTROL_MASK, Gtk.AccelFlags.VISIBLE);
 		menu_items.add (quit);
 
@@ -106,7 +106,7 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
 		settings = new Akira.Partials.HeaderBarButton ("preferences-other", _("Preferences"), _("Open Preferences (Ctrl+,)"));
 
 		layout = new Akira.Partials.HeaderBarButton ("preferences-system-windows", _("Layout"), _("Toggle Layout (Ctrl+.)"));
-		layout.action_name = Akira.Window.ACTION_PREFIX + Akira.Window.ACTION_PRESENTATION;
+		layout.action_name = Akira.Services.ActionManager.ACTION_PREFIX + Akira.Services.ActionManager.ACTION_PRESENTATION;
 		ruler = new Akira.Partials.HeaderBarButton ("applications-accessories", _("Ruler"), _("Toggle Ruler (Ctrl+⇧+R)"));
 
 		add (menu);
