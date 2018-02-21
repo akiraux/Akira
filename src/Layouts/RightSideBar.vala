@@ -18,20 +18,33 @@
 *
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
-public class Akira.Widgets.MainCanvas : Gtk.Box {
-    public Gtk.Paned pane;
-    public Gtk.Paned pane2;
+public class Akira.Layouts.RightSideBar : Gtk.Box {
+    public bool toggled {
+        get {
+            return visible;
+        } set {
+            visible = value;
+            no_show_all = !value;
+        }
+    }
 
-    public MainCanvas () {
-        Object (orientation: Gtk.Orientation.VERTICAL);
+    public RightSideBar () {
+        Object (orientation: Gtk.Orientation.HORIZONTAL, toggled: true);
     }
 
     construct {
-        var label = new Gtk.Label ("Main Canvas");
+        get_style_context ().add_class ("sidebar-r");
+        width_request = 220;
+        
+        var label = new Gtk.Label ("Sidebar R");
         label.halign = Gtk.Align.CENTER;
         label.expand = true;
         label.margin = 10;
 
         add (label);
+    }
+
+    public void toggle () {
+        toggled = !toggled;
     }
 }

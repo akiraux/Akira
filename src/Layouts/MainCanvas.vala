@@ -18,32 +18,20 @@
 *
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
+public class Akira.Layouts.MainCanvas : Gtk.Box {
+    public Gtk.Paned pane;
+    public Gtk.Paned pane2;
 
-public class Akira.Widgets.StatusBar : Gtk.ActionBar {
-    public bool toggled {
-        get {
-            return visible;
-        } set {
-            visible = value;
-            no_show_all = !value;
-        }
-    }
-
-    public StatusBar () {
-        Object (toggled: true);
+    public MainCanvas () {
+        Object (orientation: Gtk.Orientation.VERTICAL);
     }
 
     construct {
-        get_style_context ().add_class ("statusbar");
-        
-        var label = new Gtk.Label ("Status Bar");
+        var label = new Gtk.Label ("Main Canvas");
         label.halign = Gtk.Align.CENTER;
-        label.margin = 6;
+        label.expand = true;
+        label.margin = 10;
 
         add (label);
-    }
-
-    public void toggle () {
-        toggled = !toggled;
     }
 }

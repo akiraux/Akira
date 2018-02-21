@@ -21,8 +21,8 @@
 public class Akira.Window : Gtk.ApplicationWindow {
     public weak Akira.Application app { get; construct; }
 
-    public Akira.Widgets.HeaderBar headerbar;
-    public Akira.Widgets.MainWindow main_window;
+    public Akira.Layouts.HeaderBar headerbar;
+    public Akira.Layouts.MainWindow main_window;
     public Akira.Utils.Dialogs dialogs;
 
     public SimpleActionGroup actions { get; construct; }
@@ -82,8 +82,8 @@ public class Akira.Window : Gtk.ApplicationWindow {
         accel_group = new Gtk.AccelGroup ();
         add_accel_group (accel_group);
 
-        headerbar = new Akira.Widgets.HeaderBar (this);
-        main_window = new Akira.Widgets.MainWindow ();
+        headerbar = new Akira.Layouts.HeaderBar (this);
+        main_window = new Akira.Layouts.MainWindow ();
         dialogs = new Akira.Utils.Dialogs (this);
 
         build_ui ();

@@ -18,11 +18,11 @@
 *
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
-public class Akira.Widgets.MainWindow : Gtk.Box {
-    public Akira.Widgets.MainCanvas main_canvas;
-    public Akira.Widgets.LeftSideBar left_sidebar;
-    public Akira.Widgets.RightSideBar right_sidebar;
-    public Akira.Widgets.StatusBar statusbar;
+public class Akira.Layouts.MainWindow : Gtk.Box {
+    public Akira.Layouts.MainCanvas main_canvas;
+    public Akira.Layouts.LeftSideBar left_sidebar;
+    public Akira.Layouts.RightSideBar right_sidebar;
+    public Akira.Layouts.StatusBar statusbar;
 
     public Gtk.Box box;
     public Gtk.Paned pane;
@@ -33,10 +33,10 @@ public class Akira.Widgets.MainWindow : Gtk.Box {
     }
 
     construct {
-        left_sidebar = new Akira.Widgets.LeftSideBar ();
-        right_sidebar = new Akira.Widgets.RightSideBar ();
-        statusbar = new Akira.Widgets.StatusBar ();
-        main_canvas = new Akira.Widgets.MainCanvas ();
+        left_sidebar = new Akira.Layouts.LeftSideBar ();
+        right_sidebar = new Akira.Layouts.RightSideBar ();
+        statusbar = new Akira.Layouts.StatusBar ();
+        main_canvas = new Akira.Layouts.MainCanvas ();
 
         box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
         pane = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);

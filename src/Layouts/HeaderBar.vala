@@ -19,7 +19,7 @@
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
 
-public class Akira.Widgets.HeaderBar : Gtk.HeaderBar {
+public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
     public weak Akira.Window window { get; construct; }
 
     private const string TOOLS_DIR = "/com/github/alecaddd/akira/tools/";

@@ -18,7 +18,7 @@
 *
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
-public class Akira.Widgets.RightSideBar : Gtk.Box {
+public class Akira.Layouts.LeftSideBar : Gtk.Box {
     public bool toggled {
         get {
             return visible;
@@ -28,15 +28,15 @@ public class Akira.Widgets.RightSideBar : Gtk.Box {
         }
     }
 
-    public RightSideBar () {
+    public LeftSideBar () {
         Object (orientation: Gtk.Orientation.HORIZONTAL, toggled: true);
     }
 
     construct {
-        get_style_context ().add_class ("sidebar-r");
+        get_style_context ().add_class ("sidebar-l");
         width_request = 220;
         
-        var label = new Gtk.Label ("Sidebar R");
+        var label = new Gtk.Label ("Sidebar L");
         label.halign = Gtk.Align.CENTER;
         label.expand = true;
         label.margin = 10;
