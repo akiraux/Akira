@@ -19,20 +19,39 @@
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
 public class Akira.Layouts.MainCanvas : Gtk.Grid {
-	public Gtk.Paned pane;
-	public Gtk.Paned pane2;
+	public Gtk.ScrolledWindow main_scroll;
+	public Gtk.DrawingArea canvas;
 
 	public MainCanvas () {
 		Object (orientation: Gtk.Orientation.VERTICAL);
 	}
 
 	construct {
-		var label = new Gtk.Label ("Main Canvas");
-		label.halign = Gtk.Align.CENTER;
-		label.expand = true;
-		label.margin = 10;
-		label.expand = true;
+		main_scroll = new Gtk.ScrolledWindow (null, null);
+		main_scroll.expand = true;
 
-		attach (label, 0, 0, 1, 1);
+		canvas = new Gtk.DrawingArea ();
+		canvas.set_size_request(10000, 10000);
+		main_scroll.add_with_viewport (canvas);
+
+		canvas.draw.connect ((context) => {
+			weak Gtk.StyleContext style_context = canvas.get_style_context ();
+			int height = 100;
+			int width = 100;
+			Gdk.RGBA color = style_context.get_color (0);
+
+			double xc = main_scroll.get_allocated_width () / 2;
+			double yc = main_scroll.get_allocated_height () / 2;
+			double radius = int.min (width, height) / 2.0;
+			double angle1 = 0;
+			double angle2 = 2*Math.PI;
+
+			context.arc (xc, yc, radius, angle1, angle2);
+			Gdk.cairo_set_source_rgba (context, color);
+			context.fill ();
+			return true;
+		});
+
+		attach (main_scroll, 0, 0, 1, 1);
 	}
 }

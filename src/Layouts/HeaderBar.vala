@@ -30,7 +30,7 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
 
 	public Akira.Partials.MenuButton menu;
 	public Akira.Partials.MenuButton toolset;
-	public Akira.Partials.HeaderBarButton settings;
+	public Akira.Partials.HeaderBarButton preferences;
 	public Akira.Partials.HeaderBarButton layout;
 	public Akira.Partials.HeaderBarButton ruler;
 
@@ -103,7 +103,8 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
 		toolset = new Akira.Partials.MenuButton ("insert-object", _("Add"), _("Add a New Object"));
 		toolset.popup = tools;
 
-		settings = new Akira.Partials.HeaderBarButton ("preferences-other", _("Preferences"), _("Open Preferences (Ctrl+,)"));
+		preferences = new Akira.Partials.HeaderBarButton ("preferences-other", _("Preferences"), _("Open Preferences (Ctrl+,)"));
+		preferences.action_name = Akira.Services.ActionManager.ACTION_PREFIX + Akira.Services.ActionManager.ACTION_PREFERENCES;
 
 		layout = new Akira.Partials.HeaderBarButton ("preferences-system-windows", _("Layout"), _("Toggle Layout (Ctrl+.)"));
 		layout.action_name = Akira.Services.ActionManager.ACTION_PREFIX + Akira.Services.ActionManager.ACTION_PRESENTATION;
@@ -113,7 +114,7 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
 		add (new Gtk.Separator (Gtk.Orientation.VERTICAL));
 		add (toolset);
 		add (new Gtk.Separator (Gtk.Orientation.VERTICAL));
-		pack_end (settings);
+		pack_end (preferences);
 		pack_end (new Gtk.Separator (Gtk.Orientation.VERTICAL));
 		pack_end (layout);
 		pack_end (ruler);
