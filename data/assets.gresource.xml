@@ -22,7 +22,9 @@
     <file alias="pencil-alt2.svg" compressed="false" preprocess="xml-stripblanks">assets/tools/pencil-alt2.svg</file>
     <file alias="pencil.svg" compressed="false" preprocess="xml-stripblanks">assets/tools/pencil.svg</file>
     <file alias="pixels.svg" compressed="false" preprocess="xml-stripblanks">assets/tools/pixels.svg</file>
-    <file alias="plus.svg" compressed="false" preprocess="xml-stripblanks">assets/tools/plus.svg</file>
+    <file alias="rectangle.svg" compressed="false" preprocess="xml-stripblanks">assets/tools/rectangle.svg</file>
+    <file alias="triangle.svg" compressed="false" preprocess="xml-stripblanks">assets/tools/triangle.svg</file>
+    <file alias="circle.svg" compressed="false" preprocess="xml-stripblanks">assets/tools/circle.svg</file>
     <file alias="pointer-alt.svg" compressed="false" preprocess="xml-stripblanks">assets/tools/pointer-alt.svg</file>
     <file alias="pointer.svg" compressed="false" preprocess="xml-stripblanks">assets/tools/pointer.svg</file>
     <file alias="shapes.svg" compressed="false" preprocess="xml-stripblanks">assets/tools/shapes.svg</file>

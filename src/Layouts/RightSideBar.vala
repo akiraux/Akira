@@ -63,17 +63,14 @@ public class Akira.Layouts.RightSideBar : Gtk.Grid {
 	}
 
 	private Gtk.Grid build_search_bar () {
-		var search = new Gtk.Entry ();
+		var search = new Gtk.SearchEntry ();
 		search.hexpand = true;
 		search.margin = 5;
+		search.placeholder_text = _("Search Layer");
 		search.get_style_context ().add_class ("search-input");
-		search.placeholder_text = _("Search layer");
 
-		search.set_icon_from_icon_name (Gtk.EntryIconPosition.SECONDARY, "system-search-symbolic");
-		search.icon_press.connect ((pos, event) => {
-			if (pos == Gtk.EntryIconPosition.SECONDARY) {
-				warning ("search");
-			}
+		search.activate.connect (() => {
+			warning ("search");
 		});
 
 		var search_grid = new Gtk.Grid ();
@@ -87,49 +84,73 @@ public class Akira.Layouts.RightSideBar : Gtk.Grid {
 		scroll = new Gtk.ScrolledWindow (null, null);
 		scroll.expand = true;
 
-		var music_item = new Granite.Widgets.SourceList.Item ("Music");
-		music_item.editable = true;
-		music_item.activatable = new GLib.ThemedIcon ("view-more-symbolic");
-		music_item.badge = "1";
-		music_item.icon = new GLib.ThemedIcon ("library-music");
+		var artboard = new Granite.Widgets.SourceList.ExpandableItem ("Artboard 1");
+		artboard.editable = true;
+		artboard.expand_all ();
 
-		var library_category = new Granite.Widgets.SourceList.ExpandableItem ("Libraries");
-		library_category.editable = true;
-		library_category.expand_all ();
-		library_category.add (music_item);
+		var rectangle_item = new Granite.Widgets.SourceList.Item ("Rectangle");
+		rectangle_item.editable = true;
+		rectangle_item.icon = new Gdk.Pixbuf.from_resource ("/com/github/alecaddd/akira/tools/rectangle.svg");
 
-		var my_store_podcast_item = new Granite.Widgets.SourceList.Item ("Podcasts");
-		my_store_podcast_item.icon = new GLib.ThemedIcon ("library-podcast");
+		var circle_item = new Granite.Widgets.SourceList.Item ("Circle");
+		circle_item.editable = true;
+		circle_item.icon = new Gdk.Pixbuf.from_resource ("/com/github/alecaddd/akira/tools/circle.svg");
 
-		var my_store_music_item = new Granite.Widgets.SourceList.Item ("Music");
-		my_store_music_item.icon = new GLib.ThemedIcon ("library-music");
+		var triangle_item = new Granite.Widgets.SourceList.Item ("Triangle");
+		triangle_item.editable = true;
+		triangle_item.icon = new Gdk.Pixbuf.from_resource ("/com/github/alecaddd/akira/tools/triangle.svg");
+		
+		artboard.add (rectangle_item);
+		artboard.add (circle_item);
+		artboard.add (triangle_item);
 
-		var my_store_item = new Granite.Widgets.SourceList.ExpandableItem ("My Store");
-		my_store_item.icon = new GLib.ThemedIcon ("system-software-install");
-		my_store_item.editable = true;
-		my_store_item.add (my_store_music_item);
-		my_store_item.add (my_store_podcast_item);
+		var artboard2 = new Granite.Widgets.SourceList.ExpandableItem ("Artboard 2");
+		artboard2.editable = true;
+		artboard2.expand_all ();
 
-		var store_category = new Granite.Widgets.SourceList.ExpandableItem ("Stores");
-		store_category.expand_all ();
-		store_category.add (my_store_item);
+		var text_item = new Granite.Widgets.SourceList.Item ("Text");
+		text_item.editable = true;
+		text_item.icon = new Gdk.Pixbuf.from_resource ("/com/github/alecaddd/akira/tools/text.svg");
 
-		var player1_item = new Granite.Widgets.SourceList.Item ("Player 1");
-		player1_item.icon = new GLib.ThemedIcon ("multimedia-player");
+		artboard2.add (text_item);
 
-		var player2_item = new Granite.Widgets.SourceList.Item ("Player 2");
-		player2_item.badge = "3";
-		player2_item.icon = new GLib.ThemedIcon ("phone");
+		var group_rectangle_item = new Granite.Widgets.SourceList.Item ("Rectangle");
+		group_rectangle_item.editable = true;
+		group_rectangle_item.icon = new Gdk.Pixbuf.from_resource ("/com/github/alecaddd/akira/tools/rectangle.svg");
 
-		var device_category = new Granite.Widgets.SourceList.ExpandableItem ("Devices");
-		device_category.expand_all ();
-		device_category.add (player1_item);
-		device_category.add (player2_item);
+		var group_circle_item = new Granite.Widgets.SourceList.Item ("Circle");
+		group_circle_item.editable = true;
+		group_circle_item.icon = new Gdk.Pixbuf.from_resource ("/com/github/alecaddd/akira/tools/circle.svg");
+
+		var compound_item = new Granite.Widgets.SourceList.ExpandableItem ("Compound Object");
+		compound_item.icon = new Gdk.Pixbuf.from_resource ("/com/github/alecaddd/akira/tools/bool-union.svg");
+		compound_item.editable = true;
+		compound_item.expand_all ();
+		compound_item.add (group_rectangle_item);
+		compound_item.add (group_circle_item);
+
+		var group_item = new Granite.Widgets.SourceList.ExpandableItem ("Group");
+		group_item.icon = new Gdk.Pixbuf.from_resource ("/com/github/alecaddd/akira/tools/group.svg");
+		group_item.editable = true;
+		group_item.expand_all ();
+		group_item.add (compound_item);
+
+		artboard2.add (group_item);
+
+		var artboard3 = new Granite.Widgets.SourceList.ExpandableItem ("Artboard 3");
+		artboard3.editable = true;
+		artboard3.expand_all ();
+
+		var vector_item = new Granite.Widgets.SourceList.Item ("Vector Path");
+		vector_item.editable = true;
+		vector_item.icon = new Gdk.Pixbuf.from_resource ("/com/github/alecaddd/akira/tools/pen.svg");
+
+		artboard3.add (vector_item);
 
 		var source_list = new Granite.Widgets.SourceList ();
-		source_list.root.add (library_category);
-		source_list.root.add (store_category);
-		source_list.root.add (device_category);
+		source_list.root.add (artboard);
+		source_list.root.add (artboard2);
+		source_list.root.add (artboard3);
 
 		scroll.add (source_list);
 
