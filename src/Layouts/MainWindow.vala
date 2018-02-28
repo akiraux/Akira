@@ -19,6 +19,8 @@
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
 public class Akira.Layouts.MainWindow : Gtk.Grid {
+	public weak Akira.Window window { get; construct; }
+
 	public Akira.Layouts.MainCanvas main_canvas;
 	public Akira.Layouts.LeftSideBar left_sidebar;
 	public Akira.Layouts.RightSideBar right_sidebar;
@@ -28,13 +30,13 @@ public class Akira.Layouts.MainWindow : Gtk.Grid {
 	public Gtk.Paned pane;
 	public Gtk.Paned pane2;
 
-	public MainWindow () {
-		Object (orientation: Gtk.Orientation.VERTICAL);
+	public MainWindow (Akira.Window main_window) {
+		Object (window: main_window);
 	}
 
 	construct {
 		left_sidebar = new Akira.Layouts.LeftSideBar ();
-		right_sidebar = new Akira.Layouts.RightSideBar ();
+		right_sidebar = new Akira.Layouts.RightSideBar (window);
 		statusbar = new Akira.Layouts.StatusBar ();
 		main_canvas = new Akira.Layouts.MainCanvas ();
 
