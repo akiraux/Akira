@@ -33,6 +33,7 @@ executable(
     'src/Layouts/RightSideBar.vala',
     'src/Layouts/StatusBar.vala',
     'src/Layouts/Partials/LayersPanel.vala',
+    'src/Layouts/Partials/Layer.vala',
     'src/Partials/HeaderBarButton.vala',
     'src/Partials/MenuButton.vala',
     'src/Widgets/SettingsDialog.vala',

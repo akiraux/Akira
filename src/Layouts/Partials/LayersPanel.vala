@@ -55,66 +55,37 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.Grid {
 	private Granite.Widgets.SourceList build_layers () {
 		layers = new Granite.Widgets.SourceList ();
 
-		var artboard = new Granite.Widgets.SourceList.ExpandableItem ("Artboard 1");
-		artboard.editable = true;
-		artboard.expand_all ();
+		var artboard = new Akira.Layouts.Partials.Layer (window, "Artboard 1", null);
 
-		var rectangle_item = new Granite.Widgets.SourceList.Item ("Rectangle");
-		rectangle_item.editable = true;
-		// rectangle_item.icon = new Gdk.Pixbuf.from_resource ("/com/github/alecaddd/akira/tools/rectangle.svg");
-
-		var circle_item = new Granite.Widgets.SourceList.Item ("Circle");
-		circle_item.editable = true;
-		// circle_item.icon = new Gdk.Pixbuf.from_resource ("/com/github/alecaddd/akira/tools/circle.svg");
-
-		var triangle_item = new Granite.Widgets.SourceList.Item ("Triangle");
-		triangle_item.editable = true;
-		// triangle_item.icon = new Gdk.Pixbuf.from_resource ("/com/github/alecaddd/akira/tools/triangle.svg");
+		var rectangle_item = new Akira.Layouts.Partials.Layer (window, "Rectangle", "/com/github/alecaddd/akira/tools/rectangle.svg");
+		var circle_item = new Akira.Layouts.Partials.Layer (window, "Circle", "/com/github/alecaddd/akira/tools/circle.svg");
+		var triangle_item = new Akira.Layouts.Partials.Layer (window, "Triangle", "/com/github/alecaddd/akira/tools/triangle.svg");
 		
 		artboard.add (rectangle_item);
 		artboard.add (circle_item);
 		artboard.add (triangle_item);
 
-		var artboard2 = new Granite.Widgets.SourceList.ExpandableItem ("Artboard 2");
-		artboard2.editable = true;
-		artboard2.expand_all ();
+		var artboard2 = new Akira.Layouts.Partials.Layer (window, "Artboard 2", null);
 
-		var text_item = new Granite.Widgets.SourceList.Item ("Text");
-		text_item.editable = true;
-		// text_item.icon = new Gdk.Pixbuf.from_resource ("/com/github/alecaddd/akira/tools/text.svg");
+		var text_item = new Akira.Layouts.Partials.Layer (window, "Text", "/com/github/alecaddd/akira/tools/text.svg");
 
 		artboard2.add (text_item);
 
-		var group_rectangle_item = new Granite.Widgets.SourceList.Item ("Rectangle");
-		group_rectangle_item.editable = true;
-		// group_rectangle_item.icon = new Gdk.Pixbuf.from_resource ("/com/github/alecaddd/akira/tools/rectangle.svg");
+		var group_rectangle_item = new Akira.Layouts.Partials.Layer (window, "Rectangle", "/com/github/alecaddd/akira/tools/rectangle.svg");
+		var group_circle_item = new Akira.Layouts.Partials.Layer (window, "Circle", "/com/github/alecaddd/akira/tools/circle.svg");
 
-		var group_circle_item = new Granite.Widgets.SourceList.Item ("Circle");
-		group_circle_item.editable = true;
-		// group_circle_item.icon = new Gdk.Pixbuf.from_resource ("/com/github/alecaddd/akira/tools/circle.svg");
-
-		var compound_item = new Granite.Widgets.SourceList.ExpandableItem ("Compound Object");
-		// compound_item.icon = new Gdk.Pixbuf.from_resource ("/com/github/alecaddd/akira/tools/bool-union.svg");
-		compound_item.editable = true;
-		compound_item.expand_all ();
+		var compound_item = new Akira.Layouts.Partials.Layer (window, "Compound Object", "/com/github/alecaddd/akira/tools/bool-union.svg");
 		compound_item.add (group_rectangle_item);
 		compound_item.add (group_circle_item);
 
-		var group_item = new Granite.Widgets.SourceList.ExpandableItem ("Group");
-		// group_item.icon = new Gdk.Pixbuf.from_resource ("/com/github/alecaddd/akira/tools/group.svg");
-		group_item.editable = true;
-		group_item.expand_all ();
+		var group_item = new Akira.Layouts.Partials.Layer (window, "Group", "/com/github/alecaddd/akira/tools/group.svg");
 		group_item.add (compound_item);
 
 		artboard2.add (group_item);
 
-		var artboard3 = new Granite.Widgets.SourceList.ExpandableItem ("Artboard 3");
-		artboard3.editable = true;
-		artboard3.expand_all ();
+		var artboard3 = new Akira.Layouts.Partials.Layer (window, "Artboard 3", null);
 
-		var vector_item = new Granite.Widgets.SourceList.Item ("Vector Path");
-		vector_item.editable = true;
-		// vector_item.icon = new Gdk.Pixbuf.from_resource ("/com/github/alecaddd/akira/tools/pen.svg");
+		var vector_item = new Akira.Layouts.Partials.Layer (window, "Vector Path", "/com/github/alecaddd/akira/tools/pen.svg");
 
 		artboard3.add (vector_item);
 
