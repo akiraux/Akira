@@ -18,41 +18,15 @@
 *
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
-public interface Akira.LayerEntry : Granite.Widgets.SourceList.Item {
+public interface Akira.ArtboardEntry : Granite.Widgets.SourceList.Item {
 }
 
-public class Akira.Layouts.Partials.Layer : Granite.Widgets.SourceList.ExpandableItem, LayerEntry, Granite.Widgets.SourceListSortable, Granite.Widgets.SourceListDragDest {
+public class Akira.Layouts.Partials.Artboard : Granite.Widgets.SourceList.ExpandableItem, ArtboardEntry, Granite.Widgets.SourceListSortable, Granite.Widgets.SourceListDragDest {
 	public weak Akira.Window window { get; construct; }
-	// public Akira.Shape shape { get; construct; }
 
-	enum Type {
-		DEFAULT,
-		GROUP,
-		COMPOUND,
-		ARTBOARD,
-		MASK
-	}
-
-	// const Gtk.TargetEntry[] target_list = {
-	// 	{ "INTEGER",    0, Target.INT32 },
-	// 	{ "STRING",     0, Target.STRING },
-	// 	{ "text/plain", 0, Target.STRING },
-	// 	{ "application/x-rootwindow-drop", 0, Target.ROOTWIN }
-	// };
-
-	public Layer (Akira.Window main_window, string layer_name, string icon_name) {
+	public Artboard (Akira.Window main_window, string layer_name) {
 		Object (window: main_window);
 		name = layer_name;
-
-		if (icon_name.contains ("/")) {
-			try {
-				icon = new Gdk.Pixbuf.from_resource (icon_name);
-			} catch (Error e) {
-				warning (e.message);
-			}
-		} else {
-			icon = new GLib.ThemedIcon (icon_name);
-		}
 	}
 
 	construct {
@@ -72,9 +46,6 @@ public class Akira.Layouts.Partials.Layer : Granite.Widgets.SourceList.Expandabl
 	}
 
 	public int compare (Granite.Widgets.SourceList.Item a, Granite.Widgets.SourceList.Item b) {
-		// if (a is Akira.Layouts.Partials.Layer && b is Akira.Layouts.Partials.Layer) {
-		// 	return (a as Akira.Layouts.Partials.Layer).name.collate ((b as Akira.Layouts.Partials.Layer).name);
-		// }
 		return 0;
 	}
 
@@ -97,11 +68,4 @@ public class Akira.Layouts.Partials.Layer : Granite.Widgets.SourceList.Expandabl
 	public void delete () {
 		this.parent.remove (this);
 	}
-
-	// , Granite.Widgets.SourceListDragSource
-	// public bool draggable () {
-	// 	return true;
-	// }
-
-	// public void prepare_selection_data (Gtk.SelectionData data) {}
 }

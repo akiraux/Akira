@@ -21,17 +21,18 @@
 public class Akira.Layouts.Partials.LayersPanel : Gtk.Grid {
 	public weak Akira.Window window { get; construct; }
 
-	public Granite.Widgets.SourceList layers;
+	// public Granite.Widgets.SourceList layers;
+	public Akira.Layouts.Partials.LayersList layers_list;
 
 	public LayersPanel (Akira.Window main_window) {
-		Object (
-			window: main_window
-		);
+		Object (window: main_window);
 	}
 
 	construct {
+		layers_list = new Akira.Layouts.Partials.LayersList (window);
+
 		attach (build_search_bar (), 0, 0, 1, 1);
-		attach (build_layers (), 0, 1, 1, 1);
+		attach (layers_list, 0, 1, 1, 1);
 	}
 
 	private Gtk.Grid build_search_bar () {
@@ -39,7 +40,6 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.Grid {
 		search.hexpand = true;
 		search.margin = 5;
 		search.placeholder_text = _("Search Layer");
-		search.get_style_context ().add_class ("search-input");
 
 		search.activate.connect (() => {
 			warning ("search");
@@ -52,47 +52,64 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.Grid {
 		return search_grid;
 	}
 
-	private Granite.Widgets.SourceList build_layers () {
-		layers = new Granite.Widgets.SourceList ();
+	// private Granite.Widgets.SourceList build_layers () {
+	// 	layers = new Granite.Widgets.SourceList ();
+	// 	layers.get_style_context ().add_class ("layers-panel");
 
-		var artboard = new Akira.Layouts.Partials.Layer (window, "Artboard 1", null);
+	// 	Gtk.TargetEntry uri_list_entry = { "text/uri-list", Gtk.TargetFlags.SAME_APP, 0 };
+	// 	layers.enable_drag_dest ({ uri_list_entry }, Gdk.DragAction.COPY);
 
-		var rectangle_item = new Akira.Layouts.Partials.Layer (window, "Rectangle", "/com/github/alecaddd/akira/tools/rectangle.svg");
-		var circle_item = new Akira.Layouts.Partials.Layer (window, "Circle", "/com/github/alecaddd/akira/tools/circle.svg");
-		var triangle_item = new Akira.Layouts.Partials.Layer (window, "Triangle", "/com/github/alecaddd/akira/tools/triangle.svg");
+	// 	layers.events |= Gdk.EventMask.KEY_RELEASE_MASK;
+	// 	layers.key_release_event.connect ((key) => {
+	// 		if (key.keyval == Gdk.Key.Delete && (layers.selected is Akira.Layouts.Partials.Layer)) {
+	// 			(layers.selected as Akira.Layouts.Partials.Layer).delete ();
+	// 		}
+	// 		return true;
+	// 	});
+
+	// 	var artboard = new Akira.Layouts.Partials.Artboard (window, "Artboard 1");
+
+	// 	var rectangle_item = new Akira.Layouts.Partials.Layer (window, "Rectangle", "/com/github/alecaddd/akira/tools/rectangle.svg");
+	// 	var circle_item = new Akira.Layouts.Partials.Layer (window, "Circle", "/com/github/alecaddd/akira/tools/circle.svg");
+	// 	var triangle_item = new Akira.Layouts.Partials.Layer (window, "Triangle", "/com/github/alecaddd/akira/tools/triangle.svg");
 		
-		artboard.add (rectangle_item);
-		artboard.add (circle_item);
-		artboard.add (triangle_item);
+	// 	artboard.add (rectangle_item);
+	// 	artboard.add (circle_item);
+	// 	artboard.add (triangle_item);
 
-		var artboard2 = new Akira.Layouts.Partials.Layer (window, "Artboard 2", null);
+	// 	var artboard2 = new Akira.Layouts.Partials.Artboard (window, "Artboard 2");
 
-		var text_item = new Akira.Layouts.Partials.Layer (window, "Text", "/com/github/alecaddd/akira/tools/text.svg");
+	// 	var text_item = new Akira.Layouts.Partials.Layer (window, "Text", "/com/github/alecaddd/akira/tools/text.svg");
 
-		artboard2.add (text_item);
+	// 	artboard2.add (text_item);
 
-		var group_rectangle_item = new Akira.Layouts.Partials.Layer (window, "Rectangle", "/com/github/alecaddd/akira/tools/rectangle.svg");
-		var group_circle_item = new Akira.Layouts.Partials.Layer (window, "Circle", "/com/github/alecaddd/akira/tools/circle.svg");
+	// 	var group_rectangle_item = new Akira.Layouts.Partials.Layer (window, "Rectangle", "/com/github/alecaddd/akira/tools/rectangle.svg");
+	// 	var group_circle_item = new Akira.Layouts.Partials.Layer (window, "Circle", "/com/github/alecaddd/akira/tools/circle.svg");
 
-		var compound_item = new Akira.Layouts.Partials.Layer (window, "Compound Object", "/com/github/alecaddd/akira/tools/bool-union.svg");
-		compound_item.add (group_rectangle_item);
-		compound_item.add (group_circle_item);
+	// 	var compound_item = new Akira.Layouts.Partials.Layer (window, "Compound Object", "/com/github/alecaddd/akira/tools/bool-union.svg");
+	// 	compound_item.add (group_rectangle_item);
+	// 	compound_item.add (group_circle_item);
 
-		var group_item = new Akira.Layouts.Partials.Layer (window, "Group", "/com/github/alecaddd/akira/tools/group.svg");
-		group_item.add (compound_item);
+	// 	var group_item = new Akira.Layouts.Partials.Layer (window, "Group", "folder-symbolic");
+	// 	group_item.add (compound_item);
 
-		artboard2.add (group_item);
+	// 	artboard2.add (group_item);
 
-		var artboard3 = new Akira.Layouts.Partials.Layer (window, "Artboard 3", null);
+	// 	var artboard3 = new Akira.Layouts.Partials.Artboard (window, "Artboard 3");
 
-		var vector_item = new Akira.Layouts.Partials.Layer (window, "Vector Path", "/com/github/alecaddd/akira/tools/pen.svg");
+	// 	var vector_item = new Akira.Layouts.Partials.Layer (window, "Vector Path", "/com/github/alecaddd/akira/tools/pen.svg");
 
-		artboard3.add (vector_item);
+	// 	artboard3.add (vector_item);
 
-		layers.root.add (artboard);
-		layers.root.add (artboard2);
-		layers.root.add (artboard3);
+	// 	var layers_root = new Akira.Layouts.Partials.Artboard (window, "Layers");
+	// 	layers_root.expand_all ();
 
-		return layers;
-	}
+	// 	layers.root.add (layers_root);
+
+	// 	layers_root.add (artboard);
+	// 	layers_root.add (artboard2);
+	// 	layers_root.add (artboard3);
+
+	// 	return layers;
+	// }
 }

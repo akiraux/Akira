@@ -32,6 +32,22 @@
     border-bottom: 1px solid rgba(0,0,0,0.2);
 }
 
-.search-input {
-    font-size: 8px;
+.artboard {
+    padding-right: 5px;
+    padding-left: 5px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+    background: #fff;
+}
+
+.artboard-name {
+    font-weight: bold;
+    padding-left: 5px;
+    text-shadow: 0 1px 0 #fff;
+}
+
+.artboard-container {
+    background-color: #ffffff;
+    border-bottom: 1px solid #ccc;
+    border-top: 1px solid #ccc;
 }
