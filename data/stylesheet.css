@@ -19,7 +19,7 @@
 }
 
 .sidebar-r {
-    background-color: @sideLBg;
+    background-color: #eee;
     border-left: 1px solid @sideLBorder;
 }
 
@@ -33,21 +33,22 @@
 }
 
 .artboard {
-    padding-right: 5px;
-    padding-left: 5px;
-    padding-top: 6px;
-    padding-bottom: 6px;
-    background: #fff;
+    border-bottom: 1px solid #ccc;
+    background-color: #fff;
+}
+
+.artboard:hover GtkExpander {
+    background-color: #f5f5f5;
 }
 
 .artboard-name {
     font-weight: bold;
     padding-left: 5px;
+    padding-top: 6px;
+    padding-bottom: 6px;
     text-shadow: 0 1px 0 #fff;
 }
 
 .artboard-container {
-    background-color: #ffffff;
-    border-bottom: 1px solid #ccc;
     border-top: 1px solid #ccc;
 }

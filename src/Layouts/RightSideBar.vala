@@ -22,6 +22,7 @@ public class Akira.Layouts.RightSideBar : Gtk.Grid {
 	public weak Akira.Window window { get; construct; }
 
 	public Akira.Layouts.Partials.LayersPanel layers_panel;
+	public Gtk.ScrolledWindow layers_scroll;
 
 	public bool toggled {
 		get {
@@ -50,12 +51,35 @@ public class Akira.Layouts.RightSideBar : Gtk.Grid {
 		pane.wide_handle = false;
 		pane.position = 600;
 
+		layers_scroll = new Gtk.ScrolledWindow (null, null);
 		layers_panel = new Akira.Layouts.Partials.LayersPanel (window);
+		layers_scroll.add (layers_panel);
 
-		pane.pack1 (layers_panel, false, false);
+		var top_panel = new Gtk.Grid ();
+		top_panel.attach (build_search_bar (), 0, 0, 1, 1);
+		top_panel.attach (layers_scroll, 0, 1, 1, 1);
+
+		pane.pack1 (top_panel, false, false);
 		pane.pack2 (new Gtk.Label ("Bottom"), true, false);
 
 		attach (pane, 0 , 0 , 1, 1);
+	}
+
+	private Gtk.Grid build_search_bar () {
+		var search = new Gtk.SearchEntry ();
+		search.hexpand = true;
+		search.margin = 5;
+		search.placeholder_text = _("Search Layer");
+
+		search.activate.connect (() => {
+			warning ("search");
+		});
+
+		var search_grid = new Gtk.Grid ();
+		search_grid.get_style_context ().add_class ("border-bottom");
+		search_grid.add (search);
+
+		return search_grid;
 	}
 
 	public void toggle () {
