@@ -26,7 +26,7 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
 	private bool should_scroll = false;
 	public Gtk.Adjustment vadjustment;
 
-	private const int SCROLL_STEP_SIZE = 10;
+	private const int SCROLL_STEP_SIZE = 5;
 	private const int SCROLL_DISTANCE = 30;
 	private const int SCROLL_DELAY = 50;
 
@@ -107,6 +107,16 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
 		insert (source, newPos);
 	}
 
+	public bool on_drag_motion (Gdk.DragContext context, int x, int y, uint time) {
+		check_scroll (y);
+		if (should_scroll && !scrolling) {
+			scrolling = true;
+			Timeout.add (SCROLL_DELAY, scroll);
+		}
+
+		return true;
+	}
+
 	private void check_scroll (int y) {
 		vadjustment = window.main_window.right_sidebar.layers_scroll.vadjustment;
 
@@ -142,15 +152,5 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
 		}
 
 		return should_scroll;
-	}
-
-	public bool on_drag_motion (Gdk.DragContext context, int x, int y, uint time) {
-		check_scroll (y);
-		if (should_scroll && !scrolling) {
-			scrolling = true;
-			Timeout.add (SCROLL_DELAY, scroll);
-		}
-
-		return true;
 	}
 }

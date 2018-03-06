@@ -57,12 +57,12 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 	}
 
 	private void build_darg_and_drop () {
-		Gtk.drag_source_set(this, Gdk.ModifierType.BUTTON1_MASK, targetEntries, Gdk.DragAction.MOVE);
+		Gtk.drag_source_set (this, Gdk.ModifierType.BUTTON1_MASK, targetEntries, Gdk.DragAction.MOVE);
 
-		drag_begin.connect(on_drag_begin);
-		drag_data_get.connect(on_drag_data_get);
-		// drag_data_delete.connect(on_drag_data_delete);
-		// drag_end.connect(on_drag_end);
+		drag_begin.connect (on_drag_begin);
+		drag_data_get.connect (on_drag_data_get);
+		// drag_data_delete.connect (on_drag_data_delete);
+		// drag_end.connect (on_drag_end);
 	}
 
 	private void on_drag_begin (Gtk.Widget widget, Gdk.DragContext context) {
@@ -86,14 +86,14 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 		cr.rectangle (0, 0, alloc.width, alloc.height);
 		cr.fill ();
 
-		row.get_style_context().add_class("drag-icon");
-		row.draw(cr);
-		row.get_style_context().remove_class("drag-icon");
+		row.get_style_context ().add_class ("drag-icon");
+		row.draw (cr);
+		row.get_style_context ().remove_class ("drag-icon");
 
 		Gtk.drag_set_icon_surface (context, surface);
 	}
 
-	private void on_drag_data_get(Gtk.Widget widget, Gdk.DragContext context, Gtk.SelectionData selection_data, uint target_type, uint time) {
+	private void on_drag_data_get (Gtk.Widget widget, Gdk.DragContext context, Gtk.SelectionData selection_data, uint target_type, uint time) {
 		uchar[] data = new uchar[(sizeof (Akira.Layouts.Partials.Artboard))];
 		((Gtk.Widget[])data)[0] = widget;
 
