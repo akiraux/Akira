@@ -43,7 +43,6 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
 	}
 
 	construct {
-		expand = true;
 		get_style_context ().add_class ("sidebar-r");
 
 		var artboard = new Akira.Layouts.Partials.Artboard (window, "Artboard 1");
@@ -76,8 +75,7 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
 
 		drag_data_received.connect (on_drag_data_received);
 		drag_motion.connect (on_drag_motion);
-		// drag_leave.connect (on_drag_leave);
-		// drag_drop.connect (on_drag_drop);
+		drag_leave.connect (on_drag_leave);
 	}
 
 	private void on_drag_data_received (Gdk.DragContext context, int x, int y, Gtk.SelectionData selection_data, uint target_type, uint time) {
@@ -87,7 +85,7 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
 		int newPos;
 		int oldPos;
 
-		target  = (Akira.Layouts.Partials.Artboard) get_row_at_y (y);
+		target = (Akira.Layouts.Partials.Artboard) get_row_at_y (y);
 
 		newPos = target.get_index ();
 		row = ((Gtk.Widget[]) selection_data.get_data ())[0];
@@ -108,6 +106,8 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
 	}
 
 	public bool on_drag_motion (Gdk.DragContext context, int x, int y, uint time) {
+		Gtk.drag_highlight (window.main_window.right_sidebar.layers_scroll);
+
 		check_scroll (y);
 		if (should_scroll && !scrolling) {
 			scrolling = true;
@@ -115,6 +115,10 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
 		}
 
 		return true;
+	}
+
+	public void on_drag_leave (Gdk.DragContext context, uint time) {
+		Gtk.drag_unhighlight (window.main_window.right_sidebar.layers_scroll);
 	}
 
 	private void check_scroll (int y) {

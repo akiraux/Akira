@@ -32,13 +32,22 @@
     border-bottom: 1px solid rgba(0,0,0,0.2);
 }
 
+.border-top {
+    border-top: 10px solid red;
+}
+
 .artboard {
+    transition: all 240ms ease;
     border-bottom: 1px solid #ccc;
     background-color: #fff;
 }
 
-.artboard:hover GtkExpander {
+.artboard:hover {
     background-color: #f5f5f5;
+}
+
+.artboard.hover {
+    box-shadow: 0 -2px 3px rgba(255, 205, 12, 0.5), inset 0 1px 0 rgba(255, 205, 12, 1);
 }
 
 .artboard-name {

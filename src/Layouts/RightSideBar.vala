@@ -51,8 +51,9 @@ public class Akira.Layouts.RightSideBar : Gtk.Grid {
 		pane.wide_handle = false;
 		pane.position = 600;
 
-		layers_scroll = new Gtk.ScrolledWindow (null, null);
 		layers_panel = new Akira.Layouts.Partials.LayersPanel (window);
+		layers_scroll = new Gtk.ScrolledWindow (null, null);
+		layers_scroll.expand = true;
 		layers_scroll.add (layers_panel);
 
 		var top_panel = new Gtk.Grid ();
