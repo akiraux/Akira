@@ -61,7 +61,27 @@ public class Akira.Layouts.RightSideBar : Gtk.Grid {
 		top_panel.attach (layers_scroll, 0, 1, 1, 1);
 
 		pane.pack1 (top_panel, false, false);
-		pane.pack2 (new Gtk.Label ("Bottom"), true, false);
+
+		var listbox = new Gtk.ListBox();
+		listbox.selection_mode = Gtk.SelectionMode.SINGLE;
+
+		for (var i = 1; i < 4; i++)
+		{
+			string text = @"Page $i";
+			
+			var label_name = new Gtk.Label (text);
+			label_name.get_style_context ().add_class ("artboard-name");
+			label_name.halign = Gtk.Align.START;
+
+			var expander = new Gtk.Expander (text);
+			expander.label_widget = label_name;
+			expander.label_fill = true;
+			expander.expanded = false;
+
+			listbox.add(expander);
+		}
+
+		pane.pack2 (listbox, true, false);
 
 		attach (pane, 0 , 0 , 1, 1);
 	}

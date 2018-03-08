@@ -32,21 +32,24 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 	public Artboard (Akira.Window main_window, string name) {
 		Object (
 			window: main_window, 
-			layer_name: name
+			layer_name: name,
+			selectable: true
 		);
 	}
 
 	construct {
 		hexpand = true;
+		selectable = true;
 
 		var label_name =  new Gtk.Label (layer_name);
 		label_name.get_style_context ().add_class ("artboard-name");
-		label_name.halign = Gtk.Align.START;
+		label_name.halign = Gtk.Align.FILL;
+		label_name.xalign = 0;
 		label_name.hexpand = true;
 
 		expander = new Gtk.Expander (layer_name);
-		expander.label_widget = label_name;
 		expander.label_fill = true;
+		expander.label_widget = label_name;
 		expander.expanded = false;
 
 		add (expander);
