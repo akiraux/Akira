@@ -28,6 +28,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 
 	public Gtk.Expander expander;
 	public string layer_name { get; construct; }
+	public Gtk.Grid container;
 
 	public Artboard (Akira.Window main_window, string name) {
 		Object (
@@ -46,7 +47,11 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 		expander = new Gtk.Expander (layer_name);
 		expander.label_fill = true;
 		expander.label_widget = label_name;
-		expander.expanded = false;
+		expander.expanded = true;
+
+		container = new Gtk.Grid ();
+		container.get_style_context ().add_class ("artboard-container");
+		expander.add (container);
 
 		add (expander);
 

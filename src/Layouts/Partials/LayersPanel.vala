@@ -46,14 +46,9 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
 		get_style_context ().add_class ("sidebar-r");
 
 		var artboard = new Akira.Layouts.Partials.Artboard (window, "Artboard 1");
-		var artboard_area = new Gtk.Grid ();
-		artboard_area.get_style_context ().add_class ("artboard-container");
-		artboard_area.attach (new Gtk.Label ("Layer 1"), 0, 0, 1, 1);
-		artboard_area.attach (new Gtk.Label ("Layer 2"), 0, 1, 1, 1);
-		artboard_area.attach (new Gtk.Label ("Layer 3"), 0, 2, 1, 1);
-		artboard_area.attach (new Gtk.Label ("Layer 4"), 0, 3, 1, 1);
-
-		artboard.expander.add (artboard_area);
+		artboard.container.attach (new Akira.Layouts.Partials.Layer (window, "Rectangle", "/com/github/alecaddd/akira/tools/rectangle.svg"), 0, 0, 1, 1);
+		artboard.container.attach (new Akira.Layouts.Partials.Layer (window, "Circle", "/com/github/alecaddd/akira/tools/circle.svg"), 0, 1, 1, 1);
+		artboard.container.attach (new Akira.Layouts.Partials.Layer (window, "Triangle", "/com/github/alecaddd/akira/tools/triangle.svg"), 0, 2, 1, 1);
 
 		var artboard2 = new Akira.Layouts.Partials.Artboard (window, "Artboard 2");
 		var artboard3 = new Akira.Layouts.Partials.Artboard (window, "Artboard 3");
@@ -67,7 +62,7 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
 	}
 
 	private void on_row_activated (Gtk.ListBoxRow row) {
-		warning ("actvated");
+		warning (row.name);
 	}
 
 	private void build_drag_and_drop () {
