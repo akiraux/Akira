@@ -106,7 +106,7 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
 	}
 
 	public bool on_drag_motion (Gdk.DragContext context, int x, int y, uint time) {
-		Gtk.drag_highlight (window.main_window.right_sidebar.layers_scroll);
+		this.get_style_context ().add_class ("highlight-drop-area");
 
 		check_scroll (y);
 		if (should_scroll && !scrolling) {
@@ -118,7 +118,7 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
 	}
 
 	public void on_drag_leave (Gdk.DragContext context, uint time) {
-		Gtk.drag_unhighlight (window.main_window.right_sidebar.layers_scroll);
+		this.get_style_context ().remove_class ("highlight-drop-area");
 	}
 
 	private void check_scroll (int y) {
