@@ -52,6 +52,7 @@ public class Akira.Window : Gtk.ApplicationWindow {
 		dialogs = new Akira.Utils.Dialogs (this);
 
 		build_ui ();
+		get_style_context ().add_class ("rounded");
 
 		move (settings.pos_x, settings.pos_y);
 		resize (settings.window_width, settings.window_height);
