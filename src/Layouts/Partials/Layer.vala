@@ -25,6 +25,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 	public string icon_name { get; construct; }
 
 	public Gtk.Image icon;
+	public Gtk.EventBox event_box;
 
 	// public Akira.Shape shape { get; construct; }
 
@@ -40,6 +41,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 		get_style_context ().add_class ("layer");
 
 		var name = new Gtk.Label (layer_name);
+		event_box = new Gtk.EventBox ();
 
 		if (icon_name.contains ("/")) {
 			icon = new Gtk.Image.from_resource (icon_name);
@@ -52,6 +54,17 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 		grid.attach (icon, 0, 0, 1, 1);
 		grid.attach (name, 1, 0, 1, 1);
 
-		add (grid);
+		event_box.add (grid);
+		add (event_box);
+
+		event_box.enter_notify_event.connect ((event) => {
+			set_state_flags (Gtk.StateFlags.PRELIGHT, true);
+			return false;
+		});
+
+		event_box.leave_notify_event.connect ((event) => {
+			set_state_flags (Gtk.StateFlags.NORMAL, true);
+			return false;
+		});
 	}
 }
