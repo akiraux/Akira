@@ -31,7 +31,7 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
 	private const int SCROLL_DELAY = 50;
 
 	private const Gtk.TargetEntry targetEntries[] = {
-		{ "ARTBOARD", Gtk.TargetFlags.SAME_APP, 0 }
+		{ "GTK_LIST_BOX_ROW", Gtk.TargetFlags.SAME_APP, 0 }
 	};
 
 	public LayersPanel (Akira.Window main_window) {
@@ -85,11 +85,7 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
 		newPos = target.get_index ();
 		row = ((Gtk.Widget[]) selection_data.get_data ())[0];
 
-		if (! (row is Akira.Layouts.Partials.Artboard)) {
-			return;
-		}
-
-		source = (row as Akira.Layouts.Partials.Artboard);
+		source = (Akira.Layouts.Partials.Artboard) row.get_ancestor (typeof (Akira.Layouts.Partials.Artboard));
 		oldPos = source.get_index ();
 
 		if (source == target) {
