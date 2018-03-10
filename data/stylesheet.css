@@ -76,6 +76,14 @@
     border-bottom: 1px solid #ccc;
 }
 
+.artboard-edit-name {
+    transition: box-shadow 160ms ease;
+    font-weight: bold;
+    padding: 6px 10px;
+    border-bottom: 1px solid #ccc;
+    box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.2);
+}
+
 .artboard-container {
     border-bottom: 1px solid #ccc;
     background-color: #fff;

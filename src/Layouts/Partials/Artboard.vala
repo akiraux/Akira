@@ -27,6 +27,8 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 	};
 
 	public string layer_name { get; construct; }
+	public Gtk.Label label;
+	public Gtk.Entry entry;
 	public Gtk.EventBox handle;
 	public Gtk.ToggleButton button;
 	public Gtk.Image button_icon;
@@ -41,11 +43,29 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 	}
 
 	construct {
-		var label_name =  new Gtk.Label (layer_name);
-		label_name.get_style_context ().add_class ("artboard-name");
-		label_name.halign = Gtk.Align.FILL;
-		label_name.xalign = 0;
-		label_name.hexpand = true;
+		label =  new Gtk.Label (layer_name);
+		label.get_style_context ().add_class ("artboard-name");
+		label.halign = Gtk.Align.FILL;
+		label.xalign = 0;
+		label.hexpand = true;
+		label.set_ellipsize (Pango.EllipsizeMode.END);
+
+		entry = new Gtk.Entry ();
+		entry.expand = true;
+		entry.get_style_context ().add_class ("artboard-edit-name");
+		entry.get_style_context ().remove_class ("entry");
+		entry.visible = false;
+		entry.no_show_all = true;
+		entry.set_text (layer_name);
+
+		entry.activate.connect (update_on_enter);
+		entry.focus_out_event.connect (update_on_leave);
+		entry.key_release_event.connect (update_on_escape);
+
+		var label_grid = new Gtk.Grid ();
+		label_grid.expand = true;
+		label_grid.attach (label, 0, 0, 1, 1);
+		label_grid.attach (entry, 1, 0, 1, 1);
 
 		revealer = new Gtk.Revealer ();
 		revealer.hexpand = true;
@@ -57,7 +77,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 
 		handle = new Gtk.EventBox ();
 		handle.hexpand = true;
-		handle.add (label_name);
+		handle.add (label_grid);
 
 		button = new Gtk.ToggleButton ();
 		button.active = true;
@@ -102,16 +122,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 		handle.drag_motion.connect (on_drag_motion);
 		handle.drag_leave.connect (on_drag_leave);
 
-		handle.event.connect ((event) => {
-			if (event.type == Gdk.EventType.@2BUTTON_PRESS) {
-				warning ("double");
-			}
-
-			if (event.type == Gdk.EventType.@BUTTON_PRESS) {
-				activate ();
-			}
-			return false;
-		});
+		handle.event.connect (on_click_event);
 	}
 
 	private void on_drag_begin (Gtk.Widget widget, Gdk.DragContext context) {
@@ -158,5 +169,47 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 
 	public void on_drag_leave (Gdk.DragContext context, uint time) {
 		get_style_context ().remove_class ("hover");
+	}
+
+	public bool on_click_event (Gdk.Event event) {
+		if (event.type == Gdk.EventType.@BUTTON_PRESS) {
+			activate ();
+		}
+
+		if (event.type == Gdk.EventType.@2BUTTON_PRESS) {
+			entry.visible = true;
+			entry.no_show_all = false;
+			entry.select_region (0, -1);
+			label.visible = false;
+			label.no_show_all = true;
+		}
+
+		return false;
+	}
+
+	public void update_on_enter () {
+		update_label ();
+	}
+
+	public bool update_on_leave () {
+		update_label ();
+		return false;
+	}
+
+	public bool update_on_escape (Gdk.EventKey key) {
+		if (key.keyval == 65307) {
+			update_label ();
+		}
+		return false;
+	}
+
+	private void update_label () {
+		var new_label = entry.get_text ();
+		label.label = new_label;
+
+		entry.visible = false;
+		entry.no_show_all = true;
+		label.visible = true;
+		label.no_show_all = false;
 	}
 }

@@ -44,6 +44,7 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
 
 	construct {
 		get_style_context ().add_class ("sidebar-r");
+		expand = true;
 
 		var artboard = new Akira.Layouts.Partials.Artboard (window, "Artboard 1");
 		artboard.container.attach (new Akira.Layouts.Partials.Layer (window, "Rectangle", "/com/github/alecaddd/akira/tools/rectangle.svg"), 0, 0, 1, 1);
