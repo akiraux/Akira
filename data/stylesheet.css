@@ -42,7 +42,6 @@
 
 .artboard {
     transition: all 240ms ease;
-    border-bottom: 1px solid #ccc;
     background-color: #fff;
 }
 
@@ -50,13 +49,15 @@
     background-color: #f5f5f5;
 }
 
-.artboard:selected {
+.artboard:selected,
+.artboard:selected:hover,
+.artboard:selected .revealer-button GtkImage {
     background-color: #fff;
     color: #333;
 }
 
 .artboard:selected .artboard-name {
-    box-shadow: inset -4px 0 0 @primary;
+    box-shadow: inset 4px 0 0 @primary;
 }
 
 .artboard.hover {
@@ -70,19 +71,31 @@
 .artboard-name {
     transition: box-shadow 160ms ease;
     font-weight: bold;
-    padding-left: 5px;
-    padding-top: 6px;
-    padding-bottom: 6px;
+    padding: 6px 10px;
     text-shadow: 0 1px 0 #fff;
+    border-bottom: 1px solid #ccc;
 }
 
 .artboard-container {
-    border-top: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
     background-color: #fff;
 }
 
 .artboard-container .layer:nth-child(even) {
     background-color: #f5f5f5;
+}
+
+.revealer-button {
+    padding: 0 8px;
+    border-bottom: 1px solid #ccc;
+}
+
+.revealer-button GtkImage {
+    transition: all 160ms ease-in-out;
+}
+
+.revealer-button.closed GtkImage {
+    -gtk-icon-transform: rotate(-90deg);
 }
 
 .layer {

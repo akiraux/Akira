@@ -28,6 +28,8 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 
 	public string layer_name { get; construct; }
 	public Gtk.EventBox handle;
+	public Gtk.ToggleButton button;
+	public Gtk.Image button_icon;
 	public Gtk.Revealer revealer;
 	public Gtk.Grid container;
 
@@ -46,6 +48,8 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 		label_name.hexpand = true;
 
 		revealer = new Gtk.Revealer ();
+		revealer.hexpand = true;
+		revealer.reveal_child = true;
 
 		container = new Gtk.Grid ();
 		container.get_style_context ().add_class ("artboard-container");
@@ -55,9 +59,18 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 		handle.hexpand = true;
 		handle.add (label_name);
 
+		button = new Gtk.ToggleButton ();
+		button.active = true;
+		button.get_style_context ().remove_class ("button");
+		button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
+		button.get_style_context ().add_class ("revealer-button");
+		button_icon = new Gtk.Image.from_icon_name ("pan-down-symbolic", Gtk.IconSize.MENU);
+		button.add (button_icon);
+
 		var grid = new Gtk.Grid ();
 		grid.attach (handle, 0, 0, 1, 1);
-		grid.attach (revealer, 0, 1, 1, 1);
+		grid.attach (button, 1, 0, 1, 1);
+		grid.attach (revealer, 0, 1, 2, 1);
 
 		add (grid);
 
@@ -65,8 +78,16 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 
 		build_darg_and_drop ();
 
-		handle.button_press_event.connect (() => {
+		button.button_release_event.connect (() => {
 			revealer.reveal_child = ! revealer.get_reveal_child ();
+		});
+
+		button.toggled.connect (() => {
+			if (button.get_active ()) {
+				button.get_style_context ().remove_class ("closed");
+			} else {
+				button.get_style_context ().add_class ("closed");
+			}
 		});
 	}
 
