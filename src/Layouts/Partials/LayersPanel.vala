@@ -57,12 +57,7 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
 		insert (artboard2, 1);
 		insert (artboard3, 2);
 
-		row_activated.connect (on_row_activated);
 		build_drag_and_drop ();
-	}
-
-	private void on_row_activated (Gtk.ListBoxRow row) {
-		warning (row.name);
 	}
 
 	private void build_drag_and_drop () {

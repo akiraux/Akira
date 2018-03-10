@@ -80,6 +80,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 
 		button.button_release_event.connect (() => {
 			revealer.reveal_child = ! revealer.get_reveal_child ();
+			return false;
 		});
 
 		button.toggled.connect (() => {
@@ -100,6 +101,17 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 		Gtk.drag_dest_set (handle, Gtk.DestDefaults.MOTION, targetEntries, Gdk.DragAction.MOVE);
 		handle.drag_motion.connect (on_drag_motion);
 		handle.drag_leave.connect (on_drag_leave);
+
+		handle.event.connect ((event) => {
+			if (event.type == Gdk.EventType.@2BUTTON_PRESS) {
+				warning ("double");
+			}
+
+			if (event.type == Gdk.EventType.@BUTTON_PRESS) {
+				activate ();
+			}
+			return false;
+		});
 	}
 
 	private void on_drag_begin (Gtk.Widget widget, Gdk.DragContext context) {
