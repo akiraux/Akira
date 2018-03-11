@@ -56,13 +56,14 @@
     background-color: #fff;
     color: #333;
 }
-
+/*
 .artboard:selected .artboard-name {
     box-shadow: inset 4px 0 0 @primary;
-}
+}*/
 
-.artboard.hover {
-    box-shadow: 0 -2px 3px rgba(255, 205, 12, 0.5), inset 0 1px 0 rgba(255, 205, 12, 1);
+.artboard.hover,
+.layer.hover {
+    box-shadow: inset 0 2px 0 @primary;
 }
 
 .highlight-drop-area .artboard:last-child {
@@ -86,7 +87,6 @@
 }
 
 .artboard-container {
-    border-bottom: 1px solid #ccc;
     background-color: #fff;
 }
 
@@ -111,8 +111,22 @@
     transition: all 240ms ease;
 }
 
-.layer:hover {
+.artboard-container .layer:last-child {
+    border-bottom: 1px solid #ccc;
+}
+
+.layer.highlight {
     box-shadow: inset 0 0 0 2px @primary;
+}
+
+.layer:selected,
+.layer:selected GtkImage {
+    background-color: transparent;
+    color: #333;
+}
+
+.layer:selected {
+    box-shadow: inset 4px 0 0 @primary;
 }
 
 .layer GtkImage {

@@ -47,9 +47,9 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
 		expand = true;
 
 		var artboard = new Akira.Layouts.Partials.Artboard (window, "Artboard 1");
-		artboard.container.attach (new Akira.Layouts.Partials.Layer (window, "Rectangle", "/com/github/alecaddd/akira/tools/rectangle.svg"), 0, 0, 1, 1);
-		artboard.container.attach (new Akira.Layouts.Partials.Layer (window, "Circle", "/com/github/alecaddd/akira/tools/circle.svg"), 0, 1, 1, 1);
-		artboard.container.attach (new Akira.Layouts.Partials.Layer (window, "Triangle", "/com/github/alecaddd/akira/tools/triangle.svg"), 0, 2, 1, 1);
+		artboard.container.insert (new Akira.Layouts.Partials.Layer (window, "Rectangle", "/com/github/alecaddd/akira/tools/rectangle.svg"), 0);
+		artboard.container.insert (new Akira.Layouts.Partials.Layer (window, "Circle", "/com/github/alecaddd/akira/tools/circle.svg"), 1);
+		artboard.container.insert (new Akira.Layouts.Partials.Layer (window, "Triangle", "/com/github/alecaddd/akira/tools/triangle.svg"), 2);
 
 		var artboard2 = new Akira.Layouts.Partials.Artboard (window, "Artboard 2");
 		var artboard3 = new Akira.Layouts.Partials.Artboard (window, "Artboard 3");

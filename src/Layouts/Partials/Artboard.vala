@@ -26,6 +26,10 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 		{ "ARTBOARD", Gtk.TargetFlags.SAME_APP, 0 }
 	};
 
+	private const Gtk.TargetEntry targetEntriesLayer[] = {
+		{ "LAYER", Gtk.TargetFlags.SAME_APP, 0 }
+	};
+
 	public string layer_name { get; construct; }
 	public Gtk.Label label;
 	public Gtk.Entry entry;
@@ -33,7 +37,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 	public Gtk.ToggleButton button;
 	public Gtk.Image button_icon;
 	public Gtk.Revealer revealer;
-	public Gtk.Grid container;
+	public Gtk.ListBox container;
 
 	public Artboard (Akira.Window main_window, string name) {
 		Object (
@@ -71,8 +75,11 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 		revealer.hexpand = true;
 		revealer.reveal_child = true;
 
-		container = new Gtk.Grid ();
+		container = new Gtk.ListBox ();
 		container.get_style_context ().add_class ("artboard-container");
+		container.expand = true;
+		Gtk.drag_dest_set (this.container, Gtk.DestDefaults.ALL, targetEntriesLayer, Gdk.DragAction.MOVE);
+		this.container.drag_data_received.connect (on_drag_data_received);
 		revealer.add (container);
 
 		handle = new Gtk.EventBox ();
@@ -107,6 +114,32 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 				button.get_style_context ().add_class ("closed");
 			}
 		});
+	}
+
+	private void on_drag_data_received (Gdk.DragContext context, int x, int y, Gtk.SelectionData selection_data, uint target_type, uint time) {
+		Akira.Layouts.Partials.Layer target;
+		Gtk.Widget row;
+		Akira.Layouts.Partials.Layer source;
+		int newPos;
+		int oldPos;
+
+		target = (Akira.Layouts.Partials.Layer) container.get_row_at_y (y);
+
+		newPos = target.get_index ();
+		row = ((Gtk.Widget[]) selection_data.get_data ())[0];
+
+		source = (Akira.Layouts.Partials.Layer) row.get_ancestor (typeof (Akira.Layouts.Partials.Layer));
+		oldPos = source.get_index ();
+
+		if (source == target) {
+			return;
+		}
+
+		stdout.printf("NEW: %i || OLD: %i\n", newPos, oldPos);
+
+		container.remove (source);
+		container.insert (source, newPos);
+		container.show_all ();
 	}
 
 	private void build_darg_and_drop () {
