@@ -108,7 +108,6 @@
 
 .layer {
     transition: all 240ms ease;
-    padding: 6px;
 }
 
 .layer:hover {
