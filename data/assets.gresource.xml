@@ -10,6 +10,7 @@
     <file alias="bool-subtract.svg" compressed="false" preprocess="">assets/tools/bool-subtract.svg</file>
     <file alias="bool-union.svg" compressed="false" preprocess="xml-stripblanks">assets/tools/bool-union.svg</file>
     <file alias="eye.svg" compressed="false" preprocess="xml-stripblanks">assets/tools/eye.svg</file>
+    <file alias="eye-not.svg" compressed="false" preprocess="xml-stripblanks">assets/tools/eye-not.svg</file>
     <file alias="gear.svg" compressed="false" preprocess="xml-stripblanks">assets/tools/gear.svg</file>
     <file alias="grid.svg" compressed="false" preprocess="xml-stripblanks">assets/tools/grid.svg</file>
     <file alias="group.svg" compressed="false" preprocess="xml-stripblanks">assets/tools/group.svg</file>
