@@ -51,7 +51,8 @@
 
 .artboard:selected,
 .artboard:selected:hover,
-.artboard:selected .revealer-button GtkImage {
+.artboard:selected .revealer-button GtkImage,
+.artboard:selected .layer-action GtkImage {
     background-color: #fff;
     color: #333;
 }
@@ -117,4 +118,20 @@
 .layer GtkImage {
     padding-right: 4px;
     opacity: 0.8;
+}
+
+.layer-action {
+    opacity: 0;
+}
+
+.layer-action.show {
+    opacity: 0.5;
+}
+
+.layer-action GtkImage {
+    color: #333;
+}
+
+.layer-action:hover {
+    opacity: 1;
 }

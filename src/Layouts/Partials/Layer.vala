@@ -26,7 +26,10 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 
 	public Gtk.Image icon;
 	public Gtk.Image icon_locked;
+	public Gtk.Image icon_unlocked;
 	public Gtk.Image icon_hidden;
+	public Gtk.ToggleButton button_locked;
+	public Gtk.ToggleButton button_hidden;
 	public Gtk.Label label;
 	public Gtk.Entry entry;
 	public Gtk.EventBox handle;
@@ -38,7 +41,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 
 	private bool _hidden { get; set; default = false; }
 	public bool hidden {
-		get { return _hidden; } set { _locked = value; }
+		get { return _hidden; } set { _hidden = value; }
 	}
 
 	// public Akira.Shape shape { get; construct; }
@@ -77,7 +80,21 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 			icon = new Gtk.Image.from_icon_name (icon_name, Gtk.IconSize.MENU);
 		}
 
+		button_locked = new Gtk.ToggleButton ();
+		button_locked.tooltip_text = _("Lock Layer");
+		button_locked.get_style_context ().remove_class ("button");
+		button_locked.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
+		button_locked.get_style_context ().add_class ("layer-action");
 		icon_locked = new Gtk.Image.from_icon_name ("channel-secure-symbolic", Gtk.IconSize.MENU);
+		icon_unlocked = new Gtk.Image.from_icon_name ("channel-insecure-symbolic", Gtk.IconSize.MENU);
+		icon_unlocked.visible = false;
+		icon_unlocked.no_show_all = true;
+
+		var button_locked_grid = new Gtk.Grid ();
+		button_locked_grid.attach (icon_locked, 0, 0, 1, 1);
+		button_locked_grid.attach (icon_unlocked, 1, 0, 1, 1);
+		button_locked.add (button_locked_grid);
+
 		icon_hidden = new Gtk.Image.from_resource ("/com/github/alecaddd/akira/tools/eye.svg");
 
 		var label_grid = new Gtk.Grid ();
@@ -86,8 +103,8 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 		label_grid.attach (icon, 0, 0, 1, 1);
 		label_grid.attach (label, 1, 0, 1, 1);
 		label_grid.attach (entry, 2, 0, 1, 1);
-		label_grid.attach (icon_locked, 3, 0, 1, 1);
-		label_grid.attach (icon_hidden, 4, 0, 1, 1);
+		label_grid.attach (button_locked, 3, 0, 1, 1);
+		// label_grid.attach (icon_hidden, 4, 0, 1, 1);
 
 		handle = new Gtk.EventBox ();
 		handle.hexpand = true;
@@ -96,16 +113,21 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 		add (handle);
 
 		handle.enter_notify_event.connect ((event) => {
-			set_state_flags (Gtk.StateFlags.PRELIGHT, true);
-			return false;
+			button_locked.get_style_context ().add_class ("show");
+			button_locked.tooltip_text = _("Unlock Layer");
+			return true;
 		});
 
 		handle.leave_notify_event.connect ((event) => {
-			set_state_flags (Gtk.StateFlags.NORMAL, true);
-			return false;
+			if (! button_locked.get_active ()) {
+				button_locked.get_style_context ().remove_class ("show");
+				button_locked.tooltip_text = _("Lock Layer");
+			}
 		});
 
 		handle.event.connect (on_click_event);
+
+		lock_actions ();
 	}
 
 	public bool on_click_event (Gdk.Event event) {
@@ -148,5 +170,19 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 		entry.no_show_all = true;
 		label.visible = true;
 		label.no_show_all = false;
+	}
+
+	private void lock_actions () {
+		button_locked.toggled.connect (() => {
+			var active = button_locked.get_active ();
+
+			icon_unlocked.visible = active;
+			icon_unlocked.no_show_all = ! active;
+
+			icon_locked.visible = ! active;
+			icon_locked.no_show_all = active;
+
+			locked = active;
+		});
 	}
 }

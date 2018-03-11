@@ -98,7 +98,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 
 		build_darg_and_drop ();
 
-		button.button_release_event.connect (() => {
+		button.toggled.connect (() => {
 			revealer.reveal_child = ! revealer.get_reveal_child ();
 
 			if (revealer.get_reveal_child ()) {
@@ -106,8 +106,6 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 			} else {
 				button.get_style_context ().add_class ("closed");
 			}
-
-			return false;
 		});
 	}
 
