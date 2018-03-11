@@ -23,7 +23,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 	public weak Akira.Window window { get; construct; }
 
 	private const Gtk.TargetEntry targetEntries[] = {
-		{ "GTK_LIST_BOX_ROW", Gtk.TargetFlags.SAME_APP, 0 }
+		{ "ARTBOARD", Gtk.TargetFlags.SAME_APP, 0 }
 	};
 
 	public string layer_name { get; construct; }
@@ -100,15 +100,14 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 
 		button.button_release_event.connect (() => {
 			revealer.reveal_child = ! revealer.get_reveal_child ();
-			return false;
-		});
 
-		button.toggled.connect (() => {
-			if (button.get_active ()) {
+			if (revealer.get_reveal_child ()) {
 				button.get_style_context ().remove_class ("closed");
 			} else {
 				button.get_style_context ().add_class ("closed");
 			}
+
+			return false;
 		});
 	}
 
@@ -158,7 +157,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 		((Gtk.Widget[])data)[0] = widget;
 
 		selection_data.set (
-			Gdk.Atom.intern_static_string ("GTK_LIST_BOX_ROW"), 32, data
+			Gdk.Atom.intern_static_string ("ARTBOARD"), 32, data
 		);
 	}
 	

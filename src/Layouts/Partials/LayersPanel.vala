@@ -31,7 +31,7 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
 	private const int SCROLL_DELAY = 50;
 
 	private const Gtk.TargetEntry targetEntries[] = {
-		{ "GTK_LIST_BOX_ROW", Gtk.TargetFlags.SAME_APP, 0 }
+		{ "ARTBOARD", Gtk.TargetFlags.SAME_APP, 0 }
 	};
 
 	public LayersPanel (Akira.Window main_window) {
