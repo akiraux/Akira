@@ -118,9 +118,9 @@
     box-shadow: inset 0 -2px 0 @primary;
 }
 
-.artboard-container .layer:last-child {
+/*.artboard-container .layer:last-child {
     border-bottom: 1px solid #ccc;
-}
+}*/
 
 .layer.highlight {
     box-shadow: inset 0 0 0 2px @primary;

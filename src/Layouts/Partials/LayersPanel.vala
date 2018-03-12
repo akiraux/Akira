@@ -47,16 +47,29 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
 		expand = true;
 
 		var artboard = new Akira.Layouts.Partials.Artboard (window, "Artboard 1");
-		artboard.container.insert (new Akira.Layouts.Partials.Layer (window, artboard, "Rectangle", "/com/github/alecaddd/akira/tools/rectangle.svg"), 0);
-		artboard.container.insert (new Akira.Layouts.Partials.Layer (window, artboard, "Circle", "/com/github/alecaddd/akira/tools/circle.svg"), 1);
-		artboard.container.insert (new Akira.Layouts.Partials.Layer (window, artboard, "Triangle", "/com/github/alecaddd/akira/tools/triangle.svg"), 2);
+		var placeholder = new Gtk.ListBoxRow ();
+		artboard.container.insert (placeholder, 0);
+		placeholder.visible = false;
+		placeholder.no_show_all = true;
+
+		artboard.container.insert (new Akira.Layouts.Partials.Layer (window, artboard, "Rectangle", "/com/github/alecaddd/akira/tools/rectangle.svg"), 1);
+		artboard.container.insert (new Akira.Layouts.Partials.Layer (window, artboard, "Circle", "/com/github/alecaddd/akira/tools/circle.svg"), 2);
+		artboard.container.insert (new Akira.Layouts.Partials.Layer (window, artboard, "Triangle", "/com/github/alecaddd/akira/tools/triangle.svg"), 3);
+		artboard.container.insert (new Akira.Layouts.Partials.Layer (window, artboard, "Text", "/com/github/alecaddd/akira/tools/text.svg"), 4);
+		artboard.container.insert (new Akira.Layouts.Partials.Layer (window, artboard, "Bezier", "/com/github/alecaddd/akira/tools/pen.svg"), 5);
+		artboard.container.insert (new Akira.Layouts.Partials.Layer (window, artboard, "Path", "/com/github/alecaddd/akira/tools/pencil.svg"), 6);
 
 		var artboard2 = new Akira.Layouts.Partials.Artboard (window, "Artboard 2");
 		var artboard3 = new Akira.Layouts.Partials.Artboard (window, "Artboard 3");
 
-		insert (artboard, 0);
-		insert (artboard2, 1);
-		insert (artboard3, 2);
+		var artboard_placeholder = new Gtk.ListBoxRow ();
+		artboard_placeholder.visible = false;
+		artboard_placeholder.no_show_all = true;
+
+		insert (artboard_placeholder, 0);
+		insert (artboard, 1);
+		insert (artboard2, 2);
+		insert (artboard3, 3);
 
 		build_drag_and_drop ();
 	}
@@ -92,8 +105,6 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
 		if (source == target) {
 			return;
 		}
-
-		stdout.printf("OLD: %i || NEW: %i\n", oldPos, newPos);
 
 		remove (source);
 		insert (source, newPos);

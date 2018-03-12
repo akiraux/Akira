@@ -77,7 +77,6 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 
 		container = new Gtk.ListBox ();
 		container.get_style_context ().add_class ("artboard-container");
-		container.expand = true;
 		Gtk.drag_dest_set (this.container, Gtk.DestDefaults.ALL, targetEntriesLayer, Gdk.DragAction.MOVE);
 		this.container.drag_data_received.connect (on_drag_data_received);
 		revealer.add (container);
@@ -98,6 +97,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 		grid.attach (handle, 0, 0, 1, 1);
 		grid.attach (button, 1, 0, 1, 1);
 		grid.attach (revealer, 0, 1, 2, 1);
+		grid.attach (new Gtk.Separator (Gtk.Orientation.HORIZONTAL), 0, 2, 2, 1);
 
 		add (grid);
 
@@ -125,7 +125,12 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 
 		target = (Akira.Layouts.Partials.Layer) container.get_row_at_y (y);
 
-		newPos = target.get_index ();
+		if (target == null) {
+			newPos = -1;
+		} else {
+			newPos = target.get_index ();
+		}
+
 		row = ((Gtk.Widget[]) selection_data.get_data ())[0];
 
 		source = (Akira.Layouts.Partials.Layer) row.get_ancestor (typeof (Akira.Layouts.Partials.Layer));
@@ -135,11 +140,10 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 			return;
 		}
 
-		stdout.printf("NEW: %i || OLD: %i\n", newPos, oldPos);
-
 		container.remove (source);
 		container.insert (source, newPos);
 		container.show_all ();
+		show_all ();
 	}
 
 	private void build_darg_and_drop () {
