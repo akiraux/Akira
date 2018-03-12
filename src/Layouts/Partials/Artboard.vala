@@ -193,29 +193,13 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 	}
 	
 	public bool on_drag_motion (Gdk.DragContext context, int x, int y, uint time) {
-		Akira.Layouts.Partials.Artboard target;
-		Gtk.Allocation alloc;
-		get_allocation (out alloc);
+		window.main_window.right_sidebar.layers_panel.drag_highlight_row (this);
 
-		target = (Akira.Layouts.Partials.Artboard) window.main_window.right_sidebar.layers_panel.get_row_at_y (y);
-
-		if (target == this) {
-			return false;
-		}
-
-		if (y <= (alloc.height / 2)) {
-			get_style_context ().add_class ("hover-up");
-			get_style_context ().remove_class ("hover-down");
-		} else if (y > (alloc.height / 2)) {
-			get_style_context ().add_class ("hover-down");
-			get_style_context ().remove_class ("hover-up");
-		}
 		return true;
 	}
 
 	public void on_drag_leave (Gdk.DragContext context, uint time) {
-		get_style_context ().remove_class ("hover-up");
-		get_style_context ().remove_class ("hover-down");
+		window.main_window.right_sidebar.layers_panel.drag_unhighlight_row ();
 	}
 
 	public bool on_click_event (Gdk.Event event) {

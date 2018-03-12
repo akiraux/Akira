@@ -47,9 +47,9 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
 		expand = true;
 
 		var artboard = new Akira.Layouts.Partials.Artboard (window, "Artboard 1");
-		artboard.container.insert (new Akira.Layouts.Partials.Layer (window, "Rectangle", "/com/github/alecaddd/akira/tools/rectangle.svg"), 0);
-		artboard.container.insert (new Akira.Layouts.Partials.Layer (window, "Circle", "/com/github/alecaddd/akira/tools/circle.svg"), 1);
-		artboard.container.insert (new Akira.Layouts.Partials.Layer (window, "Triangle", "/com/github/alecaddd/akira/tools/triangle.svg"), 2);
+		artboard.container.insert (new Akira.Layouts.Partials.Layer (window, artboard, "Rectangle", "/com/github/alecaddd/akira/tools/rectangle.svg"), 0);
+		artboard.container.insert (new Akira.Layouts.Partials.Layer (window, artboard, "Circle", "/com/github/alecaddd/akira/tools/circle.svg"), 1);
+		artboard.container.insert (new Akira.Layouts.Partials.Layer (window, artboard, "Triangle", "/com/github/alecaddd/akira/tools/triangle.svg"), 2);
 
 		var artboard2 = new Akira.Layouts.Partials.Artboard (window, "Artboard 2");
 		var artboard3 = new Akira.Layouts.Partials.Artboard (window, "Artboard 3");
@@ -78,7 +78,12 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
 
 		target = (Akira.Layouts.Partials.Artboard) get_row_at_y (y);
 
-		newPos = target.get_index ();
+		if (target == null) {
+			newPos = -1;
+		} else {
+			newPos = target.get_index ();
+		}
+
 		row = ((Gtk.Widget[]) selection_data.get_data ())[0];
 
 		source = (Akira.Layouts.Partials.Artboard) row.get_ancestor (typeof (Akira.Layouts.Partials.Artboard));
@@ -87,6 +92,8 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
 		if (source == target) {
 			return;
 		}
+
+		stdout.printf("OLD: %i || NEW: %i\n", oldPos, newPos);
 
 		remove (source);
 		insert (source, newPos);

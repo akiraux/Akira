@@ -45,32 +45,28 @@
     background-color: #fff;
 }
 
-.artboard:hover {
+.artboard:hover,
+.artboard:selected:hover {
     background-color: #f5f5f5;
+    color: #333;
 }
 
 .artboard:selected,
-.artboard:selected:hover,
 .artboard:selected .revealer-button GtkImage,
 .artboard:selected .layer-action GtkImage {
-    background-color: #fff;
     color: #333;
 }
-/*
-.artboard:selected .artboard-name {
-    box-shadow: inset 4px 0 0 @primary;
+
+/*.artboard.hover-up {
+    box-shadow: inset 0 1px 0 @primary;
+}
+
+.artboard.hover-down {
+    box-shadow: inset 0 0 0 1px @primary;
 }*/
 
-.artboard.hover-up {
-    box-shadow: inset 0 2px 0 @primary;
-}
-
-.artboard.hover-down ~ .artboard {
-    box-shadow: inset 0 2px 0 @primary;
-}
-
 .highlight-drop-area .artboard:last-child {
-    box-shadow: inset 0 -2px 0 @primary;
+    box-shadow: inset 0 -2px 0 #000;
 }
 
 .artboard-name {

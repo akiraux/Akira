@@ -21,6 +21,7 @@
 
 public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 	public weak Akira.Window window { get; construct; }
+	public Akira.Layouts.Partials.Artboard artboard { construct set; get; }
 	public string layer_name { get; construct; }
 	public string icon_name { get; construct; }
 
@@ -51,11 +52,12 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 
 	// public Akira.Shape shape { get; construct; }
 
-	public Layer (Akira.Window main_window, string name, string icon) {
+	public Layer (Akira.Window main_window, Akira.Layouts.Partials.Artboard artboard, string name, string icon) {
 		Object (
 			window: main_window,
 			layer_name: name,
-			icon_name: icon
+			icon_name: icon,
+			artboard: artboard
 		);
 	}
 
@@ -205,22 +207,24 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 	}
 
 	public bool on_drag_motion (Gdk.DragContext context, int x, int y, uint time) {
-		Gtk.Allocation alloc;
-		get_allocation (out alloc);
+		artboard.container.drag_highlight_row (this);
+		// Gtk.Allocation alloc;
+		// get_allocation (out alloc);
 
-		if (y <= (alloc.height / 2)) {
-			get_style_context ().add_class ("hover-up");
-			get_style_context ().remove_class ("hover-down");
-		} else if (y > (alloc.height / 2)) {
-			get_style_context ().add_class ("hover-down");
-			get_style_context ().remove_class ("hover-up");
-		}
+		// if (y <= (alloc.height / 2)) {
+		// 	get_style_context ().add_class ("hover-up");
+		// 	get_style_context ().remove_class ("hover-down");
+		// } else if (y > (alloc.height / 2)) {
+		// 	get_style_context ().add_class ("hover-down");
+		// 	get_style_context ().remove_class ("hover-up");
+		// }
 		return true;
 	}
 
 	public void on_drag_leave (Gdk.DragContext context, uint time) {
-		get_style_context ().remove_class ("hover-up");
-		get_style_context ().remove_class ("hover-down");
+		artboard.container.drag_unhighlight_row ();
+		// get_style_context ().remove_class ("hover-up");
+		// get_style_context ().remove_class ("hover-down");
 	}
 
 	public bool on_click_event (Gdk.Event event) {
