@@ -205,12 +205,22 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 	}
 
 	public bool on_drag_motion (Gdk.DragContext context, int x, int y, uint time) {
-		get_style_context ().add_class ("hover");
+		Gtk.Allocation alloc;
+		get_allocation (out alloc);
+
+		if (y <= (alloc.height / 2)) {
+			get_style_context ().add_class ("hover-up");
+			get_style_context ().remove_class ("hover-down");
+		} else if (y > (alloc.height / 2)) {
+			get_style_context ().add_class ("hover-down");
+			get_style_context ().remove_class ("hover-up");
+		}
 		return true;
 	}
 
 	public void on_drag_leave (Gdk.DragContext context, uint time) {
-		get_style_context ().remove_class ("hover");
+		get_style_context ().remove_class ("hover-up");
+		get_style_context ().remove_class ("hover-down");
 	}
 
 	public bool on_click_event (Gdk.Event event) {
