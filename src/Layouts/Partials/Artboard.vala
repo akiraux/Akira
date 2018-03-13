@@ -97,7 +97,6 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 		grid.attach (handle, 0, 0, 1, 1);
 		grid.attach (button, 1, 0, 1, 1);
 		grid.attach (revealer, 0, 1, 2, 1);
-		grid.attach (new Gtk.Separator (Gtk.Orientation.HORIZONTAL), 0, 2, 2, 1);
 
 		add (grid);
 

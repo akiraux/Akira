@@ -22,7 +22,9 @@ public class Akira.Layouts.RightSideBar : Gtk.Grid {
 	public weak Akira.Window window { get; construct; }
 
 	public Akira.Layouts.Partials.LayersPanel layers_panel;
+	public Akira.Layouts.Partials.PagesPanel pages_panel;
 	public Gtk.ScrolledWindow layers_scroll;
+	public Gtk.ScrolledWindow pages_scroll;
 
 	public bool toggled {
 		get {
@@ -62,26 +64,16 @@ public class Akira.Layouts.RightSideBar : Gtk.Grid {
 
 		pane.pack1 (top_panel, false, false);
 
-		var listbox = new Gtk.ListBox();
-		listbox.selection_mode = Gtk.SelectionMode.SINGLE;
+		pages_panel = new Akira.Layouts.Partials.PagesPanel (window);
+		pages_scroll = new Gtk.ScrolledWindow (null, null);
+		pages_scroll.expand = true;
+		pages_scroll.add (pages_panel);
 
-		for (var i = 1; i < 4; i++)
-		{
-			string text = @"Page $i";
-			
-			var label_name = new Gtk.Label (text);
-			label_name.get_style_context ().add_class ("artboard-name");
-			label_name.halign = Gtk.Align.START;
+		var bottom_panel = new Gtk.Grid ();
+		bottom_panel.attach (build_pages_title (), 0, 0, 1, 1);
+		bottom_panel.attach (pages_scroll, 0, 1, 1, 1);
 
-			var expander = new Gtk.Expander (text);
-			expander.label_widget = label_name;
-			expander.label_fill = true;
-			expander.expanded = false;
-
-			listbox.add(expander);
-		}
-
-		pane.pack2 (listbox, true, false);
+		pane.pack2 (bottom_panel, true, false);
 
 		attach (pane, 0 , 0 , 1, 1);
 	}
@@ -101,6 +93,26 @@ public class Akira.Layouts.RightSideBar : Gtk.Grid {
 		search_grid.add (search);
 
 		return search_grid;
+	}
+
+	private Gtk.Grid build_pages_title () {
+		var label = new Gtk.Label (_("Pages"));
+		label.halign = Gtk.Align.START;
+		label.hexpand = true;
+		label.margin = 5;
+
+		var button = new Gtk.Button ();
+		button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
+		button.tooltip_text = _("Add Page");
+		button.can_focus = false;
+		button.add (new Gtk.Image.from_icon_name ("list-add-symbolic", Gtk.IconSize.MENU));
+
+		var pages_grid = new Gtk.Grid ();
+		pages_grid.get_style_context ().add_class ("pages-title");
+		pages_grid.attach (label, 0, 0, 1, 1);
+		pages_grid.attach (button, 1, 0, 1, 1);
+
+		return pages_grid;
 	}
 
 	public void toggle () {
