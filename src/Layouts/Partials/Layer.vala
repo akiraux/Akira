@@ -25,6 +25,15 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 	public string layer_name { get; construct; }
 	public string icon_name { get; construct; }
 
+	private bool scroll_up = false;
+	private bool scrolling = false;
+	private bool should_scroll = false;
+	public Gtk.Adjustment vadjustment;
+
+	private const int SCROLL_STEP_SIZE = 5;
+	private const int SCROLL_DISTANCE = 30;
+	private const int SCROLL_DELAY = 50;
+
 	private const Gtk.TargetEntry targetEntriesLayer[] = {
 		{ "LAYER", Gtk.TargetFlags.SAME_APP, 0 }
 	};
@@ -208,23 +217,18 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 
 	public bool on_drag_motion (Gdk.DragContext context, int x, int y, uint time) {
 		artboard.container.drag_highlight_row (this);
-		// Gtk.Allocation alloc;
-		// get_allocation (out alloc);
 
-		// if (y <= (alloc.height / 2)) {
-		// 	get_style_context ().add_class ("hover-up");
-		// 	get_style_context ().remove_class ("hover-down");
-		// } else if (y > (alloc.height / 2)) {
-		// 	get_style_context ().add_class ("hover-down");
-		// 	get_style_context ().remove_class ("hover-up");
-		// }
+		check_scroll (y);
+		if (should_scroll && !scrolling) {
+			scrolling = true;
+			Timeout.add (SCROLL_DELAY, scroll);
+		}
+
 		return true;
 	}
 
 	public void on_drag_leave (Gdk.DragContext context, uint time) {
 		artboard.container.drag_unhighlight_row ();
-		// get_style_context ().remove_class ("hover-up");
-		// get_style_context ().remove_class ("hover-down");
 	}
 
 	public bool on_click_event (Gdk.Event event) {
@@ -299,5 +303,42 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 
 			hidden = active;
 		});
+	}
+
+	private void check_scroll (int y) {
+		vadjustment = window.main_window.right_sidebar.layers_scroll.vadjustment;
+
+		if (vadjustment == null) {
+			return;
+		}
+
+		double vadjustment_min = vadjustment.value;
+		double vadjustment_max = vadjustment.page_size + vadjustment_min;
+		double show_min = double.max (0, y - SCROLL_DISTANCE);
+		double show_max = double.min (vadjustment.upper, y + SCROLL_DISTANCE);
+
+		if (vadjustment_min > show_min) {
+			should_scroll = true;
+			scroll_up = true;
+		} else if (vadjustment_max < show_max) {
+			should_scroll = true;
+			scroll_up = false;
+		} else {
+			should_scroll = false;
+		}
+	}
+
+	private bool scroll () {
+		if (should_scroll) {
+			if (scroll_up) {
+				vadjustment.value -= SCROLL_STEP_SIZE;
+			} else {
+				vadjustment.value += SCROLL_STEP_SIZE;
+			}
+		} else {
+			scrolling = false;
+		}
+
+		return should_scroll;
 	}
 }
