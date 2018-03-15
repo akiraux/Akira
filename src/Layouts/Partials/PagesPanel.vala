@@ -21,14 +21,14 @@
 public class Akira.Layouts.Partials.PagesPanel : Gtk.ListBox {
 	public weak Akira.Window window { get; construct; }
 
-	private bool scroll_up = false;
-	private bool scrolling = false;
-	private bool should_scroll = false;
-	public Gtk.Adjustment vadjustment;
+	// private bool scroll_up = false;
+	// private bool scrolling = false;
+	// private bool should_scroll = false;
+	// public Gtk.Adjustment vadjustment;
 
-	private const int SCROLL_STEP_SIZE = 5;
-	private const int SCROLL_DISTANCE = 30;
-	private const int SCROLL_DELAY = 50;
+	// private const int SCROLL_STEP_SIZE = 5;
+	// private const int SCROLL_DISTANCE = 30;
+	// private const int SCROLL_DELAY = 50;
 
 	private const Gtk.TargetEntry targetEntries[] = {
 		{ "PAGES", Gtk.TargetFlags.SAME_APP, 0 }

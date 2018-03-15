@@ -141,7 +141,6 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 
 		container.remove (source);
 		container.insert (source, newPos);
-		container.show_all ();
 		show_all ();
 	}
 
@@ -151,9 +150,9 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 		handle.drag_begin.connect (on_drag_begin);
 		handle.drag_data_get.connect (on_drag_data_get);
 
-		Gtk.drag_dest_set (handle, Gtk.DestDefaults.MOTION, targetEntries, Gdk.DragAction.MOVE);
-		handle.drag_motion.connect (on_drag_motion);
-		handle.drag_leave.connect (on_drag_leave);
+		// Gtk.drag_dest_set (this, Gtk.DestDefaults.MOTION, targetEntries, Gdk.DragAction.MOVE);
+		// this.drag_motion.connect (on_drag_motion);
+		// this.drag_leave.connect (on_drag_leave);
 
 		handle.event.connect (on_click_event);
 	}
@@ -179,9 +178,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 		cr.rectangle (0, 0, alloc.width, alloc.height);
 		cr.fill ();
 
-		row.get_style_context ().add_class ("drag-icon");
 		row.draw (cr);
-		row.get_style_context ().remove_class ("drag-icon");
 
 		Gtk.drag_set_icon_surface (context, surface);
 	}
@@ -195,15 +192,15 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 		);
 	}
 	
-	public bool on_drag_motion (Gdk.DragContext context, int x, int y, uint time) {
-		window.main_window.right_sidebar.layers_panel.drag_highlight_row (this);
+	// public bool on_drag_motion (Gdk.DragContext context, int x, int y, uint time) {
+	// 	window.main_window.right_sidebar.layers_panel.drag_highlight_row (this);
 
-		return true;
-	}
+	// 	return false;
+	// }
 
-	public void on_drag_leave (Gdk.DragContext context, uint time) {
-		window.main_window.right_sidebar.layers_panel.drag_unhighlight_row ();
-	}
+	// public void on_drag_leave (Gdk.DragContext context, uint time) {
+	// 	window.main_window.right_sidebar.layers_panel.drag_unhighlight_row ();
+	// }
 
 	public bool on_click_event (Gdk.Event event) {
 		if (event.type == Gdk.EventType.@BUTTON_PRESS) {
@@ -232,7 +229,12 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 
 	public bool update_on_escape (Gdk.EventKey key) {
 		if (key.keyval == 65307) {
-			update_label ();
+			entry.text = label.label;
+
+			entry.visible = false;
+			entry.no_show_all = true;
+			label.visible = true;
+			label.no_show_all = false;
 		}
 		return false;
 	}

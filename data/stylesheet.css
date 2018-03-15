@@ -108,6 +108,7 @@
 
 .layer {
     transition: all 240ms ease;
+    padding-left: 10px;
 }
 
 .layer.hover-up {
