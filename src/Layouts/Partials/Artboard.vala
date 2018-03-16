@@ -150,9 +150,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 		handle.drag_begin.connect (on_drag_begin);
 		handle.drag_data_get.connect (on_drag_data_get);
 
-		// Gtk.drag_dest_set (this, Gtk.DestDefaults.MOTION, targetEntries, Gdk.DragAction.MOVE);
-		// this.drag_motion.connect (on_drag_motion);
-		this.drag_leave.connect (on_drag_leave);
+		drag_leave.connect (on_drag_leave);
 
 		handle.event.connect (on_click_event);
 	}
@@ -191,12 +189,6 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 			Gdk.Atom.intern_static_string ("ARTBOARD"), 32, data
 		);
 	}
-	
-	// public bool on_drag_motion (Gdk.DragContext context, int x, int y, uint time) {
-	// 	window.main_window.right_sidebar.layers_panel.drag_highlight_row (this);
-
-	// 	return false;
-	// }
 
 	public void on_drag_leave (Gdk.DragContext context, uint time) {
 		window.main_window.right_sidebar.layers_panel.drag_unhighlight_row ();
