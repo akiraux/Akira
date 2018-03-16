@@ -152,7 +152,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 
 		// Gtk.drag_dest_set (this, Gtk.DestDefaults.MOTION, targetEntries, Gdk.DragAction.MOVE);
 		// this.drag_motion.connect (on_drag_motion);
-		// this.drag_leave.connect (on_drag_leave);
+		this.drag_leave.connect (on_drag_leave);
 
 		handle.event.connect (on_click_event);
 	}
@@ -198,9 +198,9 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 	// 	return false;
 	// }
 
-	// public void on_drag_leave (Gdk.DragContext context, uint time) {
-	// 	window.main_window.right_sidebar.layers_panel.drag_unhighlight_row ();
-	// }
+	public void on_drag_leave (Gdk.DragContext context, uint time) {
+		window.main_window.right_sidebar.layers_panel.drag_unhighlight_row ();
+	}
 
 	public bool on_click_event (Gdk.Event event) {
 		if (event.type == Gdk.EventType.@BUTTON_PRESS) {

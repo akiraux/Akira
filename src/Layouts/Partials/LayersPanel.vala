@@ -38,7 +38,7 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
 		Object (
 			window: main_window,
 			activate_on_single_click: false,
-			selection_mode: Gtk.SelectionMode.SINGLE
+			selection_mode: Gtk.SelectionMode.NONE
 		);
 	}
 
@@ -83,7 +83,7 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
 
 		drag_data_received.connect (on_drag_data_received);
 		drag_motion.connect (on_drag_motion);
-		// drag_leave.connect (on_drag_leave);
+		drag_leave.connect (on_drag_leave);
 	}
 
 	private void on_drag_data_received (Gdk.DragContext context, int x, int y, Gtk.SelectionData selection_data, uint target_type, uint time) {
@@ -115,7 +115,6 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
 	}
 
 	public bool on_drag_motion (Gdk.DragContext context, int x, int y, uint time) {
-		// this.get_style_context ().add_class ("highlight-drop-area");
 		var row = (Akira.Layouts.Partials.Artboard) get_row_at_y (y);
 		
 		if (row != null) {
@@ -151,9 +150,9 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
 		return true;
 	}
 
-	// public void on_drag_leave (Gdk.DragContext context, uint time) {
-	// 	this.get_style_context ().remove_class ("highlight-drop-area");
-	// }
+	public void on_drag_leave (Gdk.DragContext context, uint time) {
+		should_scroll = false;
+	}
 
 	private void check_scroll (int y) {
 		vadjustment = window.main_window.right_sidebar.layers_scroll.vadjustment;

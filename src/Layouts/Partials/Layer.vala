@@ -218,11 +218,11 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 	public bool on_drag_motion (Gdk.DragContext context, int x, int y, uint time) {
 		artboard.container.drag_highlight_row (this);
 
-		check_scroll (y);
-		if (should_scroll && !scrolling) {
-			scrolling = true;
-			Timeout.add (SCROLL_DELAY, scroll);
-		}
+		// check_scroll (y);
+		// if (should_scroll && !scrolling) {
+		// 	scrolling = true;
+		// 	Timeout.add (SCROLL_DELAY, scroll);
+		// }
 
 		return true;
 	}
@@ -232,7 +232,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 	}
 
 	public bool on_click_event (Gdk.Event event) {
-		if (event.type == Gdk.EventType.@BUTTON_PRESS) {
+		if (event.type == Gdk.EventType.BUTTON_RELEASE) {
 			activate ();
 		}
 
