@@ -245,7 +245,17 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 	}
 
 	public bool on_click_event (Gdk.Event event) {
+
 		if (event.type == Gdk.EventType.BUTTON_RELEASE) {
+			Gdk.ModifierType state;
+			event.get_state (out state);
+
+			if (state.to_string () == "GDK_CONTROL_MASK") {
+				artboard.container.selection_mode = Gtk.SelectionMode.MULTIPLE;
+			} else {
+				artboard.container.selection_mode = Gtk.SelectionMode.SINGLE;
+			}
+
 			activate ();
 		}
 
