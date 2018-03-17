@@ -217,11 +217,18 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 
 	public bool on_drag_motion (Gdk.DragContext context, int x, int y, uint time) {
 		artboard.container.drag_highlight_row (this);
+		var layers_panel = (Akira.Layouts.Partials.LayersPanel) artboard.get_ancestor (typeof (Akira.Layouts.Partials.LayersPanel));
+		var row = (Akira.Layouts.Partials.Artboard) layers_panel.get_row_at_index (artboard.get_index ());
 
 		int index = this.get_index ();
 		Gtk.Allocation alloc;
 		this.get_allocation (out alloc);
-		int real_y = (index * alloc.height) + y;
+
+		int row_index = row.get_index ();
+		Gtk.Allocation row_alloc;
+		row.get_allocation (out row_alloc);
+
+		int real_y = (index * alloc.height) + (row_index * alloc.height) - alloc.height + y;
 
 		check_scroll (real_y);
 		if (should_scroll && !scrolling) {
