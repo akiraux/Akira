@@ -54,15 +54,17 @@ public class Akira.Layouts.RightSideBar : Gtk.Grid {
 		pane.position = 600;
 
 		layers_panel = new Akira.Layouts.Partials.LayersPanel (window);
+		var layers_grid = new Gtk.Grid ();
+		layers_grid.vexpand = true;
+		layers_grid.add (layers_panel);
+
 		layers_scroll = new Gtk.ScrolledWindow (null, null);
 		layers_scroll.expand = true;
-		layers_scroll.add (layers_panel);
+		layers_scroll.add (layers_grid);
 
-		// Prevent the focus of the webview causing the ScrolledWindow to scroll
 		var scrolled_child = layers_scroll.get_child ();
-		if (scrolled_child is Gtk.Viewport) {
-			warning ("it is");
-			((Gtk.Viewport) scrolled_child).set_focus_vadjustment (new Gtk.Adjustment (0, 0, 0, 0, 0, 0));
+		if (scrolled_child is Gtk.Container) {
+			((Gtk.Container) scrolled_child).set_focus_vadjustment (new Gtk.Adjustment (0, 0, 0, 0, 0, 0));
 		}
 
 		var top_panel = new Gtk.Grid ();

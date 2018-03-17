@@ -168,14 +168,14 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 	}
 
 	private void build_darg_and_drop () {
-		Gtk.drag_source_set (handle, Gdk.ModifierType.BUTTON1_MASK, targetEntriesLayer, Gdk.DragAction.MOVE);
+		Gtk.drag_source_set (this, Gdk.ModifierType.BUTTON1_MASK, targetEntriesLayer, Gdk.DragAction.MOVE);
 
-		handle.drag_begin.connect (on_drag_begin);
-		handle.drag_data_get.connect (on_drag_data_get);
+		drag_begin.connect (on_drag_begin);
+		drag_data_get.connect (on_drag_data_get);
 
-		Gtk.drag_dest_set (handle, Gtk.DestDefaults.MOTION, targetEntriesLayer, Gdk.DragAction.MOVE);
-		handle.drag_motion.connect (on_drag_motion);
-		handle.drag_leave.connect (on_drag_leave);
+		Gtk.drag_dest_set (this, Gtk.DestDefaults.MOTION, targetEntriesLayer, Gdk.DragAction.MOVE);
+		drag_motion.connect (on_drag_motion);
+		drag_leave.connect (on_drag_leave);
 	}
 
 	private void on_drag_begin (Gtk.Widget widget, Gdk.DragContext context) {
@@ -218,17 +218,23 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 	public bool on_drag_motion (Gdk.DragContext context, int x, int y, uint time) {
 		artboard.container.drag_highlight_row (this);
 
-		// check_scroll (y);
-		// if (should_scroll && !scrolling) {
-		// 	scrolling = true;
-		// 	Timeout.add (SCROLL_DELAY, scroll);
-		// }
+		int index = this.get_index ();
+		Gtk.Allocation alloc;
+		this.get_allocation (out alloc);
+		int real_y = (index * alloc.height) + y;
+
+		check_scroll (real_y);
+		if (should_scroll && !scrolling) {
+			scrolling = true;
+			Timeout.add (SCROLL_DELAY, scroll);
+		}
 
 		return true;
 	}
 
 	public void on_drag_leave (Gdk.DragContext context, uint time) {
 		artboard.container.drag_unhighlight_row ();
+		should_scroll = false;
 	}
 
 	public bool on_click_event (Gdk.Event event) {

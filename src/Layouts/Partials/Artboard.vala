@@ -145,10 +145,10 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 	}
 
 	private void build_darg_and_drop () {
-		Gtk.drag_source_set (handle, Gdk.ModifierType.BUTTON1_MASK, targetEntries, Gdk.DragAction.MOVE);
+		Gtk.drag_source_set (this, Gdk.ModifierType.BUTTON1_MASK, targetEntries, Gdk.DragAction.MOVE);
 
-		handle.drag_begin.connect (on_drag_begin);
-		handle.drag_data_get.connect (on_drag_data_get);
+		drag_begin.connect (on_drag_begin);
+		drag_data_get.connect (on_drag_data_get);
 
 		drag_leave.connect (on_drag_leave);
 
@@ -195,7 +195,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 	}
 
 	public bool on_click_event (Gdk.Event event) {
-		if (event.type == Gdk.EventType.@BUTTON_PRESS) {
+		if (event.type == Gdk.EventType.BUTTON_PRESS) {
 			activate ();
 		}
 
