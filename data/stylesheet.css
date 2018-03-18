@@ -36,10 +36,6 @@
     border-bottom: 1px solid rgba(0,0,0,0.2);
 }
 
-.border-top {
-    border-top: 10px solid red;
-}
-
 .artboard {
     transition: all 240ms ease;
     background-color: #fff;
@@ -56,14 +52,6 @@
 .artboard:selected .layer-action GtkImage {
     color: #333;
 }
-
-/*.artboard.hover-up {
-    box-shadow: inset 0 1px 0 @primary;
-}
-
-.artboard.hover-down {
-    box-shadow: inset 0 0 0 1px @primary;
-}*/
 
 .highlight-drop-area .artboard:last-child {
     box-shadow: inset 0 -2px 0 #000;
@@ -133,7 +121,8 @@
     color: #333;
 }
 
-.layer:selected {
+.layer:selected,
+.artboard:selected {
     box-shadow: inset 4px 0 0 @primary;
 }
 

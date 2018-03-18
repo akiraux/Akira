@@ -196,6 +196,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 
 	public bool on_click_event (Gdk.Event event) {
 		if (event.type == Gdk.EventType.BUTTON_PRESS) {
+			window.main_window.right_sidebar.layers_panel.selection_mode = Gtk.SelectionMode.SINGLE;
 			activate ();
 		}
 

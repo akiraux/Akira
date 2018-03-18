@@ -71,6 +71,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 	}
 
 	construct {
+		can_focus = true;
 		get_style_context ().add_class ("layer");
 
 		label =  new Gtk.Label (layer_name);
@@ -247,6 +248,11 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 	public bool on_click_event (Gdk.Event event) {
 
 		if (event.type == Gdk.EventType.BUTTON_RELEASE) {
+
+			if (entry.visible == true) {
+				return false;
+			}
+
 			Gdk.ModifierType state;
 			event.get_state (out state);
 
@@ -257,6 +263,9 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 			}
 
 			activate ();
+
+			window.main_window.right_sidebar.layers_panel.selection_mode = Gtk.SelectionMode.NONE;
+			window.main_window.right_sidebar.layers_panel.unselect_row (artboard);
 		}
 
 		if (event.type == Gdk.EventType.@2BUTTON_PRESS) {
@@ -265,6 +274,8 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 			entry.select_region (0, -1);
 			label.visible = false;
 			label.no_show_all = true;
+
+            // disable accelerators on edit
 		}
 
 		return false;

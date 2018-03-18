@@ -38,7 +38,7 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
 		Object (
 			window: main_window,
 			activate_on_single_click: false,
-			selection_mode: Gtk.SelectionMode.NONE
+			selection_mode: Gtk.SelectionMode.SINGLE
 		);
 	}
 
