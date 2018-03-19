@@ -54,9 +54,9 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 		get { return _locked; } set { _locked = value; }
 	}
 
-	private bool _hidden { get; set; default = false; }
+	private bool __hidden { get; set; default = false; }
 	public bool hidden {
-		get { return _hidden; } set { _hidden = value; }
+		get { return __hidden; } set { __hidden = value; }
 	}
 
 	// public Akira.Shape shape { get; construct; }
