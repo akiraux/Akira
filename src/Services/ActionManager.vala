@@ -69,9 +69,8 @@ public class Akira.Services.ActionManager : Object {
 		action_accelerators.set (ACTION_PRESENTATION, "<Control>period");
 		action_accelerators.set (ACTION_PREFERENCES, "<Control>comma");
 		action_accelerators.set (ACTION_QUIT, "<Control>q");
-		action_accelerators.set (ACTION_QUIT, "<Control>q");
-		action_accelerators.set (ACTION_DELETE_LAYER, "Delete");
-		action_accelerators.set (ACTION_DELETE_LAYER_BK, "BackSpace");
+		action_accelerators.set (ACTION_DELETE_LAYER, "<Control>Delete");
+		action_accelerators.set (ACTION_DELETE_LAYER_BK, "<Control>BackSpace");
 	}
 
 	construct {
@@ -166,7 +165,7 @@ public class Akira.Services.ActionManager : Object {
 				var layers = artboard.container.get_selected_rows ();
 				layers.@foreach ((row) => {
 					Akira.Layouts.Partials.Layer layer = (Akira.Layouts.Partials.Layer) row;
-					if (layer.has_focus) {
+					if (layer.is_selected () && !layer.editing) {
 						artboard.container.remove (layer);
 					}
 				});
@@ -175,7 +174,6 @@ public class Akira.Services.ActionManager : Object {
 	}
 
 	public static void action_from_group (string action_name, ActionGroup? action_group) {
-		warning("action from group");
 		action_group.activate_action (action_name, null);
 	}
 }

@@ -59,6 +59,11 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 		get { return _hidden; } set { _hidden = value; }
 	}
 
+	private bool _editing { get; set; default = false; }
+	public bool editing {
+		get { return _editing; } set { _editing = value; }
+	}
+
 	// public Akira.Shape shape { get; construct; }
 
 	public Layer (Akira.Window main_window, Akira.Layouts.Partials.Artboard artboard, string name, string icon) {
@@ -82,7 +87,6 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 
 		entry = new Gtk.Entry ();
 		entry.expand = true;
-		entry.get_style_context ().remove_class ("entry");
 		entry.visible = false;
 		entry.no_show_all = true;
 		entry.set_text (layer_name);
@@ -260,6 +264,15 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 				artboard.container.selection_mode = Gtk.SelectionMode.MULTIPLE;
 			} else {
 				artboard.container.selection_mode = Gtk.SelectionMode.SINGLE;
+
+				window.main_window.right_sidebar.layers_panel.@foreach ((child) => {
+					if (child is Akira.Layouts.Partials.Artboard) {
+						Akira.Layouts.Partials.Artboard artboard = (Akira.Layouts.Partials.Artboard) child;
+
+						window.main_window.right_sidebar.layers_panel.unselect_row (artboard);
+						artboard.container.unselect_all ();
+					}
+				});
 			}
 
 			activate ();
@@ -275,7 +288,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 			label.visible = false;
 			label.no_show_all = true;
 
-            // disable accelerators on edit
+			editing = true;
 		}
 
 		return false;
@@ -305,6 +318,8 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 		entry.no_show_all = true;
 		label.visible = true;
 		label.no_show_all = false;
+
+		editing = false;
 	}
 
 	private void lock_actions () {

@@ -56,8 +56,6 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 
 		entry = new Gtk.Entry ();
 		entry.expand = true;
-		entry.get_style_context ().add_class ("artboard-edit-name");
-		entry.get_style_context ().remove_class ("entry");
 		entry.visible = false;
 		entry.no_show_all = true;
 		entry.set_text (layer_name);
@@ -197,6 +195,16 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 	public bool on_click_event (Gdk.Event event) {
 		if (event.type == Gdk.EventType.BUTTON_PRESS) {
 			window.main_window.right_sidebar.layers_panel.selection_mode = Gtk.SelectionMode.SINGLE;
+
+			window.main_window.right_sidebar.layers_panel.@foreach ((child) => {
+				if (child is Akira.Layouts.Partials.Artboard) {
+					Akira.Layouts.Partials.Artboard artboard = (Akira.Layouts.Partials.Artboard) child;
+
+					window.main_window.right_sidebar.layers_panel.unselect_row (artboard);
+					artboard.container.unselect_all ();
+				}
+			});
+
 			activate ();
 		}
 
