@@ -54,9 +54,10 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 		get { return _locked; } set { _locked = value; }
 	}
 
-	private bool _hidden { get; set; default = false; }
+	// Keep __hidden with double underscore for FreeBSD compatibility
+	private bool __hidden { get; set; default = false; }
 	public bool hidden {
-		get { return _hidden; } set { _hidden = value; }
+		get { return __hidden; } set { __hidden = value; }
 	}
 
 	private bool _editing { get; set; default = false; }
@@ -288,6 +289,11 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 			label.visible = false;
 			label.no_show_all = true;
 
+			button_locked.visible = false;
+			button_locked.no_show_all = true;
+			button_hidden.visible = false;
+			button_hidden.no_show_all = true;
+
 			editing = true;
 		}
 
@@ -318,6 +324,11 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 		entry.no_show_all = true;
 		label.visible = true;
 		label.no_show_all = false;
+
+		button_locked.visible = true;
+		button_locked.no_show_all = false;
+		button_hidden.visible = true;
+		button_hidden.no_show_all = false;
 
 		editing = false;
 	}
