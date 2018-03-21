@@ -220,11 +220,15 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 		if (event.type == Gdk.EventType.@2BUTTON_PRESS) {
 			entry.visible = true;
 			entry.no_show_all = false;
-			entry.select_region (0, -1);
 			label.visible = false;
 			label.no_show_all = true;
 
 			editing = true;
+
+			Timeout.add (10, () => {
+				entry.grab_focus ();
+				return false;
+			});
 		}
 
 		return false;
@@ -243,6 +247,14 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 	private bool delete_object () {
 		if (is_selected () && !editing) {
 			window.main_window.right_sidebar.layers_panel.remove (this);
+		} else {
+			var layers = this.container.get_selected_rows ();
+			layers.@foreach ((row) => {
+				Akira.Layouts.Partials.Layer layer = (Akira.Layouts.Partials.Layer) row;
+				if (layer.is_selected () && !layer.editing) {
+					this.container.remove (layer);
+				}
+			});
 		}
 
 		return true;
@@ -276,5 +288,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 		label.no_show_all = false;
 
 		editing = false;
+
+		activate ();
 	}
 }

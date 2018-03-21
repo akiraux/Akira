@@ -171,8 +171,6 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 
 		lock_actions ();
 		hide_actions ();
-
-		key_press_event.connect (on_key_pressed);
 	}
 
 	private void build_darg_and_drop () {
@@ -287,7 +285,6 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 		if (event.type == Gdk.EventType.@2BUTTON_PRESS) {
 			entry.visible = true;
 			entry.no_show_all = false;
-			entry.select_region (0, -1);
 			label.visible = false;
 			label.no_show_all = true;
 
@@ -297,31 +294,14 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 			button_hidden.no_show_all = true;
 
 			editing = true;
+
+			Timeout.add (10, () => {
+				entry.grab_focus ();
+				return false;
+			});
 		}
 
 		return false;
-	}
-
-	private bool on_key_pressed (Gtk.Widget source, Gdk.EventKey key) {
-		stdout.printf ("Key: %s %u\n", key.str, key.keyval);
-
-		switch (key.keyval) {
-			case 65535: // Delete Key
-			case 65288: // Backspace
-				return delete_object ();
-		}
-
-		return false;
-	}
-
-	private bool delete_object () {
-		if (is_selected () && !editing) {
-			artboard.container.remove (this);
-		} else {
-			warning ("nope");
-		}
-
-		return true;
 	}
 
 	public void update_on_enter () {
@@ -357,6 +337,8 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 		button_hidden.no_show_all = false;
 
 		editing = false;
+
+		activate ();
 	}
 
 	private void lock_actions () {
