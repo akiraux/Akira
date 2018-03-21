@@ -171,6 +171,8 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 
 		lock_actions ();
 		hide_actions ();
+
+		key_press_event.connect (on_key_pressed);
 	}
 
 	private void build_darg_and_drop () {
@@ -300,6 +302,28 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 		return false;
 	}
 
+	private bool on_key_pressed (Gtk.Widget source, Gdk.EventKey key) {
+		stdout.printf ("Key: %s %u\n", key.str, key.keyval);
+
+		switch (key.keyval) {
+			case 65535: // Delete Key
+			case 65288: // Backspace
+				return delete_object ();
+		}
+
+		return false;
+	}
+
+	private bool delete_object () {
+		if (is_selected () && !editing) {
+			artboard.container.remove (this);
+		} else {
+			warning ("nope");
+		}
+
+		return true;
+	}
+
 	public void update_on_enter () {
 		update_label ();
 	}
@@ -311,6 +335,8 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 
 	public bool update_on_escape (Gdk.EventKey key) {
 		if (key.keyval == 65307) {
+			entry.text = label.label;
+
 			update_label ();
 		}
 		return false;

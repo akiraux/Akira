@@ -153,25 +153,25 @@ public class Akira.Services.ActionManager : Object {
 		window.settings_dialog.present ();
 	}
 
-	private void action_delete_layer () {
-		window.main_window.right_sidebar.layers_panel.selected_foreach ((box, row) => {
-			window.main_window.right_sidebar.layers_panel.remove ((Akira.Layouts.Partials.Artboard) row);
-		});
+	// private void action_delete_layer () {
+	// 	window.main_window.right_sidebar.layers_panel.selected_foreach ((box, row) => {
+	// 		window.main_window.right_sidebar.layers_panel.remove ((Akira.Layouts.Partials.Artboard) row);
+	// 	});
 
-		window.main_window.right_sidebar.layers_panel.@foreach ((child) => {
-			if (child is Akira.Layouts.Partials.Artboard) {
-				Akira.Layouts.Partials.Artboard artboard = (Akira.Layouts.Partials.Artboard) child;
+	// 	window.main_window.right_sidebar.layers_panel.@foreach ((child) => {
+	// 		if (child is Akira.Layouts.Partials.Artboard) {
+	// 			Akira.Layouts.Partials.Artboard artboard = (Akira.Layouts.Partials.Artboard) child;
 
-				var layers = artboard.container.get_selected_rows ();
-				layers.@foreach ((row) => {
-					Akira.Layouts.Partials.Layer layer = (Akira.Layouts.Partials.Layer) row;
-					if (layer.is_selected () && !layer.editing) {
-						artboard.container.remove (layer);
-					}
-				});
-			}
-		});
-	}
+	// 			var layers = artboard.container.get_selected_rows ();
+	// 			layers.@foreach ((row) => {
+	// 				Akira.Layouts.Partials.Layer layer = (Akira.Layouts.Partials.Layer) row;
+	// 				if (layer.is_selected () && !layer.editing) {
+	// 					artboard.container.remove (layer);
+	// 				}
+	// 			});
+	// 		}
+	// 	});
+	// }
 
 	public static void action_from_group (string action_name, ActionGroup? action_group) {
 		action_group.activate_action (action_name, null);

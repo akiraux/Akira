@@ -39,6 +39,11 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 	public Gtk.Revealer revealer;
 	public Gtk.ListBox container;
 
+	private bool _editing { get; set; default = false; }
+	public bool editing {
+		get { return _editing; } set { _editing = value; }
+	}
+
 	public Artboard (Akira.Window main_window, string name) {
 		Object (
 			window: main_window, 
@@ -75,6 +80,8 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 
 		container = new Gtk.ListBox ();
 		container.get_style_context ().add_class ("artboard-container");
+		container.activate_on_single_click = true;
+		container.selection_mode = Gtk.SelectionMode.SINGLE;
 		Gtk.drag_dest_set (this.container, Gtk.DestDefaults.ALL, targetEntriesLayer, Gdk.DragAction.MOVE);
 		this.container.drag_data_received.connect (on_drag_data_received);
 		revealer.add (container);
@@ -111,6 +118,8 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 				button.get_style_context ().add_class ("closed");
 			}
 		});
+
+		key_press_event.connect (on_key_pressed);
 	}
 
 	private void on_drag_data_received (Gdk.DragContext context, int x, int y, Gtk.SelectionData selection_data, uint target_type, uint time) {
@@ -214,9 +223,29 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 			entry.select_region (0, -1);
 			label.visible = false;
 			label.no_show_all = true;
+
+			editing = true;
 		}
 
 		return false;
+	}
+
+	private bool on_key_pressed (Gtk.Widget source, Gdk.EventKey key) {
+		switch (key.keyval) {
+			case 65535: // Delete Key
+			case 65288: // Backspace
+				return delete_object ();
+		}
+
+		return false;
+	}
+
+	private bool delete_object () {
+		if (is_selected () && !editing) {
+			window.main_window.right_sidebar.layers_panel.remove (this);
+		}
+
+		return true;
 	}
 
 	public void update_on_enter () {
@@ -232,10 +261,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 		if (key.keyval == 65307) {
 			entry.text = label.label;
 
-			entry.visible = false;
-			entry.no_show_all = true;
-			label.visible = true;
-			label.no_show_all = false;
+			update_label ();
 		}
 		return false;
 	}
@@ -248,5 +274,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 		entry.no_show_all = true;
 		label.visible = true;
 		label.no_show_all = false;
+
+		editing = false;
 	}
 }
