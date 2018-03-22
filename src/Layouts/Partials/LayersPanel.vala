@@ -52,12 +52,25 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
 		placeholder.visible = false;
 		placeholder.no_show_all = true;
 
-		artboard.container.insert (new Akira.Layouts.Partials.Layer (window, artboard, "Rectangle", "/com/github/alecaddd/akira/tools/rectangle.svg"), 1);
-		artboard.container.insert (new Akira.Layouts.Partials.Layer (window, artboard, "Circle", "/com/github/alecaddd/akira/tools/circle.svg"), 2);
-		artboard.container.insert (new Akira.Layouts.Partials.Layer (window, artboard, "Triangle", "/com/github/alecaddd/akira/tools/triangle.svg"), 3);
-		artboard.container.insert (new Akira.Layouts.Partials.Layer (window, artboard, "Text", "/com/github/alecaddd/akira/tools/text.svg"), 4);
-		artboard.container.insert (new Akira.Layouts.Partials.Layer (window, artboard, "Bezier", "/com/github/alecaddd/akira/tools/pen.svg"), 5);
-		artboard.container.insert (new Akira.Layouts.Partials.Layer (window, artboard, "Path", "/com/github/alecaddd/akira/tools/pencil.svg"), 6);
+		artboard.container.insert (new Akira.Layouts.Partials.Layer (window, artboard, "Rectangle", "/com/github/alecaddd/akira/tools/rectangle.svg", false), 1);
+		artboard.container.insert (new Akira.Layouts.Partials.Layer (window, artboard, "Circle", "/com/github/alecaddd/akira/tools/circle.svg", false), 2);
+		artboard.container.insert (new Akira.Layouts.Partials.Layer (window, artboard, "Triangle", "/com/github/alecaddd/akira/tools/triangle.svg", false), 3);
+
+		// var layer_group = new Akira.Layouts.Partials.Layer (window, artboard, "Group", "folder", true);
+		// var layer_placeholder = new Gtk.ListBoxRow ();
+		// layer_group.container.insert (layer_placeholder, 0);
+		// layer_placeholder.visible = false;
+		// layer_placeholder.no_show_all = true;
+
+		// layer_group.container.insert (new Akira.Layouts.Partials.Layer (window, artboard, "Rectangle", "/com/github/alecaddd/akira/tools/rectangle.svg", false), 1);
+		// layer_group.container.insert (new Akira.Layouts.Partials.Layer (window, artboard, "Circle", "/com/github/alecaddd/akira/tools/circle.svg", false), 2);
+		// layer_group.container.insert (new Akira.Layouts.Partials.Layer (window, artboard, "Triangle", "/com/github/alecaddd/akira/tools/triangle.svg", false), 3);
+
+		// artboard.container.insert (layer_group, 4);
+
+		artboard.container.insert (new Akira.Layouts.Partials.Layer (window, artboard, "Text", "/com/github/alecaddd/akira/tools/text.svg", false), 5);
+		artboard.container.insert (new Akira.Layouts.Partials.Layer (window, artboard, "Bezier", "/com/github/alecaddd/akira/tools/pen.svg", false), 6);
+		artboard.container.insert (new Akira.Layouts.Partials.Layer (window, artboard, "Path", "/com/github/alecaddd/akira/tools/pencil.svg", false), 7);
 
 		var artboard2 = new Akira.Layouts.Partials.Artboard (window, "Artboard 2");
 		var artboard3 = new Akira.Layouts.Partials.Artboard (window, "Artboard 3");

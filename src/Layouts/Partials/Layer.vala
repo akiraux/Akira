@@ -49,6 +49,12 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 	public Gtk.Entry entry;
 	public Gtk.EventBox handle;
 
+	// Group related properties
+	public Gtk.ToggleButton button;
+	public Gtk.Image button_icon;
+	public Gtk.Revealer revealer;
+	public Gtk.ListBox container;
+
 	private bool _locked { get; set; default = false; }
 	public bool locked {
 		get { return _locked; } set { _locked = value; }
@@ -65,14 +71,20 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 		get { return _editing; } set { _editing = value; }
 	}
 
+	private bool _grouped { get; set; default = false; }
+	public bool grouped {
+		get { return _grouped; } set construct { _grouped = value; }
+	}
+
 	// public Akira.Shape shape { get; construct; }
 
-	public Layer (Akira.Window main_window, Akira.Layouts.Partials.Artboard artboard, string name, string icon) {
+	public Layer (Akira.Window main_window, Akira.Layouts.Partials.Artboard artboard, string name, string icon, bool group) {
 		Object (
 			window: main_window,
 			layer_name: name,
 			icon_name: icon,
-			artboard: artboard
+			artboard: artboard,
+			grouped: group
 		);
 	}
 
@@ -98,8 +110,10 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 
 		if (icon_name.contains ("/")) {
 			icon = new Gtk.Image.from_resource (icon_name);
+			icon.margin_end = 6;
 		} else {
 			icon = new Gtk.Image.from_icon_name (icon_name, Gtk.IconSize.MENU);
+			icon.margin_end = 10;
 		}
 
 		button_locked = new Gtk.ToggleButton ();
@@ -140,6 +154,42 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 		label_grid.attach (entry, 2, 0, 1, 1);
 		label_grid.attach (button_locked, 3, 0, 1, 1);
 		label_grid.attach (button_hidden, 4, 0, 1, 1);
+
+		if (grouped) {
+			button = new Gtk.ToggleButton ();
+			button.active = true;
+			button.get_style_context ().remove_class ("button");
+			button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
+			button.get_style_context ().add_class ("revealer-button");
+			button_icon = new Gtk.Image.from_icon_name ("pan-down-symbolic", Gtk.IconSize.MENU);
+			button.add (button_icon);
+
+			label_grid.attach (button, 5, 0, 1, 1);
+
+			revealer = new Gtk.Revealer ();
+			revealer.hexpand = true;
+			revealer.reveal_child = true;
+
+			container = new Gtk.ListBox ();
+			container.get_style_context ().add_class ("artboard-container");
+			container.activate_on_single_click = true;
+			container.selection_mode = Gtk.SelectionMode.SINGLE;
+			// Gtk.drag_dest_set (this.container, Gtk.DestDefaults.ALL, targetEntriesLayer, Gdk.DragAction.MOVE);
+			// this.container.drag_data_received.connect (on_drag_data_received);
+			revealer.add (container);
+
+			button.toggled.connect (() => {
+				revealer.reveal_child = ! revealer.get_reveal_child ();
+
+				if (revealer.get_reveal_child ()) {
+					button.get_style_context ().remove_class ("closed");
+				} else {
+					button.get_style_context ().add_class ("closed");
+				}
+			});
+
+			label_grid.attach (revealer, 0, 1, 5, 1);
+		}
 
 		handle = new Gtk.EventBox ();
 		handle.hexpand = true;
@@ -293,6 +343,11 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 			button_hidden.visible = false;
 			button_hidden.no_show_all = true;
 
+			if (grouped) {
+				button.visible = false;
+				button.no_show_all = true;
+			}
+
 			editing = true;
 
 			Timeout.add (10, () => {
@@ -335,6 +390,11 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 		button_locked.no_show_all = false;
 		button_hidden.visible = true;
 		button_hidden.no_show_all = false;
+
+		if (grouped) {
+			button.visible = true;
+			button.no_show_all = false;
+		}
 
 		editing = false;
 

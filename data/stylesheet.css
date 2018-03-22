@@ -78,6 +78,10 @@
     border-bottom: 1px solid #ccc;
 }
 
+.layer .revealer-button {
+    border-bottom: none;
+}
+
 .revealer-button GtkImage {
     transition: all 160ms ease-in-out;
 }
@@ -117,11 +121,11 @@
 .artboard:selected {
     box-shadow: inset 4px 0 0 @primary;
 }
-
+/*
 .layer GtkImage {
     padding-right: 4px;
     opacity: 0.8;
-}
+}*/
 
 .layer-action {
     opacity: 0;
