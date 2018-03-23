@@ -52,6 +52,8 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 	}
 
 	construct {
+		get_style_context ().add_class ("artboard");
+
 		label =  new Gtk.Label (layer_name);
 		label.get_style_context ().add_class ("artboard-name");
 		label.halign = Gtk.Align.FILL;

@@ -95,10 +95,12 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 		label =  new Gtk.Label (layer_name);
 		label.halign = Gtk.Align.FILL;
 		label.xalign = 0;
-		label.hexpand = true;
+		label.expand = true;
 		label.set_ellipsize (Pango.EllipsizeMode.END);
 
 		entry = new Gtk.Entry ();
+		entry.margin_top = 5;
+		entry.margin_bottom = 5;
 		entry.expand = true;
 		entry.visible = false;
 		entry.no_show_all = true;
@@ -111,10 +113,12 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 		if (icon_name.contains ("/")) {
 			icon = new Gtk.Image.from_resource (icon_name);
 			icon.margin_end = 6;
+			icon.margin_start = 16;
 		} else {
 			icon = new Gtk.Image.from_icon_name (icon_name, Gtk.IconSize.MENU);
 			icon.margin_end = 10;
 		}
+		icon.vexpand = true;
 
 		button_locked = new Gtk.ToggleButton ();
 		button_locked.tooltip_text = _("Lock Layer");
@@ -146,16 +150,26 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 		button_hidden_grid.attach (icon_visible, 1, 0, 1, 1);
 		button_hidden.add (button_hidden_grid);
 
+		var handle_grid = new Gtk.Grid ();
+		handle_grid.expand = true;
+		handle_grid.attach (icon, 0, 0, 1, 1);
+		handle_grid.attach (label, 1, 0, 1, 1);
+		handle_grid.attach (entry, 2, 0, 1, 1);
+
+		handle = new Gtk.EventBox ();
+		handle.expand = true;
+		handle.above_child = false;
+		handle.add (handle_grid);
+
 		var label_grid = new Gtk.Grid ();
-		label_grid.margin = 6;
 		label_grid.expand = true;
-		label_grid.attach (icon, 0, 0, 1, 1);
-		label_grid.attach (label, 1, 0, 1, 1);
-		label_grid.attach (entry, 2, 0, 1, 1);
-		label_grid.attach (button_locked, 3, 0, 1, 1);
-		label_grid.attach (button_hidden, 4, 0, 1, 1);
+		label_grid.attach (handle, 1, 0, 1, 1);
+		label_grid.attach (button_locked, 2, 0, 1, 1);
+		label_grid.attach (button_hidden, 3, 0, 1, 1);
 
 		if (grouped) {
+			get_style_context ().add_class ("layer-group");
+
 			button = new Gtk.ToggleButton ();
 			button.active = true;
 			button.get_style_context ().remove_class ("button");
@@ -164,14 +178,14 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 			button_icon = new Gtk.Image.from_icon_name ("pan-down-symbolic", Gtk.IconSize.MENU);
 			button.add (button_icon);
 
-			label_grid.attach (button, 5, 0, 1, 1);
+			label_grid.attach (button, 0, 0, 1, 1);
 
 			revealer = new Gtk.Revealer ();
 			revealer.hexpand = true;
 			revealer.reveal_child = true;
 
 			container = new Gtk.ListBox ();
-			container.get_style_context ().add_class ("artboard-container");
+			container.get_style_context ().add_class ("group-container");
 			container.activate_on_single_click = true;
 			container.selection_mode = Gtk.SelectionMode.SINGLE;
 			// Gtk.drag_dest_set (this.container, Gtk.DestDefaults.ALL, targetEntriesLayer, Gdk.DragAction.MOVE);
@@ -188,34 +202,16 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 				}
 			});
 
-			label_grid.attach (revealer, 0, 1, 5, 1);
-		}
+			var group_grid = new Gtk.Grid ();
+			group_grid.attach (label_grid, 0, 0, 1, 1);
+			group_grid.attach (revealer, 0, 1, 1, 1);
 
-		handle = new Gtk.EventBox ();
-		handle.hexpand = true;
-		handle.add (label_grid);
-
-		add (handle);
+			add (group_grid);
+		} else {
+			add (label_grid);
+		}		
 
 		build_darg_and_drop ();
-
-		handle.enter_notify_event.connect ((event) => {
-			button_locked.get_style_context ().add_class ("show");
-			button_hidden.get_style_context ().add_class ("show");
-			return true;
-		});
-
-		handle.leave_notify_event.connect ((event) => {
-			if (event.detail != Gdk.NotifyType.INFERIOR) {
-				if (! button_locked.get_active ()) {
-					button_locked.get_style_context ().remove_class ("show");
-				}
-
-				if (! button_hidden.get_active ()) {
-					button_hidden.get_style_context ().remove_class ("show");
-				}
-			}
-		});
 
 		handle.event.connect (on_click_event);
 
@@ -235,7 +231,8 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 	}
 
 	private void on_drag_begin (Gtk.Widget widget, Gdk.DragContext context) {
-		var row = (Akira.Layouts.Partials.Layer) widget.get_ancestor (typeof (Akira.Layouts.Partials.Layer));
+		// var row = (Akira.Layouts.Partials.Layer) widget.get_ancestor (typeof (Akira.Layouts.Partials.Layer));
+		var row = (widget as Akira.Layouts.Partials.Layer);
 		Gtk.Allocation alloc;
 		row.get_allocation (out alloc);
 
@@ -302,6 +299,27 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 
 	public bool on_click_event (Gdk.Event event) {
 
+		if (event.type == Gdk.EventType.@2BUTTON_PRESS) {
+			entry.visible = true;
+			entry.no_show_all = false;
+			label.visible = false;
+			label.no_show_all = true;
+
+			button_locked.visible = false;
+			button_locked.no_show_all = true;
+			button_hidden.visible = false;
+			button_hidden.no_show_all = true;
+
+			editing = true;
+
+			Timeout.add (10, () => {
+				entry.grab_focus ();
+				return false;
+			});
+
+			return false;
+		}
+
 		if (event.type == Gdk.EventType.BUTTON_RELEASE) {
 
 			if (entry.visible == true) {
@@ -330,30 +348,8 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 
 			window.main_window.right_sidebar.layers_panel.selection_mode = Gtk.SelectionMode.NONE;
 			window.main_window.right_sidebar.layers_panel.unselect_row (artboard);
-		}
 
-		if (event.type == Gdk.EventType.@2BUTTON_PRESS) {
-			entry.visible = true;
-			entry.no_show_all = false;
-			label.visible = false;
-			label.no_show_all = true;
-
-			button_locked.visible = false;
-			button_locked.no_show_all = true;
-			button_hidden.visible = false;
-			button_hidden.no_show_all = true;
-
-			if (grouped) {
-				button.visible = false;
-				button.no_show_all = true;
-			}
-
-			editing = true;
-
-			Timeout.add (10, () => {
-				entry.grab_focus ();
-				return false;
-			});
+			return false;
 		}
 
 		return false;
@@ -391,11 +387,6 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 		button_hidden.visible = true;
 		button_hidden.no_show_all = false;
 
-		if (grouped) {
-			button.visible = true;
-			button.no_show_all = false;
-		}
-
 		editing = false;
 
 		activate ();
@@ -406,6 +397,12 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 			var active = button_locked.get_active ();
 
 			button_locked.tooltip_text = active ? _("Unlock Layer") : _("Lock Layer");
+
+			if (active) {
+				button_locked.get_style_context ().add_class ("show");
+			} else {
+				button_locked.get_style_context ().remove_class ("show");
+			}
 
 			icon_unlocked.visible = active;
 			icon_unlocked.no_show_all = ! active;
@@ -422,6 +419,12 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 			var active = button_hidden.get_active ();
 
 			button_hidden.tooltip_text = active ? _("Show Layer") : _("Hide Layer");
+
+			if (active) {
+				button_hidden.get_style_context ().add_class ("show");
+			} else {
+				button_hidden.get_style_context ().remove_class ("show");
+			}
 
 			icon_visible.visible = active;
 			icon_visible.no_show_all = ! active;
