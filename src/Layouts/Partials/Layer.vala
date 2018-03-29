@@ -39,6 +39,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 	};
 
 	public Gtk.Image icon;
+	public Gtk.Image icon_folder_open;
 	public Gtk.Image icon_locked;
 	public Gtk.Image icon_unlocked;
 	public Gtk.Image icon_hidden;
@@ -120,6 +121,16 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 		}
 		icon.vexpand = true;
 
+		icon_folder_open = new Gtk.Image.from_icon_name ("folder-open", Gtk.IconSize.MENU);
+		icon_folder_open.margin_end = 10;
+		icon_folder_open.vexpand = true;
+		icon_folder_open.visible = false;
+		icon_folder_open.no_show_all = true;
+
+		var icon_layer_grid = new Gtk.Grid ();
+		icon_layer_grid.attach (icon, 0, 0, 1, 1);
+		icon_layer_grid.attach (icon_folder_open, 1, 0, 1, 1);
+
 		button_locked = new Gtk.ToggleButton ();
 		button_locked.tooltip_text = _("Lock Layer");
 		button_locked.get_style_context ().remove_class ("button");
@@ -152,7 +163,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 
 		var handle_grid = new Gtk.Grid ();
 		handle_grid.expand = true;
-		handle_grid.attach (icon, 0, 0, 1, 1);
+		handle_grid.attach (icon_layer_grid, 0, 0, 1, 1);
 		handle_grid.attach (label, 1, 0, 1, 1);
 		handle_grid.attach (entry, 2, 0, 1, 1);
 
@@ -197,10 +208,27 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 
 				if (revealer.get_reveal_child ()) {
 					button.get_style_context ().remove_class ("closed");
+					
+					icon_folder_open.visible = true;
+					icon_folder_open.no_show_all = false;
+					icon.visible = false;
+					icon.no_show_all = true;
 				} else {
 					button.get_style_context ().add_class ("closed");
+
+					icon_folder_open.visible = false;
+					icon_folder_open.no_show_all = true;
+					icon.visible = true;
+					icon.no_show_all = false;
 				}
 			});
+
+			if (revealer.get_reveal_child ()) {
+				icon_folder_open.visible = true;
+				icon_folder_open.no_show_all = false;
+				icon.visible = false;
+				icon.no_show_all = true;
+			}
 
 			var group_grid = new Gtk.Grid ();
 			group_grid.attach (label_grid, 0, 0, 1, 1);
