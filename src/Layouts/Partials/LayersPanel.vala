@@ -225,13 +225,14 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
 						}
 
 						if (layer.grouped) {
+							bool open = layer.revealer.get_reveal_child ();
+
 							layer.container.forall((row) => {
 								if (row is Akira.Layouts.Partials.Layer) {
 									Akira.Layouts.Partials.Layer inner_layer = (Akira.Layouts.Partials.Layer) row;
 									inner_layer.get_style_context ().remove_class ("even");
 
-									stdout.printf ("%s\n", inner_layer.get_instance ().expanded.to_string ());
-									if (inner_layer.expanded) {
+									if (open) {
 										i++;
 										if (i % 2 == 0) {
 											inner_layer.get_style_context ().add_class ("even");

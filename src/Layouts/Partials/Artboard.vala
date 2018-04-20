@@ -150,6 +150,8 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 
 		container.remove (source);
 		container.insert (source, newPos);
+
+		window.main_window.right_sidebar.layers_panel.reload_zebra ();
 		show_all ();
 	}
 

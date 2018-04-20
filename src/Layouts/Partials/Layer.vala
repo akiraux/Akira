@@ -49,6 +49,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 	public Gtk.Label label;
 	public Gtk.Entry entry;
 	public Gtk.EventBox handle;
+	private Gtk.Grid label_grid;
 
 	// Group related properties
 	public Gtk.ToggleButton button;
@@ -76,12 +77,6 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 	public bool grouped {
 		get { return _grouped; } set construct { _grouped = value; }
 	}
-
-	//  private bool _expanded { get; set; default = false; }
-	//  public bool expanded {
-	//  	get { return _expanded; } set { _expanded = value; }
-	//  }
-	public bool expanded { get; private set; }
 
 	// public Akira.Shape shape { get; construct; }
 
@@ -178,83 +173,92 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 		handle.above_child = false;
 		handle.add (handle_grid);
 
-		var label_grid = new Gtk.Grid ();
+		label_grid = new Gtk.Grid ();
 		label_grid.expand = true;
 		label_grid.attach (handle, 1, 0, 1, 1);
 		label_grid.attach (button_locked, 2, 0, 1, 1);
 		label_grid.attach (button_hidden, 3, 0, 1, 1);
 
-		if (grouped) {
-			get_style_context ().add_class ("layer-group");
-
-			button = new Gtk.ToggleButton ();
-			button.active = true;
-			button.get_style_context ().remove_class ("button");
-			button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
-			button.get_style_context ().add_class ("revealer-button");
-			button_icon = new Gtk.Image.from_icon_name ("pan-down-symbolic", Gtk.IconSize.MENU);
-			button.add (button_icon);
-
-			label_grid.attach (button, 0, 0, 1, 1);
-
-			revealer = new Gtk.Revealer ();
-			revealer.hexpand = true;
-			revealer.reveal_child = true;
-			expanded = true;
-
-			container = new Gtk.ListBox ();
-			container.get_style_context ().add_class ("group-container");
-			container.activate_on_single_click = true;
-			container.selection_mode = Gtk.SelectionMode.SINGLE;
-			// Gtk.drag_dest_set (this.container, Gtk.DestDefaults.ALL, targetEntriesLayer, Gdk.DragAction.MOVE);
-			// this.container.drag_data_received.connect (on_drag_data_received);
-			revealer.add (container);
-
-			button.toggled.connect (() => {
-				revealer.reveal_child = ! revealer.get_reveal_child ();
-				expanded = ! expanded;
-
-				if (revealer.get_reveal_child ()) {
-					button.get_style_context ().remove_class ("closed");
-					
-					icon_folder_open.visible = true;
-					icon_folder_open.no_show_all = false;
-					icon.visible = false;
-					icon.no_show_all = true;
-				} else {
-					button.get_style_context ().add_class ("closed");
-
-					icon_folder_open.visible = false;
-					icon_folder_open.no_show_all = true;
-					icon.visible = true;
-					icon.no_show_all = false;
-				}
-
-				window.main_window.right_sidebar.layers_panel.reload_zebra ();
-			});
-
-			if (revealer.get_reveal_child ()) {
-				icon_folder_open.visible = true;
-				icon_folder_open.no_show_all = false;
-				icon.visible = false;
-				icon.no_show_all = true;
-			}
-
-			var group_grid = new Gtk.Grid ();
-			group_grid.attach (label_grid, 0, 0, 1, 1);
-			group_grid.attach (revealer, 0, 1, 1, 1);
-
-			add (group_grid);
-		} else {
-			add (label_grid);
-		}		
-
+		is_group ();
 		build_darg_and_drop ();
 
 		handle.event.connect (on_click_event);
 
 		lock_actions ();
 		hide_actions ();
+		reveal_actions ();
+	}
+
+	private void is_group () {
+		if (! grouped) {
+			add (label_grid);
+			return;
+		}
+
+		get_style_context ().add_class ("layer-group");
+
+		button = new Gtk.ToggleButton ();
+		button.active = true;
+		button.get_style_context ().remove_class ("button");
+		button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
+		button.get_style_context ().add_class ("revealer-button");
+		button_icon = new Gtk.Image.from_icon_name ("pan-down-symbolic", Gtk.IconSize.MENU);
+		button.add (button_icon);
+
+		label_grid.attach (button, 0, 0, 1, 1);
+
+		revealer = new Gtk.Revealer ();
+		revealer.hexpand = true;
+		revealer.reveal_child = true;
+
+		container = new Gtk.ListBox ();
+		container.get_style_context ().add_class ("group-container");
+		container.activate_on_single_click = true;
+		container.selection_mode = Gtk.SelectionMode.SINGLE;
+		// Gtk.drag_dest_set (this.container, Gtk.DestDefaults.ALL, targetEntriesLayer, Gdk.DragAction.MOVE);
+		// this.container.drag_data_received.connect (on_drag_data_received);
+		revealer.add (container);
+
+		if (revealer.get_reveal_child ()) {
+			icon_folder_open.visible = true;
+			icon_folder_open.no_show_all = false;
+			icon.visible = false;
+			icon.no_show_all = true;
+		}
+
+		var group_grid = new Gtk.Grid ();
+		group_grid.attach (label_grid, 0, 0, 1, 1);
+		group_grid.attach (revealer, 0, 1, 1, 1);
+
+		add (group_grid);
+	}
+
+	private void reveal_actions () {
+		if (! grouped) {
+			return;
+		}
+
+		button.toggled.connect (() => {
+			revealer.reveal_child = ! revealer.get_reveal_child ();
+
+			if (revealer.get_reveal_child ()) {
+				button.get_style_context ().remove_class ("closed");
+				
+				icon_folder_open.visible = true;
+				icon_folder_open.no_show_all = false;
+				icon.visible = false;
+				icon.no_show_all = true;
+			} else {
+				button.get_style_context ().add_class ("closed");
+
+				icon_folder_open.visible = false;
+				icon_folder_open.no_show_all = true;
+				icon.visible = true;
+				icon.no_show_all = false;
+			}
+
+			window.main_window.right_sidebar.layers_panel.reload_zebra ();
+		});
 	}
 
 	private void build_darg_and_drop () {
