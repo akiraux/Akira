@@ -77,6 +77,12 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 		get { return _grouped; } set construct { _grouped = value; }
 	}
 
+	//  private bool _expanded { get; set; default = false; }
+	//  public bool expanded {
+	//  	get { return _expanded; } set { _expanded = value; }
+	//  }
+	public bool expanded { get; private set; }
+
 	// public Akira.Shape shape { get; construct; }
 
 	public Layer (Akira.Window main_window, Akira.Layouts.Partials.Artboard artboard, string name, string icon, bool group) {
@@ -194,6 +200,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 			revealer = new Gtk.Revealer ();
 			revealer.hexpand = true;
 			revealer.reveal_child = true;
+			expanded = true;
 
 			container = new Gtk.ListBox ();
 			container.get_style_context ().add_class ("group-container");
@@ -205,6 +212,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 
 			button.toggled.connect (() => {
 				revealer.reveal_child = ! revealer.get_reveal_child ();
+				expanded = ! expanded;
 
 				if (revealer.get_reveal_child ()) {
 					button.get_style_context ().remove_class ("closed");
@@ -221,6 +229,8 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 					icon.visible = true;
 					icon.no_show_all = false;
 				}
+
+				window.main_window.right_sidebar.layers_panel.reload_zebra ();
 			});
 
 			if (revealer.get_reveal_child ()) {

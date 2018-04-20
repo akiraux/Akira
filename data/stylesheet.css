@@ -74,7 +74,11 @@
     padding-left: 15px;
 }
 
-.layers-panel .layer:nth-child(even) {
+/* .layers-panel .layer:nth-child(even) {
+    background-color: #f5f5f5;
+} */
+
+.layer.even {
     background-color: #f5f5f5;
 }
 

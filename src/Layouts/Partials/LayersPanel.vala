@@ -90,6 +90,8 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
 		insert (artboard5, 5);
 
 		build_drag_and_drop ();
+
+		reload_zebra ();
 	}
 
 	private void build_drag_and_drop () {
@@ -203,5 +205,44 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
 		}
 
 		return should_scroll;
+	}
+
+	public void reload_zebra () {
+		int i = 0;
+		// loop through layers and add class
+		this.forall ((row) => {
+			if (row is Akira.Layouts.Partials.Artboard) {
+				Akira.Layouts.Partials.Artboard artboard = (Akira.Layouts.Partials.Artboard) row;
+
+				artboard.container.forall((row) => {
+					if (row is Akira.Layouts.Partials.Layer) {
+						i++;
+						Akira.Layouts.Partials.Layer layer = (Akira.Layouts.Partials.Layer) row;
+						layer.get_style_context ().remove_class ("even");
+
+						if (i % 2 == 0) {
+							layer.get_style_context ().add_class ("even");
+						}
+
+						if (layer.grouped) {
+							layer.container.forall((row) => {
+								if (row is Akira.Layouts.Partials.Layer) {
+									Akira.Layouts.Partials.Layer inner_layer = (Akira.Layouts.Partials.Layer) row;
+									inner_layer.get_style_context ().remove_class ("even");
+
+									stdout.printf ("%s\n", inner_layer.get_instance ().expanded.to_string ());
+									if (inner_layer.expanded) {
+										i++;
+										if (i % 2 == 0) {
+											inner_layer.get_style_context ().add_class ("even");
+										}
+									}
+								}
+							});
+						}
+					}
+				});
+			}
+		});
 	}
 }
