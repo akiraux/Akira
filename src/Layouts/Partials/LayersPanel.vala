@@ -21,6 +21,7 @@
 public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
 	public weak Akira.Window window { get; construct; }
 
+	private int loop;
 	private bool scroll_up = false;
 	private bool scrolling = false;
 	private bool should_scroll = false;
@@ -208,41 +209,42 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
 	}
 
 	public void reload_zebra () {
-		int i = 0;
-		// loop through layers and add class
+		loop = 0;
+
 		this.forall ((row) => {
 			if (row is Akira.Layouts.Partials.Artboard) {
-				Akira.Layouts.Partials.Artboard artboard = (Akira.Layouts.Partials.Artboard) row;
+				zebra_artboard ((Akira.Layouts.Partials.Artboard) row);
+			}
+		});
+	}
 
-				artboard.container.forall((row) => {
-					if (row is Akira.Layouts.Partials.Layer) {
-						i++;
-						Akira.Layouts.Partials.Layer layer = (Akira.Layouts.Partials.Layer) row;
-						layer.get_style_context ().remove_class ("even");
+	private void zebra_artboard (Akira.Layouts.Partials.Artboard artboard) {
+		artboard.container.forall((row) => {
+			if (row is Akira.Layouts.Partials.Layer) {
+				zebra_layer ((Akira.Layouts.Partials.Layer) row);
+			}
+		});
+	}
 
-						if (i % 2 == 0) {
-							layer.get_style_context ().add_class ("even");
-						}
+	private void zebra_layer (Akira.Layouts.Partials.Layer layer) {
+		loop++;
+		layer.get_style_context ().remove_class ("even");
 
-						if (layer.grouped) {
-							bool open = layer.revealer.get_reveal_child ();
+		if (loop % 2 == 0) {
+			layer.get_style_context ().add_class ("even");
+		}
 
-							layer.container.forall((row) => {
-								if (row is Akira.Layouts.Partials.Layer) {
-									Akira.Layouts.Partials.Layer inner_layer = (Akira.Layouts.Partials.Layer) row;
-									inner_layer.get_style_context ().remove_class ("even");
+		if (layer.grouped) {
+			zebra_layer_group (layer);
+		}
+	}
 
-									if (open) {
-										i++;
-										if (i % 2 == 0) {
-											inner_layer.get_style_context ().add_class ("even");
-										}
-									}
-								}
-							});
-						}
-					}
-				});
+	private void zebra_layer_group (Akira.Layouts.Partials.Layer layer) {
+		bool open = layer.revealer.get_reveal_child ();
+
+		layer.container.forall((row) => {
+			if (row is Akira.Layouts.Partials.Layer && open) {
+				zebra_layer ((Akira.Layouts.Partials.Layer) row);
 			}
 		});
 	}
