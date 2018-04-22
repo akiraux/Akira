@@ -129,27 +129,40 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 		Gtk.Widget row;
 		Akira.Layouts.Partials.Layer source;
 		int newPos;
-		int oldPos;
+		//  int oldPos;
 
 		target = (Akira.Layouts.Partials.Layer) container.get_row_at_y (y);
+		row = ((Gtk.Widget[]) selection_data.get_data ())[0];
+		source = (Akira.Layouts.Partials.Layer) row.get_ancestor (typeof (Akira.Layouts.Partials.Layer));
 
 		if (target == null) {
 			newPos = -1;
+		} else if (target.grouped) {
+			var group = (Akira.Layouts.Partials.Layer) target.container.get_row_at_y (y);
+			newPos = group.get_index ();
 		} else {
 			newPos = target.get_index ();
 		}
 
-		row = ((Gtk.Widget[]) selection_data.get_data ())[0];
-
-		source = (Akira.Layouts.Partials.Layer) row.get_ancestor (typeof (Akira.Layouts.Partials.Layer));
-		oldPos = source.get_index ();
+		//  oldPos = source.get_index ();
 
 		if (source == target) {
 			return;
 		}
 
-		container.remove (source);
-		container.insert (source, newPos);
+		if (source.layer_group != null) {
+			source.layer_group.container.remove (source);
+			source.layer_group = null;
+		} else {
+			container.remove (source);
+		}
+
+		if (target.grouped) {
+			source.layer_group = target;
+			target.container.insert (source, newPos);
+		} else {
+			container.insert (source, newPos);
+		}
 
 		window.main_window.right_sidebar.layers_panel.reload_zebra ();
 		show_all ();
@@ -251,15 +264,20 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 	private bool delete_object () {
 		if (is_selected () && !editing) {
 			window.main_window.right_sidebar.layers_panel.remove (this);
-		} else {
-			var layers = this.container.get_selected_rows ();
-			layers.@foreach ((row) => {
-				Akira.Layouts.Partials.Layer layer = (Akira.Layouts.Partials.Layer) row;
-				if (layer.is_selected () && !layer.editing) {
-					this.container.remove (layer);
-				}
-			});
+
+			return true;
 		}
+
+		var layers = this.container.get_selected_rows ();
+
+		layers.@foreach (row => {
+			Akira.Layouts.Partials.Layer layer = (Akira.Layouts.Partials.Layer) row;
+			if (layer.is_selected () && !layer.editing) {
+				this.container.remove (layer);
+			}
+		});
+
+		window.main_window.right_sidebar.layers_panel.reload_zebra ();
 
 		return true;
 	}

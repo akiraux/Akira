@@ -64,9 +64,9 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
 		layer_placeholder.visible = false;
 		layer_placeholder.no_show_all = true;
 
-		layer_group.container.insert (new Akira.Layouts.Partials.Layer (window, artboard, "Rectangle", "/com/github/alecaddd/akira/tools/rectangle.svg", false), 1);
-		layer_group.container.insert (new Akira.Layouts.Partials.Layer (window, artboard, "Circle", "/com/github/alecaddd/akira/tools/circle.svg", false), 2);
-		layer_group.container.insert (new Akira.Layouts.Partials.Layer (window, artboard, "Triangle", "/com/github/alecaddd/akira/tools/triangle.svg", false), 3);
+		layer_group.container.insert (new Akira.Layouts.Partials.Layer (window, artboard, "Rectangle", "/com/github/alecaddd/akira/tools/rectangle.svg", false, layer_group), 1);
+		layer_group.container.insert (new Akira.Layouts.Partials.Layer (window, artboard, "Circle", "/com/github/alecaddd/akira/tools/circle.svg", false, layer_group), 2);
+		layer_group.container.insert (new Akira.Layouts.Partials.Layer (window, artboard, "Triangle", "/com/github/alecaddd/akira/tools/triangle.svg", false, layer_group), 3);
 
 		artboard.container.insert (layer_group, 4);
 
@@ -212,7 +212,7 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
 		loop = 0;
 
 		@foreach (row => {
-			if (! (row is Akira.Layouts.Partials.Artboard)) {
+			if (!(row is Akira.Layouts.Partials.Artboard)) {
 				return;
 			}
 			zebra_artboard ((Akira.Layouts.Partials.Artboard) row);
@@ -221,7 +221,7 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
 
 	private void zebra_artboard (Akira.Layouts.Partials.Artboard artboard) {
 		artboard.container.@foreach (row => {
-			if (! (row is Akira.Layouts.Partials.Layer)) {
+			if (!(row is Akira.Layouts.Partials.Layer)) {
 				return;
 			}
 			zebra_layer ((Akira.Layouts.Partials.Layer) row);
@@ -245,7 +245,7 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
 		bool open = layer.revealer.get_reveal_child ();
 
 		layer.container.@foreach (row => {
-			if (! (row is Akira.Layouts.Partials.Layer) || ! open) {
+			if (!(row is Akira.Layouts.Partials.Layer) || !open) {
 				return;
 			}
 			zebra_layer ((Akira.Layouts.Partials.Layer) row);

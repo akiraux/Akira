@@ -22,6 +22,7 @@
 public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 	public weak Akira.Window window { get; construct; }
 	public Akira.Layouts.Partials.Artboard artboard { construct set; get; }
+	public Akira.Layouts.Partials.Layer? layer_group { construct set; get; }
 	public string layer_name { get; construct; }
 	public string icon_name { get; construct; }
 
@@ -80,13 +81,14 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 
 	// public Akira.Shape shape { get; construct; }
 
-	public Layer (Akira.Window main_window, Akira.Layouts.Partials.Artboard artboard, string name, string icon, bool group) {
+	public Layer (Akira.Window main_window, Akira.Layouts.Partials.Artboard artboard, string name, string icon, bool group, Akira.Layouts.Partials.Layer? parent = null) {
 		Object (
 			window: main_window,
 			layer_name: name,
 			icon_name: icon,
 			artboard: artboard,
-			grouped: group
+			grouped: group,
+			layer_group: parent
 		);
 	}
 
@@ -215,8 +217,6 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 		container.get_style_context ().add_class ("group-container");
 		container.activate_on_single_click = true;
 		container.selection_mode = Gtk.SelectionMode.SINGLE;
-		// Gtk.drag_dest_set (this.container, Gtk.DestDefaults.ALL, targetEntriesLayer, Gdk.DragAction.MOVE);
-		// this.container.drag_data_received.connect (on_drag_data_received);
 		revealer.add (container);
 
 		if (revealer.get_reveal_child ()) {
