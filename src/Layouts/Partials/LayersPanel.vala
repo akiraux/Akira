@@ -211,18 +211,20 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
 	public void reload_zebra () {
 		loop = 0;
 
-		this.forall ((row) => {
-			if (row is Akira.Layouts.Partials.Artboard) {
-				zebra_artboard ((Akira.Layouts.Partials.Artboard) row);
+		@foreach (row => {
+			if (! (row is Akira.Layouts.Partials.Artboard)) {
+				return;
 			}
+			zebra_artboard ((Akira.Layouts.Partials.Artboard) row);
 		});
 	}
 
 	private void zebra_artboard (Akira.Layouts.Partials.Artboard artboard) {
-		artboard.container.forall((row) => {
-			if (row is Akira.Layouts.Partials.Layer) {
-				zebra_layer ((Akira.Layouts.Partials.Layer) row);
+		artboard.container.@foreach (row => {
+			if (! (row is Akira.Layouts.Partials.Layer)) {
+				return;
 			}
+			zebra_layer ((Akira.Layouts.Partials.Layer) row);
 		});
 	}
 
@@ -242,10 +244,11 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
 	private void zebra_layer_group (Akira.Layouts.Partials.Layer layer) {
 		bool open = layer.revealer.get_reveal_child ();
 
-		layer.container.forall((row) => {
-			if (row is Akira.Layouts.Partials.Layer && open) {
-				zebra_layer ((Akira.Layouts.Partials.Layer) row);
+		layer.container.@foreach (row => {
+			if (! (row is Akira.Layouts.Partials.Layer) || ! open) {
+				return;
 			}
+			zebra_layer ((Akira.Layouts.Partials.Layer) row);
 		});
 	}
 }
