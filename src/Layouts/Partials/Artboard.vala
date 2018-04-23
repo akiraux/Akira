@@ -137,18 +137,20 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 		if (target == null) {
 			newPos = -1;
 		} else if (target.grouped && source.layer_group == null) {
-			//  int index = target.get_index ();
-			//  Gtk.Allocation alloc;
-			//  source.get_allocation (out alloc);
-			//  Gtk.Allocation _alloc;
-			//  target.container.get_allocation (out _alloc);
-			//  y = (index * alloc.height) - _alloc.height + y;
+			int index = target.get_index ();
+			Gtk.Allocation alloc;
+			source.get_allocation (out alloc);
+			y = y - (index * alloc.height);
 
 			var group = (Akira.Layouts.Partials.Layer) target.container.get_row_at_y (y);
 			newPos = group.get_index ();
 			debug ("Layer dropped inside group coming from OUTSIDE: %i", newPos);
-			debug ("Y: %i", y);
 		} else if (target.grouped && source.layer_group != null) {
+			int index = target.get_index ();
+			Gtk.Allocation alloc;
+			source.get_allocation (out alloc);
+			y = y - (index * alloc.height);
+
 			var group = (Akira.Layouts.Partials.Layer) target.container.get_row_at_y (y);
 			newPos = group.get_index ();
 			debug ("Layer dropped inside group coming from INSIDE: %i", newPos);
