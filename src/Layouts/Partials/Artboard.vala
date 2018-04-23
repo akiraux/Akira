@@ -129,7 +129,6 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 		Gtk.Widget row;
 		Akira.Layouts.Partials.Layer source;
 		int newPos;
-		//  int oldPos;
 
 		target = (Akira.Layouts.Partials.Layer) container.get_row_at_y (y);
 		row = ((Gtk.Widget[]) selection_data.get_data ())[0];
@@ -137,14 +136,29 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 
 		if (target == null) {
 			newPos = -1;
-		} else if (target.grouped) {
+		} else if (target.grouped && source.layer_group == null) {
+			//  int index = target.get_index ();
+			//  Gtk.Allocation alloc;
+			//  source.get_allocation (out alloc);
+			//  Gtk.Allocation _alloc;
+			//  target.container.get_allocation (out _alloc);
+			//  y = (index * alloc.height) - _alloc.height + y;
+
 			var group = (Akira.Layouts.Partials.Layer) target.container.get_row_at_y (y);
 			newPos = group.get_index ();
+			debug ("Layer dropped inside group coming from OUTSIDE: %i", newPos);
+			debug ("Y: %i", y);
+		} else if (target.grouped && source.layer_group != null) {
+			var group = (Akira.Layouts.Partials.Layer) target.container.get_row_at_y (y);
+			newPos = group.get_index ();
+			debug ("Layer dropped inside group coming from INSIDE: %i", newPos);
+		} else if (!target.grouped && source.layer_group != null) {
+			var group = (Akira.Layouts.Partials.Layer) source.layer_group.container.get_row_at_y (y);
+			newPos = group.get_index ();
+			debug ("Layer dropped coming from INSIDE a group: %i", newPos);
 		} else {
 			newPos = target.get_index ();
 		}
-
-		//  oldPos = source.get_index ();
 
 		if (source == target) {
 			return;
@@ -157,9 +171,15 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 			container.remove (source);
 		}
 
-		if (target.grouped) {
+		if (target.grouped && source.layer_group == null) {
 			source.layer_group = target;
 			target.container.insert (source, newPos);
+		} else if (target.grouped && source.layer_group != null) {
+			source.layer_group = target;
+			target.container.insert (source, newPos);
+		} else if (!target.grouped && source.layer_group != null) {
+			source.layer_group = null;
+			container.insert (source, newPos);
 		} else {
 			container.insert (source, newPos);
 		}

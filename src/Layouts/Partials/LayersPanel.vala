@@ -108,7 +108,6 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
 		Gtk.Widget row;
 		Akira.Layouts.Partials.Artboard source;
 		int newPos;
-		int oldPos;
 
 		target = (Akira.Layouts.Partials.Artboard) get_row_at_y (y);
 
@@ -121,7 +120,6 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
 		row = ((Gtk.Widget[]) selection_data.get_data ())[0];
 
 		source = (Akira.Layouts.Partials.Artboard) row.get_ancestor (typeof (Akira.Layouts.Partials.Artboard));
-		oldPos = source.get_index ();
 
 		if (source == target) {
 			return;
