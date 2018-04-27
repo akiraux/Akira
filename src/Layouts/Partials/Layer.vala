@@ -376,14 +376,21 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 			} else {
 				artboard.container.selection_mode = Gtk.SelectionMode.SINGLE;
 
-				window.main_window.right_sidebar.layers_panel.@foreach ((child) => {
+				window.main_window.right_sidebar.layers_panel.foreach (child => {
 					if (child is Akira.Layouts.Partials.Artboard) {
 						Akira.Layouts.Partials.Artboard artboard = (Akira.Layouts.Partials.Artboard) child;
 
 						window.main_window.right_sidebar.layers_panel.unselect_row (artboard);
 						artboard.container.unselect_all ();
+
+						unselect_groups (artboard.container);
 					}
 				});
+
+				if (layer_group != null) {
+					artboard.container.selection_mode = Gtk.SelectionMode.NONE;
+					artboard.container.unselect_row (layer_group);
+				}
 			}
 
 			activate ();
@@ -395,6 +402,19 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 		}
 
 		return false;
+	}
+
+	private void unselect_groups (Gtk.ListBox container) {
+		container.foreach (child => {
+			if (child is Akira.Layouts.Partials.Layer) {
+				Akira.Layouts.Partials.Layer layer = (Akira.Layouts.Partials.Layer) child;
+
+				if (layer.grouped) {
+					layer.container.unselect_all ();
+					unselect_groups (layer.container);
+				}
+			}
+		});
 	}
 
 	public void update_on_enter () {
