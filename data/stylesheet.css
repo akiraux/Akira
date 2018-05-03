@@ -48,8 +48,8 @@
 }
 
 .artboard:selected,
-.artboard:selected .revealer-button GtkImage,
-.artboard:selected .layer-action GtkImage {
+.artboard:selected .revealer-button image,
+.artboard:selected .layer-action image {
     color: #333;
 }
 
@@ -80,6 +80,10 @@
 
 .revealer-button {
     padding: 0 8px;
+    border-radius: 0;
+    border: none;
+    box-shadow: none;
+    background: transparent;
     border-bottom: 1px solid #ccc;
 }
 
@@ -87,11 +91,11 @@
     border-bottom: none;
 }
 
-.revealer-button GtkImage {
+.revealer-button image {
     transition: all 160ms ease-in-out;
 }
 
-.revealer-button.closed GtkImage {
+.revealer-button.closed image {
     -gtk-icon-transform: rotate(-90deg);
 }
 
@@ -99,7 +103,7 @@
     transition: all 240ms ease;
 }
 
-.layer GtkLabel {
+.layer label {
     padding: 8px 0;
 }
 
@@ -120,7 +124,7 @@
 }
 
 .layer:selected,
-.layer:selected GtkImage {
+.layer:selected image {
     background-color: transparent;
     color: #333;
 }
@@ -135,13 +139,13 @@
     opacity: 0;
 }
 
-.layer:hover > GtkGrid > .layer-action,
-.layer-group:hover > GtkGrid > GtkGrid > .layer-action {
+.layer:hover > grid > .layer-action,
+.layer-group:hover > grid > grid > .layer-action {
     opacity: 0.5;
 }
 
-.layer:hover > GtkGrid > .layer-action:hover,
-.layer-group:hover > GtkGrid > GtkGrid > .layer-action:hover {
+.layer:hover > grid > .layer-action:hover,
+.layer-group:hover > grid > grid > .layer-action:hover {
     opacity: 1;
 }
 
@@ -149,7 +153,7 @@
     opacity: 0.5;
 }
 
-.layer-action GtkImage {
+.layer-action image {
     color: #333;
 }
 
