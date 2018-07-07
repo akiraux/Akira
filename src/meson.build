@@ -1,4 +1,6 @@
 conf_data = configuration_data()
+conf_data.set('PROJECT_NAME', meson.project_name())
+conf_data.set('EXEC_NAME', meson.project_name())
 conf_data.set('DATADIR', get_option('datadir'))
 conf_data.set('PKGDATADIR', get_option('datadir') + '/' + meson.project_name())
 conf_data.set('GETTEXT_PACKAGE', meson.project_name())
@@ -6,6 +8,7 @@ conf_data.set('RELEASE_NAME', 'Akira')
 conf_data.set('VERSION', '0.0.1')
 conf_data.set('VERSION_INFO', 'The Linux Design Tool')
 conf_data.set('PREFIX', get_option('prefix'))
+
 config_header = configure_file(
     input: 'config.vala.in',
     output: 'config.vala',
@@ -18,9 +21,12 @@ executable(
     'Main.vala',
     'Application.vala',
     'Window.vala',
+
     'Services/Settings.vala',
     'Services/ActionManager.vala',
+
     'Utils/Dialogs.vala',
+
     'Layouts/HeaderBar.vala',
     'Layouts/LeftSideBar.vala',
     'Layouts/MainCanvas.vala',
@@ -31,9 +37,12 @@ executable(
     'Layouts/Partials/PagesPanel.vala',
     'Layouts/Partials/Artboard.vala',
     'Layouts/Partials/Layer.vala',
+
     'Partials/HeaderBarButton.vala',
     'Partials/MenuButton.vala',
+
     'Widgets/SettingsDialog.vala',
+
     asresources,
     config_header,
     dependencies: [
