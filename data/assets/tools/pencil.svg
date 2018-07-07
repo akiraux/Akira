@@ -1,16 +1,90 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg width="16px" height="16px" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <!-- Generator: Sketch 47.1 (45422) - http://www.bohemiancoding.com/sketch -->
-    <title>pencil</title>
-    <desc>Created with Sketch.</desc>
-    <defs></defs>
-    <g id="Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="Artboard" transform="translate(-154.000000, -401.000000)">
-            <g id="pencil" transform="translate(154.000000, 401.000000)">
-                <path d="M2.49237935,9.9126441 L1.20648699,14.4156291 L5.99382269,13.3945983 L15.1417704,4.42373682 C15.3367381,4.2325433 15.3373295,3.91555528 15.1453486,3.72438758 L12.2631963,0.854444133 C12.0658532,0.657936916 11.7468693,0.658154145 11.5499581,0.85506533 L2.49237935,9.9126441 Z" id="Path-4" stroke="#5E5E5E"></path>
-                <path d="M5.55555556,9.86048297 L12.0827052,3.33333333" id="Path-12" stroke="#5E5E5E"></path>
-                <polygon id="Path-14" fill="#5E5E5E" points="2.46142578 11.4663086 4.2444458 13.3782959 1.67022705 13.968811"></polygon>
-            </g>
-        </g>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="20"
+   height="20"
+   viewBox="0 0 20 20"
+   version="1.1"
+   id="svg14"
+   sodipodi:docname="pencil.svg"
+   inkscape:version="0.92.2 (unknown)">
+  <metadata
+     id="metadata18">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title>pencil</dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1920"
+     inkscape:window-height="1017"
+     id="namedview16"
+     showgrid="true"
+     inkscape:showpageshadow="false"
+     inkscape:zoom="14.75"
+     inkscape:cx="-2.4745763"
+     inkscape:cy="8"
+     inkscape:window-x="0"
+     inkscape:window-y="30"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg14">
+    <inkscape:grid
+       type="xygrid"
+       id="grid828" />
+  </sodipodi:namedview>
+  <!-- Generator: Sketch 47.1 (45422) - http://www.bohemiancoding.com/sketch -->
+  <title
+     id="title2">pencil</title>
+  <desc
+     id="desc4">Created with Sketch.</desc>
+  <defs
+     id="defs6" />
+  <g
+     id="Icons"
+     style="fill:none;fill-rule:evenodd;stroke:none;stroke-width:1.28451264"
+     transform="matrix(0.76755898,0,0,0.78960779,3.7731511,3.9453632)">
+    <g
+       id="Artboard"
+       transform="translate(-154,-401)"
+       style="stroke-width:1.28451264">
+      <g
+         id="pencil"
+         transform="translate(154,401)"
+         style="stroke-width:1.28451264">
+        <path
+           d="M 2.4923794,9.9126441 1.206487,14.415629 5.9938227,13.394598 15.14177,4.4237368 c 0.194968,-0.1911935 0.195559,-0.5081815 0.0036,-0.6993492 L 12.263196,0.85444413 c -0.197343,-0.19650721 -0.516327,-0.19628998 -0.713238,6.212e-4 z"
+           id="Path-4"
+           inkscape:connector-curvature="0"
+           style="stroke:#5e5e5e;stroke-width:1.28451264" />
+        <path
+           d="M 5.5555556,9.860483 12.082705,3.3333333"
+           id="Path-12"
+           inkscape:connector-curvature="0"
+           style="stroke:#5e5e5e;stroke-width:1.28451264" />
+        <polygon
+           id="Path-14"
+           points="4.2444458,13.378296 1.6702271,13.968811 2.4614258,11.466309 "
+           style="fill:#5e5e5e;stroke-width:1.28451264" />
+      </g>
     </g>
+  </g>
 </svg>

@@ -22,6 +22,7 @@
 public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 	public weak Akira.Window window { get; construct; }
 	public Akira.Layouts.Partials.Artboard artboard { construct set; get; }
+	public Akira.Layouts.Partials.Layer? layer_group { construct set; get; }
 	public string layer_name { get; construct; }
 	public string icon_name { get; construct; }
 
@@ -39,6 +40,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 	};
 
 	public Gtk.Image icon;
+	public Gtk.Image icon_folder_open;
 	public Gtk.Image icon_locked;
 	public Gtk.Image icon_unlocked;
 	public Gtk.Image icon_hidden;
@@ -48,40 +50,62 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 	public Gtk.Label label;
 	public Gtk.Entry entry;
 	public Gtk.EventBox handle;
+	private Gtk.Grid label_grid;
+
+	// Group related properties
+	public Gtk.ToggleButton button;
+	public Gtk.Image button_icon;
+	public Gtk.Revealer revealer;
+	public Gtk.ListBox container;
 
 	private bool _locked { get; set; default = false; }
 	public bool locked {
 		get { return _locked; } set { _locked = value; }
 	}
 
-	private bool _hidden { get; set; default = false; }
+	// Keep __hidden with double underscore for FreeBSD compatibility
+	private bool __hidden { get; set; default = false; }
 	public bool hidden {
-		get { return _hidden; } set { _hidden = value; }
+		get { return __hidden; } set { __hidden = value; }
+	}
+
+	private bool _editing { get; set; default = false; }
+	public bool editing {
+		get { return _editing; } set { _editing = value; }
+	}
+
+	private bool _grouped { get; set; default = false; }
+	public bool grouped {
+		get { return _grouped; } set construct { _grouped = value; }
 	}
 
 	// public Akira.Shape shape { get; construct; }
 
-	public Layer (Akira.Window main_window, Akira.Layouts.Partials.Artboard artboard, string name, string icon) {
+	public Layer (Akira.Window main_window, Akira.Layouts.Partials.Artboard artboard, string name, string icon, bool group, Akira.Layouts.Partials.Layer? parent = null) {
 		Object (
 			window: main_window,
 			layer_name: name,
 			icon_name: icon,
-			artboard: artboard
+			artboard: artboard,
+			grouped: group,
+			layer_group: parent
 		);
 	}
 
 	construct {
+		can_focus = true;
 		get_style_context ().add_class ("layer");
 
 		label =  new Gtk.Label (layer_name);
 		label.halign = Gtk.Align.FILL;
 		label.xalign = 0;
-		label.hexpand = true;
+		label.expand = true;
 		label.set_ellipsize (Pango.EllipsizeMode.END);
 
 		entry = new Gtk.Entry ();
+		entry.margin_top = 5;
+		entry.margin_bottom = 5;
 		entry.expand = true;
-		entry.get_style_context ().remove_class ("entry");
 		entry.visible = false;
 		entry.no_show_all = true;
 		entry.set_text (layer_name);
@@ -92,9 +116,23 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 
 		if (icon_name.contains ("/")) {
 			icon = new Gtk.Image.from_resource (icon_name);
+			icon.margin_end = 6;
+			icon.margin_start = 16;
 		} else {
 			icon = new Gtk.Image.from_icon_name (icon_name, Gtk.IconSize.MENU);
+			icon.margin_end = 10;
 		}
+		icon.vexpand = true;
+
+		icon_folder_open = new Gtk.Image.from_icon_name ("folder-open", Gtk.IconSize.MENU);
+		icon_folder_open.margin_end = 10;
+		icon_folder_open.vexpand = true;
+		icon_folder_open.visible = false;
+		icon_folder_open.no_show_all = true;
+
+		var icon_layer_grid = new Gtk.Grid ();
+		icon_layer_grid.attach (icon, 0, 0, 1, 1);
+		icon_layer_grid.attach (icon_folder_open, 1, 0, 1, 1);
 
 		button_locked = new Gtk.ToggleButton ();
 		button_locked.tooltip_text = _("Lock Layer");
@@ -126,45 +164,101 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 		button_hidden_grid.attach (icon_visible, 1, 0, 1, 1);
 		button_hidden.add (button_hidden_grid);
 
-		var label_grid = new Gtk.Grid ();
-		label_grid.margin = 6;
-		label_grid.expand = true;
-		label_grid.attach (icon, 0, 0, 1, 1);
-		label_grid.attach (label, 1, 0, 1, 1);
-		label_grid.attach (entry, 2, 0, 1, 1);
-		label_grid.attach (button_locked, 3, 0, 1, 1);
-		label_grid.attach (button_hidden, 4, 0, 1, 1);
+		var handle_grid = new Gtk.Grid ();
+		handle_grid.expand = true;
+		handle_grid.attach (icon_layer_grid, 0, 0, 1, 1);
+		handle_grid.attach (label, 1, 0, 1, 1);
+		handle_grid.attach (entry, 2, 0, 1, 1);
 
 		handle = new Gtk.EventBox ();
-		handle.hexpand = true;
-		handle.add (label_grid);
+		handle.expand = true;
+		handle.above_child = false;
+		handle.add (handle_grid);
 
-		add (handle);
+		label_grid = new Gtk.Grid ();
+		label_grid.expand = true;
+		label_grid.attach (handle, 1, 0, 1, 1);
+		label_grid.attach (button_locked, 2, 0, 1, 1);
+		label_grid.attach (button_hidden, 3, 0, 1, 1);
 
+		is_group ();
 		build_darg_and_drop ();
-
-		handle.enter_notify_event.connect ((event) => {
-			button_locked.get_style_context ().add_class ("show");
-			button_hidden.get_style_context ().add_class ("show");
-			return true;
-		});
-
-		handle.leave_notify_event.connect ((event) => {
-			if (event.detail != Gdk.NotifyType.INFERIOR) {
-				if (! button_locked.get_active ()) {
-					button_locked.get_style_context ().remove_class ("show");
-				}
-
-				if (! button_hidden.get_active ()) {
-					button_hidden.get_style_context ().remove_class ("show");
-				}
-			}
-		});
 
 		handle.event.connect (on_click_event);
 
 		lock_actions ();
 		hide_actions ();
+		reveal_actions ();
+	}
+
+	private void is_group () {
+		if (! grouped) {
+			add (label_grid);
+			return;
+		}
+
+		get_style_context ().add_class ("layer-group");
+
+		button = new Gtk.ToggleButton ();
+		button.active = true;
+		button.get_style_context ().remove_class ("button");
+		button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
+		button.get_style_context ().add_class ("revealer-button");
+		button_icon = new Gtk.Image.from_icon_name ("pan-down-symbolic", Gtk.IconSize.MENU);
+		button.add (button_icon);
+
+		label_grid.attach (button, 0, 0, 1, 1);
+
+		revealer = new Gtk.Revealer ();
+		revealer.hexpand = true;
+		revealer.reveal_child = true;
+
+		container = new Gtk.ListBox ();
+		container.get_style_context ().add_class ("group-container");
+		container.activate_on_single_click = true;
+		container.selection_mode = Gtk.SelectionMode.SINGLE;
+		revealer.add (container);
+
+		if (revealer.get_reveal_child ()) {
+			icon_folder_open.visible = true;
+			icon_folder_open.no_show_all = false;
+			icon.visible = false;
+			icon.no_show_all = true;
+		}
+
+		var group_grid = new Gtk.Grid ();
+		group_grid.attach (label_grid, 0, 0, 1, 1);
+		group_grid.attach (revealer, 0, 1, 1, 1);
+
+		add (group_grid);
+	}
+
+	private void reveal_actions () {
+		if (! grouped) {
+			return;
+		}
+
+		button.toggled.connect (() => {
+			revealer.reveal_child = ! revealer.get_reveal_child ();
+
+			if (revealer.get_reveal_child ()) {
+				button.get_style_context ().remove_class ("closed");
+				
+				icon_folder_open.visible = true;
+				icon_folder_open.no_show_all = false;
+				icon.visible = false;
+				icon.no_show_all = true;
+			} else {
+				button.get_style_context ().add_class ("closed");
+
+				icon_folder_open.visible = false;
+				icon_folder_open.no_show_all = true;
+				icon.visible = true;
+				icon.no_show_all = false;
+			}
+
+			window.main_window.right_sidebar.layers_panel.reload_zebra ();
+		});
 	}
 
 	private void build_darg_and_drop () {
@@ -179,7 +273,8 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 	}
 
 	private void on_drag_begin (Gtk.Widget widget, Gdk.DragContext context) {
-		var row = (Akira.Layouts.Partials.Layer) widget.get_ancestor (typeof (Akira.Layouts.Partials.Layer));
+		// var row = (Akira.Layouts.Partials.Layer) widget.get_ancestor (typeof (Akira.Layouts.Partials.Layer));
+		var row = (widget as Akira.Layouts.Partials.Layer);
 		Gtk.Allocation alloc;
 		row.get_allocation (out alloc);
 
@@ -245,19 +340,81 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 	}
 
 	public bool on_click_event (Gdk.Event event) {
-		if (event.type == Gdk.EventType.BUTTON_RELEASE) {
-			activate ();
-		}
 
 		if (event.type == Gdk.EventType.@2BUTTON_PRESS) {
 			entry.visible = true;
 			entry.no_show_all = false;
-			entry.select_region (0, -1);
 			label.visible = false;
 			label.no_show_all = true;
+
+			button_locked.visible = false;
+			button_locked.no_show_all = true;
+			button_hidden.visible = false;
+			button_hidden.no_show_all = true;
+
+			editing = true;
+
+			Timeout.add (10, () => {
+				entry.grab_focus ();
+				return false;
+			});
+
+			return false;
+		}
+
+		if (event.type == Gdk.EventType.BUTTON_RELEASE) {
+
+			if (entry.visible == true) {
+				return false;
+			}
+
+			Gdk.ModifierType state;
+			event.get_state (out state);
+
+			if (state.to_string () == "GDK_CONTROL_MASK") {
+				artboard.container.selection_mode = Gtk.SelectionMode.MULTIPLE;
+			} else {
+				artboard.container.selection_mode = Gtk.SelectionMode.SINGLE;
+
+				window.main_window.right_sidebar.layers_panel.foreach (child => {
+					if (child is Akira.Layouts.Partials.Artboard) {
+						Akira.Layouts.Partials.Artboard artboard = (Akira.Layouts.Partials.Artboard) child;
+
+						window.main_window.right_sidebar.layers_panel.unselect_row (artboard);
+						artboard.container.unselect_all ();
+
+						unselect_groups (artboard.container);
+					}
+				});
+
+				if (layer_group != null) {
+					artboard.container.selection_mode = Gtk.SelectionMode.NONE;
+					artboard.container.unselect_row (layer_group);
+				}
+			}
+
+			activate ();
+
+			window.main_window.right_sidebar.layers_panel.selection_mode = Gtk.SelectionMode.NONE;
+			window.main_window.right_sidebar.layers_panel.unselect_row (artboard);
+
+			return false;
 		}
 
 		return false;
+	}
+
+	private void unselect_groups (Gtk.ListBox container) {
+		container.foreach (child => {
+			if (child is Akira.Layouts.Partials.Layer) {
+				Akira.Layouts.Partials.Layer layer = (Akira.Layouts.Partials.Layer) child;
+
+				if (layer.grouped) {
+					layer.container.unselect_all ();
+					unselect_groups (layer.container);
+				}
+			}
+		});
 	}
 
 	public void update_on_enter () {
@@ -271,6 +428,8 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 
 	public bool update_on_escape (Gdk.EventKey key) {
 		if (key.keyval == 65307) {
+			entry.text = label.label;
+
 			update_label ();
 		}
 		return false;
@@ -284,6 +443,15 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 		entry.no_show_all = true;
 		label.visible = true;
 		label.no_show_all = false;
+
+		button_locked.visible = true;
+		button_locked.no_show_all = false;
+		button_hidden.visible = true;
+		button_hidden.no_show_all = false;
+
+		editing = false;
+
+		activate ();
 	}
 
 	private void lock_actions () {
@@ -291,6 +459,12 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 			var active = button_locked.get_active ();
 
 			button_locked.tooltip_text = active ? _("Unlock Layer") : _("Lock Layer");
+
+			if (active) {
+				button_locked.get_style_context ().add_class ("show");
+			} else {
+				button_locked.get_style_context ().remove_class ("show");
+			}
 
 			icon_unlocked.visible = active;
 			icon_unlocked.no_show_all = ! active;
@@ -307,6 +481,12 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 			var active = button_hidden.get_active ();
 
 			button_hidden.tooltip_text = active ? _("Show Layer") : _("Hide Layer");
+
+			if (active) {
+				button_hidden.get_style_context ().add_class ("show");
+			} else {
+				button_hidden.get_style_context ().remove_class ("show");
+			}
 
 			icon_visible.visible = active;
 			icon_visible.no_show_all = ! active;

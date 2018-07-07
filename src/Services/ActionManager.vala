@@ -45,7 +45,7 @@ public class Akira.Services.ActionManager : Object {
 		{ ACTION_PRESENTATION, action_presentation },
 		{ ACTION_PREFERENCES, action_preferences },
 		{ ACTION_LABELS, action_labels },
-		{ ACTION_QUIT, action_quit }
+		{ ACTION_QUIT, action_quit },
 	};
 
 	public ActionManager (Akira.Application akira_app, Akira.Window main_window) {
@@ -146,7 +146,6 @@ public class Akira.Services.ActionManager : Object {
 	}
 
 	public static void action_from_group (string action_name, ActionGroup? action_group) {
-		warning("action from group");
 		action_group.activate_action (action_name, null);
 	}
 }

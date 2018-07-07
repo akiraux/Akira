@@ -21,6 +21,7 @@
 public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
 	public weak Akira.Window window { get; construct; }
 
+	private int loop;
 	private bool scroll_up = false;
 	private bool scrolling = false;
 	private bool should_scroll = false;
@@ -38,12 +39,13 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
 		Object (
 			window: main_window,
 			activate_on_single_click: false,
-			selection_mode: Gtk.SelectionMode.NONE
+			selection_mode: Gtk.SelectionMode.SINGLE
 		);
 	}
 
 	construct {
 		get_style_context ().add_class ("sidebar-r");
+		get_style_context ().add_class ("layers-panel");
 		expand = true;
 
 		var artboard = new Akira.Layouts.Partials.Artboard (window, "Artboard 1");
@@ -52,12 +54,25 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
 		placeholder.visible = false;
 		placeholder.no_show_all = true;
 
-		artboard.container.insert (new Akira.Layouts.Partials.Layer (window, artboard, "Rectangle", "/com/github/alecaddd/akira/tools/rectangle.svg"), 1);
-		artboard.container.insert (new Akira.Layouts.Partials.Layer (window, artboard, "Circle", "/com/github/alecaddd/akira/tools/circle.svg"), 2);
-		artboard.container.insert (new Akira.Layouts.Partials.Layer (window, artboard, "Triangle", "/com/github/alecaddd/akira/tools/triangle.svg"), 3);
-		artboard.container.insert (new Akira.Layouts.Partials.Layer (window, artboard, "Text", "/com/github/alecaddd/akira/tools/text.svg"), 4);
-		artboard.container.insert (new Akira.Layouts.Partials.Layer (window, artboard, "Bezier", "/com/github/alecaddd/akira/tools/pen.svg"), 5);
-		artboard.container.insert (new Akira.Layouts.Partials.Layer (window, artboard, "Path", "/com/github/alecaddd/akira/tools/pencil.svg"), 6);
+		artboard.container.insert (new Akira.Layouts.Partials.Layer (window, artboard, "Rectangle", "/com/github/alecaddd/akira/tools/rectangle.svg", false), 1);
+		artboard.container.insert (new Akira.Layouts.Partials.Layer (window, artboard, "Circle", "/com/github/alecaddd/akira/tools/circle.svg", false), 2);
+		artboard.container.insert (new Akira.Layouts.Partials.Layer (window, artboard, "Triangle", "/com/github/alecaddd/akira/tools/triangle.svg", false), 3);
+
+		var layer_group = new Akira.Layouts.Partials.Layer (window, artboard, "Group", "folder", true);
+		var layer_placeholder = new Gtk.ListBoxRow ();
+		layer_group.container.insert (layer_placeholder, 0);
+		layer_placeholder.visible = false;
+		layer_placeholder.no_show_all = true;
+
+		layer_group.container.insert (new Akira.Layouts.Partials.Layer (window, artboard, "Rectangle", "/com/github/alecaddd/akira/tools/rectangle.svg", false, layer_group), 1);
+		layer_group.container.insert (new Akira.Layouts.Partials.Layer (window, artboard, "Circle", "/com/github/alecaddd/akira/tools/circle.svg", false, layer_group), 2);
+		layer_group.container.insert (new Akira.Layouts.Partials.Layer (window, artboard, "Triangle", "/com/github/alecaddd/akira/tools/triangle.svg", false, layer_group), 3);
+
+		artboard.container.insert (layer_group, 4);
+
+		artboard.container.insert (new Akira.Layouts.Partials.Layer (window, artboard, "Text", "/com/github/alecaddd/akira/tools/text.svg", false), 5);
+		artboard.container.insert (new Akira.Layouts.Partials.Layer (window, artboard, "Bezier", "/com/github/alecaddd/akira/tools/pen.svg", false), 6);
+		artboard.container.insert (new Akira.Layouts.Partials.Layer (window, artboard, "Path", "/com/github/alecaddd/akira/tools/pencil.svg", false), 7);
 
 		var artboard2 = new Akira.Layouts.Partials.Artboard (window, "Artboard 2");
 		var artboard3 = new Akira.Layouts.Partials.Artboard (window, "Artboard 3");
@@ -76,6 +91,8 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
 		insert (artboard5, 5);
 
 		build_drag_and_drop ();
+
+		reload_zebra ();
 	}
 
 	private void build_drag_and_drop () {
@@ -91,7 +108,6 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
 		Gtk.Widget row;
 		Akira.Layouts.Partials.Artboard source;
 		int newPos;
-		int oldPos;
 
 		target = (Akira.Layouts.Partials.Artboard) get_row_at_y (y);
 
@@ -104,7 +120,6 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
 		row = ((Gtk.Widget[]) selection_data.get_data ())[0];
 
 		source = (Akira.Layouts.Partials.Artboard) row.get_ancestor (typeof (Akira.Layouts.Partials.Artboard));
-		oldPos = source.get_index ();
 
 		if (source == target) {
 			return;
@@ -189,5 +204,49 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
 		}
 
 		return should_scroll;
+	}
+
+	public void reload_zebra () {
+		loop = 0;
+
+		@foreach (row => {
+			if (!(row is Akira.Layouts.Partials.Artboard)) {
+				return;
+			}
+			zebra_artboard ((Akira.Layouts.Partials.Artboard) row);
+		});
+	}
+
+	private void zebra_artboard (Akira.Layouts.Partials.Artboard artboard) {
+		artboard.container.@foreach (row => {
+			if (!(row is Akira.Layouts.Partials.Layer)) {
+				return;
+			}
+			zebra_layer ((Akira.Layouts.Partials.Layer) row);
+		});
+	}
+
+	private void zebra_layer (Akira.Layouts.Partials.Layer layer) {
+		loop++;
+		layer.get_style_context ().remove_class ("even");
+
+		if (loop % 2 == 0) {
+			layer.get_style_context ().add_class ("even");
+		}
+
+		if (layer.grouped) {
+			zebra_layer_group (layer);
+		}
+	}
+
+	private void zebra_layer_group (Akira.Layouts.Partials.Layer layer) {
+		bool open = layer.revealer.get_reveal_child ();
+
+		layer.container.@foreach (row => {
+			if (!(row is Akira.Layouts.Partials.Layer) || !open) {
+				return;
+			}
+			zebra_layer ((Akira.Layouts.Partials.Layer) row);
+		});
 	}
 }
