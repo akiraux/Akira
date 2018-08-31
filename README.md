@@ -51,6 +51,10 @@ meson build --prefix=/usr
 cd build
 ninja && sudo ninja install
 ```
+### Questions and issues
+If you want to ask any question about the project please refer to the [Forum Thread](https://forum.alecaddd.com/d/50-akira-development).
+
+If you are trying out Akira and you encounter an error or any problem feel free to just open an issue
 
 ### Donations
 If you like Akira and you want to support its development, consider donating via [PayPal](https://www.paypal.me/alecaddd) or pledge on [Patreon](https://www.patreon.com/alecaddd).
