@@ -44,7 +44,6 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
 	}
 
 	construct {
-		get_style_context ().add_class ("sidebar-r");
 		get_style_context ().add_class ("layers-panel");
 		expand = true;
 

@@ -1,0 +1,40 @@
+.artboard {
+    transition: all 240ms ease;
+    background-color: shade (@bg_color, 1);
+}
+
+.artboard-name {
+    transition: box-shadow 160ms ease;
+    font-weight: bold;
+    padding: 6px 10px;
+    text-shadow: 0 1px 0 @bg_color;
+    border-bottom: 1px solid shade (@bg_color, 0.8);
+}
+
+.artboard:hover,
+.artboard:selected:hover {
+    background-color: shade (@bg_color, 1);
+    color: @fg_color;
+}
+
+.artboard:selected {
+    box-shadow: inset 4px 0 0 @primary;
+}
+
+.artboard:selected,
+.artboard:selected .revealer-button image,
+.artboard:selected .layer-action image {
+    color: @fg_color;
+}
+
+.highlight-drop-area .artboard:last-child {
+    box-shadow: inset 0 -2px 0 shade (@bg_color, 0.5);
+}
+
+.artboard-container {
+    background-color: @bg_color;
+}
+
+.artboard-container > .layer:last-child {
+    border-bottom: 1px solid shade (@bg_color, 0.8);
+}

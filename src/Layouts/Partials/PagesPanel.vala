@@ -43,7 +43,6 @@ public class Akira.Layouts.Partials.PagesPanel : Gtk.ListBox {
 	}
 
 	construct {
-		get_style_context ().add_class ("sidebar-r");
 		expand = true;
 	}
 }

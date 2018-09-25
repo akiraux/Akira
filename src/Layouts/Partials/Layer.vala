@@ -354,7 +354,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 
 			editing = true;
 
-			Timeout.add (10, () => {
+			Timeout.add (200, () => {
 				entry.grab_focus ();
 				return false;
 			});

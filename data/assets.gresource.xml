@@ -3,6 +3,12 @@
   <gresource prefix="/com/github/alecaddd/akira">
     <file alias="stylesheet.css" compressed="true">stylesheet.css</file>
   </gresource>
+  <gresource prefix="/com/github/alecaddd/akira/partials">
+    <file alias="variables.css" compressed="true">partials/variables.css</file>
+    <file alias="layout.css" compressed="true">partials/layout.css</file>
+    <file alias="artboard.css" compressed="true">partials/artboard.css</file>
+    <file alias="layer.css" compressed="true">partials/layer.css</file>
+  </gresource>
   <gresource prefix="/com/github/alecaddd/akira/tools">
     <file alias="artboard.svg" compressed="true" preprocess="xml-stripblanks">assets/tools/artboard.svg</file>
     <file alias="bool-difference.svg" compressed="true" preprocess="xml-stripblanks">assets/tools/bool-difference.svg</file>
