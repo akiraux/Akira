@@ -78,12 +78,6 @@ public class Akira.Layouts.RightSideBar : Gtk.Grid {
 		pages_scroll.expand = true;
 		pages_scroll.add (pages_panel);
 
-		var bottom_panel = new Gtk.Grid ();
-		bottom_panel.attach (build_pages_title (), 0, 0, 1, 1);
-		bottom_panel.attach (pages_scroll, 0, 1, 1, 1);
-
-		pane.pack2 (bottom_panel, true, false);
-
 		attach (pane, 0 , 0 , 1, 1);
 	}
 
@@ -102,26 +96,6 @@ public class Akira.Layouts.RightSideBar : Gtk.Grid {
 		search_grid.add (search);
 
 		return search_grid;
-	}
-
-	private Gtk.Grid build_pages_title () {
-		var label = new Gtk.Label (_("Pages"));
-		label.halign = Gtk.Align.START;
-		label.hexpand = true;
-		label.margin = 5;
-
-		var button = new Gtk.Button ();
-		button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
-		button.tooltip_text = _("Add Page");
-		button.can_focus = false;
-		button.add (new Gtk.Image.from_icon_name ("list-add-symbolic", Gtk.IconSize.MENU));
-
-		var pages_grid = new Gtk.Grid ();
-		pages_grid.get_style_context ().add_class ("pages-title");
-		pages_grid.attach (label, 0, 0, 1, 1);
-		pages_grid.attach (button, 1, 0, 1, 1);
-
-		return pages_grid;
 	}
 
 	public void toggle () {

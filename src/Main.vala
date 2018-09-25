@@ -18,6 +18,7 @@
 *
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
+
 public const string APP_NAME = "Akira";
 public const string TERMINAL_NAME = "akira";
 
@@ -25,7 +26,7 @@ public static bool DEBUG = false;
 
 public static int main (string[] args) {
 	DEBUG = "-d" in args;
-
+	
 	Environment.set_application_name (APP_NAME);
 	Environment.set_prgname (APP_NAME);
 
