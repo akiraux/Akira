@@ -311,13 +311,13 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 	}
 
 	public bool on_drag_motion (Gdk.DragContext context, int x, int y, uint time) {
-		artboard.container.drag_highlight_row (this);
+
 		var layers_panel = (Akira.Layouts.Partials.LayersPanel) artboard.get_ancestor (typeof (Akira.Layouts.Partials.LayersPanel));
 		var row = (Akira.Layouts.Partials.Artboard) layers_panel.get_row_at_index (artboard.get_index ());
 
-		int index = this.get_index ();
+		int index = get_index ();
 		Gtk.Allocation alloc;
-		this.get_allocation (out alloc);
+		get_allocation (out alloc);
 
 		int row_index = row.get_index ();
 		Gtk.Allocation row_alloc;
@@ -330,12 +330,27 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 			scrolling = true;
 			Timeout.add (SCROLL_DELAY, scroll);
 		}
+	
+		// Highlight the correct dropping area
+		if (grouped) {
+			get_style_context ().add_class ("highlight");
+		} else {
+			if (y > (alloc.height / 2)) {
+				get_style_context ().add_class ("hover-down");
+				get_style_context ().remove_class ("hover-up");
+			} else {
+				get_style_context ().add_class ("hover-up");
+				get_style_context ().remove_class ("hover-down");
+			}
+		}
 
 		return true;
 	}
 
 	public void on_drag_leave (Gdk.DragContext context, uint time) {
-		artboard.container.drag_unhighlight_row ();
+		get_style_context ().remove_class ("highlight");
+		get_style_context ().remove_class ("hover-up");
+		get_style_context ().remove_class ("hover-down");
 		should_scroll = false;
 	}
 

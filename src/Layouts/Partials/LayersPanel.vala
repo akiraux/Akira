@@ -217,7 +217,7 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
 	}
 
 	private void zebra_artboard (Akira.Layouts.Partials.Artboard artboard) {
-		artboard.container.@foreach (row => {
+		artboard.container.foreach (row => {
 			if (!(row is Akira.Layouts.Partials.Layer)) {
 				return;
 			}
@@ -241,7 +241,7 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
 	private void zebra_layer_group (Akira.Layouts.Partials.Layer layer) {
 		bool open = layer.revealer.get_reveal_child ();
 
-		layer.container.@foreach (row => {
+		layer.container.foreach (row => {
 			if (!(row is Akira.Layouts.Partials.Layer) || !open) {
 				return;
 			}

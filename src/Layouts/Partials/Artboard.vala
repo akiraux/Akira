@@ -237,6 +237,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 	}
 
 	public void on_drag_leave (Gdk.DragContext context, uint time) {
+		debug ("drag left");
 		window.main_window.right_sidebar.layers_panel.drag_unhighlight_row ();
 	}
 
@@ -244,7 +245,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 		if (event.type == Gdk.EventType.BUTTON_PRESS) {
 			window.main_window.right_sidebar.layers_panel.selection_mode = Gtk.SelectionMode.SINGLE;
 
-			window.main_window.right_sidebar.layers_panel.@foreach ((child) => {
+			window.main_window.right_sidebar.layers_panel.foreach ((child) => {
 				if (child is Akira.Layouts.Partials.Artboard) {
 					Akira.Layouts.Partials.Artboard artboard = (Akira.Layouts.Partials.Artboard) child;
 
@@ -292,7 +293,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 
 		var layers = container.get_selected_rows ();
 
-		layers.@foreach (row => {
+		layers.foreach (row => {
 			Akira.Layouts.Partials.Layer layer = (Akira.Layouts.Partials.Layer) row;
 			if (layer.is_selected () && !layer.editing) {
 				container.remove (layer);
