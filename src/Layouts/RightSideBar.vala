@@ -77,8 +77,8 @@ public class Akira.Layouts.RightSideBar : Gtk.Grid {
 		indicator.valign = Gtk.Align.START;
 		indicator.width_request = get_allocated_width ();
 		indicator.margin_start = 20;
-		indicator.height_request = 2;
-		indicator.margin_top = 112;
+		indicator.margin_end = 5;
+		indicator.height_request = 1;
 
 		var circle = new Gtk.Grid ();
 		circle.get_style_context ().add_class ("indicator-circle");
@@ -92,9 +92,11 @@ public class Akira.Layouts.RightSideBar : Gtk.Grid {
 
 		indicator.attach (circle, 0, 0, 1, 1);
 		indicator.attach (line, 1, 0, 1, 1);
-		//  indicator.get_style_context ().add_class ("indicator");
 		layers_overlay.add_overlay (indicator);
 		layers_overlay.set_overlay_pass_through (indicator, true);
+
+		indicator.visible = false;
+		indicator.no_show_all = true;
 
 		var top_panel = new Gtk.Grid ();
 		top_panel.attach (build_search_bar (), 0, 0, 1, 1);
