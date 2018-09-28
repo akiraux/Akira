@@ -38,6 +38,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 	public Gtk.Image button_icon;
 	public Gtk.Revealer revealer;
 	public Gtk.ListBox container;
+	public int layers_count { get; set; default = 0; }
 
 	private bool _editing { get; set; default = false; }
 	public bool editing {
@@ -84,8 +85,8 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 		container.get_style_context ().add_class ("artboard-container");
 		container.activate_on_single_click = true;
 		container.selection_mode = Gtk.SelectionMode.SINGLE;
-		Gtk.drag_dest_set (this.container, Gtk.DestDefaults.ALL, targetEntriesLayer, Gdk.DragAction.MOVE);
-		this.container.drag_data_received.connect (on_drag_data_received);
+		Gtk.drag_dest_set (container, Gtk.DestDefaults.ALL, targetEntriesLayer, Gdk.DragAction.MOVE);
+		container.drag_data_received.connect (on_drag_data_received);
 		revealer.add (container);
 
 		handle = new Gtk.EventBox ();
@@ -125,6 +126,8 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 	}
 
 	private void on_drag_data_received (Gdk.DragContext context, int x, int y, Gtk.SelectionData selection_data, uint target_type, uint time) {
+		window.main_window.right_sidebar.indicator.visible = false;
+
 		Akira.Layouts.Partials.Layer target;
 		Gtk.Widget row;
 		Akira.Layouts.Partials.Layer source;
@@ -237,6 +240,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 	}
 
 	public void on_drag_leave (Gdk.DragContext context, uint time) {
+		debug ("drag left");
 		window.main_window.right_sidebar.layers_panel.drag_unhighlight_row ();
 	}
 
@@ -244,7 +248,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 		if (event.type == Gdk.EventType.BUTTON_PRESS) {
 			window.main_window.right_sidebar.layers_panel.selection_mode = Gtk.SelectionMode.SINGLE;
 
-			window.main_window.right_sidebar.layers_panel.@foreach ((child) => {
+			window.main_window.right_sidebar.layers_panel.foreach ((child) => {
 				if (child is Akira.Layouts.Partials.Artboard) {
 					Akira.Layouts.Partials.Artboard artboard = (Akira.Layouts.Partials.Artboard) child;
 
@@ -264,7 +268,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 
 			editing = true;
 
-			Timeout.add (10, () => {
+			Timeout.add (200, () => {
 				entry.grab_focus ();
 				return false;
 			});
@@ -290,18 +294,43 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 			return true;
 		}
 
-		var layers = this.container.get_selected_rows ();
+		var layers = container.get_selected_rows ();
 
-		layers.@foreach (row => {
-			Akira.Layouts.Partials.Layer layer = (Akira.Layouts.Partials.Layer) row;
-			if (layer.is_selected () && !layer.editing) {
-				this.container.remove (layer);
+		check_delete_object (layers);
+
+		container.foreach (child => {
+			if (child is Akira.Layouts.Partials.Layer) {
+				Akira.Layouts.Partials.Layer layer = (Akira.Layouts.Partials.Layer) child;
+				if (layer.grouped) {
+					check_delete_object (layer.container.get_selected_rows ());
+				}
 			}
 		});
 
 		window.main_window.right_sidebar.layers_panel.reload_zebra ();
 
 		return true;
+	}
+
+	public void check_delete_object (GLib.List<weak Gtk.ListBoxRow> layers) {
+		layers.foreach (row => {
+			Akira.Layouts.Partials.Layer layer = (Akira.Layouts.Partials.Layer) row;
+			do_delete_object (layer);
+
+			if (layer.grouped) {
+				check_delete_object (layer.container.get_selected_rows ());
+			}
+		});
+	}
+
+	public void do_delete_object (Akira.Layouts.Partials.Layer layer) {
+		if (layer.is_selected () && !layer.editing) {
+			if (layer.layer_group != null) {
+				layer.layer_group.container.remove (layer);
+			} else {
+				container.remove (layer);
+			}
+		}
 	}
 
 	public void update_on_enter () {
@@ -334,5 +363,13 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 		editing = false;
 
 		activate ();
+	}
+
+	public void count_layers () {
+		container.foreach (child => {
+			if (child is Akira.Layouts.Partials.Layer) {
+				layers_count++;
+			}
+		});
 	}
 }

@@ -50,6 +50,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 	public Gtk.Label label;
 	public Gtk.Entry entry;
 	public Gtk.EventBox handle;
+	private Gtk.Grid handle_grid;
 	private Gtk.Grid label_grid;
 
 	// Group related properties
@@ -164,7 +165,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 		button_hidden_grid.attach (icon_visible, 1, 0, 1, 1);
 		button_hidden.add (button_hidden_grid);
 
-		var handle_grid = new Gtk.Grid ();
+		handle_grid = new Gtk.Grid ();
 		handle_grid.expand = true;
 		handle_grid.attach (icon_layer_grid, 0, 0, 1, 1);
 		handle_grid.attach (label, 1, 0, 1, 1);
@@ -185,6 +186,16 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 		build_darg_and_drop ();
 
 		handle.event.connect (on_click_event);
+
+		handle.enter_notify_event.connect (event => {
+			get_style_context ().add_class ("hover");
+			return false;
+		});
+
+		handle.leave_notify_event.connect (event => {
+			get_style_context ().remove_class ("hover");
+			return false;
+		});
 
 		lock_actions ();
 		hide_actions ();
@@ -270,10 +281,11 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 		Gtk.drag_dest_set (this, Gtk.DestDefaults.MOTION, targetEntriesLayer, Gdk.DragAction.MOVE);
 		drag_motion.connect (on_drag_motion);
 		drag_leave.connect (on_drag_leave);
+
+		drag_end.connect (clear_indicator);
 	}
 
 	private void on_drag_begin (Gtk.Widget widget, Gdk.DragContext context) {
-		// var row = (Akira.Layouts.Partials.Layer) widget.get_ancestor (typeof (Akira.Layouts.Partials.Layer));
 		var row = (widget as Akira.Layouts.Partials.Layer);
 		Gtk.Allocation alloc;
 		row.get_allocation (out alloc);
@@ -294,11 +306,11 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 		cr.rectangle (0, 0, alloc.width, alloc.height);
 		cr.fill ();
 
-		row.get_style_context ().add_class ("drag-icon");
-		row.draw (cr);
-		row.get_style_context ().remove_class ("drag-icon");
+		row.handle_grid.draw (cr);
 
 		Gtk.drag_set_icon_surface (context, surface);
+
+		artboard.count_layers ();
 	}
 
 	private void on_drag_data_get (Gtk.Widget widget, Gdk.DragContext context, Gtk.SelectionData selection_data, uint target_type, uint time) {
@@ -311,13 +323,22 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 	}
 
 	public bool on_drag_motion (Gdk.DragContext context, int x, int y, uint time) {
-		artboard.container.drag_highlight_row (this);
+		if (!scrolling) {
+			window.main_window.right_sidebar.indicator.visible = true;
+			window.main_window.right_sidebar.indicator.no_show_all = false;
+			window.main_window.right_sidebar.indicator.show_all ();
+		} else {
+			window.main_window.right_sidebar.indicator.visible = false;
+		}
+
 		var layers_panel = (Akira.Layouts.Partials.LayersPanel) artboard.get_ancestor (typeof (Akira.Layouts.Partials.LayersPanel));
 		var row = (Akira.Layouts.Partials.Artboard) layers_panel.get_row_at_index (artboard.get_index ());
+		var last_adjust = 0;
+		var group_y = 0;
 
-		int index = this.get_index ();
+		int index = get_index ();
 		Gtk.Allocation alloc;
-		this.get_allocation (out alloc);
+		get_allocation (out alloc);
 
 		int row_index = row.get_index ();
 		Gtk.Allocation row_alloc;
@@ -331,16 +352,54 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 			Timeout.add (SCROLL_DELAY, scroll);
 		}
 
+		if (layer_group != null) {
+			group_y = layer_group.get_index () * alloc.height;
+			window.main_window.right_sidebar.indicator.margin_start = 40;
+		} else {
+			window.main_window.right_sidebar.indicator.margin_start = 20;
+			for (int i = index; i >= 1; i--) {
+				var past_layer = (Akira.Layouts.Partials.Layer) row.container.get_row_at_index (i);
+				if (past_layer.grouped) {
+					group_y = past_layer.get_allocated_height () - alloc.height;
+				}
+			}
+		}
+
+		vadjustment = window.main_window.right_sidebar.layers_scroll.vadjustment;
+
+		if (vadjustment == null) {
+			vadjustment.value = 0;
+		}
+
+		if (index == artboard.layers_count) {
+			last_adjust = 6;
+		}
+	
+		// Highlight the correct dropping area
+		if (grouped) {
+			get_style_context ().add_class ("highlight");
+			window.main_window.right_sidebar.indicator.visible = false;
+		} else {
+			if (y > (alloc.height / 2)) {
+				window.main_window.right_sidebar.indicator.margin_top = (index * alloc.height) + (row_index * alloc.height) - 6 - (int)vadjustment.value + group_y - last_adjust;
+			} else {
+				window.main_window.right_sidebar.indicator.margin_top = (index * alloc.height) + (row_index * alloc.height) - alloc.height - 6 - (int)vadjustment.value + group_y - last_adjust;
+			}
+		}
+
 		return true;
 	}
 
 	public void on_drag_leave (Gdk.DragContext context, uint time) {
-		artboard.container.drag_unhighlight_row ();
+		get_style_context ().remove_class ("highlight");
 		should_scroll = false;
 	}
 
-	public bool on_click_event (Gdk.Event event) {
+	public void clear_indicator (Gdk.DragContext context) {
+		window.main_window.right_sidebar.indicator.visible = false;
+	}
 
+	public bool on_click_event (Gdk.Event event) {
 		if (event.type == Gdk.EventType.@2BUTTON_PRESS) {
 			entry.visible = true;
 			entry.no_show_all = false;
@@ -354,7 +413,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 
 			editing = true;
 
-			Timeout.add (10, () => {
+			Timeout.add (200, () => {
 				entry.grab_focus ();
 				return false;
 			});
@@ -373,6 +432,24 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 
 			if (state.to_string () == "GDK_CONTROL_MASK") {
 				artboard.container.selection_mode = Gtk.SelectionMode.MULTIPLE;
+
+				if (layer_group != null) {
+					layer_group.container.selection_mode = Gtk.SelectionMode.MULTIPLE;
+
+					if (!layer_group.is_selected ()) {
+						Timeout.add (1, () => {
+							artboard.container.unselect_row (layer_group);
+							return false;
+						});
+					}
+				}
+
+				if (is_selected ()) {
+					Timeout.add (1, () => {
+						artboard.container.unselect_row (this);
+						return false;
+					});
+				}
 			} else {
 				artboard.container.selection_mode = Gtk.SelectionMode.SINGLE;
 

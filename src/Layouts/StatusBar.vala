@@ -19,7 +19,7 @@
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
 
-public class Akira.Layouts.StatusBar : Gtk.ActionBar {
+public class Akira.Layouts.StatusBar : Gtk.Grid {
 	public bool toggled {
 		get {
 			return visible;
@@ -40,7 +40,7 @@ public class Akira.Layouts.StatusBar : Gtk.ActionBar {
 		label.halign = Gtk.Align.CENTER;
 		label.margin = 6;
 
-		add (label);
+		attach (label, 0, 0, 1, 1);
 	}
 
 	public void toggle () {

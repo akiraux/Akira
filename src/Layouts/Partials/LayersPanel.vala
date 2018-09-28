@@ -44,7 +44,6 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
 	}
 
 	construct {
-		get_style_context ().add_class ("sidebar-r");
 		get_style_context ().add_class ("layers-panel");
 		expand = true;
 
@@ -130,31 +129,7 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
 	}
 
 	public bool on_drag_motion (Gdk.DragContext context, int x, int y, uint time) {
-		var row = (Akira.Layouts.Partials.Artboard) get_row_at_y (y);
-		
-		if (row != null) {
-			drag_highlight_row (row);
-
-			// Gtk.Allocation alloc;
-			// row.get_allocation (out alloc);
-
-			// var surface = new Cairo.ImageSurface (Cairo.Format.ARGB32, alloc.width, alloc.height);
-			// var cr = new Cairo.Context (surface);
-			// cr.set_source_rgba (255, 170, 0, 1);
-			// cr.set_line_width (10);
-
-			// cr.save ();
-
-			// cr.move_to (0, 0);
-			// cr.line_to (alloc.width, 0);
-			// cr.line_to (alloc.width, alloc.height);
-			// cr.line_to (0, alloc.height);
-			// cr.line_to (0, 0);
-			// cr.stroke ();
-
-			// row.draw (cr);
-			// cr.restore ();
-		}
+		//  var row = (Akira.Layouts.Partials.Artboard) get_row_at_y (y);
 
 		check_scroll (y);
 		if (should_scroll && !scrolling) {
@@ -218,7 +193,7 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
 	}
 
 	private void zebra_artboard (Akira.Layouts.Partials.Artboard artboard) {
-		artboard.container.@foreach (row => {
+		artboard.container.foreach (row => {
 			if (!(row is Akira.Layouts.Partials.Layer)) {
 				return;
 			}
@@ -242,7 +217,7 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
 	private void zebra_layer_group (Akira.Layouts.Partials.Layer layer) {
 		bool open = layer.revealer.get_reveal_child ();
 
-		layer.container.@foreach (row => {
+		layer.container.foreach (row => {
 			if (!(row is Akira.Layouts.Partials.Layer) || !open) {
 				return;
 			}

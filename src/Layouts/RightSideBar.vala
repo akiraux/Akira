@@ -21,6 +21,8 @@
 public class Akira.Layouts.RightSideBar : Gtk.Grid {
 	public weak Akira.Window window { get; construct; }
 
+	public Gtk.Overlay layers_overlay;
+	public Gtk.Grid indicator;
 	public Akira.Layouts.Partials.LayersPanel layers_panel;
 	public Akira.Layouts.Partials.PagesPanel pages_panel;
 	public Gtk.ScrolledWindow layers_scroll;
@@ -67,9 +69,39 @@ public class Akira.Layouts.RightSideBar : Gtk.Grid {
 			((Gtk.Container) scrolled_child).set_focus_vadjustment (new Gtk.Adjustment (0, 0, 0, 0, 0, 0));
 		}
 
+		layers_overlay = new Gtk.Overlay ();
+		layers_overlay.add (layers_scroll);
+
+		indicator = new Gtk.Grid ();
+		indicator.expand = false;
+		indicator.valign = Gtk.Align.START;
+		indicator.width_request = get_allocated_width ();
+		indicator.margin_start = 20;
+		indicator.margin_end = 5;
+		indicator.height_request = 1;
+
+		var circle = new Gtk.Grid ();
+		circle.get_style_context ().add_class ("indicator-circle");
+		circle.width_request = 6;
+		circle.height_request = 6;
+		circle.valign = Gtk.Align.CENTER;
+		var line = new Gtk.Grid ();
+		line.get_style_context ().add_class ("indicator");
+		line.expand = true;
+		line.height_request = 2;
+		line.valign = Gtk.Align.CENTER;
+
+		indicator.attach (circle, 0, 0, 1, 1);
+		indicator.attach (line, 1, 0, 1, 1);
+		layers_overlay.add_overlay (indicator);
+		layers_overlay.set_overlay_pass_through (indicator, true);
+
+		indicator.visible = false;
+		indicator.no_show_all = true;
+
 		var top_panel = new Gtk.Grid ();
 		top_panel.attach (build_search_bar (), 0, 0, 1, 1);
-		top_panel.attach (layers_scroll, 0, 1, 1, 1);
+		top_panel.attach (layers_overlay, 0, 1, 1, 1);
 
 		pane.pack1 (top_panel, false, false);
 
@@ -77,12 +109,6 @@ public class Akira.Layouts.RightSideBar : Gtk.Grid {
 		pages_scroll = new Gtk.ScrolledWindow (null, null);
 		pages_scroll.expand = true;
 		pages_scroll.add (pages_panel);
-
-		var bottom_panel = new Gtk.Grid ();
-		bottom_panel.attach (build_pages_title (), 0, 0, 1, 1);
-		bottom_panel.attach (pages_scroll, 0, 1, 1, 1);
-
-		pane.pack2 (bottom_panel, true, false);
 
 		attach (pane, 0 , 0 , 1, 1);
 	}
@@ -102,26 +128,6 @@ public class Akira.Layouts.RightSideBar : Gtk.Grid {
 		search_grid.add (search);
 
 		return search_grid;
-	}
-
-	private Gtk.Grid build_pages_title () {
-		var label = new Gtk.Label (_("Pages"));
-		label.halign = Gtk.Align.START;
-		label.hexpand = true;
-		label.margin = 5;
-
-		var button = new Gtk.Button ();
-		button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
-		button.tooltip_text = _("Add Page");
-		button.can_focus = false;
-		button.add (new Gtk.Image.from_icon_name ("list-add-symbolic", Gtk.IconSize.MENU));
-
-		var pages_grid = new Gtk.Grid ();
-		pages_grid.get_style_context ().add_class ("pages-title");
-		pages_grid.attach (label, 0, 0, 1, 1);
-		pages_grid.attach (button, 1, 0, 1, 1);
-
-		return pages_grid;
 	}
 
 	public void toggle () {
