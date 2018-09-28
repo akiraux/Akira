@@ -104,6 +104,5 @@
 
 .indicator-circle {
     border-radius: 50%;
-    border: solid 2px @primary;
-    background-color: transparent;
+    background-color: @primary;
 }

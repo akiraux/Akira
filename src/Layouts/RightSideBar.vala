@@ -82,8 +82,9 @@ public class Akira.Layouts.RightSideBar : Gtk.Grid {
 
 		var circle = new Gtk.Grid ();
 		circle.get_style_context ().add_class ("indicator-circle");
-		circle.width_request = 10;
-		circle.height_request = 10;
+		circle.width_request = 6;
+		circle.height_request = 6;
+		circle.valign = Gtk.Align.CENTER;
 		var line = new Gtk.Grid ();
 		line.get_style_context ().add_class ("indicator");
 		line.expand = true;

@@ -352,9 +352,9 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 			window.main_window.right_sidebar.indicator.visible = false;
 		} else {
 			if (y > (alloc.height / 2)) {
-				window.main_window.right_sidebar.indicator.margin_top = (index * alloc.height) + (row_index * alloc.height) - 8 - (int)vadjustment.value;
+				window.main_window.right_sidebar.indicator.margin_top = (index * alloc.height) + (row_index * alloc.height) - 6 - (int)vadjustment.value;
 			} else {
-				window.main_window.right_sidebar.indicator.margin_top = (index * alloc.height) + (row_index * alloc.height) - alloc.height - 8 - (int)vadjustment.value;
+				window.main_window.right_sidebar.indicator.margin_top = (index * alloc.height) + (row_index * alloc.height) - alloc.height - 6 - (int)vadjustment.value;
 			}
 		}
 
