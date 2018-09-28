@@ -38,6 +38,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 	public Gtk.Image button_icon;
 	public Gtk.Revealer revealer;
 	public Gtk.ListBox container;
+	public int layers_count { get; set; default = 0; }
 
 	private bool _editing { get; set; default = false; }
 	public bool editing {
@@ -362,5 +363,13 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 		editing = false;
 
 		activate ();
+	}
+
+	public void count_layers () {
+		container.foreach (child => {
+			if (child is Akira.Layouts.Partials.Layer) {
+				layers_count++;
+			}
+		});
 	}
 }

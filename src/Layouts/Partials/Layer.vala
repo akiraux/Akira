@@ -299,6 +299,8 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 		row.handle_grid.draw (cr);
 
 		Gtk.drag_set_icon_surface (context, surface);
+
+		artboard.count_layers ();
 	}
 
 	private void on_drag_data_get (Gtk.Widget widget, Gdk.DragContext context, Gtk.SelectionData selection_data, uint target_type, uint time) {
@@ -321,6 +323,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 
 		var layers_panel = (Akira.Layouts.Partials.LayersPanel) artboard.get_ancestor (typeof (Akira.Layouts.Partials.LayersPanel));
 		var row = (Akira.Layouts.Partials.Artboard) layers_panel.get_row_at_index (artboard.get_index ());
+		var last_adjust = 0;
 		var group_y = 0;
 
 		int index = get_index ();
@@ -357,6 +360,10 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 		if (vadjustment == null) {
 			vadjustment.value = 0;
 		}
+
+		if (index == artboard.layers_count) {
+			last_adjust = 6;
+		}
 	
 		// Highlight the correct dropping area
 		if (grouped) {
@@ -364,9 +371,9 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 			window.main_window.right_sidebar.indicator.visible = false;
 		} else {
 			if (y > (alloc.height / 2)) {
-				window.main_window.right_sidebar.indicator.margin_top = (index * alloc.height) + (row_index * alloc.height) - 6 - (int)vadjustment.value + group_y;
+				window.main_window.right_sidebar.indicator.margin_top = (index * alloc.height) + (row_index * alloc.height) - 6 - (int)vadjustment.value + group_y - last_adjust;
 			} else {
-				window.main_window.right_sidebar.indicator.margin_top = (index * alloc.height) + (row_index * alloc.height) - alloc.height - 6 - (int)vadjustment.value + group_y;
+				window.main_window.right_sidebar.indicator.margin_top = (index * alloc.height) + (row_index * alloc.height) - alloc.height - 6 - (int)vadjustment.value + group_y - last_adjust;
 			}
 		}
 
