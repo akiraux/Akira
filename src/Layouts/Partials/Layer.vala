@@ -50,6 +50,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 	public Gtk.Label label;
 	public Gtk.Entry entry;
 	public Gtk.EventBox handle;
+	private Gtk.Grid handle_grid;
 	private Gtk.Grid label_grid;
 
 	// Group related properties
@@ -164,7 +165,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 		button_hidden_grid.attach (icon_visible, 1, 0, 1, 1);
 		button_hidden.add (button_hidden_grid);
 
-		var handle_grid = new Gtk.Grid ();
+		handle_grid = new Gtk.Grid ();
 		handle_grid.expand = true;
 		handle_grid.attach (icon_layer_grid, 0, 0, 1, 1);
 		handle_grid.attach (label, 1, 0, 1, 1);
@@ -275,7 +276,6 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 	}
 
 	private void on_drag_begin (Gtk.Widget widget, Gdk.DragContext context) {
-		// var row = (Akira.Layouts.Partials.Layer) widget.get_ancestor (typeof (Akira.Layouts.Partials.Layer));
 		var row = (widget as Akira.Layouts.Partials.Layer);
 		Gtk.Allocation alloc;
 		row.get_allocation (out alloc);
@@ -296,9 +296,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 		cr.rectangle (0, 0, alloc.width, alloc.height);
 		cr.fill ();
 
-		row.get_style_context ().add_class ("drag-icon");
-		row.draw (cr);
-		row.get_style_context ().remove_class ("drag-icon");
+		row.handle_grid.draw (cr);
 
 		Gtk.drag_set_icon_surface (context, surface);
 	}
