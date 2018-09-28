@@ -323,6 +323,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 
 		var layers_panel = (Akira.Layouts.Partials.LayersPanel) artboard.get_ancestor (typeof (Akira.Layouts.Partials.LayersPanel));
 		var row = (Akira.Layouts.Partials.Artboard) layers_panel.get_row_at_index (artboard.get_index ());
+		var group_y = 0;
 
 		int index = get_index ();
 		Gtk.Allocation alloc;
@@ -340,6 +341,19 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 			Timeout.add (SCROLL_DELAY, scroll);
 		}
 
+		if (layer_group != null) {
+			group_y = layer_group.get_index () * alloc.height;
+			window.main_window.right_sidebar.indicator.margin_start = 40;
+		} else {
+			window.main_window.right_sidebar.indicator.margin_start = 20;
+			for (int i = index; i >= 1; i--) {
+				var past_layer = (Akira.Layouts.Partials.Layer) row.container.get_row_at_index (i);
+				if (past_layer.grouped) {
+					group_y = past_layer.get_allocated_height () - alloc.height;
+				}
+			}
+		}
+
 		vadjustment = window.main_window.right_sidebar.layers_scroll.vadjustment;
 
 		if (vadjustment == null) {
@@ -352,9 +366,9 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 			window.main_window.right_sidebar.indicator.visible = false;
 		} else {
 			if (y > (alloc.height / 2)) {
-				window.main_window.right_sidebar.indicator.margin_top = (index * alloc.height) + (row_index * alloc.height) - 6 - (int)vadjustment.value;
+				window.main_window.right_sidebar.indicator.margin_top = (index * alloc.height) + (row_index * alloc.height) - 6 - (int)vadjustment.value + group_y;
 			} else {
-				window.main_window.right_sidebar.indicator.margin_top = (index * alloc.height) + (row_index * alloc.height) - alloc.height - 6 - (int)vadjustment.value;
+				window.main_window.right_sidebar.indicator.margin_top = (index * alloc.height) + (row_index * alloc.height) - alloc.height - 6 - (int)vadjustment.value + group_y;
 			}
 		}
 
