@@ -428,6 +428,13 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 						});
 					}
 				}
+
+				if (is_selected ()) {
+					Timeout.add (1, () => {
+						artboard.container.unselect_row (this);
+						return false;
+					});
+				}
 			} else {
 				artboard.container.selection_mode = Gtk.SelectionMode.SINGLE;
 
