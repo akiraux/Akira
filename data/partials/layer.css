@@ -42,13 +42,13 @@
     box-shadow: none;
 }
 
-.layer:hover > grid > .layer-action,
-.layer-group:hover > grid > grid > .layer-action {
+.layer.hover > grid > .layer-action,
+.layer.hover > grid > grid > .layer-action {
     opacity: 0.5;
 }
 
-.layer:hover > grid > .layer-action:hover,
-.layer-group:hover > grid > grid > .layer-action:hover {
+.layer.hover > grid > .layer-action:hover,
+.layer-action:hover {
     opacity: 1;
 }
 

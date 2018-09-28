@@ -187,6 +187,16 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 
 		handle.event.connect (on_click_event);
 
+		handle.enter_notify_event.connect (event => {
+			get_style_context ().add_class ("hover");
+			return false;
+		});
+
+		handle.leave_notify_event.connect (event => {
+			get_style_context ().remove_class ("hover");
+			return false;
+		});
+
 		lock_actions ();
 		hide_actions ();
 		reveal_actions ();
