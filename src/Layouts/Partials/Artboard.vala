@@ -295,16 +295,41 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 
 		var layers = container.get_selected_rows ();
 
-		layers.foreach (row => {
-			Akira.Layouts.Partials.Layer layer = (Akira.Layouts.Partials.Layer) row;
-			if (layer.is_selected () && !layer.editing) {
-				container.remove (layer);
+		check_delete_object (layers);
+
+		container.foreach (child => {
+			if (child is Akira.Layouts.Partials.Layer) {
+				Akira.Layouts.Partials.Layer layer = (Akira.Layouts.Partials.Layer) child;
+				if (layer.grouped) {
+					check_delete_object (layer.container.get_selected_rows ());
+				}
 			}
 		});
 
 		window.main_window.right_sidebar.layers_panel.reload_zebra ();
 
 		return true;
+	}
+
+	public void check_delete_object (GLib.List<weak Gtk.ListBoxRow> layers) {
+		layers.foreach (row => {
+			Akira.Layouts.Partials.Layer layer = (Akira.Layouts.Partials.Layer) row;
+			do_delete_object (layer);
+
+			if (layer.grouped) {
+				check_delete_object (layer.container.get_selected_rows ());
+			}
+		});
+	}
+
+	public void do_delete_object (Akira.Layouts.Partials.Layer layer) {
+		if (layer.is_selected () && !layer.editing) {
+			if (layer.layer_group != null) {
+				layer.layer_group.container.remove (layer);
+			} else {
+				container.remove (layer);
+			}
+		}
 	}
 
 	public void update_on_enter () {

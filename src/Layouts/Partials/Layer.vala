@@ -403,6 +403,17 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 
 			if (state.to_string () == "GDK_CONTROL_MASK") {
 				artboard.container.selection_mode = Gtk.SelectionMode.MULTIPLE;
+
+				if (layer_group != null) {
+					layer_group.container.selection_mode = Gtk.SelectionMode.MULTIPLE;
+
+					if (!layer_group.is_selected ()) {
+						Timeout.add (1, () => {
+							artboard.container.unselect_row (layer_group);
+							return false;
+						});
+					}
+				}
 			} else {
 				artboard.container.selection_mode = Gtk.SelectionMode.SINGLE;
 
