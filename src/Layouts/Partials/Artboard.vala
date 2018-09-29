@@ -366,6 +366,8 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 	}
 
 	public void count_layers () {
+		layers_count = 0;
+
 		container.foreach (child => {
 			if (child is Akira.Layouts.Partials.Layer) {
 				layers_count++;
