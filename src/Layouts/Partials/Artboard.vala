@@ -92,6 +92,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 		handle = new Gtk.EventBox ();
 		handle.hexpand = true;
 		handle.add (label_grid);
+		handle.event.connect (on_click_event);
 
 		button = new Gtk.ToggleButton ();
 		button.active = true;
@@ -218,8 +219,6 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 		drag_data_get.connect (on_drag_data_get);
 
 		drag_leave.connect (on_drag_leave);
-
-		handle.event.connect (on_click_event);
 	}
 
 	private void on_drag_begin (Gtk.Widget widget, Gdk.DragContext context) {
@@ -258,8 +257,8 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 	}
 
 	public void on_drag_leave (Gdk.DragContext context, uint time) {
-		debug ("drag left");
-		window.main_window.right_sidebar.layers_panel.drag_unhighlight_row ();
+		get_style_context ().remove_class ("highlight");
+		window.main_window.right_sidebar.indicator.visible = false;
 	}
 
 	public bool on_click_event (Gdk.Event event) {

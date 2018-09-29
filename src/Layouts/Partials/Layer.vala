@@ -400,6 +400,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 
 	public void on_drag_leave (Gdk.DragContext context, uint time) {
 		get_style_context ().remove_class ("highlight");
+		window.main_window.right_sidebar.indicator.visible = false;
 		should_scroll = false;
 	}
 
