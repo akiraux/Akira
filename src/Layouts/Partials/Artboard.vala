@@ -133,6 +133,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 		Gtk.Widget row;
 		Akira.Layouts.Partials.Layer source;
 		int newPos;
+		var before_group = false;
 
 		target = (Akira.Layouts.Partials.Layer) container.get_row_at_y (y);
 		row = ((Gtk.Widget[]) selection_data.get_data ())[0];
@@ -154,15 +155,34 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 				newPos = -1;
 			}
 
-			debug ("Layer dropped inside group coming from OUTSIDE: %i", newPos);
+			if ((y + alloc.height) < (alloc.height / 2)) {
+				newPos = target.get_index () > 1 && source.get_index () > newPos ? target.get_index () - 1 : target.get_index ();
+				debug ("Layer dropped ABOVE group: %i", newPos);
+				before_group = true;
+			} else {
+				before_group = false;
+				debug ("Layer dropped inside a group from OUTSIDE: %i", newPos);
+			}
 		} else if (target.grouped && source.layer_group != null) {
 			source.get_allocation (out alloc);
 			y = y - (index * alloc.height);
 
 			var group = (Akira.Layouts.Partials.Layer) target.container.get_row_at_y (y);
-			newPos = group.get_index ();
+			
+			if (group is Akira.Layouts.Partials.Layer) {
+				newPos = group.get_index ();
+			} else {
+				newPos = -1;
+			}
 
-			debug ("Layer dropped inside group coming from INSIDE: %i", newPos);
+			if ((y + alloc.height) < (alloc.height / 2)) {
+				newPos = target.get_index () > 1 && source.get_index () > newPos ? target.get_index () - 1 : target.get_index ();
+				debug ("Layer dropped ABOVE group: %i", newPos);
+				before_group = true;
+			} else {
+				before_group = false;
+				debug ("Layer dropped WHITIN group: %i", newPos);
+			}
 		} else if (!target.grouped && source.layer_group != null) {
 			var parent = (Akira.Layouts.Partials.Artboard) target.get_ancestor (typeof (Akira.Layouts.Partials.Artboard));
 			var group = parent.container.get_row_at_y (y);
@@ -174,7 +194,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 				newPos = -1;
 			}
 
-			debug ("Layer dropped coming from INSIDE a group: %i", newPos);
+			debug ("Layer dropped from INSIDE a group: %i", newPos);
 		} else {
 			target.get_allocation (out alloc);
 			newPos = target.get_index ();
@@ -182,6 +202,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 			if (y <= ((newPos * alloc.height) - (alloc.height / 2)) && newPos > 1 && source.get_index () < newPos) {
 				newPos--;
 			}
+			debug ("Layer dropped: %i", newPos);
 		}
 
 		if (source == target) {
@@ -195,7 +216,9 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 			container.remove (source);
 		}
 
-		if (target.grouped && source.layer_group == null) {
+		if (before_group) {
+			container.insert (source, newPos);
+		} else if (target.grouped && source.layer_group == null) {
 			source.layer_group = target;
 			target.container.insert (source, newPos);
 		} else if (target.grouped && source.layer_group != null) {

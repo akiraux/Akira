@@ -371,7 +371,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 			vadjustment.value = 0;
 		}
 
-		if (index == artboard.layers_count && layer_group == null) {
+		if (index == artboard.layers_count && layer_group == null && !grouped) {
 			last_adjust = 6;
 		}
 	
