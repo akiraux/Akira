@@ -146,7 +146,12 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 			y = y - (index * alloc.height);
 
 			var group = (Akira.Layouts.Partials.Layer) target.container.get_row_at_y (y);
-			newPos = group.get_index ();
+
+			if (group is Akira.Layouts.Partials.Layer) {
+				newPos = group.get_index ();
+			} else {
+				newPos = -1;
+			}
 			debug ("Layer dropped inside group coming from OUTSIDE: %i", newPos);
 		} else if (target.grouped && source.layer_group != null) {
 			int index = target.get_index ();
