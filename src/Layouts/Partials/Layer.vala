@@ -371,14 +371,22 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 			vadjustment.value = 0;
 		}
 
-		if (index == artboard.layers_count) {
+		if (index == artboard.layers_count && layer_group == null) {
 			last_adjust = 6;
 		}
 	
 		// Highlight the correct dropping area
 		if (grouped) {
-			get_style_context ().add_class ("highlight");
-			window.main_window.right_sidebar.indicator.visible = false;
+			handle_grid.get_allocation (out alloc);
+
+			if (y >= (alloc.height / 2)) {
+				get_style_context ().add_class ("highlight");
+				window.main_window.right_sidebar.indicator.visible = false;
+			} else {
+				get_style_context ().remove_class ("highlight");
+				window.main_window.right_sidebar.indicator.margin_top = (index * alloc.height) - 6 - (int)vadjustment.value + group_y - last_adjust;
+			}
+
 		} else {
 			if (y > (alloc.height / 2)) {
 				window.main_window.right_sidebar.indicator.margin_top = (index * alloc.height) + (row_index * alloc.height) - 6 - (int)vadjustment.value + group_y - last_adjust;
