@@ -106,6 +106,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 		entry = new Gtk.Entry ();
 		entry.margin_top = 5;
 		entry.margin_bottom = 5;
+		entry.margin_end = 10;
 		entry.expand = true;
 		entry.visible = false;
 		entry.no_show_all = true;
@@ -119,12 +120,15 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 		icon.margin_start = icon_name != "folder-symbolic" ? 16 : 0;
 		icon.margin_end = 10;
 		icon.vexpand = true;
+		icon.valign = Gtk.Align.CENTER;
+		icon.get_style_context ().add_class (Gtk.STYLE_CLASS_DIM_LABEL);
 
 		icon_folder_open = new Gtk.Image.from_icon_name ("folder-open-symbolic", Gtk.IconSize.MENU);
 		icon_folder_open.margin_end = 10;
 		icon_folder_open.vexpand = true;
 		icon_folder_open.visible = false;
 		icon_folder_open.no_show_all = true;
+		icon_folder_open.get_style_context ().add_class (Gtk.STYLE_CLASS_DIM_LABEL);
 
 		var icon_layer_grid = new Gtk.Grid ();
 		icon_layer_grid.attach (icon, 0, 0, 1, 1);
@@ -135,12 +139,14 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 		button_locked.get_style_context ().remove_class ("button");
 		button_locked.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
 		button_locked.get_style_context ().add_class ("layer-action");
+		button_locked.valign = Gtk.Align.CENTER;
 		icon_locked = new Gtk.Image.from_icon_name ("changes-allow-symbolic", Gtk.IconSize.MENU);
 		icon_unlocked = new Gtk.Image.from_icon_name ("changes-prevent-symbolic", Gtk.IconSize.MENU);
 		icon_unlocked.visible = false;
 		icon_unlocked.no_show_all = true;
 
 		var button_locked_grid = new Gtk.Grid ();
+		button_locked_grid.margin_end = 6;
 		button_locked_grid.attach (icon_locked, 0, 0, 1, 1);
 		button_locked_grid.attach (icon_unlocked, 1, 0, 1, 1);
 		button_locked.add (button_locked_grid);
@@ -150,12 +156,14 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 		button_hidden.get_style_context ().remove_class ("button");
 		button_hidden.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
 		button_hidden.get_style_context ().add_class ("layer-action");
+		button_hidden.valign = Gtk.Align.CENTER;
 		icon_hidden = new Gtk.Image.from_icon_name ("eye-symbolic", Gtk.IconSize.MENU);
 		icon_visible = new Gtk.Image.from_icon_name ("eye-not-symbolic", Gtk.IconSize.MENU);
 		icon_visible.visible = false;
 		icon_visible.no_show_all = true;
 
 		var button_hidden_grid = new Gtk.Grid ();
+		button_hidden_grid.margin_end = 14;
 		button_hidden_grid.attach (icon_hidden, 0, 0, 1, 1);
 		button_hidden_grid.attach (icon_visible, 1, 0, 1, 1);
 		button_hidden.add (button_hidden_grid);
