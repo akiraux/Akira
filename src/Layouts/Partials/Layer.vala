@@ -115,14 +115,9 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 		entry.focus_out_event.connect (update_on_leave);
 		entry.key_release_event.connect (update_on_escape);
 
-		if (icon_name.contains ("/")) {
-			icon = new Gtk.Image.from_resource (icon_name);
-			icon.margin_end = 6;
-			icon.margin_start = 16;
-		} else {
-			icon = new Gtk.Image.from_icon_name (icon_name, Gtk.IconSize.MENU);
-			icon.margin_end = 10;
-		}
+		icon = new Gtk.Image.from_icon_name (icon_name, Gtk.IconSize.MENU);
+		icon.margin_start = icon_name != "folder-symbolic" ? 16 : 0;
+		icon.margin_end = 10;
 		icon.vexpand = true;
 
 		icon_folder_open = new Gtk.Image.from_icon_name ("folder-open-symbolic", Gtk.IconSize.MENU);
@@ -155,8 +150,8 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 		button_hidden.get_style_context ().remove_class ("button");
 		button_hidden.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
 		button_hidden.get_style_context ().add_class ("layer-action");
-		icon_hidden = new Gtk.Image.from_resource ("/com/github/alecaddd/akira/tools/eye.svg");
-		icon_visible = new Gtk.Image.from_resource ("/com/github/alecaddd/akira/tools/eye-not.svg");
+		icon_hidden = new Gtk.Image.from_icon_name ("eye-symbolic", Gtk.IconSize.MENU);
+		icon_visible = new Gtk.Image.from_icon_name ("eye-not-symbolic", Gtk.IconSize.MENU);
 		icon_visible.visible = false;
 		icon_visible.no_show_all = true;
 

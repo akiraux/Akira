@@ -58,6 +58,9 @@ public class Akira.Application : Granite.Application {
 	}
 
 	protected override void activate () {
+		weak Gtk.IconTheme default_theme = Gtk.IconTheme.get_default ();
+		default_theme.add_resource_path ("/com/github/alecaddd/akira");
+
 		var window = new Akira.Window (this);
 		this.add_window (window);
 	}
