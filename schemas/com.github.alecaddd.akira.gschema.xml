@@ -24,6 +24,18 @@
             <description>The saved height of the window. Must be greater than 800, or it will not take effect.</description>
         </key>
 
+        <key name="right-paned" type="i">
+            <default>220</default>
+            <summary>The saved width of the right panel.</summary>
+            <description>The saved width of the right panel. Must be greater than 220, or it will not take effect.</description>
+        </key>
+
+        <key name="left-paned" type="i">
+            <default>220</default>
+            <summary>The saved width of the left panel.</summary>
+            <description>The saved width of the left panel. Must be greater than 220, or it will not take effect.</description>
+        </key>
+
         <key name="dark-theme" type="b">
             <default>false</default>
             <summary>Use dark theme</summary>

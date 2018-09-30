@@ -122,7 +122,9 @@ public class Akira.Window : Gtk.ApplicationWindow {
         settings.pos_x = x;
         settings.pos_y = y;
         settings.window_width = width;
-        settings.window_height = height;
+		settings.window_height = height;
+		settings.right_paned = main_window.right_sidebar.get_allocated_width ();
+		settings.left_paned = main_window.left_sidebar.get_allocated_width ();
 	}
 
 	public void show_app () {
