@@ -140,8 +140,8 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 		button_locked.get_style_context ().remove_class ("button");
 		button_locked.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
 		button_locked.get_style_context ().add_class ("layer-action");
-		icon_locked = new Gtk.Image.from_icon_name ("channel-secure-symbolic", Gtk.IconSize.MENU);
-		icon_unlocked = new Gtk.Image.from_icon_name ("channel-insecure-symbolic", Gtk.IconSize.MENU);
+		icon_locked = new Gtk.Image.from_icon_name ("changes-allow-symbolic", Gtk.IconSize.MENU);
+		icon_unlocked = new Gtk.Image.from_icon_name ("changes-prevent-symbolic", Gtk.IconSize.MENU);
 		icon_unlocked.visible = false;
 		icon_unlocked.no_show_all = true;
 
