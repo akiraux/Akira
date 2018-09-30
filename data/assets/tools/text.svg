@@ -13,7 +13,7 @@
    version="1.1"
    id="svg13"
    sodipodi:docname="text.svg"
-   inkscape:version="0.92.2 (unknown)">
+   inkscape:version="0.92.3 (unknown)">
   <metadata
      id="metadata17">
     <rdf:RDF>
@@ -35,14 +35,14 @@
      guidetolerance="10"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:window-width="1920"
-     inkscape:window-height="1017"
+     inkscape:window-width="3840"
+     inkscape:window-height="2097"
      id="namedview15"
      showgrid="true"
      inkscape:showpageshadow="false"
-     inkscape:zoom="19.666667"
-     inkscape:cx="4.7457627"
-     inkscape:cy="6"
+     inkscape:zoom="55.625734"
+     inkscape:cx="5.1278826"
+     inkscape:cy="8.6313825"
      inkscape:window-x="0"
      inkscape:window-y="30"
      inkscape:window-maximized="1"
@@ -58,26 +58,16 @@
      id="desc4">Created with Sketch.</desc>
   <defs
      id="defs6" />
-  <g
-     id="Icons"
-     font-weight="normal"
-     letter-spacing="0.803199887"
-     font-size="16"
-     style="font-weight:normal;font-size:16px;font-family:Georgia;letter-spacing:0.80319989;fill:none;fill-rule:evenodd;stroke:none;stroke-width:0;stroke-miterlimit:4;stroke-dasharray:none"
-     transform="matrix(1.158371,0,0,1.0288011,3.6461927,3.654387)">
-    <g
-       id="Artboard"
-       transform="translate(-222,-403)"
-       style="fill:#5e5e5e;stroke-width:0;stroke-miterlimit:4;stroke-dasharray:none">
-      <text
-         id="text"
-         style="stroke-width:0;stroke-miterlimit:4;stroke-dasharray:none">
-        <tspan
-           x="222.14919"
-           y="415"
-           id="tspan8"
-           style="stroke-width:0;stroke-miterlimit:4;stroke-dasharray:none">T</tspan>
-      </text>
-    </g>
-  </g>
+  <text
+     id="text"
+     style="font-weight:normal;font-size:17.46664619px;font-family:Georgia;letter-spacing:1.16910076;fill:#9e9e9e;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0;stroke-miterlimit:4;stroke-dasharray:none;"
+     transform="scale(1.0611044,0.9424143)"
+     x="-319.75101"
+     y="-587.07721">
+    <tspan
+       x="3.5990889"
+       y="16.977652"
+       id="tspan8"
+       style="fill:#9e9e9e;fill-opacity:1;stroke-width:0;stroke-miterlimit:4;stroke-dasharray:none;">T</tspan>
+  </text>
 </svg>

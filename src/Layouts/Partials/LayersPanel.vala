@@ -57,7 +57,7 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
 		artboard.container.insert (new Akira.Layouts.Partials.Layer (window, artboard, "Circle", "/com/github/alecaddd/akira/tools/circle.svg", false), 2);
 		artboard.container.insert (new Akira.Layouts.Partials.Layer (window, artboard, "Triangle", "/com/github/alecaddd/akira/tools/triangle.svg", false), 3);
 
-		var layer_group = new Akira.Layouts.Partials.Layer (window, artboard, "Group", "folder", true);
+		var layer_group = new Akira.Layouts.Partials.Layer (window, artboard, "Group", "folder-symbolic", true);
 		var layer_placeholder = new Gtk.ListBoxRow ();
 		layer_group.container.insert (layer_placeholder, 0);
 		layer_placeholder.visible = false;

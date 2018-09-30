@@ -125,7 +125,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 		}
 		icon.vexpand = true;
 
-		icon_folder_open = new Gtk.Image.from_icon_name ("folder-open", Gtk.IconSize.MENU);
+		icon_folder_open = new Gtk.Image.from_icon_name ("folder-open-symbolic", Gtk.IconSize.MENU);
 		icon_folder_open.margin_end = 10;
 		icon_folder_open.vexpand = true;
 		icon_folder_open.visible = false;
