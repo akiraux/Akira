@@ -1,18 +1,91 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg width="14px" height="14px" viewBox="0 0 14 14" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <!-- Generator: Sketch 47.1 (45422) - http://www.bohemiancoding.com/sketch -->
-    <title>gear</title>
-    <desc>Created with Sketch.</desc>
-    <defs></defs>
-    <g id="Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="Artboard" transform="translate(-104.000000, -368.000000)" fill="#5E5E5E">
-            <g id="gear" transform="translate(104.000000, 368.000000)">
-                <path d="M8,3.92840486 L8,0 L6,0 L6,3.95851688 C6.32793401,3.84575511 6.67984207,3.7845364 7.04604853,3.7845364 C7.37820175,3.7845364 7.69859214,3.83489911 8,3.92840486 Z M8,10.0715951 L8,14 L6,14 L6,10.0414831 C6.32793401,10.1542449 6.67984207,10.2154636 7.04604853,10.2154636 C7.37820175,10.2154636 7.69859214,10.1651009 8,10.0715951 Z" id="Combined-Shape"></path>
-                <path d="M3.98912233,6 L1.2246468e-16,6 L0,8 L3.98912233,8 C3.88622532,7.68525136 3.83058492,7.34912343 3.83058492,7 C3.83058492,6.65087657 3.88622532,6.31474864 3.98912233,6 Z M10.1029747,6 L14,6 L14,8 L10.1029747,8 C10.2058717,7.68525136 10.2615121,7.34912343 10.2615121,7 C10.2615121,6.65087657 10.2058717,6.31474864 10.1029747,6 Z" id="Combined-Shape"></path>
-                <path d="M4.16212682,8.42365962 L1.34314575,11.2426407 L2.75735931,12.6568542 L5.56131559,9.85289797 C4.95670425,9.53759641 4.46485679,9.03573242 4.16212682,8.42365962 Z M8.46970815,4.11607829 L11.2426407,1.34314575 L12.6568542,2.75735931 L9.8989465,5.51526706 C9.58364494,4.91065572 9.08178095,4.41880826 8.46970815,4.11607829 Z" id="Combined-Shape"></path>
-                <path d="M8.46970815,9.88392171 L11.2426407,12.6568542 L12.6568542,11.2426407 L9.8989465,8.48473294 C9.58364494,9.08934428 9.08178095,9.58119174 8.46970815,9.88392171 Z M4.16212682,5.57634038 L1.34314575,2.75735931 L2.75735931,1.34314575 L5.56131559,4.14710203 C4.95670425,4.46240359 4.46485679,4.96426758 4.16212682,5.57634038 Z" id="Combined-Shape"></path>
-                <path d="M7.04604853,11.9769757 C4.29734073,11.9769757 2.06907279,9.7487078 2.06907279,7 C2.06907279,4.2512922 4.29734073,2.02302426 7.04604853,2.02302426 C9.79475633,2.02302426 12.0230243,4.2512922 12.0230243,7 C12.0230243,9.7487078 9.79475633,11.9769757 7.04604853,11.9769757 Z M7.04604853,9.86924393 C8.6306882,9.86924393 9.91529246,8.58463967 9.91529246,7 C9.91529246,5.41536033 8.6306882,4.13075607 7.04604853,4.13075607 C5.46140886,4.13075607 4.17680459,5.41536033 4.17680459,7 C4.17680459,8.58463967 5.46140886,9.86924393 7.04604853,9.86924393 Z" id="Combined-Shape"></path>
-            </g>
-        </g>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="16"
+   height="16"
+   viewBox="0 0 16 16"
+   version="1.1"
+   id="svg20"
+   sodipodi:docname="gear-symbolic.svg"
+   inkscape:version="0.92.3 (unknown)">
+  <metadata
+     id="metadata24">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title>gear</dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1920"
+     inkscape:window-height="1017"
+     id="namedview22"
+     showgrid="false"
+     inkscape:zoom="16.857143"
+     inkscape:cx="-1.809322"
+     inkscape:cy="5.3983051"
+     inkscape:window-x="0"
+     inkscape:window-y="30"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg20" />
+  <!-- Generator: Sketch 47.1 (45422) - http://www.bohemiancoding.com/sketch -->
+  <title
+     id="title2">gear</title>
+  <desc
+     id="desc4">Created with Sketch.</desc>
+  <defs
+     id="defs6" />
+  <g
+     style="fill:#666666;fill-rule:evenodd;stroke:none;stroke-width:1;fill-opacity:1"
+     transform="translate(-103,-367)"
+     id="Artboard">
+    <g
+       transform="translate(104,368)"
+       id="gear"
+       style="fill:#666666;fill-opacity:1">
+      <path
+         inkscape:connector-curvature="0"
+         id="Combined-Shape"
+         d="M 8,3.9284049 V 0 H 6 V 3.9585169 C 6.327934,3.8457551 6.6798421,3.7845364 7.0460485,3.7845364 7.3782017,3.7845364 7.6985921,3.8348991 8,3.9284049 Z M 8,10.071595 V 14 H 6 v -3.958517 c 0.327934,0.112762 0.6798421,0.173981 1.0460485,0.173981 0.3321532,0 0.6525436,-0.05036 0.9539515,-0.143869 z"
+         style="fill:#666666;fill-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path9"
+         d="M 3.9891223,6 H 0 V 8 H 3.9891223 C 3.8862253,7.6852514 3.8305849,7.3491234 3.8305849,7 c 0,-0.3491234 0.05564,-0.6852514 0.1585374,-1 z M 10.102975,6 H 14 v 2 h -3.897025 c 0.102897,-0.3147486 0.158537,-0.6508766 0.158537,-1 0,-0.3491234 -0.05564,-0.6852514 -0.158537,-1 z"
+         style="fill:#666666;fill-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path11"
+         d="M 4.1621268,8.4236596 1.3431457,11.242641 2.7573593,12.656854 5.5613156,9.852898 C 4.9567042,9.5375964 4.4648568,9.0357324 4.1621268,8.4236596 Z M 8.4697082,4.1160783 11.242641,1.3431457 12.656854,2.7573593 9.8989465,5.5152671 C 9.5836449,4.9106557 9.081781,4.4188083 8.4697082,4.1160783 Z"
+         style="fill:#666666;fill-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path13"
+         d="M 8.4697082,9.8839217 11.242641,12.656854 12.656854,11.242641 9.8989465,8.4847329 C 9.5836449,9.0893443 9.081781,9.5811917 8.4697082,9.8839217 Z M 4.1621268,5.5763404 1.3431457,2.7573593 2.7573593,1.3431457 5.5613156,4.147102 C 4.9567042,4.4624036 4.4648568,4.9642676 4.1621268,5.5763404 Z"
+         style="fill:#666666;fill-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path15"
+         d="M 7.0460485,11.976976 C 4.2973407,11.976976 2.0690728,9.7487078 2.0690728,7 c 0,-2.7487078 2.2282679,-4.9769757 4.9769757,-4.9769757 2.7487078,0 4.9769755,2.2282679 4.9769755,4.9769757 0,2.7487078 -2.2282677,4.976976 -4.9769755,4.976976 z m 0,-2.1077321 c 1.5846397,0 2.869244,-1.2846042 2.869244,-2.8692439 0,-1.5846397 -1.2846043,-2.8692439 -2.869244,-2.8692439 -1.5846396,0 -2.8692439,1.2846042 -2.8692439,2.8692439 0,1.5846397 1.2846043,2.8692439 2.8692439,2.8692439 z"
+         style="fill:#666666;fill-opacity:1" />
     </g>
+  </g>
 </svg>
