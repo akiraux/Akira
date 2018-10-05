@@ -39,13 +39,16 @@ public class Akira.Partials.HeaderBarButton : Gtk.Button {
 
 	public HeaderBarButton (string icon_name, string name, string tooltip) {
 		can_focus = false;
+		valign = Gtk.Align.CENTER;
+		margin_top = 4;
+		margin_bottom = 2;
 
 		Gtk.Image image;
 		var grid = new Gtk.Grid ();
 		label_btn = new Gtk.Label (name);
 		label_btn.margin_top = 2;
 
-		image = new Gtk.Image.from_icon_name (icon_name, Gtk.IconSize.LARGE_TOOLBAR);
+		image = new Gtk.Image.from_icon_name (icon_name, Gtk.IconSize.SMALL_TOOLBAR);
 		image.margin = 0;
 
 		grid.attach (image, 0, 0, 1, 1);

@@ -32,7 +32,8 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
 	public Akira.Partials.MenuButton toolset;
 	public Akira.Partials.HeaderBarButton preferences;
 	public Akira.Partials.HeaderBarButton layout;
-	public Akira.Partials.HeaderBarButton ruler;
+	public Akira.Partials.HeaderBarButton grid;
+	public Akira.Partials.HeaderBarButton pixel_grid;
 
 	public bool toggled {
 		get {
@@ -101,15 +102,17 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
 		tools.add (new Gtk.MenuItem.with_label(_("Image")));
 		tools.show_all ();
 
-		toolset = new Akira.Partials.MenuButton ("insert-object", _("Add"), _("Add a New Object"));
+		toolset = new Akira.Partials.MenuButton ("insert-object", _("Insert"), _("Insert a New Object"));
 		toolset.popup = tools;
 
-		preferences = new Akira.Partials.HeaderBarButton ("preferences-other", _("Preferences"), _("Open Preferences (Ctrl+,)"));
+		preferences = new Akira.Partials.HeaderBarButton ("gear-symbolic", _("Settings"), _("Open Settings (Ctrl+,)"));
 		preferences.action_name = Akira.Services.ActionManager.ACTION_PREFIX + Akira.Services.ActionManager.ACTION_PREFERENCES;
 
-		layout = new Akira.Partials.HeaderBarButton ("preferences-system-windows", _("Layout"), _("Toggle Layout (Ctrl+.)"));
+		layout = new Akira.Partials.HeaderBarButton ("ui-panels-symbolic", _("Layout"), _("Toggle Layout (Ctrl+.)"));
 		layout.action_name = Akira.Services.ActionManager.ACTION_PREFIX + Akira.Services.ActionManager.ACTION_PRESENTATION;
-		ruler = new Akira.Partials.HeaderBarButton ("applications-accessories", _("Ruler"), _("Toggle Ruler (Ctrl+⇧+R)"));
+
+		grid = new Akira.Partials.HeaderBarButton ("grid-symbolic", _("UI Grid"), _("UI Grid (Ctrl+⇧+G)"));
+		pixel_grid = new Akira.Partials.HeaderBarButton ("pixels-symbolic", _("Pixel Grid"), _("Pixel Grid (Ctrl+⇧+P)"));
 
 		add (menu);
 		add (new Gtk.Separator (Gtk.Orientation.VERTICAL));
@@ -118,7 +121,8 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
 		pack_end (preferences);
 		pack_end (new Gtk.Separator (Gtk.Orientation.VERTICAL));
 		pack_end (layout);
-		pack_end (ruler);
+		pack_end (grid);
+		pack_end (pixel_grid);
 
 		build_signals ();
 	}
