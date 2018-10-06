@@ -186,7 +186,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 		label_grid.attach (button_hidden, 3, 0, 1, 1);
 
 		is_group ();
-		build_darg_and_drop ();
+		build_drag_and_drop ();
 
 		handle.event.connect (on_click_event);
 
@@ -275,7 +275,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 		});
 	}
 
-	private void build_darg_and_drop () {
+	private void build_drag_and_drop () {
 		Gtk.drag_source_set (this, Gdk.ModifierType.BUTTON1_MASK, targetEntriesLayer, Gdk.DragAction.MOVE);
 
 		drag_begin.connect (on_drag_begin);

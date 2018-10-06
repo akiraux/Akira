@@ -111,7 +111,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 
 		get_style_context ().add_class ("artboard");
 
-		build_darg_and_drop ();
+		build_drag_and_drop ();
 
 		button.toggled.connect (() => {
 			revealer.reveal_child = ! revealer.get_reveal_child ();
@@ -256,7 +256,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 		show_all ();
 	}
 
-	private void build_darg_and_drop () {
+	private void build_drag_and_drop () {
 		Gtk.drag_source_set (this, Gdk.ModifierType.BUTTON1_MASK, targetEntries, Gdk.DragAction.MOVE);
 
 		drag_begin.connect (on_drag_begin);
