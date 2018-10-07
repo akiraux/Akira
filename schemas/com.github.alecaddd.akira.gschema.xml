@@ -48,6 +48,12 @@
             <description>Show or Hide the button labels to slim the UI.</description>
         </key>
 
+        <key name="use-symbolic" type="b">
+            <default>false</default>
+            <summary>Use SYmbolic Icons</summary>
+            <description>Allow user to chosse between normal and symbolic icons in HeaderBar.</description>
+        </key>
+
         <key name="open-quick" type="b">
             <default>false</default>
             <summary>Auto Reopen latest file</summary>

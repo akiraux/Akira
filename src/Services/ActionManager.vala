@@ -108,6 +108,12 @@ public class Akira.Services.ActionManager : Object {
 		window.headerbar.toggle ();
 	}
 
+	public void toggle_symbolic () {
+		window.headerbar.toggle ();
+		debug ("now it start the annoying part");
+		window.headerbar.toggle ();
+	}
+
 	private void action_quit () {
 		window.before_destroy ();
 	}

@@ -19,45 +19,40 @@
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
 
-public class Akira.Partials.HeaderBarButton : Gtk.Button {
+public class Akira.Partials.HeaderBarButton : Gtk.Grid {
 	public bool labelled {
 		get {
 			return label_btn.visible;
 		} set {
 			label_btn.visible = value;
 			label_btn.no_show_all = !value;
-
-			if (value) {
-				get_style_context ().add_class ("headerbar-button");
-			} else {
-				get_style_context ().remove_class ("headerbar-button");
-			}
 		}
 	}
 
 	private Gtk.Label label_btn;
+	public Gtk.Button button;
+	public Gtk.Image image;
 
 	public HeaderBarButton (string icon_name, string name, string tooltip) {
-		can_focus = false;
-		valign = Gtk.Align.CENTER;
-		margin_top = 4;
-		margin_bottom = 2;
-
-		Gtk.Image image;
-		var grid = new Gtk.Grid ();
 		label_btn = new Gtk.Label (name);
-		label_btn.margin_top = 2;
+		label_btn.get_style_context ().add_class ("headerbar-label");
 
 		image = new Gtk.Image.from_icon_name (icon_name, Gtk.IconSize.SMALL_TOOLBAR);
 		image.margin = 0;
 
-		grid.attach (image, 0, 0, 1, 1);
-		grid.attach (label_btn, 0, 1, 1, 1);
-		add (grid);
+		button = new Gtk.Button ();
+		button.can_focus = false;
+		button.valign = Gtk.Align.CENTER;
+		button.margin_top = 10;
+		button.set_tooltip_text (tooltip);
+		button.get_style_context ().add_class ("headerbar-button");
+		button.add (image);
 
-		get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
-		get_style_context ().add_class ("headerbar-button");
-		set_tooltip_text (tooltip);
+		attach (button, 0, 0, 1, 1);
+		attach (label_btn, 0, 1, 1, 1);
+
+		button.margin_bottom = 3;
+		margin_bottom = 6;
 	}
 
 	public void toggle () {

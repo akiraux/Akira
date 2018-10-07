@@ -27,6 +27,7 @@ public class Akira.Services.Settings : Granite.Services.Settings {
     public int left_paned { get; set; default = 220; }
     public bool dark_theme { get; set; }
     public bool show_label { get; set; }
+    public bool use_symbolic { get; set; }
     public bool open_quick { get; set; }
 
     public Settings () {

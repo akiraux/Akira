@@ -106,10 +106,10 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
 		toolset.popup = tools;
 
 		preferences = new Akira.Partials.HeaderBarButton ("gear-symbolic", _("Settings"), _("Open Settings (Ctrl+,)"));
-		preferences.action_name = Akira.Services.ActionManager.ACTION_PREFIX + Akira.Services.ActionManager.ACTION_PREFERENCES;
+		preferences.button.action_name = Akira.Services.ActionManager.ACTION_PREFIX + Akira.Services.ActionManager.ACTION_PREFERENCES;
 
 		layout = new Akira.Partials.HeaderBarButton ("ui-panels-symbolic", _("Layout"), _("Toggle Layout (Ctrl+.)"));
-		layout.action_name = Akira.Services.ActionManager.ACTION_PREFIX + Akira.Services.ActionManager.ACTION_PRESENTATION;
+		layout.button.action_name = Akira.Services.ActionManager.ACTION_PREFIX + Akira.Services.ActionManager.ACTION_PRESENTATION;
 
 		grid = new Akira.Partials.HeaderBarButton ("grid-symbolic", _("UI Grid"), _("UI Grid (Ctrl+⇧+G)"));
 		pixel_grid = new Akira.Partials.HeaderBarButton ("pixels-symbolic", _("Pixel Grid"), _("Pixel Grid (Ctrl+⇧+P)"));
