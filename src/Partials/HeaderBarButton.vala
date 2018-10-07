@@ -66,4 +66,12 @@ public class Akira.Partials.HeaderBarButton : Gtk.Grid {
 	public void hide_labels () {
 		labelled = false;
 	}
+
+	public void update_image (string icon_name) {
+		var size = settings.use_symbolic ? Gtk.IconSize.SMALL_TOOLBAR : Gtk.IconSize.LARGE_TOOLBAR;
+		button.remove (image);
+		image = new Gtk.Image.from_icon_name (icon_name, size);
+		button.add (image);
+		image.show_all ();
+	}
 }

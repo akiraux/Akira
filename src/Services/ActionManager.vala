@@ -110,7 +110,7 @@ public class Akira.Services.ActionManager : Object {
 
 	public void toggle_symbolic () {
 		window.headerbar.toggle ();
-		debug ("now it start the annoying part");
+		window.headerbar.toggle_symbolic ();
 		window.headerbar.toggle ();
 	}
 

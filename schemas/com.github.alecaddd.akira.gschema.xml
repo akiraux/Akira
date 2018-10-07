@@ -49,7 +49,7 @@
         </key>
 
         <key name="use-symbolic" type="b">
-            <default>false</default>
+            <default>true</default>
             <summary>Use SYmbolic Icons</summary>
             <description>Allow user to chosse between normal and symbolic icons in HeaderBar.</description>
         </key>

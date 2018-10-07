@@ -16,6 +16,7 @@
     <file alias="eye-symbolic.svg">icons/symbolic/eye-symbolic.svg</file>
     <file alias="eye-not-symbolic.svg">icons/symbolic/eye-not-symbolic.svg</file>
     <file alias="gear-symbolic.svg">icons/symbolic/gear-symbolic.svg</file>
+    <file alias="grid.svg">icons/layout/grid.svg</file>
     <file alias="grid-symbolic.svg">icons/symbolic/grid-symbolic.svg</file>
     <file alias="group-symbolic.svg">icons/symbolic/group-symbolic.svg</file>
     <file alias="image-symbolic.svg">icons/symbolic/image-symbolic.svg</file>
@@ -34,6 +35,7 @@
     <file alias="pointer-symbolic.svg">icons/symbolic/pointer-symbolic.svg</file>
     <file alias="shapes-symbolic.svg">icons/symbolic/shapes-symbolic.svg</file>
     <file alias="text-symbolic.svg">icons/symbolic/text-symbolic.svg</file>
+    <file alias="ui-panels.svg">icons/layout/ui-panels.svg</file>
     <file alias="ui-panels-symbolic.svg">icons/symbolic/ui-panels-symbolic.svg</file>
     <file alias="ungroup-symbolic.svg">icons/symbolic/ungroup-symbolic.svg</file>
   </gresource>
