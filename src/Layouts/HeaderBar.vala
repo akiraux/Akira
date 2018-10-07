@@ -139,6 +139,7 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
 		var symbolic = settings.use_symbolic ? "-symbolic" : "";
 		layout.update_image ("ui-panels" + symbolic);
 		grid.update_image ("grid" + symbolic);
+		pixel_grid.update_image ("pixels" + symbolic);
 	}
 
 	public void toggle () {

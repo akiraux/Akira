@@ -42,10 +42,10 @@ public class Akira.Partials.HeaderBarButton : Gtk.Grid {
 
 		button = new Gtk.Button ();
 		button.can_focus = false;
-		button.valign = Gtk.Align.CENTER;
+		button.halign = Gtk.Align.CENTER;
 		button.margin_top = 10;
 		button.set_tooltip_text (tooltip);
-		button.get_style_context ().add_class ("headerbar-button");
+		button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
 		button.add (image);
 
 		attach (button, 0, 0, 1, 1);
