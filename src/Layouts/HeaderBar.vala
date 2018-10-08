@@ -105,14 +105,14 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
 		toolset = new Akira.Partials.MenuButton ("insert-object", _("Insert"), _("Insert a New Object"));
 		toolset.popup = tools;
 
-		preferences = new Akira.Partials.HeaderBarButton ("gear-symbolic", _("Settings"), _("Open Settings (Ctrl+,)"));
+		preferences = new Akira.Partials.HeaderBarButton ("system-settings-symbolic", _("Settings"), _("Open Settings (Ctrl+,)"));
 		preferences.button.action_name = Akira.Services.ActionManager.ACTION_PREFIX + Akira.Services.ActionManager.ACTION_PREFERENCES;
 
-		layout = new Akira.Partials.HeaderBarButton ("ui-panels-symbolic", _("Layout"), _("Toggle Layout (Ctrl+.)"));
+		layout = new Akira.Partials.HeaderBarButton ("layout-panels-symbolic", _("Layout"), _("Toggle Layout (Ctrl+.)"));
 		layout.button.action_name = Akira.Services.ActionManager.ACTION_PREFIX + Akira.Services.ActionManager.ACTION_PRESENTATION;
 
-		grid = new Akira.Partials.HeaderBarButton ("grid-symbolic", _("UI Grid"), _("UI Grid (Ctrl+⇧+G)"));
-		pixel_grid = new Akira.Partials.HeaderBarButton ("pixels-symbolic", _("Pixel Grid"), _("Pixel Grid (Ctrl+⇧+P)"));
+		grid = new Akira.Partials.HeaderBarButton ("layout-grid-symbolic", _("UI Grid"), _("UI Grid (Ctrl+⇧+G)"));
+		pixel_grid = new Akira.Partials.HeaderBarButton ("layout-pixels-symbolic", _("Pixel Grid"), _("Pixel Grid (Ctrl+⇧+P)"));
 
 		add (menu);
 		add (new Gtk.Separator (Gtk.Orientation.VERTICAL));
@@ -137,9 +137,9 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
 
 	public void toggle_symbolic () {
 		var symbolic = settings.use_symbolic ? "-symbolic" : "";
-		layout.update_image ("ui-panels" + symbolic);
-		grid.update_image ("grid" + symbolic);
-		pixel_grid.update_image ("pixels" + symbolic);
+		layout.update_image ("layout-panels" + symbolic);
+		grid.update_image ("layout-grid" + symbolic);
+		pixel_grid.update_image ("layout-pixels" + symbolic);
 	}
 
 	public void toggle () {
