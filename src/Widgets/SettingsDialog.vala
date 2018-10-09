@@ -86,10 +86,20 @@ public class Akira.Widgets.SettingsDialog : Gtk.Dialog {
 		content_grid.column_homogeneous = true;
 
 		content_grid.attach (new SettingsHeader (_("Interface")), 0, 0, 2, 1);
+		
+		content_grid.attach (new SettingsLabel (_("Use Dark Theme:")), 0, 1, 1, 1);
+		dark_theme_switch = new SettingsSwitch ("dark-theme");
+		content_grid.attach (dark_theme_switch, 1, 1, 1, 1);
 
-		content_grid.attach (new SettingsLabel (_("Show Button Labels:")), 0, 1, 1, 1);
+		dark_theme_switch.notify["active"].connect (() => {
+			Gtk.Settings.get_default ().gtk_application_prefer_dark_theme = settings.dark_theme;
+		});
+
+		content_grid.attach (new SettingsHeader (_("ToolBar Style")), 0, 2, 2, 1);
+
+		content_grid.attach (new SettingsLabel (_("Show Button Labels:")), 0, 3, 1, 1);
 		label_switch = new SettingsSwitch ("show-label");
-		content_grid.attach (label_switch, 1, 1, 1, 1);
+		content_grid.attach (label_switch, 1, 3, 1, 1);
 
 		label_switch.notify["active"].connect (() => {
 			if (!settings.show_label) {
@@ -99,20 +109,12 @@ public class Akira.Widgets.SettingsDialog : Gtk.Dialog {
 			}
 		});
 
-		content_grid.attach (new SettingsLabel (_("Use Symbolic Icons:")), 0, 2, 1, 1);
+		content_grid.attach (new SettingsLabel (_("Use Symbolic Icons:")), 0, 4, 1, 1);
 		symbolic_switch = new SettingsSwitch ("use-symbolic");
-		content_grid.attach (symbolic_switch, 1, 2, 1, 1);
+		content_grid.attach (symbolic_switch, 1, 4, 1, 1);
 
 		symbolic_switch.notify["active"].connect (() => {
 			window.action_manager.toggle_symbolic ();
-		});
-
-		content_grid.attach (new SettingsLabel (_("Use Dark Theme:")), 0, 3, 1, 1);
-		dark_theme_switch = new SettingsSwitch ("dark-theme");
-		content_grid.attach (dark_theme_switch, 1, 3, 1, 1);
-
-		dark_theme_switch.notify["active"].connect (() => {
-			Gtk.Settings.get_default ().gtk_application_prefer_dark_theme = settings.dark_theme;
 		});
 
 		return content_grid;

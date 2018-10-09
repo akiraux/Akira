@@ -18,12 +18,15 @@
 
     <file alias="system-settings-symbolic.svg">icons/symbolic/system-settings-symbolic.svg</file>
 
-    <file alias="layout-grid.svg">icons/filled/layout-grid.svg</file>
+    <file alias="layout-grid-filled.svg">icons/filled/layout-grid-filled.svg</file>
     <file alias="layout-grid-symbolic.svg">icons/symbolic/layout-grid-symbolic.svg</file>
-    <file alias="layout-pixels.svg">icons/filled/layout-pixels.svg</file>
+    <file alias="layout-grid-lineart.svg">icons/lineart/layout-grid-lineart.svg</file>
+    <file alias="layout-pixels-filled.svg">icons/filled/layout-pixels-filled.svg</file>
     <file alias="layout-pixels-symbolic.svg">icons/symbolic/layout-pixels-symbolic.svg</file>
-    <file alias="layout-panels.svg">icons/filled/layout-panels.svg</file>
+    <file alias="layout-pixels-lineart.svg">icons/lineart/layout-pixels-lineart.svg</file>
+    <file alias="layout-panels-filled.svg">icons/filled/layout-panels-filled.svg</file>
     <file alias="layout-panels-symbolic.svg">icons/symbolic/layout-panels-symbolic.svg</file>
+    <file alias="layout-panels-lineart.svg">icons/lineart/layout-panels-lineart.svg</file>
 
     <file alias="tool-group-symbolic.svg">icons/symbolic/tool-group-symbolic.svg</file>
     <file alias="tool-ungroup-symbolic.svg">icons/symbolic/tool-ungroup-symbolic.svg</file>
