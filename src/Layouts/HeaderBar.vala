@@ -22,8 +22,6 @@
 public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
 	public weak Akira.Window window { get; construct; }
 
-	private const string TOOLS_DIR = "/com/github/alecaddd/akira/tools/";
-
 	public Akira.Partials.HeaderBarButton new_document;
 	public Akira.Partials.HeaderBarButton save_file;
 	public Akira.Partials.HeaderBarButton save_file_as;
@@ -105,14 +103,14 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
 		toolset = new Akira.Partials.MenuButton ("insert-object", _("Insert"), _("Insert a New Object"));
 		toolset.popup = tools;
 
-		preferences = new Akira.Partials.HeaderBarButton ("system-settings-symbolic", _("Settings"), _("Open Settings (Ctrl+,)"));
+		preferences = new Akira.Partials.HeaderBarButton ("system-settings-%s".printf (settings.icon_style), _("Settings"), _("Open Settings (Ctrl+,)"));
 		preferences.button.action_name = Akira.Services.ActionManager.ACTION_PREFIX + Akira.Services.ActionManager.ACTION_PREFERENCES;
 
-		layout = new Akira.Partials.HeaderBarButton ("layout-panels-symbolic", _("Layout"), _("Toggle Layout (Ctrl+.)"));
+		layout = new Akira.Partials.HeaderBarButton ("layout-panels-%s".printf (settings.icon_style), _("Layout"), _("Toggle Layout (Ctrl+.)"));
 		layout.button.action_name = Akira.Services.ActionManager.ACTION_PREFIX + Akira.Services.ActionManager.ACTION_PRESENTATION;
 
-		grid = new Akira.Partials.HeaderBarButton ("layout-grid-symbolic", _("UI Grid"), _("UI Grid (Ctrl+⇧+G)"));
-		pixel_grid = new Akira.Partials.HeaderBarButton ("layout-pixels-symbolic", _("Pixel Grid"), _("Pixel Grid (Ctrl+⇧+P)"));
+		grid = new Akira.Partials.HeaderBarButton ("layout-grid-%s".printf (settings.icon_style), _("UI Grid"), _("UI Grid (Ctrl+⇧+G)"));
+		pixel_grid = new Akira.Partials.HeaderBarButton ("layout-pixels-%s".printf (settings.icon_style), _("Pixel Grid"), _("Pixel Grid (Ctrl+⇧+P)"));
 
 		add (menu);
 		add (new Gtk.Separator (Gtk.Orientation.VERTICAL));

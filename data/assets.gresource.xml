@@ -16,7 +16,9 @@
     <file alias="layer-visible-symbolic.svg">icons/symbolic/layer-visible-symbolic.svg</file>
     <file alias="layer-hidden-symbolic.svg">icons/symbolic/layer-hidden-symbolic.svg</file>
 
+    <file alias="system-settings-filled.svg">icons/filled/system-settings-filled.svg</file>
     <file alias="system-settings-symbolic.svg">icons/symbolic/system-settings-symbolic.svg</file>
+    <file alias="system-settings-lineart.svg">icons/lineart/system-settings-lineart.svg</file>
 
     <file alias="layout-grid-filled.svg">icons/filled/layout-grid-filled.svg</file>
     <file alias="layout-grid-symbolic.svg">icons/symbolic/layout-grid-symbolic.svg</file>

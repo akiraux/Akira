@@ -51,6 +51,7 @@ executable(
         dependency('gee-0.8'),
         dependency('libxml-2.0'),
         dependency('gtksourceview-3.0'),
+        dependency('cairo', version: '>=1.14'),
     ],
     install: true
 )

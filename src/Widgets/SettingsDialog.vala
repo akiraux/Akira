@@ -109,7 +109,7 @@ public class Akira.Widgets.SettingsDialog : Gtk.Dialog {
 			}
 		});
 
-		content_grid.attach (new SettingsLabel (_("Use Symbolic Icons:")), 0, 4, 1, 1);
+		content_grid.attach (new SettingsLabel (_("Select Icon Style:")), 0, 4, 1, 1);
 		symbolic_switch = new SettingsSwitch ("use-symbolic");
 		content_grid.attach (symbolic_switch, 1, 4, 1, 1);
 

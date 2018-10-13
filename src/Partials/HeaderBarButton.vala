@@ -37,7 +37,9 @@ public class Akira.Partials.HeaderBarButton : Gtk.Grid {
 		label_btn = new Gtk.Label (name);
 		label_btn.get_style_context ().add_class ("headerbar-label");
 
-		image = new Gtk.Image.from_icon_name (icon_name, Gtk.IconSize.SMALL_TOOLBAR);
+		var size = settings.icon_style == "symbolic" ? Gtk.IconSize.SMALL_TOOLBAR : Gtk.IconSize.LARGE_TOOLBAR;
+
+		image = new Gtk.Image.from_icon_name (icon_name, size);
 		image.margin = 0;
 
 		button = new Gtk.Button ();
@@ -68,7 +70,7 @@ public class Akira.Partials.HeaderBarButton : Gtk.Grid {
 	}
 
 	public void update_image (string icon_name) {
-		var size = settings.use_symbolic ? Gtk.IconSize.SMALL_TOOLBAR : Gtk.IconSize.LARGE_TOOLBAR;
+		var size = settings.icon_style == "symbolic" ? Gtk.IconSize.SMALL_TOOLBAR : Gtk.IconSize.LARGE_TOOLBAR;
 		button.remove (image);
 		image = new Gtk.Image.from_icon_name (icon_name, size);
 		button.add (image);
