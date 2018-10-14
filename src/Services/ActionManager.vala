@@ -108,9 +108,9 @@ public class Akira.Services.ActionManager : Object {
 		window.headerbar.toggle ();
 	}
 
-	public void toggle_symbolic () {
+	public void update_icons_style () {
 		window.headerbar.toggle ();
-		window.headerbar.toggle_symbolic ();
+		window.headerbar.update_icons_style ();
 		window.headerbar.toggle ();
 	}
 

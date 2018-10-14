@@ -133,11 +133,11 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
 		// dinamically toggle button sensitivity based on document status or actor selected.
 	}
 
-	public void toggle_symbolic () {
-		var symbolic = settings.use_symbolic ? "-symbolic" : "";
-		layout.update_image ("layout-panels" + symbolic);
-		grid.update_image ("layout-grid" + symbolic);
-		pixel_grid.update_image ("layout-pixels" + symbolic);
+	public void update_icons_style () {
+		layout.update_image ("layout-panels-%s".printf (settings.icon_style));
+		grid.update_image ("layout-grid-%s".printf (settings.icon_style));
+		pixel_grid.update_image ("layout-pixels-%s".printf (settings.icon_style));
+		preferences.update_image ("system-settings-%s".printf (settings.icon_style));
 	}
 
 	public void toggle () {
