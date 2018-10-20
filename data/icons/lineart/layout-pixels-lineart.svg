@@ -27,7 +27,7 @@
          offset="0"
          id="stop825" />
       <stop
-         style="stop-color:#7239b3;stop-opacity:1"
+         style="stop-color:#a56de2;stop-opacity:1"
          offset="1"
          id="stop827" />
     </linearGradient>
@@ -50,8 +50,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="22.4"
-     inkscape:cx="6.1490796"
-     inkscape:cy="6.992747"
+     inkscape:cx="11.528544"
+     inkscape:cy="11.992747"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -86,13 +86,13 @@
     <path
        style="opacity:1;fill:url(#linearGradient841);fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        d="M 4,2 C 2.8919822,2 2,2.8919822 2,4 v 16 c 0,1.108018 0.8919822,2 2,2 h 16 c 1.108018,0 2,-0.891982 2,-2 V 4 C 22,2.8919822 21.108018,2 20,2 Z m 0,1 h 16 c 0.554009,0 1,0.4459907 1,1 v 16 c 0,0.415507 -0.250213,0.770466 -0.609375,0.921875 C 20.270906,20.972343 20.138502,21 20,21 14.542927,21 8.7410141,21 4,21 3.4459907,21 3,20.554009 3,20 V 4 C 3,3.8614977 3.027657,3.7290942 3.078125,3.609375 3.2295338,3.2502127 3.5844931,3 4,3 Z"
-       transform="matrix(0.26458334,0,0,0.26458334,0,290.64998)"
        id="rect833"
        inkscape:connector-curvature="0"
-       sodipodi:nodetypes="sssssssssssccccccccs" />
+       sodipodi:nodetypes="sssssssssssccccccccs"
+       transform="matrix(0.26458334,0,0,0.26458334,0,290.64998)" />
     <rect
        transform="rotate(90)"
-       style="opacity:0.3;fill:#a56de2;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.18708867"
+       style="opacity:0.4;fill:#a56de2;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.18708867"
        height="4.7625003"
        width="0.26458332"
        y="-5.5562501"
@@ -104,11 +104,11 @@
        y="-5.5562501"
        width="0.26458332"
        height="4.7625003"
-       style="opacity:0.3;fill:#a56de2;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.18708867"
+       style="opacity:0.4;fill:#a56de2;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.18708867"
        transform="rotate(90)" />
     <rect
        transform="rotate(90)"
-       style="opacity:0.3;fill:#a56de2;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.18708867"
+       style="opacity:0.4;fill:#a56de2;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.18708867"
        height="4.7625003"
        width="0.26458332"
        y="-5.5562501"
@@ -120,7 +120,7 @@
        y="-5.5562501"
        width="0.26458332"
        height="4.7625003"
-       style="opacity:0.3;fill:#a56de2;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.18708867"
+       style="opacity:0.4;fill:#a56de2;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.18708867"
        transform="rotate(90)" />
     <rect
        id="rect972"
@@ -128,9 +128,9 @@
        y="291.44373"
        width="0.26458332"
        height="4.7624993"
-       style="opacity:0.3;fill:#a56de2;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.18708865" />
+       style="opacity:0.4;fill:#a56de2;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.18708865" />
     <rect
-       style="opacity:0.3;fill:#a56de2;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.18708865"
+       style="opacity:0.4;fill:#a56de2;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.18708865"
        height="4.7624993"
        width="0.26458332"
        y="291.44373"
@@ -142,9 +142,9 @@
        y="291.44373"
        width="0.26458332"
        height="4.7624993"
-       style="opacity:0.3;fill:#a56de2;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.18708865" />
+       style="opacity:0.4;fill:#a56de2;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.18708865" />
     <rect
-       style="opacity:0.3;fill:#a56de2;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.18708865"
+       style="opacity:0.4;fill:#a56de2;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.18708865"
        height="4.7624993"
        width="0.26458332"
        y="291.44373"
@@ -152,7 +152,7 @@
        id="rect978" />
     <rect
        transform="rotate(90)"
-       style="opacity:0.3;fill:#a56de2;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.18708867"
+       style="opacity:0.4;fill:#a56de2;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.18708867"
        height="4.7625003"
        width="0.26458332"
        y="-5.5562501"
@@ -164,10 +164,10 @@
        y="-5.5562501"
        width="0.26458332"
        height="4.7625003"
-       style="opacity:0.3;fill:#a56de2;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.18708867"
+       style="opacity:0.4;fill:#a56de2;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.18708867"
        transform="rotate(90)" />
     <rect
-       style="opacity:0.3;fill:#a56de2;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.18708865"
+       style="opacity:0.4;fill:#a56de2;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.18708865"
        height="4.7624993"
        width="0.26458332"
        y="291.44373"
@@ -179,6 +179,6 @@
        y="291.44373"
        width="0.26458332"
        height="4.7624993"
-       style="opacity:0.3;fill:#a56de2;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.18708865" />
+       style="opacity:0.4;fill:#a56de2;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.18708865" />
   </g>
 </svg>
