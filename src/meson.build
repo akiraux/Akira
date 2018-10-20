@@ -52,6 +52,7 @@ executable(
         dependency('libxml-2.0'),
         dependency('gtksourceview-3.0'),
         dependency('cairo', version: '>=1.14'),
+        dependency('goocanvas-2.0'),
     ],
     install: true
 )
