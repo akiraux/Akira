@@ -157,8 +157,8 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 		button_hidden.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
 		button_hidden.get_style_context ().add_class ("layer-action");
 		button_hidden.valign = Gtk.Align.CENTER;
-		icon_hidden = new Gtk.Image.from_icon_name ("eye-symbolic", Gtk.IconSize.MENU);
-		icon_visible = new Gtk.Image.from_icon_name ("eye-not-symbolic", Gtk.IconSize.MENU);
+		icon_hidden = new Gtk.Image.from_icon_name ("layer-visible-symbolic", Gtk.IconSize.MENU);
+		icon_visible = new Gtk.Image.from_icon_name ("layer-hidden-symbolic", Gtk.IconSize.MENU);
 		icon_visible.visible = false;
 		icon_visible.no_show_all = true;
 
