@@ -38,7 +38,6 @@ public class Akira.Layouts.LeftSideBar : Gtk.Grid {
 	construct {
 		get_style_context ().add_class ("sidebar-l");
 		width_request = 220;
-		//  width_request = settings.left_paned;
 		
 		var label = new Gtk.Label ("Sidebar L");
 		label.halign = Gtk.Align.CENTER;

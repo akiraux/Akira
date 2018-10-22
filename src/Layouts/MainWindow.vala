@@ -43,8 +43,8 @@ public class Akira.Layouts.MainWindow : Gtk.Grid {
 		grid = new Gtk.Grid ();
 		pane = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);
 		pane2 = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);
-		pane.set_position (220);
-		pane2.set_position (2000);
+		pane.position = settings.left_paned;
+		pane2.position = settings.right_paned;
 		grid.attach (pane2, 0, 0, 1, 1);
 
 		pane.pack1 (left_sidebar, false, false);

@@ -25,9 +25,9 @@
         </key>
 
         <key name="right-paned" type="i">
-            <default>220</default>
+            <default>2000</default>
             <summary>The saved width of the right panel.</summary>
-            <description>The saved width of the right panel. Must be greater than 220, or it will not take effect.</description>
+            <description>The saved width of the right panel containing the MainCanvas and RightSidebar. Starts at 2000 to push have a decently sized layout.</description>
         </key>
 
         <key name="left-paned" type="i">
