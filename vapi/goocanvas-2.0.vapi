@@ -454,6 +454,11 @@ namespace Goo {
 		public Goo.CairoPattern stroke_pattern { owned get; set; }
 		[NoAccessorMethod]
 		public Gdk.Pixbuf stroke_pixbuf { set; }
+		[NoAccessorMethod]
+		public virtual double x { get; set; }
+		[NoAccessorMethod]
+		public virtual double y { get ; set; }
+
 	}
 	[CCode (cheader_filename = "goocanvas.h", ref_function = "goo_canvas_line_dash_ref", type_id = "GOO_TYPE_CANVAS_LINE_DASH", unref_function = "goo_canvas_line_dash_unref")]
 	[Compact]

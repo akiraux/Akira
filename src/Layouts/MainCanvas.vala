@@ -32,9 +32,10 @@ public class Akira.Layouts.MainCanvas : Gtk.Grid {
 		main_scroll = new Gtk.ScrolledWindow (null, null);
 		main_scroll.expand = true;
 
-		var canvas = new Goo.Canvas ();
+		var canvas = new Akira.Lib.Canvas ();
         canvas.set_size_request (main_window_size.width, main_window_size.height);
-        canvas.set_bounds (0, 0, 10000, 10000);
+		canvas.set_bounds (0, 0, 10000, 10000);
+		canvas.set_scale (1.0);
 
         var root = canvas.get_root_item ();
 		var text = Goo.CanvasText.create (root, "Add text here", 20, 20, 200, Goo.CanvasAnchorType.NW, "font", "Open Sans 18");
@@ -46,7 +47,7 @@ public class Akira.Layouts.MainCanvas : Gtk.Grid {
                                    "stroke-color", "yellow",
                                    "fill-color", "#a8eb12"
 								   );
-								   
+
 		main_scroll.add (canvas);
 
 		attach (main_scroll, 0, 0, 1, 1);

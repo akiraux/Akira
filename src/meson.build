@@ -43,6 +43,9 @@ executable(
 
     'Widgets/SettingsDialog.vala',
 
+    'lib/Canvas.vala',
+    'lib/Item.vala',
+
     asresources,
     config_header,
     dependencies: [

@@ -106,3 +106,7 @@
     border-radius: 50%;
     background-color: @primary;
 }
+
+.hovered {
+    box-shadow: 0 0 0 10px red;
+}
