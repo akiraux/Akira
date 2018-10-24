@@ -150,7 +150,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     }
 
     private void motion_hover_event (Gdk.EventMotion event) {
-        hovered_item = get_item_at (event.x / get_scale (), event.y / get_scale (), false);
+        hovered_item = get_item_at (event.x / get_scale (), event.y / get_scale (), true);
 
         if (!(hovered_item is Goo.CanvasItem)) {
             remove_hover_effect ();
@@ -189,6 +189,8 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                                    "line-width", line_width, 
                                    "stroke-color", "#41c9fd"
                                    );
+
+        hover_effect.can_focus = false;
     }
 
     private void remove_hover_effect () {
