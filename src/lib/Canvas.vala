@@ -35,6 +35,8 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     public signal void item_moved (Goo.CanvasItem? item);
 
     public weak Goo.CanvasItem? selected_item;
+    public weak Goo.CanvasItem? selected_effect;
+
     public weak Goo.CanvasItem? hovered_item;
     public weak Goo.CanvasRect? hover_effect;
 
@@ -72,6 +74,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
             }
 
             holding = true;
+            add_selected_effect (selected_item);
         }
 
         return true;
@@ -161,8 +164,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
         if ((hover_x != (hovered_item as Goo.CanvasItemSimple).x
             || hover_y != (hovered_item as Goo.CanvasItemSimple).y)
-            && hover_effect != hovered_item
-            ) {
+            && hover_effect != hovered_item) {
             remove_hover_effect ();
         }
 
@@ -170,20 +172,42 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         hover_y = (hovered_item as Goo.CanvasItemSimple).y;
     }
 
-    private void add_hover_effect (Goo.CanvasItem? target) {
-        if (target == null || hover_effect != null) {
+    private void add_selected_effect (Goo.CanvasItem? target) {
+        if (target == null || selected_effect != null) {
             return;
         }
 
         var item = (target as Goo.CanvasItemSimple);
 
+        var line_width = 2.0 / get_scale ();
         var stroke = item.line_width;
         var x = item.x - stroke;
         var y = item.y - stroke;
         var width = item.bounds.x2 - item.bounds.x1 + stroke;
         var height = item.bounds.y2 - item.bounds.y1 + stroke;
 
+        selected_effect = Goo.CanvasRect.create (get_root_item (), x, y, width, height,
+                                   "line-width", line_width, 
+                                   "stroke-color", "#999"
+                                   );
+
+        selected_effect.can_focus = false;
+    }
+
+
+    private void add_hover_effect (Goo.CanvasItem? target) {
+        if (target == null || hover_effect != null || selected_item == target) {
+            return;
+        }
+
+        var item = (target as Goo.CanvasItemSimple);
+
         var line_width = 2.0 / get_scale ();
+        var stroke = item.line_width;
+        var x = item.x - stroke;
+        var y = item.y - stroke;
+        var width = item.bounds.x2 - item.bounds.x1 + stroke;
+        var height = item.bounds.y2 - item.bounds.y1 + stroke;
 
         hover_effect = Goo.CanvasRect.create (get_root_item (), x, y, width, height,
                                    "line-width", line_width, 
