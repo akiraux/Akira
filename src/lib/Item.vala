@@ -20,14 +20,5 @@
 */
 
 public class Akira.Lib.Item : Goo.CanvasItemSimple, Goo.CanvasItem {
-    //  construct {
-
-    //  }
-    public bool enter_notify_event (Goo.CanvasItem target, Gdk.EventCrossing event) {
-        if (target is Goo.CanvasItem) {
-            debug ("enter");
-        }
-
-        return false;
-    }
+    //
 }

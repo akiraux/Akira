@@ -35,7 +35,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     public signal void item_moved (Goo.CanvasItem? item);
 
     public weak Goo.CanvasItem? selected_item;
-    public weak Goo.CanvasItem? selected_effect;
+    public weak Goo.CanvasItem? select_effect;
 
     public weak Goo.CanvasItem? hovered_item;
     public weak Goo.CanvasRect? hover_effect;
@@ -59,7 +59,9 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     }
 
     public override bool button_press_event (Gdk.EventButton event) {
+        
         remove_hover_effect ();
+        remove_select_effect ();
 
         current_scale = get_scale ();
         event_x_root = event.x;
@@ -74,7 +76,8 @@ public class Akira.Lib.Canvas : Goo.Canvas {
             }
 
             holding = true;
-            add_selected_effect (selected_item);
+            add_select_effect (selected_item);
+            grab_focus (selected_item);
         }
 
         return true;
@@ -111,6 +114,9 @@ public class Akira.Lib.Canvas : Goo.Canvas {
             case 0: // Moving
                 ((Goo.CanvasItemSimple) selected_item).x = delta_x + start_x;
                 ((Goo.CanvasItemSimple) selected_item).y = delta_y + start_y;
+
+                ((Goo.CanvasItemSimple) select_effect).x = delta_x + start_x - ((Goo.CanvasItemSimple) selected_item).line_width;
+                ((Goo.CanvasItemSimple) select_effect).y = delta_y + start_y - ((Goo.CanvasItemSimple) selected_item).line_width;
                 debug ("X:%f - Y:%f\n", ((Goo.CanvasItemSimple) selected_item).x, ((Goo.CanvasItemSimple) selected_item).y);
                 break;
             //  case 1: // Top left
@@ -172,28 +178,36 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         hover_y = (hovered_item as Goo.CanvasItemSimple).y;
     }
 
-    private void add_selected_effect (Goo.CanvasItem? target) {
-        if (target == null || selected_effect != null) {
+    private void add_select_effect (Goo.CanvasItem? target) {
+        if (target == null || target == select_effect) {
             return;
         }
 
         var item = (target as Goo.CanvasItemSimple);
 
-        var line_width = 2.0 / get_scale ();
+        var line_width = 1.0 / get_scale ();
         var stroke = item.line_width;
         var x = item.x - stroke;
         var y = item.y - stroke;
         var width = item.bounds.x2 - item.bounds.x1 + stroke;
         var height = item.bounds.y2 - item.bounds.y1 + stroke;
 
-        selected_effect = Goo.CanvasRect.create (get_root_item (), x, y, width, height,
+        select_effect = Goo.CanvasRect.create (get_root_item (), x, y, width, height,
                                    "line-width", line_width, 
-                                   "stroke-color", "#999"
+                                   "stroke-color", "#333"
                                    );
 
-        selected_effect.can_focus = false;
+        select_effect.can_focus = false;
     }
 
+    private void remove_select_effect () {
+        if (select_effect == null) {
+            return;
+        }
+
+        select_effect.remove ();
+        select_effect = null;
+    }
 
     private void add_hover_effect (Goo.CanvasItem? target) {
         if (target == null || hover_effect != null || selected_item == target) {
