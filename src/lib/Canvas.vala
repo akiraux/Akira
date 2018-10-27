@@ -36,6 +36,14 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
     public weak Goo.CanvasItem? selected_item;
     public weak Goo.CanvasItem? select_effect;
+    private weak Goo.CanvasItem? nob_tl;
+    private weak Goo.CanvasItem? nob_tc;
+    private weak Goo.CanvasItem? nob_tr;
+    private weak Goo.CanvasItem? nob_rc;
+    private weak Goo.CanvasItem? nob_bl;
+    private weak Goo.CanvasItem? nob_bc;
+    private weak Goo.CanvasItem? nob_br;
+    private weak Goo.CanvasItem? nob_lc;
 
     public weak Goo.CanvasItem? hovered_item;
     public weak Goo.CanvasRect? hover_effect;
@@ -49,6 +57,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     private double delta_y;
     private double hover_x;
     private double hover_y;
+    private double nob_size;
     private double current_scale;
     private int holding_id = 0;
 
@@ -59,7 +68,6 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     }
 
     public override bool button_press_event (Gdk.EventButton event) {
-        
         remove_hover_effect ();
         remove_select_effect ();
 
@@ -112,13 +120,52 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
         delta_x = (event.x - event_x_root) / current_scale;
         delta_y = (event.y - event_y_root) / current_scale;
+
+        var item = ((Goo.CanvasItemSimple) selected_item);
+        var stroke = item.line_width;
+        var width = item.bounds.x2 - item.bounds.x1 + stroke;
+        var height = item.bounds.y2 - item.bounds.y1 + stroke;
         switch (holding_id) {
             case 0: // Moving
                 ((Goo.CanvasItemSimple) selected_item).x = delta_x + start_x;
                 ((Goo.CanvasItemSimple) selected_item).y = delta_y + start_y;
 
+                // Bounding box
                 ((Goo.CanvasItemSimple) select_effect).x = delta_x + start_x - ((Goo.CanvasItemSimple) selected_item).line_width;
                 ((Goo.CanvasItemSimple) select_effect).y = delta_y + start_y - ((Goo.CanvasItemSimple) selected_item).line_width;
+
+                // TOP LEFT nob
+                ((Goo.CanvasItemSimple) nob_tl).x = delta_x + start_x - (nob_size / 2) - stroke;
+                ((Goo.CanvasItemSimple) nob_tl).y = delta_y + start_y - (nob_size / 2) - stroke;
+
+                // TOP RIGHT nob
+                ((Goo.CanvasItemSimple) nob_tr).x = delta_x + start_x + width - (nob_size / 2) - stroke;
+                ((Goo.CanvasItemSimple) nob_tr).y = delta_y + start_y - (nob_size / 2) - stroke;
+
+                // BOTTOM RIGHT nob
+                ((Goo.CanvasItemSimple) nob_br).x = delta_x + start_x + width - (nob_size / 2) - stroke;
+                ((Goo.CanvasItemSimple) nob_br).y = delta_y + start_y + height - (nob_size / 2) - stroke;
+
+                // BOTTOM LEFT nob
+                ((Goo.CanvasItemSimple) nob_bl).x = delta_x + start_x - (nob_size / 2) - stroke;
+                ((Goo.CanvasItemSimple) nob_bl).y = delta_y + start_y + height - (nob_size / 2) - stroke;
+
+                // TOP CENTER nob
+                ((Goo.CanvasItemSimple) nob_tc).x = delta_x + start_x + (width / 2) - (nob_size / 2) - stroke;
+                ((Goo.CanvasItemSimple) nob_tc).y = delta_y + start_y - (nob_size / 2) - stroke;
+
+                // RIGHT CENTER nob
+                ((Goo.CanvasItemSimple) nob_rc).x = delta_x + start_x + width - (nob_size / 2) - stroke;
+                ((Goo.CanvasItemSimple) nob_rc).y = delta_y + start_y + (height / 2) - (nob_size / 2) - stroke;
+
+                // BOTTOM CENTER nob
+                ((Goo.CanvasItemSimple) nob_bc).x = delta_x + start_x + (width / 2) - (nob_size / 2) - stroke;
+                ((Goo.CanvasItemSimple) nob_bc).y = delta_y + start_y + height - (nob_size / 2) - stroke;
+
+                // LEFT CENTER nob
+                ((Goo.CanvasItemSimple) nob_lc).x = delta_x + start_x - (nob_size / 2) - stroke;
+                ((Goo.CanvasItemSimple) nob_lc).y = delta_y + start_y + (height / 2) - (nob_size / 2) - stroke;
+
                 debug ("X:%f - Y:%f\n", ((Goo.CanvasItemSimple) selected_item).x, ((Goo.CanvasItemSimple) selected_item).y);
                 break;
             //  case 1: // Top left
@@ -187,7 +234,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
         var item = (target as Goo.CanvasItemSimple);
 
-        var line_width = 1.0 / get_scale ();
+        var line_width = 1.0 / current_scale;
         var stroke = item.line_width;
         var x = item.x - stroke;
         var y = item.y - stroke;
@@ -196,17 +243,79 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
         select_effect = Goo.CanvasRect.create (get_root_item (), x, y, width, height,
                                    "line-width", line_width, 
-                                   "stroke-color", "#333"
+                                   "stroke-color", "#666"
                                    );
 
-        var nob = Goo.CanvasRect.create (get_root_item (), x - 5, y - 5, 10, 10,
+        nob_size = 10 / current_scale;
+        nob_tl = Goo.CanvasRect.create (get_root_item (), x - (nob_size / 2), y - (nob_size / 2), nob_size, nob_size,
+                                "line-width", line_width, 
+                                "stroke-color", "#41c9fd",
+                                "fill-color", "#fff"
+                                );
+
+        nob_tr = Goo.CanvasRect.create (get_root_item (), x + width - (nob_size / 2), y - (nob_size / 2), nob_size, nob_size,
+                                "line-width", line_width, 
+                                "stroke-color", "#41c9fd",
+                                "fill-color", "#fff"
+                                );
+
+        nob_bl = Goo.CanvasRect.create (get_root_item (), x - (nob_size / 2), y + height - (nob_size / 2), nob_size, nob_size,
+                                "line-width", line_width, 
+                                "stroke-color", "#41c9fd",
+                                "fill-color", "#fff"
+                                );
+
+        nob_br = Goo.CanvasRect.create (get_root_item (), x + width - (nob_size / 2), y + height - (nob_size / 2), nob_size, nob_size,
+                                "line-width", line_width, 
+                                "stroke-color", "#41c9fd",
+                                "fill-color", "#fff"
+                                );
+
+        nob_tc = Goo.CanvasRect.create (get_root_item (), x + (width / 2) - (nob_size / 2), y - (nob_size / 2), nob_size, nob_size,
+                                "line-width", line_width, 
+                                "stroke-color", "#41c9fd",
+                                "fill-color", "#fff"
+                                );
+
+        nob_rc = Goo.CanvasRect.create (get_root_item (), 
+                                x + width - (nob_size / 2), 
+                                y + (height / 2) - (nob_size / 2), 
+                                nob_size, 
+                                nob_size,
+                                "line-width", line_width, 
+                                "stroke-color", "#41c9fd",
+                                "fill-color", "#fff"
+                                );
+
+        nob_bc = Goo.CanvasRect.create (get_root_item (), 
+                                x + (width / 2) - (nob_size / 2), 
+                                y + height - (nob_size / 2), 
+                                nob_size, 
+                                nob_size,
+                                "line-width", line_width, 
+                                "stroke-color", "#41c9fd",
+                                "fill-color", "#fff"
+                                );
+
+        nob_lc = Goo.CanvasRect.create (get_root_item (), 
+                                x - (nob_size / 2), 
+                                y + (height / 2) - (nob_size / 2), 
+                                nob_size, 
+                                nob_size,
                                 "line-width", line_width, 
                                 "stroke-color", "#41c9fd",
                                 "fill-color", "#fff"
                                 );
 
         select_effect.can_focus = false;
-        nob.can_focus = false;
+        nob_tl.can_focus = false;
+        nob_tr.can_focus = false;
+        nob_bl.can_focus = false;
+        nob_br.can_focus = false;
+        nob_tc.can_focus = false;
+        nob_rc.can_focus = false;
+        nob_bc.can_focus = false;
+        nob_lc.can_focus = false;
     }
 
     private void remove_select_effect () {
@@ -216,6 +325,15 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
         select_effect.remove ();
         select_effect = null;
+
+        nob_tl.remove ();
+        nob_bl.remove ();
+        nob_tr.remove ();
+        nob_br.remove ();
+        nob_tc.remove ();
+        nob_rc.remove ();
+        nob_bc.remove ();
+        nob_lc.remove ();
     }
 
     private void add_hover_effect (Goo.CanvasItem? target) {
