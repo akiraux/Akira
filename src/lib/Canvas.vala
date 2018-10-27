@@ -78,6 +78,8 @@ public class Akira.Lib.Canvas : Goo.Canvas {
             holding = true;
             add_select_effect (selected_item);
             grab_focus (selected_item);
+        } else {
+            grab_focus (get_root_item ());
         }
 
         return true;
@@ -197,7 +199,14 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                                    "stroke-color", "#333"
                                    );
 
+        var nob = Goo.CanvasRect.create (get_root_item (), x - 5, y - 5, 10, 10,
+                                "line-width", line_width, 
+                                "stroke-color", "#41c9fd",
+                                "fill-color", "#fff"
+                                );
+
         select_effect.can_focus = false;
+        nob.can_focus = false;
     }
 
     private void remove_select_effect () {
@@ -210,7 +219,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     }
 
     private void add_hover_effect (Goo.CanvasItem? target) {
-        if (target == null || hover_effect != null || selected_item == target) {
+        if (target == null || hover_effect != null || target == selected_item || target == select_effect) {
             return;
         }
 
