@@ -21,8 +21,6 @@
 */
 
 public class Akira.Lib.Canvas : Goo.Canvas {
-    public weak Akira.Window window { set; get; }
-
     private const int MIN_SIZE = 40;
 
     /**
@@ -348,9 +346,8 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         }
 
         if (target in nobs) {
-            var display = get_window ().get_display ();
-            var cursor = new Gdk.Cursor.for_display (display, Gdk.CursorType.SIZING);
-            get_window ().set_cursor (cursor);
+            set_cursor_for_nob (target);
+            return;
         }
 
         var item = (target as Goo.CanvasItemSimple);
@@ -371,21 +368,41 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     }
 
     private void remove_hover_effect () {
+        set_cursor (Gdk.CursorType.ARROW);
+
         if (hover_effect == null) {
             return;
         }
 
         hover_effect.remove ();
         hover_effect = null;
-
-        var display = get_window ().get_display ();
-        var cursor = new Gdk.Cursor.for_display (display, Gdk.CursorType.ARROW);
-        get_window ().set_cursor (cursor);
     }
 
-    public static void set_cursor (string cursor_type) {
-        var cursor = new Gdk.Cursor.from_name (Gdk.Display.get_default (), cursor_type);
-        //  window.get_screen ().get_active_window ().set_cursor (cursor);
+    private void set_cursor_for_nob (Goo.CanvasItem? target) {
+        if (target == nob_tl) {
+            set_cursor (Gdk.CursorType.TOP_LEFT_CORNER);
+        } else if (target == nob_tr) {
+            set_cursor (Gdk.CursorType.TOP_RIGHT_CORNER);
+        } else if (target == nob_br) {
+            set_cursor (Gdk.CursorType.BOTTOM_RIGHT_CORNER);
+        } else if (target == nob_bl) {
+            set_cursor (Gdk.CursorType.BOTTOM_LEFT_CORNER);
+        } else if (target == nob_rc) {
+            set_cursor (Gdk.CursorType.RIGHT_SIDE);
+        } else if (target == nob_bc) {
+            set_cursor (Gdk.CursorType.BOTTOM_SIDE);
+        } else if (target == nob_lc) {
+            set_cursor (Gdk.CursorType.LEFT_SIDE);
+        } else if (target == nob_tc) {
+            set_cursor (Gdk.CursorType.TOP_SIDE);
+        } else {
+            set_cursor (Gdk.CursorType.ARROW);
+        }
+    }
+
+    private void set_cursor (Gdk.CursorType cursor_type) {
+        var cursor = new Gdk.Cursor.for_display (Gdk.Display.get_default (), cursor_type);
+        get_window ().get_screen ().get_root_window ().set_cursor (cursor);
     }
 
     // To make it so items can't become imposible to grab. TODOs
