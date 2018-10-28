@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2018 Felipe Escoto (https://github.com/Philip-Scott)
+* Copyright (c) 2018 Alessandro Castellani (https://github.com/Alecaddd)
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public

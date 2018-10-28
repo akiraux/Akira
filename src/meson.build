@@ -46,6 +46,8 @@ executable(
     'Lib/Canvas.vala',
     'Lib/Item.vala',
 
+    'Lib/Selection/Nob.vala',
+
     asresources,
     config_header,
     dependencies: [

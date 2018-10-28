@@ -38,7 +38,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     public weak Goo.CanvasItem? select_effect;
 
     public Goo.CanvasItem[] nobs;
-    private weak Goo.CanvasItem? nob_tl;
+    private Goo.CanvasItem? nob_tl;
     private weak Goo.CanvasItem? nob_tc;
     private weak Goo.CanvasItem? nob_tr;
     private weak Goo.CanvasItem? nob_rc;
@@ -249,11 +249,13 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                                    );
 
         nob_size = 10 / current_scale;
-        nob_tl = Goo.CanvasRect.create (get_root_item (), x - (nob_size / 2), y - (nob_size / 2), nob_size, nob_size,
-                                "line-width", line_width, 
-                                "stroke-color", "#41c9fd",
-                                "fill-color", "#fff"
-                                );
+        //  nob_tl = Goo.CanvasRect.create (get_root_item (), x - (nob_size / 2), y - (nob_size / 2), nob_size, nob_size,
+        //                          "line-width", line_width, 
+        //                          "stroke-color", "#41c9fd",
+        //                          "fill-color", "#fff"
+        //                          );
+
+        nob_tl = new Akira.Lib.Selection.Nob.with_values (get_root_item (), x, y, current_scale);
 
         nob_tr = Goo.CanvasRect.create (get_root_item (), x + width - (nob_size / 2), y - (nob_size / 2), nob_size, nob_size,
                                 "line-width", line_width, 
