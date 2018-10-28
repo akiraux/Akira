@@ -20,7 +20,7 @@
 */
 public class Akira.Layouts.MainCanvas : Gtk.Grid {
 	public Gtk.ScrolledWindow main_scroll;
-	public Gtk.DrawingArea canvas;
+	public Akira.Lib.Canvas canvas;
 	public Gtk.Allocation main_window_size;
 
 	public MainCanvas () {
@@ -32,7 +32,7 @@ public class Akira.Layouts.MainCanvas : Gtk.Grid {
 		main_scroll = new Gtk.ScrolledWindow (null, null);
 		main_scroll.expand = true;
 
-		var canvas = new Akira.Lib.Canvas ();
+		canvas = new Akira.Lib.Canvas ();
         canvas.set_size_request (main_window_size.width, main_window_size.height);
 		canvas.set_bounds (0, 0, 10000, 10000);
 		canvas.set_scale (1.0);

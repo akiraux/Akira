@@ -21,6 +21,8 @@
 */
 
 public class Akira.Lib.Canvas : Goo.Canvas {
+    public weak Akira.Window window { set; get; }
+
     private const int MIN_SIZE = 40;
 
     /**
@@ -36,6 +38,8 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
     public weak Goo.CanvasItem? selected_item;
     public weak Goo.CanvasItem? select_effect;
+
+    public Goo.CanvasItem[] nobs;
     private weak Goo.CanvasItem? nob_tl;
     private weak Goo.CanvasItem? nob_tc;
     private weak Goo.CanvasItem? nob_tr;
@@ -297,12 +301,12 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                                 "fill-color", "#fff"
                                 );
 
-        nob_lc = Goo.CanvasRect.create (get_root_item (), 
-                                x - (nob_size / 2), 
-                                y + (height / 2) - (nob_size / 2), 
-                                nob_size, 
+        nob_lc = Goo.CanvasRect.create (get_root_item (),
+                                x - (nob_size / 2),
+                                y + (height / 2) - (nob_size / 2),
                                 nob_size,
-                                "line-width", line_width, 
+                                nob_size,
+                                "line-width", line_width,
                                 "stroke-color", "#41c9fd",
                                 "fill-color", "#fff"
                                 );
@@ -316,6 +320,8 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         nob_rc.can_focus = false;
         nob_bc.can_focus = false;
         nob_lc.can_focus = false;
+
+        nobs = {nob_tl, nob_tr, nob_bl, nob_br, nob_tc, nob_rc, nob_bc, nob_lc};
     }
 
     private void remove_select_effect () {
@@ -339,6 +345,12 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     private void add_hover_effect (Goo.CanvasItem? target) {
         if (target == null || hover_effect != null || target == selected_item || target == select_effect) {
             return;
+        }
+
+        if (target in nobs) {
+            var display = get_window ().get_display ();
+            var cursor = new Gdk.Cursor.for_display (display, Gdk.CursorType.SIZING);
+            get_window ().set_cursor (cursor);
         }
 
         var item = (target as Goo.CanvasItemSimple);
@@ -365,6 +377,15 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
         hover_effect.remove ();
         hover_effect = null;
+
+        var display = get_window ().get_display ();
+        var cursor = new Gdk.Cursor.for_display (display, Gdk.CursorType.ARROW);
+        get_window ().set_cursor (cursor);
+    }
+
+    public static void set_cursor (string cursor_type) {
+        var cursor = new Gdk.Cursor.from_name (Gdk.Display.get_default (), cursor_type);
+        //  window.get_screen ().get_active_window ().set_cursor (cursor);
     }
 
     // To make it so items can't become imposible to grab. TODOs
