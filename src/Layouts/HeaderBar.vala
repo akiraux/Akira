@@ -99,7 +99,7 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
 		tools.add (new Gtk.MenuItem.with_label(_("Image")));
 		tools.show_all ();
 
-		toolset = new Akira.Partials.MenuButton ("insert-object", _("Insert New Object"), null);
+		toolset = new Akira.Partials.MenuButton ("insert-object", _("Insert New Object"));
 		toolset.popup = tools;
 
 		preferences = new Akira.Partials.HeaderBarButton ("open-menu", _("Settings"), {"<Ctrl>comma"});

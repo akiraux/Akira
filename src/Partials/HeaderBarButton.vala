@@ -23,7 +23,7 @@ public class Akira.Partials.HeaderBarButton : Gtk.Grid {
 	public Gtk.Button button;
 	public Gtk.Image image;
 
-	public HeaderBarButton (string icon_name, string name, string[]? accels) {
+	public HeaderBarButton (string icon_name, string name, string[]? accels = null) {
 		image = new Gtk.Image.from_icon_name (icon_name, Gtk.IconSize.LARGE_TOOLBAR);
 
 		button = new Gtk.Button ();
