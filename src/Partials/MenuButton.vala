@@ -20,55 +20,14 @@
 */
 
 public class Akira.Partials.MenuButton : Gtk.MenuButton {
-	public bool labelled {
-		get {
-			return label_btn.visible;
-		} set {
-			label_btn.visible = value;
-			label_btn.no_show_all = !value;
-
-			if (value) {
-				get_style_context ().add_class ("headerbar-button");
-			} else {
-				get_style_context ().remove_class ("headerbar-button");
-			}
-		}
-	}
-
-	private Gtk.Label label_btn;
-
-	public MenuButton (string icon_name, string name, string tooltip) {
+	public MenuButton (string icon_name, string name, string[]? accels = null) {
 		can_focus = false;
-		valign = Gtk.Align.CENTER;
-		margin_top = 4;
-		margin_bottom = 2;
 
-		Gtk.Image image;
-		var grid = new Gtk.Grid ();
-		label_btn = new Gtk.Label (name);
-		label_btn.margin_top = 2;
-
-		image = new Gtk.Image.from_icon_name (icon_name, Gtk.IconSize.SMALL_TOOLBAR);
-		image.margin = 0;
-
-		grid.attach (image, 0, 0, 1, 1);
-		grid.attach (label_btn, 0, 1, 1, 1);
-		add (grid);
+		var image = new Gtk.Image.from_icon_name (icon_name, Gtk.IconSize.LARGE_TOOLBAR);
+		add (image);
 
 		get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
-		get_style_context ().add_class ("headerbar-button");
-		set_tooltip_text (tooltip);
-	}
 
-	public void toggle () {
-		labelled = !labelled;
-	}
-
-	public void show_labels () {
-		labelled = true;
-	}
-
-	public void hide_labels () {
-		labelled = false;
+		tooltip_markup = Granite.markup_accel_tooltip (accels, name);
 	}
 }

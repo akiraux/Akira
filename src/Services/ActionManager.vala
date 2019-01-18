@@ -44,7 +44,6 @@ public class Akira.Services.ActionManager : Object {
 		{ ACTION_SAVE_AS, action_save_as },
 		{ ACTION_PRESENTATION, action_presentation },
 		{ ACTION_PREFERENCES, action_preferences },
-		{ ACTION_LABELS, action_labels },
 		{ ACTION_QUIT, action_quit },
 	};
 
@@ -73,45 +72,6 @@ public class Akira.Services.ActionManager : Object {
 		foreach (var action in action_accelerators.get_keys ()) {
 			app.set_accels_for_action (ACTION_PREFIX + action, action_accelerators[action].to_array ());
 		}
-	}
-
-	private void action_labels () {
-		window.headerbar.toggle ();
-		window.headerbar.menu.toggle ();
-		window.headerbar.layout.toggle ();
-		window.headerbar.grid.toggle ();
-		window.headerbar.pixel_grid.toggle ();
-		window.headerbar.toolset.toggle ();
-		window.headerbar.preferences.toggle ();
-		window.headerbar.toggle ();
-	}
-
-	public void show_labels () {
-		window.headerbar.toggle ();
-		window.headerbar.menu.show_labels ();
-		window.headerbar.layout.show_labels ();
-		window.headerbar.grid.show_labels ();
-		window.headerbar.pixel_grid.show_labels ();
-		window.headerbar.toolset.show_labels ();
-		window.headerbar.preferences.show_labels ();
-		window.headerbar.toggle ();
-	}
-
-	public void hide_labels () {
-		window.headerbar.toggle ();
-		window.headerbar.menu.hide_labels ();
-		window.headerbar.layout.hide_labels ();
-		window.headerbar.grid.hide_labels ();
-		window.headerbar.pixel_grid.hide_labels ();
-		window.headerbar.toolset.hide_labels ();
-		window.headerbar.preferences.hide_labels ();
-		window.headerbar.toggle ();
-	}
-
-	public void update_icons_style () {
-		window.headerbar.toggle ();
-		window.headerbar.update_icons_style ();
-		window.headerbar.toggle ();
 	}
 
 	private void action_quit () {

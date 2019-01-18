@@ -20,59 +20,25 @@
 */
 
 public class Akira.Partials.HeaderBarButton : Gtk.Grid {
-	public bool labelled {
-		get {
-			return label_btn.visible;
-		} set {
-			label_btn.visible = value;
-			label_btn.no_show_all = !value;
-		}
-	}
-
-	private Gtk.Label label_btn;
 	public Gtk.Button button;
 	public Gtk.Image image;
 
-	public HeaderBarButton (string icon_name, string name, string tooltip) {
-		label_btn = new Gtk.Label (name);
-		label_btn.get_style_context ().add_class ("headerbar-label");
-
-		var size = settings.icon_style == "symbolic" ? Gtk.IconSize.SMALL_TOOLBAR : Gtk.IconSize.LARGE_TOOLBAR;
-
-		image = new Gtk.Image.from_icon_name (icon_name, size);
-		image.margin = 0;
+	public HeaderBarButton (string icon_name, string name, string[]? accels) {
+		image = new Gtk.Image.from_icon_name (icon_name, Gtk.IconSize.LARGE_TOOLBAR);
 
 		button = new Gtk.Button ();
 		button.can_focus = false;
 		button.halign = Gtk.Align.CENTER;
-		button.margin_top = 10;
-		button.set_tooltip_text (tooltip);
 		button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
+		button.tooltip_markup = Granite.markup_accel_tooltip (accels, name);
 		button.add (image);
 
 		attach (button, 0, 0, 1, 1);
-		attach (label_btn, 0, 1, 1, 1);
-
-		button.margin_bottom = 3;
-		margin_bottom = 6;
-	}
-
-	public void toggle () {
-		labelled = !labelled;
-	}
-
-	public void show_labels () {
-		labelled = true;
-	}
-
-	public void hide_labels () {
-		labelled = false;
 	}
 
 	public void update_image (string icon_name) {
-		var size = settings.icon_style == "symbolic" ? Gtk.IconSize.SMALL_TOOLBAR : Gtk.IconSize.LARGE_TOOLBAR;
 		button.remove (image);
-		image = new Gtk.Image.from_icon_name (icon_name, size);
+		image = new Gtk.Image.from_icon_name (icon_name, Gtk.IconSize.LARGE_TOOLBAR);
 		button.add (image);
 		image.show_all ();
 	}

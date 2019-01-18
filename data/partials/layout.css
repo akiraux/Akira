@@ -20,9 +20,9 @@
     background-image: linear-gradient(to top, alpha (@bg_color, 0.3), alpha (@bg_color, 0.9));
 } */
 
-.headerbar-label {
-    font-size: 8pt;
-}
+/*.headerbar-label {*/
+/*    font-size: 8pt;*/
+/*}*/
 
 .border-bottom {
     border-bottom: 1px solid shade (@bg_color, 0.8);

@@ -52,7 +52,6 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
 	construct {
 		set_title (APP_NAME);
 		set_show_close_button (true);
-		get_style_context ().add_class ("default-decoration");
 
 		var menu_items = new Gtk.Menu ();
 
@@ -86,7 +85,7 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
 
 		menu_items.show_all ();
 
-		menu = new Akira.Partials.MenuButton ("document-open", _("Menu"), _("Open Menu"));
+		menu = new Akira.Partials.MenuButton ("document-open", _("Menu"));
 		menu.popup = menu_items;
 
 		var tools = new Gtk.Menu ();
@@ -100,17 +99,18 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
 		tools.add (new Gtk.MenuItem.with_label(_("Image")));
 		tools.show_all ();
 
-		toolset = new Akira.Partials.MenuButton ("insert-object", _("Insert"), _("Insert a New Object"));
+		toolset = new Akira.Partials.MenuButton ("insert-object", _("Insert New Object"), null);
 		toolset.popup = tools;
 
-		preferences = new Akira.Partials.HeaderBarButton ("system-settings-%s".printf (settings.icon_style), _("Settings"), _("Open Settings (Ctrl+,)"));
+		preferences = new Akira.Partials.HeaderBarButton ("open-menu", _("Settings"), {"<Ctrl>,"});
 		preferences.button.action_name = Akira.Services.ActionManager.ACTION_PREFIX + Akira.Services.ActionManager.ACTION_PREFERENCES;
 
-		layout = new Akira.Partials.HeaderBarButton ("layout-panels-%s".printf (settings.icon_style), _("Layout"), _("Toggle Layout (Ctrl+.)"));
+		layout = new Akira.Partials.HeaderBarButton ("layout-panels-filled", _("Toggle Layout"), {"<Ctrl>."});
 		layout.button.action_name = Akira.Services.ActionManager.ACTION_PREFIX + Akira.Services.ActionManager.ACTION_PRESENTATION;
 
-		grid = new Akira.Partials.HeaderBarButton ("layout-grid-%s".printf (settings.icon_style), _("UI Grid"), _("UI Grid (Ctrl+⇧+G)"));
-		pixel_grid = new Akira.Partials.HeaderBarButton ("layout-pixels-%s".printf (settings.icon_style), _("Pixel Grid"), _("Pixel Grid (Ctrl+⇧+P)"));
+		grid = new Akira.Partials.HeaderBarButton ("layout-grid-filled", _("UI Grid"), {"<Shift><Ctrl>g"});
+
+		pixel_grid = new Akira.Partials.HeaderBarButton ("layout-pixels-filled", _("Pixel Grid"), {"<Shift><Ctrl>p"});
 
 		add (menu);
 		add (new Gtk.Separator (Gtk.Orientation.VERTICAL));
@@ -131,13 +131,6 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
 
 	public void button_sensitivity () {
 		// dinamically toggle button sensitivity based on document status or actor selected.
-	}
-
-	public void update_icons_style () {
-		layout.update_image ("layout-panels-%s".printf (settings.icon_style));
-		grid.update_image ("layout-grid-%s".printf (settings.icon_style));
-		pixel_grid.update_image ("layout-pixels-%s".printf (settings.icon_style));
-		preferences.update_image ("system-settings-%s".printf (settings.icon_style));
 	}
 
 	public void toggle () {
