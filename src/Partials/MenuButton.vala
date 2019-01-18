@@ -21,7 +21,6 @@
 
 public class Akira.Partials.MenuButton : Gtk.MenuButton {
 	public MenuButton (string icon_name, string name, string[]? accels = null) {
-		can_focus = false;
 		get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
 		image = new Gtk.Image.from_icon_name (icon_name, Gtk.IconSize.LARGE_TOOLBAR);
 		tooltip_markup = Granite.markup_accel_tooltip (accels, name);

@@ -21,9 +21,7 @@
 
 public class Akira.Partials.HeaderBarButton : Gtk.Button {
 	public HeaderBarButton (string icon_name, string name, string[]? accels = null) {
-		can_focus = false;
 		get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
-		halign = Gtk.Align.CENTER;
 		image = new Gtk.Image.from_icon_name (icon_name, Gtk.IconSize.LARGE_TOOLBAR);
 		tooltip_markup = Granite.markup_accel_tooltip (accels, name);
 	}
