@@ -103,10 +103,10 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
 		toolset.popup = tools;
 
 		preferences = new Akira.Partials.HeaderBarButton ("open-menu", _("Settings"), {"<Ctrl>comma"});
-		preferences.button.action_name = Akira.Services.ActionManager.ACTION_PREFIX + Akira.Services.ActionManager.ACTION_PREFERENCES;
+		preferences.action_name = Akira.Services.ActionManager.ACTION_PREFIX + Akira.Services.ActionManager.ACTION_PREFERENCES;
 
 		layout = new Akira.Partials.HeaderBarButton ("layout-panels-filled", _("Toggle Layout"), {"<Ctrl>period"});
-		layout.button.action_name = Akira.Services.ActionManager.ACTION_PREFIX + Akira.Services.ActionManager.ACTION_PRESENTATION;
+		layout.action_name = Akira.Services.ActionManager.ACTION_PREFIX + Akira.Services.ActionManager.ACTION_PRESENTATION;
 
 		grid = new Akira.Partials.HeaderBarButton ("layout-grid-filled", _("UI Grid"), {"<Shift><Ctrl>g"});
 

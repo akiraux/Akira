@@ -19,27 +19,12 @@
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
 
-public class Akira.Partials.HeaderBarButton : Gtk.Grid {
-	public Gtk.Button button;
-	public Gtk.Image image;
-
+public class Akira.Partials.HeaderBarButton : Gtk.Button {
 	public HeaderBarButton (string icon_name, string name, string[]? accels = null) {
+		can_focus = false;
+		get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
+		halign = Gtk.Align.CENTER;
 		image = new Gtk.Image.from_icon_name (icon_name, Gtk.IconSize.LARGE_TOOLBAR);
-
-		button = new Gtk.Button ();
-		button.can_focus = false;
-		button.halign = Gtk.Align.CENTER;
-		button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
-		button.tooltip_markup = Granite.markup_accel_tooltip (accels, name);
-		button.add (image);
-
-		attach (button, 0, 0, 1, 1);
-	}
-
-	public void update_image (string icon_name) {
-		button.remove (image);
-		image = new Gtk.Image.from_icon_name (icon_name, Gtk.IconSize.LARGE_TOOLBAR);
-		button.add (image);
-		image.show_all ();
+		tooltip_markup = Granite.markup_accel_tooltip (accels, name);
 	}
 }
