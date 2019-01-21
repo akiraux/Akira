@@ -1,0 +1,65 @@
+matrix:
+  include:
+  - language: bash
+
+  dist: xenial
+
+  env:
+    global:
+      - LC_ALL: C.UTF-8
+      - LANG: C.UTF-8
+
+  addons:
+    snaps:
+      - name: snapcraft
+        channel: stable
+        classic: true
+      - name: http
+      - name: transfer
+
+  script:
+    - sudo apt update
+    - snapcraft --destructive-mode
+  after_success:
+    - cp *.snap "$(echo "$TRAVIS_REPO_SLUG" | sed -e 's|.*/\(.*\)|\1|')-pr$TRAVIS_PULL_REQUEST.snap"
+    - timeout 180 /snap/bin/transfer "$(echo "$TRAVIS_REPO_SLUG" | sed -e 's|.*/\(.*\)|\1|')-pr$TRAVIS_PULL_REQUEST.snap"
+  after_failure:
+    - sudo journalctl -u snapd
+    - http https://api.snapcraft.io/v2/snaps/info/core architecture==amd64 Snap-Device-Series:16
+
+  include:
+  - language: node_js
+
+  node_js:
+    - lts/*
+
+  sudo: required
+
+  services:
+    - docker
+
+  addons:
+    apt:
+      sources:
+        - ubuntu-toolchain-r-test
+      packages:
+        - libstdc++-5-dev
+
+  cache:
+    directories:
+      - /tmp/liftoff
+
+  matrix:
+    include:
+      - env: DIST=juno
+
+  install:
+    - npm install @elementaryos/houston
+
+  script:
+    - houston ci
+      --distribution $DIST
+
+  branches:
+    only:
+    - master
