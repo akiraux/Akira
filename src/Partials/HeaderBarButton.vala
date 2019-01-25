@@ -33,7 +33,7 @@ public class Akira.Partials.HeaderBarButton : Gtk.Grid {
 	public Gtk.Button button;
 	public Gtk.Image image;
 
-	public HeaderBarButton (string icon_name, string name, string tooltip) {
+	public HeaderBarButton (string icon_name, string name) {
 		label_btn = new Gtk.Label (name);
 		label_btn.get_style_context ().add_class ("headerbar-label");
 
@@ -46,7 +46,6 @@ public class Akira.Partials.HeaderBarButton : Gtk.Grid {
 		button.can_focus = false;
 		button.halign = Gtk.Align.CENTER;
 		button.margin_top = 10;
-		button.set_tooltip_text (tooltip);
 		button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
 		button.add (image);
 

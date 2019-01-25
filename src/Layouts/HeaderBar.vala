@@ -58,30 +58,25 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
 
 		var new_window = new Gtk.MenuItem.with_label (_("New Window"));
 		new_window.action_name = Akira.Services.ActionManager.ACTION_PREFIX + Akira.Services.ActionManager.ACTION_NEW_WINDOW;
-		new_window.add_accelerator ("activate", window.accel_group, Gdk.keyval_from_name("N"), Gdk.ModifierType.CONTROL_MASK, Gtk.AccelFlags.VISIBLE);
 		menu_items.add (new_window);
 		menu_items.add (new Gtk.SeparatorMenuItem ());
 
 		var open = new Gtk.MenuItem.with_label (_("Open"));
 		open.action_name = Akira.Services.ActionManager.ACTION_PREFIX + Akira.Services.ActionManager.ACTION_OPEN;
-		open.add_accelerator ("activate", window.accel_group, Gdk.keyval_from_name("O"), Gdk.ModifierType.CONTROL_MASK, Gtk.AccelFlags.VISIBLE);
 		menu_items.add (open);
 
 		var save = new Gtk.MenuItem.with_label (_("Save"));
 		save.action_name = Akira.Services.ActionManager.ACTION_PREFIX + Akira.Services.ActionManager.ACTION_SAVE;
-		save.add_accelerator ("activate", window.accel_group, Gdk.keyval_from_name("S"), Gdk.ModifierType.CONTROL_MASK, Gtk.AccelFlags.VISIBLE);
 		menu_items.add (save);
 
 		var save_as = new Gtk.MenuItem.with_label (_("Save As"));
 		save_as.action_name = Akira.Services.ActionManager.ACTION_PREFIX + Akira.Services.ActionManager.ACTION_SAVE_AS;
-		save_as.add_accelerator ("activate", window.accel_group, Gdk.keyval_from_name("S"), Gdk.ModifierType.CONTROL_MASK + Gdk.ModifierType.SHIFT_MASK, Gtk.AccelFlags.VISIBLE);
 		menu_items.add (save_as);
 
 		menu_items.add (new Gtk.SeparatorMenuItem ());
 
 		var quit = new Gtk.MenuItem.with_label(_("Quit"));
 		quit.action_name = Akira.Services.ActionManager.ACTION_PREFIX + Akira.Services.ActionManager.ACTION_QUIT;
-		quit.add_accelerator ("activate", window.accel_group, Gdk.keyval_from_name("Q"), Gdk.ModifierType.CONTROL_MASK, Gtk.AccelFlags.VISIBLE);
 		menu_items.add (quit);
 
 		menu_items.show_all ();
@@ -103,14 +98,35 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
 		toolset = new Akira.Partials.MenuButton ("insert-object", _("Insert"), _("Insert a New Object"));
 		toolset.popup = tools;
 
-		preferences = new Akira.Partials.HeaderBarButton ("system-settings-%s".printf (settings.icon_style), _("Settings"), _("Open Settings (Ctrl+,)"));
+		var application_instance = (Gtk.Application) GLib.Application.get_default ();
+
+		preferences = new Akira.Partials.HeaderBarButton ("system-settings-%s".printf (settings.icon_style), _("Settings"));
 		preferences.button.action_name = Akira.Services.ActionManager.ACTION_PREFIX + Akira.Services.ActionManager.ACTION_PREFERENCES;
+		preferences.tooltip_markup = Granite.markup_accel_tooltip (
+			application_instance.get_accels_for_action (preferences.button.action_name),
+			_("Open Settings")
+		);
 
-		layout = new Akira.Partials.HeaderBarButton ("layout-panels-%s".printf (settings.icon_style), _("Layout"), _("Toggle Layout (Ctrl+.)"));
+		layout = new Akira.Partials.HeaderBarButton ("layout-panels-%s".printf (settings.icon_style), _("Layout"));
 		layout.button.action_name = Akira.Services.ActionManager.ACTION_PREFIX + Akira.Services.ActionManager.ACTION_PRESENTATION;
+		layout.tooltip_markup = Granite.markup_accel_tooltip (
+			application_instance.get_accels_for_action (layout.button.action_name),
+			_("Toggle Layout")
+		);
 
-		grid = new Akira.Partials.HeaderBarButton ("layout-grid-%s".printf (settings.icon_style), _("UI Grid"), _("UI Grid (Ctrl+⇧+G)"));
-		pixel_grid = new Akira.Partials.HeaderBarButton ("layout-pixels-%s".printf (settings.icon_style), _("Pixel Grid"), _("Pixel Grid (Ctrl+⇧+P)"));
+		grid = new Akira.Partials.HeaderBarButton ("layout-grid-%s".printf (settings.icon_style), _("UI Grid"));
+		grid.button.action_name = Akira.Services.ActionManager.ACTION_PREFIX + Akira.Services.ActionManager.ACTION_SHOW_UI_GRID;
+		grid.tooltip_markup = Granite.markup_accel_tooltip (
+			application_instance.get_accels_for_action (grid.button.action_name),
+			_("UI Grid")
+		);
+
+		pixel_grid = new Akira.Partials.HeaderBarButton ("layout-pixels-%s".printf (settings.icon_style), _("Pixel Grid"));
+		pixel_grid.button.action_name = Akira.Services.ActionManager.ACTION_PREFIX + Akira.Services.ActionManager.ACTION_SHOW_PIXEL_GRID;
+		pixel_grid.tooltip_markup = Granite.markup_accel_tooltip (
+			application_instance.get_accels_for_action (pixel_grid.button.action_name),
+			_("Pixel Grid")
+		);
 
 		add (menu);
 		add (new Gtk.Separator (Gtk.Orientation.VERTICAL));
