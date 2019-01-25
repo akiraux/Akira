@@ -52,7 +52,7 @@ executable(
     config_header,
     dependencies: [
         dependency('gtk+-3.0'),
-        dependency('granite', version: '>= 5.2.0')
+        dependency('granite', version: '>= 5.2.0'),
         dependency('gee-0.8'),
         dependency('libxml-2.0'),
         dependency('gtksourceview-3.0'),
