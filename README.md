@@ -3,6 +3,12 @@
 
 [![Build Status](https://travis-ci.org/Alecaddd/Akira.svg?branch=master)](https://travis-ci.org/Alecaddd/Akira)
 
+
+## Akira Kickstarter Campaign
+Help us fund the development of Akira and make this app a reality!
+[Akira on Kickstarter](https://www.kickstarter.com/projects/alecaddd/akira-the-linux-design-tool)
+
+
 **WARNING!!! AKIRA IS CURRENTLY IN EARLY DEVELOPMENT, NOT READY TO BE USED!**
 
 Akira is a native Linux Design application built in Vala and GTK. Akira focuses on offering a modern and fast approach to UI and UX Design, mainly targeting web designers and graphic designers.
