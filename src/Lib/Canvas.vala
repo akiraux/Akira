@@ -249,13 +249,13 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                                    );
 
         nob_size = 10 / current_scale;
-        //  nob_tl = Goo.CanvasRect.create (get_root_item (), x - (nob_size / 2), y - (nob_size / 2), nob_size, nob_size,
-        //                          "line-width", line_width, 
-        //                          "stroke-color", "#41c9fd",
-        //                          "fill-color", "#fff"
-        //                          );
+        nob_tl = Goo.CanvasRect.create (get_root_item (), x - (nob_size / 2), y - (nob_size / 2), nob_size, nob_size,
+                                "line-width", line_width, 
+                                "stroke-color", "#41c9fd",
+                                "fill-color", "#fff"
+                                );
 
-        nob_tl = new Akira.Lib.Selection.Nob.with_values (get_root_item (), x, y, current_scale);
+        //  nob_tl = new Akira.Lib.Selection.Nob.with_values (get_root_item (), x, y, current_scale);
 
         nob_tr = Goo.CanvasRect.create (get_root_item (), x + width - (nob_size / 2), y - (nob_size / 2), nob_size, nob_size,
                                 "line-width", line_width, 
