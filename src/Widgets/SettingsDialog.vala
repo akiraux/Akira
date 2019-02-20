@@ -25,8 +25,7 @@ public class Akira.Widgets.SettingsDialog : Gtk.Dialog {
 	private Gtk.Stack main_stack;
 	private Gtk.Switch dark_theme_switch;
 	private Gtk.Switch label_switch;
-	private Gee.HashMap<int, string> icon_types;
-	private Gtk.ComboBox icon_combo_box;
+	private Gtk.Switch symbolic_switch;
 
 	enum Column {
 		ICONTYPE
@@ -114,43 +113,11 @@ public class Akira.Widgets.SettingsDialog : Gtk.Dialog {
 			}
 		});
 		
-		content_grid.attach (new SettingsLabel (_("Select Icon Style:")), 0, 4, 1, 1);
+		content_grid.attach (new SettingsLabel (_("Use Symbolic Icons:")), 0, 4, 1, 1);
+		symbolic_switch = new SettingsSwitch ("use-symbolic");
+		content_grid.attach (symbolic_switch, 1, 4, 1, 1);
 
-		icon_types = new Gee.HashMap<int, string> ();
-		icon_types.set (0, "filled");
-		icon_types.set (1, "lineart");
-		icon_types.set (2, "symbolic");
-
-		var list_store = new Gtk.ListStore (1, typeof (string));
-
-		for (int i = 0; i < icon_types.size; i++){
-			Gtk.TreeIter iter;
-			list_store.append (out iter);
-			list_store.set (iter, Column.ICONTYPE, icon_types[i]);
-		}
-
-		icon_combo_box = new Gtk.ComboBox.with_model (list_store);
-		var cell = new Gtk.CellRendererText ();
-		icon_combo_box.pack_start (cell, false);
-
-		icon_combo_box.set_attributes (cell, "text", Column.ICONTYPE);
-		icon_combo_box.set_active (0);
-
-		foreach (var entry in icon_types.entries) {
-			if (entry.value == settings.icon_style) {
-				icon_combo_box.set_active (entry.key);
-			}
-		}
-
-		//  icons_combo_box = new Gtk.ComboBoxText ();
-		//  icons_combo_box.append_text ("filled");
-		//  icons_combo_box.append_text ("lineart");
-		//  icons_combo_box.append_text ("symbolic");
-		//  icons_combo_box.active_id = settings.icon_style;
-		content_grid.attach (icon_combo_box, 1, 4, 1, 1);
-
-		icon_combo_box.changed.connect (() => {
-			settings.icon_style = icon_types[icon_combo_box.get_active ()];
+		symbolic_switch.notify["active"].connect (() => {
 			window.action_manager.update_icons_style ();
 		});
 

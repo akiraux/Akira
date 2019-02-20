@@ -29,9 +29,8 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
 	public Akira.Partials.MenuButton menu;
 	public Akira.Partials.MenuButton toolset;
 	public Akira.Partials.HeaderBarButton preferences;
+	public Akira.Partials.HeaderBarButton export;
 	public Akira.Partials.HeaderBarButton layout;
-	public Akira.Partials.HeaderBarButton grid;
-	public Akira.Partials.HeaderBarButton pixel_grid;
 
 	public bool toggled {
 		get {
@@ -81,8 +80,8 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
 
 		menu_items.show_all ();
 
-		menu = new Akira.Partials.MenuButton ("document-open", _("Menu"), _("Open Menu"));
-		menu.popup = menu_items;
+		menu = new Akira.Partials.MenuButton ("document-open", _("Menu"), null);
+		menu.button.popup = menu_items;
 
 		var tools = new Gtk.Menu ();
 		tools.add (new Gtk.MenuItem.with_label(_("Artboard")));
@@ -95,38 +94,14 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
 		tools.add (new Gtk.MenuItem.with_label(_("Image")));
 		tools.show_all ();
 
-		toolset = new Akira.Partials.MenuButton ("insert-object", _("Insert"), _("Insert a New Object"));
-		toolset.popup = tools;
+		toolset = new Akira.Partials.MenuButton ("insert-object", _("Insert"), null);
+		toolset.button.popup = tools;
 
-		var application_instance = (Gtk.Application) GLib.Application.get_default ();
-
-		preferences = new Akira.Partials.HeaderBarButton ("system-settings-%s".printf (settings.icon_style), _("Settings"));
+		preferences = new Akira.Partials.HeaderBarButton ("open-menu", _("Settings"), {"<Ctrl>comma"});
 		preferences.button.action_name = Akira.Services.ActionManager.ACTION_PREFIX + Akira.Services.ActionManager.ACTION_PREFERENCES;
-		preferences.tooltip_markup = Granite.markup_accel_tooltip (
-			application_instance.get_accels_for_action (preferences.button.action_name),
-			_("Open Settings")
-		);
 
-		layout = new Akira.Partials.HeaderBarButton ("layout-panels-%s".printf (settings.icon_style), _("Layout"));
-		layout.button.action_name = Akira.Services.ActionManager.ACTION_PREFIX + Akira.Services.ActionManager.ACTION_PRESENTATION;
-		layout.tooltip_markup = Granite.markup_accel_tooltip (
-			application_instance.get_accels_for_action (layout.button.action_name),
-			_("Toggle Layout")
-		);
-
-		grid = new Akira.Partials.HeaderBarButton ("layout-grid-%s".printf (settings.icon_style), _("UI Grid"));
-		grid.button.action_name = Akira.Services.ActionManager.ACTION_PREFIX + Akira.Services.ActionManager.ACTION_SHOW_UI_GRID;
-		grid.tooltip_markup = Granite.markup_accel_tooltip (
-			application_instance.get_accels_for_action (grid.button.action_name),
-			_("UI Grid")
-		);
-
-		pixel_grid = new Akira.Partials.HeaderBarButton ("layout-pixels-%s".printf (settings.icon_style), _("Pixel Grid"));
-		pixel_grid.button.action_name = Akira.Services.ActionManager.ACTION_PREFIX + Akira.Services.ActionManager.ACTION_SHOW_PIXEL_GRID;
-		pixel_grid.tooltip_markup = Granite.markup_accel_tooltip (
-			application_instance.get_accels_for_action (pixel_grid.button.action_name),
-			_("Pixel Grid")
-		);
+		export = new Akira.Partials.HeaderBarButton ("document-export", _("Export"), {"<Ctrl><Shift>E"});
+		export.button.action_name = Akira.Services.ActionManager.ACTION_PREFIX + Akira.Services.ActionManager.ACTION_EXPORT;
 
 		add (menu);
 		add (new Gtk.Separator (Gtk.Orientation.VERTICAL));
@@ -134,9 +109,7 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
 		add (new Gtk.Separator (Gtk.Orientation.VERTICAL));
 		pack_end (preferences);
 		pack_end (new Gtk.Separator (Gtk.Orientation.VERTICAL));
-		pack_end (layout);
-		pack_end (grid);
-		pack_end (pixel_grid);
+		pack_end (export);
 
 		build_signals ();
 	}
@@ -150,10 +123,10 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
 	}
 
 	public void update_icons_style () {
-		layout.update_image ("layout-panels-%s".printf (settings.icon_style));
-		grid.update_image ("layout-grid-%s".printf (settings.icon_style));
-		pixel_grid.update_image ("layout-pixels-%s".printf (settings.icon_style));
-		preferences.update_image ("system-settings-%s".printf (settings.icon_style));
+		menu.update_image ();
+		toolset.update_image ();
+		export.update_image ();
+		preferences.update_image ();
 	}
 
 	public void toggle () {

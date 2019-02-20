@@ -34,6 +34,7 @@ public class Akira.Services.ActionManager : Object {
 	public const string ACTION_SHOW_UI_GRID = "action-show-ui-grid";
 	public const string ACTION_PRESENTATION = "action_presentation";
 	public const string ACTION_PREFERENCES = "action_preferences";
+	public const string ACTION_EXPORT = "action_export";
 	public const string ACTION_LABELS = "action_labels";
 	public const string ACTION_QUIT = "action_quit";
 
@@ -48,6 +49,7 @@ public class Akira.Services.ActionManager : Object {
 		{ ACTION_SHOW_UI_GRID, action_show_ui_grid },
 		{ ACTION_PRESENTATION, action_presentation },
 		{ ACTION_PREFERENCES, action_preferences },
+		{ ACTION_EXPORT, action_export },
 		{ ACTION_LABELS, action_labels },
 		{ ACTION_QUIT, action_quit },
 	};
@@ -68,6 +70,7 @@ public class Akira.Services.ActionManager : Object {
 		action_accelerators.set (ACTION_SHOW_UI_GRID, "<Control><Shift>g");
 		action_accelerators.set (ACTION_PRESENTATION, "<Control>period");
 		action_accelerators.set (ACTION_PREFERENCES, "<Control>comma");
+		action_accelerators.set (ACTION_EXPORT, "<Control><Shift>e");
 		action_accelerators.set (ACTION_QUIT, "<Control>q");
 	}
 
@@ -84,33 +87,27 @@ public class Akira.Services.ActionManager : Object {
 	private void action_labels () {
 		window.headerbar.toggle ();
 		window.headerbar.menu.toggle ();
-		window.headerbar.layout.toggle ();
-		window.headerbar.grid.toggle ();
-		window.headerbar.pixel_grid.toggle ();
 		window.headerbar.toolset.toggle ();
 		window.headerbar.preferences.toggle ();
+		window.headerbar.export.toggle ();
 		window.headerbar.toggle ();
 	}
 
 	public void show_labels () {
 		window.headerbar.toggle ();
 		window.headerbar.menu.show_labels ();
-		window.headerbar.layout.show_labels ();
-		window.headerbar.grid.show_labels ();
-		window.headerbar.pixel_grid.show_labels ();
 		window.headerbar.toolset.show_labels ();
 		window.headerbar.preferences.show_labels ();
+		window.headerbar.export.show_labels ();
 		window.headerbar.toggle ();
 	}
 
 	public void hide_labels () {
 		window.headerbar.toggle ();
 		window.headerbar.menu.hide_labels ();
-		window.headerbar.layout.hide_labels ();
-		window.headerbar.grid.hide_labels ();
-		window.headerbar.pixel_grid.hide_labels ();
 		window.headerbar.toolset.hide_labels ();
 		window.headerbar.preferences.hide_labels ();
+		window.headerbar.export.hide_labels ();
 		window.headerbar.toggle ();
 	}
 
@@ -154,18 +151,22 @@ public class Akira.Services.ActionManager : Object {
 	private void action_show_ui_grid () {
 		warning ("show UI grid");
 	}
-
+	
 	private void action_preferences () {
 		if (window.settings_dialog == null) {
 			window.settings_dialog = new Akira.Widgets.SettingsDialog (window);
 			window.settings_dialog.show_all ();
-
+			
 			window.settings_dialog.destroy.connect (() => {
 				window.settings_dialog = null;
 			});
 		}
-
+		
 		window.settings_dialog.present ();
+	}
+	
+	private void action_export () {
+		warning ("export");
 	}
 
 	public static void action_from_group (string action_name, ActionGroup? action_group) {

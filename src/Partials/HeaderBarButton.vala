@@ -33,13 +33,14 @@ public class Akira.Partials.HeaderBarButton : Gtk.Grid {
 	public Gtk.Button button;
 	public Gtk.Image image;
 
-	public HeaderBarButton (string icon_name, string name) {
+	public HeaderBarButton (string icon_name, string name, string[]? accels = null) {
 		label_btn = new Gtk.Label (name);
 		label_btn.get_style_context ().add_class ("headerbar-label");
 
-		var size = settings.icon_style == "symbolic" ? Gtk.IconSize.SMALL_TOOLBAR : Gtk.IconSize.LARGE_TOOLBAR;
+		var size = settings.use_symbolic == true ? Gtk.IconSize.SMALL_TOOLBAR : Gtk.IconSize.LARGE_TOOLBAR;
+		var icon = settings.use_symbolic == true ? ("%s-symbolic".printf (icon_name)) : icon_name;
 
-		image = new Gtk.Image.from_icon_name (icon_name, size);
+		image = new Gtk.Image.from_icon_name (icon, size);
 		image.margin = 0;
 
 		button = new Gtk.Button ();
@@ -48,6 +49,7 @@ public class Akira.Partials.HeaderBarButton : Gtk.Grid {
 		button.margin_top = 10;
 		button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
 		button.add (image);
+		button.tooltip_markup = Granite.markup_accel_tooltip (accels, name);
 
 		attach (button, 0, 0, 1, 1);
 		attach (label_btn, 0, 1, 1, 1);
@@ -68,10 +70,11 @@ public class Akira.Partials.HeaderBarButton : Gtk.Grid {
 		labelled = false;
 	}
 
-	public void update_image (string icon_name) {
-		var size = settings.icon_style == "symbolic" ? Gtk.IconSize.SMALL_TOOLBAR : Gtk.IconSize.LARGE_TOOLBAR;
+	public void update_image () {
+		var size = settings.use_symbolic == true ? Gtk.IconSize.SMALL_TOOLBAR : Gtk.IconSize.LARGE_TOOLBAR;
+		var new_icon = settings.use_symbolic == true ? ("%s-symbolic".printf (image.icon_name)) : image.icon_name.replace ("-symbolic", "");
 		button.remove (image);
-		image = new Gtk.Image.from_icon_name (icon_name, size);
+		image = new Gtk.Image.from_icon_name (new_icon, size);
 		button.add (image);
 		image.show_all ();
 	}

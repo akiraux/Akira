@@ -19,45 +19,43 @@
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
 
-public class Akira.Partials.MenuButton : Gtk.MenuButton {
+public class Akira.Partials.MenuButton : Gtk.Grid {
 	public bool labelled {
 		get {
 			return label_btn.visible;
 		} set {
 			label_btn.visible = value;
 			label_btn.no_show_all = !value;
-
-			if (value) {
-				get_style_context ().add_class ("headerbar-button");
-			} else {
-				get_style_context ().remove_class ("headerbar-button");
-			}
 		}
 	}
 
 	private Gtk.Label label_btn;
+	public Gtk.MenuButton button;
+	public Gtk.Image image;
 
-	public MenuButton (string icon_name, string name, string tooltip) {
-		can_focus = false;
-		valign = Gtk.Align.CENTER;
-		margin_top = 4;
-		margin_bottom = 2;
-
-		Gtk.Image image;
-		var grid = new Gtk.Grid ();
+	public MenuButton (string icon_name, string name, string[]? accels = null) {
 		label_btn = new Gtk.Label (name);
-		label_btn.margin_top = 2;
+		label_btn.get_style_context ().add_class ("headerbar-label");
 
-		image = new Gtk.Image.from_icon_name (icon_name, Gtk.IconSize.SMALL_TOOLBAR);
+		var size = settings.use_symbolic == true ? Gtk.IconSize.SMALL_TOOLBAR : Gtk.IconSize.LARGE_TOOLBAR;
+		var icon = settings.use_symbolic == true ? ("%s-symbolic".printf (icon_name)) : icon_name;
+
+		image = new Gtk.Image.from_icon_name (icon, size);
 		image.margin = 0;
 
-		grid.attach (image, 0, 0, 1, 1);
-		grid.attach (label_btn, 0, 1, 1, 1);
-		add (grid);
+		button = new Gtk.MenuButton ();
+		button.can_focus = false;
+		button.halign = Gtk.Align.CENTER;
+		button.margin_top = 10;
+		button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
+		button.add (image);
+		button.tooltip_markup = Granite.markup_accel_tooltip (accels, name);
 
-		get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
-		get_style_context ().add_class ("headerbar-button");
-		set_tooltip_text (tooltip);
+		attach (button, 0, 0, 1, 1);
+		attach (label_btn, 0, 1, 1, 1);
+
+		button.margin_bottom = 3;
+		margin_bottom = 6;
 	}
 
 	public void toggle () {
@@ -70,5 +68,14 @@ public class Akira.Partials.MenuButton : Gtk.MenuButton {
 
 	public void hide_labels () {
 		labelled = false;
+	}
+
+	public void update_image () {
+		var size = settings.use_symbolic == true ? Gtk.IconSize.SMALL_TOOLBAR : Gtk.IconSize.LARGE_TOOLBAR;
+		var new_icon = settings.use_symbolic == true ? ("%s-symbolic".printf (image.icon_name)) : image.icon_name.replace ("-symbolic", "");
+		button.remove (image);
+		image = new Gtk.Image.from_icon_name (new_icon, size);
+		button.add (image);
+		image.show_all ();
 	}
 }
