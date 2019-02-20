@@ -58,6 +58,7 @@ executable(
         dependency('gtksourceview-3.0'),
         dependency('cairo', version: '>=1.14'),
         dependency('goocanvas-2.0'),
+        m_dep
     ],
     install: true
 )

@@ -1,20 +1,20 @@
 /*
-* Copyright (c) 2018 Alecaddd (http://alecaddd.com)
+* Copyright (c) 2019 Alecaddd (http://alecaddd.com)
 *
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public
-* License as published by the Free Software Foundation; either
-* version 2 of the License, or (at your option) any later version.
+* This file is part of Akira.
 *
-* This program is distributed in the hope that it will be useful,
+* Akira is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+
+* Akira is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* General Public License for more details.
-*
-* You should have received a copy of the GNU General Public
-* License along with this program; if not, write to the
-* Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
-* Boston, MA 02110-1301 USA
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+
+* You should have received a copy of the GNU General Public License
+* along with Akira.  If not, see <https://www.gnu.org/licenses/>.
 *
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
@@ -38,15 +38,32 @@ public class Akira.Layouts.MainCanvas : Gtk.Grid {
 		canvas.set_scale (1.0);
 
         var root = canvas.get_root_item ();
-		var text = Goo.CanvasText.create (root, "Add text here", 20, 20, 200, Goo.CanvasAnchorType.NW, "font", "Open Sans 18");
-
-        var rect_item = Goo.CanvasRect.create (root, 100, 100, 400, 400,
+		var rect = new Goo.CanvasRect (null, 100.0, 100.0, 400.0, 400.0,
                                    "line-width", 5.0,
                                    "radius-x", 100.0,
                                    "radius-y", 100.0,
-                                   "stroke-color", "yellow",
-                                   "fill-color", "#a8eb12"
-								   );
+                                   "stroke-color", "#f37329",
+                                   "fill-color", "#ffa154", null);
+        rect.set ("parent", root);
+
+        var rect2 = new Goo.CanvasRect (null, 50, 100, 200, 100,
+            "line-width", 5.0,
+            "stroke-color", "#64baff",
+            "fill-color", "#3689e6");
+
+        rect2.set ("parent", root);
+
+        var rect3 = new Goo.CanvasRect (null, 0, 0, 64, 64,
+            "radius-x", 32.0,
+            "radius-y", 32.0,
+            "line-width", 5.0,
+            "stroke-color", "#9bdb4d",
+            "fill-color", "#68b723");
+
+        rect3.set ("parent", root);
+
+        var text = new Goo.CanvasText (null, "Add text here", 20, 20, 200, Goo.CanvasAnchorType.NW, "font", "Open Sans 18");
+        text.set ("parent", root);
 
 		main_scroll.add (canvas);
 
