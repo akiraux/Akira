@@ -1,12 +1,12 @@
 # ![Akira](akira-logo-transparent.png)
 > The Linux Design Tool
 
-[![Build Status](https://travis-ci.org/Alecaddd/Akira.svg?branch=master)](https://travis-ci.org/Alecaddd/Akira)
+[![Build Status](https://travis-ci.org/akiraux/akira.svg?branch=master)](https://travis-ci.org/akiraux/akira)
 
 
 ## Akira Kickstarter Campaign
 Help us fund the development of Akira and make this app a reality!
-[Akira on Kickstarter](https://www.kickstarter.com/projects/alecaddd/akira-the-linux-design-tool)
+[Akira on Kickstarter](https://www.kickstarter.com/projects/akiraux/akira-the-linux-design-tool)
 
 
 **WARNING!!! AKIRA IS CURRENTLY IN EARLY DEVELOPMENT, NOT READY TO BE USED!**

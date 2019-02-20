@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Copyright (c) 2017 Alessandro Castellani (https://github.com/Alecaddd/akira) -->
+<!-- Copyright (c) 2017 Alessandro Castellani (https://github.com/akiraux/akira) -->
 <component type="desktop">
   <id>com.github.akiraux.akira.desktop</id>
   <metadata_license>CC0-1.0</metadata_license>
@@ -39,22 +39,22 @@
   </releases>
   <screenshots>
     <screenshot type="default">
-      <image>https://raw.githubusercontent.com/Alecaddd/akira/master/akira-screenshot.png</image>
+      <image>https://raw.githubusercontent.com/akiraux/akira/master/akira-screenshot.png</image>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/Alecaddd/akira/master/akira-screenshot1.png</image>
+      <image>https://raw.githubusercontent.com/akiraux/akira/master/akira-screenshot1.png</image>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/Alecaddd/akira/master/akira-screenshot2.png</image>
+      <image>https://raw.githubusercontent.com/akiraux/akira/master/akira-screenshot2.png</image>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/Alecaddd/akira/master/akira-screenshot3.png</image>
+      <image>https://raw.githubusercontent.com/akiraux/akira/master/akira-screenshot3.png</image>
     </screenshot>
   </screenshots>
   <developer_name>Alessandro Castellani</developer_name>
-  <url type="homepage">https://github.com/Alecaddd/akira</url>
-  <url type="bugtracker">https://github.com/Alecaddd/akira/issues</url>
-  <url type="help">https://github.com/Alecaddd/akira/issues</url>
+  <url type="homepage">https://github.com/akiraux/akira</url>
+  <url type="bugtracker">https://github.com/akiraux/akira/issues</url>
+  <url type="help">https://github.com/akiraux/akira/issues</url>
   <update_contact>castellani.ale@gmail.com</update_contact>
   <content_rating type="oars-1.1">
     <content_attribute id="violence-cartoon">none</content_attribute>
