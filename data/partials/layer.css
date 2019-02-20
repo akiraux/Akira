@@ -37,7 +37,7 @@
 .layer-action {
     border: none;
     background: transparent;
-    padding: 7px 2px;
+    padding: 2px;
     opacity: 0;
     box-shadow: none;
 }

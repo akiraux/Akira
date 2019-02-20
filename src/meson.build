@@ -43,14 +43,21 @@ executable(
 
     'Widgets/SettingsDialog.vala',
 
+    'Lib/Canvas.vala',
+    'Lib/Item.vala',
+
+    'Lib/Selection/Nob.vala',
+
     asresources,
     config_header,
     dependencies: [
         dependency('gtk+-3.0'),
-        dependency('granite'),
+        dependency('granite', version: '>= 5.2.0'),
         dependency('gee-0.8'),
         dependency('libxml-2.0'),
         dependency('gtksourceview-3.0'),
+        dependency('cairo', version: '>=1.14'),
+        dependency('goocanvas-2.0'),
     ],
     install: true
 )

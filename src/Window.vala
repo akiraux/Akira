@@ -123,7 +123,7 @@ public class Akira.Window : Gtk.ApplicationWindow {
         settings.pos_y = y;
         settings.window_width = width;
 		settings.window_height = height;
-		settings.right_paned = main_window.right_sidebar.get_allocated_width ();
+		settings.right_paned = main_window.main_canvas.get_allocated_width ();
 		settings.left_paned = main_window.left_sidebar.get_allocated_width ();
 	}
 

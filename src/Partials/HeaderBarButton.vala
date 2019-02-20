@@ -19,46 +19,41 @@
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
 
-public class Akira.Partials.HeaderBarButton : Gtk.Button {
+public class Akira.Partials.HeaderBarButton : Gtk.Grid {
 	public bool labelled {
 		get {
 			return label_btn.visible;
 		} set {
 			label_btn.visible = value;
 			label_btn.no_show_all = !value;
-
-			if (value) {
-				get_style_context ().add_class ("headerbar-button");
-			} else {
-				get_style_context ().remove_class ("headerbar-button");
-			}
 		}
 	}
 
 	private Gtk.Label label_btn;
+	public Gtk.Button button;
+	public Gtk.Image image;
 
-	public HeaderBarButton (string icon_name, string name, string tooltip) {
-		can_focus = false;
-
-		Gtk.Image image;
-		var grid = new Gtk.Grid ();
+	public HeaderBarButton (string icon_name, string name) {
 		label_btn = new Gtk.Label (name);
-		label_btn.margin_top = 2;
+		label_btn.get_style_context ().add_class ("headerbar-label");
 
-		if (icon_name.contains ("/")) {
-			image = new Gtk.Image.from_resource (icon_name);
-		} else {
-			image = new Gtk.Image.from_icon_name (icon_name, Gtk.IconSize.LARGE_TOOLBAR);
-		}
+		var size = settings.icon_style == "symbolic" ? Gtk.IconSize.SMALL_TOOLBAR : Gtk.IconSize.LARGE_TOOLBAR;
+
+		image = new Gtk.Image.from_icon_name (icon_name, size);
 		image.margin = 0;
 
-		grid.attach (image, 0, 0, 1, 1);
-		grid.attach (label_btn, 0, 1, 1, 1);
-		add (grid);
+		button = new Gtk.Button ();
+		button.can_focus = false;
+		button.halign = Gtk.Align.CENTER;
+		button.margin_top = 10;
+		button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
+		button.add (image);
 
-		get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
-		get_style_context ().add_class ("headerbar-button");
-		set_tooltip_text (tooltip);
+		attach (button, 0, 0, 1, 1);
+		attach (label_btn, 0, 1, 1, 1);
+
+		button.margin_bottom = 3;
+		margin_bottom = 6;
 	}
 
 	public void toggle () {
@@ -71,5 +66,13 @@ public class Akira.Partials.HeaderBarButton : Gtk.Button {
 
 	public void hide_labels () {
 		labelled = false;
+	}
+
+	public void update_image (string icon_name) {
+		var size = settings.icon_style == "symbolic" ? Gtk.IconSize.SMALL_TOOLBAR : Gtk.IconSize.LARGE_TOOLBAR;
+		button.remove (image);
+		image = new Gtk.Image.from_icon_name (icon_name, size);
+		button.add (image);
+		image.show_all ();
 	}
 }

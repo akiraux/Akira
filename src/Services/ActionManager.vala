@@ -30,6 +30,8 @@ public class Akira.Services.ActionManager : Object {
 	public const string ACTION_OPEN = "action_open";
 	public const string ACTION_SAVE = "action_save";
 	public const string ACTION_SAVE_AS = "action_save_as";
+	public const string ACTION_SHOW_PIXEL_GRID = "action-show-pixel-grid";
+	public const string ACTION_SHOW_UI_GRID = "action-show-ui-grid";
 	public const string ACTION_PRESENTATION = "action_presentation";
 	public const string ACTION_PREFERENCES = "action_preferences";
 	public const string ACTION_LABELS = "action_labels";
@@ -42,6 +44,8 @@ public class Akira.Services.ActionManager : Object {
 		{ ACTION_OPEN, action_open },
 		{ ACTION_SAVE, action_save },
 		{ ACTION_SAVE_AS, action_save_as },
+		{ ACTION_SHOW_PIXEL_GRID, action_show_pixel_grid },
+		{ ACTION_SHOW_UI_GRID, action_show_ui_grid },
 		{ ACTION_PRESENTATION, action_presentation },
 		{ ACTION_PREFERENCES, action_preferences },
 		{ ACTION_LABELS, action_labels },
@@ -60,6 +64,8 @@ public class Akira.Services.ActionManager : Object {
 		action_accelerators.set (ACTION_OPEN, "<Control>o");
 		action_accelerators.set (ACTION_SAVE, "<Control>s");
 		action_accelerators.set (ACTION_SAVE_AS, "<Control><Shift>s");
+		action_accelerators.set (ACTION_SHOW_PIXEL_GRID, "<Control><Shift>p");
+		action_accelerators.set (ACTION_SHOW_UI_GRID, "<Control><Shift>g");
 		action_accelerators.set (ACTION_PRESENTATION, "<Control>period");
 		action_accelerators.set (ACTION_PREFERENCES, "<Control>comma");
 		action_accelerators.set (ACTION_QUIT, "<Control>q");
@@ -79,7 +85,8 @@ public class Akira.Services.ActionManager : Object {
 		window.headerbar.toggle ();
 		window.headerbar.menu.toggle ();
 		window.headerbar.layout.toggle ();
-		window.headerbar.ruler.toggle ();
+		window.headerbar.grid.toggle ();
+		window.headerbar.pixel_grid.toggle ();
 		window.headerbar.toolset.toggle ();
 		window.headerbar.preferences.toggle ();
 		window.headerbar.toggle ();
@@ -89,7 +96,8 @@ public class Akira.Services.ActionManager : Object {
 		window.headerbar.toggle ();
 		window.headerbar.menu.show_labels ();
 		window.headerbar.layout.show_labels ();
-		window.headerbar.ruler.show_labels ();
+		window.headerbar.grid.show_labels ();
+		window.headerbar.pixel_grid.show_labels ();
 		window.headerbar.toolset.show_labels ();
 		window.headerbar.preferences.show_labels ();
 		window.headerbar.toggle ();
@@ -99,9 +107,16 @@ public class Akira.Services.ActionManager : Object {
 		window.headerbar.toggle ();
 		window.headerbar.menu.hide_labels ();
 		window.headerbar.layout.hide_labels ();
-		window.headerbar.ruler.hide_labels ();
+		window.headerbar.grid.hide_labels ();
+		window.headerbar.pixel_grid.hide_labels ();
 		window.headerbar.toolset.hide_labels ();
 		window.headerbar.preferences.hide_labels ();
+		window.headerbar.toggle ();
+	}
+
+	public void update_icons_style () {
+		window.headerbar.toggle ();
+		window.headerbar.update_icons_style ();
 		window.headerbar.toggle ();
 	}
 
@@ -130,6 +145,14 @@ public class Akira.Services.ActionManager : Object {
 
 	private void action_save_as () {
 		warning ("save_as");
+	}
+
+	private void action_show_pixel_grid () {
+		warning ("show pixel grid");
+	}
+
+	private void action_show_ui_grid () {
+		warning ("show UI grid");
 	}
 
 	private void action_preferences () {
