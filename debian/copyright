@@ -1,5 +1,5 @@
 Format: http://dep.debian.net/deps/dep5
-Upstream-Name: com.github.alecaddd.akira
+Upstream-Name: com.github.akiraux.akira
 Source: https://github.com/Alecaddd/akira
 
 Files: src/* data/* meson/* debian/* schemas/*

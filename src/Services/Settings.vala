@@ -32,6 +32,6 @@ public class Akira.Services.Settings : Granite.Services.Settings {
     public bool open_quick { get; set; }
 
     public Settings () {
-        base ("com.github.alecaddd.akira");
+        base ("com.github.akiraux.akira");
     }
 }

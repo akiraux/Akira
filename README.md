@@ -34,7 +34,7 @@ Contact: [http://tysontan.com](http://tysontan.com)  / [tysontan@mail.com](mailt
 <!--- Akira, is primarly available from the AppCenter for elementary OS. Download it from there! -->
 
 As soon as Akira will reach a more stable version it will be available from the AppCenter for elementary OS.
-<!--- [![Get it on AppCenter](https://appcenter.elementary.io/badge.svg)](https://appcenter.elementary.io/com.github.alecaddd.akira) -->
+<!--- [![Get it on AppCenter](https://appcenter.elementary.io/badge.svg)](https://appcenter.elementary.io/com.github.akiraux.akira) -->
 
 ## Install it from source
 You can install Akira by compiling it from the source, here's the list of dependecies required:

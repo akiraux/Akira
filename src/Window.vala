@@ -38,7 +38,7 @@ public class Akira.Window : Gtk.ApplicationWindow {
 		Object (
 			application: akira_app,
 			app: akira_app,
-			icon_name: "com.github.alecaddd.akira"
+			icon_name: "com.github.akiraux.akira"
 		);
 	}
 

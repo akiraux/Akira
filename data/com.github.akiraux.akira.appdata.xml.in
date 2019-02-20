@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Copyright (c) 2017 Alessandro Castellani (https://github.com/Alecaddd/akira) -->
 <component type="desktop">
-  <id>com.github.alecaddd.akira.desktop</id>
+  <id>com.github.akiraux.akira.desktop</id>
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>GPL-3.0+</project_license>
   <name>Akira</name>
@@ -23,7 +23,7 @@
     </ul>
   </description>
   <provides>
-    <binary>com.github.alecaddd.akira</binary>
+    <binary>com.github.akiraux.akira</binary>
   </provides>
   <releases>
     <release version="0.1.0" date="2018-6-01">

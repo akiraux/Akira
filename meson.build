@@ -1,5 +1,5 @@
 # project name and programming language
-project('com.github.alecaddd.akira', 'vala', 'c')
+project('com.github.akiraux.akira', 'vala', 'c')
 
 add_project_arguments(
     ['--vapidir', join_paths(meson.current_source_dir(), 'vapi')],

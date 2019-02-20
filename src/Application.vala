@@ -38,9 +38,9 @@ public class Akira.Application : Granite.Application {
 		windows = new GLib.List <Window> ();
 
 		program_name = "Akira";
-		exec_name = "com.github.alecaddd.akira";
-		app_launcher = "com.github.alecaddd.akira.desktop";
-		application_id = "com.github.alecaddd.akira";
+		exec_name = "com.github.akiraux.akira";
+		app_launcher = "com.github.akiraux.akira.desktop";
+		application_id = "com.github.akiraux.akira";
 	}
 
 	public void new_window () {

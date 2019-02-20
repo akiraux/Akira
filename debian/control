@@ -1,4 +1,4 @@
-Source: com.github.alecaddd.akira
+Source: com.github.akiraux.akira
 Section: x11
 Priority: extra
 Maintainer: Alessandro Castellani <castellani.ale@gmail.com>
@@ -15,7 +15,7 @@ Build-Depends: debhelper (>= 10.5.1),
                meson
 Standards-Version: 4.1.1
 
-Package: com.github.alecaddd.akira
+Package: com.github.akiraux.akira
 Architecture: any
 Depends: ${misc:Depends}, ${shlibs:Depends}
 Pre-Depends: dpkg (>= 1.15.6)
