@@ -56,6 +56,7 @@ public class Akira.Partials.HeaderBarButton : Gtk.Grid {
 
 		button.margin_bottom = 3;
 		margin_bottom = 6;
+		valign = Gtk.Align.CENTER;
 	}
 
 	public void toggle () {
@@ -64,10 +65,15 @@ public class Akira.Partials.HeaderBarButton : Gtk.Grid {
 
 	public void show_labels () {
 		labelled = true;
+		button.margin_top = 10;
+		button.margin_bottom = 3;
+		margin_bottom = 6;
 	}
 
 	public void hide_labels () {
 		labelled = false;
+		button.margin = 0;
+		margin_bottom = 0;
 	}
 
 	public void update_image () {

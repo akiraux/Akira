@@ -18,9 +18,9 @@
     font-size: 8pt;
 }
 
-headerbar separator {
+/* headerbar separator {
     margin-left: 0px;
-}
+} */
 
 .border-bottom {
     border-bottom: 1px solid shade (@bg_color, 0.8);
