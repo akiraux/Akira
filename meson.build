@@ -9,6 +9,14 @@ add_project_arguments(
 # Include the translations module
 i18n = import('i18n')
 
+# Dependencies
+
+
+# Optional dependencies
+desktop_file_validate = find_program('desktop-file-validate', required: false)
+appstream_util = find_program('appstream-util', required: false)
+
+
 # Include the gnome module
 gnome = import('gnome')
 asresources = gnome.compile_resources(
