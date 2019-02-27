@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gresources>
-  <gresource prefix="/com/github/akiraux/akira/partials">
-    <file alias="variables.css" compressed="true">partials/variables.css</file>
-    <file alias="layout.css" compressed="true">partials/layout.css</file>
-    <file alias="artboard.css" compressed="true">partials/artboard.css</file>
-    <file alias="layer.css" compressed="true">partials/layer.css</file>
+  <gresource prefix="/com/github/akiraux/akira/css">
+    <file alias="variables.css" compressed="true">css/variables.css</file>
+    <file alias="layout.css" compressed="true">compressed/layout.css</file>
+    <file alias="artboard.css" compressed="true">css/artboard.css</file>
+    <file alias="layer.css" compressed="true">css/layer.css</file>
   </gresource>
   <gresource prefix="/com/github/akiraux/akira">
-    <file alias="stylesheet.css" compressed="true">stylesheet.css</file>
+    <file alias="stylesheet.css" compressed="true">css/stylesheet.css</file>
     <file alias="bool-difference-symbolic.svg">icons/symbolic/bool-difference-symbolic.svg</file>
     <file alias="bool-interesect-symbolic.svg">icons/symbolic/bool-intersect-symbolic.svg</file>
     <file alias="bool-subtract-symbolic.svg">icons/symbolic/bool-subtract-symbolic.svg</file>
