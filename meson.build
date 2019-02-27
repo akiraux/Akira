@@ -2,7 +2,7 @@
 project('com.github.akiraux.akira', 'vala', 'c')
 
 add_project_arguments(
-    ['--vapidir', join_paths(meson.current_source_dir(), 'vapi')],
+    ['--vapidir', join_paths(meson.current_source_dir(), 'src', 'vapi')],
     language: 'vala'
 )
 
