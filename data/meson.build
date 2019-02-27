@@ -41,3 +41,4 @@ install_data(
     meson.project_name() + '.mime.xml',
     install_dir: join_paths(get_option('datadir'), 'mime', 'packages')
 )
+subdir('schemas')
