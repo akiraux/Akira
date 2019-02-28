@@ -48,6 +48,6 @@
     <file alias="shape-circle-symbolic.svg">icons/symbolic/shape-circle-symbolic.svg</file>
     <file alias="shape-all-symbolic.svg">icons/symbolic/shape-all-symbolic.svg</file>
     <file alias="shape-text-symbolic.svg">icons/symbolic/shape-text-symbolic.svg</file>
-    
+
   </gresource>
 </gresources>
