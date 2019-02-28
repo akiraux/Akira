@@ -23,6 +23,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
     border_width = 12;
     row_spacing = 6;
     column_spacing = 6;
+		hexpand = true;
 
     attach (group_title (_("Position")), 0, 0);
     attach (new Akira.Widgets.LinkedInput (C_("The horizontal coordinate", "X")), 0, 1, 1);
@@ -33,17 +34,20 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
     var lock_changes = new Gtk.Button.from_icon_name ("changes-allow-symbolic");
     lock_changes.get_style_context ().add_class ("flat");
     attach (lock_changes, 1, 3);
-    attach (new Akira.Widgets.LinkedInput (C_("The first letter of Heigth", "H")), 2, 3, 4);
+    attach (new Akira.Widgets.LinkedInput (C_("The first letter of Heigth", "H")), 2, 3, 2);
 
     attach (group_title (_("Transform")), 0, 4);
     attach (new Akira.Widgets.LinkedInput (C_("The first letter of Rotation", "R")), 0, 5, 1);
 
     var hflip_button = new Gtk.Button.from_icon_name ("object-flip-horizontal", Gtk.IconSize.LARGE_TOOLBAR);
     hflip_button.get_style_context ().add_class ("flat");
+		hflip_button.hexpand = true;
     var vflip_button = new Gtk.Button.from_icon_name ("object-flip-vertical", Gtk.IconSize.LARGE_TOOLBAR);
     vflip_button.get_style_context ().add_class ("flat");
+		vflip_button.hexpand = true;
 
     var flip_box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 6);
+		flip_box.hexpand = true;
     flip_box.add (hflip_button);
     flip_box.add (vflip_button);
     attach (flip_box, 2, 5, 2);
@@ -51,6 +55,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
     attach (group_title (_("Opacity")), 0, 6);
     var opacity = new Gtk.Adjustment (0, 0, 100, 0.5, 0, 0);
     var scale = new Gtk.Scale (Gtk.Orientation.HORIZONTAL, opacity);
+		scale.hexpand = true;
     scale.draw_value = false;
     scale.sensitive = true;
     scale.round_digits = 1;

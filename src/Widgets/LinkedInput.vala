@@ -40,6 +40,7 @@ public class Akira.Widgets.LinkedInput : Gtk.Box {
   construct {
     orientation = Gtk.Orientation.HORIZONTAL;
     valign = Gtk.Align.CENTER;
+    hexpand = true;
     get_style_context ().add_class ("linked");
     if (text == "" && digit_only) {
       text = "0";
@@ -53,6 +54,7 @@ public class Akira.Widgets.LinkedInput : Gtk.Box {
     bind_property ("text", entry, "text", BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE);
     entry.width_request = 48;
     entry.width_chars = 0;
+    entry.hexpand = true;
 
     if (reversed) {
       entry.xalign = 1.0f;
