@@ -53,14 +53,19 @@ public class Akira.Partials.ZoomButton : Gtk.Grid {
 		zoom_out_button = new Gtk.Button.from_icon_name ("zoom-out-symbolic", Gtk.IconSize.MENU);
         zoom_out_button.clicked.connect (zoom_out);
         zoom_out_button.get_style_context ().add_class ("raised");
+        zoom_out_button.get_style_context ().add_class ("button-zoom");
+        zoom_out_button.can_focus = false;
 
         zoom_default_button = new Gtk.Button.with_label ("100%");
         zoom_default_button.hexpand = true;
         zoom_default_button.clicked.connect (zoom_reset);
+        zoom_default_button.can_focus = false;
 
         zoom_in_button = new Gtk.Button.from_icon_name ("zoom-in-symbolic", Gtk.IconSize.MENU);
         zoom_in_button.clicked.connect (zoom_in);
         zoom_in_button.get_style_context ().add_class ("raised");
+        zoom_in_button.get_style_context ().add_class ("button-zoom");
+        zoom_in_button.can_focus = false;
 
         add (zoom_out_button);
         add (zoom_default_button);
