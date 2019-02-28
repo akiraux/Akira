@@ -1,5 +1,5 @@
 /* akira stylesheet */
-@import url("partials/variables.css");
-@import url("partials/layout.css");
-@import url("partials/artboard.css");
-@import url("partials/layer.css");
+@import url("css/variables.css");
+@import url("css/layout.css");
+@import url("css/artboard.css");
+@import url("css/layer.css");

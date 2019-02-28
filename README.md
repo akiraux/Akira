@@ -1,7 +1,7 @@
 # ![Akira](akira-logo-transparent.png)
 > The Linux Design Tool
 
-[![Build Status](https://travis-ci.org/akiraux/akira.svg?branch=master)](https://travis-ci.org/akiraux/akira)
+[![Build Status](https://travis-ci.org/akiraux/Akira.svg)](https://travis-ci.org/akiraux/Akira)
 
 
 ## Akira Kickstarter Campaign
@@ -64,4 +64,4 @@ If you want to ask any question about the project please refer to the [Forum Thr
 If you are trying out Akira and you encounter an error or any problem feel free to just open an issue
 
 ### Donations
-If you like Akira and you want to support its development, consider donating via [PayPal](https://www.paypal.me/alecaddd) or pledge on [Patreon](https://www.patreon.com/alecaddd).
+If you like Akira and you want to support its development, consider donating via [PayPal](https://www.paypal.me/alecaddd) or pledge on [Patreon](https://www.patreon.com/akiraux).
