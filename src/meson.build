@@ -35,7 +35,7 @@ executable(
     'Layouts/RightSideBar.vala',
     'Layouts/StatusBar.vala',
     'Layouts/Partials/LayersPanel.vala',
-    'Layouts/Partials/ShapeObjectPanel.vala',
+    'Layouts/Partials/AlignItemsPanel.vala',
     'Layouts/Partials/PagesPanel.vala',
     'Layouts/Partials/Artboard.vala',
     'Layouts/Partials/Layer.vala',
