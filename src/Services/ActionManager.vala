@@ -88,6 +88,7 @@ public class Akira.Services.ActionManager : Object {
 		window.headerbar.toggle ();
 		window.headerbar.menu.toggle ();
 		window.headerbar.toolset.toggle ();
+		window.headerbar.zoom.toggle ();
 		window.headerbar.preferences.toggle ();
 		window.headerbar.export.toggle ();
 		window.headerbar.toggle ();
@@ -97,6 +98,7 @@ public class Akira.Services.ActionManager : Object {
 		window.headerbar.toggle ();
 		window.headerbar.menu.show_labels ();
 		window.headerbar.toolset.show_labels ();
+		window.headerbar.zoom.show_labels ();
 		window.headerbar.preferences.show_labels ();
 		window.headerbar.export.show_labels ();
 		window.headerbar.toggle ();
@@ -106,6 +108,7 @@ public class Akira.Services.ActionManager : Object {
 		window.headerbar.toggle ();
 		window.headerbar.menu.hide_labels ();
 		window.headerbar.toolset.hide_labels ();
+		window.headerbar.zoom.hide_labels ();
 		window.headerbar.preferences.hide_labels ();
 		window.headerbar.export.hide_labels ();
 		window.headerbar.toggle ();

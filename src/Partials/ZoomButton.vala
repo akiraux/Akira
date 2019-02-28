@@ -44,11 +44,12 @@ public class Akira.Partials.ZoomButton : Gtk.Grid {
 
 	construct {
         get_style_context ().add_class (Gtk.STYLE_CLASS_LINKED);
+        get_style_context ().add_class ("linked-flat");
 		valign = Gtk.Align.CENTER;
         column_homogeneous = false;
         width_request = 140;
         hexpand = false;
-        margin = 12;
+        margin_top = 10;
 
 		zoom_out_button = new Gtk.Button.from_icon_name ("zoom-out-symbolic", Gtk.IconSize.MENU);
         zoom_out_button.clicked.connect (zoom_out);
@@ -67,9 +68,15 @@ public class Akira.Partials.ZoomButton : Gtk.Grid {
         zoom_in_button.get_style_context ().add_class ("button-zoom");
         zoom_in_button.can_focus = false;
 
-        add (zoom_out_button);
-        add (zoom_default_button);
-        add (zoom_in_button);
+        attach (zoom_out_button, 0, 0, 1, 1);
+        attach (zoom_default_button, 1, 0, 1, 1);
+        attach (zoom_in_button, 2, 0, 1, 1);
+
+        label_btn = new Gtk.Label (_("Zoom"));
+        label_btn.get_style_context ().add_class ("headerbar-label");
+        label_btn.margin_top = 1;
+        
+        attach (label_btn, 0, 1, 3, 1);
 	}
     
     public void toggle () {
@@ -78,15 +85,15 @@ public class Akira.Partials.ZoomButton : Gtk.Grid {
 
 	public void show_labels () {
 		labelled = true;
-		//  button.margin_top = 10;
-		//  button.margin_bottom = 3;
+		margin_top = 10;
+		label_btn.margin_top = 1;
 		margin_bottom = 6;
 	}
 
 	public void hide_labels () {
 		labelled = false;
-		//  button.margin = 0;
-		margin_bottom = 0;
+		margin = 0;
+		label_btn.margin_top = 0;
     }
     
     public void zoom_out () {

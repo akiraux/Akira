@@ -28,6 +28,7 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
 
 	public Akira.Partials.MenuButton menu;
 	public Akira.Partials.MenuButton toolset;
+	public Akira.Partials.ZoomButton zoom;
 	public Akira.Partials.HeaderBarButton preferences;
 	public Akira.Partials.HeaderBarButton export;
 	public Akira.Partials.HeaderBarButton layout;
@@ -96,6 +97,8 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
 		toolset = new Akira.Partials.MenuButton ("insert-object", _("Insert"), null);
 		toolset.button.popup = tools;
 
+		zoom = new Akira.Partials.ZoomButton (window);
+
 		preferences = new Akira.Partials.HeaderBarButton ("open-menu", _("Settings"), {"<Ctrl>comma"});
 		preferences.button.action_name = Akira.Services.ActionManager.ACTION_PREFIX + Akira.Services.ActionManager.ACTION_PREFERENCES;
 
@@ -105,7 +108,7 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
 		pack_start (menu);
 		pack_start (toolset);
 		pack_start (new Gtk.Separator (Gtk.Orientation.VERTICAL));
-		pack_start (new Akira.Partials.ZoomButton (window));
+		pack_start (zoom);
 
 		pack_end (preferences);
 		pack_end (export);
