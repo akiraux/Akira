@@ -41,6 +41,6 @@
 
 .alignment-box separator {
   margin: 4pt 10pt;
-  border-color: #E8E8E8;
+  border-color: @bg_color;
   border-width: 1px;
 }
