@@ -34,6 +34,8 @@ public class Akira.Window : Gtk.ApplicationWindow {
 	public bool edited { get; set; default = false; }
 	public bool confirmed { get; set; default = false; }
 
+  public signal void signal_update_icon_style();
+
 	public Window (Akira.Application akira_app) {
 		Object (
 			application: akira_app,
@@ -75,7 +77,7 @@ public class Akira.Window : Gtk.ApplicationWindow {
 
 		var css_provider = new Gtk.CssProvider ();
 		css_provider.load_from_resource ("/com/github/akiraux/akira/stylesheet.css");
-		
+
 		Gtk.StyleContext.add_provider_for_screen (
 			Gdk.Screen.get_default (), css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
 		);

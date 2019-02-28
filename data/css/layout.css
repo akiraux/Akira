@@ -27,3 +27,20 @@
 .border-bottom {
     border-bottom: 1px solid shade (@bg_color, 0.8);
 }
+
+.alignment-box {
+  background-color: #F5F5F5;
+  border-bottom: 1px solid #A4A4A4;
+  padding: 3pt 5pt;
+}
+
+.alignment-box button {
+  padding: 5pt;
+  border-radius: 50%;
+}
+
+.alignment-box separator {
+  margin: 4pt 10px;
+  border-color: #E8E8E8;
+  border-width: 1px;
+}

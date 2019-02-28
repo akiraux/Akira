@@ -1,5 +1,7 @@
 .snapcraft
 .vscode
+.tmuxp.yaml
+build.sh
 src/config.vala
 build/
 *~

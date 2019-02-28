@@ -24,6 +24,7 @@ executable(
 
     'Services/Settings.vala',
     'Services/ActionManager.vala',
+    'Services/EventBus.vala',
 
     'Utils/Dialogs.vala',
 
@@ -34,6 +35,7 @@ executable(
     'Layouts/RightSideBar.vala',
     'Layouts/StatusBar.vala',
     'Layouts/Partials/LayersPanel.vala',
+    'Layouts/Partials/ShapeObjectPanel.vala',
     'Layouts/Partials/PagesPanel.vala',
     'Layouts/Partials/Artboard.vala',
     'Layouts/Partials/Layer.vala',

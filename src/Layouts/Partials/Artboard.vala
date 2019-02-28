@@ -47,7 +47,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 
 	public Artboard (Akira.Window main_window, string name) {
 		Object (
-			window: main_window, 
+			window: main_window,
 			layer_name: name
 		);
 	}
@@ -173,7 +173,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 			y = y - (index * alloc.height);
 
 			var group = (Akira.Layouts.Partials.Layer) target.container.get_row_at_y (y);
-			
+
 			if (group is Akira.Layouts.Partials.Layer) {
 				newPos = group.get_index ();
 			} else {
