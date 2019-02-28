@@ -39,16 +39,13 @@ public class Akira.Layouts.LeftSideBar : Gtk.Grid {
 	}
 
 	construct {
+		get_style_context ().add_class ("default-decoration");
 		get_style_context ().add_class ("sidebar-l");
 		width_request = 200;
 
-    var label = new Gtk.Label("Status");
-    label.halign = Gtk.Align.CENTER;
-    label.hexpand = true;
+    var alignItemsPanel = new Akira.Layouts.Partials.AlignItemsPanel (window);
 
-    //var shapeObjectPanel = new Akira.Layouts.Partials.ShapeObjectPanel (window);
-    attach (label, 0, 0, 1, 1);
-    print ("Width: %d", get_allocated_width());
+    attach (alignItemsPanel, 0, 0, 1, 1);
 	}
 
 	public void toggle () {

@@ -18,14 +18,14 @@
  *
  * Authored by: Giacomo "giacomoalbe" Alberini <giacomoalbe@gmail.com>
  */
-public class Akira.Layouts.Partials.ShapeObjectPanel : Gtk.Box {
+public class Akira.Layouts.Partials.AlignItemsPanel : Gtk.Box {
   public weak Akira.Window window { get; construct; }
 
   private Gtk.Box alignmentBox;
   private Gtk.Box outerBox;
 
 
-  public ShapeObjectPanel (Akira.Window main_window) {
+  public AlignItemsPanel (Akira.Window main_window) {
     Object(
       window: main_window,
       orientation: Gtk.Orientation.VERTICAL
@@ -101,10 +101,13 @@ public class Akira.Layouts.Partials.ShapeObjectPanel : Gtk.Box {
   }
 }
 
-class Akira.Partials.AlignBoxButton : Gtk.Button {
+class Akira.Partials.AlignBoxButton : Gtk.Grid {
   public string icon_name;
   public Gtk.IconSize icon_size;
   public string action;
+
+  private Gtk.Button button;
+  private Gtk.Image image;
 
   public signal void triggered(Akira.Partials.AlignBoxButton emitter);
 
@@ -118,18 +121,35 @@ class Akira.Partials.AlignBoxButton : Gtk.Button {
     can_focus = false;
     hexpand = true;
 
+    image = new Gtk.Image.from_icon_name(this.get_icon_full_name(), icon_size);
+    image.margin = 0;
 
-    get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
-    get_style_context ().add_class ("button");
+    button = new Gtk.Button();
+    button.can_focus = false;
+    button.halign = Gtk.Align.CENTER;
 
-    this.change_icon_style();
+    button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
+    button.get_style_context ().add_class ("button");
 
-    this.clicked.connect (() => {
+    button.add (image);
+
+    attach (button, 0, 0, 1, 1);
+
+    this.button.clicked.connect (() => {
       this.triggered (this);
     });
   }
 
   public void change_icon_style() {
+    this.button.remove (image);
+
+    this.icon_name = this.get_icon_full_name ();
+    image = new Gtk.Image.from_icon_name (this.icon_name, this.icon_size);
+
+    this.button.add (image);
+  }
+
+  public string get_icon_full_name() {
     var icon_full_name = "";
     //this.icon_size = Gtk.IconSize.LARGE_TOOLBAR;
 
@@ -145,7 +165,7 @@ class Akira.Partials.AlignBoxButton : Gtk.Button {
         break;
     }
 
-    this.image = new Gtk.Image.from_icon_name (icon_full_name, this.icon_size);
+    return icon_full_name;
   }
 }
 
