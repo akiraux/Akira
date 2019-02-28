@@ -141,12 +141,12 @@ class Akira.Partials.AlignBoxButton : Gtk.Grid {
   }
 
   public void change_icon_style() {
-    this.button.remove (image);
+    button.remove (image);
 
-    this.icon_name = this.get_icon_full_name ();
-    image = new Gtk.Image.from_icon_name (this.icon_name, this.icon_size);
+    image = new Gtk.Image.from_icon_name (this.get_icon_full_name (), this.icon_size);
 
-    this.button.add (image);
+    button.add (image);
+    image.show_all ();
   }
 
   public string get_icon_full_name() {
