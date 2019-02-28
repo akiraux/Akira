@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2018 Alecaddd (http://alecaddd.com)
+* Copyright (c) 2019 Alecaddd (http://alecaddd.com)
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public
@@ -18,51 +18,85 @@
 *
 * Authored by: Ana Gelez <ana@gelez.xyz>
 */
-public class Akira.Widgets.LinkedInput : Gtk.Box {
-  public bool digit_only { get; construct set; default = true; }
 
-  public string label { get; construct set; }
+/**
+* A digit input with a label next to it.
+*/
+public class Akira.Widgets.LinkedInput : Gtk.Grid {
+  private string label { get; construct set; }
 
   /**
   * Indicates wheter the label or the entry should be first
   */
-  public bool reversed { get; construct set; }
+  private bool reversed { get; construct set; }
 
-  public string text { get; set; default = ""; }
+  private string unit { get; construct set; }
 
-  public LinkedInput (string label, bool reversed = false, bool digit_only = true) {
+  public double value { get; set; }
+
+  /**
+  * Used to avoid to infinitely updating two linked data (for instance width
+  * and height when their ratio is locked)
+  */
+  private bool manually_edited = true;
+
+  public LinkedInput (string label, string unit = "", bool reversed = false, double default_val = 1.0) {
     Object (
       label: label,
-      reversed: reversed
+      reversed: reversed,
+      value: default_val,
+      unit: unit
     );
   }
 
   construct {
-    orientation = Gtk.Orientation.HORIZONTAL;
     valign = Gtk.Align.CENTER;
     hexpand = true;
-    get_style_context ().add_class ("linked");
-    if (text == "" && digit_only) {
-      text = "0";
-    }
+    get_style_context ().add_class (Gtk.STYLE_CLASS_LINKED);
 
     var label = new Gtk.Label (label);
     label.get_style_context ().add_class ("entry-label");
     label.width_request = 24;
 
     var entry = new Gtk.Entry ();
-    bind_property ("text", entry, "text", BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE);
     entry.width_request = 48;
     entry.width_chars = 0;
     entry.hexpand = true;
+    entry.notify["text"].connect (() => {
+      if (manually_edited) {
+        var text_canon = entry.text.replace (",", ".");
+        text_canon.canon ("0123456789.", '?');
+        if (text_canon.contains ("?") || (unit != null && !entry.text.has_suffix (unit))) {
+          entry.text = text_canon.replace ("?", "") + unit;
+        }
+        var new_val = double.parse (text_canon.replace("?", ""));
+        if (new_val != value) {
+          value = new_val;
+        }
+      }
+    });
+    notify["value"].connect (() => {
+      // Remove trailing 0
+      var format_value = "%f".printf (value).replace(",", ".");
+      while (format_value.has_suffix ("0") && format_value != "0") {
+        format_value = format_value.slice (0, -1);
+      }
+      if (format_value.has_suffix (".")) {
+        format_value += "0";
+      }
+
+      manually_edited = false;
+      entry.text = "%s%s".printf(format_value, unit);
+      manually_edited = true;
+    });
 
     if (reversed) {
       entry.xalign = 1.0f;
-      add (entry);
-      add (label);
+      attach (entry, 0, 0);
+      attach (label, 1, 0);
     } else {
-      add (label);
-      add (entry);
+      attach (label, 0, 0);
+      attach (entry, 1, 0);
     }
   }
 }
