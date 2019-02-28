@@ -1,7 +1,7 @@
 # ![Akira](akira-logo-transparent.png)
 > The Linux Design Tool
 
-[![Build Status](https://travis-ci.org/akiraux/akira.svg?branch=master)](https://travis-ci.org/akiraux/akira)
+[![Build Status](https://travis-ci.org/akiraux/Akira.svg)](https://travis-ci.org/akiraux/Akira)
 
 
 ## Akira Kickstarter Campaign

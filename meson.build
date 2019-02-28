@@ -2,12 +2,20 @@
 project('com.github.akiraux.akira', 'vala', 'c')
 
 add_project_arguments(
-    ['--vapidir', join_paths(meson.current_source_dir(), 'vapi')],
+    ['--vapidir', join_paths(meson.current_source_dir(), 'src', 'vapi')],
     language: 'vala'
 )
 
 # Include the translations module
 i18n = import('i18n')
+
+# Dependencies
+
+
+# Optional dependencies
+desktop_file_validate = find_program('desktop-file-validate', required: false)
+appstream_util = find_program('appstream-util', required: false)
+
 
 # Include the gnome module
 gnome = import('gnome')
@@ -32,6 +40,5 @@ endif
 subdir('src')
 subdir('data')
 subdir('po')
-subdir('schemas')
 
-meson.add_install_script('meson/post_install.py')
+meson.add_install_script('build-aux/meson/post_install.py')
