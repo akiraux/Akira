@@ -118,6 +118,8 @@ public class Akira.Services.ActionManager : Object {
 		window.headerbar.toggle ();
 		window.headerbar.update_icons_style ();
 		window.headerbar.toggle ();
+
+    window.signal_update_icon_style();
 	}
 
 	private void action_quit () {

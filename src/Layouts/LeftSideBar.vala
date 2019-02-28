@@ -19,6 +19,8 @@
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
 public class Akira.Layouts.LeftSideBar : Gtk.Grid {
+  public weak Akira.Window window { get; construct; }
+
 	public bool toggled {
 		get {
 			return visible;
@@ -28,24 +30,25 @@ public class Akira.Layouts.LeftSideBar : Gtk.Grid {
 		}
 	}
 
-	public LeftSideBar () {
+	public LeftSideBar (Akira.Window main_window) {
 		Object (
-			orientation: Gtk.Orientation.HORIZONTAL, 
+      window: main_window,
+			orientation: Gtk.Orientation.HORIZONTAL,
 			toggled: true
 		);
 	}
 
 	construct {
 		get_style_context ().add_class ("sidebar-l");
-		width_request = 220;
-		
-		var label = new Gtk.Label ("Sidebar L");
-		label.halign = Gtk.Align.CENTER;
-		label.expand = true;
-		label.margin = 10;
-		label.expand = true;
+		width_request = 200;
 
-		attach (label, 0, 0, 1, 1);
+    var label = new Gtk.Label("Status");
+    label.halign = Gtk.Align.CENTER;
+    label.hexpand = true;
+
+    //var shapeObjectPanel = new Akira.Layouts.Partials.ShapeObjectPanel (window);
+    attach (label, 0, 0, 1, 1);
+    print ("Width: %d", get_allocated_width());
 	}
 
 	public void toggle () {

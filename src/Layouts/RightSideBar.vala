@@ -49,7 +49,7 @@ public class Akira.Layouts.RightSideBar : Gtk.Grid {
 	construct {
 		get_style_context ().add_class ("sidebar-r");
 		width_request = 220;
-		
+
 		var pane = new Gtk.Paned (Gtk.Orientation.VERTICAL);
 		pane.expand = true;
 		pane.wide_handle = false;

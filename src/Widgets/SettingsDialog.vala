@@ -63,7 +63,7 @@ public class Akira.Widgets.SettingsDialog : Gtk.Dialog {
 		get_content_area ().add (main_grid);
 
 		var close_button = new SettingsButton (_("Close"));
-		
+
 		close_button.clicked.connect (() => {
 			destroy ();
 		});
@@ -91,7 +91,7 @@ public class Akira.Widgets.SettingsDialog : Gtk.Dialog {
 		content_grid.column_homogeneous = true;
 
 		content_grid.attach (new SettingsHeader (_("Interface")), 0, 0, 2, 1);
-		
+
 		content_grid.attach (new SettingsLabel (_("Use Dark Theme:")), 0, 1, 1, 1);
 		dark_theme_switch = new SettingsSwitch ("dark-theme");
 		content_grid.attach (dark_theme_switch, 1, 1, 1, 1);
@@ -113,7 +113,7 @@ public class Akira.Widgets.SettingsDialog : Gtk.Dialog {
 				window.action_manager.show_labels ();
 			}
 		});
-		
+
 		content_grid.attach (new SettingsLabel (_("Select Icon Style:")), 0, 4, 1, 1);
 
 		icon_types = new Gee.HashMap<int, string> ();
@@ -152,6 +152,7 @@ public class Akira.Widgets.SettingsDialog : Gtk.Dialog {
 		icon_combo_box.changed.connect (() => {
 			settings.icon_style = icon_types[icon_combo_box.get_active ()];
 			window.action_manager.update_icons_style ();
+      event_bus.emit("update_icons_style");
 		});
 
 		return content_grid;

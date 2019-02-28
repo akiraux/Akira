@@ -21,6 +21,7 @@
 
 namespace Akira {
 	public Akira.Services.Settings settings;
+  public Akira.Services.EventBus event_bus;
 }
 
 public class Akira.Application : Granite.Application {
@@ -35,6 +36,7 @@ public class Akira.Application : Granite.Application {
 		build_version_info = Constants.VERSION_INFO;
 
 		settings = new Akira.Services.Settings ();
+		event_bus = new Akira.Services.EventBus ();
 		windows = new GLib.List <Window> ();
 
 		program_name = "Akira";
