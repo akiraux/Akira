@@ -102,9 +102,11 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
 		export = new Akira.Partials.HeaderBarButton ("document-export", _("Export"), {"<Ctrl><Shift>E"});
 		export.button.action_name = Akira.Services.ActionManager.ACTION_PREFIX + Akira.Services.ActionManager.ACTION_EXPORT;
 
-		add (menu);
-		add (toolset);
-		add (new Gtk.Separator (Gtk.Orientation.VERTICAL));
+		pack_start (menu);
+		pack_start (toolset);
+		pack_start (new Gtk.Separator (Gtk.Orientation.VERTICAL));
+		pack_start (new Akira.Partials.ZoomButton (window));
+
 		pack_end (preferences);
 		pack_end (export);
 		pack_end (new Gtk.Separator (Gtk.Orientation.VERTICAL));

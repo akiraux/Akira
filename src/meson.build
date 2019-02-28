@@ -40,6 +40,7 @@ executable(
 
     'Partials/HeaderBarButton.vala',
     'Partials/MenuButton.vala',
+    'Partials/ZoomButton.vala',
 
     'Widgets/SettingsDialog.vala',
 
