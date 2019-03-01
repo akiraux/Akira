@@ -22,7 +22,3 @@ install:
 
 script:
   - houston ci
-
-branches:
-  only:
-  - master

@@ -7,7 +7,7 @@
     <file alias="layer.css" compressed="true">css/layer.css</file>
   </gresource>
   <gresource prefix="/com/github/akiraux/akira">
-    <file alias="stylesheet.css" compressed="true">data/stylesheet.css</file>
+    <file alias="stylesheet.css" compressed="true">stylesheet.css</file>
     <file alias="bool-difference-symbolic.svg">icons/symbolic/bool-difference-symbolic.svg</file>
     <file alias="bool-interesect-symbolic.svg">icons/symbolic/bool-intersect-symbolic.svg</file>
     <file alias="bool-subtract-symbolic.svg">icons/symbolic/bool-subtract-symbolic.svg</file>
