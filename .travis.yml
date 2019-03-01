@@ -22,6 +22,7 @@ install:
 
 script:
   - houston ci
-    --type app
-    --name-domain com.github.akiraux.akira
-    --name-human Akira
+
+branches:
+  only:
+- master

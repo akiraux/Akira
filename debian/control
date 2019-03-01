@@ -12,6 +12,7 @@ Build-Depends: debhelper (>= 10.5.1),
                libgtksourceview-3.0-dev,
                libxml2-dev,
                libglib2.0-dev,
+               libgoocanvas-2.0-dev,
                meson
 Standards-Version: 4.1.1
 
