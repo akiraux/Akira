@@ -13,7 +13,8 @@ Build-Depends: meson,
                libgtksourceview-3.0-dev,
                libxml2-dev,
                libglib2.0-dev,
-               libgoocanvas-dev
+               libcairo2-dev,
+               libgoocanvas-2.0-dev
 Standards-Version: 4.1.1
 
 Package: com.github.akiraux.akira
