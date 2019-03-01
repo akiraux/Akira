@@ -152,7 +152,7 @@ public class Akira.Widgets.SettingsDialog : Gtk.Dialog {
 		icon_combo_box.changed.connect (() => {
 			settings.icon_style = icon_types[icon_combo_box.get_active ()];
 			window.action_manager.update_icons_style ();
-      event_bus.emit("update_icons_style");
+      event_bus.emit ("update_icons_style");
 		});
 
 		return content_grid;

@@ -42,6 +42,7 @@ executable(
 
     'Partials/HeaderBarButton.vala',
     'Partials/MenuButton.vala',
+    'Partials/AlignBoxButton.vala',
 
     'Widgets/SettingsDialog.vala',
 
