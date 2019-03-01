@@ -25,8 +25,9 @@
 
 ## Screenshots of the Problem
 <!--- If you can show us a screenshot of the issue, this is the space for it! --> 
+<!--- If you're suggesting a feature and can give us a mockup, that would also be great! -->
 
-## Your Environment
+## Your Environment (for bugs)
 <!--- Include as many relevant details about the environment you experienced the bug in -->
 <!--- If you can also run the folowing command and put the output here, that would be super helpful!  -->
 <!---                   uname -a && cat /etc/os-release          -->
