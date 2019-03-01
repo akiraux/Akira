@@ -18,11 +18,11 @@
  *
  * Authored by: Giacomo "giacomoalbe" Alberini <giacomoalbe@gmail.com>
  */
-public class Akira.Layouts.Partials.AlignItemsPanel : Gtk.Box {
+public class Akira.Layouts.Partials.AlignItemsPanel : Gtk.Grid {
   public weak Akira.Window window { get; construct; }
 
-  private Gtk.Box alignmentBox;
-  private Gtk.Box outerBox;
+  private Gtk.Grid alignmentBox;
+  private Gtk.Grid outerBox;
 
 
   public AlignItemsPanel (Akira.Window main_window) {
@@ -36,12 +36,12 @@ public class Akira.Layouts.Partials.AlignItemsPanel : Gtk.Box {
     vexpand = false;
     hexpand = true;
 
-    outerBox = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
+    outerBox = new Gtk.Grid ();
 
     outerBox.hexpand = true;
     outerBox.get_style_context ().add_class("alignment-box");
 
-    alignmentBox = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
+    alignmentBox = new Gtk.Grid ();
     alignmentBox.halign = Gtk.Align.CENTER;
 
     AlignBoxItem[] alignBoxItems = {
@@ -57,10 +57,12 @@ public class Akira.Layouts.Partials.AlignItemsPanel : Gtk.Box {
       AlignBoxItem("btn", "alig-v-b", "align-vertical-bottom", "Align bottom sides")
     };
 
+    int loop = 0;
+
     foreach (var item in alignBoxItems) {
       switch (item.type) {
         case "sep":
-          alignmentBox.pack_start ( new Gtk.Separator (Gtk.Orientation.VERTICAL), false, false, 0);
+          alignmentBox.attach ( new Gtk.Separator (Gtk.Orientation.VERTICAL), loop++, 0, 1, 1 );
           break;
 
         case "btn":
@@ -68,14 +70,14 @@ public class Akira.Layouts.Partials.AlignItemsPanel : Gtk.Box {
 
           tmpAlignBoxButton.triggered.connect (on_button_event);
 
-          alignmentBox.pack_start (tmpAlignBoxButton, false, false, 0);
+          alignmentBox.attach (tmpAlignBoxButton, loop++, 0, 1, 1);
           break;
       }
     }
 
-    outerBox.pack_start (alignmentBox);
+    outerBox.attach (alignmentBox, 1, 0, 1, 1);
 
-    pack_start (outerBox);
+    attach (outerBox, 1, 0, 1, 1);
 
     connect_signals();
   }
