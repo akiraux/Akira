@@ -2,7 +2,8 @@ Source: com.github.akiraux.akira
 Section: x11
 Priority: extra
 Maintainer: Alessandro Castellani <castellani.ale@gmail.com>
-Build-Depends: debhelper (>= 10.5.1),
+Build-Depends: meson,
+               debhelper (>= 10.5.1),
                libgtk-3-dev,
                valac (>= 0.26),
                libgranite-dev (>= 0.5),
@@ -12,13 +13,11 @@ Build-Depends: debhelper (>= 10.5.1),
                libgtksourceview-3.0-dev,
                libxml2-dev,
                libglib2.0-dev,
-               libgoocanvas-2.0-dev,
-               meson
+               libgoocanvas-2.0-dev
 Standards-Version: 4.1.1
 
 Package: com.github.akiraux.akira
 Architecture: any
 Depends: ${misc:Depends}, ${shlibs:Depends}
-Pre-Depends: dpkg (>= 1.15.6)
 Description: Akira
  The Linux Design Tool
