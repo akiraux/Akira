@@ -55,8 +55,7 @@
          "sources": [
             {
                "type": "git",
-               "url": "https://github.com/akiraux/akira",
-               "branch": "wip/albfan/flatpak"
+               "url": "https://github.com/akiraux/akira"
             }
          ]
       }
