@@ -33,37 +33,37 @@ public class Akira.Layouts.MainCanvas : Gtk.Grid {
 		main_scroll.expand = true;
 
 		canvas = new Akira.Lib.Canvas ();
-        canvas.set_size_request (main_window_size.width, main_window_size.height);
+		canvas.set_size_request (main_window_size.width, main_window_size.height);
 		canvas.set_bounds (0, 0, 10000, 10000);
 		canvas.set_scale (1.0);
 
-        var root = canvas.get_root_item ();
+		var root = canvas.get_root_item ();
 		var rect = new Goo.CanvasRect (null, 100.0, 100.0, 400.0, 400.0,
-                                   "line-width", 5.0,
-                                   "radius-x", 100.0,
-                                   "radius-y", 100.0,
-                                   "stroke-color", "#f37329",
-                                   "fill-color", "#ffa154", null);
-        rect.set ("parent", root);
+									"line-width", 5.0,
+									"radius-x", 100.0,
+									"radius-y", 100.0,
+									"stroke-color", "#f37329",
+									"fill-color", "#ffa154", null);
+		rect.set ("parent", root);
 
-        var rect2 = new Goo.CanvasRect (null, 50, 100, 200, 100,
-            "line-width", 5.0,
-            "stroke-color", "#64baff",
-            "fill-color", "#3689e6");
+		var rect2 = new Goo.CanvasRect (null, 50, 100, 200, 100,
+			"line-width", 5.0,
+			"stroke-color", "#64baff",
+			"fill-color", "#3689e6");
 
-        rect2.set ("parent", root);
+		rect2.set ("parent", root);
 
-        var rect3 = new Goo.CanvasRect (null, 0, 0, 64, 64,
-            "radius-x", 32.0,
-            "radius-y", 32.0,
-            "line-width", 5.0,
-            "stroke-color", "#9bdb4d",
-            "fill-color", "#68b723");
+		var rect3 = new Goo.CanvasRect (null, 0, 0, 64, 64,
+			"radius-x", 32.0,
+			"radius-y", 32.0,
+			"line-width", 5.0,
+			"stroke-color", "#9bdb4d",
+			"fill-color", "#68b723");
 
-        rect3.set ("parent", root);
+		rect3.set ("parent", root);
 
-        var text = new Goo.CanvasText (null, "Add text here", 20, 20, 200, Goo.CanvasAnchorType.NW, "font", "Open Sans 18");
-        text.set ("parent", root);
+		var text = new Goo.CanvasText (null, "Add text here", 20, 20, 200, Goo.CanvasAnchorType.NW, "font", "Open Sans 18");
+		text.set ("parent", root);
 
 		main_scroll.add (canvas);
 
