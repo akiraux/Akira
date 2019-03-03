@@ -50,7 +50,7 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
 	}
 
 	construct {
-		set_title (APP_NAME);
+		//  set_title (APP_NAME);
 		set_show_close_button (true);
 
 		var menu_items = new Gtk.Menu ();
@@ -109,6 +109,9 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
 		pack_start (toolset);
 		pack_start (new Gtk.Separator (Gtk.Orientation.VERTICAL));
 		pack_start (zoom);
+		pack_start (new Gtk.Separator (Gtk.Orientation.VERTICAL));
+		//  pack_start (group);
+		//  pack_start (ungroup);
 
 		pack_end (preferences);
 		pack_end (export);

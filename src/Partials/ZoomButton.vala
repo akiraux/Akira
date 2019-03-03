@@ -49,24 +49,26 @@ public class Akira.Partials.ZoomButton : Gtk.Grid {
         column_homogeneous = false;
         width_request = 140;
         hexpand = false;
-        margin_top = 10;
 
 		zoom_out_button = new Gtk.Button.from_icon_name ("zoom-out-symbolic", Gtk.IconSize.MENU);
         zoom_out_button.clicked.connect (zoom_out);
         zoom_out_button.get_style_context ().add_class ("raised");
         zoom_out_button.get_style_context ().add_class ("button-zoom");
         zoom_out_button.can_focus = false;
+        zoom_out_button.tooltip_markup = Granite.markup_accel_tooltip ({"<Ctrl>minus"}, _("Zoom Out"));
 
         zoom_default_button = new Gtk.Button.with_label ("100%");
         zoom_default_button.hexpand = true;
         zoom_default_button.clicked.connect (zoom_reset);
         zoom_default_button.can_focus = false;
+        zoom_default_button.tooltip_markup = Granite.markup_accel_tooltip ({"<Ctrl>0"}, _("Reset Zoom"));
 
         zoom_in_button = new Gtk.Button.from_icon_name ("zoom-in-symbolic", Gtk.IconSize.MENU);
         zoom_in_button.clicked.connect (zoom_in);
         zoom_in_button.get_style_context ().add_class ("raised");
         zoom_in_button.get_style_context ().add_class ("button-zoom");
         zoom_in_button.can_focus = false;
+        zoom_in_button.tooltip_markup = Granite.markup_accel_tooltip ({"<Ctrl>plus"}, _("Zoom In"));
 
         attach (zoom_out_button, 0, 0, 1, 1);
         attach (zoom_default_button, 1, 0, 1, 1);
@@ -74,7 +76,7 @@ public class Akira.Partials.ZoomButton : Gtk.Grid {
 
         label_btn = new Gtk.Label (_("Zoom"));
         label_btn.get_style_context ().add_class ("headerbar-label");
-        label_btn.margin_top = 1;
+        label_btn.margin_top = 4;
         
         attach (label_btn, 0, 1, 3, 1);
 	}
@@ -85,15 +87,10 @@ public class Akira.Partials.ZoomButton : Gtk.Grid {
 
 	public void show_labels () {
 		labelled = true;
-		margin_top = 10;
-		label_btn.margin_top = 1;
-		margin_bottom = 6;
 	}
 
 	public void hide_labels () {
 		labelled = false;
-		margin = 0;
-		label_btn.margin_top = 0;
     }
     
     public void zoom_out () {

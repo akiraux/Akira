@@ -37,6 +37,9 @@ public class Akira.Services.ActionManager : Object {
 	public const string ACTION_EXPORT = "action_export";
 	public const string ACTION_LABELS = "action_labels";
 	public const string ACTION_QUIT = "action_quit";
+	public const string ACTION_ZOOM_IN = "action_zoom_in";
+	public const string ACTION_ZOOM_OUT = "action_zoom_out";
+	public const string ACTION_ZOOM_RESET = "action_zoom_reset";
 
 	public static Gee.MultiMap<string, string> action_accelerators = new Gee.HashMultiMap<string, string> ();
 
@@ -52,6 +55,9 @@ public class Akira.Services.ActionManager : Object {
 		{ ACTION_EXPORT, action_export },
 		{ ACTION_LABELS, action_labels },
 		{ ACTION_QUIT, action_quit },
+		{ ACTION_ZOOM_IN, action_zoom_in },
+		{ ACTION_ZOOM_OUT, action_zoom_out },
+		{ ACTION_ZOOM_RESET, action_zoom_reset },
 	};
 
 	public ActionManager (Akira.Application akira_app, Akira.Window main_window) {
@@ -72,6 +78,9 @@ public class Akira.Services.ActionManager : Object {
 		action_accelerators.set (ACTION_PREFERENCES, "<Control>comma");
 		action_accelerators.set (ACTION_EXPORT, "<Control><Shift>e");
 		action_accelerators.set (ACTION_QUIT, "<Control>q");
+		action_accelerators.set (ACTION_ZOOM_IN, "<Control>equal");
+		action_accelerators.set (ACTION_ZOOM_OUT, "<Control>minus");
+		action_accelerators.set (ACTION_ZOOM_RESET, "<Control>0");
 	}
 
 	construct {
@@ -170,6 +179,18 @@ public class Akira.Services.ActionManager : Object {
 	
 	private void action_export () {
 		warning ("export");
+	}
+
+	private void action_zoom_in () {
+		window.headerbar.zoom.zoom_in ();
+	}
+
+	private void action_zoom_out () {
+		window.headerbar.zoom.zoom_out ();
+	}
+
+	private void action_zoom_reset () {
+		window.headerbar.zoom.zoom_reset ();
 	}
 
 	public static void action_from_group (string action_name, ActionGroup? action_group) {

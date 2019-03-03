@@ -46,16 +46,12 @@ public class Akira.Partials.HeaderBarButton : Gtk.Grid {
 		button = new Gtk.Button ();
 		button.can_focus = false;
 		button.halign = Gtk.Align.CENTER;
-		button.margin_top = 10;
 		button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
 		button.add (image);
 		button.tooltip_markup = Granite.markup_accel_tooltip (accels, name);
 
 		attach (button, 0, 0, 1, 1);
 		attach (label_btn, 0, 1, 1, 1);
-
-		button.margin_bottom = 3;
-		margin_bottom = 6;
 		valign = Gtk.Align.CENTER;
 	}
 
@@ -65,15 +61,10 @@ public class Akira.Partials.HeaderBarButton : Gtk.Grid {
 
 	public void show_labels () {
 		labelled = true;
-		button.margin_top = 10;
-		button.margin_bottom = 3;
-		margin_bottom = 6;
 	}
 
 	public void hide_labels () {
 		labelled = false;
-		button.margin = 0;
-		margin_bottom = 0;
 	}
 
 	public void update_image () {
