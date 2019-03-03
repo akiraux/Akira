@@ -20,7 +20,7 @@
 */
 
 public class Akira.Partials.MenuButton : Gtk.Grid {
-	public bool labelled {
+	public bool labeled {
 		get {
 			return label_btn.visible;
 		} set {
@@ -57,15 +57,15 @@ public class Akira.Partials.MenuButton : Gtk.Grid {
 	}
 
 	public void toggle () {
-		labelled = !labelled;
+		labeled = !labeled;
 	}
 
 	public void show_labels () {
-		labelled = true;
+		labeled = true;
 	}
 
 	public void hide_labels () {
-		labelled = false;
+		labeled = false;
 	}
 
 	public void update_image () {
