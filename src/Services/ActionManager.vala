@@ -100,6 +100,16 @@ public class Akira.Services.ActionManager : Object {
 		window.headerbar.zoom.toggle ();
 		window.headerbar.preferences.toggle ();
 		window.headerbar.export.toggle ();
+		window.headerbar.group.toggle ();
+		window.headerbar.ungroup.toggle ();
+		window.headerbar.move_up.toggle ();
+		window.headerbar.move_down.toggle ();
+		window.headerbar.move_top.toggle ();
+		window.headerbar.move_bottom.toggle ();
+		window.headerbar.path_difference.toggle ();
+		window.headerbar.path_exclusion.toggle ();
+		window.headerbar.path_intersect.toggle ();
+		window.headerbar.path_union.toggle ();
 		window.headerbar.toggle ();
 	}
 
@@ -110,6 +120,16 @@ public class Akira.Services.ActionManager : Object {
 		window.headerbar.zoom.show_labels ();
 		window.headerbar.preferences.show_labels ();
 		window.headerbar.export.show_labels ();
+		window.headerbar.group.show_labels ();
+		window.headerbar.ungroup.show_labels ();
+		window.headerbar.move_up.show_labels ();
+		window.headerbar.move_down.show_labels ();
+		window.headerbar.move_top.show_labels ();
+		window.headerbar.move_bottom.show_labels ();
+		window.headerbar.path_difference.show_labels ();
+		window.headerbar.path_exclusion.show_labels ();
+		window.headerbar.path_intersect.show_labels ();
+		window.headerbar.path_union.show_labels ();
 		window.headerbar.toggle ();
 	}
 
@@ -120,6 +140,16 @@ public class Akira.Services.ActionManager : Object {
 		window.headerbar.zoom.hide_labels ();
 		window.headerbar.preferences.hide_labels ();
 		window.headerbar.export.hide_labels ();
+		window.headerbar.group.hide_labels ();
+		window.headerbar.ungroup.hide_labels ();
+		window.headerbar.move_up.hide_labels ();
+		window.headerbar.move_down.hide_labels ();
+		window.headerbar.move_top.hide_labels ();
+		window.headerbar.move_bottom.hide_labels ();
+		window.headerbar.path_difference.hide_labels ();
+		window.headerbar.path_exclusion.hide_labels ();
+		window.headerbar.path_intersect.hide_labels ();
+		window.headerbar.path_union.hide_labels ();
 		window.headerbar.toggle ();
 	}
 

@@ -60,6 +60,7 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
 	}
 
 	construct {
+		//  set_title (APP_NAME);
 		set_show_close_button (true);
 
 		var menu_items = new Gtk.Menu ();
@@ -117,8 +118,10 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
 		move_bottom = new Akira.Partials.HeaderBarButton ("selection-bottom", _("Bottom"), {"<Ctrl><Shift>Down"});
 
 		preferences = new Akira.Partials.HeaderBarButton ("open-menu", _("Settings"), {"<Ctrl>comma"});
+		preferences.button.action_name = Akira.Services.ActionManager.ACTION_PREFIX + Akira.Services.ActionManager.ACTION_PREFERENCES;
 
 		export = new Akira.Partials.HeaderBarButton ("document-export", _("Export"), {"<Ctrl><Shift>E"});
+		export.button.action_name = Akira.Services.ActionManager.ACTION_PREFIX + Akira.Services.ActionManager.ACTION_EXPORT;
 
 		path_difference = new Akira.Partials.HeaderBarButton ("path-difference", _("Difference"), null);
 		path_exclusion = new Akira.Partials.HeaderBarButton ("path-exclusion", _("Exclusion"), null);
@@ -164,6 +167,16 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
 		toolset.update_image ();
 		export.update_image ();
 		preferences.update_image ();
+		group.update_image ();
+		ungroup.update_image ();
+		move_up.update_image ();
+		move_down.update_image ();
+		move_top.update_image ();
+		move_bottom.update_image ();
+		path_difference.update_image ();
+		path_exclusion.update_image ();
+		path_intersect.update_image ();
+		path_union.update_image ();
 	}
 
 	public void toggle () {
