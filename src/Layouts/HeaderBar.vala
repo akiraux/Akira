@@ -29,9 +29,19 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
 	public Akira.Partials.MenuButton menu;
 	public Akira.Partials.MenuButton toolset;
 	public Akira.Partials.ZoomButton zoom;
+	public Akira.Partials.HeaderBarButton group;
+	public Akira.Partials.HeaderBarButton ungroup;
+	public Akira.Partials.HeaderBarButton move_up;
+	public Akira.Partials.HeaderBarButton move_down;
+	public Akira.Partials.HeaderBarButton move_top;
+	public Akira.Partials.HeaderBarButton move_bottom;
 	public Akira.Partials.HeaderBarButton preferences;
 	public Akira.Partials.HeaderBarButton export;
 	public Akira.Partials.HeaderBarButton layout;
+	public Akira.Partials.HeaderBarButton path_difference;
+	public Akira.Partials.HeaderBarButton path_exclusion;
+	public Akira.Partials.HeaderBarButton path_intersect;
+	public Akira.Partials.HeaderBarButton path_union;
 
 	public bool toggled {
 		get {
@@ -50,7 +60,6 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
 	}
 
 	construct {
-		//  set_title (APP_NAME);
 		set_show_close_button (true);
 
 		var menu_items = new Gtk.Menu ();
@@ -99,22 +108,44 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
 
 		zoom = new Akira.Partials.ZoomButton (window);
 
+		group = new Akira.Partials.HeaderBarButton ("object-group", _("Group"), {"<Ctrl>g"});
+		ungroup = new Akira.Partials.HeaderBarButton ("object-ungroup", _("Ungroup"), {"<Ctrl><Shift>g"});
+
+		move_up = new Akira.Partials.HeaderBarButton ("selection-raise", _("Up"), {"<Ctrl>Up"});
+		move_down = new Akira.Partials.HeaderBarButton ("selection-lower", _("Down"), {"<Ctrl>Down"});
+		move_top = new Akira.Partials.HeaderBarButton ("selection-top", _("Top"), {"<Ctrl><Shift>Up"});
+		move_bottom = new Akira.Partials.HeaderBarButton ("selection-bottom", _("Bottom"), {"<Ctrl><Shift>Down"});
+
 		preferences = new Akira.Partials.HeaderBarButton ("open-menu", _("Settings"), {"<Ctrl>comma"});
-		preferences.button.action_name = Akira.Services.ActionManager.ACTION_PREFIX + Akira.Services.ActionManager.ACTION_PREFERENCES;
 
 		export = new Akira.Partials.HeaderBarButton ("document-export", _("Export"), {"<Ctrl><Shift>E"});
-		export.button.action_name = Akira.Services.ActionManager.ACTION_PREFIX + Akira.Services.ActionManager.ACTION_EXPORT;
+
+		path_difference = new Akira.Partials.HeaderBarButton ("path-difference", _("Difference"), null);
+		path_exclusion = new Akira.Partials.HeaderBarButton ("path-exclusion", _("Exclusion"), null);
+		path_intersect = new Akira.Partials.HeaderBarButton ("path-intersection", _("Intersect"), null);
+		path_union = new Akira.Partials.HeaderBarButton ("path-union", _("Union"), null);
 
 		pack_start (menu);
 		pack_start (toolset);
 		pack_start (new Gtk.Separator (Gtk.Orientation.VERTICAL));
 		pack_start (zoom);
 		pack_start (new Gtk.Separator (Gtk.Orientation.VERTICAL));
-		//  pack_start (group);
-		//  pack_start (ungroup);
+		pack_start (group);
+		pack_start (ungroup);
+		pack_start (new Gtk.Separator (Gtk.Orientation.VERTICAL));
+		pack_start (move_up);
+		pack_start (move_down);
+		pack_start (move_top);
+		pack_start (move_bottom);
+		pack_start (new Gtk.Separator (Gtk.Orientation.VERTICAL));
 
 		pack_end (preferences);
 		pack_end (export);
+		pack_end (new Gtk.Separator (Gtk.Orientation.VERTICAL));
+		pack_end (path_difference);
+		pack_end (path_exclusion);
+		pack_end (path_intersect);
+		pack_end (path_union);
 		pack_end (new Gtk.Separator (Gtk.Orientation.VERTICAL));
 
 		build_signals ();
