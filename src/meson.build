@@ -22,6 +22,11 @@ executable(
     'Application.vala',
     'Window.vala',
 
+    'FileFormat/AkiraFile.vala',
+    'FileFormat/JsonObject.vala',
+    'FileFormat/ZipArchiveHandler.vala',
+    'FileFormat/Objects/Version.vala',
+
     'Services/Settings.vala',
     'Services/ActionManager.vala',
 
@@ -56,6 +61,8 @@ executable(
         dependency('gee-0.8'),
         dependency('libxml-2.0'),
         dependency('gtksourceview-3.0'),
+        dependency('libarchive'),
+        dependency('json-glib-1.0'),
         dependency('cairo', version: '>=1.14'),
         dependency('goocanvas-2.0'),
     ],
