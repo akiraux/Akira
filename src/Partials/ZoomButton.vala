@@ -77,10 +77,10 @@ public class Akira.Partials.ZoomButton : Gtk.Grid {
 		label_btn = new Gtk.Label (_("Zoom"));
 		label_btn.get_style_context ().add_class ("headerbar-label");
 		label_btn.margin_top = 4;
-		
+
 		attach (label_btn, 0, 1, 3, 1);
 	}
-	
+
 	public void toggle () {
 		labeled = !labeled;
 	}
@@ -92,7 +92,7 @@ public class Akira.Partials.ZoomButton : Gtk.Grid {
 	public void hide_labels () {
 		labeled = false;
 	}
-	
+
 	public void zoom_out () {
 		var zoom = int.parse (zoom_default_button.label) - 10;
 		if (zoom < 0) {
@@ -103,7 +103,7 @@ public class Akira.Partials.ZoomButton : Gtk.Grid {
 		zoom_out_button.sensitive = true;
 		zoom_default_button.label = "%.0f%%".printf (zoom);
 		window.main_window.main_canvas.canvas.set_scale (window.main_window.main_canvas.canvas.get_scale () - 0.1);
-		window.main_window.main_canvas.canvas.reset_select ();
+		// window.main_window.main_canvas.canvas.reset_select ();
 	}
 
 	public void zoom_in () {
@@ -116,7 +116,7 @@ public class Akira.Partials.ZoomButton : Gtk.Grid {
 		zoom_in_button.sensitive = true;
 		zoom_default_button.label = "%.0f%%".printf (zoom);
 		window.main_window.main_canvas.canvas.set_scale (window.main_window.main_canvas.canvas.get_scale () + 0.1);
-		window.main_window.main_canvas.canvas.reset_select ();
+		// window.main_window.main_canvas.canvas.reset_select ();
 	}
 
 	public void zoom_reset () {
@@ -124,6 +124,6 @@ public class Akira.Partials.ZoomButton : Gtk.Grid {
 		zoom_out_button.sensitive = true;
 		zoom_default_button.label = "100%";
 		window.main_window.main_canvas.canvas.set_scale (1);
-		window.main_window.main_canvas.canvas.reset_select ();
+		// window.main_window.main_canvas.canvas.reset_select ();
 	}
 }

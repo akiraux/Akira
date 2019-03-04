@@ -1,28 +1,27 @@
 /*
-* Copyright (c) 2019 Alecaddd (http://alecaddd.com)
+* Copyright (c) 2018 Felipe Escoto (https://github.com/Philip-Scott)
 *
-* This file is part of Akira.
+* This program is free software; you can redistribute it and/or
+* modify it under the terms of the GNU General Public
+* License as published by the Free Software Foundation; either
+* version 2 of the License, or (at your option) any later version.
 *
-* Akira is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
-
-* Akira is distributed in the hope that it will be useful,
+* This program is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-
-* You should have received a copy of the GNU General Public License
-* along with Akira.  If not, see <https://www.gnu.org/licenses/>.
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+* General Public License for more details.
+*
+* You should have received a copy of the GNU General Public
+* License along with this program; if not, write to the
+* Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+* Boston, MA 02111-1307, USA.
 *
 * Authored by: Felipe Escoto <felescoto95@hotmail.com>
 * Edited by: Alessandro Castellani <castellani.ale@gmail.com>
 */
 
 public class Akira.Lib.Canvas : Goo.Canvas {
-    private const int MIN_SIZE = 1;
-    private const int MIN_POS = 10;
+    private const int MIN_SIZE = 40;
 
     /**
      * Signal triggered when item was clicked by the user
@@ -35,92 +34,61 @@ public class Akira.Lib.Canvas : Goo.Canvas {
      */
     public signal void item_moved (Goo.CanvasItem? item);
 
-    public Goo.CanvasItem? selected_item;
-    public Goo.CanvasRect select_effect;
+    public weak Goo.CanvasItem? selected_item;
+    public weak Goo.CanvasItem? select_effect;
 
-     /*
-        Grabber Pos:   8
-                     0 1 2
-                     7   3
-                     6 5 4
+    public Goo.CanvasItem[] nobs;
+    private Goo.CanvasItem? nob_tl;
+    private weak Goo.CanvasItem? nob_tc;
+    private weak Goo.CanvasItem? nob_tr;
+    private weak Goo.CanvasItem? nob_rc;
+    private weak Goo.CanvasItem? nob_bl;
+    private weak Goo.CanvasItem? nob_bc;
+    private weak Goo.CanvasItem? nob_br;
+    private weak Goo.CanvasItem? nob_lc;
 
-        // -1 if no nub is grabbed
-    */
-    enum Nob {
-        NONE=-1,
-        TOP_LEFT,
-        TOP_CENTER,
-        TOP_RIGHT,
-        RIGHT_CENTER,
-        BOTTOM_RIGHT,
-        BOTTOM_CENTER,
-        BOTTOM_LEFT,
-        LEFT_CENTER,
-        ROTATE
-    }
-
-    private Goo.CanvasItemSimple[] nobs = new Goo.CanvasItemSimple[9];
-
-    private weak Goo.CanvasItem? hovered_item;
-    private Goo.CanvasRect? hover_effect;
+    public weak Goo.CanvasItem? hovered_item;
+    public weak Goo.CanvasRect? hover_effect;
 
     private bool holding;
     private double event_x_root;
     private double event_y_root;
     private double start_x;
     private double start_y;
-    private double start_w;
-    private double start_h;
     private double delta_x;
     private double delta_y;
     private double hover_x;
     private double hover_y;
     private double nob_size;
     private double current_scale;
-    private int holding_id = Nob.NONE;
-    private double bounds_x;
-    private double bounds_y;
-    private double bounds_w;
-    private double bounds_h;
+    private int holding_id = 0;
 
     construct {
         events |= Gdk.EventMask.BUTTON_PRESS_MASK;
         events |= Gdk.EventMask.BUTTON_RELEASE_MASK;
         events |= Gdk.EventMask.POINTER_MOTION_MASK;
-        get_bounds(out bounds_x, out bounds_y, out bounds_w, out bounds_h);
     }
 
     public override bool button_press_event (Gdk.EventButton event) {
         remove_hover_effect ();
+        remove_select_effect ();
 
         current_scale = get_scale ();
         event_x_root = event.x;
         event_y_root = event.y;
 
-        var clicked_item = get_item_at (event.x / current_scale, event.y / current_scale, true);
+        selected_item = get_item_at (event.x / current_scale, event.y / current_scale, true);
 
-        if (clicked_item != null) {
-            var clicked_id = get_grabbed_id (clicked_item);
-            holding = true;
-
-            if (clicked_id == Nob.NONE) { // Non-nub was clicked
-                remove_select_effect ();
-                if (clicked_item is Goo.CanvasItemSimple) {
-                    clicked_item.get ("x", out start_x, "y", out start_y, "width", out start_w, "height", out start_h);
-                    print("start event: start_x %f, start_y %f, start_w %f, start_h %f\n", start_x, start_y, start_w, start_h);
-                }
-
-                add_select_effect (clicked_item);
-                grab_focus (clicked_item);
-
-                selected_item = clicked_item;
-                holding_id = Nob.NONE;
-            } else { // nub was clicked
-                selected_item.get ("x", out start_x, "y", out start_y);
-                holding_id = clicked_id;
+        if (selected_item != null) {
+            if (selected_item is Goo.CanvasItemSimple) {
+                start_x = (selected_item as Goo.CanvasItemSimple).x;
+                start_y = (selected_item as Goo.CanvasItemSimple).y;
             }
+
+            holding = true;
+            add_select_effect (selected_item);
+            grab_focus (selected_item);
         } else {
-            remove_select_effect ();
             grab_focus (get_root_item ());
         }
 
@@ -136,14 +104,11 @@ public class Akira.Lib.Canvas : Goo.Canvas {
             return false;
         }
 
-        selected_item.get ("x", out start_x, "y", out start_y, "width", out start_w, "height", out start_h);
-        print("release event: start_x %f, start_y %f, start_w %f, start_h %f\n", start_x, start_y, start_w, start_h);
         item_moved (selected_item);
         add_hover_effect (selected_item);
 
         delta_x = 0;
         delta_y = 0;
-
 
         return false;
     }
@@ -151,128 +116,117 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     public override bool motion_notify_event (Gdk.EventMotion event) {
         if (!holding) {
             motion_hover_event (event);
+
             return false;
         }
 
         delta_x = (event.x - event_x_root) / current_scale;
         delta_y = (event.y - event_y_root) / current_scale;
 
-        print("delta_x: %f\n", delta_x);
-        print("delta_y: %f\n", delta_y);
-
-        var new_x = start_x;
-        var new_y = start_y;
-        var new_width = start_w;
-        var new_height = start_h;
-        var center_x = start_x + start_w / 2;
-        var center_y = start_y + start_h / 2;
-
-        Cairo.Matrix matrix = Cairo.Matrix.identity();
-        selected_item.get_transform(out matrix);
-        if (matrix.invert() == Cairo.Status.INVALID_MATRIX) {
-            matrix = Cairo.Matrix.identity();
-        } else {
-            selected_item.get_transform(out matrix);
-        }
-
+        var item = ((Goo.CanvasItemSimple) selected_item);
+        var stroke = item.line_width;
+        var width = item.bounds.x2 - item.bounds.x1 + stroke;
+        var height = item.bounds.y2 - item.bounds.y1 + stroke;
         switch (holding_id) {
-            case Nob.NONE: // Moving
-                new_x = fix_x_position ((delta_x + start_x), start_w);
-                new_y = fix_y_position ((delta_y + start_y), start_h);
-                break;
-            case Nob.TOP_LEFT:
-                new_x = fix_size (delta_x + start_x);
-                new_y = fix_size (delta_y + start_y);
-                new_width = fix_size (start_w - delta_x);
-                new_height = fix_size (start_h - delta_y);
-                break;
-            case Nob.TOP_CENTER:
-                new_y = delta_y + start_y;
-                new_height = start_h - delta_y;
-                break;
-            case Nob.TOP_RIGHT:
-                new_x = start_x;
-                new_y = fix_size (delta_y + start_y);
-                new_width = fix_size (start_w + delta_x);
-                new_height = fix_size (start_h - delta_y);
-                break;
-            case Nob.RIGHT_CENTER:
-                new_width = start_w + delta_x;
-                break;
-            case Nob.BOTTOM_RIGHT:
-                new_width = fix_size (start_w + delta_x);
-                new_height = fix_size (start_h + delta_y);
-                break;
-            case Nob.BOTTOM_CENTER:
-                new_height = fix_size (start_h + delta_y);
-                break;
-            case Nob.BOTTOM_LEFT:
-                new_x = fix_size(delta_x + start_x);
-                new_width = fix_size (start_w - delta_x);
-                new_height = fix_size (start_h + delta_y);
-                break;
-            case Nob.LEFT_CENTER:
-                new_x = delta_x + start_x;
-                new_width = start_w - delta_x;
-                break;
-            case Nob.ROTATE:
-                double x, y, width, height;
-                nobs[Nob.ROTATE].get ("x", out x, "y", out y, "width", out width, "height", out height);
-                var stroke = (nobs[Nob.ROTATE].line_width / 2);
-                var middle = (nob_size / 2) + stroke;
-                var nob_center_x = x + middle;
-                var nob_center_y = y;
+            case 0: // Moving
+                ((Goo.CanvasItemSimple) selected_item).x = delta_x + start_x;
+                ((Goo.CanvasItemSimple) selected_item).y = delta_y + start_y;
 
-                var rotation = Math.atan2 (event_x_root - center_x + delta_x, center_y - event_y_root - delta_y);
-                matrix = Cairo.Matrix.identity();
-                matrix.translate(center_x, center_y);
-                matrix.rotate (rotation);
-                matrix.translate(-center_x, -center_y);
-                selected_item.set_transform(matrix);
-                print("center: (%f,%f), nob: (%f,%f), rotation %f\n",
-                      center_x, center_y, nob_center_x, nob_center_y, to_deg(rotation));
+                // Bounding box
+                ((Goo.CanvasItemSimple) select_effect).x = delta_x + start_x - ((Goo.CanvasItemSimple) selected_item).line_width;
+                ((Goo.CanvasItemSimple) select_effect).y = delta_y + start_y - ((Goo.CanvasItemSimple) selected_item).line_width;
+
+                // TOP LEFT nob
+                ((Goo.CanvasItemSimple) nob_tl).x = delta_x + start_x - (nob_size / 2) - stroke;
+                ((Goo.CanvasItemSimple) nob_tl).y = delta_y + start_y - (nob_size / 2) - stroke;
+
+                // TOP RIGHT nob
+                ((Goo.CanvasItemSimple) nob_tr).x = delta_x + start_x + width - (nob_size / 2) - stroke;
+                ((Goo.CanvasItemSimple) nob_tr).y = delta_y + start_y - (nob_size / 2) - stroke;
+
+                // BOTTOM RIGHT nob
+                ((Goo.CanvasItemSimple) nob_br).x = delta_x + start_x + width - (nob_size / 2) - stroke;
+                ((Goo.CanvasItemSimple) nob_br).y = delta_y + start_y + height - (nob_size / 2) - stroke;
+
+                // BOTTOM LEFT nob
+                ((Goo.CanvasItemSimple) nob_bl).x = delta_x + start_x - (nob_size / 2) - stroke;
+                ((Goo.CanvasItemSimple) nob_bl).y = delta_y + start_y + height - (nob_size / 2) - stroke;
+
+                // TOP CENTER nob
+                ((Goo.CanvasItemSimple) nob_tc).x = delta_x + start_x + (width / 2) - (nob_size / 2) - stroke;
+                ((Goo.CanvasItemSimple) nob_tc).y = delta_y + start_y - (nob_size / 2) - stroke;
+
+                // RIGHT CENTER nob
+                ((Goo.CanvasItemSimple) nob_rc).x = delta_x + start_x + width - (nob_size / 2) - stroke;
+                ((Goo.CanvasItemSimple) nob_rc).y = delta_y + start_y + (height / 2) - (nob_size / 2) - stroke;
+
+                // BOTTOM CENTER nob
+                ((Goo.CanvasItemSimple) nob_bc).x = delta_x + start_x + (width / 2) - (nob_size / 2) - stroke;
+                ((Goo.CanvasItemSimple) nob_bc).y = delta_y + start_y + height - (nob_size / 2) - stroke;
+
+                // LEFT CENTER nob
+                ((Goo.CanvasItemSimple) nob_lc).x = delta_x + start_x - (nob_size / 2) - stroke;
+                ((Goo.CanvasItemSimple) nob_lc).y = delta_y + start_y + (height / 2) - (nob_size / 2) - stroke;
+
+                debug ("X:%f - Y:%f\n", ((Goo.CanvasItemSimple) selected_item).x, ((Goo.CanvasItemSimple) selected_item).y);
                 break;
-            default:
-                break;
+            //  case 1: // Top left
+            //      delta_x = fix_position (x, real_width, start_w);
+            //      delta_y = fix_position (y, real_height, start_h);
+            //      real_height = fix_size ((int) (start_h - 1 / current_scale * y));
+            //      real_width = fix_size ((int) (start_w - 1 / current_scale * x));
+            //      break;
+            //  case 2: // Top
+            //      delta_y = fix_position (y, real_height, start_h);
+            //      real_height = fix_size ((int)(start_h - 1 / current_scale * y));
+            //      break;
+            //  case 3: // Top right
+            //      delta_y = fix_position (y, real_height, start_h);
+            //      real_height = fix_size ((int)(start_h - 1 / current_scale * y));
+            //      real_width = fix_size ((int)(start_w + 1 / current_scale * x));
+            //      break;
+            //  case 4: // Right
+            //      real_width = fix_size ((int)(start_w + 1 / current_scale * x));
+            //      break;
+            //  case 5: // Bottom Right
+            //      real_width = fix_size ((int)(start_w + 1 / current_scale * x));
+            //      real_height = fix_size ((int)(start_h + 1 / current_scale * y));
+            //      break;
+            //  case 6: // Bottom
+            //      real_height = fix_size ((int)(start_h + 1 / current_scale * y));
+            //      break;
+            //  case 7: // Bottom left
+            //      real_height = fix_size ((int)(start_h + 1 / current_scale * y));
+            //      real_width = fix_size ((int)(start_w - 1 / current_scale * x));
+            //      delta_x = fix_position (x, real_width, start_w);
+            //      break;
+            //  case 8: // Left
+            //      real_width = fix_size ((int) (start_w - 1 / current_scale * x));
+            //      delta_x = fix_position (x, real_width, start_w);
+            //      break;
         }
-
-        print("new_x %f, new_y %f, start_x %f, start_y %f\n", new_x, new_y, start_x, start_y);
-        selected_item.set ("x", new_x, "y", new_y, "width", new_width, "height", new_height);
-
-        update_nob_position (selected_item, matrix);
-        update_select_effect (selected_item, matrix);
 
         return false;
-    }
-
-    inline double to_radians (double degrees) {
-        return degrees / (180.0 / Math.PI);
-    }
-
-    inline double to_deg (double rad) {
-        return rad * (180.0 / Math.PI);
     }
 
     private void motion_hover_event (Gdk.EventMotion event) {
         hovered_item = get_item_at (event.x / get_scale (), event.y / get_scale (), true);
 
-        if (!(hovered_item is Goo.CanvasItemSimple)) {
+        if (!(hovered_item is Goo.CanvasItem)) {
             remove_hover_effect ();
             return;
         }
 
         add_hover_effect (hovered_item);
 
-        double check_x;
-        double check_y;
-        hovered_item.get ("x", out check_x, "y", out check_y);
-
-        if ((hover_x != check_x || hover_y != check_y) && hover_effect != hovered_item) {
+        if ((hover_x != (hovered_item as Goo.CanvasItemSimple).x
+            || hover_y != (hovered_item as Goo.CanvasItemSimple).y)
+            && hover_effect != hovered_item) {
             remove_hover_effect ();
         }
 
-        hover_x = check_x;
-        hover_y = check_y;
+        hover_x = (hovered_item as Goo.CanvasItemSimple).x;
+        hover_y = (hovered_item as Goo.CanvasItemSimple).y;
     }
 
     private void add_select_effect (Goo.CanvasItem? target) {
@@ -280,60 +234,94 @@ public class Akira.Lib.Canvas : Goo.Canvas {
             return;
         }
 
-        double x, y;
-        target.get ("x", out x, "y", out y);
-
         var item = (target as Goo.CanvasItemSimple);
 
         var line_width = 1.0 / current_scale;
-        var real_x = x - (line_width * 2);
-        var real_y = y - (line_width * 2);
-        var width = item.bounds.x2 - item.bounds.x1;
-        var height = item.bounds.y2 - item.bounds.y1;
+        var stroke = item.line_width;
+        var x = item.x - stroke;
+        var y = item.y - stroke;
+        var width = item.bounds.x2 - item.bounds.x1 + stroke;
+        var height = item.bounds.y2 - item.bounds.y1 + stroke;
 
-        select_effect = new Goo.CanvasRect (null, real_x, real_y, width, height,
-                                   "line-width", line_width,
-                                   "stroke-color", "#666", null
+        select_effect = Goo.CanvasRect.create (get_root_item (), x, y, width, height,
+                                   "line-width", line_width, 
+                                   "stroke-color", "#666"
                                    );
 
-        select_effect.set ("parent", get_root_item ());
-
         nob_size = 10 / current_scale;
+        nob_tl = Goo.CanvasRect.create (get_root_item (), x - (nob_size / 2), y - (nob_size / 2), nob_size, nob_size,
+                                "line-width", line_width, 
+                                "stroke-color", "#41c9fd",
+                                "fill-color", "#fff"
+                                );
 
-        for (int i = 0; i < 9; i++) {
-            var radius = i == 8 ? nob_size : 0;
-            nobs[i] = new Goo.CanvasRect (null, 0, 0, nob_size, nob_size,
-                "line-width", line_width,
-                "radius-x", radius,
-                "radius-y", radius,
-                "stroke-color", "#41c9fd",
-                "fill-color", "#fff", null
-            );
-            nobs[i].set ("parent", get_root_item ());
-        }
+        //  nob_tl = new Akira.Lib.Selection.Nob.with_values (get_root_item (), x, y, current_scale);
 
-        Cairo.Matrix matrix = Cairo.Matrix.identity();
-        target.get_transform (out matrix);
-        update_nob_position (target, matrix);
+        nob_tr = Goo.CanvasRect.create (get_root_item (), x + width - (nob_size / 2), y - (nob_size / 2), nob_size, nob_size,
+                                "line-width", line_width, 
+                                "stroke-color", "#41c9fd",
+                                "fill-color", "#fff"
+                                );
+
+        nob_bl = Goo.CanvasRect.create (get_root_item (), x - (nob_size / 2), y + height - (nob_size / 2), nob_size, nob_size,
+                                "line-width", line_width, 
+                                "stroke-color", "#41c9fd",
+                                "fill-color", "#fff"
+                                );
+
+        nob_br = Goo.CanvasRect.create (get_root_item (), x + width - (nob_size / 2), y + height - (nob_size / 2), nob_size, nob_size,
+                                "line-width", line_width, 
+                                "stroke-color", "#41c9fd",
+                                "fill-color", "#fff"
+                                );
+
+        nob_tc = Goo.CanvasRect.create (get_root_item (), x + (width / 2) - (nob_size / 2), y - (nob_size / 2), nob_size, nob_size,
+                                "line-width", line_width, 
+                                "stroke-color", "#41c9fd",
+                                "fill-color", "#fff"
+                                );
+
+        nob_rc = Goo.CanvasRect.create (get_root_item (), 
+                                x + width - (nob_size / 2), 
+                                y + (height / 2) - (nob_size / 2), 
+                                nob_size, 
+                                nob_size,
+                                "line-width", line_width, 
+                                "stroke-color", "#41c9fd",
+                                "fill-color", "#fff"
+                                );
+
+        nob_bc = Goo.CanvasRect.create (get_root_item (), 
+                                x + (width / 2) - (nob_size / 2), 
+                                y + height - (nob_size / 2), 
+                                nob_size, 
+                                nob_size,
+                                "line-width", line_width, 
+                                "stroke-color", "#41c9fd",
+                                "fill-color", "#fff"
+                                );
+
+        nob_lc = Goo.CanvasRect.create (get_root_item (),
+                                x - (nob_size / 2),
+                                y + (height / 2) - (nob_size / 2),
+                                nob_size,
+                                nob_size,
+                                "line-width", line_width,
+                                "stroke-color", "#41c9fd",
+                                "fill-color", "#fff"
+                                );
+
         select_effect.can_focus = false;
-    }
+        nob_tl.can_focus = false;
+        nob_tr.can_focus = false;
+        nob_bl.can_focus = false;
+        nob_br.can_focus = false;
+        nob_tc.can_focus = false;
+        nob_rc.can_focus = false;
+        nob_bc.can_focus = false;
+        nob_lc.can_focus = false;
 
-    private void update_select_effect (Goo.CanvasItem? target, Cairo.Matrix matrix) {
-        if (target == null || target == select_effect) {
-            return;
-        }
-
-        double x, y, width, height;
-        target.get ("x", out x, "y", out y, "width", out width, "height", out height);
-
-        var item = (target as Goo.CanvasItemSimple);
-        var stroke = (item.line_width / 2);
-        var line_width = 1.0 / current_scale;
-        var real_x = x - (line_width * 2);
-        var real_y = y - (line_width * 2);
-
-        select_effect.set ("x", real_x, "y", real_y, "width", width + (stroke * 2), "height", height + (stroke * 2));
-        select_effect.set_transform(matrix);
+        nobs = {nob_tl, nob_tr, nob_bl, nob_br, nob_tc, nob_rc, nob_bc, nob_lc};
     }
 
     private void remove_select_effect () {
@@ -343,27 +331,15 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
         select_effect.remove ();
         select_effect = null;
-        selected_item = null;
 
-        for (int i = 0; i < 9; i++) {
-            nobs[i].remove ();
-        }
-    }
-
-    public void reset_select () {
-        if (selected_item == null && select_effect == null) {
-            return;
-        }
-
-        select_effect.remove ();
-        select_effect = null;
-
-        for (int i = 0; i < 9; i++) {
-            nobs[i].remove ();
-        }
-
-        current_scale = get_scale ();
-        add_select_effect (selected_item);
+        nob_tl.remove ();
+        nob_bl.remove ();
+        nob_tr.remove ();
+        nob_br.remove ();
+        nob_tc.remove ();
+        nob_rc.remove ();
+        nob_bc.remove ();
+        nob_lc.remove ();
     }
 
     private void add_hover_effect (Goo.CanvasItem? target) {
@@ -371,32 +347,24 @@ public class Akira.Lib.Canvas : Goo.Canvas {
             return;
         }
 
-        if ((target as Goo.CanvasItemSimple) in nobs) {
-            set_cursor_for_nob (get_grabbed_id (target));
+        if (target in nobs) {
+            set_cursor_for_nob (target);
             return;
         }
-
-        double x, y;
-        target.get ("x", out x, "y", out y);
 
         var item = (target as Goo.CanvasItemSimple);
 
         var line_width = 2.0 / get_scale ();
         var stroke = item.line_width;
-        var real_x = x - (line_width * 2);
-        var real_y = y - (line_width * 2);
-        var width = item.bounds.x2 - item.bounds.x1 + stroke - line_width;
-        var height = item.bounds.y2 - item.bounds.y1 + stroke - line_width;
+        var x = item.x - stroke;
+        var y = item.y - stroke;
+        var width = item.bounds.x2 - item.bounds.x1 + stroke;
+        var height = item.bounds.y2 - item.bounds.y1 + stroke;
 
-        hover_effect = new Goo.CanvasRect (null, real_x, real_y, width, height,
-                                   "line-width", line_width,
-                                   "stroke-color", "#41c9fd", null
+        hover_effect = Goo.CanvasRect.create (get_root_item (), x, y, width, height,
+                                   "line-width", line_width, 
+                                   "stroke-color", "#41c9fd"
                                    );
-
-        Cairo.Matrix matrix = Cairo.Matrix.identity();
-        target.get_transform (out matrix);
-        hover_effect.set_transform(matrix);
-        hover_effect.set ("parent", get_root_item ());
 
         hover_effect.can_focus = false;
     }
@@ -412,156 +380,44 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         hover_effect = null;
     }
 
-    private int get_grabbed_id (Goo.CanvasItem? target) {
-        for (int i = 0; i < 9; i++) {
-            if (target == nobs[i]) return i;
+    private void set_cursor_for_nob (Goo.CanvasItem? target) {
+        if (target == nob_tl) {
+            set_cursor (Gdk.CursorType.TOP_LEFT_CORNER);
+        } else if (target == nob_tr) {
+            set_cursor (Gdk.CursorType.TOP_RIGHT_CORNER);
+        } else if (target == nob_br) {
+            set_cursor (Gdk.CursorType.BOTTOM_RIGHT_CORNER);
+        } else if (target == nob_bl) {
+            set_cursor (Gdk.CursorType.BOTTOM_LEFT_CORNER);
+        } else if (target == nob_rc) {
+            set_cursor (Gdk.CursorType.RIGHT_SIDE);
+        } else if (target == nob_bc) {
+            set_cursor (Gdk.CursorType.BOTTOM_SIDE);
+        } else if (target == nob_lc) {
+            set_cursor (Gdk.CursorType.LEFT_SIDE);
+        } else if (target == nob_tc) {
+            set_cursor (Gdk.CursorType.TOP_SIDE);
+        } else {
+            set_cursor (Gdk.CursorType.ARROW);
         }
-
-        return Nob.NONE;
-    }
-
-    private void set_cursor_for_nob (int grabbed_id) {
-        switch (grabbed_id) {
-            case Nob.NONE:
-                set_cursor (Gdk.CursorType.ARROW);
-                break;
-            case Nob.TOP_LEFT:
-                set_cursor (Gdk.CursorType.TOP_LEFT_CORNER);
-                break;
-            case Nob.TOP_CENTER:
-                set_cursor (Gdk.CursorType.TOP_SIDE);
-                break;
-            case Nob.TOP_RIGHT:
-                set_cursor (Gdk.CursorType.TOP_RIGHT_CORNER);
-                break;
-            case Nob.RIGHT_CENTER:
-                set_cursor (Gdk.CursorType.RIGHT_SIDE);
-                break;
-            case Nob.BOTTOM_RIGHT:
-                set_cursor (Gdk.CursorType.BOTTOM_RIGHT_CORNER);
-                break;
-            case Nob.BOTTOM_CENTER:
-                set_cursor (Gdk.CursorType.BOTTOM_SIDE);
-                break;
-            case Nob.BOTTOM_LEFT:
-                set_cursor (Gdk.CursorType.BOTTOM_LEFT_CORNER);
-                break;
-            case Nob.LEFT_CENTER:
-                set_cursor (Gdk.CursorType.LEFT_SIDE);
-                break;
-            case Nob.ROTATE:
-                set_cursor (Gdk.CursorType.ICON);
-                break;
-        }
-    }
-
-    // Updates all the nub's position arround the selected item, except for the grabbed nub
-    // TODO: concider item rotation into account
-    private void update_nob_position (Goo.CanvasItem target, Cairo.Matrix? matrix)  {
-        var item = (target as Goo.CanvasItemSimple);
-
-        var stroke = (item.line_width / 2);
-        double x, y, width, height;
-        target.get ("x", out x, "y", out y, "width", out width, "height", out height);
-        var middle = (nob_size / 2) + stroke;
-        var middle_stroke = (nob_size / 2) - stroke;
-
-        // TOP LEFT nob
-        var nob = nobs[Nob.TOP_LEFT];
-        nob.set ("x", x - middle, "y", y - middle);
-        if (matrix != null)
-           nob.set_transform(matrix);
-
-        // TOP CENTER nob
-        nob = nobs[Nob.TOP_CENTER];
-        nob.set ("x", x + (width / 2) - middle, "y", y - middle);
-        if (matrix != null)
-           nob.set_transform(matrix);
-
-        // TOP RIGHT nob
-        nob = nobs[Nob.TOP_RIGHT];
-        nob.set ("x", x + width - middle_stroke, "y", y - middle);
-        if (matrix != null)
-           nob.set_transform(matrix);
-
-        // RIGHT CENTER nob
-        nob = nobs[Nob.RIGHT_CENTER];
-        nob.set ("x", x + width - middle_stroke, "y", y + (height / 2) - middle);
-        if (matrix != null)
-           nob.set_transform(matrix);
-
-        // BOTTOM RIGHT nob
-        nob = nobs[Nob.BOTTOM_RIGHT];
-        nob.set ("x", x + width - middle_stroke, "y", y + height - middle_stroke);
-        if (matrix != null)
-           nob.set_transform(matrix);
-
-        // BOTTOM CENTER nob
-        nob = nobs[Nob.BOTTOM_CENTER];
-        nob.set ("x", x + (width / 2) - middle, "y", y + height - middle_stroke);
-        if (matrix != null)
-           nob.set_transform(matrix);
-
-        // BOTTOM LEFT nob
-        nob = nobs[Nob.BOTTOM_LEFT];
-        nob.set ("x", x - middle, "y", y + height - middle_stroke);
-        if (matrix != null)
-           nob.set_transform(matrix);
-
-        // LEFT CENTER nob
-        nob = nobs[Nob.LEFT_CENTER];
-        nob.set ("x", x - middle, "y", y + (height / 2) - middle);
-        if (matrix != null)
-           nob.set_transform(matrix);
-
-        // ROTATE nob
-        double distance = 40;
-        if (current_scale < 1) {
-            distance = 40 + ((40 - (40 * current_scale)) * 2);
-        }
-
-        nob = nobs[Nob.ROTATE];
-        nob.set ("x", x + (width / 2) - middle, "y", y - (nob_size / 2) - distance);
-        if (matrix != null)
-           nob.set_transform(matrix);
     }
 
     private void set_cursor (Gdk.CursorType cursor_type) {
         var cursor = new Gdk.Cursor.for_display (Gdk.Display.get_default (), cursor_type);
-        get_window ().set_cursor (cursor);
+        get_window ().get_screen ().get_root_window ().set_cursor (cursor);
     }
 
     // To make it so items can't become imposible to grab. TODOs
-    private double fix_y_position (double y, double height) {
-        var min_delta = (MIN_POS - height) * current_scale;
-        var max_delta = (bounds_h + height - MIN_POS) * current_scale;
-        print("min_y_delta %f\n", min_delta);
-        print("max_y_delta %f\n", max_delta);
-        if (y < min_delta) {
-            return Math.round (min_delta);
-        } else if (y > max_delta) {
-            return Math.round (max_delta);
-        } else {
-            return Math.round (y);
-        }
-    }
+    //  private int fix_position (int delta, int length, int initial_length) {
+    //      var max_delta = (initial_length - MIN_SIZE) * current_scale;
+    //      if (delta < max_delta) {
+    //          return delta;
+    //      } else {
+    //          return (int) max_delta;
+    //      }
+    //  }
 
-    // To make it so items can't become imposible to grab. TODOs
-    private double fix_x_position (double x, double width) {
-        var min_delta = (MIN_POS - width) * current_scale;
-        var max_delta = (bounds_h + width - MIN_POS) * current_scale;
-        print("min_x_delta %f\n", min_delta);
-        print("max_x_delta %f\n", max_delta);
-        if (x < min_delta) {
-            return Math.round (min_delta);
-        } else if (x > max_delta) {
-            return Math.round (max_delta);
-        } else {
-            return Math.round (x);
-        }
-    }
-
-    private double fix_size (double size) {
-        return size > MIN_SIZE ? Math.round (size) : MIN_SIZE;
-    }
+    //  private int fix_size (int size) {
+    //      return size > MIN_SIZE ? size : MIN_SIZE;
+    //  }
 }
