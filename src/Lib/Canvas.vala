@@ -17,7 +17,7 @@
 * along with Akira.  If not, see <https://www.gnu.org/licenses/>.
 *
 * Authored by: Felipe Escoto <felescoto95@hotmail.com>
-* Edited by: Alessandro Castellani <castellani.ale@gmail.com>
+* Authored by: Alberto Fanjul <albertofanjul@gmail.com>
 */
 
 public class Akira.Lib.Canvas : Goo.Canvas {
@@ -164,16 +164,6 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         var new_y = start_y;
         var new_width = start_w;
         var new_height = start_h;
-        var center_x = start_x + start_w / 2;
-        var center_y = start_y + start_h / 2;
-
-        Cairo.Matrix matrix = Cairo.Matrix.identity();
-        selected_item.get_transform(out matrix);
-        if (matrix.invert() == Cairo.Status.INVALID_MATRIX) {
-            matrix = Cairo.Matrix.identity();
-        } else {
-            selected_item.get_transform(out matrix);
-        }
 
         switch (holding_id) {
             case Nob.NONE: // Moving
@@ -216,41 +206,17 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 new_width = start_w - delta_x;
                 break;
             case Nob.ROTATE:
-                double x, y, width, height;
-                nobs[Nob.ROTATE].get ("x", out x, "y", out y, "width", out width, "height", out height);
-                var stroke = (nobs[Nob.ROTATE].line_width / 2);
-                var middle = (nob_size / 2) + stroke;
-                var nob_center_x = x + middle;
-                var nob_center_y = y;
-
-                var rotation = Math.atan2 (event_x_root - center_x + delta_x, center_y - event_y_root - delta_y);
-                matrix = Cairo.Matrix.identity();
-                matrix.translate(center_x, center_y);
-                matrix.rotate (rotation);
-                matrix.translate(-center_x, -center_y);
-                selected_item.set_transform(matrix);
-                print("center: (%f,%f), nob: (%f,%f), rotation %f\n",
-                      center_x, center_y, nob_center_x, nob_center_y, to_deg(rotation));
                 break;
             default:
+                print("grab rotate");
                 break;
         }
-
-        print("new_x %f, new_y %f, start_x %f, start_y %f\n", new_x, new_y, start_x, start_y);
         selected_item.set ("x", new_x, "y", new_y, "width", new_width, "height", new_height);
 
-        update_nob_position (selected_item, matrix);
-        update_select_effect (selected_item, matrix);
+        update_nob_position (selected_item);
+        update_select_effect (selected_item);
 
         return false;
-    }
-
-    inline double to_radians (double degrees) {
-        return degrees / (180.0 / Math.PI);
-    }
-
-    inline double to_deg (double rad) {
-        return rad * (180.0 / Math.PI);
     }
 
     private void motion_hover_event (Gdk.EventMotion event) {
@@ -312,13 +278,11 @@ public class Akira.Lib.Canvas : Goo.Canvas {
             nobs[i].set ("parent", get_root_item ());
         }
 
-        Cairo.Matrix matrix = Cairo.Matrix.identity();
-        target.get_transform (out matrix);
-        update_nob_position (target, matrix);
+        update_nob_position (target);
         select_effect.can_focus = false;
     }
 
-    private void update_select_effect (Goo.CanvasItem? target, Cairo.Matrix matrix) {
+    private void update_select_effect (Goo.CanvasItem? target) {
         if (target == null || target == select_effect) {
             return;
         }
@@ -333,7 +297,6 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         var real_y = y - (line_width * 2);
 
         select_effect.set ("x", real_x, "y", real_y, "width", width + (stroke * 2), "height", height + (stroke * 2));
-        select_effect.set_transform(matrix);
     }
 
     private void remove_select_effect () {
@@ -392,10 +355,6 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                                    "line-width", line_width,
                                    "stroke-color", "#41c9fd", null
                                    );
-
-        Cairo.Matrix matrix = Cairo.Matrix.identity();
-        target.get_transform (out matrix);
-        hover_effect.set_transform(matrix);
         hover_effect.set ("parent", get_root_item ());
 
         hover_effect.can_focus = false;
@@ -457,7 +416,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
     // Updates all the nub's position arround the selected item, except for the grabbed nub
     // TODO: concider item rotation into account
-    private void update_nob_position (Goo.CanvasItem target, Cairo.Matrix? matrix)  {
+    private void update_nob_position (Goo.CanvasItem target) {
         var item = (target as Goo.CanvasItemSimple);
 
         var stroke = (item.line_width / 2);
@@ -467,52 +426,33 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         var middle_stroke = (nob_size / 2) - stroke;
 
         // TOP LEFT nob
-        var nob = nobs[Nob.TOP_LEFT];
-        nob.set ("x", x - middle, "y", y - middle);
-        if (matrix != null)
-           nob.set_transform(matrix);
+        nobs[Nob.TOP_LEFT].set ("x", x - middle, "y", y - middle);
 
         // TOP CENTER nob
-        nob = nobs[Nob.TOP_CENTER];
-        nob.set ("x", x + (width / 2) - middle, "y", y - middle);
-        if (matrix != null)
-           nob.set_transform(matrix);
+        nobs[Nob.TOP_CENTER].set ("x", x + (width / 2) - middle, "y", y - middle);
 
         // TOP RIGHT nob
-        nob = nobs[Nob.TOP_RIGHT];
-        nob.set ("x", x + width - middle_stroke, "y", y - middle);
-        if (matrix != null)
-           nob.set_transform(matrix);
+        nobs[Nob.TOP_RIGHT].set ("x", x + width - middle_stroke, "y", y - middle);
 
         // RIGHT CENTER nob
-        nob = nobs[Nob.RIGHT_CENTER];
-        nob.set ("x", x + width - middle_stroke, "y", y + (height / 2) - middle);
-        if (matrix != null)
-           nob.set_transform(matrix);
+        nobs[Nob.RIGHT_CENTER].set ("x", x + width - middle_stroke,
+                    "y", y + (height / 2) - middle);
 
         // BOTTOM RIGHT nob
-        nob = nobs[Nob.BOTTOM_RIGHT];
-        nob.set ("x", x + width - middle_stroke, "y", y + height - middle_stroke);
-        if (matrix != null)
-           nob.set_transform(matrix);
+        nobs[Nob.BOTTOM_RIGHT].set ("x", x + width - middle_stroke,
+                    "y", y + height - middle_stroke);
 
         // BOTTOM CENTER nob
-        nob = nobs[Nob.BOTTOM_CENTER];
-        nob.set ("x", x + (width / 2) - middle, "y", y + height - middle_stroke);
-        if (matrix != null)
-           nob.set_transform(matrix);
+        nobs[Nob.BOTTOM_CENTER].set ("x", x + (width / 2) - middle,
+                    "y", y + height - middle_stroke);
 
         // BOTTOM LEFT nob
-        nob = nobs[Nob.BOTTOM_LEFT];
-        nob.set ("x", x - middle, "y", y + height - middle_stroke);
-        if (matrix != null)
-           nob.set_transform(matrix);
+        nobs[Nob.BOTTOM_LEFT].set ("x", x - middle,
+                    "y", y + height - middle_stroke);
 
         // LEFT CENTER nob
-        nob = nobs[Nob.LEFT_CENTER];
-        nob.set ("x", x - middle, "y", y + (height / 2) - middle);
-        if (matrix != null)
-           nob.set_transform(matrix);
+        nobs[Nob.LEFT_CENTER].set ("x", x - middle,
+                    "y", y + (height / 2) - middle);
 
         // ROTATE nob
         double distance = 40;
@@ -520,10 +460,8 @@ public class Akira.Lib.Canvas : Goo.Canvas {
             distance = 40 + ((40 - (40 * current_scale)) * 2);
         }
 
-        nob = nobs[Nob.ROTATE];
-        nob.set ("x", x + (width / 2) - middle, "y", y - (nob_size / 2) - distance);
-        if (matrix != null)
-           nob.set_transform(matrix);
+        nobs[Nob.ROTATE].set ("x", x + (width / 2) - middle,
+                    "y", y - (nob_size / 2) - distance);
     }
 
     private void set_cursor (Gdk.CursorType cursor_type) {
