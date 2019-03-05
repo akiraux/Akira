@@ -25,6 +25,9 @@ asresources = gnome.compile_resources(
     c_name: 'as'
 )
 
+cc = meson.get_compiler('c')
+m_dep = cc.find_library('m', required: true)
+
 # Set our translation domain
 add_global_arguments('-DGETTEXT_PACKAGE="@0@"'.format (meson.project_name()), language:'c')
 

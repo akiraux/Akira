@@ -1,20 +1,20 @@
 /*
-* Copyright (c) 2018 Alecaddd (http://alecaddd.com)
+* Copyright (c) 2019 Alecaddd (http://alecaddd.com)
 *
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public
-* License as published by the Free Software Foundation; either
-* version 2 of the License, or (at your option) any later version.
+* This file is part of Akira.
 *
-* This program is distributed in the hope that it will be useful,
+* Akira is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+
+* Akira is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* General Public License for more details.
-*
-* You should have received a copy of the GNU General Public
-* License along with this program; if not, write to the
-* Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
-* Boston, MA 02110-1301 USA
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+
+* You should have received a copy of the GNU General Public License
+* along with Akira.  If not, see <https://www.gnu.org/licenses/>.
 *
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
@@ -34,8 +34,12 @@ public class Akira.Services.ActionManager : Object {
 	public const string ACTION_SHOW_UI_GRID = "action-show-ui-grid";
 	public const string ACTION_PRESENTATION = "action_presentation";
 	public const string ACTION_PREFERENCES = "action_preferences";
+	public const string ACTION_EXPORT = "action_export";
 	public const string ACTION_LABELS = "action_labels";
 	public const string ACTION_QUIT = "action_quit";
+	public const string ACTION_ZOOM_IN = "action_zoom_in";
+	public const string ACTION_ZOOM_OUT = "action_zoom_out";
+	public const string ACTION_ZOOM_RESET = "action_zoom_reset";
 
 	public static Gee.MultiMap<string, string> action_accelerators = new Gee.HashMultiMap<string, string> ();
 
@@ -48,8 +52,12 @@ public class Akira.Services.ActionManager : Object {
 		{ ACTION_SHOW_UI_GRID, action_show_ui_grid },
 		{ ACTION_PRESENTATION, action_presentation },
 		{ ACTION_PREFERENCES, action_preferences },
+		{ ACTION_EXPORT, action_export },
 		{ ACTION_LABELS, action_labels },
 		{ ACTION_QUIT, action_quit },
+		{ ACTION_ZOOM_IN, action_zoom_in },
+		{ ACTION_ZOOM_OUT, action_zoom_out },
+		{ ACTION_ZOOM_RESET, action_zoom_reset },
 	};
 
 	public ActionManager (Akira.Application akira_app, Akira.Window main_window) {
@@ -68,7 +76,11 @@ public class Akira.Services.ActionManager : Object {
 		action_accelerators.set (ACTION_SHOW_UI_GRID, "<Control><Shift>g");
 		action_accelerators.set (ACTION_PRESENTATION, "<Control>period");
 		action_accelerators.set (ACTION_PREFERENCES, "<Control>comma");
+		action_accelerators.set (ACTION_EXPORT, "<Control><Shift>e");
 		action_accelerators.set (ACTION_QUIT, "<Control>q");
+		action_accelerators.set (ACTION_ZOOM_IN, "<Control>equal");
+		action_accelerators.set (ACTION_ZOOM_OUT, "<Control>minus");
+		action_accelerators.set (ACTION_ZOOM_RESET, "<Control>0");
 	}
 
 	construct {
@@ -84,33 +96,60 @@ public class Akira.Services.ActionManager : Object {
 	private void action_labels () {
 		window.headerbar.toggle ();
 		window.headerbar.menu.toggle ();
-		window.headerbar.layout.toggle ();
-		window.headerbar.grid.toggle ();
-		window.headerbar.pixel_grid.toggle ();
 		window.headerbar.toolset.toggle ();
+		window.headerbar.zoom.toggle ();
 		window.headerbar.preferences.toggle ();
+		window.headerbar.export.toggle ();
+		window.headerbar.group.toggle ();
+		window.headerbar.ungroup.toggle ();
+		window.headerbar.move_up.toggle ();
+		window.headerbar.move_down.toggle ();
+		window.headerbar.move_top.toggle ();
+		window.headerbar.move_bottom.toggle ();
+		window.headerbar.path_difference.toggle ();
+		window.headerbar.path_exclusion.toggle ();
+		window.headerbar.path_intersect.toggle ();
+		window.headerbar.path_union.toggle ();
 		window.headerbar.toggle ();
 	}
 
 	public void show_labels () {
 		window.headerbar.toggle ();
 		window.headerbar.menu.show_labels ();
-		window.headerbar.layout.show_labels ();
-		window.headerbar.grid.show_labels ();
-		window.headerbar.pixel_grid.show_labels ();
 		window.headerbar.toolset.show_labels ();
+		window.headerbar.zoom.show_labels ();
 		window.headerbar.preferences.show_labels ();
+		window.headerbar.export.show_labels ();
+		window.headerbar.group.show_labels ();
+		window.headerbar.ungroup.show_labels ();
+		window.headerbar.move_up.show_labels ();
+		window.headerbar.move_down.show_labels ();
+		window.headerbar.move_top.show_labels ();
+		window.headerbar.move_bottom.show_labels ();
+		window.headerbar.path_difference.show_labels ();
+		window.headerbar.path_exclusion.show_labels ();
+		window.headerbar.path_intersect.show_labels ();
+		window.headerbar.path_union.show_labels ();
 		window.headerbar.toggle ();
 	}
 
 	public void hide_labels () {
 		window.headerbar.toggle ();
 		window.headerbar.menu.hide_labels ();
-		window.headerbar.layout.hide_labels ();
-		window.headerbar.grid.hide_labels ();
-		window.headerbar.pixel_grid.hide_labels ();
 		window.headerbar.toolset.hide_labels ();
+		window.headerbar.zoom.hide_labels ();
 		window.headerbar.preferences.hide_labels ();
+		window.headerbar.export.hide_labels ();
+		window.headerbar.group.hide_labels ();
+		window.headerbar.ungroup.hide_labels ();
+		window.headerbar.move_up.hide_labels ();
+		window.headerbar.move_down.hide_labels ();
+		window.headerbar.move_top.hide_labels ();
+		window.headerbar.move_bottom.hide_labels ();
+		window.headerbar.path_difference.hide_labels ();
+		window.headerbar.path_exclusion.hide_labels ();
+		window.headerbar.path_intersect.hide_labels ();
+		window.headerbar.path_union.hide_labels ();
 		window.headerbar.toggle ();
 	}
 
@@ -154,18 +193,34 @@ public class Akira.Services.ActionManager : Object {
 	private void action_show_ui_grid () {
 		warning ("show UI grid");
 	}
-
+	
 	private void action_preferences () {
 		if (window.settings_dialog == null) {
 			window.settings_dialog = new Akira.Widgets.SettingsDialog (window);
 			window.settings_dialog.show_all ();
-
+			
 			window.settings_dialog.destroy.connect (() => {
 				window.settings_dialog = null;
 			});
 		}
-
+		
 		window.settings_dialog.present ();
+	}
+	
+	private void action_export () {
+		warning ("export");
+	}
+
+	private void action_zoom_in () {
+		window.headerbar.zoom.zoom_in ();
+	}
+
+	private void action_zoom_out () {
+		window.headerbar.zoom.zoom_out ();
+	}
+
+	private void action_zoom_reset () {
+		window.headerbar.zoom.zoom_reset ();
 	}
 
 	public static void action_from_group (string action_name, ActionGroup? action_group) {
