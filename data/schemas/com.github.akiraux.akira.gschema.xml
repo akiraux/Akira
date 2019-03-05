@@ -49,15 +49,9 @@
         </key>
 
         <key name="use-symbolic" type="b">
-            <default>true</default>
+            <default>false</default>
             <summary>Use Symbolic Icons</summary>
             <description>Allow user to choose between normal and symbolic icons in HeaderBar.</description>
-        </key>
-
-        <key name="icon-style" type="s">
-            <default>"filled"</default>
-            <summary>HeaderBar Icon Style</summary>
-            <description>Allow user to change the style/theme of icons in HeaderBar.</description>
         </key>
 
         <key name="open-quick" type="b">

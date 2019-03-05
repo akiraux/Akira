@@ -46,6 +46,7 @@ executable(
 
     'Partials/HeaderBarButton.vala',
     'Partials/MenuButton.vala',
+    'Partials/ZoomButton.vala',
 
     'Widgets/SettingsDialog.vala',
 
@@ -66,6 +67,7 @@ executable(
         dependency('json-glib-1.0'),
         dependency('cairo', version: '>=1.14'),
         dependency('goocanvas-2.0'),
+        m_dep
     ],
     install: true
 )
