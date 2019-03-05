@@ -18,7 +18,6 @@
  */
 
 public class Akira.FileFormat.AkiraFile : Akira.FileFormat.ZipArchiveHandler {
-    public const string PICTURE
 
     public File pictures_folder { get; private set; }
     public File thumbnails_folder { get; private set; }

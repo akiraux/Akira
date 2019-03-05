@@ -19,10 +19,14 @@
 
 public abstract class Akira.FileFormat.JsonObject : GLib.Object {
 
+    /**
+     *Triggered when a property of the object has been set, if it was not
+     * prevented by an override of internal_changed
+     */
     [Signal (no_recurse = true, run = "first", action = true, no_hooks = true, detailed = true)]
     public signal void changed (string changed_property);
 
-    public Json.Object object { get; construct; }
+    public Json.Object object { internal get; construct set; }
     public JsonObject? parent_object { get; construct; default = null; }
 
     private ObjectClass obj_class;
@@ -40,6 +44,10 @@ public abstract class Akira.FileFormat.JsonObject : GLib.Object {
         }
     }
 
+    /**
+     * The internal object will not be updated via the properties if this does is not executed.
+     * Useful for read-only props
+     */
     public void connect_signals () {
         notify.connect (handle_notify);
     }
@@ -64,9 +72,8 @@ public abstract class Akira.FileFormat.JsonObject : GLib.Object {
     }
 
     /**
-     * For reacting to internal changes.
-     *
-     * Return false to prevent the triggering of the changed signal
+     * For reacting to internal changes. Override and return false to prevent the triggering
+     * of the changed signal
      */
     protected virtual bool internal_changed (string key)    {
         return true;
@@ -89,14 +96,48 @@ public abstract class Akira.FileFormat.JsonObject : GLib.Object {
 
         string get_key = key_override (key);
 
-        if (!source_object.has_member (get_key)) {
-            return;
-        }
-
         var prop = obj_class.find_property (key);
 
         var type = prop.value_type;
         var val = Value (type);
+
+        // The type was another object.
+        // We need to create it before anything else
+        if (type.is_a (typeof (JsonObject))) {
+            Json.Object new_objects_json;
+            if (source_object.has_member (get_key)) {
+                new_objects_json = source_object.get_object_member (get_key);
+            } else {
+                new_objects_json = new Json.Object ();
+            }
+
+            if (val.get_object () == null) {
+                var new_object = Object.new (
+                    type, "object",
+                    new_objects_json,
+                    "parent-object", this
+                ) as JsonObject;
+
+                set_property (prop.name, new_object);
+                new_object.connect_signals ();
+            } else {
+                var json_object = (JsonObject) val.get_object ();
+                json_object.override_properties_from_json (object);
+            }
+        } else if (type.is_a (typeof (FileFormat.JsonObjectArray))) {
+            if (val.get_object () == null) {
+                set_property (prop.name, Object.new (type, "object", source_object, "property_name", prop.name));
+            } else {
+                // Set elements to existing array
+            }
+
+            return;
+        }
+
+        if (!source_object.has_member (get_key)) {
+            save_on_object (get_key);
+            return;
+        }
 
         if (type == typeof (int))
             set_property (prop.name, (int) source_object.get_int_member (get_key));
@@ -110,54 +151,6 @@ public abstract class Akira.FileFormat.JsonObject : GLib.Object {
             set_property (prop.name, source_object.get_boolean_member (get_key));
         else if (type == typeof (int64))
             set_property (prop.name, source_object.get_int_member (get_key));
-        else if (type.is_a (typeof (JsonObject))) {
-            var object = source_object.get_object_member (get_key);
-            if (val.get_object () == null) {
-                set_property (prop.name, Object.new (type, "object", source_object, "parent-object", this));
-            } else {
-                var json_object = (JsonObject) val.get_object ();
-                json_object.override_properties_from_json (object);
-            }
-        } else if (type.is_a (typeof (Akira.FileFormat.JsonObjectArray))) {
-            if (val.get_object () == null) {
-                set_property (prop.name, Object.new (type, "object", source_object, "property_name", prop.name));
-            } else {
-                // Set elements to existing array
-            }
-        } else if (type == typeof (string[])) {
-            var list = new Gee.LinkedList<string> ();
-            source_object.get_array_member (get_key).get_elements ().foreach ((node) => {
-                list.add (node.get_string ());
-            });
-            set_property (prop.name, list.to_array ());
-        } else {
-            warning ("Unsupported type '%s' in object\n", type.name ());
-        }
-    }
-
-    protected string get_string_property (string key) {
-        var prop = obj_class.find_property (key);
-
-        var type = prop.value_type;
-        var val = Value (type);
-        this.get_property (prop.name.down (), ref val);
-
-        if (val.type () == prop.value_type) {
-            if (type == typeof (int))
-                return ((int) val).to_string ();
-            else if (type == typeof (uint))
-                return ((uint) val).to_string ();
-            else if (type == typeof (double))
-                return ((double) val).to_string ();
-            else if (type == typeof (string))
-                return ((string) val).to_string ();
-            else if (type == typeof (bool))
-                return ((bool) val).to_string ();
-            else if (type == typeof (int64))
-                return ((int64) val).to_string ();
-        }
-
-        assert_not_reached ();
     }
 
     /*
@@ -168,50 +161,56 @@ public abstract class Akira.FileFormat.JsonObject : GLib.Object {
             return;
         }
 
-        string get_key = key_override (key);
-
         var prop = obj_class.find_property (key);
 
         // Do not attempt to save a non-mapped key
         if (prop == null)
-            return;
+        return;
+
+        string get_key = key_override (key);
 
         var type = prop.value_type;
         var val = Value (type);
         this.get_property (prop.name, ref val);
 
+        bool member_exists = object.has_member (get_key);
         if (val.type () == prop.value_type) {
             if (type == typeof (int)) {
-                if (val.get_int () != object.get_int_member (key)) {
+                if (!member_exists || val.get_int () != object.get_int_member (get_key)) {
                     object.set_int_member (get_key, val.get_int ());
                 }
             } else if (type == typeof (uint)) {
-                if (val.get_uint () != object.get_int_member (key)) {
+                if (!member_exists || val.get_uint () != object.get_int_member (get_key)) {
                     object.set_int_member (get_key, val.get_uint ());
                 }
             } else if (type == typeof (int64)) {
-                if (val.get_int64 () != object.get_int_member (key)) {
+                if (!member_exists || val.get_int64 () != object.get_int_member (get_key)) {
                     object.set_int_member (get_key, val.get_int64 ());
                 }
             } else if (type == typeof (double)) {
-                if (val.get_double () != object.get_double_member (key)) {
-                    object.set_double_member (key, val.get_double ());
+                if (!member_exists || val.get_double () != object.get_double_member (get_key)) {
+                    object.set_double_member (get_key, val.get_double ());
                 }
             } else if (type == typeof (string)) {
-                if (val.get_string () != object.get_string_member (key)) {
-                    object.set_string_member (key, val.get_string ());
+                if (!member_exists || val.get_string () != object.get_string_member (get_key)) {
+                    object.set_string_member (get_key, val.get_string ());
                 }
-            } else if (type == typeof (string[])) {
-                //  string[] strings = null;
-                //  this.get (key, &strings);
-                //  if (strings != schema.get_strv (key)) {
-                //      schema.set_strv (key, strings);
-                //  }
             } else if (type == typeof (bool)) {
-                if (val.get_boolean () != object.get_boolean_member (key)) {
-                    object.set_boolean_member (key, val.get_boolean ());
+                if (!member_exists || val.get_boolean () != object.get_boolean_member (get_key)) {
+                    object.set_boolean_member (get_key, val.get_boolean ());
                 }
+            } else if (type.is_a (typeof (JsonObject))) {
+                var json_object = val.get_object () as JsonObject;
+                object.set_object_member (get_key, json_object.object);
+            } else if (type.is_a (typeof (JsonObjectArray))) {
+                error ("JsonObject arrays should not be directly set");
+            } else {
+                warning ("Property type %s not yet supported: %s\n", type.name (), get_key);
             }
+        }
+
+        if (object.has_member (get_key) && object.get_null_member (get_key)) {
+            object.remove_member (get_key);
         }
     }
 
@@ -231,6 +230,8 @@ public abstract class Akira.FileFormat.JsonObject : GLib.Object {
     public void override_properties_from_json (Json.Object new_object) {
         notify.disconnect (handle_notify);
 
+        this.object = new_object;
+
         var properties = obj_class.list_properties ();
         foreach (var prop in properties) {
             var prop_name = prop.name;
@@ -240,7 +241,7 @@ public abstract class Akira.FileFormat.JsonObject : GLib.Object {
 
             string get_key = key_override (prop_name);
             if (!new_object.has_member (get_key)) {
-                return;
+                continue;
             }
 
             var type = prop.value_type;
@@ -262,12 +263,6 @@ public abstract class Akira.FileFormat.JsonObject : GLib.Object {
                 change_prop = (original_value.get_double () != new_object.get_double_member (get_key));
             } else if (type == typeof (string)) {
                 change_prop = (original_value.get_string () != new_object.get_string_member (get_key));
-            } else if (type == typeof (string[])) {
-                //  string[] strings = null;
-                //  this.get (key, &strings);
-                //  if (strings != schema.get_strv (key)) {
-                //      schema.set_strv (key, strings);
-                //  }
             } else if (type == typeof (bool)) {
                 change_prop = (original_value.get_boolean () != new_object.get_boolean_member (get_key));
             } else if (type.is_a (typeof (JsonObject))) {
@@ -275,6 +270,13 @@ public abstract class Akira.FileFormat.JsonObject : GLib.Object {
 
                 var json_object = (JsonObject) original_value.get_object ();
                 json_object.override_properties_from_json (object);
+            } else if (type.is_a (typeof (JsonObjectArray))) {
+                var array = new_object.get_array_member (get_key);
+
+                var json_object = (JsonObjectArray) original_value.get_object ();
+                json_object.override_properties_from_json (object);
+            } else {
+                warning ("Property type %s not yet supported: %s\n", type.name (), get_key);
             }
 
             if (change_prop) {
@@ -285,31 +287,4 @@ public abstract class Akira.FileFormat.JsonObject : GLib.Object {
 
         notify.connect (handle_notify);
     }
-}
-
-public abstract class Akira.FileFormat.JsonObjectArray : Object {
-    public unowned Json.Object object { get; construct; }
-    public string property_name { get; construct; }
-
-    public JsonObjectArray (Json.Object object, string property_name) {
-        Object (object: object, property_name: property_name);
-    }
-
-    construct {
-        load_array ();
-    }
-
-    /**
-     * Can be overriten to add more than one type of item into the array
-     */
-    protected virtual void load_array () {
-        object.get_array_member (property_name).get_elements ().foreach ((node) => {
-            add_to_list ((FileFormat.JsonObject) Object.new (get_type_of_array (),
-                "object", node.get_object (),
-                "parent-object", null));
-        });
-    }
-
-    public abstract void add_to_list (FileFormat.JsonObject json_object);
-    public abstract Type get_type_of_array ();
 }

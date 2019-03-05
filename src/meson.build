@@ -24,6 +24,7 @@ executable(
 
     'FileFormat/AkiraFile.vala',
     'FileFormat/JsonObject.vala',
+    'FileFormat/JsonObjectArray.vala',
     'FileFormat/ZipArchiveHandler.vala',
     'FileFormat/Objects/Version.vala',
 
