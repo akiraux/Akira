@@ -20,53 +20,53 @@
 */
 
 namespace Akira {
-	public Akira.Services.Settings settings;
-  public Akira.Services.EventBus event_bus;
+    public Akira.Services.Settings settings;
+    public Akira.Services.EventBus event_bus;
 }
 
 public class Akira.Application : Granite.Application {
-	public GLib.List <Window> windows;
+    public GLib.List <Window> windows;
 
-	construct {
-		flags |= ApplicationFlags.HANDLES_OPEN;
-		build_data_dir = Constants.DATADIR;
-		build_pkg_data_dir = Constants.PKGDATADIR;
-		build_release_name = Constants.RELEASE_NAME;
-		build_version = Constants.VERSION;
-		build_version_info = Constants.VERSION_INFO;
+    construct {
+        flags |= ApplicationFlags.HANDLES_OPEN;
+        build_data_dir = Constants.DATADIR;
+        build_pkg_data_dir = Constants.PKGDATADIR;
+        build_release_name = Constants.RELEASE_NAME;
+        build_version = Constants.VERSION;
+        build_version_info = Constants.VERSION_INFO;
 
-		settings = new Akira.Services.Settings ();
-		event_bus = new Akira.Services.EventBus ();
-		windows = new GLib.List <Window> ();
+        settings = new Akira.Services.Settings ();
+        event_bus = new Akira.Services.EventBus ();
+        windows = new GLib.List <Window> ();
 
-		program_name = "Akira";
-		exec_name = "com.github.akiraux.akira";
-		app_launcher = "com.github.akiraux.akira.desktop";
-		application_id = "com.github.akiraux.akira";
-	}
+        program_name = "Akira";
+        exec_name = "com.github.akiraux.akira";
+        app_launcher = "com.github.akiraux.akira.desktop";
+        application_id = "com.github.akiraux.akira";
+    }
 
-	public void new_window () {
-		new Akira.Window (this).present ();
-	}
+    public void new_window () {
+        new Akira.Window (this).present ();
+    }
 
-	public override void window_added (Gtk.Window window) {
-		windows.append (window as Window);
-		base.window_added (window);
-	}
+    public override void window_added (Gtk.Window window) {
+        windows.append (window as Window);
+        base.window_added (window);
+    }
 
-	public override void window_removed (Gtk.Window window) {
-		windows.remove (window as Window);
-		base.window_removed (window);
-	}
+    public override void window_removed (Gtk.Window window) {
+        windows.remove (window as Window);
+        base.window_removed (window);
+    }
 
-	protected override void activate () {
-		Gtk.Settings.get_default().set_property("gtk-icon-theme-name", "elementary");
-		Gtk.Settings.get_default().set_property("gtk-theme-name", "elementary");
+    protected override void activate () {
+        Gtk.Settings.get_default().set_property("gtk-icon-theme-name", "elementary");
+        Gtk.Settings.get_default().set_property("gtk-theme-name", "elementary");
 
-		weak Gtk.IconTheme default_theme = Gtk.IconTheme.get_default ();
-		default_theme.add_resource_path ("/com/github/akiraux/akira");
+        weak Gtk.IconTheme default_theme = Gtk.IconTheme.get_default ();
+        default_theme.add_resource_path ("/com/github/akiraux/akira");
 
-		var window = new Akira.Window (this);
-		this.add_window (window);
-	}
+        var window = new Akira.Window (this);
+        this.add_window (window);
+    }
 }

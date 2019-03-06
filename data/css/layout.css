@@ -30,17 +30,18 @@
 
 .alignment-box {
   background-color: @base_color;
-  border-bottom: 1px solid shade (@bg_color, 0.8);
-  padding: 3pt 5pt;
+  border-bottom: 1pt solid shade (@bg_color, 0.8);
+  padding: 0 5pt;
 }
 
-.alignment-box button {
+.align-box-button {
   border-radius: 50%;
   padding: 5pt;
+  margin: 2pt;
 }
 
 .alignment-box separator {
-  margin: 4pt 10pt;
+  margin: 4pt 6pt;
   border-color: @bg_color;
   border-width: 1px;
 }
