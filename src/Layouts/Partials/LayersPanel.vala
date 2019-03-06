@@ -31,6 +31,7 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
 	private const int SCROLL_STEP_SIZE = 5;
 	private const int SCROLL_DISTANCE = 30;
 	private const int SCROLL_DELAY = 50;
+	public Akira.Layouts.Partials.Artboard artboard;
 
 	private const Gtk.TargetEntry targetEntries[] = {
 		{ "ARTBOARD", Gtk.TargetFlags.SAME_APP, 0 }
@@ -48,47 +49,13 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
 		get_style_context ().add_class ("layers-panel");
 		expand = true;
 
-		var artboard = new Akira.Layouts.Partials.Artboard (window, "Artboard 1");
+		artboard = new Akira.Layouts.Partials.Artboard (window, "Artboard 1");
 		var placeholder = new Gtk.ListBoxRow ();
 		artboard.container.insert (placeholder, 0);
 		placeholder.visible = false;
 		placeholder.no_show_all = true;
 
-		artboard.container.insert (new Akira.Layouts.Partials.Layer (window, artboard, "Rectangle", "shape-rectangle-symbolic", false), 1);
-		artboard.container.insert (new Akira.Layouts.Partials.Layer (window, artboard, "Circle", "shape-circle-symbolic", false), 2);
-		artboard.container.insert (new Akira.Layouts.Partials.Layer (window, artboard, "Triangle", "shape-triangle-symbolic", false), 3);
-
-		var layer_group = new Akira.Layouts.Partials.Layer (window, artboard, "Group", "folder-symbolic", true);
-		var layer_placeholder = new Gtk.ListBoxRow ();
-		layer_group.container.insert (layer_placeholder, 0);
-		layer_placeholder.visible = false;
-		layer_placeholder.no_show_all = true;
-
-		layer_group.container.insert (new Akira.Layouts.Partials.Layer (window, artboard, "Rectangle", "shape-rectangle-symbolic", false, layer_group), 1);
-		layer_group.container.insert (new Akira.Layouts.Partials.Layer (window, artboard, "Circle", "shape-circle-symbolic", false, layer_group), 2);
-		layer_group.container.insert (new Akira.Layouts.Partials.Layer (window, artboard, "Triangle", "shape-triangle-symbolic", false, layer_group), 3);
-
-		artboard.container.insert (layer_group, 4);
-
-		artboard.container.insert (new Akira.Layouts.Partials.Layer (window, artboard, "Text", "shape-text-symbolic", false), 5);
-		artboard.container.insert (new Akira.Layouts.Partials.Layer (window, artboard, "Bezier", "shape-bezier-symbolic", false), 6);
-		artboard.container.insert (new Akira.Layouts.Partials.Layer (window, artboard, "Path", "shape-pencil-symbolic", false), 7);
-
-		var artboard2 = new Akira.Layouts.Partials.Artboard (window, "Artboard 2");
-		var artboard3 = new Akira.Layouts.Partials.Artboard (window, "Artboard 3");
-		var artboard4 = new Akira.Layouts.Partials.Artboard (window, "Artboard 4");
-		var artboard5 = new Akira.Layouts.Partials.Artboard (window, "Artboard 5");
-
-		var artboard_placeholder = new Gtk.ListBoxRow ();
-		artboard_placeholder.visible = false;
-		artboard_placeholder.no_show_all = true;
-
-		insert (artboard_placeholder, 0);
-		insert (artboard, 1);
-		insert (artboard2, 2);
-		insert (artboard3, 3);
-		insert (artboard4, 4);
-		insert (artboard5, 5);
+		insert (artboard, 0);
 
 		build_drag_and_drop ();
 

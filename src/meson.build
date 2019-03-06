@@ -62,7 +62,6 @@ executable(
         dependency('granite', version: '>= 5.2.0'),
         dependency('gee-0.8'),
         dependency('libxml-2.0'),
-        dependency('gtksourceview-3.0'),
         dependency('libarchive'),
         dependency('json-glib-1.0'),
         dependency('cairo', version: '>=1.14'),
