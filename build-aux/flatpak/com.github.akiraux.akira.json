@@ -39,17 +39,6 @@
          ]
       },
       {
-         "name" : "gtksourceview",
-         "config-opts" : [ "--disable-Werror" ],
-         "sources" : [
-            {
-               "type" : "git",
-               "url" : "https://gitlab.gnome.org/GNOME/gtksourceview.git",
-               "branch" : "gnome-3-24"
-            }
-         ]
-      },
-      {
          "name": "akira",
          "buildsystem": "meson",
          "sources": [
