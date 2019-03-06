@@ -98,9 +98,20 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
 		tools.add (new Gtk.SeparatorMenuItem ());
 		tools.add (new Gtk.MenuItem.with_label(_("Vector")));
 		tools.add (new Gtk.MenuItem.with_label(_("Pencil")));
-		tools.add (new Gtk.MenuItem.with_label(_("Shapes")));
+		var shapes_item = new Gtk.MenuItem.with_label(_("Shapes"));
+		var shapes_submenu = new Gtk.Menu ();
+		shapes_item.submenu = shapes_submenu;
+		var rect_item = new Gtk.MenuItem.with_label(_("Rect"));
+		rect_item.action_name = Akira.Services.ActionManager.ACTION_PREFIX + Akira.Services.ActionManager.ACTION_ADD_RECT;
+		shapes_submenu.add (rect_item);
+		var ellipse_item = new Gtk.MenuItem.with_label(_("Ellipse"));
+		ellipse_item.action_name = Akira.Services.ActionManager.ACTION_PREFIX + Akira.Services.ActionManager.ACTION_ADD_ELLIPSE;
+		shapes_submenu.add (ellipse_item);
+		tools.add (shapes_item);
 		tools.add (new Gtk.SeparatorMenuItem ());
-		tools.add (new Gtk.MenuItem.with_label(_("Text")));
+		var text_item = new Gtk.MenuItem.with_label(_("Text"));
+		text_item.action_name = Akira.Services.ActionManager.ACTION_PREFIX + Akira.Services.ActionManager.ACTION_ADD_TEXT;
+		tools.add (text_item);
 		tools.add (new Gtk.MenuItem.with_label(_("Image")));
 		tools.show_all ();
 
