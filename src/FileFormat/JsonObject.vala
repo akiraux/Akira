@@ -271,8 +271,6 @@ public abstract class Akira.FileFormat.JsonObject : GLib.Object {
                 var json_object = (JsonObject) original_value.get_object ();
                 json_object.override_properties_from_json (object);
             } else if (type.is_a (typeof (JsonObjectArray))) {
-                var array = new_object.get_array_member (get_key);
-
                 var json_object = (JsonObjectArray) original_value.get_object ();
                 json_object.override_properties_from_json (object);
             } else {
