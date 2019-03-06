@@ -25,6 +25,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 	public Akira.Layouts.Partials.Layer? layer_group { construct set; get; }
 	public string layer_name { get; construct; }
 	public string icon_name { get; construct; }
+	public Goo.CanvasItemSimple item { get; construct; }
 
 	private bool scroll_up = false;
 	private bool scrolling = false;
@@ -82,14 +83,15 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 
 	// public Akira.Shape shape { get; construct; }
 
-	public Layer (Akira.Window main_window, Akira.Layouts.Partials.Artboard artboard, string name, string icon, bool group, Akira.Layouts.Partials.Layer? parent = null) {
+	public Layer (Akira.Window main_window, Akira.Layouts.Partials.Artboard artboard, Goo.CanvasItemSimple item_simple, string name, string icon, bool group, Akira.Layouts.Partials.Layer? parent = null) {
 		Object (
 			window: main_window,
 			layer_name: name,
 			icon_name: icon,
 			artboard: artboard,
 			grouped: group,
-			layer_group: parent
+			layer_group: parent,
+			item: item_simple
 		);
 	}
 
@@ -576,6 +578,8 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 			} else {
 				button_hidden.get_style_context ().remove_class ("show");
 			}
+
+			item.visibility = active ? Goo.CanvasItemVisibility.INVISIBLE: Goo.CanvasItemVisibility.VISIBLE;
 
 			icon_visible.visible = active;
 			icon_visible.no_show_all = ! active;
