@@ -5,7 +5,7 @@
 
 **AKIRA IS CURRENTLY IN EARLY DEVELOPMENT, NOT READY TO BE USED!**
 
-Akira is a native Linux Design application built in Vala and GTK. Akira focuses on offering a modern and fast approach to UI and UX Design, mainly targeting web designers and graphic designers./mascot/mascot_akira_akari.zip
+Akira is a native Linux Design application built in Vala and GTK. Akira focuses on offering a modern and fast approach to UI and UX Design, mainly targeting web designers and graphic designers.
 The main goal is to offer a valid and professional solution for designers who want to use Linux as their main OS.
 
 ![](akira-screenshot.png)
@@ -14,6 +14,12 @@ The main goal is to offer a valid and professional solution for designers who wa
 <!--- Akira, is primarly available from the AppCenter for elementary OS. Download it from there! -->
 As soon as Akira will reach a more stable version it will be available from the AppCenter for elementary OS.
 <!--- [![Get it on AppCenter](https://appcenter.elementary.io/badge.svg)](https://appcenter.elementary.io/com.github.akiraux.akira) -->
+
+## Get it from Flathub!
+As soon as Akira will reach a more stable version, an official Flatpack release will be avaialble from FlatHub.
+
+## Get it from the SnapCraft store!
+As soon as Akira will reach a more stable version, an official Snap package will be avaialble from SnapCraft store.
 
 ## Install it from source
 You can install Akira by compiling it from the source, here's the list of dependecies required:
