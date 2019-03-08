@@ -1,7 +1,7 @@
 # ![Akira](akira-logo-transparent.png)
 > The Linux Design Tool
 
-[![Build Status](https://travis-ci.org/akiraux/Akira.svg)](https://travis-ci.org/akiraux/Akira)
+[![Build Status](https://travis-ci.org/akiraux/Akira.svg)](https://travis-ci.org/akiraux/Akira) [![AkiraUX on Liberapay](http://img.shields.io/liberapay/patrons/AkiraUX.svg?logo=liberapay)](https://liberapay.com/AkiraUX/)  [![AkiraUX on Patreon](https://img.shields.io/badge/patreon-donate-orange.svg?logo=patreon)](https://www.patreon.com/akiraux)
 
 **AKIRA IS CURRENTLY IN EARLY DEVELOPMENT, NOT READY TO BE USED!**
 
@@ -30,8 +30,7 @@ You can install Akira by compiling it from the source, here's the list of depend
  - `gobject-2.0`
  - `libxml-2.0`
  - `gtksourceview-3.0`
- - `clutter-gtk`
- - `clutter`
+ - `goocanvas-2.0`
  - `cairo`
  - `meson`
 
@@ -53,7 +52,7 @@ If you are trying out Akira and you encounter an error or any problem feel free 
 If you like Akira and you want to support its development, consider donating via [Liberpay](https://liberapay.com/AkiraUX/) or pledge on [Patreon](https://www.patreon.com/akiraux).
 
 ### Official Mascot
-![](akira-mascot-akari.png)
+![](https://github.com/akiraux/assets/blob/master/mascot/akira-mascot-akari.png)
 
 **Akari the Cyber Phoenix** is a perfectionist. She is tidy, collected and has a sharp eye for detail. Her name Akari (灯理、) means *"the enlightenment of a sophisticated order"*. Her costume resembles the project's icon.
 
