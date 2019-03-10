@@ -37,6 +37,12 @@ public class Akira.Layouts.MainCanvas : Gtk.Grid {
 		canvas.set_bounds (0, 0, 10000, 10000);
 		canvas.set_scale (1.0);
 
+		main_scroll.add (canvas);
+
+		attach (main_scroll, 0, 0, 1, 1);
+	}
+
+	public Goo.CanvasRect add_rect () {
 		var root = canvas.get_root_item ();
 		var rect = new Goo.CanvasRect (null, 100.0, 100.0, 400.0, 400.0,
 									"line-width", 5.0,
@@ -45,28 +51,24 @@ public class Akira.Layouts.MainCanvas : Gtk.Grid {
 									"stroke-color", "#f37329",
 									"fill-color", "#ffa154", null);
 		rect.set ("parent", root);
+		return  rect;
+	}
 
-		var rect2 = new Goo.CanvasRect (null, 50, 100, 200, 100,
-			"line-width", 5.0,
-			"stroke-color", "#64baff",
-			"fill-color", "#3689e6");
-
-		rect2.set ("parent", root);
-
-		var rect3 = new Goo.CanvasRect (null, 0, 0, 64, 64,
-			"radius-x", 32.0,
-			"radius-y", 32.0,
+	public Goo.CanvasEllipse add_ellipse () {
+		var root = canvas.get_root_item ();
+		var ellipse = new Goo.CanvasEllipse (null, 0, 0, 64, 64,
 			"line-width", 5.0,
 			"stroke-color", "#9bdb4d",
 			"fill-color", "#68b723");
 
-		rect3.set ("parent", root);
+		ellipse.set ("parent", root);
+		return ellipse;
+	}
 
+	public Goo.CanvasText add_text () {
+		var root = canvas.get_root_item ();
 		var text = new Goo.CanvasText (null, "Add text here", 20, 20, 200, Goo.CanvasAnchorType.NW, "font", "Open Sans 18");
 		text.set ("parent", root);
-
-		main_scroll.add (canvas);
-
-		attach (main_scroll, 0, 0, 1, 1);
+		return text;
 	}
 }
