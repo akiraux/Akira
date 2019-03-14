@@ -123,7 +123,7 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
 		group = new Akira.Partials.HeaderBarButton ("object-group", _("Group"), {"<Ctrl>g"});
 		ungroup = new Akira.Partials.HeaderBarButton ("object-ungroup", _("Ungroup"), {"<Ctrl><Shift>g"});
 
-		move_up = new Akira.Partials.HeaderBarButton ("selection-raise", _("Up"), {"<Ctrl>Up"});
+		move_up = new Akira.Partials.HeaderBarButton ("distribute-horizontal-center", _("Up"), {"<Ctrl>Up"});
 		move_down = new Akira.Partials.HeaderBarButton ("selection-lower", _("Down"), {"<Ctrl>Down"});
 		move_top = new Akira.Partials.HeaderBarButton ("selection-top", _("Top"), {"<Ctrl><Shift>Up"});
 		move_bottom = new Akira.Partials.HeaderBarButton ("selection-bottom", _("Bottom"), {"<Ctrl><Shift>Down"});

@@ -32,27 +32,27 @@ public class Akira.Partials.AlignBoxButton : Gtk.Grid {
     public AlignBoxButton (
         string action,
         string icon_name,
-        string title,
-        Gtk.IconSize icon_size = Gtk.IconSize.SMALL_TOOLBAR) {
-
+        string title) {
         this.action = action;
-        this.icon_name = icon_name;
-        this.icon_size = icon_size;
 
         this.tooltip_text = title;
 
         can_focus = false;
         hexpand = true;
 
-        image = new Gtk.Image ();
+        this.icon_name = icon_name;
+        this.icon_size = Gtk.IconSize.LARGE_TOOLBAR;
+
+        if (settings.use_symbolic) {
+          this.icon_name = icon_name + "-symbolic";
+          this.icon_size = Gtk.IconSize.SMALL_TOOLBAR;
+        }
+
+        image = new Gtk.Image.from_icon_name (this.icon_name, this.icon_size);
         image.margin = 0;
 
-        update_icon_style ();
-
         button = new Gtk.Button ();
-
         button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
-        button.get_style_context ().add_class ("align-box-button");
 
         button.can_focus = false;
         button.halign = Gtk.Align.CENTER;
@@ -73,9 +73,11 @@ public class Akira.Partials.AlignBoxButton : Gtk.Grid {
             ? this.icon_name + "-symbolic"
             : this.icon_name;
 
-        this.image.icon_name = new_icon_name;
-        this.image.icon_size = new_icon_size;
-        this.image.show_all ();
+        this.button.remove (this.image);
+        this.image = new Gtk.Image.from_icon_name (new_icon_name, new_icon_size);
+        this.button.add (image);
+
+        image.show_all ();
     }
 
     private void connect_signals () {
