@@ -21,6 +21,7 @@
 
 namespace Akira {
 	public Akira.Services.Settings settings;
+	public Akira.Services.EventBus event_bus;
 }
 
 public class Akira.Application : Granite.Application {
@@ -35,6 +36,7 @@ public class Akira.Application : Granite.Application {
 		build_version_info = Constants.VERSION_INFO;
 
 		settings = new Akira.Services.Settings ();
+		event_bus = new Akira.Services.EventBus ();
 		windows = new GLib.List <Window> ();
 
 		program_name = "Akira";
@@ -58,8 +60,8 @@ public class Akira.Application : Granite.Application {
 	}
 
 	protected override void activate () {
-		Gtk.Settings.get_default().set_property("gtk-icon-theme-name", "elementary");
-		Gtk.Settings.get_default().set_property("gtk-theme-name", "elementary");
+		Gtk.Settings.get_default ().set_property ("gtk-icon-theme-name", "elementary");
+		Gtk.Settings.get_default ().set_property ("gtk-theme-name", "elementary");
 
 		weak Gtk.IconTheme default_theme = Gtk.IconTheme.get_default ();
 		default_theme.add_resource_path ("/com/github/akiraux/akira");
