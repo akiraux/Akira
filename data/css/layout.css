@@ -21,13 +21,11 @@
 .alignment-box {
   background-color: @base_color;
   border-bottom: 1pt solid shade (@bg_color, 0.8);
-  padding: 0 5pt;
+  padding: 3pt 5pt;
 }
 
-.align-box-button {
-  border-radius: 50%;
-  padding: 5pt;
-  margin: 2pt;
+.alignment-box button {
+  border-radius: 100%;
 }
 
 .alignment-box separator {
