@@ -19,16 +19,14 @@
  * Authored by: Giacomo "giacomoalbe" Alberini <giacomoalbe@gmail.com>
  */
 public class Akira.Partials.AlignBoxButton : Gtk.Grid {
+    public signal void triggered (Akira.Partials.AlignBoxButton emitter);
+
     public string icon_name { get; construct; }
     public string action { get; construct; }
     public string tooltip_text { get; construct; }
 
-    public Gtk.IconSize icon_size;
-
     private Gtk.Button button;
     private Gtk.Image image;
-
-    public signal void triggered (Akira.Partials.AlignBoxButton emitter);
 
     public AlignBoxButton (string action, string icon_name, string tooltip_text) {
         Object(
