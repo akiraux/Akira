@@ -19,8 +19,9 @@
  * Authored by: Giacomo "giacomoalbe" Alberini <giacomoalbe@gmail.com>
  */
 public class Akira.Partials.AlignBoxButton : Gtk.Grid {
-    public string icon_name;
-    public string action;
+    public string icon_name { get; construct; }
+    public string action { get; construct; }
+    public string tooltip_text { get; construct; }
 
     public Gtk.IconSize icon_size;
 
@@ -29,27 +30,17 @@ public class Akira.Partials.AlignBoxButton : Gtk.Grid {
 
     public signal void triggered (Akira.Partials.AlignBoxButton emitter);
 
-    public AlignBoxButton (
-        string action,
-        string icon_name,
-        string title) {
-        this.action = action;
+    public AlignBoxButton (string action, string icon_name, string tooltip_text) {
+        Object(
+            icon_name: icon_name,
+            action: action,
+            tooltip_text: tooltip_text
+        );
+    }
 
-        this.tooltip_text = title;
-
+    construct {
         can_focus = false;
         hexpand = true;
-
-        this.icon_name = icon_name;
-        this.icon_size = Gtk.IconSize.LARGE_TOOLBAR;
-
-        if (settings.use_symbolic) {
-          this.icon_name = icon_name + "-symbolic";
-          this.icon_size = Gtk.IconSize.SMALL_TOOLBAR;
-        }
-
-        image = new Gtk.Image.from_icon_name (this.icon_name, this.icon_size);
-        image.margin = 0;
 
         button = new Gtk.Button ();
         button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
@@ -57,7 +48,7 @@ public class Akira.Partials.AlignBoxButton : Gtk.Grid {
         button.can_focus = false;
         button.halign = Gtk.Align.CENTER;
 
-        button.add (image);
+        update_icon_style ();
 
         attach (button, 0, 0, 1, 1);
 
@@ -73,7 +64,10 @@ public class Akira.Partials.AlignBoxButton : Gtk.Grid {
             ? this.icon_name + "-symbolic"
             : this.icon_name;
 
-        this.button.remove (this.image);
+        if (image != null) {
+            this.button.remove (this.image);
+        }
+
         this.image = new Gtk.Image.from_icon_name (new_icon_name, new_icon_size);
         this.button.add (image);
 

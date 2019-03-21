@@ -25,7 +25,7 @@ public class Akira.Layouts.Partials.AlignItemsPanel : Gtk.Grid {
         public string type;
         public string action;
         public string icon_name;
-        public string title;
+        public string tooltip_text;
     }
 
     private const AlignBoxItem[] align_items_panel_buttons = {
@@ -68,7 +68,7 @@ public class Akira.Layouts.Partials.AlignItemsPanel : Gtk.Grid {
                     var tmp_align_box_button =
                         new Akira.Partials.AlignBoxButton (item.action,
                                                            item.icon_name,
-                                                           item.title);
+                                                           item.tooltip_text);
 
                     alignment_box.attach (tmp_align_box_button,
                                           current_button_column++,
