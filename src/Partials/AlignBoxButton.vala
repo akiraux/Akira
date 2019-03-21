@@ -59,15 +59,15 @@ public class Akira.Partials.AlignBoxButton : Gtk.Grid {
             : Gtk.IconSize.LARGE_TOOLBAR;
 
         var new_icon_name = settings.use_symbolic == true
-            ? this.icon_name + "-symbolic"
-            : this.icon_name;
+            ? icon_name + "-symbolic"
+            : icon_name;
 
         if (image != null) {
-            this.button.remove (this.image);
+            button.remove (image);
         }
 
-        this.image = new Gtk.Image.from_icon_name (new_icon_name, new_icon_size);
-        this.button.add (image);
+        image = new Gtk.Image.from_icon_name (new_icon_name, new_icon_size);
+        button.add (image);
 
         image.show_all ();
     }
