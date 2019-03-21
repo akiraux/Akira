@@ -21,17 +21,11 @@
 public class Akira.Layouts.Partials.AlignItemsPanel : Gtk.Grid {
     private Gtk.Grid alignment_box;
 
-    struct AlignBoxItem {
+    private struct AlignBoxItem {
         public string type;
         public string action;
         public string icon_name;
         public string title;
-    }
-
-    public AlignItemsPanel () {
-        Object (
-            orientation: Gtk.Orientation.VERTICAL
-            );
     }
 
     private const AlignBoxItem[] align_items_panel_buttons = {
@@ -46,6 +40,12 @@ public class Akira.Layouts.Partials.AlignItemsPanel : Gtk.Grid {
         { "btn", "alig-v-c", "align-vertical-center", "Center on vertical axis" },
         { "btn", "alig-v-b", "align-vertical-bottom", "Align bottom sides" }
     };
+
+    public AlignItemsPanel () {
+        Object (
+            orientation: Gtk.Orientation.VERTICAL
+            );
+    }
 
     construct {
         vexpand = false;
