@@ -26,6 +26,8 @@
 
 .alignment-box button {
   border-radius: 100%;
+  padding: 3pt;
+  margin: 0 3pt;
 }
 
 .alignment-box separator {
