@@ -28,10 +28,10 @@ public class Akira.Services.EventBus : Object {
 
     public void emit (string signal_id, string param = "") {
         switch (signal_id) {
-            case "update_icons_style":
+            case "update-icons-style":
                 update_icons_style ();
                 break;
-            case "align_items":
+            case "align-items":
                 align_items (param);
                 break;
         }

@@ -86,7 +86,7 @@ public class Akira.Partials.AlignBoxButton : Gtk.Grid {
         });
 
         button.clicked.connect (() => {
-            event_bus.emit ("align_items", action);
+            event_bus.emit ("align-items", action);
         });
     }
 }
