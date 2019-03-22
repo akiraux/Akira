@@ -19,7 +19,7 @@
  * Authored by: Giacomo "giacomoalbe" Alberini <giacomoalbe@gmail.com>
  */
 public class Akira.Layouts.Partials.AlignItemsPanel : Gtk.Grid {
-	public weak Akira.Window window { get; construct; }
+    public weak Akira.Window window { get; construct; }
 
     private Gtk.Grid alignment_box;
 
@@ -47,24 +47,24 @@ public class Akira.Layouts.Partials.AlignItemsPanel : Gtk.Grid {
         Object (
             window: window,
             orientation: Gtk.Orientation.VERTICAL
-        );
+            );
     }
 
     construct {
-        vexpand = false;
-        hexpand = true;
+        int current_button_column = 0;
+
+        halign = Gtk.Align.FILL;
 
         alignment_box = new Gtk.Grid ();
         alignment_box.halign = Gtk.Align.CENTER;
-
-        int current_button_column = 0;
+        alignment_box.hexpand = true;
 
         foreach (var item in ALIGN_ITEMS_PANEL_BUTTONS) {
             switch (item.type) {
                 case "sep":
                     alignment_box.attach (new Gtk.Separator
-                                          (Gtk.Orientation.VERTICAL),
-                                          current_button_column++, 0, 1, 1 );
+                            (Gtk.Orientation.VERTICAL),
+                            current_button_column++, 0, 1, 1 );
                     break;
 
                 case "btn":
@@ -75,8 +75,8 @@ public class Akira.Layouts.Partials.AlignItemsPanel : Gtk.Grid {
                                                            item.tooltip_text);
 
                     alignment_box.attach (tmp_align_box_button,
-                                          current_button_column++,
-                                          0, 1, 1);
+                            current_button_column++,
+                            0, 1, 1);
                     break;
             }
         }

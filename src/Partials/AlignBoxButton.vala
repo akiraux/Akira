@@ -18,16 +18,15 @@
  *
  * Authored by: Giacomo "giacomoalbe" Alberini <giacomoalbe@gmail.com>
  */
-public class Akira.Partials.AlignBoxButton : Gtk.Grid {
+public class Akira.Partials.AlignBoxButton : Gtk.Button {
     public signal void triggered (Akira.Partials.AlignBoxButton emitter);
 
-	public weak Akira.Window window { get; construct; }
+    public weak Akira.Window window { get; construct; }
 
     public string icon_name { get; construct; }
     public string action { get; construct; }
     public string tooltip_text { get; construct; }
 
-    private Gtk.Button button;
     private Gtk.Image image;
 
     public AlignBoxButton (Akira.Window window, string action, string icon_name, string tooltip_text) {
@@ -36,22 +35,15 @@ public class Akira.Partials.AlignBoxButton : Gtk.Grid {
             icon_name: icon_name,
             action: action,
             tooltip_text: tooltip_text
-        );
+            );
     }
 
     construct {
+        get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
+
         can_focus = false;
-        hexpand = true;
-
-        button = new Gtk.Button ();
-        button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
-
-        button.can_focus = false;
-        button.halign = Gtk.Align.CENTER;
 
         update_icon_style ();
-
-        attach (button, 0, 0, 1, 1);
 
         connect_signals ();
     }
@@ -66,12 +58,11 @@ public class Akira.Partials.AlignBoxButton : Gtk.Grid {
             : icon_name;
 
         if (image != null) {
-            button.remove (image);
+            remove (image);
         }
 
         image = new Gtk.Image.from_icon_name (new_icon_name, new_icon_size);
-        button.add (image);
-
+        add (image);
         image.show_all ();
     }
 
@@ -80,7 +71,7 @@ public class Akira.Partials.AlignBoxButton : Gtk.Grid {
             update_icon_style ();
         });
 
-        button.clicked.connect (() => {
+        clicked.connect (() => {
             window.event_bus.emit ("align-items", action);
         });
     }
