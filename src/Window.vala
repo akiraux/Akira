@@ -23,6 +23,7 @@ public class Akira.Window : Gtk.ApplicationWindow {
 	public weak Akira.Application app { get; construct; }
 
 	public Akira.Services.ActionManager action_manager;
+    public Akira.Services.EventBus event_bus;
 	public Akira.Layouts.HeaderBar headerbar;
 	public Akira.Layouts.MainWindow main_window;
 	public Akira.Widgets.SettingsDialog? settings_dialog = null;
@@ -43,6 +44,8 @@ public class Akira.Window : Gtk.ApplicationWindow {
 	}
 
 	construct {
+        event_bus = new Akira.Services.EventBus ();
+
 		accel_group = new Gtk.AccelGroup ();
 		add_accel_group (accel_group);
 
@@ -75,7 +78,7 @@ public class Akira.Window : Gtk.ApplicationWindow {
 
 		var css_provider = new Gtk.CssProvider ();
 		css_provider.load_from_resource ("/com/github/akiraux/akira/stylesheet.css");
-		
+
 		Gtk.StyleContext.add_provider_for_screen (
 			Gdk.Screen.get_default (), css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
 		);

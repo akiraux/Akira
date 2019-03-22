@@ -21,6 +21,8 @@
 public class Akira.Partials.AlignBoxButton : Gtk.Grid {
     public signal void triggered (Akira.Partials.AlignBoxButton emitter);
 
+	public weak Akira.Window window { get; construct; }
+
     public string icon_name { get; construct; }
     public string action { get; construct; }
     public string tooltip_text { get; construct; }
@@ -28,8 +30,9 @@ public class Akira.Partials.AlignBoxButton : Gtk.Grid {
     private Gtk.Button button;
     private Gtk.Image image;
 
-    public AlignBoxButton (string action, string icon_name, string tooltip_text) {
-        Object(
+    public AlignBoxButton (Akira.Window window, string action, string icon_name, string tooltip_text) {
+        Object (
+            window: window,
             icon_name: icon_name,
             action: action,
             tooltip_text: tooltip_text
@@ -73,12 +76,12 @@ public class Akira.Partials.AlignBoxButton : Gtk.Grid {
     }
 
     private void connect_signals () {
-        event_bus.update_icons_style.connect (() => {
+        window.event_bus.update_icons_style.connect (() => {
             update_icon_style ();
         });
 
         button.clicked.connect (() => {
-            event_bus.emit ("align-items", action);
+            window.event_bus.emit ("align-items", action);
         });
     }
 }

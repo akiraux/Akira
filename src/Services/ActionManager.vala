@@ -164,7 +164,7 @@ public class Akira.Services.ActionManager : Object {
 		window.headerbar.update_icons_style ();
 		window.headerbar.toggle ();
 
-        event_bus.emit ("update-icons-style");
+        window.event_bus.emit ("update-icons-style");
 	}
 
 	private void action_quit () {

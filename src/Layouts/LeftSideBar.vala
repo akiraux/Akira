@@ -20,6 +20,8 @@
 */
 
 public class Akira.Layouts.LeftSideBar : Gtk.Grid {
+    public weak Akira.Window window { get; construct; }
+
 	public bool toggled {
 		get {
 			return visible;
@@ -29,8 +31,9 @@ public class Akira.Layouts.LeftSideBar : Gtk.Grid {
 		}
 	}
 
-	public LeftSideBar () {
+	public LeftSideBar (Akira.Window window) {
 		Object (
+            window: window,
 			orientation: Gtk.Orientation.HORIZONTAL,
 			toggled: true
 		);
@@ -40,7 +43,7 @@ public class Akira.Layouts.LeftSideBar : Gtk.Grid {
 		get_style_context ().add_class ("sidebar-l");
 		width_request = 220;
 
-        var align_items_panel = new Akira.Layouts.Partials.AlignItemsPanel ();
+        var align_items_panel = new Akira.Layouts.Partials.AlignItemsPanel (window);
 
 		var label = new Gtk.Label ("Sidebar L");
 		label.halign = Gtk.Align.CENTER;

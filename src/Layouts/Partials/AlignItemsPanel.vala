@@ -19,6 +19,8 @@
  * Authored by: Giacomo "giacomoalbe" Alberini <giacomoalbe@gmail.com>
  */
 public class Akira.Layouts.Partials.AlignItemsPanel : Gtk.Grid {
+	public weak Akira.Window window { get; construct; }
+
     private Gtk.Grid alignment_box;
 
     private struct AlignBoxItem {
@@ -28,7 +30,7 @@ public class Akira.Layouts.Partials.AlignItemsPanel : Gtk.Grid {
         public string tooltip_text;
     }
 
-    private const AlignBoxItem[] align_items_panel_buttons = {
+    private const AlignBoxItem[] ALIGN_ITEMS_PANEL_BUTTONS = {
         { "btn", "even-h", "distribute-horizontal-center", "Distribute centers evenly horizontally" },
         { "btn", "even-v", "distribute-vertical-center", "Distribute center evenly vertically" },
         { "sep" },
@@ -41,10 +43,11 @@ public class Akira.Layouts.Partials.AlignItemsPanel : Gtk.Grid {
         { "btn", "alig-v-b", "align-vertical-bottom", "Align bottom sides" }
     };
 
-    public AlignItemsPanel () {
+    public AlignItemsPanel (Akira.Window window) {
         Object (
+            window: window,
             orientation: Gtk.Orientation.VERTICAL
-            );
+        );
     }
 
     construct {
@@ -56,7 +59,7 @@ public class Akira.Layouts.Partials.AlignItemsPanel : Gtk.Grid {
 
         int current_button_column = 0;
 
-        foreach (var item in align_items_panel_buttons) {
+        foreach (var item in ALIGN_ITEMS_PANEL_BUTTONS) {
             switch (item.type) {
                 case "sep":
                     alignment_box.attach (new Gtk.Separator
@@ -66,7 +69,8 @@ public class Akira.Layouts.Partials.AlignItemsPanel : Gtk.Grid {
 
                 case "btn":
                     var tmp_align_box_button =
-                        new Akira.Partials.AlignBoxButton (item.action,
+                        new Akira.Partials.AlignBoxButton (window,
+                                                           item.action,
                                                            item.icon_name,
                                                            item.tooltip_text);
 
