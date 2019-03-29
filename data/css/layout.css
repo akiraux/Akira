@@ -17,3 +17,26 @@
 .border-bottom {
     border-bottom: 1px solid shade (@bg_color, 0.8);
 }
+
+.fills-box-panel {
+    padding: 3pt 5pt;
+    background-color: @base_color;
+    border-bottom: 1px solid shade (@bg_color, 0.7);
+}
+
+.fills-box-panel label {
+    border-bottom: none;
+    font-size: 10pt;
+}
+
+.fills-box-panel button {
+    padding: 4pt;
+    border-radius: 100%;
+}
+
+.fills-list {
+    background-color: shade (@bg_color, 0.95);
+    border-bottom: 1px solid shade (@bg_color, 0.7);
+    padding: 8pt;
+    padding-bottom: 12pt;
+}

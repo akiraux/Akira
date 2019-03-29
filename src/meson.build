@@ -37,6 +37,8 @@ executable(
     'Layouts/Partials/PagesPanel.vala',
     'Layouts/Partials/Artboard.vala',
     'Layouts/Partials/Layer.vala',
+    'Layouts/Partials/FillsBoxPanel.vala',
+    'Layouts/Partials/FillItem.vala',
 
     'Partials/HeaderBarButton.vala',
     'Partials/MenuButton.vala',
