@@ -54,7 +54,7 @@
   <url type="bugtracker">https://github.com/akiraux/akira/issues</url>
   <url type="help">https://github.com/akiraux/akira/issues</url>
   <update_contact>castellani.ale@gmail.com</update_contact>
-  <translation type="gettext">@APP_ID@</translation>
+  <translation type="gettext">@GETTEXT_PACKAGE@</translation>
   <kudos>
       <!--
         GNOME Software kudos:

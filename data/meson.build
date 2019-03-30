@@ -20,14 +20,15 @@ install_data(
     install_dir: join_paths(get_option('datadir'), 'icons/hicolor/scalable/apps')
 )
 
-xdg_files_conf = configuration_data()
-xdg_files_conf.set('APP_ID', application_id)
+desktop_file_conf = configuration_data()
+desktop_file_conf.set('ICON_NAME', application_id)
+desktop_file_conf.set('EXECUTABLE', application_id)
 
 desktop_file = i18n.merge_file(
     input: configure_file(
         input: meson.project_name() + '.desktop.in.in',
         output: '@BASENAME@',
-        configuration: xdg_files_conf
+        configuration: desktop_file_conf
     ),
     output: application_id + '.desktop',
     po_dir: join_paths(meson.source_root(), 'po'),
@@ -45,11 +46,15 @@ if desktop_file_validate.found()
   )
 endif
 
+appdata_file_conf = configuration_data()
+appdata_file_conf.set('APP_ID', application_id)
+appdata_file_conf.set('GETTEXT_PACKAGE', application_id)
+
 appdata_file = i18n.merge_file(
     input: configure_file(
         input: meson.project_name() + '.appdata.xml.in.in',
         output: '@BASENAME@',
-        configuration: xdg_files_conf
+        configuration: appdata_file_conf
     ),
     output: application_id + '.appdata.xml',
     po_dir: join_paths(meson.source_root(), 'po'),

@@ -40,12 +40,15 @@ endif
 profile = get_option('profile')
 if profile == 'development'
     application_id = meson.project_name() + 'Devel'
+    schema_path = '/com/github/akiraux/akiraDevel/'
 else
     application_id = meson.project_name()
+    schema_path = '/com/github/akiraux/akira/'
 endif
+gettext_package = application_id
 
 # Set our translation domain
-add_global_arguments('-DGETTEXT_PACKAGE="@0@"'.format (application_id), language:'c')
+add_global_arguments('-DGETTEXT_PACKAGE="@0@"'.format (gettext_package), language:'c')
 
 subdir('src')
 subdir('data')
