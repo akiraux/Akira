@@ -7,7 +7,5 @@ Exec=@APP_ID@
 Icon=@APP_ID@
 Terminal=false
 Type=Application
-X-GNOME-Gettext-Domain=akira
 Keywords=Design;Web;UX;UI;Graphics;
-X-GNOME-UsesNotifications=true
 MimeType=application/x-akira;
