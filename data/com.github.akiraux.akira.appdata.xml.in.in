@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Copyright (c) 2017 Alessandro Castellani (https://github.com/akiraux/akira) -->
-<component type="desktop">
-  <id>com.github.akiraux.akira.desktop</id>
+<component type="desktop-application">
+  <id>@APP_ID@</id>
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>GPL-3.0+</project_license>
   <name>Akira</name>
@@ -23,7 +23,7 @@
     </ul>
   </description>
   <provides>
-    <binary>com.github.akiraux.akira</binary>
+    <binary>@APP_ID@</binary>
   </provides>
   <releases>
     <release version="0.1.0" date="2018-6-01">
@@ -51,6 +51,7 @@
       <image>https://raw.githubusercontent.com/akiraux/akira/master/akira-screenshot3.png</image>
     </screenshot>
   </screenshots>
+  <launchable type="desktop-id">@APP_ID@</launchable>
   <developer_name>Alessandro Castellani</developer_name>
   <url type="homepage">https://github.com/akiraux/akira</url>
   <url type="bugtracker">https://github.com/akiraux/akira/issues</url>

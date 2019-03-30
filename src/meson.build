@@ -8,6 +8,8 @@ conf_data.set('RELEASE_NAME', 'Akira')
 conf_data.set('VERSION', '0.0.1')
 conf_data.set('VERSION_INFO', 'The Linux Design Tool')
 conf_data.set('PREFIX', get_option('prefix'))
+conf_data.set('PROFILE', profile)
+conf_data.set('APP_ID', application_id)
 
 config_header = configure_file(
     input: 'config.vala.in',
@@ -17,7 +19,7 @@ config_header = configure_file(
 
 # Create a new executable, list the files we want to compile, list the dependencies we need, and install
 executable(
-    meson.project_name(),
+    application_id,
     'Main.vala',
     'Application.vala',
     'Window.vala',

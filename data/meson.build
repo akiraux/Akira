@@ -20,9 +20,16 @@ install_data(
     install_dir: join_paths(get_option('datadir'), 'icons/hicolor/scalable/apps')
 )
 
+xdg_files_conf = configuration_data()
+xdg_files_conf.set('APP_ID', application_id)
+
 desktop_file = i18n.merge_file(
-    input: meson.project_name() + '.desktop.in',
-    output: meson.project_name() + '.desktop',
+    input: configure_file(
+        input: meson.project_name() + '.desktop.in.in',
+        output: '@BASENAME@',
+        configuration: xdg_files_conf
+    ),
+    output: application_id + '.desktop',
     po_dir: join_paths(meson.source_root(), 'po'),
     type: 'desktop',
     install: true,
@@ -39,8 +46,12 @@ if desktop_file_validate.found()
 endif
 
 appdata_file = i18n.merge_file(
-    input: meson.project_name() + '.appdata.xml.in',
-    output: meson.project_name() + '.appdata.xml',
+    input: configure_file(
+        input: meson.project_name() + '.appdata.xml.in.in',
+        output: '@BASENAME@',
+        configuration: xdg_files_conf
+    ),
+    output: application_id + '.appdata.xml',
     po_dir: join_paths(meson.source_root(), 'po'),
     install: true,
     install_dir: join_paths(get_option('datadir'), 'metainfo')

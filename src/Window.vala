@@ -62,6 +62,9 @@ public class Akira.Window : Gtk.ApplicationWindow {
 	private void build_ui () {
 		set_titlebar (headerbar);
 		set_border_width (0);
+		if (Constants.PROFILE == "development") {
+			headerbar.get_style_context ().add_class ("devel");
+		}
 
 		delete_event.connect ((e) => {
 			return before_destroy ();

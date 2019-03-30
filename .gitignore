@@ -2,4 +2,6 @@
 .vscode
 src/config.vala
 build/
+_build/
+.flatpak-builder/
 *~

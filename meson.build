@@ -8,7 +8,6 @@ add_project_arguments(
 
 # Include the translations module
 i18n = import('i18n')
-
 # Dependencies
 
 
@@ -28,9 +27,6 @@ asresources = gnome.compile_resources(
 cc = meson.get_compiler('c')
 m_dep = cc.find_library('m', required: true)
 
-# Set our translation domain
-add_global_arguments('-DGETTEXT_PACKAGE="@0@"'.format (meson.project_name()), language:'c')
-
 vala_lint = find_program('io.elementary.vala-lint', required : false)
 if vala_lint.found()
     test (
@@ -39,6 +35,17 @@ if vala_lint.found()
         args: ['-d', join_paths(meson.source_root(), 'src')]
     )
 endif
+
+# Set up the profile 
+profile = get_option('profile')
+if profile == 'development'
+    application_id = meson.project_name() + 'Devel'
+else
+    application_id = meson.project_name()
+endif
+
+# Set our translation domain
+add_global_arguments('-DGETTEXT_PACKAGE="@0@"'.format (application_id), language:'c')
 
 subdir('src')
 subdir('data')
