@@ -1,23 +1,27 @@
 icon_sizes = ['16', '24', '32', '48', '64', '128']
-
-foreach i : icon_sizes
+icons_dir = join_paths(akira_datadir, 'icons', 'hicolor')
+foreach size : icon_sizes
     install_data(
-        join_paths('icons', i + 'x' + i, meson.project_name() + '.svg'),
-        install_dir: join_paths(get_option('datadir'), 'icons/hicolor', i + 'x' + i, 'apps')
+        join_paths('icons', size + 'x' + size, meson.project_name() + '.svg'),
+        install_dir: join_paths(icons_dir, size + 'x' + size, 'apps'),
+        rename: application_id + '.svg'
     )
     install_data(
-        join_paths('icons', i + 'x' + i, meson.project_name() + '.svg'),
-        install_dir: join_paths(get_option('datadir'), 'icons/hicolor', i + 'x' + i + '@2', 'apps')
+        join_paths('icons', size + 'x' + size, meson.project_name() + '.svg'),
+        install_dir: join_paths(icons_dir, size + 'x' + size + '@2', 'apps'),
+        rename: application_id + '@2.svg'
     )
     install_data(
-        join_paths('icons', i + 'x' + i, meson.project_name() + '.svg'),
-        install_dir: join_paths(get_option('datadir'), 'icons/hicolor', i + 'x' + i, 'mimetypes')
+        join_paths('icons', size + 'x' + size, meson.project_name() + '.svg'),
+        install_dir: join_paths(icons_dir, size + 'x' + size, 'mimetypes'),
+        rename: application_id + '.svg'
     )
 endforeach
 
 install_data(
     'icons/128x128/' + meson.project_name() + '.svg',
-    install_dir: join_paths(get_option('datadir'), 'icons/hicolor/scalable/apps')
+    rename: application_id + '.svg',
+    install_dir: join_paths(icons_dir, 'scalable', 'apps')
 )
 
 desktop_file_conf = configuration_data()
@@ -34,7 +38,7 @@ desktop_file = i18n.merge_file(
     po_dir: join_paths(meson.source_root(), 'po'),
     type: 'desktop',
     install: true,
-    install_dir: join_paths(get_option('datadir'), 'applications')
+    install_dir: join_paths(akira_datadir, 'applications')
 )
 if desktop_file_validate.found()
   test(
@@ -59,7 +63,7 @@ appdata_file = i18n.merge_file(
     output: application_id + '.appdata.xml',
     po_dir: join_paths(meson.source_root(), 'po'),
     install: true,
-    install_dir: join_paths(get_option('datadir'), 'metainfo')
+    install_dir: join_paths(akira_datadir, 'metainfo')
 )
 if appstream_util.found()
   test(
@@ -72,6 +76,6 @@ endif
 
 install_data(
     meson.project_name() + '.mime.xml',
-    install_dir: join_paths(get_option('datadir'), 'mime', 'packages')
+    install_dir: join_paths(akira_datadir, 'mime', 'packages')
 )
 subdir('schemas')

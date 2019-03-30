@@ -7,5 +7,5 @@ configure_file(
     input: meson.project_name() + '.gschema.xml.in',
     output: application_id + '.gschema.xml',
     configuration: schemas_conf,
-    install_dir: join_paths(get_option('datadir'), 'glib-2.0/schemas')
+    install_dir: join_paths(akira_datadir, 'glib-2.0', 'schemas')
 )
