@@ -22,9 +22,6 @@
       <li>Free hand tool for scribbling and notes</li>
     </ul>
   </description>
-  <provides>
-    <binary>@APP_ID@</binary>
-  </provides>
   <releases>
     <release version="0.1.0" date="2018-6-01">
       <description>
@@ -51,12 +48,21 @@
       <image>https://raw.githubusercontent.com/akiraux/akira/master/akira-screenshot3.png</image>
     </screenshot>
   </screenshots>
-  <launchable type="desktop-id">@APP_ID@</launchable>
+  <launchable type="desktop-id">@APP_ID@.desktop</launchable>
   <developer_name>Alessandro Castellani</developer_name>
   <url type="homepage">https://github.com/akiraux/akira</url>
   <url type="bugtracker">https://github.com/akiraux/akira/issues</url>
   <url type="help">https://github.com/akiraux/akira/issues</url>
   <update_contact>castellani.ale@gmail.com</update_contact>
+  <translation type="gettext">@APP_ID@</translation>
+  <kudos>
+      <!--
+        GNOME Software kudos:
+        https://gitlab.gnome.org/GNOME/gnome-software/blob/master/doc/kudos.md
+      -->
+      <kudo>ModernToolkit</kudo>
+      <kudo>HiDpiIcon</kudo>
+  </kudos>
   <content_rating type="oars-1.1">
     <content_attribute id="violence-cartoon">none</content_attribute>
     <content_attribute id="violence-fantasy">none</content_attribute>
