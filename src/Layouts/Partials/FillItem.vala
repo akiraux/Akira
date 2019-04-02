@@ -24,8 +24,11 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
 
     public Akira.Models.FillsItemModel model { get; construct; }
 
-    private string blending_mode {
+    private BlendingMode blending_mode {
         owned get {
+            return model.blending_mode;
+        }
+        set {
             var blending_mode_tokens = model.blending_mode
                 .to_string ()
                 .split("_");
@@ -42,20 +45,59 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
                 formatted_blending_mode += elem;
             }
 
-            return formatted_blending_mode;
+            selected_blending_mode.label = formatted_blending_mode;
         }
     }
 
-    private string opacity {
+    private string color {
         owned get {
-            return "%d %%".printf ((int) model.opacity);
+            return model.color;
+        }
+        set {
+            print ("%s\n", selected_color.get_style_context ().to_string (Gtk.StyleContextPrintFlags.RECURSE));
         }
     }
+
+    private uint opacity {
+        owned get {
+            return model.opacity;
+        }
+        set {
+            print("Setting opacity to %d\n", (int) model.opacity);
+            current_opacity.label = "%d %%".printf ((int) model.opacity);
+        }
+    }
+
+    private bool visible {
+        owned get {
+            return model.visible;
+        }
+        set {
+            model.visible = value;
+
+            print("Setting visible to %d\n", (int) model.visible);
+
+            if (visible_button_icon != null) {
+                visible_button.remove (visible_button_icon);
+            }
+
+            visible_button_icon = new Gtk.Image .from_icon_name (
+                "layer-%s-symbolic".printf(model.visible ? "visible" : "hidden"),
+                Gtk.IconSize.SMALL_TOOLBAR
+            );
+
+            visible_button.add (visible_button_icon);
+
+            visible_button_icon.show_all ();
+        }
+    }
+
 
     private Gtk.Grid fill_chooser;
     private Gtk.Button visible_button;
     private Gtk.Button delete_button;
     private Gtk.Button show_options_button;
+    private Gtk.Image visible_button_icon;
     private Gtk.Label selected_blending_mode;
     private Gtk.Label current_opacity;
     private Gtk.Button selected_color;
@@ -63,11 +105,28 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
     public FillItem (Akira.Models.FillsItemModel model) {
         Object(
             model: model
-        );
+            );
     }
 
     construct {
-        selected_blending_mode = new Gtk.Label ("%s".printf(blending_mode));
+        create_ui();
+
+        create_event_bindings ();
+
+        update_view();
+
+        show_all();
+    }
+
+    private void update_view () {
+        opacity = model.opacity;
+        visible = model.visible;
+        blending_mode = model.blending_mode;
+        color = model.color;
+    }
+
+    private void create_ui () {
+        selected_blending_mode = new Gtk.Label ("");
 
         fill_chooser = new Gtk.Grid ();
         fill_chooser.hexpand = true;
@@ -76,19 +135,20 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         selected_color.can_focus = false;
         selected_color.get_style_context ().add_class ("selected-color");
 
-        selected_blending_mode = new Gtk.Label (blending_mode);
+        selected_blending_mode = new Gtk.Label ("");
         selected_blending_mode.hexpand = true;
         selected_blending_mode.halign = Gtk.Align.START;
 
         show_options_button = new Gtk.Button ();
         show_options_button.can_focus = false;
         show_options_button.valign = Gtk.Align.CENTER;
-        show_options_button.add (new Gtk.Image.from_icon_name ("pan-down-symbolic",
-                                                Gtk.IconSize.SMALL_TOOLBAR));
         show_options_button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
         show_options_button.get_style_context ().add_class ("popover-toggler");
 
-        current_opacity = new Gtk.Label (opacity);
+        show_options_button.add (new Gtk.Image.from_icon_name ("pan-down-symbolic",
+                                                               Gtk.IconSize.SMALL_TOOLBAR));
+
+        current_opacity = new Gtk.Label ("");
         current_opacity.halign = Gtk.Align.CENTER;
         current_opacity.get_style_context ().add_class ("opacity");
 
@@ -103,15 +163,13 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         visible_button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
         visible_button.can_focus = false;
         visible_button.valign = Gtk.Align.CENTER;
-        visible_button.add (new Gtk.Image.from_icon_name ("layer-visible-symbolic",
-                                                   Gtk.IconSize.LARGE_TOOLBAR));
 
         delete_button = new Gtk.Button ();
         delete_button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
         delete_button.can_focus = false;
         delete_button.valign = Gtk.Align.CENTER;
         delete_button.add (new Gtk.Image.from_icon_name ("user-trash-symbolic",
-                                                   Gtk.IconSize.LARGE_TOOLBAR));
+                                                         Gtk.IconSize.SMALL_TOOLBAR));
 
         attach(fill_chooser, 0, 0, 1, 1);
         attach(visible_button, 1, 0, 1, 1);
@@ -119,6 +177,19 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
 
         get_style_context ().add_class ("fill-chooser-cont");
 
-        show_all();
+    }
+
+    private void create_event_bindings () {
+        delete_button.clicked.connect (on_delete_item);
+        visible_button.clicked.connect (toggle_visibility);
+    }
+
+    private void on_delete_item () {
+        print ("Deleting: %s", model.to_string ());
+        remove_item (model);
+    }
+
+    private void toggle_visibility () {
+        visible = !visible;
     }
 }
