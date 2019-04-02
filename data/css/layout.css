@@ -35,8 +35,47 @@
 }
 
 .fills-list {
-    background-color: shade (@bg_color, 0.95);
+    background-color: shade (@bg_color, 0.9);
     border-bottom: 1px solid shade (@bg_color, 0.7);
     padding: 8pt;
     padding-bottom: 12pt;
+}
+
+.fill-chooser-cont {
+    margin-bottom: 8pt;
+}
+
+.fill-chooser-cont button {
+    padding: 0;
+    margin-left: 6pt;
+    border-radius: 100%;
+}
+
+.fill-chooser {
+    background-color: shade (@bg_color, 0.98);
+    border: 1px solid shade (@bg_color, 0.7);
+    border-radius: 2pt;
+}
+
+.fill-chooser button.selected-color {
+    margin: 5pt;
+    margin-right: 6pt;
+    padding: 6pt 10pt;
+    border-radius: 0;
+    background-color: shade (#9bda5f, 1);
+    border: 1px solid;
+    border-color: shade (#9bda5f, 0.7);
+}
+
+.fill-chooser label.opacity {
+    border-left: 1px solid shade (@bg_color, 0.7);
+    padding: 0 8pt;
+    background-color: shade (@base_color, 1);
+    border-top-right-radius: 2pt;
+    border-bottom-right-radius: 2pt;
+}
+
+.popover-toggler {
+    padding: 3pt;
+    margin: 3pt;
 }

@@ -20,11 +20,45 @@
 */
 
 public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
-    public signal void remove_item (uint index);
-
-    public Gtk.Button remove_btn;
+    public signal void remove_item (Akira.Models.FillsItemModel model);
 
     public Akira.Models.FillsItemModel model { get; construct; }
+
+    private string blending_mode {
+        owned get {
+            var blending_mode_tokens = model.blending_mode
+                .to_string ()
+                .split("_");
+
+            // Get everything but BLENDING_MODE
+            blending_mode_tokens = blending_mode_tokens[2:blending_mode_tokens.length];
+
+            var formatted_blending_mode = "";
+
+            foreach (var elem in blending_mode_tokens) {
+                elem = elem[0].toupper ().to_string() +
+                    elem[1:elem.length].down();
+
+                formatted_blending_mode += elem;
+            }
+
+            return formatted_blending_mode;
+        }
+    }
+
+    private string opacity {
+        owned get {
+            return "%d %%".printf ((int) model.opacity);
+        }
+    }
+
+    private Gtk.Grid fill_chooser;
+    private Gtk.Button visible_button;
+    private Gtk.Button delete_button;
+    private Gtk.Button show_options_button;
+    private Gtk.Label selected_blending_mode;
+    private Gtk.Label current_opacity;
+    private Gtk.Button selected_color;
 
     public FillItem (Akira.Models.FillsItemModel model) {
         Object(
@@ -33,27 +67,58 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
     }
 
     construct {
-        var label = new Gtk.Label ("%d. %s".printf((int) model.index, model.title));
+        selected_blending_mode = new Gtk.Label ("%s".printf(blending_mode));
 
-        label.hexpand = true;
-        label.halign = Gtk.Align.START;
+        fill_chooser = new Gtk.Grid ();
+        fill_chooser.hexpand = true;
 
-        remove_btn = new Gtk.Button ();
-		remove_btn.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
-        remove_btn.can_focus = false;
+        selected_color = new Gtk.Button ();
+        selected_color.can_focus = false;
+        selected_color.get_style_context ().add_class ("selected-color");
 
-        remove_btn.valign = Gtk.Align.CENTER;
-        remove_btn.halign = Gtk.Align.CENTER;
+        selected_blending_mode = new Gtk.Label (blending_mode);
+        selected_blending_mode.hexpand = true;
+        selected_blending_mode.halign = Gtk.Align.START;
 
-        remove_btn.add (new Gtk.Image.from_icon_name ("list-remove-symbolic",
-                                                   Gtk.IconSize.SMALL_TOOLBAR));
-        remove_btn.clicked.connect(() => {
-            remove_item (model.index);
-        });
+        show_options_button = new Gtk.Button ();
+        show_options_button.can_focus = false;
+        show_options_button.valign = Gtk.Align.CENTER;
+        show_options_button.add (new Gtk.Image.from_icon_name ("pan-down-symbolic",
+                                                Gtk.IconSize.SMALL_TOOLBAR));
+        show_options_button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
+        show_options_button.get_style_context ().add_class ("popover-toggler");
 
-        attach(label, 0, 0, 1, 1);
-        attach(remove_btn, 1, 0, 1, 1);
+        current_opacity = new Gtk.Label (opacity);
+        current_opacity.halign = Gtk.Align.CENTER;
+        current_opacity.get_style_context ().add_class ("opacity");
 
-        show_all ();
+        fill_chooser.attach(selected_color, 0, 0, 1, 1);
+        fill_chooser.attach(selected_blending_mode, 1, 0, 1, 1);
+        fill_chooser.attach(show_options_button, 2, 0, 1, 1);
+        fill_chooser.attach(current_opacity, 3, 0, 1, 1);
+
+        fill_chooser.get_style_context ().add_class ("fill-chooser");
+
+        visible_button = new Gtk.Button ();
+        visible_button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
+        visible_button.can_focus = false;
+        visible_button.valign = Gtk.Align.CENTER;
+        visible_button.add (new Gtk.Image.from_icon_name ("layer-visible-symbolic",
+                                                   Gtk.IconSize.LARGE_TOOLBAR));
+
+        delete_button = new Gtk.Button ();
+        delete_button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
+        delete_button.can_focus = false;
+        delete_button.valign = Gtk.Align.CENTER;
+        delete_button.add (new Gtk.Image.from_icon_name ("user-trash-symbolic",
+                                                   Gtk.IconSize.LARGE_TOOLBAR));
+
+        attach(fill_chooser, 0, 0, 1, 1);
+        attach(visible_button, 1, 0, 1, 1);
+        attach(delete_button, 2, 0, 1, 1);
+
+        get_style_context ().add_class ("fill-chooser-cont");
+
+        show_all();
     }
 }
