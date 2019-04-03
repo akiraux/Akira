@@ -31,7 +31,7 @@ public class Akira.Layouts.LeftSideBar : Gtk.Grid {
 
 	public LeftSideBar () {
 		Object (
-			orientation: Gtk.Orientation.HORIZONTAL, 
+			orientation: Gtk.Orientation.HORIZONTAL,
 			toggled: true
 		);
 	}
@@ -39,14 +39,8 @@ public class Akira.Layouts.LeftSideBar : Gtk.Grid {
 	construct {
 		get_style_context ().add_class ("sidebar-l");
 		width_request = 220;
-		
-		var label = new Gtk.Label ("Sidebar L");
-		label.halign = Gtk.Align.CENTER;
-		label.expand = true;
-		label.margin = 10;
-		label.expand = true;
 
-		attach (label, 0, 0, 1, 1);
+		attach (new Partials.TransformPanel (), 0, 0, 1, 1);
 	}
 
 	public void toggle () {
