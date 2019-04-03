@@ -23,14 +23,14 @@
 * A digit input with a label next to it.
 */
 public class Akira.Widgets.LinkedInput : Gtk.Grid {
-  private string label { get; construct set; }
+  public string label { get; construct set; }
 
   /**
   * Indicates wheter the label or the entry should be first
   */
-  private bool reversed { get; construct set; }
+  public bool reversed { get; construct set; }
 
-  private string unit { get; construct set; }
+  public string unit { get; construct set; }
 
   public double value { get; set; }
 
@@ -54,9 +54,9 @@ public class Akira.Widgets.LinkedInput : Gtk.Grid {
     hexpand = true;
     get_style_context ().add_class (Gtk.STYLE_CLASS_LINKED);
 
-    var label = new Gtk.Label (label);
-    label.get_style_context ().add_class ("entry-label");
-    label.width_request = 24;
+    var entry_label = new Gtk.Label (label);
+    entry_label.get_style_context ().add_class ("entry-label");
+    entry_label.width_request = 24;
 
     var entry = new Gtk.Entry ();
     entry.width_request = 48;
@@ -93,9 +93,9 @@ public class Akira.Widgets.LinkedInput : Gtk.Grid {
     if (reversed) {
       entry.xalign = 1.0f;
       attach (entry, 0, 0);
-      attach (label, 1, 0);
+      attach (entry_label, 1, 0);
     } else {
-      attach (label, 0, 0);
+      attach (entry_label, 0, 0);
       attach (entry, 1, 0);
     }
   }
