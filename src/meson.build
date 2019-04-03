@@ -26,6 +26,7 @@ executable(
     'Services/ActionManager.vala',
 
     'Utils/Dialogs.vala',
+    'Utils/BlendingMode.vala',
 
     'Layouts/HeaderBar.vala',
     'Layouts/LeftSideBar.vala',
@@ -39,10 +40,14 @@ executable(
     'Layouts/Partials/Layer.vala',
     'Layouts/Partials/FillsBoxPanel.vala',
     'Layouts/Partials/FillItem.vala',
+    'Layouts/Partials/BlendingModeItem.vala',
 
     'Partials/HeaderBarButton.vala',
     'Partials/MenuButton.vala',
     'Partials/ZoomButton.vala',
+
+    'Models/FillsItemModel.vala',
+    'Models/FillsListModel.vala',
 
     'Widgets/SettingsDialog.vala',
 

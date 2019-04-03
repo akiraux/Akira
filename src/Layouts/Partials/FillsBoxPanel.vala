@@ -19,100 +19,13 @@
 * Authored by: Giacomo "giacomoalbe" Alberini <giacomoalbe@gmail.com>
 */
 
-public enum BlendingMode {
-    NORMAL,
-    MULTIPLY,
-    OVERLAY,
-    SOFT_LIGHT,
-    HARD_LIGHT,
-    LIGHTEN,
-    DARKEN,
-    SCREEN,
-    DIFFERENCE,
-    LUMINOSITY,
-    HUE
-}
-
-
-public class Akira.Models.FillsItemModel : GLib.Object {
-    public string color { get; set; }
-    public uint opacity { get; set; }
-    public bool visible { get; set; }
-    public BlendingMode blending_mode { get; set; }
-
-    public FillsItemModel(string color,
-                          uint opacity,
-                          bool visible,
-                          BlendingMode blending_mode ) {
-        Object(
-            color: color,
-            opacity: opacity,
-            visible: visible,
-            blending_mode: blending_mode
-        );
-    }
-
-    public string to_string () {
-        var fill_item_repr = "";
-
-        fill_item_repr += "Color: %s\n".printf(color);
-        fill_item_repr += "Opacity: %d\n".printf((int) opacity);
-        fill_item_repr += "visible: %s\n".printf(visible ? "1" : "0");
-        fill_item_repr += "BlendingMode: %s".printf(blending_mode.to_string ());
-
-        return fill_item_repr;
-    }
-}
-
-public class FillsListModel : GLib.Object, GLib.ListModel {
-    private GLib.List<Akira.Models.FillsItemModel> fills_list;
-
-    public FillsListModel() {
-        Object(
-        );
-    }
-
-    construct {
-        fills_list = new GLib.List<Akira.Models.FillsItemModel> ();
-    }
-
-    public uint get_n_items () {
-        return (uint) fills_list.length ();
-    }
-
-    public Object? get_item (uint position) {
-        return fills_list.nth_data (position) as Object;
-    }
-
-    public Type get_item_type () {
-        return typeof(Akira.Models.FillsItemModel);
-    }
-
-    public void add () {
-        var position = fills_list.length ();
-        fills_list.append (new Akira.Models.FillsItemModel ("#abcded",
-                                                            100,
-                                                            true,
-                                                            BlendingMode.NORMAL));
-
-        items_changed (position, 0, 1);
-    }
-
-    public void remove (Akira.Models.FillsItemModel item) {
-        var position = fills_list.index (item);
-        fills_list.remove (item);
-
-        items_changed (position, 1, 0);
-    }
-}
-
 public class Akira.Layouts.Partials.FillsBoxPanel : Gtk.Grid {
     public weak Akira.Window window { get; construct; }
 
     public Gtk.Label label;
     public Gtk.Button add_btn;
     public Gtk.ListBox fills_list_container;
-    public FillsListModel fills_list_model;
+    public Akira.Models.FillsListModel fills_list_model;
     public Gtk.Grid title_cont;
 
     private int last_item_position;
@@ -155,7 +68,7 @@ public class Akira.Layouts.Partials.FillsBoxPanel : Gtk.Grid {
         title_cont.attach (label, 0, 0, 1, 1);
         title_cont.attach (add_btn, 1, 0, 1, 1);
 
-        fills_list_model = new FillsListModel ();
+        fills_list_model = new Akira.Models.FillsListModel ();
 
         fills_list_container = new Gtk.ListBox ();
         fills_list_container.selection_mode = Gtk.SelectionMode.NONE;
