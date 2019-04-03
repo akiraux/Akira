@@ -16,10 +16,10 @@ As soon as Akira will reach a more stable version it will be available from the 
 <!--- [![Get it on AppCenter](https://appcenter.elementary.io/badge.svg)](https://appcenter.elementary.io/com.github.akiraux.akira) -->
 
 ## Get it from Flathub!
-As soon as Akira will reach a more stable version, an official Flatpack release will be avaialable from FlatHub.
+As soon as Akira will reach a more stable version, an official Flatpack release will be available from FlatHub.
 
 ## Get it from the SnapCraft store!
-As soon as Akira will reach a more stable version, an official Snap package will be avaialable from SnapCraft store.
+As soon as Akira will reach a more stable version, an official Snap package will be available from SnapCraft store.
 
 ## Install it from source
 You can install Akira by compiling it from the source, here's the list of dependencies required:
