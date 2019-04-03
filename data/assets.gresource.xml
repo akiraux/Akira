@@ -8,7 +8,7 @@
     <file alias="headerbar.css" compressed="true">css/headerbar.css</file>
   </gresource>
   <gresource prefix="/com/github/akiraux/akira">
-    <file alias="stylesheet.css" compressed="true">stylesheet.css</file>
+    <file alias="stylesheet.css" compressed="true">css/stylesheet.css</file>
     <file alias="bool-difference-symbolic.svg">icons/symbolic/bool-difference-symbolic.svg</file>
     <file alias="bool-interesect-symbolic.svg">icons/symbolic/bool-intersect-symbolic.svg</file>
     <file alias="bool-subtract-symbolic.svg">icons/symbolic/bool-subtract-symbolic.svg</file>
@@ -48,6 +48,5 @@
     <file alias="shape-circle-symbolic.svg">icons/symbolic/shape-circle-symbolic.svg</file>
     <file alias="shape-all-symbolic.svg">icons/symbolic/shape-all-symbolic.svg</file>
     <file alias="shape-text-symbolic.svg">icons/symbolic/shape-text-symbolic.svg</file>
-    
   </gresource>
 </gresources>

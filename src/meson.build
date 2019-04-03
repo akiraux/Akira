@@ -37,11 +37,13 @@ executable(
     'Layouts/Partials/PagesPanel.vala',
     'Layouts/Partials/Artboard.vala',
     'Layouts/Partials/Layer.vala',
+    'Layouts/Partials/TransformPanel.vala',
 
     'Partials/HeaderBarButton.vala',
     'Partials/MenuButton.vala',
     'Partials/ZoomButton.vala',
 
+    'Widgets/LinkedInput.vala',
     'Widgets/SettingsDialog.vala',
 
     'Lib/Canvas.vala',
