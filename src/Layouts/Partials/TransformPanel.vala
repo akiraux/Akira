@@ -21,7 +21,7 @@
 public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
   // Should probably be associated with the currently selected object
   // once the canvas is working
-  private bool size_lock { get; set; default = false; }
+  public bool size_lock { get; set; default = false; }
 
   double size_ratio = 1.0;
 
