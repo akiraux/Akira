@@ -95,8 +95,8 @@ public class Akira.Application : Granite.Application {
 	}
 
 	protected override void activate () {
-		Gtk.Settings.get_default().set_property("gtk-icon-theme-name", "elementary");
-		Gtk.Settings.get_default().set_property("gtk-theme-name", "elementary");
+		Gtk.Settings.get_default ().set_property ("gtk-icon-theme-name", "elementary");
+		Gtk.Settings.get_default ().set_property ("gtk-theme-name", "elementary");
 
 		weak Gtk.IconTheme default_theme = Gtk.IconTheme.get_default ();
 		default_theme.add_resource_path ("/com/github/akiraux/akira");
