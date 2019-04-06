@@ -50,6 +50,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         
         var lock_changes = new Gtk.Button.from_icon_name ("changes-allow-symbolic");
         lock_changes.can_focus = false;
+        lock_changes.tooltip_text = _("Keep Ratio");
         lock_changes.get_style_context ().add_class ("flat");
         bind_property (
             "size-lock", lock_changes, "image", BindingFlags.SYNC_CREATE,
