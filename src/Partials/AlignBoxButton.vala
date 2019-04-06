@@ -25,6 +25,7 @@ public class Akira.Partials.AlignBoxButton : Gtk.Button {
 
     public string icon { get; construct; }
     public string action { get; construct; }
+    public Gtk.Image btn_image;
 
     public AlignBoxButton (Akira.Window main_window, string action_name, string icon_name, string tooltip) {
         Object (
@@ -40,13 +41,31 @@ public class Akira.Partials.AlignBoxButton : Gtk.Button {
         get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
         sensitive = false;
 
-        var btn_image = new Gtk.Image.from_icon_name (icon, Gtk.IconSize.LARGE_TOOLBAR);
-        add (btn_image);
-
+        update_icon_style ();
         connect_signals ();
     }
 
+    private void update_icon_style () {
+        var size = settings.use_symbolic == true ? Gtk.IconSize.SMALL_TOOLBAR :
+                                                   Gtk.IconSize.LARGE_TOOLBAR;
+        var new_icon = settings.use_symbolic == true ? ("%s-symbolic".printf (icon)) :
+                                                       icon.replace ("-symbolic", "");
+
+        if (btn_image != null) {
+            remove (btn_image);
+        }
+
+        btn_image = new Gtk.Image.from_icon_name (new_icon, size);
+        add (btn_image);
+
+        show_all ();
+    }
+
     private void connect_signals () {
+        window.event_bus.update_icons_style.connect (() => {
+            update_icon_style ();
+        });
+
         clicked.connect (() => {
             window.event_bus.emit ("align-items", action);
         });
