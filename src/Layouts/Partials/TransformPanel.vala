@@ -65,14 +65,18 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         
         var rotation = new Akira.Widgets.LinkedInput (C_("The first letter of Rotation", "R"), "°");
         rotation.unit = "°";
+
         var hflip_button = new Gtk.Button.from_icon_name ("object-flip-horizontal", Gtk.IconSize.LARGE_TOOLBAR);
         hflip_button.get_style_context ().add_class ("flat");
         hflip_button.hexpand = true;
         hflip_button.can_focus = false;
+        hflip_button.tooltip_markup = Granite.markup_accel_tooltip ({"<Ctrl><Shift>bracketleft"}, _("Flip Horizontally"));
+
         var vflip_button = new Gtk.Button.from_icon_name ("object-flip-vertical", Gtk.IconSize.LARGE_TOOLBAR);
         vflip_button.get_style_context ().add_class ("flat");
         vflip_button.hexpand = true;
         vflip_button.can_focus = false;
+        vflip_button.tooltip_markup = Granite.markup_accel_tooltip ({"<Ctrl><Shift>bracketright"}, _("Flip Vertically"));
         
         var opacity = new Gtk.Adjustment (0, 0, 100, 0.5, 0, 0);
         var scale = new Gtk.Scale (Gtk.Orientation.HORIZONTAL, opacity);
@@ -82,7 +86,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         scale.round_digits = 1;
         var opacity_entry = new Akira.Widgets.LinkedInput ("%", "", true);
         opacity_entry.bind_property (
-        "value", opacity, "value", BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE
+            "value", opacity, "value", BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE
         );
         
         attach (group_title (_("Position")), 0, 0);
