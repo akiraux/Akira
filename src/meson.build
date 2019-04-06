@@ -30,6 +30,7 @@ executable(
 
     'Services/Settings.vala',
     'Services/ActionManager.vala',
+    'Services/EventBus.vala',
 
     'Utils/Dialogs.vala',
 
@@ -44,10 +45,12 @@ executable(
     'Layouts/Partials/Artboard.vala',
     'Layouts/Partials/Layer.vala',
     'Layouts/Partials/TransformPanel.vala',
+    'Layouts/Partials/AlignItemsPanel.vala',
 
     'Partials/HeaderBarButton.vala',
     'Partials/MenuButton.vala',
     'Partials/ZoomButton.vala',
+    'Partials/AlignBoxButton.vala',
 
     'Widgets/LinkedInput.vala',
     'Widgets/SettingsDialog.vala',
