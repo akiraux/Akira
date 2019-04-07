@@ -31,6 +31,7 @@ public class Akira.Partials.LinkedInput : Gtk.Grid {
     */
     public bool reversed { get; construct set; }
     public string unit { get; construct set; }
+    public double limit { get; set; }
     public double value { get; set; }
     
     /**
@@ -39,11 +40,12 @@ public class Akira.Partials.LinkedInput : Gtk.Grid {
     */
     private bool manually_edited = true;
     
-    public LinkedInput (string label, string unit = "", bool reversed = false, double default_val = 0) {
+    public LinkedInput (string label, string unit = "", bool reversed = false, double default_val = 0, double limit = 0.0) {
         Object (
             label: label,
             reversed: reversed,
             value: default_val,
+            limit: limit,
             unit: unit
         );
     }
@@ -63,7 +65,6 @@ public class Akira.Partials.LinkedInput : Gtk.Grid {
         entry.width_request = 46;
         entry.width_chars = 0;
         entry.hexpand = true;
-        //  entry.sensitive = false;
         entry.notify["text"].connect (() => {
             if (manually_edited) {
                 var text_canon = entry.text.replace (",", ".");
@@ -74,6 +75,9 @@ public class Akira.Partials.LinkedInput : Gtk.Grid {
                 var new_val = double.parse (text_canon.replace ("?", ""));
                 if (new_val != value) {
                     value = new_val;
+                }
+                if (limit > 0.0 && new_val > limit) {
+                    entry.text = limit.to_string ();
                 }
             }
         });

@@ -99,7 +99,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         scale.sensitive = true;
         scale.round_digits = 1;
         scale.margin_end = 30;
-        var opacity_entry = new Akira.Partials.LinkedInput ("%", "", true);
+        var opacity_entry = new Akira.Partials.LinkedInput ("%", "", true, 0, 100.0);
         opacity_entry.bind_property (
             "value", opacity, "value", BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE
         );
