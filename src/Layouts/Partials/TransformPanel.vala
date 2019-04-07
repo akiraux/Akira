@@ -31,8 +31,8 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         column_spacing = 6;
         hexpand = true;
         
-        var width = new Akira.Widgets.LinkedInput (C_("The first letter of Width", "W"));
-        var height = new Akira.Widgets.LinkedInput (C_("The first letter of Height", "H"));
+        var width = new Akira.Partials.LinkedInput (C_("The first letter of Width", "W"));
+        var height = new Akira.Partials.LinkedInput (C_("The first letter of Height", "H"));
         width.notify["value"].connect (() => {
             if (size_lock) {
                 height.value = width.value / size_ratio;
@@ -64,20 +64,28 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
             size_lock = !size_lock;
         });
         
-        var rotation = new Akira.Widgets.LinkedInput (C_("The first letter of Rotation", "R"), "°");
+        var rotation = new Akira.Partials.LinkedInput (C_("The first letter of Rotation", "R"), "°");
         rotation.unit = "°";
 
         var hflip_button = new Gtk.Button.from_icon_name ("object-flip-horizontal", Gtk.IconSize.LARGE_TOOLBAR);
         hflip_button.get_style_context ().add_class ("flat");
-        hflip_button.hexpand = true;
+        hflip_button.hexpand = false;
+        hflip_button.halign = Gtk.Align.CENTER;
         hflip_button.can_focus = false;
         hflip_button.tooltip_markup = Granite.markup_accel_tooltip ({"<Ctrl><Shift>bracketleft"}, _("Flip Horizontally"));
 
         var vflip_button = new Gtk.Button.from_icon_name ("object-flip-vertical", Gtk.IconSize.LARGE_TOOLBAR);
         vflip_button.get_style_context ().add_class ("flat");
-        vflip_button.hexpand = true;
+        vflip_button.hexpand = false;
+        vflip_button.halign = Gtk.Align.CENTER;
         vflip_button.can_focus = false;
         vflip_button.tooltip_markup = Granite.markup_accel_tooltip ({"<Ctrl><Shift>bracketright"}, _("Flip Vertically"));
+
+        var align_grid = new Gtk.Grid ();
+        align_grid.hexpand = true;
+        align_grid.column_homogeneous = true;
+        align_grid.attach (hflip_button, 0, 0, 1, 1);
+        align_grid.attach (vflip_button, 1, 0, 1, 1);
         
         var opacity = new Gtk.Adjustment (0, 0, 100, 0.5, 0, 0);
         var scale = new Gtk.Scale (Gtk.Orientation.HORIZONTAL, opacity);
@@ -85,35 +93,34 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         scale.draw_value = false;
         scale.sensitive = true;
         scale.round_digits = 1;
-        var opacity_entry = new Akira.Widgets.LinkedInput ("%", "", true);
+        var opacity_entry = new Akira.Partials.LinkedInput ("%", "", true);
         opacity_entry.bind_property (
             "value", opacity, "value", BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE
         );
         
-        attach (group_title (_("Position")), 0, 0);
-        attach (new Akira.Widgets.LinkedInput (C_("The horizontal coordinate", "X")), 0, 1, 1);
-        attach (new Akira.Widgets.LinkedInput (C_("The vertical coordinate", "Y")), 2, 1, 2);
+        attach (group_title (_("Position")), 0, 0, 3);
+        attach (new Akira.Partials.LinkedInput (C_("The horizontal coordinate", "X")), 0, 1, 1);
+        attach (new Akira.Partials.LinkedInput (C_("The vertical coordinate", "Y")), 2, 1, 1);
         
-        attach (group_title (_("Size")), 0, 2);
+        attach (group_title (_("Size")), 0, 2, 3);
         attach (width, 0, 3, 1);
-        attach (lock_changes, 1, 3);
-        attach (height, 2, 3, 2);
+        attach (lock_changes, 1, 3, 1);
+        attach (height, 2, 3, 1);
         
-        attach (group_title (_("Transform")), 0, 4);
+        attach (group_title (_("Transform")), 0, 4, 3);
         attach (rotation, 0, 5, 1);
-        attach (hflip_button, 2, 5, 1);
-        attach (vflip_button, 3, 5, 1);
+        attach (align_grid, 2, 5, 1);
         
-        attach (group_title (_("Opacity")), 0, 6);
-        attach (scale, 0, 7, 3);
-        attach (opacity_entry, 3, 7);
+        attach (group_title (_("Opacity")), 0, 6, 3);
+        attach (scale, 0, 7, 2);
+        attach (opacity_entry, 2, 7, 1);
     }
     
-    Gtk.Label group_title (string title) {
-        var title_label = new Gtk.Label ("<b>%s</b>".printf (title));
-        title_label.use_markup = true;
+    private Gtk.Label group_title (string title) {
+        var title_label = new Gtk.Label ("%s".printf (title));
+        title_label.get_style_context ().add_class ("group-title");
         title_label.halign = Gtk.Align.START;
-        title_label.margin_top = 6;
+        title_label.margin_bottom = 2;
         return title_label;
     }
 }

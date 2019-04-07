@@ -36,7 +36,16 @@
     border-right-width: 1px;
 }
 
+.group-title {
+    font-size: 9pt;
+    font-weight: 600;
+    color: alpha (@fg_color, 0.9);
+}
+
 .entry-label {
+    font-size: 8pt;
+    font-weight: bold;
+    color: alpha (@fg_color, 0.75);
     text-shadow: 0 1px @text_shadow_color;
     background-image:
         linear-gradient(to top, shade (@base_color, 0.93 ), shade (@base_color, 0.97));
@@ -53,4 +62,8 @@
 
 .linked .entry-label:last-child {
     border-radius: 0 2.5px 2.5px 0;
+}
+
+.linked .reversed {
+    border-right: 0;
 }
