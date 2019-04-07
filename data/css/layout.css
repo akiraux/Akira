@@ -57,6 +57,10 @@
                 0 1px 0 0 alpha (@bg_highlight_color, 0.15);
 }
 
+.linked entry {
+    padding: 3px 5px;
+}
+
 .linked .entry-label:first-child {
     border-radius: 2.5px 0 0 2.5px;
 }
