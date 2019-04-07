@@ -24,14 +24,13 @@
 */
 public class Akira.Partials.LinkedInput : Gtk.Grid {
     public string label { get; construct set; }
+    public Gtk.Entry entry { get; construct set; }
     
     /**
     * Indicates wheter the label or the entry should be first
     */
     public bool reversed { get; construct set; }
-    
     public string unit { get; construct set; }
-    
     public double value { get; set; }
     
     /**
@@ -52,7 +51,6 @@ public class Akira.Partials.LinkedInput : Gtk.Grid {
     construct {
         valign = Gtk.Align.CENTER;
         hexpand = true;
-        margin_bottom = 8;
         get_style_context ().add_class (Gtk.STYLE_CLASS_LINKED);
         
         var entry_label = new Gtk.Label (label);
@@ -61,7 +59,7 @@ public class Akira.Partials.LinkedInput : Gtk.Grid {
         entry_label.width_request = 30;
         entry_label.hexpand = false;
         
-        var entry = new Gtk.Entry ();
+        entry = new Gtk.Entry ();
         entry.width_request = 46;
         entry.width_chars = 0;
         entry.hexpand = true;

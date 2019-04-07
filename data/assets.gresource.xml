@@ -2,6 +2,7 @@
 <gresources>
   <gresource prefix="/com/github/akiraux/akira/css">
     <file alias="variables.css" compressed="true">css/variables.css</file>
+    <file alias="colors.css" compressed="true">css/colors.css</file>
     <file alias="layout.css" compressed="true">css/layout.css</file>
     <file alias="artboard.css" compressed="true">css/artboard.css</file>
     <file alias="layer.css" compressed="true">css/layer.css</file>

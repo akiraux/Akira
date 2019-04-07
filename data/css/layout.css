@@ -37,8 +37,9 @@
 }
 
 .group-title {
-    font-size: 9pt;
+    font-size: 8pt;
     font-weight: 600;
+    letter-spacing: 1px;
     color: alpha (@fg_color, 0.9);
 }
 
@@ -66,4 +67,12 @@
 
 .linked .reversed {
     border-right: 0;
+}
+
+.flip-button {
+    padding: 0;
+}
+
+.panel-separator {
+    border: none;
 }

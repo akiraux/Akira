@@ -52,6 +52,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         lock_changes.can_focus = false;
         lock_changes.tooltip_text = _("Keep Ratio");
         lock_changes.get_style_context ().add_class ("flat");
+        lock_changes.get_style_context ().add_class ("label-colors");
         bind_property (
             "size-lock", lock_changes, "image", BindingFlags.SYNC_CREATE,
             (binding, val, ref res) => {
@@ -67,17 +68,21 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         var rotation = new Akira.Partials.LinkedInput (C_("The first letter of Rotation", "R"), "°");
         rotation.unit = "°";
 
-        var hflip_button = new Gtk.Button.from_icon_name ("object-flip-horizontal", Gtk.IconSize.LARGE_TOOLBAR);
+        var hflip_button = new Gtk.Button.from_icon_name ("object-flip-horizontal", Gtk.IconSize.DND);
         hflip_button.get_style_context ().add_class ("flat");
+        hflip_button.get_style_context ().add_class ("flip-button");
         hflip_button.hexpand = false;
         hflip_button.halign = Gtk.Align.CENTER;
+        hflip_button.valign = Gtk.Align.CENTER;
         hflip_button.can_focus = false;
         hflip_button.tooltip_markup = Granite.markup_accel_tooltip ({"<Ctrl><Shift>bracketleft"}, _("Flip Horizontally"));
 
-        var vflip_button = new Gtk.Button.from_icon_name ("object-flip-vertical", Gtk.IconSize.LARGE_TOOLBAR);
+        var vflip_button = new Gtk.Button.from_icon_name ("object-flip-vertical", Gtk.IconSize.DND);
         vflip_button.get_style_context ().add_class ("flat");
+        vflip_button.get_style_context ().add_class ("flip-button");
         vflip_button.hexpand = false;
         vflip_button.halign = Gtk.Align.CENTER;
+        vflip_button.valign = Gtk.Align.CENTER;
         vflip_button.can_focus = false;
         vflip_button.tooltip_markup = Granite.markup_accel_tooltip ({"<Ctrl><Shift>bracketright"}, _("Flip Vertically"));
 
@@ -93,33 +98,48 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         scale.draw_value = false;
         scale.sensitive = true;
         scale.round_digits = 1;
+        scale.margin_end = 30;
         var opacity_entry = new Akira.Partials.LinkedInput ("%", "", true);
         opacity_entry.bind_property (
             "value", opacity, "value", BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE
         );
+        opacity_entry.hexpand = false;
+        opacity_entry.halign = Gtk.Align.END;
+        opacity_entry.entry.width_request = 60;
+
+        var opacity_grid = new Gtk.Grid ();
+        opacity_grid.hexpand = true;
+        opacity_grid.attach (scale, 0, 0, 1);
+        opacity_grid.attach (opacity_entry, 1, 0, 1);
         
         attach (group_title (_("Position")), 0, 0, 3);
         attach (new Akira.Partials.LinkedInput (C_("The horizontal coordinate", "X")), 0, 1, 1);
         attach (new Akira.Partials.LinkedInput (C_("The vertical coordinate", "Y")), 2, 1, 1);
+
+        attach (new Akira.Partials.PanelSeparator (), 0, 2, 3);
         
-        attach (group_title (_("Size")), 0, 2, 3);
-        attach (width, 0, 3, 1);
-        attach (lock_changes, 1, 3, 1);
-        attach (height, 2, 3, 1);
+        attach (group_title (_("Size")), 0, 3, 3);
+        attach (width, 0, 4, 1);
+        attach (lock_changes, 1, 4, 1);
+        attach (height, 2, 4, 1);
+
+        attach (new Akira.Partials.PanelSeparator (), 0, 5, 3);
         
-        attach (group_title (_("Transform")), 0, 4, 3);
-        attach (rotation, 0, 5, 1);
-        attach (align_grid, 2, 5, 1);
+        attach (group_title (_("Transform")), 0, 6, 3);
+        attach (rotation, 0, 7, 1);
+        attach (align_grid, 2, 7, 1);
+
+        attach (new Akira.Partials.PanelSeparator (), 0, 8, 3);
         
-        attach (group_title (_("Opacity")), 0, 6, 3);
-        attach (scale, 0, 7, 2);
-        attach (opacity_entry, 2, 7, 1);
+        attach (group_title (_("Opacity")), 0, 9, 3);
+        attach (opacity_grid, 0, 10, 3);
     }
     
     private Gtk.Label group_title (string title) {
         var title_label = new Gtk.Label ("%s".printf (title));
         title_label.get_style_context ().add_class ("group-title");
         title_label.halign = Gtk.Align.START;
+        title_label.hexpand = true;
         title_label.margin_bottom = 2;
         return title_label;
     }

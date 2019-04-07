@@ -52,6 +52,7 @@ executable(
     'Partials/ZoomButton.vala',
     'Partials/AlignBoxButton.vala',
     'Partials/LinkedInput.vala',
+    'Partials/PanelSeparator.vala',
 
     'Widgets/SettingsDialog.vala',
 
