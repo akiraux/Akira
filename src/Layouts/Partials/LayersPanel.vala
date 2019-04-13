@@ -1,23 +1,24 @@
 /*
-* Copyright (c) 2018 Alecaddd (http://alecaddd.com)
+* Copyright (c) 2019 Alecaddd (http://alecaddd.com)
 *
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public
-* License as published by the Free Software Foundation; either
-* version 2 of the License, or (at your option) any later version.
+* This file is part of Akira.
 *
-* This program is distributed in the hope that it will be useful,
+* Akira is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+
+* Akira is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* General Public License for more details.
-*
-* You should have received a copy of the GNU General Public
-* License along with this program; if not, write to the
-* Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
-* Boston, MA 02110-1301 USA
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+
+* You should have received a copy of the GNU General Public License
+* along with Akira.  If not, see <https://www.gnu.org/licenses/>.
 *
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
+
 public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
 	public weak Akira.Window window { get; construct; }
 
@@ -30,6 +31,7 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
 	private const int SCROLL_STEP_SIZE = 5;
 	private const int SCROLL_DISTANCE = 30;
 	private const int SCROLL_DELAY = 50;
+	public Akira.Layouts.Partials.Artboard artboard;
 
 	private const Gtk.TargetEntry targetEntries[] = {
 		{ "ARTBOARD", Gtk.TargetFlags.SAME_APP, 0 }
@@ -47,47 +49,13 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
 		get_style_context ().add_class ("layers-panel");
 		expand = true;
 
-		var artboard = new Akira.Layouts.Partials.Artboard (window, "Artboard 1");
+		artboard = new Akira.Layouts.Partials.Artboard (window, "Artboard 1");
 		var placeholder = new Gtk.ListBoxRow ();
 		artboard.container.insert (placeholder, 0);
 		placeholder.visible = false;
 		placeholder.no_show_all = true;
 
-		artboard.container.insert (new Akira.Layouts.Partials.Layer (window, artboard, "Rectangle", "/com/github/alecaddd/akira/tools/rectangle.svg", false), 1);
-		artboard.container.insert (new Akira.Layouts.Partials.Layer (window, artboard, "Circle", "/com/github/alecaddd/akira/tools/circle.svg", false), 2);
-		artboard.container.insert (new Akira.Layouts.Partials.Layer (window, artboard, "Triangle", "/com/github/alecaddd/akira/tools/triangle.svg", false), 3);
-
-		var layer_group = new Akira.Layouts.Partials.Layer (window, artboard, "Group", "folder-symbolic", true);
-		var layer_placeholder = new Gtk.ListBoxRow ();
-		layer_group.container.insert (layer_placeholder, 0);
-		layer_placeholder.visible = false;
-		layer_placeholder.no_show_all = true;
-
-		layer_group.container.insert (new Akira.Layouts.Partials.Layer (window, artboard, "Rectangle", "/com/github/alecaddd/akira/tools/rectangle.svg", false, layer_group), 1);
-		layer_group.container.insert (new Akira.Layouts.Partials.Layer (window, artboard, "Circle", "/com/github/alecaddd/akira/tools/circle.svg", false, layer_group), 2);
-		layer_group.container.insert (new Akira.Layouts.Partials.Layer (window, artboard, "Triangle", "/com/github/alecaddd/akira/tools/triangle.svg", false, layer_group), 3);
-
-		artboard.container.insert (layer_group, 4);
-
-		artboard.container.insert (new Akira.Layouts.Partials.Layer (window, artboard, "Text", "/com/github/alecaddd/akira/tools/text.svg", false), 5);
-		artboard.container.insert (new Akira.Layouts.Partials.Layer (window, artboard, "Bezier", "/com/github/alecaddd/akira/tools/pen.svg", false), 6);
-		artboard.container.insert (new Akira.Layouts.Partials.Layer (window, artboard, "Path", "/com/github/alecaddd/akira/tools/pencil.svg", false), 7);
-
-		var artboard2 = new Akira.Layouts.Partials.Artboard (window, "Artboard 2");
-		var artboard3 = new Akira.Layouts.Partials.Artboard (window, "Artboard 3");
-		var artboard4 = new Akira.Layouts.Partials.Artboard (window, "Artboard 4");
-		var artboard5 = new Akira.Layouts.Partials.Artboard (window, "Artboard 5");
-
-		var artboard_placeholder = new Gtk.ListBoxRow ();
-		artboard_placeholder.visible = false;
-		artboard_placeholder.no_show_all = true;
-
-		insert (artboard_placeholder, 0);
-		insert (artboard, 1);
-		insert (artboard2, 2);
-		insert (artboard3, 3);
-		insert (artboard4, 4);
-		insert (artboard5, 5);
+		insert (artboard, 0);
 
 		build_drag_and_drop ();
 

@@ -1,20 +1,20 @@
 /*
-* Copyright (c) 2018 Alecaddd (http://alecaddd.com)
+* Copyright (c) 2019 Alecaddd (http://alecaddd.com)
 *
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public
-* License as published by the Free Software Foundation; either
-* version 2 of the License, or (at your option) any later version.
+* This file is part of Akira.
 *
-* This program is distributed in the hope that it will be useful,
+* Akira is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+
+* Akira is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* General Public License for more details.
-*
-* You should have received a copy of the GNU General Public
-* License along with this program; if not, write to the
-* Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
-* Boston, MA 02110-1301 USA
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+
+* You should have received a copy of the GNU General Public License
+* along with Akira.  If not, see <https://www.gnu.org/licenses/>.
 *
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
@@ -25,6 +25,11 @@ public class Akira.Widgets.SettingsDialog : Gtk.Dialog {
 	private Gtk.Stack main_stack;
 	private Gtk.Switch dark_theme_switch;
 	private Gtk.Switch label_switch;
+	private Gtk.Switch symbolic_switch;
+
+	enum Column {
+		ICONTYPE
+	}
 
 	public SettingsDialog (Akira.Window parent) {
 		Object (
@@ -85,25 +90,35 @@ public class Akira.Widgets.SettingsDialog : Gtk.Dialog {
 		content_grid.column_homogeneous = true;
 
 		content_grid.attach (new SettingsHeader (_("Interface")), 0, 0, 2, 1);
+		
+		content_grid.attach (new SettingsLabel (_("Use Dark Theme:")), 0, 1, 1, 1);
+		dark_theme_switch = new SettingsSwitch ("dark-theme");
+		content_grid.attach (dark_theme_switch, 1, 1, 1, 1);
 
-		content_grid.attach (new SettingsLabel (_("Show Button Labels:")), 0, 1, 1, 1);
+		dark_theme_switch.notify["active"].connect (() => {
+			Gtk.Settings.get_default ().gtk_application_prefer_dark_theme = settings.dark_theme;
+		});
+
+		content_grid.attach (new SettingsHeader (_("ToolBar Style")), 0, 2, 2, 1);
+
+		content_grid.attach (new SettingsLabel (_("Show Button Labels:")), 0, 3, 1, 1);
 		label_switch = new SettingsSwitch ("show-label");
-		content_grid.attach (label_switch, 1, 1, 1, 1);
+		content_grid.attach (label_switch, 1, 3, 1, 1);
 
-		label_switch.notify.connect (() => {
+		label_switch.notify["active"].connect (() => {
 			if (!settings.show_label) {
 				window.action_manager.hide_labels ();
 			} else if (settings.show_label) {
 				window.action_manager.show_labels ();
 			}
 		});
+		
+		content_grid.attach (new SettingsLabel (_("Use Symbolic Icons:")), 0, 4, 1, 1);
+		symbolic_switch = new SettingsSwitch ("use-symbolic");
+		content_grid.attach (symbolic_switch, 1, 4, 1, 1);
 
-		content_grid.attach (new SettingsLabel (_("Use Dark Theme:")), 0, 2, 1, 1);
-		dark_theme_switch = new SettingsSwitch ("dark-theme");
-		content_grid.attach (dark_theme_switch, 1, 2, 1, 1);
-
-		dark_theme_switch.notify.connect (() => {
-			Gtk.Settings.get_default ().gtk_application_prefer_dark_theme = settings.dark_theme;
+		symbolic_switch.notify["active"].connect (() => {
+			window.action_manager.update_icons_style ();
 		});
 
 		return content_grid;
@@ -136,8 +151,7 @@ public class Akira.Widgets.SettingsDialog : Gtk.Dialog {
 		public SettingsButton (string text) {
 			label = text;
 			valign = Gtk.Align.END;
-			var style_context = this.get_style_context ();
-			style_context.add_class ("suggested-action");
+			get_style_context ().add_class ("suggested-action");
 		}
 	}
 }

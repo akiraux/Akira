@@ -1,42 +1,52 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gresources>
-  <gresource prefix="/com/github/alecaddd/akira">
-    <file alias="stylesheet.css" compressed="true">stylesheet.css</file>
+  <gresource prefix="/com/github/akiraux/akira/css">
+    <file alias="variables.css" compressed="true">css/variables.css</file>
+    <file alias="layout.css" compressed="true">css/layout.css</file>
+    <file alias="artboard.css" compressed="true">css/artboard.css</file>
+    <file alias="layer.css" compressed="true">css/layer.css</file>
+    <file alias="headerbar.css" compressed="true">css/headerbar.css</file>
   </gresource>
-  <gresource prefix="/com/github/alecaddd/akira/partials">
-    <file alias="variables.css" compressed="true">partials/variables.css</file>
-    <file alias="layout.css" compressed="true">partials/layout.css</file>
-    <file alias="artboard.css" compressed="true">partials/artboard.css</file>
-    <file alias="layer.css" compressed="true">partials/layer.css</file>
-  </gresource>
-  <gresource prefix="/com/github/alecaddd/akira/tools">
-    <file alias="artboard.svg" compressed="true" preprocess="xml-stripblanks">assets/tools/artboard.svg</file>
-    <file alias="bool-difference.svg" compressed="true" preprocess="xml-stripblanks">assets/tools/bool-difference.svg</file>
-    <file alias="bool-interesect.svg" compressed="true" preprocess="xml-stripblanks">assets/tools/bool-intersect.svg</file>
-    <file alias="bool-subtract.svg" compressed="false" preprocess="">assets/tools/bool-subtract.svg</file>
-    <file alias="bool-union.svg" compressed="false" preprocess="xml-stripblanks">assets/tools/bool-union.svg</file>
-    <file alias="eye.svg" compressed="false" preprocess="xml-stripblanks">assets/tools/eye.svg</file>
-    <file alias="eye-not.svg" compressed="false" preprocess="xml-stripblanks">assets/tools/eye-not.svg</file>
-    <file alias="gear.svg" compressed="false" preprocess="xml-stripblanks">assets/tools/gear.svg</file>
-    <file alias="grid.svg" compressed="false" preprocess="xml-stripblanks">assets/tools/grid.svg</file>
-    <file alias="group.svg" compressed="false" preprocess="xml-stripblanks">assets/tools/group.svg</file>
-    <file alias="image.svg" compressed="false" preprocess="xml-stripblanks">assets/tools/image.svg</file>
-    <file alias="knife.svg" compressed="false" preprocess="xml-stripblanks">assets/tools/knife.svg</file>
-    <file alias="move-above.svg" compressed="false" preprocess="xml-stripblanks">assets/tools/move-above.svg</file>
-    <file alias="move-below.svg" compressed="false" preprocess="xml-stripblanks">assets/tools/move-below.svg</file>
-    <file alias="pen.svg" compressed="false" preprocess="xml-stripblanks">assets/tools/pen.svg</file>
-    <file alias="pencil-alt.svg" compressed="false" preprocess="xml-stripblanks">assets/tools/pencil-alt.svg</file>
-    <file alias="pencil-alt2.svg" compressed="false" preprocess="xml-stripblanks">assets/tools/pencil-alt2.svg</file>
-    <file alias="pencil.svg" compressed="false" preprocess="xml-stripblanks">assets/tools/pencil.svg</file>
-    <file alias="pixels.svg" compressed="false" preprocess="xml-stripblanks">assets/tools/pixels.svg</file>
-    <file alias="rectangle.svg" compressed="false" preprocess="xml-stripblanks">assets/tools/rectangle.svg</file>
-    <file alias="triangle.svg" compressed="false" preprocess="xml-stripblanks">assets/tools/triangle.svg</file>
-    <file alias="circle.svg" compressed="false" preprocess="xml-stripblanks">assets/tools/circle.svg</file>
-    <file alias="pointer-alt.svg" compressed="false" preprocess="xml-stripblanks">assets/tools/pointer-alt.svg</file>
-    <file alias="pointer.svg" compressed="false" preprocess="xml-stripblanks">assets/tools/pointer.svg</file>
-    <file alias="shapes.svg" compressed="false" preprocess="xml-stripblanks">assets/tools/shapes.svg</file>
-    <file alias="text.svg" compressed="false" preprocess="xml-stripblanks">assets/tools/text.svg</file>
-    <file alias="ui-panels.svg" compressed="false" preprocess="xml-stripblanks">assets/tools/ui-panels.svg</file>
-    <file alias="ungroup.svg" compressed="false" preprocess="xml-stripblanks">assets/tools/ungroup.svg</file>
+  <gresource prefix="/com/github/akiraux/akira">
+    <file alias="stylesheet.css" compressed="true">css/stylesheet.css</file>
+    <file alias="bool-difference-symbolic.svg">icons/symbolic/bool-difference-symbolic.svg</file>
+    <file alias="bool-interesect-symbolic.svg">icons/symbolic/bool-intersect-symbolic.svg</file>
+    <file alias="bool-subtract-symbolic.svg">icons/symbolic/bool-subtract-symbolic.svg</file>
+    <file alias="bool-union-symbolic.svg">icons/symbolic/bool-union-symbolic.svg</file>
+
+    <file alias="layer-visible-symbolic.svg">icons/symbolic/layer-visible-symbolic.svg</file>
+    <file alias="layer-hidden-symbolic.svg">icons/symbolic/layer-hidden-symbolic.svg</file>
+
+    <file alias="system-settings-filled.svg">icons/filled/system-settings-filled.svg</file>
+    <file alias="system-settings-symbolic.svg">icons/symbolic/system-settings-symbolic.svg</file>
+    <file alias="system-settings-lineart.svg">icons/lineart/system-settings-lineart.svg</file>
+
+    <file alias="layout-grid-filled.svg">icons/filled/layout-grid-filled.svg</file>
+    <file alias="layout-grid-symbolic.svg">icons/symbolic/layout-grid-symbolic.svg</file>
+    <file alias="layout-grid-lineart.svg">icons/lineart/layout-grid-lineart.svg</file>
+    <file alias="layout-pixels-filled.svg">icons/filled/layout-pixels-filled.svg</file>
+    <file alias="layout-pixels-symbolic.svg">icons/symbolic/layout-pixels-symbolic.svg</file>
+    <file alias="layout-pixels-lineart.svg">icons/lineart/layout-pixels-lineart.svg</file>
+    <file alias="layout-panels-filled.svg">icons/filled/layout-panels-filled.svg</file>
+    <file alias="layout-panels-symbolic.svg">icons/symbolic/layout-panels-symbolic.svg</file>
+    <file alias="layout-panels-lineart.svg">icons/lineart/layout-panels-lineart.svg</file>
+
+    <file alias="tool-group-symbolic.svg">icons/symbolic/tool-group-symbolic.svg</file>
+    <file alias="tool-ungroup-symbolic.svg">icons/symbolic/tool-ungroup-symbolic.svg</file>
+    <file alias="tool-slice-symbolic.svg">icons/symbolic/tool-slice-symbolic.svg</file>
+    <file alias="tool-move-above-symbolic.svg">icons/symbolic/tool-move-above-symbolic.svg</file>
+    <file alias="tool-move-below-symbolic.svg">icons/symbolic/tool-move-below-symbolic.svg</file>
+    <file alias="tool-select-node-symbolic.svg">icons/symbolic/tool-select-node-symbolic.svg</file>
+    <file alias="tool-select-symbolic.svg">icons/symbolic/tool-select-symbolic.svg</file>
+
+    <file alias="shape-artboard-symbolic.svg">icons/symbolic/shape-artboard-symbolic.svg</file>
+    <file alias="shape-image-symbolic.svg">icons/symbolic/shape-image-symbolic.svg</file>
+    <file alias="shape-bezier-symbolic.svg">icons/symbolic/shape-bezier-symbolic.svg</file>
+    <file alias="shape-pencil-symbolic.svg">icons/symbolic/shape-pencil-symbolic.svg</file>
+    <file alias="shape-rectangle-symbolic.svg">icons/symbolic/shape-rectangle-symbolic.svg</file>
+    <file alias="shape-triangle-symbolic.svg">icons/symbolic/shape-triangle-symbolic.svg</file>
+    <file alias="shape-circle-symbolic.svg">icons/symbolic/shape-circle-symbolic.svg</file>
+    <file alias="shape-all-symbolic.svg">icons/symbolic/shape-all-symbolic.svg</file>
+    <file alias="shape-text-symbolic.svg">icons/symbolic/shape-text-symbolic.svg</file>
   </gresource>
 </gresources>

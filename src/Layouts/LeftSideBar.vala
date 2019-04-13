@@ -1,24 +1,27 @@
 /*
-* Copyright (c) 2018 Alecaddd (http://alecaddd.com)
+* Copyright (c) 2019 Alecaddd (http://alecaddd.com)
 *
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public
-* License as published by the Free Software Foundation; either
-* version 2 of the License, or (at your option) any later version.
+* This file is part of Akira.
 *
-* This program is distributed in the hope that it will be useful,
+* Akira is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+
+* Akira is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* General Public License for more details.
-*
-* You should have received a copy of the GNU General Public
-* License along with this program; if not, write to the
-* Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
-* Boston, MA 02110-1301 USA
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+
+* You should have received a copy of the GNU General Public License
+* along with Akira.  If not, see <https://www.gnu.org/licenses/>.
 *
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
+
 public class Akira.Layouts.LeftSideBar : Gtk.Grid {
+    public weak Akira.Window window { get; construct; }
+
 	public bool toggled {
 		get {
 			return visible;
@@ -28,24 +31,22 @@ public class Akira.Layouts.LeftSideBar : Gtk.Grid {
 		}
 	}
 
-	public LeftSideBar () {
+	public LeftSideBar (Akira.Window window) {
 		Object (
-			orientation: Gtk.Orientation.HORIZONTAL, 
+            window: window,
+			orientation: Gtk.Orientation.HORIZONTAL,
 			toggled: true
 		);
 	}
 
 	construct {
 		get_style_context ().add_class ("sidebar-l");
-		width_request = settings.left_paned;
-		
-		var label = new Gtk.Label ("Sidebar L");
-		label.halign = Gtk.Align.CENTER;
-		label.expand = true;
-		label.margin = 10;
-		label.expand = true;
+		width_request = 220;
 
-		attach (label, 0, 0, 1, 1);
+        var align_items_panel = new Akira.Layouts.Partials.AlignItemsPanel (window);
+		
+		attach (align_items_panel, 0, 0, 1, 1);
+		attach (new Partials.TransformPanel (), 0, 1, 1, 1);
 	}
 
 	public void toggle () {

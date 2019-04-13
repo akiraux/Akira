@@ -1,0 +1,15 @@
+.headerbar-label {
+    font-size: 8pt;
+}
+
+/* headerbar separator {
+    margin-left: 0px;
+} */
+
+.button-zoom {
+    padding: 0 6px;
+}
+
+.linked-flat button {
+    background-color: shade (@bg_color, 1);
+}

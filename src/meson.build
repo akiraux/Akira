@@ -22,8 +22,15 @@ executable(
     'Application.vala',
     'Window.vala',
 
+    'FileFormat/AkiraFile.vala',
+    'FileFormat/JsonObject.vala',
+    'FileFormat/JsonObjectArray.vala',
+    'FileFormat/ZipArchiveHandler.vala',
+    'FileFormat/Objects/Version.vala',
+
     'Services/Settings.vala',
     'Services/ActionManager.vala',
+    'Services/EventBus.vala',
 
     'Utils/Dialogs.vala',
 
@@ -37,20 +44,34 @@ executable(
     'Layouts/Partials/PagesPanel.vala',
     'Layouts/Partials/Artboard.vala',
     'Layouts/Partials/Layer.vala',
+    'Layouts/Partials/TransformPanel.vala',
+    'Layouts/Partials/AlignItemsPanel.vala',
 
     'Partials/HeaderBarButton.vala',
     'Partials/MenuButton.vala',
+    'Partials/ZoomButton.vala',
+    'Partials/AlignBoxButton.vala',
 
+    'Widgets/LinkedInput.vala',
     'Widgets/SettingsDialog.vala',
+
+    'Lib/Canvas.vala',
+    'Lib/Item.vala',
+
+    'Lib/Selection/Nob.vala',
 
     asresources,
     config_header,
     dependencies: [
         dependency('gtk+-3.0'),
-        dependency('granite'),
+        dependency('granite', version: '>= 5.2.0'),
         dependency('gee-0.8'),
         dependency('libxml-2.0'),
-        dependency('gtksourceview-3.0'),
+        dependency('libarchive'),
+        dependency('json-glib-1.0'),
+        dependency('cairo', version: '>=1.14'),
+        dependency('goocanvas-2.0'),
+        m_dep
     ],
     install: true
 )

@@ -1,20 +1,20 @@
 /*
-* Copyright (c) 2018 Alecaddd (http://alecaddd.com)
+* Copyright (c) 2019 Alecaddd (http://alecaddd.com)
 *
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public
-* License as published by the Free Software Foundation; either
-* version 2 of the License, or (at your option) any later version.
+* This file is part of Akira.
 *
-* This program is distributed in the hope that it will be useful,
+* Akira is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+
+* Akira is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* General Public License for more details.
-*
-* You should have received a copy of the GNU General Public
-* License along with this program; if not, write to the
-* Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
-* Boston, MA 02110-1301 USA
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+
+* You should have received a copy of the GNU General Public License
+* along with Akira.  If not, see <https://www.gnu.org/licenses/>.
 *
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
@@ -25,6 +25,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 	public Akira.Layouts.Partials.Layer? layer_group { construct set; get; }
 	public string layer_name { get; construct; }
 	public string icon_name { get; construct; }
+	public Goo.CanvasItemSimple item { get; construct; }
 
 	private bool scroll_up = false;
 	private bool scrolling = false;
@@ -82,14 +83,15 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 
 	// public Akira.Shape shape { get; construct; }
 
-	public Layer (Akira.Window main_window, Akira.Layouts.Partials.Artboard artboard, string name, string icon, bool group, Akira.Layouts.Partials.Layer? parent = null) {
+	public Layer (Akira.Window main_window, Akira.Layouts.Partials.Artboard artboard, Goo.CanvasItemSimple item_simple, string name, string icon, bool group, Akira.Layouts.Partials.Layer? parent = null) {
 		Object (
 			window: main_window,
 			layer_name: name,
 			icon_name: icon,
 			artboard: artboard,
 			grouped: group,
-			layer_group: parent
+			layer_group: parent,
+			item: item_simple
 		);
 	}
 
@@ -106,6 +108,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 		entry = new Gtk.Entry ();
 		entry.margin_top = 5;
 		entry.margin_bottom = 5;
+		entry.margin_end = 10;
 		entry.expand = true;
 		entry.visible = false;
 		entry.no_show_all = true;
@@ -115,21 +118,19 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 		entry.focus_out_event.connect (update_on_leave);
 		entry.key_release_event.connect (update_on_escape);
 
-		if (icon_name.contains ("/")) {
-			icon = new Gtk.Image.from_resource (icon_name);
-			icon.margin_end = 6;
-			icon.margin_start = 16;
-		} else {
-			icon = new Gtk.Image.from_icon_name (icon_name, Gtk.IconSize.MENU);
-			icon.margin_end = 10;
-		}
+		icon = new Gtk.Image.from_icon_name (icon_name, Gtk.IconSize.MENU);
+		icon.margin_start = icon_name != "folder-symbolic" ? 16 : 0;
+		icon.margin_end = 10;
 		icon.vexpand = true;
+		icon.valign = Gtk.Align.CENTER;
+		icon.get_style_context ().add_class (Gtk.STYLE_CLASS_DIM_LABEL);
 
 		icon_folder_open = new Gtk.Image.from_icon_name ("folder-open-symbolic", Gtk.IconSize.MENU);
 		icon_folder_open.margin_end = 10;
 		icon_folder_open.vexpand = true;
 		icon_folder_open.visible = false;
 		icon_folder_open.no_show_all = true;
+		icon_folder_open.get_style_context ().add_class (Gtk.STYLE_CLASS_DIM_LABEL);
 
 		var icon_layer_grid = new Gtk.Grid ();
 		icon_layer_grid.attach (icon, 0, 0, 1, 1);
@@ -140,12 +141,14 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 		button_locked.get_style_context ().remove_class ("button");
 		button_locked.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
 		button_locked.get_style_context ().add_class ("layer-action");
+		button_locked.valign = Gtk.Align.CENTER;
 		icon_locked = new Gtk.Image.from_icon_name ("changes-allow-symbolic", Gtk.IconSize.MENU);
 		icon_unlocked = new Gtk.Image.from_icon_name ("changes-prevent-symbolic", Gtk.IconSize.MENU);
 		icon_unlocked.visible = false;
 		icon_unlocked.no_show_all = true;
 
 		var button_locked_grid = new Gtk.Grid ();
+		button_locked_grid.margin_end = 6;
 		button_locked_grid.attach (icon_locked, 0, 0, 1, 1);
 		button_locked_grid.attach (icon_unlocked, 1, 0, 1, 1);
 		button_locked.add (button_locked_grid);
@@ -155,12 +158,14 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 		button_hidden.get_style_context ().remove_class ("button");
 		button_hidden.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
 		button_hidden.get_style_context ().add_class ("layer-action");
-		icon_hidden = new Gtk.Image.from_resource ("/com/github/alecaddd/akira/tools/eye.svg");
-		icon_visible = new Gtk.Image.from_resource ("/com/github/alecaddd/akira/tools/eye-not.svg");
+		button_hidden.valign = Gtk.Align.CENTER;
+		icon_hidden = new Gtk.Image.from_icon_name ("layer-visible-symbolic", Gtk.IconSize.MENU);
+		icon_visible = new Gtk.Image.from_icon_name ("layer-hidden-symbolic", Gtk.IconSize.MENU);
 		icon_visible.visible = false;
 		icon_visible.no_show_all = true;
 
 		var button_hidden_grid = new Gtk.Grid ();
+		button_hidden_grid.margin_end = 14;
 		button_hidden_grid.attach (icon_hidden, 0, 0, 1, 1);
 		button_hidden_grid.attach (icon_visible, 1, 0, 1, 1);
 		button_hidden.add (button_hidden_grid);
@@ -183,7 +188,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 		label_grid.attach (button_hidden, 3, 0, 1, 1);
 
 		is_group ();
-		build_darg_and_drop ();
+		build_drag_and_drop ();
 
 		handle.event.connect (on_click_event);
 
@@ -272,7 +277,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 		});
 	}
 
-	private void build_darg_and_drop () {
+	private void build_drag_and_drop () {
 		Gtk.drag_source_set (this, Gdk.ModifierType.BUTTON1_MASK, targetEntriesLayer, Gdk.DragAction.MOVE);
 
 		drag_begin.connect (on_drag_begin);
@@ -573,6 +578,8 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 			} else {
 				button_hidden.get_style_context ().remove_class ("show");
 			}
+
+			item.visibility = active ? Goo.CanvasItemVisibility.INVISIBLE: Goo.CanvasItemVisibility.VISIBLE;
 
 			icon_visible.visible = active;
 			icon_visible.no_show_all = ! active;

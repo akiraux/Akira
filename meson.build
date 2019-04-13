@@ -1,8 +1,21 @@
 # project name and programming language
-project('com.github.alecaddd.akira', 'vala', 'c')
+project('com.github.akiraux.akira', 'vala', 'c')
+
+add_project_arguments(
+    ['--vapidir', join_paths(meson.current_source_dir(), 'src', 'vapi')],
+    language: 'vala'
+)
 
 # Include the translations module
 i18n = import('i18n')
+
+# Dependencies
+
+
+# Optional dependencies
+desktop_file_validate = find_program('desktop-file-validate', required: false)
+appstream_util = find_program('appstream-util', required: false)
+
 
 # Include the gnome module
 gnome = import('gnome')
@@ -11,6 +24,9 @@ asresources = gnome.compile_resources(
     source_dir: 'data',
     c_name: 'as'
 )
+
+cc = meson.get_compiler('c')
+m_dep = cc.find_library('m', required: true)
 
 # Set our translation domain
 add_global_arguments('-DGETTEXT_PACKAGE="@0@"'.format (meson.project_name()), language:'c')
@@ -27,6 +43,5 @@ endif
 subdir('src')
 subdir('data')
 subdir('po')
-subdir('schemas')
 
-meson.add_install_script('meson/post_install.py')
+meson.add_install_script('build-aux/meson/post_install.py')

@@ -1,0 +1,52 @@
+{
+   "app-id": "com.github.akiraux.akira",
+   "runtime": "org.gnome.Platform",
+   "runtime-version": "3.30",
+   "sdk": "org.gnome.Sdk",
+   "base":"io.elementary.BaseApp",
+   "base-version": "juno",
+   "command": "com.github.akiraux.akira",
+   "cleanup": [
+      "/include",
+      "/lib/pkgconfig",
+      "/lib/debug",
+      "/share/vala",
+      "/man",
+      "*.a",
+      "*.la"
+   ],
+   "finish-args": [
+      "--share=ipc",
+      "--socket=x11",
+      "--socket=wayland",
+      "--talk-name=org.gtk.vfs.*"
+   ],
+   "modules": [
+      {
+         "name": "goocanvas",
+         "build-options" : {
+             "make-install-args" : [
+                 "girdir=/app/share/gir-1.0",
+                 "typelibdir=/app/lib/girepository-1.0"
+             ]
+         },
+         "sources": [
+            {
+               "type": "git",
+               "url": "https://gitlab.gnome.org/GNOME/goocanvas",
+               "branch": "goocanvas-2.0"
+            }
+         ]
+      },
+      {
+         "name": "akira",
+         "buildsystem": "meson",
+         "sources": [
+            {
+               "type": "git",
+               "url": "https://github.com/akiraux/akira"
+            }
+         ]
+      }
+   ]
+}
