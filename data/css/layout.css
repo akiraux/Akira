@@ -75,6 +75,14 @@
     border-bottom-right-radius: 2pt;
 }
 
+button.flat {
+  background-color: transparent;
+}
+
+.opacity-slider {
+  padding: 3pt 6pt;
+}
+
 .popover-toggler {
     padding: 3pt;
     margin: 3pt;

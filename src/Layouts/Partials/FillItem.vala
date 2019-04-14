@@ -44,12 +44,18 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
     }
 
     private new uint opacity {
-        owned get {
-            return model.opacity;
+      owned get {
+        return model.opacity;
+      }
+      set {
+        // Change only if value is different
+        if ((uint) opacity_slider.get_value () != value) {
+          opacity_slider.set_value (value);
         }
-        set {
-            current_opacity.label = "%d %%".printf ((int) model.opacity);
-        }
+
+        model.opacity = value;
+        current_opacity.label = "%d %%".printf ((int) value);
+      }
     }
 
     private new bool visible {
@@ -81,10 +87,12 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
     private Gtk.Image visible_button_icon;
     private Gtk.Button selected_blending_mode_cont;
     private Gtk.Label selected_blending_mode;
+    private Gtk.Button current_opacity_cont;
     private Gtk.Label current_opacity;
     private Gtk.Button selected_color;
-    private Gtk.Popover blending_mode_popover;
+    private Gtk.Popover popover;
     private Gtk.ListBox blending_mode_popover_items;
+    private Gtk.Scale opacity_slider;
 
     public FillItem (Akira.Models.FillsItemModel model) {
         Object(
@@ -138,12 +146,18 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
 
         current_opacity = new Gtk.Label ("");
         current_opacity.halign = Gtk.Align.CENTER;
+        current_opacity.width_chars = 5;
         current_opacity.get_style_context ().add_class ("opacity");
+
+        current_opacity_cont = new Gtk.Button ();
+        current_opacity_cont.can_focus = false;
+        current_opacity_cont.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
+        current_opacity_cont.add (current_opacity);
 
         fill_chooser.attach(selected_color, 0, 0, 1, 1);
         fill_chooser.attach(selected_blending_mode_cont, 1, 0, 1, 1);
         fill_chooser.attach(show_options_button, 2, 0, 1, 1);
-        fill_chooser.attach(current_opacity, 3, 0, 1, 1);
+        fill_chooser.attach(current_opacity_cont, 3, 0, 1, 1);
 
         fill_chooser.get_style_context ().add_class ("fill-chooser");
 
@@ -162,6 +176,12 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         blending_mode_popover_items = new Gtk.ListBox ();
         blending_mode_popover_items.get_style_context ().add_class ("popover-list");
 
+        opacity_slider = new Gtk.Scale.with_range (Gtk.Orientation.HORIZONTAL, 0, 100, 1);
+        opacity_slider.hexpand = true;
+        opacity_slider.digits = 0;
+        opacity_slider.draw_value = false;
+        opacity_slider.get_style_context ().add_class ("opacity-slider");
+
         var popover_item_index = 0;
 
         foreach (Akira.Utils.BlendingMode mode in Akira.Utils.BlendingMode.all () ) {
@@ -169,10 +189,8 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
                 .insert (new Akira.Layouts.Partials.BlendingModeItem (mode), popover_item_index++);
         }
 
-        blending_mode_popover = new Gtk.Popover(selected_blending_mode_cont);
-        blending_mode_popover.position = Gtk.PositionType.BOTTOM;
-
-        blending_mode_popover.add(blending_mode_popover_items);
+        popover = new Gtk.Popover(selected_blending_mode_cont);
+        popover.position = Gtk.PositionType.BOTTOM;
 
         attach(fill_chooser, 0, 0, 1, 1);
         attach(visible_button, 1, 0, 1, 1);
@@ -184,10 +202,16 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
     private void create_event_bindings () {
         delete_button.clicked.connect (on_delete_item);
         visible_button.clicked.connect (toggle_visibility);
-        show_options_button.clicked.connect (on_show_popover);
+
         blending_mode_popover_items.row_activated.connect (on_row_activated);
         blending_mode_popover_items.row_selected.connect (on_popover_item_selected);
-        selected_blending_mode_cont.clicked.connect (on_show_popover);
+
+        selected_blending_mode_cont.clicked.connect (() => { on_show_popover ("blending_mode"); });
+
+        current_opacity_cont.clicked.connect (() => { on_show_popover ("opacity"); });
+        opacity_slider.value_changed.connect (on_opacity_changed);
+
+        show_options_button.clicked.connect (() => { on_show_popover ("blending_mode"); });
 
         model.notify.connect (on_model_changed);
     }
@@ -199,20 +223,36 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
     private void on_row_activated (Gtk.ListBoxRow? item) {
         var fillItem = (Akira.Layouts.Partials.BlendingModeItem) item.get_child ();
         blending_mode = fillItem.mode;
-        blending_mode_popover.hide ();
+        popover.hide ();
     }
 
     private void on_popover_item_selected (Gtk.ListBoxRow? item) {
     }
 
-    private void on_show_popover () {
-        if (!blending_mode_popover.visible) {
-            blending_mode_popover.width_request = selected_blending_mode_cont.get_allocated_width ();
+    private void on_show_popover (string target) {
+      foreach (Gtk.Widget elem in popover.get_children ()) {
+        popover.remove (elem);
+      }
 
-            blending_mode_popover.show_all ();
-        } else {
-            blending_mode_popover.hide ();
-        }
+      switch (target) {
+        case "blending_mode":
+          popover.width_request = get_allocated_width ();
+          popover.relative_to = selected_blending_mode_cont;
+          popover.child = blending_mode_popover_items;
+          break;
+
+        case "opacity":
+          popover.width_request = get_allocated_width ();
+          popover.relative_to = current_opacity_cont;
+          popover.child = opacity_slider;
+          break;
+      }
+
+      if (!popover.visible) {
+        popover.show_all ();
+      } else {
+        popover.hide ();
+      }
     }
 
     private void on_delete_item () {
@@ -221,5 +261,9 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
 
     private void toggle_visibility () {
         visible = !visible;
+    }
+
+    private void on_opacity_changed (Gtk.Range slider) {
+      opacity = (uint) slider.get_value ();
     }
 }
