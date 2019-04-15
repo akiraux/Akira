@@ -60,7 +60,6 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
 	}
 
 	construct {
-		//  set_title (APP_NAME);
 		set_show_close_button (true);
 
 		var menu_items = new Gtk.Menu ();
