@@ -23,8 +23,8 @@
 public class Akira.Models.FillsListModel : GLib.Object, GLib.ListModel {
     private GLib.List<Akira.Models.FillsItemModel> fills_list;
 
-    public FillsListModel() {
-        Object(
+    public FillsListModel () {
+        Object (
         );
     }
 
@@ -41,7 +41,7 @@ public class Akira.Models.FillsListModel : GLib.Object, GLib.ListModel {
     }
 
     public Type get_item_type () {
-        return typeof(Akira.Models.FillsItemModel);
+        return typeof (Akira.Models.FillsItemModel);
     }
 
     public void add () {
@@ -66,6 +66,5 @@ public class Akira.Models.FillsListModel : GLib.Object, GLib.ListModel {
 
     public void update_fills () {
         // Update fills on canvas
-        print ("update_fills\n");
     }
 }

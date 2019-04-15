@@ -59,7 +59,6 @@
 
 .fill-chooser button.selected-color {
     margin: 5pt;
-    margin-right: 6pt;
     padding: 6pt 10pt;
     border-radius: 0;
     border: 1px solid;
@@ -89,4 +88,24 @@ button.flat {
 .popover-toggler {
     padding: 3pt;
     margin: 3pt;
+}
+
+.flat-btn {
+    background: none;
+    margin: 0;
+    padding: 0;
+}
+
+.popover-list row {
+    padding: 3pt;
+}
+
+.popover-list row:selected,
+.popover-list row:selected:hover {
+    background-color: shade (@base_color, 0.85);
+    color: shade (@fg_color, 0.7);
+}
+
+.popover-list row:hover {
+    background-color: shade (@base_color, 0.9);
 }

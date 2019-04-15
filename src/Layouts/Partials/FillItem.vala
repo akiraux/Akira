@@ -39,9 +39,10 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
       return model.color;
     }
     set {
-      print ("New Color in Set: %s\n", value);
       model.color = value;
+
       set_selected_color_background ();
+      set_color_chooser_color ();
     }
   }
 
@@ -71,8 +72,8 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         visible_button.remove (visible_button_icon);
       }
 
-      visible_button_icon = new Gtk.Image .from_icon_name (
-        "layer-%s-symbolic".printf(model.visible ? "visible" : "hidden"),
+      visible_button_icon = new Gtk.Image.from_icon_name (
+        "layer-%s-symbolic".printf (model.visible ? "visible" : "hidden"),
         Gtk.IconSize.SMALL_TOOLBAR
         );
 
@@ -99,15 +100,19 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
   private Gtk.ColorChooserWidget color_chooser_widget;
 
   public FillItem (Akira.Models.FillsItemModel model) {
-    Object(
+    Object (
       model: model
       );
   }
 
   construct {
     create_ui ();
-    create_event_bindings ();
+
+    // Update view BEFORE event bindings in order
+    // not to trigger bindings on first assignment
     update_view ();
+
+    create_event_bindings ();
     show_all ();
   }
 
@@ -158,10 +163,10 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
     current_opacity_cont.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
     current_opacity_cont.add (current_opacity);
 
-    fill_chooser.attach(selected_color, 0, 0, 1, 1);
-    fill_chooser.attach(selected_blending_mode_cont, 1, 0, 1, 1);
-    fill_chooser.attach(show_options_button, 2, 0, 1, 1);
-    fill_chooser.attach(current_opacity_cont, 3, 0, 1, 1);
+    fill_chooser.attach (selected_color, 0, 0, 1, 1);
+    fill_chooser.attach (selected_blending_mode_cont, 1, 0, 1, 1);
+    fill_chooser.attach (show_options_button, 2, 0, 1, 1);
+    fill_chooser.attach (current_opacity_cont, 3, 0, 1, 1);
 
     fill_chooser.get_style_context ().add_class ("fill-chooser");
 
@@ -187,10 +192,11 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
     opacity_slider.get_style_context ().add_class ("opacity-slider");
 
     color_chooser_widget = new Gtk.ColorChooserWidget ();
+    color_chooser_widget.hexpand = true;
     color_chooser_widget.show_editor = true;
 
     color_picker = new Gtk.Grid ();
-    color_picker.get_style_context ().add_class("padding");
+    color_picker.get_style_context ().add_class ("padding");
     color_picker.attach (color_chooser_widget, 0, 0, 1, 1);
 
     var popover_item_index = 0;
@@ -200,12 +206,12 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         .insert (new Akira.Layouts.Partials.BlendingModeItem (mode), popover_item_index++);
     }
 
-    popover = new Gtk.Popover(selected_blending_mode_cont);
+    popover = new Gtk.Popover (selected_blending_mode_cont);
     popover.position = Gtk.PositionType.BOTTOM;
 
-    attach(fill_chooser, 0, 0, 1, 1);
-    attach(visible_button, 1, 0, 1, 1);
-    attach(delete_button, 2, 0, 1, 1);
+    attach (fill_chooser, 0, 0, 1, 1);
+    attach (visible_button, 1, 0, 1, 1);
+    attach (delete_button, 2, 0, 1, 1);
 
     get_style_context ().add_class ("fill-chooser-cont");
   }
@@ -219,8 +225,8 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
 
     selected_blending_mode_cont.clicked.connect (() => { on_show_popover ("blending_mode"); });
 
-    selected_color.clicked.connect(() => { on_show_popover ("color"); });
-    color_chooser_widget.notify["rgba"].connect(on_color_changed);
+    selected_color.clicked.connect (() => { on_show_popover ("color"); });
+    color_chooser_widget.notify["rgba"].connect (on_color_changed);
 
     current_opacity_cont.clicked.connect (() => { on_show_popover ("opacity"); });
     opacity_slider.value_changed.connect (on_opacity_changed);
@@ -233,7 +239,7 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
   private void on_color_changed () {
     var selectedColor = color_chooser_widget.rgba;
 
-    color = "#%02X%02X%02X".printf(
+    color = "#%02X%02X%02X".printf (
       (int) (selectedColor.red * 255),
       (int) (selectedColor.green * 255),
       (int) (selectedColor.blue * 255)
@@ -307,7 +313,7 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
           background-color: shade (%s, 1);
           border-color: shade (%s, 0.7);
         }
-      """.printf(color, color);
+      """.printf (color, color);
 
       provider.load_from_data (css, css.length);
 
@@ -315,5 +321,12 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
     } catch (Error e) {
       warning ("Style error: %s", e.message);
     }
+  }
+
+  private void set_color_chooser_color () {
+      var newRGBA = Gdk.RGBA ();
+      newRGBA.parse (model.color);
+
+      color_chooser_widget.set_rgba (newRGBA);
   }
 }
