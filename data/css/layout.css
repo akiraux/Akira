@@ -62,9 +62,8 @@
     margin-right: 6pt;
     padding: 6pt 10pt;
     border-radius: 0;
-    background-color: shade (#9bda5f, 1);
     border: 1px solid;
-    border-color: shade (#9bda5f, 0.7);
+    transition: none;
 }
 
 .fill-chooser label.opacity {
@@ -81,6 +80,10 @@ button.flat {
 
 .opacity-slider {
   padding: 3pt 6pt;
+}
+
+.padding {
+  padding: 8pt 5pt;
 }
 
 .popover-toggler {
