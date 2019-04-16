@@ -6,4 +6,6 @@ namespace Constants {
    public const string VERSION = "@VERSION@";
    public const string VERSION_INFO = "@VERSION_INFO@";
    public const string INSTALL_PREFIX = "@PREFIX@";
+   public const string APP_ID = "@APP_ID@";
+   public const string PROFILE = "@PROFILE@";
 }
