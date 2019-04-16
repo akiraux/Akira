@@ -19,6 +19,8 @@ gee_dependency = dependency('gee-0.8')
 libxml_dependency = dependency('libxml-2.0')
 cairo_dependency = dependency('cairo', version: '>=1.14')
 goocanvas_dependency = dependency('goocanvas-2.0')
+libarchive_dependency = dependency('libarchive')
+json_glib_dependency = dependency('json-glib-1.0')
 
 # Optional dependencies
 desktop_file_validate = find_program('desktop-file-validate', required: false)

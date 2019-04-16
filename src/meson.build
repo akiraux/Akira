@@ -21,8 +21,15 @@ executable(
     'Application.vala',
     'Window.vala',
 
+    'FileFormat/AkiraFile.vala',
+    'FileFormat/JsonObject.vala',
+    'FileFormat/JsonObjectArray.vala',
+    'FileFormat/ZipArchiveHandler.vala',
+    'FileFormat/Objects/Version.vala',
+
     'Services/Settings.vala',
     'Services/ActionManager.vala',
+    'Services/EventBus.vala',
 
     'Utils/Dialogs.vala',
 
@@ -37,10 +44,12 @@ executable(
     'Layouts/Partials/Artboard.vala',
     'Layouts/Partials/Layer.vala',
     'Layouts/Partials/TransformPanel.vala',
+    'Layouts/Partials/AlignItemsPanel.vala',
 
     'Partials/HeaderBarButton.vala',
     'Partials/MenuButton.vala',
     'Partials/ZoomButton.vala',
+    'Partials/AlignBoxButton.vala',
 
     'Widgets/LinkedInput.vala',
     'Widgets/SettingsDialog.vala',
@@ -59,6 +68,8 @@ executable(
         libxml_dependency,
         cairo_dependency,
         goocanvas_dependency,
+        libarchive_dependency,
+        json_glib_dependency,
         m_dep
     ],
     install: true
