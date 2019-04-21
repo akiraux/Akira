@@ -7,8 +7,8 @@ trim_trailing_whitespace = true
 insert_final_newline = true
 charset = utf-8
 
-[*.{txt,build,json,xml,xml.in,in,py}]
+[*.{txt,build,json,xml,xml.in,in}]
 indent_size = 2
 
-[*.vala]
+[*.{vala,py}]
 indent_size = 4
