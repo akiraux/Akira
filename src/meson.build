@@ -50,8 +50,9 @@ executable(
     'Partials/MenuButton.vala',
     'Partials/ZoomButton.vala',
     'Partials/AlignBoxButton.vala',
+    'Partials/LinkedInput.vala',
+    'Partials/PanelSeparator.vala',
 
-    'Widgets/LinkedInput.vala',
     'Widgets/SettingsDialog.vala',
 
     'Lib/Canvas.vala',
