@@ -1,5 +1,5 @@
 <schemalist>
-    <schema id="com.github.akiraux.akira" path="/com/github/akiraux/akira/" gettext-domain="akira">
+    <schema id="@SCHEMA_ID@" path="@SCHEMA_PATH@" gettext-domain="@GETTEXT_PACKAGE@">
         <key name="pos-x" type="i">
             <default>360</default>
             <summary>The saved horizontal position of the window.</summary>
