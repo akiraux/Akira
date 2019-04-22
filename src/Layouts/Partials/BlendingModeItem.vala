@@ -16,22 +16,22 @@
 * You should have received a copy of the GNU General Public License
 * along with Akira.  If not, see <https://www.gnu.org/licenses/>.
 *
-* Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
+* Authored by: Giacomo "giacomoalbe" Alberini <giacomoalbe@gmail.com>
 */
 
-public class Akira.Services.Settings : Granite.Services.Settings {
-    public int pos_x { get; set; }
-    public int pos_y { get; set; }
-    public int window_width { get; set; default = 1000; }
-    public int window_height { get; set; default = 600; }
-    public int right_paned { get; set; default = 2000; }
-    public int left_paned { get; set; default = 220; }
-    public bool dark_theme { get; set; }
-    public bool show_label { get; set; }
-    public bool use_symbolic { get; set; }
-    public bool open_quick { get; set; }
+public class Akira.Layouts.Partials.BlendingModeItem : Gtk.Label {
+    public Akira.Utils.BlendingMode mode { get; construct; }
 
-    public Settings () {
-        base (Constants.APP_ID);
+    public BlendingModeItem (Akira.Utils.BlendingMode mode) {
+        Object (
+            mode: mode
+        );
+    }
+
+    construct {
+        label = mode.get_name ();
+        halign = Gtk.Align.START;
+
+        get_style_context ().add_class (Gtk.STYLE_CLASS_MENUITEM);
     }
 }

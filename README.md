@@ -38,7 +38,7 @@ You can install Akira by compiling it from the source, here's the list of depend
 
 ## Building
 ```
-meson build --prefix=/usr
+meson build --prefix=/usr -Dprofile=default|development
 cd build
 ninja && sudo ninja install
 ```

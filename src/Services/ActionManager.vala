@@ -163,6 +163,8 @@ public class Akira.Services.ActionManager : Object {
 		window.headerbar.toggle ();
 		window.headerbar.update_icons_style ();
 		window.headerbar.toggle ();
+
+        window.event_bus.emit ("update-icons-style");
 	}
 
 	private void action_quit () {
@@ -199,20 +201,20 @@ public class Akira.Services.ActionManager : Object {
 	private void action_show_ui_grid () {
 		warning ("show UI grid");
 	}
-	
+
 	private void action_preferences () {
 		if (window.settings_dialog == null) {
 			window.settings_dialog = new Akira.Widgets.SettingsDialog (window);
 			window.settings_dialog.show_all ();
-			
+
 			window.settings_dialog.destroy.connect (() => {
 				window.settings_dialog = null;
 			});
 		}
-		
+
 		window.settings_dialog.present ();
 	}
-	
+
 	private void action_export () {
 		warning ("export");
 	}

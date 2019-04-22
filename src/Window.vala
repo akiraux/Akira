@@ -20,9 +20,12 @@
 */
 
 public class Akira.Window : Gtk.ApplicationWindow {
+	public FileFormat.AkiraFile? akira_file = null;
+
 	public weak Akira.Application app { get; construct; }
 
 	public Akira.Services.ActionManager action_manager;
+    public Akira.Services.EventBus event_bus;
 	public Akira.Layouts.HeaderBar headerbar;
 	public Akira.Layouts.MainWindow main_window;
 	public Akira.Widgets.SettingsDialog? settings_dialog = null;
@@ -43,6 +46,8 @@ public class Akira.Window : Gtk.ApplicationWindow {
 	}
 
 	construct {
+        event_bus = new Akira.Services.EventBus ();
+
 		accel_group = new Gtk.AccelGroup ();
 		add_accel_group (accel_group);
 
@@ -62,6 +67,9 @@ public class Akira.Window : Gtk.ApplicationWindow {
 	private void build_ui () {
 		set_titlebar (headerbar);
 		set_border_width (0);
+		if (Constants.PROFILE == "development") {
+			headerbar.get_style_context ().add_class ("devel");
+		}
 
 		delete_event.connect ((e) => {
 			return before_destroy ();
@@ -75,7 +83,7 @@ public class Akira.Window : Gtk.ApplicationWindow {
 
 		var css_provider = new Gtk.CssProvider ();
 		css_provider.load_from_resource ("/com/github/akiraux/akira/stylesheet.css");
-		
+
 		Gtk.StyleContext.add_provider_for_screen (
 			Gdk.Screen.get_default (), css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
 		);
@@ -87,6 +95,8 @@ public class Akira.Window : Gtk.ApplicationWindow {
 
 	public bool before_destroy () {
 		update_status ();
+
+		save_and_close_current_file ();
 
 		if (!edited) {
 			app.get_active_window ().destroy ();
@@ -133,5 +143,22 @@ public class Akira.Window : Gtk.ApplicationWindow {
 
 		show ();
 		present ();
+	}
+
+	public void open_file (File file) {
+		save_and_close_current_file ();
+
+		app.register_file_to_window (file, this);
+		akira_file = new FileFormat.AkiraFile (file);
+
+		akira_file.prepare ();
+		akira_file.load_file ();
+	}
+
+	private void save_and_close_current_file () {
+		if (akira_file != null) {
+			akira_file.save_file ();
+			akira_file.close ();
+		}
 	}
 }

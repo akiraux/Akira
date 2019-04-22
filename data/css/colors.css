@@ -1,0 +1,3 @@
+.label-colors {
+    color: alpha (@fg_color, 0.8);
+}
