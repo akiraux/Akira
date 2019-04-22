@@ -18,6 +18,98 @@
     border-bottom: 1px solid shade (@bg_color, 0.8);
 }
 
+.fills-box-panel {
+    padding: 3pt 5pt;
+    background-color: @base_color;
+    border-bottom: 1px solid shade (@bg_color, 0.7);
+}
+
+.fills-box-panel label {
+    border-bottom: none;
+    font-size: 10pt;
+}
+
+.fills-box-panel button {
+    padding: 4pt;
+    border-radius: 100%;
+}
+
+.fills-list {
+    background-color: shade (@bg_color, 0.9);
+    border-bottom: 1px solid shade (@bg_color, 0.7);
+    padding: 8pt;
+    padding-bottom: 12pt;
+}
+
+.fill-chooser-cont {
+    margin-bottom: 8pt;
+}
+
+.fill-chooser-cont button {
+    padding: 0;
+    margin-left: 6pt;
+    border-radius: 100%;
+}
+
+.fill-chooser {
+    background-color: shade (@bg_color, 0.98);
+    border: 1px solid shade (@bg_color, 0.7);
+    border-radius: 2pt;
+}
+
+.fill-chooser button.selected-color {
+    margin: 5pt;
+    padding: 6pt 10pt;
+    border-radius: 0;
+    border: 1px solid;
+    transition: none;
+}
+
+.fill-chooser label.opacity {
+    border-left: 1px solid shade (@bg_color, 0.7);
+    padding: 0 8pt;
+    background-color: shade (@base_color, 1);
+    border-top-right-radius: 2pt;
+    border-bottom-right-radius: 2pt;
+}
+
+button.flat {
+  background-color: transparent;
+}
+
+.opacity-slider {
+  padding: 3pt 6pt;
+}
+
+.padding {
+  padding: 8pt 5pt;
+}
+
+.popover-toggler {
+    padding: 3pt;
+    margin: 3pt;
+}
+
+.flat-btn {
+    background: none;
+    margin: 0;
+    padding: 0;
+}
+
+.popover-list row {
+    padding: 3pt;
+}
+
+.popover-list row:selected,
+.popover-list row:selected:hover {
+    background-color: shade (@base_color, 0.85);
+    color: shade (@fg_color, 0.7);
+}
+
+.popover-list row:hover {
+    background-color: shade (@base_color, 0.9);
+}
+
 .alignment-box {
     background-color: @base_color;
     border-bottom: 1px solid shade (@bg_color, 0.8);
