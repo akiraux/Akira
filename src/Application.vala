@@ -23,25 +23,17 @@ namespace Akira {
 	public Akira.Services.Settings settings;
 }
 
-public class Akira.Application : Granite.Application {
+public class Akira.Application : Gtk.Application {
 	private Gee.HashMap<string, Akira.Window> opened_files;
 	public GLib.List <Window> windows;
 
 	construct {
 		flags |= ApplicationFlags.HANDLES_OPEN;
-		build_data_dir = Constants.DATADIR;
-		build_pkg_data_dir = Constants.PKGDATADIR;
-		build_release_name = Constants.RELEASE_NAME;
-		build_version = Constants.VERSION;
-		build_version_info = Constants.VERSION_INFO;
 
 		settings = new Akira.Services.Settings ();
 		windows = new GLib.List <Window> ();
 		opened_files = new Gee.HashMap<string, Akira.Window>();
 
-		program_name = "Akira";
-		exec_name = Constants.APP_ID;
-		app_launcher = Constants.APP_ID + ".desktop";
 		application_id = Constants.APP_ID;
 	}
 
