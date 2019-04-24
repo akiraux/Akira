@@ -60,6 +60,7 @@ gettext_package = application_id
 
 # Set our translation domain
 add_global_arguments('-DGETTEXT_PACKAGE="@0@"'.format (gettext_package), language:'c')
+add_global_arguments(['-DG_LOG_DOMAIN="Akira"'], language:'c')
 
 subdir('src')
 subdir('data')
