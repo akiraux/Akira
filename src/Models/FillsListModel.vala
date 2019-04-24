@@ -21,49 +21,49 @@
 
 
 public class Akira.Models.FillsListModel : GLib.Object, GLib.ListModel {
-	private GLib.List<Akira.Models.FillsItemModel> fills_list;
+    private GLib.List<Akira.Models.FillsItemModel> fills_list;
 
-	construct {
-		fills_list = new GLib.List<Akira.Models.FillsItemModel> ();
-	}
+    construct {
+        fills_list = new GLib.List<Akira.Models.FillsItemModel> ();
+    }
 
-	public uint get_n_items () {
-		return (uint) fills_list.length ();
-	}
+    public uint get_n_items () {
+        return (uint) fills_list.length ();
+    }
 
-	public Object? get_item (uint position) {
-		return fills_list.nth_data (position) as Object;
-	}
+    public Object? get_item (uint position) {
+        return fills_list.nth_data (position) as Object;
+    }
 
-	public Type get_item_type () {
-		return typeof (Akira.Models.FillsItemModel);
-	}
+    public Type get_item_type () {
+        return typeof (Akira.Models.FillsItemModel);
+    }
 
-	public void add () {
-		var position = fills_list.length ();
-		fills_list.append (
-			new Akira.Models.FillsItemModel (
-				"#abcded",
-				100,
-				true,
-				Akira.Utils.BlendingMode.NORMAL,
-				this
-			)
-		);
+    public void add () {
+        var position = fills_list.length ();
+        fills_list.append (
+            new Akira.Models.FillsItemModel (
+                "#abcded",
+                100,
+                true,
+                Akira.Utils.BlendingMode.NORMAL,
+                this
+            )
+        );
 
-		items_changed (position, 0, 1);
-		update_fills ();
-	}
+        items_changed (position, 0, 1);
+        update_fills ();
+    }
 
-	public void remove (Akira.Models.FillsItemModel item) {
-		var position = fills_list.index (item);
-		fills_list.remove (item);
+    public void remove (Akira.Models.FillsItemModel item) {
+        var position = fills_list.index (item);
+        fills_list.remove (item);
 
-		items_changed (position, 1, 0);
-		update_fills ();
-	}
+        items_changed (position, 1, 0);
+        update_fills ();
+    }
 
-	public void update_fills () {
-		// Update fills on canvas
-	}
+    public void update_fills () {
+        // Update fills on canvas
+    }
 }

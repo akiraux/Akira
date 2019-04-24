@@ -20,30 +20,30 @@
 */
 
 public class Akira.Layouts.StatusBar : Gtk.Grid {
-	public bool toggled {
-		get {
-			return visible;
-		} set {
-			visible = value;
-			no_show_all = !value;
-		}
-	}
+    public bool toggled {
+        get {
+            return visible;
+        } set {
+            visible = value;
+            no_show_all = !value;
+        }
+    }
 
-	public StatusBar () {
-		Object (toggled: true);
-	}
+    public StatusBar () {
+        Object (toggled: true);
+    }
 
-	construct {
-		get_style_context ().add_class ("statusbar");
-		
-		var label = new Gtk.Label ("Status Bar");
-		label.halign = Gtk.Align.CENTER;
-		label.margin = 6;
+    construct {
+        get_style_context ().add_class ("statusbar");
 
-		attach (label, 0, 0, 1, 1);
-	}
+        var label = new Gtk.Label ("Status Bar");
+        label.halign = Gtk.Align.CENTER;
+        label.margin = 6;
 
-	public void toggle () {
-		toggled = !toggled;
-	}
+        attach (label, 0, 0, 1, 1);
+    }
+
+    public void toggle () {
+        toggled = !toggled;
+    }
 }

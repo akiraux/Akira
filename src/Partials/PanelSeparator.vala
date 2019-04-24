@@ -20,9 +20,9 @@
 */
 
 public class Akira.Partials.PanelSeparator : Gtk.Separator {
-	construct {
-		orientation = Gtk.Orientation.HORIZONTAL;
-		get_style_context ().add_class ("panel-separator");
-		margin_bottom = 6;
-	}
+    construct {
+        orientation = Gtk.Orientation.HORIZONTAL;
+        get_style_context ().add_class ("panel-separator");
+        margin_bottom = 6;
+    }
 }

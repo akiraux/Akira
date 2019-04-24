@@ -20,118 +20,118 @@
 */
 
 public class Akira.Layouts.RightSideBar : Gtk.Grid {
-	public weak Akira.Window window { get; construct; }
+    public weak Akira.Window window { get; construct; }
 
-	public Gtk.Overlay layers_overlay;
-	public Gtk.Grid indicator;
-	public Akira.Layouts.Partials.LayersPanel layers_panel;
-	public Akira.Layouts.Partials.PagesPanel pages_panel;
-	public Gtk.ScrolledWindow layers_scroll;
-	public Gtk.ScrolledWindow pages_scroll;
+    public Gtk.Overlay layers_overlay;
+    public Gtk.Grid indicator;
+    public Akira.Layouts.Partials.LayersPanel layers_panel;
+    public Akira.Layouts.Partials.PagesPanel pages_panel;
+    public Gtk.ScrolledWindow layers_scroll;
+    public Gtk.ScrolledWindow pages_scroll;
 
-	public bool toggled {
-		get {
-			return visible;
-		} set {
-			visible = value;
-			no_show_all = !value;
-		}
-	}
+    public bool toggled {
+        get {
+            return visible;
+        } set {
+            visible = value;
+            no_show_all = !value;
+        }
+    }
 
-	public RightSideBar (Akira.Window main_window) {
-		Object (
-			orientation: Gtk.Orientation.VERTICAL,
-			column_homogeneous: true,
-			toggled: true,
-			window: main_window
-		);
-	}
+    public RightSideBar (Akira.Window main_window) {
+        Object (
+            orientation: Gtk.Orientation.VERTICAL,
+            column_homogeneous: true,
+            toggled: true,
+            window: main_window
+        );
+    }
 
-	construct {
-		get_style_context ().add_class ("sidebar-r");
-		width_request = 220;
-		
-		var pane = new Gtk.Paned (Gtk.Orientation.VERTICAL);
-		pane.expand = true;
-		pane.wide_handle = false;
-		pane.position = 600;
+    construct {
+        get_style_context ().add_class ("sidebar-r");
+        width_request = 220;
 
-		layers_panel = new Akira.Layouts.Partials.LayersPanel (window);
-		var layers_grid = new Gtk.Grid ();
-		layers_grid.vexpand = true;
-		layers_grid.add (layers_panel);
+        var pane = new Gtk.Paned (Gtk.Orientation.VERTICAL);
+        pane.expand = true;
+        pane.wide_handle = false;
+        pane.position = 600;
 
-		layers_scroll = new Gtk.ScrolledWindow (null, null);
-		layers_scroll.expand = true;
-		layers_scroll.add (layers_grid);
+        layers_panel = new Akira.Layouts.Partials.LayersPanel (window);
+        var layers_grid = new Gtk.Grid ();
+        layers_grid.vexpand = true;
+        layers_grid.add (layers_panel);
 
-		var scrolled_child = layers_scroll.get_child ();
-		if (scrolled_child is Gtk.Container) {
-			((Gtk.Container) scrolled_child).set_focus_vadjustment (new Gtk.Adjustment (0, 0, 0, 0, 0, 0));
-		}
+        layers_scroll = new Gtk.ScrolledWindow (null, null);
+        layers_scroll.expand = true;
+        layers_scroll.add (layers_grid);
 
-		layers_overlay = new Gtk.Overlay ();
-		layers_overlay.add (layers_scroll);
+        var scrolled_child = layers_scroll.get_child ();
+        if (scrolled_child is Gtk.Container) {
+            ((Gtk.Container) scrolled_child).set_focus_vadjustment (new Gtk.Adjustment (0, 0, 0, 0, 0, 0));
+        }
 
-		indicator = new Gtk.Grid ();
-		indicator.expand = false;
-		indicator.valign = Gtk.Align.START;
-		indicator.width_request = get_allocated_width ();
-		indicator.margin_start = 20;
-		indicator.margin_end = 5;
-		indicator.height_request = 1;
+        layers_overlay = new Gtk.Overlay ();
+        layers_overlay.add (layers_scroll);
 
-		var circle = new Gtk.Grid ();
-		circle.get_style_context ().add_class ("indicator-circle");
-		circle.width_request = 6;
-		circle.height_request = 6;
-		circle.valign = Gtk.Align.CENTER;
-		var line = new Gtk.Grid ();
-		line.get_style_context ().add_class ("indicator");
-		line.expand = true;
-		line.height_request = 2;
-		line.valign = Gtk.Align.CENTER;
+        indicator = new Gtk.Grid ();
+        indicator.expand = false;
+        indicator.valign = Gtk.Align.START;
+        indicator.width_request = get_allocated_width ();
+        indicator.margin_start = 20;
+        indicator.margin_end = 5;
+        indicator.height_request = 1;
 
-		indicator.attach (circle, 0, 0, 1, 1);
-		indicator.attach (line, 1, 0, 1, 1);
-		layers_overlay.add_overlay (indicator);
-		layers_overlay.set_overlay_pass_through (indicator, true);
+        var circle = new Gtk.Grid ();
+        circle.get_style_context ().add_class ("indicator-circle");
+        circle.width_request = 6;
+        circle.height_request = 6;
+        circle.valign = Gtk.Align.CENTER;
+        var line = new Gtk.Grid ();
+        line.get_style_context ().add_class ("indicator");
+        line.expand = true;
+        line.height_request = 2;
+        line.valign = Gtk.Align.CENTER;
 
-		indicator.visible = false;
-		indicator.no_show_all = true;
+        indicator.attach (circle, 0, 0, 1, 1);
+        indicator.attach (line, 1, 0, 1, 1);
+        layers_overlay.add_overlay (indicator);
+        layers_overlay.set_overlay_pass_through (indicator, true);
 
-		var top_panel = new Gtk.Grid ();
-		top_panel.attach (build_search_bar (), 0, 0, 1, 1);
-		top_panel.attach (layers_overlay, 0, 1, 1, 1);
+        indicator.visible = false;
+        indicator.no_show_all = true;
 
-		pane.pack1 (top_panel, false, false);
+        var top_panel = new Gtk.Grid ();
+        top_panel.attach (build_search_bar (), 0, 0, 1, 1);
+        top_panel.attach (layers_overlay, 0, 1, 1, 1);
 
-		pages_panel = new Akira.Layouts.Partials.PagesPanel (window);
-		pages_scroll = new Gtk.ScrolledWindow (null, null);
-		pages_scroll.expand = true;
-		pages_scroll.add (pages_panel);
+        pane.pack1 (top_panel, false, false);
 
-		attach (pane, 0 , 0 , 1, 1);
-	}
+        pages_panel = new Akira.Layouts.Partials.PagesPanel (window);
+        pages_scroll = new Gtk.ScrolledWindow (null, null);
+        pages_scroll.expand = true;
+        pages_scroll.add (pages_panel);
 
-	private Gtk.Grid build_search_bar () {
-		var search = new Gtk.SearchEntry ();
-		search.hexpand = true;
-		search.margin = 5;
-		search.placeholder_text = _("Search Layer");
+        attach (pane, 0 , 0 , 1, 1);
+    }
 
-		search.activate.connect (() => {
-			warning ("search");
-		});
+    private Gtk.Grid build_search_bar () {
+        var search = new Gtk.SearchEntry ();
+        search.hexpand = true;
+        search.margin = 5;
+        search.placeholder_text = _("Search Layer");
 
-		var search_grid = new Gtk.Grid ();
-		search_grid.get_style_context ().add_class ("border-bottom");
-		search_grid.add (search);
+        search.activate.connect (() => {
+            warning ("search");
+        });
 
-		return search_grid;
-	}
+        var search_grid = new Gtk.Grid ();
+        search_grid.get_style_context ().add_class ("border-bottom");
+        search_grid.add (search);
 
-	public void toggle () {
-		toggled = !toggled;
-	}
+        return search_grid;
+    }
+
+    public void toggle () {
+        toggled = !toggled;
+    }
 }

@@ -19,60 +19,60 @@
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
 public class Akira.Layouts.MainCanvas : Gtk.Grid {
-	public Gtk.ScrolledWindow main_scroll;
-	public Akira.Lib.Canvas canvas;
-	public Gtk.Allocation main_window_size;
+    public Gtk.ScrolledWindow main_scroll;
+    public Akira.Lib.Canvas canvas;
+    public Gtk.Allocation main_window_size;
 
-	public MainCanvas () {
-		Object (orientation: Gtk.Orientation.VERTICAL);
-	}
+    public MainCanvas () {
+        Object (orientation: Gtk.Orientation.VERTICAL);
+    }
 
-	construct {
-		get_allocation (out main_window_size);
-		main_scroll = new Gtk.ScrolledWindow (null, null);
-		main_scroll.expand = true;
+    construct {
+        get_allocation (out main_window_size);
+        main_scroll = new Gtk.ScrolledWindow (null, null);
+        main_scroll.expand = true;
 
-		canvas = new Akira.Lib.Canvas ();
-		canvas.set_size_request (main_window_size.width, main_window_size.height);
-		canvas.set_bounds (0, 0, 10000, 10000);
-		canvas.set_scale (1.0);
+        canvas = new Akira.Lib.Canvas ();
+        canvas.set_size_request (main_window_size.width, main_window_size.height);
+        canvas.set_bounds (0, 0, 10000, 10000);
+        canvas.set_scale (1.0);
 
-		main_scroll.add (canvas);
+        main_scroll.add (canvas);
 
-		attach (main_scroll, 0, 0, 1, 1);
-	}
+        attach (main_scroll, 0, 0, 1, 1);
+    }
 
-	public Goo.CanvasRect add_rect () {
-		var root = canvas.get_root_item ();
-		var rect = new Goo.CanvasRect (null, 100.0, 100.0, 400.0, 400.0,
-									"line-width", 5.0,
-									"radius-x", 100.0,
-									"radius-y", 100.0,
-									"stroke-color", "#f37329",
-									"fill-color", "#ffa154", null);
-		rect.set ("parent", root);
-		rect.set_transform(Cairo.Matrix.identity ());
-		return  rect;
-	}
+    public Goo.CanvasRect add_rect () {
+        var root = canvas.get_root_item ();
+        var rect = new Goo.CanvasRect (null, 100.0, 100.0, 400.0, 400.0,
+                                    "line-width", 5.0,
+                                    "radius-x", 100.0,
+                                    "radius-y", 100.0,
+                                    "stroke-color", "#f37329",
+                                    "fill-color", "#ffa154", null);
+        rect.set ("parent", root);
+        rect.set_transform(Cairo.Matrix.identity ());
+        return  rect;
+    }
 
-	public Goo.CanvasEllipse add_ellipse () {
-		var root = canvas.get_root_item ();
-		var ellipse = new Goo.CanvasEllipse (null, 150, 150, 64, 64,
-			"line-width", 5.0,
-			"stroke-color", "#9bdb4d",
-			"fill-color", "#68b723");
+    public Goo.CanvasEllipse add_ellipse () {
+        var root = canvas.get_root_item ();
+        var ellipse = new Goo.CanvasEllipse (null, 150, 150, 64, 64,
+            "line-width", 5.0,
+            "stroke-color", "#9bdb4d",
+            "fill-color", "#68b723");
 
-		ellipse.set ("parent", root);
-		ellipse.set_transform(Cairo.Matrix.identity ());
-		return ellipse;
-	}
+        ellipse.set ("parent", root);
+        ellipse.set_transform(Cairo.Matrix.identity ());
+        return ellipse;
+    }
 
-	public Goo.CanvasText add_text () {
-		var root = canvas.get_root_item ();
-		var text = new Goo.CanvasText (null, "Add text here", 20, 20, 200, Goo.CanvasAnchorType.NW, "font", "Open Sans 18");
-		text.set ("parent", root);
-		text.set ("height", 25f);
-		text.set_transform(Cairo.Matrix.identity ());
-		return text;
-	}
+    public Goo.CanvasText add_text () {
+        var root = canvas.get_root_item ();
+        var text = new Goo.CanvasText (null, "Add text here", 20, 20, 200, Goo.CanvasAnchorType.NW, "font", "Open Sans 18");
+        text.set ("parent", root);
+        text.set ("height", 25f);
+        text.set_transform(Cairo.Matrix.identity ());
+        return text;
+    }
 }

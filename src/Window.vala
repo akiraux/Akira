@@ -20,111 +20,111 @@
 */
 
 public class Akira.Window : Gtk.ApplicationWindow {
-	public FileFormat.AkiraFile? akira_file = null;
+    public FileFormat.AkiraFile? akira_file = null;
 
-	public weak Akira.Application app { get; construct; }
+    public weak Akira.Application app { get; construct; }
 
-	public Akira.Services.ActionManager action_manager;
+    public Akira.Services.ActionManager action_manager;
     public Akira.Services.EventBus event_bus;
-	public Akira.Layouts.HeaderBar headerbar;
-	public Akira.Layouts.MainWindow main_window;
-	public Akira.Widgets.SettingsDialog? settings_dialog = null;
-	public Akira.Utils.Dialogs dialogs;
+    public Akira.Layouts.HeaderBar headerbar;
+    public Akira.Layouts.MainWindow main_window;
+    public Akira.Widgets.SettingsDialog? settings_dialog = null;
+    public Akira.Utils.Dialogs dialogs;
 
-	public SimpleActionGroup actions { get; construct; }
-	public Gtk.AccelGroup accel_group { get; construct; }
+    public SimpleActionGroup actions { get; construct; }
+    public Gtk.AccelGroup accel_group { get; construct; }
 
-	public bool edited { get; set; default = false; }
-	public bool confirmed { get; set; default = false; }
+    public bool edited { get; set; default = false; }
+    public bool confirmed { get; set; default = false; }
 
-	public Window (Akira.Application akira_app) {
-		Object (
-			application: akira_app,
-			app: akira_app,
-			icon_name: "com.github.akiraux.akira"
-		);
-	}
+    public Window (Akira.Application akira_app) {
+        Object (
+            application: akira_app,
+            app: akira_app,
+            icon_name: "com.github.akiraux.akira"
+        );
+    }
 
-	construct {
+    construct {
         event_bus = new Akira.Services.EventBus ();
 
-		accel_group = new Gtk.AccelGroup ();
-		add_accel_group (accel_group);
+        accel_group = new Gtk.AccelGroup ();
+        add_accel_group (accel_group);
 
-		action_manager = new Akira.Services.ActionManager (app, this);
-		headerbar = new Akira.Layouts.HeaderBar (this);
-		main_window = new Akira.Layouts.MainWindow (this);
-		dialogs = new Akira.Utils.Dialogs (this);
+        action_manager = new Akira.Services.ActionManager (app, this);
+        headerbar = new Akira.Layouts.HeaderBar (this);
+        main_window = new Akira.Layouts.MainWindow (this);
+        dialogs = new Akira.Utils.Dialogs (this);
 
-		build_ui ();
+        build_ui ();
 
-		move (settings.pos_x, settings.pos_y);
-		resize (settings.window_width, settings.window_height);
+        move (settings.pos_x, settings.pos_y);
+        resize (settings.window_width, settings.window_height);
 
-		show_app ();
-	}
+        show_app ();
+    }
 
-	private void build_ui () {
-		set_titlebar (headerbar);
-		set_border_width (0);
-		if (Constants.PROFILE == "development") {
-			headerbar.get_style_context ().add_class ("devel");
-		}
+    private void build_ui () {
+        set_titlebar (headerbar);
+        set_border_width (0);
+        if (Constants.PROFILE == "development") {
+            headerbar.get_style_context ().add_class ("devel");
+        }
 
-		delete_event.connect ((e) => {
-			return before_destroy ();
-		});
+        delete_event.connect ((e) => {
+            return before_destroy ();
+        });
 
-		add (main_window);
-	}
+        add (main_window);
+    }
 
-	private void apply_user_settings () {
-		Gtk.Settings.get_default ().gtk_application_prefer_dark_theme = settings.dark_theme;
+    private void apply_user_settings () {
+        Gtk.Settings.get_default ().gtk_application_prefer_dark_theme = settings.dark_theme;
 
-		var css_provider = new Gtk.CssProvider ();
-		css_provider.load_from_resource ("/com/github/akiraux/akira/stylesheet.css");
+        var css_provider = new Gtk.CssProvider ();
+        css_provider.load_from_resource ("/com/github/akiraux/akira/stylesheet.css");
 
-		Gtk.StyleContext.add_provider_for_screen (
-			Gdk.Screen.get_default (), css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
-		);
+        Gtk.StyleContext.add_provider_for_screen (
+            Gdk.Screen.get_default (), css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
+        );
 
-		if (!settings.show_label) {
-			Akira.Services.ActionManager.action_from_group (Akira.Services.ActionManager.ACTION_LABELS, get_action_group ("win"));
-		}
-	}
+        if (!settings.show_label) {
+            Akira.Services.ActionManager.action_from_group (Akira.Services.ActionManager.ACTION_LABELS, get_action_group ("win"));
+        }
+    }
 
-	public bool before_destroy () {
-		update_status ();
+    public bool before_destroy () {
+        update_status ();
 
-		save_and_close_current_file ();
+        save_and_close_current_file ();
 
-		if (!edited) {
-			app.get_active_window ().destroy ();
-			on_destroy ();
-		}
+        if (!edited) {
+            app.get_active_window ().destroy ();
+            on_destroy ();
+        }
 
-		if (edited) {
-			confirmed = dialogs.message_dialog (_("Are you sure you want to quit?"), _("All unsaved data will be lost and impossible to recover."), "system-shutdown", _("Yes, Quit!"));
+        if (edited) {
+            confirmed = dialogs.message_dialog (_("Are you sure you want to quit?"), _("All unsaved data will be lost and impossible to recover."), "system-shutdown", _("Yes, Quit!"));
 
-			if (confirmed) {
-				app.get_active_window ().destroy ();
-				on_destroy ();
-			}
-		}
+            if (confirmed) {
+                app.get_active_window ().destroy ();
+                on_destroy ();
+            }
+        }
 
-		return true;
-	}
+        return true;
+    }
 
-	public void on_destroy () {
-		uint length = app.windows.length ();
+    public void on_destroy () {
+        uint length = app.windows.length ();
 
-		if (length == 0) {
-			Gtk.main_quit ();
-		}
-	}
+        if (length == 0) {
+            Gtk.main_quit ();
+        }
+    }
 
-	private void update_status () {
-		int width, height, x, y;
+    private void update_status () {
+        int width, height, x, y;
 
         get_size (out width, out height);
         get_position (out x, out y);
@@ -132,33 +132,33 @@ public class Akira.Window : Gtk.ApplicationWindow {
         settings.pos_x = x;
         settings.pos_y = y;
         settings.window_width = width;
-		settings.window_height = height;
-		settings.right_paned = main_window.main_canvas.get_allocated_width ();
-		settings.left_paned = main_window.left_sidebar.get_allocated_width ();
-	}
+        settings.window_height = height;
+        settings.right_paned = main_window.main_canvas.get_allocated_width ();
+        settings.left_paned = main_window.left_sidebar.get_allocated_width ();
+    }
 
-	public void show_app () {
-		show_all ();
-		apply_user_settings ();
+    public void show_app () {
+        show_all ();
+        apply_user_settings ();
 
-		show ();
-		present ();
-	}
+        show ();
+        present ();
+    }
 
-	public void open_file (File file) {
-		save_and_close_current_file ();
+    public void open_file (File file) {
+        save_and_close_current_file ();
 
-		app.register_file_to_window (file, this);
-		akira_file = new FileFormat.AkiraFile (file);
+        app.register_file_to_window (file, this);
+        akira_file = new FileFormat.AkiraFile (file);
 
-		akira_file.prepare ();
-		akira_file.load_file ();
-	}
+        akira_file.prepare ();
+        akira_file.load_file ();
+    }
 
-	private void save_and_close_current_file () {
-		if (akira_file != null) {
-			akira_file.save_file ();
-			akira_file.close ();
-		}
-	}
+    private void save_and_close_current_file () {
+        if (akira_file != null) {
+            akira_file.save_file ();
+            akira_file.close ();
+        }
+    }
 }
