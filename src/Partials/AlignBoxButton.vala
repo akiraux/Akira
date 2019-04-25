@@ -27,12 +27,12 @@ public class Akira.Partials.AlignBoxButton : Gtk.Button {
     public string action { get; construct; }
     public Gtk.Image btn_image;
 
-    public AlignBoxButton (Akira.Window main_window, string action_name, string icon_name, string tooltip) {
+    public AlignBoxButton (Akira.Window main_window, string action_name, string icon_name, string tooltip, string[] accels) {
         Object (
             window: main_window,
             icon: icon_name,
             action: action_name,
-            tooltip_text: tooltip
+		    tooltip_markup: Granite.markup_accel_tooltip (accels, tooltip)
         );
     }
 
