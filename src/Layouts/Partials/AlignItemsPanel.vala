@@ -25,22 +25,33 @@ public class Akira.Layouts.Partials.AlignItemsPanel : Gtk.Grid {
 
     private struct AlignBoxItem {
         public string type;
-        public string action_name;
-        public string icon_name;
-        public string tooltip_text;
+        public string? action_name;
+        public string? icon_name;
+        public string? tooltip_text;
+
+        public AlignBoxItem (
+            string type,
+            string? action_name = null,
+            string? icon_name = null,
+            string? tooltip_text = null) {
+                this.type = type;
+                this.action_name = action_name;
+                this.icon_name = icon_name;
+                this.tooltip_text = tooltip_text;
+        }
     }
 
-    private const AlignBoxItem[] ALIGN_ITEMS_PANEL_BUTTONS = {
-        { "btn", "even-h", "distribute-horizontal-center", "Distribute Horizontally" },
-        { "btn", "even-v", "distribute-vertical-center", "Distribute Vertically" },
-        { "sep" },
-        { "btn", "alig-h-l", "align-horizontal-left", "Align Left" },
-        { "btn", "alig-h-c", "align-horizontal-center", "Align Center" },
-        { "btn", "alig-h-r", "align-horizontal-right", "Align Right" },
-        { "sep" },
-        { "btn", "alig-v-t", "align-vertical-top", "Align Top" },
-        { "btn", "alig-v-c", "align-vertical-center", "Align Middle" },
-        { "btn", "alig-v-b", "align-vertical-bottom", "Align Bottom" }
+    private AlignBoxItem[] ALIGN_ITEMS_PANEL_BUTTONS = {
+        AlignBoxItem ( "btn", "even-h", "distribute-horizontal-center", _("Distribute Horizontally") ),
+        AlignBoxItem ( "btn", "even-v", "distribute-vertical-center", _("Distribute Vertically") ),
+        AlignBoxItem ( "sep" ),
+        AlignBoxItem ( "btn", "alig-h-l", "align-horizontal-left", _("Align Left") ),
+        AlignBoxItem ( "btn", "alig-h-c", "align-horizontal-center", _("Align Center") ),
+        AlignBoxItem ( "btn", "alig-h-r", "align-horizontal-right", _("Align Right") ),
+        AlignBoxItem ( "sep" ),
+        AlignBoxItem ( "btn", "alig-v-t", "align-vertical-top", _("Align Top") ),
+        AlignBoxItem ( "btn", "alig-v-c", "align-vertical-center", _("Align Middle") ),
+        AlignBoxItem ( "btn", "alig-v-b", "align-vertical-bottom", _("Align Bottom") )
     };
 
     public AlignItemsPanel (Akira.Window window) {
