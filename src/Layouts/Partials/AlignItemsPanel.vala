@@ -65,14 +65,10 @@ public class Akira.Layouts.Partials.AlignItemsPanel : Gtk.Grid {
         halign = Gtk.Align.FILL;
         get_style_context ().add_class ("alignment-box");
 
-        var alignment_box = new Gtk.Grid ();
-        alignment_box.halign = Gtk.Align.CENTER;
-        alignment_box.hexpand = true;
-
         foreach (var item in ALIGN_ITEMS_PANEL_BUTTONS) {
             switch (item.type) {
                 case "sep":
-                    alignment_box.attach (new Gtk.Separator (Gtk.Orientation.VERTICAL),
+                    attach (new Gtk.Separator (Gtk.Orientation.VERTICAL),
                                                              current_button_column++, 0, 1, 1 );
                     break;
 
@@ -83,11 +79,9 @@ public class Akira.Layouts.Partials.AlignItemsPanel : Gtk.Grid {
                                                                   item.icon_name,
                                                                   item.tooltip_text);
 
-                    alignment_box.attach (tmp_align_box_button, current_button_column++, 0, 1, 1);
+                    attach (tmp_align_box_button, current_button_column++, 0, 1, 1);
                     break;
             }
         }
-
-        attach (alignment_box, 1, 0, 1, 1);
     }
 }

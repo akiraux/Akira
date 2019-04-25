@@ -38,6 +38,7 @@ public class Akira.Partials.AlignBoxButton : Gtk.Button {
 
     construct {
         can_focus = false;
+        hexpand = true;
         get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
         sensitive = false;
 
