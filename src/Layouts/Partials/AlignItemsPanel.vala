@@ -31,16 +31,16 @@ public class Akira.Layouts.Partials.AlignItemsPanel : Gtk.Grid {
     }
 
     private const AlignBoxItem[] ALIGN_ITEMS_PANEL_BUTTONS = {
-        { "btn", "even-h", "distribute-horizontal-center", "Distribute centers evenly horizontally" },
-        { "btn", "even-v", "distribute-vertical-center", "Distribute center evenly vertically" },
+        { "btn", "even-h", "distribute-horizontal-center", "Distribute Horizontally" },
+        { "btn", "even-v", "distribute-vertical-center", "Distribute Vertically" },
         { "sep" },
-        { "btn", "alig-h-l", "align-horizontal-left", "Align left sides" },
-        { "btn", "alig-h-c", "align-horizontal-center", "Center on horizontal axis" },
-        { "btn", "alig-h-r", "align-horizontal-right", "Align right sides" },
+        { "btn", "alig-h-l", "align-horizontal-left", "Align Left" },
+        { "btn", "alig-h-c", "align-horizontal-center", "Align Center" },
+        { "btn", "alig-h-r", "align-horizontal-right", "Align Right" },
         { "sep" },
-        { "btn", "alig-v-t", "align-vertical-top", "Align top sides" },
-        { "btn", "alig-v-c", "align-vertical-center", "Center on vertical axis" },
-        { "btn", "alig-v-b", "align-vertical-bottom", "Align bottom sides" }
+        { "btn", "alig-v-t", "align-vertical-top", "Align Top" },
+        { "btn", "alig-v-c", "align-vertical-center", "Align Middle" },
+        { "btn", "alig-v-b", "align-vertical-bottom", "Align Bottom" }
     };
 
     public AlignItemsPanel (Akira.Window window) {
