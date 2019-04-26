@@ -25,12 +25,12 @@ public const string TERMINAL_NAME = "akira";
 public static bool DEBUG = false;
 
 public static int main (string[] args) {
-	DEBUG = "-d" in args;
-	
-	Environment.set_application_name (APP_NAME);
-	Environment.set_prgname (APP_NAME);
+    DEBUG = "-d" in args;
 
-	var application = new Akira.Application ();
+    Environment.set_application_name (APP_NAME);
+    Environment.set_prgname (APP_NAME);
 
-	return application.run (args);
+    var application = new Akira.Application ();
+
+    return application.run (args);
 }
