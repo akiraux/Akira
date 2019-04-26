@@ -36,11 +36,11 @@ public class Akira.Layouts.Partials.AlignItemsPanel : Gtk.Grid {
             string? icon_name = null,
             string? tooltip_text = null,
             string[]? accels = null) {
-                this.type = type;
-                this.action_name = action_name;
-                this.icon_name = icon_name;
-                this.tooltip_text = tooltip_text;
-                this.accels = accels;
+            this.type = type;
+            this.action_name = action_name;
+            this.icon_name = icon_name;
+            this.tooltip_text = tooltip_text;
+            this.accels = accels;
         }
     }
 
@@ -61,27 +61,31 @@ public class Akira.Layouts.Partials.AlignItemsPanel : Gtk.Grid {
         Object (
             window: window,
             orientation: Gtk.Orientation.VERTICAL
-        );
+            );
     }
 
     construct {
         halign = Gtk.Align.FILL;
+        column_homogeneous = true;
         get_style_context ().add_class ("alignment-box");
 
         foreach (var item in ALIGN_ITEMS_PANEL_BUTTONS) {
             switch (item.type) {
                 case "sep":
-                    attach (new Gtk.Separator (Gtk.Orientation.VERTICAL),
-                                                             current_button_column++, 0, 1, 1 );
+                    var separator = new Gtk.Separator (Gtk.Orientation.VERTICAL);
+                    separator.halign = Gtk.Align.CENTER;
+
+                    attach (separator, current_button_column++, 0, 1, 1 );
                     break;
 
                 case "btn":
-                    var tmp_align_box_button = new Akira.Partials.AlignBoxButton (
-                                                                  window,
-                                                                  item.action_name,
-                                                                  item.icon_name,
-                                                                  item.tooltip_text,
-                                                                  item.accels);
+                    var tmp_align_box_button =
+                        new Akira.Partials.AlignBoxButton (
+                            window,
+                            item.action_name,
+                            item.icon_name,
+                            item.tooltip_text,
+                            item.accels);
 
                     attach (tmp_align_box_button, current_button_column++, 0, 1, 1);
                     break;
