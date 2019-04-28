@@ -31,7 +31,8 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
     private const int SCROLL_STEP_SIZE = 5;
     private const int SCROLL_DISTANCE = 30;
     private const int SCROLL_DELAY = 50;
-    public Akira.Layouts.Partials.Artboard artboard;
+    public Akira.Layouts.Partials.Artboard? artboard;
+    private int artboard_counter = 0;
 
     private const Gtk.TargetEntry TARGET_ENTRIES[] = {
         { "ARTBOARD", Gtk.TargetFlags.SAME_APP, 0 }
@@ -43,23 +44,27 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
             activate_on_single_click: false,
             selection_mode: Gtk.SelectionMode.SINGLE
         );
+        artboard = null;
     }
 
     construct {
         get_style_context ().add_class ("layers-panel");
         expand = true;
 
-        artboard = new Akira.Layouts.Partials.Artboard (window, "Artboard 1");
+        build_drag_and_drop ();
+
+        reload_zebra ();
+    }
+
+    public void insert_artboard () {
+        //Sets as current artboard
+        var artboard = new Akira.Layouts.Partials.Artboard (window, "Artboard %d".printf(++artboard_counter));
         var placeholder = new Gtk.ListBoxRow ();
         artboard.container.insert (placeholder, 0);
         placeholder.visible = false;
         placeholder.no_show_all = true;
 
-        insert (artboard, 0);
-
-        build_drag_and_drop ();
-
-        reload_zebra ();
+        insert (artboard, -1);
     }
 
     private void build_drag_and_drop () {
@@ -71,12 +76,13 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
     }
 
     private void on_drag_data_received (Gdk.DragContext context, int x, int y, Gtk.SelectionData selection_data, uint target_type, uint time) {
-        Akira.Layouts.Partials.Artboard target;
+        Gtk.ListBoxRow target;
         Gtk.Widget row;
-        Akira.Layouts.Partials.Artboard source;
+        Gtk.ListBoxRow  source;
         int new_position;
 
-        target = (Akira.Layouts.Partials.Artboard) get_row_at_y (y);
+        debug ("drag data received layerpanel");
+        target = get_row_at_y (y);
 
         if (target == null) {
             new_position = -1;
@@ -86,19 +92,30 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
 
         row = ((Gtk.Widget[]) selection_data.get_data ())[0];
 
+        /*
+           TODO: source or target tries to locate its parent, but now that can be null if LayerPanel do not have an artboard)
+        if (row is Akira.Layouts.Artboard) {
+            var layerPanel = (Akira.Layouts.LayerPanel)row;
+            if (LayerPanel.artboard != null) {
+                source = artboard;
+        }
         source = (Akira.Layouts.Partials.Artboard) row.get_ancestor (typeof (Akira.Layouts.Partials.Artboard));
+        */
+        source = (Gtk.ListBoxRow)row;
 
         if (source == target) {
+            debug ("same object");
             return;
         }
 
         remove (source);
+        debug ("remove source");
         insert (source, new_position);
+        debug ("reinsert source");
     }
 
     public bool on_drag_motion (Gdk.DragContext context, int x, int y, uint time) {
-        //  var row = (Akira.Layouts.Partials.Artboard) get_row_at_y (y);
-
+        debug ("drag motion layerpanel");
         check_scroll (y);
         if (should_scroll && !scrolling) {
             scrolling = true;
@@ -109,6 +126,7 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
     }
 
     public void on_drag_leave (Gdk.DragContext context, uint time) {
+        debug ("drag leave layerpanel");
         should_scroll = false;
     }
 

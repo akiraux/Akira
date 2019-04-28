@@ -230,6 +230,8 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
         grid.name = "main";
 
         var artboard = new Akira.Partials.PopoverButton (_("Artboard"), "window-new-symbolic", {"A"});
+        artboard.action_name = Akira.Services.ActionManager.ACTION_PREFIX +
+                               Akira.Services.ActionManager.ACTION_ARTBOARD_TOOL;
 
         var separator = new Gtk.Separator (Gtk.Orientation.HORIZONTAL);
         separator.margin_top = separator.margin_bottom = 3;
@@ -252,11 +254,11 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
 
         var rectangle = new Akira.Partials.PopoverButton (_("Rectangle"), "shape-rectangle-symbolic", {"R"});
         rectangle.action_name = Akira.Services.ActionManager.ACTION_PREFIX +
-            Akira.Services.ActionManager.ACTION_RECT_TOOL;
+                                Akira.Services.ActionManager.ACTION_RECT_TOOL;
 
         var ellipse = new Akira.Partials.PopoverButton (_("Ellipse"), "shape-circle-symbolic", {"E"});
         ellipse.action_name = Akira.Services.ActionManager.ACTION_PREFIX +
-            Akira.Services.ActionManager.ACTION_ELLIPSE_TOOL;
+                              Akira.Services.ActionManager.ACTION_ELLIPSE_TOOL;
 
         shapes_grid.add (back_button);
         shapes_grid.add (sub_separator);
@@ -277,7 +279,7 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
 
         var text = new Akira.Partials.PopoverButton (_("Text"), "shape-text-symbolic", {"T"});
         text.action_name = Akira.Services.ActionManager.ACTION_PREFIX +
-            Akira.Services.ActionManager.ACTION_TEXT_TOOL;
+                           Akira.Services.ActionManager.ACTION_TEXT_TOOL;
 
         var image = new Akira.Partials.PopoverButton (_("Image"), "image-x-generic-symbolic", {"I"});
 

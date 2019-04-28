@@ -112,6 +112,19 @@ public class Akira.Layouts.RightSideBar : Gtk.Grid {
         pages_scroll.add (pages_panel);
 
         attach (pane, 0 , 0 , 1, 1);
+
+        key_press_event.connect (on_key_pressed);
+    }
+
+    private bool on_key_pressed (Gtk.Widget source, Gdk.EventKey key) {
+        switch (key.keyval) {
+            case Gdk.Key.Insert:
+                layers_panel.insert_artboard ();
+                show_all ();
+                return true;
+        }
+
+        return false;
     }
 
     private Gtk.Grid build_search_bar () {
