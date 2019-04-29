@@ -1,23 +1,23 @@
 /*
-* Copyright (c) 2019 Alecaddd (http://alecaddd.com)
-*
-* This file is part of Akira.
-*
-* Akira is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
+ * Copyright (c) 2019 Alecaddd (http://alecaddd.com)
+ *
+ * This file is part of Akira.
+ *
+ * Akira is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
 
-* Akira is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
+ * Akira is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
 
-* You should have received a copy of the GNU General Public License
-* along with Akira.  If not, see <https://www.gnu.org/licenses/>.
-*
-* Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
-*/
+ * You should have received a copy of the GNU General Public License
+ * along with Akira.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
+ */
 
 public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
     public weak Akira.Window window { get; construct; }
@@ -25,6 +25,7 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
     public Akira.Partials.HeaderBarButton new_document;
     public Akira.Partials.HeaderBarButton save_file;
     public Akira.Partials.HeaderBarButton save_file_as;
+    public Gtk.Grid recent_files_grid;
 
     public Akira.Partials.MenuButton menu;
     public Akira.Partials.MenuButton toolset;
@@ -62,35 +63,89 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
     construct {
         set_show_close_button (true);
 
-        var menu_items = new Gtk.Menu ();
+        var menu_popover_grid = new Gtk.Grid ();
+        menu_popover_grid.margin_bottom = 3;
+        menu_popover_grid.orientation = Gtk.Orientation.VERTICAL;
+        menu_popover_grid.width_request = 220;
 
-        var new_window = new Gtk.MenuItem.with_label (_("New Window"));
-        new_window.action_name = Akira.Services.ActionManager.ACTION_PREFIX + Akira.Services.ActionManager.ACTION_NEW_WINDOW;
-        menu_items.add (new_window);
-        menu_items.add (new Gtk.SeparatorMenuItem ());
+        var new_window_button = new Akira.Partials.PopoverButton (
+            _("Open New Window"), {"<Ctrl>n"});
+        new_window_button.action_name = Akira.Services.ActionManager.ACTION_PREFIX +
+            Akira.Services.ActionManager.ACTION_NEW_WINDOW;
 
-        var open = new Gtk.MenuItem.with_label (_("Open"));
-        open.action_name = Akira.Services.ActionManager.ACTION_PREFIX + Akira.Services.ActionManager.ACTION_OPEN;
-        menu_items.add (open);
+        var separator = new Gtk.Separator (Gtk.Orientation.HORIZONTAL);
+        separator.margin_top = separator.margin_bottom = 3;
 
-        var save = new Gtk.MenuItem.with_label (_("Save"));
-        save.action_name = Akira.Services.ActionManager.ACTION_PREFIX + Akira.Services.ActionManager.ACTION_SAVE;
-        menu_items.add (save);
+        var open_button = new Akira.Partials.PopoverButton (
+            _("Open"), {"<Ctrl>o"});
+        open_button.action_name = Akira.Services.ActionManager.ACTION_PREFIX +
+            Akira.Services.ActionManager.ACTION_OPEN;
 
-        var save_as = new Gtk.MenuItem.with_label (_("Save As"));
-        save_as.action_name = Akira.Services.ActionManager.ACTION_PREFIX + Akira.Services.ActionManager.ACTION_SAVE_AS;
-        menu_items.add (save_as);
+        // Create the recent files submenu
+        var recent_files_popover = new Gtk.PopoverMenu ();
+        recent_files_popover.name = "files-menu";
 
-        menu_items.add (new Gtk.SeparatorMenuItem ());
+        recent_files_grid = new Gtk.Grid ();
+        recent_files_grid.margin_bottom = 3;
+        recent_files_grid.orientation = Gtk.Orientation.VERTICAL;
+        recent_files_grid.width_request = 220;
 
-        var quit = new Gtk.MenuItem.with_label(_("Quit"));
-        quit.action_name = Akira.Services.ActionManager.ACTION_PREFIX + Akira.Services.ActionManager.ACTION_QUIT;
-        menu_items.add (quit);
+        var main_menu_button = new Gtk.ModelButton ();
+        main_menu_button.text = _("Main Menu");
+        main_menu_button.inverted = true;
 
-        menu_items.show_all ();
+        var sub_separator = new Gtk.Separator (Gtk.Orientation.HORIZONTAL);
+        sub_separator.margin_top = sub_separator.margin_bottom = 3;
+
+        recent_files_grid.add (main_menu_button);
+        recent_files_grid.add (sub_separator);
+        recent_files_popover.add (recent_files_grid);
+
+        fetch_recent_files ();
+
+        var open_recent_button = new Gtk.ModelButton ();
+        open_recent_button.text = _("Open Recent");
+        open_recent_button.menu_name = "files-menu";
+
+        var separator2 = new Gtk.Separator (Gtk.Orientation.HORIZONTAL);
+        separator2.margin_top = separator2.margin_bottom = 3;
+
+        var save_button = new Akira.Partials.PopoverButton (
+            _("Save"), {"<Ctrl>s"});
+        save_button.action_name = Akira.Services.ActionManager.ACTION_PREFIX +
+            Akira.Services.ActionManager.ACTION_SAVE;
+
+        var save_as_button = new Akira.Partials.PopoverButton (
+            _("Save As"), {"<Ctrl><Shift>s"});
+        save_as_button.action_name = Akira.Services.ActionManager.ACTION_PREFIX +
+            Akira.Services.ActionManager.ACTION_SAVE_AS;
+
+        var separator3 = new Gtk.Separator (Gtk.Orientation.HORIZONTAL);
+        separator3.margin_top = separator3.margin_bottom = 3;
+
+        var quit_button = new Akira.Partials.PopoverButton (
+            _("Quit"), {"<Ctrl>q"});
+        quit_button.action_name = Akira.Services.ActionManager.ACTION_PREFIX +
+            Akira.Services.ActionManager.ACTION_QUIT;
 
         menu = new Akira.Partials.MenuButton ("document-open", _("Menu"), null);
-        menu.button.popup = menu_items;
+        var menu_popover = new Gtk.PopoverMenu ();
+        menu_popover.name = "main-menu";
+        menu.button.popover = menu_popover;
+        main_menu_button.menu_name = "main-menu";
+
+        menu_popover_grid.add (new_window_button);
+        menu_popover_grid.add (separator);
+        menu_popover_grid.add (open_button);
+        menu_popover_grid.add (open_recent_button);
+        menu_popover_grid.add (separator2);
+        menu_popover_grid.add (save_button);
+        menu_popover_grid.add (save_as_button);
+        menu_popover_grid.add (separator3);
+        menu_popover_grid.add (quit_button);
+        menu_popover_grid.show_all ();
+
+        menu_popover.add (menu_popover_grid);
 
         var tools = new Gtk.Menu ();
         tools.add (new Gtk.MenuItem.with_label(_("Artboard")));
@@ -191,5 +246,13 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
 
     public void toggle () {
         toggled = !toggled;
+    }
+
+    /**
+     * TODO: Fetch the recently opened files from GSettings
+     * and add them to the grid
+     */
+    public void fetch_recent_files () {
+        recent_files_grid.show_all ();
     }
 }
