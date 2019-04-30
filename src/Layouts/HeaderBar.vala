@@ -156,8 +156,9 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
 
         recent_files_grid.add (back_button);
         recent_files_grid.add (sub_separator);
-        recent_files_popover.add (recent_files_grid);
+        recent_files_grid.show_all ();
 
+        recent_files_popover.add (recent_files_grid);
         fetch_recent_files ();
 
         var open_recent_button = new Gtk.ModelButton ();
@@ -199,6 +200,7 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
         var popover = new Gtk.PopoverMenu ();
         popover.name = "main-menu";
         popover.add (grid);
+        //  popover.child_set_property (recent_files_popover, "submenu", "files-menu");
 
         return popover;
     }
@@ -216,7 +218,7 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
 
         // Create the shapes submenu
         var shapes_popover = new Gtk.PopoverMenu ();
-        shapes_popover.name = "files-menu";
+        shapes_popover.name = "shapes-menu";
 
         var shapes_grid = new Gtk.Grid ();
         shapes_grid.margin_bottom = 3;
@@ -243,7 +245,10 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
         shapes_grid.add (sub_separator);
         shapes_grid.add (rectangle);
         shapes_grid.add (ellipse);
+        shapes_grid.show_all ();
+
         shapes_popover.add (shapes_grid);
+        shapes_popover.show_all ();
 
         var shapes_button = new Gtk.ModelButton ();
         shapes_button.text = _("Shapes");
@@ -262,23 +267,6 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
 
         var image = new Akira.Partials.PopoverButton (_("Image"), {"I"});
 
-        //  var shapes_item = new Gtk.MenuItem.with_label(_("Shapes"));
-        //  var shapes_submenu = new Gtk.Menu ();
-        //  shapes_item.submenu = shapes_submenu;
-        //  var rect_item = new Gtk.MenuItem.with_label(_("Rect"));
-        //  rect_item.action_name = Akira.Services.ActionManager.ACTION_PREFIX + Akira.Services.ActionManager.ACTION_ADD_RECT;
-        //  shapes_submenu.add (rect_item);
-        //  var ellipse_item = new Gtk.MenuItem.with_label(_("Ellipse"));
-        //  ellipse_item.action_name = Akira.Services.ActionManager.ACTION_PREFIX + Akira.Services.ActionManager.ACTION_ADD_ELLIPSE;
-        //  shapes_submenu.add (ellipse_item);
-        //  tools.add (shapes_item);
-        //  tools.add (new Gtk.SeparatorMenuItem ());
-        //  var text_item = new Gtk.MenuItem.with_label(_("Text"));
-        //  text_item.action_name = Akira.Services.ActionManager.ACTION_PREFIX + Akira.Services.ActionManager.ACTION_ADD_TEXT;
-        //  tools.add (text_item);
-        //  tools.add (new Gtk.MenuItem.with_label(_("Image")));
-        //  tools.show_all ();
-
         grid.add (artboard);
         grid.add (separator);
         grid.add (shapes_button);
@@ -292,6 +280,11 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
         var popover = new Gtk.PopoverMenu ();
         popover.name = "items-menu";
         popover.add (grid);
+        popover.add (shapes_popover);
+
+        var submenu_name = Value (typeof (string));
+        submenu_name.set_string ("shapes-menu");
+        popover.child_set_property (shapes_popover, "submenu", submenu_name);
 
         return popover;
     }
