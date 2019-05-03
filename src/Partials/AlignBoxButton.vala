@@ -27,17 +27,18 @@ public class Akira.Partials.AlignBoxButton : Gtk.Button {
     public string action { get; construct; }
     public Gtk.Image btn_image;
 
-    public AlignBoxButton (Akira.Window main_window, string action_name, string icon_name, string tooltip) {
+    public AlignBoxButton (Akira.Window main_window, string action_name, string icon_name, string tooltip, string[] accels) {
         Object (
             window: main_window,
             icon: icon_name,
             action: action_name,
-            tooltip_text: tooltip
+            tooltip_markup: Granite.markup_accel_tooltip (accels, tooltip)
         );
     }
 
     construct {
         can_focus = false;
+        halign = Gtk.Align.CENTER;
         get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
         sensitive = false;
 
@@ -46,10 +47,9 @@ public class Akira.Partials.AlignBoxButton : Gtk.Button {
     }
 
     private void update_icon_style () {
-        var size = settings.use_symbolic == true ? Gtk.IconSize.SMALL_TOOLBAR :
-                                                   Gtk.IconSize.LARGE_TOOLBAR;
-        var new_icon = settings.use_symbolic == true ? ("%s-symbolic".printf (icon)) :
-                                                       icon.replace ("-symbolic", "");
+        var size = settings.use_symbolic == true ? Gtk.IconSize.SMALL_TOOLBAR : Gtk.IconSize.LARGE_TOOLBAR;
+
+        var new_icon = settings.use_symbolic == true ? ("%s-symbolic".printf (icon)) : icon.replace ("-symbolic", "");
 
         if (btn_image != null) {
             remove (btn_image);
