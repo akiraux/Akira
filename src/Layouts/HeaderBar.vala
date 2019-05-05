@@ -123,6 +123,7 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
         grid.margin_bottom = 3;
         grid.orientation = Gtk.Orientation.VERTICAL;
         grid.width_request = 220;
+        grid.name = "main";
 
         var new_window_button = new Akira.Partials.PopoverButton (
             _("Open New Window"), {"<Ctrl>n"});
@@ -137,19 +138,17 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
         open_button.action_name = Akira.Services.ActionManager.ACTION_PREFIX +
             Akira.Services.ActionManager.ACTION_OPEN;
 
-        // Create the recent files submenu
-        var recent_files_popover = new Gtk.PopoverMenu ();
-        recent_files_popover.name = "files-menu";
-
         recent_files_grid = new Gtk.Grid ();
         recent_files_grid.margin_bottom = 3;
         recent_files_grid.orientation = Gtk.Orientation.VERTICAL;
         recent_files_grid.width_request = 220;
+        recent_files_grid.name = "files-menu";
 
         var back_button = new Gtk.ModelButton ();
         back_button.text = _("Main Menu");
         back_button.inverted = true;
-        back_button.menu_name = "main-menu";
+        back_button.menu_name = "main";
+        back_button.expand = true;
 
         var sub_separator = new Gtk.Separator (Gtk.Orientation.HORIZONTAL);
         sub_separator.margin_top = sub_separator.margin_bottom = 3;
@@ -157,8 +156,6 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
         recent_files_grid.add (back_button);
         recent_files_grid.add (sub_separator);
         recent_files_grid.show_all ();
-
-        recent_files_popover.add (recent_files_grid);
         fetch_recent_files ();
 
         var open_recent_button = new Gtk.ModelButton ();
@@ -198,9 +195,10 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
         grid.show_all ();
 
         var popover = new Gtk.PopoverMenu ();
-        popover.name = "main-menu";
         popover.add (grid);
-        //  popover.child_set_property (recent_files_popover, "submenu", "files-menu");
+        popover.add (recent_files_grid);
+        popover.child_set_property (grid, "submenu", "main");
+        popover.child_set_property (recent_files_grid, "submenu", "files-menu");
 
         return popover;
     }
@@ -210,6 +208,7 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
         grid.margin_bottom = 3;
         grid.orientation = Gtk.Orientation.VERTICAL;
         grid.width_request = 200;
+        grid.name = "main";
 
         var artboard = new Akira.Partials.PopoverButton (_("Artboard"), {"A"});
 
@@ -217,18 +216,16 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
         separator.margin_top = separator.margin_bottom = 3;
 
         // Create the shapes submenu
-        var shapes_popover = new Gtk.PopoverMenu ();
-        shapes_popover.name = "shapes-menu";
-
         var shapes_grid = new Gtk.Grid ();
         shapes_grid.margin_bottom = 3;
         shapes_grid.orientation = Gtk.Orientation.VERTICAL;
         shapes_grid.width_request = 200;
+        shapes_grid.name = "shapes-menu";
 
         var back_button = new Gtk.ModelButton ();
         back_button.text = _("Add Items");
         back_button.inverted = true;
-        back_button.menu_name = "items-menu";
+        back_button.menu_name = "main";
 
         var sub_separator = new Gtk.Separator (Gtk.Orientation.HORIZONTAL);
         sub_separator.margin_top = sub_separator.margin_bottom = 3;
@@ -246,9 +243,6 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
         shapes_grid.add (rectangle);
         shapes_grid.add (ellipse);
         shapes_grid.show_all ();
-
-        shapes_popover.add (shapes_grid);
-        shapes_popover.show_all ();
 
         var shapes_button = new Gtk.ModelButton ();
         shapes_button.text = _("Shapes");
@@ -278,13 +272,10 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
         grid.show_all ();
 
         var popover = new Gtk.PopoverMenu ();
-        popover.name = "items-menu";
         popover.add (grid);
-        popover.add (shapes_popover);
-
-        var submenu_name = Value (typeof (string));
-        submenu_name.set_string ("shapes-menu");
-        popover.child_set_property (shapes_popover, "submenu", submenu_name);
+        popover.add (shapes_grid);
+        popover.child_set_property (grid, "submenu", "main");
+        popover.child_set_property (shapes_grid, "submenu", "shapes-menu");
 
         return popover;
     }
