@@ -20,7 +20,7 @@
  */
 
 public class Akira.Partials.PopoverButton : Gtk.Button {
-    public PopoverButton (string text, string[]? accels = null) {
+    public PopoverButton (string text, string? icon, string[]? accels = null) {
         get_style_context ().add_class (Gtk.STYLE_CLASS_MENUITEM);
 
         var label = new Gtk.Label (text);
@@ -29,6 +29,11 @@ public class Akira.Partials.PopoverButton : Gtk.Button {
         label.margin_start = 6;
 
         var grid = new Gtk.Grid ();
+
+        if (icon != null) {
+            grid.add (new Gtk.Image.from_icon_name (icon, Gtk.IconSize.MENU));
+        }
+
         grid.add (label);
 
         if (accels != null) {

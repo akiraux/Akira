@@ -122,11 +122,11 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
         var grid = new Gtk.Grid ();
         grid.margin_bottom = 3;
         grid.orientation = Gtk.Orientation.VERTICAL;
-        grid.width_request = 220;
+        grid.width_request = 240;
         grid.name = "main";
 
         var new_window_button = new Akira.Partials.PopoverButton (
-            _("Open New Window"), {"<Ctrl>n"});
+            _("New Window"), "window-new-symbolic", {"<Ctrl>n"});
         new_window_button.action_name = Akira.Services.ActionManager.ACTION_PREFIX +
             Akira.Services.ActionManager.ACTION_NEW_WINDOW;
 
@@ -134,7 +134,7 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
         separator.margin_top = separator.margin_bottom = 3;
 
         var open_button = new Akira.Partials.PopoverButton (
-            _("Open"), {"<Ctrl>o"});
+            _("Open"), "document-open-symbolic", {"<Ctrl>o"});
         open_button.action_name = Akira.Services.ActionManager.ACTION_PREFIX +
             Akira.Services.ActionManager.ACTION_OPEN;
 
@@ -166,12 +166,12 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
         separator2.margin_top = separator2.margin_bottom = 3;
 
         var save_button = new Akira.Partials.PopoverButton (
-            _("Save"), {"<Ctrl>s"});
+            _("Save"), "document-save-symbolic", {"<Ctrl>s"});
         save_button.action_name = Akira.Services.ActionManager.ACTION_PREFIX +
             Akira.Services.ActionManager.ACTION_SAVE;
 
         var save_as_button = new Akira.Partials.PopoverButton (
-            _("Save As"), {"<Ctrl><Shift>s"});
+            _("Save As"), "document-save-as-symbolic", {"<Ctrl><Shift>s"});
         save_as_button.action_name = Akira.Services.ActionManager.ACTION_PREFIX +
             Akira.Services.ActionManager.ACTION_SAVE_AS;
 
@@ -179,7 +179,7 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
         separator3.margin_top = separator3.margin_bottom = 3;
 
         var quit_button = new Akira.Partials.PopoverButton (
-            _("Quit"), {"<Ctrl>q"});
+            _("Quit"), "system-shutdown-symbolic", {"<Ctrl>q"});
         quit_button.action_name = Akira.Services.ActionManager.ACTION_PREFIX +
             Akira.Services.ActionManager.ACTION_QUIT;
 
@@ -210,7 +210,7 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
         grid.width_request = 200;
         grid.name = "main";
 
-        var artboard = new Akira.Partials.PopoverButton (_("Artboard"), {"A"});
+        var artboard = new Akira.Partials.PopoverButton (_("Artboard"), "window-new-symbolic", {"A"});
 
         var separator = new Gtk.Separator (Gtk.Orientation.HORIZONTAL);
         separator.margin_top = separator.margin_bottom = 3;
@@ -230,11 +230,11 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
         var sub_separator = new Gtk.Separator (Gtk.Orientation.HORIZONTAL);
         sub_separator.margin_top = sub_separator.margin_bottom = 3;
 
-        var rectangle = new Akira.Partials.PopoverButton (_("Rectangle"), {"R"});
+        var rectangle = new Akira.Partials.PopoverButton (_("Rectangle"), "shape-rectangle-symbolic", {"R"});
         rectangle.action_name = Akira.Services.ActionManager.ACTION_PREFIX +
             Akira.Services.ActionManager.ACTION_ADD_RECT;
 
-        var ellipse = new Akira.Partials.PopoverButton (_("Ellipse"), {"E"});
+        var ellipse = new Akira.Partials.PopoverButton (_("Ellipse"), "shape-circle-symbolic", {"E"});
         ellipse.action_name = Akira.Services.ActionManager.ACTION_PREFIX +
             Akira.Services.ActionManager.ACTION_ADD_ELLIPSE;
 
@@ -251,15 +251,15 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
         var separator2 = new Gtk.Separator (Gtk.Orientation.HORIZONTAL);
         separator2.margin_top = separator2.margin_bottom = 3;
 
-        var vector = new Akira.Partials.PopoverButton (_("Vector"), {"V"});
+        var vector = new Akira.Partials.PopoverButton (_("Vector"), "segment-curve", {"V"});
 
-        var pencil = new Akira.Partials.PopoverButton (_("Pencil"), {"P"});
+        var pencil = new Akira.Partials.PopoverButton (_("Pencil"), "edit-symbolic", {"P"});
 
-        var text = new Akira.Partials.PopoverButton (_("Text"), {"T"});
+        var text = new Akira.Partials.PopoverButton (_("Text"), "shape-text-symbolic", {"T"});
         text.action_name = Akira.Services.ActionManager.ACTION_PREFIX +
             Akira.Services.ActionManager.ACTION_ADD_TEXT;
 
-        var image = new Akira.Partials.PopoverButton (_("Image"), {"I"});
+        var image = new Akira.Partials.PopoverButton (_("Image"), "image-x-generic-symbolic", {"I"});
 
         grid.add (artboard);
         grid.add (separator);
