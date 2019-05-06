@@ -20,22 +20,27 @@
 */
 
 
-public class Akira.Partials.IconButton: Gtk.Grid {
+public class Akira.Partials.ButtonImage: Gtk.Image {
 
-    private Gtk.Label label_btn;
-    public Gtk.Image image;
+    private string icon;
 
-    public IconButton (string icon_name, string name, string[]? accels = null) {
+    public ButtonImage (string icon_name) {
+        icon = icon_name;
+        margin = 0;
 
+        settings.changed["use-symbolic"].connect(() => {
+            update_image();
+        });
+
+        update_image ();
     }
 
-    public
 
-    private Gtk.Image create_button_image (string icon_name) {
+    private void update_image () {
         var size = settings.use_symbolic ? Gtk.IconSize.SMALL_TOOLBAR : Gtk.IconSize.LARGE_TOOLBAR;
-        var icon = settings.use_symbolic ? ("%s-symbolic".printf (icon_name)) : icon_name.replace ("-symbolic", "");
-        image = new Gtk.Image.from_icon_name (icon_name, size);
-        image.margin = 0;
-        return image;
+        var icon = settings.use_symbolic ? ("%s-symbolic".printf (icon)) : icon.replace ("-symbolic", "");
+        set_from_icon_name(icon, size);
     }
+
+
 }
