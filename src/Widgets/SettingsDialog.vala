@@ -20,7 +20,6 @@
 */
 
 public class Akira.Widgets.SettingsDialog : Gtk.Dialog {
-    public weak Akira.Window window { get; construct; }
 
     private Gtk.Stack main_stack;
     private Gtk.Switch dark_theme_switch;
@@ -31,14 +30,13 @@ public class Akira.Widgets.SettingsDialog : Gtk.Dialog {
         ICONTYPE
     }
 
-    public SettingsDialog (Akira.Window parent) {
+    public SettingsDialog () {
         Object (
             border_width: 5,
             deletable: false,
             resizable: false,
-            title: _("Preferences"),
-            transient_for: parent,
-            window: parent
+            modal: true,
+            title: _("Preferences")
         );
     }
 

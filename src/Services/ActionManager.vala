@@ -203,16 +203,11 @@ public class Akira.Services.ActionManager : Object {
     }
 
     private void action_preferences () {
-        if (window.settings_dialog == null) {
-            window.settings_dialog = new Akira.Widgets.SettingsDialog (window);
-            window.settings_dialog.show_all ();
-
-            window.settings_dialog.destroy.connect (() => {
-                window.settings_dialog = null;
-            });
-        }
-
-        window.settings_dialog.present ();
+        settings_dialog = new Akira.Widgets.SettingsDialog();
+        settings_dialog.parent = window;
+        settings_dialog.transient_for = window;
+        settings_dialog.show_all ();
+        settings_dialog.present ();
     }
 
     private void action_export () {

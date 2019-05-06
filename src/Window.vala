@@ -28,7 +28,6 @@ public class Akira.Window : Gtk.ApplicationWindow {
     public Akira.Services.EventBus event_bus;
     public Akira.Layouts.HeaderBar headerbar;
     public Akira.Layouts.MainWindow main_window;
-    public Akira.Widgets.SettingsDialog? settings_dialog = null;
     public Akira.Utils.Dialogs dialogs;
 
     public SimpleActionGroup actions { get; construct; }
