@@ -53,6 +53,7 @@ executable(
     'Partials/HeaderBarButton.vala',
     'Partials/MenuButton.vala',
     'Partials/ZoomButton.vala',
+    'Partials/IconButton.vala',
     'Partials/AlignBoxButton.vala',
     'Partials/LinkedInput.vala',
     'Partials/PanelSeparator.vala',

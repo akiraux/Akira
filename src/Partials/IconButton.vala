@@ -16,15 +16,26 @@
 * You should have received a copy of the GNU General Public License
 * along with Akira.  If not, see <https://www.gnu.org/licenses/>.
 *
-* Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
+* Authored by: Bilal Elmoussaoui <bilal.elmoussaoui@gnome.org>
 */
 
-public class Akira.Partials.HeaderBarButton : Akira.Partials.IconButton {
 
-    public Gtk.Button button;
+public class Akira.Partials.IconButton: Gtk.Grid {
 
-    public HeaderBarButton (string icon_name, string name, string[]? accels = null) {
-        button = new Gtk.Button ();
-        base (icon_name, name, accels);
+    private Gtk.Label label_btn;
+    public Gtk.Image image;
+
+    public IconButton (string icon_name, string name, string[]? accels = null) {
+
+    }
+
+    public
+
+    private Gtk.Image create_button_image (string icon_name) {
+        var size = settings.use_symbolic ? Gtk.IconSize.SMALL_TOOLBAR : Gtk.IconSize.LARGE_TOOLBAR;
+        var icon = settings.use_symbolic ? ("%s-symbolic".printf (icon_name)) : icon_name.replace ("-symbolic", "");
+        image = new Gtk.Image.from_icon_name (icon_name, size);
+        image.margin = 0;
+        return image;
     }
 }
