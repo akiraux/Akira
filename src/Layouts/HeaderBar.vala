@@ -120,6 +120,7 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
 
     private Gtk.PopoverMenu build_main_menu_popover () {
         var grid = new Gtk.Grid ();
+        grid.margin_top = 6;
         grid.margin_bottom = 3;
         grid.orientation = Gtk.Orientation.VERTICAL;
         grid.width_request = 240;
@@ -139,6 +140,7 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
             Akira.Services.ActionManager.ACTION_OPEN;
 
         recent_files_grid = new Gtk.Grid ();
+        recent_files_grid.margin_top = 6;
         recent_files_grid.margin_bottom = 3;
         recent_files_grid.orientation = Gtk.Orientation.VERTICAL;
         recent_files_grid.width_request = 220;
@@ -205,6 +207,7 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
 
     private Gtk.PopoverMenu build_items_popover () {
         var grid = new Gtk.Grid ();
+        grid.margin_top = 6;
         grid.margin_bottom = 3;
         grid.orientation = Gtk.Orientation.VERTICAL;
         grid.width_request = 200;
@@ -217,6 +220,7 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
 
         // Create the shapes submenu
         var shapes_grid = new Gtk.Grid ();
+        shapes_grid.margin_top = 6;
         shapes_grid.margin_bottom = 3;
         shapes_grid.orientation = Gtk.Orientation.VERTICAL;
         shapes_grid.width_request = 200;
