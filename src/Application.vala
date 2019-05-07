@@ -20,41 +20,41 @@
 */
 
 namespace Akira {
-	public Akira.Services.Settings settings;
+    public Akira.Services.Settings settings;
 }
 
 public class Akira.Application : Gtk.Application {
-	private Gee.HashMap<string, Akira.Window> opened_files;
-	public GLib.List <Window> windows;
+    private Gee.HashMap<string, Akira.Window> opened_files;
+    public GLib.List <Window> windows;
 
-	construct {
-		flags |= ApplicationFlags.HANDLES_OPEN;
+    construct {
+        flags |= ApplicationFlags.HANDLES_OPEN;
 
-		settings = new Akira.Services.Settings ();
-		windows = new GLib.List <Window> ();
-		opened_files = new Gee.HashMap<string, Akira.Window>();
+        settings = new Akira.Services.Settings ();
+        windows = new GLib.List <Window> ();
+        opened_files = new Gee.HashMap<string, Akira.Window>();
 
-		application_id = Constants.APP_ID;
-	}
+        application_id = Constants.APP_ID;
+    }
 
-	public override void open (File[] files, string hint) {
-		foreach (var file in files) {
-			if (is_file_opened (file)) {
-				// Preset active window with file
-				var window = get_window_from_file (file);
-				window.show_app ();
-			} else {
-				// Open New window
-				var window = new Akira.Window (this);
-				this.add_window (window);
+    public override void open (File[] files, string hint) {
+        foreach (var file in files) {
+            if (is_file_opened (file)) {
+                // Preset active window with file
+                var window = get_window_from_file (file);
+                window.show_app ();
+            } else {
+                // Open New window
+                var window = new Akira.Window (this);
+                this.add_window (window);
 
-				window.open_file (file);
-				window.show_app ();
-			}
-		}
-	}
+                window.open_file (file);
+                window.show_app ();
+            }
+        }
+    }
 
-	public void register_file_to_window (File file, Akira.Window window) {
+    public void register_file_to_window (File file, Akira.Window window) {
         if (!is_file_opened (file)) {
             opened_files.set (file.get_uri (), window);
         } else {
@@ -62,36 +62,36 @@ public class Akira.Application : Gtk.Application {
         }
     }
 
-	public Akira.Window get_window_from_file (File file) {
+    public Akira.Window get_window_from_file (File file) {
         return opened_files.get (file.get_uri ());
     }
 
-	public bool is_file_opened (File file) {
+    public bool is_file_opened (File file) {
         return opened_files.has_key (file.get_uri ());
     }
 
-	public void new_window () {
-		new Akira.Window (this).present ();
-	}
+    public void new_window () {
+        new Akira.Window (this).present ();
+    }
 
-	public override void window_added (Gtk.Window window) {
-		windows.append (window as Window);
-		base.window_added (window);
-	}
+    public override void window_added (Gtk.Window window) {
+        windows.append (window as Window);
+        base.window_added (window);
+    }
 
-	public override void window_removed (Gtk.Window window) {
-		windows.remove (window as Window);
-		base.window_removed (window);
-	}
+    public override void window_removed (Gtk.Window window) {
+        windows.remove (window as Window);
+        base.window_removed (window);
+    }
 
-	protected override void activate () {
-		Gtk.Settings.get_default ().set_property ("gtk-icon-theme-name", "elementary");
-		Gtk.Settings.get_default ().set_property ("gtk-theme-name", "elementary");
+    protected override void activate () {
+        Gtk.Settings.get_default ().set_property ("gtk-icon-theme-name", "elementary");
+        Gtk.Settings.get_default ().set_property ("gtk-theme-name", "elementary");
 
-		weak Gtk.IconTheme default_theme = Gtk.IconTheme.get_default ();
-		default_theme.add_resource_path ("/com/github/akiraux/akira");
+        weak Gtk.IconTheme default_theme = Gtk.IconTheme.get_default ();
+        default_theme.add_resource_path ("/com/github/akiraux/akira");
 
-		var window = new Akira.Window (this);
-		this.add_window (window);
-	}
+        var window = new Akira.Window (this);
+        this.add_window (window);
+    }
 }
