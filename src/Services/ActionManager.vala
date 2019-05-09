@@ -135,7 +135,6 @@ public class Akira.Services.ActionManager : Object {
 
     private void action_preferences () {
         var settings_dialog = new Akira.Widgets.SettingsDialog();
-        settings_dialog.parent = window;
         settings_dialog.transient_for = window;
         settings_dialog.show_all ();
         settings_dialog.present ();
