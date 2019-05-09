@@ -46,10 +46,12 @@ public class Akira.Layouts.LeftSideBar : Gtk.Grid {
         var align_items_panel = new Akira.Layouts.Partials.AlignItemsPanel (window);
         var fill_box_panel = new Akira.Layouts.Partials.FillsBoxPanel (window);
         var transorm_panel = new Akira.Layouts.Partials.TransformPanel ();
+        var style_panel = new Akira.Layouts.Partials.StylePanel();
 
         attach (align_items_panel, 0, 0, 1, 1);
         attach (transorm_panel, 0, 1, 1, 1);
         attach (fill_box_panel, 0, 2, 1, 1);
+        attach (style_panel, 0, 3, 1, 1);
 
         show_all ();
     }

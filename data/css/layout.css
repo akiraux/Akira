@@ -73,6 +73,10 @@
     border-bottom-right-radius: 2pt;
 }
 
+.style-panel .panel-title {
+    background-color: @base_color;
+}
+
 .opacity-slider {
   padding: 3pt 6pt;
 }
