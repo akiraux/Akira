@@ -43,6 +43,7 @@ public class Akira.Partials.AlignBoxButton : Gtk.Button {
         sensitive = false;
 
         btn_image = new ButtonImage (icon);
+        add (btn_image);
         connect_signals ();
     }
 
