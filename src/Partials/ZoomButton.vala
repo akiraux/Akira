@@ -22,15 +22,6 @@
 public class Akira.Partials.ZoomButton : Gtk.Grid {
     public weak Akira.Window window { get; construct; }
 
-    public bool labeled {
-        get {
-            return label_btn.visible;
-        } set {
-            label_btn.visible = value;
-            label_btn.no_show_all = !value;
-        }
-    }
-
     private Gtk.Label label_btn;
     public Gtk.Button zoom_out_button;
     public Gtk.Button zoom_default_button;
@@ -78,19 +69,12 @@ public class Akira.Partials.ZoomButton : Gtk.Grid {
         label_btn.get_style_context ().add_class ("headerbar-label");
         label_btn.margin_top = 4;
 
+        settings.changed["show-label"].connect( () => {
+            label_btn.visible = settings.show_label;
+            label_btn.no_show_all = !settings.show_label;
+        });
+
         attach (label_btn, 0, 1, 3, 1);
-    }
-
-    public void toggle () {
-        labeled = !labeled;
-    }
-
-    public void show_labels () {
-        labeled = true;
-    }
-
-    public void hide_labels () {
-        labeled = false;
     }
 
     public void zoom_out () {

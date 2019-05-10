@@ -28,7 +28,6 @@ public class Akira.Window : Gtk.ApplicationWindow {
     public Akira.Services.EventBus event_bus;
     public Akira.Layouts.HeaderBar headerbar;
     public Akira.Layouts.MainWindow main_window;
-    public Akira.Widgets.SettingsDialog? settings_dialog = null;
     public Akira.Utils.Dialogs dialogs;
 
     public SimpleActionGroup actions { get; construct; }
@@ -87,10 +86,6 @@ public class Akira.Window : Gtk.ApplicationWindow {
         Gtk.StyleContext.add_provider_for_screen (
             Gdk.Screen.get_default (), css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
         );
-
-        if (!settings.show_label) {
-            Akira.Services.ActionManager.action_from_group (Akira.Services.ActionManager.ACTION_LABELS, get_action_group ("win"));
-        }
     }
 
     public bool before_destroy () {

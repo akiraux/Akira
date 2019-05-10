@@ -35,7 +35,6 @@ public class Akira.Services.ActionManager : Object {
     public const string ACTION_PRESENTATION = "action_presentation";
     public const string ACTION_PREFERENCES = "action_preferences";
     public const string ACTION_EXPORT = "action_export";
-    public const string ACTION_LABELS = "action_labels";
     public const string ACTION_QUIT = "action_quit";
     public const string ACTION_ZOOM_IN = "action_zoom_in";
     public const string ACTION_ZOOM_OUT = "action_zoom_out";
@@ -56,7 +55,6 @@ public class Akira.Services.ActionManager : Object {
         { ACTION_PRESENTATION, action_presentation },
         { ACTION_PREFERENCES, action_preferences },
         { ACTION_EXPORT, action_export },
-        { ACTION_LABELS, action_labels },
         { ACTION_QUIT, action_quit },
         { ACTION_ZOOM_IN, action_zoom_in },
         { ACTION_ZOOM_OUT, action_zoom_out },
@@ -99,74 +97,6 @@ public class Akira.Services.ActionManager : Object {
         }
     }
 
-    private void action_labels () {
-        window.headerbar.toggle ();
-        window.headerbar.menu.toggle ();
-        window.headerbar.items.toggle ();
-        window.headerbar.zoom.toggle ();
-        window.headerbar.preferences.toggle ();
-        window.headerbar.export.toggle ();
-        window.headerbar.group.toggle ();
-        window.headerbar.ungroup.toggle ();
-        window.headerbar.move_up.toggle ();
-        window.headerbar.move_down.toggle ();
-        window.headerbar.move_top.toggle ();
-        window.headerbar.move_bottom.toggle ();
-        window.headerbar.path_difference.toggle ();
-        window.headerbar.path_exclusion.toggle ();
-        window.headerbar.path_intersect.toggle ();
-        window.headerbar.path_union.toggle ();
-        window.headerbar.toggle ();
-    }
-
-    public void show_labels () {
-        window.headerbar.toggle ();
-        window.headerbar.menu.show_labels ();
-        window.headerbar.items.show_labels ();
-        window.headerbar.zoom.show_labels ();
-        window.headerbar.preferences.show_labels ();
-        window.headerbar.export.show_labels ();
-        window.headerbar.group.show_labels ();
-        window.headerbar.ungroup.show_labels ();
-        window.headerbar.move_up.show_labels ();
-        window.headerbar.move_down.show_labels ();
-        window.headerbar.move_top.show_labels ();
-        window.headerbar.move_bottom.show_labels ();
-        window.headerbar.path_difference.show_labels ();
-        window.headerbar.path_exclusion.show_labels ();
-        window.headerbar.path_intersect.show_labels ();
-        window.headerbar.path_union.show_labels ();
-        window.headerbar.toggle ();
-    }
-
-    public void hide_labels () {
-        window.headerbar.toggle ();
-        window.headerbar.menu.hide_labels ();
-        window.headerbar.items.hide_labels ();
-        window.headerbar.zoom.hide_labels ();
-        window.headerbar.preferences.hide_labels ();
-        window.headerbar.export.hide_labels ();
-        window.headerbar.group.hide_labels ();
-        window.headerbar.ungroup.hide_labels ();
-        window.headerbar.move_up.hide_labels ();
-        window.headerbar.move_down.hide_labels ();
-        window.headerbar.move_top.hide_labels ();
-        window.headerbar.move_bottom.hide_labels ();
-        window.headerbar.path_difference.hide_labels ();
-        window.headerbar.path_exclusion.hide_labels ();
-        window.headerbar.path_intersect.hide_labels ();
-        window.headerbar.path_union.hide_labels ();
-        window.headerbar.toggle ();
-    }
-
-    public void update_icons_style () {
-        window.headerbar.toggle ();
-        window.headerbar.update_icons_style ();
-        window.headerbar.toggle ();
-
-        window.event_bus.emit ("update-icons-style");
-    }
-
     private void action_quit () {
         window.before_destroy ();
     }
@@ -203,16 +133,10 @@ public class Akira.Services.ActionManager : Object {
     }
 
     private void action_preferences () {
-        if (window.settings_dialog == null) {
-            window.settings_dialog = new Akira.Widgets.SettingsDialog (window);
-            window.settings_dialog.show_all ();
-
-            window.settings_dialog.destroy.connect (() => {
-                window.settings_dialog = null;
-            });
-        }
-
-        window.settings_dialog.present ();
+        var settings_dialog = new Akira.Widgets.SettingsDialog();
+        settings_dialog.transient_for = window;
+        settings_dialog.show_all ();
+        settings_dialog.present ();
     }
 
     private void action_export () {
