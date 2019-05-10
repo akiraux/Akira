@@ -172,23 +172,6 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
         // dinamically toggle button sensitivity based on document status or actor selected.
     }
 
-    public void update_icons_style () {
-        menu.update_image ();
-        toolset.update_image ();
-        export.update_image ();
-        preferences.update_image ();
-        group.update_image ();
-        ungroup.update_image ();
-        move_up.update_image ();
-        move_down.update_image ();
-        move_top.update_image ();
-        move_bottom.update_image ();
-        path_difference.update_image ();
-        path_exclusion.update_image ();
-        path_intersect.update_image ();
-        path_union.update_image ();
-    }
-
     public void toggle () {
         toggled = !toggled;
     }
