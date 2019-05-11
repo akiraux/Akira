@@ -29,12 +29,6 @@ public class Akira.Partials.MenuButton : Gtk.Grid {
         label_btn = new Gtk.Label (name);
         label_btn.get_style_context ().add_class ("headerbar-label");
 
-        settings.changed["show-label"].connect( () => {
-            label_btn.visible = settings.show_label;
-            label_btn.no_show_all = !settings.show_label;
-        });
-
-
         button = new Gtk.MenuButton();
         button.can_focus = false;
         button.halign = Gtk.Align.CENTER;
@@ -48,5 +42,15 @@ public class Akira.Partials.MenuButton : Gtk.Grid {
         attach (label_btn, 0, 1, 1, 1);
 
         valign = Gtk.Align.CENTER;
+        udpate_label ();
+
+        settings.changed["show-label"].connect( () => {
+            udpate_label ();
+        });
+    }
+
+    private void udpate_label () {
+        label_btn.visible = settings.show_label;
+        label_btn.no_show_all = !settings.show_label;
     }
 }

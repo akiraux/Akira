@@ -69,12 +69,17 @@ public class Akira.Partials.ZoomButton : Gtk.Grid {
         label_btn.get_style_context ().add_class ("headerbar-label");
         label_btn.margin_top = 4;
 
-        settings.changed["show-label"].connect( () => {
-            label_btn.visible = settings.show_label;
-            label_btn.no_show_all = !settings.show_label;
-        });
-
         attach (label_btn, 0, 1, 3, 1);
+        udpate_label ();
+
+        settings.changed["show-label"].connect( () => {
+            udpate_label ();
+        });
+    }
+
+    private void udpate_label () {
+        label_btn.visible = settings.show_label;
+        label_btn.no_show_all = !settings.show_label;
     }
 
     public void zoom_out () {
