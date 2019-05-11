@@ -42,7 +42,7 @@
 .fill-chooser-cont button {
     padding: 0;
     margin-left: 6px;
-    border-radius: 100%;
+    border-radius: 50%;
 }
 
 .fill-chooser {
@@ -71,19 +71,13 @@
   padding: 3px 6px;
 }
 
-.padding {
+.color-picker {
   padding: 8px 5px;
 }
 
 .popover-toggler {
     padding: 3px;
     margin: 3px;
-}
-
-.flat-btn {
-    background: none;
-    margin: 0;
-    padding: 0;
 }
 
 .popover-list row {

@@ -139,7 +139,6 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
 
     selected_blending_mode_cont = new Gtk.Button ();
     selected_blending_mode_cont.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
-    selected_blending_mode_cont.get_style_context ().add_class ("flat-btn");
     selected_blending_mode_cont.can_focus = false;
     selected_blending_mode_cont.hexpand = true;
     selected_blending_mode_cont.add (selected_blending_mode);
@@ -196,7 +195,7 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
     color_chooser_widget.show_editor = true;
 
     color_picker = new Gtk.Grid ();
-    color_picker.get_style_context ().add_class ("padding");
+    color_picker.get_style_context ().add_class ("color-picker");
     color_picker.attach (color_chooser_widget, 0, 0, 1, 1);
 
     var popover_item_index = 0;
