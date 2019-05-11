@@ -41,11 +41,10 @@ public class Akira.Layouts.LeftSideBar : Gtk.Grid {
 
     construct {
         get_style_context ().add_class ("sidebar-l");
-        width_request = 220;
 
         var align_items_panel = new Akira.Layouts.Partials.AlignItemsPanel (window);
-        var fill_box_panel = new Akira.Layouts.Partials.FillsBoxPanel (window);
         var transorm_panel = new Akira.Layouts.Partials.TransformPanel ();
+        var fill_box_panel = new Akira.Layouts.Partials.FillsBoxPanel (window);
 
         attach (align_items_panel, 0, 0, 1, 1);
         attach (transorm_panel, 0, 1, 1, 1);

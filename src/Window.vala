@@ -60,6 +60,11 @@ public class Akira.Window : Gtk.ApplicationWindow {
         move (settings.pos_x, settings.pos_y);
         resize (settings.window_width, settings.window_height);
 
+        int width, height;
+        get_size (out width, out height);
+        debug (height.to_string ());
+        debug (settings.left_paned.to_string ());
+
         show_app ();
     }
 
@@ -123,6 +128,9 @@ public class Akira.Window : Gtk.ApplicationWindow {
 
         get_size (out width, out height);
         get_position (out x, out y);
+
+        debug (height.to_string ());
+        debug (main_window.left_sidebar.get_allocated_width ().to_string ());
 
         settings.pos_x = x;
         settings.pos_y = y;

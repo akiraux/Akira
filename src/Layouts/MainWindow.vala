@@ -44,17 +44,17 @@ public class Akira.Layouts.MainWindow : Gtk.Grid {
         grid = new Gtk.Grid ();
         pane = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);
         pane2 = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);
-        pane.position = settings.left_paned;
-        pane2.position = settings.right_paned;
         grid.attach (pane2, 0, 0, 1, 1);
-
+        
         pane.pack1 (left_sidebar, false, false);
         pane.pack2 (grid, true, false);
-
+        
         pane2.pack1 (main_canvas, true, false);
         pane2.pack2 (right_sidebar, false, false);
-
+        pane2.position = settings.right_paned;
+        
         attach (pane, 0, 0, 1, 1);
         attach (statusbar, 0, 1, 1, 1);
+        pane.position = settings.left_paned;
     }
 }

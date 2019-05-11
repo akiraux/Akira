@@ -138,7 +138,7 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
     selected_blending_mode.halign = Gtk.Align.START;
 
     selected_blending_mode_cont = new Gtk.Button ();
-    selected_blending_mode_cont.get_style_context ().add_class ("flat");
+    selected_blending_mode_cont.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
     selected_blending_mode_cont.get_style_context ().add_class ("flat-btn");
     selected_blending_mode_cont.can_focus = false;
     selected_blending_mode_cont.hexpand = true;
