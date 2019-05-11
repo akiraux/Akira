@@ -1,9 +1,3 @@
-.statusbar {
-    background-color: shade (@bg_color, 0.9);
-    color: shade (@fg_color, 0.7);
-    border-top: 1px solid shade (@bg_color, 0.8);
-}
-
 .sidebar-l {
     background-color: shade (@bg_color, 0.95);
     border-right: 1px solid shade (@bg_color, 0.9);
