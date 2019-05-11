@@ -97,7 +97,6 @@ public class Akira.Services.ActionManager : Object {
         }
     }
 
-
     private void action_quit () {
         window.before_destroy ();
     }

@@ -19,7 +19,6 @@
 * Authored by: Bilal Elmoussaoui <bilal.elmoussaoui@gnome.org>
 */
 
-
 public class Akira.Partials.ButtonImage: Gtk.Image {
 
     private string icon;
@@ -35,12 +34,9 @@ public class Akira.Partials.ButtonImage: Gtk.Image {
         update_image ();
     }
 
-
     private void update_image () {
         var size = settings.use_symbolic ? Gtk.IconSize.SMALL_TOOLBAR : Gtk.IconSize.LARGE_TOOLBAR;
         var icon = settings.use_symbolic ? ("%s-symbolic".printf (icon)) : icon.replace ("-symbolic", "");
         set_from_icon_name(icon, size);
     }
-
-
 }

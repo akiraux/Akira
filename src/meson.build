@@ -57,6 +57,7 @@ executable(
     'Partials/AlignBoxButton.vala',
     'Partials/LinkedInput.vala',
     'Partials/PanelSeparator.vala',
+    'Partials/PopoverButton.vala',
 
     'Models/FillsItemModel.vala',
     'Models/FillsListModel.vala',
