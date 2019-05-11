@@ -87,6 +87,8 @@ public class Akira.Window : Gtk.ApplicationWindow {
         );
 
         resize (settings.window_width, settings.window_height);
+        main_window.pane.position = settings.left_paned;
+        main_window.pane2.position = settings.right_paned;
     }
 
     public bool before_destroy () {
@@ -129,14 +131,13 @@ public class Akira.Window : Gtk.ApplicationWindow {
         settings.pos_y = y;
         settings.window_width = width;
         settings.window_height = height;
-        settings.right_paned = main_window.main_canvas.get_allocated_width ();
-        settings.left_paned = main_window.left_sidebar.get_allocated_width ();
+        settings.left_paned = main_window.pane.get_position ();
+        settings.right_paned = main_window.pane2.get_position ();
     }
 
     public void show_app () {
-        show_all ();
         apply_user_settings ();
-
+        show_all ();
         show ();
         present ();
     }
