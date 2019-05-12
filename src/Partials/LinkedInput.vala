@@ -42,8 +42,20 @@ public class Akira.Partials.LinkedInput : Gtk.Grid {
     * (for instance width and height when their ratio is locked).
     */
     private bool manually_edited = true;
+    /**
+    * Used to avoid to infinitely updating when value is set externally.
+    */
+    private bool externally_set = true;
     private bool dragging = false;
     private double dragging_direction = 0;
+    public bool enabled {
+        get {
+            return input_field.entry.sensitive;
+        }
+        set {
+            input_field.entry.sensitive = value;
+        }
+    }
 
     public LinkedInput (string label, string tooltip = "", string unit = "",
                         bool reversed = false, double default_val = 0, double limit = 0.0) {
@@ -101,27 +113,33 @@ public class Akira.Partials.LinkedInput : Gtk.Grid {
                 // If limit is specified, force it as a value.
                 var new_val = double.parse (input_field.entry.text);
                 if (limit > 0.0 && new_val > limit) {
-                    input_field.entry.text = limit.to_string ();
+                    new_val = limit;
                 }
+                input_field.entry.text = new_val.to_string ();
+                externally_set = false;
 
                 if (new_val != value) {
                     value = new_val;
                 }
+                externally_set = true;
+
             }
         });
         notify["value"].connect (() => {
-            // Remove trailing 0.
-            var format_value = "%f".printf (value).replace (",", ".");
-            while (format_value.has_suffix ("0") && format_value != "0") {
-                format_value = format_value.slice (0, -1);
-            }
-            if (format_value.has_suffix (".")) {
-                format_value += "0";
-            }
+            if (externally_set) {
+              // Remove trailing 0.
+              var format_value = "%f".printf (value).replace (",", ".");
+              while (format_value.has_suffix ("0") && format_value != "0") {
+                  format_value = format_value.slice (0, -1);
+              }
+              if (format_value.has_suffix (".")) {
+                  format_value += "0";
+              }
 
-            manually_edited = false;
-            input_field.entry.text = "%s".printf (format_value);
-            manually_edited = true;
+              manually_edited = false;
+              input_field.entry.text = "%s".printf (format_value);
+              manually_edited = true;
+            }
         });
 
         event_box.add (entry_label);

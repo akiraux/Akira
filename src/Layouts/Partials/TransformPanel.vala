@@ -22,7 +22,84 @@
 public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
     // Should probably be associated with the currently selected object
     // once the canvas is working
+    public weak Akira.Window window { get; construct; }
     public bool size_lock { get; set; default = false; }
+    private Akira.Partials.LinkedInput x;
+    private Akira.Partials.LinkedInput y;
+    private Akira.Partials.LinkedInput width;
+    private Akira.Partials.LinkedInput height;
+    private Akira.Partials.LinkedInput rotation;
+    private Gtk.Button hflip_button;
+    private Gtk.Button vflip_button;
+    private Akira.Partials.InputField opacity_entry;
+    private Gtk.Scale scale;
+
+    public TransformPanel (Akira.Window main_window) {
+        Object (
+            window: main_window,
+            orientation: Gtk.Orientation.HORIZONTAL
+        );
+    }
+
+
+    private Goo.CanvasItem _item;
+
+    public Goo.CanvasItem item {
+        get {
+            return _item;
+        } set {
+            if (_item != null) {
+                _item.notify.disconnect(item_changed);
+            }
+            _item = value;
+            bool has_item = _item != null;
+            x.enabled = has_item;
+            y.enabled = has_item;
+            height.enabled = has_item;
+            width.enabled = has_item;
+            rotation.enabled = has_item;
+            hflip_button.sensitive = has_item;
+            vflip_button.sensitive = has_item;
+            opacity_entry.entry.sensitive = has_item;
+            scale.sensitive = has_item;
+
+            _item.notify.connect(item_changed);
+            update_fields ();
+        }
+    }
+
+    private void item_changed (Object object, ParamSpec spec) {
+        debug ("item changed, param: %s", spec.name);
+        update_fields ();
+    }
+
+    private void update_fields () {
+        double item_x, item_y, item_width, item_height/*, alpha*/;
+        item.get ("x", out item_x, "y", out item_y, "width", out item_width, "height", out item_height/*, "alpha", out alpha*/);
+        double? item_rotation = item.get_data<double?>("rotation");
+        window.main_window.main_canvas.canvas.convert_from_item_space (item, ref item_x, ref item_y);
+
+        x.notify["value"].disconnect (x_notify_value);
+        y.notify["value"].disconnect (y_notify_value);
+        width.notify["value"].disconnect (width_notify_value);
+        height.notify["value"].disconnect (height_notify_value);
+        rotation.notify["value"].disconnect (rotation_notify_value);
+
+        x.value = item_x;
+        y.value = item_y;
+        width.value = item_width;
+        height.value = item_height;
+        if (item_rotation != null)
+            rotation.value = item_rotation;
+
+        x.notify["value"].connect (x_notify_value);
+        y.notify["value"].connect (y_notify_value);
+        width.notify["value"].connect (width_notify_value);
+        height.notify["value"].connect (height_notify_value);
+        rotation.notify["value"].connect (rotation_notify_value);
+
+        window.main_window.main_canvas.canvas.update_decorations (item);
+    }
 
     double size_ratio = 1.0;
 
@@ -32,25 +109,15 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         column_spacing = 6;
         hexpand = true;
 
-        var pos_x = new Akira.Partials.LinkedInput (_("X"), _("Horizontal position"));
-        var pos_y = new Akira.Partials.LinkedInput (_("Y"), _("Vertical position"));
+        x = new Akira.Partials.LinkedInput (_("X"), _("Horizontal position"));
+        x.notify["value"].connect (x_notify_value);
 
-        var width = new Akira.Partials.LinkedInput (_("W"), _("Width"));
-        var height = new Akira.Partials.LinkedInput (_("H"), _("Height"));
-        width.notify["value"].connect (() => {
-            if (size_lock) {
-                height.value = width.value / size_ratio;
-            } else {
-                size_ratio = width.value / height.value;
-            }
-        });
-        height.notify["value"].connect (() => {
-            if (size_lock) {
-                width.value = height.value * size_ratio;
-            } else {
-                size_ratio = width.value / height.value;
-            }
-        });
+        y = new Akira.Partials.LinkedInput (_("Y"), _("Vertical position"));
+        y.notify["value"].connect (y_notify_value);
+        width = new Akira.Partials.LinkedInput (_("W"), _("Width"));
+        height = new Akira.Partials.LinkedInput (_("H"), _("Height"));
+        width.notify["value"].connect (width_notify_value);
+        height.notify["value"].connect (height_notify_value);
 
         var lock_changes = new Gtk.Button.from_icon_name ("changes-allow-symbolic");
         lock_changes.can_focus = false;
@@ -70,9 +137,10 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
             size_lock = !size_lock;
         });
 
-        var rotation = new Akira.Partials.LinkedInput (_("R"), _("Rotation degrees"), "°");
+        rotation = new Akira.Partials.LinkedInput (_("R"), _("Rotation degrees"), "°");
+        rotation.notify["value"].connect (rotation_notify_value);
 
-        var hflip_button = new Gtk.Button ();
+        hflip_button = new Gtk.Button ();
         hflip_button.add (new Akira.Partials.ButtonImage ("object-flip-horizontal"));
         hflip_button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
         hflip_button.get_style_context ().add_class ("button-rounded");
@@ -81,8 +149,11 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         hflip_button.valign = Gtk.Align.CENTER;
         hflip_button.can_focus = false;
         hflip_button.tooltip_markup = Granite.markup_accel_tooltip ({"<Ctrl><Shift>bracketleft"}, _("Flip Horizontally"));
+        hflip_button.clicked.connect (() => {
+            flip_item (-1, 1);
+        });
 
-        var vflip_button = new Gtk.Button ();
+        vflip_button = new Gtk.Button ();
         vflip_button.add (new Akira.Partials.ButtonImage ("object-flip-vertical"));
         vflip_button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
         vflip_button.get_style_context ().add_class ("button-rounded");
@@ -91,6 +162,9 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         vflip_button.valign = Gtk.Align.CENTER;
         vflip_button.can_focus = false;
         vflip_button.tooltip_markup = Granite.markup_accel_tooltip ({"<Ctrl><Shift>bracketright"}, _("Flip Vertically"));
+        vflip_button.clicked.connect (() => {
+            flip_item (1, -1);
+        });
 
         var align_grid = new Gtk.Grid ();
         align_grid.hexpand = true;
@@ -99,13 +173,13 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         align_grid.attach (vflip_button, 1, 0, 1, 1);
 
         var opacity = new Gtk.Adjustment (100.0, 0, 100.0, 0, 0, 0);
-        var scale = new Gtk.Scale (Gtk.Orientation.HORIZONTAL, opacity);
+        scale = new Gtk.Scale (Gtk.Orientation.HORIZONTAL, opacity);
         scale.hexpand = true;
+        scale.sensitive = false;
         scale.draw_value = false;
-        scale.sensitive = true;
         scale.round_digits = 1;
         scale.margin_end = 30;
-        var opacity_entry = new Akira.Partials.InputField (
+        opacity_entry = new Akira.Partials.InputField (
             Akira.Partials.InputField.Unit.PERCENTAGE, 7, true, true);
         opacity_entry.entry.text = (opacity.get_value ()).to_string ();
         opacity_entry.entry.bind_property (
@@ -125,6 +199,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
                 return true;
             }
         );
+        opacity.notify["value"].connect (opacity_notify_value);
         opacity_entry.entry.hexpand = false;
         opacity_entry.entry.width_request = 64;
 
@@ -134,8 +209,8 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         opacity_grid.attach (opacity_entry, 1, 0, 1);
 
         attach (group_title (_("Position")), 0, 0, 3);
-        attach (pos_x, 0, 1, 1);
-        attach (pos_y, 2, 1, 1);
+        attach (x, 0, 1, 1);
+        attach (y, 2, 1, 1);
 
         attach (new Akira.Partials.PanelSeparator (), 0, 2, 3);
 
@@ -154,6 +229,79 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
 
         attach (group_title (_("Opacity")), 0, 9, 3);
         attach (opacity_grid, 0, 10, 3);
+    }
+
+    private void flip_item (double sx, double sy) {
+       double x, y, width, height;
+       item.get ("x", out x, "y", out y, "width", out width, "height", out height);
+       var center_x = x + width / 2;
+       var center_y = y + height / 2;
+
+       var transform = Cairo.Matrix.identity ();
+       item.get_transform (out transform);
+       transform.translate(center_x, center_y);
+
+       double radians = item.get_data<double?>("rotation") * (Math.PI / 180);
+       transform.rotate(-radians);
+       transform.scale (sx, sy);
+       transform.rotate(radians);
+       transform.translate(-center_x, -center_y);
+       item.set_transform (transform);
+
+       window.main_window.main_canvas.canvas.update_decorations (item);
+    }
+
+    public void opacity_notify_value () {
+        var item_simple = (Goo.CanvasItemSimple)item;
+        uint fill_color_rgba = item_simple.fill_color_rgba;
+        uint stroke_color_rgba = item_simple.stroke_color_rgba;
+        var alpha = double.parse (opacity_entry.entry.text) * 255 / 100;
+        item_simple.fill_color_rgba = (uint)((fill_color_rgba & 0xFFFFFF00) + alpha);
+        item_simple.stroke_color_rgba = (uint)((stroke_color_rgba & 0xFFFFFF00) + alpha);
+    }
+
+    public void y_notify_value () {
+        double item_x = x.value;
+        double item_y = y.value;
+        window.main_window.main_canvas.canvas.convert_to_item_space(item, ref item_x, ref item_y);
+        item.set("y", item_y);
+    }
+
+    public void x_notify_value () {
+        double item_x = x.value;
+        double item_y = y.value;
+        window.main_window.main_canvas.canvas.convert_to_item_space(item, ref item_x, ref item_y);
+        item.set("x", item_x);
+    }
+
+    public void rotation_notify_value () {
+        double item_x, item_y, item_width, item_height;
+        item.get ("x", out item_x, "y", out item_y, "width", out item_width, "height", out item_height);
+        double? item_rotation = item.get_data<double?>("rotation");
+        var total_rotation = rotation.value;
+        item_rotation = total_rotation - item_rotation;
+        item.rotate(item_rotation, item_x + item_width/2, item_y + item_height/2);
+        item.set_data<double?>("rotation", total_rotation);
+
+        window.main_window.main_canvas.canvas.update_decorations (item);
+    }
+
+    public void height_notify_value () {
+        item.set("height", height.value);
+        if (size_lock) {
+            width.value = height.value * size_ratio;
+        } else {
+            size_ratio = width.value / height.value;
+        }
+    }
+
+    public void width_notify_value () {
+        item.set("width", width.value);
+        if (size_lock) {
+            height.value = width.value / size_ratio;
+        } else {
+            size_ratio = width.value / height.value;
+        }
     }
 
     private Gtk.Label group_title (string title) {

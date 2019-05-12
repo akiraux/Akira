@@ -35,7 +35,16 @@ public class Akira.Lib.Canvas : Goo.Canvas {
      */
     public signal void item_moved (Goo.CanvasItem? item);
 
-    public Goo.CanvasItem? selected_item;
+    public Goo.CanvasItem? _selected_item;
+    public Goo.CanvasItem? selected_item {
+        get {
+          return _selected_item;
+        }
+        set {
+          _selected_item = value;
+          window.main_window.left_sidebar.transform_panel.item = _selected_item;
+        }
+    }
     public Goo.CanvasRect select_effect;
     private EditMode _edit_mode;
     public EditMode edit_mode {
@@ -90,10 +99,6 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         TEXT
     }
 
-    public Canvas (Akira.Window window) {
-        Object (window: window);
-    }
-
     private Goo.CanvasItemSimple[] nobs = new Goo.CanvasItemSimple[9];
 
     private Goo.CanvasRect? hover_effect;
@@ -117,6 +122,10 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     private double border_size;
     private string border_color;
     private string fill_color;
+
+    public Canvas (Akira.Window window) {
+        Object (window: window);
+    }
 
     construct {
         edit_mode = EditMode.MODE_SELECTION;
@@ -161,6 +170,8 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 grab_focus (clicked_item);
 
                 selected_item = clicked_item;
+                window.main_window.left_sidebar.transform_panel.item = (Goo.CanvasItemSimple)selected_item;
+                selected_item.notify.connect(update_effects);
 
                 holding_id = Nob.NONE;
             } else { // nob was clicked
@@ -189,6 +200,17 @@ public class Akira.Lib.Canvas : Goo.Canvas {
           return add_text (event);
         }
         return null;
+    }
+
+    private void update_effects (Object object, ParamSpec spec) {
+        Goo.CanvasItem item = (Goo.CanvasItem)object;
+        debug ("update effects, param: %s", spec.name);
+        update_decorations (item);
+    }
+
+    public void update_decorations (Goo.CanvasItem item) {
+        update_nob_position (item);
+        update_select_effect (item);
     }
 
     public override bool button_release_event (Gdk.EventButton event) {
@@ -406,11 +428,13 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 var radians = GLib.Math.atan2 (center_y - event_y, event_x - center_x);
                 debug ("radians %f, atan2(%f - %f, %f - %f)", radians, center_y, event_y, event_x, center_x);
                 radians = start_radians - radians;
-                var rotation = radians * (180 / Math.PI);
+                double rotation = radians * (180 / Math.PI);
                 debug ("rotation: %f", rotation);
 
                 convert_from_item_space (selected_item, ref event_x, ref event_y);
                 selected_item.rotate (rotation, center_x, center_y);
+                rotation += selected_item.get_data<double?>("rotation");
+                selected_item.set_data<double?>("rotation", rotation);
                 convert_to_item_space (selected_item, ref event_x, ref event_y);
                 break;
             default:
@@ -504,19 +528,19 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     }
 
     private void update_select_effect (Goo.CanvasItem? target) {
-        if (target == null || target == select_effect) {
+        if (select_effect == null || target == null || target == select_effect) {
             return;
         }
 
-        double width, height;
-        target.get ("width", out width, "height", out height);
+        double x, y, width, height;
+        target.get ("x", out x, "y", out y, "width", out width, "height", out height);
 
         var item = (target as Goo.CanvasItemSimple);
         var stroke = item.line_width / 2;
         var real_width = width + stroke * 2;
         var real_height = height + stroke * 2;
 
-        select_effect.set ("width", real_width, "height", real_height);
+        select_effect.set ("x", x , "y", y, "width", real_width, "height", real_height);
         var transform = Cairo.Matrix.identity ();
         item.get_transform (out transform);
         select_effect.set_transform (transform);
@@ -529,6 +553,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
         select_effect.remove ();
         select_effect = null;
+        selected_item.notify.disconnect(update_effects);
         selected_item = null;
 
         for (int i = 0; i < 9; i++) {
@@ -644,6 +669,10 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
     // Updates all the nub's position arround the selected item, except for the grabbed nub
     private void update_nob_position (Goo.CanvasItem target) {
+        if (select_effect == null) {
+            return;
+        }
+
         var item = (target as Goo.CanvasItemSimple);
 
         var stroke = (item.line_width / 2);
@@ -816,7 +845,8 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                                        "fill-color", fill_color, null);
 
         rect.set ("parent", root);
-        rect.set_transform (Cairo.Matrix.identity ());
+        rect.set_transform(Cairo.Matrix.identity ());
+        rect.set_data<double?>("rotation", 0);
         var artboard = window.main_window.right_sidebar.layers_panel.artboard;
         var layer = new Akira.Layouts.Partials.Layer (window, artboard, rect,
             "Rectangle", "shape-rectangle-symbolic", false);
@@ -834,7 +864,8 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                                              "fill-color", fill_color);
 
         ellipse.set ("parent", root);
-        ellipse.set_transform (Cairo.Matrix.identity ());
+        ellipse.set_transform(Cairo.Matrix.identity ());
+        ellipse.set_data<double?>("rotation", 0);
         var artboard = window.main_window.right_sidebar.layers_panel.artboard;
         var layer = new Akira.Layouts.Partials.Layer (window, artboard, ellipse,
             "Circle", "shape-circle-symbolic", false);
@@ -850,7 +881,8 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                                        Goo.CanvasAnchorType.NW, "font", "Open Sans 18");
         text.set ("parent", root);
         text.set ("height", 25f);
-        text.set_transform (Cairo.Matrix.identity ());
+        text.set_transform(Cairo.Matrix.identity ());
+        text.set_data<double?>("rotation", 0);
         var artboard = window.main_window.right_sidebar.layers_panel.artboard;
         var layer = new Akira.Layouts.Partials.Layer (window, artboard, text, "Text", "shape-text-symbolic", false);
         text.set_data<Akira.Layouts.Partials.Layer?> ("layer", layer);
