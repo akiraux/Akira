@@ -417,7 +417,6 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
         var item = (target as Goo.CanvasItemSimple);
         var stroke = item.line_width / 2;
-        var line_width = 1.0 / current_scale;
         var real_width = width + stroke * 2;
         var real_height = height + stroke * 2;
 
@@ -472,7 +471,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
         var item = (target as Goo.CanvasItemSimple);
 
-        var line_width = get_scale () * 2;
+        var line_width = 2.0 / get_scale ();
         var stroke = item.line_width;
         var real_x = x - stroke;
         var real_y = y - stroke;

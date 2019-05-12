@@ -50,8 +50,9 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         
         var lock_changes = new Gtk.Button.from_icon_name ("changes-allow-symbolic");
         lock_changes.can_focus = false;
-        lock_changes.tooltip_text = _("Keep Ratio");
-        lock_changes.get_style_context ().add_class ("flat");
+        lock_changes.tooltip_text = _("Lock Ratio");
+        lock_changes.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
+        lock_changes.get_style_context ().add_class ("button-rounded");
         lock_changes.get_style_context ().add_class ("label-colors");
         bind_property (
             "size-lock", lock_changes, "image", BindingFlags.SYNC_CREATE,
@@ -68,18 +69,18 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         var rotation = new Akira.Partials.LinkedInput (C_("The first letter of Rotation", "R"), "°");
         rotation.unit = "°";
 
-        var hflip_button = new Gtk.Button.from_icon_name ("object-flip-horizontal", Gtk.IconSize.DND);
-        hflip_button.get_style_context ().add_class ("flat");
-        hflip_button.get_style_context ().add_class ("flip-button");
+        var hflip_button = new Gtk.Button.from_icon_name ("object-flip-horizontal", Gtk.IconSize.LARGE_TOOLBAR);
+        hflip_button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
+        hflip_button.get_style_context ().add_class ("button-rounded");
         hflip_button.hexpand = false;
         hflip_button.halign = Gtk.Align.CENTER;
         hflip_button.valign = Gtk.Align.CENTER;
         hflip_button.can_focus = false;
         hflip_button.tooltip_markup = Granite.markup_accel_tooltip ({"<Ctrl><Shift>bracketleft"}, _("Flip Horizontally"));
 
-        var vflip_button = new Gtk.Button.from_icon_name ("object-flip-vertical", Gtk.IconSize.DND);
-        vflip_button.get_style_context ().add_class ("flat");
-        vflip_button.get_style_context ().add_class ("flip-button");
+        var vflip_button = new Gtk.Button.from_icon_name ("object-flip-vertical", Gtk.IconSize.LARGE_TOOLBAR);
+        vflip_button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
+        vflip_button.get_style_context ().add_class ("button-rounded");
         vflip_button.hexpand = false;
         vflip_button.halign = Gtk.Align.CENTER;
         vflip_button.valign = Gtk.Align.CENTER;

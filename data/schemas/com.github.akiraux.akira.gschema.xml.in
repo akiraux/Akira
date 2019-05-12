@@ -13,21 +13,21 @@
         </key>
 
         <key name="window-width" type="i">
-            <default>1000</default>
+            <default>1024</default>
             <summary>The saved width of the window.</summary>
-            <description>The saved width of the window. Must be greater than 1000, or it will not take effect.</description>
+            <description>The saved width of the window.</description>
         </key>
 
         <key name="window-height" type="i">
-            <default>800</default>
+            <default>768</default>
             <summary>The saved height of the window.</summary>
-            <description>The saved height of the window. Must be greater than 800, or it will not take effect.</description>
+            <description>The saved height of the window.</description>
         </key>
 
         <key name="right-paned" type="i">
-            <default>2000</default>
+            <default>804</default>
             <summary>The saved width of the right panel.</summary>
-            <description>The saved width of the right panel containing the MainCanvas and RightSidebar. Starts at 2000 to push have a decently sized layout.</description>
+            <description>The saved width of the right panel containing the MainCanvas and RightSidebar.</description>
         </key>
 
         <key name="left-paned" type="i">

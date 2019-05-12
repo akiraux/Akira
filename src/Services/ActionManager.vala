@@ -103,7 +103,6 @@ public class Akira.Services.ActionManager : Object {
 
     private void action_presentation () {
         window.headerbar.toggle ();
-        window.main_window.statusbar.toggle ();
         window.main_window.left_sidebar.toggle ();
         window.main_window.right_sidebar.toggle ();
     }

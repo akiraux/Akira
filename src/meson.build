@@ -39,7 +39,6 @@ executable(
     'Layouts/MainCanvas.vala',
     'Layouts/MainWindow.vala',
     'Layouts/RightSideBar.vala',
-    'Layouts/StatusBar.vala',
     'Layouts/Partials/LayersPanel.vala',
     'Layouts/Partials/PagesPanel.vala',
     'Layouts/Partials/Artboard.vala',
