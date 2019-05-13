@@ -12,31 +12,27 @@
     border-bottom: 1px solid shade (@bg_color, 0.8);
 }
 
-.fills-box-panel {
-    padding: 3px 5px;
-    background-color: @base_color;
+.options-panel {
+    padding: 6px 10px;
+    background-color: alpha (@base_color, 0.9);
+    border-top: 1px solid shade (@bg_color, 0.7);
     border-bottom: 1px solid shade (@bg_color, 0.7);
 }
 
-.fills-box-panel label {
-    border-bottom: none;
-    font-size: 10pt;
+.options-panel label {
+    font-size: 9pt;
+    font-weight: bold;
+    color: @fg_color;
 }
 
-.fills-box-panel button {
+.options-panel button {
     padding: 4px;
-    border-radius: 100%;
+    border-radius: 50%;
 }
 
 .fills-list {
-    background-color: shade (@bg_color, 0.9);
-    border-bottom: 1px solid shade (@bg_color, 0.7);
-    padding: 8px;
-    padding-bottom: 12px;
-}
-
-.fill-chooser-cont {
-    margin-bottom: 8px;
+    background: transparent;
+    padding: 5px 10px;
 }
 
 .fill-chooser-cont button {

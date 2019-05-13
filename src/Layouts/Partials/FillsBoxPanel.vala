@@ -22,7 +22,6 @@
 public class Akira.Layouts.Partials.FillsBoxPanel : Gtk.Grid {
     public weak Akira.Window window { get; construct; }
 
-    public Gtk.Label label;
     public Gtk.Button add_btn;
     public Gtk.ListBox fills_list_container;
     public Akira.Models.FillsListModel fills_list_model;
@@ -43,10 +42,9 @@ public class Akira.Layouts.Partials.FillsBoxPanel : Gtk.Grid {
         title_cont = new Gtk.Grid ();
         title_cont.orientation = Gtk.Orientation.HORIZONTAL;
         title_cont.hexpand = true;
-        title_cont.get_style_context ().add_class ("fills-box-panel");
+        title_cont.get_style_context ().add_class ("options-panel");
 
-        label =  new Gtk.Label ("Fills");
-        label.get_style_context ().add_class ("artboard-name");
+        var label = new Gtk.Label (_("Fills"));
         label.halign = Gtk.Align.FILL;
         label.xalign = 0;
         label.hexpand = true;
@@ -55,10 +53,8 @@ public class Akira.Layouts.Partials.FillsBoxPanel : Gtk.Grid {
         add_btn = new Gtk.Button ();
         add_btn.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
         add_btn.can_focus = false;
-
         add_btn.valign = Gtk.Align.CENTER;
         add_btn.halign = Gtk.Align.CENTER;
-
         add_btn.add (new Gtk.Image.from_icon_name ("list-add-symbolic",
                                                    Gtk.IconSize.SMALL_TOOLBAR));
         add_btn.clicked.connect (() => {
