@@ -42,7 +42,7 @@ public class Akira.Layouts.Partials.FillsBoxPanel : Gtk.Grid {
         title_cont = new Gtk.Grid ();
         title_cont.orientation = Gtk.Orientation.HORIZONTAL;
         title_cont.hexpand = true;
-        title_cont.get_style_context ().add_class ("options-panel");
+        title_cont.get_style_context ().add_class ("option-panel");
 
         var label = new Gtk.Label (_("Fills"));
         label.halign = Gtk.Align.FILL;

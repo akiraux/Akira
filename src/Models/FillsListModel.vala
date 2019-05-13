@@ -43,9 +43,9 @@ public class Akira.Models.FillsListModel : GLib.Object, GLib.ListModel {
         var position = fills_list.length ();
         fills_list.append (
             new Akira.Models.FillsItemModel (
-                "#abcded",
+                "#CCCCCC",
                 100,
-                true,
+                false,
                 Akira.Utils.BlendingMode.NORMAL,
                 this
             )

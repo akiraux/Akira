@@ -7,6 +7,7 @@
     <file alias="artboard.css" compressed="true">css/artboard.css</file>
     <file alias="layer.css" compressed="true">css/layer.css</file>
     <file alias="headerbar.css" compressed="true">css/headerbar.css</file>
+    <file alias="option-panel.css" compressed="true">css/option-panel.css</file>
   </gresource>
   <gresource prefix="/com/github/akiraux/akira">
     <file alias="stylesheet.css" compressed="true">css/stylesheet.css</file>
