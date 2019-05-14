@@ -126,10 +126,17 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
 
         fill_chooser = new Gtk.Grid ();
         fill_chooser.hexpand = true;
-
+        fill_chooser.get_style_context ().add_class ("fill-chooser");
+        
         selected_color = new Gtk.Button ();
+        selected_color.vexpand = true;
         selected_color.can_focus = false;
         selected_color.get_style_context ().add_class ("selected-color");
+
+        var button_container = new Gtk.Grid ();
+        button_container.margin = 5;
+        button_container.get_style_context ().add_class ("bg-pattern");
+        button_container.add (selected_color);
 
         selected_blending_mode = new Gtk.Label ("");
         selected_blending_mode.hexpand = true;
@@ -160,12 +167,10 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         current_opacity_cont.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
         current_opacity_cont.add (current_opacity);
 
-        fill_chooser.attach (selected_color, 0, 0, 1, 1);
+        fill_chooser.attach (button_container, 0, 0, 1, 1);
         fill_chooser.attach (selected_blending_mode_cont, 1, 0, 1, 1);
         fill_chooser.attach (show_options_button, 2, 0, 1, 1);
         fill_chooser.attach (current_opacity_cont, 3, 0, 1, 1);
-
-        fill_chooser.get_style_context ().add_class ("fill-chooser");
 
         hidden_button = new Gtk.Button ();
         hidden_button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
@@ -306,23 +311,23 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
     }
 
     private void set_selected_color_background () {
-        //  try {
-        //      var provider = new Gtk.CssProvider ();
-        //      var context = selected_color.get_style_context ();
+        try {
+            var provider = new Gtk.CssProvider ();
+            var context = selected_color.get_style_context ();
 
-        //      var css = """
-        //      .selected-color {
-        //          background-color: alpha (%s, %f);
-        //          border-color: shade (%s, 0.7);
-        //      }
-        //      """.printf (color, alpha, color);
+            var css = """
+                .selected-color {
+                    background-color: alpha (%s, %f);
+                    border-color: shade (%s, 0.7);
+                }
+                """.printf (color, alpha, color);
 
-        //      provider.load_from_data (css, css.length);
+            provider.load_from_data (css, css.length);
 
-        //      context.add_provider (provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
-        //  } catch (Error e) {
-        //      warning ("Style error: %s", e.message);
-        //  }
+            context.add_provider (provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
+        } catch (Error e) {
+            warning ("Style error: %s", e.message);
+        }
     }
 
     private void set_color_chooser_color () {
@@ -330,6 +335,6 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         newRGBA.parse (model.color);
 
         color_chooser_widget.set_rgba (newRGBA);
-        selected_color.rgba = newRGBA;
+        //  selected_color.rgba = newRGBA;
     }
 }
