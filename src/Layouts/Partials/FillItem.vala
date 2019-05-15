@@ -45,20 +45,17 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
             set_color_chooser_color ();
         }
     }
-    private double alpha;
 
-    private new uint opacity {
+    private double alpha {
         owned get {
-            return model.opacity;
-        }
-        set {
-            // Change only if value is different
-            if ((uint) opacity_slider.get_value () != value) {
+            return model.alpha;
+        } set {
+            if ((double) opacity_slider.get_value () != value) {
                 opacity_slider.set_value (value);
             }
 
-            model.opacity = value;
-            current_opacity.label = "%d %%".printf ((int) value);
+            model.alpha = value;
+            current_opacity.label = "%d %%".printf ((int) value * 100);
         }
     }
 
@@ -97,6 +94,7 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
     private Gtk.Scale opacity_slider;
     private Gtk.Grid color_picker;
     private Gtk.ColorChooserWidget color_chooser_widget;
+    private bool updating { get; set; default = false; }
 
     public FillItem (Akira.Models.FillsItemModel model) {
         Object (model: model);
@@ -114,7 +112,7 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
     }
 
     private void update_view () {
-        opacity = model.opacity;
+        alpha = model.alpha;
         hidden = model.hidden;
         blending_mode = model.blending_mode;
         color = model.color;
@@ -187,7 +185,7 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         blending_mode_popover_items = new Gtk.ListBox ();
         blending_mode_popover_items.get_style_context ().add_class ("popover-list");
 
-        opacity_slider = new Gtk.Scale.with_range (Gtk.Orientation.HORIZONTAL, 0, 100, 1);
+        opacity_slider = new Gtk.Scale.with_range (Gtk.Orientation.HORIZONTAL, 0, 1, 0.1);
         opacity_slider.hexpand = true;
         opacity_slider.digits = 0;
         opacity_slider.draw_value = false;
@@ -237,6 +235,10 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
     }
 
     private void on_color_changed () {
+        if (updating) {
+            return;
+        }
+
         var selectedColor = color_chooser_widget.rgba;
 
         color = "#%02X%02X%02X".printf (
@@ -245,6 +247,14 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
             (int) (selectedColor.blue * 255));
 
         alpha = selectedColor.alpha;
+    }
+
+    private void update_color () {
+        var currentColor = color_chooser_widget.rgba;
+        currentColor.alpha = alpha;
+
+        updating = true;
+        color_chooser_widget.rgba = currentColor;
     }
 
     private void on_model_changed () {
@@ -307,7 +317,8 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
     }
 
     private void on_opacity_changed (Gtk.Range slider) {
-        opacity = (uint) slider.get_value ();
+        alpha = (double) slider.get_value ();
+        update_color ();
     }
 
     private void set_selected_color_background () {
@@ -318,9 +329,9 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
             var css = """
                 .selected-color {
                     background-color: alpha (%s, %f);
-                    border-color: shade (%s, 0.7);
+                    border-color: alpha (shade (%s, 0.7), %f);
                 }
-                """.printf (color, alpha, color);
+                """.printf (color, alpha, color, alpha);
 
             provider.load_from_data (css, css.length);
 
@@ -335,6 +346,5 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         newRGBA.parse (model.color);
 
         color_chooser_widget.set_rgba (newRGBA);
-        //  selected_color.rgba = newRGBA;
     }
 }

@@ -44,7 +44,7 @@ public class Akira.Models.FillsListModel : GLib.Object, GLib.ListModel {
         fills_list.append (
             new Akira.Models.FillsItemModel (
                 "#CCCCCC",
-                100,
+                1,
                 false,
                 Akira.Utils.BlendingMode.NORMAL,
                 this
