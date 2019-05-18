@@ -41,7 +41,7 @@ public class Akira.Models.FillsItemModel : GLib.Object {
     }
 
     public string to_string () {
-        return "Color: %s\n Alpha: %d\n Hidden: %s\n BlendingMode: %s".printf (
-            color, (int) alpha, (hidden ? "1" : "0"), blending_mode.to_string ());
+        return "Color: %s\nAlpha: %f\nHidden: %s\nBlendingMode: %s".printf (
+            color, alpha, (hidden ? "1" : "0"), blending_mode.to_string ());
     }
 }

@@ -41,8 +41,8 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         set {
             model.color = value;
 
-            set_selected_color_background ();
-            set_color_chooser_color ();
+            //  set_selected_color_background ();
+            //  set_color_chooser_color ();
         }
     }
 
@@ -50,12 +50,15 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         owned get {
             return model.alpha;
         } set {
-            if ((double) opacity_slider.get_value () != value) {
-                opacity_slider.set_value (value);
-            }
-
             model.alpha = value;
-            current_opacity.label = "%d %%".printf ((int) value * 100);
+
+            set_model_color ();
+            //  if ((double) opacity_slider.get_value () != value) {
+            //      opacity_slider.set_value (value);
+            //  }
+
+            //  model.alpha = value;
+            //  current_opacity.label = "%d %%".printf ((int) value * 100);
         }
     }
 
@@ -66,16 +69,8 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         set {
             model.hidden = value;
 
-            if (hidden_button_icon != null) {
-                hidden_button.remove (hidden_button_icon);
-            }
-
-            hidden_button_icon = new Gtk.Image.from_icon_name (
-                "layer-%s-symbolic".printf (model.hidden ? "hidden" : "visible"),
-                Gtk.IconSize.SMALL_TOOLBAR);
-
-            hidden_button.add (hidden_button_icon);
-            hidden_button_icon.show_all ();
+            set_hidden_button ();
+            toggle_ui_visibility ();
         }
     }
 
@@ -120,12 +115,11 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
 
     private void create_ui () {
         margin_top = margin_bottom = 5;
-        selected_blending_mode = new Gtk.Label ("");
 
         fill_chooser = new Gtk.Grid ();
         fill_chooser.hexpand = true;
         fill_chooser.get_style_context ().add_class ("fill-chooser");
-        
+
         selected_color = new Gtk.Button ();
         selected_color.vexpand = true;
         selected_color.can_focus = false;
@@ -202,8 +196,10 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         var popover_item_index = 0;
 
         foreach (Akira.Utils.BlendingMode mode in Akira.Utils.BlendingMode.all () ) {
-            blending_mode_popover_items
-            .insert (new Akira.Layouts.Partials.BlendingModeItem (mode), popover_item_index++);
+            blending_mode_popover_items.insert (
+                new Akira.Layouts.Partials.BlendingModeItem (mode),
+                popover_item_index++
+            );
         }
 
         popover = new Gtk.Popover (selected_blending_mode_cont);
@@ -306,9 +302,25 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         remove_item (model);
     }
 
+    private void set_hidden_button () {
+        if (hidden_button_icon != null) {
+            hidden_button.remove (hidden_button_icon);
+        }
+
+        hidden_button_icon = new Gtk.Image.from_icon_name (
+            "layer-%s-symbolic".printf (hidden ? "hidden" : "visible"),
+            Gtk.IconSize.SMALL_TOOLBAR);
+
+        hidden_button.add (hidden_button_icon);
+        hidden_button_icon.show_all ();
+    }
+
     private void toggle_visibility () {
         hidden = !hidden;
+        toggle_ui_visibility ();
+    }
 
+    private void toggle_ui_visibility () {
         if (hidden) {
             get_style_context ().add_class ("disabled");
         } else {
@@ -346,5 +358,9 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         newRGBA.parse (model.color);
 
         color_chooser_widget.set_rgba (newRGBA);
+    }
+
+    private void set_model_color () {
+        //
     }
 }
