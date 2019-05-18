@@ -27,10 +27,10 @@ public class Akira.Models.FillsItemModel : GLib.Object {
     public Akira.Models.FillsListModel list_model { get; set; }
 
     public FillsItemModel (string color,
-                          double alpha,
-                          bool hidden,
-                          Akira.Utils.BlendingMode blending_mode,
-                          Akira.Models.FillsListModel list_model) {
+                           double alpha,
+                           bool hidden,
+                           Akira.Utils.BlendingMode blending_mode,
+                           Akira.Models.FillsListModel list_model) {
         Object (
             color: color,
             alpha: alpha,
@@ -41,13 +41,7 @@ public class Akira.Models.FillsItemModel : GLib.Object {
     }
 
     public string to_string () {
-        var fill_item_repr = "";
-
-        fill_item_repr += "Color: %s\n".printf (color);
-        fill_item_repr += "Alpha: %d\n".printf ((int) alpha);
-        fill_item_repr += "Hidden: %s\n".printf (hidden ? "1" : "0");
-        fill_item_repr += "BlendingMode: %s".printf (blending_mode.to_string ());
-
-        return fill_item_repr;
+        return "Color: %s\n Alpha: %d\n Hidden: %s\n BlendingMode: %s".printf (
+            color, (int) alpha, (hidden ? "1" : "0"), blending_mode.to_string ());
     }
 }
