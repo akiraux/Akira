@@ -16,6 +16,12 @@
     border-radius: 50%;
 }
 
+.fill-chooser {
+    background-color: shade (@bg_color, 0.98);
+    border: 1px solid shade (@bg_color, 0.7);
+    border-radius: 2px;
+}
+
 .fills-list {
     background: transparent;
     padding: 5px 10px;
@@ -25,12 +31,6 @@
     padding: 0;
     margin-left: 6px;
     border-radius: 50%;
-}
-
-.fill-chooser {
-    background-color: shade (@bg_color, 0.98);
-    border: 1px solid shade (@bg_color, 0.7);
-    border-radius: 2px;
 }
 
 .bg-pattern {
