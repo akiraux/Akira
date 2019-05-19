@@ -16,22 +16,16 @@
     border-radius: 50%;
 }
 
-.fill-chooser {
-    background-color: shade (@bg_color, 0.98);
-    border: 1px solid shade (@bg_color, 0.7);
-    border-radius: 2px;
-}
-
 .fills-list {
     background: transparent;
     padding: 5px 10px;
 }
 
-.fill-chooser-cont button {
+/* .fill-chooser-cont button {
     padding: 0;
     margin-left: 6px;
     border-radius: 50%;
-}
+} */
 
 .bg-pattern {
     background-image: /* tint image */
@@ -43,7 +37,7 @@
     background-size: 8px 8px;
 }
 
-.fill-chooser button.selected-color {
+/* .fill-chooser button.selected-color {
     padding: 6px 16px;
     border-radius: 0;
     border: 1px solid;
@@ -60,4 +54,4 @@
 
 .opacity-slider {
   padding: 3px 6px;
-}
+} */

@@ -40,7 +40,8 @@ public class Akira.Partials.LinkedInput : Gtk.Grid {
     */
     private bool manually_edited = true;
     
-    public LinkedInput (string label, string unit = "", bool reversed = false, double default_val = 0, double limit = 0.0) {
+    public LinkedInput (string label, string unit = "", bool reversed = false, 
+        double default_val = 0, double limit = 0.0) {
         Object (
             label: label,
             reversed: reversed,

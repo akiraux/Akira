@@ -19,7 +19,6 @@
 * Authored by: Giacomo "giacomoalbe" Alberini <giacomoalbe@gmail.com>
 */
 
-
 public class Akira.Models.FillsListModel : GLib.Object, GLib.ListModel {
     private GLib.List<Akira.Models.FillsItemModel> fills_list;
 
