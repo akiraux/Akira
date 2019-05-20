@@ -122,24 +122,22 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
 
         fill_chooser = new Gtk.Grid ();
         fill_chooser.hexpand = true;
+        fill_chooser.margin_end = 5;
 
         selected_color = new Gtk.Button ();
         selected_color.vexpand = true;
-        selected_color.width_request = 30;
+        selected_color.width_request = 40;
         selected_color.can_focus = false;
         selected_color.get_style_context ().add_class ("selected-color");
 
         var picker_container = new Gtk.Grid ();
         picker_container.margin_right = 10;
-        picker_container.margin_top = picker_container.margin_bottom = 1;
-        picker_container.width_request = 30;
-        picker_container.get_style_context ().add_class ("bg-pattern");
+        picker_container.margin_top = picker_container.margin_bottom = 1;        picker_container.get_style_context ().add_class ("bg-pattern");
         picker_container.add (selected_color);
 
         color_container = new Gtk.Entry ();
         color_container.margin_right = 10;
-        color_container.width_request = 30;
-        color_container.width_chars = 0;
+        color_container.width_chars = 8;
         color_container.hexpand = true;
         color_container.text = color;
 
@@ -172,13 +170,8 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         //  current_opacity_cont.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
         //  current_opacity_cont.add (current_opacity);
 
-        opacity_container = new Gtk.Entry ();
-        opacity_container.margin_right = 5;
-        opacity_container.width_request = 20;
-        opacity_container.width_chars = 0;
-        opacity_container.hexpand = true;
-        opacity_container.xalign = 1.0f;
-        opacity_container.text = alpha.to_string ();
+        opacity_container = new Akira.Partials.InputField ("%", 6, true);
+        opacity_container.text = (alpha * 100).to_string ();
 
         fill_chooser.attach (picker_container, 0, 0, 1, 1);
         fill_chooser.attach (color_container, 1, 0, 1, 1);

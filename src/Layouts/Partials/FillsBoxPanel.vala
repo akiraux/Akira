@@ -67,6 +67,9 @@ public class Akira.Layouts.Partials.FillsBoxPanel : Gtk.Grid {
         fills_list_model = new Akira.Models.FillsListModel ();
 
         fills_list_container = new Gtk.ListBox ();
+        fills_list_container.margin_top = fills_list_container.margin_bottom = 5;
+        fills_list_container.margin_start = 10;
+        fills_list_container.margin_end = 5;
         fills_list_container.selection_mode = Gtk.SelectionMode.NONE;
         fills_list_container.get_style_context ().add_class ("fills-list");
 
