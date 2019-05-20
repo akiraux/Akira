@@ -58,7 +58,6 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
             model.color = value;
 
             set_model_color ();
-            //  set_selected_color_background ();
             //  set_color_chooser_color ();
         }
     }
@@ -210,6 +209,7 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         color_chooser_widget = new Gtk.ColorChooserWidget ();
         color_chooser_widget.hexpand = true;
         color_chooser_widget.show_editor = true;
+        set_color_chooser_color ();
 
         color_picker = new Gtk.Grid ();
         color_picker.get_style_context ().add_class ("color-picker");
@@ -359,7 +359,7 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
 
             var css = """.selected-color {
                     background-color: alpha (%s, %f);
-                    border-color: alpha (shade (%s, 0.7), %f);
+                    border-color: alpha (shade (%s, 0.75), %f);
                 }""".printf (color, alpha, color, alpha);
 
             provider.load_from_data (css, css.length);
@@ -370,10 +370,11 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         }
     }
 
-    //  private void set_color_chooser_color () {
-    //      var newRGBA = Gdk.RGBA ();
-    //      newRGBA.parse (model.color);
+    private void set_color_chooser_color () {
+        var newRGBA = Gdk.RGBA ();
+        newRGBA.parse (model.color);
+        newRGBA.alpha = alpha;
 
-    //      color_chooser_widget.set_rgba (newRGBA);
-    //  }
+        color_chooser_widget.set_rgba (newRGBA);
+    }
 }
