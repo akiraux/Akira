@@ -34,15 +34,14 @@
                       linear-gradient(to bottom, black 50%, white 50%);
     background-blend-mode: normal, difference, normal;
     background-size: 8px 8px;
+    border-radius: 2px;
 }
 
-/* .fill-chooser button.selected-color {
-    padding: 6px 16px;
-    border-radius: 0;
+button.selected-color {
+    border-radius: 2px;
     border: 1px solid;
-    transition: none;
 }
-
+/*
 .fill-chooser label.opacity {
     border-left: 1px solid shade (@bg_color, 0.7);
     padding: 0 8px;

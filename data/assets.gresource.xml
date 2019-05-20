@@ -19,6 +19,7 @@
     <file alias="layer-visible-symbolic.svg">icons/symbolic/layer-visible-symbolic.svg</file>
     <file alias="layer-hidden-symbolic.svg">icons/symbolic/layer-hidden-symbolic.svg</file>
 
+    <file alias="input-hash-symbolic.svg">icons/symbolic/input-hash-symbolic.svg</file>
     <file alias="input-percentage-symbolic.svg">icons/symbolic/input-percentage-symbolic.svg</file>
     <file alias="input-pixel-symbolic.svg">icons/symbolic/input-pixel-symbolic.svg</file>
 
