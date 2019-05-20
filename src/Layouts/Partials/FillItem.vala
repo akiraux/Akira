@@ -58,7 +58,6 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
             model.color = value;
 
             set_model_color ();
-            //  set_color_chooser_color ();
         }
     }
 
@@ -69,12 +68,6 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
             model.alpha = value;
 
             set_model_color ();
-            //  if ((double) opacity_slider.get_value () != value) {
-            //      opacity_slider.set_value (value);
-            //  }
-
-            //  model.alpha = value;
-            //  current_opacity.label = "%d %%".printf ((int) value * 100);
         }
     }
 
@@ -144,6 +137,10 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         color_container.width_chars = 8;
         color_container.hexpand = true;
         color_container.text = color;
+        color_container.bind_property (
+            "text", model, "color",
+            BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE
+        );
 
         //  selected_blending_mode = new Gtk.Label ("");
         //  selected_blending_mode.hexpand = true;
@@ -176,6 +173,21 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
 
         opacity_container = new Akira.Partials.InputField ("%", 6, true, true);
         opacity_container.text = (alpha * 100).to_string ();
+        opacity_container.bind_property (
+            "text", model, "alpha",
+            BindingFlags.BIDIRECTIONAL,
+            (binding, srcval, ref targetval) => {
+                double src = double.parse (srcval.dup_string ());
+                alpha = src / 100;
+                targetval.set_double (alpha);
+                set_color_chooser_color ();
+                return true;
+            }, (binding, srcval, ref targetval) => {
+                double src = (double) srcval;
+                targetval.set_string ((src * 100).to_string ());
+                return true;
+            }
+        );
 
         fill_chooser.attach (picker_container, 0, 0, 1, 1);
         fill_chooser.attach (color_container, 1, 0, 1, 1);
