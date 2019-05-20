@@ -25,7 +25,7 @@
 public class Akira.Partials.LinkedInput : Gtk.Grid {
     public string label { get; construct set; }
     public Gtk.Entry entry { get; construct set; }
-    
+
     /**
     * Indicates wheter the label or the entry should be first
     */
@@ -33,15 +33,15 @@ public class Akira.Partials.LinkedInput : Gtk.Grid {
     public string unit { get; construct set; }
     public double limit { get; set; }
     public double value { get; set; }
-    
+
     /**
     * Used to avoid to infinitely updating two linked data (for instance width
     * and height when their ratio is locked)
     */
     private bool manually_edited = true;
-    
-    public LinkedInput (string label, string unit = "", bool reversed = false, 
-        double default_val = 0, double limit = 0.0) {
+
+    public LinkedInput (string label, string unit = "", bool reversed = false,
+                        double default_val = 0, double limit = 0.0) {
         Object (
             label: label,
             reversed: reversed,
@@ -50,18 +50,18 @@ public class Akira.Partials.LinkedInput : Gtk.Grid {
             unit: unit
         );
     }
-    
+
     construct {
         valign = Gtk.Align.CENTER;
         hexpand = true;
         get_style_context ().add_class (Gtk.STYLE_CLASS_LINKED);
-        
+
         var entry_label = new Gtk.Label (label);
         entry_label.get_style_context ().add_class ("entry-label");
         entry_label.halign = Gtk.Align.CENTER;
         entry_label.width_request = 30;
         entry_label.hexpand = false;
-        
+
         entry = new Gtk.Entry ();
         entry.width_request = 46;
         entry.width_chars = 0;
@@ -91,12 +91,12 @@ public class Akira.Partials.LinkedInput : Gtk.Grid {
             if (format_value.has_suffix (".")) {
                 format_value += "0";
             }
-            
+
             manually_edited = false;
             entry.text = "%s%s".printf (format_value, unit);
             manually_edited = true;
         });
-        
+
         if (reversed) {
             entry.xalign = 1.0f;
             entry.get_style_context ().add_class ("reversed");
