@@ -145,7 +145,7 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         //  selected_blending_mode_cont.hexpand = true;
         //  selected_blending_mode_cont.add (selected_blending_mode);
 
-        opacity_container = new Akira.Partials.InputField ("%", 6, true, true);
+        opacity_container = new Akira.Partials.InputField ("%", 7, true, true);
         opacity_container.text = (alpha * 100).to_string ();
         opacity_container.bind_property (
             "text", model, "alpha",
@@ -216,7 +216,6 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         //  blending_mode_popover_items.row_activated.connect (on_row_activated);
         //  blending_mode_popover_items.row_selected.connect (on_popover_item_selected);
 
-        //  selected_blending_mode_cont.clicked.connect (() => { on_show_popover ("blending_mode"); });
         color_chooser_widget.notify["rgba"].connect (on_color_changed);
 
         model.notify.connect (on_model_changed);
@@ -245,38 +244,6 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
     //  }
 
     //  private void on_popover_item_selected (Gtk.ListBoxRow? item) {
-    //  }
-
-    //  private void on_show_popover (string target) {
-    //      foreach (Gtk.Widget elem in popover.get_children ()) {
-    //          popover.remove (elem);
-    //      }
-
-    //      switch (target) {
-            //  case "blending_mode":
-            //      popover.width_request = get_allocated_width ();
-            //      popover.relative_to = selected_blending_mode_cont;
-            //      popover.child = blending_mode_popover_items;
-            //  break;
-
-            //  case "opacity":
-            //      popover.width_request = get_allocated_width ();
-            //      popover.relative_to = current_opacity_cont;
-            //      popover.child = opacity_slider;
-            //  break;
-
-    //          case "color":
-    //              popover.width_request = get_allocated_width ();
-    //              popover.relative_to = selected_color;
-    //              popover.child = color_picker;
-    //          break;
-    //      }
-
-    //      if (!popover.visible) {
-    //          popover.show_all ();
-    //      } else {
-    //          popover.hide ();
-    //      }
     //  }
 
     private void on_delete_item () {
@@ -328,7 +295,7 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
     }
 
     private void set_color_chooser_color () {
-        if (!Regex.match_simple("#[0-9A-F]{6}|#[0-9A-F]{3}", model.color)) {
+        if (!Regex.match_simple ("#[0-9A-F]{6}|#[0-9A-F]{3}", model.color)) {
             return;
         }
 

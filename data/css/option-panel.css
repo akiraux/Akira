@@ -20,12 +20,6 @@
     background: transparent;
 }
 
-/* .fill-chooser-cont button {
-    padding: 0;
-    margin-left: 6px;
-    border-radius: 50%;
-} */
-
 .bg-pattern {
     background-image: /* tint image */
                       linear-gradient(to right, rgba(192, 192, 192, 0.75), rgba(192, 192, 192, 0.75)),
@@ -41,15 +35,3 @@ button.selected-color {
     border-radius: 2px;
     border: 1px solid;
 }
-/*
-.fill-chooser label.opacity {
-    border-left: 1px solid shade (@bg_color, 0.7);
-    padding: 0 8px;
-    background-color: shade (@base_color, 1);
-    border-top-right-radius: 2px;
-    border-bottom-right-radius: 2px;
-}
-
-.opacity-slider {
-  padding: 3px 6px;
-} */
