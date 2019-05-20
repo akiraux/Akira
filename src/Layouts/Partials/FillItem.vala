@@ -219,8 +219,8 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         //      );
         //  }
 
-        //  popover = new Gtk.Popover (selected_blending_mode_cont);
-        //  popover.position = Gtk.PositionType.BOTTOM;
+        popover = new Gtk.Popover (color_picker);
+        popover.position = Gtk.PositionType.BOTTOM;
 
         attach (fill_chooser, 0, 0, 1, 1);
         attach (hidden_button, 1, 0, 1, 1);
@@ -236,7 +236,7 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
 
         //  selected_blending_mode_cont.clicked.connect (() => { on_show_popover ("blending_mode"); });
 
-        //  selected_color.clicked.connect (() => { on_show_popover ("color"); });
+        selected_color.clicked.connect (() => { on_show_popover ("color"); });
         color_chooser_widget.notify["rgba"].connect (on_color_changed);
 
         //  current_opacity_cont.clicked.connect (() => { on_show_popover ("opacity"); });
@@ -283,37 +283,37 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
     private void on_popover_item_selected (Gtk.ListBoxRow? item) {
     }
 
-    //  private void on_show_popover (string target) {
-    //      foreach (Gtk.Widget elem in popover.get_children ()) {
-    //          popover.remove (elem);
-    //      }
+    private void on_show_popover (string target) {
+        foreach (Gtk.Widget elem in popover.get_children ()) {
+            popover.remove (elem);
+        }
 
-    //      switch (target) {
-    //          case "blending_mode":
-    //              popover.width_request = get_allocated_width ();
-    //              popover.relative_to = selected_blending_mode_cont;
-    //              popover.child = blending_mode_popover_items;
-    //          break;
+        switch (target) {
+            //  case "blending_mode":
+            //      popover.width_request = get_allocated_width ();
+            //      popover.relative_to = selected_blending_mode_cont;
+            //      popover.child = blending_mode_popover_items;
+            //  break;
 
-    //          case "opacity":
-    //              popover.width_request = get_allocated_width ();
-    //              popover.relative_to = current_opacity_cont;
-    //              popover.child = opacity_slider;
-    //          break;
+            //  case "opacity":
+            //      popover.width_request = get_allocated_width ();
+            //      popover.relative_to = current_opacity_cont;
+            //      popover.child = opacity_slider;
+            //  break;
 
-    //          case "color":
-    //              popover.width_request = get_allocated_width ();
-    //              popover.relative_to = selected_color;
-    //              popover.child = color_picker;
-    //          break;
-    //      }
+            case "color":
+                popover.width_request = get_allocated_width ();
+                popover.relative_to = selected_color;
+                popover.child = color_picker;
+            break;
+        }
 
-    //      if (!popover.visible) {
-    //          popover.show_all ();
-    //      } else {
-    //          popover.hide ();
-    //      }
-    //  }
+        if (!popover.visible) {
+            popover.show_all ();
+        } else {
+            popover.hide ();
+        }
+    }
 
     private void on_delete_item () {
         remove_item (model);
@@ -355,12 +355,10 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
             var provider = new Gtk.CssProvider ();
             var context = selected_color.get_style_context ();
 
-            var css = """
-                .selected-color {
+            var css = """.selected-color {
                     background-color: alpha (%s, %f);
                     border-color: alpha (shade (%s, 0.7), %f);
-                }
-                """.printf (color, alpha, color, alpha);
+                }""".printf (color, alpha, color, alpha);
 
             provider.load_from_data (css, css.length);
 
