@@ -7,12 +7,12 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- 
+
  * Akira is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- 
+
  * You should have received a copy of the GNU General Public License
  * along with Akira.  If not, see <https://www.gnu.org/licenses/>.
  *
@@ -29,10 +29,10 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
     //  private Gtk.Label selected_blending_mode;
     //  private Gtk.Button current_opacity_cont;
     //  private Gtk.Label current_opacity;
-    private Gtk.Button selected_color;
+    private Gtk.MenuButton selected_color;
     public Gtk.Entry opacity_container;
     public Gtk.Entry color_container;
-    private Gtk.Popover popover;
+    private Gtk.Popover color_popover;
     //  private Gtk.ListBox blending_mode_popover_items;
     //  private Gtk.Scale opacity_slider;
     private Gtk.Grid color_picker;
@@ -124,11 +124,16 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         fill_chooser.hexpand = true;
         fill_chooser.margin_end = 5;
 
-        selected_color = new Gtk.Button ();
+        color_popover = new Gtk.Popover (color_picker);
+        color_popover.position = Gtk.PositionType.BOTTOM;
+
+        selected_color = new Gtk.MenuButton ();
+        selected_color.remove (selected_color.get_child ());
         selected_color.vexpand = true;
         selected_color.width_request = 40;
         selected_color.can_focus = false;
         selected_color.get_style_context ().add_class ("selected-color");
+        selected_color.popover = color_popover;
 
         var picker_container = new Gtk.Grid ();
         picker_container.margin_right = 10;
@@ -209,6 +214,8 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         color_picker = new Gtk.Grid ();
         color_picker.get_style_context ().add_class ("color-picker");
         color_picker.attach (color_chooser_widget, 0, 0, 1, 1);
+        color_picker.show_all ();
+        color_popover.add (color_picker);
 
         //  var popover_item_index = 0;
 
@@ -218,9 +225,6 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         //          popover_item_index++
         //      );
         //  }
-
-        popover = new Gtk.Popover (color_picker);
-        popover.position = Gtk.PositionType.BOTTOM;
 
         attach (fill_chooser, 0, 0, 1, 1);
         attach (hidden_button, 1, 0, 1, 1);
@@ -235,8 +239,6 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         //  blending_mode_popover_items.row_selected.connect (on_popover_item_selected);
 
         //  selected_blending_mode_cont.clicked.connect (() => { on_show_popover ("blending_mode"); });
-
-        selected_color.clicked.connect (() => { on_show_popover ("color"); });
         color_chooser_widget.notify["rgba"].connect (on_color_changed);
 
         //  current_opacity_cont.clicked.connect (() => { on_show_popover ("opacity"); });
@@ -280,15 +282,15 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         //  popover.hide ();
     }
 
-    private void on_popover_item_selected (Gtk.ListBoxRow? item) {
-    }
+    //  private void on_popover_item_selected (Gtk.ListBoxRow? item) {
+    //  }
 
-    private void on_show_popover (string target) {
-        foreach (Gtk.Widget elem in popover.get_children ()) {
-            popover.remove (elem);
-        }
+    //  private void on_show_popover (string target) {
+    //      foreach (Gtk.Widget elem in popover.get_children ()) {
+    //          popover.remove (elem);
+    //      }
 
-        switch (target) {
+    //      switch (target) {
             //  case "blending_mode":
             //      popover.width_request = get_allocated_width ();
             //      popover.relative_to = selected_blending_mode_cont;
@@ -301,19 +303,19 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
             //      popover.child = opacity_slider;
             //  break;
 
-            case "color":
-                popover.width_request = get_allocated_width ();
-                popover.relative_to = selected_color;
-                popover.child = color_picker;
-            break;
-        }
+    //          case "color":
+    //              popover.width_request = get_allocated_width ();
+    //              popover.relative_to = selected_color;
+    //              popover.child = color_picker;
+    //          break;
+    //      }
 
-        if (!popover.visible) {
-            popover.show_all ();
-        } else {
-            popover.hide ();
-        }
-    }
+    //      if (!popover.visible) {
+    //          popover.show_all ();
+    //      } else {
+    //          popover.hide ();
+    //      }
+    //  }
 
     private void on_delete_item () {
         remove_item (model);
