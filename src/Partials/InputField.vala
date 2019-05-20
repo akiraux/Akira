@@ -23,10 +23,16 @@ public class Akira.Partials.InputField : Gtk.Entry {
     public int chars { get; construct set; }
     public bool rtl { get; construct set; }
     public bool icon_right { get; construct set; }
-    public string unit { get; construct set; }
+    public Unit unit { get; construct set; }
     public string icon { get; set; }
 
-    public InputField (string unit, int chars, bool icon_right = false, bool rtl = false) {
+    public enum Unit {
+        PIXEL,
+        HASH,
+        PERCENTAGE
+    }
+
+    public InputField (Unit unit, int chars, bool icon_right = false, bool rtl = false) {
         Object (
             unit: unit,
             chars: chars,
@@ -40,17 +46,17 @@ public class Akira.Partials.InputField : Gtk.Entry {
         width_chars = chars;
 
         switch (unit) {
-            case "#":
+            case Unit.HASH:
                 icon = "input-hash-symbolic";
             break;
-            case "%":
+            case Unit.PERCENTAGE:
                 icon = "input-percentage-symbolic";
             break;
-            case "px":
+            case Unit.PIXEL:
                 icon = "input-pixel-symbolic";
             break;
         }
-        
+
         if (icon_right) {
             secondary_icon_name = icon;
             secondary_icon_sensitive = false;

@@ -145,7 +145,8 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         //  selected_blending_mode_cont.hexpand = true;
         //  selected_blending_mode_cont.add (selected_blending_mode);
 
-        opacity_container = new Akira.Partials.InputField ("%", 7, true, true);
+        opacity_container = new Akira.Partials.InputField (
+            Akira.Partials.InputField.Unit.PERCENTAGE, 7, true, true);
         opacity_container.text = (alpha * 100).to_string ();
         opacity_container.bind_property (
             "text", model, "alpha",
