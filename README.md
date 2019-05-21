@@ -64,7 +64,7 @@ If you want to ask any questions about the project, we have a dedicated Discord 
 
 ## 👨‍💻 Contributing
 
-Feel free to send a pull request to this repository with your code contributions.
+Feel free to send a pull request to this repository with your code contributions, but firt read our [contributing guidelines](CONTRIBUTING.md) :page_with_curl:
 
 ## 🎉 Support
 
