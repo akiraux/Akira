@@ -12,6 +12,7 @@
             src="https://img.shields.io/badge/patreon-donate-orange.svg?logo=patreon" alt="AkiraUX on Patreon"></a>
 </p>
 <p align="center">
+    <a href="#-install">Install</a> •
     <a href="#-compile">Compile</a> •
     <a href="#-questions-issues">Questions</a> •
     <a href="#-contributing">Contributing</a> •
@@ -21,6 +22,16 @@
 </p>
 
 ![screenshot](akira-screenshot.png)
+
+Akira is a native Linux Design application built in Vala and GTK. Akira focuses on offering a modern and fast approach to UI and UX Design, mainly targeting web designers and graphic designers. The main goal is to offer a valid and professional solution for designers who want to use Linux as their main OS.
+
+**AKIRA IS CURRENTLY IN EARLY DEVELOPMENT, NOT READY TO BE USED!**
+
+## 📦 Install
+
+| elementaryOS AppCenter 	| FlatHub       	| Snapcraft Store 	|
+|------------------------	|---------------	|-----------------	|
+| Comming Soon!          	| Comming Soon! 	| Comming Soon!   	|
 
 ## 🛠 Compile
 
@@ -72,4 +83,4 @@ Contact: [http://tysontan.com](http://tysontan.com)  / [tysontan@mail.com](mailt
 ## 📜 License
 #### GNU GPLv3 / Creative Commons BY-SA
 
-Copyright © 2017 Akira Project.
+Copyright © 2019 Akira Project.
