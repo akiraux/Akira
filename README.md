@@ -66,6 +66,10 @@ If you want to ask any questions about the project, we have a dedicated Discord 
 
 Feel free to send a pull request to this repository with your code contributions, but firt read our [contributing guidelines](CONTRIBUTING.md) :page_with_curl:
 
+## 📌 Code of Conduct
+
+This project adheres to the an adapted version of Contributor Covenant [code of conduct](.github/CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code.
+
 ## 🎉 Support
 
 If you like Akira and you want to support its development, consider donating via [Liberpay](https://liberapay.com/AkiraUX/) or pledge on [Patreon](https://www.patreon.com/akiraux).
