@@ -48,11 +48,6 @@ You can install Akira by compiling it from the source, here's the list of depend
  - `libarchive`
  - `cairo`
  - `meson`
- 
- In Elementary OS 0.3 Freya and later, resolve dependencies by typing:
- ```
- sudo apt-get install -y valac meson build-essential libgtk-3-dev libgranite-dev libxml++2.6-dev libgoocanvas-2.0-dev libarchive-dev glib-2.0 libgtksourceview-3.0-dev libjson-glib-dev
- ```
 
 > _**Note:** For non-elementary distros, (such as Arch, Debian etc) you are required to install "vala" as additional dependency._
 
