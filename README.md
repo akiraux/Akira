@@ -43,7 +43,9 @@ You can install Akira by compiling it from the source, here's the list of depend
  - `gobject-2.0`
  - `libxml-2.0`
  - `gtksourceview-3.0`
+ - `libjson-glib-1.0`
  - `goocanvas-2.0`
+ - `libarchive`
  - `cairo`
  - `meson`
 
