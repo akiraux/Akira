@@ -31,7 +31,7 @@ Akira is a native Linux Design application built in Vala and GTK. Akira focuses 
 
 | elementaryOS AppCenter 	| FlatHub       	| Snapcraft Store 	|
 |------------------------	|---------------	|-----------------	|
-| Comming Soon!          	| Comming Soon! 	| Comming Soon!   	|
+| Coming Soon!          	| Coming Soon! 	    | Coming Soon!   	|
 
 ## 🛠 Compile
 
@@ -62,7 +62,7 @@ ninja && sudo ninja install
 
 ## 🤔 Questions &amp; Issues
 
-If you want to ask any questions about the project, we have a dedicated Discord channel available to any [Patreon](https://www.patreon.com/akiraux) supporters. And if you are trying out Akira and you encounter an error or any problem feel free to just open an issue.
+If you want to ask any questions about the project, we have a dedicated Discord channel available to any [Patreon](https://www.patreon.com/akiraux) supporters. If you are trying out Akira and you encounter an error or any problem feel free to just open an issue.
 
 ## 👨‍💻 Contributing
 
