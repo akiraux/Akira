@@ -19,7 +19,6 @@
 * Authored by: Giacomo "giacomoalbe" Alberini <giacomoalbe@gmail.com>
 */
 
-
 public class Akira.Models.FillsListModel : GLib.Object, GLib.ListModel {
     private GLib.List<Akira.Models.FillsItemModel> fills_list;
 
@@ -43,9 +42,9 @@ public class Akira.Models.FillsListModel : GLib.Object, GLib.ListModel {
         var position = fills_list.length ();
         fills_list.append (
             new Akira.Models.FillsItemModel (
-                "#abcded",
-                100,
-                true,
+                "#CCCCCC",
+                1,
+                false,
                 Akira.Utils.BlendingMode.NORMAL,
                 this
             )

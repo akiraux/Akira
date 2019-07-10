@@ -1,0 +1,37 @@
+.option-panel {
+    padding: 6px 10px;
+    background-color: alpha (@base_color, 0.7);
+    border-top: 1px solid shade (@bg_color, 0.7);
+    border-bottom: 1px solid shade (@bg_color, 0.7);
+}
+
+.option-panel label {
+    font-size: 9pt;
+    font-weight: bold;
+    color: @fg_color;
+}
+
+.option-panel button {
+    padding: 4px;
+    border-radius: 50%;
+}
+
+.fills-list {
+    background: transparent;
+}
+
+.bg-pattern {
+    background-image: /* tint image */
+                      linear-gradient(to right, rgba(192, 192, 192, 0.75), rgba(192, 192, 192, 0.75)),
+                      /* checkered effect */
+                      linear-gradient(to right, black 50%, white 50%),
+                      linear-gradient(to bottom, black 50%, white 50%);
+    background-blend-mode: normal, difference, normal;
+    background-size: 8px 8px;
+    border-radius: 2px;
+}
+
+button.selected-color {
+    border-radius: 2px;
+    border: 1px solid;
+}

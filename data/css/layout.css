@@ -8,69 +8,6 @@
     border-left: 1px solid shade (@bg_color, 0.9);
 }
 
-.border-bottom {
-    border-bottom: 1px solid shade (@bg_color, 0.8);
-}
-
-.fills-box-panel {
-    padding: 3px 5px;
-    background-color: @base_color;
-    border-bottom: 1px solid shade (@bg_color, 0.7);
-}
-
-.fills-box-panel label {
-    border-bottom: none;
-    font-size: 10pt;
-}
-
-.fills-box-panel button {
-    padding: 4px;
-    border-radius: 100%;
-}
-
-.fills-list {
-    background-color: shade (@bg_color, 0.9);
-    border-bottom: 1px solid shade (@bg_color, 0.7);
-    padding: 8px;
-    padding-bottom: 12px;
-}
-
-.fill-chooser-cont {
-    margin-bottom: 8px;
-}
-
-.fill-chooser-cont button {
-    padding: 0;
-    margin-left: 6px;
-    border-radius: 50%;
-}
-
-.fill-chooser {
-    background-color: shade (@bg_color, 0.98);
-    border: 1px solid shade (@bg_color, 0.7);
-    border-radius: 2px;
-}
-
-.fill-chooser button.selected-color {
-    margin: 5px;
-    padding: 6px 10px;
-    border-radius: 0;
-    border: 1px solid;
-    transition: none;
-}
-
-.fill-chooser label.opacity {
-    border-left: 1px solid shade (@bg_color, 0.7);
-    padding: 0 8px;
-    background-color: shade (@base_color, 1);
-    border-top-right-radius: 2px;
-    border-bottom-right-radius: 2px;
-}
-
-.opacity-slider {
-  padding: 3px 6px;
-}
-
 .color-picker {
   padding: 8px 5px;
 }
@@ -95,7 +32,7 @@
 }
 
 .alignment-box {
-    background-color: @base_color;
+    background-color: alpha (@base_color, 0.7);
     border-bottom: 1px solid shade (@bg_color, 0.8);
     padding: 3px;
 }
