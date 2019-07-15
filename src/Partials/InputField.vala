@@ -29,7 +29,8 @@ public class Akira.Partials.InputField : Gtk.Entry {
     public enum Unit {
         PIXEL,
         HASH,
-        PERCENTAGE
+        PERCENTAGE,
+        DEGREES
     }
 
     public InputField (Unit unit, int chars, bool icon_right = false, bool rtl = false) {
@@ -54,6 +55,9 @@ public class Akira.Partials.InputField : Gtk.Entry {
             break;
             case Unit.PIXEL:
                 icon = "input-pixel-symbolic";
+            break;
+            case Unit.DEGREES:
+                icon = "input-degrees-symbolic";
             break;
         }
 
