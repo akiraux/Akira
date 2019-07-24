@@ -74,7 +74,7 @@ This project adheres to the adapted version of Contributor Covenant [code of con
 
 ## 🎉 Support
 
-If you like Akira and you want to support its development, consider donating via [Liberpay](https://liberapay.com/AkiraUX/) or pledge on [Patreon](https://www.patreon.com/akiraux).
+If you like Akira and you want to support its development, consider donating via [Liberapay](https://liberapay.com/AkiraUX/) or pledge on [Patreon](https://www.patreon.com/akiraux).
 
 ## ✨ Mascot
 
