@@ -35,7 +35,10 @@ Akira is a native Linux Design application built in Vala and GTK. Akira focuses 
 
 ## 🛠 Compile
 
-You can install Akira by compiling it from the source, here's the list of dependencies required:
+You can install Akira by compiling it from the source
+
+### Install Dependencies
+
  - `gtk+-3.0>=3.18`
  - `granite>=0.5.0`
  - `glib-2.0`
@@ -51,14 +54,22 @@ You can install Akira by compiling it from the source, here's the list of depend
 
 > _**Note:** For non-elementary distros, (such as Arch, Debian etc) you are required to install "vala" as additional dependency._
 
-Once that above mentioned dependencies are resolved, Akira can be compiled &amp; installed by running the following commands:
-```
+#### Debian (Elementary/Ubuntu/Linux Mint)
+ ```sh
+ sudo apt-get install gtk+-3.0>=3.18 elementary-sdk glib-2.0 gee-0.8 gobject-2.0 libxml2 gtksourceview-3.0 libjson-glib-1.0 goocanvas-2.0 libarchive-dev libcairo2-dev meson valac
+ ```
+
+### Compile &amp; Run
+
+Once the above mentioned dependencies are resolved, Akira can be compiled &amp; installed
+
+```sh
 meson build --prefix=/usr -Dprofile=default
 cd build
 ninja && sudo ninja install
 ```
 
-> _**Note:** Replace the **"-Dprofile=default"** with **"-Dprofile=development"** to compile and install Akira in development mode where you can make changes._
+> _**Note:** Replace the `-Dprofile=default` with `-Dprofile=development` to compile and install Akira in **development** mode where you can make changes._
 
 ## 🤔 Questions &amp; Issues
 
@@ -87,6 +98,6 @@ Tyson Tan offers mascot design service for free and open source software, free o
 Contact: [http://tysontan.com](http://tysontan.com)  / [tysontan@mail.com](mailto:tysontan@mail.com)
 
 ## 📜 License
-#### GNU GPLv3 / Creative Commons BY-SA
+#### [GNU GPLv3 / Creative Commons BY-SA](./COPYING)
 
 Copyright © 2019 Akira Project.
