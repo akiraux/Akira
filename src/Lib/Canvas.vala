@@ -233,7 +233,11 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                         new_delta_x = delta_x;
                     }
                 }
+                update_y = event_y < y + height;
                 new_width = fix_size (width + new_delta_x);
+                if (!update_y) {
+                    new_delta_y = 0;
+                }
                 if (new_delta_y < height) {
                     selected_item.translate (0, new_delta_y);
                     debug ("translate: %f,%f\n", 0, new_delta_y);
@@ -278,11 +282,17 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                    new_delta_x = 0;
                 }
                 update_y = event_y > y;
-                if (new_delta_y == 0)
+                update_x = event_x < x + width;
+                if (!update_x) {
+                    new_delta_x = 0;
+                }
+                if (new_delta_y == 0) {
                     if (delta_y > 0 && update_y) {
                         new_delta_y = delta_y;
-                    } else
+                    } else {
                         break;
+                    }
+                }
                 debug ("translate: %f,%f\n", new_delta_x, 0);
                 selected_item.translate (new_delta_x, 0);
                 event_x -= new_delta_x;
@@ -554,52 +564,91 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         double x, y, width, height;
         target.get ("x", out x, "y", out y, "width", out width, "height", out height);
 
-        var middle = (nob_size / 2) + stroke;
-        var middle_stroke = (nob_size / 2) - stroke;
+        bool print_middle_width_nobs = width > nob_size * 3;
+        bool print_middle_height_nobs = height > nob_size * 3;
+
+        var nob_offset = (nob_size / 2);
 
         var transform = Cairo.Matrix.identity ();
         item.get_transform (out transform);
 
         // TOP LEFT nob
         nobs[Nob.TOP_LEFT].set_transform (transform);
-        nobs[Nob.TOP_LEFT].translate (x - middle, y - middle);
+        if (print_middle_width_nobs && print_middle_height_nobs) {
+          nobs[Nob.TOP_LEFT].translate (x - (nob_offset + stroke), y - (nob_offset + stroke));
+        } else {
+          nobs[Nob.TOP_LEFT].translate (x - nob_size - stroke, y - nob_size - stroke);
+        }
 
-        // TOP CENTER nob
-        nobs[Nob.TOP_CENTER].set_transform (transform);
-        nobs[Nob.TOP_CENTER].translate (x + (width / 2) - middle, y - middle);
+        if (print_middle_width_nobs) {
+          // TOP CENTER nob
+          nobs[Nob.TOP_CENTER].set_transform (transform);
+          nobs[Nob.TOP_CENTER].translate (x + (width / 2) - nob_offset, y - (nob_offset + stroke));
+          nobs[Nob.TOP_CENTER].set ("visibility", Goo.CanvasItemVisibility.VISIBLE);
+        } else {
+          nobs[Nob.TOP_CENTER].set ("visibility", Goo.CanvasItemVisibility.HIDDEN);
+        }
 
         // TOP RIGHT nob
         nobs[Nob.TOP_RIGHT].set_transform (transform);
-        nobs[Nob.TOP_RIGHT].translate (x + width - middle_stroke, y - middle);
+        if (print_middle_width_nobs && print_middle_height_nobs) {
+          nobs[Nob.TOP_RIGHT].translate (x + width - (nob_offset - stroke), y - (nob_offset + stroke));
+        } else {
+          nobs[Nob.TOP_RIGHT].translate (x + width + stroke, y - (nob_size + stroke));
+        }
 
-        // RIGHT CENTER nob
-        nobs[Nob.RIGHT_CENTER].set_transform (transform);
-        nobs[Nob.RIGHT_CENTER].translate (x + width - middle_stroke, y + (height / 2) - middle);
+        if (print_middle_height_nobs) {
+          // RIGHT CENTER nob
+          nobs[Nob.RIGHT_CENTER].set_transform (transform);
+          nobs[Nob.RIGHT_CENTER].translate (x + width - (nob_offset - stroke), y + (height / 2) - nob_offset);
+          nobs[Nob.RIGHT_CENTER].set ("visibility", Goo.CanvasItemVisibility.VISIBLE);
+        } else {
+          nobs[Nob.RIGHT_CENTER].set ("visibility", Goo.CanvasItemVisibility.HIDDEN);
+        }
 
         // BOTTOM RIGHT nob
         nobs[Nob.BOTTOM_RIGHT].set_transform (transform);
-        nobs[Nob.BOTTOM_RIGHT].translate (x + width - middle_stroke, y + height - middle_stroke);
+        if (print_middle_width_nobs && print_middle_height_nobs) {
+          nobs[Nob.BOTTOM_RIGHT].translate (x + width - (nob_offset - stroke), y + height - (nob_offset - stroke));
+        } else {
+          nobs[Nob.BOTTOM_RIGHT].translate (x + width + stroke, y + height + stroke);
+        }
 
-        // BOTTOM CENTER nob
-        nobs[Nob.BOTTOM_CENTER].set_transform (transform);
-        nobs[Nob.BOTTOM_CENTER].translate (x + (width / 2) - middle, y + height - middle_stroke);
+
+        if (print_middle_width_nobs) {
+          // BOTTOM CENTER nob
+          nobs[Nob.BOTTOM_CENTER].set_transform (transform);
+          nobs[Nob.BOTTOM_CENTER].translate (x + (width / 2) - nob_offset, y + height - (nob_offset - stroke));
+          nobs[Nob.BOTTOM_CENTER].set ("visibility", Goo.CanvasItemVisibility.VISIBLE);
+        } else {
+          nobs[Nob.BOTTOM_CENTER].set ("visibility", Goo.CanvasItemVisibility.HIDDEN);
+        }
 
         // BOTTOM LEFT nob
         nobs[Nob.BOTTOM_LEFT].set_transform (transform);
-        nobs[Nob.BOTTOM_LEFT].translate (x - middle, y + height - middle_stroke);
+        if (print_middle_width_nobs && print_middle_height_nobs) {
+          nobs[Nob.BOTTOM_LEFT].translate (x - (nob_offset + stroke), y + height - (nob_offset - stroke));
+        } else {
+          nobs[Nob.BOTTOM_LEFT].translate (x - (nob_size + stroke), y + height + stroke);
+        }
 
-        // LEFT CENTER nob
-        nobs[Nob.LEFT_CENTER].set_transform (transform);
-        nobs[Nob.LEFT_CENTER].translate (x - middle, y + (height / 2) - middle);
+        if (print_middle_height_nobs) {
+          // LEFT CENTER nob
+          nobs[Nob.LEFT_CENTER].set_transform (transform);
+          nobs[Nob.LEFT_CENTER].translate (x - (nob_offset + stroke), y + (height / 2) - nob_offset);
+          nobs[Nob.LEFT_CENTER].set ("visibility", Goo.CanvasItemVisibility.VISIBLE);
+        } else {
+          nobs[Nob.LEFT_CENTER].set ("visibility", Goo.CanvasItemVisibility.HIDDEN);
+        }
 
         // ROTATE nob
         double distance = 40;
         if (current_scale < 1) {
-            distance = 40 + ((40 - (40 * current_scale)) * 2);
+            distance = 40 * (2 * current_scale - 1);
         }
 
         nobs[Nob.ROTATE].set_transform (transform);
-        nobs[Nob.ROTATE].translate (x + (width / 2) - middle, y - (nob_size / 2) - distance);
+        nobs[Nob.ROTATE].translate (x + (width / 2) - (nob_offset + stroke), y - nob_offset - distance);
     }
 
     private void set_cursor (Gdk.CursorType cursor_type) {
@@ -638,7 +687,8 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     }
 
     private double fix_size (double size) {
-        var new_size = Math.round (size);
-        return new_size > MIN_SIZE ? new_size : MIN_SIZE;
+        return size;
+        //var new_size = Math.round (size);
+        //return new_size > MIN_SIZE ? new_size : MIN_SIZE;
     }
 }
