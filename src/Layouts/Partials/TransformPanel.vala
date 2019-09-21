@@ -95,20 +95,32 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         align_grid.attach (hflip_button, 0, 0, 1, 1);
         align_grid.attach (vflip_button, 1, 0, 1, 1);
 
-        var opacity = new Gtk.Adjustment (0, 0, 100, 0.5, 0, 0);
+        var opacity = new Gtk.Adjustment (0, 0, 100, 0.5, 100, 0);
+        opacity.set_value (100);
         var scale = new Gtk.Scale (Gtk.Orientation.HORIZONTAL, opacity);
         scale.hexpand = true;
         scale.draw_value = false;
         scale.sensitive = true;
         scale.round_digits = 1;
         scale.margin_end = 30;
-        var opacity_entry = new Akira.Partials.LinkedInput ("%", "", true, 0, 100.0);
+        var opacity_entry = new Akira.Partials.InputField (
+            Akira.Partials.InputField.Unit.PERCENTAGE, 7, true, true);
+        opacity_entry.text = (opacity.get_value()).to_string ();
         opacity_entry.bind_property (
-            "value", opacity, "value", BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE
+            "text", opacity, "value", BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE,
+            (binding, srcval, ref targetval) => {
+                double src = double.parse (srcval.dup_string ());
+                opacity.set_value (src);
+                targetval.set_double (opacity.get_value());
+                return true;
+            }, (binding, srcval, ref targetval) => {
+                double src = (double) srcval;
+                targetval.set_string ((src).to_string ());
+                return true;
+            }
         );
         opacity_entry.hexpand = false;
-        opacity_entry.halign = Gtk.Align.END;
-        opacity_entry.entry.width_request = 60;
+        opacity_entry.width_request = 64;
 
         var opacity_grid = new Gtk.Grid ();
         opacity_grid.hexpand = true;
