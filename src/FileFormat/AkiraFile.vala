@@ -40,9 +40,9 @@ public class Akira.FileFormat.AkiraFile : Akira.FileFormat.ZipArchiveHandler {
             var version_json = get_content_as_json (version_file);
             version_data = new FileFormat.Version (version_json != null ? version_json : new Json.Object ());
 
-            debug ("Version from file: %s\n", version_data.file_version);
+            debug ("Version from file: %s", version_data.file_version);
         } catch (Error e) {
-            error ("Could not load file: %s\n", e.message);
+            error ("Could not load file: %s", e.message);
         }
     }
 

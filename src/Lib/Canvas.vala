@@ -95,8 +95,8 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         temp_event_y = event.y / current_scale;
         temp_event_converted = false;
 
-        debug ("canvas temp event x: %f\n", temp_event_x);
-        debug ("canvas temp event y: %f\n", temp_event_y);
+        debug ("canvas temp event x: %f", temp_event_x);
+        debug ("canvas temp event y: %f", temp_event_y);
 
         var clicked_item = get_item_at (temp_event_x, temp_event_y, true);
 
@@ -154,28 +154,28 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
         convert_to_item_space(selected_item, ref event_x, ref event_y);
 
-        debug ("event x: %f\n", event_x);
-        debug ("event y: %f\n", event_y);
+        debug ("event x: %f", event_x);
+        debug ("event y: %f", event_y);
 
         if (!temp_event_converted) {
             convert_to_item_space(selected_item, ref temp_event_x, ref temp_event_y);
             temp_event_converted = true;
         }
 
-        debug ("temp event x: %f\n", temp_event_x);
-        debug ("temp event y: %f\n", temp_event_y);
+        debug ("temp event x: %f", temp_event_x);
+        debug ("temp event y: %f", temp_event_y);
 
         delta_x = event_x - temp_event_x;
         delta_y = event_y - temp_event_y;
 
-        debug ("delta x: %f\n", delta_x);
-        debug ("delta y: %f\n", delta_y);
+        debug ("delta x: %f", delta_x);
+        debug ("delta y: %f", delta_y);
 
         double x, y, width, height;
         selected_item.get ("x", out x, "y", out y, "width", out width, "height", out height);
 
-        debug ("x: %f\n", x);
-        debug ("y: %f\n", y);
+        debug ("x: %f", x);
+        debug ("y: %f", y);
 
         var new_height = height;
         var new_width = width;
@@ -183,33 +183,39 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         var new_delta_x = delta_x;
         var new_delta_y = delta_y;
 
-        debug ("new delta x: %f\n", new_delta_x);
-        debug ("new delta y: %f\n", new_delta_y);
+        var canvas_x = x;
+        var canvas_y = y;
+        convert_from_item_space (selected_item, ref canvas_x, ref canvas_y);
 
-        debug ("height: %f\n", height);
-        debug ("width: %f\n", width);
+        debug ("new delta x: %f", new_delta_x);
+        debug ("new delta y: %f", new_delta_y);
+
+        debug ("height: %f", height);
+        debug ("width: %f", width);
 
         bool update_x = new_delta_x != 0;
         bool update_y = new_delta_y != 0;
 
-        debug ("update x: %s\n", update_x.to_string());
-        debug ("update y: %s\n", update_y.to_string());
+        debug ("update x: %s", update_x.to_string());
+        debug ("update y: %s", update_y.to_string());
 
         switch (holding_id) {
             case Nob.NONE: // Moving
-                double move_x = fix_x_position (delta_x, x + width);
-                double move_y = fix_y_position (delta_y, y + height);
-                debug ("move x %f\n", move_x);
-                debug ("move y %f\n", move_y);
+                double move_x = fix_x_position (canvas_x, width, delta_x);
+                double move_y = fix_y_position (canvas_y, height, delta_y);
+                debug ("move x %f", move_x);
+                debug ("move y %f", move_y);
                 selected_item.translate (move_x, move_y);
                 event_x -= move_x;
                 event_y -= move_y;
                 break;
             case Nob.TOP_LEFT:
-                if (new_delta_y > height) {
+                update_x = event_x < x + width;
+                update_y = event_y < y + height;
+                if (MIN_SIZE > height - new_delta_y) {
                    new_delta_y = 0;
                 }
-                if (new_delta_x > width) {
+                if (MIN_SIZE > width - new_delta_x) {
                    new_delta_x = 0;
                 }
                 selected_item.translate (new_delta_x, new_delta_y);
@@ -219,19 +225,18 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 new_height = fix_size (height - new_delta_y);
                 break;
             case Nob.TOP_CENTER:
-                if (new_delta_y < height) {
-                    new_height = fix_size (height - new_delta_y);
-                    selected_item.translate (0, new_delta_y);
-                    event_y -= new_delta_y;
+                update_y = event_y < y + height;
+                if (MIN_SIZE > height - new_delta_y) {
+                   new_delta_y = 0;
                 }
+                new_height = fix_size (height - new_delta_y);
+                selected_item.translate (0, new_delta_y);
+                event_y -= new_delta_y;
                 break;
             case Nob.TOP_RIGHT:
                 update_x = event_x > x;
-                debug ("update x: %s\n", update_x.to_string());
-                if (new_delta_x == 0) {
-                    if (delta_x > 0 && update_x) {
-                        new_delta_x = delta_x;
-                    }
+                if (!update_x) {
+                    new_delta_x = 0;
                 }
                 update_y = event_y < y + height;
                 new_width = fix_size (width + new_delta_x);
@@ -240,41 +245,29 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 }
                 if (new_delta_y < height) {
                     selected_item.translate (0, new_delta_y);
-                    debug ("translate: %f,%f\n", 0, new_delta_y);
+                    debug ("translate: %f,%f", 0, new_delta_y);
                     event_y -= new_delta_y;
                     new_height = fix_size (height - new_delta_y);
                 }
                 break;
             case Nob.RIGHT_CENTER:
                 update_x = event_x > x;
-                if (new_delta_x == 0)
-                    if (delta_x > 0 && update_x) {
-                        new_delta_x = delta_x;
-                    } else
-                        break;
+                if (!update_x) {
+                    new_delta_x = 0;
+                }
                 new_width = fix_size (width + new_delta_x);
                 break;
             case Nob.BOTTOM_RIGHT:
                 update_x = event_x > x;
-                if (new_delta_x == 0)
-                    if (delta_x > 0 && update_x) {
-                        new_delta_x = delta_x;
-                    }
                 update_y = event_y > y;
-                if (new_delta_y == 0)
-                    if (delta_y > 0 && update_y) {
-                        new_delta_y = delta_y;
-                    }
                 new_width = fix_size (width + new_delta_x);
                 new_height = fix_size (height + new_delta_y);
                 break;
             case Nob.BOTTOM_CENTER:
                 update_y = event_y > y;
-                if (new_delta_y == 0)
-                    if (delta_y > 0 && update_y) {
-                        new_delta_y = delta_y;
-                    } else
-                        break;
+                if (!update_y) {
+                    new_delta_y = 0;
+                }
                 new_height = fix_size (height + new_delta_y);
                 break;
             case Nob.BOTTOM_LEFT:
@@ -293,13 +286,14 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                         break;
                     }
                 }
-                debug ("translate: %f,%f\n", new_delta_x, 0);
+                debug ("translate: %f,%f", new_delta_x, 0);
                 selected_item.translate (new_delta_x, 0);
                 event_x -= new_delta_x;
                 new_width = fix_size (width - new_delta_x);
                 new_height = fix_size (height + new_delta_y);
                 break;
             case Nob.LEFT_CENTER:
+                update_x = event_x < x + width;
                 if (new_delta_x < width) {
                     selected_item.translate (new_delta_x, 0);
                     event_x -= new_delta_x;
@@ -310,16 +304,16 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 var center_x = x + width / 2;
                 var center_y = y + height / 2;
 
-                debug ("center x: %f\n", center_x);
-                debug ("center y: %f\n", center_y);
+                debug ("center x: %f", center_x);
+                debug ("center y: %f", center_y);
 
                 var start_radians = GLib.Math.atan2 (center_y - temp_event_y, temp_event_x - center_x);
-                debug ("start_radians %f, atan2(%f - %f, %f - %f)\n", start_radians, center_y, temp_event_y, temp_event_x, center_x);
+                debug ("start_radians %f, atan2(%f - %f, %f - %f)", start_radians, center_y, temp_event_y, temp_event_x, center_x);
                 var radians = GLib.Math.atan2 (center_y - event_y, event_x - center_x);
-                debug ("radians %f, atan2(%f - %f, %f - %f)\n", radians, center_y ,event_y, event_x, center_x);
+                debug ("radians %f, atan2(%f - %f, %f - %f)", radians, center_y ,event_y, event_x, center_x);
                 radians = start_radians - radians;
                 var rotation = radians * (180 / Math.PI);
-                debug ("rotation: %f\n", rotation);
+                debug ("rotation: %f", rotation);
 
                 convert_from_item_space (selected_item, ref event_x, ref event_y);
                 selected_item.rotate (rotation, center_x, center_y);
@@ -328,11 +322,11 @@ public class Akira.Lib.Canvas : Goo.Canvas {
             default:
                 break;
         }
-        debug ("new width: %f\n", new_width);
-        debug ("new height: %f\n", new_height);
+        debug ("new width: %f", new_width);
+        debug ("new height: %f", new_height);
 
-        debug ("update x: %s\n", update_x.to_string());
-        debug ("update y: %s\n", update_y.to_string());
+        debug ("update x: %s", update_x.to_string());
+        debug ("update y: %s", update_y.to_string());
 
         selected_item.set ("width", new_width, "height", new_height);
 
@@ -341,14 +335,14 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
         if (update_x) {
             temp_event_x = event_x;
-            debug ("temp event x: %f\n", temp_event_x);
+            debug ("temp event x: %f", temp_event_x);
         }
         if (update_y) {
             temp_event_y = event_y;
-            debug ("temp event y: %f\n", temp_event_y);
+            debug ("temp event y: %f", temp_event_y);
         }
 
-        debug ("\n");
+        debug ("");
 
         return true;
     }
@@ -583,7 +577,11 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         if (print_middle_width_nobs) {
           // TOP CENTER nob
           nobs[Nob.TOP_CENTER].set_transform (transform);
+        if (print_middle_height_nobs) {
           nobs[Nob.TOP_CENTER].translate (x + (width / 2) - nob_offset, y - (nob_offset + stroke));
+        } else {
+          nobs[Nob.TOP_CENTER].translate (x + (width / 2) - nob_offset, y - (nob_size + stroke));
+        }
           nobs[Nob.TOP_CENTER].set ("visibility", Goo.CanvasItemVisibility.VISIBLE);
         } else {
           nobs[Nob.TOP_CENTER].set ("visibility", Goo.CanvasItemVisibility.HIDDEN);
@@ -600,7 +598,11 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         if (print_middle_height_nobs) {
           // RIGHT CENTER nob
           nobs[Nob.RIGHT_CENTER].set_transform (transform);
-          nobs[Nob.RIGHT_CENTER].translate (x + width - (nob_offset - stroke), y + (height / 2) - nob_offset);
+          if (print_middle_width_nobs) {
+            nobs[Nob.RIGHT_CENTER].translate (x + width - (nob_offset - stroke), y + (height / 2) - nob_offset);
+          } else {
+            nobs[Nob.RIGHT_CENTER].translate (x + width + stroke, y + (height / 2) - nob_offset);
+          }
           nobs[Nob.RIGHT_CENTER].set ("visibility", Goo.CanvasItemVisibility.VISIBLE);
         } else {
           nobs[Nob.RIGHT_CENTER].set ("visibility", Goo.CanvasItemVisibility.HIDDEN);
@@ -618,7 +620,11 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         if (print_middle_width_nobs) {
           // BOTTOM CENTER nob
           nobs[Nob.BOTTOM_CENTER].set_transform (transform);
-          nobs[Nob.BOTTOM_CENTER].translate (x + (width / 2) - nob_offset, y + height - (nob_offset - stroke));
+          if (print_middle_height_nobs) {
+            nobs[Nob.BOTTOM_CENTER].translate (x + (width / 2) - nob_offset, y + height - (nob_offset - stroke));
+          } else {
+            nobs[Nob.BOTTOM_CENTER].translate (x + (width / 2) - nob_offset, y + height + stroke);
+          }
           nobs[Nob.BOTTOM_CENTER].set ("visibility", Goo.CanvasItemVisibility.VISIBLE);
         } else {
           nobs[Nob.BOTTOM_CENTER].set ("visibility", Goo.CanvasItemVisibility.HIDDEN);
@@ -635,7 +641,11 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         if (print_middle_height_nobs) {
           // LEFT CENTER nob
           nobs[Nob.LEFT_CENTER].set_transform (transform);
-          nobs[Nob.LEFT_CENTER].translate (x - (nob_offset + stroke), y + (height / 2) - nob_offset);
+          if (print_middle_width_nobs) {
+            nobs[Nob.LEFT_CENTER].translate (x - (nob_offset + stroke), y + (height / 2) - nob_offset);
+          } else {
+            nobs[Nob.LEFT_CENTER].translate (x - (nob_size + stroke), y + (height / 2) - nob_offset);
+          }
           nobs[Nob.LEFT_CENTER].set ("visibility", Goo.CanvasItemVisibility.VISIBLE);
         } else {
           nobs[Nob.LEFT_CENTER].set ("visibility", Goo.CanvasItemVisibility.HIDDEN);
@@ -648,7 +658,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         }
 
         nobs[Nob.ROTATE].set_transform (transform);
-        nobs[Nob.ROTATE].translate (x + (width / 2) - (nob_offset + stroke), y - nob_offset - distance);
+        nobs[Nob.ROTATE].translate (x + (width / 2) - nob_offset, y - nob_offset - distance);
     }
 
     private void set_cursor (Gdk.CursorType cursor_type) {
@@ -656,39 +666,38 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         get_window ().set_cursor (cursor);
     }
 
-    private double fix_y_position (double y, double height) {
+    private double fix_y_position (double y, double height, double delta_y) {
         var min_delta = Math.round ((MIN_POS - height) * current_scale);
-        debug ("min delta y %f\n", min_delta);
-        var max_delta = Math.round ((bounds_h + height - MIN_POS) * current_scale);
-        debug ("min delta y %f\n", min_delta);
-        var new_y = Math.round (y);
+        debug ("min delta y %f", min_delta);
+        var max_delta = Math.round ((bounds_h - MIN_POS) * current_scale);
+        debug ("max delta y %f", max_delta);
+        var new_y = Math.round (y + delta_y);
         if (new_y < min_delta) {
-            return min_delta;
+            return 0;
         } else if (new_y > max_delta) {
-            return max_delta;
+            return 0;
         } else {
-            return new_y;
+            return delta_y;
         }
     }
 
-    private double fix_x_position (double x, double width) {
+    private double fix_x_position (double x, double width, double delta_x) {
         var min_delta = Math.round ((MIN_POS - width) * current_scale);
-        debug ("min delta x %f\n", min_delta);
-        var max_delta = Math.round ((bounds_h + width - MIN_POS) * current_scale);
-        debug ("max delta x %f\n", max_delta);
-        var new_x = Math.round (x);
+        debug ("min delta x %f", min_delta);
+        var max_delta = Math.round ((bounds_h - MIN_POS) * current_scale);
+        debug ("max delta x %f", max_delta);
+        var new_x = Math.round (x + delta_x);
         if (new_x < min_delta) {
-            return min_delta;
+            return 0;
         } else if (new_x > max_delta) {
-            return max_delta;
+            return 0;
         } else {
-            return new_x;
+            return delta_x;
         }
     }
 
     private double fix_size (double size) {
-        return size;
-        //var new_size = Math.round (size);
-        //return new_size > MIN_SIZE ? new_size : MIN_SIZE;
+        var new_size = Math.round (size);
+        return new_size > MIN_SIZE ? new_size : MIN_SIZE;
     }
 }
