@@ -95,8 +95,8 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         temp_event_y = event.y / current_scale;
         temp_event_converted = false;
 
-        debug ("canvas temp event x: %f\n", temp_event_x);
-        debug ("canvas temp event y: %f\n", temp_event_y);
+        debug ("canvas temp event x: %f", temp_event_x);
+        debug ("canvas temp event y: %f", temp_event_y);
 
         var clicked_item = get_item_at (temp_event_x, temp_event_y, true);
 
@@ -154,28 +154,28 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
         convert_to_item_space(selected_item, ref event_x, ref event_y);
 
-        debug ("event x: %f\n", event_x);
-        debug ("event y: %f\n", event_y);
+        debug ("event x: %f", event_x);
+        debug ("event y: %f", event_y);
 
         if (!temp_event_converted) {
             convert_to_item_space(selected_item, ref temp_event_x, ref temp_event_y);
             temp_event_converted = true;
         }
 
-        debug ("temp event x: %f\n", temp_event_x);
-        debug ("temp event y: %f\n", temp_event_y);
+        debug ("temp event x: %f", temp_event_x);
+        debug ("temp event y: %f", temp_event_y);
 
         delta_x = event_x - temp_event_x;
         delta_y = event_y - temp_event_y;
 
-        debug ("delta x: %f\n", delta_x);
-        debug ("delta y: %f\n", delta_y);
+        debug ("delta x: %f", delta_x);
+        debug ("delta y: %f", delta_y);
 
         double x, y, width, height;
         selected_item.get ("x", out x, "y", out y, "width", out width, "height", out height);
 
-        debug ("x: %f\n", x);
-        debug ("y: %f\n", y);
+        debug ("x: %f", x);
+        debug ("y: %f", y);
 
         var new_height = height;
         var new_width = width;
@@ -183,24 +183,25 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         var new_delta_x = delta_x;
         var new_delta_y = delta_y;
 
-        debug ("new delta x: %f\n", new_delta_x);
-        debug ("new delta y: %f\n", new_delta_y);
 
-        debug ("height: %f\n", height);
-        debug ("width: %f\n", width);
+        debug ("new delta x: %f", new_delta_x);
+        debug ("new delta y: %f", new_delta_y);
+
+        debug ("height: %f", height);
+        debug ("width: %f", width);
 
         bool update_x = new_delta_x != 0;
         bool update_y = new_delta_y != 0;
 
-        debug ("update x: %s\n", update_x.to_string());
-        debug ("update y: %s\n", update_y.to_string());
+        debug ("update x: %s", update_x.to_string());
+        debug ("update y: %s", update_y.to_string());
 
         switch (holding_id) {
             case Nob.NONE: // Moving
                 double move_x = fix_x_position (delta_x, x + width);
                 double move_y = fix_y_position (delta_y, y + height);
-                debug ("move x %f\n", move_x);
-                debug ("move y %f\n", move_y);
+                debug ("move x %f", move_x);
+                debug ("move y %f", move_y);
                 selected_item.translate (move_x, move_y);
                 event_x -= move_x;
                 event_y -= move_y;
@@ -227,7 +228,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 break;
             case Nob.TOP_RIGHT:
                 update_x = event_x > x;
-                debug ("update x: %s\n", update_x.to_string());
+                debug ("update x: %s", update_x.to_string());
                 if (new_delta_x == 0) {
                     if (delta_x > 0 && update_x) {
                         new_delta_x = delta_x;
@@ -240,7 +241,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 }
                 if (new_delta_y < height) {
                     selected_item.translate (0, new_delta_y);
-                    debug ("translate: %f,%f\n", 0, new_delta_y);
+                    debug ("translate: %f,%f", 0, new_delta_y);
                     event_y -= new_delta_y;
                     new_height = fix_size (height - new_delta_y);
                 }
@@ -293,7 +294,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                         break;
                     }
                 }
-                debug ("translate: %f,%f\n", new_delta_x, 0);
+                debug ("translate: %f,%f", new_delta_x, 0);
                 selected_item.translate (new_delta_x, 0);
                 event_x -= new_delta_x;
                 new_width = fix_size (width - new_delta_x);
@@ -310,16 +311,16 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 var center_x = x + width / 2;
                 var center_y = y + height / 2;
 
-                debug ("center x: %f\n", center_x);
-                debug ("center y: %f\n", center_y);
+                debug ("center x: %f", center_x);
+                debug ("center y: %f", center_y);
 
                 var start_radians = GLib.Math.atan2 (center_y - temp_event_y, temp_event_x - center_x);
-                debug ("start_radians %f, atan2(%f - %f, %f - %f)\n", start_radians, center_y, temp_event_y, temp_event_x, center_x);
+                debug ("start_radians %f, atan2(%f - %f, %f - %f)", start_radians, center_y, temp_event_y, temp_event_x, center_x);
                 var radians = GLib.Math.atan2 (center_y - event_y, event_x - center_x);
-                debug ("radians %f, atan2(%f - %f, %f - %f)\n", radians, center_y ,event_y, event_x, center_x);
+                debug ("radians %f, atan2(%f - %f, %f - %f)", radians, center_y ,event_y, event_x, center_x);
                 radians = start_radians - radians;
                 var rotation = radians * (180 / Math.PI);
-                debug ("rotation: %f\n", rotation);
+                debug ("rotation: %f", rotation);
 
                 convert_from_item_space (selected_item, ref event_x, ref event_y);
                 selected_item.rotate (rotation, center_x, center_y);
@@ -328,11 +329,11 @@ public class Akira.Lib.Canvas : Goo.Canvas {
             default:
                 break;
         }
-        debug ("new width: %f\n", new_width);
-        debug ("new height: %f\n", new_height);
+        debug ("new width: %f", new_width);
+        debug ("new height: %f", new_height);
 
-        debug ("update x: %s\n", update_x.to_string());
-        debug ("update y: %s\n", update_y.to_string());
+        debug ("update x: %s", update_x.to_string());
+        debug ("update y: %s", update_y.to_string());
 
         selected_item.set ("width", new_width, "height", new_height);
 
@@ -341,14 +342,14 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
         if (update_x) {
             temp_event_x = event_x;
-            debug ("temp event x: %f\n", temp_event_x);
+            debug ("temp event x: %f", temp_event_x);
         }
         if (update_y) {
             temp_event_y = event_y;
-            debug ("temp event y: %f\n", temp_event_y);
+            debug ("temp event y: %f", temp_event_y);
         }
 
-        debug ("\n");
+        debug ("");
 
         return true;
     }
