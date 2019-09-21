@@ -129,12 +129,23 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         color_container = new Gtk.Entry ();
         color_container.margin_end = 10;
         color_container.width_chars = 8;
+        color_container.max_length = 7;
         color_container.hexpand = true;
         color_container.text = color;
         color_container.bind_property (
             "text", model, "color",
-            BindingFlags.BIDIRECTIONAL
+            BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE
         );
+        color_container.key_release_event.connect (() => {
+            if (!color_container.text.contains ("#")) {
+                var builder = new StringBuilder ();
+                builder.append ("#");
+                builder.append (color_container.text);
+                color_container.text = builder.str;
+                color_container.set_position (-1);
+            }
+            return false;
+        });
 
         //  selected_blending_mode = new Gtk.Label ("");
         //  selected_blending_mode.hexpand = true;
@@ -151,7 +162,7 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         opacity_container.text = (alpha * 100).to_string ();
         opacity_container.bind_property (
             "text", model, "alpha",
-            BindingFlags.BIDIRECTIONAL,
+            BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE,
             (binding, srcval, ref targetval) => {
                 double src = double.parse (srcval.dup_string ());
                 if (src > 100) {
@@ -300,7 +311,7 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
     }
 
     private void set_color_chooser_color () {
-        if (!Regex.match_simple ("#[0-9A-F]{6}|#[0-9A-F]{3}", model.color)) {
+        if (!Regex.match_simple ("#[0-9A-F]{6}|#[0-9A-F]{3}", model.color.up ())) {
             return;
         }
 
