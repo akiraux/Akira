@@ -122,7 +122,8 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
 
         var picker_container = new Gtk.Grid ();
         picker_container.margin_end = 10;
-        picker_container.margin_top = picker_container.margin_bottom = 1;        picker_container.get_style_context ().add_class ("bg-pattern");
+        picker_container.margin_top = picker_container.margin_bottom = 1;
+        picker_container.get_style_context ().add_class ("bg-pattern");
         picker_container.add (selected_color);
 
         color_container = new Gtk.Entry ();
