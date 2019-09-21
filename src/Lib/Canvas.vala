@@ -587,7 +587,11 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         if (print_middle_width_nobs) {
           // TOP CENTER nob
           nobs[Nob.TOP_CENTER].set_transform (transform);
+        if (print_middle_height_nobs) {
           nobs[Nob.TOP_CENTER].translate (x + (width / 2) - nob_offset, y - (nob_offset + stroke));
+        } else {
+          nobs[Nob.TOP_CENTER].translate (x + (width / 2) - nob_offset, y - (nob_size + stroke));
+        }
           nobs[Nob.TOP_CENTER].set ("visibility", Goo.CanvasItemVisibility.VISIBLE);
         } else {
           nobs[Nob.TOP_CENTER].set ("visibility", Goo.CanvasItemVisibility.HIDDEN);
@@ -604,7 +608,11 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         if (print_middle_height_nobs) {
           // RIGHT CENTER nob
           nobs[Nob.RIGHT_CENTER].set_transform (transform);
-          nobs[Nob.RIGHT_CENTER].translate (x + width - (nob_offset - stroke), y + (height / 2) - nob_offset);
+          if (print_middle_width_nobs) {
+            nobs[Nob.RIGHT_CENTER].translate (x + width - (nob_offset - stroke), y + (height / 2) - nob_offset);
+          } else {
+            nobs[Nob.RIGHT_CENTER].translate (x + width + stroke, y + (height / 2) - nob_offset);
+          }
           nobs[Nob.RIGHT_CENTER].set ("visibility", Goo.CanvasItemVisibility.VISIBLE);
         } else {
           nobs[Nob.RIGHT_CENTER].set ("visibility", Goo.CanvasItemVisibility.HIDDEN);
@@ -622,7 +630,11 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         if (print_middle_width_nobs) {
           // BOTTOM CENTER nob
           nobs[Nob.BOTTOM_CENTER].set_transform (transform);
-          nobs[Nob.BOTTOM_CENTER].translate (x + (width / 2) - nob_offset, y + height - (nob_offset - stroke));
+          if (print_middle_height_nobs) {
+            nobs[Nob.BOTTOM_CENTER].translate (x + (width / 2) - nob_offset, y + height - (nob_offset - stroke));
+          } else {
+            nobs[Nob.BOTTOM_CENTER].translate (x + (width / 2) - nob_offset, y + height + stroke);
+          }
           nobs[Nob.BOTTOM_CENTER].set ("visibility", Goo.CanvasItemVisibility.VISIBLE);
         } else {
           nobs[Nob.BOTTOM_CENTER].set ("visibility", Goo.CanvasItemVisibility.HIDDEN);
@@ -639,7 +651,11 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         if (print_middle_height_nobs) {
           // LEFT CENTER nob
           nobs[Nob.LEFT_CENTER].set_transform (transform);
-          nobs[Nob.LEFT_CENTER].translate (x - (nob_offset + stroke), y + (height / 2) - nob_offset);
+          if (print_middle_width_nobs) {
+            nobs[Nob.LEFT_CENTER].translate (x - (nob_offset + stroke), y + (height / 2) - nob_offset);
+          } else {
+            nobs[Nob.LEFT_CENTER].translate (x - (nob_size + stroke), y + (height / 2) - nob_offset);
+          }
           nobs[Nob.LEFT_CENTER].set ("visibility", Goo.CanvasItemVisibility.VISIBLE);
         } else {
           nobs[Nob.LEFT_CENTER].set ("visibility", Goo.CanvasItemVisibility.HIDDEN);
