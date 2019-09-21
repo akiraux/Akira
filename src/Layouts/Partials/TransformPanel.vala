@@ -106,7 +106,8 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
             Akira.Partials.InputField.Unit.PERCENTAGE, 7, true, true);
         opacity_entry.text = (opacity.get_value()).to_string ();
         opacity_entry.bind_property (
-            "text", opacity, "value", BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE,
+            "text", opacity, "value",
+            BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE,
             (binding, srcval, ref targetval) => {
                 double src = double.parse (srcval.dup_string ());
                 if (src > 100) {
