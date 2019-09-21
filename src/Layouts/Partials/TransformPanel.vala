@@ -115,7 +115,8 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
                 return true;
             }, (binding, srcval, ref targetval) => {
                 double src = (double) srcval;
-                targetval.set_string (("%0.*f").printf (src));
+                targetval.set_string ((src).to_string ());
+                //  targetval.set_string (("%0.*f").printf (src));
                 return true;
             }
         );
