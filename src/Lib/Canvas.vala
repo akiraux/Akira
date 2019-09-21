@@ -210,10 +210,12 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 event_y -= move_y;
                 break;
             case Nob.TOP_LEFT:
-                if (new_delta_y > height) {
+                update_x = event_x < x + width;
+                update_y = event_y < y + height;
+                if (MIN_SIZE > height - new_delta_y) {
                    new_delta_y = 0;
                 }
-                if (new_delta_x > width) {
+                if (MIN_SIZE > width - new_delta_x) {
                    new_delta_x = 0;
                 }
                 selected_item.translate (new_delta_x, new_delta_y);
@@ -223,19 +225,18 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 new_height = fix_size (height - new_delta_y);
                 break;
             case Nob.TOP_CENTER:
-                if (new_delta_y < height) {
-                    new_height = fix_size (height - new_delta_y);
-                    selected_item.translate (0, new_delta_y);
-                    event_y -= new_delta_y;
+                update_y = event_y < y + height;
+                if (MIN_SIZE > height - new_delta_y) {
+                   new_delta_y = 0;
                 }
+                new_height = fix_size (height - new_delta_y);
+                selected_item.translate (0, new_delta_y);
+                event_y -= new_delta_y;
                 break;
             case Nob.TOP_RIGHT:
                 update_x = event_x > x;
-                debug ("update x: %s", update_x.to_string());
-                if (new_delta_x == 0) {
-                    if (delta_x > 0 && update_x) {
-                        new_delta_x = delta_x;
-                    }
+                if (!update_x) {
+                    new_delta_x = 0;
                 }
                 update_y = event_y < y + height;
                 new_width = fix_size (width + new_delta_x);
@@ -251,34 +252,22 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 break;
             case Nob.RIGHT_CENTER:
                 update_x = event_x > x;
-                if (new_delta_x == 0)
-                    if (delta_x > 0 && update_x) {
-                        new_delta_x = delta_x;
-                    } else
-                        break;
+                if (!update_x) {
+                    new_delta_x = 0;
+                }
                 new_width = fix_size (width + new_delta_x);
                 break;
             case Nob.BOTTOM_RIGHT:
                 update_x = event_x > x;
-                if (new_delta_x == 0)
-                    if (delta_x > 0 && update_x) {
-                        new_delta_x = delta_x;
-                    }
                 update_y = event_y > y;
-                if (new_delta_y == 0)
-                    if (delta_y > 0 && update_y) {
-                        new_delta_y = delta_y;
-                    }
                 new_width = fix_size (width + new_delta_x);
                 new_height = fix_size (height + new_delta_y);
                 break;
             case Nob.BOTTOM_CENTER:
                 update_y = event_y > y;
-                if (new_delta_y == 0)
-                    if (delta_y > 0 && update_y) {
-                        new_delta_y = delta_y;
-                    } else
-                        break;
+                if (!update_y) {
+                    new_delta_y = 0;
+                }
                 new_height = fix_size (height + new_delta_y);
                 break;
             case Nob.BOTTOM_LEFT:
@@ -304,6 +293,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 new_height = fix_size (height + new_delta_y);
                 break;
             case Nob.LEFT_CENTER:
+                update_x = event_x < x + width;
                 if (new_delta_x < width) {
                     selected_item.translate (new_delta_x, 0);
                     event_x -= new_delta_x;
@@ -707,8 +697,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     }
 
     private double fix_size (double size) {
-        return size;
-        //var new_size = Math.round (size);
-        //return new_size > MIN_SIZE ? new_size : MIN_SIZE;
+        var new_size = Math.round (size);
+        return new_size > MIN_SIZE ? new_size : MIN_SIZE;
     }
 }
