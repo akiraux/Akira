@@ -153,13 +153,15 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
             BindingFlags.BIDIRECTIONAL,
             (binding, srcval, ref targetval) => {
                 double src = double.parse (srcval.dup_string ());
-                alpha = src / 100;
-                targetval.set_double (alpha);
+                if (src > 100) {
+                    opacity_container.text = "100";
+                    return false;
+                }
+                targetval.set_double (src / 100);
                 return true;
             }, (binding, srcval, ref targetval) => {
                 double src = (double) srcval;
-                //  targetval.set_string (("%0.*f").printf (src * 100));
-                targetval.set_string ((src * 100).to_string ());
+                targetval.set_string (("%0.1f").printf (src * 100));
                 return true;
             }
         );

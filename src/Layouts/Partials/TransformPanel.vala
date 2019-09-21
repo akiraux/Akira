@@ -95,8 +95,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         align_grid.attach (hflip_button, 0, 0, 1, 1);
         align_grid.attach (vflip_button, 1, 0, 1, 1);
 
-        var opacity = new Gtk.Adjustment (0, 0, 100, 0.5, 100, 0);
-        opacity.set_value (100);
+        var opacity = new Gtk.Adjustment (100.0, 0, 100.0, 0, 0, 0);
         var scale = new Gtk.Scale (Gtk.Orientation.HORIZONTAL, opacity);
         scale.hexpand = true;
         scale.draw_value = false;
@@ -110,13 +109,15 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
             "text", opacity, "value", BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE,
             (binding, srcval, ref targetval) => {
                 double src = double.parse (srcval.dup_string ());
-                opacity.set_value (src);
-                targetval.set_double (opacity.get_value());
+                if (src > 100) {
+                    opacity_entry.text = (opacity.get_value()).to_string ();
+                    return false;
+                }
+                targetval.set_double (src);
                 return true;
             }, (binding, srcval, ref targetval) => {
                 double src = (double) srcval;
-                targetval.set_string ((src).to_string ());
-                //  targetval.set_string (("%0.*f").printf (src));
+                targetval.set_string (("%0.1f").printf (src));
                 return true;
             }
         );
