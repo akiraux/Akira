@@ -183,6 +183,9 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         var new_delta_x = delta_x;
         var new_delta_y = delta_y;
 
+        var canvas_x = x;
+        var canvas_y = y;
+        convert_from_item_space (selected_item, ref canvas_x, ref canvas_y);
 
         debug ("new delta x: %f", new_delta_x);
         debug ("new delta y: %f", new_delta_y);
@@ -198,8 +201,8 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
         switch (holding_id) {
             case Nob.NONE: // Moving
-                double move_x = fix_x_position (delta_x, x + width);
-                double move_y = fix_y_position (delta_y, y + height);
+                double move_x = fix_x_position (canvas_x, width, delta_x);
+                double move_y = fix_y_position (canvas_y, height, delta_y);
                 debug ("move x %f", move_x);
                 debug ("move y %f", move_y);
                 selected_item.translate (move_x, move_y);
@@ -657,33 +660,33 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         get_window ().set_cursor (cursor);
     }
 
-    private double fix_y_position (double y, double height) {
+    private double fix_y_position (double y, double height, double delta_y) {
         var min_delta = Math.round ((MIN_POS - height) * current_scale);
-        debug ("min delta y %f\n", min_delta);
-        var max_delta = Math.round ((bounds_h + height - MIN_POS) * current_scale);
-        debug ("min delta y %f\n", min_delta);
-        var new_y = Math.round (y);
+        debug ("min delta y %f", min_delta);
+        var max_delta = Math.round ((bounds_h - MIN_POS) * current_scale);
+        debug ("max delta y %f", max_delta);
+        var new_y = Math.round (y + delta_y);
         if (new_y < min_delta) {
-            return min_delta;
+            return 0;
         } else if (new_y > max_delta) {
-            return max_delta;
+            return 0;
         } else {
-            return new_y;
+            return delta_y;
         }
     }
 
-    private double fix_x_position (double x, double width) {
+    private double fix_x_position (double x, double width, double delta_x) {
         var min_delta = Math.round ((MIN_POS - width) * current_scale);
-        debug ("min delta x %f\n", min_delta);
-        var max_delta = Math.round ((bounds_h + width - MIN_POS) * current_scale);
-        debug ("max delta x %f\n", max_delta);
-        var new_x = Math.round (x);
+        debug ("min delta x %f", min_delta);
+        var max_delta = Math.round ((bounds_h - MIN_POS) * current_scale);
+        debug ("max delta x %f", max_delta);
+        var new_x = Math.round (x + delta_x);
         if (new_x < min_delta) {
-            return min_delta;
+            return 0;
         } else if (new_x > max_delta) {
-            return max_delta;
+            return 0;
         } else {
-            return new_x;
+            return delta_x;
         }
     }
 
