@@ -43,7 +43,7 @@ public class Akira.Partials.InputField : Gtk.Entry {
     }
 
     construct {
-        hexpand = false;
+        hexpand = true;
         width_chars = chars;
 
         switch (unit) {
