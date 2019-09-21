@@ -649,7 +649,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         }
 
         nobs[Nob.ROTATE].set_transform (transform);
-        nobs[Nob.ROTATE].translate (x + (width / 2) - (nob_offset + stroke), y - nob_offset - distance);
+        nobs[Nob.ROTATE].translate (x + (width / 2) - nob_offset, y - nob_offset - distance);
     }
 
     private void set_cursor (Gdk.CursorType cursor_type) {
