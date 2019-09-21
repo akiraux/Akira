@@ -158,7 +158,7 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
                 return true;
             }, (binding, srcval, ref targetval) => {
                 double src = (double) srcval;
-                targetval.set_string ((src * 100).to_string ());
+                targetval.set_string (("%0.*f").printf (src * 100));
                 return true;
             }
         );
