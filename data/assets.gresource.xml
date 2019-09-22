@@ -22,6 +22,7 @@
     <file alias="input-hash-symbolic.svg">icons/symbolic/input-hash-symbolic.svg</file>
     <file alias="input-percentage-symbolic.svg">icons/symbolic/input-percentage-symbolic.svg</file>
     <file alias="input-pixel-symbolic.svg">icons/symbolic/input-pixel-symbolic.svg</file>
+    <file alias="input-degrees-symbolic.svg">icons/symbolic/input-degrees-symbolic.svg</file>
 
     <file alias="system-settings-filled.svg">icons/filled/system-settings-filled.svg</file>
     <file alias="system-settings-symbolic.svg">icons/symbolic/system-settings-symbolic.svg</file>
