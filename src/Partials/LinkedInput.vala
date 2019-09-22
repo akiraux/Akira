@@ -33,10 +33,11 @@ public class Akira.Partials.LinkedInput : Gtk.Grid {
     public string unit { get; construct set; }
     public double limit { get; set; }
     public double value { get; set; }
+    public InputField.Unit icon { get; construct set;}
 
     /**
-    * Used to avoid to infinitely updating two linked data (for instance width
-    * and height when their ratio is locked)
+    * Used to avoid to infinitely updating two linked data
+    * (for instance width and height when their ratio is locked).
     */
     private bool manually_edited = true;
 
@@ -62,26 +63,41 @@ public class Akira.Partials.LinkedInput : Gtk.Grid {
         entry_label.width_request = 20;
         entry_label.hexpand = false;
 
-        entry = new Akira.Partials.InputField (
-            Akira.Partials.InputField.Unit.PIXEL, 7, true, false);
+        switch (unit) {
+            case "#":
+                icon = InputField.Unit.HASH;
+            break;
+            case "%":
+                icon = InputField.Unit.PERCENTAGE;
+            break;
+            case "px":
+                icon = InputField.Unit.PIXEL;
+            break;
+            case "°":
+                icon = InputField.Unit.DEGREES;
+            break;
+            default:
+                icon = InputField.Unit.PIXEL;
+            break;
+        }
+
+        entry = new Akira.Partials.InputField (icon, 7, true, false);
         entry.notify["text"].connect (() => {
             if (manually_edited) {
+                // Remove unwanted characters.
                 var text_canon = entry.text.replace (",", ".");
                 text_canon.canon ("0123456789.", '?');
-                if (text_canon.contains ("?") || (unit != null && !entry.text.has_suffix (unit))) {
-                    entry.text = text_canon.replace ("?", "") + unit;
-                }
-                var new_val = double.parse (text_canon.replace ("?", ""));
-                if (new_val != value) {
-                    value = new_val;
-                }
+                entry.text = text_canon.replace ("?", "");
+
+                // If limit is specified, force it as a value.
+                var new_val = double.parse (entry.text);
                 if (limit > 0.0 && new_val > limit) {
                     entry.text = limit.to_string ();
                 }
             }
         });
         notify["value"].connect (() => {
-            // Remove trailing 0
+            // Remove trailing 0.
             var format_value = "%f".printf (value).replace (",", ".");
             while (format_value.has_suffix ("0") && format_value != "0") {
                 format_value = format_value.slice (0, -1);
@@ -91,7 +107,7 @@ public class Akira.Partials.LinkedInput : Gtk.Grid {
             }
 
             manually_edited = false;
-            entry.text = "%s%s".printf (format_value, unit);
+            entry.text = "%s".printf (format_value);
             manually_edited = true;
         });
 

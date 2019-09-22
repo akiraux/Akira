@@ -84,6 +84,7 @@ public class Akira.Partials.InputField : Gtk.Entry {
             this.text = src.to_string ();
             return true;
         }
+
         // Arrow DOWN
         if (key.keyval == 65364) {
             int num = key.state == Gdk.ModifierType.SHIFT_MASK ? 10 : 1;
