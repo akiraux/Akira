@@ -72,5 +72,26 @@ public class Akira.Partials.InputField : Gtk.Entry {
         if (rtl) {
             xalign = 1.0f;
         }
+
+        key_press_event.connect (handle_key);
+    }
+
+    private bool handle_key (Gdk.EventKey key) {
+        // Arrow UP
+        if (key.keyval == 65362) {
+            int num = key.state == Gdk.ModifierType.SHIFT_MASK ? 10 : 1;
+            double src = double.parse (this.text) + num;
+            this.text = src.to_string ();
+            return true;
+        }
+        // Arrow DOWN
+        if (key.keyval == 65364) {
+            int num = key.state == Gdk.ModifierType.SHIFT_MASK ? 10 : 1;
+            double src = double.parse (this.text) - num;
+            this.text = src.to_string ();
+            return true;
+        }
+
+        return false;
     }
 }
