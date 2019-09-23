@@ -45,9 +45,9 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
         get { return _editing; } set { _editing = value; }
     }
 
-    public Artboard (Akira.Window main_window, string name) {
+    public Artboard (Akira.Window window, string name) {
         Object (
-            window: main_window,
+            window: window,
             layer_name: name
         );
     }

@@ -39,9 +39,11 @@ public class Akira.Services.ActionManager : Object {
     public const string ACTION_ZOOM_IN = "action_zoom_in";
     public const string ACTION_ZOOM_OUT = "action_zoom_out";
     public const string ACTION_ZOOM_RESET = "action_zoom_reset";
-    public const string ACTION_ADD_RECT = "action_add_rect";
-    public const string ACTION_ADD_ELLIPSE = "action_add_ellipse";
-    public const string ACTION_ADD_TEXT = "action_add_text";
+    public const string ACTION_RECT_TOOL = "action_rect_tool";
+    public const string ACTION_ELLIPSE_TOOL = "action_ellipse_tool";
+    public const string ACTION_TEXT_TOOL = "action_text_tool";
+    public const string ACTION_SELECTION_TOOL = "action_selection_tool";
+    public const string ACTION_DELETE = "action_delete";
 
     public static Gee.MultiMap<string, string> action_accelerators = new Gee.HashMultiMap<string, string> ();
 
@@ -59,15 +61,17 @@ public class Akira.Services.ActionManager : Object {
         { ACTION_ZOOM_IN, action_zoom_in },
         { ACTION_ZOOM_OUT, action_zoom_out },
         { ACTION_ZOOM_RESET, action_zoom_reset },
-        { ACTION_ADD_RECT, action_add_rect },
-        { ACTION_ADD_ELLIPSE, action_add_ellipse },
-        { ACTION_ADD_TEXT, action_add_text },
+        { ACTION_RECT_TOOL, action_rect_tool },
+        { ACTION_ELLIPSE_TOOL, action_ellipse_tool },
+        { ACTION_TEXT_TOOL, action_text_tool },
+        { ACTION_SELECTION_TOOL, action_selection_tool },
+        { ACTION_DELETE, action_delete },
     };
 
-    public ActionManager (Akira.Application akira_app, Akira.Window main_window) {
+    public ActionManager (Akira.Application akira_app, Akira.Window window) {
         Object (
             app: akira_app,
-            window: main_window
+            window: window
         );
     }
 
@@ -85,6 +89,11 @@ public class Akira.Services.ActionManager : Object {
         action_accelerators.set (ACTION_ZOOM_IN, "<Control>equal");
         action_accelerators.set (ACTION_ZOOM_OUT, "<Control>minus");
         action_accelerators.set (ACTION_ZOOM_RESET, "<Control>0");
+        action_accelerators.set (ACTION_RECT_TOOL, "r");
+        action_accelerators.set (ACTION_ELLIPSE_TOOL, "c");
+        action_accelerators.set (ACTION_TEXT_TOOL, "t");
+        action_accelerators.set (ACTION_SELECTION_TOOL, "Escape");
+        action_accelerators.set (ACTION_DELETE, "Delete");
     }
 
     construct {
@@ -154,25 +163,28 @@ public class Akira.Services.ActionManager : Object {
         window.headerbar.zoom.zoom_reset ();
     }
 
-    private void action_add_rect () {
-        var rect = window.main_window.main_canvas.add_rect ();
-        var artboard = window.main_window.right_sidebar.layers_panel.artboard;
-        artboard.container.add (new Akira.Layouts.Partials.Layer (window, artboard, rect, "Rectangle", "shape-rectangle-symbolic", false));
-        artboard.show_all ();
+    private void action_rect_tool () {
+        window.main_window.main_canvas.canvas.edit_mode = Akira.Lib.Canvas.EditMode.MODE_INSERT;
+        window.main_window.main_canvas.canvas.insert_type = Akira.Lib.Canvas.InsertType.RECT;
     }
 
-    private void action_add_ellipse () {
-        var ellipse = window.main_window.main_canvas.add_ellipse ();
-        var artboard = window.main_window.right_sidebar.layers_panel.artboard;
-        artboard.container.add (new Akira.Layouts.Partials.Layer (window, artboard, ellipse, "Circle", "shape-circle-symbolic", false));
-        artboard.show_all ();
+    private void action_selection_tool () {
+        window.main_window.main_canvas.canvas.edit_mode = Akira.Lib.Canvas.EditMode.MODE_SELECTION;
+        window.main_window.main_canvas.canvas.insert_type = null;
     }
 
-    private void action_add_text () {
-        var text = window.main_window.main_canvas.add_text ();
-        var artboard = window.main_window.right_sidebar.layers_panel.artboard;
-        artboard.container.add (new Akira.Layouts.Partials.Layer (window, artboard, text, "Text", "shape-text-symbolic", false));
-        artboard.show_all ();
+    private void action_delete () {
+        window.main_window.main_canvas.canvas.delete_selected ();
+    }
+
+    private void action_ellipse_tool () {
+        window.main_window.main_canvas.canvas.edit_mode = Akira.Lib.Canvas.EditMode.MODE_INSERT;
+        window.main_window.main_canvas.canvas.insert_type = Akira.Lib.Canvas.InsertType.ELLIPSE;
+    }
+
+    private void action_text_tool () {
+        window.main_window.main_canvas.canvas.edit_mode = Akira.Lib.Canvas.EditMode.MODE_INSERT;
+        window.main_window.main_canvas.canvas.insert_type = Akira.Lib.Canvas.InsertType.TEXT;
     }
 
     public static void action_from_group (string action_name, ActionGroup? action_group) {

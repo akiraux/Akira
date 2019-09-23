@@ -35,9 +35,9 @@ public class Akira.Layouts.Partials.PagesPanel : Gtk.ListBox {
         { "PAGES", Gtk.TargetFlags.SAME_APP, 0 }
     };
 
-    public PagesPanel (Akira.Window main_window) {
+    public PagesPanel (Akira.Window window) {
         Object (
-            window: main_window,
+            window: window,
             activate_on_single_click: false,
             selection_mode: Gtk.SelectionMode.SINGLE
         );
