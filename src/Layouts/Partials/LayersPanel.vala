@@ -37,9 +37,9 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
         { "ARTBOARD", Gtk.TargetFlags.SAME_APP, 0 }
     };
 
-    public LayersPanel (Akira.Window main_window) {
+    public LayersPanel (Akira.Window window) {
         Object (
-            window: main_window,
+            window: window,
             activate_on_single_click: false,
             selection_mode: Gtk.SelectionMode.SINGLE
         );

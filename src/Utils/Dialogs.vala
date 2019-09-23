@@ -22,9 +22,9 @@
 public class Akira.Utils.Dialogs : Object {
     public weak Akira.Window window { get; construct; }
 
-    public Dialogs (Akira.Window main_window) {
+    public Dialogs (Akira.Window window) {
         Object (
-            window: main_window
+            window: window
         );
     }
 

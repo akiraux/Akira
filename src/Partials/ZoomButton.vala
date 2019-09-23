@@ -27,9 +27,9 @@ public class Akira.Partials.ZoomButton : Gtk.Grid {
     public Gtk.Button zoom_default_button;
     public Gtk.Button zoom_in_button;
 
-    public ZoomButton (Akira.Window main_window) {
+    public ZoomButton (Akira.Window window) {
         Object (
-            window: main_window
+            window: window
         );
     }
 

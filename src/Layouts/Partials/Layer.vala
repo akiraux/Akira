@@ -83,9 +83,9 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 
     // public Akira.Shape shape { get; construct; }
 
-    public Layer (Akira.Window main_window, Akira.Layouts.Partials.Artboard artboard, Goo.CanvasItemSimple item_simple, string name, string icon, bool group, Akira.Layouts.Partials.Layer? parent = null) {
+    public Layer (Akira.Window window, Akira.Layouts.Partials.Artboard artboard, Goo.CanvasItemSimple item_simple, string name, string icon, bool group, Akira.Layouts.Partials.Layer? parent = null) {
         Object (
-            window: main_window,
+            window: window,
             layer_name: name,
             icon_name: icon,
             artboard: artboard,
@@ -518,7 +518,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
     }
 
     public bool update_on_escape (Gdk.EventKey key) {
-        if (key.keyval == 65307) {
+        if (key.keyval == Gdk.Key.Escape) {
             entry.text = label.label;
 
             update_label ();

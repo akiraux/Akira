@@ -29,14 +29,14 @@ public class Akira.Layouts.MainWindow : Gtk.Grid {
     public Gtk.Paned pane;
     public Gtk.Paned pane2;
 
-    public MainWindow (Akira.Window main_window) {
-        Object (window: main_window);
+    public MainWindow (Akira.Window window) {
+        Object (window: window);
     }
 
     construct {
         left_sidebar = new Akira.Layouts.LeftSideBar (window);
         right_sidebar = new Akira.Layouts.RightSideBar (window);
-        main_canvas = new Akira.Layouts.MainCanvas ();
+        main_canvas = new Akira.Layouts.MainCanvas (window);
 
         pane2 = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);
         pane2.pack1 (main_canvas, true, false);
