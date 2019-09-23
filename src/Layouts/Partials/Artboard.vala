@@ -340,8 +340,8 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 
     private bool on_key_pressed (Gtk.Widget source, Gdk.EventKey key) {
         switch (key.keyval) {
-            case 65535: // Delete Key
-            case 65288: // Backspace
+            case Gdk.Key.Delete:
+            case Gdk.Key.BackSpace:
                 return delete_object ();
         }
 

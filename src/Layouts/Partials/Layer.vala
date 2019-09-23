@@ -518,7 +518,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
     }
 
     public bool update_on_escape (Gdk.EventKey key) {
-        if (key.keyval == 65307) {
+        if (key.keyval == Gdk.Key.Search) {
             entry.text = label.label;
 
             update_label ();
