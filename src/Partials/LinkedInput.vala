@@ -94,6 +94,10 @@ public class Akira.Partials.LinkedInput : Gtk.Grid {
                 if (limit > 0.0 && new_val > limit) {
                     input_field.entry.text = limit.to_string ();
                 }
+
+                if (new_val != value) {
+                    value = new_val;
+                }
             }
         });
         notify["value"].connect (() => {
