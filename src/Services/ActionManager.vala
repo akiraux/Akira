@@ -89,11 +89,6 @@ public class Akira.Services.ActionManager : Object {
         action_accelerators.set (ACTION_ZOOM_IN, "<Control>equal");
         action_accelerators.set (ACTION_ZOOM_OUT, "<Control>minus");
         action_accelerators.set (ACTION_ZOOM_RESET, "<Control>0");
-        action_accelerators.set (ACTION_RECT_TOOL, "r");
-        action_accelerators.set (ACTION_ELLIPSE_TOOL, "c");
-        action_accelerators.set (ACTION_TEXT_TOOL, "t");
-        action_accelerators.set (ACTION_SELECTION_TOOL, "Escape");
-        action_accelerators.set (ACTION_DELETE, "Delete");
     }
 
     construct {

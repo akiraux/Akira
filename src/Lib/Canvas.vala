@@ -116,6 +116,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
     construct {
         edit_mode = EditMode.MODE_SELECTION;
+        events |= Gdk.EventMask.KEY_PRESS_MASK;
         events |= Gdk.EventMask.BUTTON_PRESS_MASK;
         events |= Gdk.EventMask.BUTTON_RELEASE_MASK;
         events |= Gdk.EventMask.POINTER_MOTION_MASK;
@@ -197,6 +198,24 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         delta_x = 0;
         delta_y = 0;
 
+        return false;
+    }
+
+    public override bool key_press_event (Gdk.EventKey event) {
+        switch (Gdk.keyval_to_upper (event.keyval)) {
+            case Gdk.Key.C:
+                edit_mode = Akira.Lib.Canvas.EditMode.MODE_INSERT;
+                insert_type = Akira.Lib.Canvas.InsertType.ELLIPSE;
+                return true;
+            case Gdk.Key.R:
+                edit_mode = Akira.Lib.Canvas.EditMode.MODE_INSERT;
+                insert_type = Akira.Lib.Canvas.InsertType.RECT;
+                return true;
+            case Gdk.Key.T:
+                edit_mode = Akira.Lib.Canvas.EditMode.MODE_INSERT;
+                insert_type = Akira.Lib.Canvas.InsertType.TEXT;
+                return true;
+        }
 
         return false;
     }
