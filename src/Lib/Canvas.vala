@@ -172,7 +172,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         return true;
     }
 
-    public void focus () {
+    public new void focus () {
         grab_focus (get_root_item ());
     }
 
@@ -221,6 +221,13 @@ public class Akira.Lib.Canvas : Goo.Canvas {
             case Gdk.Key.T:
                 edit_mode = Akira.Lib.Canvas.EditMode.MODE_INSERT;
                 insert_type = Akira.Lib.Canvas.InsertType.TEXT;
+                return true;
+            case Gdk.Key.Escape:
+                edit_mode = Akira.Lib.Canvas.EditMode.MODE_SELECTION;
+                insert_type = null;
+                return true;
+            case Gdk.Key.Delete:
+                delete_selected ();
                 return true;
         }
 
@@ -785,6 +792,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     }
 
     public void delete_selected () {
+        debug ("here");
         if (selected_item != null) {
             selected_item.remove();
             var artboard = window.main_window.right_sidebar.layers_panel.artboard;

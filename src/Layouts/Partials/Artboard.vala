@@ -404,7 +404,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
     }
 
     public bool update_on_escape (Gdk.EventKey key) {
-        if (key.keyval == 65307) {
+        if (key.keyval == Gdk.Key.Escape) {
             entry.text = label.label;
 
             update_label ();
