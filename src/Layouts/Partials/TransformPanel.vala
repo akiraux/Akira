@@ -111,7 +111,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
             BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE,
             (binding, srcval, ref targetval) => {
                 double src = double.parse (srcval.dup_string ());
-                if (src > 100) {
+                if (src > 100 || src < 0) {
                     opacity_entry.text = (opacity.get_value()).to_string ();
                     return false;
                 }
