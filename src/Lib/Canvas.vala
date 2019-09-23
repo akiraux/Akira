@@ -202,6 +202,9 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         delta_x = 0;
         delta_y = 0;
 
+        edit_mode = EditMode.MODE_SELECTION;
+        set_cursor_by_edit_mode ();
+
         return false;
     }
 
