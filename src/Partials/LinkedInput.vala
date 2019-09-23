@@ -24,7 +24,7 @@
 */
 public class Akira.Partials.LinkedInput : Gtk.Grid {
     public string label { get; construct set; }
-    public Akira.Partials.InputField entry { get; construct set; }
+    public Akira.Partials.InputField input_field { get; construct set; }
 
     /**
     * Indicates wheter the label or the entry should be first
@@ -81,18 +81,18 @@ public class Akira.Partials.LinkedInput : Gtk.Grid {
             break;
         }
 
-        entry = new Akira.Partials.InputField (icon, 7, true, false);
-        entry.notify["text"].connect (() => {
+        input_field = new Akira.Partials.InputField (icon, 7, true, false);
+        input_field.entry.notify["text"].connect (() => {
             if (manually_edited) {
                 // Remove unwanted characters.
-                var text_canon = entry.text.replace (",", ".");
+                var text_canon = input_field.entry.text.replace (",", ".");
                 text_canon.canon ("-0123456789.", '?');
-                entry.text = text_canon.replace ("?", "");
+                input_field.entry.text = text_canon.replace ("?", "");
 
                 // If limit is specified, force it as a value.
-                var new_val = double.parse (entry.text);
+                var new_val = double.parse (input_field.entry.text);
                 if (limit > 0.0 && new_val > limit) {
-                    entry.text = limit.to_string ();
+                    input_field.entry.text = limit.to_string ();
                 }
             }
         });
@@ -107,16 +107,16 @@ public class Akira.Partials.LinkedInput : Gtk.Grid {
             }
 
             manually_edited = false;
-            entry.text = "%s".printf (format_value);
+            input_field.entry.text = "%s".printf (format_value);
             manually_edited = true;
         });
 
         if (reversed) {
-            attach (entry, 0, 0);
+            attach (input_field, 0, 0);
             attach (entry_label, 1, 0);
         } else {
             attach (entry_label, 0, 0);
-            attach (entry, 1, 0);
+            attach (input_field, 1, 0);
         }
     }
 }

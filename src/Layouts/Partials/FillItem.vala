@@ -27,7 +27,7 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
     //  private Gtk.Button selected_blending_mode_cont;
     //  private Gtk.Label selected_blending_mode;
     private Gtk.MenuButton selected_color;
-    public Gtk.Entry opacity_container;
+    public Akira.Partials.InputField opacity_container;
     public Gtk.Entry color_container;
     private Gtk.Popover color_popover;
     private Gtk.Grid color_picker;
@@ -159,17 +159,17 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
 
         opacity_container = new Akira.Partials.InputField (
             Akira.Partials.InputField.Unit.PERCENTAGE, 7, true, true);
-        opacity_container.text = (alpha * 100).to_string ();
-        opacity_container.bind_property (
+        opacity_container.entry.text = (alpha * 100).to_string ();
+        opacity_container.entry.bind_property (
             "text", model, "alpha",
             BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE,
             (binding, srcval, ref targetval) => {
                 double src = double.parse (srcval.dup_string ());
                 if (src > 100) {
-                    opacity_container.text = "100";
+                    opacity_container.entry.text = "100";
                     return false;
                 } else if (src < 0) {
-                    opacity_container.text = "0";
+                    opacity_container.entry.text = "0";
                     return false;
                 }
                 targetval.set_double (src / 100);
