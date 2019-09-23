@@ -49,8 +49,7 @@
 
 .group-title {
     font-size: 8pt;
-    font-weight: 600;
-    letter-spacing: 1px;
+    font-weight: 700;
     color: alpha (@fg_color, 0.9);
 }
 

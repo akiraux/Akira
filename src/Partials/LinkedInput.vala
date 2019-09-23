@@ -86,7 +86,7 @@ public class Akira.Partials.LinkedInput : Gtk.Grid {
             if (manually_edited) {
                 // Remove unwanted characters.
                 var text_canon = entry.text.replace (",", ".");
-                text_canon.canon ("0123456789.", '?');
+                text_canon.canon ("-0123456789.", '?');
                 entry.text = text_canon.replace ("?", "");
 
                 // If limit is specified, force it as a value.

@@ -168,6 +168,9 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
                 if (src > 100) {
                     opacity_container.text = "100";
                     return false;
+                } else if (src < 0) {
+                    opacity_container.text = "0";
+                    return false;
                 }
                 targetval.set_double (src / 100);
                 return true;
