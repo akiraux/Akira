@@ -300,10 +300,12 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
             var provider = new Gtk.CssProvider ();
             var context = selected_color.get_style_context ();
 
+            var alpha_dot_separator = alpha.to_string ().replace (",", ".");
+
             var css = """.selected-color {
-                    background-color: alpha (%s, %f);
-                    border-color: alpha (shade (%s, 0.75), %f);
-                }""".printf (color, alpha, color, alpha);
+                    background-color: alpha (%s, %s);
+                    border-color: alpha (shade (%s, 0.75), %s);
+                }""".printf (color, alpha_dot_separator, color, alpha_dot_separator);
 
             provider.load_from_data (css, css.length);
 

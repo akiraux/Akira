@@ -29,9 +29,9 @@ public class Akira.Layouts.Partials.FillsBoxPanel : Gtk.Grid {
 
     private int last_item_position;
 
-    public FillsBoxPanel (Akira.Window main_window) {
+    public FillsBoxPanel (Akira.Window window) {
         Object (
-            window: main_window,
+            window: window,
             orientation: Gtk.Orientation.HORIZONTAL
         );
     }
