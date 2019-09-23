@@ -17,6 +17,7 @@
 * Boston, MA 02110-1301 USA
 *
 * Authored by: Ana Gelez <ana@gelez.xyz>
+* Edited by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
 public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
     // Should probably be associated with the currently selected object
