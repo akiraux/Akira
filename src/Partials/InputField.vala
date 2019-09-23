@@ -19,7 +19,9 @@
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
 
-public class Akira.Partials.InputField : Gtk.Entry {
+public class Akira.Partials.InputField : Gtk.Grid {
+    public Gtk.Entry entry { get; construct set; }
+
     public int chars { get; construct set; }
     public bool rtl { get; construct set; }
     public bool icon_right { get; construct set; }
@@ -43,8 +45,9 @@ public class Akira.Partials.InputField : Gtk.Entry {
     }
 
     construct {
-        hexpand = true;
-        width_chars = chars;
+        entry = new Gtk.Entry ();
+        entry.hexpand = true;
+        entry.width_chars = chars;
 
         switch (unit) {
             case Unit.HASH:
@@ -62,34 +65,36 @@ public class Akira.Partials.InputField : Gtk.Entry {
         }
 
         if (icon_right) {
-            secondary_icon_name = icon;
-            secondary_icon_sensitive = false;
+            entry.secondary_icon_name = icon;
+            entry.secondary_icon_sensitive = false;
         } else {
-            primary_icon_name = icon;
-            primary_icon_sensitive = false;
+            entry.primary_icon_name = icon;
+            entry.primary_icon_sensitive = false;
         }
 
         if (rtl) {
-            xalign = 1.0f;
+            entry.xalign = 1.0f;
         }
 
-        key_press_event.connect (handle_key);
+        entry.key_press_event.connect (handle_key);
+
+        add (entry);
     }
 
     private bool handle_key (Gdk.EventKey key) {
         // Arrow UP
         if (key.keyval == 65362) {
             int num = key.state == Gdk.ModifierType.SHIFT_MASK ? 10 : 1;
-            double src = double.parse (this.text) + num;
-            this.text = src.to_string ();
+            double src = double.parse (entry.text) + num;
+            entry.text = src.to_string ();
             return true;
         }
 
         // Arrow DOWN
         if (key.keyval == 65364) {
             int num = key.state == Gdk.ModifierType.SHIFT_MASK ? 10 : 1;
-            double src = double.parse (this.text) - num;
-            this.text = src.to_string ();
+            double src = double.parse (entry.text) - num;
+            entry.text = src.to_string ();
             return true;
         }
 

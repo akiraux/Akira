@@ -105,14 +105,14 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         scale.margin_end = 30;
         var opacity_entry = new Akira.Partials.InputField (
             Akira.Partials.InputField.Unit.PERCENTAGE, 7, true, true);
-        opacity_entry.text = (opacity.get_value()).to_string ();
-        opacity_entry.bind_property (
+        opacity_entry.entry.text = (opacity.get_value()).to_string ();
+        opacity_entry.entry.bind_property (
             "text", opacity, "value",
             BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE,
             (binding, srcval, ref targetval) => {
                 double src = double.parse (srcval.dup_string ());
                 if (src > 100 || src < 0) {
-                    opacity_entry.text = (opacity.get_value()).to_string ();
+                    opacity_entry.entry.text = (opacity.get_value()).to_string ();
                     return false;
                 }
                 targetval.set_double (src);
@@ -123,8 +123,8 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
                 return true;
             }
         );
-        opacity_entry.hexpand = false;
-        opacity_entry.width_request = 64;
+        opacity_entry.entry.hexpand = false;
+        opacity_entry.entry.width_request = 64;
 
         var opacity_grid = new Gtk.Grid ();
         opacity_grid.hexpand = true;
