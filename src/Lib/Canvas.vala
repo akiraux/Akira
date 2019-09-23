@@ -166,10 +166,14 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
         } else {
             remove_select_effect ();
-            grab_focus (get_root_item ());
+            focus ();
         }
 
         return true;
+    }
+
+    public void focus () {
+        grab_focus (get_root_item ());
     }
 
     public Goo.CanvasItem? insert_object (Gdk.EventButton event) {

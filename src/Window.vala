@@ -60,6 +60,8 @@ public class Akira.Window : Gtk.ApplicationWindow {
         move (settings.pos_x, settings.pos_y);
 
         show_app ();
+
+        main_window.main_canvas.canvas.focus ();
     }
 
     private void build_ui () {
