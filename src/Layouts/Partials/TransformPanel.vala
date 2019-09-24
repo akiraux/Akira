@@ -32,11 +32,11 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         column_spacing = 6;
         hexpand = true;
 
-        var pos_x = new Akira.Partials.LinkedInput (C_("The horizontal coordinate", "X"));
-        var pos_y = new Akira.Partials.LinkedInput (C_("The vertical coordinate", "Y"));
+        var pos_x = new Akira.Partials.LinkedInput (_("X"), _("Horizontal position"));
+        var pos_y = new Akira.Partials.LinkedInput (_("Y"), _("Vertical position"));
 
-        var width = new Akira.Partials.LinkedInput (C_("The first letter of Width", "W"));
-        var height = new Akira.Partials.LinkedInput (C_("The first letter of Height", "H"));
+        var width = new Akira.Partials.LinkedInput (_("W"), _("Width"));
+        var height = new Akira.Partials.LinkedInput (_("H"), _("Height"));
         width.notify["value"].connect (() => {
             if (size_lock) {
                 height.value = width.value / size_ratio;
@@ -70,8 +70,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
             size_lock = !size_lock;
         });
 
-        var rotation = new Akira.Partials.LinkedInput (C_("The first letter of Rotation", "R"), "°");
-        rotation.unit = "°";
+        var rotation = new Akira.Partials.LinkedInput (_("R"), _("Rotation degrees"), "°");
 
         var hflip_button = new Gtk.Button ();
         hflip_button.add (new Akira.Partials.ButtonImage ("object-flip-horizontal"));
