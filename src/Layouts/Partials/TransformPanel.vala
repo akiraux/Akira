@@ -32,6 +32,9 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         column_spacing = 6;
         hexpand = true;
 
+        var pos_x = new Akira.Partials.LinkedInput (C_("The horizontal coordinate", "X"));
+        var pos_y = new Akira.Partials.LinkedInput (C_("The vertical coordinate", "Y"));
+
         var width = new Akira.Partials.LinkedInput (C_("The first letter of Width", "W"));
         var height = new Akira.Partials.LinkedInput (C_("The first letter of Height", "H"));
         width.notify["value"].connect (() => {
@@ -132,8 +135,8 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         opacity_grid.attach (opacity_entry, 1, 0, 1);
 
         attach (group_title (_("Position")), 0, 0, 3);
-        attach (new Akira.Partials.LinkedInput (C_("The horizontal coordinate", "X")), 0, 1, 1);
-        attach (new Akira.Partials.LinkedInput (C_("The vertical coordinate", "Y")), 2, 1, 1);
+        attach (pos_x, 0, 1, 1);
+        attach (pos_y, 2, 1, 1);
 
         attach (new Akira.Partials.PanelSeparator (), 0, 2, 3);
 
