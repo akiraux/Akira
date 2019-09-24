@@ -24,6 +24,7 @@
 */
 public class Akira.Partials.LinkedInput : Gtk.Grid {
     public string label { get; construct set; }
+    public string tooltip { get; construct set; }
     public Akira.Partials.InputField input_field { get; construct set; }
 
     /**
@@ -41,10 +42,11 @@ public class Akira.Partials.LinkedInput : Gtk.Grid {
     */
     private bool manually_edited = true;
 
-    public LinkedInput (string label, string unit = "", bool reversed = false,
-                        double default_val = 0, double limit = 0.0) {
+    public LinkedInput (string label, string tooltip = "", string unit = "",
+                        bool reversed = false, double default_val = 0, double limit = 0.0) {
         Object (
             label: label,
+            tooltip: tooltip,
             reversed: reversed,
             value: default_val,
             limit: limit,
@@ -57,11 +59,15 @@ public class Akira.Partials.LinkedInput : Gtk.Grid {
         hexpand = true;
         get_style_context ().add_class (Gtk.STYLE_CLASS_LINKED);
 
+        var event_box = new Gtk.EventBox ();
+        event_box.event.connect (handle_event);
+
         var entry_label = new Gtk.Label (label);
         entry_label.get_style_context ().add_class ("entry-label");
         entry_label.halign = Gtk.Align.CENTER;
         entry_label.width_request = 20;
         entry_label.hexpand = false;
+        entry_label.tooltip_text = tooltip;
 
         switch (unit) {
             case "#":
@@ -115,12 +121,31 @@ public class Akira.Partials.LinkedInput : Gtk.Grid {
             manually_edited = true;
         });
 
+        event_box.add (entry_label);
+
         if (reversed) {
             attach (input_field, 0, 0);
-            attach (entry_label, 1, 0);
+            attach (event_box, 1, 0);
         } else {
-            attach (entry_label, 0, 0);
+            attach (event_box, 0, 0);
             attach (input_field, 1, 0);
         }
+    }
+
+    public bool handle_event (Gdk.Event event) {
+        if (event.type == Gdk.EventType.ENTER_NOTIFY) {
+            set_cursor (Gdk.CursorType.RIGHT_SIDE);
+        }
+
+        if (event.type == Gdk.EventType.LEAVE_NOTIFY) {
+            set_cursor (Gdk.CursorType.ARROW);
+        }
+
+        return false;
+    }
+
+    private void set_cursor (Gdk.CursorType cursor_type) {
+        var cursor = new Gdk.Cursor.for_display (Gdk.Display.get_default (), cursor_type);
+        get_window ().set_cursor (cursor);
     }
 }
