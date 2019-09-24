@@ -52,7 +52,7 @@ public class Akira.Partials.InputField : Gtk.Grid {
         entry = new Gtk.Entry ();
         entry.hexpand = true;
         entry.width_chars = chars;
-        entry.sensitive = false;
+        //  entry.sensitive = false;
 
         switch (unit) {
             case Unit.HASH:
@@ -70,11 +70,15 @@ public class Akira.Partials.InputField : Gtk.Grid {
         }
 
         if (icon_right) {
+            entry.get_style_context ().add_class ("input-icon-right");
             entry.secondary_icon_name = icon;
             entry.secondary_icon_sensitive = false;
+            entry.secondary_icon_activatable = false;
         } else {
+            entry.get_style_context ().add_class ("input-icon-left");
             entry.primary_icon_name = icon;
             entry.primary_icon_sensitive = false;
+            entry.primary_icon_activatable = false;
         }
 
         if (rtl) {
@@ -85,6 +89,8 @@ public class Akira.Partials.InputField : Gtk.Grid {
 
         spin_grid = new Gtk.Grid ();
         spin_grid.get_style_context ().add_class ("input-button-grid");
+        spin_grid.visible = false;
+        spin_grid.no_show_all = true;
 
         button_up = new Gtk.Button.from_icon_name ("pan-up-symbolic", Gtk.IconSize.MENU);
         button_up.get_style_context ().add_class ("input-button-up");
@@ -95,6 +101,18 @@ public class Akira.Partials.InputField : Gtk.Grid {
 
         attach (entry, 0, 0, 1, 1);
         attach (spin_grid, 1, 0, 1, 1);
+
+        entry.enter_notify_event.connect (event => {
+            spin_grid.visible = true;
+            spin_grid.show_all ();
+            return false;
+        });
+
+        entry.leave_notify_event.connect (event => {
+            spin_grid.visible = false;
+            spin_grid.no_show_all = true;
+            return false;
+        });
     }
 
     private bool handle_key (Gdk.EventKey key) {
