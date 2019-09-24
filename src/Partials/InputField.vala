@@ -35,6 +35,10 @@ public class Akira.Partials.InputField : Gtk.Grid {
         DEGREES
     }
 
+    public Gtk.Grid spin_grid { get; construct set; }
+    public Gtk.Button button_up { get; construct set; }
+    public Gtk.Button button_down { get; construct set; }
+
     public InputField (Unit unit, int chars, bool icon_right = false, bool rtl = false) {
         Object (
             unit: unit,
@@ -79,7 +83,18 @@ public class Akira.Partials.InputField : Gtk.Grid {
 
         entry.key_press_event.connect (handle_key);
 
-        add (entry);
+        spin_grid = new Gtk.Grid ();
+        spin_grid.get_style_context ().add_class ("input-button-grid");
+
+        button_up = new Gtk.Button.from_icon_name ("pan-up-symbolic", Gtk.IconSize.MENU);
+        button_up.get_style_context ().add_class ("input-button-up");
+        button_down = new Gtk.Button.from_icon_name ("pan-down-symbolic", Gtk.IconSize.MENU);
+        button_down.get_style_context ().add_class ("input-button-down");
+        spin_grid.attach (button_up, 0, 0, 1, 1);
+        spin_grid.attach (button_down, 0, 1, 1, 1);
+
+        attach (entry, 0, 0, 1, 1);
+        attach (spin_grid, 1, 0, 1, 1);
     }
 
     private bool handle_key (Gdk.EventKey key) {

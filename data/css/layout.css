@@ -68,3 +68,18 @@
 .panel-separator {
     border: none;
 }
+
+.input-button-grid {
+    margin-left: -22px;
+}
+
+.input-button-up {
+    padding: 0 2px;
+    border-radius: 0 2.5px 0 0;
+    border-bottom: none;
+}
+
+.input-button-down {
+    padding: 0 2px;
+    border-radius: 0 0 2.5px 0;
+}
