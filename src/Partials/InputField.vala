@@ -48,6 +48,7 @@ public class Akira.Partials.InputField : Gtk.Grid {
         entry = new Gtk.Entry ();
         entry.hexpand = true;
         entry.width_chars = chars;
+        entry.sensitive = false;
 
         switch (unit) {
             case Unit.HASH:
@@ -82,6 +83,7 @@ public class Akira.Partials.InputField : Gtk.Grid {
     }
 
     private bool handle_key (Gdk.EventKey key) {
+        debug (Gdk.Key.uparrow.to_string ());
         // Arrow UP
         if (key.keyval == 65362) {
             int num = key.state == Gdk.ModifierType.SHIFT_MASK ? 10 : 1;
