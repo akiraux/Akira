@@ -41,6 +41,8 @@ public class Akira.Partials.LinkedInput : Gtk.Grid {
     * (for instance width and height when their ratio is locked).
     */
     private bool manually_edited = true;
+    private bool dragging = false;
+    private double dragging_direction = 0;
 
     public LinkedInput (string label, string tooltip = "", string unit = "",
                         bool reversed = false, double default_val = 0, double limit = 0.0) {
@@ -139,6 +141,29 @@ public class Akira.Partials.LinkedInput : Gtk.Grid {
 
         if (event.type == Gdk.EventType.LEAVE_NOTIFY) {
             set_cursor (Gdk.CursorType.ARROW);
+        }
+
+        if (event.type == Gdk.EventType.BUTTON_PRESS) {
+            dragging = true;
+        }
+
+        if (event.type == Gdk.EventType.BUTTON_RELEASE) {
+            dragging = false;
+            dragging_direction = 0;
+        }
+
+        if (event.type == Gdk.EventType.MOTION_NOTIFY && dragging) {
+            if (dragging_direction == 0) {
+                dragging_direction = event.motion.x;
+            }
+
+            if (dragging_direction > event.motion.x) {
+                input_field.decrease_value (null);
+                dragging_direction = event.motion.x;
+            } else {
+                input_field.increase_value (null);
+                dragging_direction = event.motion.x;
+            }
         }
 
         return false;
