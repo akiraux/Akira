@@ -55,7 +55,7 @@ public class Akira.Partials.InputField : Gtk.EventBox {
         entry = new Gtk.Entry ();
         entry.hexpand = true;
         entry.width_chars = chars;
-        entry.sensitive = false;
+        //  entry.sensitive = false;
 
         switch (unit) {
             case Unit.HASH:
@@ -179,13 +179,13 @@ public class Akira.Partials.InputField : Gtk.EventBox {
     }
 
     public void increase_value (Gdk.EventKey? key) {
-        int num = key != null && key.state == Gdk.ModifierType.SHIFT_MASK ? 10 : 1;
+        int num = key != null && key.state.to_string () == "GDK_SHIFT_MASK" ? 10 : 1;
         double src = double.parse (entry.text) + num;
         entry.text = src.to_string ();
     }
 
     public void decrease_value (Gdk.EventKey? key) {
-        int num = key != null && key.state == Gdk.ModifierType.SHIFT_MASK ? 10 : 1;
+        int num = key != null && key.state.to_string () == "GDK_SHIFT_MASK" ? 10 : 1;
         double src = double.parse (entry.text) - num;
         entry.text = src.to_string ();
     }
