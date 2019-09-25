@@ -55,7 +55,7 @@ public class Akira.Partials.InputField : Gtk.EventBox {
         entry = new Gtk.Entry ();
         entry.hexpand = true;
         entry.width_chars = chars;
-        //  entry.sensitive = false;
+        entry.sensitive = false;
 
         switch (unit) {
             case Unit.HASH:
