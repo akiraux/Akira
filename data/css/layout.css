@@ -71,6 +71,13 @@
 
 .input-button {
     padding: 0 2pt;
-    margin-top: 0;
-    margin-bottom: 0;
+    margin: 0;
+}
+
+.input-button.up {
+    margin-bottom: -2pt;
+}
+
+.input-button.down {
+    margin-top: -2pt;
 }

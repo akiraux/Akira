@@ -50,12 +50,13 @@ public class Akira.Partials.InputField : Gtk.EventBox {
     }
 
     construct {
-        overlay = new Gtk.Overlay ();
+        valign = Gtk.Align.CENTER;
 
+        overlay = new Gtk.Overlay ();
         entry = new Gtk.Entry ();
         entry.hexpand = true;
         entry.width_chars = chars;
-        entry.sensitive = false;
+        //  entry.sensitive = false;
 
         switch (unit) {
             case Unit.HASH:
@@ -92,12 +93,14 @@ public class Akira.Partials.InputField : Gtk.EventBox {
 
         spin_grid = new Gtk.Grid ();
         spin_grid.halign = Gtk.Align.END;
-        spin_grid.valign = Gtk.Align.FILL;
+        spin_grid.valign = Gtk.Align.CENTER;
+        spin_grid.height_request = 20;
         spin_grid.visible = false;
         spin_grid.no_show_all = true;
 
         var button_up_image = new Gtk.Image.from_icon_name ("pan-up-symbolic", Gtk.IconSize.MENU);
         button_up_image.get_style_context ().add_class ("input-button");
+        button_up_image.get_style_context ().add_class ("up");
         button_up_image.opacity = 0.6;
 
         button_up = new Gtk.EventBox ();
@@ -115,6 +118,7 @@ public class Akira.Partials.InputField : Gtk.EventBox {
 
         var button_down_image = new Gtk.Image.from_icon_name ("pan-down-symbolic", Gtk.IconSize.MENU);
         button_down_image.get_style_context ().add_class ("input-button");
+        button_down_image.get_style_context ().add_class ("down");
         button_down_image.opacity = 0.6;
 
         button_down = new Gtk.EventBox ();
@@ -138,7 +142,7 @@ public class Akira.Partials.InputField : Gtk.EventBox {
         add (overlay);
 
         enter_notify_event.connect (event => {
-            if (!entry.sensitive) {
+            if (!entry.sensitive || entry.has_focus) {
                 return false;
             }
 
@@ -166,6 +170,16 @@ public class Akira.Partials.InputField : Gtk.EventBox {
                 }
             }
             return false;
+        });
+
+        entry.focus_in_event.connect (() => {
+            spin_grid.visible = false;
+            spin_grid.no_show_all = true;
+            if (icon_right) {
+                entry.secondary_icon_name = icon;
+            } else {
+                entry.primary_icon_name = icon;
+            }
         });
     }
 
