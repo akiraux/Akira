@@ -91,10 +91,10 @@ public class Akira.Partials.InputField : Gtk.EventBox {
         entry.key_press_event.connect (handle_key);
 
         spin_grid = new Gtk.Grid ();
-        spin_grid.get_style_context ().add_class ("input-button-grid");
         spin_grid.halign = Gtk.Align.END;
         spin_grid.valign = Gtk.Align.FILL;
-        spin_grid.opacity = 0;
+        spin_grid.visible = false;
+        spin_grid.no_show_all = true;
 
         var button_up_image = new Gtk.Image.from_icon_name ("pan-up-symbolic", Gtk.IconSize.MENU);
         button_up_image.get_style_context ().add_class ("input-button");
@@ -138,8 +138,14 @@ public class Akira.Partials.InputField : Gtk.EventBox {
         add (overlay);
 
         enter_notify_event.connect (event => {
+            if (!entry.sensitive) {
+                return false;
+            }
+
             if (event.detail != Gdk.NotifyType.INFERIOR) {
-                spin_grid.opacity = 1;
+                spin_grid.visible = true;
+                spin_grid.no_show_all = false;
+                spin_grid.show_all ();
                 if (icon_right) {
                     entry.secondary_icon_name = "";
                 } else {
@@ -151,7 +157,8 @@ public class Akira.Partials.InputField : Gtk.EventBox {
 
         leave_notify_event.connect (event => {
             if (event.detail != Gdk.NotifyType.INFERIOR) {
-                spin_grid.opacity = 0;
+                spin_grid.visible = false;
+                spin_grid.no_show_all = true;
                 if (icon_right) {
                     entry.secondary_icon_name = icon;
                 } else {
