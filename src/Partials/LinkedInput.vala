@@ -17,6 +17,7 @@
 * Boston, MA 02110-1301 USA
 *
 * Authored by: Ana Gelez <ana@gelez.xyz>
+*              Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
 
 /**
@@ -161,7 +162,7 @@ public class Akira.Partials.LinkedInput : Gtk.Grid {
                 dragging_direction = event.motion.x;
             }
 
-            if (dragging_direction > event.motion.x) {
+            if (dragging_direction > event.motion.x || event.motion.x_root == 0) {
                 input_field.decrease_value (null);
                 dragging_direction = event.motion.x;
             } else {
