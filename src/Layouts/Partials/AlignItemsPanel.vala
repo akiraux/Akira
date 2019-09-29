@@ -21,7 +21,7 @@
 public class Akira.Layouts.Partials.AlignItemsPanel : Gtk.Grid {
     public weak Akira.Window window { get; construct; }
 
-    public int current_button_column { get; set; default = 0;}
+    public int current_button_column { get; set; default = 0; }
 
     private struct AlignBoxItem {
         public string type;
@@ -61,21 +61,22 @@ public class Akira.Layouts.Partials.AlignItemsPanel : Gtk.Grid {
         Object (
             window: window,
             orientation: Gtk.Orientation.VERTICAL
-            );
+        );
     }
 
     construct {
-        halign = Gtk.Align.FILL;
-        column_homogeneous = true;
         get_style_context ().add_class ("alignment-box");
+        column_homogeneous = true;
+        hexpand = true;
 
         foreach (var item in ALIGN_ITEMS_PANEL_BUTTONS) {
             switch (item.type) {
                 case "sep":
                     var separator = new Gtk.Separator (Gtk.Orientation.VERTICAL);
                     separator.halign = Gtk.Align.CENTER;
+                    separator.margin_top = separator.margin_bottom = 4;
 
-                    attach (separator, current_button_column++, 0, 1, 1 );
+                    attach (separator, current_button_column++, 0, 1, 1);
                     break;
 
                 case "btn":

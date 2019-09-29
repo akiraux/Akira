@@ -24,8 +24,9 @@
 */
 public class Akira.Partials.LinkedInput : Gtk.Grid {
     public string label { get; construct set; }
-    public Gtk.Entry entry { get; construct set; }
-    
+    public string tooltip { get; construct set; }
+    public Akira.Partials.InputField input_field { get; construct set; }
+
     /**
     * Indicates wheter the label or the entry should be first
     */
@@ -33,56 +34,82 @@ public class Akira.Partials.LinkedInput : Gtk.Grid {
     public string unit { get; construct set; }
     public double limit { get; set; }
     public double value { get; set; }
-    
+    public InputField.Unit icon { get; construct set;}
+
     /**
-    * Used to avoid to infinitely updating two linked data (for instance width
-    * and height when their ratio is locked)
+    * Used to avoid to infinitely updating two linked data
+    * (for instance width and height when their ratio is locked).
     */
     private bool manually_edited = true;
-    
-    public LinkedInput (string label, string unit = "", bool reversed = false, double default_val = 0, double limit = 0.0) {
+    private bool dragging = false;
+    private double dragging_direction = 0;
+
+    public LinkedInput (string label, string tooltip = "", string unit = "",
+                        bool reversed = false, double default_val = 0, double limit = 0.0) {
         Object (
             label: label,
+            tooltip: tooltip,
             reversed: reversed,
             value: default_val,
             limit: limit,
             unit: unit
         );
     }
-    
+
     construct {
         valign = Gtk.Align.CENTER;
         hexpand = true;
         get_style_context ().add_class (Gtk.STYLE_CLASS_LINKED);
-        
+
+        var event_box = new Gtk.EventBox ();
+        event_box.event.connect (handle_event);
+
         var entry_label = new Gtk.Label (label);
         entry_label.get_style_context ().add_class ("entry-label");
         entry_label.halign = Gtk.Align.CENTER;
-        entry_label.width_request = 30;
+        entry_label.width_request = 20;
         entry_label.hexpand = false;
-        
-        entry = new Gtk.Entry ();
-        entry.width_request = 46;
-        entry.width_chars = 0;
-        entry.hexpand = true;
-        entry.notify["text"].connect (() => {
+        entry_label.tooltip_text = tooltip;
+
+        switch (unit) {
+            case "#":
+                icon = InputField.Unit.HASH;
+            break;
+            case "%":
+                icon = InputField.Unit.PERCENTAGE;
+            break;
+            case "px":
+                icon = InputField.Unit.PIXEL;
+            break;
+            case "°":
+                icon = InputField.Unit.DEGREES;
+            break;
+            default:
+                icon = InputField.Unit.PIXEL;
+            break;
+        }
+
+        input_field = new Akira.Partials.InputField (icon, 7, true, false);
+        input_field.entry.notify["text"].connect (() => {
             if (manually_edited) {
-                var text_canon = entry.text.replace (",", ".");
-                text_canon.canon ("0123456789.", '?');
-                if (text_canon.contains ("?") || (unit != null && !entry.text.has_suffix (unit))) {
-                    entry.text = text_canon.replace ("?", "") + unit;
+                // Remove unwanted characters.
+                var text_canon = input_field.entry.text.replace (",", ".");
+                text_canon.canon ("-0123456789.", '?');
+                input_field.entry.text = text_canon.replace ("?", "");
+
+                // If limit is specified, force it as a value.
+                var new_val = double.parse (input_field.entry.text);
+                if (limit > 0.0 && new_val > limit) {
+                    input_field.entry.text = limit.to_string ();
                 }
-                var new_val = double.parse (text_canon.replace ("?", ""));
+
                 if (new_val != value) {
                     value = new_val;
-                }
-                if (limit > 0.0 && new_val > limit) {
-                    entry.text = limit.to_string ();
                 }
             }
         });
         notify["value"].connect (() => {
-            // Remove trailing 0
+            // Remove trailing 0.
             var format_value = "%f".printf (value).replace (",", ".");
             while (format_value.has_suffix ("0") && format_value != "0") {
                 format_value = format_value.slice (0, -1);
@@ -90,20 +117,60 @@ public class Akira.Partials.LinkedInput : Gtk.Grid {
             if (format_value.has_suffix (".")) {
                 format_value += "0";
             }
-            
+
             manually_edited = false;
-            entry.text = "%s%s".printf (format_value, unit);
+            input_field.entry.text = "%s".printf (format_value);
             manually_edited = true;
         });
-        
+
+        event_box.add (entry_label);
+
         if (reversed) {
-            entry.xalign = 1.0f;
-            entry.get_style_context ().add_class ("reversed");
-            attach (entry, 0, 0);
-            attach (entry_label, 1, 0);
+            attach (input_field, 0, 0);
+            attach (event_box, 1, 0);
         } else {
-            attach (entry_label, 0, 0);
-            attach (entry, 1, 0);
+            attach (event_box, 0, 0);
+            attach (input_field, 1, 0);
         }
+    }
+
+    public bool handle_event (Gdk.Event event) {
+        if (event.type == Gdk.EventType.ENTER_NOTIFY) {
+            set_cursor (Gdk.CursorType.RIGHT_SIDE);
+        }
+
+        if (event.type == Gdk.EventType.LEAVE_NOTIFY) {
+            set_cursor (Gdk.CursorType.ARROW);
+        }
+
+        if (event.type == Gdk.EventType.BUTTON_PRESS) {
+            dragging = true;
+        }
+
+        if (event.type == Gdk.EventType.BUTTON_RELEASE) {
+            dragging = false;
+            dragging_direction = 0;
+        }
+
+        if (event.type == Gdk.EventType.MOTION_NOTIFY && dragging) {
+            if (dragging_direction == 0) {
+                dragging_direction = event.motion.x;
+            }
+
+            if (dragging_direction > event.motion.x) {
+                input_field.decrease_value (null);
+                dragging_direction = event.motion.x;
+            } else {
+                input_field.increase_value (null);
+                dragging_direction = event.motion.x;
+            }
+        }
+
+        return false;
+    }
+
+    private void set_cursor (Gdk.CursorType cursor_type) {
+        var cursor = new Gdk.Cursor.for_display (Gdk.Display.get_default (), cursor_type);
+        get_window ().set_cursor (cursor);
     }
 }

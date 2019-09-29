@@ -39,7 +39,6 @@ executable(
     'Layouts/MainCanvas.vala',
     'Layouts/MainWindow.vala',
     'Layouts/RightSideBar.vala',
-    'Layouts/StatusBar.vala',
     'Layouts/Partials/LayersPanel.vala',
     'Layouts/Partials/PagesPanel.vala',
     'Layouts/Partials/Artboard.vala',
@@ -56,8 +55,10 @@ executable(
     'Partials/ZoomButton.vala',
     'Partials/ButtonImage.vala',
     'Partials/AlignBoxButton.vala',
+    'Partials/InputField.vala',
     'Partials/LinkedInput.vala',
     'Partials/PanelSeparator.vala',
+    'Partials/PopoverButton.vala',
 
     'Models/FillsItemModel.vala',
     'Models/FillsListModel.vala',

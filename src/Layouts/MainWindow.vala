@@ -25,7 +25,6 @@ public class Akira.Layouts.MainWindow : Gtk.Grid {
     public Akira.Layouts.MainCanvas main_canvas;
     public Akira.Layouts.LeftSideBar left_sidebar;
     public Akira.Layouts.RightSideBar right_sidebar;
-    public Akira.Layouts.StatusBar statusbar;
 
     public Gtk.Grid grid;
     public Gtk.Paned pane;
@@ -38,8 +37,7 @@ public class Akira.Layouts.MainWindow : Gtk.Grid {
     construct {
         left_sidebar = new Akira.Layouts.LeftSideBar (window);
         right_sidebar = new Akira.Layouts.RightSideBar (window);
-        statusbar = new Akira.Layouts.StatusBar ();
-        main_canvas = new Akira.Layouts.MainCanvas ();
+        main_canvas = new Akira.Layouts.MainCanvas (window);
 
         grid = new Gtk.Grid ();
         pane = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);
@@ -55,6 +53,5 @@ public class Akira.Layouts.MainWindow : Gtk.Grid {
         pane2.pack2 (right_sidebar, false, false);
 
         attach (pane, 0, 0, 1, 1);
-        attach (statusbar, 0, 1, 1, 1);
     }
 }

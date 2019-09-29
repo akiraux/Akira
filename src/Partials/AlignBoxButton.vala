@@ -27,9 +27,9 @@ public class Akira.Partials.AlignBoxButton : Gtk.Button {
     public string action { get; construct; }
     public Akira.Partials.ButtonImage btn_image;
 
-    public AlignBoxButton (Akira.Window main_window, string action_name, string icon_name, string tooltip, string[] accels) {
+    public AlignBoxButton (Akira.Window window, string action_name, string icon_name, string tooltip, string[] accels) {
         Object (
-            window: main_window,
+            window: window,
             icon: icon_name,
             action: action_name,
             tooltip_markup: Granite.markup_accel_tooltip (accels, tooltip)
@@ -37,16 +37,17 @@ public class Akira.Partials.AlignBoxButton : Gtk.Button {
     }
 
     construct {
-        can_focus = false;
-        halign = Gtk.Align.CENTER;
         get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
+        get_style_context ().add_class ("button-rounded");
+        halign = Gtk.Align.CENTER;
+        valign = Gtk.Align.CENTER;
+        can_focus = false;
         sensitive = false;
 
-        btn_image = new ButtonImage (icon);
+        btn_image = new ButtonImage (icon, Gtk.IconSize.SMALL_TOOLBAR);
         add (btn_image);
         connect_signals ();
     }
-
 
     private void connect_signals () {
         clicked.connect (() => {

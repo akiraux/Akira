@@ -2,19 +2,17 @@ icon_sizes = ['16', '24', '32', '48', '64', '128']
 icons_dir = join_paths(akira_datadir, 'icons', 'hicolor')
 foreach size : icon_sizes
     install_data(
-        join_paths('icons', size + 'x' + size, meson.project_name() + '.svg'),
-        install_dir: join_paths(icons_dir, size + 'x' + size, 'apps'),
-        rename: application_id + '.svg'
+        join_paths('icons', size + 'x' + size, application_id + '.svg'),
+        install_dir: join_paths(icons_dir, size + 'x' + size, 'apps')
+
     )
     install_data(
-        join_paths('icons', size + 'x' + size, meson.project_name() + '.svg'),
-        install_dir: join_paths(icons_dir, size + 'x' + size + '@2', 'apps'),
-        rename: application_id + '@2.svg'
+        join_paths('icons', size + 'x' + size, application_id + '.svg'),
+        install_dir: join_paths(icons_dir, size + 'x' + size + '@2', 'apps')
     )
     install_data(
-        join_paths('icons', size + 'x' + size, meson.project_name() + '.svg'),
-        install_dir: join_paths(icons_dir, size + 'x' + size, 'mimetypes'),
-        rename: application_id + '.svg'
+        join_paths('icons', size + 'x' + size, application_id + '.svg'),
+        install_dir: join_paths(icons_dir, size + 'x' + size, 'mimetypes')
     )
 endforeach
 

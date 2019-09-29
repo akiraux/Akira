@@ -19,13 +19,14 @@
 * Authored by: Bilal Elmoussaoui <bilal.elmoussaoui@gnome.org>
 */
 
-
 public class Akira.Partials.ButtonImage: Gtk.Image {
 
     private string icon;
+    private Gtk.IconSize size;
 
-    public ButtonImage (string icon_name) {
+    public ButtonImage (string icon_name, Gtk.IconSize icon_size = Gtk.IconSize.LARGE_TOOLBAR) {
         icon = icon_name;
+        size = icon_size;
         margin = 0;
 
         settings.changed["use-symbolic"].connect(() => {
@@ -35,12 +36,9 @@ public class Akira.Partials.ButtonImage: Gtk.Image {
         update_image ();
     }
 
-
     private void update_image () {
-        var size = settings.use_symbolic ? Gtk.IconSize.SMALL_TOOLBAR : Gtk.IconSize.LARGE_TOOLBAR;
+        var size = settings.use_symbolic ? Gtk.IconSize.SMALL_TOOLBAR : size;
         var icon = settings.use_symbolic ? ("%s-symbolic".printf (icon)) : icon.replace ("-symbolic", "");
-        set_from_icon_name(icon, size);
+        set_from_icon_name (icon, size);
     }
-
-
 }
