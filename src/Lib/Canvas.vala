@@ -792,7 +792,6 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     }
 
     public void delete_selected () {
-        debug ("here");
         if (selected_item != null) {
             selected_item.remove();
             var artboard = window.main_window.right_sidebar.layers_panel.artboard;

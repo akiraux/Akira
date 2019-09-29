@@ -17,6 +17,7 @@
 * Boston, MA 02110-1301 USA
 *
 * Authored by: Ana Gelez <ana@gelez.xyz>
+*              Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
 
 /**
@@ -135,8 +136,12 @@ public class Akira.Partials.LinkedInput : Gtk.Grid {
     }
 
     public bool handle_event (Gdk.Event event) {
+        if (!input_field.entry.sensitive) {
+            return false;
+        }
+
         if (event.type == Gdk.EventType.ENTER_NOTIFY) {
-            set_cursor (Gdk.CursorType.RIGHT_SIDE);
+            set_cursor_from_name ("ew-resize");
         }
 
         if (event.type == Gdk.EventType.LEAVE_NOTIFY) {
@@ -157,7 +162,7 @@ public class Akira.Partials.LinkedInput : Gtk.Grid {
                 dragging_direction = event.motion.x;
             }
 
-            if (dragging_direction > event.motion.x) {
+            if (dragging_direction > event.motion.x || event.motion.x_root == 0) {
                 input_field.decrease_value (null);
                 dragging_direction = event.motion.x;
             } else {
@@ -171,6 +176,11 @@ public class Akira.Partials.LinkedInput : Gtk.Grid {
 
     private void set_cursor (Gdk.CursorType cursor_type) {
         var cursor = new Gdk.Cursor.for_display (Gdk.Display.get_default (), cursor_type);
+        get_window ().set_cursor (cursor);
+    }
+
+    private void set_cursor_from_name (string name) {
+        var cursor = new Gdk.Cursor.from_name (Gdk.Display.get_default (), name);
         get_window ().set_cursor (cursor);
     }
 }
