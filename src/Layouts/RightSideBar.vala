@@ -38,12 +38,12 @@ public class Akira.Layouts.RightSideBar : Gtk.Grid {
         }
     }
 
-    public RightSideBar (Akira.Window main_window) {
+    public RightSideBar (Akira.Window window) {
         Object (
             orientation: Gtk.Orientation.VERTICAL,
             column_homogeneous: true,
             toggled: true,
-            window: main_window
+            window: window
         );
     }
 

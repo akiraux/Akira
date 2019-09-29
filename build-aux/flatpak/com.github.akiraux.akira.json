@@ -1,11 +1,11 @@
 {
-   "app-id": "com.github.akiraux.akira",
+   "app-id": "com.github.akiraux.akiraDevel",
    "runtime": "org.gnome.Platform",
    "runtime-version": "3.32",
    "sdk": "org.gnome.Sdk",
    "base":"io.elementary.BaseApp",
    "base-version": "juno",
-   "command": "com.github.akiraux.akira",
+   "command": "com.github.akiraux.akiraDevel",
    "cleanup": [
       "/include",
       "/lib/pkgconfig",
@@ -44,6 +44,9 @@
       {
          "name": "akira",
          "buildsystem": "meson",
+         "config-opts": [
+            "-Dprofile=development"
+         ],
          "sources": [
             {
                "type": "git",

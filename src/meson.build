@@ -47,8 +47,8 @@ executable(
     'Layouts/Partials/FillItem.vala',
     'Layouts/Partials/BlendingModeItem.vala',
     'Layouts/Partials/TransformPanel.vala',
-    'Layouts/Partials/AlignItemsPanel.vala',
     'Layouts/Partials/StylePanel.vala',
+    'Layouts/Partials/AlignItemsPanel.vala',
 
     'Partials/HeaderBarButton.vala',
     'Partials/MenuButton.vala',

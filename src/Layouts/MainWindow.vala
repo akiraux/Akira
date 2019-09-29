@@ -26,12 +26,11 @@ public class Akira.Layouts.MainWindow : Gtk.Grid {
     public Akira.Layouts.LeftSideBar left_sidebar;
     public Akira.Layouts.RightSideBar right_sidebar;
 
-    public Gtk.Grid grid;
     public Gtk.Paned pane;
     public Gtk.Paned pane2;
 
-    public MainWindow (Akira.Window main_window) {
-        Object (window: main_window);
+    public MainWindow (Akira.Window window) {
+        Object (window: window);
     }
 
     construct {
@@ -39,18 +38,13 @@ public class Akira.Layouts.MainWindow : Gtk.Grid {
         right_sidebar = new Akira.Layouts.RightSideBar (window);
         main_canvas = new Akira.Layouts.MainCanvas (window);
 
-        grid = new Gtk.Grid ();
-        pane = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);
         pane2 = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);
-        pane.position = settings.left_paned;
-        pane2.position = settings.right_paned;
-        grid.attach (pane2, 0, 0, 1, 1);
-
-        pane.pack1 (left_sidebar, false, false);
-        pane.pack2 (grid, true, false);
-
         pane2.pack1 (main_canvas, true, false);
         pane2.pack2 (right_sidebar, false, false);
+
+        pane = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);
+        pane.pack1 (left_sidebar, false, false);
+        pane.pack2 (pane2, true, false);
 
         attach (pane, 0, 0, 1, 1);
     }

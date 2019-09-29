@@ -26,13 +26,13 @@ public class Akira.Layouts.Partials.StylePanel : Gtk.Box {
     private Gtk.Revealer options_revealer;
     private Gtk.Box options_box;
     private Gtk.Scale border_radius_scale;
-    private Gtk.Entry border_radius_entry;
+    private Akira.Partials.InputField border_radius_entry;
     private Gtk.ToggleButton options_button;
 
-    private Gtk.Entry border_radius_bottom_left_entry;
-    private Gtk.Entry border_radius_bottom_right_entry;
-    private Gtk.Entry border_radius_top_left_entry;
-    private Gtk.Entry border_radius_top_right_entry;
+    private Akira.Partials.InputField border_radius_bottom_left_entry;
+    private Akira.Partials.InputField border_radius_bottom_right_entry;
+    private Akira.Partials.InputField border_radius_top_left_entry;
+    private Akira.Partials.InputField border_radius_top_right_entry;
 
     private Gtk.Switch autoscale_switch;
     private Gtk.Switch uniform_switch;
@@ -45,14 +45,17 @@ public class Akira.Layouts.Partials.StylePanel : Gtk.Box {
 
     construct {
 
+        var title_cont = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 0);
+        title_cont.get_style_context ().add_class ("option-panel");
+
         label =  new Gtk.Label (_("Style"));
-        label.get_style_context ().add_class ("artboard-name");
-        label.get_style_context ().add_class ("panel-title");
         label.halign = Gtk.Align.FILL;
         label.xalign = 0;
         label.hexpand = true;
         label.set_ellipsize (Pango.EllipsizeMode.END);
-        pack_start (label, true, true, 0);
+        title_cont.pack_start (label, true, true, 0);
+
+        pack_start(title_cont, false, false, 0);
 
         var panel_grid = new Gtk.Grid ();
         get_style_context ().add_class ("style-panel");
@@ -78,8 +81,9 @@ public class Akira.Layouts.Partials.StylePanel : Gtk.Box {
         border_radius_scale.hexpand = true;
         panel_grid.attach (border_radius_scale, 0, 2, 1, 1);
 
-        border_radius_entry = new Gtk.Entry ();
-        border_radius_entry.width_chars = 6;
+        border_radius_entry = new Akira.Partials.InputField (Akira.Partials.InputField.Unit.PIXEL, 6, true, false);
+        border_radius_entry.entry.hexpand = false;
+        border_radius_entry.entry.width_request = 64;
         border_radius_entry.valign = Gtk.Align.CENTER;
         panel_grid.attach (border_radius_entry, 1, 2, 1, 1);
 
@@ -106,28 +110,33 @@ public class Akira.Layouts.Partials.StylePanel : Gtk.Box {
         border_entries_grid.column_spacing = 12;
         border_entries_grid.hexpand = true;
 
-        border_radius_top_left_entry = new Gtk.Entry ();
-        border_radius_top_left_entry.width_chars = 4;
+        border_radius_top_left_entry = new Akira.Partials.InputField (Akira.Partials.InputField.Unit.PIXEL, 6, true, false);
+        border_radius_top_left_entry.entry.hexpand = false;
+        border_radius_top_left_entry.entry.width_request = 64;
         border_radius_top_left_entry.valign = Gtk.Align.CENTER;
         border_radius_top_left_entry.halign = Gtk.Align.START;
         border_entries_grid.attach (border_radius_top_left_entry, 0, 0, 1, 1);
 
-        border_radius_top_right_entry = new Gtk.Entry ();
-        border_radius_top_right_entry.width_chars = 4;
+        border_radius_top_right_entry = new Akira.Partials.InputField (Akira.Partials.InputField.Unit.PIXEL, 6, true, false);
+        border_radius_top_right_entry.entry.hexpand = false;
+        border_radius_top_right_entry.entry.width_request = 64;
         border_radius_top_right_entry.valign = Gtk.Align.CENTER;
         border_radius_top_right_entry.halign = Gtk.Align.END;
         border_entries_grid.attach (border_radius_top_right_entry, 1, 0, 1, 1);
 
-        border_radius_bottom_left_entry = new Gtk.Entry ();
-        border_radius_bottom_left_entry.width_chars = 4;
+        border_radius_bottom_left_entry = new Akira.Partials.InputField (Akira.Partials.InputField.Unit.PIXEL, 6, true, false);
+        border_radius_bottom_left_entry.entry.hexpand = false;
+        border_radius_bottom_left_entry.entry.width_request = 64;
         border_radius_bottom_left_entry.valign = Gtk.Align.CENTER;
         border_radius_bottom_left_entry.halign = Gtk.Align.START;
         border_entries_grid.attach (border_radius_bottom_left_entry, 0, 1, 1, 1);
 
-        border_radius_bottom_right_entry = new Gtk.Entry ();
+
+        border_radius_bottom_right_entry = new Akira.Partials.InputField (Akira.Partials.InputField.Unit.PIXEL, 6, true, false);
+        border_radius_bottom_right_entry.entry.hexpand = false;
+        border_radius_bottom_right_entry.entry.width_request = 64;
         border_radius_bottom_right_entry.valign = Gtk.Align.CENTER;
         border_radius_bottom_right_entry.halign = Gtk.Align.END;
-        border_radius_bottom_right_entry.width_chars = 4;
         border_entries_grid.attach (border_radius_bottom_right_entry, 1, 1, 1, 1);
 
         options_box.pack_start (border_entries_grid, true, true, 0);
@@ -164,22 +173,21 @@ public class Akira.Layouts.Partials.StylePanel : Gtk.Box {
 
     private void bind_signals () {
         border_radius_scale.value_changed.connect ( () => {
-            string border_value = border_radius_scale.get_value ().to_string ();
-            border_radius_entry.text = border_value;
+            double border_value = border_radius_scale.get_value ();
+            border_radius_entry.entry.text = ((int)border_value).to_string ();
         });
-
-        border_radius_entry.changed.connect ( () => {
-            double typed_border_radius = double.parse (border_radius_entry.text);
+        border_radius_entry.entry.changed.connect ( () => {
+            double typed_border_radius = double.parse (border_radius_entry.entry.text);
             border_radius_scale.set_value (typed_border_radius);
         });
 
         uniform_switch.activate.connect ( () => {
             if (uniform_switch.active) {
-                string border_value = border_radius_scale.get_value ().to_string ();
-                border_radius_bottom_left_entry.text = border_value;
-                border_radius_bottom_right_entry.text = border_value;
-                border_radius_top_left_entry.text = border_value;
-                border_radius_top_right_entry.text = border_value;
+                double border_value = border_radius_scale.get_value ();
+                border_radius_bottom_left_entry.entry.text = ((int)border_value).to_string ();
+                border_radius_bottom_right_entry.entry.text = ((int)border_value).to_string ();
+                border_radius_top_left_entry.entry.text = ((int)border_value).to_string ();
+                border_radius_top_right_entry.entry.text = ((int)border_value).to_string ();
             }
         });
     }
