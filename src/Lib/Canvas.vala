@@ -114,6 +114,10 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     private double bounds_w;
     private double bounds_h;
 
+    private double border_size;
+    private string border_color;
+    private string fill_color;
+
     construct {
         edit_mode = EditMode.MODE_SELECTION;
         events |= Gdk.EventMask.KEY_PRESS_MASK;
@@ -177,6 +181,8 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     }
 
     public Goo.CanvasItem? insert_object (Gdk.EventButton event) {
+        udpate_default_values ();
+
         if (insert_type == InsertType.RECT) {
           return add_rect (event);
         } else if (insert_type == InsertType.ELLIPSE) {
@@ -806,16 +812,18 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
     public Goo.CanvasRect add_rect (Gdk.EventButton event) {
         var root = get_root_item ();
-        var rect = new Goo.CanvasRect (null, event.x, event.y, 10, 10,
-                                    "line-width", 5.0,
-                                    "radius-x", 100.0,
-                                    "radius-y", 100.0,
-                                    "stroke-color", "#f37329",
-                                    "fill-color", "#ffa154", null);
+        var rect = new Goo.CanvasRect (null, event.x, event.y, 1, 1,
+                                       "line-width", border_size,
+                                       "radius-x", 0.0,
+                                       "radius-y", 0.0,
+                                       "stroke-color", border_color,
+                                       "fill-color", fill_color, null);
+
         rect.set ("parent", root);
-        rect.set_transform(Cairo.Matrix.identity ());
+        rect.set_transform (Cairo.Matrix.identity ());
         var artboard = window.main_window.right_sidebar.layers_panel.artboard;
-        var layer = new Akira.Layouts.Partials.Layer (window, artboard, rect, "Rectangle", "shape-rectangle-symbolic", false);
+        var layer = new Akira.Layouts.Partials.Layer (window, artboard, rect,
+            "Rectangle", "shape-rectangle-symbolic", false);
         rect.set_data<Akira.Layouts.Partials.Layer?> ("layer", layer);
         artboard.container.add (layer);
         artboard.show_all ();
@@ -824,15 +832,16 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
     public Goo.CanvasEllipse add_ellipse (Gdk.EventButton event) {
         var root = get_root_item ();
-        var ellipse = new Goo.CanvasEllipse (null, event.x, event.y, 10, 10,
-            "line-width", 5.0,
-            "stroke-color", "#9bdb4d",
-            "fill-color", "#68b723");
+        var ellipse = new Goo.CanvasEllipse (null, event.x, event.y, 1, 1,
+                                             "line-width", border_size,
+                                             "stroke-color", border_color,
+                                             "fill-color", fill_color);
 
         ellipse.set ("parent", root);
-        ellipse.set_transform(Cairo.Matrix.identity ());
+        ellipse.set_transform (Cairo.Matrix.identity ());
         var artboard = window.main_window.right_sidebar.layers_panel.artboard;
-        var layer = new Akira.Layouts.Partials.Layer (window, artboard, ellipse, "Circle", "shape-circle-symbolic", false);
+        var layer = new Akira.Layouts.Partials.Layer (window, artboard, ellipse,
+            "Circle", "shape-circle-symbolic", false);
         ellipse.set_data<Akira.Layouts.Partials.Layer?> ("layer", layer);
         artboard.container.add (layer);
         artboard.show_all ();
@@ -841,7 +850,8 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
     public Goo.CanvasText add_text (Gdk.EventButton event) {
         var root = get_root_item ();
-        var text = new Goo.CanvasText (null, "Add text here", event.x, event.y, 200, Goo.CanvasAnchorType.NW, "font", "Open Sans 18");
+        var text = new Goo.CanvasText (null, "Add text here", event.x, event.y, 200,
+                                       Goo.CanvasAnchorType.NW, "font", "Open Sans 18");
         text.set ("parent", root);
         text.set ("height", 25f);
         text.set_transform(Cairo.Matrix.identity ());
@@ -853,4 +863,9 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         return text;
     }
 
+    public void udpate_default_values () {
+        border_size = settings.set_border ? settings.border_size : 0.0;
+        border_color = settings.set_border ? settings.border_color: "";
+        fill_color = settings.fill_color;
+    }
 }
