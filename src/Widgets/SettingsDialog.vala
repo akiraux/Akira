@@ -21,10 +21,14 @@
 
 public class Akira.Widgets.SettingsDialog : Gtk.Dialog {
 
-    private Gtk.Stack main_stack;
+    private Gtk.Stack stack;
     private Gtk.Switch dark_theme_switch;
     private Gtk.Switch label_switch;
     private Gtk.Switch symbolic_switch;
+    private Gtk.Switch border_switch;
+    private Gtk.ColorButton fill_color;
+    private Gtk.ColorButton border_color;
+    private int border;
 
     enum Column {
         ICONTYPE
@@ -41,23 +45,24 @@ public class Akira.Widgets.SettingsDialog : Gtk.Dialog {
     }
 
     construct {
-        main_stack = new Gtk.Stack ();
-        main_stack.margin = 6;
-        main_stack.margin_bottom = 15;
-        main_stack.margin_top = 15;
-        main_stack.add_titled (get_general_box (), "general", _("General"));
-        main_stack.add_titled (get_interface_box (), "interface", _("Interface"));
+        stack = new Gtk.Stack ();
+        stack.margin = 6;
+        stack.margin_bottom = 15;
+        stack.margin_top = 15;
+        stack.add_titled (get_general_box (), "general", _("General"));
+        stack.add_titled (get_interface_box (), "interface", _("Interface"));
+        stack.add_titled (get_shapes_box (), "shapes", _("Shapes"));
 
-        var main_stackswitcher = new Gtk.StackSwitcher ();
-        main_stackswitcher.set_stack (main_stack);
-        main_stackswitcher.halign = Gtk.Align.CENTER;
+        var stack_switcher = new Gtk.StackSwitcher ();
+        stack_switcher.set_stack (stack);
+        stack_switcher.halign = Gtk.Align.CENTER;
 
-        var main_grid = new Gtk.Grid ();
-        main_grid.halign = Gtk.Align.CENTER;
-        main_grid.attach (main_stackswitcher, 1, 1, 1, 1);
-        main_grid.attach (main_stack, 1, 2, 1, 1);
+        var grid = new Gtk.Grid ();
+        grid.halign = Gtk.Align.CENTER;
+        grid.attach (stack_switcher, 1, 1, 1, 1);
+        grid.attach (stack, 1, 2, 1, 1);
 
-        get_content_area ().add (main_grid);
+        get_content_area ().add (grid);
 
         var close_button = new SettingsButton (_("Close"));
 
@@ -69,47 +74,82 @@ public class Akira.Widgets.SettingsDialog : Gtk.Dialog {
     }
 
     private Gtk.Widget get_general_box () {
-        var general_grid = new Gtk.Grid ();
-        general_grid.row_spacing = 6;
-        general_grid.column_spacing = 12;
-        general_grid.column_homogeneous = true;
+        var grid = new Gtk.Grid ();
+        grid.row_spacing = 6;
+        grid.column_spacing = 12;
+        grid.column_homogeneous = true;
 
-        general_grid.attach (new SettingsHeader (_("General")), 0, 0, 2, 1);
-        general_grid.attach (new SettingsLabel (_("Auto Reopen Latest File:")), 0, 1, 1, 1);
-        general_grid.attach (new SettingsSwitch ("open-quick"), 1, 1, 1, 1);
+        grid.attach (new SettingsHeader (_("General")), 0, 0, 2, 1);
+        grid.attach (new SettingsLabel (_("Auto Reopen Latest File:")), 0, 1, 1, 1);
+        grid.attach (new SettingsSwitch ("open-quick"), 1, 1, 1, 1);
 
-        return general_grid;
+        return grid;
     }
 
     private Gtk.Widget get_interface_box () {
-        var content_grid = new Gtk.Grid ();
-        content_grid.row_spacing = 6;
-        content_grid.column_spacing = 12;
-        content_grid.column_homogeneous = true;
+        var grid = new Gtk.Grid ();
+        grid.row_spacing = 6;
+        grid.column_spacing = 12;
+        grid.column_homogeneous = true;
 
-        content_grid.attach (new SettingsHeader (_("Interface")), 0, 0, 2, 1);
+        grid.attach (new SettingsHeader (_("Interface")), 0, 0, 2, 1);
 
-        content_grid.attach (new SettingsLabel (_("Use Dark Theme:")), 0, 1, 1, 1);
+        grid.attach (new SettingsLabel (_("Use Dark Theme:")), 0, 1, 1, 1);
         dark_theme_switch = new SettingsSwitch ("dark-theme");
 
-        content_grid.attach (dark_theme_switch, 1, 1, 1, 1);
+        grid.attach (dark_theme_switch, 1, 1, 1, 1);
 
         dark_theme_switch.notify["active"].connect (() => {
             Gtk.Settings.get_default ().gtk_application_prefer_dark_theme = settings.dark_theme;
         });
 
-        content_grid.attach (new SettingsHeader (_("ToolBar Style")), 0, 2, 2, 1);
+        grid.attach (new SettingsHeader (_("ToolBar Style")), 0, 2, 2, 1);
 
-        content_grid.attach (new SettingsLabel (_("Show Button Labels:")), 0, 3, 1, 1);
+        grid.attach (new SettingsLabel (_("Show Button Labels:")), 0, 3, 1, 1);
         label_switch = new SettingsSwitch ("show-label");
-        content_grid.attach (label_switch, 1, 3, 1, 1);
+        grid.attach (label_switch, 1, 3, 1, 1);
 
-        content_grid.attach (new SettingsLabel (_("Use Symbolic Icons:")), 0, 4, 1, 1);
+        grid.attach (new SettingsLabel (_("Use Symbolic Icons:")), 0, 4, 1, 1);
         symbolic_switch = new SettingsSwitch ("use-symbolic");
-        content_grid.attach (symbolic_switch, 1, 4, 1, 1);
+        grid.attach (symbolic_switch, 1, 4, 1, 1);
 
-        
-        return content_grid;
+        return grid;
+    }
+
+    private Gtk.Widget get_shapes_box () {
+        var grid = new Gtk.Grid ();
+        grid.row_spacing = 6;
+        grid.column_spacing = 12;
+        grid.column_homogeneous = true;
+        border = 1;
+
+        grid.attach (new SettingsHeader (_("Default Colors")), 0, 0, 2, 1);
+
+        var description = new Gtk.Label (_("Define the default style used when creating a new shape."));
+        description.halign = Gtk.Align.START;
+        description.margin_bottom = 10;
+        grid.attach (description, 0, 1, 2, 1);
+
+        grid.attach (new SettingsLabel (_("Fill Color:")), 0, 2, 1, 1);
+        fill_color = new Gtk.ColorButton ();
+        fill_color.halign = Gtk.Align.START;
+        grid.attach (fill_color, 1, 2, 1, 1);
+
+        grid.attach (new SettingsLabel (_("Enable Border Style:")), 0, 3, 1, 1);
+        border_switch = new SettingsSwitch ("set-border");
+        grid.attach (border_switch, 1, 3, 1, 1);
+
+        grid.attach (new SettingsLabel (_("Border Color:")), 0, 4, 1, 1);
+        border_color = new Gtk.ColorButton ();
+        border_color.halign = Gtk.Align.START;
+        grid.attach (border_color, 1, 4, 1, 1);
+
+        grid.attach (new SettingsLabel (_("Border Width:")), 0, 5, 1, 1);
+        var border_width = new Gtk.SpinButton.with_range (1, 9999, 1);
+        border_width.halign = Gtk.Align.START;
+        grid.attach (border_width, 1, 5, 1, 1);
+
+        return grid;
     }
 
     private class SettingsHeader : Gtk.Label {
@@ -123,14 +163,13 @@ public class Akira.Widgets.SettingsDialog : Gtk.Dialog {
     private class SettingsLabel : Gtk.Label {
         public SettingsLabel (string text) {
             label = text;
-            halign = Gtk.Align.START;
-            margin_end = 10;
+            halign = Gtk.Align.END;
         }
     }
 
     private class SettingsSwitch : Gtk.Switch {
         public SettingsSwitch (string setting) {
-            halign = Gtk.Align.END;
+            halign = Gtk.Align.START;
             settings.schema.bind (setting, this, "active", SettingsBindFlags.DEFAULT);
         }
     }
