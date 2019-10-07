@@ -152,7 +152,6 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         }
 
         if (clicked_item != null) {
-
             var clicked_id = get_grabbed_id (clicked_item);
             holding = true;
 
@@ -167,7 +166,6 @@ public class Akira.Lib.Canvas : Goo.Canvas {
             } else { // nob was clicked
                 holding_id = clicked_id;
             }
-
         } else {
             remove_select_effect ();
             focus ();
@@ -216,7 +214,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
     public override bool key_press_event (Gdk.EventKey event) {
         switch (Gdk.keyval_to_upper (event.keyval)) {
-            case Gdk.Key.C:
+            case Gdk.Key.E:
                 edit_mode = Akira.Lib.Canvas.EditMode.MODE_INSERT;
                 insert_type = Akira.Lib.Canvas.InsertType.ELLIPSE;
                 return true;
@@ -481,9 +479,8 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         var real_y = y - stroke;
 
         select_effect = new Goo.CanvasRect (null, real_x, real_y, 0, 0,
-                                   "line-width", line_width,
-                                   "stroke-color", "#666", null
-                                   );
+                                            "line-width", line_width,
+                                            "stroke-color", "#666", null);
 
         update_select_effect (target);
 
@@ -494,12 +491,11 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         for (int i = 0; i < 9; i++) {
             var radius = i == 8 ? nob_size : 0;
             nobs[i] = new Goo.CanvasRect (null, 0, 0, nob_size, nob_size,
-                "line-width", line_width,
-                "radius-x", radius,
-                "radius-y", radius,
-                "stroke-color", "#41c9fd",
-                "fill-color", "#fff", null
-            );
+                                          "line-width", line_width,
+                                          "radius-x", radius,
+                                          "radius-y", radius,
+                                          "stroke-color", "#41c9fd",
+                                          "fill-color", "#fff", null);
             nobs[i].set ("parent", get_root_item ());
         }
 
@@ -557,7 +553,8 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     }
 
     private void add_hover_effect (Goo.CanvasItem? target) {
-        if (target == null || hover_effect != null || target == selected_item || target == select_effect) {
+        if (target == null || hover_effect != null || target == selected_item
+            || target == select_effect || edit_mode == EditMode.MODE_INSERT) {
             return;
         }
 
@@ -579,9 +576,8 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         var real_height = height + stroke * 2;
 
         hover_effect = new Goo.CanvasRect (null, real_x, real_y, real_width, real_height,
-                                   "line-width", line_width,
-                                   "stroke-color", "#41c9fd", null
-                                   );
+                                           "line-width", line_width,
+                                           "stroke-color", "#41c9fd", null);
         var transform = Cairo.Matrix.identity ();
         item.get_transform (out transform);
         hover_effect.set_transform (transform);

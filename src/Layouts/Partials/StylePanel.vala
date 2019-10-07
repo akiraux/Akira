@@ -19,12 +19,12 @@
  * Authored by: Bilal Elmoussaoui <bil.elmoussaoui@gmail.com>
  */
 
-public class Akira.Layouts.Partials.StylePanel : Gtk.Box {
+public class Akira.Layouts.Partials.StylePanel : Gtk.Grid {
 
     public Gtk.Label label;
 
     private Gtk.Revealer options_revealer;
-    private Gtk.Box options_box;
+    private Gtk.Grid options_grid;
     private Gtk.Scale border_radius_scale;
     private Akira.Partials.InputField border_radius_entry;
     private Gtk.ToggleButton options_button;
@@ -45,7 +45,7 @@ public class Akira.Layouts.Partials.StylePanel : Gtk.Box {
 
     construct {
 
-        var title_cont = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 0);
+        var title_cont = new Gtk.Grid ();
         title_cont.get_style_context ().add_class ("option-panel");
 
         label =  new Gtk.Label (_("Style"));
@@ -53,9 +53,9 @@ public class Akira.Layouts.Partials.StylePanel : Gtk.Box {
         label.xalign = 0;
         label.hexpand = true;
         label.set_ellipsize (Pango.EllipsizeMode.END);
-        title_cont.pack_start (label, true, true, 0);
+        title_cont.attach (label, 0, 0, 1, 1);
 
-        pack_start(title_cont, false, false, 0);
+        attach(title_cont, 0, 0, 1, 1);
 
         var panel_grid = new Gtk.Grid ();
         get_style_context ().add_class ("style-panel");
@@ -63,7 +63,7 @@ public class Akira.Layouts.Partials.StylePanel : Gtk.Box {
         panel_grid.border_width = 12;
         panel_grid.column_spacing = 6;
         panel_grid.hexpand = true;
-        pack_start (panel_grid, true, true, 0);
+        attach(panel_grid, 0, 1, 1, 1);
 
 
         var border_radius_label = new Gtk.Label (_("Border Radius"));
@@ -100,9 +100,9 @@ public class Akira.Layouts.Partials.StylePanel : Gtk.Box {
 
         options_button.bind_property ("active", options_revealer, "reveal-child", BindingFlags.DEFAULT | BindingFlags.SYNC_CREATE);
 
-        options_box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 6);
-        options_box.border_width = 12;
-        options_box.hexpand = true;
+        options_grid = new Gtk.Grid ();
+        options_grid.border_width = 12;
+        options_grid.hexpand = true;
 
         var border_entries_grid = new Gtk.Grid ();
         border_entries_grid.row_spacing = 12;
@@ -139,8 +139,8 @@ public class Akira.Layouts.Partials.StylePanel : Gtk.Box {
         border_radius_bottom_right_entry.halign = Gtk.Align.END;
         border_entries_grid.attach (border_radius_bottom_right_entry, 1, 1, 1, 1);
 
-        options_box.pack_start (border_entries_grid, true, true, 0);
-        options_revealer.add (options_box);
+        options_grid.attach (border_entries_grid, 0, 0, 1, 1);
+        options_revealer.add (options_grid);
 
 
         var border_options_grid = new Gtk.Grid ();
@@ -166,7 +166,7 @@ public class Akira.Layouts.Partials.StylePanel : Gtk.Box {
         uniform_label.valign = Gtk.Align.CENTER;
         uniform_label.halign = Gtk.Align.START;
         border_options_grid.attach (uniform_label, 1, 1, 1, 1);
-        options_box.pack_start (border_options_grid, true, true, 0);
+        options_grid.attach (border_options_grid, 0, 1, 1, 1);
 
         bind_signals ();
     }
