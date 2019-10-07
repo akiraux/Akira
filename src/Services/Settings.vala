@@ -29,7 +29,10 @@ public class Akira.Services.Settings : Granite.Services.Settings {
     public bool dark_theme { get; set; }
     public bool show_label { get; set; }
     public bool use_symbolic { get; set; }
+    public string fill_color { get; set; }
     public bool set_border { get; set; }
+    public int border_size { get; set; }
+    public string border_color { get; set; }
     public bool open_quick { get; set; }
 
     public Settings () {
