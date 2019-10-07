@@ -54,6 +54,12 @@
             <description>Allow user to choose between normal and symbolic icons in HeaderBar.</description>
         </key>
 
+        <key name="set-border" type="b">
+            <default>true</default>
+            <summary>Add Border on Shape Creation</summary>
+            <description>Enable the addition of the border style when creating a new shape.</description>
+        </key>
+
         <key name="open-quick" type="b">
             <default>false</default>
             <summary>Auto Reopen latest file</summary>
