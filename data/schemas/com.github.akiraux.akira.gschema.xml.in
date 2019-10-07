@@ -54,10 +54,27 @@
             <description>Allow user to choose between normal and symbolic icons in HeaderBar.</description>
         </key>
 
+        <key name="fill-color" type="s">
+            <default>'#CCCCCC'</default>
+            <summary>Default Shape Color.</summary>
+            <description>The default color of a newly created shape.</description>
+        </key>
+
         <key name="set-border" type="b">
             <default>true</default>
             <summary>Add Border on Shape Creation</summary>
             <description>Enable the addition of the border style when creating a new shape.</description>
+        </key>
+
+        <key name="border-size" type="i">
+            <default>1</default>
+            <summary>Default Border Width.</summary>
+            <description>The default width of the border for a newly created shape.</description>
+        </key>
+        <key name="border-color" type="s">
+            <default>'#AAAAAA'</default>
+            <summary>Default Border Color.</summary>
+            <description>The default color of the border for a newly created shape.</description>
         </key>
 
         <key name="open-quick" type="b">
