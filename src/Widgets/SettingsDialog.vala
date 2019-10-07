@@ -28,7 +28,7 @@ public class Akira.Widgets.SettingsDialog : Gtk.Dialog {
     private Gtk.Switch border_switch;
     private Gtk.ColorButton fill_color;
     private Gtk.ColorButton border_color;
-    private int border;
+    private Gtk.SpinButton border_size;
 
     enum Column {
         ICONTYPE
@@ -121,7 +121,11 @@ public class Akira.Widgets.SettingsDialog : Gtk.Dialog {
         grid.row_spacing = 6;
         grid.column_spacing = 12;
         grid.column_homogeneous = true;
-        border = 1;
+
+        var fillRGBA = Gdk.RGBA ();
+        fillRGBA.parse (settings.fill_color);
+        var borderRGBA = Gdk.RGBA ();
+        borderRGBA.parse (settings.border_color);
 
         grid.attach (new SettingsHeader (_("Default Colors")), 0, 0, 2, 1);
 
@@ -131,23 +135,38 @@ public class Akira.Widgets.SettingsDialog : Gtk.Dialog {
         grid.attach (description, 0, 1, 2, 1);
 
         grid.attach (new SettingsLabel (_("Fill Color:")), 0, 2, 1, 1);
-        fill_color = new Gtk.ColorButton ();
+        fill_color = new Gtk.ColorButton.with_rgba (fillRGBA);
         fill_color.halign = Gtk.Align.START;
         grid.attach (fill_color, 1, 2, 1, 1);
+
+        fill_color.color_set.connect (() => {
+            settings.fill_color = fill_color.get_rgba ().to_string ();
+        });
 
         grid.attach (new SettingsLabel (_("Enable Border Style:")), 0, 3, 1, 1);
         border_switch = new SettingsSwitch ("set-border");
         grid.attach (border_switch, 1, 3, 1, 1);
 
+        border_switch.notify["active"].connect (() => {
+			border_color.sensitive = border_switch.get_active ();
+			border_size.sensitive = border_switch.get_active ();
+		});
+
         grid.attach (new SettingsLabel (_("Border Color:")), 0, 4, 1, 1);
-        border_color = new Gtk.ColorButton ();
+        border_color = new Gtk.ColorButton.with_rgba (borderRGBA);
         border_color.halign = Gtk.Align.START;
         grid.attach (border_color, 1, 4, 1, 1);
 
+        border_color.color_set.connect (() => {
+            settings.border_color = border_color.get_rgba ().to_string ();
+        });
+
         grid.attach (new SettingsLabel (_("Border Width:")), 0, 5, 1, 1);
-        var border_width = new Gtk.SpinButton.with_range (1, 9999, 1);
-        border_width.halign = Gtk.Align.START;
-        grid.attach (border_width, 1, 5, 1, 1);
+        border_size = new Gtk.SpinButton.with_range (1, 9999, 1);
+        border_size.halign = Gtk.Align.START;
+        grid.attach (border_size, 1, 5, 1, 1);
+
+        settings.schema.bind ("border-size", border_size, "value", SettingsBindFlags.DEFAULT);
 
         return grid;
     }
