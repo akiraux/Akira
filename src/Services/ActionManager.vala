@@ -19,11 +19,15 @@
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
 
+using Akira.Lib.Managers;
+
 public class Akira.Services.ActionManager : Object {
     public weak Akira.Application app { get; construct; }
     public weak Akira.Window window { get; construct; }
 
     public SimpleActionGroup actions { get; construct; }
+
+    public FileManager file_manager;
 
     public const string ACTION_PREFIX = "win.";
     public const string ACTION_NEW_WINDOW = "action_new_window";
@@ -81,6 +85,7 @@ public class Akira.Services.ActionManager : Object {
             app: akira_app,
             window: window
         );
+        file_manager = new FileManager (window);
     }
 
     static construct {
@@ -129,15 +134,15 @@ public class Akira.Services.ActionManager : Object {
     }
 
     private void action_open () {
-        warning ("open");
+        file_manager.open_file ();
     }
 
-    private void action_save () {
-        warning ("save");
+    private void action_save (SimpleAction action, Variant? parameter) {
+        file_manager.save_file ();
     }
 
-    private void action_save_as () {
-        warning ("save_as");
+    private void action_save_as (SimpleAction action, Variant? parameter) {
+        file_manager.save_as ();
     }
 
     private void action_show_pixel_grid () {

@@ -177,6 +177,7 @@ public class Akira.Lib.Managers.NobManager : Object {
             "stroke-color", STROKE_COLOR,
             null
         );
+        select_effect.set_data<bool> ("ignore", true);
 
         select_effect.set_transform (transform);
 
@@ -202,6 +203,7 @@ public class Akira.Lib.Managers.NobManager : Object {
 
         for (int i = 0; i < 9; i++) {
             nobs[i] = new Selection.Nob (root, (Managers.NobManager.Nob) i, current_scale);
+            nobs[i].set_data<bool> ("ignore", true);
         }
 
         nob_size = Selection.Nob.NOB_SIZE / current_scale;
