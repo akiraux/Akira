@@ -35,7 +35,9 @@ public class Akira.Layouts.MainCanvas : Gtk.Grid {
 
         canvas = new Akira.Lib.Canvas (window);
         canvas.set_size_request (main_window_size.width, main_window_size.height);
-        canvas.set_bounds (0, 0, 10000, 10000);
+        var wcenter = (100000 - main_window_size.width) / 2;
+        var hcenter = (100000 - main_window_size.height) / 2;
+        canvas.set_bounds (0, 0, 100000, 100000);
         canvas.set_scale (1.0);
 
         main_scroll.add (canvas);
