@@ -7,7 +7,7 @@ akira_datadir = join_paths(akira_prefix, get_option('datadir'))
 akira_pkgdatadir = join_paths(akira_datadir, meson.project_name())
 
 add_project_arguments(
-    ['--vapidir', join_paths(meson.current_source_dir(), 'src', 'vapi')],
+    ['--vapidir', join_paths(meson.current_source_dir(), 'vapi')],
     language: 'vala'
 )
 # Include the translations module
@@ -47,7 +47,7 @@ if vala_lint.found()
     )
 endif
 
-# Set up the profile 
+# Set up the profile
 profile = get_option('profile')
 if profile == 'development'
     application_id = meson.project_name() + 'Devel'
