@@ -242,14 +242,14 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
     }
 
     private void on_color_changed () {
-        var selectedColor = color_chooser_widget.rgba;
+        var selected_color = color_chooser_widget.rgba;
 
         color = "#%02X%02X%02X".printf (
-            (int) (selectedColor.red * 255),
-            (int) (selectedColor.green * 255),
-            (int) (selectedColor.blue * 255));
+            (int) (selected_color.red * 255),
+            (int) (selected_color.green * 255),
+            (int) (selected_color.blue * 255));
 
-        alpha = selectedColor.alpha;
+        alpha = selected_color.alpha;
     }
 
     private void on_model_changed () {
@@ -321,10 +321,10 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
             return;
         }
 
-        var newRGBA = Gdk.RGBA ();
-        newRGBA.parse (model.color);
-        newRGBA.alpha = alpha;
+        var new_rgba = Gdk.RGBA ();
+        new_rgba.parse (model.color);
+        new_rgba.alpha = alpha;
 
-        color_chooser_widget.set_rgba (newRGBA);
+        color_chooser_widget.set_rgba (new_rgba);
     }
 }

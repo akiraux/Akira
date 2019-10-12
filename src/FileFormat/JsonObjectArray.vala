@@ -36,7 +36,7 @@ public abstract class Akira.FileFormat.JsonObjectArray : Object {
     }
 
     construct {
-        elements = new Gee.ArrayList<JsonObject>();
+        elements = new Gee.ArrayList<JsonObject> ();
         load_array ();
     }
 
@@ -46,7 +46,7 @@ public abstract class Akira.FileFormat.JsonObjectArray : Object {
      * objects from this array.
      */
     public void override_properties_from_json (Json.Object new_object) {
-        elements = new Gee.ArrayList<JsonObject>();
+        elements = new Gee.ArrayList<JsonObject> ();
         object = new_object;
 
         load_array ();
@@ -65,7 +65,7 @@ public abstract class Akira.FileFormat.JsonObjectArray : Object {
         array.get_elements ().foreach ((node) => {
             var json = node.get_object ();
 
-            var element =  Object.new (get_type_of_array (json),
+            var element = Object.new (get_type_of_array (json),
             "object", json,
             "parent-object", null) as FileFormat.JsonObject;
 

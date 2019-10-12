@@ -32,7 +32,7 @@ public class Akira.Application : Gtk.Application {
 
         settings = new Akira.Services.Settings ();
         windows = new GLib.List <Window> ();
-        opened_files = new Gee.HashMap<string, Akira.Window>();
+        opened_files = new Gee.HashMap<string, Akira.Window> ();
 
         application_id = Constants.APP_ID;
     }

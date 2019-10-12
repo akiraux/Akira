@@ -72,7 +72,7 @@ public class Akira.Partials.ZoomButton : Gtk.Grid {
         attach (label_btn, 0, 1, 3, 1);
         udpate_label ();
 
-        settings.changed["show-label"].connect( () => {
+        settings.changed["show-label"].connect ( () => {
             udpate_label ();
         });
     }

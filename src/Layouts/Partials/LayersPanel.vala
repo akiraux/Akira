@@ -33,7 +33,7 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
     private const int SCROLL_DELAY = 50;
     public Akira.Layouts.Partials.Artboard artboard;
 
-    private const Gtk.TargetEntry targetEntries[] = {
+    private const Gtk.TargetEntry TARGET_ENTRIES[] = {
         { "ARTBOARD", Gtk.TargetFlags.SAME_APP, 0 }
     };
 
@@ -63,7 +63,7 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
     }
 
     private void build_drag_and_drop () {
-        Gtk.drag_dest_set (this, Gtk.DestDefaults.ALL, targetEntries, Gdk.DragAction.MOVE);
+        Gtk.drag_dest_set (this, Gtk.DestDefaults.ALL, TARGET_ENTRIES, Gdk.DragAction.MOVE);
 
         drag_data_received.connect (on_drag_data_received);
         drag_motion.connect (on_drag_motion);
@@ -74,14 +74,14 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
         Akira.Layouts.Partials.Artboard target;
         Gtk.Widget row;
         Akira.Layouts.Partials.Artboard source;
-        int newPos;
+        int new_position;
 
         target = (Akira.Layouts.Partials.Artboard) get_row_at_y (y);
 
         if (target == null) {
-            newPos = -1;
+            new_position = -1;
         } else {
-            newPos = target.get_index ();
+            new_position = target.get_index ();
         }
 
         row = ((Gtk.Widget[]) selection_data.get_data ())[0];
@@ -93,7 +93,7 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
         }
 
         remove (source);
-        insert (source, newPos);
+        insert (source, new_position);
     }
 
     public bool on_drag_motion (Gdk.DragContext context, int x, int y, uint time) {
