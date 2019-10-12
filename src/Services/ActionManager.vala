@@ -39,6 +39,10 @@ public class Akira.Services.ActionManager : Object {
     public const string ACTION_ZOOM_IN = "action_zoom_in";
     public const string ACTION_ZOOM_OUT = "action_zoom_out";
     public const string ACTION_ZOOM_RESET = "action_zoom_reset";
+    public const string ACTION_MOVE_UP = "action_move_up";
+    public const string ACTION_MOVE_DOWN = "action_move_down";
+    public const string ACTION_MOVE_TOP = "action_move_top";
+    public const string ACTION_MOVE_BOTTOM = "action_move_bottom";
     public const string ACTION_RECT_TOOL = "action_rect_tool";
     public const string ACTION_ELLIPSE_TOOL = "action_ellipse_tool";
     public const string ACTION_TEXT_TOOL = "action_text_tool";
@@ -60,6 +64,10 @@ public class Akira.Services.ActionManager : Object {
         { ACTION_QUIT, action_quit },
         { ACTION_ZOOM_IN, action_zoom_in },
         { ACTION_ZOOM_OUT, action_zoom_out },
+        { ACTION_MOVE_UP, action_move_up },
+        { ACTION_MOVE_DOWN, action_move_down },
+        { ACTION_MOVE_TOP, action_move_top },
+        { ACTION_MOVE_BOTTOM, action_move_bottom },
         { ACTION_ZOOM_RESET, action_zoom_reset },
         { ACTION_RECT_TOOL, action_rect_tool },
         { ACTION_ELLIPSE_TOOL, action_ellipse_tool },
@@ -89,6 +97,10 @@ public class Akira.Services.ActionManager : Object {
         action_accelerators.set (ACTION_ZOOM_IN, "<Control>plus");
         action_accelerators.set (ACTION_ZOOM_OUT, "<Control>minus");
         action_accelerators.set (ACTION_ZOOM_RESET, "<Control>0");
+        action_accelerators.set (ACTION_MOVE_UP, "<Control>Up");
+        action_accelerators.set (ACTION_MOVE_DOWN, "<Control>Down");
+        action_accelerators.set (ACTION_MOVE_TOP, "<Control><Shift>Up");
+        action_accelerators.set (ACTION_MOVE_BOTTOM, "<Control><Shift>Down");
     }
 
     construct {
@@ -156,6 +168,22 @@ public class Akira.Services.ActionManager : Object {
 
     private void action_zoom_reset () {
         window.headerbar.zoom.zoom_reset ();
+    }
+
+    private void action_move_up () {
+        window.main_window.main_canvas.canvas.change_z_selected(true, false);
+    }
+
+    private void action_move_down () {
+        window.main_window.main_canvas.canvas.change_z_selected(false, false);
+    }
+
+    private void action_move_top () {
+        window.main_window.main_canvas.canvas.change_z_selected(true, true);
+    }
+
+    private void action_move_bottom () {
+        window.main_window.main_canvas.canvas.change_z_selected(false, true);
     }
 
     private void action_rect_tool () {
