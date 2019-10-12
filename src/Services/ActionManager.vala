@@ -86,7 +86,7 @@ public class Akira.Services.ActionManager : Object {
         action_accelerators.set (ACTION_PREFERENCES, "<Control>comma");
         action_accelerators.set (ACTION_EXPORT, "<Control><Shift>e");
         action_accelerators.set (ACTION_QUIT, "<Control>q");
-        action_accelerators.set (ACTION_ZOOM_IN, "<Control>equal");
+        action_accelerators.set (ACTION_ZOOM_IN, "<Control>plus");
         action_accelerators.set (ACTION_ZOOM_OUT, "<Control>minus");
         action_accelerators.set (ACTION_ZOOM_RESET, "<Control>0");
     }
