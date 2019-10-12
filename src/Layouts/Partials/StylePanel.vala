@@ -38,7 +38,7 @@ public class Akira.Layouts.Partials.StylePanel : Gtk.Grid {
     private Gtk.Switch uniform_switch;
 
     public StylePanel () {
-        Object(
+        Object (
             orientation: Gtk.Orientation.VERTICAL
         );
     }
@@ -48,14 +48,14 @@ public class Akira.Layouts.Partials.StylePanel : Gtk.Grid {
         var title_cont = new Gtk.Grid ();
         title_cont.get_style_context ().add_class ("option-panel");
 
-        label =  new Gtk.Label (_("Style"));
+        label = new Gtk.Label (_("Style"));
         label.halign = Gtk.Align.FILL;
         label.xalign = 0;
         label.hexpand = true;
         label.set_ellipsize (Pango.EllipsizeMode.END);
         title_cont.attach (label, 0, 0, 1, 1);
 
-        attach(title_cont, 0, 0, 1, 1);
+        attach (title_cont, 0, 0, 1, 1);
 
         var panel_grid = new Gtk.Grid ();
         get_style_context ().add_class ("style-panel");
@@ -63,7 +63,7 @@ public class Akira.Layouts.Partials.StylePanel : Gtk.Grid {
         panel_grid.border_width = 12;
         panel_grid.column_spacing = 6;
         panel_grid.hexpand = true;
-        attach(panel_grid, 0, 1, 1, 1);
+        attach (panel_grid, 0, 1, 1, 1);
 
 
         var border_radius_label = new Gtk.Label (_("Border Radius"));
@@ -162,7 +162,7 @@ public class Akira.Layouts.Partials.StylePanel : Gtk.Grid {
         uniform_switch.valign = Gtk.Align.CENTER;
         uniform_switch.halign = Gtk.Align.START;
         border_options_grid.attach (uniform_switch, 0, 1, 1, 1);
-        var uniform_label = new Gtk.Label(_("Uniform Corners"));
+        var uniform_label = new Gtk.Label (_("Uniform Corners"));
         uniform_label.valign = Gtk.Align.CENTER;
         uniform_label.halign = Gtk.Align.START;
         border_options_grid.attach (uniform_label, 1, 1, 1, 1);

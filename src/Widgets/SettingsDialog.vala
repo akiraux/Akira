@@ -122,10 +122,10 @@ public class Akira.Widgets.SettingsDialog : Gtk.Dialog {
         grid.column_spacing = 12;
         grid.column_homogeneous = true;
 
-        var fillRGBA = Gdk.RGBA ();
-        fillRGBA.parse (settings.fill_color);
-        var borderRGBA = Gdk.RGBA ();
-        borderRGBA.parse (settings.border_color);
+        var fill_rgba = Gdk.RGBA ();
+        fill_rgba.parse (settings.fill_color);
+        var border_rgba = Gdk.RGBA ();
+        border_rgba.parse (settings.border_color);
 
         grid.attach (new SettingsHeader (_("Default Colors")), 0, 0, 2, 1);
 
@@ -135,7 +135,7 @@ public class Akira.Widgets.SettingsDialog : Gtk.Dialog {
         grid.attach (description, 0, 1, 2, 1);
 
         grid.attach (new SettingsLabel (_("Fill Color:")), 0, 2, 1, 1);
-        fill_color = new Gtk.ColorButton.with_rgba (fillRGBA);
+        fill_color = new Gtk.ColorButton.with_rgba (fill_rgba);
         fill_color.halign = Gtk.Align.START;
         grid.attach (fill_color, 1, 2, 1, 1);
 
@@ -148,12 +148,12 @@ public class Akira.Widgets.SettingsDialog : Gtk.Dialog {
         grid.attach (border_switch, 1, 3, 1, 1);
 
         border_switch.notify["active"].connect (() => {
-			border_color.sensitive = border_switch.get_active ();
-			border_size.sensitive = border_switch.get_active ();
-		});
+            border_color.sensitive = border_switch.get_active ();
+            border_size.sensitive = border_switch.get_active ();
+        });
 
         grid.attach (new SettingsLabel (_("Border Color:")), 0, 4, 1, 1);
-        border_color = new Gtk.ColorButton.with_rgba (borderRGBA);
+        border_color = new Gtk.ColorButton.with_rgba (border_rgba);
         border_color.halign = Gtk.Align.START;
         grid.attach (border_color, 1, 4, 1, 1);
 

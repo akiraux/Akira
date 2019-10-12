@@ -51,7 +51,7 @@ public enum Akira.Utils.BlendingMode {
     public string get_name () {
         var blending_mode_tokens = this
             .to_string ()
-            .split("_");
+            .split ("_");
 
         // Get everything but BLENDING_MODE
         blending_mode_tokens = blending_mode_tokens[4:blending_mode_tokens.length];
@@ -59,8 +59,8 @@ public enum Akira.Utils.BlendingMode {
         var formatted_blending_mode = "";
 
         foreach (var elem in blending_mode_tokens) {
-            elem = elem[0].toupper ().to_string() +
-                elem[1:elem.length].down();
+            elem = elem[0].toupper ().to_string () +
+                elem[1:elem.length].down ();
 
             formatted_blending_mode += elem;
         }

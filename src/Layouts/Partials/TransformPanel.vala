@@ -61,7 +61,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         bind_property (
             "size-lock", lock_changes, "image", BindingFlags.SYNC_CREATE,
             (binding, val, ref res) => {
-                var icon = val.get_boolean() ? "changes-prevent-symbolic" : "changes-allow-symbolic";
+                var icon = val.get_boolean () ? "changes-prevent-symbolic" : "changes-allow-symbolic";
                 var image = new Gtk.Image.from_icon_name (icon, Gtk.IconSize.BUTTON);
                 res = image;
                 return true;
@@ -107,14 +107,14 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         scale.margin_end = 30;
         var opacity_entry = new Akira.Partials.InputField (
             Akira.Partials.InputField.Unit.PERCENTAGE, 7, true, true);
-        opacity_entry.entry.text = (opacity.get_value()).to_string ();
+        opacity_entry.entry.text = (opacity.get_value ()).to_string ();
         opacity_entry.entry.bind_property (
             "text", opacity, "value",
             BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE,
             (binding, srcval, ref targetval) => {
                 double src = double.parse (srcval.dup_string ());
                 if (src > 100 || src < 0) {
-                    opacity_entry.entry.text = (opacity.get_value()).to_string ();
+                    opacity_entry.entry.text = (opacity.get_value ()).to_string ();
                     return false;
                 }
                 targetval.set_double (src);

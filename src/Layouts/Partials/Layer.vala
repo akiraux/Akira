@@ -36,7 +36,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
     private const int SCROLL_DISTANCE = 30;
     private const int SCROLL_DELAY = 50;
 
-    private const Gtk.TargetEntry targetEntriesLayer[] = {
+    private const Gtk.TargetEntry TARGET_ENTRIES[] = {
         { "LAYER", Gtk.TargetFlags.SAME_APP, 0 }
     };
 
@@ -99,7 +99,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
         can_focus = true;
         get_style_context ().add_class ("layer");
 
-        label =  new Gtk.Label (layer_name);
+        label = new Gtk.Label (layer_name);
         label.halign = Gtk.Align.FILL;
         label.xalign = 0;
         label.expand = true;
@@ -278,12 +278,12 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
     }
 
     private void build_drag_and_drop () {
-        Gtk.drag_source_set (this, Gdk.ModifierType.BUTTON1_MASK, targetEntriesLayer, Gdk.DragAction.MOVE);
+        Gtk.drag_source_set (this, Gdk.ModifierType.BUTTON1_MASK, TARGET_ENTRIES, Gdk.DragAction.MOVE);
 
         drag_begin.connect (on_drag_begin);
         drag_data_get.connect (on_drag_data_get);
 
-        Gtk.drag_dest_set (this, Gtk.DestDefaults.MOTION, targetEntriesLayer, Gdk.DragAction.MOVE);
+        Gtk.drag_dest_set (this, Gtk.DestDefaults.MOTION, TARGET_ENTRIES, Gdk.DragAction.MOVE);
         drag_motion.connect (on_drag_motion);
         drag_leave.connect (on_drag_leave);
 
