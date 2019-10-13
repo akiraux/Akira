@@ -44,10 +44,26 @@ public class Akira.Layouts.MainCanvas : Gtk.Grid {
 
         canvas.update_bounds ();
         adjust_scroll ();
+
+        //  Detect keyboard scroll events and block them
+        main_scroll.scroll_child.connect (on_keyboard_scroll);
+
+        // Detect mouse scroll and change adjustment
+        canvas.scroll_event.connect (on_scroll);
     }
 
     public void adjust_scroll () {
         main_scroll.hadjustment.value = 50000 - (settings.window_width / 2);
         main_scroll.vadjustment.value = 50000 - (settings.window_height / 2);
+    }
+
+    public bool on_keyboard_scroll (Gtk.ScrollType scroll, bool horizontal) {
+        return false;
+    }
+
+    public bool on_scroll (Gdk.EventScroll event) {
+        // Let's do this: https://stackoverflow.com/questions/43948186/scrolledwindow-scroll-by-drag-simulate-finger-on-touchscreen
+        debug (event.type.to_string ());
+        return false;
     }
 }
