@@ -47,7 +47,7 @@ public class Akira.Services.ActionManager : Object {
 
     public static Gee.MultiMap<string, string> action_accelerators = new Gee.HashMultiMap<string, string> ();
 
-    private const ActionEntry[] action_entries = {
+    private const ActionEntry[] ACTION_ENTRIES = {
         { ACTION_NEW_WINDOW, action_new_window },
         { ACTION_OPEN, action_open },
         { ACTION_SAVE, action_save },
@@ -86,14 +86,14 @@ public class Akira.Services.ActionManager : Object {
         action_accelerators.set (ACTION_PREFERENCES, "<Control>comma");
         action_accelerators.set (ACTION_EXPORT, "<Control><Shift>e");
         action_accelerators.set (ACTION_QUIT, "<Control>q");
-        action_accelerators.set (ACTION_ZOOM_IN, "<Control>equal");
+        action_accelerators.set (ACTION_ZOOM_IN, "<Control>plus");
         action_accelerators.set (ACTION_ZOOM_OUT, "<Control>minus");
         action_accelerators.set (ACTION_ZOOM_RESET, "<Control>0");
     }
 
     construct {
         actions = new SimpleActionGroup ();
-        actions.add_action_entries (action_entries, this);
+        actions.add_action_entries (ACTION_ENTRIES, this);
         window.insert_action_group ("win", actions);
 
         foreach (var action in action_accelerators.get_keys ()) {
@@ -136,7 +136,7 @@ public class Akira.Services.ActionManager : Object {
     }
 
     private void action_preferences () {
-        var settings_dialog = new Akira.Widgets.SettingsDialog();
+        var settings_dialog = new Akira.Widgets.SettingsDialog ();
         settings_dialog.transient_for = window;
         settings_dialog.show_all ();
         settings_dialog.present ();

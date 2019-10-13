@@ -75,7 +75,7 @@ public abstract class Akira.FileFormat.JsonObject : GLib.Object {
      * For reacting to internal changes. Override and return false to prevent the triggering
      * of the changed signal
      */
-    protected virtual bool internal_changed (string key)    {
+    protected virtual bool internal_changed (string key) {
         return true;
     }
 

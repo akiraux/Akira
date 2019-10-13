@@ -4,7 +4,7 @@
 </h1>
 <h4 align="center">The Linux Design Tool</h4>
 <p align="center">
-    <a href="https://travis-ci.org/akiraux/Akira"><img src="https://travis-ci.org/akiraux/Akira.svg"
+    <a href="https://github.com/akiraux/Akira/actions"><img src="https://github.com/akiraux/Akira/workflows/CI/badge.svg"
             alt="Build Status"></a>
     <a href="https://liberapay.com/AkiraUX"><img
             src="http://img.shields.io/liberapay/patrons/AkiraUX.svg?logo=liberapay" alt="AkiraUX on Liberapay"></a>

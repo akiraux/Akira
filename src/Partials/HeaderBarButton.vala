@@ -44,7 +44,7 @@ public class Akira.Partials.HeaderBarButton : Gtk.Grid {
         valign = Gtk.Align.CENTER;
         udpate_label ();
 
-        settings.changed["show-label"].connect( () => {
+        settings.changed["show-label"].connect ( () => {
             udpate_label ();
         });
     }
