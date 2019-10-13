@@ -81,3 +81,31 @@
 .input-button.down {
     margin-top: -2pt;
 }
+
+.scrolledwindow undershoot.top,
+.scrolledwindow undershoot.bottom,
+.scrolledwindow undershoot.left,
+.scrolledwindow undershoot.right,
+.scrolledwindow overshoot.top,
+.scrolledwindow overshoot.bottom,
+.scrolledwindow overshoot.left,
+.scrolledwindow overshoot.right {
+    background-image: none;
+}
+
+.scrollbar {
+	padding-right: 2px;
+	background: transparent;
+	box-shadow: none;
+	border: 1px solid transparent;
+    min-width: 0px;
+    opacity: 0;
+}
+
+.scrollbar slider {
+	background-color: transparent;
+    box-shadow:none;
+	border: 1px;
+	border-color: transparent;
+    min-width: 0px;
+}

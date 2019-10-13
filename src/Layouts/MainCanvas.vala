@@ -29,6 +29,10 @@ public class Akira.Layouts.MainCanvas : Gtk.Grid {
 
     construct {
         main_scroll = new Gtk.ScrolledWindow (null, null);
+        main_scroll.set_shadow_type (Gtk.ShadowType.NONE);
+        main_scroll.get_style_context ().add_class ("scrolledwindow");
+        main_scroll.get_vscrollbar ().get_style_context ().add_class ("scrollbar");
+        main_scroll.get_hscrollbar ().get_style_context ().add_class ("scrollbar");
         main_scroll.expand = true;
 
         canvas = new Akira.Lib.Canvas (window);
@@ -38,7 +42,8 @@ public class Akira.Layouts.MainCanvas : Gtk.Grid {
         main_scroll.add (canvas);
         attach (main_scroll, 0, 0, 1, 1);
 
-        //  adjust_scroll ();
+        canvas.update_bounds ();
+        adjust_scroll ();
     }
 
     public void adjust_scroll () {
