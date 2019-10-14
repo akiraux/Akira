@@ -125,6 +125,9 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         events |= Gdk.EventMask.BUTTON_PRESS_MASK;
         events |= Gdk.EventMask.BUTTON_RELEASE_MASK;
         events |= Gdk.EventMask.POINTER_MOTION_MASK;
+        events |= Gdk.EventMask.SCROLL_MASK;
+        events |= Gdk.EventMask.TOUCHPAD_GESTURE_MASK;
+        events |= Gdk.EventMask.TOUCH_MASK;
     }
 
     public void update_bounds () {
