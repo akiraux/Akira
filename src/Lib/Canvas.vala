@@ -25,7 +25,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
     private const int MIN_SIZE = 1;
     private const int MIN_POS = 10;
-    private const int ROTATION_FIXED_STEP = 15;
+    private const double ROTATION_FIXED_STEP = 15.0;
 
     /**
      * Signal triggered when item was clicked by the user
@@ -487,15 +487,10 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
                 radians = start_radians - radians;
 
-                double current_x, current_y, current_scale, current_rotation_double;
-                selected_item.get_simple_transform (out current_x, out current_y, out current_scale, out current_rotation_double);
+                double current_x, current_y, current_scale, current_rotation;
+                selected_item.get_simple_transform (out current_x, out current_y, out current_scale, out current_rotation);
 
-                var current_rotation = ((int) current_rotation_double);
                 var rotation = radians * (180 / Math.PI);
-
-                debug ("rotation: %f", rotation);
-                debug ("item rotation: %d", current_rotation);
-
 
                 if (ctrl_is_pressed) {
                     do_rotation = false;
@@ -514,9 +509,23 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                         // to the current rotation, which might lead to a situation in which you
                         // cannot "reset" item rotation to rounded values (0, 90, 180, ...) without
                         // manually resetting the rotation input field in the properties panel
-                        var rotation_amount = ROTATION_FIXED_STEP - (current_rotation % ROTATION_FIXED_STEP);
+                        var current_rotation_int = ((int) GLib.Math.round (current_rotation));
+
+                        var rotation_amount = ROTATION_FIXED_STEP;
+
+                        // Strange glitch: when current_rotation == 30.0, the fmod
+                        // function does not work properly.
+                        // 30.00000 % 15.00000 != 0 => rotation_amount becomes 0.
+                        // That's why here is used the int representation of current_rotation
+                        if (current_rotation_int % ROTATION_FIXED_STEP != 0) {
+                            rotation_amount -= GLib.Math.fmod (current_rotation, ROTATION_FIXED_STEP);
+                        }
 
                         rotation = rotation > 0 ? rotation_amount : -rotation_amount;
+
+                        //debug ("Current rotation: %f", current_rotation);
+                        //debug ("Current rotation int: %f", current_rotation_int);
+                        //debug ("Actual rotation: %f", rotation);
 
                         update_x = true;
                         update_y = true;
@@ -549,6 +558,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
             temp_event_x = event_x;
             //  debug ("temp event x: %f", temp_event_x);
         }
+
         if (update_y) {
             temp_event_y = event_y;
             //  debug ("temp event y: %f", temp_event_y);
