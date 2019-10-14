@@ -488,7 +488,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 var start_radians = GLib.Math.atan2 (center_y - temp_event_y, temp_event_x - center_x);
                 debug ("start_radians %f, atan2(%f - %f, %f - %f)", start_radians, center_y, temp_event_y, temp_event_x, center_x);
                 var radians = GLib.Math.atan2 (center_y - event_y, event_x - center_x);
-                debug ("radians %f, atan2(%f - %f, %f - %f)", radians, center_y ,event_y, event_x, center_x);
+                debug ("radians %f, atan2(%f - %f, %f - %f)", radians, center_y , event_y, event_x, center_x);
                 radians = start_radians - radians;
                 var rotation = radians * (180 / Math.PI);
                 debug ("rotation: %f", rotation);
