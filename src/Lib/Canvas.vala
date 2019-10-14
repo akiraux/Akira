@@ -193,7 +193,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                                        Goo.CanvasAnchorType.NW, "font", "Open Sans 18");
         text.set ("parent", root);
         text.set ("height", 25f);
-        text.set_transform(Cairo.Matrix.identity ());
+        text.set_transform (Cairo.Matrix.identity ());
         var artboard = window.main_window.right_sidebar.layers_panel.artboard;
         var layer = new Akira.Layouts.Partials.Layer (window, artboard, text, "Text", "shape-text-symbolic", false);
         text.set_data<Akira.Layouts.Partials.Layer?> ("layer", layer);
@@ -318,13 +318,13 @@ public class Akira.Lib.Canvas : Goo.Canvas {
             return false;
         }
 
-        convert_to_item_space(selected_item, ref event_x, ref event_y);
+        convert_to_item_space (selected_item, ref event_x, ref event_y);
 
         debug ("event x: %f", event_x);
         debug ("event y: %f", event_y);
 
         if (!temp_event_converted) {
-            convert_to_item_space(selected_item, ref temp_event_x, ref temp_event_y);
+            convert_to_item_space (selected_item, ref temp_event_x, ref temp_event_y);
             temp_event_converted = true;
         }
 
@@ -363,8 +363,8 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         bool update_x = new_delta_x != 0;
         bool update_y = new_delta_y != 0;
 
-        debug ("update x: %s", update_x.to_string());
-        debug ("update y: %s", update_y.to_string());
+        debug ("update x: %s", update_x.to_string ());
+        debug ("update y: %s", update_y.to_string ());
 
         switch (holding_id) {
             case Nob.NONE: // Moving
@@ -493,8 +493,8 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         debug ("new width: %f", new_width);
         debug ("new height: %f", new_height);
 
-        debug ("update x: %s", update_x.to_string());
-        debug ("update y: %s", update_y.to_string());
+        debug ("update x: %s", update_x.to_string ());
+        debug ("update y: %s", update_y.to_string ());
 
         selected_item.set ("width", new_width, "height", new_height);
 
