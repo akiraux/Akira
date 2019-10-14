@@ -132,8 +132,6 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         events |= Gdk.EventMask.BUTTON_PRESS_MASK;
         events |= Gdk.EventMask.BUTTON_RELEASE_MASK;
         events |= Gdk.EventMask.POINTER_MOTION_MASK;
-
-        update_bounds ();
     }
 
     /********************************
@@ -203,12 +201,6 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         artboard.container.add (layer);
         artboard.show_all ();
         return text;
-    }
-
-    public void update_bounds () {
-        get_bounds (out bounds_x, out bounds_y, out bounds_w, out bounds_h);
-
-        debug (@"Bounds: $(bounds_w) x $(bounds_h), [$(bounds_x), $(bounds_y)]");
     }
 
     public void udpate_default_values () {

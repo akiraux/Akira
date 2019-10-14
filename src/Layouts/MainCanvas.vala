@@ -42,9 +42,6 @@ public class Akira.Layouts.MainCanvas : Gtk.Grid {
         canvas.set_bounds (0, 0, 10000, 10000);
         canvas.set_scale (1.0);
 
-        // Necessary in order to update bounds in fix_position
-        canvas.update_bounds ();
-
         canvas.canvas_moved.connect ((event_x, event_y) => {
             // Move scroll window according to normalized mouse delta
             // relative to the scroll window, so with Canvas' pixel
