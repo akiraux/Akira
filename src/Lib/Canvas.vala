@@ -53,10 +53,26 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     public InsertType? insert_type { get; set; }
 
     public void set_cursor_by_edit_mode () {
-        if (_edit_mode == EditMode.MODE_SELECTION) {
-            set_cursor (Gdk.CursorType.ARROW);
-        } else {
-            set_cursor (Gdk.CursorType.CROSSHAIR);
+        switch (_edit_mode) {
+            case EditMode.MODE_SELECTION:
+                set_cursor ("default");
+                break;
+
+            case EditMode.MODE_INSERT:
+                set_cursor ("crosshair");
+                break;
+
+            case EditMode.MODE_PAN:
+                if (holding) {
+                    set_cursor ("grabbing");
+                } else {
+                    set_cursor ("grab");
+                }
+                break;
+
+            default:
+                set_cursor ("default");
+                break;
         }
     }
 
@@ -85,7 +101,9 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
     public enum EditMode {
         MODE_SELECTION,
-        MODE_INSERT
+        MODE_INSERT,
+        MODE_PAN,
+        MODE_ZOOM,
     }
 
     public enum InsertType {
@@ -103,9 +121,6 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     private Goo.CanvasRect? hover_effect;
 
     private bool ctrl_is_pressed = false;
-    private bool pan_mode_enabled = false;
-    private bool zoom_mode_enabled = false;
-    private bool pan_zoom_is_holding = false;
     private bool holding;
     private bool temp_event_converted;
     private double temp_event_x;
@@ -132,6 +147,8 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         events |= Gdk.EventMask.BUTTON_PRESS_MASK;
         events |= Gdk.EventMask.BUTTON_RELEASE_MASK;
         events |= Gdk.EventMask.POINTER_MOTION_MASK;
+
+        get_bounds (out bounds_x, out bounds_y, out bounds_w, out bounds_h);
     }
 
     /********************************
@@ -227,7 +244,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         debug ("canvas temp event x: %f", temp_event_x);
         debug ("canvas temp event y: %f", temp_event_y);
 
-        if (pan_mode_enabled || zoom_mode_enabled) {
+        if (edit_mode == EditMode.MODE_PAN || edit_mode == EditMode.MODE_ZOOM) {
             double tmp_event_x_normalized = temp_event_x;
             double tmp_event_y_normalized = temp_event_y;
 
@@ -235,7 +252,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
             canvas_scroll_set_origin (tmp_event_x_normalized, tmp_event_y_normalized);
 
-            pan_zoom_is_holding = true;
+            holding = true;
         }
 
         Goo.CanvasItem clicked_item;
@@ -275,8 +292,6 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     }
 
     public override bool button_release_event (Gdk.EventButton event) {
-        pan_zoom_is_holding = false;
-
         if (!holding) return false;
 
         holding = false;
@@ -301,7 +316,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         var event_x = event.x / current_scale;
         var event_y = event.y / current_scale;
 
-        if (pan_zoom_is_holding && pan_mode_enabled) {
+        if (holding && edit_mode == EditMode.MODE_PAN) {
             move_canvas (event_x, event_y);
             return false;
         }
@@ -583,14 +598,14 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 delete_selected ();
                 return true;
             case Gdk.Key.space:
-                if (!zoom_mode_enabled) {
-                    pan_mode_enabled = true;
+                if (edit_mode != EditMode.MODE_ZOOM) {
+                    edit_mode = EditMode.MODE_PAN;
                 }
                 return true;
             case Gdk.Key.Control_L:
             case Gdk.Key.Control_R:
-                if (!pan_mode_enabled) {
-                    zoom_mode_enabled = true;
+                if (edit_mode != EditMode.MODE_PAN) {
+                    edit_mode = EditMode.MODE_ZOOM;
                 }
 
                 ctrl_is_pressed = true;
@@ -604,13 +619,12 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     public override bool key_release_event (Gdk.EventKey event) {
         switch (Gdk.keyval_to_upper (event.keyval)) {
             case Gdk.Key.space:
-                debug ("Pan mode disabled");
-                pan_mode_enabled = false;
+                edit_mode = EditMode.MODE_SELECTION;
                 return true;
+
             case Gdk.Key.Control_L:
             case Gdk.Key.Control_R:
-                debug ("Zoom mode disabled");
-                zoom_mode_enabled = false;
+                edit_mode = EditMode.MODE_SELECTION;
                 ctrl_is_pressed = false;
                 return true;
         }
@@ -802,31 +816,24 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 set_cursor_by_edit_mode ();
                 break;
             case Nob.TOP_LEFT:
-                set_cursor (Gdk.CursorType.TOP_LEFT_CORNER);
+            case Nob.BOTTOM_RIGHT:
+                set_cursor ("nwse-resize");
                 break;
             case Nob.TOP_CENTER:
-                set_cursor (Gdk.CursorType.TOP_SIDE);
+            case Nob.BOTTOM_CENTER:
+                set_cursor ("ns-resize");
                 break;
             case Nob.TOP_RIGHT:
-                set_cursor (Gdk.CursorType.TOP_RIGHT_CORNER);
+            case Nob.BOTTOM_LEFT:
+                set_cursor ("nesw-resize");
                 break;
             case Nob.RIGHT_CENTER:
-                set_cursor (Gdk.CursorType.RIGHT_SIDE);
-                break;
-            case Nob.BOTTOM_RIGHT:
-                set_cursor (Gdk.CursorType.BOTTOM_RIGHT_CORNER);
-                break;
-            case Nob.BOTTOM_CENTER:
-                set_cursor (Gdk.CursorType.BOTTOM_SIDE);
-                break;
-            case Nob.BOTTOM_LEFT:
-                set_cursor (Gdk.CursorType.BOTTOM_LEFT_CORNER);
-                break;
             case Nob.LEFT_CENTER:
-                set_cursor (Gdk.CursorType.LEFT_SIDE);
+                set_cursor ("ew-resize");
                 break;
             case Nob.ROTATE:
-                set_cursor (Gdk.CursorType.ICON);
+                debug ("Rotate Nob");
+                set_cursor ("move");
                 break;
         }
     }
@@ -942,8 +949,8 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         nobs[Nob.ROTATE].translate (x + (width / 2) - nob_offset, y - nob_offset - distance);
     }
 
-    private void set_cursor (Gdk.CursorType cursor_type) {
-        var cursor = new Gdk.Cursor.for_display (Gdk.Display.get_default (), cursor_type);
+    private void set_cursor (string cursor_name) {
+        var cursor = new Gdk.Cursor.from_name (Gdk.Display.get_default (), cursor_name);
         get_window ().set_cursor (cursor);
     }
 
