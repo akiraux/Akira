@@ -30,6 +30,8 @@ public class Akira.Lib.Canvas : Goo.Canvas {
      * Signal triggered when item was clicked by the user
      */
     public signal void item_clicked (Goo.CanvasItem? item);
+    public signal void canvas_moved (double delta_x, double delta_y);
+    public signal void canvas_scroll_set_origin (double origin_x, double origin_y);
 
     /**
      * Signal triggered when item has finished moving by the user,
@@ -97,6 +99,9 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
     private Goo.CanvasRect? hover_effect;
 
+    private bool pan_mode_enabled = false;
+    private bool zoom_mode_enabled = false;
+    private bool pan_zoom_is_holding = false;
     private bool holding;
     private bool temp_event_converted;
     private double temp_event_x;
@@ -150,6 +155,18 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
         //  debug ("canvas temp event x: %f", temp_event_x);
         //  debug ("canvas temp event y: %f", temp_event_y);
+
+        if (pan_mode_enabled || zoom_mode_enabled) {
+            double tmp_event_x_normalized = temp_event_x;
+            double tmp_event_y_normalized = temp_event_y;
+
+            convert_to_pixels (ref tmp_event_x_normalized, ref tmp_event_y_normalized);
+
+            canvas_scroll_set_origin (tmp_event_x_normalized, tmp_event_y_normalized);
+
+            pan_zoom_is_holding = true;
+            return true;
+        }
 
         Goo.CanvasItem clicked_item;
 
@@ -248,9 +265,12 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     }
 
     public override bool button_release_event (Gdk.EventButton event) {
+        pan_zoom_is_holding = false;
+
         if (!holding) {
             return false;
         }
+
 
         holding = false;
 
@@ -270,47 +290,34 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         return false;
     }
 
-    public override bool key_press_event (Gdk.EventKey event) {
-        switch (Gdk.keyval_to_upper (event.keyval)) {
-            case Gdk.Key.E:
-                edit_mode = Akira.Lib.Canvas.EditMode.MODE_INSERT;
-                insert_type = Akira.Lib.Canvas.InsertType.ELLIPSE;
-                return true;
-            case Gdk.Key.R:
-                edit_mode = Akira.Lib.Canvas.EditMode.MODE_INSERT;
-                insert_type = Akira.Lib.Canvas.InsertType.RECT;
-                return true;
-            case Gdk.Key.T:
-                edit_mode = Akira.Lib.Canvas.EditMode.MODE_INSERT;
-                insert_type = Akira.Lib.Canvas.InsertType.TEXT;
-                return true;
-            case Gdk.Key.Escape:
-                edit_mode = Akira.Lib.Canvas.EditMode.MODE_SELECTION;
-                insert_type = null;
-                return true;
-            case Gdk.Key.Delete:
-                delete_selected ();
-                return true;
+    public override bool motion_notify_event (Gdk.EventMotion event) {
+        var event_x = event.x / current_scale;
+        var event_y = event.y / current_scale;
+
+        if (pan_zoom_is_holding) {
+            if (pan_mode_enabled) {
+                move_canvas (event_x, event_y);
+                return false;
+            }
+
+            if (zoom_mode_enabled) {
+                debug ("Zooming");
+                return false;
+            }
         }
 
-        return false;
-    }
-
-    public override bool motion_notify_event (Gdk.EventMotion event) {
         if (!holding) {
             motion_hover_event (event);
             return false;
         }
-        var event_x = event.x / current_scale;
-        var event_y = event.y / current_scale;
 
-        convert_to_item_space (selected_item, ref event_x, ref event_y);
+        convert_to_item_space(selected_item, ref event_x, ref event_y);
 
         //  debug ("event x: %f", event_x);
         //  debug ("event y: %f", event_y);
 
         if (!temp_event_converted) {
-            convert_to_item_space (selected_item, ref temp_event_x, ref temp_event_y);
+            convert_to_item_space(selected_item, ref temp_event_x, ref temp_event_y);
             temp_event_converted = true;
         }
 
@@ -322,6 +329,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
         //  debug ("delta x: %f", delta_x);
         //  debug ("delta y: %f", delta_y);
+
 
         double x, y, width, height;
         selected_item.get ("x", out x, "y", out y, "width", out width, "height", out height);
@@ -365,10 +373,10 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 update_x = event_x < x + width;
                 update_y = event_y < y + height;
                 if (MIN_SIZE > height - new_delta_y) {
-                   new_delta_y = 0;
+                    new_delta_y = 0;
                 }
                 if (MIN_SIZE > width - new_delta_x) {
-                   new_delta_x = 0;
+                    new_delta_x = 0;
                 }
                 selected_item.translate (new_delta_x, new_delta_y);
                 event_x -= new_delta_x;
@@ -379,7 +387,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
             case Nob.TOP_CENTER:
                 update_y = event_y < y + height;
                 if (MIN_SIZE > height - new_delta_y) {
-                   new_delta_y = 0;
+                    new_delta_y = 0;
                 }
                 new_height = fix_size (height - new_delta_y);
                 selected_item.translate (0, new_delta_y);
@@ -424,7 +432,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 break;
             case Nob.BOTTOM_LEFT:
                 if (new_delta_x > width) {
-                   new_delta_x = 0;
+                    new_delta_x = 0;
                 }
                 update_y = event_y > y;
                 update_x = event_x < x + width;
@@ -495,7 +503,67 @@ public class Akira.Lib.Canvas : Goo.Canvas {
             //  debug ("temp event y: %f", temp_event_y);
         }
 
+
         return true;
+    }
+
+    public override bool key_press_event (Gdk.EventKey event) {
+        switch (Gdk.keyval_to_upper (event.keyval)) {
+            case Gdk.Key.E:
+                edit_mode = Akira.Lib.Canvas.EditMode.MODE_INSERT;
+                insert_type = Akira.Lib.Canvas.InsertType.ELLIPSE;
+                return true;
+            case Gdk.Key.R:
+                edit_mode = Akira.Lib.Canvas.EditMode.MODE_INSERT;
+                insert_type = Akira.Lib.Canvas.InsertType.RECT;
+                return true;
+            case Gdk.Key.Escape:
+                edit_mode = Akira.Lib.Canvas.EditMode.MODE_SELECTION;
+                insert_type = null;
+                return true;
+            case Gdk.Key.Delete:
+                delete_selected ();
+                return true;
+            case Gdk.Key.space:
+                if (!zoom_mode_enabled) {
+                    pan_mode_enabled = true;
+                }
+                return true;
+            case Gdk.Key.Control_L:
+            case Gdk.Key.Control_R:
+                if (!pan_mode_enabled) {
+                    zoom_mode_enabled = true;
+                }
+                return true;
+        }
+
+        return false;
+    }
+
+    public override bool key_release_event (Gdk.EventKey event) {
+        switch (Gdk.keyval_to_upper (event.keyval)) {
+            case Gdk.Key.space:
+                // debug ("Pan mode disabled");
+                pan_mode_enabled = false;
+                return true;
+            case Gdk.Key.Control_L:
+            case Gdk.Key.Control_R:
+                // debug ("Zoom mode disabled");
+                zoom_mode_enabled = false;
+                return true;
+        }
+
+        return false;
+    }
+
+    private void move_canvas (double event_x, double event_y) {
+        double event_x_normalized = event_x;
+        double event_y_normalized = event_y;
+
+        convert_to_pixels (ref event_x_normalized, ref event_y_normalized);
+
+        canvas_moved (event_x_normalized, event_y_normalized);
+        return;
     }
 
     private void motion_hover_event (Gdk.EventMotion event) {
