@@ -130,7 +130,8 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         events |= Gdk.EventMask.BUTTON_PRESS_MASK;
         events |= Gdk.EventMask.BUTTON_RELEASE_MASK;
         events |= Gdk.EventMask.POINTER_MOTION_MASK;
-        get_bounds (out bounds_x, out bounds_y, out bounds_w, out bounds_h);
+
+        update_bounds ();
     }
 
     /********************************
@@ -200,6 +201,12 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         artboard.container.add (layer);
         artboard.show_all ();
         return text;
+    }
+
+    public void update_bounds () {
+        get_bounds (out bounds_x, out bounds_y, out bounds_w, out bounds_h);
+
+        debug (@"Bounds: $(bounds_w) x $(bounds_h), [$(bounds_x), $(bounds_y)]");
     }
 
     public void udpate_default_values () {
@@ -337,7 +344,6 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         debug ("delta x: %f", delta_x);
         debug ("delta y: %f", delta_y);
 
-
         double x, y, width, height;
         selected_item.get ("x", out x, "y", out y, "width", out width, "height", out height);
 
@@ -352,6 +358,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
         var canvas_x = x;
         var canvas_y = y;
+
         convert_from_item_space (selected_item, ref canvas_x, ref canvas_y);
 
         debug ("new delta x: %f", new_delta_x);
@@ -370,11 +377,15 @@ public class Akira.Lib.Canvas : Goo.Canvas {
             case Nob.NONE: // Moving
                 double move_x = fix_x_position (canvas_x, width, delta_x);
                 double move_y = fix_y_position (canvas_y, height, delta_y);
+
                 debug ("move x %f", move_x);
                 debug ("move y %f", move_y);
+
                 selected_item.translate (move_x, move_y);
+
                 event_x -= move_x;
                 event_y -= move_y;
+
                 break;
             case Nob.TOP_LEFT:
                 update_x = event_x < x + width;
@@ -898,10 +909,12 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     }
 
     private double fix_y_position (double y, double height, double delta_y) {
-        var min_delta = Math.round ((MIN_POS - height) * current_scale);
+        var min_delta = Math.round ((MIN_POS - height));
+        var max_delta = Math.round ((bounds_h - MIN_POS));
+
         debug ("min delta y %f", min_delta);
-        var max_delta = Math.round ((bounds_h - MIN_POS) * current_scale);
         debug ("max delta y %f", max_delta);
+
         var new_y = Math.round (y + delta_y);
         if (new_y < min_delta) {
             return 0;
@@ -913,11 +926,14 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     }
 
     private double fix_x_position (double x, double width, double delta_x) {
-        var min_delta = Math.round ((MIN_POS - width) * current_scale);
+        var min_delta = Math.round ((MIN_POS - width));
+        var max_delta = Math.round ((bounds_w - MIN_POS));
+
         debug ("min delta x %f", min_delta);
-        var max_delta = Math.round ((bounds_h - MIN_POS) * current_scale);
         debug ("max delta x %f", max_delta);
+
         var new_x = Math.round (x + delta_x);
+
         if (new_x < min_delta) {
             return 0;
         } else if (new_x > max_delta) {
