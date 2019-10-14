@@ -23,6 +23,7 @@
 public class Akira.Lib.Canvas : Goo.Canvas {
     private const int MIN_SIZE = 1;
     private const int MIN_POS = 10;
+    private const int ROTATION_FIXED_STEP = 15;
 
     /**
      * Signal triggered when item was clicked by the user
@@ -101,6 +102,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
     private Goo.CanvasRect? hover_effect;
 
+    private bool ctrl_is_pressed = false;
     private bool pan_mode_enabled = false;
     private bool zoom_mode_enabled = false;
     private bool pan_zoom_is_holding = false;
@@ -242,7 +244,6 @@ public class Akira.Lib.Canvas : Goo.Canvas {
             canvas_scroll_set_origin (tmp_event_x_normalized, tmp_event_y_normalized);
 
             pan_zoom_is_holding = true;
-            return true;
         }
 
         Goo.CanvasItem clicked_item;
@@ -308,16 +309,9 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         var event_x = event.x / current_scale;
         var event_y = event.y / current_scale;
 
-        if (pan_zoom_is_holding) {
-            if (pan_mode_enabled) {
-                move_canvas (event_x, event_y);
-                return false;
-            }
-
-            if (zoom_mode_enabled) {
-                debug ("Zooming");
-                return false;
-            }
+        if (pan_zoom_is_holding && pan_mode_enabled) {
+            move_canvas (event_x, event_y);
+            return false;
         }
 
         if (!holding) {
@@ -481,21 +475,61 @@ public class Akira.Lib.Canvas : Goo.Canvas {
             case Nob.ROTATE:
                 var center_x = x + width / 2;
                 var center_y = y + height / 2;
+                var do_rotation = true;
 
                 debug ("center x: %f", center_x);
                 debug ("center y: %f", center_y);
 
                 var start_radians = GLib.Math.atan2 (center_y - temp_event_y, temp_event_x - center_x);
-                debug ("start_radians %f, atan2(%f - %f, %f - %f)", start_radians, center_y, temp_event_y, temp_event_x, center_x);
                 var radians = GLib.Math.atan2 (center_y - event_y, event_x - center_x);
-                debug ("radians %f, atan2(%f - %f, %f - %f)", radians, center_y , event_y, event_x, center_x);
-                radians = start_radians - radians;
-                var rotation = radians * (180 / Math.PI);
-                debug ("rotation: %f", rotation);
 
-                convert_from_item_space (selected_item, ref event_x, ref event_y);
-                selected_item.rotate (rotation, center_x, center_y);
-                convert_to_item_space (selected_item, ref event_x, ref event_y);
+                debug ("start_radians %f, atan2(%f - %f, %f - %f)", start_radians, center_y, temp_event_y, temp_event_x, center_x);
+                debug ("radians %f, atan2(%f - %f, %f - %f)", radians, center_y , event_y, event_x, center_x);
+
+                radians = start_radians - radians;
+
+                double current_x, current_y, current_scale, current_rotation_double;
+                selected_item.get_simple_transform (out current_x, out current_y, out current_scale, out current_rotation_double);
+
+                var current_rotation = ((int) current_rotation_double);
+                var rotation = radians * (180 / Math.PI);
+
+                debug ("rotation: %f", rotation);
+                debug ("item rotation: %d", current_rotation);
+
+
+                if (ctrl_is_pressed) {
+                    do_rotation = false;
+
+                    // Don't update temp_event_x and temp_event_y
+                    // before reaching the ROTATION_FIXED_STEP threshold
+                    update_x = false;
+                    update_y = false;
+
+                    if (rotation.abs () > ROTATION_FIXED_STEP) {
+                        do_rotation = true;
+
+                        // The rotation amount needs to take into consideration
+                        // the current rotation in order to anchor the item to truly
+                        // "fixed" rotation step instead of simply adding ROTATION_FIXED_STEP
+                        // to the current rotation, which might lead to a situation in which you
+                        // cannot "reset" item rotation to rounded values (0, 90, 180, ...) without
+                        // manually resetting the rotation input field in the properties panel
+                        var rotation_amount = ROTATION_FIXED_STEP - (current_rotation % ROTATION_FIXED_STEP);
+
+                        rotation = rotation > 0 ? rotation_amount : -rotation_amount;
+
+                        update_x = true;
+                        update_y = true;
+                    }
+                }
+
+                if (do_rotation) {
+                    convert_from_item_space (selected_item, ref event_x, ref event_y);
+                    selected_item.rotate (rotation, center_x, center_y);
+                    convert_to_item_space (selected_item, ref event_x, ref event_y);
+                }
+
                 break;
             default:
                 break;
@@ -523,7 +557,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
         debug ("");
 
-            return true;
+        return true;
     }
 
     public override bool key_press_event (Gdk.EventKey event) {
@@ -557,6 +591,9 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 if (!pan_mode_enabled) {
                     zoom_mode_enabled = true;
                 }
+
+                ctrl_is_pressed = true;
+
                 return true;
         }
 
@@ -573,6 +610,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
             case Gdk.Key.Control_R:
                 debug ("Zoom mode disabled");
                 zoom_mode_enabled = false;
+                ctrl_is_pressed = false;
                 return true;
         }
 
