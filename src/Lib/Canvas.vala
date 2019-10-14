@@ -311,13 +311,13 @@ public class Akira.Lib.Canvas : Goo.Canvas {
             return false;
         }
 
-        convert_to_item_space(selected_item, ref event_x, ref event_y);
+        convert_to_item_space (selected_item, ref event_x, ref event_y);
 
         //  debug ("event x: %f", event_x);
         //  debug ("event y: %f", event_y);
 
         if (!temp_event_converted) {
-            convert_to_item_space(selected_item, ref temp_event_x, ref temp_event_y);
+            convert_to_item_space (selected_item, ref temp_event_x, ref temp_event_y);
             temp_event_converted = true;
         }
 

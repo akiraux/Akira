@@ -42,7 +42,7 @@ public class Akira.Layouts.MainCanvas : Gtk.Grid {
         canvas.set_bounds (0, 0, 10000, 10000);
         canvas.set_scale (1.0);
 
-        canvas.canvas_moved.connect((event_x, event_y) => {
+        canvas.canvas_moved.connect ((event_x, event_y) => {
             // Move scroll window according to normalized mouse delta
             // relative to the scroll window, so with Canvas' pixel
             // coordinates translated into ScrolledWindow's one.
@@ -53,7 +53,7 @@ public class Akira.Layouts.MainCanvas : Gtk.Grid {
             main_scroll.vadjustment.value -= delta_y;
         });
 
-        canvas.canvas_scroll_set_origin.connect((origin_x, origin_y) => {
+        canvas.canvas_scroll_set_origin.connect ((origin_x, origin_y) => {
             // Update scroll origin on Canvas' button_press_event
             scroll_origin_x = origin_x;
             scroll_origin_y = origin_y;
