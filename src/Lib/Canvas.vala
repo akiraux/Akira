@@ -103,7 +103,6 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         MODE_SELECTION,
         MODE_INSERT,
         MODE_PAN,
-        MODE_ZOOM,
     }
 
     public enum InsertType {
@@ -244,7 +243,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         debug ("canvas temp event x: %f", temp_event_x);
         debug ("canvas temp event y: %f", temp_event_y);
 
-        if (edit_mode == EditMode.MODE_PAN || edit_mode == EditMode.MODE_ZOOM) {
+        if (edit_mode == EditMode.MODE_PAN) {
             double tmp_event_x_normalized = temp_event_x;
             double tmp_event_y_normalized = temp_event_y;
 
@@ -598,18 +597,11 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 delete_selected ();
                 return true;
             case Gdk.Key.space:
-                if (edit_mode != EditMode.MODE_ZOOM) {
-                    edit_mode = EditMode.MODE_PAN;
-                }
+                edit_mode = EditMode.MODE_PAN;
                 return true;
             case Gdk.Key.Control_L:
             case Gdk.Key.Control_R:
-                if (edit_mode != EditMode.MODE_PAN) {
-                    edit_mode = EditMode.MODE_ZOOM;
-                }
-
                 ctrl_is_pressed = true;
-
                 return true;
         }
 
