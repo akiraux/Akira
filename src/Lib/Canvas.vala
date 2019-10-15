@@ -18,6 +18,7 @@
 *
 * Authored by: Felipe Escoto <felescoto95@hotmail.com>
 * Authored by: Alberto Fanjul <albertofanjul@gmail.com>
+* Authored by: Giacomo "giacomoalbe" Alberini <giacomoalbe@gmail.com>
 */
 
 public class Akira.Lib.Canvas : Goo.Canvas {
