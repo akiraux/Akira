@@ -252,6 +252,8 @@ public class Akira.Lib.Canvas : Goo.Canvas {
             canvas_scroll_set_origin (tmp_event_x_normalized, tmp_event_y_normalized);
 
             holding = true;
+
+            return true;
         }
 
         Goo.CanvasItem clicked_item;
@@ -315,13 +317,21 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         var event_x = event.x / current_scale;
         var event_y = event.y / current_scale;
 
-        if (holding && edit_mode == EditMode.MODE_PAN) {
-            move_canvas (event_x, event_y);
+        if (edit_mode == EditMode.MODE_PAN) {
+            if (holding) {
+                // Move canvas if holding mouse and spacebar pressed
+                move_canvas (event_x, event_y);
+            } else {
+                // Remove hover effect on selected items if just
+                // moving around with spacebar pressed
+                remove_hover_effect ();
+            }
+
             return false;
         }
 
         if (!holding) {
-            motion_hover_event (event);
+            motion_hover_event (event.x, event.y);
             return false;
         }
 
@@ -598,6 +608,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 return true;
             case Gdk.Key.space:
                 edit_mode = EditMode.MODE_PAN;
+                remove_hover_effect ();
                 return true;
             case Gdk.Key.Control_L:
             case Gdk.Key.Control_R:
@@ -612,6 +623,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         switch (Gdk.keyval_to_upper (event.keyval)) {
             case Gdk.Key.space:
                 edit_mode = EditMode.MODE_SELECTION;
+                motion_hover_event (hover_x, hover_y);
                 return true;
 
             case Gdk.Key.Control_L:
@@ -634,8 +646,8 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         return;
     }
 
-    private void motion_hover_event (Gdk.EventMotion event) {
-        var hovered_item = get_item_at (event.x / get_scale (), event.y / get_scale (), true);
+    private void motion_hover_event (double event_x, double event_y) {
+        var hovered_item = get_item_at (event_x / get_scale (), event_y / get_scale (), true);
 
         if (!(hovered_item is Goo.CanvasItemSimple)) {
             remove_hover_effect ();
