@@ -54,11 +54,6 @@ You can install Akira by compiling it from the source
 
 > _**Note:** For non-elementary distros, (such as Arch, Debian etc) you are required to install "vala" as additional dependency._
 
-#### Debian (Elementary/Ubuntu/Linux Mint)
- ```sh
- sudo apt-get install gtk+-3.0 elementary-sdk glib-2.0 gee-0.8 gobject-2.0 libxml2 gtksourceview-3.0 libjson-glib-1.0 goocanvas-2.0 libarchive-dev libcairo2-dev meson valac
- ```
-
 ### Compile &amp; Run
 
 Once the above mentioned dependencies are resolved, Akira can be compiled &amp; installed
