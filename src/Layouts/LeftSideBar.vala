@@ -21,6 +21,7 @@
 
 public class Akira.Layouts.LeftSideBar : Gtk.Grid {
     public weak Akira.Window window { get; construct; }
+    public Akira.Layouts.Partials.TransformPanel transform_panel;
 
     public bool toggled {
         get {
@@ -43,12 +44,12 @@ public class Akira.Layouts.LeftSideBar : Gtk.Grid {
         get_style_context ().add_class ("sidebar-l");
 
         var align_items_panel = new Akira.Layouts.Partials.AlignItemsPanel (window);
-        var transorm_panel = new Akira.Layouts.Partials.TransformPanel ();
+        transform_panel = new Akira.Layouts.Partials.TransformPanel (window);
         var style_panel = new Akira.Layouts.Partials.StylePanel ();
         var fill_box_panel = new Akira.Layouts.Partials.FillsBoxPanel (window);
 
         attach (align_items_panel, 0, 0, 1, 1);
-        attach (transorm_panel, 0, 1, 1, 1);
+        attach (transform_panel, 0, 1, 1, 1);
         attach (style_panel, 0, 2, 1, 1);
         attach (fill_box_panel, 0, 3, 1, 1);
 
