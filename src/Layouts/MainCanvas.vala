@@ -45,7 +45,6 @@ public class Akira.Layouts.MainCanvas : Gtk.Grid {
     }
 
     public bool on_scroll (Gdk.EventScroll event) {
-        // Let's do this: https://stackoverflow.com/questions/43948186/scrolledwindow-scroll-by-drag-simulate-finger-on-touchscreen
         switch (event.direction) {
             case Gdk.ScrollDirection.UP:
                 // Zoom in
