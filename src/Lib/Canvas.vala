@@ -171,7 +171,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
                 selected_item = clicked_item;
                 window.main_window.left_sidebar.transform_panel.item = (Goo.CanvasItemSimple)selected_item;
-                selected_item.notify.connect(update_effects);
+                selected_item.notify.connect (update_effects);
 
                 holding_id = Nob.NONE;
             } else { // nob was clicked
@@ -433,8 +433,8 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
                 convert_from_item_space (selected_item, ref event_x, ref event_y);
                 selected_item.rotate (rotation, center_x, center_y);
-                rotation += selected_item.get_data<double?>("rotation");
-                selected_item.set_data<double?>("rotation", rotation);
+                rotation += selected_item.get_data<double?> ("rotation");
+                selected_item.set_data<double?> ("rotation", rotation);
                 convert_to_item_space (selected_item, ref event_x, ref event_y);
                 break;
             default:
@@ -553,7 +553,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
         select_effect.remove ();
         select_effect = null;
-        selected_item.notify.disconnect(update_effects);
+        selected_item.notify.disconnect (update_effects);
         selected_item = null;
 
         for (int i = 0; i < 9; i++) {
@@ -845,8 +845,8 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                                        "fill-color", fill_color, null);
 
         rect.set ("parent", root);
-        rect.set_transform(Cairo.Matrix.identity ());
-        rect.set_data<double?>("rotation", 0);
+        rect.set_transform (Cairo.Matrix.identity ());
+        rect.set_data<double?> ("rotation", 0);
         var artboard = window.main_window.right_sidebar.layers_panel.artboard;
         var layer = new Akira.Layouts.Partials.Layer (window, artboard, rect,
             "Rectangle", "shape-rectangle-symbolic", false);
@@ -864,8 +864,8 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                                              "fill-color", fill_color);
 
         ellipse.set ("parent", root);
-        ellipse.set_transform(Cairo.Matrix.identity ());
-        ellipse.set_data<double?>("rotation", 0);
+        ellipse.set_transform (Cairo.Matrix.identity ());
+        ellipse.set_data<double?> ("rotation", 0);
         var artboard = window.main_window.right_sidebar.layers_panel.artboard;
         var layer = new Akira.Layouts.Partials.Layer (window, artboard, ellipse,
             "Circle", "shape-circle-symbolic", false);
@@ -881,8 +881,8 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                                        Goo.CanvasAnchorType.NW, "font", "Open Sans 18");
         text.set ("parent", root);
         text.set ("height", 25f);
-        text.set_transform(Cairo.Matrix.identity ());
-        text.set_data<double?>("rotation", 0);
+        text.set_transform (Cairo.Matrix.identity ());
+        text.set_data<double?> ("rotation", 0);
         var artboard = window.main_window.right_sidebar.layers_panel.artboard;
         var layer = new Akira.Layouts.Partials.Layer (window, artboard, text, "Text", "shape-text-symbolic", false);
         text.set_data<Akira.Layouts.Partials.Layer?> ("layer", layer);
