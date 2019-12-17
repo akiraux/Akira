@@ -19,22 +19,30 @@
 * Authored by: Felipe Escoto <felescoto95@hotmail.com>
 * Authored by: Alberto Fanjul <albertofanjul@gmail.com>
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
+* Authored by: Giacomo "giacomoalbe" Alberini <giacomoalbe@gmail.com>
 */
 
 public class Akira.Lib.Canvas : Goo.Canvas {
     private const int MIN_SIZE = 1;
     private const int MIN_POS = 10;
+    private const double ROTATION_FIXED_STEP = 15.0;
 
     /**
-     * Signal triggered when item was clicked by the user
+     * Signal triggered when item was clicked by the user.
      */
     public signal void item_clicked (Goo.CanvasItem? item);
 
     /**
      * Signal triggered when item has finished moving by the user,
-     * and a change of it's coordenates was made
+     * and a change of it's coordenates was made.
      */
     public signal void item_moved (Goo.CanvasItem? item);
+
+    /**
+     * Signals triggered when the canvas is moved via keyboard or mouse actions.
+    */
+    public signal void canvas_moved (double delta_x, double delta_y);
+    public signal void canvas_scroll_set_origin (double origin_x, double origin_y);
 
     public Goo.CanvasItem? _selected_item;
     public Goo.CanvasItem? selected_item {
@@ -60,11 +68,27 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     public InsertType? insert_type { get; set; }
 
     public void set_cursor_by_edit_mode () {
-      if (_edit_mode == EditMode.MODE_SELECTION) {
-        set_cursor (Gdk.CursorType.ARROW);
-      } else {
-        set_cursor (Gdk.CursorType.CROSSHAIR);
-      }
+        switch (_edit_mode) {
+            case EditMode.MODE_SELECTION:
+                set_cursor (Gdk.CursorType.ARROW);
+                break;
+
+            case EditMode.MODE_INSERT:
+                set_cursor (Gdk.CursorType.CROSSHAIR);
+                break;
+
+            case EditMode.MODE_PAN:
+                if (holding) {
+                    set_cursor (Gdk.CursorType.HAND1);
+                } else {
+                    set_cursor (Gdk.CursorType.HAND2);
+                }
+                break;
+
+            default:
+                set_cursor (Gdk.CursorType.ARROW);
+                break;
+        }
     }
     public weak Akira.Window window { get; construct; }
 
@@ -91,7 +115,8 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
     public enum EditMode {
         MODE_SELECTION,
-        MODE_INSERT
+        MODE_INSERT,
+        MODE_PAN
     }
 
     public enum InsertType {
@@ -105,6 +130,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     private Goo.CanvasRect? hover_effect;
 
     private bool holding;
+    private bool ctrl_is_pressed = false;
     private bool temp_event_converted;
     private double temp_event_x;
     private double temp_event_y;
@@ -156,15 +182,25 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
         Goo.CanvasItem clicked_item;
 
+        if (edit_mode == EditMode.MODE_PAN) {
+            double tmp_event_x_normalized = temp_event_x;
+            double tmp_event_y_normalized = temp_event_y;
+
+            convert_to_pixels (ref tmp_event_x_normalized, ref tmp_event_y_normalized);
+            canvas_scroll_set_origin (tmp_event_x_normalized, tmp_event_y_normalized);
+            holding = true;
+            return true;
+        }
+
         if (edit_mode == EditMode.MODE_INSERT) {
-          remove_select_effect ();
-          var item = insert_object (event);
-          selected_item = item;
-          add_hover_effect (item);
-          add_select_effect (item);
-          clicked_item = nobs[Nob.BOTTOM_RIGHT];
+            remove_select_effect ();
+            var item = insert_object (event);
+            selected_item = item;
+            add_hover_effect (item);
+            add_select_effect (item);
+            clicked_item = nobs[Nob.BOTTOM_RIGHT];
         } else {
-          clicked_item = get_item_at (temp_event_x, temp_event_y, true);
+            clicked_item = get_item_at (temp_event_x, temp_event_y, true);
         }
 
         if (clicked_item != null) {
