@@ -38,17 +38,15 @@ public class Akira.Models.FillsListModel : GLib.Object, GLib.ListModel {
         return typeof (Akira.Models.FillsItemModel);
     }
 
-    public void add () {
+    public void add (Goo.CanvasItemSimple item) {
         var position = fills_list.length ();
-        fills_list.append (
-            new Akira.Models.FillsItemModel (
-                "#CCCCCC",
-                1,
+        var model_item = new Akira.Models.FillsItemModel (
+                item,
                 false,
                 Akira.Utils.BlendingMode.NORMAL,
                 this
-            )
-        );
+            );
+        fills_list.append (model_item);
 
         items_changed (position, 0, 1);
         update_fills ();
@@ -60,6 +58,13 @@ public class Akira.Models.FillsListModel : GLib.Object, GLib.ListModel {
 
         items_changed (position, 1, 0);
         update_fills ();
+    }
+
+    public void clear () {
+	    foreach (Akira.Models.FillsItemModel i in fills_list) {
+            debug ("remove fill");
+            remove (i);
+	    }
     }
 
     public void update_fills () {

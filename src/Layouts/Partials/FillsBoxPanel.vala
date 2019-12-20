@@ -58,7 +58,8 @@ public class Akira.Layouts.Partials.FillsBoxPanel : Gtk.Grid {
         add_btn.add (new Gtk.Image.from_icon_name ("list-add-symbolic",
                                                    Gtk.IconSize.SMALL_TOOLBAR));
         add_btn.clicked.connect (() => {
-            fills_list_model.add ();
+            //TODO: What means add another fillitem to an object: gradient???
+            //fills_list_model.add ();
         });
 
         title_cont.attach (label, 0, 0, 1, 1);

@@ -31,8 +31,13 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
     private Akira.Partials.LinkedInput rotation;
     private Gtk.Button hflip_button;
     private Gtk.Button vflip_button;
+    private Gtk.Adjustment opacity_adj;
     private Akira.Partials.InputField opacity_entry;
     private Gtk.Scale scale;
+    private uint fill_rgb;
+    private uint fill_a;
+    private uint stroke_rgb;
+    private uint stroke_a;
 
     public TransformPanel (Akira.Window main_window) {
         Object (
@@ -61,6 +66,9 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
             hflip_button.sensitive = has_item;
             vflip_button.sensitive = has_item;
             opacity_entry.entry.sensitive = has_item;
+            if (has_item) {
+                opacity_adj.value = item.get_data<double?>("opacity");
+            }
             scale.sensitive = has_item;
 
             _item.notify.connect (item_changed);
@@ -78,6 +86,14 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         item.get ("x", out item_x, "y", out item_y, "width", out item_width, "height", out item_height/*, "alpha", out alpha*/);
         double? item_rotation = item.get_data<double?> ("rotation");
         window.main_window.main_canvas.canvas.convert_from_item_space (item, ref item_x, ref item_y);
+
+        var item_simple = (Goo.CanvasItemSimple)item;
+        uint fill_color_rgba = item_simple.fill_color_rgba;
+        uint stroke_color_rgba = item_simple.stroke_color_rgba;
+        fill_rgb = fill_color_rgba & 0xFFFFFF00;
+        fill_a = fill_color_rgba & 0x000000FF;
+        stroke_rgb = stroke_color_rgba & 0xFFFFFF00;
+        stroke_a = stroke_color_rgba & 0x000000FF;
 
         x.notify["value"].disconnect (x_notify_value);
         y.notify["value"].disconnect (y_notify_value);
@@ -173,8 +189,8 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         align_grid.attach (hflip_button, 0, 0, 1, 1);
         align_grid.attach (vflip_button, 1, 0, 1, 1);
 
-        var opacity = new Gtk.Adjustment (100.0, 0, 100.0, 0, 0, 0);
-        scale = new Gtk.Scale (Gtk.Orientation.HORIZONTAL, opacity);
+        opacity_adj = new Gtk.Adjustment (100.0, 0, 100.0, 0, 0, 0);
+        scale = new Gtk.Scale (Gtk.Orientation.HORIZONTAL, opacity_adj);
         scale.hexpand = true;
         scale.sensitive = false;
         scale.draw_value = false;
@@ -182,14 +198,14 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         scale.margin_end = 30;
         opacity_entry = new Akira.Partials.InputField (
             Akira.Partials.InputField.Unit.PERCENTAGE, 7, true, true);
-        opacity_entry.entry.text = (opacity.get_value ()).to_string ();
+        opacity_entry.entry.text = (opacity_adj.get_value ()).to_string ();
         opacity_entry.entry.bind_property (
-            "text", opacity, "value",
+            "text", opacity_adj, "value",
             BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE,
             (binding, srcval, ref targetval) => {
                 double src = double.parse (srcval.dup_string ());
                 if (src > 100 || src < 0) {
-                    opacity_entry.entry.text = (opacity.get_value ()).to_string ();
+                    opacity_entry.entry.text = (opacity_adj.get_value ()).to_string ();
                     return false;
                 }
                 targetval.set_double (src);
@@ -200,7 +216,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
                 return true;
             }
         );
-        opacity.notify["value"].connect (opacity_notify_value);
+        opacity_adj.notify["value"].connect (opacity_notify_value);
         opacity_entry.entry.hexpand = false;
         opacity_entry.entry.width_request = 64;
 
@@ -254,11 +270,23 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
 
     public void opacity_notify_value () {
         var item_simple = (Goo.CanvasItemSimple)item;
+        int? fill_a = item.get_data<int?> ("fill-alpha");
+        int? stroke_a = item.get_data<int?> ("stroke-alpha");
+
+        var opacity_factor = double.parse (opacity_entry.entry.text) / 100;
+
         uint fill_color_rgba = item_simple.fill_color_rgba;
         uint stroke_color_rgba = item_simple.stroke_color_rgba;
-        var alpha = double.parse (opacity_entry.entry.text) * 255 / 100;
-        item_simple.fill_color_rgba = (uint) ((fill_color_rgba & 0xFFFFFF00) + alpha);
-        item_simple.stroke_color_rgba = (uint) ((stroke_color_rgba & 0xFFFFFF00) + alpha);
+        fill_rgb = fill_color_rgba & 0xFFFFFF00;
+        stroke_rgb = stroke_color_rgba & 0xFFFFFF00;
+
+        item_simple.notify.disconnect (item_changed);
+
+        item.set_data<double?> ("opacity", opacity_factor * 100);
+        item_simple.fill_color_rgba = (uint) (fill_rgb + (fill_a * opacity_factor));
+        item_simple.stroke_color_rgba = (uint) (stroke_rgb + (stroke_a * opacity_factor));
+
+        item_simple.notify.connect (item_changed);
     }
 
     public void y_notify_value () {

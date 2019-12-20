@@ -443,8 +443,8 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         debug ("new width: %f", new_width);
         debug ("new height: %f", new_height);
 
-        debug ("update y: %s", update_y.to_string ());
         debug ("update x: %s", update_x.to_string ());
+        debug ("update y: %s", update_y.to_string ());
 
         selected_item.set ("width", new_width, "height", new_height);
 
@@ -496,6 +496,10 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         target.get ("x", out x, "y", out y);
 
         var item = (target as Goo.CanvasItemSimple);
+
+        var fills_list_model = window.main_window.left_sidebar.fill_box_panel.fills_list_model;
+        fills_list_model.clear ();
+        fills_list_model.add(item);
 
         var line_width = 1.0 / current_scale;
         var stroke = item.line_width / 2;
@@ -552,6 +556,10 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         }
 
         select_effect.remove ();
+
+        var fills_list_model = window.main_window.left_sidebar.fill_box_panel.fills_list_model;
+        fills_list_model.clear ();
+
         select_effect = null;
         selected_item.notify.disconnect (update_effects);
         selected_item = null;
@@ -824,7 +832,10 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
     public void delete_selected () {
         if (selected_item != null) {
-            selected_item.remove ();
+            selected_item.remove();
+
+            var fills_list_model = window.main_window.left_sidebar.fill_box_panel.fills_list_model;
+            fills_list_model.clear ();
             var artboard = window.main_window.right_sidebar.layers_panel.artboard;
             Akira.Layouts.Partials.Layer layer = selected_item.get_data<Akira.Layouts.Partials.Layer?> ("layer");
             if (layer != null) {
@@ -837,6 +848,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
     public Goo.CanvasRect add_rect (Gdk.EventButton event) {
         var root = get_root_item ();
+        debug ("fill color %s", fill_color);
         var rect = new Goo.CanvasRect (null, event.x, event.y, 1, 1,
                                        "line-width", border_size,
                                        "radius-x", 0.0,
@@ -851,6 +863,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         var layer = new Akira.Layouts.Partials.Layer (window, artboard, rect,
             "Rectangle", "shape-rectangle-symbolic", false);
         rect.set_data<Akira.Layouts.Partials.Layer?> ("layer", layer);
+        init_item (rect);
         artboard.container.add (layer);
         artboard.show_all ();
         return rect;
@@ -870,6 +883,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         var layer = new Akira.Layouts.Partials.Layer (window, artboard, ellipse,
             "Circle", "shape-circle-symbolic", false);
         ellipse.set_data<Akira.Layouts.Partials.Layer?> ("layer", layer);
+        init_item (ellipse);
         artboard.container.add (layer);
         artboard.show_all ();
         return ellipse;
@@ -886,9 +900,16 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         var artboard = window.main_window.right_sidebar.layers_panel.artboard;
         var layer = new Akira.Layouts.Partials.Layer (window, artboard, text, "Text", "shape-text-symbolic", false);
         text.set_data<Akira.Layouts.Partials.Layer?> ("layer", layer);
+        init_item (text);
         artboard.container.add (layer);
         artboard.show_all ();
         return text;
+    }
+
+    private void init_item(Object object) {
+        object.set_data<int?> ("fill-alpha", 255);
+        object.set_data<int?> ("stroke-alpha", 255);
+        object.set_data<double?> ("opacity", 100);
     }
 
     public void udpate_default_values () {
