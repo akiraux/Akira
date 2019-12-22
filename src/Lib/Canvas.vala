@@ -558,7 +558,8 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         select_effect.remove ();
 
         var fills_list_model = window.main_window.left_sidebar.fill_box_panel.fills_list_model;
-        fills_list_model.clear ();
+        if (fills_list_model != null)
+            fills_list_model.clear ();
 
         select_effect = null;
         selected_item.notify.disconnect (update_effects);

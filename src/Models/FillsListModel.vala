@@ -31,7 +31,12 @@ public class Akira.Models.FillsListModel : GLib.Object, GLib.ListModel {
     }
 
     public Object? get_item (uint position) {
-        return fills_list.nth_data (position) as Object;
+        debug ("get item %u", position);
+        var o = fills_list.nth_data (position);
+        if (o != null)
+            return o as Object;
+        else
+            return null;
     }
 
     public Type get_item_type () {
@@ -53,17 +58,21 @@ public class Akira.Models.FillsListModel : GLib.Object, GLib.ListModel {
     }
 
     public void remove (Akira.Models.FillsItemModel item) {
-        var position = fills_list.index (item);
-        fills_list.remove (item);
+        if (item != null) {
+            var position = fills_list.index (item);
+            fills_list.remove (item);
 
-        items_changed (position, 1, 0);
-        update_fills ();
+            items_changed (position, 1, 0);
+            update_fills ();
+        }
     }
 
     public void clear () {
+       debug ("clear filllist");
 	    foreach (Akira.Models.FillsItemModel i in fills_list) {
             debug ("remove fill");
-            remove (i);
+            if (i != null)
+                remove (i);
 	    }
     }
 
