@@ -140,7 +140,14 @@ public class Akira.Widgets.SettingsDialog : Gtk.Dialog {
         grid.attach (fill_color, 1, 2, 1, 1);
 
         fill_color.color_set.connect (() => {
-            settings.fill_color = fill_color.get_rgba ().to_string ();
+            var rgba = fill_color.get_rgba ();
+            //Gdk.RGBA uses rgb() if alpha is 1.
+            string rgba_str = "rgba(%f,%f,%f,%f)" .printf (rgba.red * 255,
+                                                          rgba.green * 255,
+                                                          rgba.blue * 255,
+                                                          rgba.alpha);
+            debug ("setting color: %s", rgba_str);
+            settings.fill_color = rgba_str;
         });
 
         grid.attach (new SettingsLabel (_("Enable Border Style:")), 0, 3, 1, 1);
@@ -158,7 +165,14 @@ public class Akira.Widgets.SettingsDialog : Gtk.Dialog {
         grid.attach (border_color, 1, 4, 1, 1);
 
         border_color.color_set.connect (() => {
-            settings.border_color = border_color.get_rgba ().to_string ();
+            var rgba = border_color.get_rgba ();
+            //Gdk.RGBA uses rgb() if alpha is 1.
+            string rgba_str = "rgba(%f,%f,%f,%f)".printf (rgba.red * 255,
+                                                         rgba.green * 255,
+                                                         rgba.blue * 255,
+                                                         rgba.alpha);
+            debug ("setting color: %s", rgba_str);
+            settings.border_color = rgba_str;
         });
 
         grid.attach (new SettingsLabel (_("Border Width:")), 0, 5, 1, 1);

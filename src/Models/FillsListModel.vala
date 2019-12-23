@@ -31,35 +31,50 @@ public class Akira.Models.FillsListModel : GLib.Object, GLib.ListModel {
     }
 
     public Object? get_item (uint position) {
-        return fills_list.nth_data (position) as Object;
+        debug ("get item %u", position);
+        var o = fills_list.nth_data (position);
+        if (o != null)
+            return o as Object;
+        else
+            return null;
     }
 
     public Type get_item_type () {
         return typeof (Akira.Models.FillsItemModel);
     }
 
-    public void add () {
+    public void add (Goo.CanvasItemSimple item) {
         var position = fills_list.length ();
-        fills_list.append (
-            new Akira.Models.FillsItemModel (
-                "#CCCCCC",
-                1,
+        var model_item = new Akira.Models.FillsItemModel (
+                item,
                 false,
                 Akira.Utils.BlendingMode.NORMAL,
                 this
-            )
-        );
+            );
+        fills_list.append (model_item);
 
         items_changed (position, 0, 1);
         update_fills ();
     }
 
     public void remove (Akira.Models.FillsItemModel item) {
-        var position = fills_list.index (item);
-        fills_list.remove (item);
+        if (item != null) {
+            var position = fills_list.index (item);
+            fills_list.remove (item);
 
-        items_changed (position, 1, 0);
-        update_fills ();
+            items_changed (position, 1, 0);
+            update_fills ();
+        }
+    }
+
+    public void clear () {
+        debug ("clear filllist");
+        foreach (Akira.Models.FillsItemModel i in fills_list) {
+            debug ("remove fill");
+            if (i != null) {
+                remove (i);
+            }
+        }
     }
 
     public void update_fills () {
