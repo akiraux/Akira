@@ -161,7 +161,6 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         events |= Gdk.EventMask.BUTTON_RELEASE_MASK;
         events |= Gdk.EventMask.POINTER_MOTION_MASK;
         events |= Gdk.EventMask.SCROLL_MASK;
-        events |= Gdk.EventMask.SMOOTH_SCROLL_MASK;
         events |= Gdk.EventMask.TOUCHPAD_GESTURE_MASK;
         events |= Gdk.EventMask.TOUCH_MASK;
     }
@@ -556,7 +555,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         hover_y = check_y;
     }
 
-    private void add_select_effect (Goo.CanvasItem? target) {
+    private void add_select_effect (Goo.CanvasItem? target, bool is_zoom = false) {
         if (target == null || target == select_effect) {
             return;
         }
@@ -566,9 +565,13 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
         var item = (target as Goo.CanvasItemSimple);
 
-        var fills_list_model = window.main_window.left_sidebar.fill_box_panel.fills_list_model;
-        fills_list_model.clear ();
-        fills_list_model.add (item);
+        // Do not reset the fill model if we're zooming the canvas.
+        if (!is_zoom) {
+            var fills_list_model =
+                window.main_window.left_sidebar.fill_box_panel.fills_list_model;
+            fills_list_model.clear ();
+            fills_list_model.add (item);
+        }
 
         var line_width = 1.0 / current_scale;
         var stroke = item.line_width / 2;
@@ -627,8 +630,9 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         select_effect.remove ();
 
         var fills_list_model = window.main_window.left_sidebar.fill_box_panel.fills_list_model;
-        if (fills_list_model != null)
+        if (fills_list_model != null) {
             fills_list_model.clear ();
+        }
 
         select_effect = null;
         selected_item.notify.disconnect (update_effects);
@@ -639,7 +643,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         }
     }
 
-    public void reset_select () {
+    public void reset_select (bool is_zoom = false) {
         if (selected_item == null && select_effect == null) {
             return;
         }
@@ -652,7 +656,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         }
 
         current_scale = get_scale ();
-        add_select_effect (selected_item);
+        add_select_effect (selected_item, is_zoom);
     }
 
     private void add_hover_effect (Goo.CanvasItem? target) {
@@ -910,19 +914,25 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     }
 
     public void delete_selected () {
-        if (selected_item != null) {
-            selected_item.remove ();
-
-            var fills_list_model = window.main_window.left_sidebar.fill_box_panel.fills_list_model;
-            fills_list_model.clear ();
-            var artboard = window.main_window.right_sidebar.layers_panel.artboard;
-            Akira.Layouts.Partials.Layer layer = selected_item.get_data<Akira.Layouts.Partials.Layer?> ("layer");
-            if (layer != null) {
-                artboard.container.remove (layer);
-            }
-            remove_select_effect ();
-            remove_hover_effect ();
+        if (selected_item == null) {
+            return;
         }
+        selected_item.remove ();
+
+        var fills_list_model =
+            window.main_window.left_sidebar.fill_box_panel.fills_list_model;
+        fills_list_model.clear ();
+        var artboard =
+            window.main_window.right_sidebar.layers_panel.artboard;
+        Akira.Layouts.Partials.Layer layer =
+            selected_item.get_data<Akira.Layouts.Partials.Layer?> ("layer");
+
+        if (layer != null) {
+            artboard.container.remove (layer);
+        }
+
+        remove_select_effect ();
+        remove_hover_effect ();
     }
 
     public Goo.CanvasRect add_rect (Gdk.EventButton event) {
