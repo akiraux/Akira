@@ -96,7 +96,6 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
     }
 
     private void update_view () {
-        alpha = model.alpha;
         hidden = model.hidden;
         //  blending_mode = model.blending_mode;
         color = model.color;
@@ -160,7 +159,7 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         opacity_container = new Akira.Partials.InputField (
             Akira.Partials.InputField.Unit.PERCENTAGE, 7, true, true);
         opacity_container.entry.sensitive = true;
-        opacity_container.entry.text = (alpha * 100).to_string ();
+        opacity_container.entry.text = (alpha / 255 * 100).to_string ();
         opacity_container.entry.bind_property (
             "text", model, "alpha",
             BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE,
@@ -176,7 +175,7 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
                 targetval.set_double (src / 100);
                 return true;
             }, (binding, srcval, ref targetval) => {
-                double src = (double) srcval;
+                double src = (double) srcval / 255;
                 targetval.set_string (("%0.1f").printf (src * 100));
                 return true;
             }
@@ -301,12 +300,14 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
             var provider = new Gtk.CssProvider ();
             var context = selected_color.get_style_context ();
 
-            var alpha_dot_separator = alpha.to_string ().replace (",", ".");
+            var alpha_dot_separator = (alpha / 255).to_string ().replace (",", ".");
 
             var css = """.selected-color {
                     background-color: alpha (%s, %s);
                     border-color: alpha (shade (%s, 0.75), %s);
                 }""".printf (color, alpha_dot_separator, color, alpha_dot_separator);
+
+            debug ("fills: css %s", css);
 
             provider.load_from_data (css, css.length);
 
@@ -323,7 +324,7 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
 
         var new_rgba = Gdk.RGBA ();
         new_rgba.parse (model.color);
-        new_rgba.alpha = alpha;
+        new_rgba.alpha = alpha / 255;
 
         color_chooser_widget.set_rgba (new_rgba);
     }
