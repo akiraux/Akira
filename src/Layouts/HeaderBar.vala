@@ -78,19 +78,19 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
 
         move_up = new Akira.Partials.HeaderBarButton ("selection-raise", _("Up"), {"<Ctrl>Up"});
         move_up.button.clicked.connect (() => {
-            window.main_window.main_canvas.canvas.change_z_selected(true, false);
+            window.main_window.main_canvas.canvas.change_z_selected (true, false);
         });
         move_down = new Akira.Partials.HeaderBarButton ("selection-lower", _("Down"), {"<Ctrl>Down"});
         move_down.button.clicked.connect (() => {
-            window.main_window.main_canvas.canvas.change_z_selected(false, false);
+            window.main_window.main_canvas.canvas.change_z_selected (false, false);
         });
         move_top = new Akira.Partials.HeaderBarButton ("selection-top", _("Top"), {"<Ctrl><Shift>Up"});
         move_top.button.clicked.connect (() => {
-            window.main_window.main_canvas.canvas.change_z_selected(true, true);
+            window.main_window.main_canvas.canvas.change_z_selected (true, true);
         });
         move_bottom = new Akira.Partials.HeaderBarButton ("selection-bottom", _("Bottom"), {"<Ctrl><Shift>Down"});
         move_bottom.button.clicked.connect (() => {
-            window.main_window.main_canvas.canvas.change_z_selected(false, true);
+            window.main_window.main_canvas.canvas.change_z_selected (false, true);
         });
 
         preferences = new Akira.Partials.HeaderBarButton ("open-menu", _("Settings"), {"<Ctrl>comma"});
