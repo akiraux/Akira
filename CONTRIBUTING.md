@@ -51,6 +51,12 @@ These are mostly guidelines, not rules. Use your best judgment, and feel free to
 
         > For non-elementary distros, (such as Arch, Debian etc) you are required to install "vala" as additional dependency.
 
+    * Debian (Elementary/Ubuntu/Linux Mint)
+
+        ```sh
+        sudo apt-get install gtk+-3.0 elementary-sdk glib-2.0 gee-0.8 gobject-2.0 libxml2 gtksourceview-3.0 libjson-glib-1.0 goocanvas-2.0 libarchive-dev libcairo2-dev meson valac
+        ```
+
     2. Building:
         ```
         meson build --prefix=/usr -Dprofile=default|development
