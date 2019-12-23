@@ -68,12 +68,13 @@ public class Akira.Models.FillsListModel : GLib.Object, GLib.ListModel {
     }
 
     public void clear () {
-       debug ("clear filllist");
-	    foreach (Akira.Models.FillsItemModel i in fills_list) {
+        debug ("clear filllist");
+        foreach (Akira.Models.FillsItemModel i in fills_list) {
             debug ("remove fill");
-            if (i != null)
+            if (i != null) {
                 remove (i);
-	    }
+            }
+        }
     }
 
     public void update_fills () {

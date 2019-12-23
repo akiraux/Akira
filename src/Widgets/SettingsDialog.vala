@@ -142,7 +142,7 @@ public class Akira.Widgets.SettingsDialog : Gtk.Dialog {
         fill_color.color_set.connect (() => {
             var rgba = fill_color.get_rgba ();
             //Gdk.RGBA uses rgb() if alpha is 1.
-            string rgba_str = "rgba(%f,%f,%f,%f)" .printf(rgba.red * 255,
+            string rgba_str = "rgba(%f,%f,%f,%f)" .printf (rgba.red * 255,
                                                           rgba.green * 255,
                                                           rgba.blue * 255,
                                                           rgba.alpha);
@@ -167,7 +167,7 @@ public class Akira.Widgets.SettingsDialog : Gtk.Dialog {
         border_color.color_set.connect (() => {
             var rgba = border_color.get_rgba ();
             //Gdk.RGBA uses rgb() if alpha is 1.
-            string rgba_str = "rgba(%f,%f,%f,%f)".printf(rgba.red * 255,
+            string rgba_str = "rgba(%f,%f,%f,%f)".printf (rgba.red * 255,
                                                          rgba.green * 255,
                                                          rgba.blue * 255,
                                                          rgba.alpha);

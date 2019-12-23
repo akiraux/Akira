@@ -67,7 +67,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
             vflip_button.sensitive = has_item;
             opacity_entry.entry.sensitive = has_item;
             if (has_item) {
-                opacity_adj.value = item.get_data<double?>("opacity");
+                opacity_adj.value = item.get_data<double?> ("opacity");
             }
             scale.sensitive = has_item;
 

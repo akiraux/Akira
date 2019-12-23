@@ -528,7 +528,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
         var fills_list_model = window.main_window.left_sidebar.fill_box_panel.fills_list_model;
         fills_list_model.clear ();
-        fills_list_model.add(item);
+        fills_list_model.add (item);
 
         var line_width = 1.0 / current_scale;
         var stroke = item.line_width / 2;
@@ -871,7 +871,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
     public void delete_selected () {
         if (selected_item != null) {
-            selected_item.remove();
+            selected_item.remove ();
 
             var fills_list_model = window.main_window.left_sidebar.fill_box_panel.fills_list_model;
             fills_list_model.clear ();
@@ -945,7 +945,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         return text;
     }
 
-    private void init_item(Object object) {
+    private void init_item (Object object) {
         object.set_data<int?> ("fill-alpha", 255);
         object.set_data<int?> ("stroke-alpha", 255);
         object.set_data<double?> ("opacity", 100);

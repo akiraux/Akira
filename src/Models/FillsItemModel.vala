@@ -23,36 +23,36 @@ public class Akira.Models.FillsItemModel : GLib.Object {
     public string color {
         owned get {
             var rgba = item.fill_color_rgba;
-            var result = "#%02x%02x%02x".printf((int)(Math.round(rgba >> 24 & 0xFF)),
-                                                (int)(Math.round(rgba >> 16 & 0xFF)),
-                                                (int)(Math.round(rgba >>  8 & 0xFF)));
+            var result = "#%02x%02x%02x".printf ((int) (Math.round (rgba >> 24 & 0xFF)),
+                                                (int) (Math.round (rgba >> 16 & 0xFF)),
+                                                (int) (Math.round (rgba >> 8 & 0xFF)));
             return result;
         } set {
-            var newRGBA = Gdk.RGBA ();
-            newRGBA.parse (value);
-            var fill_a = item.get_data<int?>("fill-alpha");
-            var opacity_factor = item.get_data<double?>("opacity") / 100;
+            var new_rgba = Gdk.RGBA ();
+            new_rgba.parse (value);
+            var fill_a = item.get_data<int?> ("fill-alpha");
+            var opacity_factor = item.get_data<double?> ("opacity") / 100;
             var alpha = fill_a * opacity_factor;
-            debug ("set color: real alpha: %f,%f,%f,%f", newRGBA.red, newRGBA.green, newRGBA.blue, alpha / 255);
-            uint rgba = (uint)Math.round(newRGBA.red * 255);
-            rgba = (rgba << 8) + (uint)Math.round(newRGBA.green * 255);
-            rgba = (rgba << 8) + (uint)Math.round(newRGBA.blue * 255);
-            rgba = (rgba << 8) + (uint)Math.round(alpha);
+            debug ("set color: real alpha: %f,%f,%f,%f", new_rgba.red, new_rgba.green, new_rgba.blue, alpha / 255);
+            uint rgba = (uint)Math.round (new_rgba.red * 255);
+            rgba = (rgba << 8) + (uint)Math.round (new_rgba.green * 255);
+            rgba = (rgba << 8) + (uint)Math.round (new_rgba.blue * 255);
+            rgba = (rgba << 8) + (uint)Math.round (alpha);
             item.fill_color_rgba = rgba;
         }
     }
     public double alpha {
         get {
-            return item.get_data<int?>("fill-alpha");
+            return item.get_data<int?> ("fill-alpha");
         }
         set {
             var rgba = item.fill_color_rgba;
-            var fill_a = (int)(value * 255);
+            var fill_a = (int) (value * 255);
             debug ("set alpha: %f", fill_a);
-            item.set_data<int?>("fill-alpha", fill_a);
-            var opacity_factor = item.get_data<double?>("opacity") / 100;
+            item.set_data<int?> ("fill-alpha", fill_a);
+            var opacity_factor = item.get_data<double?> ("opacity") / 100;
             var alpha = fill_a * opacity_factor;
-            item.fill_color_rgba = (rgba & 0xFFFFFF00) + (uint)(alpha);
+            item.fill_color_rgba = (rgba & 0xFFFFFF00) + (uint) (alpha);
         }
     }
     public bool hidden { get; set; }
@@ -60,7 +60,7 @@ public class Akira.Models.FillsItemModel : GLib.Object {
     public Akira.Models.FillsListModel list_model { get; set; }
     public Goo.CanvasItemSimple item { get; construct; }
 
-    public FillsItemModel(Goo.CanvasItemSimple item_simple,
+    public FillsItemModel (Goo.CanvasItemSimple item_simple,
                            bool hidden,
                            Akira.Utils.BlendingMode blending_mode,
                            Akira.Models.FillsListModel list_model) {
