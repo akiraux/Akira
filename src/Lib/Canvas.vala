@@ -189,6 +189,31 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         grab_focus (get_root_item ());
     }
 
+    public void change_z_selected (bool raise, bool total) {
+        if (selected_item == null)
+            return;
+
+        var root_item = get_root_item ();
+        var pos_selected = root_item.find_child (selected_item);
+        if (pos_selected != -1) {
+            int target_item_pos;
+            if (total) {
+                target_item_pos = raise ? (root_item.get_n_children () - 1): 0;
+            } else {
+                target_item_pos = pos_selected + (raise ? 1 : -1);
+            }
+            var target_item = root_item.get_child (target_item_pos);
+            if (target_item != null) {
+                if (raise) {
+                    selected_item.raise (target_item);
+                } else {
+                    selected_item.lower (target_item);
+                }
+                update_decorations (selected_item);
+            }
+        }
+    }
+
     public Goo.CanvasItem? insert_object (Gdk.EventButton event) {
         udpate_default_values ();
 
@@ -694,19 +719,21 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         } else {
           nobs[Nob.TOP_LEFT].translate (x - nob_size - stroke, y - nob_size - stroke);
         }
+        nobs[Nob.TOP_LEFT].raise (item);
 
         if (print_middle_width_nobs) {
           // TOP CENTER nob
           nobs[Nob.TOP_CENTER].set_transform (transform);
-        if (print_middle_height_nobs) {
-          nobs[Nob.TOP_CENTER].translate (x + (width / 2) - nob_offset, y - (nob_offset + stroke));
-        } else {
-          nobs[Nob.TOP_CENTER].translate (x + (width / 2) - nob_offset, y - (nob_size + stroke));
-        }
+          if (print_middle_height_nobs) {
+            nobs[Nob.TOP_CENTER].translate (x + (width / 2) - nob_offset, y - (nob_offset + stroke));
+          } else {
+            nobs[Nob.TOP_CENTER].translate (x + (width / 2) - nob_offset, y - (nob_size + stroke));
+          }
           nobs[Nob.TOP_CENTER].set ("visibility", Goo.CanvasItemVisibility.VISIBLE);
         } else {
           nobs[Nob.TOP_CENTER].set ("visibility", Goo.CanvasItemVisibility.HIDDEN);
         }
+        nobs[Nob.TOP_CENTER].raise (item);
 
         // TOP RIGHT nob
         nobs[Nob.TOP_RIGHT].set_transform (transform);
@@ -715,6 +742,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         } else {
           nobs[Nob.TOP_RIGHT].translate (x + width + stroke, y - (nob_size + stroke));
         }
+        nobs[Nob.TOP_RIGHT].raise (item);
 
         if (print_middle_height_nobs) {
           // RIGHT CENTER nob
@@ -728,6 +756,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         } else {
           nobs[Nob.RIGHT_CENTER].set ("visibility", Goo.CanvasItemVisibility.HIDDEN);
         }
+        nobs[Nob.RIGHT_CENTER].raise (item);
 
         // BOTTOM RIGHT nob
         nobs[Nob.BOTTOM_RIGHT].set_transform (transform);
@@ -736,6 +765,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         } else {
           nobs[Nob.BOTTOM_RIGHT].translate (x + width + stroke, y + height + stroke);
         }
+        nobs[Nob.BOTTOM_RIGHT].raise (item);
 
 
         if (print_middle_width_nobs) {
@@ -750,6 +780,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         } else {
           nobs[Nob.BOTTOM_CENTER].set ("visibility", Goo.CanvasItemVisibility.HIDDEN);
         }
+        nobs[Nob.BOTTOM_CENTER].raise (item);
 
         // BOTTOM LEFT nob
         nobs[Nob.BOTTOM_LEFT].set_transform (transform);
@@ -758,6 +789,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         } else {
           nobs[Nob.BOTTOM_LEFT].translate (x - (nob_size + stroke), y + height + stroke);
         }
+        nobs[Nob.BOTTOM_LEFT].raise (item);
 
         if (print_middle_height_nobs) {
           // LEFT CENTER nob
@@ -771,6 +803,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         } else {
           nobs[Nob.LEFT_CENTER].set ("visibility", Goo.CanvasItemVisibility.HIDDEN);
         }
+        nobs[Nob.LEFT_CENTER].raise (item);
 
         // ROTATE nob
         double distance = 40;
@@ -780,6 +813,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
         nobs[Nob.ROTATE].set_transform (transform);
         nobs[Nob.ROTATE].translate (x + (width / 2) - nob_offset, y - nob_offset - distance);
+        nobs[Nob.ROTATE].raise (item);
     }
 
     private void set_cursor (Gdk.CursorType cursor_type) {
