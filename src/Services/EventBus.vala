@@ -22,6 +22,7 @@ public class Akira.Services.EventBus : Object {
     public signal void update_icons_style ();
     public signal void align_items (string align_action);
     public signal void close_popover (string popover);
+    public signal void change_sensitivity (string type);
 
     public EventBus () {
         Object ();
@@ -37,6 +38,9 @@ public class Akira.Services.EventBus : Object {
                 break;
             case "close-popover":
                 close_popover (param);
+                break;
+            case "change-sensitivity":
+                change_sensitivity (param);
                 break;
         }
     }
