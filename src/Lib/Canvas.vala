@@ -38,11 +38,12 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     public Goo.CanvasItem? _selected_item;
     public Goo.CanvasItem? selected_item {
         get {
-          return _selected_item;
+            return _selected_item;
         }
         set {
-          _selected_item = value;
-          window.main_window.left_sidebar.transform_panel.item = _selected_item;
+            _selected_item = value;
+            window.main_window.left_sidebar.transform_panel.item = _selected_item;
+            event_bus.emit ("change-sensitivity", "single");
         }
     }
     public Goo.CanvasRect select_effect;
