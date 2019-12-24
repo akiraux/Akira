@@ -44,6 +44,8 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
     public Akira.Partials.HeaderBarButton path_intersect;
     public Akira.Partials.HeaderBarButton path_union;
 
+    public Gtk.PopoverMenu popover_insert;
+
     public bool toggled {
         get {
             return visible;
@@ -287,17 +289,20 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
         grid.add (image);
         grid.show_all ();
 
-        var popover = new Gtk.PopoverMenu ();
-        popover.add (grid);
-        popover.add (shapes_grid);
-        popover.child_set_property (grid, "submenu", "main");
-        popover.child_set_property (shapes_grid, "submenu", "shapes-menu");
+        popover_insert = new Gtk.PopoverMenu ();
+        popover_insert.add (grid);
+        popover_insert.add (shapes_grid);
+        popover_insert.child_set_property (grid, "submenu", "main");
+        popover_insert.child_set_property (shapes_grid, "submenu", "shapes-menu");
 
-        return popover;
+        return popover_insert;
     }
 
     private void build_signals () {
         // TODO: deal with signals not part of accelerators
+        window.event_bus.close_popover.connect (() => {
+            popover_insert.closed ();
+        });
     }
 
     public void button_sensitivity () {

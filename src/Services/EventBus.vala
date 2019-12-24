@@ -21,6 +21,7 @@
 public class Akira.Services.EventBus : Object {
     public signal void update_icons_style ();
     public signal void align_items (string align_action);
+    public signal void close_popover (string popover);
 
     public EventBus () {
         Object ();
@@ -33,6 +34,9 @@ public class Akira.Services.EventBus : Object {
                 break;
             case "align-items":
                 align_items (param);
+                break;
+            case "close-popover":
+                close_popover (param);
                 break;
         }
     }
