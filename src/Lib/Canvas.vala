@@ -45,6 +45,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         set {
             _selected_item = value;
             window.main_window.left_sidebar.transform_panel.item = _selected_item;
+            event_bus.emit ("change-sensitivity", "single");
         }
     }
     public Goo.CanvasRect select_effect;

@@ -20,12 +20,13 @@
 */
 
 public class Akira.Partials.HeaderBarButton : Gtk.Grid {
-
     public Gtk.Button button;
     private Gtk.Label label_btn;
     public Akira.Partials.ButtonImage image;
+    public string? sensitive_type;
 
-    public HeaderBarButton (string icon_name, string name, string[]? accels = null) {
+    public HeaderBarButton (string icon_name, string name, string[]? accels = null, string? type = null) {
+        sensitive_type = type;
         label_btn = new Gtk.Label (name);
         label_btn.get_style_context ().add_class ("headerbar-label");
 
@@ -42,7 +43,10 @@ public class Akira.Partials.HeaderBarButton : Gtk.Grid {
         attach (label_btn, 0, 1, 1, 1);
 
         valign = Gtk.Align.CENTER;
+        sensitive = false;
+
         udpate_label ();
+        build_signals ();
 
         settings.changed["show-label"].connect ( () => {
             udpate_label ();
@@ -52,5 +56,13 @@ public class Akira.Partials.HeaderBarButton : Gtk.Grid {
     private void udpate_label () {
         label_btn.visible = settings.show_label;
         label_btn.no_show_all = !settings.show_label;
+    }
+
+    private void build_signals () {
+        event_bus.change_sensitivity.connect ((type) => {
+            if (type == sensitive_type) {
+                sensitive = !sensitive;
+            }
+        });
     }
 }

@@ -44,6 +44,8 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
     public Akira.Partials.HeaderBarButton path_intersect;
     public Akira.Partials.HeaderBarButton path_union;
 
+    public Gtk.PopoverMenu popover_insert;
+
     public bool toggled {
         get {
             return visible;
@@ -73,36 +75,38 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
 
         zoom = new Akira.Partials.ZoomButton (window);
 
-        group = new Akira.Partials.HeaderBarButton ("object-group", _("Group"), {"<Ctrl>g"});
-        ungroup = new Akira.Partials.HeaderBarButton ("object-ungroup", _("Ungroup"), {"<Ctrl><Shift>g"});
+        group = new Akira.Partials.HeaderBarButton ("object-group", _("Group"), {"<Ctrl>g"}, "multiple");
+        ungroup = new Akira.Partials.HeaderBarButton ("object-ungroup", _("Ungroup"), {"<Ctrl><Shift>g"}, "group");
 
-        move_up = new Akira.Partials.HeaderBarButton ("selection-raise", _("Up"), {"<Ctrl>Up"});
+        move_up = new Akira.Partials.HeaderBarButton ("selection-raise", _("Up"), {"<Ctrl>Up"}, "single");
         move_up.button.clicked.connect (() => {
             window.main_window.main_canvas.canvas.change_z_selected (true, false);
         });
-        move_down = new Akira.Partials.HeaderBarButton ("selection-lower", _("Down"), {"<Ctrl>Down"});
+        move_down = new Akira.Partials.HeaderBarButton ("selection-lower", _("Down"), {"<Ctrl>Down"}, "single");
         move_down.button.clicked.connect (() => {
             window.main_window.main_canvas.canvas.change_z_selected (false, false);
         });
-        move_top = new Akira.Partials.HeaderBarButton ("selection-top", _("Top"), {"<Ctrl><Shift>Up"});
+        move_top = new Akira.Partials.HeaderBarButton ("selection-top", _("Top"), {"<Ctrl><Shift>Up"}, "single");
         move_top.button.clicked.connect (() => {
             window.main_window.main_canvas.canvas.change_z_selected (true, true);
         });
-        move_bottom = new Akira.Partials.HeaderBarButton ("selection-bottom", _("Bottom"), {"<Ctrl><Shift>Down"});
+        move_bottom = new Akira.Partials.HeaderBarButton ("selection-bottom", _("Bottom"), {"<Ctrl><Shift>Down"}, "single");
         move_bottom.button.clicked.connect (() => {
             window.main_window.main_canvas.canvas.change_z_selected (false, true);
         });
 
         preferences = new Akira.Partials.HeaderBarButton ("open-menu", _("Settings"), {"<Ctrl>comma"});
         preferences.button.action_name = Akira.Services.ActionManager.ACTION_PREFIX + Akira.Services.ActionManager.ACTION_PREFERENCES;
+        preferences.sensitive = true;
 
         export = new Akira.Partials.HeaderBarButton ("document-export", _("Export"), {"<Ctrl><Shift>E"});
         export.button.action_name = Akira.Services.ActionManager.ACTION_PREFIX + Akira.Services.ActionManager.ACTION_EXPORT;
+        export.sensitive = true;
 
-        path_difference = new Akira.Partials.HeaderBarButton ("path-difference", _("Difference"), null);
-        path_exclusion = new Akira.Partials.HeaderBarButton ("path-exclusion", _("Exclusion"), null);
-        path_intersect = new Akira.Partials.HeaderBarButton ("path-intersection", _("Intersect"), null);
-        path_union = new Akira.Partials.HeaderBarButton ("path-union", _("Union"), null);
+        path_difference = new Akira.Partials.HeaderBarButton ("path-difference", _("Difference"), null, "multiple");
+        path_exclusion = new Akira.Partials.HeaderBarButton ("path-exclusion", _("Exclusion"), null, "multiple");
+        path_intersect = new Akira.Partials.HeaderBarButton ("path-intersection", _("Intersect"), null, "multiple");
+        path_union = new Akira.Partials.HeaderBarButton ("path-union", _("Union"), null, "multiple");
 
         pack_start (menu);
         pack_start (items);
@@ -287,17 +291,20 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
         grid.add (image);
         grid.show_all ();
 
-        var popover = new Gtk.PopoverMenu ();
-        popover.add (grid);
-        popover.add (shapes_grid);
-        popover.child_set_property (grid, "submenu", "main");
-        popover.child_set_property (shapes_grid, "submenu", "shapes-menu");
+        popover_insert = new Gtk.PopoverMenu ();
+        popover_insert.add (grid);
+        popover_insert.add (shapes_grid);
+        popover_insert.child_set_property (grid, "submenu", "main");
+        popover_insert.child_set_property (shapes_grid, "submenu", "shapes-menu");
 
-        return popover;
+        return popover_insert;
     }
 
     private void build_signals () {
         // TODO: deal with signals not part of accelerators
+        event_bus.close_popover.connect (() => {
+            popover_insert.closed ();
+        });
     }
 
     public void button_sensitivity () {
