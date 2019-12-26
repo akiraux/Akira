@@ -21,6 +21,8 @@
 */
 
 public class Akira.Lib.Canvas : Goo.Canvas {
+    public weak Akira.Window window { get; construct; }
+
     private const int MIN_SIZE = 1;
     private const int MIN_POS = 10;
 
@@ -50,23 +52,14 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     private EditMode _edit_mode;
     public EditMode edit_mode {
         get {
-          return _edit_mode;
+            return _edit_mode;
         }
         set {
-          _edit_mode = value;
-          set_cursor_by_edit_mode ();
+            _edit_mode = value;
+            set_cursor_by_edit_mode ();
         }
     }
     public InsertType? insert_type { get; set; }
-
-    public void set_cursor_by_edit_mode () {
-      if (_edit_mode == EditMode.MODE_SELECTION) {
-        set_cursor (Gdk.CursorType.ARROW);
-      } else {
-        set_cursor (Gdk.CursorType.CROSSHAIR);
-      }
-    }
-    public weak Akira.Window window { get; construct; }
 
     /*
         Grabber Pos:   8
@@ -129,7 +122,6 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     }
 
     construct {
-        edit_mode = EditMode.MODE_SELECTION;
         events |= Gdk.EventMask.KEY_PRESS_MASK;
         events |= Gdk.EventMask.BUTTON_PRESS_MASK;
         events |= Gdk.EventMask.BUTTON_RELEASE_MASK;
@@ -138,6 +130,14 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         events |= Gdk.EventMask.TOUCHPAD_GESTURE_MASK;
         events |= Gdk.EventMask.TOUCH_MASK;
         get_bounds (out bounds_x, out bounds_y, out bounds_w, out bounds_h);
+    }
+
+    public void set_cursor_by_edit_mode () {
+        if (_edit_mode == EditMode.MODE_SELECTION) {
+            set_cursor (Gdk.CursorType.ARROW);
+        } else {
+            set_cursor (Gdk.CursorType.CROSSHAIR);
+        }
     }
 
     public override bool button_press_event (Gdk.EventButton event) {
@@ -194,6 +194,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     }
 
     public void focus_canvas () {
+        edit_mode = EditMode.MODE_SELECTION;
         grab_focus (get_root_item ());
     }
 
