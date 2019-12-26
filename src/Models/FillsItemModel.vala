@@ -23,9 +23,11 @@ public class Akira.Models.FillsItemModel : GLib.Object {
     public string color {
         owned get {
             var rgba = item.fill_color_rgba;
-            var result = "#%02x%02x%02x".printf ((int) (Math.round (rgba >> 24 & 0xFF)),
-                                                (int) (Math.round (rgba >> 16 & 0xFF)),
-                                                (int) (Math.round (rgba >> 8 & 0xFF)));
+            var result = "#%02x%02x%02x".printf (
+                (int) (Math.round (rgba >> 24 & 0xFF)),
+                (int) (Math.round (rgba >> 16 & 0xFF)),
+                (int) (Math.round (rgba >> 8 & 0xFF))
+            );
             return result;
         } set {
             var new_rgba = Gdk.RGBA ();
@@ -33,7 +35,7 @@ public class Akira.Models.FillsItemModel : GLib.Object {
             var fill_a = item.get_data<int?> ("fill-alpha");
             var opacity_factor = item.get_data<double?> ("opacity") / 100;
             var alpha = fill_a * opacity_factor;
-            debug ("set color: real alpha: %f,%f,%f,%f", new_rgba.red, new_rgba.green, new_rgba.blue, alpha / 255);
+            //  debug ("set color: real alpha: %f,%f,%f,%f", new_rgba.red, new_rgba.green, new_rgba.blue, alpha / 255);
             uint rgba = (uint)Math.round (new_rgba.red * 255);
             rgba = (rgba << 8) + (uint)Math.round (new_rgba.green * 255);
             rgba = (rgba << 8) + (uint)Math.round (new_rgba.blue * 255);
@@ -48,7 +50,7 @@ public class Akira.Models.FillsItemModel : GLib.Object {
         set {
             var rgba = item.fill_color_rgba;
             var fill_a = (int) (value * 255);
-            debug ("set alpha: %f", fill_a);
+            //  debug ("set alpha: %f", fill_a);
             item.set_data<int?> ("fill-alpha", fill_a);
             var opacity_factor = item.get_data<double?> ("opacity") / 100;
             var alpha = fill_a * opacity_factor;

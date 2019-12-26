@@ -31,12 +31,12 @@ public class Akira.Models.FillsListModel : GLib.Object, GLib.ListModel {
     }
 
     public Object? get_item (uint position) {
-        debug ("get item %u", position);
+        //  debug ("get item %u", position);
         var o = fills_list.nth_data (position);
-        if (o != null)
+        if (o != null) {
             return o as Object;
-        else
-            return null;
+        }
+        return null;
     }
 
     public Type get_item_type () {
@@ -46,38 +46,30 @@ public class Akira.Models.FillsListModel : GLib.Object, GLib.ListModel {
     public void add (Goo.CanvasItemSimple item) {
         var position = fills_list.length ();
         var model_item = new Akira.Models.FillsItemModel (
-                item,
-                false,
-                Akira.Utils.BlendingMode.NORMAL,
-                this
-            );
+            item,
+            false,
+            Akira.Utils.BlendingMode.NORMAL,
+            this
+        );
         fills_list.append (model_item);
 
         items_changed (position, 0, 1);
-        update_fills ();
     }
 
-    public void remove (Akira.Models.FillsItemModel item) {
+    public void remove_item (Akira.Models.FillsItemModel? item) {
         if (item != null) {
             var position = fills_list.index (item);
             fills_list.remove (item);
 
             items_changed (position, 1, 0);
-            update_fills ();
         }
     }
 
     public void clear () {
-        debug ("clear filllist");
-        foreach (Akira.Models.FillsItemModel i in fills_list) {
-            debug ("remove fill");
-            if (i != null) {
-                remove (i);
-            }
+        //  debug ("clear fill list");
+        foreach (Akira.Models.FillsItemModel? item in fills_list) {
+            //  debug ("remove fill");
+            remove_item (item);
         }
-    }
-
-    public void update_fills () {
-        // Update fills on canvas
     }
 }
