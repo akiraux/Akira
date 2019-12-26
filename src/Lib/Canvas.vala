@@ -153,42 +153,46 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         Goo.CanvasItem clicked_item;
 
         if (edit_mode == EditMode.MODE_INSERT) {
-          remove_select_effect ();
-          var item = insert_object (event);
-          selected_item = item;
-          add_hover_effect (item);
-          add_select_effect (item);
-          clicked_item = nobs[Nob.BOTTOM_RIGHT];
+            remove_select_effect ();
+            var item = insert_object (event);
+            selected_item = item;
+            add_hover_effect (item);
+            add_select_effect (item);
+            clicked_item = nobs[Nob.BOTTOM_RIGHT];
         } else {
-          clicked_item = get_item_at (temp_event_x, temp_event_y, true);
+            clicked_item = get_item_at (temp_event_x, temp_event_y, true);
         }
 
-        if (clicked_item != null) {
+        if (clicked_item != null && clicked_item != selected_item && clicked_item != select_effect
+            && clicked_item != hover_effect) {
             var clicked_id = get_grabbed_id (clicked_item);
             holding = true;
 
-            if (clicked_item != selected_item && clicked_id == Nob.NONE) {
+            if (clicked_id == Nob.NONE) {
                 remove_select_effect ();
                 add_select_effect (clicked_item);
                 grab_focus (clicked_item);
-
                 selected_item = clicked_item;
-                window.main_window.left_sidebar.transform_panel.item = (Goo.CanvasItemSimple)selected_item;
-                selected_item.notify.connect (update_effects);
-
                 holding_id = Nob.NONE;
             } else { // nob was clicked
                 holding_id = clicked_id;
             }
-        } else {
+        }
+
+        if (clicked_item == selected_item) {
+            holding = true;
+            holding_id = Nob.NONE;
+        }
+
+        if (clicked_item == null) {
             remove_select_effect ();
-            focus ();
+            focus_canvas ();
         }
 
         return true;
     }
 
-    public new void focus () {
+    public void focus_canvas () {
         grab_focus (get_root_item ());
     }
 
@@ -232,9 +236,8 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     }
 
     private void update_effects (Object object, ParamSpec spec) {
-        Goo.CanvasItem item = (Goo.CanvasItem)object;
         //  debug ("update effects, param: %s", spec.name);
-        update_decorations (item);
+        update_decorations ((Goo.CanvasItem) object);
     }
 
     public void update_decorations (Goo.CanvasItem item) {
@@ -516,7 +519,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     }
 
     private void add_select_effect (Goo.CanvasItem? target) {
-        if (target == null || target == select_effect) {
+        if (target == null || target == select_effect || target == hover_effect) {
             return;
         }
 
@@ -558,6 +561,8 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
         update_nob_position (target);
         select_effect.can_focus = false;
+
+        item.notify.connect (update_effects);
     }
 
     private void update_select_effect (Goo.CanvasItem? target) {
@@ -579,11 +584,10 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         select_effect.set_transform (transform);
     }
 
-    private void remove_select_effect () {
-        if (select_effect == null) {
+    private void remove_select_effect (bool keep_selection = false) {
+        if (select_effect == null || selected_item == null) {
             return;
         }
-        debug ("remove");
 
         var fills_list_model = window.main_window.left_sidebar.fill_box_panel.fills_list_model;
         if (fills_list_model != null) {
@@ -592,8 +596,11 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
         select_effect.remove ();
         select_effect = null;
-        selected_item.notify.disconnect (update_effects);
-        selected_item = null;
+
+        if (selected_item != null && !keep_selection) {
+            selected_item.notify.disconnect (update_effects);
+            selected_item = null;
+        }
 
         for (int i = 0; i < 9; i++) {
             nobs[i].remove ();
@@ -601,17 +608,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     }
 
     public void reset_select () {
-        if (selected_item == null && select_effect == null) {
-            return;
-        }
-
-        select_effect.remove ();
-        select_effect = null;
-
-        for (int i = 0; i < 9; i++) {
-            nobs[i].remove ();
-        }
-
+        remove_select_effect (true);
         current_scale = get_scale ();
         add_select_effect (selected_item);
     }
