@@ -180,7 +180,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
             }
         }
 
-        if (clicked_item == selected_item) {
+        if (clicked_item == selected_item && selected_item != null) {
             holding = true;
             holding_id = Nob.NONE;
         }
