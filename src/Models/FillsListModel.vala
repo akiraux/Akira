@@ -20,10 +20,10 @@
 */
 
 public class Akira.Models.FillsListModel : GLib.Object, GLib.ListModel {
-    private GLib.List<Akira.Models.FillsItemModel> fills_list;
+    private GLib.List<Akira.Models.FillsItemModel?> fills_list;
 
     construct {
-        fills_list = new GLib.List<Akira.Models.FillsItemModel> ();
+        fills_list = new GLib.List<Akira.Models.FillsItemModel?> ();
     }
 
     public uint get_n_items () {
@@ -44,7 +44,6 @@ public class Akira.Models.FillsListModel : GLib.Object, GLib.ListModel {
     }
 
     public void add (Goo.CanvasItemSimple item) {
-        var position = fills_list.length ();
         var model_item = new Akira.Models.FillsItemModel (
             item,
             false,
@@ -53,7 +52,7 @@ public class Akira.Models.FillsListModel : GLib.Object, GLib.ListModel {
         );
         fills_list.append (model_item);
 
-        items_changed (position, 0, 1);
+        items_changed (get_n_items () - 1, 0, 1);
     }
 
     public void remove_item (Akira.Models.FillsItemModel? item) {

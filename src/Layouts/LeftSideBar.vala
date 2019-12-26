@@ -49,10 +49,17 @@ public class Akira.Layouts.LeftSideBar : Gtk.Grid {
         var style_panel = new Akira.Layouts.Partials.StylePanel ();
         fill_box_panel = new Akira.Layouts.Partials.FillsBoxPanel (window);
 
+        var scrolled_window = new Gtk.ScrolledWindow (null, null);
+        scrolled_window.expand = true;
+        var scrolled_grid = new Gtk.Grid ();
+        scrolled_grid.expand = true;
+        scrolled_grid.attach (transform_panel, 0, 0, 1, 1);
+        scrolled_grid.attach (style_panel, 0, 1, 1, 1);
+        scrolled_grid.attach (fill_box_panel, 0, 2, 1, 1);
+        scrolled_window.add (scrolled_grid);
+
         attach (align_items_panel, 0, 0, 1, 1);
-        attach (transform_panel, 0, 1, 1, 1);
-        attach (style_panel, 0, 2, 1, 1);
-        attach (fill_box_panel, 0, 3, 1, 1);
+        attach (scrolled_window, 0, 1, 1, 1);
 
         show_all ();
     }

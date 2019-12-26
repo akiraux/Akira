@@ -88,7 +88,7 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         create_ui ();
 
         // Update view BEFORE event bindings in order
-        // not to trigger bindings on first assignment
+        // not to trigger bindings on first assignment.
         update_view ();
 
         create_event_bindings ();
