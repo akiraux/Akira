@@ -43,7 +43,7 @@ public class Akira.Models.FillsListModel : GLib.Object, GLib.ListModel {
         return typeof (Akira.Models.FillsItemModel);
     }
 
-    public void add (Goo.CanvasItemSimple item) {
+    public async void add (Goo.CanvasItemSimple item) {
         var model_item = new Akira.Models.FillsItemModel (
             item,
             false,
@@ -55,20 +55,19 @@ public class Akira.Models.FillsListModel : GLib.Object, GLib.ListModel {
         items_changed (get_n_items () - 1, 0, 1);
     }
 
-    public void remove_item (Akira.Models.FillsItemModel? item) {
+    public async void remove_item (Akira.Models.FillsItemModel? item) {
         if (item != null) {
             var position = fills_list.index (item);
             fills_list.remove (item);
-
             items_changed (position, 1, 0);
         }
     }
 
-    public void clear () {
+    public async void clear () {
         //  debug ("clear fill list");
-        foreach (Akira.Models.FillsItemModel? item in fills_list) {
+        fills_list.foreach ((item) => {
             //  debug ("remove fill");
-            remove_item (item);
-        }
+            remove_item.begin (item);
+        });
     }
 }

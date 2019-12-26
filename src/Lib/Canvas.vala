@@ -532,7 +532,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
         var fills_list_model = window.main_window.left_sidebar.fill_box_panel.fills_list_model;
         if (fills_list_model != null) {
-            fills_list_model.add (item);
+            fills_list_model.add.begin (item);
         }
 
         var line_width = 1.0 / current_scale;
@@ -593,7 +593,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
         var fills_list_model = window.main_window.left_sidebar.fill_box_panel.fills_list_model;
         if (fills_list_model != null) {
-            fills_list_model.clear ();
+            fills_list_model.clear.begin ();
         }
 
         select_effect.remove ();
