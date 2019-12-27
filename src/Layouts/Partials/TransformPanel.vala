@@ -20,9 +20,8 @@
 * Edited by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
 public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
-    // Should probably be associated with the currently selected object
-    // once the canvas is working
     public weak Akira.Window window { get; construct; }
+
     public bool size_lock { get; set; default = false; }
     private Akira.Partials.LinkedInput x;
     private Akira.Partials.LinkedInput y;
@@ -39,6 +38,8 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
     private uint stroke_rgb;
     private uint stroke_a;
 
+    public double size_ratio = 1.0;
+
     public TransformPanel (Akira.Window main_window) {
         Object (
             window: main_window,
@@ -46,9 +47,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         );
     }
 
-
     private Goo.CanvasItem _item;
-
     public Goo.CanvasItem item {
         get {
             return _item;
@@ -71,54 +70,12 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
             }
             scale.sensitive = has_item;
 
-            _item.notify.connect (item_changed);
-            update_fields ();
+            if (_item != null) {
+                _item.notify.connect (item_changed);
+                update_fields ();
+            }
         }
     }
-
-    private void item_changed (Object object, ParamSpec spec) {
-        debug ("item changed, param: %s", spec.name);
-        update_fields ();
-    }
-
-    private void update_fields () {
-        double item_x, item_y, item_width, item_height/*, alpha*/;
-        item.get ("x", out item_x, "y", out item_y, "width", out item_width, "height", out item_height/*, "alpha", out alpha*/);
-        double? item_rotation = item.get_data<double?> ("rotation");
-        window.main_window.main_canvas.canvas.convert_from_item_space (item, ref item_x, ref item_y);
-
-        var item_simple = (Goo.CanvasItemSimple)item;
-        uint fill_color_rgba = item_simple.fill_color_rgba;
-        uint stroke_color_rgba = item_simple.stroke_color_rgba;
-        fill_rgb = fill_color_rgba & 0xFFFFFF00;
-        fill_a = fill_color_rgba & 0x000000FF;
-        stroke_rgb = stroke_color_rgba & 0xFFFFFF00;
-        stroke_a = stroke_color_rgba & 0x000000FF;
-
-        x.notify["value"].disconnect (x_notify_value);
-        y.notify["value"].disconnect (y_notify_value);
-        width.notify["value"].disconnect (width_notify_value);
-        height.notify["value"].disconnect (height_notify_value);
-        rotation.notify["value"].disconnect (rotation_notify_value);
-
-        x.value = item_x;
-        y.value = item_y;
-        width.value = item_width;
-        height.value = item_height;
-        if (item_rotation != null) {
-            rotation.value = item_rotation;
-        }
-
-        x.notify["value"].connect (x_notify_value);
-        y.notify["value"].connect (y_notify_value);
-        width.notify["value"].connect (width_notify_value);
-        height.notify["value"].connect (height_notify_value);
-        rotation.notify["value"].connect (rotation_notify_value);
-
-        window.main_window.main_canvas.canvas.update_decorations (item);
-    }
-
-    double size_ratio = 1.0;
 
     construct {
         border_width = 12;
@@ -165,7 +122,8 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         hflip_button.halign = Gtk.Align.CENTER;
         hflip_button.valign = Gtk.Align.CENTER;
         hflip_button.can_focus = false;
-        hflip_button.tooltip_markup = Granite.markup_accel_tooltip ({"<Ctrl><Shift>bracketleft"}, _("Flip Horizontally"));
+        hflip_button.tooltip_markup =
+            Granite.markup_accel_tooltip ({"<Ctrl><Shift>bracketleft"}, _("Flip Horizontally"));
         hflip_button.clicked.connect (() => {
             flip_item (-1, 1);
         });
@@ -178,7 +136,8 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         vflip_button.halign = Gtk.Align.CENTER;
         vflip_button.valign = Gtk.Align.CENTER;
         vflip_button.can_focus = false;
-        vflip_button.tooltip_markup = Granite.markup_accel_tooltip ({"<Ctrl><Shift>bracketright"}, _("Flip Vertically"));
+        vflip_button.tooltip_markup =
+            Granite.markup_accel_tooltip ({"<Ctrl><Shift>bracketright"}, _("Flip Vertically"));
         vflip_button.clicked.connect (() => {
             flip_item (1, -1);
         });
@@ -246,6 +205,48 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
 
         attach (group_title (_("Opacity")), 0, 9, 3);
         attach (opacity_grid, 0, 10, 3);
+    }
+
+    private void item_changed (Object object, ParamSpec spec) {
+        //  debug ("item changed, param: %s", spec.name);
+        update_fields ();
+    }
+
+    private void update_fields () {
+        double item_x, item_y, item_width, item_height;
+        item.get ("x", out item_x, "y", out item_y, "width", out item_width, "height", out item_height);
+        double? item_rotation = item.get_data<double?> ("rotation");
+        window.main_window.main_canvas.canvas.convert_from_item_space (item, ref item_x, ref item_y);
+
+        var item_simple = (Goo.CanvasItemSimple)item;
+        uint fill_color_rgba = item_simple.fill_color_rgba;
+        uint stroke_color_rgba = item_simple.stroke_color_rgba;
+        fill_rgb = fill_color_rgba & 0xFFFFFF00;
+        fill_a = fill_color_rgba & 0x000000FF;
+        stroke_rgb = stroke_color_rgba & 0xFFFFFF00;
+        stroke_a = stroke_color_rgba & 0x000000FF;
+
+        x.notify["value"].disconnect (x_notify_value);
+        y.notify["value"].disconnect (y_notify_value);
+        width.notify["value"].disconnect (width_notify_value);
+        height.notify["value"].disconnect (height_notify_value);
+        rotation.notify["value"].disconnect (rotation_notify_value);
+
+        x.value = item_x;
+        y.value = item_y;
+        width.value = item_width;
+        height.value = item_height;
+        if (item_rotation != null) {
+            rotation.value = item_rotation;
+        }
+
+        x.notify["value"].connect (x_notify_value);
+        y.notify["value"].connect (y_notify_value);
+        width.notify["value"].connect (width_notify_value);
+        height.notify["value"].connect (height_notify_value);
+        rotation.notify["value"].connect (rotation_notify_value);
+
+        window.main_window.main_canvas.canvas.update_decorations (item);
     }
 
     private void flip_item (double sx, double sy) {

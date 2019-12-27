@@ -20,10 +20,10 @@
 */
 
 public class Akira.Models.FillsListModel : GLib.Object, GLib.ListModel {
-    private GLib.List<Akira.Models.FillsItemModel> fills_list;
+    private GLib.List<Akira.Models.FillsItemModel?> fills_list;
 
     construct {
-        fills_list = new GLib.List<Akira.Models.FillsItemModel> ();
+        fills_list = new GLib.List<Akira.Models.FillsItemModel?> ();
     }
 
     public uint get_n_items () {
@@ -31,53 +31,43 @@ public class Akira.Models.FillsListModel : GLib.Object, GLib.ListModel {
     }
 
     public Object? get_item (uint position) {
-        debug ("get item %u", position);
+        //  debug ("get item %u", position);
         var o = fills_list.nth_data (position);
-        if (o != null)
+        if (o != null) {
             return o as Object;
-        else
-            return null;
+        }
+        return null;
     }
 
     public Type get_item_type () {
         return typeof (Akira.Models.FillsItemModel);
     }
 
-    public void add (Goo.CanvasItemSimple item) {
-        var position = fills_list.length ();
+    public async void add (Goo.CanvasItemSimple item) {
         var model_item = new Akira.Models.FillsItemModel (
-                item,
-                false,
-                Akira.Utils.BlendingMode.NORMAL,
-                this
-            );
+            item,
+            false,
+            Akira.Utils.BlendingMode.NORMAL,
+            this
+        );
         fills_list.append (model_item);
 
-        items_changed (position, 0, 1);
-        update_fills ();
+        items_changed (get_n_items () - 1, 0, 1);
     }
 
-    public void remove (Akira.Models.FillsItemModel item) {
+    public async void remove_item (Akira.Models.FillsItemModel? item) {
         if (item != null) {
             var position = fills_list.index (item);
             fills_list.remove (item);
-
             items_changed (position, 1, 0);
-            update_fills ();
         }
     }
 
-    public void clear () {
-        debug ("clear filllist");
-        foreach (Akira.Models.FillsItemModel i in fills_list) {
-            debug ("remove fill");
-            if (i != null) {
-                remove (i);
-            }
-        }
-    }
-
-    public void update_fills () {
-        // Update fills on canvas
+    public async void clear () {
+        //  debug ("clear fill list");
+        fills_list.foreach ((item) => {
+            //  debug ("remove fill");
+            remove_item.begin (item);
+        });
     }
 }

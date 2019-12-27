@@ -88,7 +88,7 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         create_ui ();
 
         // Update view BEFORE event bindings in order
-        // not to trigger bindings on first assignment
+        // not to trigger bindings on first assignment.
         update_view ();
 
         create_event_bindings ();
@@ -252,7 +252,6 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
     }
 
     private void on_model_changed () {
-        model.list_model.update_fills ();
         set_color_chooser_color ();
     }
 
@@ -307,7 +306,7 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
                     border-color: alpha (shade (%s, 0.75), %s);
                 }""".printf (color, alpha_dot_separator, color, alpha_dot_separator);
 
-            debug ("fills: css %s", css);
+            //  debug ("fills: css %s", css);
 
             provider.load_from_data (css, css.length);
 
