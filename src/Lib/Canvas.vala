@@ -93,7 +93,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         TEXT
     }
 
-    private Goo.CanvasItemSimple[] nobs = new Goo.CanvasItemSimple[9];
+    private Selection.Nob[] nobs = new Selection.Nob[9];
 
     private Goo.CanvasRect? hover_effect;
 
@@ -615,7 +615,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
             return;
         }
 
-        if ((target as Goo.CanvasItemSimple) in nobs) {
+        if ((target as Selection.Nob) in nobs) {
             set_cursor_for_nob (get_grabbed_id (target));
             return;
         }
