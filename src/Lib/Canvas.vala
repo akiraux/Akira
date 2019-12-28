@@ -551,8 +551,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         nob_size = 10 / current_scale;
 
         for (int i = 0; i < 9; i++) {
-            var radius = i == 8 ? nob_size : 0;
-            nobs[i] = new Selection.Nob (get_root_item (), radius, current_scale, i);
+            nobs[i] = new Selection.Nob (get_root_item (), current_scale, i);
             //  nobs[i] = new Goo.CanvasRect (null, 0, 0, nob_size, nob_size,
             //                                "line-width", line_width,
             //                                "radius-x", radius,

@@ -37,7 +37,7 @@ public class Akira.Lib.Selection.Nob : Goo.CanvasRect {
     public double current_scale { get; set; default = 1.0; }
     public int nob_type { get; set; }
 
-    public Nob (Goo.CanvasItem? root, double radius, double scale, int i) {
+    public Nob (Goo.CanvasItem? root, double scale, int i) {
         nob_type = i;
         current_scale = scale;
 
@@ -47,8 +47,8 @@ public class Akira.Lib.Selection.Nob : Goo.CanvasRect {
         line_width = 1.0 / current_scale;
         fill_color = color_fill;
         stroke_color = color_stroke;
-        radius_x = radius;
-        radius_y = radius;
+        radius_x = i == 8 ? width : 0;
+        radius_y = i == 8 ? width : 0;
 
         set ("parent", root);
     }
