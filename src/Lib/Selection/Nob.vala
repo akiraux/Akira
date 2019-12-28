@@ -20,7 +20,6 @@
 */
 public class Akira.Lib.Selection.Nob : Goo.CanvasRect {
     enum Type {
-        NONE=-1,
         TOP_LEFT,
         TOP_CENTER,
         TOP_RIGHT,
@@ -36,6 +35,7 @@ public class Akira.Lib.Selection.Nob : Goo.CanvasRect {
     public string color_stroke { get; set; default = "#41c9fd"; }
     public double current_scale { get; set; default = 1.0; }
     public int nob_type { get; set; }
+    public double nob_size { get; set; }
 
     public Nob (Goo.CanvasItem? root, double scale, int i) {
         nob_type = i;
@@ -45,6 +45,7 @@ public class Akira.Lib.Selection.Nob : Goo.CanvasRect {
         parent = null;
         height = 10 / current_scale;
         width = 10 / current_scale;
+        nob_size = width;
         line_width = 1.0 / current_scale;
         fill_color = color_fill;
         stroke_color = color_stroke;
@@ -55,20 +56,16 @@ public class Akira.Lib.Selection.Nob : Goo.CanvasRect {
     }
 
     public void update_position (Goo.CanvasItem? target, Goo.CanvasItem? select_effect) {
-        if (select_effect == null) {
-            return;
-        }
-
         var item = (target as Goo.CanvasItemSimple);
 
         var stroke = (item.line_width / 2);
         double x, y, width, height;
         target.get ("x", out x, "y", out y, "width", out width, "height", out height);
 
-        bool print_middle_width_nobs = width > width * 3;
-        bool print_middle_height_nobs = height > width * 3;
+        bool print_middle_width_nobs = width > nob_size * 3;
+        bool print_middle_height_nobs = height > nob_size * 3;
 
-        var nob_offset = (width / 2);
+        var nob_offset = (nob_size / 2);
 
         var transform = Cairo.Matrix.identity ();
         item.get_transform (out transform);
@@ -79,7 +76,7 @@ public class Akira.Lib.Selection.Nob : Goo.CanvasRect {
             if (print_middle_width_nobs && print_middle_height_nobs) {
                 translate (x - (nob_offset + stroke), y - (nob_offset + stroke));
             } else {
-                translate (x - width - stroke, y - width - stroke);
+                translate (x - nob_size - stroke, y - nob_size - stroke);
             }
             raise (item);
         }
@@ -91,7 +88,7 @@ public class Akira.Lib.Selection.Nob : Goo.CanvasRect {
                 if (print_middle_height_nobs) {
                     translate (x + (width / 2) - nob_offset, y - (nob_offset + stroke));
                 } else {
-                    translate (x + (width / 2) - nob_offset, y - (width + stroke));
+                    translate (x + (width / 2) - nob_offset, y - (nob_size + stroke));
                 }
                 updated_visibility (Goo.CanvasItemVisibility.VISIBLE);
             } else {
@@ -106,7 +103,7 @@ public class Akira.Lib.Selection.Nob : Goo.CanvasRect {
             if (print_middle_width_nobs && print_middle_height_nobs) {
                 translate (x + width - (nob_offset - stroke), y - (nob_offset + stroke));
             } else {
-                translate (x + width + stroke, y - (width + stroke));
+                translate (x + width + stroke, y - (nob_size + stroke));
             }
             raise (item);
         }
@@ -160,7 +157,7 @@ public class Akira.Lib.Selection.Nob : Goo.CanvasRect {
             if (print_middle_width_nobs && print_middle_height_nobs) {
                 translate (x - (nob_offset + stroke), y + height - (nob_offset - stroke));
             } else {
-                translate (x - (width + stroke), y + height + stroke);
+                translate (x - (nob_size + stroke), y + height + stroke);
             }
             raise (item);
         }
@@ -172,7 +169,7 @@ public class Akira.Lib.Selection.Nob : Goo.CanvasRect {
                 if (print_middle_width_nobs) {
                     translate (x - (nob_offset + stroke), y + (height / 2) - nob_offset);
                 } else {
-                    translate (x - (width + stroke), y + (height / 2) - nob_offset);
+                    translate (x - (nob_size + stroke), y + (height / 2) - nob_offset);
                 }
                 updated_visibility (Goo.CanvasItemVisibility.VISIBLE);
             } else {

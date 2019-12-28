@@ -105,7 +105,6 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     private double delta_y;
     private double hover_x;
     private double hover_y;
-    private double nob_size;
     private double current_scale;
     private int holding_id = Nob.NONE;
     private double bounds_x;
@@ -548,11 +547,8 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
         select_effect.set ("parent", get_root_item ());
 
-        nob_size = 10 / current_scale;
-
         for (int i = 0; i < 9; i++) {
             nobs[i] = new Selection.Nob (get_root_item (), current_scale, i);
-            //  nobs[i].update_position (target, select_effect);
         }
 
         update_nob_position (target);
@@ -696,127 +692,15 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         }
     }
 
-    // Updates all the nub's position arround the selected item, except for the grabbed nub
-    private void update_nob_position (Goo.CanvasItem target) {
-        if (select_effect == null) {
+    // Updates all the nobs' position arround the selected item, except for the grabbed nob.
+    private void update_nob_position (Goo.CanvasItem? target) {
+        if (target == null || select_effect == null) {
             return;
         }
 
-        var item = (target as Goo.CanvasItemSimple);
-
-        var stroke = (item.line_width / 2);
-        double x, y, width, height;
-        target.get ("x", out x, "y", out y, "width", out width, "height", out height);
-
-        bool print_middle_width_nobs = width > nob_size * 3;
-        bool print_middle_height_nobs = height > nob_size * 3;
-
-        var nob_offset = (nob_size / 2);
-
-        var transform = Cairo.Matrix.identity ();
-        item.get_transform (out transform);
-
-        // TOP LEFT nob
-        nobs[Nob.TOP_LEFT].set_transform (transform);
-        if (print_middle_width_nobs && print_middle_height_nobs) {
-          nobs[Nob.TOP_LEFT].translate (x - (nob_offset + stroke), y - (nob_offset + stroke));
-        } else {
-          nobs[Nob.TOP_LEFT].translate (x - nob_size - stroke, y - nob_size - stroke);
+        foreach (var nob in nobs) {
+            nob.update_position (target, select_effect);
         }
-        nobs[Nob.TOP_LEFT].raise (item);
-
-        if (print_middle_width_nobs) {
-          // TOP CENTER nob
-          nobs[Nob.TOP_CENTER].set_transform (transform);
-          if (print_middle_height_nobs) {
-            nobs[Nob.TOP_CENTER].translate (x + (width / 2) - nob_offset, y - (nob_offset + stroke));
-          } else {
-            nobs[Nob.TOP_CENTER].translate (x + (width / 2) - nob_offset, y - (nob_size + stroke));
-          }
-          nobs[Nob.TOP_CENTER].set ("visibility", Goo.CanvasItemVisibility.VISIBLE);
-        } else {
-          nobs[Nob.TOP_CENTER].set ("visibility", Goo.CanvasItemVisibility.HIDDEN);
-        }
-        nobs[Nob.TOP_CENTER].raise (item);
-
-        // TOP RIGHT nob
-        nobs[Nob.TOP_RIGHT].set_transform (transform);
-        if (print_middle_width_nobs && print_middle_height_nobs) {
-          nobs[Nob.TOP_RIGHT].translate (x + width - (nob_offset - stroke), y - (nob_offset + stroke));
-        } else {
-          nobs[Nob.TOP_RIGHT].translate (x + width + stroke, y - (nob_size + stroke));
-        }
-        nobs[Nob.TOP_RIGHT].raise (item);
-
-        if (print_middle_height_nobs) {
-          // RIGHT CENTER nob
-          nobs[Nob.RIGHT_CENTER].set_transform (transform);
-          if (print_middle_width_nobs) {
-            nobs[Nob.RIGHT_CENTER].translate (x + width - (nob_offset - stroke), y + (height / 2) - nob_offset);
-          } else {
-            nobs[Nob.RIGHT_CENTER].translate (x + width + stroke, y + (height / 2) - nob_offset);
-          }
-          nobs[Nob.RIGHT_CENTER].set ("visibility", Goo.CanvasItemVisibility.VISIBLE);
-        } else {
-          nobs[Nob.RIGHT_CENTER].set ("visibility", Goo.CanvasItemVisibility.HIDDEN);
-        }
-        nobs[Nob.RIGHT_CENTER].raise (item);
-
-        // BOTTOM RIGHT nob
-        nobs[Nob.BOTTOM_RIGHT].set_transform (transform);
-        if (print_middle_width_nobs && print_middle_height_nobs) {
-          nobs[Nob.BOTTOM_RIGHT].translate (x + width - (nob_offset - stroke), y + height - (nob_offset - stroke));
-        } else {
-          nobs[Nob.BOTTOM_RIGHT].translate (x + width + stroke, y + height + stroke);
-        }
-        nobs[Nob.BOTTOM_RIGHT].raise (item);
-
-        if (print_middle_width_nobs) {
-          // BOTTOM CENTER nob
-          nobs[Nob.BOTTOM_CENTER].set_transform (transform);
-          if (print_middle_height_nobs) {
-            nobs[Nob.BOTTOM_CENTER].translate (x + (width / 2) - nob_offset, y + height - (nob_offset - stroke));
-          } else {
-            nobs[Nob.BOTTOM_CENTER].translate (x + (width / 2) - nob_offset, y + height + stroke);
-          }
-          nobs[Nob.BOTTOM_CENTER].set ("visibility", Goo.CanvasItemVisibility.VISIBLE);
-        } else {
-          nobs[Nob.BOTTOM_CENTER].set ("visibility", Goo.CanvasItemVisibility.HIDDEN);
-        }
-        nobs[Nob.BOTTOM_CENTER].raise (item);
-
-        // BOTTOM LEFT nob
-        nobs[Nob.BOTTOM_LEFT].set_transform (transform);
-        if (print_middle_width_nobs && print_middle_height_nobs) {
-          nobs[Nob.BOTTOM_LEFT].translate (x - (nob_offset + stroke), y + height - (nob_offset - stroke));
-        } else {
-          nobs[Nob.BOTTOM_LEFT].translate (x - (nob_size + stroke), y + height + stroke);
-        }
-        nobs[Nob.BOTTOM_LEFT].raise (item);
-
-        if (print_middle_height_nobs) {
-          // LEFT CENTER nob
-          nobs[Nob.LEFT_CENTER].set_transform (transform);
-          if (print_middle_width_nobs) {
-            nobs[Nob.LEFT_CENTER].translate (x - (nob_offset + stroke), y + (height / 2) - nob_offset);
-          } else {
-            nobs[Nob.LEFT_CENTER].translate (x - (nob_size + stroke), y + (height / 2) - nob_offset);
-          }
-          nobs[Nob.LEFT_CENTER].set ("visibility", Goo.CanvasItemVisibility.VISIBLE);
-        } else {
-          nobs[Nob.LEFT_CENTER].set ("visibility", Goo.CanvasItemVisibility.HIDDEN);
-        }
-        nobs[Nob.LEFT_CENTER].raise (item);
-
-        // ROTATE nob
-        double distance = 40;
-        if (current_scale < 1) {
-            distance = 40 * (2 * current_scale - 1);
-        }
-
-        nobs[Nob.ROTATE].set_transform (transform);
-        nobs[Nob.ROTATE].translate (x + (width / 2) - nob_offset, y - nob_offset - distance);
-        nobs[Nob.ROTATE].raise (item);
     }
 
     private void set_cursor (Gdk.CursorType cursor_type) {
