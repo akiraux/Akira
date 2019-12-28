@@ -548,7 +548,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         select_effect.set ("parent", get_root_item ());
 
         for (int i = 0; i < 9; i++) {
-            nobs[i] = new Selection.Nob (get_root_item (), current_scale, i);
+            nobs[i] = new Selection.Nob (this, get_root_item (), current_scale, i);
         }
 
         update_nob_position (target);
@@ -612,7 +612,8 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         }
 
         if ((target as Selection.Nob) in nobs) {
-            set_cursor_for_nob (get_grabbed_id (target));
+            var nob = (target as Selection.Nob);
+            nob.set_cursor_for_nob ();
             return;
         }
 
@@ -650,46 +651,11 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     }
 
     private int get_grabbed_id (Goo.CanvasItem? target) {
-        for (int i = 0; i < 9; i++) {
-            if (target == nobs[i]) return i;
+        if ((target as Selection.Nob) in nobs) {
+            return (target as Selection.Nob).nob_type;
         }
 
         return Nob.NONE;
-    }
-
-    private void set_cursor_for_nob (int grabbed_id) {
-        switch (grabbed_id) {
-            case Nob.NONE:
-                set_cursor_by_edit_mode ();
-                break;
-            case Nob.TOP_LEFT:
-                set_cursor (Gdk.CursorType.TOP_LEFT_CORNER);
-                break;
-            case Nob.TOP_CENTER:
-                set_cursor (Gdk.CursorType.TOP_SIDE);
-                break;
-            case Nob.TOP_RIGHT:
-                set_cursor (Gdk.CursorType.TOP_RIGHT_CORNER);
-                break;
-            case Nob.RIGHT_CENTER:
-                set_cursor (Gdk.CursorType.RIGHT_SIDE);
-                break;
-            case Nob.BOTTOM_RIGHT:
-                set_cursor (Gdk.CursorType.BOTTOM_RIGHT_CORNER);
-                break;
-            case Nob.BOTTOM_CENTER:
-                set_cursor (Gdk.CursorType.BOTTOM_SIDE);
-                break;
-            case Nob.BOTTOM_LEFT:
-                set_cursor (Gdk.CursorType.BOTTOM_LEFT_CORNER);
-                break;
-            case Nob.LEFT_CENTER:
-                set_cursor (Gdk.CursorType.LEFT_SIDE);
-                break;
-            case Nob.ROTATE:
-                set_cursor (Gdk.CursorType.ICON);
-                break;
-        }
     }
 
     // Updates all the nobs' position arround the selected item, except for the grabbed nob.
@@ -703,7 +669,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         }
     }
 
-    private void set_cursor (Gdk.CursorType cursor_type) {
+    public void set_cursor (Gdk.CursorType cursor_type) {
         var cursor = new Gdk.Cursor.for_display (Gdk.Display.get_default (), cursor_type);
         get_window ().set_cursor (cursor);
     }

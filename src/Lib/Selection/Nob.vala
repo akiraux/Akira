@@ -20,6 +20,7 @@
 */
 public class Akira.Lib.Selection.Nob : Goo.CanvasRect {
     enum Type {
+        NONE=-1,
         TOP_LEFT,
         TOP_CENTER,
         TOP_RIGHT,
@@ -31,13 +32,16 @@ public class Akira.Lib.Selection.Nob : Goo.CanvasRect {
         ROTATE
     }
 
-    public string color_fill { get; set; default = "#fff"; }
-    public string color_stroke { get; set; default = "#41c9fd"; }
-    public double current_scale { get; set; default = 1.0; }
-    public int nob_type { get; set; }
-    public double nob_size { get; set; }
+    private new Akira.Lib.Canvas canvas;
 
-    public Nob (Goo.CanvasItem? root, double scale, int i) {
+    private string color_fill { get; set; default = "#fff"; }
+    private string color_stroke { get; set; default = "#41c9fd"; }
+    private double current_scale { get; set; default = 1.0; }
+    public int nob_type;
+    private double nob_size;
+
+    public Nob (Akira.Lib.Canvas _canvas, Goo.CanvasItem? root, double scale, int i) {
+        canvas = _canvas;
         nob_type = i;
         current_scale = scale;
         can_focus = false;
@@ -193,5 +197,40 @@ public class Akira.Lib.Selection.Nob : Goo.CanvasRect {
 
     private void updated_visibility (Goo.CanvasItemVisibility visibility) {
         set ("visibility", visibility);
+    }
+
+    public void set_cursor_for_nob () {
+        switch (nob_type) {
+            case Type.NONE:
+                canvas.set_cursor_by_edit_mode ();
+                break;
+            case Type.TOP_LEFT:
+                canvas.set_cursor (Gdk.CursorType.TOP_LEFT_CORNER);
+                break;
+            case Type.TOP_CENTER:
+                canvas.set_cursor (Gdk.CursorType.TOP_SIDE);
+                break;
+            case Type.TOP_RIGHT:
+                canvas.set_cursor (Gdk.CursorType.TOP_RIGHT_CORNER);
+                break;
+            case Type.RIGHT_CENTER:
+                canvas.set_cursor (Gdk.CursorType.RIGHT_SIDE);
+                break;
+            case Type.BOTTOM_RIGHT:
+                canvas.set_cursor (Gdk.CursorType.BOTTOM_RIGHT_CORNER);
+                break;
+            case Type.BOTTOM_CENTER:
+                canvas.set_cursor (Gdk.CursorType.BOTTOM_SIDE);
+                break;
+            case Type.BOTTOM_LEFT:
+                canvas.set_cursor (Gdk.CursorType.BOTTOM_LEFT_CORNER);
+                break;
+            case Type.LEFT_CENTER:
+                canvas.set_cursor (Gdk.CursorType.LEFT_SIDE);
+                break;
+            case Type.ROTATE:
+                canvas.set_cursor (Gdk.CursorType.ICON);
+                break;
+        }
     }
 }
