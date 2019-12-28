@@ -552,6 +552,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
         for (int i = 0; i < 9; i++) {
             nobs[i] = new Selection.Nob (get_root_item (), current_scale, i);
+            //  nobs[i].update_position (target, select_effect);
         }
 
         update_nob_position (target);
