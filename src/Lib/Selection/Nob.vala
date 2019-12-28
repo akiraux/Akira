@@ -18,42 +18,178 @@
 *
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
-public class Akira.Lib.Selection.Nob : Goo.CanvasItemSimple, Goo.CanvasItem {
-    public double height { get; set; default = 10; }
-    public double radius_x { get; set; }
-    public double radius_y { get; set; }
-    public double width { get; set; default = 10; }
-    public double x { get; set; }
-    public double y { get; set; }
-
-    public string f_color { get; set; default = "#fff"; }
-    public string s_color { get; set; default = "#41c9fd"; }
-    public double s { get; set; default = 1.0; }
-
-    public double scale { get; set; default = 1.0; }
-
-    public Nob (Goo.CanvasItem? root) {
-        set_rectangle (root, 0, 0);
+public class Akira.Lib.Selection.Nob : Goo.CanvasRect {
+    enum Type {
+        NONE=-1,
+        TOP_LEFT,
+        TOP_CENTER,
+        TOP_RIGHT,
+        RIGHT_CENTER,
+        BOTTOM_RIGHT,
+        BOTTOM_CENTER,
+        BOTTOM_LEFT,
+        LEFT_CENTER,
+        ROTATE
     }
 
-    public Nob.with_values (Goo.CanvasItem? root, double x, double y, double canvas_scale) {
-        Object (parent: root);
-        scale = canvas_scale;
-        set_rectangle (root, x, y);
+    public string color_fill { get; set; default = "#fff"; }
+    public string color_stroke { get; set; default = "#41c9fd"; }
+    public double current_scale { get; set; default = 1.0; }
+    public int nob_type { get; set; }
+
+    public Nob (Goo.CanvasItem? root, double radius, double scale, int i) {
+        nob_type = i;
+        current_scale = scale;
+
+        parent = null;
+        height = 10 / current_scale;
+        width = 10 / current_scale;
+        line_width = 1.0 / current_scale;
+        fill_color = color_fill;
+        stroke_color = color_stroke;
+        radius_x = radius;
+        radius_y = radius;
+
+        set ("parent", root);
     }
 
-    construct {
-        can_focus = false;
-    }
+    public void update_position (Goo.CanvasItem? target, Goo.CanvasItem? select_effect) {
+        if (select_effect == null) {
+            return;
+        }
 
-    public void set_rectangle (Goo.CanvasItem? root, double _x, double _y) {
-        parent = root;
-        height = height / scale;
-        width = width / scale;
-        x = _x - (width / 2);
-        y = _y - (height / 2);
-        line_width = s / scale;
-        fill_color = "#fff";
-        stroke_color = "#41c9fd";
+        var item = (target as Goo.CanvasItemSimple);
+
+        var stroke = (item.line_width / 2);
+        double x, y, width, height;
+        target.get ("x", out x, "y", out y, "width", out width, "height", out height);
+
+        bool print_middle_width_nobs = width > width * 3;
+        bool print_middle_height_nobs = height > width * 3;
+
+        var nob_offset = (width / 2);
+
+        var transform = Cairo.Matrix.identity ();
+        item.get_transform (out transform);
+
+        // TOP LEFT nob
+        if (nob_type == Type.TOP_LEFT) {
+            set_transform (transform);
+            if (print_middle_width_nobs && print_middle_height_nobs) {
+                translate (x - (nob_offset + stroke), y - (nob_offset + stroke));
+            } else {
+                translate (x - width - stroke, y - width - stroke);
+            }
+            raise (item);
+        }
+
+        // TOP CENTER nob
+        if (nob_type == Type.TOP_CENTER) {
+            if (print_middle_width_nobs) {
+                set_transform (transform);
+                if (print_middle_height_nobs) {
+                    translate (x + (width / 2) - nob_offset, y - (nob_offset + stroke));
+                } else {
+                    translate (x + (width / 2) - nob_offset, y - (width + stroke));
+                }
+                set ("visibility", Goo.CanvasItemVisibility.VISIBLE);
+            } else {
+                set ("visibility", Goo.CanvasItemVisibility.HIDDEN);
+            }
+            raise (item);
+        }
+
+        // TOP RIGHT nob
+        if (nob_type == Type.TOP_RIGHT) {
+            set_transform (transform);
+            if (print_middle_width_nobs && print_middle_height_nobs) {
+                translate (x + width - (nob_offset - stroke), y - (nob_offset + stroke));
+            } else {
+                translate (x + width + stroke, y - (width + stroke));
+            }
+            raise (item);
+        }
+
+        // RIGHT CENTER nob
+        if (nob_type == Type.RIGHT_CENTER) {
+            if (print_middle_height_nobs) {
+                set_transform (transform);
+                if (print_middle_width_nobs) {
+                    translate (x + width - (nob_offset - stroke), y + (height / 2) - nob_offset);
+                } else {
+                    translate (x + width + stroke, y + (height / 2) - nob_offset);
+                }
+                set ("visibility", Goo.CanvasItemVisibility.VISIBLE);
+            } else {
+                set ("visibility", Goo.CanvasItemVisibility.HIDDEN);
+            }
+            raise (item);
+        }
+
+        // BOTTOM RIGHT nob
+        if (nob_type == Type.BOTTOM_RIGHT) {
+            set_transform (transform);
+            if (print_middle_width_nobs && print_middle_height_nobs) {
+                translate (x + width - (nob_offset - stroke), y + height - (nob_offset - stroke));
+            } else {
+                translate (x + width + stroke, y + height + stroke);
+            }
+            raise (item);
+        }
+
+        // BOTTOM CENTER nob
+        if (nob_type == Type.BOTTOM_CENTER) {
+            if (print_middle_width_nobs) {
+                set_transform (transform);
+                if (print_middle_height_nobs) {
+                    translate (x + (width / 2) - nob_offset, y + height - (nob_offset - stroke));
+                } else {
+                    translate (x + (width / 2) - nob_offset, y + height + stroke);
+                }
+                set ("visibility", Goo.CanvasItemVisibility.VISIBLE);
+            } else {
+                set ("visibility", Goo.CanvasItemVisibility.HIDDEN);
+            }
+            raise (item);
+        }
+
+        // BOTTOM LEFT nob
+        if (nob_type == Type.BOTTOM_LEFT) {
+            set_transform (transform);
+            if (print_middle_width_nobs && print_middle_height_nobs) {
+                translate (x - (nob_offset + stroke), y + height - (nob_offset - stroke));
+            } else {
+                translate (x - (width + stroke), y + height + stroke);
+            }
+            raise (item);
+        }
+
+        // LEFT CENTER nob
+        if (nob_type == Type.LEFT_CENTER) {
+            if (print_middle_height_nobs) {
+                set_transform (transform);
+                if (print_middle_width_nobs) {
+                    translate (x - (nob_offset + stroke), y + (height / 2) - nob_offset);
+                } else {
+                    translate (x - (width + stroke), y + (height / 2) - nob_offset);
+                }
+                set ("visibility", Goo.CanvasItemVisibility.VISIBLE);
+            } else {
+                set ("visibility", Goo.CanvasItemVisibility.HIDDEN);
+            }
+            raise (item);
+        }
+
+        // ROTATE nob
+        if (nob_type == Type.ROTATE) {
+            double distance = 40;
+            if (current_scale < 1) {
+                distance = 40 * (2 * current_scale - 1);
+            }
+
+            set_transform (transform);
+            translate (x + (width / 2) - nob_offset, y - nob_offset - distance);
+            raise (item);
+        }
     }
 }

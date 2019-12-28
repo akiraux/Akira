@@ -552,13 +552,14 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
         for (int i = 0; i < 9; i++) {
             var radius = i == 8 ? nob_size : 0;
-            nobs[i] = new Goo.CanvasRect (null, 0, 0, nob_size, nob_size,
-                                          "line-width", line_width,
-                                          "radius-x", radius,
-                                          "radius-y", radius,
-                                          "stroke-color", "#41c9fd",
-                                          "fill-color", "#fff", null);
-            nobs[i].set ("parent", get_root_item ());
+            nobs[i] = new Selection.Nob (get_root_item (), radius, current_scale, i);
+            //  nobs[i] = new Goo.CanvasRect (null, 0, 0, nob_size, nob_size,
+            //                                "line-width", line_width,
+            //                                "radius-x", radius,
+            //                                "radius-y", radius,
+            //                                "stroke-color", "#41c9fd",
+            //                                "fill-color", "#fff", null);
+            //  nobs[i].set ("parent", get_root_item ());
         }
 
         update_nob_position (target);
