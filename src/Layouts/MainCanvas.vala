@@ -34,6 +34,7 @@ public class Akira.Layouts.MainCanvas : Gtk.Grid {
 
     construct {
         get_allocation (out main_window_size);
+
         main_scroll = new Gtk.ScrolledWindow (null, null);
         main_scroll.expand = true;
 
@@ -42,6 +43,8 @@ public class Akira.Layouts.MainCanvas : Gtk.Grid {
         canvas.set_size_request (main_window_size.width, main_window_size.height);
         canvas.set_bounds (0, 0, 10000, 10000);
         canvas.set_scale (1.0);
+
+        canvas.update_bounds ();
 
         canvas.canvas_moved.connect ((event_x, event_y) => {
             // Move scroll window according to normalized mouse delta
