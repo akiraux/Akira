@@ -44,7 +44,7 @@ public class Akira.Layouts.MainCanvas : Gtk.Grid {
         //main_scroll.overlay_scrolling = false;
 
         // Change visibility of canvas scrollbars
-        main_scroll.set_policy (Gtk.PolicyType.NEVER, Gtk.PolicyType.NEVER);
+        //main_scroll.set_policy (Gtk.PolicyType.NEVER, Gtk.PolicyType.NEVER);
 
         canvas = new Akira.Lib.Canvas (window);
 
@@ -71,6 +71,8 @@ public class Akira.Layouts.MainCanvas : Gtk.Grid {
             scroll_origin_y = origin_y;
         });
 
+        canvas.scroll_event.connect (on_scroll);
+
         main_scroll.add (canvas);
 
         // Center canvas at startup
@@ -78,5 +80,34 @@ public class Akira.Layouts.MainCanvas : Gtk.Grid {
         main_scroll.vadjustment.value = CANVAS_SIZE / 2;
 
         attach (main_scroll, 0, 0, 1, 1);
+    }
+
+    public bool on_scroll (Gdk.EventScroll event) {
+        bool isShift = (event.state & Gdk.ModifierType.SHIFT_MASK) > 0;
+        bool isCtrl = (event.state & Gdk.ModifierType.CONTROL_MASK) > 0;
+
+        switch (event.direction) {
+            case Gdk.ScrollDirection.UP:
+                // Zoom in
+                if (isCtrl) {
+                    window.headerbar.zoom.zoom_in ();
+                } else if (isShift) {
+                    main_scroll.hadjustment.value += 10;
+                } else {
+                    main_scroll.vadjustment.value -= 10;
+                }
+                break;
+            case Gdk.ScrollDirection.DOWN:
+                // Zoom out
+                if (isCtrl) {
+                    window.headerbar.zoom.zoom_out ();
+                } else if (isShift) {
+                    main_scroll.hadjustment.value -= 10;
+                } else {
+                    main_scroll.vadjustment.value += 10;
+                }
+                break;
+        }
+        return true;
     }
 }
