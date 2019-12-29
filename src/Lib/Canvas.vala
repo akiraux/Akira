@@ -61,27 +61,6 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     }
     public InsertType? insert_type { get; set; }
 
-    /*
-        Grabber Pos:   8
-                     0 1 2
-                     7   3
-                     6 5 4
-
-        // -1 if no nub is grabbed
-    */
-    enum Nob {
-        NONE=-1,
-        TOP_LEFT,
-        TOP_CENTER,
-        TOP_RIGHT,
-        RIGHT_CENTER,
-        BOTTOM_RIGHT,
-        BOTTOM_CENTER,
-        BOTTOM_LEFT,
-        LEFT_CENTER,
-        ROTATE
-    }
-
     public enum EditMode {
         MODE_SELECTION,
         MODE_INSERT
@@ -106,7 +85,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     private double hover_x;
     private double hover_y;
     private double current_scale;
-    private int holding_id = Nob.NONE;
+    private int holding_id = Selection.Nob.Type.NONE;
     private double bounds_x;
     private double bounds_y;
     private double bounds_w;
@@ -158,7 +137,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
             selected_item = item;
             add_hover_effect (item);
             add_select_effect (item);
-            clicked_item = nobs[Nob.BOTTOM_RIGHT];
+            clicked_item = nobs[Selection.Nob.Type.BOTTOM_RIGHT];
         } else {
             clicked_item = get_item_at (temp_event_x, temp_event_y, true);
         }
@@ -168,12 +147,12 @@ public class Akira.Lib.Canvas : Goo.Canvas {
             var clicked_id = get_grabbed_id (clicked_item);
             holding = true;
 
-            if (clicked_id == Nob.NONE) {
+            if (clicked_id == Selection.Nob.Type.NONE) {
                 remove_select_effect ();
                 add_select_effect (clicked_item);
                 grab_focus (clicked_item);
                 selected_item = clicked_item;
-                holding_id = Nob.NONE;
+                holding_id = Selection.Nob.Type.NONE;
             } else { // nob was clicked
                 holding_id = clicked_id;
             }
@@ -181,7 +160,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
         if (clicked_item == selected_item && selected_item != null) {
             holding = true;
-            holding_id = Nob.NONE;
+            holding_id = Selection.Nob.Type.NONE;
         }
 
         if (clicked_item == null) {
@@ -272,19 +251,19 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     public override bool key_press_event (Gdk.EventKey event) {
         switch (Gdk.keyval_to_upper (event.keyval)) {
             case Gdk.Key.E:
-                edit_mode = Akira.Lib.Canvas.EditMode.MODE_INSERT;
-                insert_type = Akira.Lib.Canvas.InsertType.ELLIPSE;
+                edit_mode = EditMode.MODE_INSERT;
+                insert_type = InsertType.ELLIPSE;
                 return true;
             case Gdk.Key.R:
-                edit_mode = Akira.Lib.Canvas.EditMode.MODE_INSERT;
-                insert_type = Akira.Lib.Canvas.InsertType.RECT;
+                edit_mode = EditMode.MODE_INSERT;
+                insert_type = InsertType.RECT;
                 return true;
             case Gdk.Key.T:
-                edit_mode = Akira.Lib.Canvas.EditMode.MODE_INSERT;
-                insert_type = Akira.Lib.Canvas.InsertType.TEXT;
+                edit_mode = EditMode.MODE_INSERT;
+                insert_type = InsertType.TEXT;
                 return true;
             case Gdk.Key.Escape:
-                edit_mode = Akira.Lib.Canvas.EditMode.MODE_SELECTION;
+                edit_mode = EditMode.MODE_SELECTION;
                 insert_type = null;
                 return true;
             case Gdk.Key.Delete:
@@ -351,7 +330,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         //  debug ("update y: %s", update_y.to_string ());
 
         switch (holding_id) {
-            case Nob.NONE: // Moving
+            case Selection.Nob.Type.NONE: // Moving
                 double move_x = fix_x_position (canvas_x, width, delta_x);
                 double move_y = fix_y_position (canvas_y, height, delta_y);
                 //  debug ("move x %f", move_x);
@@ -360,7 +339,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 event_x -= move_x;
                 event_y -= move_y;
                 break;
-            case Nob.TOP_LEFT:
+            case Selection.Nob.Type.TOP_LEFT:
                 update_x = event_x < x + width;
                 update_y = event_y < y + height;
                 if (MIN_SIZE > height - new_delta_y) {
@@ -375,7 +354,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 new_width = fix_size (width - new_delta_x);
                 new_height = fix_size (height - new_delta_y);
                 break;
-            case Nob.TOP_CENTER:
+            case Selection.Nob.Type.TOP_CENTER:
                 update_y = event_y < y + height;
                 if (MIN_SIZE > height - new_delta_y) {
                    new_delta_y = 0;
@@ -384,7 +363,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 selected_item.translate (0, new_delta_y);
                 event_y -= new_delta_y;
                 break;
-            case Nob.TOP_RIGHT:
+            case Selection.Nob.Type.TOP_RIGHT:
                 update_x = event_x > x;
                 if (!update_x) {
                     new_delta_x = 0;
@@ -401,27 +380,27 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                     new_height = fix_size (height - new_delta_y);
                 }
                 break;
-            case Nob.RIGHT_CENTER:
+            case Selection.Nob.Type.RIGHT_CENTER:
                 update_x = event_x > x;
                 if (!update_x) {
                     new_delta_x = 0;
                 }
                 new_width = fix_size (width + new_delta_x);
                 break;
-            case Nob.BOTTOM_RIGHT:
+            case Selection.Nob.Type.BOTTOM_RIGHT:
                 update_x = event_x > x;
                 update_y = event_y > y;
                 new_width = fix_size (width + new_delta_x);
                 new_height = fix_size (height + new_delta_y);
                 break;
-            case Nob.BOTTOM_CENTER:
+            case Selection.Nob.Type.BOTTOM_CENTER:
                 update_y = event_y > y;
                 if (!update_y) {
                     new_delta_y = 0;
                 }
                 new_height = fix_size (height + new_delta_y);
                 break;
-            case Nob.BOTTOM_LEFT:
+            case Selection.Nob.Type.BOTTOM_LEFT:
                 if (new_delta_x > width) {
                    new_delta_x = 0;
                 }
@@ -443,7 +422,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 new_width = fix_size (width - new_delta_x);
                 new_height = fix_size (height + new_delta_y);
                 break;
-            case Nob.LEFT_CENTER:
+            case Selection.Nob.Type.LEFT_CENTER:
                 update_x = event_x < x + width;
                 if (new_delta_x < width) {
                     selected_item.translate (new_delta_x, 0);
@@ -451,7 +430,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                     new_width = fix_size (width - new_delta_x);
                 }
                 break;
-            case Nob.ROTATE:
+            case Selection.Nob.Type.ROTATE:
                 var center_x = x + width / 2;
                 var center_y = y + height / 2;
 
@@ -655,7 +634,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
             return (target as Selection.Nob).nob_type;
         }
 
-        return Nob.NONE;
+        return Selection.Nob.Type.NONE;
     }
 
     // Updates all the nobs' position arround the selected item, except for the grabbed nob.
