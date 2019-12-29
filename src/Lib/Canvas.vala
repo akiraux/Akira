@@ -175,6 +175,12 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         //  debug ("canvas temp event x: %f", temp_event_x);
         //  debug ("canvas temp event y: %f", temp_event_y);
 
+        if (event.button == 2) {
+            // Middle mouse clicked
+            holding = true;
+            edit_mode = EditMode.MODE_PAN;
+        }
+
         if (edit_mode == EditMode.MODE_PAN) {
             double tmp_event_x_normalized = temp_event_x;
             double tmp_event_y_normalized = temp_event_y;
@@ -291,6 +297,10 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
         holding = false;
 
+        if (event.button == 2) {
+            edit_mode = EditMode.MODE_SELECTION;
+        }
+
         if (delta_x == 0 && delta_y == 0) {
             return false;
         }
@@ -302,7 +312,6 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         delta_y = 0;
 
         edit_mode = EditMode.MODE_SELECTION;
-        set_cursor_by_edit_mode ();
 
         return false;
     }
