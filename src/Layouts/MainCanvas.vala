@@ -20,6 +20,8 @@
 * Authored by: Giacomo "giacomoalbe" Alberini <giacomoalbe@gmail.com>
 */
 public class Akira.Layouts.MainCanvas : Gtk.Grid {
+    public const int CANVAS_SIZE = 100000;
+
     public Gtk.ScrolledWindow main_scroll;
     public Akira.Lib.Canvas canvas;
     public Gtk.Allocation main_window_size;
@@ -47,7 +49,7 @@ public class Akira.Layouts.MainCanvas : Gtk.Grid {
         canvas = new Akira.Lib.Canvas (window);
 
         canvas.set_size_request (main_window_size.width, main_window_size.height);
-        canvas.set_bounds (0, 0, 10000, 10000);
+        canvas.set_bounds (0, 0, CANVAS_SIZE, CANVAS_SIZE);
         canvas.set_scale (1.0);
 
         canvas.update_bounds ();
@@ -70,6 +72,10 @@ public class Akira.Layouts.MainCanvas : Gtk.Grid {
         });
 
         main_scroll.add (canvas);
+
+        // Center canvas at startup
+        main_scroll.hadjustment.value = CANVAS_SIZE / 2;
+        main_scroll.vadjustment.value = CANVAS_SIZE / 2;
 
         attach (main_scroll, 0, 0, 1, 1);
     }
