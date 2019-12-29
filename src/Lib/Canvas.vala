@@ -20,7 +20,6 @@
 * Authored by: Alberto Fanjul <albertofanjul@gmail.com>
 * Authored by: Giacomo "giacomoalbe" Alberini <giacomoalbe@gmail.com>
 */
-
 public class Akira.Lib.Canvas : Goo.Canvas {
     public weak Akira.Window window { get; construct; }
 
@@ -115,6 +114,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     private double bounds_y;
     private double bounds_w;
     private double bounds_h;
+    private double prev_rotation_difference = 0.0;
 
     private double border_size;
     private string border_color;
@@ -475,6 +475,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 var center_x = x + width / 2;
                 var center_y = y + height / 2;
                 var do_rotation = true;
+                double rotation_amount = 0;
 
                 //  debug ("center x: %f", center_x);
                 //  debug ("center y: %f", center_y);
@@ -491,7 +492,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 double current_x, current_y, current_scale, current_rotation;
                 selected_item.get_simple_transform (out current_x, out current_y, out current_scale, out current_rotation);
 
-                var rotation = radians * (180 / Math.PI);
+                var rotation = radians * (180 / Math.PI) + prev_rotation_difference;
 
                 if (ctrl_is_pressed) {
                     do_rotation = false;
@@ -512,7 +513,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                         // manually resetting the rotation input field in the properties panel
                         var current_rotation_int = ((int) GLib.Math.round (current_rotation));
 
-                        var rotation_amount = ROTATION_FIXED_STEP;
+                        rotation_amount = ROTATION_FIXED_STEP;
 
                         // Strange glitch: when current_rotation == 30.0, the fmod
                         // function does not work properly.
@@ -522,7 +523,11 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                             rotation_amount -= GLib.Math.fmod (current_rotation, ROTATION_FIXED_STEP);
                         }
 
+                        var prev_rotation = rotation;
+
                         rotation = rotation > 0 ? rotation_amount : -rotation_amount;
+
+                        prev_rotation_difference = prev_rotation - rotation;
 
                         //debug ("Current rotation: %f", current_rotation);
                         //debug ("Current rotation int: %f", current_rotation_int);
@@ -531,13 +536,18 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                         update_x = true;
                         update_y = true;
                     }
+                } else {
+                    prev_rotation_difference = 0.0;
                 }
 
                 if (do_rotation) {
                     convert_from_item_space (selected_item, ref event_x, ref event_y);
+
                     selected_item.rotate (rotation, center_x, center_y);
-                    var selected_item_rotation = selected_item.get_data<double?> ("rotation");
-                    selected_item.set_data<double?> ("rotation", selected_item_rotation + rotation);
+
+                    var new_rotation = selected_item.get_data<double?> ("rotation") + rotation;
+
+                    selected_item.set_data<double?> ("rotation", new_rotation);
                     convert_to_item_space (selected_item, ref event_x, ref event_y);
                 }
 
