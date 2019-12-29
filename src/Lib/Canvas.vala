@@ -543,6 +543,9 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 if (do_rotation) {
                     convert_from_item_space (selected_item, ref event_x, ref event_y);
 
+                    // Round rotation in order to avoid sub degree issue
+                    rotation = Math.round (rotation);
+
                     selected_item.rotate (rotation, center_x, center_y);
 
                     var new_rotation = selected_item.get_data<double?> ("rotation") + rotation;
