@@ -83,15 +83,15 @@ public class Akira.Layouts.MainCanvas : Gtk.Grid {
     }
 
     public bool on_scroll (Gdk.EventScroll event) {
-        bool isShift = (event.state & Gdk.ModifierType.SHIFT_MASK) > 0;
-        bool isCtrl = (event.state & Gdk.ModifierType.CONTROL_MASK) > 0;
+        bool is_shift = (event.state & Gdk.ModifierType.SHIFT_MASK) > 0;
+        bool is_ctrl = (event.state & Gdk.ModifierType.CONTROL_MASK) > 0;
 
         switch (event.direction) {
             case Gdk.ScrollDirection.UP:
                 // Zoom in
-                if (isCtrl) {
+                if (is_ctrl) {
                     window.headerbar.zoom.zoom_in ();
-                } else if (isShift) {
+                } else if (is_shift) {
                     main_scroll.hadjustment.value += 10;
                 } else {
                     main_scroll.vadjustment.value -= 10;
@@ -99,9 +99,9 @@ public class Akira.Layouts.MainCanvas : Gtk.Grid {
                 break;
             case Gdk.ScrollDirection.DOWN:
                 // Zoom out
-                if (isCtrl) {
+                if (is_ctrl) {
                     window.headerbar.zoom.zoom_out ();
-                } else if (isShift) {
+                } else if (is_shift) {
                     main_scroll.hadjustment.value -= 10;
                 } else {
                     main_scroll.vadjustment.value += 10;
