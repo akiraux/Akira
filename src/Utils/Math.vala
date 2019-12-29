@@ -20,13 +20,13 @@
 */
 
 public class Akira.Utils.Math {
-    public static double roundDouble(double val, int precision = 2) {
-        int precisionPower = 1;
+    public static double round_double (double val, int precision = 2) {
+        int precision_power = 1;
 
-        for (int i=0; i<precision; i++) {
-            precisionPower *= 10;
+        for (int i = 0; i < precision; i++) {
+            precision_power *= 10;
         }
 
-        return GLib.Math.round (val * precisionPower) / precisionPower;
+        return GLib.Math.round (val * precision_power) / precision_power;
     }
 }

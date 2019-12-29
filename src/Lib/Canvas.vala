@@ -551,7 +551,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                     var new_rotation = selected_item.get_data<double?> ("rotation") + rotation;
 
                     // Cap new_rotation to the [0, 360[ range
-                    new_rotation = Math.fmod(new_rotation, 360);
+                    new_rotation = Math.fmod (new_rotation, 360);
 
                     selected_item.set_data<double?> ("rotation", new_rotation);
                     convert_to_item_space (selected_item, ref event_x, ref event_y);
