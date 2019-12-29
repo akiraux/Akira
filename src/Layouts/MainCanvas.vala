@@ -38,6 +38,12 @@ public class Akira.Layouts.MainCanvas : Gtk.Grid {
         main_scroll = new Gtk.ScrolledWindow (null, null);
         main_scroll.expand = true;
 
+        // Overlay the scrollbars only if mouse pointer is inside canvas
+        //main_scroll.overlay_scrolling = false;
+
+        // Change visibility of canvas scrollbars
+        main_scroll.set_policy (Gtk.PolicyType.NEVER, Gtk.PolicyType.NEVER);
+
         canvas = new Akira.Lib.Canvas (window);
 
         canvas.set_size_request (main_window_size.width, main_window_size.height);
