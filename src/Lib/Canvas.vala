@@ -87,11 +87,9 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         MODE_INSERT
     }
 
-    public enum InsertType {
-        RECT,
-        ELLIPSE,
-        TEXT
-    }
+
+    private Managers.SelectedBoundManager selected_bound_manager;
+    private Managers.ItemsManager items_manager;
 
     private Goo.CanvasItemSimple[] nobs = new Goo.CanvasItemSimple[9];
 
@@ -129,6 +127,10 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         events |= Gdk.EventMask.SCROLL_MASK;
         events |= Gdk.EventMask.TOUCHPAD_GESTURE_MASK;
         events |= Gdk.EventMask.TOUCH_MASK;
+
+        selected_bound_manager = new Managers.SelectedBoundManager ();
+        items_manager = new Managers.ItemsManager ();
+
         get_bounds (out bounds_x, out bounds_y, out bounds_w, out bounds_h);
     }
 
@@ -271,29 +273,30 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     }
 
     public override bool key_press_event (Gdk.EventKey event) {
-        switch (Gdk.keyval_to_upper (event.keyval)) {
-            case Gdk.Key.E:
-                edit_mode = Akira.Lib.Canvas.EditMode.MODE_INSERT;
-                insert_type = Akira.Lib.Canvas.InsertType.ELLIPSE;
-                return true;
-            case Gdk.Key.R:
-                edit_mode = Akira.Lib.Canvas.EditMode.MODE_INSERT;
-                insert_type = Akira.Lib.Canvas.InsertType.RECT;
-                return true;
-            case Gdk.Key.T:
-                edit_mode = Akira.Lib.Canvas.EditMode.MODE_INSERT;
-                insert_type = Akira.Lib.Canvas.InsertType.TEXT;
-                return true;
+        uint uppercase_keyval = Gdk.keyval_to_upper (event.keyval);
+
+        switch (uppercase_keyval) {
             case Gdk.Key.Escape:
                 edit_mode = Akira.Lib.Canvas.EditMode.MODE_SELECTION;
-                insert_type = null;
                 return true;
-            case Gdk.Key.Delete:
-                delete_selected ();
-                return true;
-        }
 
-        return false;
+            case Gdk.Key.Delete:
+                selected_bound_manager.delete_selection ();
+                // delete_selected ();
+                return true;
+
+            default:
+                if (uppercase_keyval <= Gdk.Key.Z && uppercase_keyval >= Gdk.Key.A) {
+                    // Send to ItemsManager to deal with custom user shape
+                    // hotkey preferences from settings
+                    edit_mode = Akira.Lib.Canvas.EditMode.MODE_INSERT;
+                    items_manager.set_insert_type_from_key (uppercase_keyval);
+
+                    return true;
+                }
+
+                return false;
+        }
     }
 
     public override bool motion_notify_event (Gdk.EventMotion event) {

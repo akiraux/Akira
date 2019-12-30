@@ -23,6 +23,7 @@ public class Akira.Services.EventBus : Object {
     public signal void align_items (string align_action);
     public signal void close_popover (string popover);
     public signal void change_sensitivity (string type);
+    public signal void insert_item (string type);
 
     public EventBus () {
         Object ();
@@ -33,15 +34,26 @@ public class Akira.Services.EventBus : Object {
             case "update-icons-style":
                 update_icons_style ();
                 break;
+
             case "align-items":
                 align_items (param);
                 break;
+
             case "close-popover":
                 close_popover (param);
                 break;
+
             case "change-sensitivity":
                 change_sensitivity (param);
                 break;
+
+            case "insert-item":
+                insert_item (param);
+                break;
         }
+    }
+
+    public void test (string caller_id) {
+        debug (@"Test from EventBus called by $(caller_id)");
     }
 }

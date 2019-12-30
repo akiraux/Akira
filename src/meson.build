@@ -66,7 +66,13 @@ executable(
     'Widgets/SettingsDialog.vala',
 
     'Lib/Canvas.vala',
-    'Lib/Item.vala',
+    #'Lib/Models/Item.vala',
+    #'Lib/Models/Rectangle.vala',
+    #'Lib/Models/Ellipse.vala',
+    'Lib/Managers/SelectedBoundManager.vala',
+    #'Lib/Managers/AffineTransformManager.vala',
+    'Lib/Managers/ItemsManager.vala',
+    #'Lib/Managers/NobManager.vala',
 
     'Lib/Selection/Nob.vala',
 
