@@ -94,9 +94,9 @@ public class Akira.Lib.Selection.Nob : Goo.CanvasRect {
                 } else {
                     translate (x + (width / 2) - nob_offset, y - (nob_size + stroke));
                 }
-                updated_visibility (Goo.CanvasItemVisibility.VISIBLE);
+                set_visibility (Goo.CanvasItemVisibility.VISIBLE);
             } else {
-                updated_visibility (Goo.CanvasItemVisibility.HIDDEN);
+                set_visibility (Goo.CanvasItemVisibility.HIDDEN);
             }
             raise (item);
         }
@@ -121,9 +121,9 @@ public class Akira.Lib.Selection.Nob : Goo.CanvasRect {
                 } else {
                     translate (x + width + stroke, y + (height / 2) - nob_offset);
                 }
-                updated_visibility (Goo.CanvasItemVisibility.VISIBLE);
+                set_visibility (Goo.CanvasItemVisibility.VISIBLE);
             } else {
-                updated_visibility (Goo.CanvasItemVisibility.HIDDEN);
+                set_visibility (Goo.CanvasItemVisibility.HIDDEN);
             }
             raise (item);
         }
@@ -148,9 +148,9 @@ public class Akira.Lib.Selection.Nob : Goo.CanvasRect {
                 } else {
                     translate (x + (width / 2) - nob_offset, y + height + stroke);
                 }
-                updated_visibility (Goo.CanvasItemVisibility.VISIBLE);
+                set_visibility (Goo.CanvasItemVisibility.VISIBLE);
             } else {
-                updated_visibility (Goo.CanvasItemVisibility.HIDDEN);
+                set_visibility (Goo.CanvasItemVisibility.HIDDEN);
             }
             raise (item);
         }
@@ -175,9 +175,9 @@ public class Akira.Lib.Selection.Nob : Goo.CanvasRect {
                 } else {
                     translate (x - (nob_size + stroke), y + (height / 2) - nob_offset);
                 }
-                updated_visibility (Goo.CanvasItemVisibility.VISIBLE);
+                set_visibility (Goo.CanvasItemVisibility.VISIBLE);
             } else {
-                updated_visibility (Goo.CanvasItemVisibility.HIDDEN);
+                set_visibility (Goo.CanvasItemVisibility.HIDDEN);
             }
             raise (item);
         }
@@ -195,11 +195,11 @@ public class Akira.Lib.Selection.Nob : Goo.CanvasRect {
         }
     }
 
-    private void updated_visibility (Goo.CanvasItemVisibility visibility) {
+    private void set_visibility (Goo.CanvasItemVisibility visibility) {
         set ("visibility", visibility);
     }
 
-    public void set_cursor_for_nob () {
+    public void set_cursor () {
         switch (nob_type) {
             case Type.NONE:
                 canvas.set_cursor_by_edit_mode ();

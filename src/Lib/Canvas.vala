@@ -612,8 +612,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         }
 
         if ((target as Selection.Nob) in nobs) {
-            var nob = (target as Selection.Nob);
-            nob.set_cursor_for_nob ();
+            (target as Selection.Nob).set_cursor ();
             return;
         }
 
