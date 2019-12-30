@@ -91,8 +91,13 @@ public class Akira.Partials.ZoomButton : Gtk.Grid {
 
         zoom_out_button.sensitive = true;
         zoom_default_button.label = "%.0f%%".printf (zoom);
+
+        event_bus.emit("zoom", "out");
+
+        /*
         window.main_window.main_canvas.canvas.set_scale (window.main_window.main_canvas.canvas.get_scale () - 0.1);
         window.main_window.main_canvas.canvas.reset_select ();
+        */
     }
 
     public void zoom_in () {
@@ -104,15 +109,24 @@ public class Akira.Partials.ZoomButton : Gtk.Grid {
 
         zoom_in_button.sensitive = true;
         zoom_default_button.label = "%.0f%%".printf (zoom);
+
+        event_bus.emit("request-zoom", "in");
+
+        /*
         window.main_window.main_canvas.canvas.set_scale (window.main_window.main_canvas.canvas.get_scale () + 0.1);
         window.main_window.main_canvas.canvas.reset_select ();
+        */
     }
 
     public void zoom_reset () {
         zoom_in_button.sensitive = true;
         zoom_out_button.sensitive = true;
         zoom_default_button.label = "100%";
+
+        event_bus.emit("request-zoom", "reset");
+        /*
         window.main_window.main_canvas.canvas.set_scale (1);
         window.main_window.main_canvas.canvas.reset_select ();
+        */
     }
 }

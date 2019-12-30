@@ -37,6 +37,9 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
     private uint fill_a;
     private uint stroke_rgb;
     private uint stroke_a;
+    private Gtk.Label coord_label;
+    private double coord_x = 0;
+    private double coord_y = 0;
 
     public double size_ratio = 1.0;
 
@@ -205,6 +208,19 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
 
         attach (group_title (_("Opacity")), 0, 9, 3);
         attach (opacity_grid, 0, 10, 3);
+
+
+        coord_label = new Gtk.Label (@"$(coord_x), $(coord_y)");
+
+        attach (group_title (_("Coordinates")), 0, 11, 3);
+        attach (coord_label, 0, 12, 3);
+
+        event_bus.coordinate_change.connect((x, y) => {
+            coord_x = x;
+            coord_y = y;
+
+            coord_label.label =  "(X: %.2f Y: %.2f)".printf(coord_x, coord_y);
+        });
     }
 
     private void item_changed (Object object, ParamSpec spec) {
@@ -246,7 +262,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         height.notify["value"].connect (height_notify_value);
         rotation.notify["value"].connect (rotation_notify_value);
 
-        window.main_window.main_canvas.canvas.update_decorations (item);
+        //window.main_window.main_canvas.canvas.update_decorations (item);
     }
 
     private void flip_item (double sx, double sy) {
@@ -266,7 +282,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
        transform.translate (-center_x, -center_y);
        item.set_transform (transform);
 
-       window.main_window.main_canvas.canvas.update_decorations (item);
+       //window.main_window.main_canvas.canvas.update_decorations (item);
     }
 
     public void opacity_notify_value () {
@@ -313,7 +329,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         item.rotate (item_rotation, item_x + item_width / 2, item_y + item_height / 2);
         item.set_data<double?> ("rotation", total_rotation);
 
-        window.main_window.main_canvas.canvas.update_decorations (item);
+        //window.main_window.main_canvas.canvas.update_decorations (item);
     }
 
     public void height_notify_value () {

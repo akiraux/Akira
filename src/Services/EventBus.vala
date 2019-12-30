@@ -24,6 +24,10 @@ public class Akira.Services.EventBus : Object {
     public signal void close_popover (string popover);
     public signal void change_sensitivity (string type);
     public signal void insert_item (string type);
+    public signal void selected_items_bb_changed (Goo.CanvasBounds? select_bb);
+    public signal void zoom ();
+    public signal void request_zoom (string direction);
+    public signal void coordinate_change (double x, double y);
 
     public EventBus () {
         Object ();
@@ -50,6 +54,15 @@ public class Akira.Services.EventBus : Object {
             case "insert-item":
                 insert_item (param);
                 break;
+
+            case "request-zoom":
+                request_zoom (param);
+                break;
+
+            case "zoom":
+                zoom ();
+                break;
+
         }
     }
 

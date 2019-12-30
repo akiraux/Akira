@@ -199,7 +199,7 @@ public class Akira.Services.ActionManager : Object {
     }
 
     private void action_delete () {
-        window.main_window.main_canvas.canvas.delete_selected ();
+        //window.main_window.main_canvas.canvas.delete_selected ();
     }
 
     private void action_ellipse_tool () {

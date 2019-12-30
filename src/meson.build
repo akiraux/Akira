@@ -72,7 +72,7 @@ executable(
     'Lib/Managers/SelectedBoundManager.vala',
     #'Lib/Managers/AffineTransformManager.vala',
     'Lib/Managers/ItemsManager.vala',
-    #'Lib/Managers/NobManager.vala',
+    'Lib/Managers/NobManager.vala',
 
     'Lib/Selection/Nob.vala',
 
