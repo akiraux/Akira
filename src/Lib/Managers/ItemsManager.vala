@@ -103,7 +103,8 @@ public class Akira.Lib.Managers.ItemsManager : Object {
     public Goo.CanvasRect add_rect (Gdk.EventButton event) {
         var rect = new Goo.CanvasRect (
             null,
-            event.x, event.y, 200, 200,
+            event.x, event.y,
+            1, 1,
             "line-width", border_size,
             "radius-x", 0.0,
             "radius-y", 0.0,
@@ -139,7 +140,8 @@ public class Akira.Lib.Managers.ItemsManager : Object {
     public Goo.CanvasEllipse add_ellipse (Gdk.EventButton event) {
         var ellipse = new Goo.CanvasEllipse (
             null,
-            event.x, event.y, 1, 1,
+            event.x, event.y,
+            1, 1,
             "line-width", border_size,
             "stroke-color", border_color,
             "fill-color", fill_color,
@@ -196,8 +198,6 @@ public class Akira.Lib.Managers.ItemsManager : Object {
     }
 
     private void set_item_to_insert (string type) {
-        debug (@"Adding $(type) item");
-
         switch (type) {
             case "rectangle":
                 insert_type = InsertType.RECT;

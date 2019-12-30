@@ -117,25 +117,52 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         }
     }
 
+    public override bool key_press_event (Gdk.EventKey event) {
+        uint uppercase_keyval = Gdk.keyval_to_upper (event.keyval);
+
+        switch (uppercase_keyval) {
+            case Gdk.Key.Escape:
+                edit_mode = Akira.Lib.Canvas.EditMode.MODE_SELECTION;
+                return true;
+
+            case Gdk.Key.Delete:
+                selected_bound_manager.delete_selection ();
+                // delete_selected ();
+                return true;
+
+            default:
+                if (uppercase_keyval <= Gdk.Key.Z && uppercase_keyval >= Gdk.Key.A) {
+                    // Send to ItemsManager to deal with custom user shape
+                    // hotkey preferences from settings
+                    edit_mode = Akira.Lib.Canvas.EditMode.MODE_INSERT;
+                    items_manager.set_insert_type_from_key (uppercase_keyval);
+
+                    return true;
+                }
+
+                return false;
+        }
+    }
+
     public override bool button_press_event (Gdk.EventButton event) {
+        holding = true;
+
         //remove_hover_effect ();
-
-        current_scale = get_scale ();
-
         temp_event_x = event.x / current_scale;
         temp_event_y = event.y / current_scale;
 
         temp_event_converted = false;
 
-        debug ("canvas temp event x: %f", temp_event_x);
-        debug ("canvas temp event y: %f", temp_event_y);
-
         switch (edit_mode) {
             case EditMode.MODE_INSERT:
+                selected_bound_manager.reset_selection ();
+
                 var new_item = items_manager.insert_item (event);
                 selected_bound_manager.add_item_to_selection (new_item);
 
-                nob_manager.set_selected ("bottom-right");
+                selected_bound_manager.set_initial_coordinates (temp_event_x, temp_event_y);
+
+                nob_manager.set_selected (Managers.NobManager.Nob.BOTTOM_RIGHT);
                 break;
 
             case EditMode.MODE_SELECTION:
@@ -190,6 +217,46 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         */
     }
 
+    public override bool button_release_event (Gdk.EventButton event) {
+        if (!holding) {
+            return false;
+        }
+
+        holding = false;
+
+        //item_moved (selected_item);
+        //add_hover_effect (selected_item);
+
+        edit_mode = EditMode.MODE_SELECTION;
+
+        return false;
+    }
+
+    public override bool motion_notify_event (Gdk.EventMotion event) {
+        var event_x = event.x / current_scale;
+        var event_y = event.y / current_scale;
+
+        event_bus.coordinate_change (event_x, event_y);
+
+        if (!holding) {
+            // Only motion_hover_effect
+            return false;
+        }
+
+        switch (edit_mode) {
+            case EditMode.MODE_INSERT:
+                var selected_nob = nob_manager.get_selected_nob ();
+
+                selected_bound_manager.transform_bound (event_x, event_y, selected_nob);
+                break;
+
+            case EditMode.MODE_SELECTION:
+                break;
+        }
+
+        return true;
+    }
+
     public void focus_canvas () {
         edit_mode = EditMode.MODE_SELECTION;
         grab_focus (get_root_item ());
@@ -221,67 +288,8 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         }
     }
 
-    public override bool button_release_event (Gdk.EventButton event) {
-        if (!holding) {
-            return false;
-        }
-
-        holding = false;
-
-        if (delta_x == 0 && delta_y == 0) {
-            return false;
-        }
-
-        item_moved (selected_item);
-        //add_hover_effect (selected_item);
-
-        delta_x = 0;
-        delta_y = 0;
-
-        edit_mode = EditMode.MODE_SELECTION;
-        set_cursor_by_edit_mode ();
-
-        return false;
-    }
-
-    public override bool key_press_event (Gdk.EventKey event) {
-        uint uppercase_keyval = Gdk.keyval_to_upper (event.keyval);
-
-        switch (uppercase_keyval) {
-            case Gdk.Key.Escape:
-                edit_mode = Akira.Lib.Canvas.EditMode.MODE_SELECTION;
-                return true;
-
-            case Gdk.Key.Delete:
-                selected_bound_manager.delete_selection ();
-                // delete_selected ();
-                return true;
-
-            default:
-                if (uppercase_keyval <= Gdk.Key.Z && uppercase_keyval >= Gdk.Key.A) {
-                    // Send to ItemsManager to deal with custom user shape
-                    // hotkey preferences from settings
-                    edit_mode = Akira.Lib.Canvas.EditMode.MODE_INSERT;
-                    items_manager.set_insert_type_from_key (uppercase_keyval);
-
-                    return true;
-                }
-
-                return false;
-        }
-    }
-
     private void on_request_zoom (string direction) {
         event_bus.emit ("zoom");
-    }
-
-    public override bool motion_notify_event (Gdk.EventMotion event) {
-        var event_x = event.x / current_scale;
-        var event_y = event.y / current_scale;
-
-        event_bus.coordinate_change (event_x, event_y);
-
-        return true;
     }
 
     /*
@@ -349,97 +357,6 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 selected_item.translate (move_x, move_y);
                 event_x -= move_x;
                 event_y -= move_y;
-                break;
-            case Nob.TOP_LEFT:
-                update_x = event_x < x + width;
-                update_y = event_y < y + height;
-                if (MIN_SIZE > height - new_delta_y) {
-                   new_delta_y = 0;
-                }
-                if (MIN_SIZE > width - new_delta_x) {
-                   new_delta_x = 0;
-                }
-                selected_item.translate (new_delta_x, new_delta_y);
-                event_x -= new_delta_x;
-                event_y -= new_delta_y;
-                new_width = fix_size (width - new_delta_x);
-                new_height = fix_size (height - new_delta_y);
-                break;
-            case Nob.TOP_CENTER:
-                update_y = event_y < y + height;
-                if (MIN_SIZE > height - new_delta_y) {
-                   new_delta_y = 0;
-                }
-                new_height = fix_size (height - new_delta_y);
-                selected_item.translate (0, new_delta_y);
-                event_y -= new_delta_y;
-                break;
-            case Nob.TOP_RIGHT:
-                update_x = event_x > x;
-                if (!update_x) {
-                    new_delta_x = 0;
-                }
-                update_y = event_y < y + height;
-                new_width = fix_size (width + new_delta_x);
-                if (!update_y) {
-                    new_delta_y = 0;
-                }
-                if (new_delta_y < height) {
-                    selected_item.translate (0, new_delta_y);
-                    //  debug ("translate: %f,%f", 0, new_delta_y);
-                    event_y -= new_delta_y;
-                    new_height = fix_size (height - new_delta_y);
-                }
-                break;
-            case Nob.RIGHT_CENTER:
-                update_x = event_x > x;
-                if (!update_x) {
-                    new_delta_x = 0;
-                }
-                new_width = fix_size (width + new_delta_x);
-                break;
-            case Nob.BOTTOM_RIGHT:
-                update_x = event_x > x;
-                update_y = event_y > y;
-                new_width = fix_size (width + new_delta_x);
-                new_height = fix_size (height + new_delta_y);
-                break;
-            case Nob.BOTTOM_CENTER:
-                update_y = event_y > y;
-                if (!update_y) {
-                    new_delta_y = 0;
-                }
-                new_height = fix_size (height + new_delta_y);
-                break;
-            case Nob.BOTTOM_LEFT:
-                if (new_delta_x > width) {
-                   new_delta_x = 0;
-                }
-                update_y = event_y > y;
-                update_x = event_x < x + width;
-                if (!update_x) {
-                    new_delta_x = 0;
-                }
-                if (new_delta_y == 0) {
-                    if (delta_y > 0 && update_y) {
-                        new_delta_y = delta_y;
-                    } else {
-                        break;
-                    }
-                }
-                //  debug ("translate: %f,%f", new_delta_x, 0);
-                selected_item.translate (new_delta_x, 0);
-                event_x -= new_delta_x;
-                new_width = fix_size (width - new_delta_x);
-                new_height = fix_size (height + new_delta_y);
-                break;
-            case Nob.LEFT_CENTER:
-                update_x = event_x < x + width;
-                if (new_delta_x < width) {
-                    selected_item.translate (new_delta_x, 0);
-                    event_x -= new_delta_x;
-                    new_width = fix_size (width - new_delta_x);
-                }
                 break;
             case Nob.ROTATE:
                 var center_x = x + width / 2;
@@ -565,41 +482,6 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     private void set_cursor (Gdk.CursorType cursor_type) {
         var cursor = new Gdk.Cursor.for_display (Gdk.Display.get_default (), cursor_type);
         get_window ().set_cursor (cursor);
-    }
-
-    private double fix_y_position (double y, double height, double delta_y) {
-        var min_delta = Math.round ((MIN_POS - height) * current_scale);
-        //  debug ("min delta y %f", min_delta);
-        var max_delta = Math.round ((bounds_h - MIN_POS) * current_scale);
-        //  debug ("max delta y %f", max_delta);
-        var new_y = Math.round (y + delta_y);
-        if (new_y < min_delta) {
-            return 0;
-        } else if (new_y > max_delta) {
-            return 0;
-        } else {
-            return delta_y;
-        }
-    }
-
-    private double fix_x_position (double x, double width, double delta_x) {
-        var min_delta = Math.round ((MIN_POS - width) * current_scale);
-        //  debug ("min delta x %f", min_delta);
-        var max_delta = Math.round ((bounds_h - MIN_POS) * current_scale);
-        //  debug ("max delta x %f", max_delta);
-        var new_x = Math.round (x + delta_x);
-        if (new_x < min_delta) {
-            return 0;
-        } else if (new_x > max_delta) {
-            return 0;
-        } else {
-            return delta_x;
-        }
-    }
-
-    private double fix_size (double size) {
-        var new_size = Math.round (size);
-        return new_size > MIN_SIZE ? new_size : MIN_SIZE;
     }
 
     /*

@@ -28,7 +28,7 @@ public class Akira.Lib.Managers.NobManager : Object {
 
         // -1 if no nub is grabbed
     */
-    enum Nob {
+    public enum Nob {
         NONE=-1,
         TOP_LEFT,
         TOP_CENTER,
@@ -46,6 +46,7 @@ public class Akira.Lib.Managers.NobManager : Object {
     private Goo.CanvasItem root;
     private Goo.CanvasItem select_effect;
     private Goo.CanvasItemSimple[] nobs = new Goo.CanvasItemSimple[9];
+    private Nob selected_nob;
     private double top;
     private double left;
     private double width;
@@ -69,8 +70,12 @@ public class Akira.Lib.Managers.NobManager : Object {
         event_bus.zoom.connect (on_zoom);
     }
 
-    public void set_selected (string nob_position) {
-        debug (@"Select nob: $(nob_position)");
+    public void set_selected (Nob selected_nob) {
+        this.selected_nob = selected_nob;
+    }
+
+    public Nob get_selected_nob () {
+        return selected_nob;
     }
 
     private void on_zoom () {
@@ -93,7 +98,6 @@ public class Akira.Lib.Managers.NobManager : Object {
 
         update_select_bb_coords (select_bb);
 
-
         /*
         var fills_list_model = window.main_window.left_sidebar.fill_box_panel.fills_list_model;
         if (fills_list_model != null) {
@@ -102,18 +106,11 @@ public class Akira.Lib.Managers.NobManager : Object {
         */
 
         var line_width = 1.0 / current_scale;
-        var stroke = 0;
-        var real_x = left - stroke;
-        var real_y = top - stroke;
-
-        debug (@"RealX: $(real_x) RealY: $(real_y)");
-
-        debug (@"NobManager::line-width: $(line_width)");
 
         if (select_effect == null) {
             select_effect = new Goo.CanvasRect (
                 null,
-                real_x, real_y,
+                left, top,
                 0, 0,
                 "line-width", line_width,
                 "stroke-color", "#666",
@@ -286,20 +283,11 @@ public class Akira.Lib.Managers.NobManager : Object {
     }
 
     private void update_select_effect (Goo.CanvasBounds select_bb) {
-        double x = select_bb.x1;
-        double y = select_bb.y1;
-        double width = select_bb.x2 - select_bb.x1;
-        double height = select_bb.y2 - select_bb.y1;
-
-        var stroke = 0;
-        var real_width = width + stroke * 2;
-        var real_height = height + stroke * 2;
-
         select_effect.set (
-            "x", x ,
-            "y", y,
-            "width", real_width,
-            "height", real_height
+            "x", left,
+            "y", top,
+            "width", width,
+            "height", height
         );
 
         /*
