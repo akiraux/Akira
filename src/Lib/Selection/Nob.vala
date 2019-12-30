@@ -19,6 +19,14 @@
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
 public class Akira.Lib.Selection.Nob : Goo.CanvasRect {
+    /*
+    * Grabber Pos:   8
+    *              0 1 2
+    *              7   3
+    *              6 5 4
+    *
+    * -1 if no nob is grabbed.
+    */
     enum Type {
         NONE=-1,
         TOP_LEFT,
