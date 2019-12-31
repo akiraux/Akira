@@ -26,7 +26,7 @@ public enum Akira.Lib.Models.CanvasItemType {
 }
 
 public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItem {
-    public static int globalId = 0;
+    public static int global_id = 0;
 
     public abstract string id { get; public set; }
     public abstract bool selected { get; public set; }
@@ -43,7 +43,7 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItem {
         string[] type_slug_tokens = item.item_type.to_string ().split ("_");
         string type_slug = type_slug_tokens[type_slug_tokens.length - 1];
 
-        return "%s%d".printf (type_slug, globalId++);
+        return "%s%d".printf (type_slug, global_id++);
     }
 
     public static void init_item (Goo.CanvasItem item) {

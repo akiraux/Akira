@@ -60,7 +60,7 @@ public class Akira.Lib.Managers.HoverManager : Object {
 
             double x = item_bounds.x1;
             double y = item_bounds.y1;
-            double width = item_bounds.x2- item_bounds.x1;
+            double width = item_bounds.x2 - item_bounds.x1;
             double height = item_bounds.y2 - item_bounds.y1;
 
             //debug (@"x: $(x) y: $(y) width: $(width) height: $(height)");

@@ -34,7 +34,7 @@ public class Akira.Lib.Models.CanvasRect : Goo.CanvasRect, Models.CanvasItem {
         string _border_color = "#aaa",
         string _fill_color = "#ccc",
         Goo.CanvasItem? parent = null
-        )  {
+    ) {
         Object (
             parent: parent
             );

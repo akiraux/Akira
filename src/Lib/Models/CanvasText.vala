@@ -31,11 +31,11 @@ public class Akira.Lib.Models.CanvasText : Goo.CanvasText, Models.CanvasItem {
         double _y = 0,
         double _width = 0,
         double _height = 0,
-        Goo.CanvasAnchorType _anchor  = Goo.CanvasAnchorType.NW,
+        Goo.CanvasAnchorType _anchor = Goo.CanvasAnchorType.NW,
         string _font = "Open Sans 16",
         Goo.CanvasItem? parent = null
-    )  {
-        Object(
+    ) {
+        Object (
             parent: parent,
             x: _x,
             y: _y,

@@ -34,8 +34,8 @@ public class Akira.Lib.Models.CanvasEllipse : Goo.CanvasEllipse, Models.CanvasIt
         string _border_color = "#aaa",
         string _fill_color = "#ccc",
         Goo.CanvasItem? parent = null
-    )  {
-        Object(
+    ) {
+        Object (
             parent: parent
         );
 

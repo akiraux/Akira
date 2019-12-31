@@ -208,19 +208,6 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
 
         attach (group_title (_("Opacity")), 0, 9, 3);
         attach (opacity_grid, 0, 10, 3);
-
-
-        coord_label = new Gtk.Label (@"$(coord_x), $(coord_y)");
-
-        attach (group_title (_("Coordinates")), 0, 11, 3);
-        attach (coord_label, 0, 12, 3);
-
-        event_bus.coordinate_change.connect((x, y) => {
-            coord_x = x;
-            coord_y = y;
-
-            coord_label.label =  "(X: %.2f Y: %.2f)".printf(coord_x, coord_y);
-        });
     }
 
     private void item_changed (Object object, ParamSpec spec) {

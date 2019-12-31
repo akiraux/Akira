@@ -23,8 +23,8 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
 
     private const int MIN_SIZE = 1;
     private const int MIN_POS = 10;
-    private const int bounds_h = 10000;
-    private const int bounds_w = 10000;
+    private const int BOUNDS_H = 10000;
+    private const int BOUNDS_W = 10000;
 
     public weak Goo.Canvas canvas { get; construct; }
     public unowned List<Models.CanvasItem> selected_items {
@@ -193,7 +193,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         selected_items = new List<Models.CanvasItem> ();
     }
 
-    private void update_bounding_box  () {
+    private void update_bounding_box () {
         if (selected_items.length () == 0) {
             event_bus.selected_items_bb_changed (null);
             return;
@@ -206,10 +206,10 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
             Goo.CanvasBounds item_bounds;
             item.get_bounds (out item_bounds);
 
-            bb_left = double.min(bb_left, item_bounds.x1);
-            bb_top = double.min(bb_top, item_bounds.y1);
-            bb_right = double.max(bb_right, item_bounds.x2);
-            bb_bottom = double.max(bb_bottom, item_bounds.y2);
+            bb_left = double.min (bb_left, item_bounds.x1);
+            bb_top = double.min (bb_top, item_bounds.y1);
+            bb_right = double.max (bb_right, item_bounds.x2);
+            bb_bottom = double.max (bb_bottom, item_bounds.y2);
         }
 
         select_bb = Goo.CanvasBounds () {
@@ -224,7 +224,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
 
     private double fix_x_position (double x, double width, double delta_x) {
         var min_delta = Math.round (MIN_POS - width);
-        var max_delta = Math.round (bounds_h - MIN_POS);
+        var max_delta = Math.round (BOUNDS_H - MIN_POS);
 
         var new_x = Math.round (x + delta_x);
 
@@ -239,7 +239,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
 
     private double fix_y_position (double y, double height, double delta_y) {
         var min_delta = Math.round (MIN_POS - height);
-        var max_delta = Math.round (bounds_h - MIN_POS);
+        var max_delta = Math.round (BOUNDS_H - MIN_POS);
 
         var new_y = Math.round (y + delta_y);
 
