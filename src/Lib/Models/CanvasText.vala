@@ -20,7 +20,9 @@
 */
 
 public class Akira.Lib.Models.CanvasText : Goo.CanvasText, Models.CanvasItem {
+
     public string id { get; set; }
+    public bool selected { get; set; }
     public Models.CanvasItemType item_type { get; set; }
 
     public CanvasText (
@@ -34,7 +36,11 @@ public class Akira.Lib.Models.CanvasText : Goo.CanvasText, Models.CanvasItem {
         Goo.CanvasItem? parent = null
     )  {
         Object(
-            parent: parent
+            parent: parent,
+            x: _x,
+            y: _y,
+            width: _width,
+            height: _height
         );
 
         item_type = Models.CanvasItemType.TEXT;

@@ -70,6 +70,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     private Managers.SelectedBoundManager selected_bound_manager;
     private Managers.ItemsManager items_manager;
     private Managers.NobManager nob_manager;
+    private Managers.HoverManager hover_manager;
 
     private Goo.CanvasRect? hover_effect;
 
@@ -103,6 +104,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         selected_bound_manager = new Managers.SelectedBoundManager (this);
         items_manager = new Managers.ItemsManager (this);
         nob_manager = new Managers.NobManager (this);
+        hover_manager = new Managers.HoverManager (this);
 
         event_bus.request_zoom.connect (on_request_zoom);
 
@@ -147,11 +149,12 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     public override bool button_press_event (Gdk.EventButton event) {
         holding = true;
 
-        //remove_hover_effect ();
         temp_event_x = event.x / current_scale;
         temp_event_y = event.y / current_scale;
 
         temp_event_converted = false;
+
+        hover_manager.remove_hover_effect ();
 
         switch (edit_mode) {
             case EditMode.MODE_INSERT:
@@ -260,9 +263,9 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
         if (!holding) {
             // Only motion_hover_effect
+            hover_manager.add_hover_effect (event_x, event_y);
             return false;
         }
-
 
         switch (edit_mode) {
             case EditMode.MODE_INSERT:
@@ -452,38 +455,6 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         add_select_effect (selected_item);
     }
 
-    private void add_hover_effect (Goo.CanvasItem? target) {
-        if (target == null || hover_effect != null || target == selected_item || target == select_effect
-            || edit_mode == EditMode.MODE_INSERT) {
-            return;
-        }
-
-        if ((target as Goo.CanvasItemSimple) in nobs) {
-            set_cursor_for_nob (get_grabbed_id (target));
-            return;
-        }
-
-        double x, y, width, height;
-        target.get ("x", out x, "y", out y, "width", out width, "height", out height);
-
-        var item = (target as Goo.CanvasItemSimple);
-
-        var line_width = 2.0 / get_scale ();
-        var stroke = item.line_width;
-        var real_x = x - stroke;
-        var real_y = y - stroke;
-        var real_width = width + stroke * 2;
-        var real_height = height + stroke * 2;
-
-        hover_effect = new Goo.CanvasRect (null, real_x, real_y, real_width, real_height,
-                                           "line-width", line_width, "stroke-color", "#41c9fd", null);
-        var transform = Cairo.Matrix.identity ();
-        item.get_transform (out transform);
-        hover_effect.set_transform (transform);
-
-        hover_effect.set ("parent", get_root_item ());
-        hover_effect.can_focus = false;
-    }
 
     private void remove_hover_effect () {
         set_cursor_by_edit_mode ();

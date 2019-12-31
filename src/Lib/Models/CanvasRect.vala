@@ -20,7 +20,9 @@
 */
 
 public class Akira.Lib.Models.CanvasRect : Goo.CanvasRect, Models.CanvasItem {
+
     public string id { get; set; }
+    public bool selected { get; set; }
     public Models.CanvasItemType item_type { get; set; }
 
     public CanvasRect (
@@ -32,10 +34,10 @@ public class Akira.Lib.Models.CanvasRect : Goo.CanvasRect, Models.CanvasItem {
         string _border_color = "#aaa",
         string _fill_color = "#ccc",
         Goo.CanvasItem? parent = null
-    )  {
-        Object(
+        )  {
+        Object (
             parent: parent
-        );
+            );
 
         item_type = Models.CanvasItemType.RECT;
 

@@ -20,7 +20,9 @@
 */
 
 public class Akira.Lib.Models.CanvasEllipse : Goo.CanvasEllipse, Models.CanvasItem {
+
     public string id { get; set; }
+    public bool selected { get; set; }
     public Models.CanvasItemType item_type { get; set; }
 
     public CanvasEllipse (

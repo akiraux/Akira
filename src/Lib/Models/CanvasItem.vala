@@ -28,8 +28,16 @@ public enum Akira.Lib.Models.CanvasItemType {
 public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItem {
     public static int globalId = 0;
 
-    public abstract string id { get; protected set; }
+    public abstract string id { get; public set; }
+    public abstract bool selected { get; public set; }
     public abstract Models.CanvasItemType item_type { get; protected set; }
+
+    public virtual double get_coords (string coord_id) {
+        double _coord = 0.0;
+        get (coord_id, out _coord);
+
+        return _coord;
+    }
 
     public static string create_item_id (Models.CanvasItem item) {
         string[] type_slug_tokens = item.item_type.to_string ().split ("_");

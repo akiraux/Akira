@@ -176,6 +176,8 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
     }
 
     public void add_item_to_selection (Models.CanvasItem item) {
+        item.selected = true;
+
         selected_items.append (item);
     }
 
@@ -184,6 +186,10 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
     }
 
     public void reset_selection () {
+        foreach (var item in selected_items) {
+            item.selected = false;
+        }
+
         selected_items = new List<Models.CanvasItem> ();
     }
 
