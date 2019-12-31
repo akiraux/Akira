@@ -45,6 +45,7 @@ public class Akira.Lib.Managers.HoverManager : Object {
 
     public void add_hover_effect (double event_x, double event_y) {
         remove_hover_effect ();
+        set_cursor_for_nob (Managers.NobManager.Nob.NONE);
 
         var target = canvas.get_item_at (event_x, event_y, true);
 
@@ -84,6 +85,11 @@ public class Akira.Lib.Managers.HoverManager : Object {
             }
         }
 
+        if (target is Selection.Nob) {
+            var target_nob = target as Selection.Nob;
+            set_cursor_for_nob (target_nob.handle_id);
+        }
+
         return;
     }
 
@@ -92,5 +98,44 @@ public class Akira.Lib.Managers.HoverManager : Object {
             hover_effect.remove ();
             hover_effect = null;
         }
+    }
+
+    private void set_cursor_for_nob (int grabbed_id) {
+        Gdk.CursorType? selected_cursor = null;
+
+        switch (grabbed_id) {
+            case Managers.NobManager.Nob.NONE:
+                selected_cursor =  null;
+                break;
+            case Managers.NobManager.Nob.TOP_LEFT:
+                selected_cursor = Gdk.CursorType.TOP_LEFT_CORNER;
+                break;
+            case Managers.NobManager.Nob.TOP_CENTER:
+                selected_cursor = Gdk.CursorType.TOP_SIDE;
+                break;
+            case Managers.NobManager.Nob.TOP_RIGHT:
+                selected_cursor = Gdk.CursorType.TOP_RIGHT_CORNER;
+                break;
+            case Managers.NobManager.Nob.RIGHT_CENTER:
+                selected_cursor = Gdk.CursorType.RIGHT_SIDE;
+                break;
+            case Managers.NobManager.Nob.BOTTOM_RIGHT:
+                selected_cursor = Gdk.CursorType.BOTTOM_RIGHT_CORNER;
+                break;
+            case Managers.NobManager.Nob.BOTTOM_CENTER:
+                selected_cursor = Gdk.CursorType.BOTTOM_SIDE;
+                break;
+            case Managers.NobManager.Nob.BOTTOM_LEFT:
+                selected_cursor = Gdk.CursorType.BOTTOM_LEFT_CORNER;
+                break;
+            case Managers.NobManager.Nob.LEFT_CENTER:
+                selected_cursor = Gdk.CursorType.LEFT_SIDE;
+                break;
+            case Managers.NobManager.Nob.ROTATE:
+                selected_cursor = Gdk.CursorType.ICON;
+                break;
+        }
+
+        event_bus.request_change_cursor (selected_cursor);
     }
 }

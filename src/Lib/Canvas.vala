@@ -107,6 +107,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         hover_manager = new Managers.HoverManager (this);
 
         event_bus.request_zoom.connect (on_request_zoom);
+        event_bus.request_change_cursor.connect (on_request_change_cursor);
 
         get_bounds (out bounds_x, out bounds_y, out bounds_w, out bounds_h);
     }
@@ -311,6 +312,14 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
     private void on_request_zoom (string direction) {
         event_bus.emit ("zoom");
+    }
+
+    private void on_request_change_cursor (Gdk.CursorType? cursor_type) {
+        if (cursor_type == null) {
+            set_cursor_by_edit_mode ();
+        } else {
+            set_cursor (cursor_type);
+        }
     }
 
     /*

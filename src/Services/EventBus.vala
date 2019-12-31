@@ -28,6 +28,7 @@ public class Akira.Services.EventBus : Object {
     public signal void zoom ();
     public signal void request_zoom (string direction);
     public signal void coordinate_change (double x, double y);
+    public signal void request_change_cursor (Gdk.CursorType? cursor_type);
 
     public EventBus () {
         Object ();

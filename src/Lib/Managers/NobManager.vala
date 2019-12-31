@@ -136,18 +136,14 @@ public class Akira.Lib.Managers.NobManager : Object {
 
         for (int i = 0; i < 9; i++) {
             var radius = i == 8 ? nob_size : 0;
-            nobs[i] = new Goo.CanvasRect (
-                null,
-                0, 0, nob_size, nob_size,
-                "line-width", line_width,
-                "radius-x", radius,
-                "radius-y", radius,
-                "stroke-color", "#41c9fd",
-                "fill-color", "#fff",
-                null
-            );
 
-            nobs[i].set ("parent", root);
+            nobs[i] = new Selection.Nob (
+                root,
+                (Managers.NobManager.Nob) i,
+                nob_size,
+                radius,
+                current_scale
+            );
         }
 
         update_nob_position (select_bb);
@@ -307,6 +303,7 @@ public class Akira.Lib.Managers.NobManager : Object {
         */
     }
 
+
     /*
     public void update_decorations (Goo.CanvasItem item) {
         update_nob_position (item);
@@ -318,40 +315,6 @@ public class Akira.Lib.Managers.NobManager : Object {
         update_decorations ((Goo.CanvasItem) object);
     }
 
-    private void set_cursor_for_nob (int grabbed_id) {
-        switch (grabbed_id) {
-            case Nob.NONE:
-                set_cursor_by_edit_mode ();
-                break;
-            case Nob.TOP_LEFT:
-                set_cursor (Gdk.CursorType.TOP_LEFT_CORNER);
-                break;
-            case Nob.TOP_CENTER:
-                set_cursor (Gdk.CursorType.TOP_SIDE);
-                break;
-            case Nob.TOP_RIGHT:
-                set_cursor (Gdk.CursorType.TOP_RIGHT_CORNER);
-                break;
-            case Nob.RIGHT_CENTER:
-                set_cursor (Gdk.CursorType.RIGHT_SIDE);
-                break;
-            case Nob.BOTTOM_RIGHT:
-                set_cursor (Gdk.CursorType.BOTTOM_RIGHT_CORNER);
-                break;
-            case Nob.BOTTOM_CENTER:
-                set_cursor (Gdk.CursorType.BOTTOM_SIDE);
-                break;
-            case Nob.BOTTOM_LEFT:
-                set_cursor (Gdk.CursorType.BOTTOM_LEFT_CORNER);
-                break;
-            case Nob.LEFT_CENTER:
-                set_cursor (Gdk.CursorType.LEFT_SIDE);
-                break;
-            case Nob.ROTATE:
-                set_cursor (Gdk.CursorType.ICON);
-                break;
-        }
-    }
 
 
     */
