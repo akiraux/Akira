@@ -59,8 +59,15 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         initial_event_x = event_x;
         initial_event_y = event_y;
 
-        initial_width = select_bb.x2 - select_bb.x1;
-        initial_height = select_bb.y2 - select_bb.y1;
+        if (selected_items.length () == 1) {
+            var selected_item = selected_items.nth_data (0);
+            initial_width = selected_item.get_coords ("width");
+            initial_height = selected_item.get_coords ("height");
+        } else {
+            initial_width = select_bb.x2 - select_bb.x1;
+            initial_height = select_bb.y2 - select_bb.y1;
+        }
+
     }
 
     public void transform_bound (double event_x, double event_y, Managers.NobManager.Nob selected_nob) {
@@ -82,85 +89,118 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
     }
 
     private void scale (double x, double y, Managers.NobManager.Nob selected_nob) {
+        Models.CanvasItem selected_item;
+        selected_item = selected_items.nth_data (0);
+
         double delta_x = x - initial_event_x;
         double delta_y = y - initial_event_y;
 
-        double new_width = initial_width;
-        double new_height = initial_height;
+        double item_width = selected_item.get_coords ("width");
+        double item_height = selected_item.get_coords ("height");
 
-        Goo.CanvasItem selected_item;
+        double item_x = selected_item.get_coords ("x");
+        double item_y = selected_item.get_coords ("y");
 
-        selected_item = selected_items.nth_data (0);
+        double new_width = item_width;
+        double new_height = item_height;
+
+        double origin_move_delta_x = 0.0;
+        double origin_move_delta_y = 0.0;
 
         switch (selected_nob) {
             case Managers.NobManager.Nob.TOP_LEFT:
-                if (MIN_SIZE > initial_height - delta_y) {
-                    delta_y = 0;
+                new_height = initial_height - delta_y;
+                new_width = initial_width - delta_x;
+
+                if (item_height > MIN_SIZE) {
+                    origin_move_delta_y = item_height - new_height;
                 }
 
-                if (MIN_SIZE > initial_width - delta_x) {
-                    delta_x = 0;
+                if (item_width > MIN_SIZE) {
+                    origin_move_delta_x = item_width - new_width;
                 }
-
-                selected_item.translate (delta_x, delta_y);
-
-                new_width = fix_size (initial_width - delta_x);
-                new_height = fix_size (initial_height - delta_y);
                 break;
 
             case Managers.NobManager.Nob.TOP_CENTER:
-                if (MIN_SIZE > initial_height - delta_y) {
-                    delta_y = 0;
+                new_height = initial_height - delta_y;
+
+                if (item_height > MIN_SIZE) {
+                    origin_move_delta_y = item_height - new_height;
                 }
-
-                new_height = fix_size (initial_height - delta_y);
-
-                selected_item.translate (0, delta_y);
                 break;
 
             case Managers.NobManager.Nob.TOP_RIGHT:
-                new_width = fix_size (initial_width + delta_x);
-                new_height = fix_size (initial_height + delta_y);
+                new_width = initial_width + delta_x;
+                new_height = initial_height - delta_y;
 
-                /*
-                if (delta_y < initial_height) {
-                    selected_item.translate (0, delta_y);
-
-                    new_height = fix_size (initial_height - delta_y);
+                if (item_height > MIN_SIZE) {
+                    origin_move_delta_y = item_height - new_height;
                 }
-                */
 
+                if (item_width > MIN_SIZE) {
+                    origin_move_delta_x = item_width - new_width;
+                }
                 break;
 
             case Managers.NobManager.Nob.RIGHT_CENTER:
-                new_width = fix_size (initial_width + delta_x);
+                new_width = initial_width + delta_x;
                 break;
 
             case Managers.NobManager.Nob.BOTTOM_RIGHT:
-                new_width = fix_size (initial_width + delta_x);
-                new_height = fix_size (initial_height + delta_y);
+                new_width = initial_width + delta_x;
+                new_height = initial_height + delta_y;
                 break;
 
             case Managers.NobManager.Nob.BOTTOM_CENTER:
-                new_height = fix_size (initial_height + delta_y);
+                new_height = initial_height + delta_y;
                 break;
 
             case Managers.NobManager.Nob.BOTTOM_LEFT:
-                selected_item.translate (delta_x, 0);
+                new_height = initial_height + delta_y;
+                new_width = initial_width - delta_x;
 
-                new_width = fix_size (initial_width - delta_x);
-                new_height = fix_size (initial_height + delta_y);
+                if (item_width > MIN_SIZE) {
+                    origin_move_delta_x = item_width - new_width;
+                }
                 break;
 
             case Managers.NobManager.Nob.LEFT_CENTER:
-                if (delta_x < initial_width) {
-                    selected_item.translate (delta_x, 0);
-                    new_width = fix_size (initial_width - delta_x);
+                new_width = initial_width - delta_x;
+
+                if (item_width > MIN_SIZE) {
+                    origin_move_delta_x = item_width - new_width;
                 }
                 break;
         }
 
+        origin_move_delta_x = Math.round (origin_move_delta_x);
+        origin_move_delta_y = Math.round (origin_move_delta_y);
+
+        new_width = fix_size (new_width);
+        new_height = fix_size (new_height);
+
+        if (new_width == MIN_SIZE) {
+            origin_move_delta_x = 0.0;
+        }
+
+        if (new_height == MIN_SIZE) {
+            origin_move_delta_y = 0.0;
+        }
+
+        debug (@"New width: $(new_width)");
+        debug (@"New height: $(new_height)");
+        debug (@"Delta x: $(origin_move_delta_x)");
+        debug (@"Delta y: $(origin_move_delta_y)");
+
+        selected_item.translate (origin_move_delta_x, origin_move_delta_y);
         selected_item.set ("width", new_width, "height", new_height);
+
+        if (
+            (new_width == MIN_SIZE || new_height == MIN_SIZE) &&
+            (origin_move_delta_y > 0.0 || origin_move_delta_x > 0.0)
+        ) {
+        }
+
     }
 
     private void move (double x, double y) {

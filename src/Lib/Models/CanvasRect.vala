@@ -37,7 +37,7 @@ public class Akira.Lib.Models.CanvasRect : Goo.CanvasRect, Models.CanvasItem {
     ) {
         Object (
             parent: parent
-            );
+        );
 
         item_type = Models.CanvasItemType.RECT;
 

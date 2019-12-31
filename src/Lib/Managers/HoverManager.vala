@@ -105,7 +105,7 @@ public class Akira.Lib.Managers.HoverManager : Object {
 
         switch (grabbed_id) {
             case Managers.NobManager.Nob.NONE:
-                selected_cursor =  null;
+                selected_cursor = null;
                 break;
             case Managers.NobManager.Nob.TOP_LEFT:
                 selected_cursor = Gdk.CursorType.TOP_LEFT_CORNER;
