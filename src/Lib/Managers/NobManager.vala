@@ -70,12 +70,22 @@ public class Akira.Lib.Managers.NobManager : Object {
         event_bus.zoom.connect (on_zoom);
     }
 
-    public void set_selected (Nob selected_nob) {
+    public void set_selected_by_name (Nob selected_nob) {
         this.selected_nob = selected_nob;
     }
 
     public Nob get_selected_nob () {
         return selected_nob;
+    }
+
+    public Nob get_grabbed_id (Goo.CanvasItem? target) {
+        int grabbed_id = -1;
+
+        for (int i = 0; i < 9; i++) {
+            if (target == nobs[i]) grabbed_id = i;
+        }
+
+        return (Nob) grabbed_id;
     }
 
     private void on_zoom () {
@@ -343,13 +353,6 @@ public class Akira.Lib.Managers.NobManager : Object {
         }
     }
 
-    private int get_grabbed_id (Goo.CanvasItem? target) {
-        for (int i = 0; i < 9; i++) {
-            if (target == nobs[i]) return i;
-        }
-
-        return Nob.NONE;
-    }
 
     */
 }

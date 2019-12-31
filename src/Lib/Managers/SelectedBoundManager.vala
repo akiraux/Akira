@@ -85,8 +85,8 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         double delta_x = x - initial_event_x;
         double delta_y = y - initial_event_y;
 
-        double new_width = 0;
-        double new_height = 0;
+        double new_width = initial_width;
+        double new_height = initial_height;
 
         Goo.CanvasItem selected_item;
 
@@ -120,12 +120,16 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
 
             case Managers.NobManager.Nob.TOP_RIGHT:
                 new_width = fix_size (initial_width + delta_x);
+                new_height = fix_size (initial_height + delta_y);
 
+                /*
                 if (delta_y < initial_height) {
                     selected_item.translate (0, delta_y);
 
                     new_height = fix_size (initial_height - delta_y);
                 }
+                */
+
                 break;
 
             case Managers.NobManager.Nob.RIGHT_CENTER:
@@ -162,12 +166,12 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
     private void move (double x, double y) {
         //double move_x = fix_x_position (canvas_x, initial_width, delta_x);
         //double move_y = fix_y_position (canvas_y, initial_height, delta_y);
+        Goo.CanvasItem selected_item = selected_items.nth_data (0);
 
         double delta_x = x - initial_event_x;
         double delta_y = y - initial_event_y;
 
         selected_item.translate (delta_x, delta_y);
-        break;
     }
 
     public void add_item_to_selection (Goo.CanvasItem item) {

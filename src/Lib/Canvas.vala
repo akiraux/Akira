@@ -162,12 +162,30 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
                 selected_bound_manager.set_initial_coordinates (temp_event_x, temp_event_y);
 
-                nob_manager.set_selected (Managers.NobManager.Nob.BOTTOM_RIGHT);
+                nob_manager.set_selected_by_name (Managers.NobManager.Nob.BOTTOM_RIGHT);
                 break;
 
             case EditMode.MODE_SELECTION:
-                //var clicked_item = selected_bound_manager.get_item_at (temp_event_x, temp_event_y);
-                selected_bound_manager.reset_selection ();
+                var clicked_item = get_item_at (temp_event_x, temp_event_y, true);
+
+                if (clicked_item == null) {
+                    selected_bound_manager.reset_selection ();
+                    return true;
+                }
+
+                var clicked_nob_name = nob_manager.get_grabbed_id (clicked_item);
+
+                selected_bound_manager.set_initial_coordinates (temp_event_x, temp_event_y);
+
+                if (clicked_nob_name == Managers.NobManager.Nob.NONE) {
+                    selected_bound_manager.reset_selection ();
+
+                    // Item has been selected
+                    selected_bound_manager.add_item_to_selection (clicked_item);
+                } else {
+                    nob_manager.set_selected_by_name (clicked_nob_name);
+                }
+
                 break;
         }
 
@@ -245,12 +263,10 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
         switch (edit_mode) {
             case EditMode.MODE_INSERT:
+            case EditMode.MODE_SELECTION:
                 var selected_nob = nob_manager.get_selected_nob ();
 
                 selected_bound_manager.transform_bound (event_x, event_y, selected_nob);
-                break;
-
-            case EditMode.MODE_SELECTION:
                 break;
         }
 
