@@ -18,6 +18,7 @@
 *
 * Authored by: Felipe Escoto <felescoto95@hotmail.com>
 * Authored by: Alberto Fanjul <albertofanjul@gmail.com>
+* Authored by: Giacomo "giacomoalbe" Alberini <giacomoalbe@gmail.com>
 */
 
 public class Akira.Lib.Canvas : Goo.Canvas {
@@ -30,6 +31,8 @@ public class Akira.Lib.Canvas : Goo.Canvas {
      * Signal triggered when item was clicked by the user
      */
     public signal void item_clicked (Goo.CanvasItem? item);
+    public signal void canvas_moved (double delta_x, double delta_y);
+    public signal void canvas_scroll_set_origin (double origin_x, double origin_y);
 
     /**
      * Signal triggered when item has finished moving by the user,
@@ -61,6 +64,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     }
     public InsertType? insert_type { get; set; }
 
+
     /*
         Grabber Pos:   8
                      0 1 2
@@ -84,7 +88,8 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
     public enum EditMode {
         MODE_SELECTION,
-        MODE_INSERT
+        MODE_INSERT,
+        MODE_PAN,
     }
 
     public enum InsertType {
@@ -127,17 +132,37 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         events |= Gdk.EventMask.BUTTON_RELEASE_MASK;
         events |= Gdk.EventMask.POINTER_MOTION_MASK;
         events |= Gdk.EventMask.SCROLL_MASK;
+        events |= Gdk.EventMask.SMOOTH_SCROLL_MASK;
         events |= Gdk.EventMask.TOUCHPAD_GESTURE_MASK;
         events |= Gdk.EventMask.TOUCH_MASK;
-        get_bounds (out bounds_x, out bounds_y, out bounds_w, out bounds_h);
     }
 
     public void set_cursor_by_edit_mode () {
-        if (_edit_mode == EditMode.MODE_SELECTION) {
-            set_cursor (Gdk.CursorType.ARROW);
-        } else {
-            set_cursor (Gdk.CursorType.CROSSHAIR);
+        switch (_edit_mode) {
+            case EditMode.MODE_SELECTION:
+                set_cursor ("default");
+                break;
+
+            case EditMode.MODE_INSERT:
+                set_cursor ("crosshair");
+                break;
+
+            case EditMode.MODE_PAN:
+                if (holding) {
+                    set_cursor ("grabbing");
+                } else {
+                    set_cursor ("grab");
+                }
+                break;
+
+            default:
+                set_cursor ("default");
+                break;
         }
+    }
+
+    public void update_bounds () {
+        get_bounds (out bounds_x, out bounds_y, out bounds_w, out bounds_h);
     }
 
     public override bool button_press_event (Gdk.EventButton event) {
@@ -150,6 +175,25 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
         //  debug ("canvas temp event x: %f", temp_event_x);
         //  debug ("canvas temp event y: %f", temp_event_y);
+
+        if (event.button == 2) {
+            // Middle mouse clicked
+            holding = true;
+            edit_mode = EditMode.MODE_PAN;
+        }
+
+        if (edit_mode == EditMode.MODE_PAN) {
+            double tmp_event_x_normalized = temp_event_x;
+            double tmp_event_y_normalized = temp_event_y;
+
+            convert_to_pixels (ref tmp_event_x_normalized, ref tmp_event_y_normalized);
+
+            canvas_scroll_set_origin (tmp_event_x_normalized, tmp_event_y_normalized);
+
+            holding = true;
+
+            return true;
+        }
 
         Goo.CanvasItem clicked_item;
 
@@ -254,6 +298,10 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
         holding = false;
 
+        if (event.button == 2) {
+            edit_mode = EditMode.MODE_SELECTION;
+        }
+
         if (delta_x == 0 && delta_y == 0) {
             return false;
         }
@@ -265,44 +313,35 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         delta_y = 0;
 
         edit_mode = EditMode.MODE_SELECTION;
-        set_cursor_by_edit_mode ();
-
-        return false;
-    }
-
-    public override bool key_press_event (Gdk.EventKey event) {
-        switch (Gdk.keyval_to_upper (event.keyval)) {
-            case Gdk.Key.E:
-                edit_mode = Akira.Lib.Canvas.EditMode.MODE_INSERT;
-                insert_type = Akira.Lib.Canvas.InsertType.ELLIPSE;
-                return true;
-            case Gdk.Key.R:
-                edit_mode = Akira.Lib.Canvas.EditMode.MODE_INSERT;
-                insert_type = Akira.Lib.Canvas.InsertType.RECT;
-                return true;
-            case Gdk.Key.T:
-                edit_mode = Akira.Lib.Canvas.EditMode.MODE_INSERT;
-                insert_type = Akira.Lib.Canvas.InsertType.TEXT;
-                return true;
-            case Gdk.Key.Escape:
-                edit_mode = Akira.Lib.Canvas.EditMode.MODE_SELECTION;
-                insert_type = null;
-                return true;
-            case Gdk.Key.Delete:
-                delete_selected ();
-                return true;
-        }
 
         return false;
     }
 
     public override bool motion_notify_event (Gdk.EventMotion event) {
-        if (!holding) {
-            motion_hover_event (event);
-            return false;
-        }
         var event_x = event.x / current_scale;
         var event_y = event.y / current_scale;
+
+        if (edit_mode == EditMode.MODE_PAN) {
+            if (holding) {
+                // Move canvas if holding mouse and spacebar pressed
+                move_canvas (event_x, event_y);
+            } else {
+                // Remove hover effect on selected items if just
+                // moving around with spacebar pressed
+                remove_hover_effect ();
+            }
+
+            return false;
+        }
+
+        if (!holding) {
+            motion_hover_event (event.x, event.y);
+            return false;
+        }
+
+        if (selected_item == null) {
+            return false;
+        }
 
         convert_to_item_space (selected_item, ref event_x, ref event_y);
 
@@ -323,6 +362,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         //  debug ("delta x: %f", delta_x);
         //  debug ("delta y: %f", delta_y);
 
+
         double x, y, width, height;
         selected_item.get ("x", out x, "y", out y, "width", out width, "height", out height);
 
@@ -337,6 +377,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
         var canvas_x = x;
         var canvas_y = y;
+
         convert_from_item_space (selected_item, ref canvas_x, ref canvas_y);
 
         //  debug ("new delta x: %f", new_delta_x);
@@ -355,8 +396,10 @@ public class Akira.Lib.Canvas : Goo.Canvas {
             case Nob.NONE: // Moving
                 double move_x = fix_x_position (canvas_x, width, delta_x);
                 double move_y = fix_y_position (canvas_y, height, delta_y);
-                //  debug ("move x %f", move_x);
-                //  debug ("move y %f", move_y);
+
+                // debug ("move x %f", move_x);
+                // debug ("move y %f", move_y);
+
                 selected_item.translate (move_x, move_y);
                 event_x -= move_x;
                 event_y -= move_y;
@@ -365,10 +408,10 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 update_x = event_x < x + width;
                 update_y = event_y < y + height;
                 if (MIN_SIZE > height - new_delta_y) {
-                   new_delta_y = 0;
+                    new_delta_y = 0;
                 }
                 if (MIN_SIZE > width - new_delta_x) {
-                   new_delta_x = 0;
+                    new_delta_x = 0;
                 }
                 selected_item.translate (new_delta_x, new_delta_y);
                 event_x -= new_delta_x;
@@ -379,7 +422,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
             case Nob.TOP_CENTER:
                 update_y = event_y < y + height;
                 if (MIN_SIZE > height - new_delta_y) {
-                   new_delta_y = 0;
+                    new_delta_y = 0;
                 }
                 new_height = fix_size (height - new_delta_y);
                 selected_item.translate (0, new_delta_y);
@@ -424,7 +467,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 break;
             case Nob.BOTTOM_LEFT:
                 if (new_delta_x > width) {
-                   new_delta_x = 0;
+                    new_delta_x = 0;
                 }
                 update_y = event_y > y;
                 update_x = event_x < x + width;
@@ -495,11 +538,67 @@ public class Akira.Lib.Canvas : Goo.Canvas {
             //  debug ("temp event y: %f", temp_event_y);
         }
 
+
         return true;
     }
 
-    private void motion_hover_event (Gdk.EventMotion event) {
-        var hovered_item = get_item_at (event.x / get_scale (), event.y / get_scale (), true);
+    public override bool key_press_event (Gdk.EventKey event) {
+        switch (Gdk.keyval_to_upper (event.keyval)) {
+            case Gdk.Key.E:
+                edit_mode = Akira.Lib.Canvas.EditMode.MODE_INSERT;
+                insert_type = Akira.Lib.Canvas.InsertType.ELLIPSE;
+                return true;
+            case Gdk.Key.R:
+                edit_mode = Akira.Lib.Canvas.EditMode.MODE_INSERT;
+                insert_type = Akira.Lib.Canvas.InsertType.RECT;
+                return true;
+            case Gdk.Key.Escape:
+                edit_mode = Akira.Lib.Canvas.EditMode.MODE_SELECTION;
+                insert_type = null;
+                return true;
+            case Gdk.Key.Delete:
+                delete_selected ();
+                return true;
+            case Gdk.Key.space:
+                edit_mode = EditMode.MODE_PAN;
+                remove_hover_effect ();
+                return true;
+            case Gdk.Key.Control_L:
+            case Gdk.Key.Control_R:
+                return true;
+        }
+
+        return false;
+    }
+
+    public override bool key_release_event (Gdk.EventKey event) {
+        switch (Gdk.keyval_to_upper (event.keyval)) {
+            case Gdk.Key.space:
+                edit_mode = EditMode.MODE_SELECTION;
+                motion_hover_event (hover_x, hover_y);
+                return true;
+
+            case Gdk.Key.Control_L:
+            case Gdk.Key.Control_R:
+                edit_mode = EditMode.MODE_SELECTION;
+                return true;
+        }
+
+        return false;
+    }
+
+    private void move_canvas (double event_x, double event_y) {
+        double event_x_normalized = event_x;
+        double event_y_normalized = event_y;
+
+        convert_to_pixels (ref event_x_normalized, ref event_y_normalized);
+
+        canvas_moved (event_x_normalized, event_y_normalized);
+        return;
+    }
+
+    private void motion_hover_event (double event_x, double event_y) {
+        var hovered_item = get_item_at (event_x / get_scale (), event_y / get_scale (), true);
 
         if (!(hovered_item is Goo.CanvasItemSimple)) {
             remove_hover_effect ();
@@ -673,31 +772,24 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 set_cursor_by_edit_mode ();
                 break;
             case Nob.TOP_LEFT:
-                set_cursor (Gdk.CursorType.TOP_LEFT_CORNER);
+            case Nob.BOTTOM_RIGHT:
+                set_cursor ("nwse-resize");
                 break;
             case Nob.TOP_CENTER:
-                set_cursor (Gdk.CursorType.TOP_SIDE);
+            case Nob.BOTTOM_CENTER:
+                set_cursor ("ns-resize");
                 break;
             case Nob.TOP_RIGHT:
-                set_cursor (Gdk.CursorType.TOP_RIGHT_CORNER);
+            case Nob.BOTTOM_LEFT:
+                set_cursor ("nesw-resize");
                 break;
             case Nob.RIGHT_CENTER:
-                set_cursor (Gdk.CursorType.RIGHT_SIDE);
-                break;
-            case Nob.BOTTOM_RIGHT:
-                set_cursor (Gdk.CursorType.BOTTOM_RIGHT_CORNER);
-                break;
-            case Nob.BOTTOM_CENTER:
-                set_cursor (Gdk.CursorType.BOTTOM_SIDE);
-                break;
-            case Nob.BOTTOM_LEFT:
-                set_cursor (Gdk.CursorType.BOTTOM_LEFT_CORNER);
-                break;
             case Nob.LEFT_CENTER:
-                set_cursor (Gdk.CursorType.LEFT_SIDE);
+                set_cursor ("ew-resize");
                 break;
             case Nob.ROTATE:
-                set_cursor (Gdk.CursorType.ICON);
+                debug ("Rotate Nob");
+                set_cursor ("move");
                 break;
         }
     }
@@ -825,17 +917,20 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         nobs[Nob.ROTATE].raise (item);
     }
 
-    private void set_cursor (Gdk.CursorType cursor_type) {
-        var cursor = new Gdk.Cursor.for_display (Gdk.Display.get_default (), cursor_type);
+    private void set_cursor (string cursor_name) {
+        var cursor = new Gdk.Cursor.from_name (Gdk.Display.get_default (), cursor_name);
         get_window ().set_cursor (cursor);
     }
 
     private double fix_y_position (double y, double height, double delta_y) {
-        var min_delta = Math.round ((MIN_POS - height) * current_scale);
-        //  debug ("min delta y %f", min_delta);
-        var max_delta = Math.round ((bounds_h - MIN_POS) * current_scale);
-        //  debug ("max delta y %f", max_delta);
+        var min_delta = Math.round (MIN_POS / current_scale - height);
+        var max_delta = Math.round (bounds_h - MIN_POS / current_scale);
         var new_y = Math.round (y + delta_y);
+
+        //debug ("min delta y %f", min_delta);
+        //debug ("max delta y %f", max_delta);
+        //debug ("new_y %f", new_y);
+
         if (new_y < min_delta) {
             return 0;
         } else if (new_y > max_delta) {
@@ -846,11 +941,14 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     }
 
     private double fix_x_position (double x, double width, double delta_x) {
-        var min_delta = Math.round ((MIN_POS - width) * current_scale);
-        //  debug ("min delta x %f", min_delta);
-        var max_delta = Math.round ((bounds_h - MIN_POS) * current_scale);
-        //  debug ("max delta x %f", max_delta);
+        var min_delta = Math.round (MIN_POS / current_scale - width);
+        var max_delta = Math.round (bounds_h - MIN_POS / current_scale);
         var new_x = Math.round (x + delta_x);
+
+        //debug ("min delta x %f", min_delta);
+        //debug ("max delta x %f", max_delta);
+        //debug ("new_x %f", new_x);
+
         if (new_x < min_delta) {
             return 0;
         } else if (new_x > max_delta) {
