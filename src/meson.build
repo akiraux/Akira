@@ -74,6 +74,11 @@ executable(
     'Lib/Managers/ItemsManager.vala',
     'Lib/Managers/NobManager.vala',
 
+    'Lib/Models/CanvasItem.vala',
+    'Lib/Models/CanvasRect.vala',
+    'Lib/Models/CanvasEllipse.vala',
+    'Lib/Models/CanvasText.vala',
+
     'Lib/Selection/Nob.vala',
 
     asresources,

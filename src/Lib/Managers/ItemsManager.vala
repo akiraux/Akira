@@ -29,7 +29,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
 
     public weak Goo.Canvas canvas { get; construct; }
 
-    private List<Goo.CanvasItem> items;
+    private List<Models.CanvasItem> items;
     private InsertType? insert_type { get; set; }
     private Goo.CanvasItem root;
     private double border_size;
@@ -44,7 +44,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
 
     construct {
         root = canvas.get_root_item ();
-        items = new List<Goo.CanvasItem> ();
+        items = new List<Models.CanvasItem> ();
 
         event_bus.insert_item.connect (set_item_to_insert);
     }
@@ -68,10 +68,10 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         }
     }
 
-    public Goo.CanvasItem? insert_item (Gdk.EventButton event) {
+    public Models.CanvasItem? insert_item (Gdk.EventButton event) {
         udpate_default_values ();
 
-        Goo.CanvasItem? new_item;
+        Models.CanvasItem? new_item;
 
         switch (insert_type) {
             case InsertType.RECT:
@@ -92,30 +92,23 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         }
 
         if (new_item != null) {
-            init_item (new_item);
-
             items.append (new_item);
         }
 
         return new_item;
     }
 
-    public Goo.CanvasRect add_rect (Gdk.EventButton event) {
-        var rect = new Goo.CanvasRect (
-            null,
-            event.x, event.y,
-            1, 1,
-            "line-width", border_size,
-            "radius-x", 0.0,
-            "radius-y", 0.0,
-            "stroke-color", border_color,
-            "fill-color", fill_color,
-            null
+    public Models.CanvasItem add_rect (Gdk.EventButton event) {
+        var rect = new Models.CanvasRect (
+            event.x,
+            event.y,
+            0.0,
+            0.0,
+            border_size,
+            border_color,
+            fill_color,
+            root
         );
-
-        rect.set ("parent", root);
-        rect.set_transform (Cairo.Matrix.identity ());
-        rect.set_data<double?> ("rotation", 0);
 
         /*
         var artboard = window.main_window.right_sidebar.layers_panel.artboard;
@@ -137,20 +130,17 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         return rect;
     }
 
-    public Goo.CanvasEllipse add_ellipse (Gdk.EventButton event) {
-        var ellipse = new Goo.CanvasEllipse (
-            null,
-            event.x, event.y,
-            1, 1,
-            "line-width", border_size,
-            "stroke-color", border_color,
-            "fill-color", fill_color,
-            null
+    public Models.CanvasEllipse add_ellipse (Gdk.EventButton event) {
+        var ellipse = new Models.CanvasEllipse (
+            event.x,
+            event.y,
+            1,
+            1,
+            border_size,
+            border_color,
+            fill_color,
+            root
         );
-
-        ellipse.set ("parent", root);
-        ellipse.set_transform (Cairo.Matrix.identity ());
-        ellipse.set_data<double?> ("rotation", 0);
 
         /*
         var artboard = window.main_window.right_sidebar.layers_panel.artboard;
@@ -164,21 +154,17 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         return ellipse;
     }
 
-    public Goo.CanvasText add_text (Gdk.EventButton event) {
-        var text = new Goo.CanvasText (
-            null,
+    public Models.CanvasText add_text (Gdk.EventButton event) {
+        var text = new Models.CanvasText (
             "Add text here",
-            event.x, event.y,
+            event.x,
+            event.y,
             200,
+            25f,
             Goo.CanvasAnchorType.NW,
-            "font", "Open Sans 18",
-            null
+            "Open Sans 18",
+            root
         );
-
-        text.set ("parent", root);
-        text.set ("height", 25f);
-        text.set_transform (Cairo.Matrix.identity ());
-        text.set_data<double?> ("rotation", 0);
 
         /*
         var artboard = window.main_window.right_sidebar.layers_panel.artboard;
@@ -191,11 +177,6 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         return text;
     }
 
-    private void init_item (Object object) {
-        object.set_data<int?> ("fill-alpha", 255);
-        object.set_data<int?> ("stroke-alpha", 255);
-        object.set_data<double?> ("opacity", 100);
-    }
 
     private void set_item_to_insert (string type) {
         switch (type) {

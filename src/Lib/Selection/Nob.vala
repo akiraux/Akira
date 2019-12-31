@@ -54,6 +54,7 @@ public class Akira.Lib.Selection.Nob : Goo.CanvasItemSimple, Goo.CanvasItem {
         y = _y - (height / 2);
         line_width = s / scale;
         fill_color = "#fff";
-        stroke_color = "#41c9fd";
+        //stroke_color = "#41c9fd";
+        stroke_color = "#888";
     }
 }

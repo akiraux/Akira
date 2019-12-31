@@ -166,7 +166,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 break;
 
             case EditMode.MODE_SELECTION:
-                var clicked_item = get_item_at (temp_event_x, temp_event_y, true);
+                Models.CanvasItem clicked_item = (Models.CanvasItem) get_item_at (temp_event_x, temp_event_y, true);
 
                 if (clicked_item == null) {
                     selected_bound_manager.reset_selection ();
@@ -174,6 +174,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 }
 
                 var clicked_nob_name = nob_manager.get_grabbed_id (clicked_item);
+                nob_manager.set_selected_by_name (clicked_nob_name);
 
                 selected_bound_manager.set_initial_coordinates (temp_event_x, temp_event_y);
 
@@ -182,8 +183,6 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
                     // Item has been selected
                     selected_bound_manager.add_item_to_selection (clicked_item);
-                } else {
-                    nob_manager.set_selected_by_name (clicked_nob_name);
                 }
 
                 break;

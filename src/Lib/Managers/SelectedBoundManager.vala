@@ -27,7 +27,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
     private const int bounds_w = 10000;
 
     public weak Goo.Canvas canvas { get; construct; }
-    public unowned List<Goo.CanvasItem> selected_items {
+    public unowned List<Models.CanvasItem> selected_items {
         get {
             return _selected_items;
         }
@@ -38,7 +38,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         }
     }
 
-    private unowned List<Goo.CanvasItem> _selected_items;
+    private unowned List<Models.CanvasItem> _selected_items;
     private Goo.CanvasBounds select_bb;
     private double initial_event_x;
     private double initial_event_y;
@@ -166,6 +166,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
     private void move (double x, double y) {
         //double move_x = fix_x_position (canvas_x, initial_width, delta_x);
         //double move_y = fix_y_position (canvas_y, initial_height, delta_y);
+
         Goo.CanvasItem selected_item = selected_items.nth_data (0);
 
         double delta_x = x - initial_event_x;
@@ -174,7 +175,8 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         selected_item.translate (delta_x, delta_y);
     }
 
-    public void add_item_to_selection (Goo.CanvasItem item) {
+    public void add_item_to_selection (Models.CanvasItem item) {
+        debug (@"Selecting $(item.id)");
         selected_items.append (item);
     }
 
@@ -183,7 +185,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
     }
 
     public void reset_selection () {
-        selected_items = new List<Goo.CanvasItem> ();
+        selected_items = new List<Models.CanvasItem> ();
     }
 
     private void update_bounding_box  () {
