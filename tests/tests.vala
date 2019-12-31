@@ -19,8 +19,6 @@
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
 
-using GLib;
-
 namespace Akira {
     public delegate void TestCaseFunc ();
 
@@ -94,7 +92,7 @@ namespace Akira {
     public class TestRunner : GLib.Object {
         private GLib.TestSuite root_suite;
         private GLib.File tmp_dir;
-        private const string SCHEMA_FILE_NAME = "com.github.akiraux.akira.gschema.xml";
+        private const string SCHEMA_FILE_NAME = "com.github.akiraux.akira.gschema.xml.in";
 
         public TestRunner (GLib.TestSuite? root_suite = null) {
             if (root_suite == null) {
@@ -119,15 +117,14 @@ namespace Akira {
                 var top_builddir = TestRunner.get_top_builddir ();
 
                 var source_schema_file = GLib.File.new_for_path (
-                    Path.build_filename (top_builddir, "data", SCHEMA_FILE_NAME));
+                    Path.build_filename (top_builddir, "data/schemas", SCHEMA_FILE_NAME));
 
                 var target_schema_file = GLib.File.new_for_path (
                     Path.build_filename (target_schema_path, SCHEMA_FILE_NAME));
 
                 source_schema_file.copy (target_schema_file,
                                          GLib.FileCopyFlags.OVERWRITE);
-            }
-            catch (GLib.Error error) {
+            } catch (GLib.Error error) {
                 GLib.error ("Error copying schema file: %s", error.message);
             }
 
@@ -138,8 +135,7 @@ namespace Akira {
                             null,
                             null,
                             out compile_schemas_result);
-            }
-            catch (GLib.SpawnError error) {
+            } catch (GLib.SpawnError error) {
                 GLib.error (error.message);
             }
 
@@ -197,13 +193,12 @@ namespace Akira {
         private static string get_top_builddir () {
             var builddir = Environment.get_variable ("top_builddir");
 
-            if (builddir == null)
-            {
+            if (builddir == null) {
                 var dir = GLib.File.new_for_path (Environment.get_current_dir ());
 
                 while (dir != null) {
                     var schema_path = GLib.Path.build_filename (dir.get_path (),
-                                                                "data",
+                                                                "data/schemas",
                                                                 SCHEMA_FILE_NAME);
 
                     if (GLib.FileUtils.test (schema_path, GLib.FileTest.IS_REGULAR)) {

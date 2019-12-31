@@ -1,7 +1,6 @@
 # project name and programming language
 project('com.github.akiraux.akira', 'vala', 'c')
 
-
 akira_prefix = get_option('prefix')
 akira_datadir = join_paths(akira_prefix, get_option('datadir'))
 akira_pkgdatadir = join_paths(akira_datadir, meson.project_name())
@@ -25,7 +24,6 @@ json_glib_dependency = dependency('json-glib-1.0')
 # Optional dependencies
 desktop_file_validate = find_program('desktop-file-validate', required: false)
 appstream_util = find_program('appstream-util', required: false)
-
 
 # Include the gnome module
 gnome = import('gnome')
