@@ -170,6 +170,9 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
                 if (clicked_item == null) {
                     selected_bound_manager.reset_selection ();
+
+                    // Workaround: when no item is clicked, there's no point in keeping holding active
+                    holding = false;
                     return true;
                 }
 
@@ -260,11 +263,11 @@ public class Akira.Lib.Canvas : Goo.Canvas {
             return false;
         }
 
+
         switch (edit_mode) {
             case EditMode.MODE_INSERT:
             case EditMode.MODE_SELECTION:
                 var selected_nob = nob_manager.get_selected_nob ();
-
                 selected_bound_manager.transform_bound (event_x, event_y, selected_nob);
                 break;
         }

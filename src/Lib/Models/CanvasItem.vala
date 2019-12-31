@@ -32,7 +32,6 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItem {
     public abstract Models.CanvasItemType item_type { get; protected set; }
 
     public static string create_item_id (Models.CanvasItem item) {
-        debug (@"Item type: $(item.item_type)");
         string[] type_slug_tokens = item.item_type.to_string ().split ("_");
         string type_slug = type_slug_tokens[type_slug_tokens.length - 1];
 

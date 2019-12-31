@@ -66,7 +66,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
     public void transform_bound (double event_x, double event_y, Managers.NobManager.Nob selected_nob) {
         switch (selected_nob) {
             case Managers.NobManager.Nob.NONE:
-                debug ("Move");
+                move (event_x, event_y);
                 break;
 
             case Managers.NobManager.Nob.ROTATE:
@@ -164,19 +164,18 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
     }
 
     private void move (double x, double y) {
-        //double move_x = fix_x_position (canvas_x, initial_width, delta_x);
-        //double move_y = fix_y_position (canvas_y, initial_height, delta_y);
-
-        Goo.CanvasItem selected_item = selected_items.nth_data (0);
+        Models.CanvasItem selected_item = selected_items.nth_data (0);
 
         double delta_x = x - initial_event_x;
         double delta_y = y - initial_event_y;
 
         selected_item.translate (delta_x, delta_y);
+
+        initial_event_x = x;
+        initial_event_y = y;
     }
 
     public void add_item_to_selection (Models.CanvasItem item) {
-        debug (@"Selecting $(item.id)");
         selected_items.append (item);
     }
 
