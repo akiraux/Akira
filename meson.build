@@ -65,5 +65,6 @@ add_global_arguments(['-DG_LOG_DOMAIN="Akira"'], language:'c')
 subdir('src')
 subdir('data')
 subdir('po')
+subdir('tests')
 
 meson.add_install_script('build-aux/meson/post_install.py')
