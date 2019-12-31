@@ -76,7 +76,7 @@ public class Akira.Lib.Managers.HoverManager : Object {
                 );
 
                 var transform = Cairo.Matrix.identity ();
-                target_model.get_transform (out transform);
+                //target_model.get_transform (out transform);
                 hover_effect.set_transform (transform);
 
                 hover_effect.set ("parent", canvas.get_root_item ());
