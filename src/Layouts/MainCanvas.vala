@@ -21,6 +21,7 @@
 */
 public class Akira.Layouts.MainCanvas : Gtk.Grid {
     public const int CANVAS_SIZE = 100000;
+    public const double SCROLL_DISTANCE = 0;
 
     public Gtk.ScrolledWindow main_scroll;
     public Akira.Lib.Canvas canvas;
@@ -41,10 +42,10 @@ public class Akira.Layouts.MainCanvas : Gtk.Grid {
         main_scroll.expand = true;
 
         // Overlay the scrollbars only if mouse pointer is inside canvas
-        //main_scroll.overlay_scrolling = false;
+        main_scroll.overlay_scrolling = false;
 
         // Change visibility of canvas scrollbars
-        //main_scroll.set_policy (Gtk.PolicyType.NEVER, Gtk.PolicyType.NEVER);
+        main_scroll.set_policy (Gtk.PolicyType.NEVER, Gtk.PolicyType.NEVER);
 
         canvas = new Akira.Lib.Canvas (window);
 
@@ -86,27 +87,35 @@ public class Akira.Layouts.MainCanvas : Gtk.Grid {
         bool is_shift = (event.state & Gdk.ModifierType.SHIFT_MASK) > 0;
         bool is_ctrl = (event.state & Gdk.ModifierType.CONTROL_MASK) > 0;
 
-        switch (event.direction) {
-            case Gdk.ScrollDirection.UP:
+        double delta_x, delta_y;
+        event.get_scroll_deltas (out delta_x, out delta_y);
+
+        if (delta_y < -SCROLL_DISTANCE) {
+            // Scroll UP
+            if (is_ctrl) {
                 // Zoom in
-                if (is_ctrl) {
-                    window.headerbar.zoom.zoom_in ();
-                } else if (is_shift) {
-                    main_scroll.hadjustment.value += 10;
-                } else {
-                    main_scroll.vadjustment.value -= 10;
-                }
-                break;
-            case Gdk.ScrollDirection.DOWN:
+                window.headerbar.zoom.zoom_in ();
+            } else if (is_shift) {
+                main_scroll.hadjustment.value += delta_y * 10;
+            } else {
+                main_scroll.vadjustment.value += delta_y * 10;
+            }
+        } else if (delta_y > SCROLL_DISTANCE) {
+            // Scoll DOWN
+            if (is_ctrl) {
                 // Zoom out
-                if (is_ctrl) {
-                    window.headerbar.zoom.zoom_out ();
-                } else if (is_shift) {
-                    main_scroll.hadjustment.value -= 10;
-                } else {
-                    main_scroll.vadjustment.value += 10;
-                }
-                break;
+                window.headerbar.zoom.zoom_out ();
+            } else if (is_shift) {
+                main_scroll.hadjustment.value += delta_y * 10;
+            } else {
+                main_scroll.vadjustment.value += delta_y * 10;
+            }
+        }
+
+        if (delta_x < -SCROLL_DISTANCE) {
+            main_scroll.hadjustment.value += delta_x * 10;
+        } else if (delta_x > SCROLL_DISTANCE) {
+            main_scroll.hadjustment.value += delta_x * 10;
         }
         return true;
     }
