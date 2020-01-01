@@ -57,8 +57,7 @@ namespace Akira {
         }
     }
 
-    public abstract class TestSuite : GLib.Object
-    {
+    public abstract class TestSuite : GLib.Object {
         private GLib.TestSuite g_test_suite;
         private TestSuiteAdaptor[] adaptors = new TestSuiteAdaptor[0];
 
@@ -220,24 +219,23 @@ namespace Akira {
     }
 }
 
+//  public static int main (string[] args) {
+//      var exit_status = 0;
 
-public static int main (string[] args) {
-    var exit_status = 0;
+//      Gtk.init (ref args);
+//      Test.init (ref args);
 
-    Gtk.init (ref args);
-    Test.init (ref args);
+//      var tests = new Akira.TestRunner ();
+//      tests.add (new Akira.FillsItemTest ());
 
-    var tests = new Akira.TestRunner ();
-    tests.add (new Akira.FillsItemTest ());
+//      GLib.Idle.add (() => {
+//          exit_status = tests.run ();
+//          Gtk.main_quit ();
 
-    GLib.Idle.add (() => {
-        exit_status = tests.run ();
-        Gtk.main_quit ();
+//          return false;
+//      });
 
-        return false;
-    });
+//      Gtk.main ();
 
-    Gtk.main ();
-
-    return exit_status;
-}
+//      return exit_status;
+//  }

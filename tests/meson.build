@@ -1,18 +1,11 @@
-e = executable(
-    'tests',
-    'tests.vala',
-    'test-fills-item.vala',
-    dependencies: [
-        gtk_dependency,
-        granite_dependency,
-        gee_dependency,
-        libxml_dependency,
-        cairo_dependency,
-        goocanvas_dependency,
-        libarchive_dependency,
-        json_glib_dependency,
-        m_dep
-    ]
-)
+lib = library ('dummy', sources, asresources, config_header, dependencies: deps)
 
-test('akiratests', e)
+lib_dep = declare_dependency (link_with: lib)
+test = executable (
+    'simple_unit_test',
+    sources: [
+        'tests.vala',
+        'test-fills-item.vala'
+    ], dependencies: [deps, lib_dep])
+
+test ('akiratest', app)

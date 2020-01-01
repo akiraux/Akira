@@ -19,29 +19,19 @@
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
 
-namespace Akira
-{
-    public class FillsItemTest : Akira.TestSuite
-    {
-        public FillsItemTest () {
-            // this.add_test ("placeholder_test", this.placeholder_test);
-        }
+public class Akira.FillsItemTest : Akira.TestSuite {
+    public FillsItemTest () {
+        this.add_test ("loops_through_items", this.loops_through_items);
+    }
 
-        public override void setup () {
-            // var settings = Akira.get_settings ().get_child ("state");
-            // var canvas = new Akira.Lib.Canvas ();
-        }
+    public override void setup () {
+    }
 
-        public override void teardown () {
-        }
+    public override void teardown () {
+    }
 
-        /**
-         * Unit test for Akira.Models.FillListModel.add () method.
-         *
-         * Check whether quickly selecting and deselecting multiple items causes a segfault.
-         */
-        //  public void placeholder_test () {
-            /* TODO */
-        //  }
+    // Unit test for Akira.Models.FillListModel.add () method.
+    // Check whether quickly selecting and deselecting multiple items causes a segfault.
+    public void loops_through_items () {
     }
 }

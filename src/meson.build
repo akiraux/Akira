@@ -14,9 +14,7 @@ config_header = configure_file(
     configuration: conf_data
 )
 
-# Create a new executable, list the files we want to compile, list the dependencies we need, and install
-executable(
-    application_id,
+sources = files(
     'Main.vala',
     'Application.vala',
     'Window.vala',
@@ -69,19 +67,26 @@ executable(
     'Lib/Item.vala',
 
     'Lib/Selection/Nob.vala',
+)
 
+deps = [
+    gtk_dependency,
+    granite_dependency,
+    gee_dependency,
+    libxml_dependency,
+    cairo_dependency,
+    goocanvas_dependency,
+    libarchive_dependency,
+    json_glib_dependency,
+    m_dep
+]
+
+# Create a new executable, list the files we want to compile, list the dependencies we need, and install
+app = executable(
+    application_id,
+    sources,
     asresources,
     config_header,
-    dependencies: [
-        gtk_dependency,
-        granite_dependency,
-        gee_dependency,
-        libxml_dependency,
-        cairo_dependency,
-        goocanvas_dependency,
-        libarchive_dependency,
-        json_glib_dependency,
-        m_dep
-    ],
+    dependencies: deps,
     install: true
 )
