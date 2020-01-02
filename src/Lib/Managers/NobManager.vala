@@ -53,7 +53,7 @@ public class Akira.Lib.Managers.NobManager : Object {
     private double width;
     private double height;
     private double nob_size;
-    private double current_scale;
+    private double current_scale = 1.0;
 
     public NobManager (Goo.Canvas canvas) {
         Object (
@@ -63,8 +63,6 @@ public class Akira.Lib.Managers.NobManager : Object {
 
     construct {
         root = canvas.get_root_item ();
-
-        on_zoom ();
 
         event_bus.selected_items_changed.connect (on_add_select_effect);
         event_bus.zoom.connect (on_zoom);
@@ -88,8 +86,8 @@ public class Akira.Lib.Managers.NobManager : Object {
         return (Nob) grabbed_id;
     }
 
-    private void on_zoom () {
-        current_scale = canvas.get_scale ();
+    private void on_zoom (double _current_scale) {
+        current_scale = _current_scale;
     }
 
     private void update_select_bb_coords (List<Models.CanvasItem> selected_items) {
@@ -202,19 +200,15 @@ public class Akira.Lib.Managers.NobManager : Object {
             ref width, ref height
         );
 
-        nob_size = 10 / current_scale;
-
         for (int i = 0; i < 9; i++) {
-            var radius = i == 8 ? nob_size : 0;
-
             nobs[i] = new Selection.Nob (
                 root,
                 (Managers.NobManager.Nob) i,
-                nob_size,
-                radius,
                 current_scale
             );
         }
+
+        nob_size = Selection.Nob.NOB_SIZE / current_scale;
 
         bool print_middle_width_nobs = width > nob_size * 3;
         bool print_middle_height_nobs = height > nob_size * 3;
@@ -323,7 +317,6 @@ public class Akira.Lib.Managers.NobManager : Object {
         nobs[Nob.ROTATE].translate (x + (width / 2) - nob_offset, y - nob_offset - distance);
         nobs[Nob.ROTATE].raise (select_effect);
     }
-
 
     private void set_bound_coordinates (
         List<Models.CanvasItem> selected_items,

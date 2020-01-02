@@ -19,41 +19,62 @@
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
 public class Akira.Lib.Selection.Nob : Goo.CanvasRect {
+    public const double NOB_SIZE = 10;
+    public const double LINE_WIDTH = 2;
 
     public Managers.NobManager.Nob handle_id;
 
     public double scale { get; set; default = 1.0; }
 
+    private double nob_size;
+    private double radius;
+
     public Nob (
         Goo.CanvasItem? root,
         Managers.NobManager.Nob _handle_id,
-        double nob_size,
-        double radius,
-        double canvas_scale
+        double current_scale
     ) {
         Object (
             parent: root
         );
 
         handle_id = _handle_id;
-        scale = canvas_scale;
+        scale = current_scale;
 
-        set_rectangle (0, 0, nob_size, radius);
+        set_rectangle ();
+
+        event_bus.zoom.connect (on_zoom);
     }
 
     construct {
         can_focus = false;
     }
 
-    public void set_rectangle (double _x, double _y, double nob_size, double _radius) {
-        height = nob_size / scale;
-        width = nob_size / scale;
+    private void update_size () {
+        line_width = LINE_WIDTH / scale;
+        nob_size = NOB_SIZE / scale;
+
+        set ("line-width", line_width);
+        set ("height", nob_size);
+        set ("width", nob_size);
+    }
+
+    private void on_zoom (double current_scale) {
+        scale = current_scale;
+
+        update_size ();
+    }
+
+    public void set_rectangle () {
         x = 0;
         y = 0;
 
-        set ("radius-x", _radius);
-        set ("radius-y", _radius);
-        set ("line-width", 2.0);
+        update_size ();
+
+        radius = handle_id == 8 ? nob_size : 0;
+
+        set ("radius-x", radius);
+        set ("radius-y", radius);
         set ("fill-color", "#fff");
         set ("stroke-color", "#41c9fd");
     }

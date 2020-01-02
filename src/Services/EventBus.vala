@@ -26,7 +26,7 @@ public class Akira.Services.EventBus : Object {
     public signal void change_sensitivity (string type);
     public signal void insert_item (string type);
     public signal void selected_items_changed (List<Lib.Models.CanvasItem> selected_items);
-    public signal void zoom ();
+    public signal void zoom (double current_scale);
     public signal void request_zoom (string direction);
     public signal void coordinate_change (double x, double y);
     public signal void request_change_cursor (Gdk.CursorType? cursor_type);
@@ -59,10 +59,6 @@ public class Akira.Services.EventBus : Object {
 
             case "request-zoom":
                 request_zoom (param);
-                break;
-
-            case "zoom":
-                zoom ();
                 break;
 
         }

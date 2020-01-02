@@ -159,7 +159,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
                 if (clicked_item is Models.CanvasItem) {
                     // Item has been selected
-                    selected_bound_manager.add_item_to_selection ((Models.CanvasItem) clicked_item);
+                    selected_bound_manager.add_item_to_selection (clicked_item as Models.CanvasItem);
                 }
 
                 selected_bound_manager.set_initial_coordinates (temp_event_x, temp_event_y);
@@ -213,7 +213,21 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     }
 
     private void on_request_zoom (string direction) {
-        event_bus.emit ("zoom");
+        switch (direction) {
+            case "in":
+                current_scale += 0.1;
+                break;
+            case "out":
+                current_scale -= 0.1;
+                break;
+            case "reset":
+                current_scale = 1.0;
+                break;
+        }
+
+        set_scale (current_scale);
+
+        event_bus.zoom (current_scale);
     }
 
     private void on_request_change_cursor (Gdk.CursorType? cursor_type) {
