@@ -89,7 +89,7 @@ public abstract class Akira.TestSuite : GLib.Object {
 public class Akira.TestRunner : GLib.Object {
     private GLib.TestSuite root_suite;
     private GLib.File tmp_dir;
-    private const string SCHEMA_FILE_NAME = "com.github.akiraux.akira.gschema.xml";
+    //  private const string SCHEMA_FILE_NAME = "com.github.akiraux.akira.gschema.xml";
 
     public TestRunner (GLib.TestSuite? root_suite = null) {
         if (root_suite == null) {
@@ -103,43 +103,43 @@ public class Akira.TestRunner : GLib.Object {
         this.root_suite.add_suite (test_suite.get_g_test_suite ());
     }
 
-    private void setup_settings () {
-        Environment.set_variable ("GSETTINGS_BACKEND", "memory", true);
-        Environment.set_variable ("GSETTINGS_SCHEMA_DIR", this.tmp_dir.get_path (), true);
+    //  private void setup_settings () {
+    //      Environment.set_variable ("GSETTINGS_BACKEND", "memory", true);
+    //      Environment.set_variable ("GSETTINGS_SCHEMA_DIR", this.tmp_dir.get_path (), true);
 
-        /* prepare temporary settings */
-        var target_schema_path = this.tmp_dir.get_path ();
+    //      /* prepare temporary settings */
+    //      var target_schema_path = this.tmp_dir.get_path ();
 
-        try {
-            var top_builddir = TestRunner.get_top_builddir ();
+    //      try {
+    //          var top_builddir = TestRunner.get_top_builddir ();
 
-            var source_schema_file = GLib.File.new_for_path (
-                Path.build_filename (top_builddir, "data/schemas", SCHEMA_FILE_NAME));
+    //          var source_schema_file = GLib.File.new_for_path (
+    //              Path.build_filename (top_builddir, "data/schemas", SCHEMA_FILE_NAME));
 
-            var target_schema_file = GLib.File.new_for_path (
-                Path.build_filename (target_schema_path, SCHEMA_FILE_NAME));
+    //          var target_schema_file = GLib.File.new_for_path (
+    //              Path.build_filename (target_schema_path, SCHEMA_FILE_NAME));
 
-            source_schema_file.copy (target_schema_file,
-                                        GLib.FileCopyFlags.OVERWRITE);
-        } catch (GLib.Error error) {
-            GLib.error ("Error copying schema file: %s", error.message);
-        }
+    //          source_schema_file.copy (target_schema_file,
+    //                                      GLib.FileCopyFlags.OVERWRITE);
+    //      } catch (GLib.Error error) {
+    //          GLib.error ("Error copying schema file: %s", error.message);
+    //      }
 
-        var compile_schemas_result = 0;
-        try {
-            GLib.Process.spawn_command_line_sync (
-                "glib-compile-schemas %s".printf (target_schema_path),
-                null,
-                null,
-                out compile_schemas_result);
-        } catch (GLib.SpawnError error) {
-            GLib.error (error.message);
-        }
+    //      var compile_schemas_result = 0;
+    //      try {
+    //          GLib.Process.spawn_command_line_sync (
+    //              "glib-compile-schemas %s".printf (target_schema_path),
+    //              null,
+    //              null,
+    //              out compile_schemas_result);
+    //      } catch (GLib.SpawnError error) {
+    //          GLib.error (error.message);
+    //      }
 
-        if (compile_schemas_result != 0) {
-            GLib.error ("Could not compile schemas '%s'.", target_schema_path);
-        }
-    }
+    //      if (compile_schemas_result != 0) {
+    //          GLib.error ("Could not compile schemas '%s'.", target_schema_path);
+    //      }
+    //  }
 
     public virtual void global_setup () {
         Environment.set_variable ("LANGUAGE", "C", true);
@@ -150,7 +150,7 @@ public class Akira.TestRunner : GLib.Object {
             GLib.error ("Error creating temporary directory for test files: %s".printf (error.message));
         }
 
-        this.setup_settings ();
+        //  this.setup_settings ();
     }
 
     public virtual void global_teardown () {
@@ -185,33 +185,33 @@ public class Akira.TestRunner : GLib.Object {
         return exit_status;
     }
 
-    private static string get_top_builddir () {
-        var builddir = Environment.get_variable ("top_builddir");
+    //  private static string get_top_builddir () {
+    //      var builddir = Environment.get_variable ("top_builddir");
 
-        if (builddir == null) {
-            var dir = GLib.File.new_for_path (Environment.get_current_dir ());
+    //      if (builddir == null) {
+    //          var dir = GLib.File.new_for_path (Environment.get_current_dir ());
 
-            while (dir != null) {
-                var schema_path = GLib.Path.build_filename (dir.get_path (),
-                                                            "data/schemas",
-                                                            SCHEMA_FILE_NAME);
+    //          while (dir != null) {
+    //              var schema_path = GLib.Path.build_filename (dir.get_path (),
+    //                                                          "data/schemas",
+    //                                                          SCHEMA_FILE_NAME);
 
-                if (GLib.FileUtils.test (schema_path, GLib.FileTest.IS_REGULAR)) {
-                    builddir = dir.get_path ();
-                    break;
-                }
+    //              if (GLib.FileUtils.test (schema_path, GLib.FileTest.IS_REGULAR)) {
+    //                  builddir = dir.get_path ();
+    //                  break;
+    //              }
 
-                dir = dir.get_parent ();
-            }
-        }
+    //              dir = dir.get_parent ();
+    //          }
+    //      }
 
-        if (builddir == null) {
-            /* fallback to parent dir, test should be ran from 'tests' dir */
-            builddir = "..";
-        }
+    //      if (builddir == null) {
+    //          /* fallback to parent dir, test should be ran from 'tests' dir */
+    //          builddir = "..";
+    //      }
 
-        return builddir;
-    }
+    //      return builddir;
+    //  }
 }
 
 class Main : GLib.Object {
