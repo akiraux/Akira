@@ -20,13 +20,10 @@
 */
 
 public class Akira.Lib.Managers.HoverManager : Object {
-
     public weak Goo.Canvas canvas { get; construct; }
 
     private double initial_event_x;
     private double initial_event_y;
-    private double initial_width;
-    private double initial_height;
     private Goo.CanvasItem hover_effect;
 
     public HoverManager (Goo.Canvas canvas) {

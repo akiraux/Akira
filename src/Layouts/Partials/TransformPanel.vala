@@ -37,9 +37,6 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
     private uint fill_a;
     private uint stroke_rgb;
     private uint stroke_a;
-    private Gtk.Label coord_label;
-    private double coord_x = 0;
-    private double coord_y = 0;
 
     public double size_ratio = 1.0;
 

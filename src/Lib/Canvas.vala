@@ -141,6 +141,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 if (clicked_item == null) {
                     selected_bound_manager.reset_selection ();
 
+                    // TODO: allow for multi select with click & drag on canvas
                     // Workaround: when no item is clicked, there's no point in keeping holding active
                     holding = false;
                     return true;
@@ -157,9 +158,6 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 nob_manager.set_selected_by_name (clicked_nob_name);
 
                 if (clicked_item is Models.CanvasItem) {
-                    // Just 1 selected element at the same time
-                    selected_bound_manager.reset_selection ();
-
                     // Item has been selected
                     selected_bound_manager.add_item_to_selection ((Models.CanvasItem) clicked_item);
                 }

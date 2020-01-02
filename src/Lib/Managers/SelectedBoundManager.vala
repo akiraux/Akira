@@ -107,6 +107,10 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
     }
 
     public void add_item_to_selection (Models.CanvasItem item) {
+        // Just 1 selected element at the same time
+        // TODO: allow for multi selection with shift pressed
+        reset_selection ();
+
         item.selected = true;
 
         selected_items.append (item);

@@ -54,7 +54,6 @@ public class Akira.Lib.Managers.NobManager : Object {
     private double height;
     private double nob_size;
     private double current_scale;
-    private int holding_id = Nob.NONE;
 
     public NobManager (Goo.Canvas canvas) {
         Object (

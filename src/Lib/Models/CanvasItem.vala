@@ -53,10 +53,10 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItem {
 
     public static void init_item (Goo.CanvasItem item) {
         // TODO: understand why those properties are not settable
-        return;
-
+        /*
         item.set ("fill-alpha", 255);
         item.set ("stroke-alpha", 255);
         item.set ("opacity", 100);
+        */
     }
 }
