@@ -16,8 +16,7 @@ jobs:
       run: |
         apt update
         apt install -y libarchive-dev libgoocanvas-2.0-dev valac meson appstream-util
-        apt install xvfb
-        xvfb-run --auto-servernum ninja -C build test
+        apt install -y xvfb
     - name: Build
       env:
         DESTDIR: out
@@ -26,3 +25,4 @@ jobs:
         ninja -C build
         # ninja -C build test
         ninja -C build install
+        xvfb-run --auto-servernum ninja -C build test
