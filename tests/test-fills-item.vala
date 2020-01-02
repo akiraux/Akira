@@ -33,6 +33,6 @@ public class Akira.FillsItemTest : Akira.TestSuite {
     // Unit test for Akira.Models.FillListModel.add () method.
     // Check whether quickly selecting and deselecting multiple items causes a segfault.
     public void loops_through_items () {
-        stdout.printf ("Vala is working.\n");
+        stdout.printf ("Looping!.\n");
     }
 }
