@@ -81,8 +81,23 @@ deps = [
     m_dep
 ]
 
+akira_library = shared_library(
+    'akira-library-1.0',
+    sources,
+    asresources,
+    config_header,
+    dependencies : deps,
+    install : true
+)
+
+akira_dep = declare_dependency(
+    dependencies: deps,
+    link_with : akira_library,
+    include_directories: include_directories('.')
+)
+
 # Create a new executable, list the files we want to compile, list the dependencies we need, and install
-app = executable(
+executable(
     application_id,
     sources,
     asresources,

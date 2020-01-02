@@ -25,7 +25,7 @@ public class Akira.FillsItemTest : Akira.TestSuite {
     }
 
     public override void setup () {
-        //  var window = new Akira.Window (this.application);
+        //  var window = new Akira.Window (app);
         //  window.main_window.main_canvas.canvas.focus_canvas ();
     }
 
