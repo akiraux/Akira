@@ -112,20 +112,12 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
     }
 
     public void delete_selection () {
-        debug ("Delete selection");
-        /*
-        if (selected_item != null) {
-            selected_item.remove ();
-
-            var artboard = window.main_window.right_sidebar.layers_panel.artboard;
-            Akira.Layouts.Partials.Layer layer = selected_item.get_data<Akira.Layouts.Partials.Layer?> ("layer");
-            if (layer != null) {
-                artboard.container.remove (layer);
-            }
-            remove_select_effect ();
-            remove_hover_effect ();
+        foreach (var item in selected_items) {
+            item.delete ();
         }
-        */
+
+        // By emptying the selected_items list, the select_effect get dropped
+        selected_items = new List<Models.CanvasItem> ();
     }
 
     public void reset_selection () {
