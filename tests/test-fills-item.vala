@@ -24,17 +24,52 @@ public class Akira.FillsItemTest : Akira.TestSuite {
         this.add_test ("loops_through_items", this.loops_through_items);
     }
 
-    public override void setup () {
-        //  var window = new Akira.Window (app);
-        //  window.main_window.main_canvas.canvas.focus_canvas ();
-    }
+    public override void setup () {}
 
-    public override void teardown () {
-    }
+    public override void teardown () {}
 
     // Unit test for Akira.Models.FillListModel.add () method.
     // Check whether quickly selecting and deselecting multiple items causes a segfault.
     public void loops_through_items () {
-        stdout.printf ("Looping!.\n");
+        //  var app = new Akira.Application ();
+        app.activate.connect ((a) => {
+            var window = new Akira.Window (app);
+            app.add_window (window);
+            var canvas = window.main_window.main_canvas.canvas;
+
+            // TRUE: The canvas was properly generated.
+            assert (canvas is Akira.Lib.Canvas);
+
+            // Create Items
+            var root = canvas.get_root_item ();
+            var item = new Goo.CanvasRect (null, 10, 10, 10, 10,
+                                        "line-width", 1.0,
+                                        "radius-x", 0.0,
+                                        "radius-y", 0.0,
+                                        "stroke-color", "#cccccc",
+                                        "fill-color", "#f00", null);
+
+            item.set ("parent", root);
+            item.set_transform (Cairo.Matrix.identity ());
+            item.set_data<double?> ("rotation", 0);
+
+            var artboard = window.main_window.right_sidebar.layers_panel.artboard;
+            var layer = new Akira.Layouts.Partials.Layer (window, artboard, item,
+                "Rectangle", "shape-rectangle-symbolic", false);
+            item.set_data<Akira.Layouts.Partials.Layer?> ("layer", layer);
+            artboard.container.add (layer);
+            artboard.show_all ();
+
+            //  canvas.selected_item = item;
+
+            //  Timeout.add (3000, () => {
+            //      app.quit();
+            //      return false;
+            //  });
+            app.quit();
+        });
+
+        app.run ();
+        app = null;
     }
 }
