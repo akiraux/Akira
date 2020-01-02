@@ -21,7 +21,7 @@
 
 public class Akira.FillsItemTest : Akira.TestSuite {
     public FillsItemTest () {
-        this.add_test ("loops_through_items", this.loops_through_items);
+        this.add_test ("loops_through_items", this.loop_through_items);
     }
 
     public override void setup () {}
@@ -30,8 +30,7 @@ public class Akira.FillsItemTest : Akira.TestSuite {
 
     // Unit test for Akira.Models.FillListModel.add () method.
     // Check whether quickly selecting and deselecting multiple items causes a segfault.
-    public void loops_through_items () {
-        //  var app = new Akira.Application ();
+    public void loop_through_items () {
         app.activate.connect ((a) => {
             var window = new Akira.Window (app);
             app.add_window (window);
@@ -40,33 +39,44 @@ public class Akira.FillsItemTest : Akira.TestSuite {
             // TRUE: The canvas was properly generated.
             assert (canvas is Akira.Lib.Canvas);
 
-            // Create Items
             var root = canvas.get_root_item ();
-            var item = new Goo.CanvasRect (null, 10, 10, 10, 10,
-                                        "line-width", 1.0,
-                                        "radius-x", 0.0,
-                                        "radius-y", 0.0,
-                                        "stroke-color", "#cccccc",
-                                        "fill-color", "#f00", null);
+            var fills_list_model = window.main_window.left_sidebar.fill_box_panel.fills_list_model;
 
-            item.set ("parent", root);
-            item.set_transform (Cairo.Matrix.identity ());
-            item.set_data<double?> ("rotation", 0);
+            // Create 1000 Items and quickly select/deselect them to stress test the canvas.
+            for (var i = 0; i < 1000; i++) {
+                var item = new Goo.CanvasRect (null, 10, 10, 10, 10,
+                                               "line-width", 1.0,
+                                               "radius-x", 0.0,
+                                               "radius-y", 0.0,
+                                               "stroke-color", "#cccccc",
+                                               "fill-color", "#f00", null);
 
-            var artboard = window.main_window.right_sidebar.layers_panel.artboard;
-            var layer = new Akira.Layouts.Partials.Layer (window, artboard, item,
-                "Rectangle", "shape-rectangle-symbolic", false);
-            item.set_data<Akira.Layouts.Partials.Layer?> ("layer", layer);
-            artboard.container.add (layer);
-            artboard.show_all ();
+                item.set ("parent", root);
 
-            //  canvas.selected_item = item;
+                // We don't need to set any other parameter or create other widgets like the layer
+                // panel since we're only interested in testing the selection effect and the fill model.
+                canvas.init_item (item);
+                canvas.selected_item = item;
 
-            //  Timeout.add (3000, () => {
-            //      app.quit();
-            //      return false;
-            //  });
-            app.quit();
+                // TRUE: We selected the correct item.
+                assert (canvas.selected_item == item);
+
+                canvas.add_select_effect (item);
+
+                // TRUE: A fill model was created and listed.
+                assert (fills_list_model.get_n_items () == 1);
+
+                canvas.delete_selected ();
+
+                // TRUE: The previous fill model was deleted.
+                assert (fills_list_model.get_n_items () == 0);
+
+                // TRUE: We deselected the item.
+                assert (canvas.selected_item == null);
+            }
+
+            // Shut down the test.
+            app.quit ();
         });
 
         app.run ();
