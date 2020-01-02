@@ -91,7 +91,7 @@ namespace Akira {
     public class TestRunner : GLib.Object {
         private GLib.TestSuite root_suite;
         private GLib.File tmp_dir;
-        private const string SCHEMA_FILE_NAME = "com.github.akiraux.akira.gschema.xml.in";
+        private const string SCHEMA_FILE_NAME = "com.github.akiraux.akira.gschema.xml";
 
         public TestRunner (GLib.TestSuite? root_suite = null) {
             if (root_suite == null) {
