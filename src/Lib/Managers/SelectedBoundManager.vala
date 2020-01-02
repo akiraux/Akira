@@ -21,11 +21,6 @@
 
 public class Akira.Lib.Managers.SelectedBoundManager : Object {
 
-    private const int MIN_SIZE = 1;
-    private const int MIN_POS = 10;
-    private const int BOUNDS_H = 10000;
-    private const int BOUNDS_W = 10000;
-
     public weak Goo.Canvas canvas { get; construct; }
     public unowned List<Models.CanvasItem> selected_items {
         get {
@@ -76,167 +71,38 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
     }
 
     public void transform_bound (double event_x, double event_y, Managers.NobManager.Nob selected_nob) {
+        Models.CanvasItem selected_item;
+        selected_item = selected_items.nth_data (0);
+
         switch (selected_nob) {
             case Managers.NobManager.Nob.NONE:
-                move (event_x, event_y);
+                Utils.AffineTransform.move (
+                    event_x, event_y,
+                    initial_event_x, initial_event_y,
+                    selected_item
+                );
                 break;
 
             case Managers.NobManager.Nob.ROTATE:
-                debug ("Rotate");
-                rotate (event_x, event_y);
+                Utils.AffineTransform.rotate (
+                    event_x, event_y,
+                    initial_event_x, initial_event_y,
+                    selected_item
+                );
                 break;
 
             default:
-                scale (event_x, event_y, selected_nob);
+                Utils.AffineTransform.scale (
+                    event_x, event_y,
+                    ref initial_event_x, ref initial_event_y,
+                    initial_width, initial_height,
+                    selected_nob,
+                    selected_item
+                );
                 break;
         }
 
         update_bounding_box ();
-    }
-
-    private void scale (double x, double y, Managers.NobManager.Nob selected_nob) {
-        Models.CanvasItem selected_item;
-        selected_item = selected_items.nth_data (0);
-
-        canvas.convert_to_item_space (selected_item, ref x, ref y);
-
-        double delta_x = x - initial_event_x;
-        double delta_y = y - initial_event_y;
-
-        double item_width = selected_item.get_coords ("width");
-        double item_height = selected_item.get_coords ("height");
-
-        double item_x = selected_item.get_coords ("x");
-        double item_y = selected_item.get_coords ("y");
-
-        double new_width = item_width;
-        double new_height = item_height;
-
-        double origin_move_delta_x = 0.0;
-        double origin_move_delta_y = 0.0;
-
-        switch (selected_nob) {
-            case Managers.NobManager.Nob.TOP_LEFT:
-                new_height = initial_height - delta_y;
-                new_width = initial_width - delta_x;
-
-                if (item_height > MIN_SIZE) {
-                    origin_move_delta_y = item_height - new_height;
-                }
-
-                if (item_width > MIN_SIZE) {
-                    origin_move_delta_x = item_width - new_width;
-                }
-                break;
-
-            case Managers.NobManager.Nob.TOP_CENTER:
-                new_height = initial_height - delta_y;
-
-                if (item_height > MIN_SIZE) {
-                    origin_move_delta_y = item_height - new_height;
-                }
-                break;
-
-            case Managers.NobManager.Nob.TOP_RIGHT:
-                new_width = initial_width + delta_x;
-                new_height = initial_height - delta_y;
-
-                if (item_height > MIN_SIZE) {
-                    origin_move_delta_y = item_height - new_height;
-                }
-                break;
-
-            case Managers.NobManager.Nob.RIGHT_CENTER:
-                new_width = initial_width + delta_x;
-                break;
-
-            case Managers.NobManager.Nob.BOTTOM_RIGHT:
-                new_width = initial_width + delta_x;
-                new_height = initial_height + delta_y;
-                break;
-
-            case Managers.NobManager.Nob.BOTTOM_CENTER:
-                new_height = initial_height + delta_y;
-                break;
-
-            case Managers.NobManager.Nob.BOTTOM_LEFT:
-                new_height = initial_height + delta_y;
-                new_width = initial_width - delta_x;
-
-                if (item_width > MIN_SIZE) {
-                    origin_move_delta_x = item_width - new_width;
-                }
-                break;
-
-            case Managers.NobManager.Nob.LEFT_CENTER:
-                new_width = initial_width - delta_x;
-
-                if (item_width > MIN_SIZE) {
-                    origin_move_delta_x = item_width - new_width;
-                }
-                break;
-        }
-
-        origin_move_delta_x = Math.round (origin_move_delta_x);
-        origin_move_delta_y = Math.round (origin_move_delta_y);
-
-        new_width = fix_size (new_width);
-        new_height = fix_size (new_height);
-
-        if (new_width == MIN_SIZE) {
-            origin_move_delta_x = 0.0;
-        }
-
-        if (new_height == MIN_SIZE) {
-            origin_move_delta_y = 0.0;
-        }
-
-        // Before translating, recover the original "canvas" position of
-        // initial_event, in order to convert it to the "new" translated
-        // item space after the transformation has been applied.
-        canvas.convert_from_item_space (selected_item, ref initial_event_x, ref initial_event_y);
-        selected_item.translate (origin_move_delta_x, origin_move_delta_y);
-        canvas.convert_to_item_space (selected_item, ref initial_event_x, ref initial_event_y);
-
-        selected_item.set ("width", new_width, "height", new_height);
-    }
-
-    private void move (double x, double y) {
-        Models.CanvasItem selected_item = selected_items.nth_data (0);
-
-        canvas.convert_to_item_space (selected_item, ref x, ref y);
-
-        double delta_x = Math.round (x - initial_event_x);
-        double delta_y = Math.round (y - initial_event_y);
-
-        selected_item.translate (delta_x, delta_y);
-    }
-
-    private void rotate (double x, double y) {
-        Models.CanvasItem selected_item = selected_items.nth_data (0);
-
-        canvas.convert_to_item_space (selected_item, ref x, ref y);
-
-        var center_x = initial_width / 2;
-        var center_y = initial_height / 2;
-
-        var start_radians = GLib.Math.atan2 (
-            center_y - initial_event_y,
-            initial_event_x - center_x
-        );
-
-        var radians = GLib.Math.atan2 (center_y - y, x - center_x);
-        radians = start_radians - radians;
-        double rotation = radians * (180 / Math.PI);
-
-        initial_event_x = x;
-        initial_event_y = y;
-
-        canvas.convert_from_item_space (selected_item, ref initial_event_x, ref initial_event_y);
-        selected_item.rotate (rotation, center_x, center_y);
-        //rotation += selected_item.get_data<double?> ("rotation");
-        //selected_item.set_data<double?> ("rotation", rotation);
-        canvas.convert_to_item_space (selected_item, ref initial_event_x, ref initial_event_y);
     }
 
     public void add_item_to_selection (Models.CanvasItem item) {
@@ -297,40 +163,5 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         };
 
         event_bus.selected_items_bb_changed (select_bb);
-    }
-
-    private double fix_x_position (double x, double width, double delta_x) {
-        var min_delta = Math.round (MIN_POS - width);
-        var max_delta = Math.round (BOUNDS_H - MIN_POS);
-
-        var new_x = Math.round (x + delta_x);
-
-        if (new_x < min_delta) {
-            return 0;
-        } else if (new_x > max_delta) {
-            return 0;
-        } else {
-            return delta_x;
-        }
-    }
-
-    private double fix_y_position (double y, double height, double delta_y) {
-        var min_delta = Math.round (MIN_POS - height);
-        var max_delta = Math.round (BOUNDS_H - MIN_POS);
-
-        var new_y = Math.round (y + delta_y);
-
-        if (new_y < min_delta) {
-            return 0;
-        } else if (new_y > max_delta) {
-            return 0;
-        } else {
-            return delta_y;
-        }
-    }
-
-    private double fix_size (double size) {
-        var new_size = Math.round (size);
-        return new_size > MIN_SIZE ? new_size : MIN_SIZE;
     }
 }

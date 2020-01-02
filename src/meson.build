@@ -33,6 +33,7 @@ executable(
 
     'Utils/Dialogs.vala',
     'Utils/BlendingMode.vala',
+    'Utils/AffineTransform.vala',
 
     'Layouts/HeaderBar.vala',
     'Layouts/LeftSideBar.vala',
