@@ -83,6 +83,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
 
             case Managers.NobManager.Nob.ROTATE:
                 debug ("Rotate");
+                rotate (event_x, event_y);
                 break;
 
             default:
@@ -209,6 +210,33 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         double delta_y = Math.round (y - initial_event_y);
 
         selected_item.translate (delta_x, delta_y);
+    }
+
+    private void rotate (double x, double y) {
+        Models.CanvasItem selected_item = selected_items.nth_data (0);
+
+        canvas.convert_to_item_space (selected_item, ref x, ref y);
+
+        var center_x = initial_width / 2;
+        var center_y = initial_height / 2;
+
+        var start_radians = GLib.Math.atan2 (
+            center_y - initial_event_y,
+            initial_event_x - center_x
+        );
+
+        var radians = GLib.Math.atan2 (center_y - y, x - center_x);
+        radians = start_radians - radians;
+        double rotation = radians * (180 / Math.PI);
+
+        initial_event_x = x;
+        initial_event_y = y;
+
+        canvas.convert_from_item_space (selected_item, ref initial_event_x, ref initial_event_y);
+        selected_item.rotate (rotation, center_x, center_y);
+        //rotation += selected_item.get_data<double?> ("rotation");
+        //selected_item.set_data<double?> ("rotation", rotation);
+        canvas.convert_to_item_space (selected_item, ref initial_event_x, ref initial_event_y);
     }
 
     public void add_item_to_selection (Models.CanvasItem item) {
