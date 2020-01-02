@@ -29,7 +29,7 @@ private class Akira.TestSuiteAdaptor {
     private Akira.TestSuite test_suite;
 
     public TestSuiteAdaptor (string name, owned Akira.TestCaseFunc test_case_func,
-                                Akira.TestSuite test_suite) {
+                             Akira.TestSuite test_suite) {
         this.name = name;
         this.func = (owned) test_case_func;
         this.test_suite = test_suite;
@@ -49,21 +49,19 @@ private class Akira.TestSuiteAdaptor {
 
     public GLib.TestCase get_g_test_case () {
         return new GLib.TestCase (this.name,
-                                    this.setup,
-                                    this.run,
-                                    this.teardown);
+                                  this.setup,
+                                  this.run,
+                                  this.teardown);
     }
 }
 
 public abstract class Akira.TestSuite : GLib.Object {
     private GLib.TestSuite g_test_suite;
     private TestSuiteAdaptor[] adaptors = new TestSuiteAdaptor[0];
-    public Akira.Application application;
 
     public TestSuite () {
         var name = this.get_name ();
         this.g_test_suite = new GLib.TestSuite (name);
-        application = new Akira.Application ();
     }
 
     public string get_name () {
@@ -81,11 +79,9 @@ public abstract class Akira.TestSuite : GLib.Object {
         this.g_test_suite.add (adaptor.get_g_test_case ());
     }
 
-    public virtual void setup () {
-    }
+    public virtual void setup () {}
 
-    public virtual void teardown () {
-    }
+    public virtual void teardown () {}
 }
 
 public class Akira.TestRunner : GLib.Object {
@@ -130,10 +126,10 @@ public class Akira.TestRunner : GLib.Object {
         var compile_schemas_result = 0;
         try {
             GLib.Process.spawn_command_line_sync (
-                        "glib-compile-schemas %s".printf (target_schema_path),
-                        null,
-                        null,
-                        out compile_schemas_result);
+                "glib-compile-schemas %s".printf (target_schema_path),
+                null,
+                null,
+                out compile_schemas_result);
         } catch (GLib.SpawnError error) {
             GLib.error (error.message);
         }
@@ -147,8 +143,7 @@ public class Akira.TestRunner : GLib.Object {
         Environment.set_variable ("LANGUAGE", "C", true);
 
         try {
-            this.tmp_dir = GLib.File.new_for_path (
-                    GLib.DirUtils.make_tmp ("gnome-Akira-test-XXXXXX"));
+            this.tmp_dir = GLib.File.new_for_path (GLib.DirUtils.make_tmp ("gnome-Akira-test-XXXXXX"));
         } catch (GLib.Error error) {
             GLib.error ("Error creating temporary directory for test files: %s".printf (error.message));
         }
@@ -163,17 +158,16 @@ public class Akira.TestRunner : GLib.Object {
 
             try {
                 GLib.Process.spawn_command_line_sync (
-                                        "rm -rf %s".printf (tmp_dir_path),
-                                        null,
-                                        null,
-                                        out delete_tmp_result);
+                    "rm -rf %s".printf (tmp_dir_path),
+                    null,
+                    null,
+                    out delete_tmp_result);
             } catch (GLib.SpawnError error) {
                 GLib.warning (error.message);
             }
 
             if (delete_tmp_result != 0) {
-                GLib.warning ("Could not delete temporary directory '%s'",
-                                tmp_dir_path);
+                GLib.warning ("Could not delete temporary directory '%s'", tmp_dir_path);
             }
         }
     }
