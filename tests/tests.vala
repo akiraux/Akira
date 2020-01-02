@@ -58,10 +58,12 @@ private class Akira.TestSuiteAdaptor {
 public abstract class Akira.TestSuite : GLib.Object {
     private GLib.TestSuite g_test_suite;
     private TestSuiteAdaptor[] adaptors = new TestSuiteAdaptor[0];
+    public Akira.Application application;
 
     public TestSuite () {
         var name = this.get_name ();
         this.g_test_suite = new GLib.TestSuite (name);
+        application = new Akira.Application ();
     }
 
     public string get_name () {

@@ -26,14 +26,14 @@ namespace Akira {
 
 public class Akira.Application : Gtk.Application {
     private Gee.HashMap<string, Akira.Window> opened_files;
-    public GLib.List <Window> windows;
+    public GLib.List<Window> windows;
 
     construct {
         flags |= ApplicationFlags.HANDLES_OPEN;
 
         event_bus = new Akira.Services.EventBus ();
         settings = new Akira.Services.Settings ();
-        windows = new GLib.List <Window> ();
+        windows = new GLib.List<Window> ();
         opened_files = new Gee.HashMap<string, Akira.Window> ();
 
         application_id = Constants.APP_ID;
@@ -77,12 +77,12 @@ public class Akira.Application : Gtk.Application {
     }
 
     public override void window_added (Gtk.Window window) {
-        windows.append (window as Window);
+        windows.append (window as Akira.Window);
         base.window_added (window);
     }
 
     public override void window_removed (Gtk.Window window) {
-        windows.remove (window as Window);
+        windows.remove (window as Akira.Window);
         base.window_removed (window);
     }
 

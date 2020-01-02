@@ -90,17 +90,20 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
         move_top.button.clicked.connect (() => {
             window.main_window.main_canvas.canvas.change_z_selected (true, true);
         });
-        move_bottom = new Akira.Partials.HeaderBarButton ("selection-bottom", _("Bottom"), {"<Ctrl><Shift>Down"}, "single");
+        move_bottom = new Akira.Partials.HeaderBarButton ("selection-bottom", _("Bottom"), {"<Ctrl><Shift>Down"},
+            "single");
         move_bottom.button.clicked.connect (() => {
             window.main_window.main_canvas.canvas.change_z_selected (false, true);
         });
 
         preferences = new Akira.Partials.HeaderBarButton ("open-menu", _("Settings"), {"<Ctrl>comma"});
-        preferences.button.action_name = Akira.Services.ActionManager.ACTION_PREFIX + Akira.Services.ActionManager.ACTION_PREFERENCES;
+        preferences.button.action_name = Akira.Services.ActionManager.ACTION_PREFIX
+            + Akira.Services.ActionManager.ACTION_PREFERENCES;
         preferences.sensitive = true;
 
         export = new Akira.Partials.HeaderBarButton ("document-export", _("Export"), {"<Ctrl><Shift>E"});
-        export.button.action_name = Akira.Services.ActionManager.ACTION_PREFIX + Akira.Services.ActionManager.ACTION_EXPORT;
+        export.button.action_name = Akira.Services.ActionManager.ACTION_PREFIX
+            + Akira.Services.ActionManager.ACTION_EXPORT;
         export.sensitive = true;
 
         path_difference = new Akira.Partials.HeaderBarButton ("path-difference", _("Difference"), null, "multiple");
@@ -144,16 +147,16 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
 
         var new_window_button = new Akira.Partials.PopoverButton (
             _("New Window"), "window-new-symbolic", {"<Ctrl>n"});
-        new_window_button.action_name = Akira.Services.ActionManager.ACTION_PREFIX +
-            Akira.Services.ActionManager.ACTION_NEW_WINDOW;
+        new_window_button.action_name = Akira.Services.ActionManager.ACTION_PREFIX
+            + Akira.Services.ActionManager.ACTION_NEW_WINDOW;
 
         var separator = new Gtk.Separator (Gtk.Orientation.HORIZONTAL);
         separator.margin_top = separator.margin_bottom = 3;
 
         var open_button = new Akira.Partials.PopoverButton (
             _("Open"), "document-open-symbolic", {"<Ctrl>o"});
-        open_button.action_name = Akira.Services.ActionManager.ACTION_PREFIX +
-            Akira.Services.ActionManager.ACTION_OPEN;
+        open_button.action_name = Akira.Services.ActionManager.ACTION_PREFIX
+            + Akira.Services.ActionManager.ACTION_OPEN;
 
         recent_files_grid = new Gtk.Grid ();
         recent_files_grid.margin_top = 6;
@@ -185,21 +188,21 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
 
         var save_button = new Akira.Partials.PopoverButton (
             _("Save"), "document-save-symbolic", {"<Ctrl>s"});
-        save_button.action_name = Akira.Services.ActionManager.ACTION_PREFIX +
-            Akira.Services.ActionManager.ACTION_SAVE;
+        save_button.action_name = Akira.Services.ActionManager.ACTION_PREFIX
+            + Akira.Services.ActionManager.ACTION_SAVE;
 
         var save_as_button = new Akira.Partials.PopoverButton (
             _("Save As"), "document-save-as-symbolic", {"<Ctrl><Shift>s"});
-        save_as_button.action_name = Akira.Services.ActionManager.ACTION_PREFIX +
-            Akira.Services.ActionManager.ACTION_SAVE_AS;
+        save_as_button.action_name = Akira.Services.ActionManager.ACTION_PREFIX
+            + Akira.Services.ActionManager.ACTION_SAVE_AS;
 
         var separator3 = new Gtk.Separator (Gtk.Orientation.HORIZONTAL);
         separator3.margin_top = separator3.margin_bottom = 3;
 
         var quit_button = new Akira.Partials.PopoverButton (
             _("Quit"), "system-shutdown-symbolic", {"<Ctrl>q"});
-        quit_button.action_name = Akira.Services.ActionManager.ACTION_PREFIX +
-            Akira.Services.ActionManager.ACTION_QUIT;
+        quit_button.action_name = Akira.Services.ActionManager.ACTION_PREFIX
+            + Akira.Services.ActionManager.ACTION_QUIT;
 
         grid.add (new_window_button);
         grid.add (separator);
@@ -305,12 +308,6 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
         event_bus.close_popover.connect (() => {
             popover_insert.closed ();
         });
-    }
-
-    public void button_sensitivity () {
-        /* TODO: dinamically toggle button sensitivity
-         * based on document status or actor selected.
-         */
     }
 
     public void toggle () {

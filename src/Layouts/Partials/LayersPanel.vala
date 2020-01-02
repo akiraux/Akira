@@ -70,7 +70,8 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
         drag_leave.connect (on_drag_leave);
     }
 
-    private void on_drag_data_received (Gdk.DragContext context, int x, int y, Gtk.SelectionData selection_data, uint target_type, uint time) {
+    private void on_drag_data_received (Gdk.DragContext context, int x, int y, Gtk.SelectionData selection_data,
+        uint target_type, uint time) {
         Akira.Layouts.Partials.Artboard target;
         Gtk.Widget row;
         Akira.Layouts.Partials.Artboard source;

@@ -98,7 +98,8 @@ public class Akira.Layouts.Partials.StylePanel : Gtk.Grid {
         options_revealer = new Gtk.Revealer ();
         panel_grid.attach (options_revealer, 0, 3, 3, 1);
 
-        options_button.bind_property ("active", options_revealer, "reveal-child", BindingFlags.DEFAULT | BindingFlags.SYNC_CREATE);
+        options_button.bind_property (
+            "active", options_revealer, "reveal-child", BindingFlags.DEFAULT | BindingFlags.SYNC_CREATE);
 
         options_grid = new Gtk.Grid ();
         options_grid.border_width = 12;
@@ -110,21 +111,24 @@ public class Akira.Layouts.Partials.StylePanel : Gtk.Grid {
         border_entries_grid.column_spacing = 12;
         border_entries_grid.hexpand = true;
 
-        border_radius_top_left_entry = new Akira.Partials.InputField (Akira.Partials.InputField.Unit.PIXEL, 6, true, false);
+        border_radius_top_left_entry = new Akira.Partials.InputField (
+            Akira.Partials.InputField.Unit.PIXEL, 6, true, false);
         border_radius_top_left_entry.entry.hexpand = false;
         border_radius_top_left_entry.entry.width_request = 64;
         border_radius_top_left_entry.valign = Gtk.Align.CENTER;
         border_radius_top_left_entry.halign = Gtk.Align.START;
         border_entries_grid.attach (border_radius_top_left_entry, 0, 0, 1, 1);
 
-        border_radius_top_right_entry = new Akira.Partials.InputField (Akira.Partials.InputField.Unit.PIXEL, 6, true, false);
+        border_radius_top_right_entry = new Akira.Partials.InputField (
+            Akira.Partials.InputField.Unit.PIXEL, 6, true, false);
         border_radius_top_right_entry.entry.hexpand = false;
         border_radius_top_right_entry.entry.width_request = 64;
         border_radius_top_right_entry.valign = Gtk.Align.CENTER;
         border_radius_top_right_entry.halign = Gtk.Align.END;
         border_entries_grid.attach (border_radius_top_right_entry, 1, 0, 1, 1);
 
-        border_radius_bottom_left_entry = new Akira.Partials.InputField (Akira.Partials.InputField.Unit.PIXEL, 6, true, false);
+        border_radius_bottom_left_entry = new Akira.Partials.InputField (
+            Akira.Partials.InputField.Unit.PIXEL, 6, true, false);
         border_radius_bottom_left_entry.entry.hexpand = false;
         border_radius_bottom_left_entry.entry.width_request = 64;
         border_radius_bottom_left_entry.valign = Gtk.Align.CENTER;
@@ -132,7 +136,8 @@ public class Akira.Layouts.Partials.StylePanel : Gtk.Grid {
         border_entries_grid.attach (border_radius_bottom_left_entry, 0, 1, 1, 1);
 
 
-        border_radius_bottom_right_entry = new Akira.Partials.InputField (Akira.Partials.InputField.Unit.PIXEL, 6, true, false);
+        border_radius_bottom_right_entry = new Akira.Partials.InputField (
+            Akira.Partials.InputField.Unit.PIXEL, 6, true, false);
         border_radius_bottom_right_entry.entry.hexpand = false;
         border_radius_bottom_right_entry.entry.width_request = 64;
         border_radius_bottom_right_entry.valign = Gtk.Align.CENTER;

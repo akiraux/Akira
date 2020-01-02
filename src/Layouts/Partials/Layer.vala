@@ -83,7 +83,8 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 
     // public Akira.Shape shape { get; construct; }
 
-    public Layer (Akira.Window window, Akira.Layouts.Partials.Artboard artboard, Goo.CanvasItemSimple item_simple, string name, string icon, bool group, Akira.Layouts.Partials.Layer? parent = null) {
+    public Layer (Akira.Window window, Akira.Layouts.Partials.Artboard artboard, Goo.CanvasItemSimple item_simple,
+        string name, string icon, bool group, Akira.Layouts.Partials.Layer? parent = null) {
         Object (
             window: window,
             layer_name: name,
@@ -318,7 +319,8 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
         artboard.count_layers ();
     }
 
-    private void on_drag_data_get (Gtk.Widget widget, Gdk.DragContext context, Gtk.SelectionData selection_data, uint target_type, uint time) {
+    private void on_drag_data_get (Gtk.Widget widget, Gdk.DragContext context, Gtk.SelectionData selection_data,
+        uint target_type, uint time) {
         uchar[] data = new uchar[(sizeof (Akira.Layouts.Partials.Layer))];
         ((Gtk.Widget[])data)[0] = widget;
 
@@ -336,7 +338,8 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
             window.main_window.right_sidebar.indicator.visible = false;
         }
 
-        var layers_panel = (Akira.Layouts.Partials.LayersPanel) artboard.get_ancestor (typeof (Akira.Layouts.Partials.LayersPanel));
+        var layers_panel = (Akira.Layouts.Partials.LayersPanel) artboard.get_ancestor (typeof
+            (Akira.Layouts.Partials.LayersPanel));
         var row = (Akira.Layouts.Partials.Artboard) layers_panel.get_row_at_index (artboard.get_index ());
         var last_adjust = 0;
         var group_y = 0;
@@ -389,14 +392,19 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
                 window.main_window.right_sidebar.indicator.visible = false;
             } else {
                 get_style_context ().remove_class ("highlight");
-                window.main_window.right_sidebar.indicator.margin_top = (index * alloc.height) - 6 - (int)vadjustment.value + group_y - last_adjust;
+                window.main_window.right_sidebar.indicator.margin_top =
+                    (index * alloc.height) - 6 - (int)vadjustment.value + group_y - last_adjust;
             }
 
         } else {
             if (y > (alloc.height / 2)) {
-                window.main_window.right_sidebar.indicator.margin_top = (index * alloc.height) + (row_index * alloc.height) - 6 - (int)vadjustment.value + group_y - last_adjust;
+                window.main_window.right_sidebar.indicator.margin_top =
+                    (index * alloc.height) + (row_index * alloc.height) - 6
+                    - (int)vadjustment.value + group_y - last_adjust;
             } else {
-                window.main_window.right_sidebar.indicator.margin_top = (index * alloc.height) + (row_index * alloc.height) - alloc.height - 6 - (int)vadjustment.value + group_y - last_adjust;
+                window.main_window.right_sidebar.indicator.margin_top =
+                    (index * alloc.height) + (row_index * alloc.height) - alloc.height - 6
+                    - (int)vadjustment.value + group_y - last_adjust;
             }
         }
 

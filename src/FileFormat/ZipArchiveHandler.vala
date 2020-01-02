@@ -19,7 +19,8 @@
 
 public class Akira.FileFormat.ZipArchiveHandler : GLib.Object {
 
-    // Prefix to be added at the beginning of the folder name when a gzipped file is opened. Should start with a period to hide the folder by default
+    // Prefix to be added at the beginning of the folder name when a gzipped file is opened.
+    // Should start with a period to hide the folder by default.
     private const string UNARCHIVED_PREFIX = ".~lock.akira.";
 
     /**
@@ -43,7 +44,8 @@ public class Akira.FileFormat.ZipArchiveHandler : GLib.Object {
 
     construct {
         var parent_folder = opened_file.get_parent ().get_path ();
-        unarchived_location = File.new_for_path (Path.build_filename (parent_folder, UNARCHIVED_PREFIX + opened_file.get_basename ()));
+        unarchived_location = File.new_for_path (
+            Path.build_filename (parent_folder, UNARCHIVED_PREFIX + opened_file.get_basename ()));
 
         file_collector = new FileCollector (unarchived_location);
     }
@@ -250,7 +252,9 @@ public class Akira.FileFormat.ZipArchiveHandler : GLib.Object {
         extractor.set_standard_lookup ();
 
         if (archive.open_filename (gzipped_file.get_path (), 10240) != Archive.Result.OK) {
-            throw new FileError.FAILED ("Error opening %s: %s (%d)", gzipped_file.get_path (), archive.error_string (), archive.errno ());
+            throw new FileError.FAILED (
+                "Error opening %s: %s (%d)", gzipped_file.get_path (), archive.error_string (), archive.errno ()
+            );
         }
 
         unowned Archive.Entry entry;
@@ -308,7 +312,8 @@ public class Akira.FileFormat.ZipArchiveHandler : GLib.Object {
                 if (current_info.get_file_type () == FileType.DIRECTORY) {
                     add_to_archive_recursive (initial_folder, current_file, archive);
                 } else {
-                    GLib.FileInfo file_info = current_file.query_info (GLib.FileAttribute.STANDARD_SIZE, GLib.FileQueryInfoFlags.NONE);
+                    GLib.FileInfo file_info = current_file.query_info (GLib.FileAttribute.STANDARD_SIZE,
+                        GLib.FileQueryInfoFlags.NONE);
 
                     FileInputStream input_stream = current_file.read ();
                     DataInputStream data_input_stream = new DataInputStream (input_stream);
@@ -321,7 +326,12 @@ public class Akira.FileFormat.ZipArchiveHandler : GLib.Object {
                     entry.set_perm (0644);
 
                     if (archive.write_header (entry) != Archive.Result.OK) {
-                        critical ("Error writing '%s': %s (%d)", current_file.get_path (), archive.error_string (), archive.errno ());
+                        critical (
+                            "Error writing '%s': %s (%d)",
+                            current_file.get_path (),
+                            archive.error_string (),
+                            archive.errno ()
+                        );
                         return;
                     }
 
