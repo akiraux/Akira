@@ -19,19 +19,9 @@
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
 
-public class Akira.FillsItemTest : Akira.TestSuite {
-    public FillsItemTest () {
-        this.add_test ("loops_through_items", this.loops_through_items);
-    }
-
-    public override void setup () {
-    }
-
-    public override void teardown () {
-    }
-
-    // Unit test for Akira.Models.FillListModel.add () method.
-    // Check whether quickly selecting and deselecting multiple items causes a segfault.
-    public void loops_through_items () {
+public class Akira.FillsItemTest : Object {
+    public static int main(string[] args) {
+        stdout.printf("Vala is working.\n");
+        return 0;
     }
 }
