@@ -15,14 +15,12 @@ jobs:
     - name: Install Dependencies
       run: |
         apt update
-        apt install -y libarchive-dev libgoocanvas-2.0-dev valac meson appstream-util
-        apt install -y xvfb
+        apt install -y libarchive-dev libgoocanvas-2.0-dev valac meson appstream-util xvfb
     - name: Build
       env:
         DESTDIR: out
       run: |
         meson build
         ninja -C build
-        # ninja -C build test
         ninja -C build install
         xvfb-run --auto-servernum ninja -C build test
