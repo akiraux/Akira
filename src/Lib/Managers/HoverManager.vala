@@ -54,19 +54,25 @@ public class Akira.Lib.Managers.HoverManager : Object {
         }
 
         if (target is Models.CanvasItem) {
-            var target_model = target as Models.CanvasItem;
+            var item = target as Models.CanvasItem;
 
-            Goo.CanvasBounds item_bounds;
-            target_model.get_bounds (out item_bounds);
+            double line_width = 0.0;
+            item.get ("line-width", out line_width);
 
-            double x = item_bounds.x1;
-            double y = item_bounds.y1;
-            double width = item_bounds.x2 - item_bounds.x1;
-            double height = item_bounds.y2 - item_bounds.y1;
+            // Each item is always at 0,0 relative to its
+            // coordinate system
+            double x = 0 - line_width / 2;
+            double y = 0 - line_width / 2;
 
-            //debug (@"x: $(x) y: $(y) width: $(width) height: $(height)");
+            double width = item.get_coords ("width");
+            double height = item.get_coords ("height");
 
-            if (!target_model.selected) {
+            x -= line_width / 2;
+            y -= line_width / 2;
+            width += line_width * 2;
+            height += line_width * 2;
+
+            if (!item.selected) {
                 hover_effect = new Goo.CanvasRect (
                     null,
                     x, y,
@@ -77,7 +83,7 @@ public class Akira.Lib.Managers.HoverManager : Object {
                 );
 
                 var transform = Cairo.Matrix.identity ();
-                //target_model.get_transform (out transform);
+                item.get_transform (out transform);
                 hover_effect.set_transform (transform);
 
                 hover_effect.set ("parent", canvas.get_root_item ());
@@ -86,8 +92,8 @@ public class Akira.Lib.Managers.HoverManager : Object {
         }
 
         if (target is Selection.Nob) {
-            var target_nob = target as Selection.Nob;
-            set_cursor_for_nob (target_nob.handle_id);
+            var nob = target as Selection.Nob;
+            set_cursor_for_nob (nob.handle_id);
         }
 
         return;

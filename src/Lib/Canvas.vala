@@ -18,6 +18,7 @@
 *
 * Authored by: Felipe Escoto <felescoto95@hotmail.com>
 * Authored by: Alberto Fanjul <albertofanjul@gmail.com>
+* Authored by: Giacomo Alberini <giacomoalbe@gmail.com>
 */
 
 public class Akira.Lib.Canvas : Goo.Canvas {
@@ -255,117 +256,6 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 //update_decorations (selected_item);
             }
         }
-    }
-
-    public override bool motion_notify_event (Gdk.EventMotion event) {
-        if (!holding) {
-            motion_hover_event (event);
-            return false;
-        }
-        var event_x = event.x / current_scale;
-        var event_y = event.y / current_scale;
-
-        convert_to_item_space (selected_item, ref event_x, ref event_y);
-
-        //  debug ("event x: %f", event_x);
-        //  debug ("event y: %f", event_y);
-
-        if (!temp_event_converted) {
-            convert_to_item_space (selected_item, ref temp_event_x, ref temp_event_y);
-            temp_event_converted = true;
-        }
-
-        //  debug ("temp event x: %f", temp_event_x);
-        //  debug ("temp event y: %f", temp_event_y);
-
-        delta_x = event_x - temp_event_x;
-        delta_y = event_y - temp_event_y;
-
-        //  debug ("delta x: %f", delta_x);
-        //  debug ("delta y: %f", delta_y);
-
-        double x, y, width, height;
-        selected_item.get ("x", out x, "y", out y, "width", out width, "height", out height);
-
-        //  debug ("x: %f", x);
-        //  debug ("y: %f", y);
-
-        var new_height = height;
-        var new_width = width;
-
-        var new_delta_x = delta_x;
-        var new_delta_y = delta_y;
-
-        var canvas_x = x;
-        var canvas_y = y;
-        convert_from_item_space (selected_item, ref canvas_x, ref canvas_y);
-
-        //  debug ("new delta x: %f", new_delta_x);
-        //  debug ("new delta y: %f", new_delta_y);
-
-        //  debug ("height: %f", height);
-        //  debug ("width: %f", width);
-
-        bool update_x = new_delta_x != 0;
-        bool update_y = new_delta_y != 0;
-
-        //  debug ("update x: %s", update_x.to_string ());
-        //  debug ("update y: %s", update_y.to_string ());
-
-        switch (holding_id) {
-            case Nob.NONE: // Moving
-                double move_x = fix_x_position (canvas_x, width, delta_x);
-                double move_y = fix_y_position (canvas_y, height, delta_y);
-                //  debug ("move x %f", move_x);
-                //  debug ("move y %f", move_y);
-                selected_item.translate (move_x, move_y);
-                event_x -= move_x;
-                event_y -= move_y;
-                break;
-            case Nob.ROTATE:
-                var center_x = x + width / 2;
-                var center_y = y + height / 2;
-
-                //  debug ("center x: %f", center_x);
-                //  debug ("center y: %f", center_y);
-
-                var start_radians = GLib.Math.atan2 (center_y - temp_event_y, temp_event_x - center_x);
-                //  debug ("start_radians %f, atan2(%f - %f, %f - %f)", start_radians, center_y, temp_event_y, temp_event_x, center_x);
-                var radians = GLib.Math.atan2 (center_y - event_y, event_x - center_x);
-                //  debug ("radians %f, atan2(%f - %f, %f - %f)", radians, center_y, event_y, event_x, center_x);
-                radians = start_radians - radians;
-                double rotation = radians * (180 / Math.PI);
-                //  debug ("rotation: %f", rotation);
-
-                convert_from_item_space (selected_item, ref event_x, ref event_y);
-                selected_item.rotate (rotation, center_x, center_y);
-                rotation += selected_item.get_data<double?> ("rotation");
-                selected_item.set_data<double?> ("rotation", rotation);
-                convert_to_item_space (selected_item, ref event_x, ref event_y);
-                break;
-        }
-
-        //  debug ("new width: %f", new_width);
-        //  debug ("new height: %f", new_height);
-
-        //  debug ("update x: %s", update_x.to_string ());
-        //  debug ("update y: %s", update_y.to_string ());
-
-        selected_item.set ("width", new_width, "height", new_height);
-
-        update_nob_position (selected_item);
-        update_select_effect (selected_item);
-
-        if (update_x) {
-            temp_event_x = event_x;
-            //  debug ("temp event x: %f", temp_event_x);
-        }
-        if (update_y) {
-            temp_event_y = event_y;
-            //  debug ("temp event y: %f", temp_event_y);
-        }
-
-        return true;
     }
     */
 }

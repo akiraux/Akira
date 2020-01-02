@@ -18,13 +18,14 @@
  *
  * Authored by: Giacomo "giacomoalbe" Alberini <giacomoalbe@gmail.com>
  */
+
 public class Akira.Services.EventBus : Object {
     public signal void update_icons_style ();
     public signal void align_items (string align_action);
     public signal void close_popover (string popover);
     public signal void change_sensitivity (string type);
     public signal void insert_item (string type);
-    public signal void selected_items_bb_changed (Goo.CanvasBounds? select_bb);
+    public signal void selected_items_changed (List<Lib.Models.CanvasItem> selected_items);
     public signal void zoom ();
     public signal void request_zoom (string direction);
     public signal void coordinate_change (double x, double y);

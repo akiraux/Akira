@@ -46,6 +46,7 @@ public class Akira.Lib.Managers.NobManager : Object {
     private Goo.CanvasItem root;
     private Goo.CanvasItem select_effect;
     private Goo.CanvasItemSimple[] nobs = new Goo.CanvasItemSimple[9];
+    private Goo.CanvasBounds select_bb;
     private Nob selected_nob;
     private double top;
     private double left;
@@ -66,7 +67,7 @@ public class Akira.Lib.Managers.NobManager : Object {
 
         on_zoom ();
 
-        event_bus.selected_items_bb_changed.connect (on_add_select_effect);
+        event_bus.selected_items_changed.connect (on_add_select_effect);
         event_bus.zoom.connect (on_zoom);
     }
 
@@ -92,45 +93,115 @@ public class Akira.Lib.Managers.NobManager : Object {
         current_scale = canvas.get_scale ();
     }
 
-    private void update_select_bb_coords (Goo.CanvasBounds select_bb) {
+    private void update_select_bb_coords (List<Models.CanvasItem> selected_items) {
+        // Bounding box edges
+        double bb_left = 1e6, bb_top = 1e6, bb_right = 0, bb_bottom = 0;
+
+        foreach (var item in selected_items) {
+            Goo.CanvasBounds item_bounds;
+            item.get_bounds (out item_bounds);
+
+            bb_left = double.min (bb_left, item_bounds.x1);
+            bb_top = double.min (bb_top, item_bounds.y1);
+            bb_right = double.max (bb_right, item_bounds.x2);
+            bb_bottom = double.max (bb_bottom, item_bounds.y2);
+        }
+
+        select_bb = Goo.CanvasBounds () {
+            x1 = bb_left,
+            y1 = bb_top,
+            x2 = bb_right,
+            y2 = bb_bottom
+        };
+
         top = select_bb.y1;
         left = select_bb.x1;
         width = select_bb.x2 - select_bb.x1;
         height = select_bb.y2 - select_bb.y1;
     }
 
-    private void on_add_select_effect (Goo.CanvasBounds? select_bb) {
+    private void on_add_select_effect (List<Models.CanvasItem> selected_items) {
         remove_select_effect ();
 
-        if (select_bb == null) {
+        if (selected_items.length () == 0) {
             return;
         }
 
-        update_select_bb_coords (select_bb);
-
-        /*
-        var fills_list_model = window.main_window.left_sidebar.fill_box_panel.fills_list_model;
-        if (fills_list_model != null) {
-            fills_list_model.add.begin (item);
+        if (selected_items.length () > 1) {
+            update_select_bb_coords (selected_items);
         }
-        */
 
-        var line_width = 1.0 / current_scale;
+        update_select_effect (selected_items);
+        update_nob_position (selected_items);
+    }
 
+    private void remove_select_effect (bool keep_selection = false) {
         if (select_effect == null) {
-            select_effect = new Goo.CanvasRect (
-                null,
-                left, top,
-                0, 0,
-                "line-width", line_width,
-                "stroke-color", "#666",
-                null
-            );
+            return;
         }
 
-        update_select_effect (select_bb);
+        select_effect.remove ();
+        select_effect = null;
+
+        for (int i = 0; i < 9; i++) {
+            nobs[i].remove ();
+        }
+    }
+
+    private void update_select_effect (List<Models.CanvasItem> selected_items) {
+        double x = 0.0;
+        double y = 0.0;
+        double line_width = 0.0;
+        double width = 0.0;
+        double height = 0.0;
+
+        var transform = Cairo.Matrix.identity ();
+
+        set_bound_coordinates (
+            selected_items,
+            ref x, ref y,
+            ref transform,
+            ref line_width,
+            ref width, ref height
+        );
+
+        // Account for line_width
+        x -= line_width;
+        y -= line_width;
+        width += line_width * 2;
+        height += line_width * 2;
+
+        select_effect = new Goo.CanvasRect (
+            null,
+            x, y,
+            width,
+            height,
+            "line-width", 1.0 / current_scale,
+            "stroke-color", "#666",
+            null
+        );
+
+        select_effect.set_transform (transform);
 
         select_effect.set ("parent", root);
+    }
+
+    private void update_nob_position (List<Models.CanvasItem> selected_items) {
+        var transform = Cairo.Matrix.identity ();
+
+        double line_width = 0.0;
+        double x = 0.0;
+        double y = 0.0;
+        double width = 0.0;
+        double height = 0.0;
+
+        set_bound_coordinates (
+            selected_items,
+            ref x, ref y,
+            ref transform,
+            ref line_width,
+            ref width, ref height
+        );
 
         nob_size = 10 / current_scale;
 
@@ -146,51 +217,17 @@ public class Akira.Lib.Managers.NobManager : Object {
             );
         }
 
-        update_nob_position (select_bb);
-
-        //select_effect.can_focus = false;
-    }
-
-    private void remove_select_effect (bool keep_selection = false) {
-        if (select_effect == null) {
-            return;
-        }
-
-        /*
-        var fills_list_model = window.main_window.left_sidebar.fill_box_panel.fills_list_model;
-        if (fills_list_model != null) {
-            fills_list_model.clear.begin ();
-        }
-        */
-
-        select_effect.remove ();
-        select_effect = null;
-
-        for (int i = 0; i < 9; i++) {
-            nobs[i].remove ();
-        }
-    }
-
-    // Updates all the nub's position arround the selected item, except for the grabbed nub
-    private void update_nob_position (Goo.CanvasBounds select_bb) {
-        var stroke = 0;
-        var x = left;
-        var y = top;
-
         bool print_middle_width_nobs = width > nob_size * 3;
         bool print_middle_height_nobs = height > nob_size * 3;
 
         var nob_offset = (nob_size / 2);
 
-        var transform = Cairo.Matrix.identity ();
-        //item.get_transform (out transform);
-
         // TOP LEFT nob
         nobs[Nob.TOP_LEFT].set_transform (transform);
         if (print_middle_width_nobs && print_middle_height_nobs) {
-          nobs[Nob.TOP_LEFT].translate (x - (nob_offset + stroke), y - (nob_offset + stroke));
+          nobs[Nob.TOP_LEFT].translate (x - (nob_offset + line_width), y - (nob_offset + line_width));
         } else {
-          nobs[Nob.TOP_LEFT].translate (x - nob_size - stroke, y - nob_size - stroke);
+          nobs[Nob.TOP_LEFT].translate (x - nob_size - line_width, y - nob_size - line_width);
         }
         nobs[Nob.TOP_LEFT].raise (select_effect);
 
@@ -198,9 +235,9 @@ public class Akira.Lib.Managers.NobManager : Object {
           // TOP CENTER nob
           nobs[Nob.TOP_CENTER].set_transform (transform);
           if (print_middle_height_nobs) {
-            nobs[Nob.TOP_CENTER].translate (x + (width / 2) - nob_offset, y - (nob_offset + stroke));
+            nobs[Nob.TOP_CENTER].translate (x + (width / 2) - nob_offset, y - (nob_offset + line_width));
           } else {
-            nobs[Nob.TOP_CENTER].translate (x + (width / 2) - nob_offset, y - (nob_size + stroke));
+            nobs[Nob.TOP_CENTER].translate (x + (width / 2) - nob_offset, y - (nob_size + line_width));
           }
           nobs[Nob.TOP_CENTER].set ("visibility", Goo.CanvasItemVisibility.VISIBLE);
         } else {
@@ -211,9 +248,9 @@ public class Akira.Lib.Managers.NobManager : Object {
         // TOP RIGHT nob
         nobs[Nob.TOP_RIGHT].set_transform (transform);
         if (print_middle_width_nobs && print_middle_height_nobs) {
-          nobs[Nob.TOP_RIGHT].translate (x + width - (nob_offset - stroke), y - (nob_offset + stroke));
+          nobs[Nob.TOP_RIGHT].translate (x + width - (nob_offset - line_width), y - (nob_offset + line_width));
         } else {
-          nobs[Nob.TOP_RIGHT].translate (x + width + stroke, y - (nob_size + stroke));
+          nobs[Nob.TOP_RIGHT].translate (x + width + line_width, y - (nob_size + line_width));
         }
         nobs[Nob.TOP_RIGHT].raise (select_effect);
 
@@ -221,9 +258,9 @@ public class Akira.Lib.Managers.NobManager : Object {
           // RIGHT CENTER nob
           nobs[Nob.RIGHT_CENTER].set_transform (transform);
           if (print_middle_width_nobs) {
-            nobs[Nob.RIGHT_CENTER].translate (x + width - (nob_offset - stroke), y + (height / 2) - nob_offset);
+            nobs[Nob.RIGHT_CENTER].translate (x + width - (nob_offset - line_width), y + (height / 2) - nob_offset);
           } else {
-            nobs[Nob.RIGHT_CENTER].translate (x + width + stroke, y + (height / 2) - nob_offset);
+            nobs[Nob.RIGHT_CENTER].translate (x + width + line_width, y + (height / 2) - nob_offset);
           }
           nobs[Nob.RIGHT_CENTER].set ("visibility", Goo.CanvasItemVisibility.VISIBLE);
         } else {
@@ -234,9 +271,9 @@ public class Akira.Lib.Managers.NobManager : Object {
         // BOTTOM RIGHT nob
         nobs[Nob.BOTTOM_RIGHT].set_transform (transform);
         if (print_middle_width_nobs && print_middle_height_nobs) {
-          nobs[Nob.BOTTOM_RIGHT].translate (x + width - (nob_offset - stroke), y + height - (nob_offset - stroke));
+          nobs[Nob.BOTTOM_RIGHT].translate (x + width - (nob_offset - line_width), y + height - (nob_offset - line_width));
         } else {
-          nobs[Nob.BOTTOM_RIGHT].translate (x + width + stroke, y + height + stroke);
+          nobs[Nob.BOTTOM_RIGHT].translate (x + width + line_width, y + height + line_width);
         }
         nobs[Nob.BOTTOM_RIGHT].raise (select_effect);
 
@@ -244,9 +281,9 @@ public class Akira.Lib.Managers.NobManager : Object {
           // BOTTOM CENTER nob
           nobs[Nob.BOTTOM_CENTER].set_transform (transform);
           if (print_middle_height_nobs) {
-            nobs[Nob.BOTTOM_CENTER].translate (x + (width / 2) - nob_offset, y + height - (nob_offset - stroke));
+            nobs[Nob.BOTTOM_CENTER].translate (x + (width / 2) - nob_offset, y + height - (nob_offset - line_width));
           } else {
-            nobs[Nob.BOTTOM_CENTER].translate (x + (width / 2) - nob_offset, y + height + stroke);
+            nobs[Nob.BOTTOM_CENTER].translate (x + (width / 2) - nob_offset, y + height + line_width);
           }
           nobs[Nob.BOTTOM_CENTER].set ("visibility", Goo.CanvasItemVisibility.VISIBLE);
         } else {
@@ -257,9 +294,9 @@ public class Akira.Lib.Managers.NobManager : Object {
         // BOTTOM LEFT nob
         nobs[Nob.BOTTOM_LEFT].set_transform (transform);
         if (print_middle_width_nobs && print_middle_height_nobs) {
-          nobs[Nob.BOTTOM_LEFT].translate (x - (nob_offset + stroke), y + height - (nob_offset - stroke));
+          nobs[Nob.BOTTOM_LEFT].translate (x - (nob_offset + line_width), y + height - (nob_offset - line_width));
         } else {
-          nobs[Nob.BOTTOM_LEFT].translate (x - (nob_size + stroke), y + height + stroke);
+          nobs[Nob.BOTTOM_LEFT].translate (x - (nob_size + line_width), y + height + line_width);
         }
         nobs[Nob.BOTTOM_LEFT].raise (select_effect);
 
@@ -267,9 +304,9 @@ public class Akira.Lib.Managers.NobManager : Object {
           // LEFT CENTER nob
           nobs[Nob.LEFT_CENTER].set_transform (transform);
           if (print_middle_width_nobs) {
-            nobs[Nob.LEFT_CENTER].translate (x - (nob_offset + stroke), y + (height / 2) - nob_offset);
+            nobs[Nob.LEFT_CENTER].translate (x - (nob_offset + line_width), y + (height / 2) - nob_offset);
           } else {
-            nobs[Nob.LEFT_CENTER].translate (x - (nob_size + stroke), y + (height / 2) - nob_offset);
+            nobs[Nob.LEFT_CENTER].translate (x - (nob_size + line_width), y + (height / 2) - nob_offset);
           }
           nobs[Nob.LEFT_CENTER].set ("visibility", Goo.CanvasItemVisibility.VISIBLE);
         } else {
@@ -288,34 +325,29 @@ public class Akira.Lib.Managers.NobManager : Object {
         nobs[Nob.ROTATE].raise (select_effect);
     }
 
-    private void update_select_effect (Goo.CanvasBounds select_bb) {
-        select_effect.set (
-            "x", left,
-            "y", top,
-            "width", width,
-            "height", height
-        );
 
-        /*
-        var transform = Cairo.Matrix.identity ();
-        item.get_transform (out transform);
-        select_effect.set_transform (transform);
-        */
+    private void set_bound_coordinates (
+        List<Models.CanvasItem> selected_items,
+        ref double x,
+        ref double y,
+        ref Cairo.Matrix transform,
+        ref double line_width,
+        ref double _width,
+        ref double _height
+    ) {
+        if (selected_items.length () == 1) {
+            var item = selected_items.nth_data (0);
+
+            item.get_transform (out transform);
+            item.get ("line_width", out line_width);
+            item.get ("width", out _width);
+            item.get ("height", out _height);
+        } else {
+            line_width = 0.0;
+            _width = width;
+            _height = height;
+            x = left;
+            y = top;
+        }
     }
-
-
-    /*
-    public void update_decorations (Goo.CanvasItem item) {
-        update_nob_position (item);
-        update_select_effect (item);
-    }
-
-    private void update_effects (Object object, ParamSpec spec) {
-        //  debug ("update effects, param: %s", spec.name);
-        update_decorations ((Goo.CanvasItem) object);
-    }
-
-
-
-    */
 }

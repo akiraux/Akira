@@ -29,7 +29,8 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         set {
             _selected_items = value;
 
-            update_bounding_box ();
+            update_selected_items ();
+
         }
     }
 
@@ -102,7 +103,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
                 break;
         }
 
-        update_bounding_box ();
+        update_selected_items ();
     }
 
     public void add_item_to_selection (Models.CanvasItem item) {
@@ -128,32 +129,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         selected_items = new List<Models.CanvasItem> ();
     }
 
-    private void update_bounding_box () {
-        if (selected_items.length () == 0) {
-            event_bus.selected_items_bb_changed (null);
-            return;
-        }
-
-        // Bounding box edges
-        double bb_left = 1e6, bb_top = 1e6, bb_right = 0, bb_bottom = 0;
-
-        foreach (var item in selected_items) {
-            Goo.CanvasBounds item_bounds;
-            item.get_bounds (out item_bounds);
-
-            bb_left = double.min (bb_left, item_bounds.x1);
-            bb_top = double.min (bb_top, item_bounds.y1);
-            bb_right = double.max (bb_right, item_bounds.x2);
-            bb_bottom = double.max (bb_bottom, item_bounds.y2);
-        }
-
-        select_bb = Goo.CanvasBounds () {
-            x1 = bb_left,
-            y1 = bb_top,
-            x2 = bb_right,
-            y2 = bb_bottom
-        };
-
-        event_bus.selected_items_bb_changed (select_bb);
+    private void update_selected_items () {
+        event_bus.selected_items_changed (selected_items);
     }
 }
