@@ -22,5 +22,5 @@ jobs:
       run: |
         meson build
         ninja -C build
-        ninja -C build test
+        # ninja -C build test
         ninja -C build install
