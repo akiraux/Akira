@@ -56,18 +56,23 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
     }
 
     public void set_initial_coordinates (double event_x, double event_y) {
-        initial_event_x = event_x;
-        initial_event_y = event_y;
-
         if (selected_items.length () == 1) {
             var selected_item = selected_items.nth_data (0);
+
+            initial_event_x = event_x;
+            initial_event_y = event_y;
+
+            canvas.convert_to_item_space (selected_item, ref initial_event_x, ref initial_event_y);
+
             initial_width = selected_item.get_coords ("width");
             initial_height = selected_item.get_coords ("height");
         } else {
+            initial_event_x = event_x;
+            initial_event_y = event_y;
+
             initial_width = select_bb.x2 - select_bb.x1;
             initial_height = select_bb.y2 - select_bb.y1;
         }
-
     }
 
     public void transform_bound (double event_x, double event_y, Managers.NobManager.Nob selected_nob) {
@@ -91,6 +96,8 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
     private void scale (double x, double y, Managers.NobManager.Nob selected_nob) {
         Models.CanvasItem selected_item;
         selected_item = selected_items.nth_data (0);
+
+        canvas.convert_to_item_space (selected_item, ref x, ref y);
 
         double delta_x = x - initial_event_x;
         double delta_y = y - initial_event_y;
@@ -135,10 +142,6 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
 
                 if (item_height > MIN_SIZE) {
                     origin_move_delta_y = item_height - new_height;
-                }
-
-                if (item_width > MIN_SIZE) {
-                    origin_move_delta_x = item_width - new_width;
                 }
                 break;
 
@@ -187,32 +190,25 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
             origin_move_delta_y = 0.0;
         }
 
-        debug (@"New width: $(new_width)");
-        debug (@"New height: $(new_height)");
-        debug (@"Delta x: $(origin_move_delta_x)");
-        debug (@"Delta y: $(origin_move_delta_y)");
-
+        // Before translating, recover the original "canvas" position of
+        // initial_event, in order to convert it to the "new" translated
+        // item space after the transformation has been applied.
+        canvas.convert_from_item_space (selected_item, ref initial_event_x, ref initial_event_y);
         selected_item.translate (origin_move_delta_x, origin_move_delta_y);
+        canvas.convert_to_item_space (selected_item, ref initial_event_x, ref initial_event_y);
+
         selected_item.set ("width", new_width, "height", new_height);
-
-        if (
-            (new_width == MIN_SIZE || new_height == MIN_SIZE) &&
-            (origin_move_delta_y > 0.0 || origin_move_delta_x > 0.0)
-        ) {
-        }
-
     }
 
     private void move (double x, double y) {
         Models.CanvasItem selected_item = selected_items.nth_data (0);
 
-        double delta_x = x - initial_event_x;
-        double delta_y = y - initial_event_y;
+        canvas.convert_to_item_space (selected_item, ref x, ref y);
+
+        double delta_x = Math.round (x - initial_event_x);
+        double delta_y = Math.round (y - initial_event_y);
 
         selected_item.translate (delta_x, delta_y);
-
-        initial_event_x = x;
-        initial_event_y = y;
     }
 
     public void add_item_to_selection (Models.CanvasItem item) {
@@ -223,6 +219,19 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
 
     public void delete_selection () {
         debug ("Delete selection");
+        /*
+        if (selected_item != null) {
+            selected_item.remove ();
+
+            var artboard = window.main_window.right_sidebar.layers_panel.artboard;
+            Akira.Layouts.Partials.Layer layer = selected_item.get_data<Akira.Layouts.Partials.Layer?> ("layer");
+            if (layer != null) {
+                artboard.container.remove (layer);
+            }
+            remove_select_effect ();
+            remove_hover_effect ();
+        }
+        */
     }
 
     public void reset_selection () {

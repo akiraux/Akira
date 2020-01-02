@@ -48,15 +48,17 @@ public class Akira.Lib.Models.CanvasEllipse : Goo.CanvasEllipse, Models.CanvasIt
         radius_y = _radius_y;
         width = 1;
         height = 1;
-        center_x = _center_x;
-        center_y = _center_y;
+        center_x = 0.0;
+        center_y = 0.0;
 
         set_transform (Cairo.Matrix.identity ());
+
+        // Keep the item always in the origin
+        // move the entire coordinate system every time
+        translate (_center_x, _center_y);
 
         set ("line-width", _border_size);
         set ("fill-color", _fill_color);
         set ("stroke-color", _border_color);
-
-        debug (@"Created item with ID: $(id)");
     }
 }

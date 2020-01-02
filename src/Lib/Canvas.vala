@@ -26,29 +26,6 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     private const int MIN_SIZE = 1;
     private const int MIN_POS = 10;
 
-    /**
-     * Signal triggered when item was clicked by the user
-     */
-    public signal void item_clicked (Goo.CanvasItem? item);
-
-    /**
-     * Signal triggered when item has finished moving by the user,
-     * and a change of it's coordenates was made
-     */
-    public signal void item_moved (Goo.CanvasItem? item);
-
-    public Goo.CanvasItem? _selected_item;
-    public Goo.CanvasItem? selected_item {
-        get {
-            return _selected_item;
-        }
-        set {
-            _selected_item = value;
-            window.main_window.left_sidebar.transform_panel.item = _selected_item;
-            event_bus.emit ("change-sensitivity", "single");
-        }
-    }
-    public Goo.CanvasRect select_effect;
     private EditMode _edit_mode;
     public EditMode edit_mode {
         get {
@@ -59,8 +36,6 @@ public class Akira.Lib.Canvas : Goo.Canvas {
             set_cursor_by_edit_mode ();
         }
     }
-    public InsertType? insert_type { get; set; }
-
 
     public enum EditMode {
         MODE_SELECTION,
@@ -72,16 +47,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     private Managers.NobManager nob_manager;
     private Managers.HoverManager hover_manager;
 
-    private Goo.CanvasRect? hover_effect;
-
     private bool holding;
-    private bool temp_event_converted;
-    private double temp_event_x;
-    private double temp_event_y;
-    private double delta_x;
-    private double delta_y;
-    private double hover_x;
-    private double hover_y;
     private double current_scale = 1.0;
     private double bounds_x;
     private double bounds_y;
@@ -137,8 +103,9 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 if (uppercase_keyval <= Gdk.Key.Z && uppercase_keyval >= Gdk.Key.A) {
                     // Send to ItemsManager to deal with custom user shape
                     // hotkey preferences from settings
-                    edit_mode = Akira.Lib.Canvas.EditMode.MODE_INSERT;
-                    items_manager.set_insert_type_from_key (uppercase_keyval);
+                    if (items_manager.set_insert_type_from_key (uppercase_keyval)) {
+                        edit_mode = Akira.Lib.Canvas.EditMode.MODE_INSERT;
+                    }
 
                     return true;
                 }
@@ -150,10 +117,8 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     public override bool button_press_event (Gdk.EventButton event) {
         holding = true;
 
-        temp_event_x = event.x / current_scale;
-        temp_event_y = event.y / current_scale;
-
-        temp_event_converted = false;
+        var temp_event_x = event.x / current_scale;
+        var temp_event_y = event.y / current_scale;
 
         hover_manager.remove_hover_effect ();
 
@@ -170,7 +135,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 break;
 
             case EditMode.MODE_SELECTION:
-                Models.CanvasItem clicked_item = (Models.CanvasItem) get_item_at (temp_event_x, temp_event_y, true);
+                var clicked_item = get_item_at (temp_event_x, temp_event_y, true);
 
                 if (clicked_item == null) {
                     selected_bound_manager.reset_selection ();
@@ -180,65 +145,29 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                     return true;
                 }
 
-                var clicked_nob_name = nob_manager.get_grabbed_id (clicked_item);
+                var clicked_nob_name = Managers.NobManager.Nob.NONE;
+
+                if (clicked_item is Selection.Nob) {
+                    var selected_nob = clicked_item as Selection.Nob;
+
+                    clicked_nob_name = nob_manager.get_grabbed_id (selected_nob);
+                }
+
                 nob_manager.set_selected_by_name (clicked_nob_name);
 
-                selected_bound_manager.set_initial_coordinates (temp_event_x, temp_event_y);
-
-                if (clicked_nob_name == Managers.NobManager.Nob.NONE) {
+                if (clicked_item is Models.CanvasItem) {
+                    // Just 1 selected element at the same time
                     selected_bound_manager.reset_selection ();
 
                     // Item has been selected
-                    selected_bound_manager.add_item_to_selection (clicked_item);
+                    selected_bound_manager.add_item_to_selection ((Models.CanvasItem) clicked_item);
                 }
 
+                selected_bound_manager.set_initial_coordinates (temp_event_x, temp_event_y);
                 break;
         }
 
         return true;
-
-        /*
-        Goo.CanvasItem clicked_item;
-
-        if (edit_mode == EditMode.MODE_INSERT) {
-            remove_select_effect ();
-            var item = insert_object (event);
-            selected_item = item;
-            add_hover_effect (item);
-            add_select_effect (item);
-            clicked_item = nobs[Nob.BOTTOM_RIGHT];
-        } else {
-            clicked_item = get_item_at (temp_event_x, temp_event_y, true);
-        }
-
-        if (clicked_item != null && clicked_item != selected_item && clicked_item != select_effect
-            && clicked_item != hover_effect) {
-            var clicked_id = get_grabbed_id (clicked_item);
-            holding = true;
-
-            if (clicked_id == Nob.NONE) {
-                remove_select_effect ();
-                add_select_effect (clicked_item);
-                grab_focus (clicked_item);
-                selected_item = clicked_item;
-                holding_id = Nob.NONE;
-            } else { // nob was clicked
-                holding_id = clicked_id;
-            }
-        }
-
-        if (clicked_item == selected_item && selected_item != null) {
-            holding = true;
-            holding_id = Nob.NONE;
-        }
-
-        if (clicked_item == null) {
-            remove_select_effect ();
-            focus_canvas ();
-        }
-
-        return true;
-        */
     }
 
     public override bool button_release_event (Gdk.EventButton event) {
@@ -284,6 +213,24 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         grab_focus (get_root_item ());
     }
 
+    private void on_request_zoom (string direction) {
+        event_bus.emit ("zoom");
+    }
+
+    private void on_request_change_cursor (Gdk.CursorType? cursor_type) {
+        if (cursor_type == null) {
+            set_cursor_by_edit_mode ();
+        } else {
+            set_cursor (cursor_type);
+        }
+    }
+
+    private void set_cursor (Gdk.CursorType cursor_type) {
+        var cursor = new Gdk.Cursor.for_display (Gdk.Display.get_default (), cursor_type);
+        get_window ().set_cursor (cursor);
+    }
+
+    /*
     public void change_z_selected (bool raise, bool total) {
         if (selected_item == null) {
             return;
@@ -310,19 +257,6 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         }
     }
 
-    private void on_request_zoom (string direction) {
-        event_bus.emit ("zoom");
-    }
-
-    private void on_request_change_cursor (Gdk.CursorType? cursor_type) {
-        if (cursor_type == null) {
-            set_cursor_by_edit_mode ();
-        } else {
-            set_cursor (cursor_type);
-        }
-    }
-
-    /*
     public override bool motion_notify_event (Gdk.EventMotion event) {
         if (!holding) {
             motion_hover_event (event);
@@ -432,69 +366,6 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         }
 
         return true;
-    }
-    */
-
-    /*
-    private void motion_hover_event (Gdk.EventMotion event) {
-        var hovered_item = get_item_at (event.x / get_scale (), event.y / get_scale (), true);
-
-        if (!(hovered_item is Goo.CanvasItemSimple)) {
-            remove_hover_effect ();
-            return;
-        }
-
-        add_hover_effect (hovered_item);
-
-        double check_x;
-        double check_y;
-        hovered_item.get ("x", out check_x, "y", out check_y);
-
-        if ((hover_x != check_x || hover_y != check_y) && hover_effect != hovered_item) {
-            remove_hover_effect ();
-        }
-
-        hover_x = check_x;
-        hover_y = check_y;
-    }
-
-    public void reset_select () {
-        remove_select_effect (true);
-        current_scale = get_scale ();
-        add_select_effect (selected_item);
-    }
-
-
-    private void remove_hover_effect () {
-        set_cursor_by_edit_mode ();
-
-        if (hover_effect == null) {
-            return;
-        }
-
-        hover_effect.remove ();
-        hover_effect = null;
-    }
-    */
-
-    private void set_cursor (Gdk.CursorType cursor_type) {
-        var cursor = new Gdk.Cursor.for_display (Gdk.Display.get_default (), cursor_type);
-        get_window ().set_cursor (cursor);
-    }
-
-    /*
-    public void delete_selected () {
-        if (selected_item != null) {
-            selected_item.remove ();
-
-            var artboard = window.main_window.right_sidebar.layers_panel.artboard;
-            Akira.Layouts.Partials.Layer layer = selected_item.get_data<Akira.Layouts.Partials.Layer?> ("layer");
-            if (layer != null) {
-                artboard.container.remove (layer);
-            }
-            remove_select_effect ();
-            remove_hover_effect ();
-        }
     }
     */
 }

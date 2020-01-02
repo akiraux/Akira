@@ -171,19 +171,19 @@ public class Akira.Services.ActionManager : Object {
     }
 
     private void action_move_up () {
-        window.main_window.main_canvas.canvas.change_z_selected (true, false);
+        //window.main_window.main_canvas.canvas.change_z_selected (true, false);
     }
 
     private void action_move_down () {
-        window.main_window.main_canvas.canvas.change_z_selected (false, false);
+        //window.main_window.main_canvas.canvas.change_z_selected (false, false);
     }
 
     private void action_move_top () {
-        window.main_window.main_canvas.canvas.change_z_selected (true, true);
+        //window.main_window.main_canvas.canvas.change_z_selected (true, true);
     }
 
     private void action_move_bottom () {
-        window.main_window.main_canvas.canvas.change_z_selected (false, true);
+        //window.main_window.main_canvas.canvas.change_z_selected (false, true);
     }
 
     private void action_rect_tool () {
@@ -195,7 +195,7 @@ public class Akira.Services.ActionManager : Object {
 
     private void action_selection_tool () {
         window.main_window.main_canvas.canvas.edit_mode = Akira.Lib.Canvas.EditMode.MODE_SELECTION;
-        window.main_window.main_canvas.canvas.insert_type = null;
+        //window.main_window.main_canvas.canvas.insert_type = null;
     }
 
     private void action_delete () {

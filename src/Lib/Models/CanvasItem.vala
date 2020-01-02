@@ -32,7 +32,7 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItem {
     public abstract bool selected { get; public set; }
     public abstract Models.CanvasItemType item_type { get; protected set; }
 
-    public virtual double get_coords (string coord_id) {
+    public virtual double get_coords (string coord_id, bool convert_to_item_space = false) {
         double _coord = 0.0;
         get (coord_id, out _coord);
 

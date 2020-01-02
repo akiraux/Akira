@@ -49,7 +49,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         event_bus.insert_item.connect (set_item_to_insert);
     }
 
-    public void set_insert_type_from_key (uint keyval) {
+    public bool set_insert_type_from_key (uint keyval) {
         // TODO: take those values from preferences/settings and not from hardcoded values
 
         switch (keyval) {
@@ -65,7 +65,11 @@ public class Akira.Lib.Managers.ItemsManager : Object {
                 set_item_to_insert ("text");
                 break;
 
+            default:
+                return false;
         }
+
+        return true;
     }
 
     public Models.CanvasItem? insert_item (Gdk.EventButton event) {
@@ -176,7 +180,6 @@ public class Akira.Lib.Managers.ItemsManager : Object {
 
         return text;
     }
-
 
     private void set_item_to_insert (string type) {
         switch (type) {

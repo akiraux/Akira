@@ -49,8 +49,8 @@ public class Akira.Lib.Models.CanvasText : Goo.CanvasText, Models.CanvasItem {
         Models.CanvasItem.init_item (this);
 
         text = _text;
-        x = _x;
-        y = _y;
+        x = 0.0;
+        y = 0.0;
         width = _width;
         anchor = _anchor;
 
@@ -59,6 +59,8 @@ public class Akira.Lib.Models.CanvasText : Goo.CanvasText, Models.CanvasItem {
 
         set_transform (Cairo.Matrix.identity ());
 
-        debug (@"Created item with ID: $(id)");
+        // Keep the item always in the origin
+        // move the entire coordinate system every time
+        translate (_x, _y);
     }
 }

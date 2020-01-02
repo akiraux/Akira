@@ -48,15 +48,17 @@ public class Akira.Lib.Models.CanvasRect : Goo.CanvasRect, Models.CanvasItem {
         radius_y = _radius_y;
         width = 1;
         height = 1;
-        x = _x;
-        y = _y;
+        x = 0;
+        y = 0;
 
         set_transform (Cairo.Matrix.identity ());
+
+        // Keep the item always in the origin
+        // move the entire coordinate system every time
+        translate (_x, _y);
 
         set ("line-width", _border_size);
         set ("fill-color", _fill_color);
         set ("stroke-color", _border_color);
-
-        debug (@"Created item with ID: $(id)");
     }
 }
