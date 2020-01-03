@@ -24,4 +24,7 @@ jobs:
         ninja -C build
         ninja -C build install
         # xvfb-run -a -s "-screen 0 1600x1200x32" ninja -C build install
-        dbus-run-session -- xvfb-run -a -s "-screen 0 1600x1200x32" ninja -C build test
+        # dbus-run-session -- xvfb-run -a -s "-screen 0 1600x1200x32" ninja -C build test -v
+        xvfb-run -a -s "-screen 0 1024x768x24" \
+          --env=NO_AT_BRIDGE=1 \
+          dbus-run-session meson test -C build
