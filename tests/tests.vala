@@ -55,7 +55,7 @@ private class Akira.TestSuiteAdaptor {
     }
 }
 
-public abstract class Akira.TestSuite : GLib.Object {
+public class Akira.TestSuite : GLib.Object {
     private GLib.TestSuite g_test_suite;
     private TestSuiteAdaptor[] adaptors = new TestSuiteAdaptor[0];
     public Akira.Application app;
