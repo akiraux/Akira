@@ -22,11 +22,10 @@ jobs:
       run: |
         meson build
         ninja -C build
-        # ninja -C build install
-        xvfb-run -a -s "-screen 0 1600x1200x32" ninja -C build install
-        # xvfb-run -a -s "-screen 0 1600x1200x32" ninja -C build test
-        # xvfb-run -a -s "-screen 0 1024x768x24" \
-          # dbus-run-session meson test -C build --no-rebuild -v --no-stdsplit --wrap catchsegv
+        ninja -C build install
+        # xvfb-run -a -s "-screen 0 1600x1200x32" ninja -C build install
+        xvfb-run -a -s "-screen 0 1024x768x24" \
+          dbus-run-session meson test -C build --no-rebuild -v --no-stdsplit --wrap catchsegv
     - name: cleanup xvfb
       run: |
         xvfb_pids=`ps aux | grep tmp/xvfb-run | grep -v grep | awk '{print $2}'`
