@@ -86,8 +86,7 @@ akira_library = shared_library(
     sources,
     asresources,
     config_header,
-    dependencies: deps,
-    install: true
+    dependencies: deps
 )
 
 akira_dep = declare_dependency(
