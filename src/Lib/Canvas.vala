@@ -75,6 +75,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
         event_bus.request_zoom.connect (on_request_zoom);
         event_bus.request_change_cursor.connect (on_request_change_cursor);
+        event_bus.set_focus_on_canvas.connect (focus_canvas);
 
         get_bounds (out bounds_x, out bounds_y, out bounds_w, out bounds_h);
     }
