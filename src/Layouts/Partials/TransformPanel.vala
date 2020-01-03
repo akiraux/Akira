@@ -52,6 +52,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         get {
             return _item;
         } set {
+
             if (_item != null) {
                 _item.notify.disconnect (item_changed);
             }
@@ -59,6 +60,10 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
             _item = value;
 
             bool has_item = _item != null;
+
+            if (!has_item) {
+                reset_values ();
+            }
 
             x.enabled = has_item;
             y.enabled = has_item;
@@ -232,6 +237,31 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         update_fields ();
     }
 
+    private void reset_values () {
+        x.notify["value"].disconnect (x_notify_value);
+        y.notify["value"].disconnect (y_notify_value);
+        width.notify["value"].disconnect (width_notify_value);
+        height.notify["value"].disconnect (height_notify_value);
+        rotation.notify["value"].disconnect (rotation_notify_value);
+        opacity_adj.notify["value"].disconnect (opacity_notify_value);
+
+        x.value = 0.0;
+        y.value = 0.0;
+        width.value = 0.0;
+        height.value = 0.0;
+        opacity_adj.value = 100.0;
+        rotation.value = 0.0;
+        size_ratio = 1.0;
+        size_lock = false;
+
+        x.notify["value"].connect (x_notify_value);
+        y.notify["value"].connect (y_notify_value);
+        width.notify["value"].connect (width_notify_value);
+        height.notify["value"].connect (height_notify_value);
+        rotation.notify["value"].connect (rotation_notify_value);
+        opacity_adj.notify["value"].connect (opacity_notify_value);
+    }
+
     private void update_fields () {
         double item_x, item_y, item_width, item_height;
         item.get ("x", out item_x, "y", out item_y, "width", out item_width, "height", out item_height);
@@ -288,7 +318,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
     }
 
     public void opacity_notify_value () {
-        var item_simple = (Goo.CanvasItemSimple)item;
+        var item_simple = (Goo.CanvasItemSimple) item;
 
         int? fill_a = item.fill_alpha;
         int? stroke_a = item.stroke_alpha;
@@ -310,33 +340,20 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
     }
 
     public void y_notify_value () {
-        double item_x = x.value;
-        double item_y = y.value;
-        window.main_window.main_canvas.canvas.convert_to_item_space (item, ref item_x, ref item_y);
-        item.set ("y", item_y);
+        event_bus.request_selection_bound_transform ("y", y.value);
     }
 
     public void x_notify_value () {
-        double item_x = x.value;
-        double item_y = y.value;
-        window.main_window.main_canvas.canvas.convert_to_item_space (item, ref item_x, ref item_y);
-        item.set ("x", item_x);
+        event_bus.request_selection_bound_transform ("x", x.value);
     }
 
     public void rotation_notify_value () {
-        double item_x, item_y, item_width, item_height;
-        item.get ("x", out item_x, "y", out item_y, "width", out item_width, "height", out item_height);
-        double? item_rotation = item.rotation;
-        var total_rotation = rotation.value;
-        item_rotation = total_rotation - item_rotation;
-        item.rotate (item_rotation, item_x + item_width / 2, item_y + item_height / 2);
-        item.set_data<double?> ("rotation", total_rotation);
-
-        //window.main_window.main_canvas.canvas.update_decorations (item);
+        event_bus.request_selection_bound_transform ("rotation", rotation.value);
     }
 
     public void height_notify_value () {
-        item.set ("height", height.value);
+        event_bus.request_selection_bound_transform ("height", height.value);
+
         if (size_lock) {
             width.value = height.value * size_ratio;
         } else {
@@ -345,7 +362,8 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
     }
 
     public void width_notify_value () {
-        item.set ("width", width.value);
+        event_bus.request_selection_bound_transform ("width", width.value);
+
         if (size_lock) {
             height.value = width.value / size_ratio;
         } else {

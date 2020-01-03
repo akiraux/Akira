@@ -25,8 +25,8 @@ public class Akira.Lib.Models.CanvasEllipse : Goo.CanvasEllipse, Models.CanvasIt
     public bool selected { get; set; }
     public double opacity { get; set; }
     public double rotation { get; set; }
-    public int fill_alpha  { get; set; }
-    public int stroke_alpha  { get; set; }
+    public int fill_alpha { get; set; }
+    public int stroke_alpha { get; set; }
     public Models.CanvasItemType item_type { get; set; }
 
     public CanvasEllipse (

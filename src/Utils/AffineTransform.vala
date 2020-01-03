@@ -28,7 +28,7 @@ public class Akira.Utils.AffineTransform : Object {
     private const int BOUNDS_H = 10000;
     private const int BOUNDS_W = 10000;
 
-    public static void move (
+    public static void move_from_event (
         double x,
         double y,
         double initial_x,
@@ -45,7 +45,7 @@ public class Akira.Utils.AffineTransform : Object {
         selected_item.translate (delta_x, delta_y);
     }
 
-    public static void scale (
+    public static void scale_from_event (
         double x,
         double y,
         ref double initial_x,
@@ -153,10 +153,10 @@ public class Akira.Utils.AffineTransform : Object {
         selected_item.translate (origin_move_delta_x, origin_move_delta_y);
         canvas.convert_to_item_space (selected_item, ref initial_x, ref initial_y);
 
-        selected_item.set ("width", new_width, "height", new_height);
+        set_size (new_width, new_height, selected_item);
     }
 
-    public static void rotate (
+    public static void rotate_from_event (
         double x,
         double y,
         double initial_x,
@@ -185,9 +185,51 @@ public class Akira.Utils.AffineTransform : Object {
         initial_y = y;
 
         canvas.convert_from_item_space (selected_item, ref initial_x, ref initial_y);
-        selected_item.rotate (rotation, center_x, center_y);
-        selected_item.rotation += rotation;
+        set_rotation (selected_item.rotation + rotation, selected_item);
         canvas.convert_to_item_space (selected_item, ref initial_x, ref initial_y);
+    }
+
+    public static void set_position (double? x, double? y, CanvasItem item) {
+        var canvas = item.get_canvas ();
+
+        double current_x = item.get_coords ("x");
+        double current_y = item.get_coords ("y");
+
+        canvas.convert_from_item_space (item, ref current_x, ref current_y);
+
+        var move_x_amount = 0.0;
+        var move_y_amount = 0.0;
+
+        if (x != null) {
+            move_x_amount = x - current_x;
+        }
+
+        if (y != null) {
+            move_y_amount = y - current_y;
+        }
+
+        item.translate (move_x_amount, move_y_amount);
+    }
+
+    public static void set_size (double? width, double? height, CanvasItem item) {
+        if (width != null) {
+            item.set ("width", (double) width);
+        }
+
+        if (height != null) {
+            item.set ("height", (double) height);
+        }
+    }
+
+    public static void set_rotation (double rotation, CanvasItem item) {
+        var center_x = item.get_coords ("width") / 2;
+        var center_y = item.get_coords ("height") / 2;
+
+        var actual_rotation = rotation - item.rotation;
+
+        item.rotate (actual_rotation, center_x, center_y);
+
+        item.rotation += actual_rotation;
     }
 
     /*

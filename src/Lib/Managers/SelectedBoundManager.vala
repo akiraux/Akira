@@ -45,6 +45,8 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         Object (
             canvas: canvas
         );
+
+        event_bus.request_selection_bound_transform.connect (on_request_selection_bound_transform);
     }
 
     construct {
@@ -77,7 +79,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
 
         switch (selected_nob) {
             case Managers.NobManager.Nob.NONE:
-                Utils.AffineTransform.move (
+                Utils.AffineTransform.move_from_event (
                     event_x, event_y,
                     initial_event_x, initial_event_y,
                     selected_item
@@ -85,7 +87,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
                 break;
 
             case Managers.NobManager.Nob.ROTATE:
-                Utils.AffineTransform.rotate (
+                Utils.AffineTransform.rotate_from_event (
                     event_x, event_y,
                     initial_event_x, initial_event_y,
                     selected_item
@@ -93,7 +95,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
                 break;
 
             default:
-                Utils.AffineTransform.scale (
+                Utils.AffineTransform.scale_from_event (
                     event_x, event_y,
                     ref initial_event_x, ref initial_event_y,
                     initial_width, initial_height,
@@ -135,5 +137,30 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
 
     private void update_selected_items () {
         event_bus.selected_items_changed (selected_items);
+    }
+
+    private void on_request_selection_bound_transform (string property, double amount) {
+        Models.CanvasItem selected_item;
+        selected_item = selected_items.nth_data (0);
+
+        switch (property) {
+            case "rotation":
+                Utils.AffineTransform.set_rotation (amount, selected_item);
+                break;
+            case "width":
+                Utils.AffineTransform.set_size (amount, null, selected_item);
+                break;
+            case "height":
+                Utils.AffineTransform.set_size (null, amount, selected_item);
+                break;
+            case "x":
+                Utils.AffineTransform.set_position (amount, null, selected_item);
+                break;
+            case "y":
+                Utils.AffineTransform.set_position (null, amount, selected_item);
+                break;
+        }
+
+        update_selected_items ();
     }
 }
