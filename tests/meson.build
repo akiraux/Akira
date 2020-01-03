@@ -1,9 +1,13 @@
-test_env = [
-    'G_TEST_SRCDIR=@0@'.format(meson.current_source_dir()),
-    'G_TEST_BUILDDIR=@0@'.format(meson.current_build_dir()),
-    'GSETTINGS_BACKEND=memory',
-    'GSETTINGS_SCHEMA_DIR=@0@/data/schemas'.format(meson.build_root()),
-]
+# test_env = [
+#     'G_TEST_SRCDIR=@0@'.format(meson.current_source_dir()),
+#     'G_TEST_BUILDDIR=@0@'.format(meson.current_build_dir()),
+#     'GSETTINGS_BACKEND=memory',
+#     'GSETTINGS_SCHEMA_DIR=@0@/data/schemas'.format(meson.build_root()),
+# ]
+
+test_env = environment()
+test_env.set('GSETTINGS_SCHEMA_DIR', join_paths(meson.build_root(), 'data', 'schemas'))
+# test_env.set('GSETTINGS_SCHEMA_DIR', join_paths(akira_datadir, 'glib-2.0', 'schemas'))
 
 test_cflags = [
   '-I@0@/../src'.format(meson.current_source_dir()),
