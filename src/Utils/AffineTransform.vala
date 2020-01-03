@@ -186,8 +186,7 @@ public class Akira.Utils.AffineTransform : Object {
 
         canvas.convert_from_item_space (selected_item, ref initial_x, ref initial_y);
         selected_item.rotate (rotation, center_x, center_y);
-        //rotation += selected_item.get_data<double?> ("rotation");
-        //selected_item.set_data<double?> ("rotation", rotation);
+        selected_item.rotation += rotation;
         canvas.convert_to_item_space (selected_item, ref initial_x, ref initial_y);
     }
 

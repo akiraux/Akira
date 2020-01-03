@@ -47,27 +47,33 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         );
     }
 
-    private Goo.CanvasItem _item;
-    public Goo.CanvasItem item {
+    private Lib.Models.CanvasItem _item;
+    public Lib.Models.CanvasItem item {
         get {
             return _item;
         } set {
             if (_item != null) {
                 _item.notify.disconnect (item_changed);
             }
+
             _item = value;
+
             bool has_item = _item != null;
+
             x.enabled = has_item;
             y.enabled = has_item;
             height.enabled = has_item;
             width.enabled = has_item;
             rotation.enabled = has_item;
+
             hflip_button.sensitive = has_item;
             vflip_button.sensitive = has_item;
             opacity_entry.entry.sensitive = has_item;
+
             if (has_item) {
-                opacity_adj.value = item.get_data<double?> ("opacity");
+                opacity_adj.value = item.opacity;
             }
+
             scale.sensitive = has_item;
 
             if (_item != null) {
@@ -163,10 +169,12 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
             BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE,
             (binding, srcval, ref targetval) => {
                 double src = double.parse (srcval.dup_string ());
+
                 if (src > 100 || src < 0) {
                     opacity_entry.entry.text = (opacity_adj.get_value ()).to_string ();
                     return false;
                 }
+
                 targetval.set_double (src);
                 return true;
             }, (binding, srcval, ref targetval) => {
@@ -205,6 +213,18 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
 
         attach (group_title (_("Opacity")), 0, 9, 3);
         attach (opacity_grid, 0, 10, 3);
+
+        event_bus.selected_items_changed.connect (on_selected_items_changed);
+    }
+
+    private void on_selected_items_changed (List<Lib.Models.CanvasItem> selected_items) {
+        if (selected_items.length () == 1) {
+            item = selected_items.nth_data (0);
+        } else {
+            if (item != null) {
+                item = null;
+            }
+        }
     }
 
     private void item_changed (Object object, ParamSpec spec) {
@@ -215,7 +235,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
     private void update_fields () {
         double item_x, item_y, item_width, item_height;
         item.get ("x", out item_x, "y", out item_y, "width", out item_width, "height", out item_height);
-        double? item_rotation = item.get_data<double?> ("rotation");
+        double item_rotation = item.rotation;
         window.main_window.main_canvas.canvas.convert_from_item_space (item, ref item_x, ref item_y);
 
         var item_simple = (Goo.CanvasItemSimple)item;
@@ -236,9 +256,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         y.value = item_y;
         width.value = item_width;
         height.value = item_height;
-        if (item_rotation != null) {
-            rotation.value = item_rotation;
-        }
+        rotation.value = item_rotation;
 
         x.notify["value"].connect (x_notify_value);
         y.notify["value"].connect (y_notify_value);
@@ -271,8 +289,9 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
 
     public void opacity_notify_value () {
         var item_simple = (Goo.CanvasItemSimple)item;
-        int? fill_a = item.get_data<int?> ("fill-alpha");
-        int? stroke_a = item.get_data<int?> ("stroke-alpha");
+
+        int? fill_a = item.fill_alpha;
+        int? stroke_a = item.stroke_alpha;
 
         var opacity_factor = double.parse (opacity_entry.entry.text) / 100;
 
@@ -283,7 +302,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
 
         item_simple.notify.disconnect (item_changed);
 
-        item.set_data<double?> ("opacity", opacity_factor * 100);
+        item.opacity = opacity_factor * 100;
         item_simple.fill_color_rgba = (uint) (fill_rgb + (fill_a * opacity_factor));
         item_simple.stroke_color_rgba = (uint) (stroke_rgb + (stroke_a * opacity_factor));
 
@@ -307,7 +326,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
     public void rotation_notify_value () {
         double item_x, item_y, item_width, item_height;
         item.get ("x", out item_x, "y", out item_y, "width", out item_width, "height", out item_height);
-        double? item_rotation = item.get_data<double?> ("rotation");
+        double? item_rotation = item.rotation;
         var total_rotation = rotation.value;
         item_rotation = total_rotation - item_rotation;
         item.rotate (item_rotation, item_x + item_width / 2, item_y + item_height / 2);

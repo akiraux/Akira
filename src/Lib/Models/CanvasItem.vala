@@ -30,6 +30,10 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItem {
 
     public abstract string id { get; public set; }
     public abstract bool selected { get; public set; }
+    public abstract double opacity { get;  public set; }
+    public abstract double rotation { get; public set; }
+    public abstract int fill_alpha  { get; public set; }
+    public abstract int stroke_alpha  { get; public set; }
     public abstract Models.CanvasItemType item_type { get; protected set; }
 
     public double get_coords (string coord_id, bool convert_to_item_space = false) {
@@ -52,11 +56,8 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItem {
     }
 
     public static void init_item (Goo.CanvasItem item) {
-        // TODO: understand why those properties are not settable
-        /*
+        item.set ("opacity", 100.0);
         item.set ("fill-alpha", 255);
         item.set ("stroke-alpha", 255);
-        item.set ("opacity", 100);
-        */
     }
 }

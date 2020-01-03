@@ -23,6 +23,10 @@ public class Akira.Lib.Models.CanvasRect : Goo.CanvasRect, Models.CanvasItem {
 
     public string id { get; set; }
     public bool selected { get; set; }
+    public double opacity { get; public set; }
+    public double rotation { get; public set; }
+    public int fill_alpha  { get; set; }
+    public int stroke_alpha  { get; set; }
     public Models.CanvasItemType item_type { get; set; }
 
     public CanvasRect (
