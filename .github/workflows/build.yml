@@ -17,14 +17,14 @@ jobs:
         apt update
         apt install -y libarchive-dev libgoocanvas-2.0-dev valac meson appstream-util xvfb at-spi2-core
     - name: Build
-      env:
-        DESTDIR: out
+      # env:
+      #   DESTDIR: out
       run: |
         meson build
         ninja -C build
-        ninja -C build install
+        # ninja -C build install
         xvfb-run -a -s "-screen 0 1600x1200x32" ninja -C build install
-        xvfb-run -a -s "-screen 0 1600x1200x32" ninja -C build test
+        # xvfb-run -a -s "-screen 0 1600x1200x32" ninja -C build test
         # xvfb-run -a -s "-screen 0 1024x768x24" \
           # dbus-run-session meson test -C build --no-rebuild -v --no-stdsplit --wrap catchsegv
     - name: cleanup xvfb
