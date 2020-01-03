@@ -6,8 +6,8 @@
 # ]
 
 test_env = environment()
-test_env.set('GSETTINGS_SCHEMA_DIR', join_paths(meson.build_root(), 'data', 'schemas'))
-# test_env.set('GSETTINGS_SCHEMA_DIR', join_paths(akira_datadir, 'glib-2.0', 'schemas'))
+# test_env.set('GSETTINGS_SCHEMA_DIR', join_paths(meson.build_root(), 'data', 'schemas'))
+test_env.set('GSETTINGS_SCHEMA_DIR', join_paths(akira_datadir, 'glib-2.0', 'schemas'))
 
 test_cflags = [
   '-I@0@/../src'.format(meson.current_source_dir()),
