@@ -15,7 +15,7 @@ jobs:
     - name: Install Dependencies
       run: |
         apt update
-        apt install -y libarchive-dev libgoocanvas-2.0-dev valac meson appstream-util xvfb libxrender1 libxtst6 libxi6
+        apt install -y libarchive-dev libgoocanvas-2.0-dev valac meson appstream-util xvfb
     - name: Build
       env:
         DESTDIR: out
@@ -24,4 +24,4 @@ jobs:
         ninja -C build
         ninja -C build install
         # xvfb-run -a -s "-screen 0 1600x1200x32" ninja -C build install
-        dbus-run-session -- xvfb-run meson test -C build --no-rebuild
+        dbus-run-session -- xvfb-run -a -s "-screen 0 1600x1200x32" ninja -C build test
