@@ -23,6 +23,4 @@ jobs:
         meson build
         ninja -C build
         ninja -C build install
-        # xvfb-run --auto-servernum ninja -C build install test
-        xvfb-run -a -s "-screen 0 1024x768x24" ninja -C build install test
         # xvfb-run -a -s "-screen 0 1024x768x24" ninja -C build test
