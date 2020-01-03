@@ -126,7 +126,8 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
         key_press_event.connect (on_key_pressed);
     }
 
-    private void on_drag_data_received (Gdk.DragContext context, int x, int y, Gtk.SelectionData selection_data, uint target_type, uint time) {
+    private void on_drag_data_received (Gdk.DragContext context, int x, int y, Gtk.SelectionData selection_data,
+        uint target_type, uint time) {
         window.main_window.right_sidebar.indicator.visible = false;
 
         Akira.Layouts.Partials.Layer target;
@@ -156,7 +157,8 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
             }
 
             if ((y + alloc.height) < (alloc.height / 2)) {
-                new_position = target.get_index () > 1 && source.get_index () > new_position ? target.get_index () - 1 : target.get_index ();
+                new_position = target.get_index () > 1 && source.get_index () > new_position ?
+                    target.get_index () - 1 : target.get_index ();
                 debug ("Layer dropped ABOVE group: %i", new_position);
                 before_group = true;
             } else {
@@ -181,7 +183,8 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
             }
 
             if ((y + alloc.height) < (alloc.height / 2)) {
-                new_position = target.get_index () > 1 && source.get_index () > new_position ? target.get_index () - 1 : target.get_index ();
+                new_position = target.get_index () > 1 && source.get_index () > new_position ?
+                    target.get_index () - 1 : target.get_index ();
                 debug ("Layer dropped ABOVE group: %i", new_position);
                 before_group = true;
             } else {
@@ -193,14 +196,16 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
                 if (y > ((new_position * alloc.height) - (alloc.height / 2)) && source.get_index () > new_position) {
                     debug ("dropped below");
                     new_position++;
-                } else if (y <= ((new_position * alloc.height) - (alloc.height / 2)) && source.get_index () < new_position) {
+                } else if (y <= ((new_position * alloc.height) - (alloc.height / 2))
+                    && source.get_index () < new_position) {
                     debug ("dropped above");
                     new_position--;
                 }
                 debug ("Layer dropped WHITIN group: %i", new_position);
             }
         } else if (!target.grouped && source.layer_group != null) {
-            var parent = (Akira.Layouts.Partials.Artboard) target.get_ancestor (typeof (Akira.Layouts.Partials.Artboard));
+            var parent = (Akira.Layouts.Partials.Artboard) target.get_ancestor (
+                typeof (Akira.Layouts.Partials.Artboard));
             var group = parent.container.get_row_at_y (y);
             group.get_allocation (out alloc);
 
@@ -220,7 +225,8 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
             target.get_allocation (out alloc);
             new_position = target.get_index ();
 
-            if (y <= ((new_position * alloc.height) - (alloc.height / 2)) && new_position > 1 && source.get_index () < new_position) {
+            if (y <= ((new_position * alloc.height) - (alloc.height / 2))
+                && new_position > 1 && source.get_index () < new_position) {
                 new_position--;
             }
             debug ("Layer dropped: %i", new_position);
@@ -291,7 +297,8 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
         Gtk.drag_set_icon_surface (context, surface);
     }
 
-    private void on_drag_data_get (Gtk.Widget widget, Gdk.DragContext context, Gtk.SelectionData selection_data, uint target_type, uint time) {
+    private void on_drag_data_get (Gtk.Widget widget, Gdk.DragContext context, Gtk.SelectionData selection_data,
+        uint target_type, uint time) {
         uchar[] data = new uchar[(sizeof (Akira.Layouts.Partials.Artboard))];
         ((Gtk.Widget[])data)[0] = widget;
 

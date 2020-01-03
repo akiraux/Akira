@@ -29,7 +29,8 @@ public class Akira.Utils.Dialogs : Object {
     }
 
     public bool message_dialog (string title, string description, string icon, string primary_button) {
-        var dialog = new Granite.MessageDialog.with_image_from_icon_name (title, description, icon, Gtk.ButtonsType.CANCEL);
+        var dialog = new Granite.MessageDialog.with_image_from_icon_name (
+            title, description, icon, Gtk.ButtonsType.CANCEL);
         dialog.transient_for = window;
 
         var button = new Gtk.Button.with_label (primary_button);

@@ -15,12 +15,22 @@ jobs:
     - name: Install Dependencies
       run: |
         apt update
-        apt install -y libarchive-dev libgoocanvas-2.0-dev valac meson appstream-util
+        apt install -y libarchive-dev libgoocanvas-2.0-dev valac meson appstream-util xvfb at-spi2-core
     - name: Build
-      env:
-        DESTDIR: out
+      # env:
+      #   DESTDIR: out
       run: |
         meson build
         ninja -C build
-        ninja -C build test
         ninja -C build install
+        xvfb-run -a -s "-screen 0 1024x768x24" \
+          dbus-run-session meson test -C build --no-rebuild -v --no-stdsplit --wrap catchsegv
+    - name: cleanup xvfb
+      run: |
+        xvfb_pids=`ps aux | grep tmp/xvfb-run | grep -v grep | awk '{print $2}'`
+        if [ "$xvfb_pids" != "" ]; then
+          echo "Killing the following xvfb processes: $xvfb_pids"
+          sudo kill $xvfb_pids
+        else
+          echo "No xvfb processes to kill"
+        fi

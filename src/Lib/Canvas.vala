@@ -111,7 +111,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     private double hover_x;
     private double hover_y;
     private double nob_size;
-    private double current_scale;
+    private double current_scale { get; set; default = 1.0; }
     private int holding_id = Nob.NONE;
     private double bounds_x;
     private double bounds_y;
@@ -619,7 +619,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         hover_y = check_y;
     }
 
-    private void add_select_effect (Goo.CanvasItem? target) {
+    public void add_select_effect (Goo.CanvasItem? target) {
         if (target == null || target == select_effect || target == hover_effect) {
             return;
         }
@@ -1037,7 +1037,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         return text;
     }
 
-    private void init_item (Object object) {
+    public void init_item (Object object) {
         object.set_data<int?> ("fill-alpha", 255);
         object.set_data<int?> ("stroke-alpha", 255);
         object.set_data<double?> ("opacity", 100);
