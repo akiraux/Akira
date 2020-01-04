@@ -51,7 +51,7 @@ public class Akira.Partials.AlignBoxButton : Gtk.Button {
 
     private void connect_signals () {
         clicked.connect (() => {
-            event_bus.align_items (action);
+            window.event_bus.align_items (action);
         });
     }
 }

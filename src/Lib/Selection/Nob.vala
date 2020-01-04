@@ -43,7 +43,7 @@ public class Akira.Lib.Selection.Nob : Goo.CanvasRect {
 
         set_rectangle ();
 
-        event_bus.zoom.connect (on_zoom);
+        (root.get_canvas () as Akira.Lib.Canvas).window.event_bus.zoom.connect (on_zoom);
     }
 
     construct {

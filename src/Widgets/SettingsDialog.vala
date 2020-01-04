@@ -20,7 +20,7 @@
 */
 
 public class Akira.Widgets.SettingsDialog : Gtk.Dialog {
-
+    public weak Akira.Window window { get; construct; }
     private Gtk.Stack stack;
     private Gtk.Switch dark_theme_switch;
     private Gtk.Switch label_switch;
@@ -34,8 +34,9 @@ public class Akira.Widgets.SettingsDialog : Gtk.Dialog {
         ICONTYPE
     }
 
-    public SettingsDialog () {
+    public SettingsDialog (Akira.Window _window) {
         Object (
+            window: _window,
             border_width: 5,
             deletable: false,
             resizable: false,
@@ -45,6 +46,7 @@ public class Akira.Widgets.SettingsDialog : Gtk.Dialog {
     }
 
     construct {
+        transient_for = window;
         stack = new Gtk.Stack ();
         stack.margin = 6;
         stack.margin_bottom = 15;
@@ -68,7 +70,7 @@ public class Akira.Widgets.SettingsDialog : Gtk.Dialog {
 
         close_button.clicked.connect (() => {
             destroy ();
-            event_bus.set_focus_on_canvas ();
+            window.event_bus.set_focus_on_canvas ();
         });
 
         add_action_widget (close_button, 0);

@@ -23,13 +23,13 @@ public class Akira.Lib.Managers.HoverManager : Object {
     private const string STROKE_COLOR = "#41c9fd";
     private const double LINE_WIDTH = 2.0;
 
-    public weak Goo.Canvas canvas { get; construct; }
+    public weak Akira.Lib.Canvas canvas { get; construct; }
 
     private double initial_event_x;
     private double initial_event_y;
     private Goo.CanvasItem hover_effect;
 
-    public HoverManager (Goo.Canvas canvas) {
+    public HoverManager (Akira.Lib.Canvas canvas) {
         Object (
             canvas: canvas
         );
@@ -139,6 +139,6 @@ public class Akira.Lib.Managers.HoverManager : Object {
                 break;
         }
 
-        event_bus.request_change_cursor (selected_cursor);
+        canvas.window.event_bus.request_change_cursor (selected_cursor);
     }
 }

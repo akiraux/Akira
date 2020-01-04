@@ -21,7 +21,7 @@
 
 
 public class Akira.Lib.Managers.ItemsManager : Object {
-    public weak Goo.Canvas canvas { get; construct; }
+    public weak Akira.Lib.Canvas canvas { get; construct; }
 
     public enum InsertType {
         RECT,
@@ -36,7 +36,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
     private string border_color;
     private string fill_color;
 
-    public ItemsManager (Goo.Canvas canvas) {
+    public ItemsManager (Akira.Lib.Canvas canvas) {
         Object (
             canvas: canvas
         );
@@ -46,7 +46,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         root = canvas.get_root_item ();
         items = new List<Models.CanvasItem> ();
 
-        event_bus.insert_item.connect (set_item_to_insert);
+        canvas.window.event_bus.insert_item.connect (set_item_to_insert);
     }
 
     public bool set_insert_type_from_key (uint keyval) {

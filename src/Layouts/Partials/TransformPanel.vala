@@ -219,7 +219,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         attach (group_title (_("Opacity")), 0, 9, 3);
         attach (opacity_grid, 0, 10, 3);
 
-        event_bus.selected_items_changed.connect (on_selected_items_changed);
+        window.event_bus.selected_items_changed.connect (on_selected_items_changed);
     }
 
     private void on_selected_items_changed (List<Lib.Models.CanvasItem> selected_items) {
@@ -345,19 +345,19 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
     }
 
     public void y_notify_value () {
-        event_bus.request_selection_bound_transform ("y", y.value);
+        window.event_bus.request_selection_bound_transform ("y", y.value);
     }
 
     public void x_notify_value () {
-        event_bus.request_selection_bound_transform ("x", x.value);
+        window.event_bus.request_selection_bound_transform ("x", x.value);
     }
 
     public void rotation_notify_value () {
-        event_bus.request_selection_bound_transform ("rotation", rotation.value);
+        window.event_bus.request_selection_bound_transform ("rotation", rotation.value);
     }
 
     public void height_notify_value () {
-        event_bus.request_selection_bound_transform ("height", height.value);
+        window.event_bus.request_selection_bound_transform ("height", height.value);
 
         if (size_lock) {
             width.value = height.value * size_ratio;
@@ -367,7 +367,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
     }
 
     public void width_notify_value () {
-        event_bus.request_selection_bound_transform ("width", width.value);
+        window.event_bus.request_selection_bound_transform ("width", width.value);
 
         if (size_lock) {
             height.value = width.value / size_ratio;

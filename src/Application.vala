@@ -21,7 +21,6 @@
 
 namespace Akira {
     public Akira.Services.Settings settings;
-    public Akira.Services.EventBus event_bus;
 }
 
 public class Akira.Application : Gtk.Application {
@@ -31,7 +30,6 @@ public class Akira.Application : Gtk.Application {
     construct {
         flags |= ApplicationFlags.HANDLES_OPEN;
 
-        event_bus = Akira.Services.EventBus.get_default ();
         settings = new Akira.Services.Settings ();
         windows = new GLib.List<Window> ();
         opened_files = new Gee.HashMap<string, Akira.Window> ();

@@ -21,16 +21,6 @@
  */
 
 public class Akira.Services.EventBus : Object {
-    static Akira.Services.EventBus? instance = null;
-    public static unowned Akira.Services.EventBus get_default () {
-        if (instance == null) {
-            instance = new Akira.Services.EventBus ();
-        }
-
-        return instance;
-    }
-
-    // List of signals.
     public signal void update_icons_style ();
     public signal void align_items (string align_action);
     public signal void close_popover (string popover);

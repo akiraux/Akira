@@ -81,9 +81,9 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         nob_manager = new Managers.NobManager (this);
         hover_manager = new Managers.HoverManager (this);
 
-        event_bus.request_zoom.connect (on_request_zoom);
-        event_bus.request_change_cursor.connect (on_request_change_cursor);
-        event_bus.set_focus_on_canvas.connect (focus_canvas);
+        window.event_bus.request_zoom.connect (on_request_zoom);
+        window.event_bus.request_change_cursor.connect (on_request_change_cursor);
+        window.event_bus.set_focus_on_canvas.connect (focus_canvas);
     }
 
     public void update_bounds () {
@@ -212,7 +212,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         var event_x = event.x / current_scale;
         var event_y = event.y / current_scale;
 
-        event_bus.coordinate_change (event_x, event_y);
+        window.event_bus.coordinate_change (event_x, event_y);
 
         if (!holding) {
             // Only motion_hover_effect
@@ -251,7 +251,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
         set_scale (current_scale);
 
-        event_bus.zoom (current_scale);
+        window.event_bus.zoom (current_scale);
     }
 
     private void on_request_change_cursor (Gdk.CursorType? cursor_type) {
