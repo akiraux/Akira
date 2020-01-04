@@ -92,7 +92,7 @@ public class Akira.Partials.ZoomButton : Gtk.Grid {
         zoom_out_button.sensitive = true;
         zoom_default_button.label = "%.0f%%".printf (zoom);
 
-        event_bus.emit ("request-zoom", "out");
+        event_bus.request_zoom ("out");
 
         /*
         window.main_window.main_canvas.canvas.set_scale (window.main_window.main_canvas.canvas.get_scale () - 0.1);
@@ -110,7 +110,7 @@ public class Akira.Partials.ZoomButton : Gtk.Grid {
         zoom_in_button.sensitive = true;
         zoom_default_button.label = "%.0f%%".printf (zoom);
 
-        event_bus.emit ("request-zoom", "in");
+        event_bus.request_zoom ("in");
 
         /*
         window.main_window.main_canvas.canvas.set_scale (window.main_window.main_canvas.canvas.get_scale () + 0.1);
@@ -123,7 +123,7 @@ public class Akira.Partials.ZoomButton : Gtk.Grid {
         zoom_out_button.sensitive = true;
         zoom_default_button.label = "100%";
 
-        event_bus.emit ("request-zoom", "reset");
+        event_bus.request_zoom ("reset");
         /*
         window.main_window.main_canvas.canvas.set_scale (1);
         window.main_window.main_canvas.canvas.reset_select ();

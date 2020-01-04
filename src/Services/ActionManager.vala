@@ -189,8 +189,8 @@ public class Akira.Services.ActionManager : Object {
     private void action_rect_tool () {
         window.main_window.main_canvas.canvas.edit_mode = Akira.Lib.Canvas.EditMode.MODE_INSERT;
         //window.main_window.main_canvas.canvas.insert_type = Akira.Lib.Canvas.InsertType.RECT;
-        event_bus.emit ("insert-item", "rectangle");
-        event_bus.emit ("close-popover", "insert");
+        event_bus.insert_item ("rectangle");
+        event_bus.close_popover ("insert");
     }
 
     private void action_selection_tool () {
@@ -205,15 +205,15 @@ public class Akira.Services.ActionManager : Object {
     private void action_ellipse_tool () {
         window.main_window.main_canvas.canvas.edit_mode = Akira.Lib.Canvas.EditMode.MODE_INSERT;
         //window.main_window.main_canvas.canvas.insert_type = Akira.Lib.Canvas.InsertType.ELLIPSE;
-        event_bus.emit ("insert-item", "ellipse");
-        event_bus.emit ("close-popover", "insert");
+        event_bus.insert_item ("ellipse");
+        event_bus.close_popover ("insert");
     }
 
     private void action_text_tool () {
         window.main_window.main_canvas.canvas.edit_mode = Akira.Lib.Canvas.EditMode.MODE_INSERT;
         //window.main_window.main_canvas.canvas.insert_type = Akira.Lib.Canvas.InsertType.TEXT;
-        event_bus.emit ("insert-item", "text");
-        event_bus.emit ("close-popover", "insert");
+        event_bus.insert_item ("text");
+        event_bus.close_popover ("insert");
     }
 
     public static void action_from_group (string action_name, ActionGroup? action_group) {

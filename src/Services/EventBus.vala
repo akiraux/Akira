@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Alecaddd (http://alecaddd.com)
+ * Copyright (c) 2019 Alecaddd (https://alecaddd.com)
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -17,6 +17,7 @@
  * Boston, MA 02110-1301 USA
  *
  * Authored by: Giacomo "giacomoalbe" Alberini <giacomoalbe@gmail.com>
+ * Authored by: Alessandro "alecaddd" Castellani <castellani.ale@gmail.com>
  */
 
 public class Akira.Services.EventBus : Object {
@@ -32,39 +33,6 @@ public class Akira.Services.EventBus : Object {
     public signal void request_change_cursor (Gdk.CursorType? cursor_type);
     public signal void request_selection_bound_transform (string property, double amount);
     public signal void set_focus_on_canvas ();
-
-    public EventBus () {
-        Object ();
-    }
-
-    public void emit (string signal_id, string param = "") {
-        switch (signal_id) {
-            case "update-icons-style":
-                update_icons_style ();
-                break;
-
-            case "align-items":
-                align_items (param);
-                break;
-
-            case "close-popover":
-                close_popover (param);
-                break;
-
-            case "change-sensitivity":
-                change_sensitivity (param);
-                break;
-
-            case "insert-item":
-                insert_item (param);
-                break;
-
-            case "request-zoom":
-                request_zoom (param);
-                break;
-
-        }
-    }
 
     public void test (string caller_id) {
         debug (@"Test from EventBus called by $(caller_id)");
