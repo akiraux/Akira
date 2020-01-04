@@ -103,7 +103,11 @@ public class Akira.Window : Gtk.ApplicationWindow {
         }
 
         if (edited) {
-            confirmed = dialogs.message_dialog (_("Are you sure you want to quit?"), _("All unsaved data will be lost and impossible to recover."), "system-shutdown", _("Yes, Quit!"));
+            confirmed = dialogs.message_dialog (
+                _("Are you sure you want to quit?"),
+                _("All unsaved data will be lost and impossible to recover."),
+                "system-shutdown",
+                _("Yes, Quit!"));
 
             if (confirmed) {
                 app.get_active_window ().destroy ();
