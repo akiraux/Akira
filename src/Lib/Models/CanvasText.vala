@@ -27,6 +27,8 @@ public class Akira.Lib.Models.CanvasText : Goo.CanvasText, Models.CanvasItem {
     public double rotation { get; set; }
     public int fill_alpha { get; set; }
     public int stroke_alpha { get; set; }
+    public string color { get; set; }
+    public string border_color { get; set; }
     public Models.CanvasItemType item_type { get; set; }
 
     public CanvasText (

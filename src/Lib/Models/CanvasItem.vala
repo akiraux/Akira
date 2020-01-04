@@ -34,6 +34,8 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItem {
     public abstract double rotation { get; public set; }
     public abstract int fill_alpha { get; public set; }
     public abstract int stroke_alpha { get; public set; }
+    public abstract string color { get; public set; }
+    public abstract string border_color { get; public set; }
     public abstract Models.CanvasItemType item_type { get; protected set; }
 
     public double get_coords (string coord_id, bool convert_to_item_space = false) {

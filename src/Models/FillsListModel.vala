@@ -43,13 +43,14 @@ public class Akira.Models.FillsListModel : GLib.Object, GLib.ListModel {
         return typeof (Akira.Models.FillsItemModel);
     }
 
-    public async void add (Goo.CanvasItemSimple item) {
-        var model_item = new Akira.Models.FillsItemModel (
+    public async void add (Lib.Models.CanvasItem item) {
+        var model_item = new Models.FillsItemModel (
             item,
             false,
             Akira.Utils.BlendingMode.NORMAL,
             this
         );
+
         fills_list.append (model_item);
 
         items_changed (get_n_items () - 1, 0, 1);

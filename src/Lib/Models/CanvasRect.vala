@@ -27,6 +27,18 @@ public class Akira.Lib.Models.CanvasRect : Goo.CanvasRect, Models.CanvasItem {
     public double rotation { get; public set; }
     public int fill_alpha { get; set; }
     public int stroke_alpha { get; set; }
+    private string _color;
+    public string color {
+        get {
+            return _color;
+        }
+        set {
+            _color = value;
+
+            set ("fill-color", _color);
+        }
+    }
+    public string border_color  { get; set; }
     public Models.CanvasItemType item_type { get; set; }
 
     public CanvasRect (
@@ -61,8 +73,9 @@ public class Akira.Lib.Models.CanvasRect : Goo.CanvasRect, Models.CanvasItem {
         // move the entire coordinate system every time
         translate (_x, _y);
 
+        color = _fill_color;
+        border_color = _border_color;
+
         set ("line-width", _border_size);
-        set ("fill-color", _fill_color);
-        set ("stroke-color", _border_color);
     }
 }
