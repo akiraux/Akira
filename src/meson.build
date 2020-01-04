@@ -31,6 +31,7 @@ sources = files(
 
     'Utils/Dialogs.vala',
     'Utils/BlendingMode.vala',
+    'Utils/AffineTransform.vala',
 
     'Layouts/HeaderBar.vala',
     'Layouts/LeftSideBar.vala',
@@ -64,7 +65,17 @@ sources = files(
     'Widgets/SettingsDialog.vala',
 
     'Lib/Canvas.vala',
-    'Lib/Item.vala',
+
+    'Lib/Managers/HoverManager.vala',
+    'Lib/Managers/SelectedBoundManager.vala',
+    #'Lib/Managers/AffineTransformManager.vala',
+    'Lib/Managers/ItemsManager.vala',
+    'Lib/Managers/NobManager.vala',
+
+    'Lib/Models/CanvasItem.vala',
+    'Lib/Models/CanvasRect.vala',
+    'Lib/Models/CanvasEllipse.vala',
+    'Lib/Models/CanvasText.vala',
 
     'Lib/Selection/Nob.vala',
 )

@@ -68,6 +68,7 @@ public class Akira.Widgets.SettingsDialog : Gtk.Dialog {
 
         close_button.clicked.connect (() => {
             destroy ();
+            event_bus.set_focus_on_canvas ();
         });
 
         add_action_widget (close_button, 0);
