@@ -90,18 +90,6 @@ public class Akira.Layouts.Partials.FillsBoxPanel : Gtk.Grid {
             if (selected_item == null || selected_item != selected_items.nth_data (0)) {
                 selected_item = selected_items.nth_data (0);
 
-                debug (@"Setting::color: $(settings.fill_color)");
-                var rgba = Gdk.RGBA ();
-                rgba.parse (settings.fill_color);
-
-                debug (@"$rgba");
-
-                rgba.parse ("rgba(100,0, 100,0, 100,0, 0,0)");
-
-                debug (@"$rgba");
-
-
-                debug (@"SelectedItem::color: $(selected_item.color)");
                 fills_list_model.add.begin (selected_item);
             }
         } else {

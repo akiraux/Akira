@@ -32,6 +32,7 @@ sources = files(
     'Utils/Dialogs.vala',
     'Utils/BlendingMode.vala',
     'Utils/AffineTransform.vala',
+    'Utils/Color.vala',
 
     'Layouts/HeaderBar.vala',
     'Layouts/LeftSideBar.vala',

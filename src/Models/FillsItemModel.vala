@@ -22,41 +22,19 @@
 public class Akira.Models.FillsItemModel : GLib.Object {
     public string color {
         owned get {
-            return item.color;
+            debug (@"Getting color: $(item.color)");
 
-            /*
-            var rgba = item.fill_color_rgba;
-            var result = "#%02x%02x%02x".printf (
-                (int) (Math.round (rgba >> 24 & 0xFF)),
-                (int) (Math.round (rgba >> 16 & 0xFF)),
-                (int) (Math.round (rgba >> 8 & 0xFF))
-            );
-            return result;
-            */
+            return item.color;
         } set {
+            debug (@"Setting color: $value");
             var new_rgba = Gdk.RGBA ();
             new_rgba.parse (value);
 
-            debug (@"R: $(new_rgba.red)");
-            debug (@"G: $(new_rgba.green)");
-            debug (@"B: $(new_rgba.blue)");
-
             var alpha = item.fill_alpha * item.opacity;
 
-            uint rgba = (uint) Math.round (new_rgba.red * 255);
-            rgba = (rgba << 8) + (uint)Math.round (new_rgba.green * 255);
-            rgba = (rgba << 8) + (uint)Math.round (new_rgba.blue * 255);
-            rgba = (rgba << 8) + (uint)Math.round (alpha);
+            new_rgba.alpha = alpha;
 
-            var new_color_hex = "#%02x%02x%02x".printf (
-                (int) (Math.round (rgba >> 24 & 0xFF)),
-                (int) (Math.round (rgba >> 16 & 0xFF)),
-                (int) (Math.round (rgba >> 8 & 0xFF))
-            );
-
-            debug (@"New color: $(new_color_hex)");
-
-            item.color = new_color_hex;
+            item.color = new_rgba.to_string ();
         }
     }
     public double alpha {
@@ -76,6 +54,7 @@ public class Akira.Models.FillsItemModel : GLib.Object {
             */
         }
     }
+
     public bool hidden { get; set; }
     public Akira.Utils.BlendingMode blending_mode { get; set; }
     public Akira.Models.FillsListModel list_model { get; set; }

@@ -99,8 +99,6 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         hidden = model.hidden;
         //  blending_mode = model.blending_mode;
         color = model.color;
-
-        debug (@"model.color: $(model.color)");
     }
 
     private void create_ui () {
@@ -132,12 +130,31 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         color_container.width_chars = 8;
         color_container.max_length = 7;
         color_container.hexpand = true;
-        color_container.text = color;
+        color_container.text = Utils.Color.rgba_to_hex (color);
+
         color_container.bind_property (
             "text", model, "color",
-            BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE
+            BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE,
+            // this => model
+            (binding, color_container_value, ref model_value) => {
+                var color_container_hex = color_container_value.dup_string ();
+
+                model_value.set_string (Utils.Color.hex_to_rgba (color_container_hex));
+
+                return false;
+            },
+            // model => this
+            (binding, model_value, ref color_container_value) => {
+                debug (@"Color model value: $(model_value.dup_string ())");
+                var model_rgba = model_value.dup_string ();
+
+                color_container_value.set_string (Utils.Color.rgba_to_hex (model_rgba));
+
+                return true;
+            }
         );
-        color_container.key_release_event.connect (() => {
+
+        color_container.key_release_event.connect ((event) => {
             if (!color_container.text.contains ("#")) {
                 var builder = new StringBuilder ();
                 builder.append ("#");
@@ -145,7 +162,38 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
                 color_container.text = builder.str;
                 color_container.set_position (-1);
             }
+
             return false;
+        });
+
+        color_container.insert_text.connect ((_new_text, new_text_length) => {
+            string new_text = _new_text;
+
+            if (new_text.contains ("#")) {
+                new_text = _new_text.substring (1, new_text.length - 1);
+            }
+
+            bool is_valid_hex = true;
+
+            bool char_is_numeric = true;
+            bool char_is_valid_alpha = true;
+
+            uint keyval;
+
+            for (var i = 0; i < new_text.length; i++) {
+                keyval = Gdk.keyval_to_upper (new_text [i]);
+
+                char_is_numeric = keyval >= Gdk.Key.@0 && keyval <= Gdk.Key.@9;
+                char_is_valid_alpha = keyval >= Gdk.Key.A && keyval <= Gdk.Key.F;
+
+                is_valid_hex &= (char_is_numeric || char_is_valid_alpha);
+
+            }
+
+            if (!is_valid_hex) {
+                GLib.Signal.stop_emission_by_name (color_container, "insert-text");
+                return;
+            }
         });
 
         //  selected_blending_mode = new Gtk.Label ("");
@@ -245,12 +293,9 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
     private void on_color_changed () {
         var selected_color = color_chooser_widget.rgba;
 
-        color = "#%02X%02X%02X".printf (
-            (int) (selected_color.red * 255),
-            (int) (selected_color.green * 255),
-            (int) (selected_color.blue * 255));
-
         alpha = selected_color.alpha;
+
+        color = selected_color.to_string ();
     }
 
     private void on_model_changed () {
