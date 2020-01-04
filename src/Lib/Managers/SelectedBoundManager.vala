@@ -22,6 +22,8 @@
 public class Akira.Lib.Managers.SelectedBoundManager : Object {
 
     public weak Goo.Canvas canvas { get; construct; }
+
+    private unowned List<Models.CanvasItem> _selected_items;
     public unowned List<Models.CanvasItem> selected_items {
         get {
             return _selected_items;
@@ -34,7 +36,6 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         }
     }
 
-    private unowned List<Models.CanvasItem> _selected_items;
     private Goo.CanvasBounds select_bb;
     private double initial_event_x;
     private double initial_event_y;
@@ -64,13 +65,15 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
 
             initial_width = selected_item.get_coords ("width");
             initial_height = selected_item.get_coords ("height");
-        } else {
-            initial_event_x = event_x;
-            initial_event_y = event_y;
 
-            initial_width = select_bb.x2 - select_bb.x1;
-            initial_height = select_bb.y2 - select_bb.y1;
+            return;
         }
+
+        initial_event_x = event_x;
+        initial_event_y = event_y;
+
+        initial_width = select_bb.x2 - select_bb.x1;
+        initial_height = select_bb.y2 - select_bb.y1;
     }
 
     public void transform_bound (double event_x, double event_y, Managers.NobManager.Nob selected_nob) {
@@ -140,8 +143,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
     }
 
     private void on_request_selection_bound_transform (string property, double amount) {
-        Models.CanvasItem selected_item;
-        selected_item = selected_items.nth_data (0);
+        Models.CanvasItem selected_item = selected_items.nth_data (0);
 
         switch (property) {
             case "rotation":

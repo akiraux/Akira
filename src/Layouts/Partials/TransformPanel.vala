@@ -223,13 +223,12 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
     }
 
     private void on_selected_items_changed (List<Lib.Models.CanvasItem> selected_items) {
-        if (selected_items.length () == 1) {
-            item = selected_items.nth_data (0);
-        } else {
-            if (item != null) {
-                item = null;
-            }
+        if (selected_items.length () == 0) {
+            item = null;
+            return;
         }
+
+        item = selected_items.nth_data (0);
     }
 
     private void item_changed (Object object, ParamSpec spec) {
@@ -238,6 +237,12 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
     }
 
     private void reset_values () {
+        // Connecting and disconnecting are necessary in order
+        // not to create infinite "jumps" between the value notify
+        // and the property setter.
+        // Maybe this behaviour can be incapsulated into the LinkedInput widget
+        // in order to avoid code duplication and clarify a little bit
+        // better how those items work.
         x.notify["value"].disconnect (x_notify_value);
         y.notify["value"].disconnect (y_notify_value);
         width.notify["value"].disconnect (width_notify_value);

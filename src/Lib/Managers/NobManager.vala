@@ -20,6 +20,9 @@
 */
 
 public class Akira.Lib.Managers.NobManager : Object {
+    private const string STROKE_COLOR = "#666";
+    private const double LINE_WIDTH = 1.0;
+
     /*
         Grabber Pos:   8
                      0 1 2
@@ -43,11 +46,12 @@ public class Akira.Lib.Managers.NobManager : Object {
 
     public weak Goo.Canvas canvas { get; construct; }
 
+    public Nob selected_nob;
+
     private Goo.CanvasItem root;
     private Goo.CanvasItem select_effect;
     private Goo.CanvasItemSimple[] nobs = new Goo.CanvasItemSimple[9];
     private Goo.CanvasBounds select_bb;
-    private Nob selected_nob;
     private double top;
     private double left;
     private double width;
@@ -70,10 +74,6 @@ public class Akira.Lib.Managers.NobManager : Object {
 
     public void set_selected_by_name (Nob selected_nob) {
         this.selected_nob = selected_nob;
-    }
-
-    public Nob get_selected_nob () {
-        return selected_nob;
     }
 
     public Nob get_grabbed_id (Goo.CanvasItem? target) {
@@ -173,8 +173,8 @@ public class Akira.Lib.Managers.NobManager : Object {
             x, y,
             width,
             height,
-            "line-width", 1.0 / current_scale,
-            "stroke-color", "#666",
+            "line-width", LINE_WIDTH / current_scale,
+            "stroke-color", STROKE_COLOR,
             null
         );
 
@@ -201,11 +201,7 @@ public class Akira.Lib.Managers.NobManager : Object {
         );
 
         for (int i = 0; i < 9; i++) {
-            nobs[i] = new Selection.Nob (
-                root,
-                (Managers.NobManager.Nob) i,
-                current_scale
-            );
+            nobs[i] = new Selection.Nob (root, (Managers.NobManager.Nob) i, current_scale);
         }
 
         nob_size = Selection.Nob.NOB_SIZE / current_scale;
@@ -232,10 +228,11 @@ public class Akira.Lib.Managers.NobManager : Object {
           } else {
             nobs[Nob.TOP_CENTER].translate (x + (width / 2) - nob_offset, y - (nob_size + line_width));
           }
-          nobs[Nob.TOP_CENTER].set ("visibility", Goo.CanvasItemVisibility.VISIBLE);
+          set_nob_visibility (Nob.TOP_CENTER, true);
         } else {
-          nobs[Nob.TOP_CENTER].set ("visibility", Goo.CanvasItemVisibility.HIDDEN);
+          set_nob_visibility (Nob.TOP_CENTER, false);
         }
+
         nobs[Nob.TOP_CENTER].raise (select_effect);
 
         // TOP RIGHT nob
@@ -255,10 +252,11 @@ public class Akira.Lib.Managers.NobManager : Object {
           } else {
             nobs[Nob.RIGHT_CENTER].translate (x + width + line_width, y + (height / 2) - nob_offset);
           }
-          nobs[Nob.RIGHT_CENTER].set ("visibility", Goo.CanvasItemVisibility.VISIBLE);
+          set_nob_visibility (Nob.RIGHT_CENTER, true);
         } else {
-          nobs[Nob.RIGHT_CENTER].set ("visibility", Goo.CanvasItemVisibility.HIDDEN);
+          set_nob_visibility (Nob.RIGHT_CENTER, false);
         }
+
         nobs[Nob.RIGHT_CENTER].raise (select_effect);
 
         // BOTTOM RIGHT nob
@@ -278,9 +276,9 @@ public class Akira.Lib.Managers.NobManager : Object {
           } else {
             nobs[Nob.BOTTOM_CENTER].translate (x + (width / 2) - nob_offset, y + height + line_width);
           }
-          nobs[Nob.BOTTOM_CENTER].set ("visibility", Goo.CanvasItemVisibility.VISIBLE);
+          set_nob_visibility (Nob.BOTTOM_CENTER, true);
         } else {
-          nobs[Nob.BOTTOM_CENTER].set ("visibility", Goo.CanvasItemVisibility.HIDDEN);
+          set_nob_visibility (Nob.BOTTOM_CENTER, false);
         }
         nobs[Nob.BOTTOM_CENTER].raise (select_effect);
 
@@ -301,10 +299,11 @@ public class Akira.Lib.Managers.NobManager : Object {
           } else {
             nobs[Nob.LEFT_CENTER].translate (x - (nob_size + line_width), y + (height / 2) - nob_offset);
           }
-          nobs[Nob.LEFT_CENTER].set ("visibility", Goo.CanvasItemVisibility.VISIBLE);
+          set_nob_visibility (Nob.LEFT_CENTER, true);
         } else {
-          nobs[Nob.LEFT_CENTER].set ("visibility", Goo.CanvasItemVisibility.HIDDEN);
+          set_nob_visibility (Nob.LEFT_CENTER, false);
         }
+
         nobs[Nob.LEFT_CENTER].raise (select_effect);
 
         // ROTATE nob
@@ -316,6 +315,14 @@ public class Akira.Lib.Managers.NobManager : Object {
         nobs[Nob.ROTATE].set_transform (transform);
         nobs[Nob.ROTATE].translate (x + (width / 2) - nob_offset, y - nob_offset - distance);
         nobs[Nob.ROTATE].raise (select_effect);
+    }
+
+    private void set_nob_visibility (Nob nob_handle, bool visible) {
+        if (visible) {
+          nobs[nob_handle].set ("visibility", Goo.CanvasItemVisibility.VISIBLE);
+        } else {
+          nobs[nob_handle].set ("visibility", Goo.CanvasItemVisibility.HIDDEN);
+        }
     }
 
     private void set_bound_coordinates (
@@ -334,12 +341,14 @@ public class Akira.Lib.Managers.NobManager : Object {
             item.get ("line_width", out line_width);
             item.get ("width", out _width);
             item.get ("height", out _height);
-        } else {
-            line_width = 0.0;
-            _width = width;
-            _height = height;
-            x = left;
-            y = top;
+
+            return;
         }
+
+        line_width = 0.0;
+        _width = width;
+        _height = height;
+        x = left;
+        y = top;
     }
 }

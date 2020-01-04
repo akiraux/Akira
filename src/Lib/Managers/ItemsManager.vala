@@ -19,15 +19,15 @@
  * Authored by: Giacomo Alberini <giacomoalbe@gmail.com>
  */
 
-public enum InsertType {
-    RECT,
-    ELLIPSE,
-    TEXT
-}
 
 public class Akira.Lib.Managers.ItemsManager : Object {
-
     public weak Goo.Canvas canvas { get; construct; }
+
+    public enum InsertType {
+        RECT,
+        ELLIPSE,
+        TEXT
+    }
 
     private List<Models.CanvasItem> items;
     private InsertType? insert_type { get; set; }
@@ -51,6 +51,9 @@ public class Akira.Lib.Managers.ItemsManager : Object {
 
     public bool set_insert_type_from_key (uint keyval) {
         // TODO: take those values from preferences/settings and not from hardcoded values
+        if (keyval > Gdk.Key.Z || keyval < Gdk.Key.A) {
+          return false;
+        }
 
         switch (keyval) {
             case Gdk.Key.R:

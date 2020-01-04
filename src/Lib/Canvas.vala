@@ -102,13 +102,10 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 return true;
 
             default:
-                if (uppercase_keyval <= Gdk.Key.Z && uppercase_keyval >= Gdk.Key.A) {
-                    // Send to ItemsManager to deal with custom user shape
-                    // hotkey preferences from settings
-                    if (items_manager.set_insert_type_from_key (uppercase_keyval)) {
-                        edit_mode = Akira.Lib.Canvas.EditMode.MODE_INSERT;
-                    }
-
+                // Send to ItemsManager to deal with custom user shape
+                // hotkey preferences from settings
+                if (items_manager.set_insert_type_from_key (uppercase_keyval)) {
+                    edit_mode = Akira.Lib.Canvas.EditMode.MODE_INSERT;
                     return true;
                 }
 
@@ -133,7 +130,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
                 selected_bound_manager.set_initial_coordinates (temp_event_x, temp_event_y);
 
-                nob_manager.set_selected_by_name (Managers.NobManager.Nob.BOTTOM_RIGHT);
+                nob_manager.selected_nob = Managers.NobManager.Nob.BOTTOM_RIGHT;
                 break;
 
             case EditMode.MODE_SELECTION:
@@ -156,7 +153,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                     clicked_nob_name = nob_manager.get_grabbed_id (selected_nob);
                 }
 
-                nob_manager.set_selected_by_name (clicked_nob_name);
+                nob_manager.selected_nob = clicked_nob_name;
 
                 if (clicked_item is Models.CanvasItem) {
                     // Item has been selected
@@ -200,7 +197,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         switch (edit_mode) {
             case EditMode.MODE_INSERT:
             case EditMode.MODE_SELECTION:
-                var selected_nob = nob_manager.get_selected_nob ();
+                var selected_nob = nob_manager.selected_nob;
                 selected_bound_manager.transform_bound (event_x, event_y, selected_nob);
                 break;
         }

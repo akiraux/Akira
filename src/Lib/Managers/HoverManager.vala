@@ -20,6 +20,9 @@
 */
 
 public class Akira.Lib.Managers.HoverManager : Object {
+    private const string STROKE_COLOR = "#41c9fd";
+    private const double LINE_WIDTH = 2.0;
+
     public weak Goo.Canvas canvas { get; construct; }
 
     private double initial_event_x;
@@ -30,9 +33,6 @@ public class Akira.Lib.Managers.HoverManager : Object {
         Object (
             canvas: canvas
         );
-    }
-
-    construct {
     }
 
     public void set_initial_coordinates (double event_x, double event_y) {
@@ -74,8 +74,8 @@ public class Akira.Lib.Managers.HoverManager : Object {
                     null,
                     x, y,
                     width, height,
-                    "line-width", 2.0,
-                    "stroke-color", "#41c9fd",
+                    "line-width", LINE_WIDTH,
+                    "stroke-color", STROKE_COLOR,
                     null
                 );
 
