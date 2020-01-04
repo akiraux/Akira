@@ -24,7 +24,7 @@ public class Akira.Utils.Color : Object {
         var rgba = Gdk.RGBA ();
         rgba.parse (rgba_string);
 
-        return "#%02x%02x%02x".printf(
+        return "#%02x%02x%02x".printf (
             (int) (rgba.red * 255),
             (int) (rgba.green * 255),
             (int) (rgba.blue * 255)
@@ -49,5 +49,16 @@ public class Akira.Utils.Color : Object {
         // we can assume that, if it's arrived here
         // the content is only 0-9A-F
         return true;
+    }
+
+    public static uint rgba_to_uint (Gdk.RGBA rgba) {
+        uint uint_rgba = 0;
+
+        uint_rgba |= ((uint) (rgba.red * 255)) << 24;
+        uint_rgba |= ((uint) (rgba.green * 255)) << 16;
+        uint_rgba |= ((uint) (rgba.blue * 255)) << 8;
+        uint_rgba |= ((uint) (rgba.alpha * 255));
+
+        return uint_rgba;
     }
 }

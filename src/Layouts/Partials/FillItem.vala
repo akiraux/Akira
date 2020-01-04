@@ -57,10 +57,11 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         }
     }
 
-    private double alpha {
+    private int alpha {
         owned get {
             return model.alpha;
         } set {
+            debug (@"Alpha value set in setter: $(value)");
             model.alpha = value;
 
             set_button_color ();
@@ -222,20 +223,28 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         opacity_container = new Akira.Partials.InputField (
             Akira.Partials.InputField.Unit.PERCENTAGE, 7, true, true);
         opacity_container.entry.sensitive = true;
-        opacity_container.entry.text = (alpha / 255 * 100).to_string ();
+        opacity_container.entry.text = ((double) alpha / 255 * 100).to_string ();
         opacity_container.entry.bind_property (
             "text", model, "alpha",
             BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE,
             (binding, srcval, ref targetval) => {
                 double src = double.parse (srcval.dup_string ());
+
+                debug (@"Src: $(src)");
+
                 if (src > 100) {
+                    src = 100;
                     opacity_container.entry.text = "100";
-                    return false;
                 } else if (src < 0) {
+                    src = 0;
                     opacity_container.entry.text = "0";
-                    return false;
                 }
-                targetval.set_double (src / 100);
+
+                int alpha_int_value = (int) (src / 100 * 255);
+
+                debug (@"Alpha int value: $(alpha_int_value)");
+
+                targetval.set_int (alpha_int_value);
                 return true;
             }, (binding, srcval, ref targetval) => {
                 double src = (double) srcval / 255;
@@ -306,7 +315,7 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
     private void on_color_changed () {
         var selected_color = color_chooser_widget.rgba;
 
-        alpha = selected_color.alpha;
+        alpha = (int) (selected_color.alpha * 100);
 
         color = selected_color.to_string ();
     }

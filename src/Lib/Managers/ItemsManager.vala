@@ -33,8 +33,8 @@ public class Akira.Lib.Managers.ItemsManager : Object {
     private InsertType? insert_type { get; set; }
     private Goo.CanvasItem root;
     private double border_size;
-    private string border_color;
-    private string fill_color;
+    private Gdk.RGBA border_color;
+    private Gdk.RGBA fill_color;
 
     public ItemsManager (Akira.Lib.Canvas canvas) {
         Object (
@@ -45,6 +45,9 @@ public class Akira.Lib.Managers.ItemsManager : Object {
     construct {
         root = canvas.get_root_item ();
         items = new List<Models.CanvasItem> ();
+
+        border_color = Gdk.RGBA ();
+        fill_color = Gdk.RGBA ();
 
         canvas.window.event_bus.insert_item.connect (set_item_to_insert);
     }
@@ -202,7 +205,11 @@ public class Akira.Lib.Managers.ItemsManager : Object {
 
     private void udpate_default_values () {
         border_size = settings.set_border ? settings.border_size : 0.0;
-        border_color = settings.set_border ? settings.border_color: "";
-        fill_color = settings.fill_color;
+
+        string border_color_str = settings.set_border ? settings.border_color : DEFAUL_BORDER_COLOR;
+        string fill_color_str = settings.fill_color;
+
+        border_color.parse (border_color_str);
+        fill_color.parse (fill_color_str);
     }
 }

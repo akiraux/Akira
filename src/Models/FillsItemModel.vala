@@ -22,36 +22,22 @@
 public class Akira.Models.FillsItemModel : GLib.Object {
     public string color {
         owned get {
-            debug (@"Getting color: $(item.color)");
-
-            return item.color;
+            return item.color.to_string ();
         } set {
-            debug (@"Setting color: $value");
             var new_rgba = Gdk.RGBA ();
             new_rgba.parse (value);
 
-            var alpha = item.fill_alpha * item.opacity;
-
-            new_rgba.alpha = alpha;
-
-            item.color = new_rgba.to_string ();
+            item.color = new_rgba;
         }
     }
-    public double alpha {
+    public int alpha {
         get {
+            debug (@"model::get::alpha::$(item.fill_alpha)");
             return item.fill_alpha;
         }
         set {
-            debug (@"Alpha: $(value)");
-            /*
-            var rgba = item.fill_color_rgba;
-            var fill_a = (int) (value * 255);
-            //  debug ("set alpha: %f", fill_a);
-            item.set_data<int?> ("fill-alpha", fill_a);
-            var opacity_factor = item.get_data<double?> ("opacity") / 100;
-            var alpha = fill_a * opacity_factor;
-            item.fill_color_rgba = (rgba & 0xFFFFFF00) + (uint) (alpha);
-            */
+            debug (@"Alpha in fills_model: $(value)");
+            item.fill_alpha = value;
         }
     }
 

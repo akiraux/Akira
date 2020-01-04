@@ -26,8 +26,8 @@ public class Akira.Lib.Models.CanvasEllipse : Goo.CanvasEllipse, Models.CanvasIt
     public double rotation { get; set; }
     public int fill_alpha { get; set; }
     public int stroke_alpha { get; set; }
-    public string color { get; set; }
-    public string border_color { get; set; }
+    public Gdk.RGBA color { get; set; }
+    public Gdk.RGBA border_color { get; set; }
     public Models.CanvasItemType item_type { get; set; }
 
     public CanvasEllipse (
@@ -36,8 +36,8 @@ public class Akira.Lib.Models.CanvasEllipse : Goo.CanvasEllipse, Models.CanvasIt
         double _radius_x = 0,
         double _radius_y = 0,
         double _border_size = 1.0,
-        string _border_color = "#aaa",
-        string _fill_color = "#ccc",
+        Gdk.RGBA _border_color,
+        Gdk.RGBA _fill_color,
         Goo.CanvasItem? parent = null
     ) {
         Object (

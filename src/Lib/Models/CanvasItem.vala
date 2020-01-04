@@ -25,17 +25,17 @@ public enum Akira.Lib.Models.CanvasItemType {
     TEXT
 }
 
-public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItem {
+public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasItem {
     public static int global_id = 0;
 
     public abstract string id { get; public set; }
     public abstract bool selected { get; public set; }
     public abstract double opacity { get; public set; }
     public abstract double rotation { get; public set; }
-    public abstract int fill_alpha { get; public set; }
+    public abstract int fill_alpha { get; public  set; }
     public abstract int stroke_alpha { get; public set; }
-    public abstract string color { get; public set; }
-    public abstract string border_color { get; public set; }
+    public abstract Gdk.RGBA color { get; public set; }
+    public abstract Gdk.RGBA border_color { get; public set; }
     public abstract Models.CanvasItemType item_type { get; protected set; }
 
     public double get_coords (string coord_id, bool convert_to_item_space = false) {
@@ -61,5 +61,16 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItem {
         item.set ("opacity", 100.0);
         item.set ("fill-alpha", 255);
         item.set ("stroke-alpha", 255);
+    }
+
+    public void reset_colors () {
+        var rgba = Gdk.RGBA ();
+
+        rgba = color;
+        rgba.alpha = ((double) fill_alpha) / 255 * opacity / 100;
+
+        uint fill_color_rgba = Utils.Color.rgba_to_uint (rgba);
+
+        set ("fill-color-rgba", fill_color_rgba);
     }
 }
