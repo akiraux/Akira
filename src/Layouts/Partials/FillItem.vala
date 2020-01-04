@@ -99,6 +99,8 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         hidden = model.hidden;
         //  blending_mode = model.blending_mode;
         color = model.color;
+
+        debug (@"model.color: $(model.color)");
     }
 
     private void create_ui () {
