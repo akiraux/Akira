@@ -32,11 +32,22 @@ public class Akira.Utils.Color : Object {
     }
 
     public static string hex_to_rgba (string hex) {
-        debug (@"Hex: $(hex)");
+        var rgba = Gdk.RGBA ();
+        rgba.parse (hex);
+
+        return rgba.to_string ();
+    }
+
+    public static bool is_valid_hex (string hex) {
         var hex_values = hex.split ("#") [1];
 
-        debug (@"hex values: $(hex_values)");
+        if (hex_values.length != 3 && hex_values.length != 6) {
+            return false;
+        }
 
-        return hex_values;
+        // Since validation is done inside the insert-text
+        // we can assume that, if it's arrived here
+        // the content is only 0-9A-F
+        return true;
     }
 }

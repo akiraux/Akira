@@ -45,6 +45,8 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
     //      }
     //  }
 
+    private string old_color;
+    private bool color_set_manually = false;
     private string color {
         owned get {
             return model.color;
@@ -99,6 +101,7 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         hidden = model.hidden;
         //  blending_mode = model.blending_mode;
         color = model.color;
+        old_color = color;
     }
 
     private void create_ui () {
@@ -139,14 +142,24 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
             (binding, color_container_value, ref model_value) => {
                 var color_container_hex = color_container_value.dup_string ();
 
-                model_value.set_string (Utils.Color.hex_to_rgba (color_container_hex));
+                if (!Utils.Color.is_valid_hex (color_container_hex)) {
+                    model_value.set_string (Utils.Color.rgba_to_hex (old_color));
+                    return false;
+                }
 
-                return false;
+                color_set_manually = true;
+
+                var new_color_rgba = Utils.Color.hex_to_rgba (color_container_hex);
+
+                model_value.set_string (new_color_rgba);
+                set_button_color (color_container_hex);
+
+                return true;
             },
             // model => this
             (binding, model_value, ref color_container_value) => {
-                debug (@"Color model value: $(model_value.dup_string ())");
                 var model_rgba = model_value.dup_string ();
+                old_color = model_rgba;
 
                 color_container_value.set_string (Utils.Color.rgba_to_hex (model_rgba));
 
@@ -341,7 +354,13 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         }
     }
 
-    private void set_button_color () {
+    private void set_button_color (string? _button_color = null) {
+        var button_color = color;
+
+        if (_button_color != null) {
+            button_color = (string) _button_color;
+        }
+
         try {
             var provider = new Gtk.CssProvider ();
             var context = selected_color.get_style_context ();
@@ -351,7 +370,7 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
             var css = """.selected-color {
                     background-color: alpha (%s, %s);
                     border-color: alpha (shade (%s, 0.75), %s);
-                }""".printf (color, alpha_dot_separator, color, alpha_dot_separator);
+                }""".printf (button_color, alpha_dot_separator, button_color, alpha_dot_separator);
 
             //  debug ("fills: css %s", css);
 
@@ -364,11 +383,15 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
     }
 
     private void set_color_chooser_color () {
-        if (!Regex.match_simple ("#[0-9A-F]{6}|#[0-9A-F]{3}", model.color.up ())) {
+        // Prevent infinite loop by checking whether the color
+        // has been set manually or not
+        if (color_set_manually) {
+            color_set_manually = false;
             return;
         }
 
         var new_rgba = Gdk.RGBA ();
+
         new_rgba.parse (model.color);
         new_rgba.alpha = alpha / 255;
 
