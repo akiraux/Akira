@@ -171,45 +171,48 @@ public class Akira.Services.ActionManager : Object {
     }
 
     private void action_move_up () {
-        window.main_window.main_canvas.canvas.change_z_selected (true, false);
+        //window.main_window.main_canvas.canvas.change_z_selected (true, false);
     }
 
     private void action_move_down () {
-        window.main_window.main_canvas.canvas.change_z_selected (false, false);
+        //window.main_window.main_canvas.canvas.change_z_selected (false, false);
     }
 
     private void action_move_top () {
-        window.main_window.main_canvas.canvas.change_z_selected (true, true);
+        //window.main_window.main_canvas.canvas.change_z_selected (true, true);
     }
 
     private void action_move_bottom () {
-        window.main_window.main_canvas.canvas.change_z_selected (false, true);
+        //window.main_window.main_canvas.canvas.change_z_selected (false, true);
     }
 
     private void action_rect_tool () {
         window.main_window.main_canvas.canvas.edit_mode = Akira.Lib.Canvas.EditMode.MODE_INSERT;
-        window.main_window.main_canvas.canvas.insert_type = Akira.Lib.Canvas.InsertType.RECT;
+        //window.main_window.main_canvas.canvas.insert_type = Akira.Lib.Canvas.InsertType.RECT;
+        event_bus.emit ("insert-item", "rectangle");
         event_bus.emit ("close-popover", "insert");
     }
 
     private void action_selection_tool () {
         window.main_window.main_canvas.canvas.edit_mode = Akira.Lib.Canvas.EditMode.MODE_SELECTION;
-        window.main_window.main_canvas.canvas.insert_type = null;
+        //window.main_window.main_canvas.canvas.insert_type = null;
     }
 
     private void action_delete () {
-        window.main_window.main_canvas.canvas.delete_selected ();
+        //window.main_window.main_canvas.canvas.delete_selected ();
     }
 
     private void action_ellipse_tool () {
         window.main_window.main_canvas.canvas.edit_mode = Akira.Lib.Canvas.EditMode.MODE_INSERT;
-        window.main_window.main_canvas.canvas.insert_type = Akira.Lib.Canvas.InsertType.ELLIPSE;
+        //window.main_window.main_canvas.canvas.insert_type = Akira.Lib.Canvas.InsertType.ELLIPSE;
+        event_bus.emit ("insert-item", "ellipse");
         event_bus.emit ("close-popover", "insert");
     }
 
     private void action_text_tool () {
         window.main_window.main_canvas.canvas.edit_mode = Akira.Lib.Canvas.EditMode.MODE_INSERT;
-        window.main_window.main_canvas.canvas.insert_type = Akira.Lib.Canvas.InsertType.TEXT;
+        //window.main_window.main_canvas.canvas.insert_type = Akira.Lib.Canvas.InsertType.TEXT;
+        event_bus.emit ("insert-item", "text");
         event_bus.emit ("close-popover", "insert");
     }
 
