@@ -133,7 +133,7 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         color_container.width_chars = 8;
         color_container.max_length = 7;
         color_container.hexpand = true;
-        color_container.text = Utils.Color.rgba_to_hex (color);
+        //color_container.text = Utils.Color.rgba_to_hex (color);
 
         color_container.bind_property (
             "text", model, "color",
@@ -159,15 +159,21 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
             // model => this
             (binding, model_value, ref color_container_value) => {
                 var model_rgba = model_value.dup_string ();
+
                 old_color = model_rgba;
 
                 color_container_value.set_string (Utils.Color.rgba_to_hex (model_rgba));
-
                 return true;
             }
         );
 
         color_container.delete_text.connect ((start_pos, end_pos) => {
+            if (end_pos == -1) {
+                // We are replacing the string from the internal
+                // Not by manually selecting the text, so we don't need to check anything
+                return;
+            }
+
             string new_text = color_container.text.splice (start_pos, end_pos);
 
             if (!new_text.contains ("#")) {
@@ -307,18 +313,12 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         //  blending_mode_popover_items.row_selected.connect (on_popover_item_selected);
 
         color_chooser_widget.notify["rgba"].connect (on_color_changed);
-
-        model.notify.connect (on_model_changed);
     }
 
     private void on_color_changed () {
         var selected_color = color_chooser_widget.rgba;
 
         color = selected_color.to_string ();
-    }
-
-    private void on_model_changed () {
-        set_color_chooser_color ();
     }
 
     //  private void on_row_activated (Gtk.ListBoxRow? item) {
