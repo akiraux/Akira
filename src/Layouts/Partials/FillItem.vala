@@ -133,7 +133,7 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         color_container.width_chars = 8;
         color_container.max_length = 7;
         color_container.hexpand = true;
-        //color_container.text = Utils.Color.rgba_to_hex (color);
+        color_container.text = Utils.Color.rgba_to_hex (color);
 
         color_container.bind_property (
             "text", model, "color",
@@ -157,7 +157,7 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
                 return true;
             },
             // model => this
-            (binding, model_value, ref color_container_value) => {
+            (bpnding, model_value, ref color_container_value) => {
                 var model_rgba = model_value.dup_string ();
 
                 old_color = model_rgba;
@@ -223,7 +223,7 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         opacity_container = new Akira.Partials.InputField (
             Akira.Partials.InputField.Unit.PERCENTAGE, 7, true, true);
         opacity_container.entry.sensitive = true;
-        opacity_container.entry.text = Math. round ((double) alpha / 255 * 100).to_string ();
+        opacity_container.entry.text = Math.round ((double) alpha / 255 * 100).to_string ();
         opacity_container.entry.bind_property (
             "text", model, "alpha",
             BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE,
@@ -252,7 +252,7 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
 
                 src = Math.round (src * 100);
 
-                entry_text_val.set_string (("%f").printf (src * 100));
+                entry_text_val.set_string (("%f").printf (src));
 
                 return true;
             }
@@ -316,9 +316,7 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
     }
 
     private void on_color_changed () {
-        var selected_color = color_chooser_widget.rgba;
-
-        color = selected_color.to_string ();
+        color = color_chooser_widget.rgba.to_string ();
     }
 
     //  private void on_row_activated (Gtk.ListBoxRow? item) {

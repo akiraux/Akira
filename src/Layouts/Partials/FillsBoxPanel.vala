@@ -86,15 +86,16 @@ public class Akira.Layouts.Partials.FillsBoxPanel : Gtk.Grid {
     }
 
     private void on_selected_items_changed (List<Lib.Models.CanvasItem> selected_items) {
-        if (selected_items.length () > 0) {
-            if (selected_item == null || selected_item != selected_items.nth_data (0)) {
-                selected_item = selected_items.nth_data (0);
-
-                fills_list_model.add.begin (selected_item);
-            }
-        } else {
+        if (selected_items.length () == 0) {
             selected_item = null;
             fills_list_model.clear.begin ();
+            return;
+        }
+
+        if (selected_item == null || selected_item != selected_items.nth_data (0)) {
+            selected_item = selected_items.nth_data (0);
+
+            fills_list_model.add.begin (selected_item);
         }
     }
 }
