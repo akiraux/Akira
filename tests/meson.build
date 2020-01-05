@@ -1,3 +1,4 @@
+# Define environment variables to run tests.
 test_env = [
     'G_TEST_SRCDIR=@0@'.format(meson.current_source_dir()),
     'G_TEST_BUILDDIR=@0@'.format(meson.current_build_dir()),
@@ -5,18 +6,26 @@ test_env = [
     'GSETTINGS_SCHEMA_DIR=@0@/data/schemas'.format(meson.build_root()),
 ]
 
+# Set necessary C flags.
 test_cflags = [
   '-I@0@/../src'.format(meson.current_source_dir()),
   '-I@0@/../src'.format(meson.current_build_dir()),
   '-DTEST_DATA_DIR="@0@/data/schemas"'.format(meson.current_source_dir()),
 ]
 
-test = executable (
-    'akira_tests',
-    'tests.vala',
-    'test-fills-item.vala',
+# Canvas Tests ---------------------------------------- #
+canvas_tests = executable (
+    'canvas_tests',
+    'tests-model.vala',
+
+    'canvas/test-fills-item.vala',
+    'canvas/test-main.vala',
     c_args: test_cflags,
     dependencies: [akira_dep]
 )
 
-test ('akiratest', test, env: test_env)
+test ('canvas_tests', canvas_tests, env: test_env)
+
+# Settings Tests ---------------------------------------- #
+
+# File Format Tests ---------------------------------------- #
