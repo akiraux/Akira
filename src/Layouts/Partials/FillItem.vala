@@ -61,7 +61,6 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         owned get {
             return model.alpha;
         } set {
-            debug (@"Alpha value set in setter: $(value)");
             model.alpha = value;
 
             set_button_color ();
@@ -223,32 +222,37 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         opacity_container = new Akira.Partials.InputField (
             Akira.Partials.InputField.Unit.PERCENTAGE, 7, true, true);
         opacity_container.entry.sensitive = true;
-        opacity_container.entry.text = ((double) alpha / 255 * 100).to_string ();
+        opacity_container.entry.text = Math. round((double) alpha / 255 * 100).to_string ();
         opacity_container.entry.bind_property (
             "text", model, "alpha",
             BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE,
-            (binding, srcval, ref targetval) => {
-                double src = double.parse (srcval.dup_string ());
-
-                debug (@"Src: $(src)");
+            (binding, entry_text_val, ref model_alpha_val) => {
+                double src = double.parse (entry_text_val.dup_string ());
 
                 if (src > 100) {
-                    src = 100;
+                    src = 100.0;
                     opacity_container.entry.text = "100";
                 } else if (src < 0) {
-                    src = 0;
+                    src = 0.0;
                     opacity_container.entry.text = "0";
                 }
 
+                color_set_manually = true;
+
                 int alpha_int_value = (int) (src / 100 * 255);
 
-                debug (@"Alpha int value: $(alpha_int_value)");
+                model_alpha_val.set_int (alpha_int_value);
 
-                targetval.set_int (alpha_int_value);
+                set_button_color (null, alpha_int_value);
+
                 return true;
-            }, (binding, srcval, ref targetval) => {
-                double src = (double) srcval / 255;
-                targetval.set_string (("%0.1f").printf (src * 100));
+            }, (binding, model_alpha_val, ref entry_text_val) => {
+                double src = (double) model_alpha_val.get_int () / 255;
+
+                src = Math.round (src * 100);
+
+                entry_text_val.set_string (("%f").printf (src * 100));
+
                 return true;
             }
         );
@@ -315,8 +319,6 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
     private void on_color_changed () {
         var selected_color = color_chooser_widget.rgba;
 
-        alpha = (int) (selected_color.alpha * 100);
-
         color = selected_color.to_string ();
     }
 
@@ -363,25 +365,37 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         }
     }
 
-    private void set_button_color (string? _button_color = null) {
+    private void set_button_color (string? _button_color = null, int? _alpha_int = null) {
         var button_color = color;
+        var button_alpha = (double) alpha / 255;
 
         if (_button_color != null) {
             button_color = (string) _button_color;
         }
 
+        if (_alpha_int != null) {
+            button_alpha = (double) ((int) _alpha_int) / 255;
+        }
+
+        // Ensure button_color has alpha = 1
+        // real alpha is given by item's alpha
+        var button_color_rgba_no_alpha = Gdk.RGBA ();
+        button_color_rgba_no_alpha.parse (button_color);
+
+        button_color_rgba_no_alpha.alpha = 1.0;
+
+        button_color = button_color_rgba_no_alpha.to_string ();
+
         try {
             var provider = new Gtk.CssProvider ();
             var context = selected_color.get_style_context ();
 
-            var alpha_dot_separator = (alpha / 255).to_string ().replace (",", ".");
+            var alpha_dot_separator = button_alpha.to_string ().replace (",", ".");
 
             var css = """.selected-color {
                     background-color: alpha (%s, %s);
                     border-color: alpha (shade (%s, 0.75), %s);
                 }""".printf (button_color, alpha_dot_separator, button_color, alpha_dot_separator);
-
-            //  debug ("fills: css %s", css);
 
             provider.load_from_data (css, css.length);
 
@@ -402,7 +416,7 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         var new_rgba = Gdk.RGBA ();
 
         new_rgba.parse (model.color);
-        new_rgba.alpha = alpha / 255;
+        new_rgba.alpha = (double) alpha / 255;
 
         color_chooser_widget.set_rgba (new_rgba);
     }

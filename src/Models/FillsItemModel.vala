@@ -32,11 +32,9 @@ public class Akira.Models.FillsItemModel : GLib.Object {
     }
     public int alpha {
         get {
-            debug (@"model::get::alpha::$(item.fill_alpha)");
             return item.fill_alpha;
         }
         set {
-            debug (@"Alpha in fills_model: $(value)");
             item.fill_alpha = value;
         }
     }
