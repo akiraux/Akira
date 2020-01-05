@@ -59,7 +59,19 @@ public class Akira.Lib.Models.CanvasRect : Goo.CanvasRect, Models.CanvasItem {
             reset_colors ();
         }
     }
-    public Gdk.RGBA border_color { get; set; }
+
+    private Gdk.RGBA _border_color;
+    public Gdk.RGBA border_color {
+        get {
+            return _border_color;
+        }
+        set {
+            _border_color = value;
+
+            reset_colors ();
+        }
+    }
+
     public Models.CanvasItemType item_type { get; set; }
 
     public CanvasRect (
@@ -97,6 +109,9 @@ public class Akira.Lib.Models.CanvasRect : Goo.CanvasRect, Models.CanvasItem {
         color = _fill_color;
         border_color = _border_color;
 
+        debug (@"BorderColor: $border_color");
+
         set ("line-width", _border_size);
+        set ("stroke-color", _border_color);
     }
 }

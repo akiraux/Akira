@@ -209,6 +209,9 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         string border_color_str = settings.set_border ? settings.border_color : DEFAUL_BORDER_COLOR;
         string fill_color_str = settings.fill_color;
 
+        debug (@"Settings::set-border: $(settings.set_border.to_string ())");
+        debug (@"Settings::border-color: $(settings.border_color.to_string ())");
+
         border_color.parse (border_color_str);
         fill_color.parse (fill_color_str);
     }

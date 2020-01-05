@@ -64,13 +64,19 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
     }
 
     public void reset_colors () {
-        var rgba = Gdk.RGBA ();
+        var rgba_fill = Gdk.RGBA ();
+        var rgba_stroke = Gdk.RGBA ();
 
-        rgba = color;
-        rgba.alpha = ((double) fill_alpha) / 255 * opacity / 100;
+        rgba_fill = color;
+        rgba_fill.alpha = ((double) fill_alpha) / 255 * opacity / 100;
 
-        uint fill_color_rgba = Utils.Color.rgba_to_uint (rgba);
+        rgba_stroke = border_color;
+        rgba_stroke.alpha = ((double) stroke_alpha) / 255 * opacity / 100;
+
+        uint fill_color_rgba = Utils.Color.rgba_to_uint (rgba_fill);
+        uint stroke_color_rgba = Utils.Color.rgba_to_uint (rgba_stroke);
 
         set ("fill-color-rgba", fill_color_rgba);
+        set ("stroke-color-rgba", stroke_color_rgba);
     }
 }
