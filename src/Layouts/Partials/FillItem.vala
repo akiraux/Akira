@@ -167,23 +167,19 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
             }
         );
 
-        color_container.key_release_event.connect ((event) => {
-            if (!color_container.text.contains ("#")) {
-                var builder = new StringBuilder ();
-                builder.append ("#");
-                builder.append (color_container.text);
-                color_container.text = builder.str;
-                color_container.set_position (-1);
-            }
+        color_container.delete_text.connect ((start_pos, end_pos) => {
+            string new_text = color_container.text.splice (start_pos, end_pos);
 
-            return false;
+            if (!new_text.contains ("#")) {
+                GLib.Signal.stop_emission_by_name (color_container, "delete-text");
+            }
         });
 
         color_container.insert_text.connect ((_new_text, new_text_length) => {
-            string new_text = _new_text;
+            string new_text = _new_text.strip ();
 
             if (new_text.contains ("#")) {
-                new_text = _new_text.substring (1, new_text.length - 1);
+                new_text = new_text.substring (1, new_text.length - 1);
             }
 
             bool is_valid_hex = true;
@@ -191,16 +187,15 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
             bool char_is_numeric = true;
             bool char_is_valid_alpha = true;
 
-            uint keyval;
+            char keyval;
 
             for (var i = 0; i < new_text.length; i++) {
-                keyval = Gdk.keyval_to_upper (new_text [i]);
+                keyval = new_text [i];
 
                 char_is_numeric = keyval >= Gdk.Key.@0 && keyval <= Gdk.Key.@9;
                 char_is_valid_alpha = keyval >= Gdk.Key.A && keyval <= Gdk.Key.F;
 
-                is_valid_hex &= (char_is_numeric || char_is_valid_alpha);
-
+                is_valid_hex &= keyval.isxdigit ();
             }
 
             if (!is_valid_hex) {

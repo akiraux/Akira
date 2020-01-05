@@ -39,6 +39,10 @@ public class Akira.Utils.Color : Object {
     }
 
     public static bool is_valid_hex (string hex) {
+        if (hex == "") {
+            return false;
+        }
+
         var hex_values = hex.split ("#") [1];
 
         if (hex_values.length != 3 && hex_values.length != 6) {
