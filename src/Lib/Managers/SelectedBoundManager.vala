@@ -21,7 +21,7 @@
 
 public class Akira.Lib.Managers.SelectedBoundManager : Object {
 
-    public weak Goo.Canvas canvas { get; construct; }
+    public weak Akira.Lib.Canvas canvas { get; construct; }
 
     private unowned List<Models.CanvasItem> _selected_items;
     public unowned List<Models.CanvasItem> selected_items {
@@ -42,12 +42,14 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
     private double initial_width;
     private double initial_height;
 
-    public SelectedBoundManager (Goo.Canvas canvas) {
+    public SelectedBoundManager (Akira.Lib.Canvas canvas) {
         Object (
             canvas: canvas
         );
 
-        event_bus.request_selection_bound_transform.connect (on_request_selection_bound_transform);
+        canvas.window.event_bus.request_selection_bound_transform.connect (
+            on_request_selection_bound_transform
+        );
     }
 
     construct {
@@ -139,7 +141,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
     }
 
     private void update_selected_items () {
-        event_bus.selected_items_changed (selected_items);
+        canvas.window.event_bus.selected_items_changed (selected_items);
     }
 
     private void on_request_selection_bound_transform (string property, double amount) {
