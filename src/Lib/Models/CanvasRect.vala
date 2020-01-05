@@ -109,8 +109,6 @@ public class Akira.Lib.Models.CanvasRect : Goo.CanvasRect, Models.CanvasItem {
         color = _fill_color;
         border_color = _border_color;
 
-        debug (@"BorderColor: $border_color");
-
         set ("line-width", _border_size);
         set ("stroke-color", _border_color);
     }

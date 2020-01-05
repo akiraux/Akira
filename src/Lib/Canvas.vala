@@ -84,6 +84,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         window.event_bus.request_zoom.connect (on_request_zoom);
         window.event_bus.request_change_cursor.connect (on_request_change_cursor);
         window.event_bus.set_focus_on_canvas.connect (focus_canvas);
+        window.event_bus.set_focus_on_canvas.connect (on_set_focus_on_canvas);
     }
 
     public void update_bounds () {
@@ -140,6 +141,8 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     }
 
     public override bool button_press_event (Gdk.EventButton event) {
+        focus_canvas ();
+
         holding = true;
 
         var temp_event_x = event.x / current_scale;
@@ -164,7 +167,6 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
                 if (clicked_item == null) {
                     selected_bound_manager.reset_selection ();
-
                     // TODO: allow for multi select with click & drag on canvas
                     // Workaround: when no item is clicked, there's no point in keeping holding active
                     holding = false;
@@ -231,8 +233,12 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         return true;
     }
 
-    public void focus_canvas () {
+    public void on_set_focus_on_canvas () {
         edit_mode = EditMode.MODE_SELECTION;
+        focus_canvas ();
+    }
+
+    public void focus_canvas () {
         grab_focus (get_root_item ());
     }
 

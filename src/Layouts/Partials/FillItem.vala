@@ -222,7 +222,7 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         opacity_container = new Akira.Partials.InputField (
             Akira.Partials.InputField.Unit.PERCENTAGE, 7, true, true);
         opacity_container.entry.sensitive = true;
-        opacity_container.entry.text = Math. round((double) alpha / 255 * 100).to_string ();
+        opacity_container.entry.text = Math. round ((double) alpha / 255 * 100).to_string ();
         opacity_container.entry.bind_property (
             "text", model, "alpha",
             BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE,
