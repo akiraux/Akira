@@ -82,7 +82,7 @@ public class Akira.Layouts.Partials.FillsBoxPanel : Gtk.Grid {
         attach (title_cont, 0, 0, 1, 1);
         attach (fills_list_container, 0, 1, 1, 1);
 
-        event_bus.selected_items_changed.connect (on_selected_items_changed);
+        window.event_bus.selected_items_changed.connect (on_selected_items_changed);
     }
 
     private void on_selected_items_changed (List<Lib.Models.CanvasItem> selected_items) {
