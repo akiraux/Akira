@@ -20,13 +20,14 @@
 */
 
 public class Akira.Lib.Models.CanvasText : Goo.CanvasText, Models.CanvasItem {
-
     public string id { get; set; }
     public bool selected { get; set; }
     public double opacity { get; set; }
     public double rotation { get; set; }
     public int fill_alpha { get; set; }
     public int stroke_alpha { get; set; }
+    public Gdk.RGBA color { get; set; }
+    public Gdk.RGBA border_color { get; set; }
     public Models.CanvasItemType item_type { get; set; }
 
     public CanvasText (

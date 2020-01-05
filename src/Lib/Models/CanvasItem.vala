@@ -25,16 +25,18 @@ public enum Akira.Lib.Models.CanvasItemType {
     TEXT
 }
 
-public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItem {
+public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasItem {
     public static int global_id = 0;
 
-    public abstract string id { get; public set; }
-    public abstract bool selected { get; public set; }
-    public abstract double opacity { get; public set; }
-    public abstract double rotation { get; public set; }
-    public abstract int fill_alpha { get; public set; }
-    public abstract int stroke_alpha { get; public set; }
-    public abstract Models.CanvasItemType item_type { get; protected set; }
+    public abstract string id { get; set; }
+    public abstract bool selected { get; set; }
+    public abstract double opacity { get; set; }
+    public abstract double rotation { get; set; }
+    public abstract int fill_alpha { get; set; }
+    public abstract int stroke_alpha { get; set; }
+    public abstract Gdk.RGBA color { get; set; }
+    public abstract Gdk.RGBA border_color { get; set; }
+    public abstract Models.CanvasItemType item_type { get; set; }
 
     public double get_coords (string coord_id, bool convert_to_item_space = false) {
         double _coord = 0.0;
@@ -59,5 +61,22 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItem {
         item.set ("opacity", 100.0);
         item.set ("fill-alpha", 255);
         item.set ("stroke-alpha", 255);
+    }
+
+    public void reset_colors () {
+        var rgba_fill = Gdk.RGBA ();
+        var rgba_stroke = Gdk.RGBA ();
+
+        rgba_fill = color;
+        rgba_fill.alpha = ((double) fill_alpha) / 255 * opacity / 100;
+
+        rgba_stroke = border_color;
+        rgba_stroke.alpha = ((double) stroke_alpha) / 255 * opacity / 100;
+
+        uint fill_color_rgba = Utils.Color.rgba_to_uint (rgba_fill);
+        uint stroke_color_rgba = Utils.Color.rgba_to_uint (rgba_stroke);
+
+        set ("fill-color-rgba", fill_color_rgba);
+        set ("stroke-color-rgba", stroke_color_rgba);
     }
 }

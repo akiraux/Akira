@@ -52,11 +52,6 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         get {
             return _item;
         } set {
-
-            if (_item != null) {
-                _item.notify.disconnect (item_changed);
-            }
-
             _item = value;
 
             bool has_item = _item != null;
@@ -82,7 +77,6 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
             scale.sensitive = has_item;
 
             if (_item != null) {
-                _item.notify.connect (item_changed);
                 update_fields ();
             }
         }
@@ -231,11 +225,6 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         item = selected_items.nth_data (0);
     }
 
-    private void item_changed (Object object, ParamSpec spec) {
-        //  debug ("item changed, param: %s", spec.name);
-        update_fields ();
-    }
-
     private void reset_values () {
         // Connecting and disconnecting are necessary in order
         // not to create infinite "jumps" between the value notify
@@ -318,30 +307,11 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
        transform.rotate (radians);
        transform.translate (-center_x, -center_y);
        item.set_transform (transform);
-
-       //window.main_window.main_canvas.canvas.update_decorations (item);
     }
 
     public void opacity_notify_value () {
-        var item_simple = (Goo.CanvasItemSimple) item;
-
-        int? fill_a = item.fill_alpha;
-        int? stroke_a = item.stroke_alpha;
-
-        var opacity_factor = double.parse (opacity_entry.entry.text) / 100;
-
-        uint fill_color_rgba = item_simple.fill_color_rgba;
-        uint stroke_color_rgba = item_simple.stroke_color_rgba;
-        fill_rgb = fill_color_rgba & 0xFFFFFF00;
-        stroke_rgb = stroke_color_rgba & 0xFFFFFF00;
-
-        item_simple.notify.disconnect (item_changed);
-
-        item.opacity = opacity_factor * 100;
-        item_simple.fill_color_rgba = (uint) (fill_rgb + (fill_a * opacity_factor));
-        item_simple.stroke_color_rgba = (uint) (stroke_rgb + (stroke_a * opacity_factor));
-
-        item_simple.notify.connect (item_changed);
+        var opacity_factor = double.parse (opacity_entry.entry.text);
+        item.opacity = opacity_factor;
     }
 
     public void y_notify_value () {

@@ -144,12 +144,17 @@ public class Akira.Widgets.SettingsDialog : Gtk.Dialog {
 
         fill_color.color_set.connect (() => {
             var rgba = fill_color.get_rgba ();
+
             //Gdk.RGBA uses rgb() if alpha is 1.
-            string rgba_str = "rgba(%f,%f,%f,%f)" .printf (rgba.red * 255,
-                                                          rgba.green * 255,
-                                                          rgba.blue * 255,
-                                                          rgba.alpha);
+            string rgba_str = "rgba(%d,%d,%d,%d)" .printf (
+                (int) (rgba.red * 255),
+                (int) (rgba.green * 255),
+                (int) (rgba.blue * 255),
+                (int) (rgba.alpha)
+            );
+
             debug ("setting color: %s", rgba_str);
+
             settings.fill_color = rgba_str;
         });
 
@@ -169,12 +174,17 @@ public class Akira.Widgets.SettingsDialog : Gtk.Dialog {
 
         border_color.color_set.connect (() => {
             var rgba = border_color.get_rgba ();
+
             //Gdk.RGBA uses rgb() if alpha is 1.
-            string rgba_str = "rgba(%f,%f,%f,%f)".printf (rgba.red * 255,
-                                                         rgba.green * 255,
-                                                         rgba.blue * 255,
-                                                         rgba.alpha);
+            string rgba_str = "rgba(%d,%d,%d,%d)".printf (
+                (int) (rgba.red * 255),
+                (int) (rgba.green * 255),
+                (int) (rgba.blue * 255),
+                (int) (rgba.alpha)
+            );
+
             debug ("setting color: %s", rgba_str);
+
             settings.border_color = rgba_str;
         });
 

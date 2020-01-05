@@ -26,6 +26,7 @@ public class Akira.Layouts.Partials.FillsBoxPanel : Gtk.Grid {
     public Gtk.ListBox fills_list_container;
     public Akira.Models.FillsListModel fills_list_model;
     public Gtk.Grid title_cont;
+    private Lib.Models.CanvasItem selected_item;
 
     private int last_item_position;
 
@@ -80,5 +81,21 @@ public class Akira.Layouts.Partials.FillsBoxPanel : Gtk.Grid {
 
         attach (title_cont, 0, 0, 1, 1);
         attach (fills_list_container, 0, 1, 1, 1);
+
+        window.event_bus.selected_items_changed.connect (on_selected_items_changed);
+    }
+
+    private void on_selected_items_changed (List<Lib.Models.CanvasItem> selected_items) {
+        if (selected_items.length () == 0) {
+            selected_item = null;
+            fills_list_model.clear.begin ();
+            return;
+        }
+
+        if (selected_item == null || selected_item != selected_items.nth_data (0)) {
+            selected_item = selected_items.nth_data (0);
+
+            fills_list_model.add.begin (selected_item);
+        }
     }
 }

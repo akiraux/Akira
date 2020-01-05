@@ -20,13 +20,57 @@
 */
 
 public class Akira.Lib.Models.CanvasEllipse : Goo.CanvasEllipse, Models.CanvasItem {
-
     public string id { get; set; }
-    public bool selected { get; set; }
-    public double opacity { get; set; }
     public double rotation { get; set; }
-    public int fill_alpha { get; set; }
+    public bool selected { get; set; }
+
+    private double _opacity;
+    public double opacity {
+        get {
+            return _opacity;
+        }
+        public set {
+            _opacity = value;
+
+            reset_colors ();
+        }
+    }
+
+    private int _fill_alpha;
+    public int fill_alpha {
+        get {
+            return _fill_alpha;
+        }
+        set {
+            _fill_alpha = value;
+            reset_colors ();
+        }
+    }
     public int stroke_alpha { get; set; }
+
+    private Gdk.RGBA _color;
+    public Gdk.RGBA color {
+        get {
+            return _color;
+        }
+        set {
+            _color = value;
+
+            reset_colors ();
+        }
+    }
+
+    private Gdk.RGBA _border_color;
+    public Gdk.RGBA border_color {
+        get {
+            return _border_color;
+        }
+        set {
+            _border_color = value;
+
+            reset_colors ();
+        }
+    }
     public Models.CanvasItemType item_type { get; set; }
 
     public CanvasEllipse (
@@ -35,8 +79,8 @@ public class Akira.Lib.Models.CanvasEllipse : Goo.CanvasEllipse, Models.CanvasIt
         double _radius_x = 0,
         double _radius_y = 0,
         double _border_size = 1.0,
-        string _border_color = "#aaa",
-        string _fill_color = "#ccc",
+        Gdk.RGBA _border_color,
+        Gdk.RGBA _fill_color,
         Goo.CanvasItem? parent = null
     ) {
         Object (
@@ -61,8 +105,7 @@ public class Akira.Lib.Models.CanvasEllipse : Goo.CanvasEllipse, Models.CanvasIt
         // move the entire coordinate system every time
         translate (_center_x, _center_y);
 
-        set ("line-width", _border_size);
-        set ("fill-color", _fill_color);
-        set ("stroke-color", _border_color);
+        color = _fill_color;
+        border_color = _border_color;
     }
 }
