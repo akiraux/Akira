@@ -178,7 +178,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
                 return true;
             }, (binding, srcval, ref targetval) => {
                 double src = (double) srcval;
-                targetval.set_string (("%0.1f").printf (src));
+                targetval.set_string (("%0.0f").printf (src));
                 return true;
             }
         );
@@ -312,6 +312,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
     public void opacity_notify_value () {
         var opacity_factor = double.parse (opacity_entry.entry.text);
         item.opacity = opacity_factor;
+        item.reset_colors ();
     }
 
     public void y_notify_value () {

@@ -336,7 +336,6 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         var new_rgba = Gdk.RGBA ();
         new_rgba.parse (color);
         new_rgba.alpha = (double) alpha / 255;
-        debug ("set color chooser");
 
         color_chooser_widget.set_rgba (new_rgba);
     }
