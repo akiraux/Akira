@@ -50,7 +50,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         MODE_PAN,
     }
 
-    private Managers.SelectedBoundManager selected_bound_manager;
+    public Managers.SelectedBoundManager selected_bound_manager;
     private Managers.ItemsManager items_manager;
     private Managers.NobManager nob_manager;
     private Managers.HoverManager hover_manager;

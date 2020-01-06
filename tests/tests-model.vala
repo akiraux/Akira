@@ -213,26 +213,3 @@ public class Akira.TestRunner : GLib.Object {
         return builddir;
     }
 }
-
-class Main : GLib.Object {
-    public static int main (string[] args) {
-        var exit_status = 0;
-
-        Gtk.init (ref args);
-        Test.init (ref args);
-
-        var tests = new Akira.TestRunner ();
-        tests.add (new Akira.FillsItemTest ());
-
-        GLib.Idle.add (() => {
-            exit_status = tests.run ();
-            Gtk.main_quit ();
-
-            return false;
-        });
-
-        Gtk.main ();
-
-        return exit_status;
-    }
-}
