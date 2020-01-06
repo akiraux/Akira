@@ -27,6 +27,7 @@ public class Akira.Lib.Models.CanvasText : Goo.CanvasText, Models.CanvasItem {
     public int fill_alpha { get; set; }
     public int stroke_alpha { get; set; }
     public Gdk.RGBA color { get; set; }
+    public double border_size { get; set; }
     public Gdk.RGBA border_color { get; set; }
     public Models.CanvasItemType item_type { get; set; }
 

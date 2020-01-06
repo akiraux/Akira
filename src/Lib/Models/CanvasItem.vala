@@ -36,6 +36,7 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
     public abstract int fill_alpha { get; set; }
     public abstract int stroke_alpha { get; set; }
     public abstract Gdk.RGBA color { get; set; }
+    public abstract double border_size { get; set; }
     public abstract Gdk.RGBA border_color { get; set; }
     public abstract Models.CanvasItemType item_type { get; set; }
 
@@ -66,21 +67,25 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
 
     public void reset_colors () {
         var rgba_fill = Gdk.RGBA ();
-        var rgba_stroke = Gdk.RGBA ();
-
-        //  debug (fill_alpha.to_string ());
-
         rgba_fill = color;
+        //  debug (fill_alpha.to_string ());
         rgba_fill.alpha = ((double) fill_alpha) / 255 * opacity / 100;
         //  debug (rgba_fill.alpha.to_string ());
 
-        rgba_stroke = border_color;
-        rgba_stroke.alpha = ((double) stroke_alpha) / 255 * opacity / 100;
-
         uint fill_color_rgba = Utils.Color.rgba_to_uint (rgba_fill);
-        uint stroke_color_rgba = Utils.Color.rgba_to_uint (rgba_stroke);
-
         set ("fill-color-rgba", fill_color_rgba);
-        set ("stroke-color-rgba", stroke_color_rgba);
+
+        if (settings.set_border) {
+            var rgba_stroke = Gdk.RGBA ();
+            rgba_stroke = border_color;
+            rgba_stroke.alpha = ((double) stroke_alpha) / 255 * opacity / 100;
+
+            uint stroke_color_rgba = Utils.Color.rgba_to_uint (rgba_stroke);
+            set ("stroke-color-rgba", stroke_color_rgba);
+            set ("line-width", border_size);
+        } else {
+            set ("stroke-color-rgba", null);
+            set ("line-width", null);
+        }
     }
 }

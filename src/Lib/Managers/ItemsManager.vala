@@ -204,11 +204,12 @@ public class Akira.Lib.Managers.ItemsManager : Object {
     }
 
     private void udpate_default_values () {
-        border_size = settings.set_border ? settings.border_size : 0.0;
-
-        string border_color_str = settings.set_border ? settings.border_color : "";
-
-        border_color.parse (border_color_str);
         fill_color.parse (settings.fill_color);
+
+        // Do not set the border if the user disabled it.
+        if (settings.set_border) {
+            border_size = settings.border_size;
+            border_color.parse (settings.border_color);
+        }
     }
 }

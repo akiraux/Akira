@@ -24,47 +24,12 @@ public class Akira.Lib.Models.CanvasEllipse : Goo.CanvasEllipse, Models.CanvasIt
     public string id { get; set; }
     public double rotation { get; set; }
     public bool selected { get; set; }
-
-    private double _opacity;
-    public double opacity {
-        get {
-            return _opacity;
-        }
-        set {
-            _opacity = value;
-        }
-    }
-
-    private int _fill_alpha;
-    public int fill_alpha {
-        get {
-            return _fill_alpha;
-        }
-        set {
-            _fill_alpha = value;
-        }
-    }
+    public double opacity { get; set; }
+    public int fill_alpha { get; set; }
     public int stroke_alpha { get; set; }
-
-    private Gdk.RGBA _color;
-    public Gdk.RGBA color {
-        get {
-            return _color;
-        }
-        set {
-            _color = value;
-        }
-    }
-
-    private Gdk.RGBA _border_color;
-    public Gdk.RGBA border_color {
-        get {
-            return _border_color;
-        }
-        set {
-            _border_color = value;
-        }
-    }
+    public Gdk.RGBA color { get; set; }
+    public double border_size { get; set; }
+    public Gdk.RGBA border_color { get; set; }
     public Models.CanvasItemType item_type { get; set; }
 
     public CanvasEllipse (
@@ -100,7 +65,10 @@ public class Akira.Lib.Models.CanvasEllipse : Goo.CanvasEllipse, Models.CanvasIt
         translate (_center_x, _center_y);
 
         color = _fill_color;
-        border_color = _border_color;
+        if (settings.set_border) {
+            border_color = _border_color;
+            border_size = _border_size;
+        }
         reset_colors ();
     }
 }
