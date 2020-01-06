@@ -17,6 +17,7 @@
 * along with Akira.  If not, see <https://www.gnu.org/licenses/>.
 *
 * Authored by: Giacomo Alberini <giacomoalbe@gmail.com>
+* Authored by: Alessandro "alecaddd" Castellani <castellani.ale@gmail.com>
 */
 
 public class Akira.Lib.Models.CanvasRect : Goo.CanvasRect, Models.CanvasItem {
@@ -29,10 +30,8 @@ public class Akira.Lib.Models.CanvasRect : Goo.CanvasRect, Models.CanvasItem {
         get {
             return _opacity;
         }
-        public set {
+        set {
             _opacity = value;
-
-            reset_colors ();
         }
     }
 
@@ -43,7 +42,6 @@ public class Akira.Lib.Models.CanvasRect : Goo.CanvasRect, Models.CanvasItem {
         }
         set {
             _fill_alpha = value;
-            reset_colors ();
         }
     }
     public int stroke_alpha { get; set; }
@@ -55,8 +53,6 @@ public class Akira.Lib.Models.CanvasRect : Goo.CanvasRect, Models.CanvasItem {
         }
         set {
             _color = value;
-
-            reset_colors ();
         }
     }
 
@@ -67,8 +63,6 @@ public class Akira.Lib.Models.CanvasRect : Goo.CanvasRect, Models.CanvasItem {
         }
         set {
             _border_color = value;
-
-            reset_colors ();
         }
     }
 
@@ -108,5 +102,6 @@ public class Akira.Lib.Models.CanvasRect : Goo.CanvasRect, Models.CanvasItem {
 
         color = _fill_color;
         border_color = _border_color;
+        reset_colors ();
     }
 }

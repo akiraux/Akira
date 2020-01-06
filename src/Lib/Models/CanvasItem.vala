@@ -67,8 +67,11 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
         var rgba_fill = Gdk.RGBA ();
         var rgba_stroke = Gdk.RGBA ();
 
+        //  debug (fill_alpha.to_string ());
+
         rgba_fill = color;
         rgba_fill.alpha = ((double) fill_alpha) / 255 * opacity / 100;
+        //  debug (rgba_fill.alpha.to_string ());
 
         rgba_stroke = border_color;
         rgba_stroke.alpha = ((double) stroke_alpha) / 255 * opacity / 100;

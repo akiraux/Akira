@@ -23,10 +23,10 @@ public class Akira.Models.FillsItemModel : GLib.Object {
     public string color {
         owned get {
             return item.color.to_string ();
-        } set {
+        }
+        set {
             var new_rgba = Gdk.RGBA ();
             new_rgba.parse (value);
-
             item.color = new_rgba;
         }
     }

@@ -29,10 +29,8 @@ public class Akira.Lib.Models.CanvasEllipse : Goo.CanvasEllipse, Models.CanvasIt
         get {
             return _opacity;
         }
-        public set {
+        set {
             _opacity = value;
-
-            reset_colors ();
         }
     }
 
@@ -43,7 +41,6 @@ public class Akira.Lib.Models.CanvasEllipse : Goo.CanvasEllipse, Models.CanvasIt
         }
         set {
             _fill_alpha = value;
-            reset_colors ();
         }
     }
     public int stroke_alpha { get; set; }
@@ -55,8 +52,6 @@ public class Akira.Lib.Models.CanvasEllipse : Goo.CanvasEllipse, Models.CanvasIt
         }
         set {
             _color = value;
-
-            reset_colors ();
         }
     }
 
@@ -67,8 +62,6 @@ public class Akira.Lib.Models.CanvasEllipse : Goo.CanvasEllipse, Models.CanvasIt
         }
         set {
             _border_color = value;
-
-            reset_colors ();
         }
     }
     public Models.CanvasItemType item_type { get; set; }
@@ -107,5 +100,6 @@ public class Akira.Lib.Models.CanvasEllipse : Goo.CanvasEllipse, Models.CanvasIt
 
         color = _fill_color;
         border_color = _border_color;
+        reset_colors ();
     }
 }
