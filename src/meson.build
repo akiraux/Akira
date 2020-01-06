@@ -43,7 +43,7 @@ sources = files(
     'Layouts/Partials/PagesPanel.vala',
     'Layouts/Partials/Artboard.vala',
     'Layouts/Partials/Layer.vala',
-    'Layouts/Partials/FillsBoxPanel.vala',
+    'Layouts/Partials/FillsPanel.vala',
     'Layouts/Partials/FillItem.vala',
     'Layouts/Partials/BlendingModeItem.vala',
     'Layouts/Partials/TransformPanel.vala',

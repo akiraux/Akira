@@ -54,6 +54,7 @@ public class Akira.Models.FillsListModel : GLib.Object, GLib.ListModel {
         fills_list.append (model_item);
 
         items_changed (get_n_items () - 1, 0, 1);
+        debug (model_item.to_string ());
     }
 
     public async void remove_item (Akira.Models.FillsItemModel? item) {

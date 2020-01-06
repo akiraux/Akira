@@ -19,7 +19,7 @@
 * Authored by: Giacomo "giacomoalbe" Alberini <giacomoalbe@gmail.com>
 */
 
-public class Akira.Layouts.Partials.FillsBoxPanel : Gtk.Grid {
+public class Akira.Layouts.Partials.FillsPanel : Gtk.Grid {
     public weak Akira.Window window { get; construct; }
 
     public Gtk.Button add_btn;
@@ -30,7 +30,7 @@ public class Akira.Layouts.Partials.FillsBoxPanel : Gtk.Grid {
 
     private int last_item_position;
 
-    public FillsBoxPanel (Akira.Window window) {
+    public FillsPanel (Akira.Window window) {
         Object (
             window: window,
             orientation: Gtk.Orientation.HORIZONTAL
