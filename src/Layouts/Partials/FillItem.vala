@@ -35,6 +35,9 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
     public Akira.Models.FillsItemModel model { get; construct; }
 
     private string old_color;
+
+    // If the color or alpha are manually set from the ColorPicker.
+    // If true, the ColorChooserWidget doesn't need to be updated.
     private bool color_set_manually = false;
     private string color {
         owned get {
@@ -72,7 +75,7 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         create_ui ();
 
         // Update view BEFORE event bindings in order
-        // not to trigger bindings on first assignment.
+        // to not trigger bindings on first assignment.
         update_view ();
 
         create_event_bindings ();
@@ -121,6 +124,7 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
             BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE,
             // this => model
             (binding, color_container_value, ref model_value) => {
+                color_set_manually = false;
                 var color_container_hex = color_container_value.dup_string ();
 
                 if (!Utils.Color.is_valid_hex (color_container_hex)) {
@@ -135,9 +139,7 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
             // model => this
             (bpnding, model_value, ref color_container_value) => {
                 var model_rgba = model_value.dup_string ();
-
                 old_color = model_rgba;
-
                 color_container_value.set_string (Utils.Color.rgba_to_hex (model_rgba));
                 return true;
             }
@@ -190,34 +192,34 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
             Akira.Partials.InputField.Unit.PERCENTAGE, 7, true, true);
         opacity_container.entry.sensitive = true;
         opacity_container.entry.text = Math.round ((double) alpha / 255 * 100).to_string ();
-        //  opacity_container.entry.bind_property (
-        //      "text", model, "alpha",
-        //      BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE,
-        //      (binding, entry_text_val, ref model_alpha_val) => {
-        //          double src = double.parse (entry_text_val.dup_string ());
 
-        //          if (src > 100) {
-        //              src = 100.0;
-        //              opacity_container.entry.text = "100";
-        //          } else if (src < 0) {
-        //              src = 0.0;
-        //              opacity_container.entry.text = "0";
-        //          }
-        //          int alpha_int_value = (int) (src / 100 * 255);
+        opacity_container.entry.bind_property (
+            "text", model, "alpha",
+            BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE,
+            // this => model
+            (binding, entry_text_val, ref model_alpha_val) => {
+                color_set_manually = false;
+                double src = double.parse (entry_text_val.dup_string ());
 
-        //          model_alpha_val.set_int (alpha_int_value);
-
-        //          return true;
-        //      }, (binding, model_alpha_val, ref entry_text_val) => {
-        //          double src = (double) model_alpha_val.get_int () / 255;
-
-        //          src = Math.round (src * 100);
-
-        //          entry_text_val.set_string (("%f").printf (src));
-
-        //          return true;
-        //      }
-        //  );
+                if (src > 100) {
+                    src = 100.0;
+                    opacity_container.entry.text = "100";
+                } else if (src < 0) {
+                    src = 0.0;
+                    opacity_container.entry.text = "0";
+                }
+                int alpha_int_value = (int) (src / 100 * 255);
+                model_alpha_val.set_int (alpha_int_value);
+                return true;
+            },
+            // model => this
+            (binding, model_alpha_val, ref entry_text_val) => {
+                entry_text_val.set_string (("%i").printf (
+                    ((model_alpha_val.get_int () * 100) / 255)
+                ));
+                return true;
+            }
+        );
 
         fill_chooser.attach (picker_container, 0, 0, 1, 1);
         fill_chooser.attach (color_container, 1, 0, 1, 1);
@@ -240,7 +242,6 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         color_chooser_widget = new Gtk.ColorChooserWidget ();
         color_chooser_widget.hexpand = true;
         color_chooser_widget.show_editor = true;
-        set_color_chooser_color ();
 
         color_picker = new Gtk.Grid ();
         color_picker.get_style_context ().add_class ("color-picker");
@@ -251,6 +252,9 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         attach (fill_chooser, 0, 0, 1, 1);
         attach (hidden_button, 1, 0, 1, 1);
         attach (delete_button, 2, 0, 1, 1);
+
+        set_color_chooser_color ();
+        set_button_color ();
     }
 
     private void create_event_bindings () {
@@ -269,8 +273,7 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
     private void on_color_changed () {
         color_set_manually = true;
         color = color_chooser_widget.rgba.to_string ();
-        //  alpha = ((int)(color_chooser_widget.rgba.alpha * 100));
-        //  debug (color);
+        alpha = ((int)(color_chooser_widget.rgba.alpha * 255));
     }
 
     private void on_delete_item () {
@@ -308,12 +311,12 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         try {
             var provider = new Gtk.CssProvider ();
             var context = selected_color.get_style_context ();
-            var new_alpha = ((double) alpha / 100);
+            var new_color = color_chooser_widget.rgba.to_string ();
 
             var css = """.selected-color {
-                    background-color: alpha (%s, %f);
-                    border-color: alpha (shade (%s, 0.75), %f);
-                }""".printf (color, new_alpha, color, new_alpha);
+                    background-color: %s;
+                    border-color: shade (%s, 0.75);
+                }""".printf (new_color, new_color);
 
             provider.load_from_data (css, css.length);
 
@@ -327,14 +330,13 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         // Prevent infinite loop by checking whether the color
         // has been set manually or not
         if (color_set_manually) {
-            color_set_manually = false;
             return;
         }
 
-        debug ("set");
         var new_rgba = Gdk.RGBA ();
         new_rgba.parse (color);
-        //  new_rgba.alpha = (double) alpha / 255;
+        new_rgba.alpha = (double) alpha / 255;
+        debug ("set color chooser");
 
         color_chooser_widget.set_rgba (new_rgba);
     }
