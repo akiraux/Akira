@@ -1,23 +1,23 @@
 /*
-* Copyright (c) 2019 Alecaddd (http://alecaddd.com)
+* Copyright (c) 2019 Alecaddd (https://alecaddd.com)
 *
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public
-* License as published by the Free Software Foundation; either
-* version 2 of the License, or (at your option) any later version.
+* This file is part of Akira.
 *
-* This program is distributed in the hope that it will be useful,
+* Akira is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+
+* Akira is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* General Public License for more details.
-*
-* You should have received a copy of the GNU General Public
-* License along with this program; if not, write to the
-* Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
-* Boston, MA 02110-1301 USA
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+
+* You should have received a copy of the GNU General Public License
+* along with Akira. If not, see <https://www.gnu.org/licenses/>.
 *
 * Authored by: Ana Gelez <ana@gelez.xyz>
-* Edited by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
+* Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
 public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
     public weak Akira.Window window { get; construct; }
@@ -178,7 +178,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
                 return true;
             }, (binding, srcval, ref targetval) => {
                 double src = (double) srcval;
-                targetval.set_string (("%0.1f").printf (src));
+                targetval.set_string (("%0.0f").printf (src));
                 return true;
             }
         );
@@ -312,6 +312,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
     public void opacity_notify_value () {
         var opacity_factor = double.parse (opacity_entry.entry.text);
         item.opacity = opacity_factor;
+        item.reset_colors ();
     }
 
     public void y_notify_value () {

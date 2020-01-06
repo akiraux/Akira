@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2019 Alecaddd (http://alecaddd.com)
+* Copyright (c) 2019 Alecaddd (https://alecaddd.com)
 *
 * This file is part of Akira.
 *
@@ -14,64 +14,22 @@
 * GNU General Public License for more details.
 
 * You should have received a copy of the GNU General Public License
-* along with Akira.  If not, see <https://www.gnu.org/licenses/>.
+* along with Akira. If not, see <https://www.gnu.org/licenses/>.
 *
 * Authored by: Giacomo Alberini <giacomoalbe@gmail.com>
+* Authored by: Alessandro "alecaddd" Castellani <castellani.ale@gmail.com>
 */
 
 public class Akira.Lib.Models.CanvasRect : Goo.CanvasRect, Models.CanvasItem {
     public string id { get; set; }
     public bool selected { get; set; }
     public double rotation { get; public set; }
-
-    private double _opacity;
-    public double opacity {
-        get {
-            return _opacity;
-        }
-        public set {
-            _opacity = value;
-
-            reset_colors ();
-        }
-    }
-
-    private int _fill_alpha;
-    public int fill_alpha {
-        get {
-            return _fill_alpha;
-        }
-        set {
-            _fill_alpha = value;
-            reset_colors ();
-        }
-    }
+    public double opacity { get; set; }
+    public int fill_alpha { get; set; }
     public int stroke_alpha { get; set; }
-
-    private Gdk.RGBA _color;
-    public Gdk.RGBA color {
-        get {
-            return _color;
-        }
-        set {
-            _color = value;
-
-            reset_colors ();
-        }
-    }
-
-    private Gdk.RGBA _border_color;
-    public Gdk.RGBA border_color {
-        get {
-            return _border_color;
-        }
-        set {
-            _border_color = value;
-
-            reset_colors ();
-        }
-    }
-
+    public Gdk.RGBA color { get; set; }
+    public double border_size { get; set; }
+    public Gdk.RGBA border_color { get; set; }
     public Models.CanvasItemType item_type { get; set; }
 
     public CanvasRect (
@@ -107,6 +65,10 @@ public class Akira.Lib.Models.CanvasRect : Goo.CanvasRect, Models.CanvasItem {
         translate (_x, _y);
 
         color = _fill_color;
-        border_color = _border_color;
+        if (settings.set_border) {
+            border_color = _border_color;
+            border_size = _border_size;
+        }
+        reset_colors ();
     }
 }

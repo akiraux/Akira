@@ -20,7 +20,7 @@
 */
 public class Akira.Lib.Selection.Nob : Goo.CanvasRect {
     public const double NOB_SIZE = 10;
-    public const double LINE_WIDTH = 2;
+    public const double LINE_WIDTH = 1;
 
     public Managers.NobManager.Nob handle_id;
 

@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2019 Alecaddd (http://alecaddd.com)
+* Copyright (c) 2019 Alecaddd (https://alecaddd.com)
 *
 * This file is part of Akira.
 *
@@ -14,19 +14,20 @@
 * GNU General Public License for more details.
 
 * You should have received a copy of the GNU General Public License
-* along with Akira.  If not, see <https://www.gnu.org/licenses/>.
+* along with Akira. If not, see <https://www.gnu.org/licenses/>.
 *
 * Authored by: Giacomo "giacomoalbe" Alberini <giacomoalbe@gmail.com>
+* Authored by: Alessandro "alecaddd" Castellani <castellani.ale@gmail.com>
 */
 
 public class Akira.Models.FillsItemModel : GLib.Object {
     public string color {
         owned get {
             return item.color.to_string ();
-        } set {
+        }
+        set {
             var new_rgba = Gdk.RGBA ();
             new_rgba.parse (value);
-
             item.color = new_rgba;
         }
     }
