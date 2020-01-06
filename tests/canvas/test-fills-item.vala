@@ -10,11 +10,11 @@
 
 * Akira is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 * GNU General Public License for more details.
 
 * You should have received a copy of the GNU General Public License
-* along with Akira.  If not, see <https://www.gnu.org/licenses/>.
+* along with Akira. If not, see <https://www.gnu.org/licenses/>.
 *
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
@@ -43,9 +43,9 @@ public class Akira.FillsItemTest : Akira.TestSuite {
             var fills_list_model = window.main_window.left_sidebar.fill_box_panel.fills_list_model;
 
             // Create 1000 Items and quickly select/deselect them to stress test the canvas.
-            for (var i = 0; i < 1; i++) {
+            for (var i = 0; i < 1000; i++) {
                 var item = new Akira.Lib.Models.CanvasRect (
-                    10, 10, 10, 10, 1.0, "#cccccc", "#f00", root);
+                    10, 10, 10, 10, 1.0, Gdk.RGBA (), Gdk.RGBA (), root);
 
                 item.set ("parent", root);
 
@@ -58,15 +58,15 @@ public class Akira.FillsItemTest : Akira.TestSuite {
                 assert ((item as Akira.Lib.Models.CanvasItem).selected == true);
 
                 // TRUE: A fill model was created and listed.
-                //  assert (fills_list_model.get_n_items () == 1);
+                assert (fills_list_model.get_n_items () == 1);
 
-                //  canvas.delete_selected ();
+                canvas.selected_bound_manager.delete_selection ();
 
                 // TRUE: The previous fill model was deleted.
-                //  assert (fills_list_model.get_n_items () == 0);
+                assert (fills_list_model.get_n_items () == 0);
 
-                // TRUE: We deselected the item.
-                //  assert (canvas.selected_item == null);
+                // TRUE: We no item is selected.
+                assert (canvas.selected_bound_manager.selected_items.length () == 0);
             }
 
             // Shut down the test.
