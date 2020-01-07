@@ -10,7 +10,7 @@
 
 * Akira is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 * GNU General Public License for more details.
 
 * You should have received a copy of the GNU General Public License
@@ -31,6 +31,7 @@ public class Akira.Models.FillsItemModel : GLib.Object {
             item.color = new_rgba;
         }
     }
+
     public int alpha {
         get {
             return item.fill_alpha;
@@ -40,19 +41,25 @@ public class Akira.Models.FillsItemModel : GLib.Object {
         }
     }
 
-    public bool hidden { get; set; }
+    public bool hidden {
+        get {
+            return item.hidden_fill;
+        }
+        set {
+            item.hidden_fill = value;
+        }
+    }
+
     public Akira.Utils.BlendingMode blending_mode { get; set; }
     public Akira.Models.FillsListModel list_model { get; set; }
     public Lib.Models.CanvasItem item { get; construct; }
 
     public FillsItemModel (
         Lib.Models.CanvasItem item,
-        bool hidden,
         Akira.Utils.BlendingMode blending_mode,
         Akira.Models.FillsListModel list_model
     ) {
         Object (
-            hidden: hidden,
             blending_mode: blending_mode,
             list_model: list_model,
             item: item

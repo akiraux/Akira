@@ -20,7 +20,6 @@
 */
 
 public class Akira.Lib.Managers.SelectedBoundManager : Object {
-
     public weak Akira.Lib.Canvas canvas { get; construct; }
 
     private unowned List<Models.CanvasItem> _selected_items;
@@ -30,9 +29,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         }
         set {
             _selected_items = value;
-
             update_selected_items ();
-
         }
     }
 
@@ -114,6 +111,10 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
     }
 
     public void add_item_to_selection (Models.CanvasItem item) {
+        // Don't clear and reselect the same element if it's already selected.
+        if (selected_items.index (item) != -1) {
+            return;
+        }
         // Just 1 selected element at the same time
         // TODO: allow for multi selection with shift pressed
         reset_selection ();
@@ -124,6 +125,10 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
     }
 
     public void delete_selection () {
+        if (selected_items.length () == 0) {
+            return;
+        }
+
         foreach (var item in selected_items) {
             item.delete ();
         }
@@ -133,6 +138,10 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
     }
 
     public void reset_selection () {
+        if (selected_items.length () == 0) {
+            return;
+        }
+
         foreach (var item in selected_items) {
             item.selected = false;
         }

@@ -40,7 +40,7 @@ public class Akira.FillsItemTest : Akira.TestSuite {
             assert (canvas is Akira.Lib.Canvas);
 
             var root = canvas.get_root_item ();
-            var fills_list_model = window.main_window.left_sidebar.fill_box_panel.fills_list_model;
+            var fills_list_model = window.main_window.left_sidebar.fills_panel.fills_list_model;
 
             // Create 1000 Items and quickly select/deselect them to stress test the canvas.
             for (var i = 0; i < 1000; i++) {
