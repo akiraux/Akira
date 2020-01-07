@@ -40,19 +40,24 @@ public class Akira.Models.FillsItemModel : GLib.Object {
         }
     }
 
-    public bool hidden { get; set; }
+    public bool hidden {
+        get {
+            return item.hidden_fill;
+        }
+        set {
+            item.hidden_fill = value;
+        }
+    }
     public Akira.Utils.BlendingMode blending_mode { get; set; }
     public Akira.Models.FillsListModel list_model { get; set; }
     public Lib.Models.CanvasItem item { get; construct; }
 
     public FillsItemModel (
         Lib.Models.CanvasItem item,
-        bool hidden,
         Akira.Utils.BlendingMode blending_mode,
         Akira.Models.FillsListModel list_model
     ) {
         Object (
-            hidden: hidden,
             blending_mode: blending_mode,
             list_model: list_model,
             item: item

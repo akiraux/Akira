@@ -46,7 +46,6 @@ public class Akira.Models.FillsListModel : GLib.Object, GLib.ListModel {
     public async void add (Lib.Models.CanvasItem item) {
         var model_item = new Models.FillsItemModel (
             item,
-            false,
             Akira.Utils.BlendingMode.NORMAL,
             this
         );

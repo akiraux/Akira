@@ -31,13 +31,21 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
 
     public abstract string id { get; set; }
     public abstract bool selected { get; set; }
+
+    // Transform Panel attributes.
     public abstract double opacity { get; set; }
     public abstract double rotation { get; set; }
+
+    // Fill Panel attributes.
     public abstract int fill_alpha { get; set; }
     public abstract int stroke_alpha { get; set; }
     public abstract Gdk.RGBA color { get; set; }
+    public abstract bool hidden_fill { get; set; default = false; }
+
+    // Border Panel attributes.
     public abstract double border_size { get; set; }
     public abstract Gdk.RGBA border_color { get; set; }
+
     public abstract Models.CanvasItemType item_type { get; set; }
 
     public double get_coords (string coord_id, bool convert_to_item_space = false) {
@@ -66,6 +74,32 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
     }
 
     public void reset_colors () {
+        reset_fill ();
+        reset_border ();
+    }
+
+    private void reset_border () {
+        if (!settings.set_border) {
+            set ("stroke-color-rgba", null);
+            set ("line-width", null);
+            return;
+        }
+
+        var rgba_stroke = Gdk.RGBA ();
+        rgba_stroke = border_color;
+        rgba_stroke.alpha = ((double) stroke_alpha) / 255 * opacity / 100;
+
+        uint stroke_color_rgba = Utils.Color.rgba_to_uint (rgba_stroke);
+        set ("stroke-color-rgba", stroke_color_rgba);
+        set ("line-width", border_size);
+    }
+
+    private void reset_fill () {
+        if (hidden_fill) {
+            set ("fill-color-rgba", null);
+            return;
+        }
+
         var rgba_fill = Gdk.RGBA ();
         rgba_fill = color;
         //  debug (fill_alpha.to_string ());
@@ -74,18 +108,5 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
 
         uint fill_color_rgba = Utils.Color.rgba_to_uint (rgba_fill);
         set ("fill-color-rgba", fill_color_rgba);
-
-        if (settings.set_border) {
-            var rgba_stroke = Gdk.RGBA ();
-            rgba_stroke = border_color;
-            rgba_stroke.alpha = ((double) stroke_alpha) / 255 * opacity / 100;
-
-            uint stroke_color_rgba = Utils.Color.rgba_to_uint (rgba_stroke);
-            set ("stroke-color-rgba", stroke_color_rgba);
-            set ("line-width", border_size);
-        } else {
-            set ("stroke-color-rgba", null);
-            set ("line-width", null);
-        }
     }
 }

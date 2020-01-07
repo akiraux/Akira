@@ -30,6 +30,7 @@ public class Akira.Lib.Models.CanvasEllipse : Goo.CanvasEllipse, Models.CanvasIt
     public Gdk.RGBA color { get; set; }
     public double border_size { get; set; }
     public Gdk.RGBA border_color { get; set; }
+    public bool hidden_fill { get; set; }
     public Models.CanvasItemType item_type { get; set; }
 
     public CanvasEllipse (
