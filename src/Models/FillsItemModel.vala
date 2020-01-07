@@ -51,13 +51,13 @@ public class Akira.Models.FillsItemModel : GLib.Object {
     }
 
     public Akira.Utils.BlendingMode blending_mode { get; set; }
-    public Akira.Models.FillsListModel list_model { get; set; }
+    public Akira.Models.ListModel list_model { get; set; }
     public Lib.Models.CanvasItem item { get; construct; }
 
     public FillsItemModel (
         Lib.Models.CanvasItem item,
         Akira.Utils.BlendingMode blending_mode,
-        Akira.Models.FillsListModel list_model
+        Akira.Models.ListModel list_model
     ) {
         Object (
             blending_mode: blending_mode,

@@ -61,7 +61,7 @@ sources = files(
     'Partials/PopoverButton.vala',
 
     'Models/FillsItemModel.vala',
-    'Models/FillsListModel.vala',
+    'Models/ListModel.vala',
 
     'Widgets/SettingsDialog.vala',
 

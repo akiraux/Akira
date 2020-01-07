@@ -24,7 +24,7 @@ public class Akira.Layouts.Partials.FillsPanel : Gtk.Grid {
 
     public Gtk.Button add_btn;
     public Gtk.ListBox fills_list_container;
-    public Akira.Models.FillsListModel fills_list_model;
+    public Akira.Models.ListModel list_model;
     public Gtk.Grid title_cont;
     private Lib.Models.CanvasItem selected_item;
 
@@ -68,7 +68,7 @@ public class Akira.Layouts.Partials.FillsPanel : Gtk.Grid {
         title_cont.attach (label, 0, 0, 1, 1);
         title_cont.attach (add_btn, 1, 0, 1, 1);
 
-        fills_list_model = new Akira.Models.FillsListModel ();
+        list_model = new Akira.Models.ListModel ();
 
         fills_list_container = new Gtk.ListBox ();
         fills_list_container.margin_top = fills_list_container.margin_bottom = 5;
@@ -77,7 +77,7 @@ public class Akira.Layouts.Partials.FillsPanel : Gtk.Grid {
         fills_list_container.selection_mode = Gtk.SelectionMode.NONE;
         fills_list_container.get_style_context ().add_class ("fills-list");
 
-        fills_list_container.bind_model (fills_list_model, item => {
+        fills_list_container.bind_model (list_model, item => {
             return new Akira.Layouts.Partials.FillItem (window, (Akira.Models.FillsItemModel) item);
         });
 
@@ -95,7 +95,7 @@ public class Akira.Layouts.Partials.FillsPanel : Gtk.Grid {
             toggle_add_btn (true);
         });
         add_btn.clicked.connect (() => {
-            fills_list_model.add.begin (selected_item);
+            list_model.add.begin (selected_item);
             selected_item.reset_colors ();
             toggle_add_btn (false);
         });
@@ -104,7 +104,7 @@ public class Akira.Layouts.Partials.FillsPanel : Gtk.Grid {
     private void on_selected_items_changed (List<Lib.Models.CanvasItem> selected_items) {
         if (selected_items.length () == 0) {
             selected_item = null;
-            fills_list_model.clear.begin ();
+            list_model.clear.begin ();
             toggle_add_btn (false);
             toggled = false;
             return;
@@ -119,7 +119,7 @@ public class Akira.Layouts.Partials.FillsPanel : Gtk.Grid {
                 return;
             }
 
-            fills_list_model.add.begin (selected_item);
+            list_model.add.begin (selected_item);
         }
     }
 

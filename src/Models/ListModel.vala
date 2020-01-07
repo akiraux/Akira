@@ -20,7 +20,7 @@
 * Authored by: Alessandro "alecaddd" Castellani <castellani.ale@gmail.com>
 */
 
-public class Akira.Models.FillsListModel : GLib.Object, GLib.ListModel {
+public class Akira.Models.ListModel : GLib.Object, GLib.ListModel {
     private GLib.List<Akira.Models.FillsItemModel?> fills_list;
 
     construct {
