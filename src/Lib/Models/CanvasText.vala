@@ -24,6 +24,7 @@ public class Akira.Lib.Models.CanvasText : Goo.CanvasText, Models.CanvasItem {
     public bool selected { get; set; }
     public double opacity { get; set; }
     public double rotation { get; set; }
+    public bool has_fill { get; set; default = true; }
     public int fill_alpha { get; set; }
     public int stroke_alpha { get; set; }
     public Gdk.RGBA color { get; set; }

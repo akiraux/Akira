@@ -21,6 +21,8 @@
  */
 
 public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
+    public weak Akira.Window window { get; construct; }
+
     private Gtk.Grid fill_chooser;
     private Gtk.Button hidden_button;
     private Gtk.Button delete_button;
@@ -65,10 +67,11 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         }
     }
 
-    public signal void remove_item (Akira.Models.FillsItemModel model);
-
-    public FillItem (Akira.Models.FillsItemModel model) {
-        Object (model: model);
+    public FillItem (Akira.Window window, Akira.Models.FillsItemModel model) {
+        Object (
+            window: window,
+            model: model
+        );
     }
 
     construct {
@@ -277,7 +280,9 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
     }
 
     private void on_delete_item () {
-        remove_item (model);
+        model.list_model.remove_item.begin (model);
+        model.item.reset_colors ();
+        window.event_bus.fill_deleted ();
     }
 
     private void set_hidden_button () {

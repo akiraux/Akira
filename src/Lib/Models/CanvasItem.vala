@@ -37,6 +37,7 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
     public abstract double rotation { get; set; }
 
     // Fill Panel attributes.
+    public abstract bool has_fill { get; set; default = true; }
     public abstract int fill_alpha { get; set; }
     public abstract int stroke_alpha { get; set; }
     public abstract Gdk.RGBA color { get; set; }
@@ -78,6 +79,22 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
         reset_border ();
     }
 
+    private void reset_fill () {
+        if (hidden_fill || !has_fill) {
+            set ("fill-color-rgba", null);
+            return;
+        }
+
+        var rgba_fill = Gdk.RGBA ();
+        rgba_fill = color;
+        //  debug (fill_alpha.to_string ());
+        rgba_fill.alpha = ((double) fill_alpha) / 255 * opacity / 100;
+        //  debug (rgba_fill.alpha.to_string ());
+
+        uint fill_color_rgba = Utils.Color.rgba_to_uint (rgba_fill);
+        set ("fill-color-rgba", fill_color_rgba);
+    }
+
     private void reset_border () {
         if (!settings.set_border) {
             set ("stroke-color-rgba", null);
@@ -92,21 +109,5 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
         uint stroke_color_rgba = Utils.Color.rgba_to_uint (rgba_stroke);
         set ("stroke-color-rgba", stroke_color_rgba);
         set ("line-width", border_size);
-    }
-
-    private void reset_fill () {
-        if (hidden_fill) {
-            set ("fill-color-rgba", null);
-            return;
-        }
-
-        var rgba_fill = Gdk.RGBA ();
-        rgba_fill = color;
-        //  debug (fill_alpha.to_string ());
-        rgba_fill.alpha = ((double) fill_alpha) / 255 * opacity / 100;
-        //  debug (rgba_fill.alpha.to_string ());
-
-        uint fill_color_rgba = Utils.Color.rgba_to_uint (rgba_fill);
-        set ("fill-color-rgba", fill_color_rgba);
     }
 }

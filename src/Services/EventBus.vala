@@ -33,6 +33,7 @@ public class Akira.Services.EventBus : Object {
     public signal void request_change_cursor (Gdk.CursorType? cursor_type);
     public signal void request_selection_bound_transform (string property, double amount);
     public signal void set_focus_on_canvas ();
+    public signal void fill_deleted ();
 
     public void test (string caller_id) {
         debug (@"Test from EventBus called by $(caller_id)");

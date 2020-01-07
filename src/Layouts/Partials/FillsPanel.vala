@@ -57,11 +57,8 @@ public class Akira.Layouts.Partials.FillsPanel : Gtk.Grid {
         add_btn.valign = Gtk.Align.CENTER;
         add_btn.halign = Gtk.Align.CENTER;
         add_btn.add (new Gtk.Image.from_icon_name ("list-add-symbolic", Gtk.IconSize.SMALL_TOOLBAR));
-
-        // TODO: What means add another fillitem to an object: gradient???
-        //  add_btn.clicked.connect (() => {
-        //      fills_list_model.add ();
-        //  });
+        add_btn.show_all ();
+        toggle_add_btn (false);
 
         title_cont.attach (label, 0, 0, 1, 1);
         title_cont.attach (add_btn, 1, 0, 1, 1);
@@ -76,24 +73,47 @@ public class Akira.Layouts.Partials.FillsPanel : Gtk.Grid {
         fills_list_container.get_style_context ().add_class ("fills-list");
 
         fills_list_container.bind_model (fills_list_model, item => {
-            return new Akira.Layouts.Partials.FillItem ((Akira.Models.FillsItemModel) item);
+            return new Akira.Layouts.Partials.FillItem (window, (Akira.Models.FillsItemModel) item);
         });
 
         attach (title_cont, 0, 0, 1, 1);
         attach (fills_list_container, 0, 1, 1, 1);
 
+        create_event_bindings ();
+    }
+
+    private void toggle_add_btn (bool show) {
+        add_btn.visible = show;
+        add_btn.no_show_all = !show;
+    }
+
+    private void create_event_bindings () {
         window.event_bus.selected_items_changed.connect (on_selected_items_changed);
+        window.event_bus.fill_deleted.connect (() => {
+            toggle_add_btn (true);
+        });
+        add_btn.clicked.connect (() => {
+            fills_list_model.add.begin (selected_item);
+            selected_item.reset_colors ();
+            toggle_add_btn (false);
+        });
     }
 
     private void on_selected_items_changed (List<Lib.Models.CanvasItem> selected_items) {
         if (selected_items.length () == 0) {
             selected_item = null;
             fills_list_model.clear.begin ();
+            toggle_add_btn (false);
             return;
         }
 
         if (selected_item == null || selected_item != selected_items.nth_data (0)) {
             selected_item = selected_items.nth_data (0);
+
+            if (!selected_item.has_fill) {
+                toggle_add_btn (true);
+                return;
+            }
 
             fills_list_model.add.begin (selected_item);
         }
