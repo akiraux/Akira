@@ -28,7 +28,14 @@ public class Akira.Layouts.Partials.FillsPanel : Gtk.Grid {
     public Gtk.Grid title_cont;
     private Lib.Models.CanvasItem selected_item;
 
-    private int last_item_position;
+    public bool toggled {
+        get {
+            return visible;
+        } set {
+            visible = value;
+            no_show_all = !value;
+        }
+    }
 
     public FillsPanel (Akira.Window window) {
         Object (
@@ -38,8 +45,6 @@ public class Akira.Layouts.Partials.FillsPanel : Gtk.Grid {
     }
 
     construct {
-        last_item_position = 0;
-
         title_cont = new Gtk.Grid ();
         title_cont.orientation = Gtk.Orientation.HORIZONTAL;
         title_cont.hexpand = true;
@@ -78,16 +83,13 @@ public class Akira.Layouts.Partials.FillsPanel : Gtk.Grid {
 
         attach (title_cont, 0, 0, 1, 1);
         attach (fills_list_container, 0, 1, 1, 1);
+        show_all ();
 
         create_event_bindings ();
     }
 
-    private void toggle_add_btn (bool show) {
-        add_btn.visible = show;
-        add_btn.no_show_all = !show;
-    }
-
     private void create_event_bindings () {
+        toggled = false;
         window.event_bus.selected_items_changed.connect (on_selected_items_changed);
         window.event_bus.fill_deleted.connect (() => {
             toggle_add_btn (true);
@@ -104,10 +106,12 @@ public class Akira.Layouts.Partials.FillsPanel : Gtk.Grid {
             selected_item = null;
             fills_list_model.clear.begin ();
             toggle_add_btn (false);
+            toggled = false;
             return;
         }
 
         if (selected_item == null || selected_item != selected_items.nth_data (0)) {
+            toggled = true;
             selected_item = selected_items.nth_data (0);
 
             if (!selected_item.has_fill) {
@@ -117,5 +121,10 @@ public class Akira.Layouts.Partials.FillsPanel : Gtk.Grid {
 
             fills_list_model.add.begin (selected_item);
         }
+    }
+
+    private void toggle_add_btn (bool show) {
+        add_btn.visible = show;
+        add_btn.no_show_all = !show;
     }
 }

@@ -1,26 +1,26 @@
 /*
- * Copyright (c) 2019 Alecaddd (http://alecaddd.com)
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
- *
- * You should have received a copy of the GNU General Public
- * License along with this program; if not, write to the
- * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
- * Boston, MA 02110-1301 USA
- *
- * Authored by: Bilal Elmoussaoui <bil.elmoussaoui@gmail.com>
- */
+* Copyright (c) 2019 Alecaddd (http://alecaddd.com)
+*
+* This file is part of Akira.
+*
+* Akira is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+
+* Akira is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+
+* You should have received a copy of the GNU General Public License
+* along with Akira. If not, see <https://www.gnu.org/licenses/>.
+*
+* Authored by: Bilal Elmoussaoui <bil.elmoussaoui@gmail.com>
+* Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
+*/
 
 public class Akira.Layouts.Partials.StylePanel : Gtk.Grid {
-
     public Gtk.Label label;
 
     private Gtk.Revealer options_revealer;
@@ -37,6 +37,15 @@ public class Akira.Layouts.Partials.StylePanel : Gtk.Grid {
     private Gtk.Switch autoscale_switch;
     private Gtk.Switch uniform_switch;
 
+    public bool toggled {
+        get {
+            return visible;
+        } set {
+            visible = value;
+            no_show_all = !value;
+        }
+    }
+
     public StylePanel () {
         Object (
             orientation: Gtk.Orientation.VERTICAL
@@ -44,7 +53,6 @@ public class Akira.Layouts.Partials.StylePanel : Gtk.Grid {
     }
 
     construct {
-
         var title_cont = new Gtk.Grid ();
         title_cont.get_style_context ().add_class ("option-panel");
 
@@ -172,11 +180,13 @@ public class Akira.Layouts.Partials.StylePanel : Gtk.Grid {
         uniform_label.halign = Gtk.Align.START;
         border_options_grid.attach (uniform_label, 1, 1, 1, 1);
         options_grid.attach (border_options_grid, 0, 1, 1, 1);
+        show_all ();
 
         bind_signals ();
     }
 
     private void bind_signals () {
+        toggled = false;
         border_radius_scale.value_changed.connect ( () => {
             double border_value = border_radius_scale.get_value ();
             border_radius_entry.entry.text = ((int)border_value).to_string ();
@@ -196,6 +206,4 @@ public class Akira.Layouts.Partials.StylePanel : Gtk.Grid {
             }
         });
     }
-
-
 }
