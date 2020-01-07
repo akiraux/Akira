@@ -29,7 +29,7 @@ public class Akira.Lib.Models.CanvasText : Goo.CanvasText, Models.CanvasItem {
     public bool hidden_fill { get; set; }
     public Gdk.RGBA color { get; set; }
     public bool has_border { get; set; default = true; }
-    public double border_size { get; set; }
+    public int border_size { get; set; }
     public Gdk.RGBA border_color { get; set; }
     public int stroke_alpha { get; set; }
     public bool hidden_border { get; set; }

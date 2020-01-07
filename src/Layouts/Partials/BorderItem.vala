@@ -27,7 +27,7 @@ public class Akira.Layouts.Partials.BorderItem : Gtk.Grid {
     private Gtk.Button delete_button;
     private Gtk.Image hidden_button_icon;
     private Gtk.MenuButton selected_color;
-    public Akira.Partials.InputField opacity_container;
+    public Akira.Partials.InputField tickness_container;
     public Gtk.Entry color_container;
     private Gtk.Popover color_popover;
     private Gtk.Grid color_picker;
@@ -37,7 +37,7 @@ public class Akira.Layouts.Partials.BorderItem : Gtk.Grid {
 
     private string old_color;
 
-    // If the color or alpha are manually set from the ColorPicker.
+    // If the color is manually set from the ColorPicker.
     // If true, the ColorChooserWidget doesn't need to be updated.
     private bool color_set_manually = false;
     private string color {
@@ -53,6 +53,14 @@ public class Akira.Layouts.Partials.BorderItem : Gtk.Grid {
             return model.alpha;
         } set {
             model.alpha = value;
+        }
+    }
+
+    private int border_size {
+        owned get {
+            return model.border_size;
+        } set {
+            model.border_size = value;
         }
     }
 
@@ -190,42 +198,28 @@ public class Akira.Layouts.Partials.BorderItem : Gtk.Grid {
             }
         });
 
-        opacity_container = new Akira.Partials.InputField (
-            Akira.Partials.InputField.Unit.PERCENTAGE, 7, true, true);
-        opacity_container.entry.sensitive = true;
-        opacity_container.entry.text = Math.round ((double) alpha / 255 * 100).to_string ();
+        tickness_container = new Akira.Partials.InputField (
+            Akira.Partials.InputField.Unit.PIXEL, 7, true, true);
+        tickness_container.entry.sensitive = true;
+        tickness_container.entry.text = border_size.to_string ();
 
-        opacity_container.entry.bind_property (
-            "text", model, "alpha",
+        tickness_container.entry.bind_property (
+            "text", model, "border_size",
             BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE,
             // this => model
-            (binding, entry_text_val, ref model_alpha_val) => {
-                color_set_manually = false;
-                double src = double.parse (entry_text_val.dup_string ());
-
-                if (src > 100) {
-                    src = 100.0;
-                    opacity_container.entry.text = "100";
-                } else if (src < 0) {
-                    src = 0.0;
-                    opacity_container.entry.text = "0";
+            (binding, entry_text_val, ref model_border_val) => {
+                int src = int.parse (entry_text_val.dup_string ());
+                if (src < 0) {
+                    src = 0;
                 }
-                int alpha_int_value = (int) (src / 100 * 255);
-                model_alpha_val.set_int (alpha_int_value);
-                return true;
-            },
-            // model => this
-            (binding, model_alpha_val, ref entry_text_val) => {
-                entry_text_val.set_string (("%i").printf (
-                    ((model_alpha_val.get_int () * 100) / 255)
-                ));
+                model_border_val.set_int (src);
                 return true;
             }
         );
 
         color_chooser.attach (picker_container, 0, 0, 1, 1);
         color_chooser.attach (color_container, 1, 0, 1, 1);
-        color_chooser.attach (opacity_container, 2, 0, 1, 1);
+        color_chooser.attach (tickness_container, 2, 0, 1, 1);
 
         hidden_button = new Gtk.Button ();
         hidden_button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);

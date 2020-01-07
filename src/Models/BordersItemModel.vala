@@ -40,6 +40,15 @@ public class Akira.Models.BordersItemModel : GLib.Object {
         }
     }
 
+    public int border_size {
+        get {
+            return item.border_size;
+        }
+        set {
+            item.border_size = value;
+        }
+    }
+
     public bool hidden {
         get {
             return item.hidden_border;
@@ -66,7 +75,7 @@ public class Akira.Models.BordersItemModel : GLib.Object {
     }
 
     public string to_string () {
-        return "Color: %s\nAlpha: %f\nHidden: %s\nBlendingMode: %s".printf (
-            color, alpha, (hidden ? "1" : "0"), blending_mode.to_string ());
+        return "Color: %s\nAlpha: %f\nSize: %i\nHidden: %s\nBlendingMode: %s".printf (
+            color, alpha, border_size, (hidden ? "1" : "0"), blending_mode.to_string ());
     }
 }
