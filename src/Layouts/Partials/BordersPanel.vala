@@ -24,7 +24,7 @@ public class Akira.Layouts.Partials.BordersPanel : Gtk.Grid {
 
     public Gtk.Button add_btn;
     public Gtk.ListBox borders_list_container;
-    public Akira.Models.BordersListModel borders_list_model;
+    public Akira.Models.ListModel list_model;
     public Gtk.Grid title_cont;
     private Lib.Models.CanvasItem selected_item;
 
@@ -68,7 +68,7 @@ public class Akira.Layouts.Partials.BordersPanel : Gtk.Grid {
         title_cont.attach (label, 0, 0, 1, 1);
         title_cont.attach (add_btn, 1, 0, 1, 1);
 
-        borders_list_model = new Akira.Models.BordersListModel ();
+        list_model = new Akira.Models.ListModel ();
 
         borders_list_container = new Gtk.ListBox ();
         borders_list_container.margin_top = borders_list_container.margin_bottom = 5;
@@ -77,7 +77,7 @@ public class Akira.Layouts.Partials.BordersPanel : Gtk.Grid {
         borders_list_container.selection_mode = Gtk.SelectionMode.NONE;
         borders_list_container.get_style_context ().add_class ("fills-list");
 
-        borders_list_container.bind_model (borders_list_model, item => {
+        borders_list_container.bind_model (list_model, item => {
             return new Akira.Layouts.Partials.BorderItem (window, (Akira.Models.BordersItemModel) item);
         });
 
@@ -95,7 +95,7 @@ public class Akira.Layouts.Partials.BordersPanel : Gtk.Grid {
             toggle_add_btn (true);
         });
         add_btn.clicked.connect (() => {
-            borders_list_model.add.begin (selected_item);
+            list_model.add_border.begin (selected_item);
             selected_item.reset_colors ();
             toggle_add_btn (false);
         });
@@ -104,7 +104,7 @@ public class Akira.Layouts.Partials.BordersPanel : Gtk.Grid {
     private void on_selected_items_changed (List<Lib.Models.CanvasItem> selected_items) {
         if (selected_items.length () == 0) {
             selected_item = null;
-            borders_list_model.clear.begin ();
+            list_model.clear.begin ();
             toggle_add_btn (false);
             toggled = false;
             return;
@@ -119,7 +119,7 @@ public class Akira.Layouts.Partials.BordersPanel : Gtk.Grid {
                 return;
             }
 
-            borders_list_model.add.begin (selected_item);
+            list_model.add_border.begin (selected_item);
         }
     }
 

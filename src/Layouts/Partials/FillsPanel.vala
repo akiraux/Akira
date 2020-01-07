@@ -68,7 +68,7 @@ public class Akira.Layouts.Partials.FillsPanel : Gtk.Grid {
         title_cont.attach (label, 0, 0, 1, 1);
         title_cont.attach (add_btn, 1, 0, 1, 1);
 
-        list_model = new Akira.Models.ListModel ();
+        list_model = new Akira.Models.ListModel (Akira.Models.ListModel.ListType.FILL);
 
         fills_list_container = new Gtk.ListBox ();
         fills_list_container.margin_top = fills_list_container.margin_bottom = 5;
@@ -95,7 +95,7 @@ public class Akira.Layouts.Partials.FillsPanel : Gtk.Grid {
             toggle_add_btn (true);
         });
         add_btn.clicked.connect (() => {
-            list_model.add.begin (selected_item);
+            list_model.add_fill.begin (selected_item);
             selected_item.reset_colors ();
             toggle_add_btn (false);
         });
@@ -119,7 +119,7 @@ public class Akira.Layouts.Partials.FillsPanel : Gtk.Grid {
                 return;
             }
 
-            list_model.add.begin (selected_item);
+            list_model.add_fill.begin (selected_item);
         }
     }
 

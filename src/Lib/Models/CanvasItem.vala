@@ -39,13 +39,15 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
     // Fill Panel attributes.
     public abstract bool has_fill { get; set; default = true; }
     public abstract int fill_alpha { get; set; }
-    public abstract int stroke_alpha { get; set; }
     public abstract Gdk.RGBA color { get; set; }
     public abstract bool hidden_fill { get; set; default = false; }
 
     // Border Panel attributes.
+    public abstract bool has_border { get; set; default = true; }
     public abstract double border_size { get; set; }
     public abstract Gdk.RGBA border_color { get; set; }
+    public abstract int stroke_alpha { get; set; }
+    public abstract bool hidden_border { get; set; default = false; }
 
     public abstract Models.CanvasItemType item_type { get; set; }
 

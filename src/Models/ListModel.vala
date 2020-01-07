@@ -22,29 +22,55 @@
 
 public class Akira.Models.ListModel : GLib.Object, GLib.ListModel {
     private GLib.List<Akira.Models.FillsItemModel?> fills_list;
+    private GLib.List<Akira.Models.BordersItemModel?> borders_list;
+    public ListType list_type;
+    public enum ListType {
+        FILL,
+        BORDER
+    }
+
+    public ListModel (ListType type) {
+        list_type = type;
+    }
 
     construct {
-        fills_list = new GLib.List<Akira.Models.FillsItemModel?> ();
+        if (list_type == ListType.FILL) {
+            fills_list = new GLib.List<Akira.Models.FillsItemModel?> ();
+        } else {
+            borders_list = new GLib.List<Akira.Models.BordersItemModel?> ();
+        }
     }
 
     public uint get_n_items () {
-        return (uint) fills_list.length ();
+        if (list_type == ListType.FILL) {
+            return (uint) fills_list.length ();
+        }
+        return (uint) borders_list.length ();
     }
 
     public Object? get_item (uint position) {
+        Object? o = null;
         //  debug ("get item %u", position);
-        var o = fills_list.nth_data (position);
+        if (list_type == ListType.FILL) {
+            o = fills_list.nth_data (position);
+        }
+
         if (o != null) {
             return o as Object;
         }
+
         return null;
     }
 
     public Type get_item_type () {
-        return typeof (Akira.Models.FillsItemModel);
+        if (list_type == ListType.FILL) {
+            return typeof (Akira.Models.FillsItemModel);
+        }
+
+        return typeof (Akira.Models.BordersItemModel);
     }
 
-    public async void add (Lib.Models.CanvasItem item) {
+    public async void add_fill (Lib.Models.CanvasItem item) {
         var model_item = new Models.FillsItemModel (
             item,
             Akira.Utils.BlendingMode.NORMAL,
@@ -52,31 +78,66 @@ public class Akira.Models.ListModel : GLib.Object, GLib.ListModel {
         );
 
         fills_list.append (model_item);
-
         items_changed (get_n_items () - 1, 0, 1);
         item.has_fill = true;
     }
 
-    public async void remove_item (Akira.Models.FillsItemModel? item) {
-        if (item == null) {
+    public async void add_border (Lib.Models.CanvasItem item) {
+        var model_item = new Models.BordersItemModel (
+            item,
+            Akira.Utils.BlendingMode.NORMAL,
+            this
+        );
+
+        borders_list.append (model_item);
+        items_changed (get_n_items () - 1, 0, 1);
+        item.has_fill = true;
+    }
+
+    public async void remove_item (Object? item_model) {
+        if (item_model == null) {
             return;
         }
 
-        var position = fills_list.index (item);
-        fills_list.remove (item);
+        if (list_type == ListType.FILL) {
+            var model = (Akira.Models.FillsItemModel) item_model;
+            var position = fills_list.index (model);
+            fills_list.remove (model);
+            items_changed (position, 1, 0);
+
+            // Update has_fill only if no fill is present and the item is still
+            // selected. This is necessary to be sure we're removing the fill only
+            // if the user specifically clicked on the trash icon.
+            if (get_n_items () == 0 && model.item.selected) {
+                model.item.has_fill = false;
+            }
+            return;
+        }
+
+        var model = (Akira.Models.BordersItemModel) item_model;
+        var position = borders_list.index (model);
+        borders_list.remove (model);
         items_changed (position, 1, 0);
 
-        // Update has_fill only if no fills are present and the item is still
-        // selected. This is necessary to be sure we're removing the fill only
+        // Update has_border only if no border is present and the item is still
+        // selected. This is necessary to be sure we're removing the border only
         // if the user specifically clicked on the trash icon.
-        if (get_n_items () == 0 && item.item.selected) {
-            item.item.has_fill = false;
+        if (get_n_items () == 0 && model.item.selected) {
+            model.item.has_border = false;
         }
     }
 
     public async void clear () {
         //  debug ("clear fill list");
-        fills_list.foreach ((item) => {
+        if (list_type == ListType.FILL) {
+            fills_list.foreach ((item) => {
+                //  debug ("remove fill");
+                remove_item.begin (item);
+            });
+            return;
+        }
+
+        borders_list.foreach ((item) => {
             //  debug ("remove fill");
             remove_item.begin (item);
         });
