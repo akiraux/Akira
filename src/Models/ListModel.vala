@@ -53,6 +53,8 @@ public class Akira.Models.ListModel : GLib.Object, GLib.ListModel {
         //  debug ("get item %u", position);
         if (list_type == ListType.FILL) {
             o = fills_list.nth_data (position);
+        } else {
+            o = borders_list.nth_data (position);
         }
 
         if (o != null) {
@@ -91,7 +93,7 @@ public class Akira.Models.ListModel : GLib.Object, GLib.ListModel {
 
         borders_list.append (model_item);
         items_changed (get_n_items () - 1, 0, 1);
-        item.has_fill = true;
+        item.has_border = true;
     }
 
     public async void remove_item (Object? item_model) {

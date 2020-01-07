@@ -98,7 +98,7 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
     }
 
     private void reset_border () {
-        if (!settings.set_border) {
+        if (hidden_border || !has_border) {
             set ("stroke-color-rgba", null);
             set ("line-width", null);
             return;
