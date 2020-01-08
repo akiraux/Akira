@@ -93,11 +93,13 @@ public class Akira.Layouts.Partials.BordersPanel : Gtk.Grid {
         window.event_bus.selected_items_changed.connect (on_selected_items_changed);
         window.event_bus.border_deleted.connect (() => {
             add_btn.show ();
+            window.main_window.left_sidebar.queue_resize ();
         });
         add_btn.clicked.connect (() => {
             list_model.add_border.begin (selected_item);
             selected_item.reset_colors ();
             add_btn.hide ();
+            window.main_window.left_sidebar.queue_resize ();
         });
     }
 

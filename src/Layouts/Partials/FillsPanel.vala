@@ -93,11 +93,13 @@ public class Akira.Layouts.Partials.FillsPanel : Gtk.Grid {
         window.event_bus.selected_items_changed.connect (on_selected_items_changed);
         window.event_bus.fill_deleted.connect (() => {
             add_btn.show ();
+            window.main_window.left_sidebar.queue_resize ();
         });
         add_btn.clicked.connect (() => {
             list_model.add_fill.begin (selected_item);
             selected_item.reset_colors ();
             add_btn.hide ();
+            window.main_window.left_sidebar.queue_resize ();
         });
     }
 
