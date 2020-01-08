@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2019 Alecaddd (http://alecaddd.com)
+* Copyright (c) 2019 Alecaddd (https://alecaddd.com)
 *
 * This file is part of Akira.
 *
@@ -10,7 +10,7 @@
 
 * Akira is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 * GNU General Public License for more details.
 
 * You should have received a copy of the GNU General Public License
@@ -37,6 +37,21 @@ public class Akira.Layouts.Partials.StylePanel : Gtk.Grid {
 
     private Gtk.Switch autoscale_switch;
     private Gtk.Switch uniform_switch;
+
+    private Lib.Models.CanvasItem _selected_item;
+    private Lib.Models.CanvasItem selected_item {
+        get {
+            return _selected_item;
+        } set {
+            _selected_item = value;
+            if (_selected_item == null) {
+                //   || !_selected_item.has_border_radius
+                reset_fields ();
+                return;
+            }
+            update_fields ();
+        }
+    }
 
     public bool toggled {
         get {
@@ -90,7 +105,8 @@ public class Akira.Layouts.Partials.StylePanel : Gtk.Grid {
         border_radius_scale.hexpand = true;
         panel_grid.attach (border_radius_scale, 0, 2, 1, 1);
 
-        border_radius_entry = new Akira.Partials.InputField (Akira.Partials.InputField.Unit.PIXEL, 6, true, false);
+        border_radius_entry = new Akira.Partials.InputField (
+            Akira.Partials.InputField.Unit.PIXEL, 7, true, true);
         border_radius_entry.entry.hexpand = false;
         border_radius_entry.entry.width_request = 64;
         border_radius_entry.valign = Gtk.Align.CENTER;
@@ -119,7 +135,7 @@ public class Akira.Layouts.Partials.StylePanel : Gtk.Grid {
         border_entries_grid.hexpand = true;
 
         border_radius_top_left_entry = new Akira.Partials.InputField (
-            Akira.Partials.InputField.Unit.PIXEL, 6, true, false);
+            Akira.Partials.InputField.Unit.PIXEL, 7, true, true);
         border_radius_top_left_entry.entry.hexpand = false;
         border_radius_top_left_entry.entry.width_request = 64;
         border_radius_top_left_entry.valign = Gtk.Align.CENTER;
@@ -127,7 +143,7 @@ public class Akira.Layouts.Partials.StylePanel : Gtk.Grid {
         border_entries_grid.attach (border_radius_top_left_entry, 0, 0, 1, 1);
 
         border_radius_top_right_entry = new Akira.Partials.InputField (
-            Akira.Partials.InputField.Unit.PIXEL, 6, true, false);
+            Akira.Partials.InputField.Unit.PIXEL, 7, true, true);
         border_radius_top_right_entry.entry.hexpand = false;
         border_radius_top_right_entry.entry.width_request = 64;
         border_radius_top_right_entry.valign = Gtk.Align.CENTER;
@@ -135,7 +151,7 @@ public class Akira.Layouts.Partials.StylePanel : Gtk.Grid {
         border_entries_grid.attach (border_radius_top_right_entry, 1, 0, 1, 1);
 
         border_radius_bottom_left_entry = new Akira.Partials.InputField (
-            Akira.Partials.InputField.Unit.PIXEL, 6, true, false);
+            Akira.Partials.InputField.Unit.PIXEL, 7, true, true);
         border_radius_bottom_left_entry.entry.hexpand = false;
         border_radius_bottom_left_entry.entry.width_request = 64;
         border_radius_bottom_left_entry.valign = Gtk.Align.CENTER;
@@ -143,7 +159,7 @@ public class Akira.Layouts.Partials.StylePanel : Gtk.Grid {
         border_entries_grid.attach (border_radius_bottom_left_entry, 0, 1, 1, 1);
 
         border_radius_bottom_right_entry = new Akira.Partials.InputField (
-            Akira.Partials.InputField.Unit.PIXEL, 6, true, false);
+            Akira.Partials.InputField.Unit.PIXEL, 7, true, true);
         border_radius_bottom_right_entry.entry.hexpand = false;
         border_radius_bottom_right_entry.entry.width_request = 64;
         border_radius_bottom_right_entry.valign = Gtk.Align.CENTER;
@@ -183,7 +199,8 @@ public class Akira.Layouts.Partials.StylePanel : Gtk.Grid {
     }
 
     private void bind_signals () {
-        //  toggled = false;
+        toggled = false;
+        window.event_bus.selected_items_changed.connect (on_selected_items_changed);
         options_button.toggled.connect (() => {
             options_revealer.reveal_child = !options_revealer.child_revealed;
             // We need to wait for the transition to finish before redrawing the widget.
@@ -213,5 +230,58 @@ public class Akira.Layouts.Partials.StylePanel : Gtk.Grid {
             border_radius_top_left_entry.entry.text = ((int)border_value).to_string ();
             border_radius_top_right_entry.entry.text = ((int)border_value).to_string ();
         });
+    }
+
+    private void on_selected_items_changed (List<Lib.Models.CanvasItem> selected_items) {
+        if (selected_items.length () == 0) {
+            selected_item = null;
+            toggled = false;
+            return;
+        }
+
+        if (selected_item == null || selected_item != selected_items.nth_data (0)) {
+            toggled = true;
+            selected_item = selected_items.nth_data (0);
+        }
+    }
+
+    private void update_fields () {
+        //  autoscale_switch.active = false;
+        //  uniform_switch.active = false;
+
+        //  border_radius_scale.set_value (0);
+
+        border_radius_entry.entry.text = "";
+        border_radius_entry.entry.sensitive = true;
+
+        border_radius_top_left_entry.entry.text = "";
+        border_radius_top_left_entry.entry.sensitive = true;
+
+        border_radius_top_right_entry.entry.text = "";
+        border_radius_top_right_entry.entry.sensitive = true;
+
+        border_radius_bottom_left_entry.entry.text = "";
+        border_radius_bottom_left_entry.entry.sensitive = true;
+
+        border_radius_bottom_right_entry.entry.text = "";
+        border_radius_bottom_right_entry.entry.sensitive = true;
+    }
+
+    private void reset_fields () {
+        autoscale_switch.active = false;
+        uniform_switch.active = false;
+
+        border_radius_scale.set_value (0);
+
+        border_radius_entry.entry.text = "";
+        border_radius_entry.entry.sensitive = false;
+        border_radius_top_left_entry.entry.text = "";
+        border_radius_top_left_entry.entry.sensitive = false;
+        border_radius_top_right_entry.entry.text = "";
+        border_radius_top_right_entry.entry.sensitive = false;
+        border_radius_bottom_left_entry.entry.text = "";
+        border_radius_bottom_left_entry.entry.sensitive = false;
+        border_radius_bottom_right_entry.entry.text = "";
+        border_radius_bottom_right_entry.entry.sensitive = false;
     }
 }
