@@ -193,7 +193,7 @@ public class Akira.Widgets.SettingsDialog : Gtk.Dialog {
         border_size.halign = Gtk.Align.START;
         grid.attach (border_size, 1, 5, 1, 1);
 
-        settings.schema.bind ("border-size", border_size, "value", SettingsBindFlags.DEFAULT);
+        settings.bind ("border-size", border_size, "value", SettingsBindFlags.DEFAULT);
 
         return grid;
     }
@@ -216,7 +216,7 @@ public class Akira.Widgets.SettingsDialog : Gtk.Dialog {
     private class SettingsSwitch : Gtk.Switch {
         public SettingsSwitch (string setting) {
             halign = Gtk.Align.START;
-            settings.schema.bind (setting, this, "active", SettingsBindFlags.DEFAULT);
+            settings.bind (setting, this, "active", SettingsBindFlags.DEFAULT);
         }
     }
 
