@@ -211,6 +211,8 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
             case EditMode.MODE_PAN:
                 set_cursor_by_edit_mode ();
+
+                canvas_scroll_set_origin (temp_event_x, temp_event_y);
                 break;
         }
 
@@ -260,6 +262,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 break;
 
             case EditMode.MODE_PAN:
+                canvas_moved (event_x, event_y);
                 break;
         }
 
@@ -303,7 +306,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     }
 
     private void set_cursor (Gdk.CursorType? cursor_type) {
-        debug (@"Setting cursor: $cursor_type");
+        // debug (@"Setting cursor: $cursor_type");
         current_cursor = cursor_type;
 
         var cursor = new Gdk.Cursor.for_display (Gdk.Display.get_default (), cursor_type);
