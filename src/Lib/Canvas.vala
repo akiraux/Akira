@@ -168,6 +168,10 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
         hover_manager.remove_hover_effect ();
 
+        if (event.button == Gdk.BUTTON_MIDDLE) {
+            edit_mode = EditMode.MODE_PAN;
+        }
+
         switch (edit_mode) {
             case EditMode.MODE_INSERT:
                 selected_bound_manager.reset_selection ();
@@ -225,6 +229,10 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         }
 
         holding = false;
+
+        if (event.button == Gdk.BUTTON_MIDDLE) {
+            edit_mode = EditMode.MODE_SELECTION;
+        }
 
         //item_moved (selected_item);
         //add_hover_effect (selected_item);
