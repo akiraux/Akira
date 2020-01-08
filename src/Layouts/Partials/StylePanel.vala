@@ -21,8 +21,9 @@
 */
 
 public class Akira.Layouts.Partials.StylePanel : Gtk.Grid {
-    public Gtk.Label label;
+    public weak Akira.Window window { get; construct; }
 
+    public Gtk.Label label;
     private Gtk.Revealer options_revealer;
     private Gtk.Grid options_grid;
     private Gtk.Scale border_radius_scale;
@@ -46,8 +47,9 @@ public class Akira.Layouts.Partials.StylePanel : Gtk.Grid {
         }
     }
 
-    public StylePanel () {
+    public StylePanel (Akira.Window window) {
         Object (
+            window: window,
             orientation: Gtk.Orientation.VERTICAL
         );
     }
@@ -72,7 +74,6 @@ public class Akira.Layouts.Partials.StylePanel : Gtk.Grid {
         panel_grid.column_spacing = 6;
         panel_grid.hexpand = true;
         attach (panel_grid, 0, 1, 1, 1);
-
 
         var border_radius_label = new Gtk.Label (_("Border Radius"));
         border_radius_label.get_style_context ().add_class ("group-title");
@@ -101,13 +102,11 @@ public class Akira.Layouts.Partials.StylePanel : Gtk.Grid {
         options_button.halign = Gtk.Align.END;
         options_button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
         options_button.add (options_image);
+        options_button.can_focus = false;
         panel_grid.attach (options_button, 2, 2, 1, 1);
 
         options_revealer = new Gtk.Revealer ();
         panel_grid.attach (options_revealer, 0, 3, 3, 1);
-
-        options_button.bind_property (
-            "active", options_revealer, "reveal-child", BindingFlags.DEFAULT | BindingFlags.SYNC_CREATE);
 
         options_grid = new Gtk.Grid ();
         options_grid.border_width = 12;
@@ -143,7 +142,6 @@ public class Akira.Layouts.Partials.StylePanel : Gtk.Grid {
         border_radius_bottom_left_entry.halign = Gtk.Align.START;
         border_entries_grid.attach (border_radius_bottom_left_entry, 0, 1, 1, 1);
 
-
         border_radius_bottom_right_entry = new Akira.Partials.InputField (
             Akira.Partials.InputField.Unit.PIXEL, 6, true, false);
         border_radius_bottom_right_entry.entry.hexpand = false;
@@ -154,7 +152,6 @@ public class Akira.Layouts.Partials.StylePanel : Gtk.Grid {
 
         options_grid.attach (border_entries_grid, 0, 0, 1, 1);
         options_revealer.add (options_grid);
-
 
         var border_options_grid = new Gtk.Grid ();
         border_options_grid.row_spacing = 6;
@@ -186,24 +183,35 @@ public class Akira.Layouts.Partials.StylePanel : Gtk.Grid {
     }
 
     private void bind_signals () {
-        toggled = false;
+        //  toggled = false;
+        options_button.toggled.connect (() => {
+            options_revealer.reveal_child = !options_revealer.child_revealed;
+            // We need to wait for the transition to finish before redrawing the widget.
+            Timeout.add (options_revealer.transition_duration, () => {
+                window.main_window.left_sidebar.queue_resize ();
+                return false;
+            });
+        });
+
         border_radius_scale.value_changed.connect ( () => {
             double border_value = border_radius_scale.get_value ();
             border_radius_entry.entry.text = ((int)border_value).to_string ();
         });
+
         border_radius_entry.entry.changed.connect ( () => {
             double typed_border_radius = double.parse (border_radius_entry.entry.text);
             border_radius_scale.set_value (typed_border_radius);
         });
 
         uniform_switch.activate.connect ( () => {
-            if (uniform_switch.active) {
-                double border_value = border_radius_scale.get_value ();
-                border_radius_bottom_left_entry.entry.text = ((int)border_value).to_string ();
-                border_radius_bottom_right_entry.entry.text = ((int)border_value).to_string ();
-                border_radius_top_left_entry.entry.text = ((int)border_value).to_string ();
-                border_radius_top_right_entry.entry.text = ((int)border_value).to_string ();
+            if (!uniform_switch.active) {
+                return;
             }
+            double border_value = border_radius_scale.get_value ();
+            border_radius_bottom_left_entry.entry.text = ((int)border_value).to_string ();
+            border_radius_bottom_right_entry.entry.text = ((int)border_value).to_string ();
+            border_radius_top_left_entry.entry.text = ((int)border_value).to_string ();
+            border_radius_top_right_entry.entry.text = ((int)border_value).to_string ();
         });
     }
 }

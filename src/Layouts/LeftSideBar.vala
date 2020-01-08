@@ -47,7 +47,7 @@ public class Akira.Layouts.LeftSideBar : Gtk.Grid {
 
         var align_items_panel = new Akira.Layouts.Partials.AlignItemsPanel (window);
         transform_panel = new Akira.Layouts.Partials.TransformPanel (window);
-        var style_panel = new Akira.Layouts.Partials.StylePanel ();
+        var style_panel = new Akira.Layouts.Partials.StylePanel (window);
         fills_panel = new Akira.Layouts.Partials.FillsPanel (window);
         borders_panel = new Akira.Layouts.Partials.BordersPanel (window);
 
