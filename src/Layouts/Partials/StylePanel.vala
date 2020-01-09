@@ -38,6 +38,7 @@ public class Akira.Layouts.Partials.StylePanel : Gtk.Grid {
     private Gtk.Switch autoscale_switch;
     private Gtk.Switch uniform_switch;
     private Binding radius_binding;
+    private Binding uniform_binding;
     private double max_value;
 
     private Akira.Lib.Models.CanvasRect _selected_item;
@@ -45,12 +46,23 @@ public class Akira.Layouts.Partials.StylePanel : Gtk.Grid {
         get {
             return _selected_item;
         } set {
+            // Disconnect the model binding if an item was previsouly stored.
+            // This is necessary to prevent GObject Critical errors.
+            if (_selected_item != null) {
+                _selected_item.notify.disconnect (on_model_change);
+            }
+            // If the same item is already selected, or the value is still null
+            // we don't do anything to prevent redraw and calculations.
+            if (_selected_item == value) {
+                return;
+            }
             _selected_item = value;
             if (_selected_item == null || !_selected_item.has_border_radius) {
                 disable ();
                 return;
             }
             enable ();
+            _selected_item.notify.connect (on_model_change);
         }
     }
 
@@ -234,8 +246,13 @@ public class Akira.Layouts.Partials.StylePanel : Gtk.Grid {
     }
 
     private void on_selected_items_changed (List<Lib.Models.CanvasItem> selected_items) {
-        if (selected_items.length () == 0 || !selected_items.nth_data (0).has_border_radius) {
-            selected_item.notify.disconnect (on_model_change);
+        if (selected_items.length () == 0) {
+            selected_item = null;
+            toggled = false;
+            return;
+        }
+
+        if (!(selected_items.nth_data (0) is Akira.Lib.Models.CanvasRect)) {
             selected_item = null;
             toggled = false;
             return;
@@ -244,7 +261,6 @@ public class Akira.Layouts.Partials.StylePanel : Gtk.Grid {
         if (selected_item == null || selected_item != selected_items.nth_data (0)) {
             toggled = true;
             selected_item = (Akira.Lib.Models.CanvasRect) selected_items.nth_data (0);
-            selected_item.notify.connect (on_model_change);
         }
     }
 
@@ -254,6 +270,8 @@ public class Akira.Layouts.Partials.StylePanel : Gtk.Grid {
     }
 
     private void enable () {
+        uniform_binding = uniform_switch.bind_property (
+            "active", selected_item, "is_radius_uniform");
         //  autoscale_switch.active = false;
 
         // Uniform radius
@@ -304,6 +322,7 @@ public class Akira.Layouts.Partials.StylePanel : Gtk.Grid {
 
     private void disable () {
         radius_binding.unbind ();
+        uniform_binding.unbind ();
         border_radius_scale.value_changed.disconnect (on_radius_change);
 
         autoscale_switch.active = false;
