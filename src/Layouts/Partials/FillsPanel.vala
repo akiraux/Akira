@@ -66,7 +66,7 @@ public class Akira.Layouts.Partials.FillsPanel : Gtk.Grid {
         title_cont.attach (label, 0, 0, 1, 1);
         title_cont.attach (add_btn, 1, 0, 1, 1);
 
-        list_model = new Akira.Models.ListModel (Akira.Models.ListModel.ListType.FILL);
+        list_model = new Akira.Models.ListModel ();
 
         fills_list_container = new Gtk.ListBox ();
         fills_list_container.margin_top = 5;
@@ -77,7 +77,7 @@ public class Akira.Layouts.Partials.FillsPanel : Gtk.Grid {
         fills_list_container.get_style_context ().add_class ("fills-list");
 
         fills_list_container.bind_model (list_model, item => {
-            return new Akira.Layouts.Partials.FillItem (window, (Akira.Models.FillsItemModel) item);
+            return new Akira.Layouts.Partials.FillItem (window, (Akira.Models.ItemModel) item);
         });
 
         attach (title_cont, 0, 0, 1, 1);
@@ -91,12 +91,20 @@ public class Akira.Layouts.Partials.FillsPanel : Gtk.Grid {
     private void create_event_bindings () {
         toggled = false;
         window.event_bus.selected_items_changed.connect (on_selected_items_changed);
+
         window.event_bus.fill_deleted.connect (() => {
             add_btn.show ();
             window.main_window.left_sidebar.queue_resize ();
         });
+
+        list_model.items_changed.connect ((position, removed, added) => {
+            if (selected_item != null) {
+                selected_item.has_fill = (added == 1);
+            }
+        });
+
         add_btn.clicked.connect (() => {
-            list_model.add_fill.begin (selected_item);
+            list_model.add_item.begin (selected_item);
             selected_item.reset_colors ();
             add_btn.hide ();
             window.main_window.left_sidebar.queue_resize ();
@@ -121,7 +129,7 @@ public class Akira.Layouts.Partials.FillsPanel : Gtk.Grid {
                 return;
             }
 
-            list_model.add_fill.begin (selected_item);
+            list_model.add_item.begin (selected_item);
         }
     }
 }

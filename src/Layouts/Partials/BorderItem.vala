@@ -33,7 +33,7 @@ public class Akira.Layouts.Partials.BorderItem : Gtk.Grid {
     private Gtk.Grid color_picker;
     private Gtk.ColorChooserWidget color_chooser_widget;
 
-    public Akira.Models.BordersItemModel model { get; construct; }
+    public Akira.Models.ItemModel model { get; construct; }
 
     private string old_color;
 
@@ -74,7 +74,7 @@ public class Akira.Layouts.Partials.BorderItem : Gtk.Grid {
         }
     }
 
-    public BorderItem (Akira.Window window, Akira.Models.BordersItemModel model) {
+    public BorderItem (Akira.Window window, Akira.Models.ItemModel model) {
         Object (
             window: window,
             model: model
