@@ -31,7 +31,7 @@ public abstract class Akira.FileFormat.JsonObjectArray : Object {
      *
      * Your JsonObject implementation should have it's own list of items
      */
-    public JsonObjectArray (Json.Object object, string property_name) {
+    protected JsonObjectArray (Json.Object object, string property_name) {
         Object (object: object, property_name: property_name);
     }
 
