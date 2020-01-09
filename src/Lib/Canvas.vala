@@ -183,8 +183,13 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 nob_manager.selected_nob = clicked_nob_name;
 
                 if (clicked_item is Models.CanvasItem) {
+                    var model_canvas_item = clicked_item as Models.CanvasItem;
+                    bool is_shift = (event.state & Gdk.ModifierType.SHIFT_MASK) > 0;
+                    if (!selected_bound_manager.contains_item (model_canvas_item) && !is_shift) {
+                       selected_bound_manager.reset_selection ();
+                    }
                     // Item has been selected
-                    selected_bound_manager.add_item_to_selection (clicked_item as Models.CanvasItem);
+                    selected_bound_manager.add_item_to_selection (model_canvas_item);
                 }
 
                 selected_bound_manager.set_initial_coordinates (temp_event_x, temp_event_y);

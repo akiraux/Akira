@@ -110,14 +110,15 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         update_selected_items ();
     }
 
+    public bool contains_item (Models.CanvasItem item) {
+        return selected_items.index (item) != -1;
+    }
+
     public void add_item_to_selection (Models.CanvasItem item) {
         // Don't clear and reselect the same element if it's already selected.
-        if (selected_items.index (item) != -1) {
+        if (contains_item (item)) {
             return;
         }
-        // Just 1 selected element at the same time
-        // TODO: allow for multi selection with shift pressed
-        reset_selection ();
 
         item.selected = true;
 
