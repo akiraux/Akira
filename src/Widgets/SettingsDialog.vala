@@ -161,12 +161,6 @@ public class Akira.Widgets.SettingsDialog : Gtk.Dialog {
         grid.attach (new SettingsLabel (_("Enable Border Style:")), 0, 3, 1, 1);
         border_switch = new SettingsSwitch ("set-border");
         grid.attach (border_switch, 1, 3, 1, 1);
-
-        border_switch.notify["active"].connect (() => {
-            border_color.sensitive = border_switch.get_active ();
-            border_size.sensitive = border_switch.get_active ();
-        });
-
         grid.attach (new SettingsLabel (_("Border Color:")), 0, 4, 1, 1);
         border_color = new Gtk.ColorButton.with_rgba (border_rgba);
         border_color.halign = Gtk.Align.START;
@@ -194,6 +188,9 @@ public class Akira.Widgets.SettingsDialog : Gtk.Dialog {
         grid.attach (border_size, 1, 5, 1, 1);
 
         settings.bind ("border-size", border_size, "value", SettingsBindFlags.DEFAULT);
+
+        border_switch.bind_property ("active", border_color, "sensitive");
+        border_switch.bind_property ("active", border_size, "sensitive");
 
         return grid;
     }
