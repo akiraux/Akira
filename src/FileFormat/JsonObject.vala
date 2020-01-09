@@ -31,7 +31,7 @@ public abstract class Akira.FileFormat.JsonObject : GLib.Object {
 
     private ObjectClass obj_class;
 
-    public JsonObject.from_object (Json.Object object) {
+    protected JsonObject.from_object (Json.Object object) {
         Object (object: object);
     }
 
