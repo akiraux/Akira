@@ -5,10 +5,14 @@ akira_prefix = get_option('prefix')
 akira_datadir = join_paths(akira_prefix, get_option('datadir'))
 akira_pkgdatadir = join_paths(akira_datadir, meson.project_name())
 
-add_project_arguments(
-    ['--vapidir', join_paths(meson.current_source_dir(), 'vapi')],
-    language: 'vala'
-)
+vala_version = meson.get_compiler('vala').version()
+if vala_version.version_compare('<=0.43.90')
+    add_project_arguments(
+        ['--vapidir', join_paths(meson.current_source_dir(), 'vapi')],
+        language: 'vala'
+    )
+endif
+
 # Include the translations module
 i18n = import('i18n')
 # Dependencies
