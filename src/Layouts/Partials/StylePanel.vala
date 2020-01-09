@@ -223,20 +223,21 @@ public class Akira.Layouts.Partials.StylePanel : Gtk.Grid {
             });
         });
 
-        border_radius_scale.value_changed.connect ( () => {
+        border_radius_scale.value_changed.connect (() => {
             double border_value = border_radius_scale.get_value ();
             border_radius_entry.entry.text = ((int)border_value).to_string ();
         });
 
-        border_radius_entry.entry.changed.connect ( () => {
+        border_radius_entry.entry.changed.connect (() => {
             double typed_border_radius = double.parse (border_radius_entry.entry.text);
             border_radius_scale.set_value (typed_border_radius);
         });
 
-        uniform_switch.activate.connect ( () => {
-            if (!uniform_switch.active) {
-                return;
-            }
+        uniform_switch.activate.connect (() => {
+            debug ("here");
+            //  if (!uniform_switch.active) {
+            //      return;
+            //  }
             double border_value = border_radius_scale.get_value ();
             border_radius_bottom_left_entry.entry.text = ((int)border_value).to_string ();
             border_radius_bottom_right_entry.entry.text = ((int)border_value).to_string ();
@@ -272,7 +273,7 @@ public class Akira.Layouts.Partials.StylePanel : Gtk.Grid {
     private void enable () {
         uniform_binding = uniform_switch.bind_property (
             "active", selected_item, "is_radius_uniform");
-        //  autoscale_switch.active = false;
+        // autoscale_switch.active = false;
 
         // Uniform radius
         if (selected_item.is_radius_uniform) {
