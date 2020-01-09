@@ -43,6 +43,8 @@ sources = files(
     'Layouts/Partials/PagesPanel.vala',
     'Layouts/Partials/Artboard.vala',
     'Layouts/Partials/Layer.vala',
+    'Layouts/Partials/BordersPanel.vala',
+    'Layouts/Partials/BorderItem.vala',
     'Layouts/Partials/FillsPanel.vala',
     'Layouts/Partials/FillItem.vala',
     'Layouts/Partials/BlendingModeItem.vala',
@@ -60,8 +62,9 @@ sources = files(
     'Partials/PanelSeparator.vala',
     'Partials/PopoverButton.vala',
 
+    'Models/BordersItemModel.vala',
     'Models/FillsItemModel.vala',
-    'Models/FillsListModel.vala',
+    'Models/ListModel.vala',
 
     'Widgets/SettingsDialog.vala',
 

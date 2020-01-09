@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2019 Alecaddd (http://alecaddd.com)
+* Copyright (c) 2019 Alecaddd (https://alecaddd.com)
 *
 * This file is part of Akira.
 *
@@ -14,16 +14,16 @@
 * GNU General Public License for more details.
 
 * You should have received a copy of the GNU General Public License
-* along with Akira.  If not, see <https://www.gnu.org/licenses/>.
+* along with Akira. If not, see <https://www.gnu.org/licenses/>.
 *
-* Authored by: Giacomo "giacomoalbe" Alberini <giacomoalbe@gmail.com>
+* Authored by: Alessandro "alecaddd" Castellani <castellani.ale@gmail.com>
 */
 
-public class Akira.Layouts.Partials.FillsPanel : Gtk.Grid {
+public class Akira.Layouts.Partials.BordersPanel : Gtk.Grid {
     public weak Akira.Window window { get; construct; }
 
     public Gtk.Button add_btn;
-    public Gtk.ListBox fills_list_container;
+    public Gtk.ListBox borders_list_container;
     public Akira.Models.ListModel list_model;
     public Gtk.Grid title_cont;
     private Lib.Models.CanvasItem selected_item;
@@ -37,7 +37,7 @@ public class Akira.Layouts.Partials.FillsPanel : Gtk.Grid {
         }
     }
 
-    public FillsPanel (Akira.Window window) {
+    public BordersPanel (Akira.Window window) {
         Object (
             window: window,
             orientation: Gtk.Orientation.HORIZONTAL
@@ -50,7 +50,7 @@ public class Akira.Layouts.Partials.FillsPanel : Gtk.Grid {
         title_cont.hexpand = true;
         title_cont.get_style_context ().add_class ("option-panel");
 
-        var label = new Gtk.Label (_("Fills"));
+        var label = new Gtk.Label (_("Borders"));
         label.halign = Gtk.Align.FILL;
         label.xalign = 0;
         label.hexpand = true;
@@ -66,22 +66,22 @@ public class Akira.Layouts.Partials.FillsPanel : Gtk.Grid {
         title_cont.attach (label, 0, 0, 1, 1);
         title_cont.attach (add_btn, 1, 0, 1, 1);
 
-        list_model = new Akira.Models.ListModel (Akira.Models.ListModel.ListType.FILL);
+        list_model = new Akira.Models.ListModel (Akira.Models.ListModel.ListType.BORDER);
 
-        fills_list_container = new Gtk.ListBox ();
-        fills_list_container.margin_top = 5;
-        fills_list_container.margin_bottom = 15;
-        fills_list_container.margin_start = 10;
-        fills_list_container.margin_end = 5;
-        fills_list_container.selection_mode = Gtk.SelectionMode.NONE;
-        fills_list_container.get_style_context ().add_class ("fills-list");
+        borders_list_container = new Gtk.ListBox ();
+        borders_list_container.margin_top = 5;
+        borders_list_container.margin_bottom = 15;
+        borders_list_container.margin_start = 10;
+        borders_list_container.margin_end = 5;
+        borders_list_container.selection_mode = Gtk.SelectionMode.NONE;
+        borders_list_container.get_style_context ().add_class ("fills-list");
 
-        fills_list_container.bind_model (list_model, item => {
-            return new Akira.Layouts.Partials.FillItem (window, (Akira.Models.FillsItemModel) item);
+        borders_list_container.bind_model (list_model, item => {
+            return new Akira.Layouts.Partials.BorderItem (window, (Akira.Models.BordersItemModel) item);
         });
 
         attach (title_cont, 0, 0, 1, 1);
-        attach (fills_list_container, 0, 1, 1, 1);
+        attach (borders_list_container, 0, 1, 1, 1);
         show_all ();
         add_btn.hide ();
 
@@ -91,12 +91,12 @@ public class Akira.Layouts.Partials.FillsPanel : Gtk.Grid {
     private void create_event_bindings () {
         toggled = false;
         window.event_bus.selected_items_changed.connect (on_selected_items_changed);
-        window.event_bus.fill_deleted.connect (() => {
+        window.event_bus.border_deleted.connect (() => {
             add_btn.show ();
             window.main_window.left_sidebar.queue_resize ();
         });
         add_btn.clicked.connect (() => {
-            list_model.add_fill.begin (selected_item);
+            list_model.add_border.begin (selected_item);
             selected_item.reset_colors ();
             add_btn.hide ();
             window.main_window.left_sidebar.queue_resize ();
@@ -116,12 +116,12 @@ public class Akira.Layouts.Partials.FillsPanel : Gtk.Grid {
             toggled = true;
             selected_item = selected_items.nth_data (0);
 
-            if (!selected_item.has_fill) {
+            if (!selected_item.has_border) {
                 add_btn.show ();
                 return;
             }
 
-            list_model.add_fill.begin (selected_item);
+            list_model.add_border.begin (selected_item);
         }
     }
 }

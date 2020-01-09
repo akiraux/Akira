@@ -16,37 +16,45 @@
 * You should have received a copy of the GNU General Public License
 * along with Akira. If not, see <https://www.gnu.org/licenses/>.
 *
-* Authored by: Giacomo "giacomoalbe" Alberini <giacomoalbe@gmail.com>
 * Authored by: Alessandro "alecaddd" Castellani <castellani.ale@gmail.com>
 */
 
-public class Akira.Models.FillsItemModel : GLib.Object {
+public class Akira.Models.BordersItemModel : GLib.Object {
     public string color {
         owned get {
-            return item.color.to_string ();
+            return item.border_color.to_string ();
         }
         set {
             var new_rgba = Gdk.RGBA ();
             new_rgba.parse (value);
-            item.color = new_rgba;
+            item.border_color = new_rgba;
         }
     }
 
     public int alpha {
         get {
-            return item.fill_alpha;
+            return item.stroke_alpha;
         }
         set {
-            item.fill_alpha = value;
+            item.stroke_alpha = value;
+        }
+    }
+
+    public int border_size {
+        get {
+            return item.border_size;
+        }
+        set {
+            item.border_size = value;
         }
     }
 
     public bool hidden {
         get {
-            return item.hidden_fill;
+            return item.hidden_border;
         }
         set {
-            item.hidden_fill = value;
+            item.hidden_border = value;
         }
     }
 
@@ -54,7 +62,7 @@ public class Akira.Models.FillsItemModel : GLib.Object {
     public Akira.Models.ListModel list_model { get; set; }
     public Lib.Models.CanvasItem item { get; construct; }
 
-    public FillsItemModel (
+    public BordersItemModel (
         Lib.Models.CanvasItem item,
         Akira.Utils.BlendingMode blending_mode,
         Akira.Models.ListModel list_model
@@ -67,7 +75,7 @@ public class Akira.Models.FillsItemModel : GLib.Object {
     }
 
     public string to_string () {
-        return "Color: %s\nAlpha: %f\nHidden: %s\nBlendingMode: %s".printf (
-            color, alpha, (hidden ? "1" : "0"), blending_mode.to_string ());
+        return "Color: %s\nAlpha: %f\nSize: %i\nHidden: %s\nBlendingMode: %s".printf (
+            color, alpha, border_size, (hidden ? "1" : "0"), blending_mode.to_string ());
     }
 }

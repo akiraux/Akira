@@ -8,7 +8,7 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * General Public License for more details.
  *
  * You should have received a copy of the GNU General Public
@@ -34,6 +34,7 @@ public class Akira.Services.EventBus : Object {
     public signal void request_selection_bound_transform (string property, double amount);
     public signal void set_focus_on_canvas ();
     public signal void fill_deleted ();
+    public signal void border_deleted ();
 
     public void test (string caller_id) {
         debug (@"Test from EventBus called by $(caller_id)");

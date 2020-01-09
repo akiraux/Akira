@@ -39,13 +39,15 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
     // Fill Panel attributes.
     public abstract bool has_fill { get; set; default = true; }
     public abstract int fill_alpha { get; set; }
-    public abstract int stroke_alpha { get; set; }
     public abstract Gdk.RGBA color { get; set; }
     public abstract bool hidden_fill { get; set; default = false; }
 
     // Border Panel attributes.
-    public abstract double border_size { get; set; }
+    public abstract bool has_border { get; set; default = true; }
+    public abstract int border_size { get; set; }
     public abstract Gdk.RGBA border_color { get; set; }
+    public abstract int stroke_alpha { get; set; }
+    public abstract bool hidden_border { get; set; default = false; }
 
     public abstract Models.CanvasItemType item_type { get; set; }
 
@@ -96,7 +98,7 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
     }
 
     private void reset_border () {
-        if (!settings.set_border) {
+        if (hidden_border || !has_border) {
             set ("stroke-color-rgba", null);
             set ("line-width", null);
             return;
@@ -108,6 +110,6 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
 
         uint stroke_color_rgba = Utils.Color.rgba_to_uint (rgba_stroke);
         set ("stroke-color-rgba", stroke_color_rgba);
-        set ("line-width", border_size);
+        set ("line-width", (double) border_size);
     }
 }

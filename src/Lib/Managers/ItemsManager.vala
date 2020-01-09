@@ -32,7 +32,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
     private List<Models.CanvasItem> items;
     private InsertType? insert_type { get; set; }
     private Goo.CanvasItem root;
-    private double border_size;
+    private int border_size;
     private Gdk.RGBA border_color;
     private Gdk.RGBA fill_color;
 
@@ -208,7 +208,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
 
         // Do not set the border if the user disabled it.
         if (settings.set_border) {
-            border_size = settings.border_size;
+            border_size = (int) settings.border_size;
             border_color.parse (settings.border_color);
         }
     }

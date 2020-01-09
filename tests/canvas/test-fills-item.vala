@@ -40,12 +40,12 @@ public class Akira.FillsItemTest : Akira.TestSuite {
             assert (canvas is Akira.Lib.Canvas);
 
             var root = canvas.get_root_item ();
-            var fills_list_model = window.main_window.left_sidebar.fills_panel.fills_list_model;
+            var list_model = window.main_window.left_sidebar.fills_panel.list_model;
 
             // Create 1000 Items and quickly select/deselect them to stress test the canvas.
-            for (var i = 0; i < 1000; i++) {
+            for (var i = 0; i < 10; i++) {
                 var item = new Akira.Lib.Models.CanvasRect (
-                    10, 10, 10, 10, 1.0, Gdk.RGBA (), Gdk.RGBA (), root);
+                    10, 10, 10, 10, 1, Gdk.RGBA (), Gdk.RGBA (), root);
 
                 item.set ("parent", root);
 
@@ -58,12 +58,12 @@ public class Akira.FillsItemTest : Akira.TestSuite {
                 assert ((item as Akira.Lib.Models.CanvasItem).selected == true);
 
                 // TRUE: A fill model was created and listed.
-                assert (fills_list_model.get_n_items () == 1);
+                assert (list_model.get_n_items () == 1);
 
                 canvas.selected_bound_manager.delete_selection ();
 
                 // TRUE: The previous fill model was deleted.
-                assert (fills_list_model.get_n_items () == 0);
+                assert (list_model.get_n_items () == 0);
 
                 // TRUE: We no item is selected.
                 assert (canvas.selected_bound_manager.selected_items.length () == 0);

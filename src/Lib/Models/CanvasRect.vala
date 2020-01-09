@@ -27,11 +27,13 @@ public class Akira.Lib.Models.CanvasRect : Goo.CanvasRect, Models.CanvasItem {
     public double opacity { get; set; }
     public bool has_fill { get; set; default = true; }
     public int fill_alpha { get; set; }
-    public int stroke_alpha { get; set; }
     public Gdk.RGBA color { get; set; }
-    public double border_size { get; set; }
-    public Gdk.RGBA border_color { get; set; }
     public bool hidden_fill { get; set; }
+    public bool has_border { get; set; default = true; }
+    public int border_size { get; set; }
+    public Gdk.RGBA border_color { get; set; }
+    public int stroke_alpha { get; set; }
+    public bool hidden_border { get; set; }
     public Models.CanvasItemType item_type { get; set; }
 
     public CanvasRect (
@@ -39,7 +41,7 @@ public class Akira.Lib.Models.CanvasRect : Goo.CanvasRect, Models.CanvasItem {
         double _y = 0,
         double _radius_x = 0,
         double _radius_y = 0,
-        double _border_size = 1.0,
+        int _border_size = 1,
         Gdk.RGBA _border_color,
         Gdk.RGBA _fill_color,
         Goo.CanvasItem? parent = null
