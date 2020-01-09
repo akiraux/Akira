@@ -37,19 +37,20 @@ public class Akira.Layouts.Partials.StylePanel : Gtk.Grid {
 
     private Gtk.Switch autoscale_switch;
     private Gtk.Switch uniform_switch;
+    private Binding radius_binding;
+    private double max_value;
 
-    private Lib.Models.CanvasItem _selected_item;
-    private Lib.Models.CanvasItem selected_item {
+    private Akira.Lib.Models.CanvasRect _selected_item;
+    private Akira.Lib.Models.CanvasRect selected_item {
         get {
             return _selected_item;
         } set {
             _selected_item = value;
-            if (_selected_item == null) {
-                //   || !_selected_item.has_border_radius
-                reset_fields ();
+            if (_selected_item == null || !_selected_item.has_border_radius) {
+                disable ();
                 return;
             }
-            update_fields ();
+            enable ();
         }
     }
 
@@ -97,7 +98,7 @@ public class Akira.Layouts.Partials.StylePanel : Gtk.Grid {
         border_radius_label.margin_bottom = 2;
         panel_grid.attach (border_radius_label, 0, 1, 3, 1);
 
-        border_radius_scale = new Gtk.Scale.with_range (Gtk.Orientation.HORIZONTAL, 0, 100, 1);
+        border_radius_scale = new Gtk.Scale.with_range (Gtk.Orientation.HORIZONTAL, 0, 1, 1);
         border_radius_scale.digits = 0;
         border_radius_scale.draw_value = false;
         border_radius_scale.valign = Gtk.Align.CENTER;
@@ -233,7 +234,8 @@ public class Akira.Layouts.Partials.StylePanel : Gtk.Grid {
     }
 
     private void on_selected_items_changed (List<Lib.Models.CanvasItem> selected_items) {
-        if (selected_items.length () == 0) {
+        if (selected_items.length () == 0 || !selected_items.nth_data (0).has_border_radius) {
+            selected_item.notify.disconnect (on_model_change);
             selected_item = null;
             toggled = false;
             return;
@@ -241,33 +243,69 @@ public class Akira.Layouts.Partials.StylePanel : Gtk.Grid {
 
         if (selected_item == null || selected_item != selected_items.nth_data (0)) {
             toggled = true;
-            selected_item = selected_items.nth_data (0);
+            selected_item = (Akira.Lib.Models.CanvasRect) selected_items.nth_data (0);
+            selected_item.notify.connect (on_model_change);
         }
     }
 
-    private void update_fields () {
+    private void on_model_change () {
+        max_value = Math.round (double.min (selected_item.width, selected_item.height) / 2);
+        border_radius_scale.set_range (0, max_value);
+    }
+
+    private void enable () {
         //  autoscale_switch.active = false;
-        //  uniform_switch.active = false;
 
-        //  border_radius_scale.set_value (0);
+        // Uniform radius
+        if (selected_item.is_radius_uniform) {
+            uniform_switch.active = true;
 
-        border_radius_entry.entry.text = "";
-        border_radius_entry.entry.sensitive = true;
+            border_radius_scale.set_value (selected_item.radius_x);
+            border_radius_entry.entry.text = selected_item.radius_x.to_string ();
+            border_radius_entry.entry.sensitive = true;
 
-        border_radius_top_left_entry.entry.text = "";
+            radius_binding = border_radius_entry.entry.bind_property (
+                "text", selected_item, "radius_x",
+                BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE,
+                (binding, srcval, ref targetval) => {
+                    double src = double.parse (srcval.dup_string ());
+
+                    if (src > max_value || src < 0) {
+                        border_radius_entry.entry.text =
+                            (border_radius_scale.get_value ()).to_string ();
+                        return false;
+                    }
+
+                    targetval.set_double (src);
+                    return true;
+                }, (binding, srcval, ref targetval) => {
+                    double src = (double) srcval;
+                    targetval.set_string (("%0.0f").printf (src));
+                    return true;
+                });
+            border_radius_scale.value_changed.connect (on_radius_change);
+
+            border_radius_top_left_entry.entry.text = "";
+            border_radius_top_right_entry.entry.text = "";
+            border_radius_bottom_left_entry.entry.text = "";
+            border_radius_bottom_right_entry.entry.text = "";
+            return;
+        }
+
         border_radius_top_left_entry.entry.sensitive = true;
-
-        border_radius_top_right_entry.entry.text = "";
         border_radius_top_right_entry.entry.sensitive = true;
-
-        border_radius_bottom_left_entry.entry.text = "";
         border_radius_bottom_left_entry.entry.sensitive = true;
-
-        border_radius_bottom_right_entry.entry.text = "";
         border_radius_bottom_right_entry.entry.sensitive = true;
     }
 
-    private void reset_fields () {
+    private void on_radius_change () {
+        selected_item.update_border ();
+    }
+
+    private void disable () {
+        radius_binding.unbind ();
+        border_radius_scale.value_changed.disconnect (on_radius_change);
+
         autoscale_switch.active = false;
         uniform_switch.active = false;
 
