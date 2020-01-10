@@ -20,54 +20,20 @@
 * Authored by: Alessandro "alecaddd" Castellani <castellani.ale@gmail.com>
 */
 
-public class Akira.Models.FillsItemModel : GLib.Object {
-    public string color {
-        owned get {
-            return item.color.to_string ();
-        }
-        set {
-            var new_rgba = Gdk.RGBA ();
-            new_rgba.parse (value);
-            item.color = new_rgba;
-        }
-    }
-
-    public int alpha {
-        get {
-            return item.fill_alpha;
-        }
-        set {
-            item.fill_alpha = value;
-        }
-    }
-
-    public bool hidden {
-        get {
-            return item.hidden_fill;
-        }
-        set {
-            item.hidden_fill = value;
-        }
-    }
-
-    public Akira.Utils.BlendingMode blending_mode { get; set; }
-    public Akira.Models.ListModel list_model { get; set; }
-    public Lib.Models.CanvasItem item { get; construct; }
-
+public class Akira.Models.FillsItemModel : Models.ItemModel {
     public FillsItemModel (
         Lib.Models.CanvasItem item,
-        Akira.Utils.BlendingMode blending_mode,
-        Akira.Models.ListModel list_model
+        Akira.Models.ListModel list_model,
+        Akira.Utils.BlendingMode blending_mode
     ) {
         Object (
-            blending_mode: blending_mode,
+            item: item,
             list_model: list_model,
-            item: item
+            blending_mode: blending_mode
         );
     }
 
-    public string to_string () {
-        return "Color: %s\nAlpha: %f\nHidden: %s\nBlendingMode: %s".printf (
-            color, alpha, (hidden ? "1" : "0"), blending_mode.to_string ());
+    construct {
+        item.has_fill = true;
     }
 }

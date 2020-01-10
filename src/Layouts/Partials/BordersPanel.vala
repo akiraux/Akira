@@ -66,7 +66,7 @@ public class Akira.Layouts.Partials.BordersPanel : Gtk.Grid {
         title_cont.attach (label, 0, 0, 1, 1);
         title_cont.attach (add_btn, 1, 0, 1, 1);
 
-        list_model = new Akira.Models.ListModel (Akira.Models.ListModel.ListType.NONE);
+        list_model = new Akira.Models.ListModel ();
 
         borders_list_container = new Gtk.ListBox ();
         borders_list_container.margin_top = 5;
