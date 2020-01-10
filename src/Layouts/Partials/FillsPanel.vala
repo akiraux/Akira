@@ -113,8 +113,8 @@ public class Akira.Layouts.Partials.FillsPanel : Gtk.Grid {
                 // to TRUE or FALSE based on the model cahnges.
 
                 // This will need to be updated in the future once we're dealing
-                // with multiple border colors, udpating to FALSE only if all
-                // the borders have been deleted.
+                // with multiple fill colors, udpating to FALSE only if all
+                // the fills have been deleted.
                 selected_item.has_fill = (added == 1);
             }
         });
