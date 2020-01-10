@@ -33,7 +33,6 @@ public class Akira.Models.ListModel : GLib.Object, GLib.ListModel {
 
     public Object? get_item (uint position) {
         Object? o = null;
-        //  debug ("get item %u", position);
         o = list.nth_data (position);
         if (o != null) {
             return o as Object;
