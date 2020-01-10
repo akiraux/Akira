@@ -66,7 +66,7 @@ public class Akira.Layouts.Partials.BordersPanel : Gtk.Grid {
         title_cont.attach (label, 0, 0, 1, 1);
         title_cont.attach (add_btn, 1, 0, 1, 1);
 
-        list_model = new Akira.Models.ListModel (Akira.Models.ListModel.ListType.BORDER);
+        list_model = new Akira.Models.ListModel (Akira.Models.ListModel.ListType.NONE);
 
         borders_list_container = new Gtk.ListBox ();
         borders_list_container.margin_top = 5;
@@ -91,15 +91,24 @@ public class Akira.Layouts.Partials.BordersPanel : Gtk.Grid {
     private void create_event_bindings () {
         toggled = false;
         window.event_bus.selected_items_changed.connect (on_selected_items_changed);
+
         window.event_bus.border_deleted.connect (() => {
             add_btn.show ();
             window.main_window.left_sidebar.queue_resize ();
         });
+
         add_btn.clicked.connect (() => {
-            list_model.add_border.begin (selected_item);
+            var model_item = create_model ();
+            list_model.add_item.begin (model_item);
             selected_item.reset_colors ();
             add_btn.hide ();
             window.main_window.left_sidebar.queue_resize ();
+        });
+
+        list_model.items_changed.connect ((position, removed, added) => {
+            if (selected_item != null) {
+                selected_item.has_border = (added == 1);
+            }
         });
     }
 
@@ -121,7 +130,16 @@ public class Akira.Layouts.Partials.BordersPanel : Gtk.Grid {
                 return;
             }
 
-            list_model.add_border.begin (selected_item);
+            var model_item = create_model ();
+            list_model.add_item.begin (model_item);
         }
+    }
+
+    private Akira.Models.BordersItemModel create_model () {
+        return new Akira.Models.BordersItemModel (
+            selected_item,
+            list_model,
+            Akira.Utils.BlendingMode.NORMAL
+        );
     }
 }

@@ -21,12 +21,14 @@
 */
 
 public class Akira.Models.ListModel : GLib.Object, GLib.ListModel {
+    private GLib.List<Akira.Models.ItemModel?> list;
     private GLib.List<Akira.Models.FillsItemModel?> fills_list;
     private GLib.List<Akira.Models.BordersItemModel?> borders_list;
     public ListType list_type;
     public enum ListType {
         FILL,
-        BORDER
+        BORDER,
+        NONE
     }
 
     public ListModel (ListType type) {
@@ -36,16 +38,21 @@ public class Akira.Models.ListModel : GLib.Object, GLib.ListModel {
     construct {
         if (list_type == ListType.FILL) {
             fills_list = new GLib.List<Akira.Models.FillsItemModel?> ();
-        } else {
+        } else if (list_type == ListType.BORDER) {
             borders_list = new GLib.List<Akira.Models.BordersItemModel?> ();
+        } else {
+            list = new GLib.List<Akira.Models.ItemModel?> ();
         }
     }
 
     public uint get_n_items () {
         if (list_type == ListType.FILL) {
             return (uint) fills_list.length ();
+        } else if (list_type == ListType.BORDER) {
+            return (uint) borders_list.length ();
+        } else {
+            return (uint) list.length ();
         }
-        return (uint) borders_list.length ();
     }
 
     public Object? get_item (uint position) {
@@ -53,8 +60,10 @@ public class Akira.Models.ListModel : GLib.Object, GLib.ListModel {
         //  debug ("get item %u", position);
         if (list_type == ListType.FILL) {
             o = fills_list.nth_data (position);
-        } else {
+        } else if (list_type == ListType.BORDER) {
             o = borders_list.nth_data (position);
+        } else {
+            o = list.nth_data (position);
         }
 
         if (o != null) {
@@ -67,9 +76,15 @@ public class Akira.Models.ListModel : GLib.Object, GLib.ListModel {
     public Type get_item_type () {
         if (list_type == ListType.FILL) {
             return typeof (Akira.Models.FillsItemModel);
+        } else if (list_type == ListType.BORDER) {
+            return typeof (Akira.Models.BordersItemModel);
         }
+        return typeof (Akira.Models.ItemModel);
+    }
 
-        return typeof (Akira.Models.BordersItemModel);
+    public async void add_item (Akira.Models.ItemModel model_item) {
+        list.append (model_item);
+        items_changed (get_n_items () - 1, 0, 1);
     }
 
     public async void add_fill (Lib.Models.CanvasItem item) {
@@ -87,13 +102,12 @@ public class Akira.Models.ListModel : GLib.Object, GLib.ListModel {
     public async void add_border (Lib.Models.CanvasItem item) {
         var model_item = new Models.BordersItemModel (
             item,
-            Akira.Utils.BlendingMode.NORMAL,
-            this
+            this,
+            Akira.Utils.BlendingMode.NORMAL
         );
 
         borders_list.append (model_item);
         items_changed (get_n_items () - 1, 0, 1);
-        item.has_border = true;
     }
 
     public async void remove_item (Object? item_model) {
@@ -114,19 +128,25 @@ public class Akira.Models.ListModel : GLib.Object, GLib.ListModel {
                 model.item.has_fill = false;
             }
             return;
+        } else if (list_type == ListType.BORDER) {
+            var model = (Akira.Models.BordersItemModel) item_model;
+            var position = borders_list.index (model);
+            borders_list.remove (model);
+            items_changed (position, 1, 0);
+
+            // Update has_border only if no border is present and the item is still
+            // selected. This is necessary to be sure we're removing the border only
+            // if the user specifically clicked on the trash icon.
+            if (get_n_items () == 0 && model.item.selected) {
+                model.item.has_border = false;
+            }
+            return;
         }
 
-        var model = (Akira.Models.BordersItemModel) item_model;
-        var position = borders_list.index (model);
-        borders_list.remove (model);
+        var model = (Akira.Models.ItemModel) item_model;
+        var position = list.index (model);
+        list.remove (model);
         items_changed (position, 1, 0);
-
-        // Update has_border only if no border is present and the item is still
-        // selected. This is necessary to be sure we're removing the border only
-        // if the user specifically clicked on the trash icon.
-        if (get_n_items () == 0 && model.item.selected) {
-            model.item.has_border = false;
-        }
     }
 
     public async void clear () {
@@ -137,10 +157,14 @@ public class Akira.Models.ListModel : GLib.Object, GLib.ListModel {
                 remove_item.begin (item);
             });
             return;
+        } else if (list_type == ListType.BORDER) {
+            borders_list.foreach ((item) => {
+                //  debug ("remove fill");
+                remove_item.begin (item);
+            });
         }
 
-        borders_list.foreach ((item) => {
-            //  debug ("remove fill");
+        list.foreach ((item) => {
             remove_item.begin (item);
         });
     }
