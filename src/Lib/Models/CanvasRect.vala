@@ -36,6 +36,7 @@ public class Akira.Lib.Models.CanvasRect : Goo.CanvasRect, Models.CanvasItem {
     public bool hidden_border { get; set; }
     public bool has_border_radius { get; set; }
     public bool is_radius_uniform { get; set; }
+    public bool is_radius_autoscale { get; set; }
 
     public Models.CanvasItemType item_type { get; set; }
 
@@ -66,6 +67,7 @@ public class Akira.Lib.Models.CanvasRect : Goo.CanvasRect, Models.CanvasItem {
         y = 0;
         has_border_radius = true;
         is_radius_uniform = true;
+        is_radius_autoscale = false;
 
         set_transform (Cairo.Matrix.identity ());
 
