@@ -20,7 +20,7 @@
 * Authored by: Alessandro "alecaddd" Castellani <castellani.ale@gmail.com>
 */
 
-public class Akira.Models.FillsItemModel : GLib.Object {
+public class Akira.Models.FillsItemModel : Models.ItemModel {
     public string color {
         owned get {
             return item.color.to_string ();
@@ -50,20 +50,21 @@ public class Akira.Models.FillsItemModel : GLib.Object {
         }
     }
 
-    public Akira.Utils.BlendingMode blending_mode { get; set; }
-    public Akira.Models.ListModel list_model { get; set; }
-    public Lib.Models.CanvasItem item { get; construct; }
+    public Akira.Utils.BlendingMode blending_mode;
 
     public FillsItemModel (
         Lib.Models.CanvasItem item,
-        Akira.Utils.BlendingMode blending_mode,
         Akira.Models.ListModel list_model
     ) {
         Object (
-            blending_mode: blending_mode,
-            list_model: list_model,
-            item: item
+            item: item,
+            list_model: list_model
         );
+    }
+
+    construct {
+        item.has_fill = true;
+        blending_mode = Akira.Utils.BlendingMode.NORMAL;
     }
 
     public string to_string () {

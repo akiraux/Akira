@@ -19,7 +19,7 @@
 * Authored by: Alessandro "alecaddd" Castellani <castellani.ale@gmail.com>
 */
 
-public class Akira.Models.BordersItemModel : GLib.Object {
+public class Akira.Models.BordersItemModel : Models.ItemModel {
     public string color {
         owned get {
             return item.border_color.to_string ();
@@ -58,24 +58,22 @@ public class Akira.Models.BordersItemModel : GLib.Object {
         }
     }
 
-    public Akira.Utils.BlendingMode blending_mode { get; set; }
-    public Akira.Models.ListModel list_model { get; set; }
-    public Lib.Models.CanvasItem item { get; construct; }
-
     public BordersItemModel (
         Lib.Models.CanvasItem item,
-        Akira.Utils.BlendingMode blending_mode,
         Akira.Models.ListModel list_model
     ) {
         Object (
-            blending_mode: blending_mode,
-            list_model: list_model,
-            item: item
+            item: item,
+            list_model: list_model
         );
     }
 
+    construct {
+        item.has_border = true;
+    }
+
     public string to_string () {
-        return "Color: %s\nAlpha: %f\nSize: %i\nHidden: %s\nBlendingMode: %s".printf (
-            color, alpha, border_size, (hidden ? "1" : "0"), blending_mode.to_string ());
+        return "Color: %s\nAlpha: %f\nSize: %i\nHidden: %s".printf (
+            color, alpha, border_size, (hidden ? "1" : "0"));
     }
 }

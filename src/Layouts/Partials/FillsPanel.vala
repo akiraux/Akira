@@ -10,13 +10,14 @@
 
 * Akira is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 * GNU General Public License for more details.
 
 * You should have received a copy of the GNU General Public License
 * along with Akira.  If not, see <https://www.gnu.org/licenses/>.
 *
 * Authored by: Giacomo "giacomoalbe" Alberini <giacomoalbe@gmail.com>
+* Authored by: Alessandro "alecaddd" Castellani <castellani.ale@gmail.com>
 */
 
 public class Akira.Layouts.Partials.FillsPanel : Gtk.Grid {
@@ -66,7 +67,7 @@ public class Akira.Layouts.Partials.FillsPanel : Gtk.Grid {
         title_cont.attach (label, 0, 0, 1, 1);
         title_cont.attach (add_btn, 1, 0, 1, 1);
 
-        list_model = new Akira.Models.ListModel (Akira.Models.ListModel.ListType.FILL);
+        list_model = new Akira.Models.ListModel ();
 
         fills_list_container = new Gtk.ListBox ();
         fills_list_container.margin_top = 5;
@@ -91,15 +92,31 @@ public class Akira.Layouts.Partials.FillsPanel : Gtk.Grid {
     private void create_event_bindings () {
         toggled = false;
         window.event_bus.selected_items_changed.connect (on_selected_items_changed);
+
         window.event_bus.fill_deleted.connect (() => {
             add_btn.show ();
             window.main_window.left_sidebar.queue_resize ();
         });
+
         add_btn.clicked.connect (() => {
-            list_model.add_fill.begin (selected_item);
+            var model_item = create_model ();
+            list_model.add_item.begin (model_item);
             selected_item.reset_colors ();
             add_btn.hide ();
             window.main_window.left_sidebar.queue_resize ();
+        });
+
+        // Listen to the model changes when adding/removing items.
+        list_model.items_changed.connect ((position, removed, added) => {
+            if (selected_item != null) {
+                // If an item is still selected, udpate the has_fill property
+                // to TRUE or FALSE based on the model cahnges.
+
+                // This will need to be updated in the future once we're dealing
+                // with multiple fill colors, udpating to FALSE only if all
+                // the fills have been deleted.
+                selected_item.has_fill = (added == 1);
+            }
         });
     }
 
@@ -121,7 +138,12 @@ public class Akira.Layouts.Partials.FillsPanel : Gtk.Grid {
                 return;
             }
 
-            list_model.add_fill.begin (selected_item);
+            var model_item = create_model ();
+            list_model.add_item.begin (model_item);
         }
+    }
+
+    private Akira.Models.FillsItemModel create_model () {
+        return new Akira.Models.FillsItemModel (selected_item, list_model);
     }
 }

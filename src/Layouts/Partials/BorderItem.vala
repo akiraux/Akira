@@ -147,7 +147,7 @@ public class Akira.Layouts.Partials.BorderItem : Gtk.Grid {
                 return true;
             },
             // model => this
-            (bpnding, model_value, ref color_container_value) => {
+            (binding, model_value, ref color_container_value) => {
                 var model_rgba = model_value.dup_string ();
                 old_color = model_rgba;
                 color_container_value.set_string (Utils.Color.rgba_to_hex (model_rgba));
@@ -211,6 +211,7 @@ public class Akira.Layouts.Partials.BorderItem : Gtk.Grid {
                 int src = int.parse (entry_text_val.dup_string ());
                 if (src < 0) {
                     src = 0;
+                    tickness_container.entry.text = "0";
                 }
                 model_border_val.set_int (src);
                 return true;
