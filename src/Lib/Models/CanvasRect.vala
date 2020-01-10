@@ -69,7 +69,8 @@ public class Akira.Lib.Models.CanvasRect : Goo.CanvasRect, Models.CanvasItem {
         translate (_x, _y);
 
         color = _fill_color;
-        if (settings.set_border) {
+        has_border = settings.set_border;
+        if (has_border) {
             border_color = _border_color;
             border_size = _border_size;
         }
