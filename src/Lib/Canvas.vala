@@ -47,6 +47,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         MODE_SELECTION,
         MODE_INSERT,
         MODE_PAN,
+        MODE_PANNING,
     }
 
     public Managers.SelectedBoundManager selected_bound_manager;
@@ -91,6 +92,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     }
 
     public void set_cursor_by_edit_mode () {
+        // debug ("Calling set_cursor_by_edit_mode");
         Gdk.CursorType? new_cursor;
 
         switch (_edit_mode) {
@@ -103,7 +105,11 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 break;
 
             case EditMode.MODE_PAN:
-                new_cursor = holding ? Gdk.CursorType.HAND2 : Gdk.CursorType.HAND1;
+                new_cursor = Gdk.CursorType.HAND2;
+                break;
+
+            case EditMode.MODE_PANNING:
+                new_cursor = Gdk.CursorType.HAND1;
                 break;
 
             default:
@@ -112,6 +118,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         }
 
         if (current_cursor != new_cursor) {
+            // debug (@"Changing cursor. $new_cursor");
             set_cursor (new_cursor);
         }
     }
@@ -126,11 +133,12 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
             case Gdk.Key.Delete:
                 selected_bound_manager.delete_selection ();
-                // delete_selected ();
                 return true;
 
             case Gdk.Key.space:
-                edit_mode = EditMode.MODE_PAN;
+                if (edit_mode != EditMode.MODE_PANNING) {
+                    edit_mode = EditMode.MODE_PAN;
+                }
                 return true;
 
             default:
@@ -169,7 +177,8 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         hover_manager.remove_hover_effect ();
 
         if (event.button == Gdk.BUTTON_MIDDLE) {
-            edit_mode = EditMode.MODE_PAN;
+            edit_mode = EditMode.MODE_PANNING;
+            canvas_scroll_set_origin (temp_event_x, temp_event_y);
         }
 
         switch (edit_mode) {
@@ -214,8 +223,8 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 break;
 
             case EditMode.MODE_PAN:
-                set_cursor_by_edit_mode ();
-
+                //set_cursor_by_edit_mode ();
+                edit_mode = EditMode.MODE_PANNING;
                 canvas_scroll_set_origin (temp_event_x, temp_event_y);
                 break;
         }
@@ -234,12 +243,9 @@ public class Akira.Lib.Canvas : Goo.Canvas {
             edit_mode = EditMode.MODE_SELECTION;
         }
 
-        //item_moved (selected_item);
-        //add_hover_effect (selected_item);
-
         switch (edit_mode) {
-            case EditMode.MODE_PAN:
-                set_cursor_by_edit_mode ();
+            case EditMode.MODE_PANNING:
+                edit_mode = EditMode.MODE_PAN;
                 break;
 
             default:
@@ -269,7 +275,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 selected_bound_manager.transform_bound (event_x, event_y, selected_nob);
                 break;
 
-            case EditMode.MODE_PAN:
+            case EditMode.MODE_PANNING:
                 canvas_moved (event_x, event_y);
                 break;
         }
@@ -305,6 +311,8 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     }
 
     private void on_request_change_cursor (Gdk.CursorType? cursor_type) {
+        // debug ("Setting cursor from on_request_change_cursor");
+
         if (cursor_type == null) {
             set_cursor_by_edit_mode ();
             return;
