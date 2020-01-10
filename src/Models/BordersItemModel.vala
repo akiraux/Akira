@@ -60,13 +60,11 @@ public class Akira.Models.BordersItemModel : Models.ItemModel {
 
     public BordersItemModel (
         Lib.Models.CanvasItem item,
-        Akira.Models.ListModel list_model,
-        Akira.Utils.BlendingMode blending_mode
+        Akira.Models.ListModel list_model
     ) {
         Object (
             item: item,
-            list_model: list_model,
-            blending_mode: blending_mode
+            list_model: list_model
         );
     }
 
@@ -75,7 +73,7 @@ public class Akira.Models.BordersItemModel : Models.ItemModel {
     }
 
     public string to_string () {
-        return "Color: %s\nAlpha: %f\nSize: %i\nHidden: %s\nBlendingMode: %s".printf (
-            color, alpha, border_size, (hidden ? "1" : "0"), blending_mode.to_string ());
+        return "Color: %s\nAlpha: %f\nSize: %i\nHidden: %s".printf (
+            color, alpha, border_size, (hidden ? "1" : "0"));
     }
 }

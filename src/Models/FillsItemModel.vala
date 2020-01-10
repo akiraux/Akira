@@ -50,20 +50,21 @@ public class Akira.Models.FillsItemModel : Models.ItemModel {
         }
     }
 
+    public Akira.Utils.BlendingMode blending_mode;
+
     public FillsItemModel (
         Lib.Models.CanvasItem item,
-        Akira.Models.ListModel list_model,
-        Akira.Utils.BlendingMode blending_mode
+        Akira.Models.ListModel list_model
     ) {
         Object (
             item: item,
-            list_model: list_model,
-            blending_mode: blending_mode
+            list_model: list_model
         );
     }
 
     construct {
         item.has_fill = true;
+        blending_mode = Akira.Utils.BlendingMode.NORMAL;
     }
 
     public string to_string () {

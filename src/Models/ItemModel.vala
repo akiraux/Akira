@@ -20,5 +20,4 @@
 public abstract class Akira.Models.ItemModel : GLib.Object {
     public Lib.Models.CanvasItem item { get; construct; }
     public Akira.Models.ListModel list_model { get; set; }
-    public Akira.Utils.BlendingMode blending_mode { get; set; }
 }

@@ -106,8 +106,15 @@ public class Akira.Layouts.Partials.FillsPanel : Gtk.Grid {
             window.main_window.left_sidebar.queue_resize ();
         });
 
+        // Listen to the model changes when adding/removing items.
         list_model.items_changed.connect ((position, removed, added) => {
             if (selected_item != null) {
+                // If an item is still selected, udpate the has_fill property
+                // to TRUE or FALSE based on the model cahnges.
+
+                // This will need to be updated in the future once we're dealing
+                // with multiple border colors, udpating to FALSE only if all
+                // the borders have been deleted.
                 selected_item.has_fill = (added == 1);
             }
         });
@@ -137,10 +144,6 @@ public class Akira.Layouts.Partials.FillsPanel : Gtk.Grid {
     }
 
     private Akira.Models.FillsItemModel create_model () {
-        return new Akira.Models.FillsItemModel (
-            selected_item,
-            list_model,
-            Akira.Utils.BlendingMode.NORMAL
-        );
+        return new Akira.Models.FillsItemModel (selected_item, list_model);
     }
 }
