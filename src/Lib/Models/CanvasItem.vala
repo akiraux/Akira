@@ -23,7 +23,8 @@
 public enum Akira.Lib.Models.CanvasItemType {
     RECT,
     ELLIPSE,
-    TEXT
+    TEXT,
+    IMAGE
 }
 
 public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasItem {

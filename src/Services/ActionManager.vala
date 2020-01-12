@@ -46,6 +46,7 @@ public class Akira.Services.ActionManager : Object {
     public const string ACTION_RECT_TOOL = "action_rect_tool";
     public const string ACTION_ELLIPSE_TOOL = "action_ellipse_tool";
     public const string ACTION_TEXT_TOOL = "action_text_tool";
+    public const string ACTION_IMAGE_TOOL = "action_image_tool";
     public const string ACTION_SELECTION_TOOL = "action_selection_tool";
     public const string ACTION_DELETE = "action_delete";
 
@@ -72,6 +73,7 @@ public class Akira.Services.ActionManager : Object {
         { ACTION_RECT_TOOL, action_rect_tool },
         { ACTION_ELLIPSE_TOOL, action_ellipse_tool },
         { ACTION_TEXT_TOOL, action_text_tool },
+        { ACTION_IMAGE_TOOL, action_image_tool },
         { ACTION_SELECTION_TOOL, action_selection_tool },
         { ACTION_DELETE, action_delete },
     };
@@ -214,6 +216,33 @@ public class Akira.Services.ActionManager : Object {
         //window.main_window.main_canvas.canvas.insert_type = Akira.Lib.Canvas.InsertType.TEXT;
         window.event_bus.insert_item ("text");
         window.event_bus.close_popover ("insert");
+    }
+
+    private void action_image_tool () {
+        var dialog = new Gtk.FileChooserNative (_("Choose image file"), window, Gtk.FileChooserAction.OPEN, _("Select"), _("Close"));
+        dialog.select_multiple = true;
+        dialog.response.connect ((response_id) => on_choose_image_response (dialog, response_id));
+        dialog.show ();
+        window.event_bus.close_popover ("insert");
+    }
+
+    private void on_choose_image_response (Gtk.FileChooserNative dialog, int response_id) {
+        switch (response_id) {
+            case Gtk.ResponseType.ACCEPT:
+            case Gtk.ResponseType.OK:
+                SList<File> files = dialog.get_files ();
+                weak Akira.Lib.Canvas canvas = window.main_window.main_canvas.canvas;
+                files.@foreach ((file) => {
+                    var provider = new Akira.Services.FileImageProvider (file);
+                    var item = new Akira.Lib.Models.CanvasImage (provider, canvas.get_root_item ());
+
+                    canvas.insert_item_default (item);
+                });
+                
+                break;
+        default:
+            break;
+        }
     }
 
     public static void action_from_group (string action_name, ActionGroup? action_group) {

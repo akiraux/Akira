@@ -87,6 +87,16 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         window.event_bus.set_focus_on_canvas.connect (on_set_focus_on_canvas);
     }
 
+    public void insert_item_default (Akira.Lib.Models.CanvasItem item, bool select = false) {
+        items_manager.add_item (item);
+        if (select) {
+            selected_bound_manager.reset_selection ();
+            selected_bound_manager.add_item_to_selection (item);
+            selected_bound_manager.set_initial_coordinates (50000, 50000);
+            nob_manager.selected_nob = Managers.NobManager.Nob.BOTTOM_RIGHT;
+        }
+    }
+
     public void update_bounds () {
         get_bounds (out bounds_x, out bounds_y, out bounds_w, out bounds_h);
     }

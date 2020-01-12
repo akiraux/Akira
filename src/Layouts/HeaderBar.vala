@@ -294,6 +294,8 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
             Akira.Services.ActionManager.ACTION_TEXT_TOOL;
 
         var image = new Akira.Partials.PopoverButton (_("Image"), "image-x-generic-symbolic", {"I"});
+        image.action_name = Akira.Services.ActionManager.ACTION_PREFIX +
+            Akira.Services.ActionManager.ACTION_IMAGE_TOOL;
 
         grid.add (artboard);
         grid.add (separator);
