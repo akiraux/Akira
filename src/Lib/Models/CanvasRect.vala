@@ -89,5 +89,7 @@ public class Akira.Lib.Models.CanvasRect : Goo.CanvasRect, Models.CanvasItem {
             set ("radius-x", radius_x);
             set ("radius-y", radius_x);
         }
+
+        // TODO: handle uneven border radius.
     }
 }

@@ -47,15 +47,16 @@ public class Akira.Layouts.Partials.BorderRadiusPanel : Gtk.Grid {
         get {
             return _selected_item;
         } set {
-            // Disconnect the model binding if an item was previsouly stored.
-            // This is necessary to prevent GObject Critical errors.
-            if (_selected_item != null) {
-                _selected_item.notify["width"].disconnect (on_size_change);
-            }
             // If the same item is already selected, or the value is still null
             // we don't do anything to prevent redraw and calculations.
             if (_selected_item == value) {
                 return;
+            }
+            // Disconnect the model binding if an item was previsouly stored.
+            // This is necessary to prevent GObject Critical errors.
+            if (_selected_item != null) {
+                _selected_item.notify["width"].disconnect (on_size_change);
+                _selected_item.notify["height"].disconnect (on_size_change);
             }
             _selected_item = value;
             if (_selected_item == null || !_selected_item.has_border_radius) {
@@ -64,6 +65,7 @@ public class Akira.Layouts.Partials.BorderRadiusPanel : Gtk.Grid {
             }
             enable ();
             _selected_item.notify["width"].connect (on_size_change);
+            _selected_item.notify["height"].connect (on_size_change);
         }
     }
 
@@ -238,10 +240,10 @@ public class Akira.Layouts.Partials.BorderRadiusPanel : Gtk.Grid {
             update_all_borders (uniform_switch.active);
         });
 
-        //  border_radius_top_left_entry.entry.changed.connect (on_uneven_radius_change);
-        //  border_radius_top_right_entry.entry.changed.connect (on_uneven_radius_change);
-        //  border_radius_bottom_right_entry.entry.changed.connect (on_uneven_radius_change);
-        //  border_radius_bottom_left_entry.entry.changed.connect (on_uneven_radius_change);
+        //  border_radius_top_left_entry.entry.changed.connect (on_radius_change);
+        //  border_radius_top_right_entry.entry.changed.connect (on_radius_change);
+        //  border_radius_bottom_right_entry.entry.changed.connect (on_radius_change);
+        //  border_radius_bottom_left_entry.entry.changed.connect (on_radius_change);
     }
 
     private void on_selected_items_changed (List<Lib.Models.CanvasItem> selected_items) {
@@ -264,8 +266,17 @@ public class Akira.Layouts.Partials.BorderRadiusPanel : Gtk.Grid {
     }
 
     private void on_size_change () {
-        max_value = Math.round (double.min (selected_item.width, selected_item.height) / 2);
+        var max_size = double.min (selected_item.width, selected_item.height);
+        max_value = Math.round (max_size / 2);
         border_radius_scale.set_range (0, max_value);
+
+        if (!selected_item.is_radius_autoscale) {
+            return;
+        }
+
+        // Calculate the radius percentage and udpate the value on shape resize.
+        var percentage = Math.round (border_radius_scale.get_value () / max_size * 100);
+        border_radius_scale.set_value (Math.round (percentage * max_size / 100));
     }
 
     private void enable () {
@@ -278,10 +289,13 @@ public class Akira.Layouts.Partials.BorderRadiusPanel : Gtk.Grid {
         }
         update_all_borders (selected_item.is_radius_uniform);
 
-        // Uniform radius
-        if (!selected_item.is_radius_uniform) {
-            //  border_radius_bottom_left_entry.entry.text = "20";
-        }
+        // Non-Uniform radius
+        //  if (!selected_item.is_radius_uniform) {
+        //      border_radius_top_left_entry.entry.text = selected_item.radius_tl;
+        //      border_radius_top_right_entry.entry.text = selected_item.radius_tr;
+        //      border_radius_bottom_right_entry.entry.text = selected_item.radius_br;
+        //      border_radius_bottom_left_entry.entry.text = selected_item.radius_bl;
+        //  }
 
         radius_binding = border_radius_entry.entry.bind_property (
             "text", selected_item, "radius_x",
@@ -332,22 +346,11 @@ public class Akira.Layouts.Partials.BorderRadiusPanel : Gtk.Grid {
         selected_item.update_border ();
     }
 
-    //  NOT WORKING!!!
-    //  private void on_uneven_radius_change () {
-    //      var matrix = Cairo.Matrix.identity ();
-    //      selected_item.get_transform (out matrix);
-    //      var context = selected_item.get_canvas ().create_cairo_context ();
-    //      context.set_matrix (matrix);
-
-    //      context.arc (30.0, 10.0, 0.0, 40.0, 2 * (Math.PI/180.0));
-    //      selected_item.set_transform (context.get_matrix ());
-    //  }
-
     private void disable () {
-        //  border_radius_top_left_entry.entry.changed.disconnect (on_uneven_radius_change);
-        //  border_radius_top_right_entry.entry.changed.disconnect (on_uneven_radius_change);
-        //  border_radius_bottom_right_entry.entry.changed.disconnect (on_uneven_radius_change);
-        //  border_radius_bottom_left_entry.entry.changed.disconnect (on_uneven_radius_change);
+        //  border_radius_top_left_entry.entry.changed.disconnect (on_radius_change);
+        //  border_radius_top_right_entry.entry.changed.disconnect (on_radius_change);
+        //  border_radius_bottom_right_entry.entry.changed.disconnect (on_radius_change);
+        //  border_radius_bottom_left_entry.entry.changed.disconnect (on_radius_change);
 
         radius_binding.unbind ();
         uniform_binding.unbind ();
