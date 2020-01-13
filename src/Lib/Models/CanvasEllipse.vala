@@ -34,6 +34,7 @@ public class Akira.Lib.Models.CanvasEllipse : Goo.CanvasEllipse, Models.CanvasIt
     public Gdk.RGBA border_color { get; set; }
     public int stroke_alpha { get; set; }
     public bool hidden_border { get; set; }
+    public bool has_border_radius { get; set; }
     public Models.CanvasItemType item_type { get; set; }
 
     public CanvasEllipse (
