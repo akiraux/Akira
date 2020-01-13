@@ -52,20 +52,13 @@ public class Akira.Layouts.Partials.BorderRadiusPanel : Gtk.Grid {
             if (_selected_item == value) {
                 return;
             }
-            // Disconnect the model binding if an item was previsouly stored.
-            // This is necessary to prevent GObject Critical errors.
-            if (_selected_item != null) {
-                _selected_item.notify["width"].disconnect (on_size_change);
-                _selected_item.notify["height"].disconnect (on_size_change);
-            }
+            disconnect_previous_item ();
             _selected_item = value;
             if (_selected_item == null || !_selected_item.has_border_radius) {
                 disable ();
                 return;
             }
             enable ();
-            _selected_item.notify["width"].connect (on_size_change);
-            _selected_item.notify["height"].connect (on_size_change);
         }
     }
 
@@ -316,12 +309,24 @@ public class Akira.Layouts.Partials.BorderRadiusPanel : Gtk.Grid {
                 targetval.set_string (("%0.0f").printf (src));
                 return true;
             });
-
         border_radius_scale.value_changed.connect (on_radius_change);
+
         uniform_binding = uniform_switch.bind_property (
             "active", selected_item, "is_radius_uniform");
         autoscale_binding = autoscale_switch.bind_property (
             "active", selected_item, "is_radius_autoscale");
+
+        selected_item.notify["width"].connect (on_size_change);
+        selected_item.notify["height"].connect (on_size_change);
+    }
+
+    private void disconnect_previous_item () {
+        // Disconnect the model binding if an item was previsouly stored.
+        // This is necessary to prevent GObject Critical errors.
+        if (selected_item != null) {
+            selected_item.notify["width"].disconnect (on_size_change);
+            selected_item.notify["height"].disconnect (on_size_change);
+        }
     }
 
     private void update_all_borders (bool switch_active) {
