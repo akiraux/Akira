@@ -37,17 +37,22 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
     public abstract double rotation { get; set; }
 
     // Fill Panel attributes.
+    // If FALSE, don't add a FillItem to the ListModel
     public abstract bool has_fill { get; set; default = true; }
     public abstract int fill_alpha { get; set; }
     public abstract Gdk.RGBA color { get; set; }
     public abstract bool hidden_fill { get; set; default = false; }
 
     // Border Panel attributes.
+    // If FALSE, don't add a BorderItem to the ListModel
     public abstract bool has_border { get; set; default = true; }
     public abstract int border_size { get; set; }
     public abstract Gdk.RGBA border_color { get; set; }
     public abstract int stroke_alpha { get; set; }
     public abstract bool hidden_border { get; set; default = false; }
+
+    // Style Panel attributes.
+    public abstract bool has_border_radius { get; set; default = false; }
 
     public abstract Models.CanvasItemType item_type { get; set; }
 

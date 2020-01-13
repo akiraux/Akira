@@ -27,9 +27,6 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     private const int MIN_SIZE = 1;
     private const int MIN_POS = 10;
 
-    /**
-     * Signal triggered when item was clicked by the user
-     */
     public signal void canvas_moved (double delta_x, double delta_y);
     public signal void canvas_scroll_set_origin (double origin_x, double origin_y);
 
@@ -39,8 +36,10 @@ public class Akira.Lib.Canvas : Goo.Canvas {
             return _edit_mode;
         }
         set {
-            _edit_mode = value;
-            set_cursor_by_edit_mode ();
+            if (_edit_mode != value) {
+                _edit_mode = value;
+                set_cursor_by_edit_mode ();
+            }
         }
     }
 
@@ -48,6 +47,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         MODE_SELECTION,
         MODE_INSERT,
         MODE_PAN,
+        MODE_PANNING,
     }
 
     public Managers.SelectedBoundManager selected_bound_manager;
@@ -61,6 +61,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     private double bounds_y;
     private double bounds_w;
     private double bounds_h;
+    private Gdk.CursorType current_cursor = Gdk.CursorType.ARROW;
 
     public Canvas (Akira.Window window) {
         Object (window: window);
@@ -91,26 +92,34 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     }
 
     public void set_cursor_by_edit_mode () {
+        // debug ("Calling set_cursor_by_edit_mode");
+        Gdk.CursorType? new_cursor;
+
         switch (_edit_mode) {
             case EditMode.MODE_SELECTION:
-                set_cursor (Gdk.CursorType.ARROW);
+                new_cursor = Gdk.CursorType.ARROW;
                 break;
 
             case EditMode.MODE_INSERT:
-                set_cursor (Gdk.CursorType.CROSSHAIR);
+                new_cursor = Gdk.CursorType.CROSSHAIR;
                 break;
 
             case EditMode.MODE_PAN:
-                if (holding) {
-                    set_cursor (Gdk.CursorType.HAND2);
-                } else {
-                    set_cursor (Gdk.CursorType.HAND1);
-                }
+                new_cursor = Gdk.CursorType.HAND2;
+                break;
+
+            case EditMode.MODE_PANNING:
+                new_cursor = Gdk.CursorType.HAND1;
                 break;
 
             default:
-                set_cursor (Gdk.CursorType.ARROW);
+                new_cursor = Gdk.CursorType.ARROW;
                 break;
+        }
+
+        if (current_cursor != new_cursor) {
+            // debug (@"Changing cursor. $new_cursor");
+            set_cursor (new_cursor);
         }
     }
 
@@ -124,7 +133,12 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
             case Gdk.Key.Delete:
                 selected_bound_manager.delete_selection ();
-                // delete_selected ();
+                return true;
+
+            case Gdk.Key.space:
+                if (edit_mode != EditMode.MODE_PANNING) {
+                    edit_mode = EditMode.MODE_PAN;
+                }
                 return true;
 
             default:
@@ -139,6 +153,19 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         }
     }
 
+    public override bool key_release_event (Gdk.EventKey event) {
+        uint uppercase_keyval = Gdk.keyval_to_upper (event.keyval);
+
+        switch (uppercase_keyval) {
+            case Gdk.Key.space:
+                edit_mode = EditMode.MODE_SELECTION;
+                return true;
+
+            default:
+                return false;
+        }
+    }
+
     public override bool button_press_event (Gdk.EventButton event) {
         focus_canvas ();
 
@@ -148,6 +175,11 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         var temp_event_y = event.y / current_scale;
 
         hover_manager.remove_hover_effect ();
+
+        if (event.button == Gdk.BUTTON_MIDDLE) {
+            edit_mode = EditMode.MODE_PANNING;
+            canvas_scroll_set_origin (temp_event_x, temp_event_y);
+        }
 
         switch (edit_mode) {
             case EditMode.MODE_INSERT:
@@ -194,6 +226,12 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
                 selected_bound_manager.set_initial_coordinates (temp_event_x, temp_event_y);
                 break;
+
+            case EditMode.MODE_PAN:
+                //set_cursor_by_edit_mode ();
+                edit_mode = EditMode.MODE_PANNING;
+                canvas_scroll_set_origin (temp_event_x, temp_event_y);
+                break;
         }
 
         return true;
@@ -206,10 +244,19 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
         holding = false;
 
-        //item_moved (selected_item);
-        //add_hover_effect (selected_item);
+        if (event.button == Gdk.BUTTON_MIDDLE) {
+            edit_mode = EditMode.MODE_SELECTION;
+        }
 
-        edit_mode = EditMode.MODE_SELECTION;
+        switch (edit_mode) {
+            case EditMode.MODE_PANNING:
+                edit_mode = EditMode.MODE_PAN;
+                break;
+
+            default:
+                edit_mode = EditMode.MODE_SELECTION;
+                break;
+        }
 
         return false;
     }
@@ -231,6 +278,10 @@ public class Akira.Lib.Canvas : Goo.Canvas {
             case EditMode.MODE_SELECTION:
                 var selected_nob = nob_manager.selected_nob;
                 selected_bound_manager.transform_bound (event_x, event_y, selected_nob);
+                break;
+
+            case EditMode.MODE_PANNING:
+                canvas_moved (event_x, event_y);
                 break;
         }
 
@@ -265,14 +316,20 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     }
 
     private void on_request_change_cursor (Gdk.CursorType? cursor_type) {
+        // debug ("Setting cursor from on_request_change_cursor");
+
         if (cursor_type == null) {
             set_cursor_by_edit_mode ();
-        } else {
-            set_cursor (cursor_type);
+            return;
         }
+
+        set_cursor (cursor_type);
     }
 
     private void set_cursor (Gdk.CursorType? cursor_type) {
+        // debug (@"Setting cursor: $cursor_type");
+        current_cursor = cursor_type;
+
         var cursor = new Gdk.Cursor.for_display (Gdk.Display.get_default (), cursor_type);
         get_window ().set_cursor (cursor);
     }

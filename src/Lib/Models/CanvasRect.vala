@@ -34,6 +34,10 @@ public class Akira.Lib.Models.CanvasRect : Goo.CanvasRect, Models.CanvasItem {
     public Gdk.RGBA border_color { get; set; }
     public int stroke_alpha { get; set; }
     public bool hidden_border { get; set; }
+    public bool has_border_radius { get; set; }
+    public bool is_radius_uniform { get; set; }
+    public bool is_radius_autoscale { get; set; }
+
     public Models.CanvasItemType item_type { get; set; }
 
     public CanvasRect (
@@ -61,6 +65,9 @@ public class Akira.Lib.Models.CanvasRect : Goo.CanvasRect, Models.CanvasItem {
         height = 1;
         x = 0;
         y = 0;
+        has_border_radius = true;
+        is_radius_uniform = true;
+        is_radius_autoscale = false;
 
         set_transform (Cairo.Matrix.identity ());
 
@@ -69,10 +76,20 @@ public class Akira.Lib.Models.CanvasRect : Goo.CanvasRect, Models.CanvasItem {
         translate (_x, _y);
 
         color = _fill_color;
-        if (settings.set_border) {
+        has_border = settings.set_border;
+        if (has_border) {
             border_color = _border_color;
             border_size = _border_size;
         }
         reset_colors ();
+    }
+
+    public void update_border () {
+        if (is_radius_uniform) {
+            set ("radius-x", radius_x);
+            set ("radius-y", radius_x);
+        }
+
+        // TODO: handle uneven border radius.
     }
 }
