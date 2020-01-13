@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2019 Alecaddd (http://alecaddd.com)
+* Copyright (c) 2020 Alecaddd (https://alecaddd.com)
 *
 * This file is part of Akira.
 *
@@ -10,11 +10,11 @@
 
 * Akira is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 * GNU General Public License for more details.
 
 * You should have received a copy of the GNU General Public License
-* along with Akira.  If not, see <https://www.gnu.org/licenses/>.
+* along with Akira. If not, see <https://www.gnu.org/licenses/>.
 *
 * Authored by: Giacomo "giacomoalbe" Alberini <giacomoalbe@gmail.com>
 */
@@ -27,6 +27,9 @@ public class Akira.Utils.AffineTransform : Object {
     private const int MIN_POS = 10;
     private const int BOUNDS_H = 10000;
     private const int BOUNDS_W = 10000;
+    private const double ROTATION_FIXED_STEP = 15.0;
+
+    public static double prev_rotation_difference = 0.0;
 
     public static void move_from_event (
         double x,
@@ -39,8 +42,8 @@ public class Akira.Utils.AffineTransform : Object {
 
         canvas.convert_to_item_space (selected_item, ref x, ref y);
 
-        double delta_x = Math.round (x - initial_x);
-        double delta_y = Math.round (y - initial_y);
+        double delta_x = GLib.Math.round (x - initial_x);
+        double delta_y = GLib.Math.round (y - initial_y);
 
         selected_item.translate (delta_x, delta_y);
     }
@@ -132,8 +135,8 @@ public class Akira.Utils.AffineTransform : Object {
                 break;
         }
 
-        origin_move_delta_x = Math.round (origin_move_delta_x);
-        origin_move_delta_y = Math.round (origin_move_delta_y);
+        origin_move_delta_x = GLib.Math.round (origin_move_delta_x);
+        origin_move_delta_y = GLib.Math.round (origin_move_delta_y);
 
         new_width = fix_size (new_width);
         new_height = fix_size (new_height);
@@ -171,22 +174,64 @@ public class Akira.Utils.AffineTransform : Object {
 
         var center_x = initial_width / 2;
         var center_y = initial_height / 2;
+        var do_rotation = true;
+        double rotation_amount = 0;
 
         var start_radians = GLib.Math.atan2 (
             center_y - initial_y,
             initial_x - center_x
         );
 
+        double current_x, current_y, current_scale, current_rotation;
+        selected_item.get_simple_transform (out current_x, out current_y, out current_scale, out current_rotation);
         var radians = GLib.Math.atan2 (center_y - y, x - center_x);
         radians = start_radians - radians;
-        double rotation = radians * (180 / Math.PI);
+        var rotation = radians * (180 / Math.PI) + prev_rotation_difference;
 
         initial_x = x;
         initial_y = y;
 
-        canvas.convert_from_item_space (selected_item, ref initial_x, ref initial_y);
-        set_rotation (selected_item.rotation + rotation, selected_item);
-        canvas.convert_to_item_space (selected_item, ref initial_x, ref initial_y);
+        if ((canvas as Akira.Lib.Canvas).ctrl_is_pressed) {
+            do_rotation = false;
+
+            if (rotation.abs () > ROTATION_FIXED_STEP) {
+                do_rotation = true;
+
+                // The rotation amount needs to take into consideration
+                // the current rotation in order to anchor the item to truly
+                // "fixed" rotation step instead of simply adding ROTATION_FIXED_STEP
+                // to the current rotation, which might lead to a situation in which you
+                // cannot "reset" item rotation to rounded values (0, 90, 180, ...) without
+                // manually resetting the rotation input field in the properties panel
+                var current_rotation_int = ((int) GLib.Math.round (current_rotation));
+
+                rotation_amount = ROTATION_FIXED_STEP;
+
+                // Strange glitch: when current_rotation == 30.0, the fmod
+                // function does not work properly.
+                // 30.00000 % 15.00000 != 0 => rotation_amount becomes 0.
+                // That's why here is used the int representation of current_rotation
+                if (current_rotation_int % ROTATION_FIXED_STEP != 0) {
+                    rotation_amount -= GLib.Math.fmod (current_rotation, ROTATION_FIXED_STEP);
+                }
+
+                var prev_rotation = rotation;
+                rotation = rotation > 0 ? rotation_amount : -rotation_amount;
+                prev_rotation_difference = prev_rotation - rotation;
+            }
+        } else {
+            prev_rotation_difference = 0.0;
+        }
+
+        if (do_rotation) {
+            canvas.convert_from_item_space (selected_item, ref initial_x, ref initial_y);
+            // Round rotation in order to avoid sub degree issue
+            rotation = GLib.Math.round (rotation);
+            // Cap new_rotation to the [0, 360] range
+            var new_rotation = GLib.Math.fmod (selected_item.rotation + rotation, 360);
+            set_rotation (new_rotation, selected_item);
+            canvas.convert_to_item_space (selected_item, ref initial_x, ref initial_y);
+        }
     }
 
     public static void set_position (double? x, double? y, CanvasItem item) {
@@ -265,7 +310,7 @@ public class Akira.Utils.AffineTransform : Object {
     */
 
     private static double fix_size (double size) {
-        var new_size = Math.round (size);
+        var new_size = GLib.Math.round (size);
         return new_size > MIN_SIZE ? new_size : MIN_SIZE;
     }
 }

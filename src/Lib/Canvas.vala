@@ -55,6 +55,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     private Managers.NobManager nob_manager;
     private Managers.HoverManager hover_manager;
 
+    public bool ctrl_is_pressed = false;
     private bool holding;
     private double current_scale = 1.0;
     private double bounds_x;
@@ -141,6 +142,11 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 }
                 return true;
 
+            case Gdk.Key.Control_L:
+            case Gdk.Key.Control_R:
+                ctrl_is_pressed = true;
+                return true;
+
             default:
                 // Send to ItemsManager to deal with custom user shape
                 // hotkey preferences from settings
@@ -159,6 +165,11 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         switch (uppercase_keyval) {
             case Gdk.Key.space:
                 edit_mode = EditMode.MODE_SELECTION;
+                return true;
+
+            case Gdk.Key.Control_L:
+            case Gdk.Key.Control_R:
+                ctrl_is_pressed = false;
                 return true;
 
             default:
