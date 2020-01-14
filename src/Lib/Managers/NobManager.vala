@@ -44,7 +44,7 @@ public class Akira.Lib.Managers.NobManager : Object {
         ROTATE
     }
 
-    public weak Goo.Canvas canvas { get; construct; }
+    public weak Akira.Lib.Canvas canvas { get; construct; }
 
     public Nob selected_nob;
 
@@ -59,7 +59,7 @@ public class Akira.Lib.Managers.NobManager : Object {
     private double nob_size;
     private double current_scale = 1.0;
 
-    public NobManager (Goo.Canvas canvas) {
+    public NobManager (Akira.Lib.Canvas canvas) {
         Object (
             canvas: canvas
         );
@@ -68,8 +68,8 @@ public class Akira.Lib.Managers.NobManager : Object {
     construct {
         root = canvas.get_root_item ();
 
-        event_bus.selected_items_changed.connect (on_add_select_effect);
-        event_bus.zoom.connect (on_zoom);
+        canvas.window.event_bus.selected_items_changed.connect (on_add_select_effect);
+        canvas.window.event_bus.zoom.connect (on_zoom);
     }
 
     public void set_selected_by_name (Nob selected_nob) {

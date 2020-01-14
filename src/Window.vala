@@ -23,6 +23,7 @@ public class Akira.Window : Gtk.ApplicationWindow {
     public FileFormat.AkiraFile? akira_file = null;
 
     public weak Akira.Application app { get; construct; }
+    public Akira.Services.EventBus event_bus;
 
     public Akira.Services.ActionManager action_manager;
     public Akira.Layouts.HeaderBar headerbar;
@@ -47,6 +48,7 @@ public class Akira.Window : Gtk.ApplicationWindow {
         accel_group = new Gtk.AccelGroup ();
         add_accel_group (accel_group);
 
+        event_bus = new Akira.Services.EventBus ();
         action_manager = new Akira.Services.ActionManager (app, this);
         headerbar = new Akira.Layouts.HeaderBar (this);
         main_window = new Akira.Layouts.MainWindow (this);
@@ -101,7 +103,11 @@ public class Akira.Window : Gtk.ApplicationWindow {
         }
 
         if (edited) {
-            confirmed = dialogs.message_dialog (_("Are you sure you want to quit?"), _("All unsaved data will be lost and impossible to recover."), "system-shutdown", _("Yes, Quit!"));
+            confirmed = dialogs.message_dialog (
+                _("Are you sure you want to quit?"),
+                _("All unsaved data will be lost and impossible to recover."),
+                "system-shutdown",
+                _("Yes, Quit!"));
 
             if (confirmed) {
                 app.get_active_window ().destroy ();

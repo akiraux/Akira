@@ -16,29 +16,28 @@
  * You should have received a copy of the GNU General Public License
  * along with Akira. If not, see <https://www.gnu.org/licenses/>.
  *
- * Authored by: Giacomo "giacomoalbe" Alberini <giacomoalbe@gmail.com>
  * Authored by: Alessandro "alecaddd" Castellani <castellani.ale@gmail.com>
  */
 
-public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
+public class Akira.Layouts.Partials.BorderItem : Gtk.Grid {
     public weak Akira.Window window { get; construct; }
 
-    private Gtk.Grid fill_chooser;
+    private Gtk.Grid color_chooser;
     private Gtk.Button hidden_button;
     private Gtk.Button delete_button;
     private Gtk.Image hidden_button_icon;
     private Gtk.MenuButton selected_color;
-    public Akira.Partials.InputField opacity_container;
+    public Akira.Partials.InputField tickness_container;
     public Gtk.Entry color_container;
     private Gtk.Popover color_popover;
     private Gtk.Grid color_picker;
     private Gtk.ColorChooserWidget color_chooser_widget;
 
-    public Akira.Models.FillsItemModel model { get; construct; }
+    public Akira.Models.BordersItemModel model { get; construct; }
 
     private string old_color;
 
-    // If the color or alpha are manually set from the ColorPicker.
+    // If the color is manually set from the ColorPicker.
     // If true, the ColorChooserWidget doesn't need to be updated.
     private bool color_set_manually = false;
     private string color {
@@ -57,6 +56,14 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         }
     }
 
+    private int border_size {
+        owned get {
+            return model.border_size;
+        } set {
+            model.border_size = value;
+        }
+    }
+
     private bool hidden {
         owned get {
             return model.hidden;
@@ -67,7 +74,7 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         }
     }
 
-    public FillItem (Akira.Window window, Akira.Models.FillsItemModel model) {
+    public BorderItem (Akira.Window window, Akira.Models.BordersItemModel model) {
         Object (
             window: window,
             model: model
@@ -94,9 +101,9 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
     private void create_ui () {
         margin_top = margin_bottom = 5;
 
-        fill_chooser = new Gtk.Grid ();
-        fill_chooser.hexpand = true;
-        fill_chooser.margin_end = 5;
+        color_chooser = new Gtk.Grid ();
+        color_chooser.hexpand = true;
+        color_chooser.margin_end = 5;
 
         color_popover = new Gtk.Popover (color_picker);
         color_popover.position = Gtk.PositionType.BOTTOM;
@@ -191,42 +198,29 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
             }
         });
 
-        opacity_container = new Akira.Partials.InputField (
-            Akira.Partials.InputField.Unit.PERCENTAGE, 7, true, true);
-        opacity_container.entry.sensitive = true;
-        opacity_container.entry.text = Math.round ((double) alpha / 255 * 100).to_string ();
+        tickness_container = new Akira.Partials.InputField (
+            Akira.Partials.InputField.Unit.PIXEL, 7, true, true);
+        tickness_container.entry.sensitive = true;
+        tickness_container.entry.text = border_size.to_string ();
 
-        opacity_container.entry.bind_property (
-            "text", model, "alpha",
+        tickness_container.entry.bind_property (
+            "text", model, "border_size",
             BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE,
             // this => model
-            (binding, entry_text_val, ref model_alpha_val) => {
-                color_set_manually = false;
-                double src = double.parse (entry_text_val.dup_string ());
-
-                if (src > 100) {
-                    src = 100.0;
-                    opacity_container.entry.text = "100";
-                } else if (src < 0) {
-                    src = 0.0;
-                    opacity_container.entry.text = "0";
+            (binding, entry_text_val, ref model_border_val) => {
+                int src = int.parse (entry_text_val.dup_string ());
+                if (src < 0) {
+                    src = 0;
+                    tickness_container.entry.text = "0";
                 }
-                int alpha_int_value = (int) (src / 100 * 255);
-                model_alpha_val.set_int (alpha_int_value);
-                return true;
-            },
-            // model => this
-            (binding, model_alpha_val, ref entry_text_val) => {
-                entry_text_val.set_string (("%i").printf (
-                    ((model_alpha_val.get_int () * 100) / 255)
-                ));
+                model_border_val.set_int (src);
                 return true;
             }
         );
 
-        fill_chooser.attach (picker_container, 0, 0, 1, 1);
-        fill_chooser.attach (color_container, 1, 0, 1, 1);
-        fill_chooser.attach (opacity_container, 2, 0, 1, 1);
+        color_chooser.attach (picker_container, 0, 0, 1, 1);
+        color_chooser.attach (color_container, 1, 0, 1, 1);
+        color_chooser.attach (tickness_container, 2, 0, 1, 1);
 
         hidden_button = new Gtk.Button ();
         hidden_button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
@@ -252,7 +246,7 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         color_picker.show_all ();
         color_popover.add (color_picker);
 
-        attach (fill_chooser, 0, 0, 1, 1);
+        attach (color_chooser, 0, 0, 1, 1);
         attach (hidden_button, 1, 0, 1, 1);
         attach (delete_button, 2, 0, 1, 1);
 
@@ -282,7 +276,7 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
     private void on_delete_item () {
         model.list_model.remove_item.begin (model);
         model.item.reset_colors ();
-        window.event_bus.fill_deleted ();
+        window.event_bus.border_deleted ();
     }
 
     private void set_hidden_button () {

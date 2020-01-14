@@ -20,12 +20,15 @@
 */
 
 public class Akira.Partials.HeaderBarButton : Gtk.Grid {
+    public weak Akira.Window window;
     public Gtk.Button button;
     private Gtk.Label label_btn;
     public Akira.Partials.ButtonImage image;
     public string? sensitive_type;
 
-    public HeaderBarButton (string icon_name, string name, string[]? accels = null, string? type = null) {
+    public HeaderBarButton (Akira.Window _window, string icon_name, string name,
+        string[]? accels = null,string? type = null) {
+        window = _window;
         sensitive_type = type;
         label_btn = new Gtk.Label (name);
         label_btn.get_style_context ().add_class ("headerbar-label");
@@ -59,7 +62,7 @@ public class Akira.Partials.HeaderBarButton : Gtk.Grid {
     }
 
     private void build_signals () {
-        event_bus.change_sensitivity.connect ((type) => {
+        window.event_bus.change_sensitivity.connect ((type) => {
             if (type == sensitive_type) {
                 sensitive = !sensitive;
             }
