@@ -47,6 +47,10 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         canvas.window.event_bus.request_selection_bound_transform.connect (
             on_request_selection_bound_transform
         );
+
+        canvas.window.event_bus.item_bound_changed.connect (
+            on_item_bound_changed
+        );
     }
 
     construct {
@@ -174,6 +178,10 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
                 break;
         }
 
+        update_selected_items ();
+    }
+
+    private void on_item_bound_changed (Lib.Models.CanvasItem item) {
         update_selected_items ();
     }
 }

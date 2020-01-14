@@ -23,7 +23,17 @@ public class Akira.Lib.Models.CanvasImage : Goo.CanvasImage, CanvasItem {
     public string id { get; set; }
     public bool selected { get; set; }
     public double rotation { get; set; }
-    public double opacity { get; set; }
+    
+    public double opacity { 
+        get {
+            return alpha * 100.0;
+        }
+
+        set {
+            set ("alpha", value / 100.0);
+        }
+    }
+    
     public bool has_fill { get; set; default = false; }
     public int fill_alpha { get; set; }
     public Gdk.RGBA color { get; set; }
@@ -35,28 +45,37 @@ public class Akira.Lib.Models.CanvasImage : Goo.CanvasImage, CanvasItem {
     public bool hidden_border { get; set; }
     public Models.CanvasItemType item_type { get; set; }
 
-    public CanvasImage (Akira.Services.ImageProvider provider, Goo.CanvasItem? parent = null) {
+    public CanvasImage (Akira.Services.EventBus event_bus, Akira.Services.ImageProvider provider, Goo.CanvasItem? parent = null) {
         Object (parent: parent);
 
         item_type = Models.CanvasItemType.IMAGE;
         id = Models.CanvasItem.create_item_id (this);
         Models.CanvasItem.init_item (this);
 
-
-        width = 100;
-        height = 100;
+        width = 1;
+        height = 1;
         x = 0;
         y = 0;
+        scale_to_fit = true;
 
         set_transform (Cairo.Matrix.identity ());
 
         provider.get_pixbuf.begin (-1, -1, (obj, res) => {
             try {
-                pixbuf = provider.get_pixbuf.end (res);
-            } catch (Error e) {
+                var _pixbuf = provider.get_pixbuf.end (res);
+                pixbuf = _pixbuf;
+                width = _pixbuf.get_width ();
+                height = _pixbuf.get_height ();
+                event_bus.item_bound_changed (this);
+        } catch (Error e) {
                 warning (e.message);
                 // TODO: handle error here
             }
         });
+
+        reset_colors ();
+    }
+
+    public void reset_colors () {
     }
 }

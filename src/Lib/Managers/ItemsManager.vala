@@ -26,8 +26,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
     public enum InsertType {
         RECT,
         ELLIPSE,
-        TEXT,
-        IMAGE
+        TEXT
     }
 
     private List<Models.CanvasItem> items;
@@ -71,11 +70,6 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             case Gdk.Key.T:
                 set_item_to_insert ("text");
                 break;
-
-            case Gdk.Key.I:
-                set_item_to_insert ("image");
-                break;
-
             default:
                 return false;
         }
@@ -100,10 +94,6 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             case InsertType.TEXT:
                 new_item = add_text (event);
                 break;
-
-            //  case InsertType.IMAGE:
-            //      new_item = add_image (event);
-            //      break;
             default:
                 new_item = null;
                 break;
@@ -199,12 +189,6 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         return text;
     }
 
-    public Models.CanvasImage add_image (Gdk.EventButton event) {
-        //  var image = new Models.CanvasImage (root);
-        //  return image;
-        return null;
-    }
-
     private void set_item_to_insert (string type) {
         switch (type) {
             case "rectangle":
@@ -217,10 +201,6 @@ public class Akira.Lib.Managers.ItemsManager : Object {
 
             case "text":
                 insert_type = InsertType.TEXT;
-                break;
-            
-            case "image":
-                insert_type = InsertType.IMAGE;
                 break;
         }
     }

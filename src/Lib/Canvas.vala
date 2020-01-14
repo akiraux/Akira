@@ -89,10 +89,16 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
     public void insert_item_default (Akira.Lib.Models.CanvasItem item, bool select = false) {
         items_manager.add_item (item);
+        // TODO: place in the viewport
+        Utils.AffineTransform.set_position (
+            Akira.Layouts.MainCanvas.CANVAS_SIZE / 2,
+            Akira.Layouts.MainCanvas.CANVAS_SIZE / 2,
+            item    
+        );
+
         if (select) {
             selected_bound_manager.reset_selection ();
             selected_bound_manager.add_item_to_selection (item);
-            selected_bound_manager.set_initial_coordinates (50000, 50000);
             nob_manager.selected_nob = Managers.NobManager.Nob.BOTTOM_RIGHT;
         }
     }

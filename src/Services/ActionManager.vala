@@ -227,6 +227,7 @@ public class Akira.Services.ActionManager : Object {
     }
 
     private void on_choose_image_response (Gtk.FileChooserNative dialog, int response_id) {
+        window.main_window.main_canvas.canvas.edit_mode = Akira.Lib.Canvas.EditMode.MODE_SELECTION;
         switch (response_id) {
             case Gtk.ResponseType.ACCEPT:
             case Gtk.ResponseType.OK:
@@ -234,9 +235,9 @@ public class Akira.Services.ActionManager : Object {
                 weak Akira.Lib.Canvas canvas = window.main_window.main_canvas.canvas;
                 files.@foreach ((file) => {
                     var provider = new Akira.Services.FileImageProvider (file);
-                    var item = new Akira.Lib.Models.CanvasImage (provider, canvas.get_root_item ());
+                    var item = new Akira.Lib.Models.CanvasImage (window.event_bus, provider, canvas.get_root_item ());
 
-                    canvas.insert_item_default (item);
+                    canvas.insert_item_default (item, true);
                 });
                 
                 break;

@@ -79,7 +79,7 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
         item.set ("stroke-alpha", 255);
     }
 
-    public void reset_colors () {
+    public virtual void reset_colors () {
         reset_fill ();
         reset_border ();
     }
