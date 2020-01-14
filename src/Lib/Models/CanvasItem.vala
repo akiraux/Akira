@@ -52,6 +52,9 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
     public abstract int stroke_alpha { get; set; }
     public abstract bool hidden_border { get; set; default = false; }
 
+    // Style Panel attributes.
+    public abstract bool has_border_radius { get; set; default = false; }
+
     public abstract Models.CanvasItemType item_type { get; set; }
 
     public double get_coords (string coord_id, bool convert_to_item_space = false) {

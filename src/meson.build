@@ -50,7 +50,7 @@ sources = files(
     'Layouts/Partials/FillItem.vala',
     'Layouts/Partials/BlendingModeItem.vala',
     'Layouts/Partials/TransformPanel.vala',
-    'Layouts/Partials/StylePanel.vala',
+    'Layouts/Partials/BorderRadiusPanel.vala',
     'Layouts/Partials/AlignItemsPanel.vala',
 
     'Partials/HeaderBarButton.vala',
