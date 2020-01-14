@@ -28,6 +28,7 @@ public class Akira.Lib.Managers.HoverManager : Object {
     private double initial_event_x;
     private double initial_event_y;
     private Goo.CanvasItem hover_effect;
+    private Lib.Managers.NobManager.Nob current_hovering_nob;
 
     public HoverManager (Akira.Lib.Canvas canvas) {
         Object (
@@ -42,11 +43,11 @@ public class Akira.Lib.Managers.HoverManager : Object {
 
     public void add_hover_effect (double event_x, double event_y) {
         remove_hover_effect ();
-        set_cursor_for_nob (Managers.NobManager.Nob.NONE);
 
         var target = canvas.get_item_at (event_x, event_y, true);
 
         if (target == null) {
+            set_cursor_for_nob (Managers.NobManager.Nob.NONE);
             return;
         }
 
@@ -86,6 +87,8 @@ public class Akira.Lib.Managers.HoverManager : Object {
                 hover_effect.set ("parent", canvas.get_root_item ());
                 hover_effect.can_focus = false;
             }
+
+            set_cursor_for_nob (Managers.NobManager.Nob.NONE);
         }
 
         if (target is Selection.Nob) {
@@ -103,7 +106,7 @@ public class Akira.Lib.Managers.HoverManager : Object {
         }
     }
 
-    private void set_cursor_for_nob (int grabbed_id) {
+    private void set_cursor_for_nob (Lib.Managers.NobManager.Nob grabbed_id) {
         Gdk.CursorType? selected_cursor = null;
 
         switch (grabbed_id) {
@@ -139,6 +142,9 @@ public class Akira.Lib.Managers.HoverManager : Object {
                 break;
         }
 
-        canvas.window.event_bus.request_change_cursor (selected_cursor);
+        if (grabbed_id != current_hovering_nob) {
+            canvas.window.event_bus.request_change_cursor (selected_cursor);
+            current_hovering_nob = grabbed_id;
+        }
     }
 }

@@ -49,7 +49,7 @@ sources = files(
     'Layouts/Partials/FillItem.vala',
     'Layouts/Partials/BlendingModeItem.vala',
     'Layouts/Partials/TransformPanel.vala',
-    'Layouts/Partials/StylePanel.vala',
+    'Layouts/Partials/BorderRadiusPanel.vala',
     'Layouts/Partials/AlignItemsPanel.vala',
 
     'Partials/HeaderBarButton.vala',
@@ -64,6 +64,7 @@ sources = files(
 
     'Models/BordersItemModel.vala',
     'Models/FillsItemModel.vala',
+    'Models/ItemModel.vala',
     'Models/ListModel.vala',
 
     'Widgets/SettingsDialog.vala',
