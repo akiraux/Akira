@@ -22,6 +22,8 @@
 public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
     public weak Akira.Window window { get; construct; }
 
+    private Lib.Models.CanvasItem selected_item;
+
     public Akira.Partials.HeaderBarButton new_document;
     public Akira.Partials.HeaderBarButton save_file;
     public Akira.Partials.HeaderBarButton save_file_as;
@@ -83,22 +85,22 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
         move_up = new Akira.Partials.HeaderBarButton (window, "selection-raise",
             _("Up"), {"<Ctrl>Up"}, "single");
         move_up.button.clicked.connect (() => {
-            //window.main_window.main_canvas.canvas.change_z_selected (true, false);
+            window.event_bus.change_z_selected (true, false);
         });
         move_down = new Akira.Partials.HeaderBarButton (window, "selection-lower",
             _("Down"), {"<Ctrl>Down"}, "single");
         move_down.button.clicked.connect (() => {
-            //window.main_window.main_canvas.canvas.change_z_selected (false, false);
+            window.event_bus.change_z_selected (false, false);
         });
         move_top = new Akira.Partials.HeaderBarButton (window, "selection-top",
             _("Top"), {"<Ctrl><Shift>Up"}, "single");
         move_top.button.clicked.connect (() => {
-            //window.main_window.main_canvas.canvas.change_z_selected (true, true);
+            window.event_bus.change_z_selected (true, true);
         });
         move_bottom = new Akira.Partials.HeaderBarButton (window, "selection-bottom",
             _("Bottom"), {"<Ctrl><Shift>Down"}, "single");
         move_bottom.button.clicked.connect (() => {
-            //window.main_window.main_canvas.canvas.change_z_selected (false, true);
+            window.event_bus.change_z_selected (false, true);
         });
 
         preferences = new Akira.Partials.HeaderBarButton (window, "open-menu",
@@ -319,6 +321,9 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
         window.event_bus.close_popover.connect (() => {
             popover_insert.closed ();
         });
+
+        window.event_bus.selected_items_changed.connect (on_selected_items_changed);
+        window.event_bus.z_selected_changed.connect (update_button_sensitivity);
     }
 
     public void toggle () {
@@ -331,5 +336,45 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
      */
     public void fetch_recent_files () {
         recent_files_grid.show_all ();
+    }
+
+    private void on_selected_items_changed (List<Lib.Models.CanvasItem> selected_items) {
+        if (selected_items.length () == 0) {
+            selected_item = null;
+            update_button_sensitivity ();
+            return;
+        }
+
+        if (selected_item == null || selected_item != selected_items.nth_data (0)) {
+            selected_item = selected_items.nth_data (0);
+            update_button_sensitivity ();
+        }
+    }
+
+    private void update_button_sensitivity () {
+        move_up.sensitive = (selected_item != null);
+        move_down.sensitive = (selected_item != null);
+        move_top.sensitive = (selected_item != null);
+        move_bottom.sensitive = (selected_item != null);
+
+        if (selected_item == null) {
+            return;
+        }
+
+        var root_item = selected_item.get_canvas ().get_root_item ();
+        var item_position = root_item.find_child (selected_item);
+        if (item_position == 0) {
+            move_down.sensitive = false;
+            move_bottom.sensitive = false;
+        }
+
+        var top_position = root_item.get_n_children () - 1;
+        if (item_position == top_position) {
+            move_up.sensitive = false;
+            move_top.sensitive = false;
+        }
+
+        //  debug (item_position.to_string ());
+        //  debug (top_position.to_string ());
     }
 }

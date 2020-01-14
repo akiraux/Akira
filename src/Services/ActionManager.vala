@@ -171,19 +171,19 @@ public class Akira.Services.ActionManager : Object {
     }
 
     private void action_move_up () {
-        //window.main_window.main_canvas.canvas.change_z_selected (true, false);
+        window.event_bus.change_z_selected (true, false);
     }
 
     private void action_move_down () {
-        //window.main_window.main_canvas.canvas.change_z_selected (false, false);
+        window.event_bus.change_z_selected (false, false);
     }
 
     private void action_move_top () {
-        //window.main_window.main_canvas.canvas.change_z_selected (true, true);
+        window.event_bus.change_z_selected (true, true);
     }
 
     private void action_move_bottom () {
-        //window.main_window.main_canvas.canvas.change_z_selected (false, true);
+        window.event_bus.change_z_selected (false, true);
     }
 
     private void action_rect_tool () {
