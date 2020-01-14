@@ -1,23 +1,23 @@
 /*
-* Copyright (c) 2019 Alecaddd (http://alecaddd.com)
+* Copyright (c) 2019 Alecaddd (https://alecaddd.com)
 *
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public
-* License as published by the Free Software Foundation; either
-* version 2 of the License, or (at your option) any later version.
+* This file is part of Akira.
 *
-* This program is distributed in the hope that it will be useful,
+* Akira is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+
+* Akira is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* General Public License for more details.
-*
-* You should have received a copy of the GNU General Public
-* License along with this program; if not, write to the
-* Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
-* Boston, MA 02110-1301 USA
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+
+* You should have received a copy of the GNU General Public License
+* along with Akira. If not, see <https://www.gnu.org/licenses/>.
 *
 * Authored by: Ana Gelez <ana@gelez.xyz>
-* Edited by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
+* Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
 public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
     public weak Akira.Window window { get; construct; }
@@ -52,11 +52,6 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         get {
             return _item;
         } set {
-
-            if (_item != null) {
-                _item.notify.disconnect (item_changed);
-            }
-
             _item = value;
 
             bool has_item = _item != null;
@@ -82,7 +77,6 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
             scale.sensitive = has_item;
 
             if (_item != null) {
-                _item.notify.connect (item_changed);
                 update_fields ();
             }
         }
@@ -184,7 +178,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
                 return true;
             }, (binding, srcval, ref targetval) => {
                 double src = (double) srcval;
-                targetval.set_string (("%0.1f").printf (src));
+                targetval.set_string (("%0.0f").printf (src));
                 return true;
             }
         );
@@ -219,7 +213,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         attach (group_title (_("Opacity")), 0, 9, 3);
         attach (opacity_grid, 0, 10, 3);
 
-        event_bus.selected_items_changed.connect (on_selected_items_changed);
+        window.event_bus.selected_items_changed.connect (on_selected_items_changed);
     }
 
     private void on_selected_items_changed (List<Lib.Models.CanvasItem> selected_items) {
@@ -229,11 +223,6 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         }
 
         item = selected_items.nth_data (0);
-    }
-
-    private void item_changed (Object object, ParamSpec spec) {
-        //  debug ("item changed, param: %s", spec.name);
-        update_fields ();
     }
 
     private void reset_values () {
@@ -318,46 +307,28 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
        transform.rotate (radians);
        transform.translate (-center_x, -center_y);
        item.set_transform (transform);
-
-       //window.main_window.main_canvas.canvas.update_decorations (item);
     }
 
     public void opacity_notify_value () {
-        var item_simple = (Goo.CanvasItemSimple) item;
-
-        int? fill_a = item.fill_alpha;
-        int? stroke_a = item.stroke_alpha;
-
-        var opacity_factor = double.parse (opacity_entry.entry.text) / 100;
-
-        uint fill_color_rgba = item_simple.fill_color_rgba;
-        uint stroke_color_rgba = item_simple.stroke_color_rgba;
-        fill_rgb = fill_color_rgba & 0xFFFFFF00;
-        stroke_rgb = stroke_color_rgba & 0xFFFFFF00;
-
-        item_simple.notify.disconnect (item_changed);
-
-        item.opacity = opacity_factor * 100;
-        item_simple.fill_color_rgba = (uint) (fill_rgb + (fill_a * opacity_factor));
-        item_simple.stroke_color_rgba = (uint) (stroke_rgb + (stroke_a * opacity_factor));
-
-        item_simple.notify.connect (item_changed);
+        var opacity_factor = double.parse (opacity_entry.entry.text);
+        item.opacity = opacity_factor;
+        item.reset_colors ();
     }
 
     public void y_notify_value () {
-        event_bus.request_selection_bound_transform ("y", y.value);
+        window.event_bus.request_selection_bound_transform ("y", y.value);
     }
 
     public void x_notify_value () {
-        event_bus.request_selection_bound_transform ("x", x.value);
+        window.event_bus.request_selection_bound_transform ("x", x.value);
     }
 
     public void rotation_notify_value () {
-        event_bus.request_selection_bound_transform ("rotation", rotation.value);
+        window.event_bus.request_selection_bound_transform ("rotation", rotation.value);
     }
 
     public void height_notify_value () {
-        event_bus.request_selection_bound_transform ("height", height.value);
+        window.event_bus.request_selection_bound_transform ("height", height.value);
 
         if (size_lock) {
             width.value = height.value * size_ratio;
@@ -367,7 +338,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
     }
 
     public void width_notify_value () {
-        event_bus.request_selection_bound_transform ("width", width.value);
+        window.event_bus.request_selection_bound_transform ("width", width.value);
 
         if (size_lock) {
             height.value = width.value / size_ratio;

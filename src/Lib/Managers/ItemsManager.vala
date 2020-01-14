@@ -21,7 +21,7 @@
 
 
 public class Akira.Lib.Managers.ItemsManager : Object {
-    public weak Goo.Canvas canvas { get; construct; }
+    public weak Akira.Lib.Canvas canvas { get; construct; }
 
     public enum InsertType {
         RECT,
@@ -32,11 +32,11 @@ public class Akira.Lib.Managers.ItemsManager : Object {
     private List<Models.CanvasItem> items;
     private InsertType? insert_type { get; set; }
     private Goo.CanvasItem root;
-    private double border_size;
-    private string border_color;
-    private string fill_color;
+    private int border_size;
+    private Gdk.RGBA border_color;
+    private Gdk.RGBA fill_color;
 
-    public ItemsManager (Goo.Canvas canvas) {
+    public ItemsManager (Akira.Lib.Canvas canvas) {
         Object (
             canvas: canvas
         );
@@ -46,7 +46,10 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         root = canvas.get_root_item ();
         items = new List<Models.CanvasItem> ();
 
-        event_bus.insert_item.connect (set_item_to_insert);
+        border_color = Gdk.RGBA ();
+        fill_color = Gdk.RGBA ();
+
+        canvas.window.event_bus.insert_item.connect (set_item_to_insert);
     }
 
     public bool set_insert_type_from_key (uint keyval) {
@@ -201,8 +204,12 @@ public class Akira.Lib.Managers.ItemsManager : Object {
     }
 
     private void udpate_default_values () {
-        border_size = settings.set_border ? settings.border_size : 0.0;
-        border_color = settings.set_border ? settings.border_color: "";
-        fill_color = settings.fill_color;
+        fill_color.parse (settings.fill_color);
+
+        // Do not set the border if the user disabled it.
+        if (settings.set_border) {
+            border_size = (int) settings.border_size;
+            border_color.parse (settings.border_color);
+        }
     }
 }

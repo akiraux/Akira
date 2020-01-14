@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2019 Alecaddd (http://alecaddd.com)
+* Copyright (c) 2019 Alecaddd (https://alecaddd.com)
 *
 * This file is part of Akira.
 *
@@ -14,19 +14,30 @@
 * GNU General Public License for more details.
 
 * You should have received a copy of the GNU General Public License
-* along with Akira.  If not, see <https://www.gnu.org/licenses/>.
+* along with Akira. If not, see <https://www.gnu.org/licenses/>.
 *
 * Authored by: Giacomo Alberini <giacomoalbe@gmail.com>
+* Authored by: Alessandro "alecaddd" Castellani <castellani.ale@gmail.com>
 */
 
 public class Akira.Lib.Models.CanvasRect : Goo.CanvasRect, Models.CanvasItem {
-
     public string id { get; set; }
     public bool selected { get; set; }
-    public double opacity { get; public set; }
-    public double rotation { get; public set; }
+    public double rotation { get; set; }
+    public double opacity { get; set; }
+    public bool has_fill { get; set; default = true; }
     public int fill_alpha { get; set; }
+    public Gdk.RGBA color { get; set; }
+    public bool hidden_fill { get; set; }
+    public bool has_border { get; set; default = true; }
+    public int border_size { get; set; }
+    public Gdk.RGBA border_color { get; set; }
     public int stroke_alpha { get; set; }
+    public bool hidden_border { get; set; }
+    public bool has_border_radius { get; set; }
+    public bool is_radius_uniform { get; set; }
+    public bool is_radius_autoscale { get; set; }
+
     public Models.CanvasItemType item_type { get; set; }
 
     public CanvasRect (
@@ -34,11 +45,11 @@ public class Akira.Lib.Models.CanvasRect : Goo.CanvasRect, Models.CanvasItem {
         double _y = 0,
         double _radius_x = 0,
         double _radius_y = 0,
-        double _border_size = 1.0,
-        string _border_color = "#aaa",
-        string _fill_color = "#ccc",
+        int _border_size = 1,
+        Gdk.RGBA _border_color,
+        Gdk.RGBA _fill_color,
         Goo.CanvasItem? parent = null
-    ) {
+        ) {
         Object (
             parent: parent
         );
@@ -54,6 +65,9 @@ public class Akira.Lib.Models.CanvasRect : Goo.CanvasRect, Models.CanvasItem {
         height = 1;
         x = 0;
         y = 0;
+        has_border_radius = true;
+        is_radius_uniform = true;
+        is_radius_autoscale = false;
 
         set_transform (Cairo.Matrix.identity ());
 
@@ -61,8 +75,21 @@ public class Akira.Lib.Models.CanvasRect : Goo.CanvasRect, Models.CanvasItem {
         // move the entire coordinate system every time
         translate (_x, _y);
 
-        set ("line-width", _border_size);
-        set ("fill-color", _fill_color);
-        set ("stroke-color", _border_color);
+        color = _fill_color;
+        has_border = settings.set_border;
+        if (has_border) {
+            border_color = _border_color;
+            border_size = _border_size;
+        }
+        reset_colors ();
+    }
+
+    public void update_border () {
+        if (is_radius_uniform) {
+            set ("radius-x", radius_x);
+            set ("radius-y", radius_x);
+        }
+
+        // TODO: handle uneven border radius.
     }
 }

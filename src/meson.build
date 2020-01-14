@@ -32,6 +32,7 @@ sources = files(
     'Utils/Dialogs.vala',
     'Utils/BlendingMode.vala',
     'Utils/AffineTransform.vala',
+    'Utils/Color.vala',
 
     'Layouts/HeaderBar.vala',
     'Layouts/LeftSideBar.vala',
@@ -42,11 +43,13 @@ sources = files(
     'Layouts/Partials/PagesPanel.vala',
     'Layouts/Partials/Artboard.vala',
     'Layouts/Partials/Layer.vala',
-    'Layouts/Partials/FillsBoxPanel.vala',
+    'Layouts/Partials/BordersPanel.vala',
+    'Layouts/Partials/BorderItem.vala',
+    'Layouts/Partials/FillsPanel.vala',
     'Layouts/Partials/FillItem.vala',
     'Layouts/Partials/BlendingModeItem.vala',
     'Layouts/Partials/TransformPanel.vala',
-    'Layouts/Partials/StylePanel.vala',
+    'Layouts/Partials/BorderRadiusPanel.vala',
     'Layouts/Partials/AlignItemsPanel.vala',
 
     'Partials/HeaderBarButton.vala',
@@ -59,8 +62,10 @@ sources = files(
     'Partials/PanelSeparator.vala',
     'Partials/PopoverButton.vala',
 
+    'Models/BordersItemModel.vala',
     'Models/FillsItemModel.vala',
-    'Models/FillsListModel.vala',
+    'Models/ItemModel.vala',
+    'Models/ListModel.vala',
 
     'Widgets/SettingsDialog.vala',
 
