@@ -94,6 +94,7 @@ public class Akira.Services.ActionManager : Object {
         action_accelerators.set (ACTION_PREFERENCES, "<Control>comma");
         action_accelerators.set (ACTION_EXPORT, "<Control><Shift>e");
         action_accelerators.set (ACTION_QUIT, "<Control>q");
+        action_accelerators.set (ACTION_ZOOM_IN, "<Control>equal");
         action_accelerators.set (ACTION_ZOOM_IN, "<Control>plus");
         action_accelerators.set (ACTION_ZOOM_OUT, "<Control>minus");
         action_accelerators.set (ACTION_ZOOM_RESET, "<Control>0");
@@ -148,8 +149,7 @@ public class Akira.Services.ActionManager : Object {
     }
 
     private void action_preferences () {
-        var settings_dialog = new Akira.Widgets.SettingsDialog ();
-        settings_dialog.transient_for = window;
+        var settings_dialog = new Akira.Widgets.SettingsDialog (window);
         settings_dialog.show_all ();
         settings_dialog.present ();
     }
@@ -171,46 +171,49 @@ public class Akira.Services.ActionManager : Object {
     }
 
     private void action_move_up () {
-        window.main_window.main_canvas.canvas.change_z_selected (true, false);
+        //window.main_window.main_canvas.canvas.change_z_selected (true, false);
     }
 
     private void action_move_down () {
-        window.main_window.main_canvas.canvas.change_z_selected (false, false);
+        //window.main_window.main_canvas.canvas.change_z_selected (false, false);
     }
 
     private void action_move_top () {
-        window.main_window.main_canvas.canvas.change_z_selected (true, true);
+        //window.main_window.main_canvas.canvas.change_z_selected (true, true);
     }
 
     private void action_move_bottom () {
-        window.main_window.main_canvas.canvas.change_z_selected (false, true);
+        //window.main_window.main_canvas.canvas.change_z_selected (false, true);
     }
 
     private void action_rect_tool () {
         window.main_window.main_canvas.canvas.edit_mode = Akira.Lib.Canvas.EditMode.MODE_INSERT;
-        window.main_window.main_canvas.canvas.insert_type = Akira.Lib.Canvas.InsertType.RECT;
-        event_bus.emit ("close-popover", "insert");
+        //window.main_window.main_canvas.canvas.insert_type = Akira.Lib.Canvas.InsertType.RECT;
+        window.event_bus.insert_item ("rectangle");
+        window.event_bus.close_popover ("insert");
     }
 
     private void action_selection_tool () {
         window.main_window.main_canvas.canvas.edit_mode = Akira.Lib.Canvas.EditMode.MODE_SELECTION;
-        window.main_window.main_canvas.canvas.insert_type = null;
+        //window.main_window.main_canvas.canvas.insert_type = null;
     }
 
     private void action_delete () {
-        window.main_window.main_canvas.canvas.delete_selected ();
+        //window.main_window.main_canvas.canvas.delete_selected ();
     }
 
     private void action_ellipse_tool () {
         window.main_window.main_canvas.canvas.edit_mode = Akira.Lib.Canvas.EditMode.MODE_INSERT;
-        window.main_window.main_canvas.canvas.insert_type = Akira.Lib.Canvas.InsertType.ELLIPSE;
-        event_bus.emit ("close-popover", "insert");
+        //window.main_window.main_canvas.canvas.insert_type = Akira.Lib.Canvas.InsertType.ELLIPSE;
+        window.event_bus.insert_item ("ellipse");
+        window.event_bus.close_popover ("insert");
     }
 
     private void action_text_tool () {
         window.main_window.main_canvas.canvas.edit_mode = Akira.Lib.Canvas.EditMode.MODE_INSERT;
-        window.main_window.main_canvas.canvas.insert_type = Akira.Lib.Canvas.InsertType.TEXT;
-        event_bus.emit ("close-popover", "insert");
+        //window.main_window.main_canvas.canvas.insert_type = Akira.Lib.Canvas.InsertType.TEXT;
+        window.event_bus.insert_item ("text");
+        window.event_bus.close_popover ("insert");
     }
 
     public static void action_from_group (string action_name, ActionGroup? action_group) {
