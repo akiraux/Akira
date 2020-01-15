@@ -191,13 +191,14 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
 
         int target_item_pos;
         if (total) {
-            target_item_pos = raise ? (root_item.get_n_children () - 1): 0;
+            target_item_pos = raise ? (root_item.get_n_children () - 10): 0;
         } else {
             target_item_pos = pos_selected + (raise ? 1 : -1);
         }
 
         var target_item = root_item.get_child (target_item_pos);
-        if (target_item == null) {
+        // Don't change z-index if the target item is not an a CanvasItem (eg. nob or select_effect).
+        if (target_item == null || (!(target_item is Models.CanvasItem) && !total)) {
             return;
         }
 
@@ -207,7 +208,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
             selected_item.lower (target_item);
         }
 
-        canvas.window.event_bus.z_selected_changed ();
         update_selected_items ();
+        canvas.window.event_bus.z_selected_changed ();
     }
 }

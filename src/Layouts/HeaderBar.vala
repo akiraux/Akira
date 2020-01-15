@@ -323,7 +323,9 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
         });
 
         window.event_bus.selected_items_changed.connect (on_selected_items_changed);
-        window.event_bus.z_selected_changed.connect (update_button_sensitivity);
+        window.event_bus.z_selected_changed.connect (() => {
+            update_button_sensitivity (false);
+        });
     }
 
     public void toggle () {
@@ -341,17 +343,17 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
     private void on_selected_items_changed (List<Lib.Models.CanvasItem> selected_items) {
         if (selected_items.length () == 0) {
             selected_item = null;
-            update_button_sensitivity ();
+            update_button_sensitivity (true);
             return;
         }
 
         if (selected_item == null || selected_item != selected_items.nth_data (0)) {
             selected_item = selected_items.nth_data (0);
-            update_button_sensitivity ();
+            update_button_sensitivity (true);
         }
     }
 
-    private void update_button_sensitivity () {
+    private void update_button_sensitivity (bool selected) {
         move_up.sensitive = (selected_item != null);
         move_down.sensitive = (selected_item != null);
         move_top.sensitive = (selected_item != null);
@@ -368,13 +370,10 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
             move_bottom.sensitive = false;
         }
 
-        var top_position = root_item.get_n_children () - 1;
+        var top_position = root_item.get_n_children () - (selected ? 1 : 11);
         if (item_position == top_position) {
             move_up.sensitive = false;
             move_top.sensitive = false;
         }
-
-        //  debug (item_position.to_string ());
-        //  debug (top_position.to_string ());
     }
 }
