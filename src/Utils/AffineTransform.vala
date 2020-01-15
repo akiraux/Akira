@@ -193,34 +193,32 @@ public class Akira.Utils.AffineTransform : Object {
 
         if ((canvas as Akira.Lib.Canvas).ctrl_is_pressed) {
             do_rotation = false;
+        }
 
-            if (rotation.abs () > ROTATION_FIXED_STEP) {
-                do_rotation = true;
+        if ((canvas as Akira.Lib.Canvas).ctrl_is_pressed && rotation.abs () > ROTATION_FIXED_STEP) {
+            do_rotation = true;
 
-                // The rotation amount needs to take into consideration
-                // the current rotation in order to anchor the item to truly
-                // "fixed" rotation step instead of simply adding ROTATION_FIXED_STEP
-                // to the current rotation, which might lead to a situation in which you
-                // cannot "reset" item rotation to rounded values (0, 90, 180, ...) without
-                // manually resetting the rotation input field in the properties panel
-                var current_rotation_int = ((int) GLib.Math.round (current_rotation));
+            // The rotation amount needs to take into consideration
+            // the current rotation in order to anchor the item to truly
+            // "fixed" rotation step instead of simply adding ROTATION_FIXED_STEP
+            // to the current rotation, which might lead to a situation in which you
+            // cannot "reset" item rotation to rounded values (0, 90, 180, ...) without
+            // manually resetting the rotation input field in the properties panel
+            var current_rotation_int = ((int) GLib.Math.round (current_rotation));
 
-                rotation_amount = ROTATION_FIXED_STEP;
+            rotation_amount = ROTATION_FIXED_STEP;
 
-                // Strange glitch: when current_rotation == 30.0, the fmod
-                // function does not work properly.
-                // 30.00000 % 15.00000 != 0 => rotation_amount becomes 0.
-                // That's why here is used the int representation of current_rotation
-                if (current_rotation_int % ROTATION_FIXED_STEP != 0) {
-                    rotation_amount -= GLib.Math.fmod (current_rotation, ROTATION_FIXED_STEP);
-                }
-
-                var prev_rotation = rotation;
-                rotation = rotation > 0 ? rotation_amount : -rotation_amount;
-                prev_rotation_difference = prev_rotation - rotation;
+            // Strange glitch: when current_rotation == 30.0, the fmod
+            // function does not work properly.
+            // 30.00000 % 15.00000 != 0 => rotation_amount becomes 0.
+            // That's why here is used the int representation of current_rotation
+            if (current_rotation_int % ROTATION_FIXED_STEP != 0) {
+                rotation_amount -= GLib.Math.fmod (current_rotation, ROTATION_FIXED_STEP);
             }
-        } else {
-            prev_rotation_difference = 0.0;
+
+            var prev_rotation = rotation;
+            rotation = rotation > 0 ? rotation_amount : -rotation_amount;
+            prev_rotation_difference = prev_rotation - rotation;
         }
 
         if (do_rotation) {
@@ -232,6 +230,9 @@ public class Akira.Utils.AffineTransform : Object {
             set_rotation (new_rotation, selected_item);
             canvas.convert_to_item_space (selected_item, ref initial_x, ref initial_y);
         }
+
+        // Reset rotation to prevent infinite rotation loops.
+        prev_rotation_difference = 0.0;
     }
 
     public static void set_position (double? x, double? y, CanvasItem item) {
