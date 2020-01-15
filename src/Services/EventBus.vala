@@ -35,6 +35,8 @@ public class Akira.Services.EventBus : Object {
     public signal void set_focus_on_canvas ();
     public signal void fill_deleted ();
     public signal void border_deleted ();
+    public signal void change_z_selected (bool raise, bool total);
+    public signal void z_selected_changed ();
 
     public void test (string caller_id) {
         debug (@"Test from EventBus called by $(caller_id)");
