@@ -132,6 +132,11 @@ public class Akira.Layouts.Partials.BordersPanel : Gtk.Grid {
             toggled = true;
             selected_item = selected_items.nth_data (0);
 
+            if (!selected_item.show_border_panel) {
+                toggled = false;
+                return;
+            }
+
             if (!selected_item.has_border) {
                 add_btn.show ();
                 return;

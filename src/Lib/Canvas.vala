@@ -88,6 +88,26 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         window.event_bus.set_focus_on_canvas.connect (on_set_focus_on_canvas);
     }
 
+    public void insert_item_default (Akira.Lib.Models.CanvasItem item, bool select) {
+        double start_x, start_y, scale, rotation;
+        start_x = Akira.Layouts.MainCanvas.CANVAS_SIZE / 2;
+        start_y = Akira.Layouts.MainCanvas.CANVAS_SIZE / 2;
+
+        if (selected_bound_manager.selected_items.length () > 0) {
+            selected_bound_manager.selected_items.nth_data (0).get_simple_transform (
+                out start_x, out start_y, out scale, out rotation
+            );
+        }
+
+        items_manager.add_item (item);
+        Utils.AffineTransform.set_position (start_x, start_y, item);
+
+        if (select) {
+            selected_bound_manager.reset_selection ();
+            selected_bound_manager.add_item_to_selection (item);
+        }
+    }
+
     public void update_bounds () {
         get_bounds (out bounds_x, out bounds_y, out bounds_w, out bounds_h);
     }
