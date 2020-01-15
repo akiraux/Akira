@@ -34,7 +34,9 @@ public class Akira.Lib.Models.CanvasRect : Goo.CanvasRect, Models.CanvasItem {
     public Gdk.RGBA border_color { get; set; }
     public int stroke_alpha { get; set; }
     public bool hidden_border { get; set; }
-    public bool has_border_radius { get; set; }
+    public bool show_border_radius_panel { get; set; }
+    public bool show_fill_panel { get; set; }
+    public bool show_border_panel { get; set; }
     public bool is_radius_uniform { get; set; }
     public bool is_radius_autoscale { get; set; }
 
@@ -65,7 +67,9 @@ public class Akira.Lib.Models.CanvasRect : Goo.CanvasRect, Models.CanvasItem {
         height = 1;
         x = 0;
         y = 0;
-        has_border_radius = true;
+        show_border_radius_panel = true;
+        show_fill_panel = true;
+        show_border_panel = true;
         is_radius_uniform = true;
         is_radius_autoscale = false;
 

@@ -28,6 +28,7 @@ sources = files(
     'Services/Settings.vala',
     'Services/ActionManager.vala',
     'Services/EventBus.vala',
+    'Services/ImageProvider.vala',
 
     'Utils/Dialogs.vala',
     'Utils/BlendingMode.vala',
@@ -81,6 +82,7 @@ sources = files(
     'Lib/Models/CanvasRect.vala',
     'Lib/Models/CanvasEllipse.vala',
     'Lib/Models/CanvasText.vala',
+    'Lib/Models/CanvasImage.vala',
 
     'Lib/Selection/Nob.vala',
 )

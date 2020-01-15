@@ -54,7 +54,7 @@ public class Akira.Layouts.Partials.BorderRadiusPanel : Gtk.Grid {
             }
             disconnect_previous_item ();
             _selected_item = value;
-            if (_selected_item == null || !_selected_item.has_border_radius) {
+            if (_selected_item == null || !_selected_item.show_border_radius_panel) {
                 disable ();
                 return;
             }

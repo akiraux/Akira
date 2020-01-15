@@ -133,6 +133,11 @@ public class Akira.Layouts.Partials.FillsPanel : Gtk.Grid {
             toggled = true;
             selected_item = selected_items.nth_data (0);
 
+            if (!selected_item.show_fill_panel) {
+                toggled = false;
+                return;
+            }
+
             if (!selected_item.has_fill) {
                 add_btn.show ();
                 return;

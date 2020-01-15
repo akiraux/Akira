@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2019 Alecaddd (https://alecaddd.com)
+* Copyright (c) 2020 Adam Bieńkowski
 *
 * This file is part of Akira.
 *
@@ -16,20 +16,29 @@
 * You should have received a copy of the GNU General Public License
 * along with Akira. If not, see <https://www.gnu.org/licenses/>.
 *
-* Authored by: Giacomo Alberini <giacomoalbe@gmail.com>
-* Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
+* Authored by: Adam Bieńkowski <donadigos159@gmail.com>
 */
 
-public class Akira.Lib.Models.CanvasEllipse : Goo.CanvasEllipse, Models.CanvasItem {
+public class Akira.Lib.Models.CanvasImage : Goo.CanvasImage, CanvasItem {
     public string id { get; set; }
-    public double rotation { get; set; }
     public bool selected { get; set; }
-    public double opacity { get; set; }
-    public bool has_fill { get; set; default = true; }
+    public double rotation { get; set; }
+
+    public double opacity {
+        get {
+            return alpha * 100.0;
+        }
+
+        set {
+            set ("alpha", value / 100.0);
+        }
+    }
+
+    public bool has_fill { get; set; default = false; }
     public int fill_alpha { get; set; }
-    public bool hidden_fill { get; set; }
     public Gdk.RGBA color { get; set; }
-    public bool has_border { get; set; default = true; }
+    public bool hidden_fill { get; set; }
+    public bool has_border { get; set; default = false; }
     public int border_size { get; set; }
     public Gdk.RGBA border_color { get; set; }
     public int stroke_alpha { get; set; }
@@ -39,46 +48,37 @@ public class Akira.Lib.Models.CanvasEllipse : Goo.CanvasEllipse, Models.CanvasIt
     public bool show_border_panel { get; set; }
     public Models.CanvasItemType item_type { get; set; }
 
-    public CanvasEllipse (
-        double _center_x = 0,
-        double _center_y = 0,
-        double _radius_x = 0,
-        double _radius_y = 0,
-        int _border_size = 1,
-        Gdk.RGBA _border_color,
-        Gdk.RGBA _fill_color,
-        Goo.CanvasItem? parent = null
-    ) {
-        Object (
-            parent: parent
-        );
+    public CanvasImage (Akira.Services.EventBus event_bus, Akira.Services.ImageProvider provider, Goo.CanvasItem? parent = null) {
+        Object (parent: parent);
 
-        item_type = Models.CanvasItemType.ELLIPSE;
-
+        item_type = Models.CanvasItemType.IMAGE;
         id = Models.CanvasItem.create_item_id (this);
         Models.CanvasItem.init_item (this);
 
-        radius_x = _radius_x;
-        radius_y = _radius_y;
         width = 1;
         height = 1;
-        center_x = 0.0;
-        center_y = 0.0;
-        show_fill_panel = true;
-        show_border_panel = true;
+        x = 0;
+        y = 0;
+        scale_to_fit = true;
 
         set_transform (Cairo.Matrix.identity ());
 
-        // Keep the item always in the origin
-        // move the entire coordinate system every time
-        translate (_center_x, _center_y);
+        provider.get_pixbuf.begin (-1, -1, (obj, res) => {
+            try {
+                var _pixbuf = provider.get_pixbuf.end (res);
+                pixbuf = _pixbuf;
+                width = _pixbuf.get_width ();
+                height = _pixbuf.get_height ();
+                event_bus.item_bound_changed (this);
+        } catch (Error e) {
+                warning (e.message);
+                // TODO: handle error here
+            }
+        });
 
-        color = _fill_color;
-        has_border = settings.set_border;
-        if (has_border) {
-            border_color = _border_color;
-            border_size = _border_size;
-        }
         reset_colors ();
+    }
+
+    public void reset_colors () {
     }
 }

@@ -27,6 +27,7 @@ public class Akira.Services.EventBus : Object {
     public signal void change_sensitivity (string type);
     public signal void insert_item (string type);
     public signal void selected_items_changed (List<Lib.Models.CanvasItem> selected_items);
+    public signal void item_bound_changed (Lib.Models.CanvasItem item);
     public signal void zoom (double current_scale);
     public signal void request_zoom (string direction);
     public signal void coordinate_change (double x, double y);
