@@ -79,7 +79,4 @@ public class Akira.Lib.Models.CanvasImage : Goo.CanvasImage, CanvasItem {
 
         reset_colors ();
     }
-
-    public void reset_colors () {
-    }
 }

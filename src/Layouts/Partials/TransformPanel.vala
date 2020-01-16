@@ -10,7 +10,7 @@
 
 * Akira is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 * GNU General Public License for more details.
 
 * You should have received a copy of the GNU General Public License
@@ -37,6 +37,11 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
 
     public double size_ratio = 1.0;
 
+    // Bindings.
+    //  private Binding x_bind;
+    private Binding rotation_bind;
+    private Binding opacity_bind;
+
     public TransformPanel (Akira.Window main_window) {
         Object (
             window: main_window,
@@ -44,19 +49,20 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         );
     }
 
-    private Lib.Models.CanvasItem _item;
-    public Lib.Models.CanvasItem item {
+    private Lib.Models.CanvasItem _selected_item;
+    public Lib.Models.CanvasItem selected_item {
         get {
-            return _item;
+            return _selected_item;
         } set {
-            _item = value;
-
-            bool has_item = _item != null;
-
-            if (!has_item) {
-                reset_values ();
+            // If the same item is already selected, or the value is still null
+            // we don't do anything to prevent redraw and calculations.
+            if (_selected_item == value) {
+                return;
             }
+            disconnect_previous_item ();
+            _selected_item = value;
 
+            bool has_item = _selected_item != null;
             x.enabled = has_item;
             y.enabled = has_item;
             height.enabled = has_item;
@@ -68,12 +74,13 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
             scale.sensitive = has_item;
             lock_changes.sensitive = has_item;
 
-            if (has_item) {
-                opacity_adj.value = item.opacity;
+            if (!has_item) {
+                disable ();
+                return;
             }
 
-            if (_item != null) {
-                update_fields ();
+            if (_selected_item != null ) {
+                enable ();
             }
         }
     }
@@ -85,14 +92,10 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         hexpand = true;
 
         x = new Akira.Partials.LinkedInput (_("X"), _("Horizontal position"));
-        x.notify["value"].connect (x_notify_value);
 
         y = new Akira.Partials.LinkedInput (_("Y"), _("Vertical position"));
-        y.notify["value"].connect (y_notify_value);
         width = new Akira.Partials.LinkedInput (_("W"), _("Width"));
         height = new Akira.Partials.LinkedInput (_("H"), _("Height"));
-        width.notify["value"].connect (width_notify_value);
-        height.notify["value"].connect (height_notify_value);
 
         lock_changes = new Gtk.Button.from_icon_name ("changes-allow-symbolic");
         lock_changes.can_focus = false;
@@ -111,12 +114,11 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
                 return true;
             });
         lock_changes.clicked.connect (() => {
-            item.size_locked = !size_lock;
+            selected_item.size_locked = !size_lock;
             size_lock = !size_lock;
         });
 
         rotation = new Akira.Partials.LinkedInput (_("R"), _("Rotation degrees"), "°");
-        rotation.notify["value"].connect (rotation_notify_value);
 
         hflip_button = new Gtk.Button ();
         hflip_button.add (new Akira.Partials.ButtonImage ("object-flip-horizontal"));
@@ -181,7 +183,6 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
                 return true;
             }
         );
-        opacity_adj.notify["value"].connect (opacity_notify_value);
         opacity_entry.entry.hexpand = false;
         opacity_entry.entry.width_request = 64;
 
@@ -193,22 +194,16 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         attach (group_title (_("Position")), 0, 0, 3);
         attach (x, 0, 1, 1);
         attach (y, 2, 1, 1);
-
         attach (new Akira.Partials.PanelSeparator (), 0, 2, 3);
-
         attach (group_title (_("Size")), 0, 3, 3);
         attach (width, 0, 4, 1);
         attach (lock_changes, 1, 4, 1);
         attach (height, 2, 4, 1);
-
         attach (new Akira.Partials.PanelSeparator (), 0, 5, 3);
-
         attach (group_title (_("Transform")), 0, 6, 3);
         attach (rotation, 0, 7, 1);
         attach (align_grid, 2, 7, 1);
-
         attach (new Akira.Partials.PanelSeparator (), 0, 8, 3);
-
         attach (group_title (_("Opacity")), 0, 9, 3);
         attach (opacity_grid, 0, 10, 3);
 
@@ -217,93 +212,104 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
 
     private void on_selected_items_changed (List<Lib.Models.CanvasItem> selected_items) {
         if (selected_items.length () == 0) {
-            item = null;
+            selected_item = null;
             return;
         }
 
-        item = selected_items.nth_data (0);
+        selected_item = selected_items.nth_data (0);
     }
 
-    private void reset_values () {
-        // Connecting and disconnecting are necessary in order
-        // not to create infinite "jumps" between the value notify
-        // and the property setter.
-        // Maybe this behaviour can be incapsulated into the LinkedInput widget
-        // in order to avoid code duplication and clarify a little bit
-        // better how those items work.
-        x.notify["value"].disconnect (x_notify_value);
-        y.notify["value"].disconnect (y_notify_value);
-        width.notify["value"].disconnect (width_notify_value);
-        height.notify["value"].disconnect (height_notify_value);
-        rotation.notify["value"].disconnect (rotation_notify_value);
-        opacity_adj.notify["value"].disconnect (opacity_notify_value);
+    private void disconnect_previous_item () {
+        if (selected_item == null) {
+            return;
+        }
 
-        x.value = 0.0;
-        y.value = 0.0;
-        width.value = 0.0;
-        height.value = 0.0;
+        // Disconnect the signals notification.
+        //  x.notify["value"].disconnect (x_notify_value);
+        //  x_bind.unbind ();
+        //  y.notify["value"].disconnect (y_notify_value);
+        //  width.notify["value"].disconnect (width_notify_value);
+        //  height.notify["value"].disconnect (height_notify_value);
+        rotation_bind.unbind ();
+        opacity_bind.unbind ();
+    }
+
+    private void disable () {
+        // Reset all the values.
+        //  x.value = 0.0;
+        //  y.value = 0.0;
+        //  width.value = 0.0;
+        //  height.value = 0.0;
         opacity_adj.value = 100.0;
         rotation.value = 0.0;
         size_ratio = 1.0;
         size_lock = false;
-
-        x.notify["value"].connect (x_notify_value);
-        y.notify["value"].connect (y_notify_value);
-        width.notify["value"].connect (width_notify_value);
-        height.notify["value"].connect (height_notify_value);
-        rotation.notify["value"].connect (rotation_notify_value);
-        opacity_adj.notify["value"].connect (opacity_notify_value);
     }
 
-    private void update_fields () {
-        double item_x, item_y, item_width, item_height;
-        item.get ("x", out item_x, "y", out item_y, "width", out item_width, "height", out item_height);
-        double item_rotation = item.rotation;
-        window.main_window.main_canvas.canvas.convert_from_item_space (item, ref item_x, ref item_y);
+    private void enable () {
+        //  double item_x, item_y;
+        //  selected_item.get ("x", out item_x, "y", out item_y);
+        //  selected_item.get_canvas ().convert_from_item_space (selected_item, ref item_x, ref item_y);
 
-        x.notify["value"].disconnect (x_notify_value);
-        y.notify["value"].disconnect (y_notify_value);
-        width.notify["value"].disconnect (width_notify_value);
-        height.notify["value"].disconnect (height_notify_value);
-        rotation.notify["value"].disconnect (rotation_notify_value);
+        //  x.value = item_x;
+        //  y.value = item_y;
+        //  width.value = selected_item.get_coords ("width");
+        //  height.value = selected_item.get_coords ("height");
+        rotation.value = selected_item.rotation;
+        opacity_adj.value = selected_item.opacity;
+        size_lock = selected_item.size_locked;
 
-        x.value = item_x;
-        y.value = item_y;
-        width.value = item_width;
-        height.value = item_height;
-        rotation.value = item_rotation;
+        //  x.notify["value"].connect (x_notify_value);
+        //  x_bind = x.bind_property (
+        //      "value", selected_item, "x",
+        //      BindingFlags.SYNC_CREATE | BindingFlags.BIDIRECTIONAL,
+        //      (binding, srcval, ref targetval) => {
+        //          double src = (double) srcval;
+        //          targetval.set_double (src);
+        //          window.event_bus.request_selection_bound_transform ("x", x.value);
+        //          return true;
+        //      });
+        //  y.notify["value"].connect (y_notify_value);
+        //  width.notify["value"].connect (width_notify_value);
+        //  height.notify["value"].connect (height_notify_value);
 
-        x.notify["value"].connect (x_notify_value);
-        y.notify["value"].connect (y_notify_value);
-        width.notify["value"].connect (width_notify_value);
-        height.notify["value"].connect (height_notify_value);
-        rotation.notify["value"].connect (rotation_notify_value);
+        rotation_bind = rotation.bind_property (
+            "value", selected_item, "rotation",
+            BindingFlags.SYNC_CREATE | BindingFlags.BIDIRECTIONAL,
+            (binding, srcval, ref targetval) => {
+                double src = (double) srcval;
+                targetval.set_double (src);
+                window.event_bus.request_selection_bound_transform ("rotation", rotation.value);
+                return true;
+            });
 
-        size_lock = item.size_locked;
+        opacity_bind = opacity_adj.bind_property (
+            "value", selected_item, "opacity",
+            BindingFlags.SYNC_CREATE | BindingFlags.BIDIRECTIONAL,
+            (binding, srcval, ref targetval) => {
+                double src = (double) srcval;
+                targetval.set_double (src);
+                selected_item.reset_colors ();
+                return true;
+            });
     }
 
     private void flip_item (double sx, double sy) {
        double x, y, width, height;
-       item.get ("x", out x, "y", out y, "width", out width, "height", out height);
+       selected_item.get ("x", out x, "y", out y, "width", out width, "height", out height);
        var center_x = x + width / 2;
        var center_y = y + height / 2;
 
        var transform = Cairo.Matrix.identity ();
-       item.get_transform (out transform);
+       selected_item.get_transform (out transform);
        transform.translate (center_x, center_y);
 
-       double radians = item.get_data<double?> ("rotation") * (Math.PI / 180);
+       double radians = selected_item.get_data<double?> ("rotation") * (Math.PI / 180);
        transform.rotate (-radians);
        transform.scale (sx, sy);
        transform.rotate (radians);
        transform.translate (-center_x, -center_y);
-       item.set_transform (transform);
-    }
-
-    public void opacity_notify_value () {
-        var opacity_factor = double.parse (opacity_entry.entry.text);
-        item.opacity = opacity_factor;
-        item.reset_colors ();
+       selected_item.set_transform (transform);
     }
 
     public void y_notify_value () {
@@ -312,10 +318,6 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
 
     public void x_notify_value () {
         window.event_bus.request_selection_bound_transform ("x", x.value);
-    }
-
-    public void rotation_notify_value () {
-        window.event_bus.request_selection_bound_transform ("rotation", rotation.value);
     }
 
     public void height_notify_value () {
