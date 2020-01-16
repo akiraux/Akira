@@ -38,7 +38,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
     public double size_ratio = 1.0;
 
     // Bindings.
-    //  private Binding x_bind;
+    private Binding width_bind;
     private Binding rotation_bind;
     private Binding opacity_bind;
 
@@ -181,8 +181,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
                 double src = (double) srcval;
                 targetval.set_string (("%0.0f").printf (src));
                 return true;
-            }
-        );
+            });
         opacity_entry.entry.hexpand = false;
         opacity_entry.entry.width_request = 64;
 
@@ -225,11 +224,11 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         }
 
         // Disconnect the signals notification.
-        //  x.notify["value"].disconnect (x_notify_value);
-        //  x_bind.unbind ();
-        //  y.notify["value"].disconnect (y_notify_value);
+        x.notify["value"].disconnect (x_notify_value);
+        y.notify["value"].disconnect (y_notify_value);
         //  width.notify["value"].disconnect (width_notify_value);
         //  height.notify["value"].disconnect (height_notify_value);
+        width_bind.unbind ();
         rotation_bind.unbind ();
         opacity_bind.unbind ();
     }
@@ -238,7 +237,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         // Reset all the values.
         //  x.value = 0.0;
         //  y.value = 0.0;
-        //  width.value = 0.0;
+        width.value = 0.0;
         //  height.value = 0.0;
         opacity_adj.value = 100.0;
         rotation.value = 0.0;
@@ -247,30 +246,29 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
     }
 
     private void enable () {
-        //  double item_x, item_y;
-        //  selected_item.get ("x", out item_x, "y", out item_y);
-        //  selected_item.get_canvas ().convert_from_item_space (selected_item, ref item_x, ref item_y);
+        double item_x, item_y;
+        selected_item.get ("x", out item_x, "y", out item_y);
+        selected_item.get_canvas ().convert_from_item_space (selected_item, ref item_x, ref item_y);
 
-        //  x.value = item_x;
-        //  y.value = item_y;
-        //  width.value = selected_item.get_coords ("width");
-        //  height.value = selected_item.get_coords ("height");
+        x.value = item_x;
+        y.value = item_y;
+        width.value = selected_item.get_coords ("width");
+        height.value = selected_item.get_coords ("height");
         rotation.value = selected_item.rotation;
         opacity_adj.value = selected_item.opacity;
         size_lock = selected_item.size_locked;
 
-        //  x.notify["value"].connect (x_notify_value);
-        //  x_bind = x.bind_property (
-        //      "value", selected_item, "x",
-        //      BindingFlags.SYNC_CREATE | BindingFlags.BIDIRECTIONAL,
-        //      (binding, srcval, ref targetval) => {
-        //          double src = (double) srcval;
-        //          targetval.set_double (src);
-        //          window.event_bus.request_selection_bound_transform ("x", x.value);
-        //          return true;
-        //      });
-        //  y.notify["value"].connect (y_notify_value);
+        x.notify["value"].connect (x_notify_value);
+        y.notify["value"].connect (y_notify_value);
         //  width.notify["value"].connect (width_notify_value);
+        width_bind = width.bind_property (
+            "value", selected_item, "width",
+            BindingFlags.SYNC_CREATE | BindingFlags.BIDIRECTIONAL,
+            (binding, srcval, ref targetval) => {
+                double src = (double) srcval;
+                targetval.set_double (src);
+                return true;
+            });
         //  height.notify["value"].connect (height_notify_value);
 
         rotation_bind = rotation.bind_property (
@@ -279,7 +277,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
             (binding, srcval, ref targetval) => {
                 double src = (double) srcval;
                 targetval.set_double (src);
-                window.event_bus.request_selection_bound_transform ("rotation", rotation.value);
+                window.event_bus.request_selection_bound_transform ("rotation", src);
                 return true;
             });
 
@@ -331,16 +329,16 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         }
     }
 
-    public void width_notify_value () {
-        window.event_bus.request_selection_bound_transform ("width", width.value);
+    //  public void width_notify_value () {
+    //      window.event_bus.request_selection_bound_transform ("width", width.value);
 
-        if (size_lock) {
-            window.event_bus.request_selection_bound_transform (
-                "height",
-                GLib.Math.round (width.value / size_ratio)
-            );
-        }
-    }
+    //      if (size_lock) {
+    //          window.event_bus.request_selection_bound_transform (
+    //              "height",
+    //              GLib.Math.round (width.value / size_ratio)
+    //          );
+    //      }
+    //  }
 
     public void update_size_ratio () {
         size_ratio = width.value / height.value;

@@ -47,9 +47,6 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         canvas.window.event_bus.request_selection_bound_transform.connect (
             on_request_selection_bound_transform
         );
-        canvas.window.event_bus.item_bound_changed.connect (
-            on_item_bound_changed
-        );
         canvas.window.event_bus.change_z_selected.connect (change_z_selected);
     }
 
@@ -123,6 +120,9 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         reset_selection ();
         item.selected = true;
         selected_items.append (item);
+
+        // Necessary for the transform panel bindings.
+        //  item.notify.connect (update_selected_items);
     }
 
     public void delete_selection () {
@@ -175,10 +175,6 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
                 break;
         }
 
-        update_selected_items ();
-    }
-
-    private void on_item_bound_changed (Lib.Models.CanvasItem item) {
         update_selected_items ();
     }
 

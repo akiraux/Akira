@@ -49,7 +49,7 @@ public class Akira.Lib.Models.CanvasImage : Goo.CanvasImage, CanvasItem {
     public bool show_border_panel { get; set; }
     public Models.CanvasItemType item_type { get; set; }
 
-    public CanvasImage (Akira.Services.EventBus event_bus, Akira.Services.ImageProvider provider, Goo.CanvasItem? parent = null) {
+    public CanvasImage (Akira.Services.ImageProvider provider, Goo.CanvasItem? parent = null) {
         Object (parent: parent);
 
         item_type = Models.CanvasItemType.IMAGE;
@@ -70,8 +70,7 @@ public class Akira.Lib.Models.CanvasImage : Goo.CanvasImage, CanvasItem {
                 pixbuf = _pixbuf;
                 width = _pixbuf.get_width ();
                 height = _pixbuf.get_height ();
-                event_bus.item_bound_changed (this);
-        } catch (Error e) {
+            } catch (Error e) {
                 warning (e.message);
                 // TODO: handle error here
             }

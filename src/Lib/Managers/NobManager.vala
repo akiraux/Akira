@@ -163,11 +163,11 @@ public class Akira.Lib.Managers.NobManager : Object {
         var transform = Cairo.Matrix.identity ();
 
         set_bound_coordinates (
-        selected_items,
-        ref x, ref y,
-        ref transform,
-        ref line_width,
-        ref width, ref height
+            selected_items,
+            ref x, ref y,
+            ref transform,
+            ref line_width,
+            ref width, ref height
         );
 
         // Account for line_width
@@ -205,11 +205,11 @@ public class Akira.Lib.Managers.NobManager : Object {
         double height = 0.0;
 
         set_bound_coordinates (
-        selected_items,
-        ref x, ref y,
-        ref transform,
-        ref line_width,
-        ref width, ref height
+            selected_items,
+            ref x, ref y,
+            ref transform,
+            ref line_width,
+            ref width, ref height
         );
 
         if (create) {
@@ -345,13 +345,13 @@ public class Akira.Lib.Managers.NobManager : Object {
     }
 
     private void set_bound_coordinates (
-    List<Models.CanvasItem> selected_items,
-    ref double x,
-    ref double y,
-    ref Cairo.Matrix transform,
-    ref double line_width,
-    ref double _width,
-    ref double _height
+        List<Models.CanvasItem> selected_items,
+        ref double x,
+        ref double y,
+        ref Cairo.Matrix transform,
+        ref double line_width,
+        ref double _width,
+        ref double _height
     ) {
         if (selected_items.length () == 1) {
             var item = selected_items.nth_data (0);
@@ -360,6 +360,8 @@ public class Akira.Lib.Managers.NobManager : Object {
             item.get ("line_width", out line_width);
             item.get ("width", out _width);
             item.get ("height", out _height);
+            item.get ("x", out x);
+            item.get ("y", out y);
 
             return;
         }
