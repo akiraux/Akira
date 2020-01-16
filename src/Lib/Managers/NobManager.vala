@@ -58,7 +58,8 @@ public class Akira.Lib.Managers.NobManager : Object {
     private double width;
     private double height;
     private double nob_size;
-	private double current_scale = 1.0;
+    private double current_scale = 1.0;
+
 	// If the effect needs to be created or it's only a value update.
 	private bool create { get; set; default = true; }
 
