@@ -58,7 +58,9 @@ public class Akira.Lib.Managers.NobManager : Object {
     private double width;
     private double height;
     private double nob_size;
-    private double current_scale = 1.0;
+	private double current_scale = 1.0;
+	// If the effect needs to be created or it's only a value update.
+	private bool create { get; set; default = true; }
 
     public NobManager (Akira.Lib.Canvas canvas) {
         Object (
@@ -119,18 +121,19 @@ public class Akira.Lib.Managers.NobManager : Object {
     }
 
     private void on_add_select_effect (List<Models.CanvasItem> selected_items) {
-        remove_select_effect ();
-
-        if (selected_items.length () == 0) {
+		if (selected_items.length () == 0) {
+			remove_select_effect ();
             return;
         }
 
         if (selected_items.length () > 1) {
             update_select_bb_coords (selected_items);
-        }
+		}
 
         update_select_effect (selected_items);
-        update_nob_position (selected_items);
+		update_nob_position (selected_items);
+		// We don't need to recreate those objects after this.
+		create = false;
     }
 
     private void remove_select_effect (bool keep_selection = false) {
@@ -143,15 +146,18 @@ public class Akira.Lib.Managers.NobManager : Object {
 
         for (int i = 0; i < 9; i++) {
             nobs[i].remove ();
-        }
-    }
+		}
+		// Those objects were removed, new objects should be created.
+		create = true;
+		//  debug ("removed");
+	}
 
     private void update_select_effect (List<Models.CanvasItem> selected_items) {
         double x = 0.0;
         double y = 0.0;
         double line_width = 0.0;
         double width = 0.0;
-        double height = 0.0;
+		double height = 0.0;
 
         var transform = Cairo.Matrix.identity ();
 
@@ -167,21 +173,25 @@ public class Akira.Lib.Managers.NobManager : Object {
         x -= line_width;
         y -= line_width;
         width += line_width * 2;
-        height += line_width * 2;
+		height += line_width * 2;
 
-        select_effect = new Goo.CanvasRect (
-            null,
-            x, y,
-            width,
-            height,
-            "line-width", LINE_WIDTH / current_scale,
-            "stroke-color", STROKE_COLOR,
-            null
-        );
+		if (create) {
+			//  debug ("create effect");
+			select_effect = new Goo.CanvasRect (
+				null,
+				x, y,
+				width,
+				height,
+				"line-width", LINE_WIDTH / current_scale,
+				"stroke-color", STROKE_COLOR,
+				null
+			);
+			select_effect.set ("parent", root);
+		}
 
-        select_effect.set_transform (transform);
-
-        select_effect.set ("parent", root);
+		select_effect.set_transform (transform);
+		select_effect.set ("width", width);
+		select_effect.set ("height", height);
     }
 
     private void update_nob_position (List<Models.CanvasItem> selected_items) {
@@ -201,9 +211,12 @@ public class Akira.Lib.Managers.NobManager : Object {
             ref width, ref height
         );
 
-        for (int i = 0; i < 9; i++) {
-            nobs[i] = new Selection.Nob (root, (Managers.NobManager.Nob) i, current_scale);
-        }
+		if (create) {
+			//  debug ("create nobs");
+			for (int i = 0; i < 9; i++) {
+				nobs[i] = new Selection.Nob (root, (Managers.NobManager.Nob) i, current_scale);
+			}
+		}
 
         nob_size = Selection.Nob.NOB_SIZE / current_scale;
 
@@ -320,10 +333,10 @@ public class Akira.Lib.Managers.NobManager : Object {
 
     private void set_nob_visibility (Nob nob_handle, bool visible) {
         if (visible) {
-          nobs[nob_handle].set ("visibility", Goo.CanvasItemVisibility.VISIBLE);
-        } else {
-          nobs[nob_handle].set ("visibility", Goo.CanvasItemVisibility.HIDDEN);
+			nobs[nob_handle].set ("visibility", Goo.CanvasItemVisibility.VISIBLE);
+			return;
         }
+		nobs[nob_handle].set ("visibility", Goo.CanvasItemVisibility.HIDDEN);
     }
 
     private void set_bound_coordinates (
