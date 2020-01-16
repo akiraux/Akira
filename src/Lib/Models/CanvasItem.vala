@@ -53,6 +53,7 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
     public abstract bool hidden_border { get; set; default = false; }
 
     // Style Panel attributes.
+    public abstract bool size_locked { get; set; default = false; }
     public abstract bool show_border_radius_panel { get; set; default = false; }
     public abstract bool show_fill_panel { get; set; default = false; }
     public abstract bool show_border_panel { get; set; default = false; }

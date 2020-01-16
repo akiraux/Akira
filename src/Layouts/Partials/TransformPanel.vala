@@ -28,15 +28,12 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
     private Akira.Partials.LinkedInput width;
     private Akira.Partials.LinkedInput height;
     private Akira.Partials.LinkedInput rotation;
+    private Gtk.Button lock_changes;
     private Gtk.Button hflip_button;
     private Gtk.Button vflip_button;
     private Gtk.Adjustment opacity_adj;
     private Akira.Partials.InputField opacity_entry;
     private Gtk.Scale scale;
-    private uint fill_rgb;
-    private uint fill_a;
-    private uint stroke_rgb;
-    private uint stroke_a;
 
     public double size_ratio = 1.0;
 
@@ -65,16 +62,15 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
             height.enabled = has_item;
             width.enabled = has_item;
             rotation.enabled = has_item;
-
             hflip_button.sensitive = has_item;
             vflip_button.sensitive = has_item;
             opacity_entry.entry.sensitive = has_item;
+            scale.sensitive = has_item;
+            lock_changes.sensitive = has_item;
 
             if (has_item) {
                 opacity_adj.value = item.opacity;
             }
-
-            scale.sensitive = has_item;
 
             if (_item != null) {
                 update_fields ();
@@ -98,8 +94,9 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         width.notify["value"].connect (width_notify_value);
         height.notify["value"].connect (height_notify_value);
 
-        var lock_changes = new Gtk.Button.from_icon_name ("changes-allow-symbolic");
+        lock_changes = new Gtk.Button.from_icon_name ("changes-allow-symbolic");
         lock_changes.can_focus = false;
+        lock_changes.sensitive = false;
         lock_changes.tooltip_text = _("Lock Ratio");
         lock_changes.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
         lock_changes.get_style_context ().add_class ("button-rounded");
@@ -110,9 +107,11 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
                 var icon = val.get_boolean () ? "changes-prevent-symbolic" : "changes-allow-symbolic";
                 var image = new Gtk.Image.from_icon_name (icon, Gtk.IconSize.BUTTON);
                 res = image;
+                update_size_ratio ();
                 return true;
             });
         lock_changes.clicked.connect (() => {
+            item.size_locked = !size_lock;
             size_lock = !size_lock;
         });
 
@@ -262,14 +261,6 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         double item_rotation = item.rotation;
         window.main_window.main_canvas.canvas.convert_from_item_space (item, ref item_x, ref item_y);
 
-        var item_simple = (Goo.CanvasItemSimple)item;
-        uint fill_color_rgba = item_simple.fill_color_rgba;
-        uint stroke_color_rgba = item_simple.stroke_color_rgba;
-        fill_rgb = fill_color_rgba & 0xFFFFFF00;
-        fill_a = fill_color_rgba & 0x000000FF;
-        stroke_rgb = stroke_color_rgba & 0xFFFFFF00;
-        stroke_a = stroke_color_rgba & 0x000000FF;
-
         x.notify["value"].disconnect (x_notify_value);
         y.notify["value"].disconnect (y_notify_value);
         width.notify["value"].disconnect (width_notify_value);
@@ -288,7 +279,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         height.notify["value"].connect (height_notify_value);
         rotation.notify["value"].connect (rotation_notify_value);
 
-        //window.main_window.main_canvas.canvas.update_decorations (item);
+        size_lock = item.size_locked;
     }
 
     private void flip_item (double sx, double sy) {
@@ -331,9 +322,10 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         window.event_bus.request_selection_bound_transform ("height", height.value);
 
         if (size_lock) {
-            width.value = height.value * size_ratio;
-        } else {
-            size_ratio = width.value / height.value;
+            window.event_bus.request_selection_bound_transform (
+                "width",
+                GLib.Math.round (height.value * size_ratio)
+            );
         }
     }
 
@@ -341,10 +333,15 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         window.event_bus.request_selection_bound_transform ("width", width.value);
 
         if (size_lock) {
-            height.value = width.value / size_ratio;
-        } else {
-            size_ratio = width.value / height.value;
+            window.event_bus.request_selection_bound_transform (
+                "height",
+                GLib.Math.round (width.value / size_ratio)
+            );
         }
+    }
+
+    public void update_size_ratio () {
+        size_ratio = width.value / height.value;
     }
 
     private Gtk.Label group_title (string title) {
