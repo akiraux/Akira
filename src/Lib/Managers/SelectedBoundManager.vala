@@ -84,7 +84,6 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
                     initial_event_x, initial_event_y,
                     selected_item
                 );
-                canvas.window.event_bus.item_coord_changed ();
                 update_selected_items ();
                 break;
 
@@ -106,6 +105,9 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
                 );
                 break;
         }
+
+        // Notify the X & Y values in the transform panel.
+        canvas.window.event_bus.item_coord_changed ();
     }
 
     public void add_item_to_selection (Models.CanvasItem item) {

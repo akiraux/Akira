@@ -77,5 +77,8 @@ public class Akira.Lib.Models.CanvasImage : Goo.CanvasImage, CanvasItem {
         });
 
         reset_colors ();
+
+        // Imported images should keep their aspect ratio by default.
+        size_locked = true;
     }
 }
