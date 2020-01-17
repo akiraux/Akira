@@ -29,7 +29,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
     private Akira.Partials.LinkedInput width;
     private Akira.Partials.LinkedInput height;
     private Akira.Partials.LinkedInput rotation;
-    private Gtk.Button lock_changes;
+    private Gtk.ToggleButton lock_changes;
     private Gtk.Button hflip_button;
     private Gtk.Button vflip_button;
     private Gtk.Adjustment opacity_adj;
@@ -97,13 +97,14 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         width = new Akira.Partials.LinkedInput (_("W"), _("Width"));
         height = new Akira.Partials.LinkedInput (_("H"), _("Height"));
 
-        lock_changes = new Gtk.Button.from_icon_name ("changes-allow-symbolic");
-        lock_changes.can_focus = false;
-        lock_changes.sensitive = false;
+        var lock_image = new Gtk.Image.from_icon_name ("changes-allow-symbolic", Gtk.IconSize.BUTTON);
+        lock_changes = new Gtk.ToggleButton ();
         lock_changes.tooltip_text = _("Lock Ratio");
         lock_changes.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
-        lock_changes.get_style_context ().add_class ("button-rounded");
         lock_changes.get_style_context ().add_class ("label-colors");
+        lock_changes.image = lock_image;
+        lock_changes.can_focus = false;
+        lock_changes.sensitive = false;
         bind_property (
             "size-lock", lock_changes, "image", BindingFlags.SYNC_CREATE,
             (binding, val, ref res) => {
