@@ -56,6 +56,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     private Managers.HoverManager hover_manager;
 
     public bool ctrl_is_pressed = false;
+    public double size_ratio = 1.0;
     private bool holding;
     private double current_scale = 1.0;
     private double bounds_x;

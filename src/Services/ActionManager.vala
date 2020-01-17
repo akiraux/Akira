@@ -190,36 +190,31 @@ public class Akira.Services.ActionManager : Object {
 
     private void action_rect_tool () {
         window.main_window.main_canvas.canvas.edit_mode = Akira.Lib.Canvas.EditMode.MODE_INSERT;
-        //window.main_window.main_canvas.canvas.insert_type = Akira.Lib.Canvas.InsertType.RECT;
         window.event_bus.insert_item ("rectangle");
         window.event_bus.close_popover ("insert");
     }
 
     private void action_selection_tool () {
         window.main_window.main_canvas.canvas.edit_mode = Akira.Lib.Canvas.EditMode.MODE_SELECTION;
-        //window.main_window.main_canvas.canvas.insert_type = null;
     }
 
-    private void action_delete () {
-        //window.main_window.main_canvas.canvas.delete_selected ();
-    }
+    private void action_delete () {}
 
     private void action_ellipse_tool () {
         window.main_window.main_canvas.canvas.edit_mode = Akira.Lib.Canvas.EditMode.MODE_INSERT;
-        //window.main_window.main_canvas.canvas.insert_type = Akira.Lib.Canvas.InsertType.ELLIPSE;
         window.event_bus.insert_item ("ellipse");
         window.event_bus.close_popover ("insert");
     }
 
     private void action_text_tool () {
         window.main_window.main_canvas.canvas.edit_mode = Akira.Lib.Canvas.EditMode.MODE_INSERT;
-        //window.main_window.main_canvas.canvas.insert_type = Akira.Lib.Canvas.InsertType.TEXT;
         window.event_bus.insert_item ("text");
         window.event_bus.close_popover ("insert");
     }
 
     private void action_image_tool () {
-        var dialog = new Gtk.FileChooserNative (_("Choose image file"), window, Gtk.FileChooserAction.OPEN, _("Select"), _("Close"));
+        var dialog = new Gtk.FileChooserNative (
+            _("Choose image file"), window, Gtk.FileChooserAction.OPEN, _("Select"), _("Close"));
         dialog.select_multiple = true;
         dialog.response.connect ((response_id) => on_choose_image_response (dialog, response_id));
         dialog.show ();
@@ -236,7 +231,7 @@ public class Akira.Services.ActionManager : Object {
                 files.@foreach ((file) => {
                     var provider = new Akira.Services.FileImageProvider (file);
                     var item = new Akira.Lib.Models.CanvasImage (
-                        window.event_bus, provider, canvas.get_root_item ()
+                        provider, canvas.get_root_item ()
                     );
                     var select = files.index (file) + 1 == files.length () ? true : false;
 

@@ -53,13 +53,14 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
     public abstract bool hidden_border { get; set; default = false; }
 
     // Style Panel attributes.
+    public abstract bool size_locked { get; set; default = false; }
     public abstract bool show_border_radius_panel { get; set; default = false; }
     public abstract bool show_fill_panel { get; set; default = false; }
     public abstract bool show_border_panel { get; set; default = false; }
 
     public abstract Models.CanvasItemType item_type { get; set; }
 
-    public double get_coords (string coord_id, bool convert_to_item_space = false) {
+    public double get_coords (string coord_id) {
         double _coord = 0.0;
         get (coord_id, out _coord);
 
