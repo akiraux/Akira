@@ -37,8 +37,8 @@
          "sources": [
             {
                "type": "git",
-               "url": "https://gitlab.gnome.org/GNOME/goocanvas",
-               "branch": "goocanvas-2.0"
+               "url": "https://gitlab.gnome.org/GNOME/goocanvas.git",
+               "branch": "wip/albfan/rect-radii"
             }
          ]
       },
