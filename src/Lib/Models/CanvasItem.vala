@@ -54,6 +54,8 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
 
     // Style Panel attributes.
     public abstract bool size_locked { get; set; default = false; }
+    public abstract bool flipped_h { get; set; default = false; }
+    public abstract bool flipped_v { get; set; default = false; }
     public abstract bool show_border_radius_panel { get; set; default = false; }
     public abstract bool show_fill_panel { get; set; default = false; }
     public abstract bool show_border_panel { get; set; default = false; }
