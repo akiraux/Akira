@@ -106,13 +106,15 @@ public class Akira.Utils.AffineTransform : Object {
 
             case NobManager.Nob.RIGHT_CENTER:
                 new_width = initial_width + delta_x;
+                if (canvas.ctrl_is_pressed || selected_item.size_locked) {
+                    new_height = GLib.Math.round (new_width / canvas.size_ratio);
+                }
                 break;
 
             case NobManager.Nob.BOTTOM_RIGHT:
                 new_width = initial_width + delta_x;
                 if (canvas.ctrl_is_pressed || selected_item.size_locked) {
-                    new_height = GLib.Math.round (
-                        new_width / canvas.size_ratio);
+                    new_height = GLib.Math.round (new_width / canvas.size_ratio);
                     break;
                 }
                 new_height = initial_height + delta_y;
@@ -120,6 +122,10 @@ public class Akira.Utils.AffineTransform : Object {
 
             case NobManager.Nob.BOTTOM_CENTER:
                 new_height = initial_height + delta_y;
+                if (canvas.ctrl_is_pressed || selected_item.size_locked) {
+                    new_width = GLib.Math.round (new_height * canvas.size_ratio);
+                    break;
+                }
                 break;
 
             case NobManager.Nob.BOTTOM_LEFT:
