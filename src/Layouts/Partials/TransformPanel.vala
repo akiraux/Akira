@@ -30,8 +30,8 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
     private Akira.Partials.LinkedInput height;
     private Akira.Partials.LinkedInput rotation;
     private Gtk.ToggleButton lock_changes;
-    private Gtk.Button hflip_button;
-    private Gtk.Button vflip_button;
+    private Gtk.ToggleButton hflip_button;
+    private Gtk.ToggleButton vflip_button;
     private Gtk.Adjustment opacity_adj;
     private Akira.Partials.InputField opacity_entry;
     private Gtk.Scale scale;
@@ -108,6 +108,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         bind_property (
             "size-lock", lock_changes, "image", BindingFlags.SYNC_CREATE,
             (binding, val, ref res) => {
+                //  lock_changes.active = val.get_boolean ();
                 var icon = val.get_boolean () ? "changes-prevent-symbolic" : "changes-allow-symbolic";
                 var image = new Gtk.Image.from_icon_name (icon, Gtk.IconSize.BUTTON);
                 res = image;
@@ -121,37 +122,35 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
 
         rotation = new Akira.Partials.LinkedInput (_("R"), _("Rotation degrees"), "°");
 
-        hflip_button = new Gtk.Button ();
+        hflip_button = new Gtk.ToggleButton ();
         hflip_button.add (new Akira.Partials.ButtonImage ("object-flip-horizontal"));
         hflip_button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
-        hflip_button.get_style_context ().add_class ("button-rounded");
         hflip_button.hexpand = false;
+        hflip_button.can_focus = false;
+        hflip_button.sensitive = false;
         hflip_button.halign = Gtk.Align.CENTER;
         hflip_button.valign = Gtk.Align.CENTER;
-        hflip_button.can_focus = false;
         hflip_button.tooltip_markup =
             Granite.markup_accel_tooltip ({"<Ctrl><Shift>bracketleft"}, _("Flip Horizontally"));
         hflip_button.clicked.connect (() => {
             Utils.AffineTransform.flip_item (selected_item, -1, 1);
             on_item_value_changed ();
         });
-        hflip_button.sensitive = false;
 
-        vflip_button = new Gtk.Button ();
+        vflip_button = new Gtk.ToggleButton ();
         vflip_button.add (new Akira.Partials.ButtonImage ("object-flip-vertical"));
         vflip_button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
-        vflip_button.get_style_context ().add_class ("button-rounded");
         vflip_button.hexpand = false;
+        vflip_button.can_focus = false;
+        vflip_button.sensitive = false;
         vflip_button.halign = Gtk.Align.CENTER;
         vflip_button.valign = Gtk.Align.CENTER;
-        vflip_button.can_focus = false;
         vflip_button.tooltip_markup =
             Granite.markup_accel_tooltip ({"<Ctrl><Shift>bracketright"}, _("Flip Vertically"));
         vflip_button.clicked.connect (() => {
             Utils.AffineTransform.flip_item (selected_item, 1, -1);
             on_item_value_changed ();
         });
-        vflip_button.sensitive = false;
 
         var align_grid = new Gtk.Grid ();
         align_grid.hexpand = true;
@@ -259,6 +258,9 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         rotation.value = selected_item.rotation;
         opacity_adj.value = selected_item.opacity;
         size_lock = selected_item.size_locked;
+
+        hflip_button.bind_property (
+            "active", selected_item, "flipped_h", BindingFlags.SYNC_CREATE | BindingFlags.BIDIRECTIONAL);
 
         // Property binding doesn't work for X and Y as these attributes are not
         // directly accessible from the CanvasItem. (goocanvas shenanigans)
