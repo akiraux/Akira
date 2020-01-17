@@ -44,9 +44,8 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
             canvas: canvas
         );
 
-        canvas.window.event_bus.request_selection_bound_transform.connect (
-            on_request_selection_bound_transform
-        );
+        canvas.window.event_bus.change_z_selected.connect (change_z_selected);
+        canvas.window.event_bus.item_value_changed.connect (update_selected_items);
     }
 
     construct {
@@ -76,8 +75,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
     }
 
     public void transform_bound (double event_x, double event_y, Managers.NobManager.Nob selected_nob) {
-        Models.CanvasItem selected_item;
-        selected_item = selected_items.nth_data (0);
+        Models.CanvasItem selected_item = selected_items.nth_data (0);
 
         switch (selected_nob) {
             case Managers.NobManager.Nob.NONE:
@@ -86,6 +84,8 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
                     initial_event_x, initial_event_y,
                     selected_item
                 );
+                canvas.window.event_bus.item_coord_changed ();
+                update_selected_items ();
                 break;
 
             case Managers.NobManager.Nob.ROTATE:
@@ -106,8 +106,6 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
                 );
                 break;
         }
-
-        update_selected_items ();
     }
 
     public void add_item_to_selection (Models.CanvasItem item) {
@@ -118,9 +116,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         // Just 1 selected element at the same time
         // TODO: allow for multi selection with shift pressed
         reset_selection ();
-
         item.selected = true;
-
         selected_items.append (item);
     }
 
@@ -153,27 +149,40 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         canvas.window.event_bus.selected_items_changed (selected_items);
     }
 
-    private void on_request_selection_bound_transform (string property, double amount) {
-        Models.CanvasItem selected_item = selected_items.nth_data (0);
-
-        switch (property) {
-            case "rotation":
-                Utils.AffineTransform.set_rotation (amount, selected_item);
-                break;
-            case "width":
-                Utils.AffineTransform.set_size (amount, null, selected_item);
-                break;
-            case "height":
-                Utils.AffineTransform.set_size (null, amount, selected_item);
-                break;
-            case "x":
-                Utils.AffineTransform.set_position (amount, null, selected_item);
-                break;
-            case "y":
-                Utils.AffineTransform.set_position (null, amount, selected_item);
-                break;
+    private void change_z_selected (bool raise, bool total) {
+        if (selected_items.length () == 0) {
+            return;
         }
 
-        update_selected_items ();
+        Models.CanvasItem selected_item = selected_items.nth_data (0);
+        var root_item = canvas.get_root_item ();
+        var pos_selected = root_item.find_child (selected_item);
+
+        // Interrupt if item position doesn't exist.
+        if (pos_selected == -1) {
+            return;
+        }
+
+        int target_item_pos;
+        if (total) {
+            // Account for nobs and select effect.
+            target_item_pos = raise ? (root_item.get_n_children () - 11): 0;
+        } else {
+            target_item_pos = pos_selected + (raise ? 1 : -1);
+        }
+
+        var target_item = root_item.get_child (target_item_pos);
+        // Don't change z-index if the target item is not an a CanvasItem (eg. nob or select_effect).
+        if (target_item == null || (!(target_item is Models.CanvasItem) && !total)) {
+            return;
+        }
+
+        if (raise) {
+            selected_item.raise (target_item);
+        } else {
+            selected_item.lower (target_item);
+        }
+
+        canvas.window.event_bus.z_selected_changed ();
     }
 }

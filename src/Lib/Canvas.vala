@@ -55,6 +55,8 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     private Managers.NobManager nob_manager;
     private Managers.HoverManager hover_manager;
 
+    public bool ctrl_is_pressed = false;
+    public double size_ratio = 1.0;
     private bool holding;
     private double current_scale = 1.0;
     private double bounds_x;
@@ -85,6 +87,26 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         window.event_bus.request_zoom.connect (on_request_zoom);
         window.event_bus.request_change_cursor.connect (on_request_change_cursor);
         window.event_bus.set_focus_on_canvas.connect (on_set_focus_on_canvas);
+    }
+
+    public void insert_item_default (Akira.Lib.Models.CanvasItem item, bool select) {
+        double start_x, start_y, scale, rotation;
+        start_x = Akira.Layouts.MainCanvas.CANVAS_SIZE / 2;
+        start_y = Akira.Layouts.MainCanvas.CANVAS_SIZE / 2;
+
+        if (selected_bound_manager.selected_items.length () > 0) {
+            selected_bound_manager.selected_items.nth_data (0).get_simple_transform (
+                out start_x, out start_y, out scale, out rotation
+            );
+        }
+
+        items_manager.add_item (item);
+        Utils.AffineTransform.set_position (start_x, start_y, item);
+
+        if (select) {
+            selected_bound_manager.reset_selection ();
+            selected_bound_manager.add_item_to_selection (item);
+        }
     }
 
     public void update_bounds () {
@@ -141,6 +163,11 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 }
                 return true;
 
+            case Gdk.Key.Control_L:
+            case Gdk.Key.Control_R:
+                ctrl_is_pressed = true;
+                return true;
+
             default:
                 // Send to ItemsManager to deal with custom user shape
                 // hotkey preferences from settings
@@ -159,6 +186,11 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         switch (uppercase_keyval) {
             case Gdk.Key.space:
                 edit_mode = EditMode.MODE_SELECTION;
+                return true;
+
+            case Gdk.Key.Control_L:
+            case Gdk.Key.Control_R:
+                ctrl_is_pressed = false;
                 return true;
 
             default:
@@ -306,13 +338,11 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         }
 
         set_scale (current_scale);
-
         window.event_bus.zoom (current_scale);
     }
 
     private void on_request_change_cursor (Gdk.CursorType? cursor_type) {
         // debug ("Setting cursor from on_request_change_cursor");
-
         if (cursor_type == null) {
             set_cursor_by_edit_mode ();
             return;
@@ -328,32 +358,4 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         var cursor = new Gdk.Cursor.for_display (Gdk.Display.get_default (), cursor_type);
         get_window ().set_cursor (cursor);
     }
-
-    /*
-    public void change_z_selected (bool raise, bool total) {
-        if (selected_item == null) {
-            return;
-        }
-
-        var root_item = get_root_item ();
-        var pos_selected = root_item.find_child (selected_item);
-        if (pos_selected != -1) {
-            int target_item_pos;
-            if (total) {
-                target_item_pos = raise ? (root_item.get_n_children () - 1): 0;
-            } else {
-                target_item_pos = pos_selected + (raise ? 1 : -1);
-            }
-            var target_item = root_item.get_child (target_item_pos);
-            if (target_item != null) {
-                if (raise) {
-                    selected_item.raise (target_item);
-                } else {
-                    selected_item.lower (target_item);
-                }
-                //update_decorations (selected_item);
-            }
-        }
-    }
-    */
 }

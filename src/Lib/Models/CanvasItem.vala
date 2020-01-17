@@ -23,7 +23,8 @@
 public enum Akira.Lib.Models.CanvasItemType {
     RECT,
     ELLIPSE,
-    TEXT
+    TEXT,
+    IMAGE
 }
 
 public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasItem {
@@ -52,11 +53,14 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
     public abstract bool hidden_border { get; set; default = false; }
 
     // Style Panel attributes.
-    public abstract bool has_border_radius { get; set; default = false; }
+    public abstract bool size_locked { get; set; default = false; }
+    public abstract bool show_border_radius_panel { get; set; default = false; }
+    public abstract bool show_fill_panel { get; set; default = false; }
+    public abstract bool show_border_panel { get; set; default = false; }
 
     public abstract Models.CanvasItemType item_type { get; set; }
 
-    public double get_coords (string coord_id, bool convert_to_item_space = false) {
+    public double get_coords (string coord_id) {
         double _coord = 0.0;
         get (coord_id, out _coord);
 
@@ -81,7 +85,7 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
         item.set ("stroke-alpha", 255);
     }
 
-    public void reset_colors () {
+    public virtual void reset_colors () {
         reset_fill ();
         reset_border ();
     }

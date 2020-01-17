@@ -70,7 +70,6 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             case Gdk.Key.T:
                 set_item_to_insert ("text");
                 break;
-
             default:
                 return false;
         }
@@ -95,7 +94,6 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             case InsertType.TEXT:
                 new_item = add_text (event);
                 break;
-
             default:
                 new_item = null;
                 break;
@@ -106,6 +104,10 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         }
 
         return new_item;
+    }
+
+    public void add_item (Akira.Lib.Models.CanvasItem item) {
+        items.append (item);
     }
 
     public Models.CanvasItem add_rect (Gdk.EventButton event) {
