@@ -132,8 +132,10 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         hflip_button.tooltip_markup =
             Granite.markup_accel_tooltip ({"<Ctrl><Shift>bracketleft"}, _("Flip Horizontally"));
         hflip_button.clicked.connect (() => {
-            flip_item (-1, 1);
+            Utils.AffineTransform.flip_item (selected_item, -1, 1);
+            on_item_value_changed ();
         });
+        hflip_button.sensitive = false;
 
         vflip_button = new Gtk.Button ();
         vflip_button.add (new Akira.Partials.ButtonImage ("object-flip-vertical"));
@@ -146,8 +148,10 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         vflip_button.tooltip_markup =
             Granite.markup_accel_tooltip ({"<Ctrl><Shift>bracketright"}, _("Flip Vertically"));
         vflip_button.clicked.connect (() => {
-            flip_item (1, -1);
+            Utils.AffineTransform.flip_item (selected_item, 1, -1);
+            on_item_value_changed ();
         });
+        vflip_button.sensitive = false;
 
         var align_grid = new Gtk.Grid ();
         align_grid.hexpand = true;
@@ -311,30 +315,13 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
 
     // We need to fetch new X and Y values to update the fields.
     private void on_item_coord_changed () {
-        double item_x, item_y, item_scale, item_rotation;
-        selected_item.get_simple_transform (
-            out item_x, out item_y, out item_scale, out item_rotation);
+        double item_x = selected_item.get_coords ("x");
+        double item_y = selected_item.get_coords ("y");
+
+        selected_item.canvas.convert_from_item_space (selected_item, ref item_x, ref item_y);
 
         x.value = item_x;
         y.value = item_y;
-    }
-
-    private void flip_item (double sx, double sy) {
-    //     double x, y, width, height;
-    //     selected_item.get ("x", out x, "y", out y, "width", out width, "height", out height);
-    //     var center_x = x + width / 2;
-    //     var center_y = y + height / 2;
-
-    //     var transform = Cairo.Matrix.identity ();
-    //     selected_item.get_transform (out transform);
-    //     transform.translate (center_x, center_y);
-
-    //     double radians = selected_item.get_data<double?> ("rotation") * (Math.PI / 180);
-    //     transform.rotate (-radians);
-    //     transform.scale (sx, sy);
-    //     transform.rotate (radians);
-    //     transform.translate (-center_x, -center_y);
-    //     selected_item.set_transform (transform);
     }
 
     public void y_notify_value () {

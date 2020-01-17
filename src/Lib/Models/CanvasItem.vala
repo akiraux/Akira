@@ -60,7 +60,7 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
 
     public abstract Models.CanvasItemType item_type { get; set; }
 
-    public double get_coords (string coord_id, bool convert_to_item_space = false) {
+    public double get_coords (string coord_id) {
         double _coord = 0.0;
         get (coord_id, out _coord);
 

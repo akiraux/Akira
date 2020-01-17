@@ -278,6 +278,23 @@ public class Akira.Utils.AffineTransform : Object {
         item.rotation += actual_rotation;
     }
 
+    public static void flip_item (CanvasItem item, double sx, double sy) {
+        double x, y, width, height;
+        item.get ("x", out x, "y", out y, "width", out width, "height", out height);
+        var center_x = x + width / 2;
+        var center_y = y + height / 2;
+
+        var transform = Cairo.Matrix.identity ();
+        item.get_transform (out transform);
+        transform.translate (center_x, center_y);
+        double radians = item.rotation * (Math.PI / 180);
+        transform.rotate (-radians);
+        transform.scale (sx, sy);
+        transform.rotate (radians);
+        transform.translate (-center_x, -center_y);
+        item.set_transform (transform);
+    }
+
     /*
     private static double fix_x_position (double x, double width, double delta_x) {
         var min_delta = Math.round (MIN_POS - width);
