@@ -89,11 +89,19 @@ public class Akira.Lib.Models.CanvasRect : Goo.CanvasRect, Models.CanvasItem {
     }
 
     public void update_border () {
+        //We only use one value (don't do ellipses)
         if (is_radius_uniform) {
             set ("radius-x", radius_x);
             set ("radius-y", radius_x);
+        } else {
+            set ("radius-top-left-x", radius_top_left_x);
+            set ("radius-top-left-y", radius_top_left_x);
+            set ("radius-top-right-x", radius_top_right_x);
+            set ("radius-top-right-y", radius_top_right_x);
+            set ("radius-bottom-left-x", radius_bottom_left_x);
+            set ("radius-bottom-left-y", radius_bottom_left_x);
+            set ("radius-bottom-right-x", radius_bottom_right_x);
+            set ("radius-bottom-right-y", radius_bottom_right_x);
         }
-
-        // TODO: handle uneven border radius.
     }
 }

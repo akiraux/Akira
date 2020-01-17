@@ -38,6 +38,10 @@ public class Akira.Layouts.Partials.BorderRadiusPanel : Gtk.Grid {
     private Gtk.Switch autoscale_switch;
     private Gtk.Switch uniform_switch;
     private Binding radius_binding;
+    private Binding radius_top_left_binding;
+    private Binding radius_top_right_binding;
+    private Binding radius_bottom_left_binding;
+    private Binding radius_bottom_right_binding;
     private Binding uniform_binding;
     private Binding autoscale_binding;
     private double max_value;
@@ -233,10 +237,10 @@ public class Akira.Layouts.Partials.BorderRadiusPanel : Gtk.Grid {
             update_all_borders (uniform_switch.active);
         });
 
-        //  border_radius_top_left_entry.entry.changed.connect (on_radius_change);
-        //  border_radius_top_right_entry.entry.changed.connect (on_radius_change);
-        //  border_radius_bottom_right_entry.entry.changed.connect (on_radius_change);
-        //  border_radius_bottom_left_entry.entry.changed.connect (on_radius_change);
+        border_radius_top_left_entry.entry.changed.connect (on_radius_change);
+        border_radius_top_right_entry.entry.changed.connect (on_radius_change);
+        border_radius_bottom_right_entry.entry.changed.connect (on_radius_change);
+        border_radius_bottom_left_entry.entry.changed.connect (on_radius_change);
     }
 
     private void on_selected_items_changed (List<Lib.Models.CanvasItem> selected_items) {
@@ -282,14 +286,6 @@ public class Akira.Layouts.Partials.BorderRadiusPanel : Gtk.Grid {
         }
         update_all_borders (selected_item.is_radius_uniform);
 
-        // Non-Uniform radius
-        //  if (!selected_item.is_radius_uniform) {
-        //      border_radius_top_left_entry.entry.text = selected_item.radius_tl;
-        //      border_radius_top_right_entry.entry.text = selected_item.radius_tr;
-        //      border_radius_bottom_right_entry.entry.text = selected_item.radius_br;
-        //      border_radius_bottom_left_entry.entry.text = selected_item.radius_bl;
-        //  }
-
         radius_binding = border_radius_entry.entry.bind_property (
             "text", selected_item, "radius_x",
             BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE,
@@ -309,6 +305,11 @@ public class Akira.Layouts.Partials.BorderRadiusPanel : Gtk.Grid {
                 targetval.set_string (("%0.0f").printf (src));
                 return true;
             });
+        radius_top_left_binding = build_radius_binding (border_radius_top_left_entry, selected_item, "radius_top_left_x");
+        radius_top_right_binding = build_radius_binding (border_radius_top_right_entry, selected_item, "radius_top_right_x");
+        radius_bottom_left_binding = build_radius_binding (border_radius_bottom_left_entry, selected_item, "radius_bottom_left_x");
+        radius_bottom_right_binding = build_radius_binding (border_radius_bottom_right_entry, selected_item, "radius_bottom_right_x");
+
         border_radius_scale.value_changed.connect (on_radius_change);
 
         uniform_binding = uniform_switch.bind_property (
@@ -318,6 +319,22 @@ public class Akira.Layouts.Partials.BorderRadiusPanel : Gtk.Grid {
 
         selected_item.notify["width"].connect (on_size_change);
         selected_item.notify["height"].connect (on_size_change);
+    }
+
+    public Binding build_radius_binding (Akira.Partials.InputField entry, Akira.Lib.Models.CanvasRect item, string property) {
+        return entry.entry.bind_property (
+            "text", item, property,
+            BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE,
+            (binding, srcval, ref targetval) => {
+                double src = double.parse (srcval.dup_string ());
+
+                targetval.set_double (src);
+                return true;
+            }, (binding, srcval, ref targetval) => {
+                double src = (double) srcval;
+                targetval.set_string (("%0.0f").printf (src));
+                return true;
+            });
     }
 
     private void disconnect_previous_item () {
@@ -352,12 +369,16 @@ public class Akira.Layouts.Partials.BorderRadiusPanel : Gtk.Grid {
     }
 
     private void disable () {
-        //  border_radius_top_left_entry.entry.changed.disconnect (on_radius_change);
-        //  border_radius_top_right_entry.entry.changed.disconnect (on_radius_change);
-        //  border_radius_bottom_right_entry.entry.changed.disconnect (on_radius_change);
-        //  border_radius_bottom_left_entry.entry.changed.disconnect (on_radius_change);
+        border_radius_top_left_entry.entry.changed.disconnect (on_radius_change);
+        border_radius_top_right_entry.entry.changed.disconnect (on_radius_change);
+        border_radius_bottom_right_entry.entry.changed.disconnect (on_radius_change);
+        border_radius_bottom_left_entry.entry.changed.disconnect (on_radius_change);
 
         radius_binding.unbind ();
+        radius_top_left_binding.unbind ();
+        radius_top_right_binding.unbind ();
+        radius_bottom_left_binding.unbind ();
+        radius_bottom_right_binding.unbind ();
         uniform_binding.unbind ();
         autoscale_binding.unbind ();
         border_radius_scale.value_changed.disconnect (on_radius_change);
