@@ -39,6 +39,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
 
     // Bindings.
     private Binding width_bind;
+    private Binding height_bind;
     private Binding rotation_bind;
     private Binding opacity_bind;
 
@@ -49,8 +50,8 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         );
     }
 
-    private Lib.Models.CanvasItem _selected_item;
-    public Lib.Models.CanvasItem selected_item {
+    private Lib.Models.CanvasItem? _selected_item;
+    public Lib.Models.CanvasItem? selected_item {
         get {
             return _selected_item;
         } set {
@@ -207,6 +208,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         attach (opacity_grid, 0, 10, 3);
 
         window.event_bus.selected_items_changed.connect (on_selected_items_changed);
+        window.event_bus.item_coord_changed.connect (on_item_coord_changed);
     }
 
     private void on_selected_items_changed (List<Lib.Models.CanvasItem> selected_items) {
@@ -226,8 +228,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         // Disconnect the signals notification.
         x.notify["value"].disconnect (x_notify_value);
         y.notify["value"].disconnect (y_notify_value);
-        //  width.notify["value"].disconnect (width_notify_value);
-        //  height.notify["value"].disconnect (height_notify_value);
+        height_bind.unbind ();
         width_bind.unbind ();
         rotation_bind.unbind ();
         opacity_bind.unbind ();
@@ -235,10 +236,10 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
 
     private void disable () {
         // Reset all the values.
-        //  x.value = 0.0;
-        //  y.value = 0.0;
+        x.value = 0.0;
+        y.value = 0.0;
         width.value = 0.0;
-        //  height.value = 0.0;
+        height.value = 0.0;
         opacity_adj.value = 100.0;
         rotation.value = 0.0;
         size_ratio = 1.0;
@@ -246,30 +247,42 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
     }
 
     private void enable () {
-        double item_x, item_y;
-        selected_item.get ("x", out item_x, "y", out item_y);
-        selected_item.get_canvas ().convert_from_item_space (selected_item, ref item_x, ref item_y);
+        on_item_coord_changed ();
 
-        x.value = item_x;
-        y.value = item_y;
         width.value = selected_item.get_coords ("width");
         height.value = selected_item.get_coords ("height");
         rotation.value = selected_item.rotation;
         opacity_adj.value = selected_item.opacity;
         size_lock = selected_item.size_locked;
 
+        // Property binding doesn't work for X and Y as these attributes are not
+        // directly accessible from the CanvasItem. (goocanvas shenanigans)
         x.notify["value"].connect (x_notify_value);
         y.notify["value"].connect (y_notify_value);
-        //  width.notify["value"].connect (width_notify_value);
+
         width_bind = width.bind_property (
             "value", selected_item, "width",
             BindingFlags.SYNC_CREATE | BindingFlags.BIDIRECTIONAL,
             (binding, srcval, ref targetval) => {
                 double src = (double) srcval;
                 targetval.set_double (src);
+                if (size_lock) {
+                    height.value = GLib.Math.round (src / size_ratio);
+                }
                 return true;
             });
-        //  height.notify["value"].connect (height_notify_value);
+
+        height_bind = height.bind_property (
+            "value", selected_item, "height",
+            BindingFlags.SYNC_CREATE | BindingFlags.BIDIRECTIONAL,
+            (binding, srcval, ref targetval) => {
+                double src = (double) srcval;
+                targetval.set_double (src);
+                if (size_lock) {
+                    width.value = GLib.Math.round (src * size_ratio);
+                }
+                return true;
+            });
 
         rotation_bind = rotation.bind_property (
             "value", selected_item, "rotation",
@@ -277,68 +290,62 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
             (binding, srcval, ref targetval) => {
                 double src = (double) srcval;
                 targetval.set_double (src);
-                window.event_bus.request_selection_bound_transform ("rotation", src);
+                Utils.AffineTransform.set_rotation (src, selected_item);
                 return true;
             });
 
         opacity_bind = opacity_adj.bind_property (
             "value", selected_item, "opacity",
-            BindingFlags.SYNC_CREATE | BindingFlags.BIDIRECTIONAL,
-            (binding, srcval, ref targetval) => {
-                double src = (double) srcval;
-                targetval.set_double (src);
-                selected_item.reset_colors ();
-                return true;
-            });
+            BindingFlags.SYNC_CREATE | BindingFlags.BIDIRECTIONAL);
+
+        // Connect items value changes to redraw the selection bounds.
+        selected_item.notify["width"].connect (on_item_value_changed);
+        selected_item.notify["height"].connect (on_item_value_changed);
+        selected_item.notify["rotation"].connect (on_item_value_changed);
+        selected_item.notify["opacity"].connect (selected_item.reset_colors);
+    }
+
+    private void on_item_value_changed () {
+        window.event_bus.item_value_changed ();
+    }
+
+    // We need to fetch new X and Y values to update the fields.
+    private void on_item_coord_changed () {
+        double item_x, item_y, item_scale, item_rotation;
+        selected_item.get_simple_transform (
+            out item_x, out item_y, out item_scale, out item_rotation);
+
+        x.value = item_x;
+        y.value = item_y;
     }
 
     private void flip_item (double sx, double sy) {
-       double x, y, width, height;
-       selected_item.get ("x", out x, "y", out y, "width", out width, "height", out height);
-       var center_x = x + width / 2;
-       var center_y = y + height / 2;
+    //     double x, y, width, height;
+    //     selected_item.get ("x", out x, "y", out y, "width", out width, "height", out height);
+    //     var center_x = x + width / 2;
+    //     var center_y = y + height / 2;
 
-       var transform = Cairo.Matrix.identity ();
-       selected_item.get_transform (out transform);
-       transform.translate (center_x, center_y);
+    //     var transform = Cairo.Matrix.identity ();
+    //     selected_item.get_transform (out transform);
+    //     transform.translate (center_x, center_y);
 
-       double radians = selected_item.get_data<double?> ("rotation") * (Math.PI / 180);
-       transform.rotate (-radians);
-       transform.scale (sx, sy);
-       transform.rotate (radians);
-       transform.translate (-center_x, -center_y);
-       selected_item.set_transform (transform);
+    //     double radians = selected_item.get_data<double?> ("rotation") * (Math.PI / 180);
+    //     transform.rotate (-radians);
+    //     transform.scale (sx, sy);
+    //     transform.rotate (radians);
+    //     transform.translate (-center_x, -center_y);
+    //     selected_item.set_transform (transform);
     }
 
     public void y_notify_value () {
-        window.event_bus.request_selection_bound_transform ("y", y.value);
+        Utils.AffineTransform.set_position (null, y.value, selected_item);
+        on_item_value_changed ();
     }
 
     public void x_notify_value () {
-        window.event_bus.request_selection_bound_transform ("x", x.value);
+        Utils.AffineTransform.set_position (x.value, null, selected_item);
+        on_item_value_changed ();
     }
-
-    public void height_notify_value () {
-        window.event_bus.request_selection_bound_transform ("height", height.value);
-
-        if (size_lock) {
-            window.event_bus.request_selection_bound_transform (
-                "width",
-                GLib.Math.round (height.value * size_ratio)
-            );
-        }
-    }
-
-    //  public void width_notify_value () {
-    //      window.event_bus.request_selection_bound_transform ("width", width.value);
-
-    //      if (size_lock) {
-    //          window.event_bus.request_selection_bound_transform (
-    //              "height",
-    //              GLib.Math.round (width.value / size_ratio)
-    //          );
-    //      }
-    //  }
 
     public void update_size_ratio () {
         size_ratio = width.value / height.value;
