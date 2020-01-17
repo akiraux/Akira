@@ -59,8 +59,17 @@ public class Akira.Layouts.MainCanvas : Gtk.Grid {
             // Move scroll window according to normalized mouse delta
             // relative to the scroll window, so with Canvas' pixel
             // coordinates translated into ScrolledWindow's one.
-            var delta_x = event_x - scroll_origin_x;
-            var delta_y = event_y - scroll_origin_y;
+            double event_x_pixel_space = event_x;
+            double event_y_pixel_space = event_y;
+
+            // Convert coordinates to pixel space, which does account for
+            // canvas scale and canvas translation.
+            // Otherwise, delta can start to "diverge" due to the
+            // translation of starting point happening during canvas translation
+            canvas.convert_to_pixels (ref event_x_pixel_space, ref event_y_pixel_space);
+
+            var delta_x = event_x_pixel_space - scroll_origin_x;
+            var delta_y = event_y_pixel_space - scroll_origin_y;
 
             main_scroll.hadjustment.value -= delta_x;
             main_scroll.vadjustment.value -= delta_y;
@@ -70,6 +79,8 @@ public class Akira.Layouts.MainCanvas : Gtk.Grid {
             // Update scroll origin on Canvas' button_press_event
             scroll_origin_x = origin_x;
             scroll_origin_y = origin_y;
+
+            canvas.convert_to_pixels (ref scroll_origin_x, ref scroll_origin_y);
         });
 
         canvas.scroll_event.connect (on_scroll);
