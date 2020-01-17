@@ -76,7 +76,11 @@ public class Akira.Utils.AffineTransform : Object {
         switch (selected_nob) {
             case NobManager.Nob.TOP_LEFT:
                 new_height = initial_height - delta_y;
-                new_width = initial_width - delta_x;
+                if (canvas.ctrl_is_pressed || selected_item.size_locked) {
+                    new_width = GLib.Math.round (new_height * canvas.size_ratio);
+                } else {
+                    new_width = initial_width - delta_x;
+                }
 
                 if (item_height > MIN_SIZE) {
                     origin_move_delta_y = item_height - new_height;
@@ -89,6 +93,9 @@ public class Akira.Utils.AffineTransform : Object {
 
             case NobManager.Nob.TOP_CENTER:
                 new_height = initial_height - delta_y;
+                if (canvas.ctrl_is_pressed || selected_item.size_locked) {
+                    new_width = GLib.Math.round (new_height * canvas.size_ratio);
+                }
 
                 if (item_height > MIN_SIZE) {
                     origin_move_delta_y = item_height - new_height;
@@ -97,7 +104,11 @@ public class Akira.Utils.AffineTransform : Object {
 
             case NobManager.Nob.TOP_RIGHT:
                 new_width = initial_width + delta_x;
-                new_height = initial_height - delta_y;
+                if (canvas.ctrl_is_pressed || selected_item.size_locked) {
+                    new_height = GLib.Math.round (new_width / canvas.size_ratio);
+                } else {
+                    new_height = initial_height - delta_y;
+                }
 
                 if (item_height > MIN_SIZE) {
                     origin_move_delta_y = item_height - new_height;
@@ -124,13 +135,16 @@ public class Akira.Utils.AffineTransform : Object {
                 new_height = initial_height + delta_y;
                 if (canvas.ctrl_is_pressed || selected_item.size_locked) {
                     new_width = GLib.Math.round (new_height * canvas.size_ratio);
-                    break;
                 }
                 break;
 
             case NobManager.Nob.BOTTOM_LEFT:
                 new_height = initial_height + delta_y;
-                new_width = initial_width - delta_x;
+                if (canvas.ctrl_is_pressed || selected_item.size_locked) {
+                    new_width = GLib.Math.round (new_height * canvas.size_ratio);
+                } else {
+                    new_width = initial_width - delta_x;
+                }
 
                 if (item_width > MIN_SIZE) {
                     origin_move_delta_x = item_width - new_width;
@@ -139,6 +153,9 @@ public class Akira.Utils.AffineTransform : Object {
 
             case NobManager.Nob.LEFT_CENTER:
                 new_width = initial_width - delta_x;
+                if (canvas.ctrl_is_pressed || selected_item.size_locked) {
+                    new_height = GLib.Math.round (new_width / canvas.size_ratio);
+                }
 
                 if (item_width > MIN_SIZE) {
                     origin_move_delta_x = item_width - new_width;
