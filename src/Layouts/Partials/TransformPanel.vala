@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2019 Alecaddd (https://alecaddd.com)
+* Copyright (c) 2020 Alecaddd (https://alecaddd.com)
 *
 * This file is part of Akira.
 *
@@ -21,6 +21,7 @@
 */
 public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
     public weak Akira.Window window { get; construct; }
+    public weak Akira.Lib.Canvas canvas;
 
     public bool size_lock { get; set; default = false; }
     private Akira.Partials.LinkedInput x;
@@ -34,8 +35,6 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
     private Gtk.Adjustment opacity_adj;
     private Akira.Partials.InputField opacity_entry;
     private Gtk.Scale scale;
-
-    public double size_ratio = 1.0;
 
     // Bindings.
     private Binding width_bind;
@@ -246,11 +245,12 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         height.value = 0.0;
         opacity_adj.value = 100.0;
         rotation.value = 0.0;
-        size_ratio = 1.0;
+        canvas.size_ratio = 1.0;
         size_lock = false;
     }
 
     private void enable () {
+        canvas = selected_item.canvas as Akira.Lib.Canvas;
         on_item_coord_changed ();
 
         width.value = selected_item.get_coords ("width");
@@ -271,7 +271,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
                 double src = (double) srcval;
                 targetval.set_double (src);
                 if (size_lock) {
-                    height.value = GLib.Math.round (src / size_ratio);
+                    height.value = GLib.Math.round (src / canvas.size_ratio);
                 }
                 return true;
             });
@@ -283,7 +283,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
                 double src = (double) srcval;
                 targetval.set_double (src);
                 if (size_lock) {
-                    width.value = GLib.Math.round (src * size_ratio);
+                    width.value = GLib.Math.round (src * canvas.size_ratio);
                 }
                 return true;
             });
@@ -335,7 +335,11 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
     }
 
     public void update_size_ratio () {
-        size_ratio = width.value / height.value;
+        // We can't divide by 0, let's avoid to open a black hole.
+        if (height.value == 0) {
+            return;
+        }
+        canvas.size_ratio = width.value / height.value;
     }
 
     private Gtk.Label group_title (string title) {
