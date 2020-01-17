@@ -617,6 +617,22 @@ namespace Goo {
 		[NoAccessorMethod]
 		public double radius_y { get; set; }
 		[NoAccessorMethod]
+		public double radius_top_left_x { get; set; }
+		[NoAccessorMethod]
+		public double radius_top_left_y { get; set; }
+		[NoAccessorMethod]
+		public double radius_top_right_x { get; set; }
+		[NoAccessorMethod]
+		public double radius_top_right_y { get; set; }
+		[NoAccessorMethod]
+		public double radius_bottom_left_x { get; set; }
+		[NoAccessorMethod]
+		public double radius_bottom_left_y { get; set; }
+		[NoAccessorMethod]
+		public double radius_bottom_right_x { get; set; }
+		[NoAccessorMethod]
+		public double radius_bottom_right_y { get; set; }
+		[NoAccessorMethod]
 		public double width { get; set; }
 		[NoAccessorMethod]
 		public double x { get; set; }
@@ -634,6 +650,22 @@ namespace Goo {
 		public double radius_x { get; set; }
 		[NoAccessorMethod]
 		public double radius_y { get; set; }
+		[NoAccessorMethod]
+		public double radius_top_left_x { get; set; }
+		[NoAccessorMethod]
+		public double radius_top_left_y { get; set; }
+		[NoAccessorMethod]
+		public double radius_top_right_x { get; set; }
+		[NoAccessorMethod]
+		public double radius_top_right_y { get; set; }
+		[NoAccessorMethod]
+		public double radius_bottom_left_x { get; set; }
+		[NoAccessorMethod]
+		public double radius_bottom_left_y { get; set; }
+		[NoAccessorMethod]
+		public double radius_bottom_right_x { get; set; }
+		[NoAccessorMethod]
+		public double radius_bottom_right_y { get; set; }
 		[NoAccessorMethod]
 		public double width { get; set; }
 		[NoAccessorMethod]
