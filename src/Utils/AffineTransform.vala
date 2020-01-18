@@ -177,6 +177,16 @@ public class Akira.Utils.AffineTransform : Object {
             origin_move_delta_y = 0.0;
         }
 
+        if (new_width < MIN_SIZE) {
+            canvas.window.event_bus.flip_item ();
+            return;
+        }
+
+        if (new_height < MIN_SIZE) {
+            canvas.window.event_bus.flip_item (true);
+            return;
+        }
+
         // Before translating, recover the original "canvas" position of
         // initial_event, in order to convert it to the "new" translated
         // item space after the transformation has been applied.
@@ -356,7 +366,6 @@ public class Akira.Utils.AffineTransform : Object {
     */
 
     private static double fix_size (double size) {
-        var new_size = GLib.Math.round (size);
-        return new_size > MIN_SIZE ? new_size : MIN_SIZE;
+        return GLib.Math.round (size);
     }
 }
