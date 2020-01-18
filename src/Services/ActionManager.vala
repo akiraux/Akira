@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2019 Alecaddd (http://alecaddd.com)
+* Copyright (c) 2019-2020 Alecaddd (https://alecaddd.com)
 *
 * This file is part of Akira.
 *
@@ -10,11 +10,11 @@
 
 * Akira is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 * GNU General Public License for more details.
 
 * You should have received a copy of the GNU General Public License
-* along with Akira.  If not, see <https://www.gnu.org/licenses/>.
+* along with Akira. If not, see <https://www.gnu.org/licenses/>.
 *
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
@@ -49,6 +49,8 @@ public class Akira.Services.ActionManager : Object {
     public const string ACTION_IMAGE_TOOL = "action_image_tool";
     public const string ACTION_SELECTION_TOOL = "action_selection_tool";
     public const string ACTION_DELETE = "action_delete";
+    public const string ACTION_FLIP_H = "action_flip_h";
+    public const string ACTION_FLIP_V = "action_flip_v";
 
     public static Gee.MultiMap<string, string> action_accelerators = new Gee.HashMultiMap<string, string> ();
 
@@ -76,6 +78,8 @@ public class Akira.Services.ActionManager : Object {
         { ACTION_IMAGE_TOOL, action_image_tool },
         { ACTION_SELECTION_TOOL, action_selection_tool },
         { ACTION_DELETE, action_delete },
+        { ACTION_FLIP_H, action_flip_h },
+        { ACTION_FLIP_V, action_flip_v },
     };
 
     public ActionManager (Akira.Application akira_app, Akira.Window window) {
@@ -104,6 +108,8 @@ public class Akira.Services.ActionManager : Object {
         action_accelerators.set (ACTION_MOVE_DOWN, "<Control>Down");
         action_accelerators.set (ACTION_MOVE_TOP, "<Control><Shift>Up");
         action_accelerators.set (ACTION_MOVE_BOTTOM, "<Control><Shift>Down");
+        action_accelerators.set (ACTION_FLIP_H, "<Control>bracketleft");
+        action_accelerators.set (ACTION_FLIP_V, "<Control>bracketright");
     }
 
     construct {
@@ -199,6 +205,14 @@ public class Akira.Services.ActionManager : Object {
     }
 
     private void action_delete () {}
+
+    private void action_flip_h () {
+        window.event_bus.flip_item ();
+    }
+
+    private void action_flip_v () {
+        window.event_bus.flip_item (true);
+    }
 
     private void action_ellipse_tool () {
         window.main_window.main_canvas.canvas.edit_mode = Akira.Lib.Canvas.EditMode.MODE_INSERT;

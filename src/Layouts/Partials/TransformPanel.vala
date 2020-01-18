@@ -119,11 +119,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         hflip_button.halign = Gtk.Align.CENTER;
         hflip_button.valign = Gtk.Align.CENTER;
         hflip_button.tooltip_markup =
-            Granite.markup_accel_tooltip ({"<Ctrl><Shift>bracketleft"}, _("Flip Horizontally"));
-        //  hflip_button.clicked.connect (() => {
-        //      Utils.AffineTransform.flip_item (selected_item, -1, 1);
-        //      on_item_value_changed ();
-        //  });
+            Granite.markup_accel_tooltip ({"<Ctrl>bracketleft"}, _("Flip Horizontally"));
 
         vflip_button = new Gtk.ToggleButton ();
         vflip_button.add (new Akira.Partials.ButtonImage ("object-flip-vertical"));
@@ -134,11 +130,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         vflip_button.halign = Gtk.Align.CENTER;
         vflip_button.valign = Gtk.Align.CENTER;
         vflip_button.tooltip_markup =
-            Granite.markup_accel_tooltip ({"<Ctrl><Shift>bracketright"}, _("Flip Vertically"));
-        //  vflip_button.clicked.connect (() => {
-        //      Utils.AffineTransform.flip_item (selected_item, 1, -1);
-        //      on_item_value_changed ();
-        //  });
+            Granite.markup_accel_tooltip ({"<Ctrl>bracketright"}, _("Flip Vertically"));
 
         var align_grid = new Gtk.Grid ();
         align_grid.hexpand = true;
@@ -312,8 +304,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
             "active", selected_item, "flipped-h", BindingFlags.BIDIRECTIONAL,
             (binding, val, ref res) => {
                 res = val.get_boolean ();
-                Utils.AffineTransform.flip_item (selected_item, -1, 1);
-                on_item_value_changed ();
+                window.event_bus.flip_item ();
                 return true;
             });
 
@@ -321,8 +312,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
             "active", selected_item, "flipped-v", BindingFlags.BIDIRECTIONAL,
             (binding, val, ref res) => {
                 res = val.get_boolean ();
-                Utils.AffineTransform.flip_item (selected_item, 1, -1);
-                on_item_value_changed ();
+                window.event_bus.flip_item (true);
                 return true;
             });
 
