@@ -41,6 +41,7 @@ public class Akira.Services.EventBus : Object {
     public signal void flip_item (bool clicked, bool vertical = false);
     public signal void move_item_from_canvas (Gdk.EventKey event);
     public signal void request_escape ();
+    public signal void item_inserted (Lib.Models.CanvasItem new_item);
 
     public void test (string caller_id) {
         debug (@"Test from EventBus called by $(caller_id)");

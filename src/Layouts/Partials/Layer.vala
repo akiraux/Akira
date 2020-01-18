@@ -21,7 +21,7 @@
 
 public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
     public weak Akira.Window window { get; construct; }
-    public Akira.Layouts.Partials.Artboard artboard { construct set; get; }
+    public Akira.Layouts.Partials.Artboard? artboard { construct set; get; }
     public Akira.Layouts.Partials.Layer? layer_group { construct set; get; }
     public string layer_name { get; construct; }
     public string icon_name { get; construct; }
@@ -83,7 +83,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 
     // public Akira.Shape shape { get; construct; }
 
-    public Layer (Akira.Window window, Akira.Layouts.Partials.Artboard artboard, Goo.CanvasItemSimple item_simple,
+    public Layer (Akira.Window window, Akira.Layouts.Partials.Artboard? artboard, Goo.CanvasItemSimple item_simple,
         string name, string icon, bool group, Akira.Layouts.Partials.Layer? parent = null) {
         Object (
             window: window,
@@ -316,7 +316,9 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 
         Gtk.drag_set_icon_surface (context, surface);
 
-        artboard.count_layers ();
+        if (artboard != null) {
+            artboard.count_layers ();
+        }
     }
 
     private void on_drag_data_get (Gtk.Widget widget, Gdk.DragContext context, Gtk.SelectionData selection_data,
@@ -443,8 +445,11 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
             return false;
         }
 
-        if (event.type == Gdk.EventType.BUTTON_RELEASE) {
+        if (event.type == Gdk.EventType.BUTTON_PRESS) {
+            activate ();
+        }
 
+        if (event.type == Gdk.EventType.BUTTON_RELEASE) {
             if (entry.visible == true) {
                 return false;
             }
@@ -472,32 +477,41 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
                         return false;
                     });
                 }
-            } else {
-                artboard.container.selection_mode = Gtk.SelectionMode.SINGLE;
 
-                window.main_window.right_sidebar.layers_panel.foreach (child => {
-                    if (child is Akira.Layouts.Partials.Artboard) {
-                        Akira.Layouts.Partials.Artboard artboard = (Akira.Layouts.Partials.Artboard) child;
-
-                        window.main_window.right_sidebar.layers_panel.unselect_row (artboard);
-                        artboard.container.unselect_all ();
-
-                        unselect_groups (artboard.container);
-                    }
-                });
-
-                if (layer_group != null) {
-                    artboard.container.selection_mode = Gtk.SelectionMode.NONE;
-                    artboard.container.unselect_row (layer_group);
-                }
+                return true;
             }
 
-            activate ();
+            if (artboard != null) {
+                artboard.container.selection_mode = Gtk.SelectionMode.SINGLE;
+            }
 
-            window.main_window.right_sidebar.layers_panel.selection_mode = Gtk.SelectionMode.NONE;
-            window.main_window.right_sidebar.layers_panel.unselect_row (artboard);
+            window.main_window.right_sidebar.layers_panel.foreach (child => {
+                if (child is Akira.Layouts.Partials.Artboard) {
+                    Akira.Layouts.Partials.Artboard artboard = (Akira.Layouts.Partials.Artboard) child;
 
-            return false;
+                    debug ("Unselecting something");
+
+                    window.main_window.right_sidebar.layers_panel.unselect_row (artboard);
+                    artboard.container.unselect_all ();
+
+                    unselect_groups (artboard.container);
+                }
+            });
+
+            if (layer_group != null) {
+                debug ("Entra");
+                artboard.container.selection_mode = Gtk.SelectionMode.NONE;
+                artboard.container.unselect_row (layer_group);
+            }
+
+            //activate ();
+            //window.main_window.right_sidebar.layers_panel.selection_mode = Gtk.SelectionMode.NONE;
+
+            if (artboard != null) {
+                window.main_window.right_sidebar.layers_panel.unselect_row (artboard);
+            }
+
+            return true;
         }
 
         return false;

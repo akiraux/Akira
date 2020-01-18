@@ -28,6 +28,9 @@ public enum Akira.Lib.Models.CanvasItemType {
 }
 
 public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasItem {
+    public abstract string LAYER_TEXT { get; set; }
+    public abstract string LAYER_ICON { get; set; }
+
     public static int global_id = 0;
 
     public abstract string id { get; set; }

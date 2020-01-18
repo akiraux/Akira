@@ -20,6 +20,9 @@
 */
 
 public class Akira.Lib.Models.CanvasImage : Goo.CanvasImage, CanvasItem {
+    public string LAYER_TEXT { get; set; default = "Image"; }
+    public string LAYER_ICON { get; set; default = "shape-text-symbolic"; }
+
     public string id { get; set; }
     public bool selected { get; set; }
     public double rotation { get; set; }

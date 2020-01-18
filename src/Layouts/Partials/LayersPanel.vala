@@ -49,17 +49,25 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
         get_style_context ().add_class ("layers-panel");
         expand = true;
 
-        artboard = new Akira.Layouts.Partials.Artboard (window, "Artboard 1");
-        var placeholder = new Gtk.ListBoxRow ();
-        artboard.container.insert (placeholder, 0);
-        placeholder.visible = false;
-        placeholder.no_show_all = true;
-
-        insert (artboard, 0);
-
         build_drag_and_drop ();
-
         reload_zebra ();
+
+        window.event_bus.item_inserted.connect (on_item_inserted);
+        window.event_bus.item_deleted.connect (on_item_deleted);
+    }
+
+    private void on_item_inserted (Lib.Models.CanvasItem new_item) {
+        var layer = new Akira.Layouts.Partials.Layer (
+            window,
+            artboard,
+            new_item,
+            new_item.id,
+            new_item.LAYER_ICON,
+            false
+        );
+
+        insert (layer, 0);
+        show_all ();
     }
 
     private void build_drag_and_drop () {

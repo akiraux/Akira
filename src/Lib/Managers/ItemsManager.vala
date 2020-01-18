@@ -101,6 +101,8 @@ public class Akira.Lib.Managers.ItemsManager : Object {
 
         if (new_item != null) {
             items.append (new_item);
+
+            canvas.window.event_bus.item_inserted (new_item);
         }
 
         return new_item;
@@ -122,22 +124,6 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             root
         );
 
-        /*
-        var artboard = window.main_window.right_sidebar.layers_panel.artboard;
-        var layer = new Akira.Layouts.Partials.Layer (
-            window,
-            artboard,
-            rect,
-            "Rectangle",
-            "shape-rectangle-symbolic",
-            false
-        );
-
-        rect.set_data<Akira.Layouts.Partials.Layer?> ("layer", layer);
-
-        artboard.container.add (layer);
-        artboard.show_all ();
-        */
 
         return rect;
     }
