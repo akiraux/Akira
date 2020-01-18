@@ -178,12 +178,12 @@ public class Akira.Utils.AffineTransform : Object {
         }
 
         if (new_width < MIN_SIZE) {
-            canvas.window.event_bus.flip_item ();
+            canvas.window.event_bus.flip_item (false);
             return;
         }
 
         if (new_height < MIN_SIZE) {
-            canvas.window.event_bus.flip_item (true);
+            canvas.window.event_bus.flip_item (false, true);
             return;
         }
 
@@ -316,20 +316,28 @@ public class Akira.Utils.AffineTransform : Object {
         item.rotation += actual_rotation;
     }
 
-    public static void flip_item (CanvasItem item, double sx, double sy) {
-        double x, y, width, height;
-        item.get ("x", out x, "y", out y, "width", out width, "height", out height);
-        var center_x = x + width / 2;
-        var center_y = y + height / 2;
+    public static void flip_item (bool clicked, CanvasItem item, double sx, double sy) {
+        if (clicked) {
+            double x, y, width, height;
+            item.get ("x", out x, "y", out y, "width", out width, "height", out height);
+            var center_x = x + width / 2;
+            var center_y = y + height / 2;
+
+            var transform = Cairo.Matrix.identity ();
+            item.get_transform (out transform);
+            double radians = item.rotation * (Math.PI / 180);
+            transform.translate (center_x, center_y);
+            transform.rotate (-radians);
+            transform.scale (sx, sy);
+            transform.rotate (radians);
+            transform.translate (-center_x, -center_y);
+            item.set_transform (transform);
+            return;
+        }
 
         var transform = Cairo.Matrix.identity ();
         item.get_transform (out transform);
-        transform.translate (center_x, center_y);
-        double radians = item.rotation * (Math.PI / 180);
-        transform.rotate (-radians);
         transform.scale (sx, sy);
-        transform.rotate (radians);
-        transform.translate (-center_x, -center_y);
         item.set_transform (transform);
     }
 

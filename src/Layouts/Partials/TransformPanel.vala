@@ -289,18 +289,18 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
             BindingFlags.SYNC_CREATE | BindingFlags.BIDIRECTIONAL);
 
         hflip_bind = hflip_button.bind_property (
-            "active", selected_item, "flipped-h", BindingFlags.BIDIRECTIONAL,
+            "active", selected_item, "flipped-h", BindingFlags.SYNC_CREATE | BindingFlags.BIDIRECTIONAL,
             (binding, val, ref res) => {
                 res = val.get_boolean ();
-                window.event_bus.flip_item ();
+                window.event_bus.flip_item (true);
                 return true;
             });
 
         vflip_bind = vflip_button.bind_property (
-            "active", selected_item, "flipped-v", BindingFlags.BIDIRECTIONAL,
+            "active", selected_item, "flipped-v", BindingFlags.SYNC_CREATE | BindingFlags.BIDIRECTIONAL,
             (binding, val, ref res) => {
                 res = val.get_boolean ();
-                window.event_bus.flip_item (true);
+                window.event_bus.flip_item (true, true);
                 return true;
             });
 
