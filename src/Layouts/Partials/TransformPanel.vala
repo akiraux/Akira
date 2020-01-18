@@ -94,7 +94,6 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         hexpand = true;
 
         x = new Akira.Partials.LinkedInput (_("X"), _("Horizontal position"));
-
         y = new Akira.Partials.LinkedInput (_("Y"), _("Vertical position"));
         width = new Akira.Partials.LinkedInput (_("W"), _("Width"));
         height = new Akira.Partials.LinkedInput (_("H"), _("Height"));

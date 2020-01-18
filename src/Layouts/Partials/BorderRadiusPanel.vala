@@ -294,13 +294,6 @@ public class Akira.Layouts.Partials.BorderRadiusPanel : Gtk.Grid {
             BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE,
             (binding, srcval, ref targetval) => {
                 double src = double.parse (srcval.dup_string ());
-
-                if (src > max_value || src < 0) {
-                    border_radius_entry.entry.text =
-                        (border_radius_scale.get_value ()).to_string ();
-                    return false;
-                }
-
                 targetval.set_double (src);
                 return true;
             }, (binding, srcval, ref targetval) => {
