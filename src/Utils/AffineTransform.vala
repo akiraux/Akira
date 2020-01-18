@@ -38,7 +38,7 @@ public class Akira.Utils.AffineTransform : Object {
         double initial_y,
         CanvasItem selected_item
     ) {
-        Goo.Canvas canvas = selected_item.get_canvas ();
+        var canvas = selected_item.canvas;
 
         canvas.convert_to_item_space (selected_item, ref x, ref y);
 
@@ -58,7 +58,7 @@ public class Akira.Utils.AffineTransform : Object {
         NobManager.Nob selected_nob,
         CanvasItem selected_item
     ) {
-        Goo.Canvas canvas = selected_item.get_canvas ();
+        var canvas = selected_item.canvas as Akira.Lib.Canvas;
         canvas.convert_to_item_space (selected_item, ref x, ref y);
 
         double delta_x = x - initial_x;
@@ -76,7 +76,11 @@ public class Akira.Utils.AffineTransform : Object {
         switch (selected_nob) {
             case NobManager.Nob.TOP_LEFT:
                 new_height = initial_height - delta_y;
-                new_width = initial_width - delta_x;
+                if (canvas.ctrl_is_pressed || selected_item.size_locked) {
+                    new_width = GLib.Math.round (new_height * canvas.size_ratio);
+                } else {
+                    new_width = initial_width - delta_x;
+                }
 
                 if (item_height > MIN_SIZE) {
                     origin_move_delta_y = item_height - new_height;
@@ -89,6 +93,9 @@ public class Akira.Utils.AffineTransform : Object {
 
             case NobManager.Nob.TOP_CENTER:
                 new_height = initial_height - delta_y;
+                if (canvas.ctrl_is_pressed || selected_item.size_locked) {
+                    new_width = GLib.Math.round (new_height * canvas.size_ratio);
+                }
 
                 if (item_height > MIN_SIZE) {
                     origin_move_delta_y = item_height - new_height;
@@ -97,7 +104,11 @@ public class Akira.Utils.AffineTransform : Object {
 
             case NobManager.Nob.TOP_RIGHT:
                 new_width = initial_width + delta_x;
-                new_height = initial_height - delta_y;
+                if (canvas.ctrl_is_pressed || selected_item.size_locked) {
+                    new_height = GLib.Math.round (new_width / canvas.size_ratio);
+                } else {
+                    new_height = initial_height - delta_y;
+                }
 
                 if (item_height > MIN_SIZE) {
                     origin_move_delta_y = item_height - new_height;
@@ -106,20 +117,34 @@ public class Akira.Utils.AffineTransform : Object {
 
             case NobManager.Nob.RIGHT_CENTER:
                 new_width = initial_width + delta_x;
+                if (canvas.ctrl_is_pressed || selected_item.size_locked) {
+                    new_height = GLib.Math.round (new_width / canvas.size_ratio);
+                }
                 break;
 
             case NobManager.Nob.BOTTOM_RIGHT:
                 new_width = initial_width + delta_x;
+                if (canvas.ctrl_is_pressed || selected_item.size_locked) {
+                    new_height = GLib.Math.round (new_width / canvas.size_ratio);
+                    break;
+                }
                 new_height = initial_height + delta_y;
                 break;
 
             case NobManager.Nob.BOTTOM_CENTER:
                 new_height = initial_height + delta_y;
+                if (canvas.ctrl_is_pressed || selected_item.size_locked) {
+                    new_width = GLib.Math.round (new_height * canvas.size_ratio);
+                }
                 break;
 
             case NobManager.Nob.BOTTOM_LEFT:
                 new_height = initial_height + delta_y;
-                new_width = initial_width - delta_x;
+                if (canvas.ctrl_is_pressed || selected_item.size_locked) {
+                    new_width = GLib.Math.round (new_height * canvas.size_ratio);
+                } else {
+                    new_width = initial_width - delta_x;
+                }
 
                 if (item_width > MIN_SIZE) {
                     origin_move_delta_x = item_width - new_width;
@@ -128,6 +153,9 @@ public class Akira.Utils.AffineTransform : Object {
 
             case NobManager.Nob.LEFT_CENTER:
                 new_width = initial_width - delta_x;
+                if (canvas.ctrl_is_pressed || selected_item.size_locked) {
+                    new_height = GLib.Math.round (new_width / canvas.size_ratio);
+                }
 
                 if (item_width > MIN_SIZE) {
                     origin_move_delta_x = item_width - new_width;
@@ -149,6 +177,16 @@ public class Akira.Utils.AffineTransform : Object {
             origin_move_delta_y = 0.0;
         }
 
+        if (new_width < MIN_SIZE) {
+            canvas.window.event_bus.flip_item ();
+            return;
+        }
+
+        if (new_height < MIN_SIZE) {
+            canvas.window.event_bus.flip_item (true);
+            return;
+        }
+
         // Before translating, recover the original "canvas" position of
         // initial_event, in order to convert it to the "new" translated
         // item space after the transformation has been applied.
@@ -166,7 +204,7 @@ public class Akira.Utils.AffineTransform : Object {
         double initial_y,
         CanvasItem selected_item
     ) {
-        Goo.Canvas canvas = selected_item.get_canvas ();
+        var canvas = selected_item.canvas as Akira.Lib.Canvas;
         canvas.convert_to_item_space (selected_item, ref x, ref y);
 
         var initial_width = selected_item.get_coords ("width");
@@ -191,11 +229,11 @@ public class Akira.Utils.AffineTransform : Object {
         initial_x = x;
         initial_y = y;
 
-        if ((canvas as Akira.Lib.Canvas).ctrl_is_pressed) {
+        if (canvas.ctrl_is_pressed) {
             do_rotation = false;
         }
 
-        if ((canvas as Akira.Lib.Canvas).ctrl_is_pressed && rotation.abs () > ROTATION_FIXED_STEP) {
+        if (canvas.ctrl_is_pressed && rotation.abs () > ROTATION_FIXED_STEP) {
             do_rotation = true;
 
             // The rotation amount needs to take into consideration
@@ -236,7 +274,7 @@ public class Akira.Utils.AffineTransform : Object {
     }
 
     public static void set_position (double? x, double? y, CanvasItem item) {
-        var canvas = item.get_canvas ();
+        var canvas = item.canvas;
 
         double current_x = item.get_coords ("x");
         double current_y = item.get_coords ("y");
@@ -278,6 +316,23 @@ public class Akira.Utils.AffineTransform : Object {
         item.rotation += actual_rotation;
     }
 
+    public static void flip_item (CanvasItem item, double sx, double sy) {
+        double x, y, width, height;
+        item.get ("x", out x, "y", out y, "width", out width, "height", out height);
+        var center_x = x + width / 2;
+        var center_y = y + height / 2;
+
+        var transform = Cairo.Matrix.identity ();
+        item.get_transform (out transform);
+        transform.translate (center_x, center_y);
+        double radians = item.rotation * (Math.PI / 180);
+        transform.rotate (-radians);
+        transform.scale (sx, sy);
+        transform.rotate (radians);
+        transform.translate (-center_x, -center_y);
+        item.set_transform (transform);
+    }
+
     /*
     private static double fix_x_position (double x, double width, double delta_x) {
         var min_delta = Math.round (MIN_POS - width);
@@ -311,7 +366,6 @@ public class Akira.Utils.AffineTransform : Object {
     */
 
     private static double fix_size (double size) {
-        var new_size = GLib.Math.round (size);
-        return new_size > MIN_SIZE ? new_size : MIN_SIZE;
+        return GLib.Math.round (size);
     }
 }

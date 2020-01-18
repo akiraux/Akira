@@ -34,6 +34,9 @@ public class Akira.Lib.Models.CanvasRect : Goo.CanvasRect, Models.CanvasItem {
     public Gdk.RGBA border_color { get; set; }
     public int stroke_alpha { get; set; }
     public bool hidden_border { get; set; }
+    public bool size_locked { get; set; }
+    public bool flipped_h { get; set; }
+    public bool flipped_v { get; set; }
     public bool show_border_radius_panel { get; set; }
     public bool show_fill_panel { get; set; }
     public bool show_border_panel { get; set; }

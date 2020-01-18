@@ -372,10 +372,14 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
             move_bottom.sensitive = false;
         }
 
+        // Account for nobs and select effect.
         var top_position = root_item.get_n_children () - (selected ? 1 : 11);
         if (item_position == top_position) {
             move_up.sensitive = false;
             move_top.sensitive = false;
         }
+
+        //  debug (item_position.to_string ());
+        //  debug (top_position.to_string ());
     }
 }

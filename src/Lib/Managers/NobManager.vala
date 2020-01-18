@@ -25,12 +25,12 @@ public class Akira.Lib.Managers.NobManager : Object {
     private const double LINE_WIDTH = 1.0;
 
     /*
-        Grabber Pos:   8
-                     0 1 2
-                     7   3
-                     6 5 4
+    Grabber Pos:   8
+    0 1 2
+    7   3
+    6 5 4
 
-        // -1 if no nub is grabbed
+    // -1 if no nub is grabbed
     */
     public enum Nob {
         NONE=-1,
@@ -59,6 +59,9 @@ public class Akira.Lib.Managers.NobManager : Object {
     private double height;
     private double nob_size;
     private double current_scale = 1.0;
+
+    // If the effect needs to be created or it's only a value update.
+    private bool create { get; set; default = true; }
 
     public NobManager (Akira.Lib.Canvas canvas) {
         Object (
@@ -119,9 +122,8 @@ public class Akira.Lib.Managers.NobManager : Object {
     }
 
     private void on_add_select_effect (List<Models.CanvasItem> selected_items) {
-        remove_select_effect ();
-
         if (selected_items.length () == 0) {
+            remove_select_effect ();
             return;
         }
 
@@ -131,6 +133,8 @@ public class Akira.Lib.Managers.NobManager : Object {
 
         update_select_effect (selected_items);
         update_nob_position (selected_items);
+        // We don't need to recreate those objects after this.
+        create = false;
     }
 
     private void remove_select_effect (bool keep_selection = false) {
@@ -144,6 +148,9 @@ public class Akira.Lib.Managers.NobManager : Object {
         for (int i = 0; i < 9; i++) {
             nobs[i].remove ();
         }
+        // Those objects were removed, new objects should be created.
+        create = true;
+        //  debug ("removed");
     }
 
     private void update_select_effect (List<Models.CanvasItem> selected_items) {
@@ -169,7 +176,9 @@ public class Akira.Lib.Managers.NobManager : Object {
         width += line_width * 2;
         height += line_width * 2;
 
-        select_effect = new Goo.CanvasRect (
+        if (create) {
+            //  debug ("create effect");
+            select_effect = new Goo.CanvasRect (
             null,
             x, y,
             width,
@@ -177,11 +186,13 @@ public class Akira.Lib.Managers.NobManager : Object {
             "line-width", LINE_WIDTH / current_scale,
             "stroke-color", STROKE_COLOR,
             null
-        );
+            );
+            select_effect.set ("parent", root);
+        }
 
         select_effect.set_transform (transform);
-
-        select_effect.set ("parent", root);
+        select_effect.set ("width", width);
+        select_effect.set ("height", height);
     }
 
     private void update_nob_position (List<Models.CanvasItem> selected_items) {
@@ -201,8 +212,11 @@ public class Akira.Lib.Managers.NobManager : Object {
             ref width, ref height
         );
 
-        for (int i = 0; i < 9; i++) {
-            nobs[i] = new Selection.Nob (root, (Managers.NobManager.Nob) i, current_scale);
+        if (create) {
+            //  debug ("create nobs");
+            for (int i = 0; i < 9; i++) {
+                nobs[i] = new Selection.Nob (root, (Managers.NobManager.Nob) i, current_scale);
+            }
         }
 
         nob_size = Selection.Nob.NOB_SIZE / current_scale;
@@ -215,23 +229,23 @@ public class Akira.Lib.Managers.NobManager : Object {
         // TOP LEFT nob
         nobs[Nob.TOP_LEFT].set_transform (transform);
         if (print_middle_width_nobs && print_middle_height_nobs) {
-          nobs[Nob.TOP_LEFT].translate (x - (nob_offset + line_width), y - (nob_offset + line_width));
+            nobs[Nob.TOP_LEFT].translate (x - (nob_offset + line_width), y - (nob_offset + line_width));
         } else {
-          nobs[Nob.TOP_LEFT].translate (x - nob_size - line_width, y - nob_size - line_width);
+            nobs[Nob.TOP_LEFT].translate (x - nob_size - line_width, y - nob_size - line_width);
         }
         nobs[Nob.TOP_LEFT].raise (select_effect);
 
         if (print_middle_width_nobs) {
-          // TOP CENTER nob
-          nobs[Nob.TOP_CENTER].set_transform (transform);
-          if (print_middle_height_nobs) {
-            nobs[Nob.TOP_CENTER].translate (x + (width / 2) - nob_offset, y - (nob_offset + line_width));
-          } else {
-            nobs[Nob.TOP_CENTER].translate (x + (width / 2) - nob_offset, y - (nob_size + line_width));
-          }
-          set_nob_visibility (Nob.TOP_CENTER, true);
+            // TOP CENTER nob
+            nobs[Nob.TOP_CENTER].set_transform (transform);
+            if (print_middle_height_nobs) {
+                nobs[Nob.TOP_CENTER].translate (x + (width / 2) - nob_offset, y - (nob_offset + line_width));
+            } else {
+                nobs[Nob.TOP_CENTER].translate (x + (width / 2) - nob_offset, y - (nob_size + line_width));
+            }
+            set_nob_visibility (Nob.TOP_CENTER, true);
         } else {
-          set_nob_visibility (Nob.TOP_CENTER, false);
+            set_nob_visibility (Nob.TOP_CENTER, false);
         }
 
         nobs[Nob.TOP_CENTER].raise (select_effect);
@@ -239,23 +253,23 @@ public class Akira.Lib.Managers.NobManager : Object {
         // TOP RIGHT nob
         nobs[Nob.TOP_RIGHT].set_transform (transform);
         if (print_middle_width_nobs && print_middle_height_nobs) {
-          nobs[Nob.TOP_RIGHT].translate (x + width - (nob_offset - line_width), y - (nob_offset + line_width));
+            nobs[Nob.TOP_RIGHT].translate (x + width - (nob_offset - line_width), y - (nob_offset + line_width));
         } else {
-          nobs[Nob.TOP_RIGHT].translate (x + width + line_width, y - (nob_size + line_width));
+            nobs[Nob.TOP_RIGHT].translate (x + width + line_width, y - (nob_size + line_width));
         }
         nobs[Nob.TOP_RIGHT].raise (select_effect);
 
         if (print_middle_height_nobs) {
-          // RIGHT CENTER nob
-          nobs[Nob.RIGHT_CENTER].set_transform (transform);
-          if (print_middle_width_nobs) {
-            nobs[Nob.RIGHT_CENTER].translate (x + width - (nob_offset - line_width), y + (height / 2) - nob_offset);
-          } else {
-            nobs[Nob.RIGHT_CENTER].translate (x + width + line_width, y + (height / 2) - nob_offset);
-          }
-          set_nob_visibility (Nob.RIGHT_CENTER, true);
+            // RIGHT CENTER nob
+            nobs[Nob.RIGHT_CENTER].set_transform (transform);
+            if (print_middle_width_nobs) {
+                nobs[Nob.RIGHT_CENTER].translate (x + width - (nob_offset - line_width), y + (height / 2) - nob_offset);
+            } else {
+                nobs[Nob.RIGHT_CENTER].translate (x + width + line_width, y + (height / 2) - nob_offset);
+            }
+            set_nob_visibility (Nob.RIGHT_CENTER, true);
         } else {
-          set_nob_visibility (Nob.RIGHT_CENTER, false);
+            set_nob_visibility (Nob.RIGHT_CENTER, false);
         }
 
         nobs[Nob.RIGHT_CENTER].raise (select_effect);
@@ -263,46 +277,50 @@ public class Akira.Lib.Managers.NobManager : Object {
         // BOTTOM RIGHT nob
         nobs[Nob.BOTTOM_RIGHT].set_transform (transform);
         if (print_middle_width_nobs && print_middle_height_nobs) {
-          nobs[Nob.BOTTOM_RIGHT].translate (x + width - (nob_offset - line_width), y + height - (nob_offset - line_width));
+            nobs[Nob.BOTTOM_RIGHT].translate (
+                x + width - (nob_offset - line_width), y + height - (nob_offset - line_width)
+            );
         } else {
-          nobs[Nob.BOTTOM_RIGHT].translate (x + width + line_width, y + height + line_width);
+            nobs[Nob.BOTTOM_RIGHT].translate (x + width + line_width, y + height + line_width);
         }
         nobs[Nob.BOTTOM_RIGHT].raise (select_effect);
 
         if (print_middle_width_nobs) {
-          // BOTTOM CENTER nob
-          nobs[Nob.BOTTOM_CENTER].set_transform (transform);
-          if (print_middle_height_nobs) {
-            nobs[Nob.BOTTOM_CENTER].translate (x + (width / 2) - nob_offset, y + height - (nob_offset - line_width));
-          } else {
-            nobs[Nob.BOTTOM_CENTER].translate (x + (width / 2) - nob_offset, y + height + line_width);
-          }
-          set_nob_visibility (Nob.BOTTOM_CENTER, true);
+            // BOTTOM CENTER nob
+            nobs[Nob.BOTTOM_CENTER].set_transform (transform);
+            if (print_middle_height_nobs) {
+                nobs[Nob.BOTTOM_CENTER].translate (
+                    x + (width / 2) - nob_offset, y + height - (nob_offset - line_width)
+                );
+            } else {
+                nobs[Nob.BOTTOM_CENTER].translate (x + (width / 2) - nob_offset, y + height + line_width);
+            }
+            set_nob_visibility (Nob.BOTTOM_CENTER, true);
         } else {
-          set_nob_visibility (Nob.BOTTOM_CENTER, false);
+            set_nob_visibility (Nob.BOTTOM_CENTER, false);
         }
         nobs[Nob.BOTTOM_CENTER].raise (select_effect);
 
         // BOTTOM LEFT nob
         nobs[Nob.BOTTOM_LEFT].set_transform (transform);
         if (print_middle_width_nobs && print_middle_height_nobs) {
-          nobs[Nob.BOTTOM_LEFT].translate (x - (nob_offset + line_width), y + height - (nob_offset - line_width));
+            nobs[Nob.BOTTOM_LEFT].translate (x - (nob_offset + line_width), y + height - (nob_offset - line_width));
         } else {
-          nobs[Nob.BOTTOM_LEFT].translate (x - (nob_size + line_width), y + height + line_width);
+            nobs[Nob.BOTTOM_LEFT].translate (x - (nob_size + line_width), y + height + line_width);
         }
         nobs[Nob.BOTTOM_LEFT].raise (select_effect);
 
         if (print_middle_height_nobs) {
-          // LEFT CENTER nob
-          nobs[Nob.LEFT_CENTER].set_transform (transform);
-          if (print_middle_width_nobs) {
-            nobs[Nob.LEFT_CENTER].translate (x - (nob_offset + line_width), y + (height / 2) - nob_offset);
-          } else {
-            nobs[Nob.LEFT_CENTER].translate (x - (nob_size + line_width), y + (height / 2) - nob_offset);
-          }
-          set_nob_visibility (Nob.LEFT_CENTER, true);
+            // LEFT CENTER nob
+            nobs[Nob.LEFT_CENTER].set_transform (transform);
+            if (print_middle_width_nobs) {
+                nobs[Nob.LEFT_CENTER].translate (x - (nob_offset + line_width), y + (height / 2) - nob_offset);
+            } else {
+                nobs[Nob.LEFT_CENTER].translate (x - (nob_size + line_width), y + (height / 2) - nob_offset);
+            }
+            set_nob_visibility (Nob.LEFT_CENTER, true);
         } else {
-          set_nob_visibility (Nob.LEFT_CENTER, false);
+            set_nob_visibility (Nob.LEFT_CENTER, false);
         }
 
         nobs[Nob.LEFT_CENTER].raise (select_effect);
@@ -320,10 +338,10 @@ public class Akira.Lib.Managers.NobManager : Object {
 
     private void set_nob_visibility (Nob nob_handle, bool visible) {
         if (visible) {
-          nobs[nob_handle].set ("visibility", Goo.CanvasItemVisibility.VISIBLE);
-        } else {
-          nobs[nob_handle].set ("visibility", Goo.CanvasItemVisibility.HIDDEN);
+            nobs[nob_handle].set ("visibility", Goo.CanvasItemVisibility.VISIBLE);
+            return;
         }
+        nobs[nob_handle].set ("visibility", Goo.CanvasItemVisibility.HIDDEN);
     }
 
     private void set_bound_coordinates (
@@ -342,6 +360,8 @@ public class Akira.Lib.Managers.NobManager : Object {
             item.get ("line_width", out line_width);
             item.get ("width", out _width);
             item.get ("height", out _height);
+            item.get ("x", out x);
+            item.get ("y", out y);
 
             return;
         }

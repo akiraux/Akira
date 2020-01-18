@@ -43,12 +43,15 @@ public class Akira.Lib.Models.CanvasImage : Goo.CanvasImage, CanvasItem {
     public Gdk.RGBA border_color { get; set; }
     public int stroke_alpha { get; set; }
     public bool hidden_border { get; set; }
+    public bool size_locked { get; set; }
+    public bool flipped_h { get; set; }
+    public bool flipped_v { get; set; }
     public bool show_border_radius_panel { get; set; }
     public bool show_fill_panel { get; set; }
     public bool show_border_panel { get; set; }
     public Models.CanvasItemType item_type { get; set; }
 
-    public CanvasImage (Akira.Services.EventBus event_bus, Akira.Services.ImageProvider provider, Goo.CanvasItem? parent = null) {
+    public CanvasImage (Akira.Services.ImageProvider provider, Goo.CanvasItem? parent = null) {
         Object (parent: parent);
 
         item_type = Models.CanvasItemType.IMAGE;
@@ -69,16 +72,15 @@ public class Akira.Lib.Models.CanvasImage : Goo.CanvasImage, CanvasItem {
                 pixbuf = _pixbuf;
                 width = _pixbuf.get_width ();
                 height = _pixbuf.get_height ();
-                event_bus.item_bound_changed (this);
-        } catch (Error e) {
+            } catch (Error e) {
                 warning (e.message);
                 // TODO: handle error here
             }
         });
 
         reset_colors ();
-    }
 
-    public void reset_colors () {
+        // Imported images should keep their aspect ratio by default.
+        size_locked = true;
     }
 }
