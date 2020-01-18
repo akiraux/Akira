@@ -144,28 +144,12 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         scale.sensitive = false;
         scale.draw_value = false;
         scale.round_digits = 1;
-        scale.margin_end = 30;
+        scale.margin_end = 20;
         opacity_entry = new Akira.Partials.InputField (
-            Akira.Partials.InputField.Unit.PERCENTAGE, 7, true, true);
-        opacity_entry.entry.text = (opacity_adj.get_value ()).to_string ();
+            Akira.Partials.InputField.Unit.PERCENTAGE, 7, true, true, 0, 100, 1);
         opacity_entry.entry.bind_property (
-            "text", opacity_adj, "value",
-            BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE,
-            (binding, srcval, ref targetval) => {
-                double src = double.parse (srcval.dup_string ());
-
-                if (src > 100 || src < 0) {
-                    opacity_entry.entry.text = (opacity_adj.get_value ()).to_string ();
-                    return false;
-                }
-
-                targetval.set_double (src);
-                return true;
-            }, (binding, srcval, ref targetval) => {
-                double src = (double) srcval;
-                targetval.set_string (("%0.0f").printf (src));
-                return true;
-            });
+            "value", opacity_adj, "value",
+            BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE);
         opacity_entry.entry.hexpand = false;
         opacity_entry.entry.width_request = 64;
 

@@ -36,16 +36,9 @@ public class Akira.Partials.LinkedInput : Gtk.Grid {
     public double limit { get; set; }
     public double value { get; set; }
     public InputField.Unit icon { get; construct set;}
-
-    /**
-    * Used to avoid to infinitely updating two linked data
-    * (for instance width and height when their ratio is locked).
-    */
-    private bool manually_edited = true;
     /**
     * Used to avoid to infinitely updating when value is set externally.
     */
-    private bool externally_set = true;
     private bool dragging = false;
     private double dragging_direction = 0;
     public bool enabled {
@@ -103,44 +96,47 @@ public class Akira.Partials.LinkedInput : Gtk.Grid {
         }
 
         input_field = new Akira.Partials.InputField (icon, 7, true, false);
-        input_field.entry.notify["text"].connect (() => {
-            if (manually_edited) {
-                // Remove unwanted characters.
-                var text_canon = input_field.entry.text.replace (",", ".");
-                text_canon.canon ("-0123456789.", '?');
-                input_field.entry.text = text_canon.replace ("?", "");
+        //  input_field.entry.notify["text"].connect (() => {
+        //      if (manually_edited) {
+        //          // Remove unwanted characters.
+        //          var text_canon = input_field.entry.text.replace (",", ".");
+        //          text_canon.canon ("-0123456789.", '?');
+        //          input_field.entry.text = text_canon.replace ("?", "");
 
-                // If limit is specified, force it as a value.
-                var new_val = double.parse (input_field.entry.text);
-                if (limit > 0.0 && new_val > limit) {
-                    new_val = limit;
-                }
-                input_field.entry.text = new_val.to_string ();
-                externally_set = false;
+        //          // If limit is specified, force it as a value.
+        //          var new_val = double.parse (input_field.entry.text);
+        //          if (limit > 0.0 && new_val > limit) {
+        //              new_val = limit;
+        //          }
+        //          input_field.entry.text = new_val.to_string ();
+        //          externally_set = false;
 
-                if (new_val != value) {
-                    value = new_val;
-                }
-                externally_set = true;
+        //          if (new_val != value) {
+        //              value = new_val;
+        //          }
+        //          externally_set = true;
 
-            }
-        });
-        notify["value"].connect (() => {
-            if (externally_set) {
-              // Remove trailing 0.
-              var format_value = "%f".printf (value).replace (",", ".");
-              while (format_value.has_suffix ("0") && format_value != "0") {
-                  format_value = format_value.slice (0, -1);
-              }
-              if (format_value.has_suffix (".")) {
-                  format_value += "0";
-              }
+        //      }
+        //  });
+        //  notify["value"].connect (() => {
+        //      if (externally_set) {
+        //        // Remove trailing 0.
+        //        var format_value = "%f".printf (value).replace (",", ".");
+        //        while (format_value.has_suffix ("0") && format_value != "0") {
+        //            format_value = format_value.slice (0, -1);
+        //        }
+        //        if (format_value.has_suffix (".")) {
+        //            format_value += "0";
+        //        }
 
-              manually_edited = false;
-              input_field.entry.text = "%s".printf (format_value);
-              manually_edited = true;
-            }
-        });
+        //        manually_edited = false;
+        //        input_field.entry.text = "%s".printf (format_value);
+        //        manually_edited = true;
+        //      }
+        //  });
+        bind_property (
+            "value", input_field.entry, "value",
+            BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE);
 
         event_box.add (entry_label);
 
@@ -181,10 +177,10 @@ public class Akira.Partials.LinkedInput : Gtk.Grid {
             }
 
             if (dragging_direction > event.motion.x || event.motion.x_root == 0) {
-                input_field.decrease_value (null);
+                //  input_field.decrease_value (null);
                 dragging_direction = event.motion.x;
             } else {
-                input_field.increase_value (null);
+                //  input_field.increase_value (null);
                 dragging_direction = event.motion.x;
             }
         }

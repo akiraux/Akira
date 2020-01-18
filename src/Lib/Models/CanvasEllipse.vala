@@ -65,8 +65,10 @@ public class Akira.Lib.Models.CanvasEllipse : Goo.CanvasEllipse, Models.CanvasIt
         radius_y = _radius_y;
         width = 1;
         height = 1;
-        center_x = 0.0;
-        center_y = 0.0;
+        // The Ellipse as a weird 0.5 value always attached to it on creation.
+        // We should get back to this and figure it out.
+        center_x = - 0.5;
+        center_y = - 0.5;
         show_fill_panel = true;
         show_border_panel = true;
 

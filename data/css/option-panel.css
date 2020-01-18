@@ -35,3 +35,10 @@ button.selected-color {
     border-radius: 2px;
     border: 1px solid;
 }
+
+/* spin button */
+spinbutton.horizontal button.down,
+spinbutton.horizontal button.up {
+    -gtk-icon-transform: scale(0.7);
+    padding: 0 1px;
+}

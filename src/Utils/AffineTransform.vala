@@ -365,7 +365,7 @@ public class Akira.Utils.AffineTransform : Object {
     }
     */
 
-    private static double fix_size (double size) {
+    public static double fix_size (double size) {
         return GLib.Math.round (size);
     }
 }
