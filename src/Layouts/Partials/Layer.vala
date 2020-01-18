@@ -180,6 +180,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 
         handle = new Gtk.EventBox ();
         handle.expand = true;
+        handle.can_focus = true;
         handle.above_child = false;
         handle.add (handle_grid);
 
@@ -193,6 +194,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
         build_drag_and_drop ();
 
         handle.event.connect (on_click_event);
+        handle.key_release_event.connect (on_key_release_event);
 
         handle.enter_notify_event.connect (event => {
             get_style_context ().add_class ("hover");
@@ -448,6 +450,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 
         if (event.type == Gdk.EventType.BUTTON_PRESS) {
             activate ();
+            handle.grab_focus ();
         }
 
         if (event.type == Gdk.EventType.BUTTON_RELEASE) {
@@ -518,6 +521,18 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
         return false;
     }
 
+    public bool on_key_release_event (Gdk.EventKey event) {
+        switch (event.keyval) {
+            case Gdk.Key.Delete:
+                window.event_bus.request_delete_item (model.item);
+                break;
+            default:
+                break;
+        }
+
+        return false;
+    }
+
     private void unselect_groups (Gtk.ListBox container) {
         container.foreach (child => {
             if (child is Akira.Layouts.Partials.Layer) {
@@ -550,15 +565,6 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
     }
 
     private void update_label () {
-        var new_label = entry.get_text ();
-
-        if (label.label == new_label) {
-            return;
-        }
-
-        label.label = new_label;
-        model.name = new_label;
-
         entry.visible = false;
         entry.no_show_all = true;
         label.visible = true;
@@ -572,6 +578,15 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
         editing = false;
 
         activate ();
+
+        var new_label = entry.get_text ();
+
+        if (label.label == new_label) {
+            return;
+        }
+
+        label.label = new_label;
+        model.name = new_label;
     }
 
     private void lock_actions () {

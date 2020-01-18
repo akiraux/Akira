@@ -50,6 +50,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         fill_color = Gdk.RGBA ();
 
         canvas.window.event_bus.insert_item.connect (set_item_to_insert);
+        canvas.window.event_bus.request_delete_item.connect (on_request_delete_item);
     }
 
     public bool set_insert_type_from_key (uint keyval) {
@@ -110,6 +111,11 @@ public class Akira.Lib.Managers.ItemsManager : Object {
 
     public void add_item (Akira.Lib.Models.CanvasItem item) {
         items.append (item);
+    }
+
+    public void on_request_delete_item (Lib.Models.CanvasItem item_to_delete) {
+        item_to_delete.delete ();
+        canvas.window.event_bus.item_deleted (item_to_delete);
     }
 
     public Models.CanvasItem add_rect (Gdk.EventButton event) {
