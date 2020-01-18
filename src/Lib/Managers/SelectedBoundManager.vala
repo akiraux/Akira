@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2019 Alecaddd (http://alecaddd.com)
+* Copyright (c) 2019-2020 Alecaddd (https://alecaddd.com)
 *
 * This file is part of Akira.
 *
@@ -10,13 +10,14 @@
 
 * Akira is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 * GNU General Public License for more details.
 
 * You should have received a copy of the GNU General Public License
-* along with Akira.  If not, see <https://www.gnu.org/licenses/>.
+* along with Akira. If not, see <https://www.gnu.org/licenses/>.
 *
 * Authored by: Giacomo Alberini <giacomoalbe@gmail.com>
+* Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
 
 public class Akira.Lib.Managers.SelectedBoundManager : Object {
@@ -46,6 +47,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
 
         canvas.window.event_bus.change_z_selected.connect (change_z_selected);
         canvas.window.event_bus.item_value_changed.connect (update_selected_items);
+        canvas.window.event_bus.flip_item.connect (on_flip_item);
     }
 
     construct {
@@ -186,5 +188,23 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         }
 
         canvas.window.event_bus.z_selected_changed ();
+    }
+
+    private void on_flip_item (bool vertical) {
+        if (selected_items.length () == 0) {
+            return;
+        }
+
+        selected_items.foreach ((item) => {
+            if (vertical) {
+                item.flipped_v = !item.flipped_v;
+                Utils.AffineTransform.flip_item (item, 1, -1);
+                canvas.window.event_bus.item_value_changed ();
+                return;
+            }
+            item.flipped_h = !item.flipped_h;
+            Utils.AffineTransform.flip_item (item, -1, 1);
+            canvas.window.event_bus.item_value_changed ();
+        });
     }
 }

@@ -23,24 +23,26 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
     public weak Akira.Window window { get; construct; }
     public weak Akira.Lib.Canvas canvas;
 
-    public bool size_lock { get; set; default = false; }
     private Akira.Partials.LinkedInput x;
     private Akira.Partials.LinkedInput y;
     private Akira.Partials.LinkedInput width;
     private Akira.Partials.LinkedInput height;
     private Akira.Partials.LinkedInput rotation;
     private Gtk.ToggleButton lock_changes;
-    private Gtk.Button hflip_button;
-    private Gtk.Button vflip_button;
+    private Gtk.ToggleButton hflip_button;
+    private Gtk.ToggleButton vflip_button;
     private Gtk.Adjustment opacity_adj;
     private Akira.Partials.InputField opacity_entry;
     private Gtk.Scale scale;
 
     // Bindings.
+    private Binding ratio_bind;
     private Binding width_bind;
     private Binding height_bind;
     private Binding rotation_bind;
     private Binding opacity_bind;
+    private Binding hflip_bind;
+    private Binding vflip_bind;
 
     public TransformPanel (Akira.Window main_window) {
         Object (
@@ -105,53 +107,30 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         lock_changes.image = lock_image;
         lock_changes.can_focus = false;
         lock_changes.sensitive = false;
-        bind_property (
-            "size-lock", lock_changes, "image", BindingFlags.SYNC_CREATE,
-            (binding, val, ref res) => {
-                var icon = val.get_boolean () ? "changes-prevent-symbolic" : "changes-allow-symbolic";
-                var image = new Gtk.Image.from_icon_name (icon, Gtk.IconSize.BUTTON);
-                res = image;
-                update_size_ratio ();
-                return true;
-            });
-        lock_changes.clicked.connect (() => {
-            selected_item.size_locked = !size_lock;
-            size_lock = !size_lock;
-        });
 
         rotation = new Akira.Partials.LinkedInput (_("R"), _("Rotation degrees"), "°");
 
-        hflip_button = new Gtk.Button ();
+        hflip_button = new Gtk.ToggleButton ();
         hflip_button.add (new Akira.Partials.ButtonImage ("object-flip-horizontal"));
         hflip_button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
-        hflip_button.get_style_context ().add_class ("button-rounded");
         hflip_button.hexpand = false;
+        hflip_button.can_focus = false;
+        hflip_button.sensitive = false;
         hflip_button.halign = Gtk.Align.CENTER;
         hflip_button.valign = Gtk.Align.CENTER;
-        hflip_button.can_focus = false;
         hflip_button.tooltip_markup =
-            Granite.markup_accel_tooltip ({"<Ctrl><Shift>bracketleft"}, _("Flip Horizontally"));
-        hflip_button.clicked.connect (() => {
-            Utils.AffineTransform.flip_item (selected_item, -1, 1);
-            on_item_value_changed ();
-        });
-        hflip_button.sensitive = false;
+            Granite.markup_accel_tooltip ({"<Ctrl>bracketleft"}, _("Flip Horizontally"));
 
-        vflip_button = new Gtk.Button ();
+        vflip_button = new Gtk.ToggleButton ();
         vflip_button.add (new Akira.Partials.ButtonImage ("object-flip-vertical"));
         vflip_button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
-        vflip_button.get_style_context ().add_class ("button-rounded");
         vflip_button.hexpand = false;
+        vflip_button.can_focus = false;
+        vflip_button.sensitive = false;
         vflip_button.halign = Gtk.Align.CENTER;
         vflip_button.valign = Gtk.Align.CENTER;
-        vflip_button.can_focus = false;
         vflip_button.tooltip_markup =
-            Granite.markup_accel_tooltip ({"<Ctrl><Shift>bracketright"}, _("Flip Vertically"));
-        vflip_button.clicked.connect (() => {
-            Utils.AffineTransform.flip_item (selected_item, 1, -1);
-            on_item_value_changed ();
-        });
-        vflip_button.sensitive = false;
+            Granite.markup_accel_tooltip ({"<Ctrl>bracketright"}, _("Flip Vertically"));
 
         var align_grid = new Gtk.Grid ();
         align_grid.hexpand = true;
@@ -232,10 +211,13 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         // Disconnect the signals notification.
         x.notify["value"].disconnect (x_notify_value);
         y.notify["value"].disconnect (y_notify_value);
-        height_bind.unbind ();
+        ratio_bind.unbind ();
         width_bind.unbind ();
+        height_bind.unbind ();
         rotation_bind.unbind ();
         opacity_bind.unbind ();
+        hflip_bind.unbind ();
+        vflip_bind.unbind ();
     }
 
     private void disable () {
@@ -247,7 +229,9 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         opacity_adj.value = 100.0;
         rotation.value = 0.0;
         canvas.size_ratio = 1.0;
-        size_lock = false;
+        lock_changes.active = false;
+        hflip_button.active = false;
+        vflip_button.active = false;
     }
 
     private void enable () {
@@ -258,12 +242,25 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         height.value = selected_item.get_coords ("height");
         rotation.value = selected_item.rotation;
         opacity_adj.value = selected_item.opacity;
-        size_lock = selected_item.size_locked;
+        lock_changes.active = selected_item.size_locked;
+        hflip_button.active = selected_item.flipped_h;
+        vflip_button.active = selected_item.flipped_v;
 
         // Property binding doesn't work for X and Y as these attributes are not
         // directly accessible from the CanvasItem. (goocanvas shenanigans)
         x.notify["value"].connect (x_notify_value);
         y.notify["value"].connect (y_notify_value);
+
+        ratio_bind = lock_changes.bind_property (
+            "active", selected_item, "size-locked",
+            BindingFlags.SYNC_CREATE | BindingFlags.BIDIRECTIONAL,
+            (binding, val, ref res) => {
+                var icon = val.get_boolean () ? "changes-prevent-symbolic" : "changes-allow-symbolic";
+                lock_changes.image = new Gtk.Image.from_icon_name (icon, Gtk.IconSize.BUTTON);
+                res = val.get_boolean ();
+                update_size_ratio ();
+                return true;
+            });
 
         width_bind = width.bind_property (
             "value", selected_item, "width",
@@ -271,7 +268,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
             (binding, srcval, ref targetval) => {
                 double src = (double) srcval;
                 targetval.set_double (src);
-                if (size_lock) {
+                if (selected_item.size_locked) {
                     height.value = GLib.Math.round (src / canvas.size_ratio);
                 }
                 return true;
@@ -283,7 +280,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
             (binding, srcval, ref targetval) => {
                 double src = (double) srcval;
                 targetval.set_double (src);
-                if (size_lock) {
+                if (selected_item.size_locked) {
                     width.value = GLib.Math.round (src * canvas.size_ratio);
                 }
                 return true;
@@ -302,6 +299,22 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         opacity_bind = opacity_adj.bind_property (
             "value", selected_item, "opacity",
             BindingFlags.SYNC_CREATE | BindingFlags.BIDIRECTIONAL);
+
+        hflip_bind = hflip_button.bind_property (
+            "active", selected_item, "flipped-h", BindingFlags.BIDIRECTIONAL,
+            (binding, val, ref res) => {
+                res = val.get_boolean ();
+                window.event_bus.flip_item ();
+                return true;
+            });
+
+        vflip_bind = vflip_button.bind_property (
+            "active", selected_item, "flipped-v", BindingFlags.BIDIRECTIONAL,
+            (binding, val, ref res) => {
+                res = val.get_boolean ();
+                window.event_bus.flip_item (true);
+                return true;
+            });
 
         // Connect items value changes to redraw the selection bounds.
         selected_item.notify["width"].connect (on_item_value_changed);
