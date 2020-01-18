@@ -58,6 +58,8 @@ public class Akira.Partials.InputField : Gtk.EventBox {
         entry.width_chars = chars;
         entry.sensitive = false;
 
+        entry.key_press_event.connect (handle_key);
+
         switch (unit) {
             case Unit.HASH:
                 icon = "input-hash-symbolic";
@@ -92,49 +94,27 @@ public class Akira.Partials.InputField : Gtk.EventBox {
         add (entry);
     }
 
-    public void set_range (double max_value) {
-        entry.set_range (0, max_value);
+    public void set_range (double min_value, double max_value) {
+        entry.set_range (min_value, max_value);
     }
 
-    //  private bool handle_key (Gdk.EventKey key) {
-    //      // Arrow UP
-    //      if (key.keyval == 65362) {
-    //          increase_value (key);
-    //          return true;
-    //      }
+    private bool handle_key (Gdk.EventKey key) {
+        if (key.state != Gdk.ModifierType.SHIFT_MASK) {
+            return false;
+        }
 
-    //      // Arrow DOWN
-    //      if (key.keyval == 65364) {
-    //          decrease_value (key);
-    //          return true;
-    //      }
+        // Arrow UP
+        if (key.keyval == 65362) {
+            entry.spin (Gtk.SpinType.STEP_FORWARD, 10);
+            return true;
+        }
 
-    //      return false;
-    //  }
+        // Arrow DOWN
+        if (key.keyval == 65364) {
+            entry.spin (Gtk.SpinType.STEP_BACKWARD, 10);
+            return true;
+        }
 
-    //  public void increase_value (Gdk.EventKey? key) {
-    //      int num = key != null && key.state.to_string () == "GDK_SHIFT_MASK" ? 10 : 1;
-    //      double src = double.parse (entry.text) + num;
-    //      entry.text = src.to_string ();
-    //  }
-
-    //  public void decrease_value (Gdk.EventKey? key) {
-    //      int num = key != null && key.state.to_string () == "GDK_SHIFT_MASK" ? 10 : 1;
-    //      double src = double.parse (entry.text) - num;
-    //      entry.text = src.to_string ();
-    //  }
-
-    //  public bool button_up_event (Gdk.Event event) {
-    //      if (event.type == Gdk.EventType.BUTTON_PRESS) {
-    //          increase_value (null);
-    //      }
-    //      return false;
-    //  }
-
-    //  public bool button_down_event (Gdk.Event event) {
-    //      if (event.type == Gdk.EventType.BUTTON_PRESS) {
-    //          decrease_value (null);
-    //      }
-    //      return false;
-    //  }
+        return false;
+    }
 }

@@ -109,6 +109,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         lock_changes.sensitive = false;
 
         rotation = new Akira.Partials.LinkedInput (_("R"), _("Rotation degrees"), "°");
+        rotation.input_field.set_range (-360, 360);
 
         hflip_button = new Gtk.ToggleButton ();
         hflip_button.add (new Akira.Partials.ButtonImage ("object-flip-horizontal"));

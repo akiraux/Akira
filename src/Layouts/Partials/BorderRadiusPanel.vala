@@ -260,7 +260,7 @@ public class Akira.Layouts.Partials.BorderRadiusPanel : Gtk.Grid {
         var max_size = double.min (selected_item.width, selected_item.height);
         max_value = Math.round (max_size / 2);
         border_radius_scale.set_range (0, max_value);
-        border_radius_entry.set_range (max_value);
+        border_radius_entry.set_range (0, max_value);
 
         if (!selected_item.is_radius_autoscale) {
             return;

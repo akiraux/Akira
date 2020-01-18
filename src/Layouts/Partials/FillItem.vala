@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Alecaddd (https://alecaddd.com)
+ * Copyright (c) 2019-2020 Alecaddd (https://alecaddd.com)
  *
  * This file is part of Akira.
  *
@@ -53,6 +53,7 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         owned get {
             return model.alpha;
         } set {
+            opacity_container.entry.set_value ((value * 100) / 255);
             model.alpha = value;
         }
     }
@@ -194,35 +195,12 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         opacity_container = new Akira.Partials.InputField (
             Akira.Partials.InputField.Unit.PERCENTAGE, 7, true, true);
         opacity_container.entry.sensitive = true;
-        opacity_container.entry.text = Math.round ((double) alpha / 255 * 100).to_string ();
+        opacity_container.entry.value = Math.round ((double) alpha / 255 * 100);
 
-        opacity_container.entry.bind_property (
-            "text", model, "alpha",
-            BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE,
-            // this => model
-            (binding, entry_text_val, ref model_alpha_val) => {
-                color_set_manually = false;
-                double src = double.parse (entry_text_val.dup_string ());
-
-                if (src > 100) {
-                    src = 100.0;
-                    opacity_container.entry.text = "100";
-                } else if (src < 0) {
-                    src = 0.0;
-                    opacity_container.entry.text = "0";
-                }
-                int alpha_int_value = (int) (src / 100 * 255);
-                model_alpha_val.set_int (alpha_int_value);
-                return true;
-            },
-            // model => this
-            (binding, model_alpha_val, ref entry_text_val) => {
-                entry_text_val.set_string (("%i").printf (
-                    ((model_alpha_val.get_int () * 100) / 255)
-                ));
-                return true;
-            }
-        );
+        opacity_container.entry.changed.connect (() => {
+            color_set_manually = false;
+            model.alpha = (int) (opacity_container.entry.get_value () / 100 * 255);
+        });
 
         fill_chooser.attach (picker_container, 0, 0, 1, 1);
         fill_chooser.attach (color_container, 1, 0, 1, 1);

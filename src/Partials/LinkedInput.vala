@@ -177,10 +177,10 @@ public class Akira.Partials.LinkedInput : Gtk.Grid {
             }
 
             if (dragging_direction > event.motion.x || event.motion.x_root == 0) {
-                //  input_field.decrease_value (null);
+                input_field.entry.spin (Gtk.SpinType.STEP_BACKWARD, 1);
                 dragging_direction = event.motion.x;
             } else {
-                //  input_field.increase_value (null);
+                input_field.entry.spin (Gtk.SpinType.STEP_FORWARD, 1);
                 dragging_direction = event.motion.x;
             }
         }
