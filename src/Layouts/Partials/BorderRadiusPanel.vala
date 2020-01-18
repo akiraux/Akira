@@ -220,13 +220,11 @@ public class Akira.Layouts.Partials.BorderRadiusPanel : Gtk.Grid {
         });
 
         border_radius_scale.value_changed.connect (() => {
-            double border_value = border_radius_scale.get_value ();
-            border_radius_entry.entry.text = ((int)border_value).to_string ();
+            border_radius_entry.entry.value = border_radius_scale.get_value ();
         });
 
         border_radius_entry.entry.changed.connect (() => {
-            double typed_border_radius = double.parse (border_radius_entry.entry.text);
-            border_radius_scale.set_value (typed_border_radius);
+            border_radius_scale.set_value (border_radius_entry.entry.value);
         });
 
         uniform_switch.notify["active"].connect (() => {
@@ -262,6 +260,7 @@ public class Akira.Layouts.Partials.BorderRadiusPanel : Gtk.Grid {
         var max_size = double.min (selected_item.width, selected_item.height);
         max_value = Math.round (max_size / 2);
         border_radius_scale.set_range (0, max_value);
+        border_radius_entry.set_range (max_value);
 
         if (!selected_item.is_radius_autoscale) {
             return;

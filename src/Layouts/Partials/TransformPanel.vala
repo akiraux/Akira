@@ -146,7 +146,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         scale.round_digits = 1;
         scale.margin_end = 20;
         opacity_entry = new Akira.Partials.InputField (
-            Akira.Partials.InputField.Unit.PERCENTAGE, 7, true, true, 0, 100, 1);
+            Akira.Partials.InputField.Unit.PERCENTAGE, 7, true, true);
         opacity_entry.entry.bind_property (
             "value", opacity_adj, "value",
             BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE);

@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2019 Alecaddd (http://alecaddd.com)
+* Copyright (c) 2019-2020 Alecaddd (https://alecaddd.com)
 *
 * This file is part of Akira.
 *
@@ -10,18 +10,17 @@
 
 * Akira is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 * GNU General Public License for more details.
 
 * You should have received a copy of the GNU General Public License
-* along with Akira.  If not, see <https://www.gnu.org/licenses/>.
+* along with Akira. If not, see <https://www.gnu.org/licenses/>.
 *
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
 
 public class Akira.Partials.InputField : Gtk.EventBox {
     public Gtk.SpinButton entry { get; construct set; }
-    //  public Gtk.Overlay overlay { get; construct set; }
 
     public int chars { get; construct set; }
     public bool rtl { get; construct set; }
@@ -29,9 +28,7 @@ public class Akira.Partials.InputField : Gtk.EventBox {
     public Unit unit { get; construct set; }
     public string icon { get; set; }
 
-    public double min { get; construct set; }
-    public double max { get; construct set; }
-    public double step { get; construct set; }
+    public double step { get; set; default = 1; }
 
     public enum Unit {
         PIXEL,
@@ -40,34 +37,23 @@ public class Akira.Partials.InputField : Gtk.EventBox {
         DEGREES
     }
 
-    //  public Gtk.Grid spin_grid { get; construct set; }
-    //  public Gtk.EventBox button_up { get; construct set; }
-    //  public Gtk.EventBox button_down { get; construct set; }
-
     public InputField (
         Unit unit,
         int chars,
         bool icon_right = false,
-        bool rtl = false,
-        double min = 0,
-        double max = 100,
-        double step = 1) {
+        bool rtl = false) {
         Object (
             unit: unit,
             chars: chars,
             icon_right: icon_right,
-            rtl: rtl,
-            min: min,
-            max: max,
-            step: step
+            rtl: rtl
         );
     }
 
     construct {
         valign = Gtk.Align.CENTER;
 
-        //  overlay = new Gtk.Overlay ();
-        entry = new Gtk.SpinButton.with_range (min, max, step);
+        entry = new Gtk.SpinButton.with_range (0, 100, step);
         entry.hexpand = true;
         entry.width_chars = chars;
         entry.sensitive = false;
@@ -103,103 +89,11 @@ public class Akira.Partials.InputField : Gtk.EventBox {
             entry.xalign = 1.0f;
         }
 
-        //  entry.key_press_event.connect (handle_key);
-        //  entry.notify.connect (() => {
-        //      var text_canon = entry.text.replace (",", ".");
-        //      text_canon.canon ("-0123456789.", '?');
-        //      //  entry.text = text_canon.replace ("?", "");
-        //  });
-
-        //  spin_grid = new Gtk.Grid ();
-        //  spin_grid.halign = Gtk.Align.END;
-        //  spin_grid.valign = Gtk.Align.CENTER;
-        //  spin_grid.height_request = 20;
-        //  spin_grid.visible = false;
-        //  spin_grid.no_show_all = true;
-
-        //  var button_up_image = new Gtk.Image.from_icon_name ("pan-up-symbolic", Gtk.IconSize.MENU);
-        //  button_up_image.get_style_context ().add_class ("input-button");
-        //  button_up_image.get_style_context ().add_class ("up");
-        //  button_up_image.opacity = 0.6;
-
-        //  button_up = new Gtk.EventBox ();
-        //  button_up.add (button_up_image);
-        //  button_up.event.connect (button_up_event);
-
-        //  button_up.enter_notify_event.connect (event => {
-        //      button_up_image.opacity = 1;
-        //      return false;
-        //  });
-        //  button_up.leave_notify_event.connect (event => {
-        //      button_up_image.opacity = 0.6;
-        //      return false;
-        //  });
-
-        //  var button_down_image = new Gtk.Image.from_icon_name ("pan-down-symbolic", Gtk.IconSize.MENU);
-        //  button_down_image.get_style_context ().add_class ("input-button");
-        //  button_down_image.get_style_context ().add_class ("down");
-        //  button_down_image.opacity = 0.6;
-
-        //  button_down = new Gtk.EventBox ();
-        //  button_down.add (button_down_image);
-        //  button_down.event.connect (button_down_event);
-
-        //  button_down.enter_notify_event.connect (event => {
-        //      button_down_image.opacity = 1;
-        //      return false;
-        //  });
-        //  button_down.leave_notify_event.connect (event => {
-        //      button_down_image.opacity = 0.6;
-        //      return false;
-        //  });
-
-        //  spin_grid.attach (button_up, 0, 0, 1, 1);
-        //  spin_grid.attach (button_down, 0, 1, 1, 1);
-
-        //  overlay.add (entry);
-        //  overlay.add_overlay (spin_grid);
         add (entry);
+    }
 
-        //  enter_notify_event.connect (event => {
-        //      if (!entry.sensitive || entry.has_focus) {
-        //          return false;
-        //      }
-
-        //      if (event.detail != Gdk.NotifyType.INFERIOR) {
-        //          spin_grid.visible = true;
-        //          spin_grid.no_show_all = false;
-        //          spin_grid.show_all ();
-        //          if (icon_right) {
-        //              entry.secondary_icon_name = "";
-        //          } else {
-        //              entry.primary_icon_name = "";
-        //          }
-        //      }
-        //      return false;
-        //  });
-
-        //  leave_notify_event.connect (event => {
-        //      if (event.detail != Gdk.NotifyType.INFERIOR) {
-        //          spin_grid.visible = false;
-        //          spin_grid.no_show_all = true;
-        //          if (icon_right) {
-        //              entry.secondary_icon_name = icon;
-        //          } else {
-        //              entry.primary_icon_name = icon;
-        //          }
-        //      }
-        //      return false;
-        //  });
-
-        //  entry.focus_in_event.connect (() => {
-        //      spin_grid.visible = false;
-        //      spin_grid.no_show_all = true;
-        //      if (icon_right) {
-        //          entry.secondary_icon_name = icon;
-        //      } else {
-        //          entry.primary_icon_name = icon;
-        //      }
-        //  });
+    public void set_range (double max_value) {
+        entry.set_range (0, max_value);
     }
 
     //  private bool handle_key (Gdk.EventKey key) {
