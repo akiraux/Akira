@@ -21,8 +21,7 @@
 */
 
 public class Akira.Lib.Models.CanvasRect : Goo.CanvasRect, Models.CanvasItem {
-    public string LAYER_TEXT { get; set; default = "Rectangle"; }
-    public string LAYER_ICON { get; set; default = "shape-rectangle-symbolic"; }
+    public string layer_icon { get; set; default = "shape-rectangle-symbolic"; }
 
     public string id { get; set; }
     public bool selected { get; set; }

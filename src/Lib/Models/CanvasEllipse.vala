@@ -21,8 +21,7 @@
 */
 
 public class Akira.Lib.Models.CanvasEllipse : Goo.CanvasEllipse, Models.CanvasItem {
-    public string LAYER_TEXT { get; set; default = "Ellipse"; }
-    public string LAYER_ICON { get; set; default = "shape-circle-symbolic"; }
+    public string layer_icon { get; set; default = "shape-circle-symbolic"; }
 
     public string id { get; set; }
     public double rotation { get; set; }

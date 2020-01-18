@@ -32,7 +32,7 @@ public class Akira.Models.LayerModel : Models.ItemModel {
 
     public string icon {
         get {
-            return item.LAYER_ICON;
+            return item.layer_icon;
         }
     }
 
@@ -49,7 +49,6 @@ public class Akira.Models.LayerModel : Models.ItemModel {
 
     public bool? locked {
         get {
-            debug (@"Getting panel isLocked");
             return true;
         }
 
