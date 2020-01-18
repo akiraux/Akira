@@ -17,6 +17,7 @@
 * along with Akira.  If not, see <https://www.gnu.org/licenses/>.
 *
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
+* Authored by: Giacomo Alberini <giacomoalbe@gmail.com>
 */
 
 public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
@@ -26,12 +27,14 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
     private bool scroll_up = false;
     private bool scrolling = false;
     private bool should_scroll = false;
+
+    private Akira.Models.ListModel list_model;
+    private Gee.HashMap<string, Akira.Models.LayerModel> item_model_map;
     public Gtk.Adjustment vadjustment;
 
     private const int SCROLL_STEP_SIZE = 5;
     private const int SCROLL_DISTANCE = 30;
     private const int SCROLL_DELAY = 50;
-    public Akira.Layouts.Partials.Artboard artboard;
 
     private const Gtk.TargetEntry TARGET_ENTRIES[] = {
         { "ARTBOARD", Gtk.TargetFlags.SAME_APP, 0 }
@@ -49,6 +52,18 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
         get_style_context ().add_class ("layers-panel");
         expand = true;
 
+        list_model = new Akira.Models.ListModel ();
+        item_model_map = new Gee.HashMap<string, Akira.Models.LayerModel> ();
+
+        bind_model (list_model, item => {
+            // TODO: Differentiate between layer and artboard
+            // based upon item "type" of some sort
+            return new Akira.Layouts.Partials.Layer (
+                window,
+                (Akira.Models.LayerModel) item
+            );
+        });
+
         build_drag_and_drop ();
         reload_zebra ();
 
@@ -57,17 +72,21 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
     }
 
     private void on_item_inserted (Lib.Models.CanvasItem new_item) {
-        var layer = new Akira.Layouts.Partials.Layer (
-            window,
-            artboard,
-            new_item,
-            new_item.id,
-            new_item.LAYER_ICON,
-            false
-        );
+        var model = new Akira.Models.LayerModel (new_item, list_model);
+        list_model.add_item.begin (model);
 
-        insert (layer, 0);
+        // This map is necessary for easily knowing which
+        // item is related to which model, since the canvas knows only
+        // real items and the layers panel only knows items model
+        item_model_map.@set (new_item.id, model);
+
         show_all ();
+    }
+
+    private void on_item_deleted (Lib.Models.CanvasItem item_to_delete) {
+        var model_to_delete = item_model_map.@get (item_to_delete.id);
+
+        list_model.remove_item.begin (model_to_delete);
     }
 
     private void build_drag_and_drop () {

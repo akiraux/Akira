@@ -17,6 +17,7 @@
 * along with Akira.  If not, see <https://www.gnu.org/licenses/>.
 *
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
+* Authored by: Giacomo Alberini <giacomoalbe@gmail.com>
 */
 
 public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
@@ -26,6 +27,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
     public string layer_name { get; construct; }
     public string icon_name { get; construct; }
     public Goo.CanvasItemSimple item { get; construct; }
+    public Akira.Models.LayerModel model { get; construct; }
 
     private bool scroll_up = false;
     private bool scrolling = false;
@@ -83,16 +85,15 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 
     // public Akira.Shape shape { get; construct; }
 
-    public Layer (Akira.Window window, Akira.Layouts.Partials.Artboard? artboard, Goo.CanvasItemSimple item_simple,
-        string name, string icon, bool group, Akira.Layouts.Partials.Layer? parent = null) {
+    public Layer (
+        Akira.Window window,
+        Akira.Models.LayerModel model,
+        Layouts.Partials.Artboard? artboard = null
+    ) {
         Object (
             window: window,
-            layer_name: name,
-            icon_name: icon,
-            artboard: artboard,
-            grouped: group,
-            layer_group: parent,
-            item: item_simple
+            model: model,
+            artboard: artboard
         );
     }
 
@@ -100,7 +101,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
         can_focus = true;
         get_style_context ().add_class ("layer");
 
-        label = new Gtk.Label (layer_name);
+        label = new Gtk.Label (model.name);
         label.halign = Gtk.Align.FILL;
         label.xalign = 0;
         label.expand = true;
@@ -113,13 +114,13 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
         entry.expand = true;
         entry.visible = false;
         entry.no_show_all = true;
-        entry.set_text (layer_name);
+        entry.set_text (model.name);
 
         entry.activate.connect (update_on_enter);
         entry.focus_out_event.connect (update_on_leave);
         entry.key_release_event.connect (update_on_escape);
 
-        icon = new Gtk.Image.from_icon_name (icon_name, Gtk.IconSize.MENU);
+        icon = new Gtk.Image.from_icon_name (model.icon, Gtk.IconSize.MENU);
         icon.margin_start = icon_name != "folder-symbolic" ? 16 : 0;
         icon.margin_end = 10;
         icon.vexpand = true;
@@ -550,7 +551,13 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 
     private void update_label () {
         var new_label = entry.get_text ();
+
+        if (label.label == new_label) {
+            return;
+        }
+
         label.label = new_label;
+        model.name = new_label;
 
         entry.visible = false;
         entry.no_show_all = true;
@@ -585,7 +592,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
             icon_locked.visible = ! active;
             icon_locked.no_show_all = active;
 
-            locked = active;
+            model.locked = active;
         });
     }
 
@@ -601,7 +608,8 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
                 button_hidden.get_style_context ().remove_class ("show");
             }
 
-            item.visibility = active ? Goo.CanvasItemVisibility.INVISIBLE: Goo.CanvasItemVisibility.VISIBLE;
+            model.visibility = !active;
+            //item.visibility = active ? Goo.CanvasItemVisibility.INVISIBLE: Goo.CanvasItemVisibility.VISIBLE;
 
             icon_visible.visible = active;
             icon_visible.no_show_all = ! active;
