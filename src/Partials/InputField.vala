@@ -60,6 +60,7 @@ public class Akira.Partials.InputField : Gtk.EventBox {
 
         entry.key_press_event.connect (handle_key_press);
         entry.key_release_event.connect (handle_key_release);
+        entry.scroll_event.connect (handle_scroll_event);
 
         switch (unit) {
             case Unit.HASH:
@@ -120,6 +121,14 @@ public class Akira.Partials.InputField : Gtk.EventBox {
             entry.update ();
         }
 
+        return false;
+    }
+
+    private bool handle_scroll_event (Gdk.EventScroll event) {
+        // If the input field is not focused, don't change the value.
+        if (!entry.has_focus) {
+            GLib.Signal.stop_emission_by_name (entry, "scroll-event");
+        }
         return false;
     }
 }
