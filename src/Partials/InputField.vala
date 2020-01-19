@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2019 Alecaddd (http://alecaddd.com)
+* Copyright (c) 2019-2020 Alecaddd (https://alecaddd.com)
 *
 * This file is part of Akira.
 *
@@ -10,24 +10,25 @@
 
 * Akira is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 * GNU General Public License for more details.
 
 * You should have received a copy of the GNU General Public License
-* along with Akira.  If not, see <https://www.gnu.org/licenses/>.
+* along with Akira. If not, see <https://www.gnu.org/licenses/>.
 *
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
 
 public class Akira.Partials.InputField : Gtk.EventBox {
-    public Gtk.Entry entry { get; construct set; }
-    public Gtk.Overlay overlay { get; construct set; }
+    public Gtk.SpinButton entry { get; construct set; }
 
     public int chars { get; construct set; }
     public bool rtl { get; construct set; }
     public bool icon_right { get; construct set; }
     public Unit unit { get; construct set; }
     public string icon { get; set; }
+
+    public double step { get; set; default = 1; }
 
     public enum Unit {
         PIXEL,
@@ -36,11 +37,11 @@ public class Akira.Partials.InputField : Gtk.EventBox {
         DEGREES
     }
 
-    public Gtk.Grid spin_grid { get; construct set; }
-    public Gtk.EventBox button_up { get; construct set; }
-    public Gtk.EventBox button_down { get; construct set; }
-
-    public InputField (Unit unit, int chars, bool icon_right = false, bool rtl = false) {
+    public InputField (
+        Unit unit,
+        int chars,
+        bool icon_right = false,
+        bool rtl = false) {
         Object (
             unit: unit,
             chars: chars,
@@ -52,11 +53,14 @@ public class Akira.Partials.InputField : Gtk.EventBox {
     construct {
         valign = Gtk.Align.CENTER;
 
-        overlay = new Gtk.Overlay ();
-        entry = new Gtk.Entry ();
+        entry = new Gtk.SpinButton.with_range (0, 100, step);
         entry.hexpand = true;
         entry.width_chars = chars;
         entry.sensitive = false;
+
+        entry.key_press_event.connect (handle_key_press);
+        entry.key_release_event.connect (handle_key_release);
+        entry.scroll_event.connect (handle_scroll_event);
 
         switch (unit) {
             case Unit.HASH:
@@ -89,138 +93,41 @@ public class Akira.Partials.InputField : Gtk.EventBox {
             entry.xalign = 1.0f;
         }
 
-        entry.key_press_event.connect (handle_key);
-
-        spin_grid = new Gtk.Grid ();
-        spin_grid.halign = Gtk.Align.END;
-        spin_grid.valign = Gtk.Align.CENTER;
-        spin_grid.height_request = 20;
-        spin_grid.visible = false;
-        spin_grid.no_show_all = true;
-
-        var button_up_image = new Gtk.Image.from_icon_name ("pan-up-symbolic", Gtk.IconSize.MENU);
-        button_up_image.get_style_context ().add_class ("input-button");
-        button_up_image.get_style_context ().add_class ("up");
-        button_up_image.opacity = 0.6;
-
-        button_up = new Gtk.EventBox ();
-        button_up.add (button_up_image);
-        button_up.event.connect (button_up_event);
-
-        button_up.enter_notify_event.connect (event => {
-            button_up_image.opacity = 1;
-            return false;
-        });
-        button_up.leave_notify_event.connect (event => {
-            button_up_image.opacity = 0.6;
-            return false;
-        });
-
-        var button_down_image = new Gtk.Image.from_icon_name ("pan-down-symbolic", Gtk.IconSize.MENU);
-        button_down_image.get_style_context ().add_class ("input-button");
-        button_down_image.get_style_context ().add_class ("down");
-        button_down_image.opacity = 0.6;
-
-        button_down = new Gtk.EventBox ();
-        button_down.add (button_down_image);
-        button_down.event.connect (button_down_event);
-
-        button_down.enter_notify_event.connect (event => {
-            button_down_image.opacity = 1;
-            return false;
-        });
-        button_down.leave_notify_event.connect (event => {
-            button_down_image.opacity = 0.6;
-            return false;
-        });
-
-        spin_grid.attach (button_up, 0, 0, 1, 1);
-        spin_grid.attach (button_down, 0, 1, 1, 1);
-
-        overlay.add (entry);
-        overlay.add_overlay (spin_grid);
-        add (overlay);
-
-        enter_notify_event.connect (event => {
-            if (!entry.sensitive || entry.has_focus) {
-                return false;
-            }
-
-            if (event.detail != Gdk.NotifyType.INFERIOR) {
-                spin_grid.visible = true;
-                spin_grid.no_show_all = false;
-                spin_grid.show_all ();
-                if (icon_right) {
-                    entry.secondary_icon_name = "";
-                } else {
-                    entry.primary_icon_name = "";
-                }
-            }
-            return false;
-        });
-
-        leave_notify_event.connect (event => {
-            if (event.detail != Gdk.NotifyType.INFERIOR) {
-                spin_grid.visible = false;
-                spin_grid.no_show_all = true;
-                if (icon_right) {
-                    entry.secondary_icon_name = icon;
-                } else {
-                    entry.primary_icon_name = icon;
-                }
-            }
-            return false;
-        });
-
-        entry.focus_in_event.connect (() => {
-            spin_grid.visible = false;
-            spin_grid.no_show_all = true;
-            if (icon_right) {
-                entry.secondary_icon_name = icon;
-            } else {
-                entry.primary_icon_name = icon;
-            }
-        });
+        add (entry);
     }
 
-    private bool handle_key (Gdk.EventKey key) {
+    public void set_range (double min_value, double max_value) {
+        entry.set_range (min_value, max_value);
+    }
+
+    private bool handle_key_press (Gdk.EventKey key) {
         // Arrow UP
-        if (key.keyval == 65362) {
-            increase_value (key);
+        if (key.keyval == Gdk.Key.Up && key.state == Gdk.ModifierType.SHIFT_MASK) {
+            entry.spin (Gtk.SpinType.STEP_FORWARD, 10);
             return true;
         }
 
         // Arrow DOWN
-        if (key.keyval == 65364) {
-            decrease_value (key);
+        if (key.keyval == Gdk.Key.Down && key.state == Gdk.ModifierType.SHIFT_MASK) {
+            entry.spin (Gtk.SpinType.STEP_BACKWARD, 10);
             return true;
         }
 
         return false;
     }
 
-    public void increase_value (Gdk.EventKey? key) {
-        int num = key != null && key.state.to_string () == "GDK_SHIFT_MASK" ? 10 : 1;
-        double src = double.parse (entry.text) + num;
-        entry.text = src.to_string ();
-    }
-
-    public void decrease_value (Gdk.EventKey? key) {
-        int num = key != null && key.state.to_string () == "GDK_SHIFT_MASK" ? 10 : 1;
-        double src = double.parse (entry.text) - num;
-        entry.text = src.to_string ();
-    }
-
-    public bool button_up_event (Gdk.Event event) {
-        if (event.type == Gdk.EventType.BUTTON_PRESS) {
-            increase_value (null);
+    private bool handle_key_release (Gdk.EventKey key) {
+        if (key.keyval != Gdk.Key.Up && key.keyval != Gdk.Key.Down) {
+            entry.update ();
         }
+
         return false;
     }
 
-    public bool button_down_event (Gdk.Event event) {
-        if (event.type == Gdk.EventType.BUTTON_PRESS) {
-            decrease_value (null);
+    private bool handle_scroll_event (Gdk.EventScroll event) {
+        // If the input field is not focused, don't change the value.
+        if (!entry.has_focus) {
+            GLib.Signal.stop_emission_by_name (entry, "scroll-event");
         }
         return false;
     }

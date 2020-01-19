@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Alecaddd (https://alecaddd.com)
+ * Copyright (c) 2019-2020 Alecaddd (https://alecaddd.com)
  *
  * This file is part of Akira.
  *
@@ -200,23 +200,12 @@ public class Akira.Layouts.Partials.BorderItem : Gtk.Grid {
 
         tickness_container = new Akira.Partials.InputField (
             Akira.Partials.InputField.Unit.PIXEL, 7, true, true);
+        tickness_container.set_range (0, Akira.Layouts.MainCanvas.CANVAS_SIZE);
         tickness_container.entry.sensitive = true;
-        tickness_container.entry.text = border_size.to_string ();
+        tickness_container.entry.value = border_size;
 
         tickness_container.entry.bind_property (
-            "text", model, "border_size",
-            BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE,
-            // this => model
-            (binding, entry_text_val, ref model_border_val) => {
-                int src = int.parse (entry_text_val.dup_string ());
-                if (src < 0) {
-                    src = 0;
-                    tickness_container.entry.text = "0";
-                }
-                model_border_val.set_int (src);
-                return true;
-            }
-        );
+            "value", model, "border_size", BindingFlags.BIDIRECTIONAL);
 
         color_chooser.attach (picker_container, 0, 0, 1, 1);
         color_chooser.attach (color_container, 1, 0, 1, 1);

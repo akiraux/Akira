@@ -112,8 +112,8 @@ public class Akira.Lib.Managers.ItemsManager : Object {
 
     public Models.CanvasItem add_rect (Gdk.EventButton event) {
         var rect = new Models.CanvasRect (
-            event.x,
-            event.y,
+            Utils.AffineTransform.fix_size (event.x),
+            Utils.AffineTransform.fix_size (event.y),
             0.0,
             0.0,
             border_size,
@@ -144,10 +144,10 @@ public class Akira.Lib.Managers.ItemsManager : Object {
 
     public Models.CanvasEllipse add_ellipse (Gdk.EventButton event) {
         var ellipse = new Models.CanvasEllipse (
-            event.x,
-            event.y,
-            1,
-            1,
+            Utils.AffineTransform.fix_size (event.x),
+            Utils.AffineTransform.fix_size (event.y),
+            0.0,
+            0.0,
             border_size,
             border_color,
             fill_color,
@@ -169,8 +169,8 @@ public class Akira.Lib.Managers.ItemsManager : Object {
     public Models.CanvasText add_text (Gdk.EventButton event) {
         var text = new Models.CanvasText (
             "Add text here",
-            event.x,
-            event.y,
+            Utils.AffineTransform.fix_size (event.x),
+            Utils.AffineTransform.fix_size (event.y),
             200,
             25f,
             Goo.CanvasAnchorType.NW,
