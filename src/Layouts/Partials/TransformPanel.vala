@@ -281,7 +281,6 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
                 double src = (double) srcval;
                 targetval.set_double (src);
                 Utils.AffineTransform.set_rotation (src, selected_item);
-                on_item_coord_changed ();
                 return true;
             });
 
@@ -314,6 +313,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
 
     private void on_item_value_changed () {
         window.event_bus.item_value_changed ();
+        on_item_coord_changed ();
     }
 
     // We need to fetch new X and Y values to update the fields.
