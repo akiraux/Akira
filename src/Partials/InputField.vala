@@ -58,7 +58,8 @@ public class Akira.Partials.InputField : Gtk.EventBox {
         entry.width_chars = chars;
         entry.sensitive = false;
 
-        entry.key_release_event.connect (handle_key);
+        entry.key_press_event.connect (handle_key_press);
+        entry.key_release_event.connect (handle_key_release);
 
         switch (unit) {
             case Unit.HASH:
@@ -98,7 +99,7 @@ public class Akira.Partials.InputField : Gtk.EventBox {
         entry.set_range (min_value, max_value);
     }
 
-    private bool handle_key (Gdk.EventKey key) {
+    private bool handle_key_press (Gdk.EventKey key) {
         // Arrow UP
         if (key.keyval == 65362 && key.state == Gdk.ModifierType.SHIFT_MASK) {
             entry.spin (Gtk.SpinType.STEP_FORWARD, 10);
@@ -111,6 +112,10 @@ public class Akira.Partials.InputField : Gtk.EventBox {
             return true;
         }
 
+        return false;
+    }
+
+    private bool handle_key_release (Gdk.EventKey key) {
         if (key.keyval != 65362 && key.keyval != 65364) {
             entry.update ();
         }

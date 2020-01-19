@@ -200,12 +200,12 @@ public class Akira.Layouts.Partials.BorderItem : Gtk.Grid {
 
         tickness_container = new Akira.Partials.InputField (
             Akira.Partials.InputField.Unit.PIXEL, 7, true, true);
-        tickness_container.set_range (0, 100000);
+        tickness_container.set_range (0, Akira.Layouts.MainCanvas.CANVAS_SIZE);
         tickness_container.entry.sensitive = true;
         tickness_container.entry.value = border_size;
-        tickness_container.entry.changed.connect (() => {
-            border_size = (int) tickness_container.entry.value;
-        });
+
+        tickness_container.entry.bind_property (
+            "value", model, "border_size", BindingFlags.BIDIRECTIONAL);
 
         color_chooser.attach (picker_container, 0, 0, 1, 1);
         color_chooser.attach (color_container, 1, 0, 1, 1);

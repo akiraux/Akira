@@ -53,7 +53,6 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         owned get {
             return model.alpha;
         } set {
-            opacity_container.entry.set_value ((value * 100) / 255);
             model.alpha = value;
         }
     }
@@ -197,10 +196,18 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         opacity_container.entry.sensitive = true;
         opacity_container.entry.value = Math.round ((double) alpha / 255 * 100);
 
-        opacity_container.entry.changed.connect (() => {
-            color_set_manually = false;
-            model.alpha = (int) (opacity_container.entry.get_value () / 100 * 255);
-        });
+        opacity_container.entry.bind_property (
+            "value", model, "alpha",
+            BindingFlags.BIDIRECTIONAL,
+            (binding, srcval, ref targetval) => {
+                color_set_manually = false;
+                targetval.set_int ((int) ((double) srcval / 100 * 255));
+                return true;
+            },
+            (binding, srcval, ref targetval) => {
+                targetval.set_double ((srcval.get_int () * 100) / 255);
+                return true;
+            });
 
         fill_chooser.attach (picker_container, 0, 0, 1, 1);
         fill_chooser.attach (color_container, 1, 0, 1, 1);
