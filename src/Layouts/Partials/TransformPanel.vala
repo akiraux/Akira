@@ -224,7 +224,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
 
     private void enable () {
         canvas = selected_item.canvas as Akira.Lib.Canvas;
-        on_item_coord_changed.begin ();
+        on_item_coord_changed ();
 
         width.value = selected_item.get_coords ("width");
         height.value = selected_item.get_coords ("height");
@@ -293,7 +293,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
             (binding, val, ref res) => {
                 res = val.get_boolean ();
                 window.event_bus.flip_item (true);
-                on_item_coord_changed.begin ();
+                on_item_coord_changed ();
                 return true;
             });
 
@@ -302,7 +302,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
             (binding, val, ref res) => {
                 res = val.get_boolean ();
                 window.event_bus.flip_item (true, true);
-                on_item_coord_changed.begin ();
+                on_item_coord_changed ();
                 return true;
             });
 
@@ -313,17 +313,17 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         selected_item.notify["opacity"].connect (selected_item.reset_colors);
     }
 
-    private async void on_item_value_changed () {
+    private void on_item_value_changed () {
         if (selected_item == null) {
             return;
         }
 
-        yield on_item_coord_changed ();
         window.event_bus.item_value_changed ();
+        on_item_coord_changed ();
     }
 
     // We need to fetch new X and Y values to update the fields.
-    private async void on_item_coord_changed () {
+    private void on_item_coord_changed () {
         // Prevents X & Y AffineTransform callback loop.
         x.notify["value"].disconnect (x_notify_value);
         y.notify["value"].disconnect (y_notify_value);
@@ -348,7 +348,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         // will recalculate the right position.
         // Who knows why it needs a delay in order to work. This is gross...
         Timeout.add (1, () => {
-            on_item_value_changed.begin ();
+            on_item_value_changed ();
             return false;
         });
     }
@@ -361,7 +361,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         // will recalculate the right position.
         // Who knows why it needs a delay in order to work. This is gross...
         Timeout.add (1, () => {
-            on_item_value_changed.begin ();
+            on_item_value_changed ();
             return false;
         });
     }
