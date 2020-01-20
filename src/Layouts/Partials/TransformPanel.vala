@@ -338,8 +338,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
             return;
         }
 
-        debug ("update Y");
-        Utils.AffineTransform.set_position (null, y.value, selected_item);
+        Utils.AffineTransform.set_position (selected_item, 0, y.value);
         on_item_value_changed ();
     }
 
@@ -348,8 +347,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
             return;
         }
 
-        debug ("update X");
-        Utils.AffineTransform.set_position (x.value, null, selected_item);
+        Utils.AffineTransform.set_position (selected_item, x.value);
         on_item_value_changed ();
     }
 

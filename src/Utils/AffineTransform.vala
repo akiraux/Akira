@@ -273,24 +273,15 @@ public class Akira.Utils.AffineTransform : Object {
         prev_rotation_difference = 0.0;
     }
 
-    public static void set_position (double? x, double? y, CanvasItem item) {
+    public static void set_position (CanvasItem item, double? x = 0, double? y = 0) {
         var canvas = item.canvas;
-
         double current_x = item.get_coords ("x");
         double current_y = item.get_coords ("y");
 
         canvas.convert_from_item_space (item, ref current_x, ref current_y);
 
-        var move_x_amount = 0.0;
-        var move_y_amount = 0.0;
-
-        if (x != null) {
-            move_x_amount = x - current_x;
-        }
-
-        if (y != null) {
-            move_y_amount = y - current_y;
-        }
+        double move_x_amount = (x > 0) ? x - current_x : 0;
+        double move_y_amount = (y > 0) ? y - current_y: 0;
 
         item.translate (move_x_amount, move_y_amount);
     }
