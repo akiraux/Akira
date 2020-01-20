@@ -283,8 +283,10 @@ public class Akira.Utils.AffineTransform : Object {
         double move_x = (x > 0) ? x - current_x : 0;
         double move_y = (y > 0) ? y - current_y: 0;
 
-        //  double move_x = (x < 1 && x > -1) ? 0 : x;
-        //  double move_y = (y < 1 && y > -1) ? 0 : y;
+        // If the value is less than the minimum allowed, round it to 0
+        // to prevent subpixel shifts.
+        // Deliberately not using Math.round () because we will need
+        // to account for subpixel if the user enables it in the settings.
         move_x = (move_x < 1 && move_x > -1) ? 0 : move_x;
         move_y = (move_y < 1 && move_y > -1) ? 0 : move_y;
 
