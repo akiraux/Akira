@@ -43,6 +43,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
     private Binding opacity_bind;
     private Binding hflip_bind;
     private Binding vflip_bind;
+    private bool coords_changed = false;
 
     public TransformPanel (Akira.Window main_window) {
         Object (
@@ -293,6 +294,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
             (binding, val, ref res) => {
                 res = val.get_boolean ();
                 window.event_bus.flip_item (true);
+                on_item_coord_changed ();
                 return true;
             });
 
@@ -301,6 +303,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
             (binding, val, ref res) => {
                 res = val.get_boolean ();
                 window.event_bus.flip_item (true, true);
+                on_item_coord_changed ();
                 return true;
             });
 
@@ -323,22 +326,35 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
 
         selected_item.canvas.convert_from_item_space (selected_item, ref item_x, ref item_y);
 
+        // Prevents X & Y AffineTransform callback loop.
+        coords_changed = true;
         x.value = item_x;
         y.value = item_y;
+        coords_changed = false;
     }
 
     public void y_notify_value () {
+        if (coords_changed) {
+            return;
+        }
+
+        debug ("update Y");
         Utils.AffineTransform.set_position (null, y.value, selected_item);
         on_item_value_changed ();
     }
 
     public void x_notify_value () {
+        if (coords_changed) {
+            return;
+        }
+
+        debug ("update X");
         Utils.AffineTransform.set_position (x.value, null, selected_item);
         on_item_value_changed ();
     }
 
     public void update_size_ratio () {
-        // We can't divide by 0, let's avoid to open a black hole.
+        // We can't divide by 0, let's avoid opening a black hole.
         if (height.value == 0) {
             return;
         }
