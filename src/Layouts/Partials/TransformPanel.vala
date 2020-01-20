@@ -43,7 +43,6 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
     private Binding opacity_bind;
     private Binding hflip_bind;
     private Binding vflip_bind;
-    private bool coords_changed = false;
 
     public TransformPanel (Akira.Window main_window) {
         Object (
@@ -225,7 +224,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
 
     private void enable () {
         canvas = selected_item.canvas as Akira.Lib.Canvas;
-        on_item_coord_changed ();
+        on_item_coord_changed.begin ();
 
         width.value = selected_item.get_coords ("width");
         height.value = selected_item.get_coords ("height");
@@ -294,7 +293,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
             (binding, val, ref res) => {
                 res = val.get_boolean ();
                 window.event_bus.flip_item (true);
-                on_item_coord_changed ();
+                on_item_coord_changed.begin ();
                 return true;
             });
 
@@ -303,7 +302,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
             (binding, val, ref res) => {
                 res = val.get_boolean ();
                 window.event_bus.flip_item (true, true);
-                on_item_coord_changed ();
+                on_item_coord_changed.begin ();
                 return true;
             });
 
@@ -314,41 +313,57 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         selected_item.notify["opacity"].connect (selected_item.reset_colors);
     }
 
-    private void on_item_value_changed () {
+    private async void on_item_value_changed () {
+        if (selected_item == null) {
+            return;
+        }
+
+        yield on_item_coord_changed ();
         window.event_bus.item_value_changed ();
-        on_item_coord_changed ();
     }
 
     // We need to fetch new X and Y values to update the fields.
-    private void on_item_coord_changed () {
+    private async void on_item_coord_changed () {
+        // Prevents X & Y AffineTransform callback loop.
+        x.notify["value"].disconnect (x_notify_value);
+        y.notify["value"].disconnect (y_notify_value);
+
         double item_x = selected_item.get_coords ("x");
         double item_y = selected_item.get_coords ("y");
 
         selected_item.canvas.convert_from_item_space (selected_item, ref item_x, ref item_y);
 
-        // Prevents X & Y AffineTransform callback loop.
-        coords_changed = true;
         x.value = item_x;
         y.value = item_y;
-        coords_changed = false;
-    }
 
-    public void y_notify_value () {
-        if (coords_changed) {
-            return;
-        }
-
-        Utils.AffineTransform.set_position (selected_item, 0, y.value);
-        on_item_value_changed ();
+        x.notify["value"].connect (x_notify_value);
+        y.notify["value"].connect (y_notify_value);
     }
 
     public void x_notify_value () {
-        if (coords_changed) {
-            return;
-        }
-
         Utils.AffineTransform.set_position (selected_item, x.value);
-        on_item_value_changed ();
+
+        // Hack! In case the item is rotated, the actual X & Y values might be
+        // different from what we have stored in the input field. This method
+        // will recalculate the right position.
+        // Who knows why it needs a delay in order to work. This is gross...
+        Timeout.add (1, () => {
+            on_item_value_changed.begin ();
+            return false;
+        });
+    }
+
+    public void y_notify_value () {
+        Utils.AffineTransform.set_position (selected_item, 0, y.value);
+
+        // Hack! In case the item is rotated, the actual X & Y values might be
+        // different from what we have stored in the input field. This method
+        // will recalculate the right position.
+        // Who knows why it needs a delay in order to work. This is gross...
+        Timeout.add (1, () => {
+            on_item_value_changed.begin ();
+            return false;
+        });
     }
 
     public void update_size_ratio () {
