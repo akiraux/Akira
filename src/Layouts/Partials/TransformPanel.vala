@@ -347,7 +347,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         // different from what we have stored in the input field. This method
         // will recalculate the right position.
         // Who knows why it needs a delay in order to work. This is gross...
-        Timeout.add (1, () => {
+        Idle.add (() => {
             on_item_value_changed ();
             return false;
         });
@@ -360,7 +360,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         // different from what we have stored in the input field. This method
         // will recalculate the right position.
         // Who knows why it needs a delay in order to work. This is gross...
-        Timeout.add (1, () => {
+        Idle.add (() => {
             on_item_value_changed ();
             return false;
         });
