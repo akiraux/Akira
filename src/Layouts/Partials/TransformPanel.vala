@@ -342,28 +342,12 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
 
     public void x_notify_value () {
         Utils.AffineTransform.set_position (selected_item, x.value);
-
-        // Hack! In case the item is rotated, the actual X & Y values might be
-        // different from what we have stored in the input field. This method
-        // will recalculate the right position.
-        // Who knows why it needs a delay in order to work. This is gross...
-        Idle.add (() => {
-            on_item_value_changed ();
-            return false;
-        });
+        window.event_bus.item_value_changed ();
     }
 
     public void y_notify_value () {
         Utils.AffineTransform.set_position (selected_item, 0, y.value);
-
-        // Hack! In case the item is rotated, the actual X & Y values might be
-        // different from what we have stored in the input field. This method
-        // will recalculate the right position.
-        // Who knows why it needs a delay in order to work. This is gross...
-        Idle.add (() => {
-            on_item_value_changed ();
-            return false;
-        });
+        window.event_bus.item_value_changed ();
     }
 
     public void update_size_ratio () {

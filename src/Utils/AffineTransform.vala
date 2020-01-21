@@ -273,17 +273,16 @@ public class Akira.Utils.AffineTransform : Object {
         prev_rotation_difference = 0.0;
     }
 
-    public static void set_position (CanvasItem item, double? x = 0, double? y = 0) {
-        var canvas = item.canvas;
-        double current_x = item.get_coords ("x");
-        double current_y = item.get_coords ("y");
+    public static void set_position (CanvasItem item, double x = 0, double y = 0) {
+        Cairo.Matrix matrix;
+        item.get_transform (out matrix);
 
-        canvas.convert_from_item_space (item, ref current_x, ref current_y);
+        double new_x = (x > 0) ? x : matrix.x0;
+        double new_y = (y > 0) ? y : matrix.y0;
 
-        double move_x = (x > 0) ? x - current_x : 0;
-        double move_y = (y > 0) ? y - current_y: 0;
+        var new_matrix = Cairo.Matrix (matrix.xx, matrix.yx, matrix.xy, matrix.yy, new_x, new_y);
 
-        item.translate (GLib.Math.round (move_x), GLib.Math.round (move_y));
+        item.set_transform (new_matrix);
     }
 
     public static void set_size (double? width, double? height, CanvasItem item) {
