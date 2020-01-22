@@ -101,7 +101,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         }
 
         items_manager.add_item (item);
-        Utils.AffineTransform.set_position (start_x, start_y, item);
+        Utils.AffineTransform.set_position (item, start_x, start_y);
 
         if (select) {
             selected_bound_manager.reset_selection ();

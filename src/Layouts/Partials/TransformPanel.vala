@@ -196,9 +196,17 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
             return;
         }
 
+        // Disconnect the item's value changes.
+        selected_item.notify["width"].disconnect (on_item_value_changed);
+        selected_item.notify["height"].disconnect (on_item_value_changed);
+        selected_item.notify["rotation"].disconnect (on_item_value_changed);
+        selected_item.notify["opacity"].disconnect (selected_item.reset_colors);
+
         // Disconnect the signals notification.
         x.notify["value"].disconnect (x_notify_value);
         y.notify["value"].disconnect (y_notify_value);
+
+        // Clear the bindings.
         ratio_bind.unbind ();
         width_bind.unbind ();
         height_bind.unbind ();
@@ -223,8 +231,8 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
     }
 
     private void enable () {
-        canvas = selected_item.canvas as Akira.Lib.Canvas;
         on_item_coord_changed ();
+        canvas = selected_item.canvas as Akira.Lib.Canvas;
 
         width.value = selected_item.get_coords ("width");
         height.value = selected_item.get_coords ("height");
@@ -281,7 +289,6 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
                 double src = (double) srcval;
                 targetval.set_double (src);
                 Utils.AffineTransform.set_rotation (src, selected_item);
-                on_item_coord_changed ();
                 return true;
             });
 
@@ -294,6 +301,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
             (binding, val, ref res) => {
                 res = val.get_boolean ();
                 window.event_bus.flip_item (true);
+                on_item_coord_changed ();
                 return true;
             });
 
@@ -302,6 +310,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
             (binding, val, ref res) => {
                 res = val.get_boolean ();
                 window.event_bus.flip_item (true, true);
+                on_item_coord_changed ();
                 return true;
             });
 
@@ -313,32 +322,45 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
     }
 
     private void on_item_value_changed () {
+        if (selected_item == null) {
+            return;
+        }
+
         window.event_bus.item_value_changed ();
+        on_item_coord_changed ();
     }
 
     // We need to fetch new X and Y values to update the fields.
     private void on_item_coord_changed () {
-        double item_x = selected_item.get_coords ("x");
-        double item_y = selected_item.get_coords ("y");
+        var position = Utils.AffineTransform.get_position (selected_item);
 
-        selected_item.canvas.convert_from_item_space (selected_item, ref item_x, ref item_y);
+        if (position["x"] != x.value) {
+            // Prevents X AffineTransform callback loop.
+            x.notify["value"].disconnect (x_notify_value);
+            x.value = position["x"];
+            x.notify["value"].connect (x_notify_value);
+        }
 
-        x.value = item_x;
-        y.value = item_y;
-    }
-
-    public void y_notify_value () {
-        Utils.AffineTransform.set_position (null, y.value, selected_item);
-        on_item_value_changed ();
+        if (position["y"] != y.value) {
+            // Prevents Y AffineTransform callback loop.
+            y.notify["value"].disconnect (y_notify_value);
+            y.value = position["y"];
+            y.notify["value"].connect (y_notify_value);
+        }
     }
 
     public void x_notify_value () {
-        Utils.AffineTransform.set_position (x.value, null, selected_item);
-        on_item_value_changed ();
+        Utils.AffineTransform.set_position (selected_item, x.value);
+        window.event_bus.item_value_changed ();
+    }
+
+    public void y_notify_value () {
+        Utils.AffineTransform.set_position (selected_item, null, y.value);
+        window.event_bus.item_value_changed ();
     }
 
     public void update_size_ratio () {
-        // We can't divide by 0, let's avoid to open a black hole.
+        // We can't divide by 0, let's avoid opening a black hole.
         if (height.value == 0) {
             return;
         }

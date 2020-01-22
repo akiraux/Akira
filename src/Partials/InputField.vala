@@ -117,7 +117,9 @@ public class Akira.Partials.InputField : Gtk.EventBox {
     }
 
     private bool handle_key_release (Gdk.EventKey key) {
-        if (key.keyval != Gdk.Key.Up && key.keyval != Gdk.Key.Down) {
+        if (key.keyval != Gdk.Key.Up && key.keyval != Gdk.Key.Down &&
+            key.keyval != Gdk.Key.Right && key.keyval != Gdk.Key.Left &&
+            key.is_modifier != 1) {
             entry.update ();
         }
 

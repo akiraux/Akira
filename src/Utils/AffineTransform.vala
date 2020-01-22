@@ -17,6 +17,7 @@
 * along with Akira. If not, see <https://www.gnu.org/licenses/>.
 *
 * Authored by: Giacomo "giacomoalbe" Alberini <giacomoalbe@gmail.com>
+* Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
 
 using Akira.Lib.Models;
@@ -25,11 +26,22 @@ using Akira.Lib.Managers;
 public class Akira.Utils.AffineTransform : Object {
     private const int MIN_SIZE = 1;
     private const int MIN_POS = 10;
-    private const int BOUNDS_H = 10000;
-    private const int BOUNDS_W = 10000;
     private const double ROTATION_FIXED_STEP = 15.0;
 
     public static double prev_rotation_difference = 0.0;
+
+    public static HashTable<string, double?> get_position (CanvasItem item) {
+        HashTable<string, double?> array = new HashTable<string, double?> (str_hash, str_equal);
+        double item_x = item.get_coords ("x");
+        double item_y = item.get_coords ("y");
+
+        item.canvas.convert_from_item_space (item, ref item_x, ref item_y);
+
+        array.insert ("x", item_x);
+        array.insert ("y", item_y);
+
+        return array;
+    }
 
     public static void move_from_event (
         double x,
@@ -273,26 +285,16 @@ public class Akira.Utils.AffineTransform : Object {
         prev_rotation_difference = 0.0;
     }
 
-    public static void set_position (double? x, double? y, CanvasItem item) {
-        var canvas = item.canvas;
+    public static void set_position (CanvasItem item, double? x = null, double? y = null) {
+        Cairo.Matrix matrix;
+        item.get_transform (out matrix);
 
-        double current_x = item.get_coords ("x");
-        double current_y = item.get_coords ("y");
+        double new_x = (x != null) ? x : matrix.x0;
+        double new_y = (y != null) ? y : matrix.y0;
 
-        canvas.convert_from_item_space (item, ref current_x, ref current_y);
+        var new_matrix = Cairo.Matrix (matrix.xx, matrix.yx, matrix.xy, matrix.yy, new_x, new_y);
 
-        var move_x_amount = 0.0;
-        var move_y_amount = 0.0;
-
-        if (x != null) {
-            move_x_amount = x - current_x;
-        }
-
-        if (y != null) {
-            move_y_amount = y - current_y;
-        }
-
-        item.translate (move_x_amount, move_y_amount);
+        item.set_transform (new_matrix);
     }
 
     public static void set_size (double? width, double? height, CanvasItem item) {
