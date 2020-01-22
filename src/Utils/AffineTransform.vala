@@ -17,6 +17,7 @@
 * along with Akira. If not, see <https://www.gnu.org/licenses/>.
 *
 * Authored by: Giacomo "giacomoalbe" Alberini <giacomoalbe@gmail.com>
+* Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
 
 using Akira.Lib.Models;
