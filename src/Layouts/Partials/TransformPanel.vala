@@ -196,9 +196,17 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
             return;
         }
 
+        // Disconnect the item's value changes.
+        selected_item.notify["width"].disconnect (on_item_value_changed);
+        selected_item.notify["height"].disconnect (on_item_value_changed);
+        selected_item.notify["rotation"].disconnect (on_item_value_changed);
+        selected_item.notify["opacity"].disconnect (selected_item.reset_colors);
+
         // Disconnect the signals notification.
         x.notify["value"].disconnect (x_notify_value);
         y.notify["value"].disconnect (y_notify_value);
+
+        // Clear the bindings.
         ratio_bind.unbind ();
         width_bind.unbind ();
         height_bind.unbind ();
@@ -223,8 +231,8 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
     }
 
     private void enable () {
-        canvas = selected_item.canvas as Akira.Lib.Canvas;
         on_item_coord_changed ();
+        canvas = selected_item.canvas as Akira.Lib.Canvas;
 
         width.value = selected_item.get_coords ("width");
         height.value = selected_item.get_coords ("height");
@@ -324,20 +332,21 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
 
     // We need to fetch new X and Y values to update the fields.
     private void on_item_coord_changed () {
-        // Prevents X & Y AffineTransform callback loop.
-        x.notify["value"].disconnect (x_notify_value);
-        y.notify["value"].disconnect (y_notify_value);
+        var position = Utils.AffineTransform.get_position (selected_item);
 
-        double item_x = selected_item.get_coords ("x");
-        double item_y = selected_item.get_coords ("y");
+        if (position["x"] != x.value) {
+            // Prevents X AffineTransform callback loop.
+            x.notify["value"].disconnect (x_notify_value);
+            x.value = position["x"];
+            x.notify["value"].connect (x_notify_value);
+        }
 
-        selected_item.canvas.convert_from_item_space (selected_item, ref item_x, ref item_y);
-
-        x.value = item_x;
-        y.value = item_y;
-
-        x.notify["value"].connect (x_notify_value);
-        y.notify["value"].connect (y_notify_value);
+        if (position["y"] != y.value) {
+            // Prevents Y AffineTransform callback loop.
+            y.notify["value"].disconnect (y_notify_value);
+            y.value = position["y"];
+            y.notify["value"].connect (y_notify_value);
+        }
     }
 
     public void x_notify_value () {
@@ -346,7 +355,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
     }
 
     public void y_notify_value () {
-        Utils.AffineTransform.set_position (selected_item, 0, y.value);
+        Utils.AffineTransform.set_position (selected_item, null, y.value);
         window.event_bus.item_value_changed ();
     }
 
