@@ -169,6 +169,13 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 ctrl_is_pressed = true;
                 return true;
 
+            case Gdk.Key.Up:
+            case Gdk.Key.Down:
+            case Gdk.Key.Right:
+            case Gdk.Key.Left:
+                window.event_bus.move_item_from_canvas (event);
+                return true;
+
             default:
                 // Send to ItemsManager to deal with custom user shape
                 // hotkey preferences from settings

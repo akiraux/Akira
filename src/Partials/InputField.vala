@@ -59,7 +59,6 @@ public class Akira.Partials.InputField : Gtk.EventBox {
         entry.sensitive = false;
 
         entry.key_press_event.connect (handle_key_press);
-        entry.key_release_event.connect (handle_key_release);
         entry.scroll_event.connect (handle_scroll_event);
 
         switch (unit) {
@@ -100,27 +99,17 @@ public class Akira.Partials.InputField : Gtk.EventBox {
         entry.set_range (min_value, max_value);
     }
 
-    private bool handle_key_press (Gdk.EventKey key) {
+    private bool handle_key_press (Gdk.EventKey event) {
         // Arrow UP
-        if (key.keyval == Gdk.Key.Up && key.state == Gdk.ModifierType.SHIFT_MASK) {
+        if (event.keyval == Gdk.Key.Up && (event.state & Gdk.ModifierType.SHIFT_MASK) > 0) {
             entry.spin (Gtk.SpinType.STEP_FORWARD, 10);
             return true;
         }
 
         // Arrow DOWN
-        if (key.keyval == Gdk.Key.Down && key.state == Gdk.ModifierType.SHIFT_MASK) {
+        if (event.keyval == Gdk.Key.Down && (event.state & Gdk.ModifierType.SHIFT_MASK) > 0) {
             entry.spin (Gtk.SpinType.STEP_BACKWARD, 10);
             return true;
-        }
-
-        return false;
-    }
-
-    private bool handle_key_release (Gdk.EventKey key) {
-        if (key.keyval != Gdk.Key.Up && key.keyval != Gdk.Key.Down &&
-            key.keyval != Gdk.Key.Right && key.keyval != Gdk.Key.Left &&
-            key.is_modifier != 1) {
-            entry.update ();
         }
 
         return false;

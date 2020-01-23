@@ -242,11 +242,6 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         hflip_button.active = selected_item.flipped_h;
         vflip_button.active = selected_item.flipped_v;
 
-        // Property binding doesn't work for X and Y as these attributes are not
-        // directly accessible from the CanvasItem. (goocanvas shenanigans)
-        x.notify["value"].connect (x_notify_value);
-        y.notify["value"].connect (y_notify_value);
-
         ratio_bind = lock_changes.bind_property (
             "active", selected_item, "size-locked",
             BindingFlags.SYNC_CREATE | BindingFlags.BIDIRECTIONAL,
