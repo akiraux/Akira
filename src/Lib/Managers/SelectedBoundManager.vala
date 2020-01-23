@@ -48,6 +48,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         canvas.window.event_bus.change_z_selected.connect (change_z_selected);
         canvas.window.event_bus.item_value_changed.connect (update_selected_items);
         canvas.window.event_bus.flip_item.connect (on_flip_item);
+        canvas.window.event_bus.move_item_from_canvas.connect (on_move_item_from_canvas);
     }
 
     construct {
@@ -199,12 +200,42 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
             if (vertical) {
                 item.flipped_v = !item.flipped_v;
                 Utils.AffineTransform.flip_item (clicked, item, 1, -1);
-                canvas.window.event_bus.item_value_changed ();
+                update_selected_items ();
                 return;
             }
             item.flipped_h = !item.flipped_h;
             Utils.AffineTransform.flip_item (clicked, item, -1, 1);
-            canvas.window.event_bus.item_value_changed ();
+            update_selected_items ();
+        });
+    }
+
+    private void on_move_item_from_canvas (Gdk.EventKey event) {
+        if (selected_items.length () == 0 || !canvas.has_focus) {
+            return;
+        }
+
+        var amount = event.state == Gdk.ModifierType.SHIFT_MASK ? 10 : 1;
+
+        selected_items.foreach ((item) => {
+            var position = Akira.Utils.AffineTransform.get_position (item);
+
+            switch (event.keyval) {
+                case Gdk.Key.Up:
+                    Utils.AffineTransform.set_position (item, null, position["y"] - amount);
+                    break;
+                case Gdk.Key.Down:
+                    Utils.AffineTransform.set_position (item, null, position["y"] + amount);
+                    break;
+                case Gdk.Key.Right:
+                    Utils.AffineTransform.set_position (item, position["x"] + amount);
+                    break;
+                case Gdk.Key.Left:
+                    Utils.AffineTransform.set_position (item, position["x"] - amount);
+                    break;
+            }
+
+            canvas.window.event_bus.item_coord_changed ();
+            update_selected_items ();
         });
     }
 }
