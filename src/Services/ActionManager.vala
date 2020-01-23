@@ -51,6 +51,7 @@ public class Akira.Services.ActionManager : Object {
     public const string ACTION_DELETE = "action_delete";
     public const string ACTION_FLIP_H = "action_flip_h";
     public const string ACTION_FLIP_V = "action_flip_v";
+    public const string ACTION_ESCAPE = "action_escape";
 
     public static Gee.MultiMap<string, string> action_accelerators = new Gee.HashMultiMap<string, string> ();
 
@@ -80,6 +81,7 @@ public class Akira.Services.ActionManager : Object {
         { ACTION_DELETE, action_delete },
         { ACTION_FLIP_H, action_flip_h },
         { ACTION_FLIP_V, action_flip_v },
+        { ACTION_ESCAPE, action_escape },
     };
 
     public ActionManager (Akira.Application akira_app, Akira.Window window) {
@@ -110,6 +112,7 @@ public class Akira.Services.ActionManager : Object {
         action_accelerators.set (ACTION_MOVE_BOTTOM, "<Control><Shift>Down");
         action_accelerators.set (ACTION_FLIP_H, "<Control>bracketleft");
         action_accelerators.set (ACTION_FLIP_V, "<Control>bracketright");
+        action_accelerators.set (ACTION_ESCAPE, "Escape");
     }
 
     construct {
@@ -256,6 +259,10 @@ public class Akira.Services.ActionManager : Object {
         default:
             break;
         }
+    }
+
+    private void action_escape () {
+        window.event_bus.request_escape ();
     }
 
     public static void action_from_group (string action_name, ActionGroup? action_group) {
