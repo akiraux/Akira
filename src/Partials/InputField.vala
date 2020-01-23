@@ -100,11 +100,6 @@ public class Akira.Partials.InputField : Gtk.EventBox {
     }
 
     private bool handle_key_press (Gdk.EventKey key) {
-        //  debug (key.state.to_string ());
-        //  debug (Gdk.ModifierType.SHIFT_MASK.to_string ());
-
-        //  debug ((key.state.to_string () == Gdk.ModifierType.SHIFT_MASK.to_string ()).to_string ());
-        //  debug ((key.state == Gdk.ModifierType.SHIFT_MASK).to_string ());
         // Arrow UP
         if (key.keyval == Gdk.Key.Up && key.state == Gdk.ModifierType.SHIFT_MASK) {
             entry.spin (Gtk.SpinType.STEP_FORWARD, 10);
