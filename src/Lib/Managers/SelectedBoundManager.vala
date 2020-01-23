@@ -214,7 +214,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
             return;
         }
 
-        var amount = event.state == Gdk.ModifierType.SHIFT_MASK ? 10 : 1;
+        var amount = (event.state & Gdk.ModifierType.SHIFT_MASK) > 0 ? 10 : 1;
 
         selected_items.foreach ((item) => {
             var position = Akira.Utils.AffineTransform.get_position (item);
