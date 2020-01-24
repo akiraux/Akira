@@ -204,6 +204,14 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
             return false;
         });
 
+        model.notify["selected"].connect (() => {
+            if (model.selected) {
+                debug (@"Activating $(model.name)");
+                activate ();
+            }
+        });
+
+
         lock_actions ();
         hide_actions ();
         reveal_actions ();

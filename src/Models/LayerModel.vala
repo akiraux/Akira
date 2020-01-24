@@ -57,6 +57,8 @@ public class Akira.Models.LayerModel : Models.ItemModel {
         }
     }
 
+    public bool selected { get; set; }
+
     public LayerModel (
         Lib.Models.CanvasItem item,
         Akira.Models.ListModel list_model

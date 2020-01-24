@@ -27,6 +27,7 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
     private bool scroll_up = false;
     private bool scrolling = false;
     private bool should_scroll = false;
+    private string current_selected_item_id;
 
     private Akira.Models.ListModel list_model;
     private Gee.HashMap<string, Akira.Models.LayerModel> item_model_map;
@@ -69,6 +70,7 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
 
         window.event_bus.item_inserted.connect (on_item_inserted);
         window.event_bus.item_deleted.connect (on_item_deleted);
+        window.event_bus.selected_items_changed.connect (on_selected_items_changed);
     }
 
     private void on_item_inserted (Lib.Models.CanvasItem new_item) {
@@ -87,6 +89,31 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
         var model = item_model_map.@get (item.id);
 
         list_model.remove_item.begin (model);
+    }
+
+    private void on_selected_items_changed (List<Lib.Models.CanvasItem> selected_items) {
+      if (current_selected_item_id != null) {
+        item_model_map.@get (current_selected_item_id).selected = false;
+      }
+
+      if (selected_items.length () == 0) {
+        current_selected_item_id = null;
+        return;
+      }
+
+      var selected_item = selected_items.nth_data (0);
+
+      if (selected_item.id == current_selected_item_id) {
+        return;
+      }
+
+      item_model_map.@get (selected_item.id).selected = true;
+
+      current_selected_item_id = selected_item.id;
+
+      // After activating a row it is necessary to
+      // put (keyboard) focus back to the canvas
+      window.event_bus.set_focus_on_canvas ();
     }
 
     private void build_drag_and_drop () {
