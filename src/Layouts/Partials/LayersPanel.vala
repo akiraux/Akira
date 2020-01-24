@@ -113,7 +113,7 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
         return;
       }
 
-      var new_selected_model =  item_model_map.@get (selected_item.id);
+      var new_selected_model = item_model_map.@get (selected_item.id);
 
       if (new_selected_model != null) {
         new_selected_model.selected = true;
