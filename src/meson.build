@@ -74,7 +74,6 @@ sources = files(
 
     'Lib/Managers/HoverManager.vala',
     'Lib/Managers/SelectedBoundManager.vala',
-    #'Lib/Managers/AffineTransformManager.vala',
     'Lib/Managers/ItemsManager.vala',
     'Lib/Managers/NobManager.vala',
 
