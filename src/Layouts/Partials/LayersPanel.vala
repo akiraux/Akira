@@ -83,10 +83,10 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
         show_all ();
     }
 
-    private void on_item_deleted (Lib.Models.CanvasItem item_to_delete) {
-        var model_to_delete = item_model_map.@get (item_to_delete.id);
+    private void on_item_deleted (Lib.Models.CanvasItem item) {
+        var model = item_model_map.@get (item.id);
 
-        list_model.remove_item.begin (model_to_delete);
+        list_model.remove_item.begin (model);
     }
 
     private void build_drag_and_drop () {

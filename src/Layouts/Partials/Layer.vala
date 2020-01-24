@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2019 Alecaddd (http://alecaddd.com)
+* Copyright (c) 2019-2020 Alecaddd (http://alecaddd.com)
 *
 * This file is part of Akira.
 *
@@ -82,8 +82,6 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
     public bool grouped {
         get { return _grouped; } set construct { _grouped = value; }
     }
-
-    // public Akira.Shape shape { get; construct; }
 
     public Layer (
         Akira.Window window,
@@ -585,8 +583,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
             return;
         }
 
-        label.label = new_label;
-        model.name = new_label;
+        label.label = model.name = new_label;
     }
 
     private void lock_actions () {

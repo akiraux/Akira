@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2019 Alecaddd (https://alecaddd.com)
+* Copyright (c) 2019-2020 Alecaddd (https://alecaddd.com)
 *
 * This file is part of Akira.
 *

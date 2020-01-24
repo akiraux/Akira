@@ -113,9 +113,9 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         items.append (item);
     }
 
-    public void on_request_delete_item (Lib.Models.CanvasItem item_to_delete) {
-        item_to_delete.delete ();
-        canvas.window.event_bus.item_deleted (item_to_delete);
+    public void on_request_delete_item (Lib.Models.CanvasItem item) {
+        item.delete ();
+        canvas.window.event_bus.item_deleted (item);
     }
 
     public Models.CanvasItem add_rect (Gdk.EventButton event) {
