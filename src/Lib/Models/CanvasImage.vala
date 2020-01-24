@@ -73,6 +73,7 @@ public class Akira.Lib.Models.CanvasImage : Goo.CanvasImage, CanvasItem {
                 pixbuf = _pixbuf;
                 width = _pixbuf.get_width ();
                 height = _pixbuf.get_height ();
+                fix_image_size ();
             } catch (Error e) {
                 warning (e.message);
                 // TODO: handle error here
@@ -80,9 +81,11 @@ public class Akira.Lib.Models.CanvasImage : Goo.CanvasImage, CanvasItem {
         });
 
         reset_colors ();
+    }
 
+    public void fix_image_size () {
         // Imported images should keep their aspect ratio by default.
-        size_locked = true;
         size_ratio = width / height;
+        size_locked = true;
     }
 }
