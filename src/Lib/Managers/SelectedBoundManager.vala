@@ -49,8 +49,9 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         canvas.window.event_bus.item_value_changed.connect (update_selected_items);
         canvas.window.event_bus.flip_item.connect (on_flip_item);
         canvas.window.event_bus.move_item_from_canvas.connect (on_move_item_from_canvas);
-        canvas.window.event_bus.item_deleted.connect (on_item_deleted);
+        canvas.window.event_bus.item_deleted.connect (remove_item_from_selection);
         canvas.window.event_bus.request_add_item_to_selection.connect (add_item_to_selection);
+        canvas.window.event_bus.item_locked.connect (remove_item_from_selection);
     }
 
     construct {
@@ -247,9 +248,9 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         });
     }
 
-    private void on_item_deleted (Lib.Models.CanvasItem item_deleted) {
-        if (selected_items.index (item_deleted) > -1) {
-            selected_items.remove (item_deleted);
+    private void remove_item_from_selection (Lib.Models.CanvasItem item) {
+        if (selected_items.index (item) > -1) {
+            selected_items.remove (item);
         }
     }
 }

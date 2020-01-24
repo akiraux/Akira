@@ -33,6 +33,8 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
     public static int global_id = 0;
 
     public abstract string id { get; set; }
+    public abstract string name { get; set; }
+
     public abstract bool selected { get; set; }
     public abstract bool locked { get; set; default = false; }
 

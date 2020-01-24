@@ -613,6 +613,10 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
             icon_locked.no_show_all = active;
 
             model.locked = active;
+
+            if (active) {
+                window.event_bus.item_locked (model.item);
+            }
         });
     }
 

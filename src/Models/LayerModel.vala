@@ -22,11 +22,14 @@
 public class Akira.Models.LayerModel : Models.ItemModel {
     public string name {
         owned get {
+            if (item.name != null) {
+                return item.name;
+            }
+
             return item.id;
         }
         set {
-            // TODO: add "name" property to item
-            debug (@"New item.name: $(value)");
+            item.name = value;
         }
     }
 
@@ -53,7 +56,6 @@ public class Akira.Models.LayerModel : Models.ItemModel {
         }
 
         set {
-            debug (@"Locking panel: $(value)");
             item.locked = value;
         }
     }
