@@ -35,6 +35,7 @@ public class Akira.Lib.Models.CanvasEllipse : Goo.CanvasEllipse, Models.CanvasIt
     public int stroke_alpha { get; set; }
     public bool hidden_border { get; set; }
     public bool size_locked { get; set; }
+    public double size_ratio { get; set; }
     public bool flipped_h { get; set; }
     public bool flipped_v { get; set; }
     public bool show_border_radius_panel { get; set; }
