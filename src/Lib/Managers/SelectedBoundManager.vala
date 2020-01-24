@@ -252,5 +252,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         if (selected_items.index (item) > -1) {
             selected_items.remove (item);
         }
+
+        canvas.window.event_bus.set_focus_on_canvas ();
     }
 }
