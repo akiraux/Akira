@@ -50,6 +50,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         canvas.window.event_bus.flip_item.connect (on_flip_item);
         canvas.window.event_bus.move_item_from_canvas.connect (on_move_item_from_canvas);
         canvas.window.event_bus.item_deleted.connect (on_item_deleted);
+        canvas.window.event_bus.request_add_item_to_selection.connect (add_item_to_selection);
     }
 
     construct {

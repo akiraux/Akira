@@ -205,10 +205,16 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
         });
 
         model.notify["selected"].connect (() => {
+            debug (@"New model.selected: $(model.selected)");
+
             if (model.selected) {
-                debug (@"Activating $(model.name)");
-                activate ();
+              debug (@"Activating $(model.name)");
+              activate ();
+              return;
             }
+
+            debug ("Unselecting all rows");
+            (parent as Gtk.ListBox).unselect_row (this);
         });
 
 
@@ -457,6 +463,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
         if (event.type == Gdk.EventType.BUTTON_PRESS) {
             activate ();
             handle.grab_focus ();
+            window.event_bus.request_add_item_to_selection (model.item);
         }
 
         if (event.type == Gdk.EventType.BUTTON_RELEASE) {
@@ -499,8 +506,6 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
                 if (child is Akira.Layouts.Partials.Artboard) {
                     Akira.Layouts.Partials.Artboard artboard = (Akira.Layouts.Partials.Artboard) child;
 
-                    debug ("Unselecting something");
-
                     window.main_window.right_sidebar.layers_panel.unselect_row (artboard);
                     artboard.container.unselect_all ();
 
@@ -509,7 +514,6 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
             });
 
             if (layer_group != null) {
-                debug ("Entra");
                 artboard.container.selection_mode = Gtk.SelectionMode.NONE;
                 artboard.container.unselect_row (layer_group);
             }
