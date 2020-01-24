@@ -46,6 +46,7 @@ public class Akira.Services.EventBus : Object {
     public signal void item_deleted (Lib.Models.CanvasItem item);
     public signal void request_add_item_to_selection (Lib.Models.CanvasItem item);
     public signal void item_locked (Lib.Models.CanvasItem item);
+    public signal void hover_over_item (Lib.Models.CanvasItem? item);
 
     public void test (string caller_id) {
         debug (@"Test from EventBus called by $(caller_id)");

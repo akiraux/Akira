@@ -206,8 +206,9 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 
         model.notify["selected"].connect (() => {
             if (model.selected) {
-              activate ();
-              return;
+                get_style_context ().remove_class ("hovered");
+                activate ();
+                return;
             }
 
             (parent as Gtk.ListBox).unselect_row (this);
@@ -217,6 +218,17 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
         lock_actions ();
         hide_actions ();
         reveal_actions ();
+
+        window.event_bus.hover_over_item.connect (on_hover_over_item);
+    }
+
+    private void on_hover_over_item (Lib.Models.CanvasItem? item) {
+        if (item == model.item) {
+            get_style_context ().add_class ("hovered");
+            return;
+        }
+
+        get_style_context ().remove_class ("hovered");
     }
 
     private void is_group () {
@@ -458,6 +470,11 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 
         if (event.type == Gdk.EventType.BUTTON_PRESS) {
             activate ();
+
+            // Selected layers cannot be hovering
+            // We need to reflect the status of the canvas item
+            get_style_context ().remove_class ("hovered");
+
             handle.grab_focus ();
             window.event_bus.request_add_item_to_selection (model.item);
         }
