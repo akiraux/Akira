@@ -82,6 +82,8 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
         // real items and the layers panel only knows items model
         item_model_map.@set (new_item.id, model);
 
+        reload_zebra ();
+
         show_all ();
     }
 
@@ -89,11 +91,18 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
         var model = item_model_map.@get (item.id);
 
         list_model.remove_item.begin (model);
+
+        reload_zebra ();
     }
 
     private void on_selected_items_changed (List<Lib.Models.CanvasItem> selected_items) {
       if (selected_items.length () == 0) {
-        item_model_map.@get (current_selected_item_id).selected = false;
+        var current_selected_item = item_model_map.@get (current_selected_item_id);
+
+        if (current_selected_item != null) {
+          current_selected_item.selected = false;
+        }
+
         current_selected_item_id = null;
         return;
       }
@@ -212,8 +221,10 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
 
         @foreach (row => {
             if (!(row is Akira.Layouts.Partials.Artboard)) {
-                return;
+              zebra_layer ((Akira.Layouts.Partials.Layer) row);
+              return;
             }
+
             zebra_artboard ((Akira.Layouts.Partials.Artboard) row);
         });
     }
