@@ -52,6 +52,7 @@ public class Akira.Layouts.LeftSideBar : Gtk.Grid {
         borders_panel = new Akira.Layouts.Partials.BordersPanel (window);
 
         var scrolled_window = new Gtk.ScrolledWindow (null, null);
+        scrolled_window.hscrollbar_policy = Gtk.PolicyType.NEVER;
         scrolled_window.expand = true;
         var scrolled_grid = new Gtk.Grid ();
         scrolled_grid.expand = true;

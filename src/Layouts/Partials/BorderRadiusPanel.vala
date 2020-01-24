@@ -131,6 +131,7 @@ public class Akira.Layouts.Partials.BorderRadiusPanel : Gtk.Grid {
         panel_grid.attach (options_button, 2, 2, 1, 1);
 
         options_revealer = new Gtk.Revealer ();
+        options_revealer.transition_type = Gtk.RevealerTransitionType.NONE;
         panel_grid.attach (options_revealer, 0, 3, 3, 1);
 
         options_grid = new Gtk.Grid ();
@@ -212,9 +213,11 @@ public class Akira.Layouts.Partials.BorderRadiusPanel : Gtk.Grid {
         window.event_bus.selected_items_changed.connect (on_selected_items_changed);
         options_button.toggled.connect (() => {
             options_revealer.reveal_child = !options_revealer.child_revealed;
-            // We need to wait for the transition to finish before redrawing the widget.
-            Timeout.add (options_revealer.transition_duration, () => {
-                window.main_window.left_sidebar.queue_resize ();
+            // Dirty hack to fix GTK UI glitches for the sidebar after the widget has been revealed.
+            // queue_resize and similar methods don't work. We need to toggle the visibility.
+            Idle.add (() => {
+                window.main_window.left_sidebar.visible = !window.main_window.left_sidebar.visible;
+                window.main_window.left_sidebar.visible = !window.main_window.left_sidebar.visible;
                 return false;
             });
         });
