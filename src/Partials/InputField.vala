@@ -118,7 +118,7 @@ public class Akira.Partials.InputField : Gtk.EventBox {
     private bool handle_scroll_event (Gdk.EventScroll event) {
         // If the input field is not focused, don't change the value.
         if (!entry.has_focus) {
-            GLib.Signal.stop_emission_by_name (entry, "scroll-event");
+            return true;
         }
         return false;
     }
