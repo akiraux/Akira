@@ -77,8 +77,6 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
         var model = new Akira.Models.LayerModel (new_item, list_model);
         list_model.add_item.begin (model);
 
-        debug ("On item inserted ");
-
         // This map is necessary for easily knowing which
         // item is related to which model, since the canvas knows only
         // real items and the layers panel only knows items model
@@ -95,8 +93,8 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
 
     private void on_selected_items_changed (List<Lib.Models.CanvasItem> selected_items) {
       if (selected_items.length () == 0) {
-        current_selected_item_id = null;
         item_model_map.@get (current_selected_item_id).selected = false;
+        current_selected_item_id = null;
         return;
       }
 
@@ -106,10 +104,13 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
         return;
       }
 
-      debug(@"SelectedItemID: $(selected_item.id) CurrentSelectedId: $(current_selected_item_id)");
-
       item_model_map.@get (selected_item.id).selected = true;
-      item_model_map.@get (current_selected_item_id).selected = false;
+
+      var current_selected_item = item_model_map.@get (current_selected_item_id);
+
+      if (current_selected_item != null) {
+        current_selected_item.selected = false;
+      }
 
       current_selected_item_id = selected_item.id;
 

@@ -205,15 +205,11 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
         });
 
         model.notify["selected"].connect (() => {
-            debug (@"New model.selected: $(model.selected)");
-
             if (model.selected) {
-              debug (@"Activating $(model.name)");
               activate ();
               return;
             }
 
-            debug ("Unselecting all rows");
             (parent as Gtk.ListBox).unselect_row (this);
         });
 
