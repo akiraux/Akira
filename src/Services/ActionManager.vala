@@ -34,7 +34,9 @@ public class Akira.Services.ActionManager : Object {
     public const string ACTION_SHOW_UI_GRID = "action-show-ui-grid";
     public const string ACTION_PRESENTATION = "action_presentation";
     public const string ACTION_PREFERENCES = "action_preferences";
-    public const string ACTION_EXPORT = "action_export";
+    public const string ACTION_EXPORT_SELECTION = "action_export_selection";
+    public const string ACTION_EXPORT_ARTBOARDS = "action_export_artboards";
+    public const string ACTION_EXPORT_GRAB = "action_export_grab";
     public const string ACTION_QUIT = "action_quit";
     public const string ACTION_ZOOM_IN = "action_zoom_in";
     public const string ACTION_ZOOM_OUT = "action_zoom_out";
@@ -64,7 +66,9 @@ public class Akira.Services.ActionManager : Object {
         { ACTION_SHOW_UI_GRID, action_show_ui_grid },
         { ACTION_PRESENTATION, action_presentation },
         { ACTION_PREFERENCES, action_preferences },
-        { ACTION_EXPORT, action_export },
+        { ACTION_EXPORT_SELECTION, action_export_selection },
+        { ACTION_EXPORT_ARTBOARDS, action_export_artboards },
+        { ACTION_EXPORT_GRAB, action_export_grab },
         { ACTION_QUIT, action_quit },
         { ACTION_ZOOM_IN, action_zoom_in },
         { ACTION_ZOOM_OUT, action_zoom_out },
@@ -100,7 +104,9 @@ public class Akira.Services.ActionManager : Object {
         action_accelerators.set (ACTION_SHOW_UI_GRID, "<Control><Shift>g");
         action_accelerators.set (ACTION_PRESENTATION, "<Control>period");
         action_accelerators.set (ACTION_PREFERENCES, "<Control>comma");
-        action_accelerators.set (ACTION_EXPORT, "<Control><Shift>e");
+        action_accelerators.set (ACTION_EXPORT_SELECTION, "<Control><Alt>e");
+        action_accelerators.set (ACTION_EXPORT_ARTBOARDS, "<Control><Alt>a");
+        action_accelerators.set (ACTION_EXPORT_GRAB, "<Control><Alt>g");
         action_accelerators.set (ACTION_QUIT, "<Control>q");
         action_accelerators.set (ACTION_ZOOM_IN, "<Control>equal");
         action_accelerators.set (ACTION_ZOOM_IN, "<Control>plus");
@@ -165,7 +171,15 @@ public class Akira.Services.ActionManager : Object {
         settings_dialog.present ();
     }
 
-    private void action_export () {
+    private void action_export_selection () {
+        warning ("export");
+    }
+
+    private void action_export_artboards () {
+        warning ("export");
+    }
+
+    private void action_export_grab () {
         warning ("export");
     }
 

@@ -39,7 +39,7 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
     public Akira.Partials.HeaderBarButton move_top;
     public Akira.Partials.HeaderBarButton move_bottom;
     public Akira.Partials.HeaderBarButton preferences;
-    public Akira.Partials.HeaderBarButton export;
+    public Akira.Partials.MenuButton export;
     public Akira.Partials.HeaderBarButton layout;
     public Akira.Partials.HeaderBarButton path_difference;
     public Akira.Partials.HeaderBarButton path_exclusion;
@@ -109,10 +109,9 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
             + Akira.Services.ActionManager.ACTION_PREFERENCES;
         preferences.sensitive = true;
 
-        export = new Akira.Partials.HeaderBarButton (window, "document-export",
-            _("Export"), {"<Ctrl><Shift>E"});
-        export.button.action_name = Akira.Services.ActionManager.ACTION_PREFIX
-            + Akira.Services.ActionManager.ACTION_EXPORT;
+        export = new Akira.Partials.MenuButton ("document-export", _("Export"), null);
+        var export_popover = build_export_popover ();
+        export.button.popover = export_popover;
         export.sensitive = true;
 
         path_difference = new Akira.Partials.HeaderBarButton (window, "path-difference",
@@ -318,8 +317,42 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
         return popover_insert;
     }
 
+    private Gtk.PopoverMenu build_export_popover () {
+        var grid = new Gtk.Grid ();
+        grid.margin_top = 6;
+        grid.margin_bottom = 3;
+        grid.orientation = Gtk.Orientation.VERTICAL;
+        grid.width_request = 240;
+        grid.name = "main";
+
+        var export_selection = new Akira.Partials.PopoverButton (_("Export Selection"), null, {"<Ctrl><Alt>e"});
+        export_selection.action_name = Akira.Services.ActionManager.ACTION_PREFIX
+            + Akira.Services.ActionManager.ACTION_EXPORT_SELECTION;
+
+        var export_artboards = new Akira.Partials.PopoverButton (_("Export Artboards"), null, {"<Ctrl><Alt>a"});
+        export_artboards.action_name = Akira.Services.ActionManager.ACTION_PREFIX
+            + Akira.Services.ActionManager.ACTION_EXPORT_ARTBOARDS;
+
+        var separator = new Gtk.Separator (Gtk.Orientation.HORIZONTAL);
+        separator.margin_top = separator.margin_bottom = 3;
+
+        var export_area_grab = new Akira.Partials.PopoverButton (_("Export Area to Grab"), null, {"<Ctrl><Alt>g"});
+        export_area_grab.action_name = Akira.Services.ActionManager.ACTION_PREFIX
+            + Akira.Services.ActionManager.ACTION_EXPORT_GRAB;
+
+        grid.add (export_selection);
+        grid.add (export_artboards);
+        grid.add (separator);
+        grid.add (export_area_grab);
+        grid.show_all ();
+
+        var popover = new Gtk.PopoverMenu ();
+        popover.add (grid);
+
+        return popover;
+    }
+
     private void build_signals () {
-        // TODO: deal with signals not part of accelerators
         window.event_bus.close_popover.connect (() => {
             popover_insert.closed ();
         });
