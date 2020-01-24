@@ -67,9 +67,6 @@ public class Akira.Models.LayerModel : Models.ItemModel {
         );
     }
 
-    construct {
-    }
-
     public string to_string () {
         return "Layer: %s Hidden: %d Lock: %d".printf (item.id, 0, 0);
     }
