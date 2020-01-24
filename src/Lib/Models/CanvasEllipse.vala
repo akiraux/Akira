@@ -24,8 +24,11 @@ public class Akira.Lib.Models.CanvasEllipse : Goo.CanvasEllipse, Models.CanvasIt
     public string layer_icon { get; set; default = "shape-circle-symbolic"; }
 
     public string id { get; set; }
-    public double rotation { get; set; }
+
     public bool selected { get; set; }
+    public bool locked { get; set; }
+
+    public double rotation { get; set; }
     public double opacity { get; set; }
     public bool has_fill { get; set; default = true; }
     public int fill_alpha { get; set; }

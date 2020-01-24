@@ -24,7 +24,10 @@ public class Akira.Lib.Models.CanvasRect : Goo.CanvasRect, Models.CanvasItem {
     public string layer_icon { get; set; default = "shape-rectangle-symbolic"; }
 
     public string id { get; set; }
+
     public bool selected { get; set; }
+    public bool locked { get; set; }
+
     public double rotation { get; set; }
     public double opacity { get; set; }
     public bool has_fill { get; set; default = true; }

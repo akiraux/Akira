@@ -123,6 +123,11 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         // Just 1 selected element at the same time
         // TODO: allow for multi selection with shift pressed
         reset_selection ();
+
+        if (item.locked) {
+            return;
+        }
+
         item.selected = true;
         selected_items.append (item);
     }

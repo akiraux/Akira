@@ -34,6 +34,7 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
 
     public abstract string id { get; set; }
     public abstract bool selected { get; set; }
+    public abstract bool locked { get; set; default = false; }
 
     // Transform Panel attributes.
     public abstract double opacity { get; set; }

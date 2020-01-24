@@ -54,6 +54,10 @@ public class Akira.Lib.Managers.HoverManager : Object {
         if (target is Models.CanvasItem) {
             var item = target as Models.CanvasItem;
 
+            if (item.locked) {
+                return;
+            }
+
             double line_width = 0.0;
             item.get ("line-width", out line_width);
 

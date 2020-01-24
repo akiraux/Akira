@@ -49,11 +49,12 @@ public class Akira.Models.LayerModel : Models.ItemModel {
 
     public bool? locked {
         get {
-            return true;
+            return item.locked;
         }
 
         set {
             debug (@"Locking panel: $(value)");
+            item.locked = value;
         }
     }
 
