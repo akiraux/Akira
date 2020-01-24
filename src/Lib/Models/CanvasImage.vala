@@ -44,6 +44,7 @@ public class Akira.Lib.Models.CanvasImage : Goo.CanvasImage, CanvasItem {
     public int stroke_alpha { get; set; }
     public bool hidden_border { get; set; }
     public bool size_locked { get; set; }
+    public double size_ratio { get; set; }
     public bool flipped_h { get; set; }
     public bool flipped_v { get; set; }
     public bool show_border_radius_panel { get; set; }
@@ -72,6 +73,7 @@ public class Akira.Lib.Models.CanvasImage : Goo.CanvasImage, CanvasItem {
                 pixbuf = _pixbuf;
                 width = _pixbuf.get_width ();
                 height = _pixbuf.get_height ();
+                fix_image_size ();
             } catch (Error e) {
                 warning (e.message);
                 // TODO: handle error here
@@ -79,8 +81,11 @@ public class Akira.Lib.Models.CanvasImage : Goo.CanvasImage, CanvasItem {
         });
 
         reset_colors ();
+    }
 
+    public void fix_image_size () {
         // Imported images should keep their aspect ratio by default.
+        size_ratio = width / height;
         size_locked = true;
     }
 }

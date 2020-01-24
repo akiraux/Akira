@@ -224,7 +224,6 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         height.value = 0.0;
         opacity_adj.value = 100.0;
         rotation.value = 0.0;
-        canvas.size_ratio = 1.0;
         lock_changes.active = false;
         hflip_button.active = false;
         vflip_button.active = false;
@@ -260,7 +259,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
                 double src = (double) srcval;
                 targetval.set_double (src);
                 if (selected_item.size_locked) {
-                    height.value = GLib.Math.round (src / canvas.size_ratio);
+                    height.value = GLib.Math.round (src / selected_item.size_ratio);
                 }
                 return true;
             });
@@ -272,7 +271,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
                 double src = (double) srcval;
                 targetval.set_double (src);
                 if (selected_item.size_locked) {
-                    width.value = GLib.Math.round (src * canvas.size_ratio);
+                    width.value = GLib.Math.round (src * selected_item.size_ratio);
                 }
                 return true;
             });
@@ -359,7 +358,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         if (height.value == 0) {
             return;
         }
-        canvas.size_ratio = width.value / height.value;
+        selected_item.size_ratio = width.value / height.value;
     }
 
     private Gtk.Label group_title (string title) {
