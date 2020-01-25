@@ -84,7 +84,16 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
         string[] type_slug_tokens = item.item_type.to_string ().split ("_");
         string type_slug = type_slug_tokens[type_slug_tokens.length - 1];
 
-        return "%s%d".printf (type_slug, global_id++);
+        return "%s %d".printf (capitalize (type_slug.down ()), global_id++);
+    }
+
+    public static string capitalize (string s) {
+        string back = s;
+        if (s.get_char (0).islower ()) {
+            back = s.get_char (0).toupper ().to_string () + s.substring (1);
+        }
+
+        return back;
     }
 
     public static void init_item (Goo.CanvasItem item) {

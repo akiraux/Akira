@@ -22,11 +22,7 @@
 public class Akira.Models.LayerModel : Models.ItemModel {
     public string name {
         owned get {
-            if (item.name != null) {
-                return item.name;
-            }
-
-            return item.id;
+            return item.name != null ? item.name : item.id;
         }
         set {
             item.name = value;
@@ -54,17 +50,23 @@ public class Akira.Models.LayerModel : Models.ItemModel {
         get {
             return item.locked;
         }
-
         set {
             item.locked = value;
 
-            if (item.locked && item.selected) {
-                item.selected = false;
+            if (item.locked) {
+                selected = false;
             }
         }
     }
 
-    public bool selected { get; set; }
+    public bool selected {
+        get {
+            return item.selected;
+        }
+        set {
+            item.selected = value;
+        }
+    }
 
     public LayerModel (
         Lib.Models.CanvasItem item,

@@ -6,15 +6,12 @@
 /* selected status */
 .layer,
 .layer:selected {
-    border: 1px solid @base_color;
     background-color: @base_color;
 }
 
 .layer:selected {
-    border-left-color: @primary;
-    box-shadow: inset 3px 0 0 @primary;
+    box-shadow: inset 4px 0 0 @primary;
 }
-
 
 .layer:selected image,
 .layer:selected button {
@@ -26,14 +23,13 @@
 .layer.even,
 .layer.even:focus,
 .layer.even:selected {
-    border: 1px solid shade (@bg_color, 1);
     background-color: shade (@bg_color, 1);
 }
 
 /* Hovered */
-.layer.hovered,
-.layer.even.hovered {
-  border: 1px solid @hovering;
+.layer.hovered:not(:selected),
+.layer.even.hovered:not(:selected) {
+  box-shadow: inset 0 0 0 2px @highlight;
 }
 
 /* label */
@@ -47,7 +43,7 @@
 .layer-action {
     border: none;
     background: transparent;
-    padding: 2px;
+    padding: 0 2px;
     opacity: 0;
     box-shadow: none;
 }

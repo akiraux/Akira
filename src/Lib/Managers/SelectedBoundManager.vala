@@ -83,6 +83,10 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
     public void transform_bound (double event_x, double event_y, Managers.NobManager.Nob selected_nob) {
         Models.CanvasItem selected_item = selected_items.nth_data (0);
 
+        if (selected_item == null) {
+            return;
+        }
+
         switch (selected_nob) {
             case Managers.NobManager.Nob.NONE:
                 Utils.AffineTransform.move_from_event (

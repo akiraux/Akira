@@ -254,6 +254,9 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 nob_manager.selected_nob = clicked_nob_name;
 
                 if (clicked_item is Models.CanvasItem) {
+                    if ((clicked_item as Models.CanvasItem).locked) {
+                        return true;
+                    }
                     // Item has been selected
                     selected_bound_manager.add_item_to_selection (clicked_item as Models.CanvasItem);
                 }
@@ -273,7 +276,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
     public override bool button_release_event (Gdk.EventButton event) {
         if (!holding) {
-            return false;
+            return true;
         }
 
         holding = false;
@@ -292,7 +295,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 break;
         }
 
-        return false;
+        return true;
     }
 
     public override bool motion_notify_event (Gdk.EventMotion event) {
