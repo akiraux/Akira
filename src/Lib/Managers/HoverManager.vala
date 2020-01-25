@@ -43,7 +43,6 @@ public class Akira.Lib.Managers.HoverManager : Object {
     }
 
     public void add_hover_effect (double event_x, double event_y) {
-
         var target = canvas.get_item_at (event_x, event_y, true);
 
         if (target == null) {
@@ -58,7 +57,7 @@ public class Akira.Lib.Managers.HoverManager : Object {
             var item = target as Models.CanvasItem;
 
             if (current_hover_item != null && item.id == current_hover_item.id) {
-                // We already hae the hover effect rendered correctly
+                // We already have the hover effect rendered correctly
                 return;
             }
 
@@ -128,7 +127,6 @@ public class Akira.Lib.Managers.HoverManager : Object {
 
             canvas.window.event_bus.hover_over_item (null);
         }
-
     }
 
     private void set_cursor_for_nob (Lib.Managers.NobManager.Nob grabbed_id) {

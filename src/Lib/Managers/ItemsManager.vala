@@ -39,7 +39,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
     public ItemsManager (Akira.Lib.Canvas canvas) {
         Object (
             canvas: canvas
-            );
+        );
     }
 
     construct {
@@ -128,7 +128,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             border_color,
             fill_color,
             root
-            );
+        );
 
 
         return rect;

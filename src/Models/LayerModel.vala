@@ -39,7 +39,7 @@ public class Akira.Models.LayerModel : Models.ItemModel {
         }
     }
 
-    public bool? visibility {
+    public bool? is_visible {
         owned get {
             return item.visibility == Goo.CanvasItemVisibility.VISIBLE;
         }
@@ -50,13 +50,17 @@ public class Akira.Models.LayerModel : Models.ItemModel {
         }
     }
 
-    public bool? locked {
+    public bool? is_locked {
         get {
             return item.locked;
         }
 
         set {
             item.locked = value;
+
+            if (item.locked && item.selected) {
+                item.selected = false;
+            }
         }
     }
 

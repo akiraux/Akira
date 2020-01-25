@@ -33,7 +33,7 @@
 /* Hovered */
 .layer.hovered,
 .layer.even.hovered {
-  border: 1px solid #41c9fd;
+  border: 1px solid @hovering;
 }
 
 /* label */

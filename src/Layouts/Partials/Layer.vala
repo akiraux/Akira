@@ -531,9 +531,6 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
                 artboard.container.unselect_row (layer_group);
             }
 
-            //activate ();
-            //window.main_window.right_sidebar.layers_panel.selection_mode = Gtk.SelectionMode.NONE;
-
             if (artboard != null) {
                 window.main_window.right_sidebar.layers_panel.unselect_row (artboard);
             }
@@ -548,8 +545,6 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
         switch (event.keyval) {
             case Gdk.Key.Delete:
                 window.event_bus.request_delete_item (model.item);
-                break;
-            default:
                 break;
         }
 
@@ -629,11 +624,13 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
             icon_locked.visible = ! active;
             icon_locked.no_show_all = active;
 
-            model.locked = active;
+            model.is_locked = active;
 
             if (active) {
                 window.event_bus.item_locked (model.item);
             }
+
+            window.event_bus.set_focus_on_canvas ();
         });
     }
 
@@ -649,8 +646,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
                 button_hidden.get_style_context ().remove_class ("show");
             }
 
-            model.visibility = !active;
-            //item.visibility = active ? Goo.CanvasItemVisibility.INVISIBLE: Goo.CanvasItemVisibility.VISIBLE;
+            model.is_visible = !active;
 
             icon_visible.visible = active;
             icon_visible.no_show_all = ! active;
