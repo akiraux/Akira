@@ -49,6 +49,9 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         canvas.window.event_bus.item_value_changed.connect (update_selected_items);
         canvas.window.event_bus.flip_item.connect (on_flip_item);
         canvas.window.event_bus.move_item_from_canvas.connect (on_move_item_from_canvas);
+        canvas.window.event_bus.item_deleted.connect (remove_item_from_selection);
+        canvas.window.event_bus.request_add_item_to_selection.connect (add_item_to_selection);
+        canvas.window.event_bus.item_locked.connect (remove_item_from_selection);
     }
 
     construct {
@@ -121,6 +124,11 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         // Just 1 selected element at the same time
         // TODO: allow for multi selection with shift pressed
         reset_selection ();
+
+        if (item.locked) {
+            return;
+        }
+
         item.selected = true;
         selected_items.append (item);
     }
@@ -130,11 +138,12 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
             return;
         }
 
-        foreach (var item in selected_items) {
-            item.delete ();
+        for (var i = 0; i < selected_items.length (); i++) {
+            var item = selected_items.nth_data (i);
+            canvas.window.event_bus.request_delete_item (item);
         }
 
-        // By emptying the selected_items list, the select_effect get dropped
+        // By emptying the selected_items list, the select_effect gets dropped
         selected_items = new List<Models.CanvasItem> ();
     }
 
@@ -237,5 +246,13 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
             canvas.window.event_bus.item_coord_changed ();
             update_selected_items ();
         });
+    }
+
+    private void remove_item_from_selection (Lib.Models.CanvasItem item) {
+        if (selected_items.index (item) > -1) {
+            selected_items.remove (item);
+        }
+
+        canvas.window.event_bus.set_focus_on_canvas ();
     }
 }

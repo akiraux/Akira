@@ -63,6 +63,7 @@ sources = files(
     'Partials/PanelSeparator.vala',
     'Partials/PopoverButton.vala',
 
+    'Models/LayerModel.vala',
     'Models/BordersItemModel.vala',
     'Models/FillsItemModel.vala',
     'Models/ItemModel.vala',

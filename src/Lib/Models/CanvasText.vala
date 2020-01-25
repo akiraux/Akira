@@ -20,8 +20,14 @@
 */
 
 public class Akira.Lib.Models.CanvasText : Goo.CanvasText, Models.CanvasItem {
+    public string layer_icon { get; set; default = "shape-text-symbolic"; }
+
     public string id { get; set; }
+    public string name { get; set; }
+
     public bool selected { get; set; }
+    public bool locked { get; set; }
+
     public double opacity { get; set; }
     public double rotation { get; set; }
     public bool has_fill { get; set; default = true; }

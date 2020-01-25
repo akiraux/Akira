@@ -50,12 +50,13 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         fill_color = Gdk.RGBA ();
 
         canvas.window.event_bus.insert_item.connect (set_item_to_insert);
+        canvas.window.event_bus.request_delete_item.connect (on_request_delete_item);
     }
 
     public bool set_insert_type_from_key (uint keyval) {
         // TODO: take those values from preferences/settings and not from hardcoded values
         if (keyval > Gdk.Key.Z || keyval < Gdk.Key.A) {
-          return false;
+            return false;
         }
 
         switch (keyval) {
@@ -101,6 +102,8 @@ public class Akira.Lib.Managers.ItemsManager : Object {
 
         if (new_item != null) {
             items.append (new_item);
+
+            canvas.window.event_bus.item_inserted (new_item);
         }
 
         return new_item;
@@ -108,6 +111,11 @@ public class Akira.Lib.Managers.ItemsManager : Object {
 
     public void add_item (Akira.Lib.Models.CanvasItem item) {
         items.append (item);
+    }
+
+    public void on_request_delete_item (Lib.Models.CanvasItem item) {
+        item.delete ();
+        canvas.window.event_bus.item_deleted (item);
     }
 
     public Models.CanvasItem add_rect (Gdk.EventButton event) {
@@ -122,22 +130,6 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             root
         );
 
-        /*
-        var artboard = window.main_window.right_sidebar.layers_panel.artboard;
-        var layer = new Akira.Layouts.Partials.Layer (
-            window,
-            artboard,
-            rect,
-            "Rectangle",
-            "shape-rectangle-symbolic",
-            false
-        );
-
-        rect.set_data<Akira.Layouts.Partials.Layer?> ("layer", layer);
-
-        artboard.container.add (layer);
-        artboard.show_all ();
-        */
 
         return rect;
     }
@@ -152,16 +144,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             border_color,
             fill_color,
             root
-        );
-
-        /*
-        var artboard = window.main_window.right_sidebar.layers_panel.artboard;
-        var layer = new Akira.Layouts.Partials.Layer (window, artboard, ellipse,
-            "Circle", "shape-circle-symbolic", false);
-        ellipse.set_data<Akira.Layouts.Partials.Layer?> ("layer", layer);
-        artboard.container.add (layer);
-        artboard.show_all ();
-        */
+            );
 
         return ellipse;
     }
@@ -176,15 +159,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             Goo.CanvasAnchorType.NW,
             "Open Sans 18",
             root
-        );
-
-        /*
-        var artboard = window.main_window.right_sidebar.layers_panel.artboard;
-        var layer = new Akira.Layouts.Partials.Layer (window, artboard, text, "Text", "shape-text-symbolic", false);
-        text.set_data<Akira.Layouts.Partials.Layer?> ("layer", layer);
-        artboard.container.add (layer);
-        artboard.show_all ();
-        */
+            );
 
         return text;
     }
