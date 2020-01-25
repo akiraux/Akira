@@ -17,6 +17,7 @@
 * along with Akira.  If not, see <https://www.gnu.org/licenses/>.
 *
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
+* Authored by: Giacomo Alberini <giacomoalbe@gmail.com>
 */
 
 public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
@@ -26,12 +27,15 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
     private bool scroll_up = false;
     private bool scrolling = false;
     private bool should_scroll = false;
+    private string current_selected_item_id;
+
+    private Akira.Models.ListModel list_model;
+    private Gee.HashMap<string, Akira.Models.LayerModel> item_model_map;
     public Gtk.Adjustment vadjustment;
 
     private const int SCROLL_STEP_SIZE = 5;
     private const int SCROLL_DISTANCE = 30;
     private const int SCROLL_DELAY = 50;
-    public Akira.Layouts.Partials.Artboard artboard;
 
     private const Gtk.TargetEntry TARGET_ENTRIES[] = {
         { "ARTBOARD", Gtk.TargetFlags.SAME_APP, 0 }
@@ -49,17 +53,83 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
         get_style_context ().add_class ("layers-panel");
         expand = true;
 
-        artboard = new Akira.Layouts.Partials.Artboard (window, "Artboard 1");
-        var placeholder = new Gtk.ListBoxRow ();
-        artboard.container.insert (placeholder, 0);
-        placeholder.visible = false;
-        placeholder.no_show_all = true;
+        list_model = new Akira.Models.ListModel ();
+        item_model_map = new Gee.HashMap<string, Akira.Models.LayerModel> ();
 
-        insert (artboard, 0);
+        bind_model (list_model, item => {
+            // TODO: Differentiate between layer and artboard
+            // based upon item "type" of some sort
+            return new Akira.Layouts.Partials.Layer (
+                window,
+                (Akira.Models.LayerModel) item
+            );
+        });
 
         build_drag_and_drop ();
+        reload_zebra ();
+
+        window.event_bus.item_inserted.connect (on_item_inserted);
+        window.event_bus.item_deleted.connect (on_item_deleted);
+        window.event_bus.selected_items_changed.connect (on_selected_items_changed);
+    }
+
+    private void on_item_inserted (Lib.Models.CanvasItem new_item) {
+        var model = new Akira.Models.LayerModel (new_item, list_model);
+        list_model.add_item.begin (model);
+
+        // This map is necessary for easily knowing which
+        // item is related to which model, since the canvas knows only
+        // real items and the layers panel only knows items model
+        item_model_map.@set (new_item.id, model);
 
         reload_zebra ();
+
+        show_all ();
+    }
+
+    private void on_item_deleted (Lib.Models.CanvasItem item) {
+        var model = item_model_map.@get (item.id);
+
+        list_model.remove_item.begin (model);
+
+        reload_zebra ();
+    }
+
+    private void on_selected_items_changed (List<Lib.Models.CanvasItem> selected_items) {
+      if (selected_items.length () == 0) {
+        var current_selected_item = item_model_map.@get (current_selected_item_id);
+
+        if (current_selected_item != null) {
+          current_selected_item.selected = false;
+        }
+
+        current_selected_item_id = null;
+        return;
+      }
+
+      var selected_item = selected_items.nth_data (0);
+
+      if (selected_item.id == current_selected_item_id) {
+        return;
+      }
+
+      var new_selected_model = item_model_map.@get (selected_item.id);
+
+      if (new_selected_model != null) {
+        new_selected_model.selected = true;
+      }
+
+      var current_selected_model = item_model_map.@get (current_selected_item_id);
+
+      if (current_selected_model != null) {
+        current_selected_model.selected = false;
+      }
+
+      current_selected_item_id = selected_item.id;
+
+      // After activating a row it is necessary to
+      // put (keyboard) focus back to the canvas
+      window.event_bus.set_focus_on_canvas ();
     }
 
     private void build_drag_and_drop () {
@@ -155,8 +225,10 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
 
         @foreach (row => {
             if (!(row is Akira.Layouts.Partials.Artboard)) {
-                return;
+              zebra_layer ((Akira.Layouts.Partials.Layer) row);
+              return;
             }
+
             zebra_artboard ((Akira.Layouts.Partials.Artboard) row);
         });
     }
