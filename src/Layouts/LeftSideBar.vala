@@ -43,6 +43,8 @@ public class Akira.Layouts.LeftSideBar : Gtk.Grid {
     }
 
     construct {
+        window.event_bus.request_widget_redraw.connect (on_widget_redraw_request);
+
         get_style_context ().add_class ("sidebar-l");
 
         var align_items_panel = new Akira.Layouts.Partials.AlignItemsPanel (window);
@@ -70,5 +72,9 @@ public class Akira.Layouts.LeftSideBar : Gtk.Grid {
 
     public void toggle () {
         toggled = !toggled;
+    }
+
+    private void on_widget_redraw_request () {
+        queue_resize ();
     }
 }

@@ -213,13 +213,7 @@ public class Akira.Layouts.Partials.BorderRadiusPanel : Gtk.Grid {
         window.event_bus.selected_items_changed.connect (on_selected_items_changed);
         options_button.toggled.connect (() => {
             options_revealer.reveal_child = !options_revealer.child_revealed;
-            // Dirty hack to fix GTK UI glitches for the sidebar after the widget has been revealed.
-            // queue_resize and similar methods don't work. We need to toggle the visibility.
-            Idle.add (() => {
-                window.main_window.left_sidebar.visible = !window.main_window.left_sidebar.visible;
-                window.main_window.left_sidebar.visible = !window.main_window.left_sidebar.visible;
-                return false;
-            });
+            window.event_bus.request_widget_redraw ();
         });
 
         border_radius_scale.value_changed.connect (() => {
