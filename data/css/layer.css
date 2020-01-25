@@ -13,7 +13,6 @@
     box-shadow: inset 4px 0 0 @primary;
 }
 
-
 .layer:selected image,
 .layer:selected button {
     background-color: transparent;
