@@ -131,6 +131,7 @@ public class Akira.Layouts.Partials.BorderRadiusPanel : Gtk.Grid {
         panel_grid.attach (options_button, 2, 2, 1, 1);
 
         options_revealer = new Gtk.Revealer ();
+        options_revealer.transition_type = Gtk.RevealerTransitionType.NONE;
         panel_grid.attach (options_revealer, 0, 3, 3, 1);
 
         options_grid = new Gtk.Grid ();
@@ -212,11 +213,7 @@ public class Akira.Layouts.Partials.BorderRadiusPanel : Gtk.Grid {
         window.event_bus.selected_items_changed.connect (on_selected_items_changed);
         options_button.toggled.connect (() => {
             options_revealer.reveal_child = !options_revealer.child_revealed;
-            // We need to wait for the transition to finish before redrawing the widget.
-            Timeout.add (options_revealer.transition_duration, () => {
-                window.main_window.left_sidebar.queue_resize ();
-                return false;
-            });
+            window.event_bus.request_widget_redraw ();
         });
 
         border_radius_scale.value_changed.connect (() => {

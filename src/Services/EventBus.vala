@@ -41,6 +41,7 @@ public class Akira.Services.EventBus : Object {
     public signal void flip_item (bool clicked, bool vertical = false);
     public signal void move_item_from_canvas (Gdk.EventKey event);
     public signal void request_escape ();
+    public signal void request_widget_redraw ();
     public signal void item_inserted (Lib.Models.CanvasItem item);
     public signal void request_delete_item (Lib.Models.CanvasItem item);
     public signal void item_deleted (Lib.Models.CanvasItem item);
