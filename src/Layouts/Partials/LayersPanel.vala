@@ -43,9 +43,9 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
 
     public LayersPanel (Akira.Window window) {
         Object (
-        window: window,
-        activate_on_single_click: false,
-        selection_mode: Gtk.SelectionMode.SINGLE
+            window: window,
+            activate_on_single_click: false,
+            selection_mode: Gtk.SelectionMode.SINGLE
         );
     }
 
@@ -59,10 +59,7 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
         bind_model (list_model, item => {
             // TODO: Differentiate between layer and artboard
             // based upon item "type" of some sort
-            return new Akira.Layouts.Partials.Layer (
-            window,
-            (Akira.Models.LayerModel) item
-            );
+            return new Akira.Layouts.Partials.Layer (window, (Akira.Models.LayerModel) item);
         });
 
         build_drag_and_drop ();
@@ -140,8 +137,8 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
         drag_leave.connect (on_drag_leave);
     }
 
-    private void on_drag_data_received (Gdk.DragContext context, int x, int y, Gtk.SelectionData selection_data,
-    uint target_type, uint time) {
+    private void on_drag_data_received (Gdk.DragContext context, int x, int y,
+        Gtk.SelectionData selection_data, uint target_type, uint time) {
         Akira.Layouts.Partials.Artboard target;
         Gtk.Widget row;
         Akira.Layouts.Partials.Artboard source;
