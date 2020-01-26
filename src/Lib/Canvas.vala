@@ -340,6 +340,9 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 current_scale += 0.1;
                 break;
             case "out":
+                if (current_scale == 0.1) {
+                    break;
+                }
                 current_scale -= 0.1;
                 break;
             case "reset":
