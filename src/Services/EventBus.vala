@@ -35,7 +35,8 @@ public class Akira.Services.EventBus : Object {
     public signal void request_escape ();
     public signal void request_zoom (string direction);
     public signal void set_focus_on_canvas ();
-    public signal void zoom (double current_scale);
+    public signal void update_nob_size ();
+    public signal void zoom ();
 
     // Options panel signals.
     public signal void align_items (string align_action);

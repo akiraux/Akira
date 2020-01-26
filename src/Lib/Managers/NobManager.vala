@@ -58,7 +58,6 @@ public class Akira.Lib.Managers.NobManager : Object {
     private double width;
     private double height;
     private double nob_size;
-    private double current_scale = 1.0;
 
     // If the effect needs to be created or it's only a value update.
     private bool create { get; set; default = true; }
@@ -73,7 +72,11 @@ public class Akira.Lib.Managers.NobManager : Object {
         root = canvas.get_root_item ();
 
         canvas.window.event_bus.selected_items_changed.connect (on_add_select_effect);
-        canvas.window.event_bus.zoom.connect (on_zoom);
+        canvas.window.event_bus.zoom.connect (on_canvas_zoom);
+    }
+
+    private void on_canvas_zoom () {
+        on_add_select_effect (canvas.selected_bound_manager.selected_items);
     }
 
     public void set_selected_by_name (Nob selected_nob) {
@@ -88,10 +91,6 @@ public class Akira.Lib.Managers.NobManager : Object {
         }
 
         return (Nob) grabbed_id;
-    }
-
-    private void on_zoom (double _current_scale) {
-        current_scale = _current_scale;
     }
 
     private void update_select_bb_coords (List<Models.CanvasItem> selected_items) {
@@ -171,21 +170,21 @@ public class Akira.Lib.Managers.NobManager : Object {
         );
 
         // Account for line_width
-        x -= line_width;
-        y -= line_width;
-        width += line_width * 2;
-        height += line_width * 2;
+        x -= line_width / 2;
+        y -= line_width / 2;
+        width += line_width;
+        height += line_width;
 
         if (create) {
             //  debug ("create effect");
             select_effect = new Goo.CanvasRect (
-            null,
-            x, y,
-            width,
-            height,
-            "line-width", LINE_WIDTH / current_scale,
-            "stroke-color", STROKE_COLOR,
-            null
+                null,
+                x, y,
+                width,
+                height,
+                "line-width", LINE_WIDTH / canvas.current_scale,
+                "stroke-color", STROKE_COLOR,
+                null
             );
             select_effect.set ("parent", root);
         }
@@ -193,6 +192,7 @@ public class Akira.Lib.Managers.NobManager : Object {
         select_effect.set_transform (transform);
         select_effect.set ("width", width);
         select_effect.set ("height", height);
+        select_effect.set ("line-width", LINE_WIDTH / canvas.current_scale);
     }
 
     private void update_nob_position (List<Models.CanvasItem> selected_items) {
@@ -215,11 +215,12 @@ public class Akira.Lib.Managers.NobManager : Object {
         if (create) {
             //  debug ("create nobs");
             for (int i = 0; i < 9; i++) {
-                nobs[i] = new Selection.Nob (root, (Managers.NobManager.Nob) i, current_scale);
+                nobs[i] = new Selection.Nob (root, (Managers.NobManager.Nob) i);
             }
         }
 
-        nob_size = Selection.Nob.NOB_SIZE / current_scale;
+        canvas.window.event_bus.update_nob_size ();
+        nob_size = Selection.Nob.NOB_SIZE / canvas.current_scale;
 
         bool print_middle_width_nobs = width > nob_size * 3;
         bool print_middle_height_nobs = height > nob_size * 3;
@@ -327,8 +328,8 @@ public class Akira.Lib.Managers.NobManager : Object {
 
         // ROTATE nob
         double distance = 40;
-        if (current_scale < 1) {
-            distance = 40 * (2 * current_scale - 1);
+        if (canvas.current_scale < 1) {
+            distance = 40 * (2 * canvas.current_scale - 1);
         }
 
         nobs[Nob.ROTATE].set_transform (transform);
