@@ -64,6 +64,7 @@ public class Akira.Lib.Models.CanvasImage : Goo.CanvasImage, CanvasItem {
     public bool selected { get; set; }
     public bool locked { get; set; }
     public string layer_icon { get; set; default = "shape-image-symbolic"; }
+    public int z_index { get; set; }
 
     public CanvasImage (Akira.Services.ImageProvider provider, Goo.CanvasItem? parent = null) {
         Object (

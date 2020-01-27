@@ -68,6 +68,7 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
         window.event_bus.item_inserted.connect (on_item_inserted);
         window.event_bus.item_deleted.connect (on_item_deleted);
         window.event_bus.selected_items_changed.connect (on_selected_items_changed);
+        window.event_bus.z_selected_changed.connect (on_z_selected_changed);
     }
 
     private void on_item_inserted (Lib.Models.CanvasItem new_item) {
@@ -127,6 +128,25 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
         // After activating a row it is necessary to
         // put (keyboard) focus back to the canvas
         window.event_bus.set_focus_on_canvas ();
+    }
+
+    private void on_z_selected_changed () {
+      debug ("On z-selected-changed");
+
+      foreach (var model in list_model) {
+        Lib.Models.CanvasItem.update_z_index (model.item);
+      }
+
+      list_model.sort ((a, b) => {
+        return a.item.z_index - b.item.z_index;
+      });
+
+      foreach (var model in list_model) {
+        debug (@"Id: $(model.item.id) z_index: $(model.item.z_index)");
+      }
+
+      invalidate_sort ();
+
     }
 
     private void build_drag_and_drop () {

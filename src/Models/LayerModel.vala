@@ -22,7 +22,7 @@
 public class Akira.Models.LayerModel : Models.ItemModel {
     public string name {
         owned get {
-            return item.name != null ? item.name : item.id;
+            return item.name != null ? item.name : @"$(item.id) $(item.z_index)";
         }
         set {
             item.name = value;

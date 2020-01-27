@@ -20,6 +20,25 @@
 * Authored by: Alessandro "alecaddd" Castellani <castellani.ale@gmail.com>
 */
 
+public class Iterator {
+  private int index;
+  private weak GLib.List<Akira.Models.ItemModel?> list;
+
+  public Iterator (GLib.List<Akira.Models.ItemModel?> list) {
+    index = 0;
+    this.list = list;
+  }
+
+  public bool next () {
+    return index < list.length ();
+  }
+
+  public Akira.Models.ItemModel? get () {
+    index++;
+    return this.list.nth_data (index - 1);
+  }
+}
+
 public class Akira.Models.ListModel : GLib.Object, GLib.ListModel {
     private GLib.List<Akira.Models.ItemModel?> list;
 
@@ -65,5 +84,14 @@ public class Akira.Models.ListModel : GLib.Object, GLib.ListModel {
         list.foreach ((item) => {
             remove_item.begin (item);
         });
+    }
+
+    public Iterator iterator () {
+      return new Iterator(list);
+    }
+
+    public void sort (CompareFunc<Akira.Models.ItemModel?> sort_fn) {
+      list.sort (sort_fn);
+      items_changed (0, 0, 0);
     }
 }
