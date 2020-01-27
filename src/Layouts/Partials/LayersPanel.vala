@@ -94,7 +94,6 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
         item_model_map.@set (new_item.id, model);
 
         reload_zebra ();
-
         show_all ();
     }
 
@@ -144,9 +143,8 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
     }
 
     private void on_z_selected_changed () {
-        debug ("On z-selected-changed");
-
         var n_items = list_model.get_n_items ();
+
         for (int i = 0; i < n_items; i++) {
             var layer = list_model.get_item (i) as Akira.Models.LayerModel;
             if (layer != null) {
@@ -155,6 +153,7 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
         }
 
         invalidate_sort ();
+        reload_zebra ();
     }
 
     private void build_drag_and_drop () {
