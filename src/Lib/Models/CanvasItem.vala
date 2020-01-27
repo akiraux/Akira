@@ -107,7 +107,7 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
     public static void update_z_index (Goo.CanvasItem item) {
         var z_index = item.get_canvas ().get_root_item ().find_child (item);
 
-        item.set ("z_index", z_index);
+        item.set ("z-index", z_index);
     }
 
     public virtual void reset_colors () {
