@@ -329,7 +329,7 @@ public class Akira.Lib.Managers.NobManager : Object {
         // ROTATE nob
         double distance = 40;
         if (canvas.current_scale > 1) {
-            distance -= (distance * canvas.current_scale) / 100;
+            distance -= (distance * canvas.current_scale) * 0.05;
         } else if (canvas.current_scale < 1) {
             distance += (distance / canvas.current_scale) / 4;
         }
