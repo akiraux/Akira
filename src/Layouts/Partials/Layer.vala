@@ -216,7 +216,6 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
             (parent as Gtk.ListBox).unselect_row (this);
         });
 
-
         lock_actions ();
         hide_actions ();
         reveal_actions ();

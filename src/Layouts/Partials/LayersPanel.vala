@@ -69,19 +69,6 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
         window.event_bus.item_deleted.connect (on_item_deleted);
         window.event_bus.selected_items_changed.connect (on_selected_items_changed);
         window.event_bus.z_selected_changed.connect (on_z_selected_changed);
-
-        set_sort_func (sort_by_z_index);
-    }
-
-    private int sort_by_z_index (Gtk.ListBoxRow a, Gtk.ListBoxRow b) {
-        var row_a = a as Akira.Layouts.Partials.Layer;
-        var row_b = b as Akira.Layouts.Partials.Layer;
-
-        if (row_a != null && row_b != null) {
-            return row_a.model.item.z_index - row_b.model.item.z_index;
-        }
-
-        return 0;
     }
 
     private void on_item_inserted (Lib.Models.CanvasItem new_item) {
@@ -152,8 +139,18 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
             }
         }
 
-        invalidate_sort ();
+        list_model.sort ((a, b) => {
+          return a.item.z_index - b.item.z_index;
+        });
+
         reload_zebra ();
+
+        show_all ();
+
+        // Activate the selected items again
+        var model = item_model_map.@get (current_selected_item_id);
+
+        model.selected = true;
     }
 
     private void build_drag_and_drop () {

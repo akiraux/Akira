@@ -66,4 +66,10 @@ public class Akira.Models.ListModel : GLib.Object, GLib.ListModel {
             remove_item.begin (item);
         });
     }
+
+    public void sort (CompareFunc<Akira.Models.ItemModel?> sort_fn) {
+        list.sort (sort_fn);
+
+        items_changed (0, list.length (), list.length ());
+    }
 }
