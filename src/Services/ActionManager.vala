@@ -174,6 +174,9 @@ public class Akira.Services.ActionManager : Object {
         var settings_dialog = new Akira.Widgets.SettingsDialog (window);
         settings_dialog.show_all ();
         settings_dialog.present ();
+        settings_dialog.close.connect (() => {
+            window.event_bus.set_focus_on_canvas ();
+        });
     }
 
     private void action_export_selection () {
