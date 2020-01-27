@@ -84,38 +84,28 @@ public class Akira.Partials.ZoomButton : Gtk.Grid {
 
     public void zoom_out () {
         var zoom = int.parse (zoom_default_button.label) - 10;
-        if (zoom < 0) {
-            zoom_out_button.sensitive = false;
-            return;
-        }
-
-        zoom_out_button.sensitive = true;
-        zoom_default_button.label = "%.0f%%".printf (zoom);
-
-        window.event_bus.request_zoom ("out");
-
-        /*
-        window.main_window.main_canvas.canvas.set_scale (window.main_window.main_canvas.canvas.get_scale () - 0.1);
-        window.main_window.main_canvas.canvas.reset_select ();
-        */
-    }
-
-    public void zoom_in () {
-        var zoom = int.parse (zoom_default_button.label) + 10;
-        if (zoom > 1000) {
-            zoom_in_button.sensitive = false;
+        zoom_out_button.sensitive = (zoom > 10);
+        if (zoom < 10) {
             return;
         }
 
         zoom_in_button.sensitive = true;
         zoom_default_button.label = "%.0f%%".printf (zoom);
 
-        window.event_bus.request_zoom ("in");
+        window.event_bus.request_zoom ("out");
+    }
 
-        /*
-        window.main_window.main_canvas.canvas.set_scale (window.main_window.main_canvas.canvas.get_scale () + 0.1);
-        window.main_window.main_canvas.canvas.reset_select ();
-        */
+    public void zoom_in () {
+        var zoom = int.parse (zoom_default_button.label) + 10;
+        zoom_in_button.sensitive = (zoom < 1000);
+        if (zoom > 1000) {
+            return;
+        }
+
+        zoom_out_button.sensitive = true;
+        zoom_default_button.label = "%.0f%%".printf (zoom);
+
+        window.event_bus.request_zoom ("in");
     }
 
     public void zoom_reset () {
@@ -124,9 +114,5 @@ public class Akira.Partials.ZoomButton : Gtk.Grid {
         zoom_default_button.label = "100%";
 
         window.event_bus.request_zoom ("reset");
-        /*
-        window.main_window.main_canvas.canvas.set_scale (1);
-        window.main_window.main_canvas.canvas.reset_select ();
-        */
     }
 }

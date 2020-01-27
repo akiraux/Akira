@@ -57,7 +57,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
     public bool ctrl_is_pressed = false;
     private bool holding;
-    private double current_scale = 1.0;
+    public double current_scale = 1.0;
     private double bounds_x;
     private double bounds_y;
     private double bounds_w;
@@ -340,6 +340,9 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 current_scale += 0.1;
                 break;
             case "out":
+                if (current_scale == 0.1) {
+                    break;
+                }
                 current_scale -= 0.1;
                 break;
             case "reset":
@@ -348,7 +351,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         }
 
         set_scale (current_scale);
-        window.event_bus.zoom (current_scale);
+        window.event_bus.zoom ();
     }
 
     private void on_request_change_cursor (Gdk.CursorType? cursor_type) {

@@ -28,15 +28,11 @@ public enum Akira.Lib.Models.CanvasItemType {
 }
 
 public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasItem {
-    public abstract string layer_icon { get; set; }
-
+    // Identifiers.
     public static int global_id = 0;
-
+    public abstract Models.CanvasItemType item_type { get; set; }
     public abstract string id { get; set; }
     public abstract string name { get; set; }
-
-    public abstract bool selected { get; set; }
-    public abstract bool locked { get; set; default = false; }
 
     // Transform Panel attributes.
     public abstract double opacity { get; set; }
@@ -66,7 +62,10 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
     public abstract bool show_fill_panel { get; set; default = false; }
     public abstract bool show_border_panel { get; set; default = false; }
 
-    public abstract Models.CanvasItemType item_type { get; set; }
+    // Layers panel attributes.
+    public abstract bool selected { get; set; }
+    public abstract bool locked { get; set; default = false; }
+    public abstract string layer_icon { get; set; }
 
     public double get_coords (string coord_id) {
         double _coord = 0.0;

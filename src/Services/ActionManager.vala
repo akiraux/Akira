@@ -45,11 +45,11 @@ public class Akira.Services.ActionManager : Object {
     public const string ACTION_MOVE_DOWN = "action_move_down";
     public const string ACTION_MOVE_TOP = "action_move_top";
     public const string ACTION_MOVE_BOTTOM = "action_move_bottom";
+    public const string ACTION_ARTBOARD_TOOL = "action_artboard_tool";
     public const string ACTION_RECT_TOOL = "action_rect_tool";
     public const string ACTION_ELLIPSE_TOOL = "action_ellipse_tool";
     public const string ACTION_TEXT_TOOL = "action_text_tool";
     public const string ACTION_IMAGE_TOOL = "action_image_tool";
-    public const string ACTION_SELECTION_TOOL = "action_selection_tool";
     public const string ACTION_DELETE = "action_delete";
     public const string ACTION_FLIP_H = "action_flip_h";
     public const string ACTION_FLIP_V = "action_flip_v";
@@ -77,11 +77,11 @@ public class Akira.Services.ActionManager : Object {
         { ACTION_MOVE_TOP, action_move_top },
         { ACTION_MOVE_BOTTOM, action_move_bottom },
         { ACTION_ZOOM_RESET, action_zoom_reset },
+        { ACTION_ARTBOARD_TOOL, action_artboard_tool },
         { ACTION_RECT_TOOL, action_rect_tool },
         { ACTION_ELLIPSE_TOOL, action_ellipse_tool },
         { ACTION_TEXT_TOOL, action_text_tool },
         { ACTION_IMAGE_TOOL, action_image_tool },
-        { ACTION_SELECTION_TOOL, action_selection_tool },
         { ACTION_DELETE, action_delete },
         { ACTION_FLIP_H, action_flip_h },
         { ACTION_FLIP_V, action_flip_v },
@@ -116,6 +116,11 @@ public class Akira.Services.ActionManager : Object {
         action_accelerators.set (ACTION_MOVE_DOWN, "<Control>Down");
         action_accelerators.set (ACTION_MOVE_TOP, "<Control><Shift>Up");
         action_accelerators.set (ACTION_MOVE_BOTTOM, "<Control><Shift>Down");
+        action_accelerators.set (ACTION_ARTBOARD_TOOL, "a");
+        action_accelerators.set (ACTION_RECT_TOOL, "r");
+        action_accelerators.set (ACTION_ELLIPSE_TOOL, "e");
+        action_accelerators.set (ACTION_TEXT_TOOL, "t");
+        action_accelerators.set (ACTION_IMAGE_TOOL, "i");
         action_accelerators.set (ACTION_FLIP_H, "<Control>bracketleft");
         action_accelerators.set (ACTION_FLIP_V, "<Control>bracketright");
         action_accelerators.set (ACTION_ESCAPE, "Escape");
@@ -211,14 +216,16 @@ public class Akira.Services.ActionManager : Object {
         window.event_bus.change_z_selected (false, true);
     }
 
+    private void action_artboard_tool () {
+        //  window.main_window.main_canvas.canvas.edit_mode = Akira.Lib.Canvas.EditMode.MODE_INSERT;
+        //  window.event_bus.insert_item ("artboard");
+        //  window.event_bus.close_popover ("insert");
+    }
+
     private void action_rect_tool () {
         window.main_window.main_canvas.canvas.edit_mode = Akira.Lib.Canvas.EditMode.MODE_INSERT;
         window.event_bus.insert_item ("rectangle");
         window.event_bus.close_popover ("insert");
-    }
-
-    private void action_selection_tool () {
-        window.main_window.main_canvas.canvas.edit_mode = Akira.Lib.Canvas.EditMode.MODE_SELECTION;
     }
 
     private void action_delete () {}
