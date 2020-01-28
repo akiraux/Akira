@@ -345,10 +345,17 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
         }
     }
 
-    private void on_drag_data_get (Gtk.Widget widget, Gdk.DragContext context, Gtk.SelectionData selection_data,
-        uint target_type, uint time) {
+    private void on_drag_data_get (
+      Gtk.Widget widget,
+      Gdk.DragContext context,
+      Gtk.SelectionData selection_data,
+      uint target_type, uint time) {
+
         uchar[] data = new uchar[(sizeof (Akira.Layouts.Partials.Layer))];
+
         ((Gtk.Widget[])data)[0] = widget;
+
+        debug ("On drag data get");
 
         selection_data.set (
             Gdk.Atom.intern_static_string ("LAYER"), 32, data
@@ -364,23 +371,31 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
             window.main_window.right_sidebar.indicator.visible = false;
         }
 
-        var layers_panel = (Akira.Layouts.Partials.LayersPanel) artboard.get_ancestor (typeof
-            (Akira.Layouts.Partials.LayersPanel));
-        var row = (Akira.Layouts.Partials.Artboard) layers_panel.get_row_at_index (artboard.get_index ());
+        //var layers_panel = (Akira.Layouts.Partials.LayersPanel) artboard.get_ancestor (typeof
+        //    (Akira.Layouts.Partials.LayersPanel));
+
+        int row_index = get_index ();
+
+        var layers_panel = (parent as Akira.Layouts.Partials.LayersPanel);
+
+        var row = (Akira.Layouts.Partials.Layer) layers_panel.get_row_at_index (row_index);
         var last_adjust = 0;
         var group_y = 0;
 
-        int index = get_index ();
         Gtk.Allocation alloc;
         get_allocation (out alloc);
 
-        int row_index = row.get_index ();
+        //debug (@"RowIndex: $(row_index)");
+
         Gtk.Allocation row_alloc;
         row.get_allocation (out row_alloc);
 
-        int real_y = (index * alloc.height) + (row_index * alloc.height) - alloc.height + y;
+        //debug (@"Alloc: $(alloc.width) * $(alloc.height)");
+
+        int real_y = (row_index * alloc.height) + y;
 
         check_scroll (real_y);
+
         if (should_scroll && !scrolling) {
             scrolling = true;
             Timeout.add (SCROLL_DELAY, scroll);
@@ -391,12 +406,16 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
             window.main_window.right_sidebar.indicator.margin_start = 40;
         } else {
             window.main_window.right_sidebar.indicator.margin_start = 20;
+
+            // Account for nested grouping
+            /*
             for (int i = index; i >= 1; i--) {
                 var past_layer = (Akira.Layouts.Partials.Layer) row.container.get_row_at_index (i);
                 if (past_layer.grouped) {
                     group_y = past_layer.get_allocated_height () - alloc.height;
                 }
             }
+            */
         }
 
         vadjustment = window.main_window.right_sidebar.layers_scroll.vadjustment;
@@ -405,7 +424,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
             vadjustment.value = 0;
         }
 
-        if (index == artboard.layers_count && layer_group == null && !grouped) {
+        if (row_index == 0 && layer_group == null && !grouped) {
             last_adjust = 6;
         }
 
@@ -415,31 +434,43 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 
             if (y >= (alloc.height / 2)) {
                 get_style_context ().add_class ("highlight");
-                window.main_window.right_sidebar.indicator.visible = false;
+                //window.main_window.right_sidebar.indicator.visible = false;
             } else {
                 get_style_context ().remove_class ("highlight");
                 window.main_window.right_sidebar.indicator.margin_top =
-                    (index * alloc.height) - 6 - (int)vadjustment.value + group_y - last_adjust;
+                    (row_index * alloc.height) - 6 - (int)vadjustment.value + group_y - last_adjust;
             }
 
-        } else {
-            if (y > (alloc.height / 2)) {
-                window.main_window.right_sidebar.indicator.margin_top =
-                    (index * alloc.height) + (row_index * alloc.height) - 6
-                    - (int)vadjustment.value + group_y - last_adjust;
-            } else {
-                window.main_window.right_sidebar.indicator.margin_top =
-                    (index * alloc.height) + (row_index * alloc.height) - alloc.height - 6
-                    - (int)vadjustment.value + group_y - last_adjust;
-            }
+            return true;
         }
+
+        var new_margin_top = 0;
+        var new_margin_right = 0;
+
+        if (y > (alloc.height / 2)) {
+          // We are trying to move this into the *next* layer
+          new_margin_top = (row_index + 1) * alloc.height;
+        } else {
+          // Still moving this in the current layer
+          new_margin_top = row_index * alloc.height;
+        }
+
+        // Account for vadjustment and group_y
+        new_margin_top += - (int)vadjustment.value + group_y;
+
+        // Prevent negative allocation, which does give warning
+        new_margin_top = new_margin_top > 0 ? new_margin_top : 0;
+
+        window.main_window.right_sidebar.indicator.margin_top = new_margin_top;
 
         return true;
     }
 
     public void on_drag_leave (Gdk.DragContext context, uint time) {
+        //debug ("On drag leave");
         get_style_context ().remove_class ("highlight");
-        window.main_window.right_sidebar.indicator.visible = false;
+        // Remove this visible to prevent indicator flickering between 2 layers
+        //window.main_window.right_sidebar.indicator.visible = false;
         should_scroll = false;
     }
 

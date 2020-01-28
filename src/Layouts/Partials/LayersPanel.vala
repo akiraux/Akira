@@ -38,7 +38,8 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
     private const int SCROLL_DELAY = 50;
 
     private const Gtk.TargetEntry TARGET_ENTRIES[] = {
-        { "ARTBOARD", Gtk.TargetFlags.SAME_APP, 0 }
+        { "ARTBOARD", Gtk.TargetFlags.SAME_APP, 0 },
+        { "LAYER", Gtk.TargetFlags.SAME_APP, 0 }
     };
 
     public LayersPanel (Akira.Window window) {
@@ -161,14 +162,17 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
         drag_leave.connect (on_drag_leave);
     }
 
-    private void on_drag_data_received (Gdk.DragContext context, int x, int y,
-        Gtk.SelectionData selection_data, uint target_type, uint time) {
-        Akira.Layouts.Partials.Artboard target;
+    private void on_drag_data_received (
+      Gdk.DragContext context,
+      int x, int y,
+      Gtk.SelectionData selection_data,
+      uint target_type, uint time) {
+        Akira.Layouts.Partials.Layer? target;
         Gtk.Widget row;
-        Akira.Layouts.Partials.Artboard source;
+        Akira.Layouts.Partials.Layer? source;
         int new_position;
 
-        target = (Akira.Layouts.Partials.Artboard) get_row_at_y (y);
+        target = (Akira.Layouts.Partials.Layer) get_row_at_y (y);
 
         if (target == null) {
             new_position = -1;
@@ -178,18 +182,21 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
 
         row = ((Gtk.Widget[]) selection_data.get_data ())[0];
 
-        source = (Akira.Layouts.Partials.Artboard) row.get_ancestor (typeof (Akira.Layouts.Partials.Artboard));
+        //source = (Akira.Layouts.Partials.Artboard) row.get_ancestor (typeof (Akira.Layouts.Partials.Artboard));
+
+        source = row as Akira.Layouts.Partials.Layer;
+
+        debug (@"Source: $(source.model.item.id)");
+        debug (@"Target: $(target.model.item.id)");
 
         if (source == target) {
             return;
         }
-
-        remove (source);
-        insert (source, new_position);
     }
 
     public bool on_drag_motion (Gdk.DragContext context, int x, int y, uint time) {
         //  var row = (Akira.Layouts.Partials.Artboard) get_row_at_y (y);
+        return true;
 
         check_scroll (y);
         if (should_scroll && !scrolling) {
