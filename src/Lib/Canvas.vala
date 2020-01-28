@@ -151,40 +151,42 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         switch (uppercase_keyval) {
             case Gdk.Key.Escape:
                 edit_mode = Akira.Lib.Canvas.EditMode.MODE_SELECTION;
-                return true;
+                break;
 
             case Gdk.Key.Delete:
                 selected_bound_manager.delete_selection ();
-                return true;
+                break;
 
             case Gdk.Key.space:
                 if (edit_mode != EditMode.MODE_PANNING) {
                     edit_mode = EditMode.MODE_PAN;
                 }
-                return true;
+                break;
 
             case Gdk.Key.Control_L:
             case Gdk.Key.Control_R:
                 ctrl_is_pressed = true;
-                return true;
+                break;
 
             case Gdk.Key.Up:
             case Gdk.Key.Down:
             case Gdk.Key.Right:
             case Gdk.Key.Left:
                 window.event_bus.move_item_from_canvas (event);
-                return true;
+                break;
 
             default:
                 // Send to ItemsManager to deal with custom user shape
                 // hotkey preferences from settings
                 if (items_manager.set_insert_type_from_key (uppercase_keyval)) {
                     edit_mode = Akira.Lib.Canvas.EditMode.MODE_INSERT;
-                    return true;
+                    break;
                 }
 
-                return false;
+                break;
         }
+
+        return true;
     }
 
     public override bool key_release_event (Gdk.EventKey event) {
@@ -327,6 +329,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
     public void on_set_focus_on_canvas () {
         edit_mode = EditMode.MODE_SELECTION;
+        ctrl_is_pressed = false;
         focus_canvas ();
     }
 
