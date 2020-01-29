@@ -211,12 +211,15 @@ public class Akira.Lib.Managers.ItemsManager : Object {
                 break;
 
             default:
-                var item_at_position = root_item.get_child (position);
+                Goo.CanvasItem item_at_position = null;
+
                 var current_position = root_item.find_child (item);
 
                 if (current_position > position) {
+                    item_at_position = root_item.get_child (position);
                     item.lower (item_at_position);
                 } else {
+                    item_at_position = root_item.get_child (position - 1);
                     item.raise (item_at_position);
                 }
                 break;
