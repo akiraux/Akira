@@ -85,6 +85,7 @@ sources = files(
     'Lib/Models/CanvasImage.vala',
 
     'Lib/Selection/Nob.vala',
+    'Lib/Selection/SelectionRect.vala',
 )
 
 deps = [

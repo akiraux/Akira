@@ -113,6 +113,21 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         update_selected_items ();
     }
 
+    public void set_selected_from_area (List<unowned Goo.CanvasItem> items) {
+        foreach (var item in selected_items) {
+            item.selected = false;
+        }
+
+        selected_items = null;
+        foreach (unowned Goo.CanvasItem gitem in items) {
+            unowned Models.CanvasItem? item = gitem as Models.CanvasItem;
+            if (item != null) {
+                item.selected = true;
+                selected_items.prepend (item);
+            }
+        }
+    }
+
     public void add_item_to_selection (Models.CanvasItem item) {
         // Don't clear and reselect the same element if it's already selected.
         if (selected_items.index (item) != -1) {

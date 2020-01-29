@@ -62,6 +62,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     private double bounds_y;
     private double bounds_w;
     private double bounds_h;
+    private Selection.SelectionRect selection_rect;
     private Gdk.CursorType current_cursor = Gdk.CursorType.ARROW;
 
     public Canvas (Akira.Window window) {
@@ -82,6 +83,8 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         items_manager = new Managers.ItemsManager (this);
         nob_manager = new Managers.NobManager (this);
         hover_manager = new Managers.HoverManager (this);
+
+        selection_rect = new Selection.SelectionRect (get_root_item ());
 
         window.event_bus.request_zoom.connect (on_request_zoom);
         window.event_bus.request_change_cursor.connect (on_request_change_cursor);
@@ -229,9 +232,8 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
                 if (clicked_item == null) {
                     selected_bound_manager.reset_selection ();
-                    // TODO: allow for multi select with click & drag on canvas
-                    // Workaround: when no item is clicked, there's no point in keeping holding active
-                    holding = false;
+                    nob_manager.selected_nob = Managers.NobManager.Nob.NONE;
+                    selection_rect.set_start_point (temp_event_x, temp_event_y);
                     return true;
                 }
 
@@ -279,6 +281,9 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 edit_mode = EditMode.MODE_PAN;
                 break;
 
+            case EditMode.MODE_SELECTION:
+                selection_rect.hide ();
+                break;
             default:
                 edit_mode = EditMode.MODE_SELECTION;
                 break;
@@ -302,6 +307,12 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         switch (edit_mode) {
             case EditMode.MODE_INSERT:
             case EditMode.MODE_SELECTION:
+                if (selection_rect.dragging) {
+                    selection_rect.set_end_point (event_x, event_y);
+                    update_selection_area ();
+                    return true;
+                }
+
                 var selected_nob = nob_manager.selected_nob;
                 selected_bound_manager.transform_bound (event_x, event_y, selected_nob);
                 break;
@@ -321,6 +332,14 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
     public void focus_canvas () {
         grab_focus (get_root_item ());
+    }
+
+    private void update_selection_area () {
+        Goo.CanvasBounds bounds;
+        selection_rect.get_bounds (out bounds);
+
+        var items = get_items_in_area (bounds, true, true, true);
+        selected_bound_manager.set_selected_from_area (items);     
     }
 
     private void on_request_zoom (string direction) {
