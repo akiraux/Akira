@@ -51,6 +51,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
 
         canvas.window.event_bus.insert_item.connect (set_item_to_insert);
         canvas.window.event_bus.request_delete_item.connect (on_request_delete_item);
+        canvas.window.event_bus.change_item_z_index.connect (on_change_item_z_index);
     }
 
     public bool set_insert_type_from_key (uint keyval) {
@@ -189,4 +190,33 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             border_color.parse (settings.border_color);
         }
     }
+
+    private void on_change_item_z_index (Lib.Models.CanvasItem item, int position) {
+        // Lower `item` behind the item at index `position` or raise
+        // it above the item at index `position - 1`
+        var root_item = item.get_canvas ().get_root_item ();
+
+        switch (position) {
+            case 0:
+                // Put the item at the bottom of the stack
+                item.lower (null);
+                break;
+
+            case -1:
+                // Put the item on top of the stack
+                var canvas_item_at_top_position = root_item.get_n_children () - 11;
+                var canvas_item_at_top = root_item.get_child (canvas_item_at_top_position);
+
+                item.raise (canvas_item_at_top);
+                break;
+
+            default:
+                var item_at_position = root_item.get_child (position - 1);
+                item.raise (item_at_position);
+                break;
+        }
+
+        canvas.window.event_bus.z_selected_changed ();
+    }
+
 }

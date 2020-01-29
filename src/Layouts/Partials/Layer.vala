@@ -355,8 +355,6 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 
         ((Gtk.Widget[])data)[0] = widget;
 
-        debug ("On drag data get");
-
         selection_data.set (
             Gdk.Atom.intern_static_string ("LAYER"), 32, data
         );
@@ -370,9 +368,6 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
         } else {
             window.main_window.right_sidebar.indicator.visible = false;
         }
-
-        //var layers_panel = (Akira.Layouts.Partials.LayersPanel) artboard.get_ancestor (typeof
-        //    (Akira.Layouts.Partials.LayersPanel));
 
         int row_index = get_index ();
 
@@ -406,16 +401,6 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
             window.main_window.right_sidebar.indicator.margin_start = 40;
         } else {
             window.main_window.right_sidebar.indicator.margin_start = 20;
-
-            // Account for nested grouping
-            /*
-            for (int i = index; i >= 1; i--) {
-                var past_layer = (Akira.Layouts.Partials.Layer) row.container.get_row_at_index (i);
-                if (past_layer.grouped) {
-                    group_y = past_layer.get_allocated_height () - alloc.height;
-                }
-            }
-            */
         }
 
         vadjustment = window.main_window.right_sidebar.layers_scroll.vadjustment;
@@ -475,6 +460,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
     }
 
     public void clear_indicator (Gdk.DragContext context) {
+        debug ("Clear indicator");
         window.main_window.right_sidebar.indicator.visible = false;
     }
 

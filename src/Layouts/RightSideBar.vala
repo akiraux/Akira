@@ -80,6 +80,7 @@ public class Akira.Layouts.RightSideBar : Gtk.Grid {
         indicator.margin_start = 20;
         indicator.margin_end = 5;
         indicator.height_request = 1;
+        indicator.can_focus = false;
 
         var circle = new Gtk.Grid ();
         circle.get_style_context ().add_class ("indicator-circle");

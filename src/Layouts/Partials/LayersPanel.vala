@@ -172,7 +172,19 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
         Akira.Layouts.Partials.Layer? source;
         int new_position;
 
-        target = (Akira.Layouts.Partials.Layer) get_row_at_y (y);
+        row = ((Gtk.Widget[]) selection_data.get_data ())[0];
+        source = row as Akira.Layouts.Partials.Layer;
+
+        Gtk.Allocation alloc;
+        source.get_allocation (out alloc);
+
+        // In order to determine which position should the dragged
+        // item occupy, we need to check in which gap it is.
+        // By adding half of the height of a row we know between which
+        // rows we want to inser the dragged layer
+        var target_row_y = y + alloc.height / 2;
+
+        target = (Akira.Layouts.Partials.Layer) get_row_at_y (target_row_y);
 
         if (target == null) {
             new_position = -1;
@@ -180,18 +192,13 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
             new_position = target.get_index ();
         }
 
-        row = ((Gtk.Widget[]) selection_data.get_data ())[0];
-
-        //source = (Akira.Layouts.Partials.Artboard) row.get_ancestor (typeof (Akira.Layouts.Partials.Artboard));
-
-        source = row as Akira.Layouts.Partials.Layer;
-
-        debug (@"Source: $(source.model.item.id)");
-        debug (@"Target: $(target.model.item.id)");
-
         if (source == target) {
             return;
         }
+
+        window.event_bus.change_item_z_index (source.model.item, new_position);
+
+        window.main_window.right_sidebar.indicator.visible = false;
     }
 
     public bool on_drag_motion (Gdk.DragContext context, int x, int y, uint time) {

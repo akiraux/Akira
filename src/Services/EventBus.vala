@@ -57,6 +57,7 @@ public class Akira.Services.EventBus : Object {
     public signal void hover_over_item (Lib.Models.CanvasItem? item);
     public signal void item_deleted (Lib.Models.CanvasItem item);
     public signal void item_locked (Lib.Models.CanvasItem item);
+    public signal void change_item_z_index (Lib.Models.CanvasItem item, int position);
 
     // Others.
     public signal void disconnect_typing_accel ();
