@@ -202,10 +202,8 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
     }
 
     public bool on_drag_motion (Gdk.DragContext context, int x, int y, uint time) {
-        //  var row = (Akira.Layouts.Partials.Artboard) get_row_at_y (y);
-        return true;
-
         check_scroll (y);
+
         if (should_scroll && !scrolling) {
             scrolling = true;
             Timeout.add (SCROLL_DELAY, scroll);

@@ -430,7 +430,6 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
         }
 
         var new_margin_top = 0;
-        var new_margin_right = 0;
 
         if (y > (alloc.height / 2)) {
           // We are trying to move this into the *next* layer
@@ -460,7 +459,6 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
     }
 
     public void clear_indicator (Gdk.DragContext context) {
-        debug ("Clear indicator");
         window.main_window.right_sidebar.indicator.visible = false;
     }
 
