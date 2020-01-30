@@ -29,6 +29,7 @@ public class Akira.Lib.Managers.HoverManager : Object {
     private double initial_event_y;
     private Goo.CanvasItem hover_effect;
     private Lib.Managers.NobManager.Nob current_hovering_nob;
+    private Lib.Models.CanvasItem current_hover_item;
 
     public HoverManager (Akira.Lib.Canvas canvas) {
         Object (
@@ -42,68 +43,86 @@ public class Akira.Lib.Managers.HoverManager : Object {
     }
 
     public void add_hover_effect (double event_x, double event_y) {
-        remove_hover_effect ();
-
         var target = canvas.get_item_at (event_x, event_y, true);
 
         if (target == null) {
+            current_hover_item = null;
+            remove_hover_effect ();
+
             set_cursor_for_nob (Managers.NobManager.Nob.NONE);
             return;
-        }
-
-        if (target is Models.CanvasItem) {
-            var item = target as Models.CanvasItem;
-
-            double line_width = 0.0;
-            item.get ("line-width", out line_width);
-
-            // Each item is always at 0,0 relative to its
-            // coordinate system
-            double x = 0 - line_width / 2;
-            double y = 0 - line_width / 2;
-
-            double width = item.get_coords ("width");
-            double height = item.get_coords ("height");
-
-            x -= line_width / 2;
-            y -= line_width / 2;
-            width += line_width * 2;
-            height += line_width * 2;
-
-            if (!item.selected) {
-                hover_effect = new Goo.CanvasRect (
-                    null,
-                    x, y,
-                    width, height,
-                    "line-width", LINE_WIDTH,
-                    "stroke-color", STROKE_COLOR,
-                    null
-                );
-
-                var transform = Cairo.Matrix.identity ();
-                item.get_transform (out transform);
-                hover_effect.set_transform (transform);
-
-                hover_effect.set ("parent", canvas.get_root_item ());
-                hover_effect.can_focus = false;
-            }
-
-            set_cursor_for_nob (Managers.NobManager.Nob.NONE);
         }
 
         if (target is Selection.Nob) {
             var nob = target as Selection.Nob;
             set_cursor_for_nob (nob.handle_id);
+            return;
         }
 
-        return;
+        if (!(target is Models.CanvasItem)) {
+            return;
+        }
+
+        var item = target as Models.CanvasItem;
+
+        if (current_hover_item != null && item.id == current_hover_item.id) {
+            // We already have the hover effect rendered correctly
+            return;
+        }
+
+        // We need to recreate it
+        remove_hover_effect ();
+        current_hover_item = item;
+
+        if (item.locked) {
+            return;
+        }
+
+        double line_width = 0.0;
+        item.get ("line-width", out line_width);
+
+        // Each item is always at 0,0 relative to its coordinate system
+        double x = 0 - line_width / 2;
+        double y = 0 - line_width / 2;
+
+        double width = item.get_coords ("width");
+        double height = item.get_coords ("height");
+
+        width += line_width;
+        height += line_width;
+
+        if (!item.selected) {
+            hover_effect = new Goo.CanvasRect (
+                null,
+                x, y,
+                width, height,
+                "line-width", LINE_WIDTH / canvas.current_scale,
+                "stroke-color", STROKE_COLOR,
+                null
+            );
+
+            var transform = Cairo.Matrix.identity ();
+            item.get_transform (out transform);
+            hover_effect.set_transform (transform);
+
+            hover_effect.set ("parent", canvas.get_root_item ());
+            hover_effect.can_focus = false;
+
+            canvas.window.event_bus.hover_over_item (item);
+        }
+
+        set_cursor_for_nob (Managers.NobManager.Nob.NONE);
     }
 
     public void remove_hover_effect () {
-        if (hover_effect != null) {
-            hover_effect.remove ();
-            hover_effect = null;
+        if (hover_effect == null) {
+            return;
         }
+
+        hover_effect.remove ();
+        hover_effect = null;
+
+        canvas.window.event_bus.hover_over_item (null);
     }
 
     private void set_cursor_for_nob (Lib.Managers.NobManager.Nob grabbed_id) {

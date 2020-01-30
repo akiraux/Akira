@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2019 Alecaddd (http://alecaddd.com)
+* Copyright (c) 2019-2020 Alecaddd (https://alecaddd.com)
 *
 * This file is part of Akira.
 *
@@ -10,13 +10,14 @@
 
 * Akira is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 * GNU General Public License for more details.
 
 * You should have received a copy of the GNU General Public License
-* along with Akira.  If not, see <https://www.gnu.org/licenses/>.
+* along with Akira. If not, see <https://www.gnu.org/licenses/>.
 *
 * Authored by: Giacomo Alberini <giacomoalbe@gmail.com>
+* Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
 
 public class Akira.Lib.Managers.SelectedBoundManager : Object {
@@ -44,13 +45,13 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
             canvas: canvas
         );
 
-        canvas.window.event_bus.request_selection_bound_transform.connect (
-            on_request_selection_bound_transform
-        );
-        canvas.window.event_bus.item_bound_changed.connect (
-            on_item_bound_changed
-        );
         canvas.window.event_bus.change_z_selected.connect (change_z_selected);
+        canvas.window.event_bus.item_value_changed.connect (update_selected_items);
+        canvas.window.event_bus.flip_item.connect (on_flip_item);
+        canvas.window.event_bus.move_item_from_canvas.connect (on_move_item_from_canvas);
+        canvas.window.event_bus.item_deleted.connect (remove_item_from_selection);
+        canvas.window.event_bus.request_add_item_to_selection.connect (add_item_to_selection);
+        canvas.window.event_bus.item_locked.connect (remove_item_from_selection);
     }
 
     construct {
@@ -82,6 +83,10 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
     public void transform_bound (double event_x, double event_y, Managers.NobManager.Nob selected_nob) {
         Models.CanvasItem selected_item = selected_items.nth_data (0);
 
+        if (selected_item == null) {
+            return;
+        }
+
         switch (selected_nob) {
             case Managers.NobManager.Nob.NONE:
                 Utils.AffineTransform.move_from_event (
@@ -89,6 +94,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
                     initial_event_x, initial_event_y,
                     selected_item
                 );
+                update_selected_items ();
                 break;
 
             case Managers.NobManager.Nob.ROTATE:
@@ -110,7 +116,8 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
                 break;
         }
 
-        update_selected_items ();
+        // Notify the X & Y values in the transform panel.
+        canvas.window.event_bus.item_coord_changed ();
     }
 
     public void set_selected_from_area (List<unowned Goo.CanvasItem> items) {
@@ -136,6 +143,11 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         // Just 1 selected element at the same time
         // TODO: allow for multi selection with shift pressed
         reset_selection ();
+
+        if (item.locked) {
+            return;
+        }
+
         item.selected = true;
         selected_items.append (item);
     }
@@ -145,11 +157,12 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
             return;
         }
 
-        foreach (var item in selected_items) {
-            item.delete ();
+        for (var i = 0; i < selected_items.length (); i++) {
+            var item = selected_items.nth_data (i);
+            canvas.window.event_bus.request_delete_item (item);
         }
 
-        // By emptying the selected_items list, the select_effect get dropped
+        // By emptying the selected_items list, the select_effect gets dropped
         selected_items = new List<Models.CanvasItem> ();
     }
 
@@ -169,34 +182,6 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         canvas.window.event_bus.selected_items_changed (selected_items);
     }
 
-    private void on_request_selection_bound_transform (string property, double amount) {
-        Models.CanvasItem selected_item = selected_items.nth_data (0);
-
-        switch (property) {
-            case "rotation":
-                Utils.AffineTransform.set_rotation (amount, selected_item);
-                break;
-            case "width":
-                Utils.AffineTransform.set_size (amount, null, selected_item);
-                break;
-            case "height":
-                Utils.AffineTransform.set_size (null, amount, selected_item);
-                break;
-            case "x":
-                Utils.AffineTransform.set_position (amount, null, selected_item);
-                break;
-            case "y":
-                Utils.AffineTransform.set_position (null, amount, selected_item);
-                break;
-        }
-
-        update_selected_items ();
-    }
-
-    private void on_item_bound_changed (Lib.Models.CanvasItem item) {
-        update_selected_items ();
-    }
-
     private void change_z_selected (bool raise, bool total) {
         if (selected_items.length () == 0) {
             return;
@@ -213,7 +198,8 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
 
         int target_item_pos;
         if (total) {
-            target_item_pos = raise ? (root_item.get_n_children () - 10): 0;
+            // Account for nobs and select effect.
+            target_item_pos = raise ? (root_item.get_n_children () - 11): 0;
         } else {
             target_item_pos = pos_selected + (raise ? 1 : -1);
         }
@@ -230,7 +216,62 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
             selected_item.lower (target_item);
         }
 
-        update_selected_items ();
         canvas.window.event_bus.z_selected_changed ();
+    }
+
+    private void on_flip_item (bool clicked, bool vertical) {
+        if (selected_items.length () == 0) {
+            return;
+        }
+
+        selected_items.foreach ((item) => {
+            if (vertical) {
+                item.flipped_v = !item.flipped_v;
+                Utils.AffineTransform.flip_item (clicked, item, 1, -1);
+                update_selected_items ();
+                return;
+            }
+            item.flipped_h = !item.flipped_h;
+            Utils.AffineTransform.flip_item (clicked, item, -1, 1);
+            update_selected_items ();
+        });
+    }
+
+    private void on_move_item_from_canvas (Gdk.EventKey event) {
+        if (selected_items.length () == 0 || !canvas.has_focus) {
+            return;
+        }
+
+        var amount = (event.state & Gdk.ModifierType.SHIFT_MASK) > 0 ? 10 : 1;
+
+        selected_items.foreach ((item) => {
+            var position = Akira.Utils.AffineTransform.get_position (item);
+
+            switch (event.keyval) {
+                case Gdk.Key.Up:
+                    Utils.AffineTransform.set_position (item, null, position["y"] - amount);
+                    break;
+                case Gdk.Key.Down:
+                    Utils.AffineTransform.set_position (item, null, position["y"] + amount);
+                    break;
+                case Gdk.Key.Right:
+                    Utils.AffineTransform.set_position (item, position["x"] + amount);
+                    break;
+                case Gdk.Key.Left:
+                    Utils.AffineTransform.set_position (item, position["x"] - amount);
+                    break;
+            }
+
+            canvas.window.event_bus.item_coord_changed ();
+            update_selected_items ();
+        });
+    }
+
+    private void remove_item_from_selection (Lib.Models.CanvasItem item) {
+        if (selected_items.index (item) > -1) {
+            selected_items.remove (item);
+        }
+
+        canvas.window.event_bus.set_focus_on_canvas ();
     }
 }

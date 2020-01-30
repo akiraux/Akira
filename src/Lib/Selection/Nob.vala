@@ -24,45 +24,29 @@ public class Akira.Lib.Selection.Nob : Goo.CanvasRect {
 
     public Managers.NobManager.Nob handle_id;
 
-    public double scale { get; set; default = 1.0; }
-
     private double nob_size;
     private double radius;
 
-    public Nob (
-        Goo.CanvasItem? root,
-        Managers.NobManager.Nob _handle_id,
-        double current_scale
-    ) {
+    public Nob (Goo.CanvasItem? root, Managers.NobManager.Nob _handle_id) {
         Object (
             parent: root
         );
 
         handle_id = _handle_id;
-        scale = current_scale;
-
         set_rectangle ();
-
-        (root.get_canvas () as Akira.Lib.Canvas).window.event_bus.zoom.connect (on_zoom);
-    }
-
-    construct {
         can_focus = false;
+
+        (canvas as Akira.Lib.Canvas).window.event_bus.update_nob_size.connect (update_size);
     }
 
     private void update_size () {
-        line_width = LINE_WIDTH / scale;
-        nob_size = NOB_SIZE / scale;
+        var canvas = canvas as Akira.Lib.Canvas;
+        line_width = LINE_WIDTH / canvas.current_scale;
+        nob_size = NOB_SIZE / canvas.current_scale;
 
         set ("line-width", line_width);
         set ("height", nob_size);
         set ("width", nob_size);
-    }
-
-    private void on_zoom (double current_scale) {
-        scale = current_scale;
-
-        update_size ();
     }
 
     public void set_rectangle () {

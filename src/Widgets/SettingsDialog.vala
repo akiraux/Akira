@@ -188,8 +188,8 @@ public class Akira.Widgets.SettingsDialog : Gtk.Dialog {
 
         settings.bind ("border-size", border_size, "value", SettingsBindFlags.DEFAULT);
 
-        border_switch.bind_property ("active", border_color, "sensitive");
-        border_switch.bind_property ("active", border_size, "sensitive");
+        border_switch.bind_property ("active", border_color, "sensitive", BindingFlags.SYNC_CREATE);
+        border_switch.bind_property ("active", border_size, "sensitive", BindingFlags.SYNC_CREATE);
 
         return grid;
     }

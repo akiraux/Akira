@@ -57,7 +57,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
     public bool ctrl_is_pressed = false;
     private bool holding;
-    private double current_scale = 1.0;
+    public double current_scale = 1.0;
     private double bounds_x;
     private double bounds_y;
     private double bounds_w;
@@ -89,6 +89,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         window.event_bus.request_zoom.connect (on_request_zoom);
         window.event_bus.request_change_cursor.connect (on_request_change_cursor);
         window.event_bus.set_focus_on_canvas.connect (on_set_focus_on_canvas);
+        window.event_bus.request_escape.connect (on_set_focus_on_canvas);
     }
 
     public void insert_item_default (Akira.Lib.Models.CanvasItem item, bool select) {
@@ -103,7 +104,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         }
 
         items_manager.add_item (item);
-        Utils.AffineTransform.set_position (start_x, start_y, item);
+        Utils.AffineTransform.set_position (item, start_x, start_y);
 
         if (select) {
             selected_bound_manager.reset_selection ();
@@ -153,33 +154,42 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         switch (uppercase_keyval) {
             case Gdk.Key.Escape:
                 edit_mode = Akira.Lib.Canvas.EditMode.MODE_SELECTION;
-                return true;
+                break;
 
             case Gdk.Key.Delete:
                 selected_bound_manager.delete_selection ();
-                return true;
+                break;
 
             case Gdk.Key.space:
                 if (edit_mode != EditMode.MODE_PANNING) {
                     edit_mode = EditMode.MODE_PAN;
                 }
-                return true;
+                break;
 
             case Gdk.Key.Control_L:
             case Gdk.Key.Control_R:
                 ctrl_is_pressed = true;
-                return true;
+                break;
+
+            case Gdk.Key.Up:
+            case Gdk.Key.Down:
+            case Gdk.Key.Right:
+            case Gdk.Key.Left:
+                window.event_bus.move_item_from_canvas (event);
+                break;
 
             default:
                 // Send to ItemsManager to deal with custom user shape
                 // hotkey preferences from settings
                 if (items_manager.set_insert_type_from_key (uppercase_keyval)) {
                     edit_mode = Akira.Lib.Canvas.EditMode.MODE_INSERT;
-                    return true;
+                    break;
                 }
 
-                return false;
+                break;
         }
+
+        return true;
     }
 
     public override bool key_release_event (Gdk.EventKey event) {
@@ -205,14 +215,14 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
         holding = true;
 
-        var temp_event_x = event.x / current_scale;
-        var temp_event_y = event.y / current_scale;
+        event.x /= current_scale;
+        event.y /= current_scale;
 
         hover_manager.remove_hover_effect ();
 
         if (event.button == Gdk.BUTTON_MIDDLE) {
             edit_mode = EditMode.MODE_PANNING;
-            canvas_scroll_set_origin (temp_event_x, temp_event_y);
+            canvas_scroll_set_origin (event.x, event.y);
         }
 
         switch (edit_mode) {
@@ -222,13 +232,13 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 var new_item = items_manager.insert_item (event);
                 selected_bound_manager.add_item_to_selection (new_item);
 
-                selected_bound_manager.set_initial_coordinates (temp_event_x, temp_event_y);
+                selected_bound_manager.set_initial_coordinates (event.x, event.y);
 
                 nob_manager.selected_nob = Managers.NobManager.Nob.BOTTOM_RIGHT;
                 break;
 
             case EditMode.MODE_SELECTION:
-                var clicked_item = get_item_at (temp_event_x, temp_event_y, true);
+                var clicked_item = get_item_at (event.x, event.y, true);
 
                 if (clicked_item == null) {
                     selected_bound_manager.reset_selection ();
@@ -248,17 +258,20 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 nob_manager.selected_nob = clicked_nob_name;
 
                 if (clicked_item is Models.CanvasItem) {
+                    if ((clicked_item as Models.CanvasItem).locked) {
+                        return true;
+                    }
                     // Item has been selected
                     selected_bound_manager.add_item_to_selection (clicked_item as Models.CanvasItem);
                 }
 
-                selected_bound_manager.set_initial_coordinates (temp_event_x, temp_event_y);
+                selected_bound_manager.set_initial_coordinates (event.x, event.y);
                 break;
 
             case EditMode.MODE_PAN:
                 //set_cursor_by_edit_mode ();
                 edit_mode = EditMode.MODE_PANNING;
-                canvas_scroll_set_origin (temp_event_x, temp_event_y);
+                canvas_scroll_set_origin (event.x, event.y);
                 break;
         }
 
@@ -267,7 +280,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
     public override bool button_release_event (Gdk.EventButton event) {
         if (!holding) {
-            return false;
+            return true;
         }
 
         holding = false;
@@ -289,18 +302,18 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 break;
         }
 
-        return false;
+        return true;
     }
 
     public override bool motion_notify_event (Gdk.EventMotion event) {
-        var event_x = event.x / current_scale;
-        var event_y = event.y / current_scale;
+        event.x /= current_scale;
+        event.y /= current_scale;
 
-        window.event_bus.coordinate_change (event_x, event_y);
+        window.event_bus.coordinate_change (event.x, event.y);
 
         if (!holding) {
             // Only motion_hover_effect
-            hover_manager.add_hover_effect (event_x, event_y);
+            hover_manager.add_hover_effect (event.x, event.y);
             return false;
         }
 
@@ -314,11 +327,11 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 }
 
                 var selected_nob = nob_manager.selected_nob;
-                selected_bound_manager.transform_bound (event_x, event_y, selected_nob);
+                selected_bound_manager.transform_bound (event.x, event.y, selected_nob);
                 break;
 
             case EditMode.MODE_PANNING:
-                canvas_moved (event_x, event_y);
+                canvas_moved (event.x, event.y);
                 break;
         }
 
@@ -327,6 +340,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
     public void on_set_focus_on_canvas () {
         edit_mode = EditMode.MODE_SELECTION;
+        ctrl_is_pressed = false;
         focus_canvas ();
     }
 
@@ -348,6 +362,9 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 current_scale += 0.1;
                 break;
             case "out":
+                if (current_scale == 0.1) {
+                    break;
+                }
                 current_scale -= 0.1;
                 break;
             case "reset":
@@ -356,7 +373,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         }
 
         set_scale (current_scale);
-        window.event_bus.zoom (current_scale);
+        window.event_bus.zoom ();
     }
 
     private void on_request_change_cursor (Gdk.CursorType? cursor_type) {

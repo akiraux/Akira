@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2019 Alecaddd (http://alecaddd.com)
+* Copyright (c) 2019-2020 Alecaddd (https://alecaddd.com)
 *
 * This file is part of Akira.
 *
@@ -10,11 +10,11 @@
 
 * Akira is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 * GNU General Public License for more details.
 
 * You should have received a copy of the GNU General Public License
-* along with Akira.  If not, see <https://www.gnu.org/licenses/>.
+* along with Akira. If not, see <https://www.gnu.org/licenses/>.
 *
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
@@ -34,7 +34,9 @@ public class Akira.Services.ActionManager : Object {
     public const string ACTION_SHOW_UI_GRID = "action-show-ui-grid";
     public const string ACTION_PRESENTATION = "action_presentation";
     public const string ACTION_PREFERENCES = "action_preferences";
-    public const string ACTION_EXPORT = "action_export";
+    public const string ACTION_EXPORT_SELECTION = "action_export_selection";
+    public const string ACTION_EXPORT_ARTBOARDS = "action_export_artboards";
+    public const string ACTION_EXPORT_GRAB = "action_export_grab";
     public const string ACTION_QUIT = "action_quit";
     public const string ACTION_ZOOM_IN = "action_zoom_in";
     public const string ACTION_ZOOM_OUT = "action_zoom_out";
@@ -43,12 +45,15 @@ public class Akira.Services.ActionManager : Object {
     public const string ACTION_MOVE_DOWN = "action_move_down";
     public const string ACTION_MOVE_TOP = "action_move_top";
     public const string ACTION_MOVE_BOTTOM = "action_move_bottom";
+    public const string ACTION_ARTBOARD_TOOL = "action_artboard_tool";
     public const string ACTION_RECT_TOOL = "action_rect_tool";
     public const string ACTION_ELLIPSE_TOOL = "action_ellipse_tool";
     public const string ACTION_TEXT_TOOL = "action_text_tool";
     public const string ACTION_IMAGE_TOOL = "action_image_tool";
-    public const string ACTION_SELECTION_TOOL = "action_selection_tool";
     public const string ACTION_DELETE = "action_delete";
+    public const string ACTION_FLIP_H = "action_flip_h";
+    public const string ACTION_FLIP_V = "action_flip_v";
+    public const string ACTION_ESCAPE = "action_escape";
 
     public static Gee.MultiMap<string, string> action_accelerators = new Gee.HashMultiMap<string, string> ();
 
@@ -61,7 +66,9 @@ public class Akira.Services.ActionManager : Object {
         { ACTION_SHOW_UI_GRID, action_show_ui_grid },
         { ACTION_PRESENTATION, action_presentation },
         { ACTION_PREFERENCES, action_preferences },
-        { ACTION_EXPORT, action_export },
+        { ACTION_EXPORT_SELECTION, action_export_selection },
+        { ACTION_EXPORT_ARTBOARDS, action_export_artboards },
+        { ACTION_EXPORT_GRAB, action_export_grab },
         { ACTION_QUIT, action_quit },
         { ACTION_ZOOM_IN, action_zoom_in },
         { ACTION_ZOOM_OUT, action_zoom_out },
@@ -70,12 +77,15 @@ public class Akira.Services.ActionManager : Object {
         { ACTION_MOVE_TOP, action_move_top },
         { ACTION_MOVE_BOTTOM, action_move_bottom },
         { ACTION_ZOOM_RESET, action_zoom_reset },
+        { ACTION_ARTBOARD_TOOL, action_artboard_tool },
         { ACTION_RECT_TOOL, action_rect_tool },
         { ACTION_ELLIPSE_TOOL, action_ellipse_tool },
         { ACTION_TEXT_TOOL, action_text_tool },
         { ACTION_IMAGE_TOOL, action_image_tool },
-        { ACTION_SELECTION_TOOL, action_selection_tool },
         { ACTION_DELETE, action_delete },
+        { ACTION_FLIP_H, action_flip_h },
+        { ACTION_FLIP_V, action_flip_v },
+        { ACTION_ESCAPE, action_escape },
     };
 
     public ActionManager (Akira.Application akira_app, Akira.Window window) {
@@ -94,7 +104,9 @@ public class Akira.Services.ActionManager : Object {
         action_accelerators.set (ACTION_SHOW_UI_GRID, "<Control><Shift>g");
         action_accelerators.set (ACTION_PRESENTATION, "<Control>period");
         action_accelerators.set (ACTION_PREFERENCES, "<Control>comma");
-        action_accelerators.set (ACTION_EXPORT, "<Control><Shift>e");
+        action_accelerators.set (ACTION_EXPORT_SELECTION, "<Control><Alt>e");
+        action_accelerators.set (ACTION_EXPORT_ARTBOARDS, "<Control><Alt>a");
+        action_accelerators.set (ACTION_EXPORT_GRAB, "<Control><Alt>g");
         action_accelerators.set (ACTION_QUIT, "<Control>q");
         action_accelerators.set (ACTION_ZOOM_IN, "<Control>equal");
         action_accelerators.set (ACTION_ZOOM_IN, "<Control>plus");
@@ -104,6 +116,14 @@ public class Akira.Services.ActionManager : Object {
         action_accelerators.set (ACTION_MOVE_DOWN, "<Control>Down");
         action_accelerators.set (ACTION_MOVE_TOP, "<Control><Shift>Up");
         action_accelerators.set (ACTION_MOVE_BOTTOM, "<Control><Shift>Down");
+        action_accelerators.set (ACTION_ARTBOARD_TOOL, "a");
+        action_accelerators.set (ACTION_RECT_TOOL, "r");
+        action_accelerators.set (ACTION_ELLIPSE_TOOL, "e");
+        action_accelerators.set (ACTION_TEXT_TOOL, "t");
+        action_accelerators.set (ACTION_IMAGE_TOOL, "i");
+        action_accelerators.set (ACTION_FLIP_H, "<Control>bracketleft");
+        action_accelerators.set (ACTION_FLIP_V, "<Control>bracketright");
+        action_accelerators.set (ACTION_ESCAPE, "Escape");
     }
 
     construct {
@@ -154,9 +174,20 @@ public class Akira.Services.ActionManager : Object {
         var settings_dialog = new Akira.Widgets.SettingsDialog (window);
         settings_dialog.show_all ();
         settings_dialog.present ();
+        settings_dialog.close.connect (() => {
+            window.event_bus.set_focus_on_canvas ();
+        });
     }
 
-    private void action_export () {
+    private void action_export_selection () {
+        warning ("export");
+    }
+
+    private void action_export_artboards () {
+        warning ("export");
+    }
+
+    private void action_export_grab () {
         warning ("export");
     }
 
@@ -188,38 +219,43 @@ public class Akira.Services.ActionManager : Object {
         window.event_bus.change_z_selected (false, true);
     }
 
+    private void action_artboard_tool () {
+        //  window.main_window.main_canvas.canvas.edit_mode = Akira.Lib.Canvas.EditMode.MODE_INSERT;
+        //  window.event_bus.insert_item ("artboard");
+        //  window.event_bus.close_popover ("insert");
+    }
+
     private void action_rect_tool () {
         window.main_window.main_canvas.canvas.edit_mode = Akira.Lib.Canvas.EditMode.MODE_INSERT;
-        //window.main_window.main_canvas.canvas.insert_type = Akira.Lib.Canvas.InsertType.RECT;
         window.event_bus.insert_item ("rectangle");
         window.event_bus.close_popover ("insert");
     }
 
-    private void action_selection_tool () {
-        window.main_window.main_canvas.canvas.edit_mode = Akira.Lib.Canvas.EditMode.MODE_SELECTION;
-        //window.main_window.main_canvas.canvas.insert_type = null;
+    private void action_delete () {}
+
+    private void action_flip_h () {
+        window.event_bus.flip_item (true);
     }
 
-    private void action_delete () {
-        //window.main_window.main_canvas.canvas.delete_selected ();
+    private void action_flip_v () {
+        window.event_bus.flip_item (true, true);
     }
 
     private void action_ellipse_tool () {
         window.main_window.main_canvas.canvas.edit_mode = Akira.Lib.Canvas.EditMode.MODE_INSERT;
-        //window.main_window.main_canvas.canvas.insert_type = Akira.Lib.Canvas.InsertType.ELLIPSE;
         window.event_bus.insert_item ("ellipse");
         window.event_bus.close_popover ("insert");
     }
 
     private void action_text_tool () {
         window.main_window.main_canvas.canvas.edit_mode = Akira.Lib.Canvas.EditMode.MODE_INSERT;
-        //window.main_window.main_canvas.canvas.insert_type = Akira.Lib.Canvas.InsertType.TEXT;
         window.event_bus.insert_item ("text");
         window.event_bus.close_popover ("insert");
     }
 
     private void action_image_tool () {
-        var dialog = new Gtk.FileChooserNative (_("Choose image file"), window, Gtk.FileChooserAction.OPEN, _("Select"), _("Close"));
+        var dialog = new Gtk.FileChooserNative (
+            _("Choose image file"), window, Gtk.FileChooserAction.OPEN, _("Select"), _("Close"));
         dialog.select_multiple = true;
         dialog.response.connect ((response_id) => on_choose_image_response (dialog, response_id));
         dialog.show ();
@@ -236,7 +272,7 @@ public class Akira.Services.ActionManager : Object {
                 files.@foreach ((file) => {
                     var provider = new Akira.Services.FileImageProvider (file);
                     var item = new Akira.Lib.Models.CanvasImage (
-                        window.event_bus, provider, canvas.get_root_item ()
+                        provider, canvas.get_root_item ()
                     );
                     var select = files.index (file) + 1 == files.length () ? true : false;
 
@@ -247,6 +283,10 @@ public class Akira.Services.ActionManager : Object {
         default:
             break;
         }
+    }
+
+    private void action_escape () {
+        window.event_bus.request_escape ();
     }
 
     public static void action_from_group (string action_name, ActionGroup? action_group) {

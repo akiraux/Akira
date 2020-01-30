@@ -43,6 +43,8 @@ public class Akira.Layouts.LeftSideBar : Gtk.Grid {
     }
 
     construct {
+        window.event_bus.request_widget_redraw.connect (on_widget_redraw_request);
+
         get_style_context ().add_class ("sidebar-l");
 
         var align_items_panel = new Akira.Layouts.Partials.AlignItemsPanel (window);
@@ -52,6 +54,7 @@ public class Akira.Layouts.LeftSideBar : Gtk.Grid {
         borders_panel = new Akira.Layouts.Partials.BordersPanel (window);
 
         var scrolled_window = new Gtk.ScrolledWindow (null, null);
+        scrolled_window.hscrollbar_policy = Gtk.PolicyType.NEVER;
         scrolled_window.expand = true;
         var scrolled_grid = new Gtk.Grid ();
         scrolled_grid.expand = true;
@@ -69,5 +72,9 @@ public class Akira.Layouts.LeftSideBar : Gtk.Grid {
 
     public void toggle () {
         toggled = !toggled;
+    }
+
+    private void on_widget_redraw_request () {
+        queue_resize ();
     }
 }

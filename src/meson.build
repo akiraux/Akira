@@ -61,8 +61,8 @@ sources = files(
     'Partials/InputField.vala',
     'Partials/LinkedInput.vala',
     'Partials/PanelSeparator.vala',
-    'Partials/PopoverButton.vala',
 
+    'Models/LayerModel.vala',
     'Models/BordersItemModel.vala',
     'Models/FillsItemModel.vala',
     'Models/ItemModel.vala',
@@ -74,7 +74,6 @@ sources = files(
 
     'Lib/Managers/HoverManager.vala',
     'Lib/Managers/SelectedBoundManager.vala',
-    #'Lib/Managers/AffineTransformManager.vala',
     'Lib/Managers/ItemsManager.vala',
     'Lib/Managers/NobManager.vala',
 

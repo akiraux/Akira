@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2019 Alecaddd (https://alecaddd.com)
+* Copyright (c) 2019-202 Alecaddd (https://alecaddd.com)
 *
 * This file is part of Akira.
 *
@@ -28,10 +28,11 @@ public enum Akira.Lib.Models.CanvasItemType {
 }
 
 public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasItem {
+    // Identifiers.
     public static int global_id = 0;
-
+    public abstract Models.CanvasItemType item_type { get; set; }
     public abstract string id { get; set; }
-    public abstract bool selected { get; set; }
+    public abstract string name { get; set; }
 
     // Transform Panel attributes.
     public abstract double opacity { get; set; }
@@ -53,13 +54,20 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
     public abstract bool hidden_border { get; set; default = false; }
 
     // Style Panel attributes.
+    public abstract bool size_locked { get; set; default = false; }
+    public abstract double size_ratio { get; set; default = 1.0; }
+    public abstract bool flipped_h { get; set; default = false; }
+    public abstract bool flipped_v { get; set; default = false; }
     public abstract bool show_border_radius_panel { get; set; default = false; }
     public abstract bool show_fill_panel { get; set; default = false; }
     public abstract bool show_border_panel { get; set; default = false; }
 
-    public abstract Models.CanvasItemType item_type { get; set; }
+    // Layers panel attributes.
+    public abstract bool selected { get; set; }
+    public abstract bool locked { get; set; default = false; }
+    public abstract string layer_icon { get; set; }
 
-    public double get_coords (string coord_id, bool convert_to_item_space = false) {
+    public double get_coords (string coord_id) {
         double _coord = 0.0;
         get (coord_id, out _coord);
 
@@ -75,7 +83,16 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
         string[] type_slug_tokens = item.item_type.to_string ().split ("_");
         string type_slug = type_slug_tokens[type_slug_tokens.length - 1];
 
-        return "%s%d".printf (type_slug, global_id++);
+        return "%s %d".printf (capitalize (type_slug.down ()), global_id++);
+    }
+
+    public static string capitalize (string s) {
+        string back = s;
+        if (s.get_char (0).islower ()) {
+            back = s.get_char (0).toupper ().to_string () + s.substring (1);
+        }
+
+        return back;
     }
 
     public static void init_item (Goo.CanvasItem item) {
