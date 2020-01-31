@@ -56,6 +56,7 @@ public class Akira.Services.ActionManager : Object {
     public const string ACTION_ESCAPE = "action_escape";
 
     public static Gee.MultiMap<string, string> action_accelerators = new Gee.HashMultiMap<string, string> ();
+    public static Gee.MultiMap<string, string> typing_accelerators = new Gee.HashMultiMap<string, string> ();
 
     private const ActionEntry[] ACTION_ENTRIES = {
         { ACTION_NEW_WINDOW, action_new_window },
@@ -116,14 +117,15 @@ public class Akira.Services.ActionManager : Object {
         action_accelerators.set (ACTION_MOVE_DOWN, "<Control>Down");
         action_accelerators.set (ACTION_MOVE_TOP, "<Control><Shift>Up");
         action_accelerators.set (ACTION_MOVE_BOTTOM, "<Control><Shift>Down");
-        action_accelerators.set (ACTION_ARTBOARD_TOOL, "a");
-        action_accelerators.set (ACTION_RECT_TOOL, "r");
-        action_accelerators.set (ACTION_ELLIPSE_TOOL, "e");
-        action_accelerators.set (ACTION_TEXT_TOOL, "t");
-        action_accelerators.set (ACTION_IMAGE_TOOL, "i");
         action_accelerators.set (ACTION_FLIP_H, "<Control>bracketleft");
         action_accelerators.set (ACTION_FLIP_V, "<Control>bracketright");
         action_accelerators.set (ACTION_ESCAPE, "Escape");
+
+        typing_accelerators.set (ACTION_ARTBOARD_TOOL, "a");
+        typing_accelerators.set (ACTION_RECT_TOOL, "r");
+        typing_accelerators.set (ACTION_ELLIPSE_TOOL, "e");
+        typing_accelerators.set (ACTION_TEXT_TOOL, "t");
+        typing_accelerators.set (ACTION_IMAGE_TOOL, "i");
     }
 
     construct {
@@ -133,6 +135,25 @@ public class Akira.Services.ActionManager : Object {
 
         foreach (var action in action_accelerators.get_keys ()) {
             app.set_accels_for_action (ACTION_PREFIX + action, action_accelerators[action].to_array ());
+        }
+
+        enable_typing_accels ();
+
+        window.event_bus.disconnect_typing_accel.connect (disable_typing_accels);
+        window.event_bus.connect_typing_accel.connect (enable_typing_accels);
+    }
+
+    // Temporarily disable all the accelerators that might interfere with input fields.
+    private void disable_typing_accels () {
+        foreach (var action in typing_accelerators.get_keys ()) {
+            app.set_accels_for_action (ACTION_PREFIX + action, {});
+        }
+    }
+
+    // Enable all the accelerators that might interfere with input fields.
+    private void enable_typing_accels () {
+        foreach (var action in typing_accelerators.get_keys ()) {
+            app.set_accels_for_action (ACTION_PREFIX + action, typing_accelerators[action].to_array ());
         }
     }
 

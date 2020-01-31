@@ -59,6 +59,7 @@ sources = files(
     'Partials/ButtonImage.vala',
     'Partials/AlignBoxButton.vala',
     'Partials/InputField.vala',
+    'Partials/ColorField.vala',
     'Partials/LinkedInput.vala',
     'Partials/PanelSeparator.vala',
 
