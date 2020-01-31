@@ -117,6 +117,8 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
         entry.activate.connect (update_on_enter);
         entry.focus_out_event.connect (update_on_leave);
         entry.key_release_event.connect (update_on_escape);
+        entry.focus_in_event.connect (handle_focus_in);
+        entry.focus_out_event.connect (handle_focus_out);
 
         icon = new Gtk.Image.from_icon_name (model.icon, Gtk.IconSize.MENU);
         icon.margin_start = icon_name != "folder-symbolic" ? 16 : 0;
@@ -693,5 +695,15 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
         }
 
         return should_scroll;
+    }
+
+    private bool handle_focus_in (Gdk.EventFocus event) {
+        window.event_bus.disconnect_typing_accel ();
+        return false;
+    }
+
+    private bool handle_focus_out (Gdk.EventFocus event) {
+        window.event_bus.connect_typing_accel ();
+        return false;
     }
 }

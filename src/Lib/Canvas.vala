@@ -174,16 +174,6 @@ public class Akira.Lib.Canvas : Goo.Canvas {
             case Gdk.Key.Left:
                 window.event_bus.move_item_from_canvas (event);
                 break;
-
-            default:
-                // Send to ItemsManager to deal with custom user shape
-                // hotkey preferences from settings
-                if (items_manager.set_insert_type_from_key (uppercase_keyval)) {
-                    edit_mode = Akira.Lib.Canvas.EditMode.MODE_INSERT;
-                    break;
-                }
-
-                break;
         }
 
         return true;
@@ -195,16 +185,15 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         switch (uppercase_keyval) {
             case Gdk.Key.space:
                 edit_mode = EditMode.MODE_SELECTION;
-                return true;
+                break;
 
             case Gdk.Key.Control_L:
             case Gdk.Key.Control_R:
                 ctrl_is_pressed = false;
-                return true;
-
-            default:
-                return false;
+                break;
         }
+
+        return false;
     }
 
     public override bool button_press_event (Gdk.EventButton event) {

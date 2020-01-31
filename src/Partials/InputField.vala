@@ -20,6 +20,7 @@
 */
 
 public class Akira.Partials.InputField : Gtk.EventBox {
+    //  private Akira.Window window;
     public Gtk.SpinButton entry { get; construct set; }
 
     public int chars { get; construct set; }
@@ -51,6 +52,7 @@ public class Akira.Partials.InputField : Gtk.EventBox {
     }
 
     construct {
+        //  window = get_toplevel () as Akira.Window;
         valign = Gtk.Align.CENTER;
 
         entry = new Gtk.SpinButton.with_range (0, 100, step);
@@ -60,6 +62,8 @@ public class Akira.Partials.InputField : Gtk.EventBox {
 
         entry.key_press_event.connect (handle_key_press);
         entry.scroll_event.connect (handle_scroll_event);
+        entry.focus_in_event.connect (handle_focus_in);
+        entry.focus_out_event.connect (handle_focus_out);
 
         switch (unit) {
             case Unit.HASH:
@@ -120,6 +124,20 @@ public class Akira.Partials.InputField : Gtk.EventBox {
         if (!entry.has_focus) {
             return true;
         }
+        return false;
+    }
+
+    private bool handle_focus_in (Gdk.EventFocus event) {
+        Akira.Window window = get_toplevel () as Akira.Window;
+        window.event_bus.disconnect_typing_accel ();
+
+        return false;
+    }
+
+    private bool handle_focus_out (Gdk.EventFocus event) {
+        Akira.Window window = get_toplevel () as Akira.Window;
+        window.event_bus.connect_typing_accel ();
+
         return false;
     }
 }

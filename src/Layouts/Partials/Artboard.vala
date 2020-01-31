@@ -67,6 +67,8 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
         entry.visible = false;
         entry.no_show_all = true;
         entry.set_text (layer_name);
+        entry.focus_in_event.connect (handle_focus_in);
+        entry.focus_out_event.connect (handle_focus_out);
 
         entry.activate.connect (update_on_enter);
         entry.focus_out_event.connect (update_on_leave);
@@ -441,5 +443,15 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
                 layers_count++;
             }
         });
+    }
+
+    private bool handle_focus_in (Gdk.EventFocus event) {
+        window.event_bus.disconnect_typing_accel ();
+        return false;
+    }
+
+    private bool handle_focus_out (Gdk.EventFocus event) {
+        window.event_bus.connect_typing_accel ();
+        return false;
     }
 }

@@ -128,6 +128,8 @@ public class Akira.Layouts.Partials.BorderItem : Gtk.Grid {
         color_container.max_length = 7;
         color_container.hexpand = true;
         color_container.text = Utils.Color.rgba_to_hex (color);
+        color_container.focus_in_event.connect (handle_focus_in);
+        color_container.focus_out_event.connect (handle_focus_out);
 
         color_container.bind_property (
             "text", model, "color",
@@ -326,5 +328,15 @@ public class Akira.Layouts.Partials.BorderItem : Gtk.Grid {
         new_rgba.alpha = (double) alpha / 255;
 
         color_chooser_widget.set_rgba (new_rgba);
+    }
+
+    private bool handle_focus_in (Gdk.EventFocus event) {
+        window.event_bus.disconnect_typing_accel ();
+        return false;
+    }
+
+    private bool handle_focus_out (Gdk.EventFocus event) {
+        window.event_bus.connect_typing_accel ();
+        return false;
     }
 }
