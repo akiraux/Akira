@@ -29,7 +29,7 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
     private Gtk.Image hidden_button_icon;
     private Gtk.MenuButton selected_color;
     public Akira.Partials.InputField opacity_container;
-    public Gtk.Entry color_container;
+    public Akira.Partials.ColorField color_container;
     private Gtk.Popover color_popover;
     private Gtk.Grid color_picker;
     private Gtk.ColorChooserWidget color_chooser_widget;
@@ -115,14 +115,8 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         picker_container.get_style_context ().add_class ("bg-pattern");
         picker_container.add (selected_color);
 
-        color_container = new Gtk.Entry ();
-        color_container.margin_end = 10;
-        color_container.width_chars = 8;
-        color_container.max_length = 7;
-        color_container.hexpand = true;
+        color_container = new Akira.Partials.ColorField (window);
         color_container.text = Utils.Color.rgba_to_hex (color);
-        color_container.focus_in_event.connect (handle_focus_in);
-        color_container.focus_out_event.connect (handle_focus_out);
 
         color_container.bind_property (
             "text", model, "color",
@@ -149,41 +143,6 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
                 return true;
             }
         );
-
-        color_container.insert_text.connect ((_new_text, new_text_length) => {
-            string new_text = _new_text.strip ();
-
-            if (new_text.contains ("#")) {
-                new_text = new_text.substring (1, new_text.length - 1);
-            } else if (!color_container.text.contains ("#")) {
-                GLib.Signal.stop_emission_by_name (color_container, "insert-text");
-
-                var builder = new StringBuilder ();
-                builder.append (new_text);
-                builder.prepend ("#");
-                color_container.text = builder.str;
-            }
-
-            bool is_valid_hex = true;
-            bool char_is_numeric = true;
-            bool char_is_valid_alpha = true;
-
-            char keyval;
-
-            for (var i = 0; i < new_text.length; i++) {
-                keyval = new_text [i];
-
-                char_is_numeric = keyval >= Gdk.Key.@0 && keyval <= Gdk.Key.@9;
-                char_is_valid_alpha = keyval >= Gdk.Key.A && keyval <= Gdk.Key.F;
-
-                is_valid_hex &= keyval.isxdigit ();
-            }
-
-            if (!is_valid_hex) {
-                GLib.Signal.stop_emission_by_name (color_container, "insert-text");
-                return;
-            }
-        });
 
         opacity_container = new Akira.Partials.InputField (
             Akira.Partials.InputField.Unit.PERCENTAGE, 7, true, true);
@@ -322,15 +281,5 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         new_rgba.alpha = (double) alpha / 255;
 
         color_chooser_widget.set_rgba (new_rgba);
-    }
-
-    private bool handle_focus_in (Gdk.EventFocus event) {
-        window.event_bus.disconnect_typing_accel ();
-        return false;
-    }
-
-    private bool handle_focus_out (Gdk.EventFocus event) {
-        window.event_bus.connect_typing_accel ();
-        return false;
     }
 }
