@@ -157,29 +157,21 @@ public class Akira.Layouts.Partials.BorderItem : Gtk.Grid {
             }
         );
 
-        color_container.delete_text.connect ((start_pos, end_pos) => {
-            if (end_pos == -1) {
-                // We are replacing the string from the internal
-                // Not by manually selecting the text, so we don't need to check anything
-                return;
-            }
-
-            string new_text = color_container.text.splice (start_pos, end_pos);
-
-            if (!new_text.contains ("#")) {
-                GLib.Signal.stop_emission_by_name (color_container, "delete-text");
-            }
-        });
-
         color_container.insert_text.connect ((_new_text, new_text_length) => {
             string new_text = _new_text.strip ();
 
             if (new_text.contains ("#")) {
                 new_text = new_text.substring (1, new_text.length - 1);
+            } else if (!color_container.text.contains ("#")) {
+                GLib.Signal.stop_emission_by_name (color_container, "insert-text");
+
+                var builder = new StringBuilder ();
+                builder.append (new_text);
+                builder.prepend ("#");
+                color_container.text = builder.str;
             }
 
             bool is_valid_hex = true;
-
             bool char_is_numeric = true;
             bool char_is_valid_alpha = true;
 
