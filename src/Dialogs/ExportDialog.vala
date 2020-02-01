@@ -22,6 +22,9 @@
 public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
     public weak Akira.Window window { get; construct; }
 
+    private Gtk.Grid sidebar;
+    public Gtk.FileChooserButton folder_button;
+
     public ExportDialog (Akira.Window window) {
         Object (
             window: window,
@@ -41,13 +44,14 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
         var sidebar_header = new Gtk.Grid ();
         sidebar_header.vexpand = true;
         sidebar_header.get_style_context ().add_class ("sidebar-l");
-        sidebar_header.width_request = 300;
+        sidebar_header.width_request = 280;
 
         var close_button =  new Gtk.Button.from_icon_name (
             "window-close-symbolic",
             Gtk.IconSize.MENU
         );
-        close_button.margin = 6;
+        close_button.margin_top = close_button.margin_bottom = 6;
+        close_button.margin_right = close_button.margin_left = 4;
         close_button.clicked.connect (() => {
             close ();
         });
@@ -74,16 +78,13 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
         var button_area = button.get_parent ();
         button_area.destroy ();
 
-        var sidebar = new Gtk.Grid ();
-        sidebar.vexpand = true;
-        sidebar.get_style_context ().add_class ("sidebar-l");
-        sidebar.width_request = 300;
-        sidebar.add (new Gtk.Label ("Sidebar"));
+        sidebar = new Gtk.Grid ();
+        sidebar.get_style_context ().add_class ("sidebar-export");
+        sidebar.width_request = 280;
 
         var main = new Gtk.Grid ();
         main.vexpand = true;
         main.get_style_context ().add_class ("layers-panel");
-        main.add (new Gtk.Label ("Main"));
 
         var pane = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);
         pane.pack1 (sidebar, false, false);
@@ -93,10 +94,39 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
         content_area.border_width = 0;
         content_area.add (pane);
 
-        pane.bind_property ("position", pane_header, "position", BindingFlags.SYNC_CREATE);
+        pane.bind_property ("position", pane_header, "position");
 
-        pane_header.notify.connect (() => {
+        pane_header.notify["position"].connect (() => {
             pane_header.position = pane.position;
         });
+
+        Idle.add (() => {
+            build_export_sidebar ();
+        });
+    }
+
+    private void build_export_sidebar () {
+        var folder_dir = Environment.get_user_special_dir (UserDirectory.PICTURES);
+
+        // Folder location
+        var folder_label = new Gtk.Label (_("Select Destination Folder"));
+        folder_label.get_style_context ().add_class ("h4");
+        folder_label.halign = Gtk.Align.START;
+        sidebar.attach (folder_label, 0, 0, 1, 1);
+
+        folder_button = new Gtk.FileChooserButton (_("Select Folder"), Gtk.FileChooserAction.SELECT_FOLDER);
+        folder_button.set_current_folder (folder_dir);
+        folder_button.hexpand = true;
+        sidebar.attach (folder_button, 0, 1, 1, 1);
+
+        // Quality spinbutton
+
+        // File format
+
+        // Scale
+
+        // Buttons
+
+        sidebar.show_all ();
     }
 }
