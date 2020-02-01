@@ -129,6 +129,9 @@ public class Akira.Partials.InputField : Gtk.EventBox {
 
     private bool handle_focus_in (Gdk.EventFocus event) {
         Akira.Window window = get_toplevel () as Akira.Window;
+        if (!(window is Akira.Window)) {
+            return true;
+        }
         window.event_bus.disconnect_typing_accel ();
 
         return false;
@@ -136,6 +139,9 @@ public class Akira.Partials.InputField : Gtk.EventBox {
 
     private bool handle_focus_out (Gdk.EventFocus event) {
         Akira.Window window = get_toplevel () as Akira.Window;
+        if (!(window is Akira.Window)) {
+            return true;
+        }
         window.event_bus.connect_typing_accel ();
 
         return false;

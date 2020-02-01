@@ -209,10 +209,13 @@ public class Akira.Services.ActionManager : Object {
     }
 
     private void action_export_grab () {
+        disable_typing_accels ();
+
         var export_dialog = new Akira.Dialogs.ExportDialog (window);
         export_dialog.show_all ();
         export_dialog.present ();
         export_dialog.close.connect (() => {
+            enable_typing_accels ();
             window.event_bus.set_focus_on_canvas ();
         });
     }

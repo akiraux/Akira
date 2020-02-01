@@ -38,7 +38,7 @@ public class Akira.Dialogs.SettingsDialog : Gtk.Dialog {
         Object (
             window: _window,
             border_width: 5,
-            deletable: false,
+            deletable: true,
             resizable: false,
             modal: true,
             title: _("Preferences")
@@ -65,14 +65,6 @@ public class Akira.Dialogs.SettingsDialog : Gtk.Dialog {
         grid.attach (stack, 1, 2, 1, 1);
 
         get_content_area ().add (grid);
-
-        var close_button = (Gtk.Button) add_button (_("Close"), 0);
-        close_button.get_style_context ().add_class (Gtk.STYLE_CLASS_SUGGESTED_ACTION);
-
-        close_button.clicked.connect (() => {
-            destroy ();
-            window.event_bus.set_focus_on_canvas ();
-        });
     }
 
     private Gtk.Widget get_general_box () {

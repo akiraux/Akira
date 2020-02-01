@@ -362,7 +362,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
     }
 
     private Gtk.Label group_title (string title) {
-        var title_label = new Gtk.Label ("%s".printf (title));
+        var title_label = new Gtk.Label (title);
         title_label.get_style_context ().add_class ("group-title");
         title_label.halign = Gtk.Align.START;
         title_label.hexpand = true;
