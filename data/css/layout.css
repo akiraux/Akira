@@ -81,3 +81,9 @@
 .input-button.down {
     margin-top: -2pt;
 }
+
+paned > separator {
+    min-width: 1px;
+    margin-right: 0;
+    margin-left: 0;
+}

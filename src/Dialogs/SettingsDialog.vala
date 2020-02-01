@@ -19,7 +19,7 @@
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
 
-public class Akira.Widgets.SettingsDialog : Gtk.Dialog {
+public class Akira.Dialogs.SettingsDialog : Gtk.Dialog {
     public weak Akira.Window window { get; construct; }
     private Gtk.Stack stack;
     private Gtk.Switch dark_theme_switch;
