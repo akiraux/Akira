@@ -215,6 +215,12 @@ public class Akira.Services.ActionManager : Object {
         export_dialog.show_all ();
         export_dialog.present ();
         export_dialog.close.connect (() => {
+            int width, height;
+
+            export_dialog.get_size (out width, out height);
+            settings.export_width = width;
+            settings.export_height = height;
+
             enable_typing_accels ();
             window.event_bus.set_focus_on_canvas ();
         });

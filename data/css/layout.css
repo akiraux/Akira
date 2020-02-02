@@ -10,7 +10,7 @@
 
 .sidebar-export {
     background-color: shade (@bg_color, 0.95);
-    padding: 0 10px;
+    padding: 10px 20px 20px;
 }
 
 .color-picker {
