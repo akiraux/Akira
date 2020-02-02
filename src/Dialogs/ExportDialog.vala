@@ -46,7 +46,7 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
 
         var sidebar_header = new Gtk.Grid ();
         sidebar_header.vexpand = true;
-        sidebar_header.get_style_context ().add_class ("sidebar-l");
+        sidebar_header.get_style_context ().add_class ("sidebar-export-header");
         sidebar_header.width_request = 300;
 
         var close_button = new Gtk.Button.from_icon_name (
