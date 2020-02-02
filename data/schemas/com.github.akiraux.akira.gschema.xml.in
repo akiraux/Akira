@@ -97,8 +97,8 @@
 
         <key name="export-paned" type="i">
             <default>300</default>
-            <summary>The saved width of the export right panel.</summary>
-            <description>The saved width of the right panel in the export dialog.</description>
+            <summary>The saved position of the export left panel.</summary>
+            <description>The saved position of the left panel in the export dialog.</description>
         </key>
 
         <key name="export-quality" type="i">

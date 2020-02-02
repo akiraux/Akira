@@ -49,7 +49,7 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
         sidebar_header.get_style_context ().add_class ("sidebar-l");
         sidebar_header.width_request = 300;
 
-        var close_button =  new Gtk.Button.from_icon_name (
+        var close_button = new Gtk.Button.from_icon_name (
             "window-close-symbolic",
             Gtk.IconSize.MENU
         );
@@ -76,7 +76,7 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
         set_titlebar (pane_header);
 
         // Another hack to remove the bottom action area.
-        var button = add_button("OK", 3);
+        var button = add_button ("OK", 3);
         var button_area = button.get_parent ();
         button_area.destroy ();
 
