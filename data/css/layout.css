@@ -15,7 +15,6 @@
 
 .sidebar-export {
     background-color: shade (@bg_color, 0.95);
-    padding: 10px 20px 20px;
     border-radius: 0 0 0 4px;
 }
 

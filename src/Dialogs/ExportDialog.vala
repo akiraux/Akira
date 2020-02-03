@@ -109,6 +109,7 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
     private void build_export_sidebar () {
         var grid = new Gtk.Grid ();
         grid.expand = true;
+        grid.margin = 12;
         grid.column_spacing = 10;
 
         // Folder location.
@@ -179,9 +180,14 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
         grid.attach (separator, 0, 6, 2, 1);
 
         // Buttons.
+        var action_area = new Gtk.Grid ();
+        action_area.column_spacing = 6;
+        action_area.halign = Gtk.Align.END;
+        grid.attach (action_area, 0, 7, 2);
+
         var cancel_button = new Gtk.Button.with_label (_("Cancel"));
-        cancel_button.halign = Gtk.Align.START;
-        grid.attach (cancel_button, 0, 7, 1, 1);
+        cancel_button.halign = Gtk.Align.END;
+        action_area.add (cancel_button);
         cancel_button.clicked.connect (() => {
             close ();
         });
@@ -189,7 +195,7 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
         var export_button = new Gtk.Button.with_label (_("Export"));
         export_button.get_style_context ().add_class (Gtk.STYLE_CLASS_SUGGESTED_ACTION);
         export_button.halign = Gtk.Align.END;
-        grid.attach (export_button, 1, 7, 1, 1);
+        action_area.add (export_button);
 
         sidebar.add (grid);
     }
