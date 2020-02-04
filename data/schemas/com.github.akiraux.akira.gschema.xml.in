@@ -119,8 +119,8 @@
             <description>The format type for exporting images in the export dialog.</description>
         </key>
 
-        <key name="export-scale" type="s">
-            <default>'1'</default>
+        <key name="export-scale" type="i">
+            <default>0</default>
             <summary>The scaled resolution for exporting images.</summary>
             <description>The scaled resolution for exporting images in the export dialog.</description>
         </key>

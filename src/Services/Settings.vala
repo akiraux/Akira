@@ -110,9 +110,9 @@ public class Akira.Services.Settings : GLib.Settings {
         owned get { return get_string ("export-format"); }
         set { set_string ("export-format", value); }
     }
-    public string export_scale {
-        owned get { return get_string ("export-scale"); }
-        set { set_string ("export-scale", value); }
+    public int export_scale {
+        get { return get_int ("export-scale"); }
+        set { set_int ("export-scale", value); }
     }
 
     public Settings () {

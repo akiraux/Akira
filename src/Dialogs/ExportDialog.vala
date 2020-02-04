@@ -29,6 +29,9 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
     public Akira.Partials.InputField quality_entry;
     public Gtk.Adjustment compression_adj;
     public Gtk.Scale compression_scale;
+    public Gtk.ComboBoxText file_format;
+    public Gtk.Label jpeg_title;
+    public Gtk.Label png_title;
 
     public ExportDialog (Akira.Window window) {
         Object (
@@ -49,8 +52,7 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
         var sidebar_header = new Gtk.Grid ();
         sidebar_header.vexpand = true;
         sidebar_header.get_style_context ().add_class ("sidebar-export-header");
-        sidebar_header.width_request = 300;
-        sidebar_header.height_request = 34;
+        sidebar_header.height_request = 30;
 
         var main_header = new Gtk.Grid ();
         main_header.vexpand = true;
@@ -74,7 +76,6 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
 
         sidebar = new Gtk.Grid ();
         sidebar.get_style_context ().add_class ("sidebar-export");
-        sidebar.width_request = 300;
         build_export_sidebar ();
 
         var main = new Gtk.Grid ();
@@ -96,15 +97,19 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
         });
 
         settings.bind ("export-paned", pane, "position", SettingsBindFlags.DEFAULT);
+
+        update_format_ui ();
     }
 
     private void build_export_sidebar () {
         var grid = new Gtk.Grid ();
         grid.expand = true;
-        grid.column_spacing = 10;
+        grid.column_spacing = 12;
+        grid.margin_start = grid.margin_end = grid.margin_bottom = 12;
+        grid.row_spacing = 6;
 
         // Folder location.
-        grid.attach (section_title (_("Select Destination Folder")), 0, 0, 2, 1);
+        grid.attach (section_title (_("Export to:")), 0, 0, 1, 1);
 
         folder_button = new Gtk.FileChooserButton (
             _("Select Folder"),
@@ -114,82 +119,81 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
             Environment.get_user_special_dir (UserDirectory.PICTURES)
         );
         folder_button.hexpand = true;
-        folder_button.margin_bottom = 20;
-        grid.attach (folder_button, 0, 1, 2, 1);
+        grid.attach (folder_button, 1, 0, 1, 1);
+
+        // File format.
+        var format_title = section_title (_("Format:"));
+        grid.attach (format_title, 0, 2, 1, 1);
+
+        file_format = new Gtk.ComboBoxText ();
+        file_format.append ("png", "PNG");
+        file_format.append ("jpg", "JPG");
+        file_format.changed.connect (update_format_ui);
+        settings.bind ("export-format", file_format, "active_id", SettingsBindFlags.DEFAULT);
+        grid.attach (file_format, 1, 2, 1, 1);
 
         // Quality spinbutton.
-        grid.attach (section_title (_("JPEG Quality")), 0, 2, 2, 1);
+        jpeg_title = section_title (_("Quality:"));
+        grid.attach (jpeg_title, 0, 3, 1, 1);
 
         quality_adj = new Gtk.Adjustment (100.0, 0, 100.0, 0, 0, 0);
         quality_scale = new Gtk.Scale (Gtk.Orientation.HORIZONTAL, quality_adj);
         quality_scale.hexpand = true;
-        quality_scale.draw_value = false;
+        quality_scale.draw_value = true;
         quality_scale.digits = 0;
-        quality_scale.margin_bottom = 20;
-        grid.attach (quality_scale, 0, 3, 1, 1);
+        grid.attach (quality_scale, 1, 3, 1, 1);
 
-        quality_entry = new Akira.Partials.InputField (
-            Akira.Partials.InputField.Unit.PERCENTAGE, 7, true, true);
-        quality_entry.entry.sensitive = true;
-        quality_entry.entry.hexpand = false;
-        quality_entry.margin_bottom = 20;
-        settings.bind ("export-quality", quality_entry.entry, "value", SettingsBindFlags.DEFAULT);
+        //  quality_entry = new Akira.Partials.InputField (
+        //      Akira.Partials.InputField.Unit.PERCENTAGE, 7, true, true);
+        //  quality_entry.entry.sensitive = true;
+        //  quality_entry.entry.hexpand = false;
+        //  settings.bind ("export-quality", quality_entry.entry, "value", SettingsBindFlags.DEFAULT);
 
-        quality_entry.entry.bind_property (
-            "value", quality_adj, "value",
-            BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE);
-        grid.attach (quality_entry, 1, 3, 1, 1);
+        //  quality_entry.entry.bind_property (
+        //      "value", quality_adj, "value",
+        //      BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE);
+        //  grid.attach (quality_entry, 1, 4, 1, 1);
 
         // Compression spinbutton.
-        grid.attach (section_title (_("PNG Compression")), 0, 4, 2, 1);
+        png_title = section_title (_("Compression:"));
+        grid.attach (png_title, 0, 4, 1, 1);
 
         compression_adj = new Gtk.Adjustment (0.0, 0, 9.0, 1, 0, 0);
         compression_scale = new Gtk.Scale (Gtk.Orientation.HORIZONTAL, compression_adj);
         compression_scale.hexpand = true;
         compression_scale.draw_value = true;
         compression_scale.digits = 0;
-        compression_scale.margin_bottom = 20;
         for (int i = 1; i <= 9; i++) {
             compression_scale.add_mark (i, Gtk.PositionType.BOTTOM, null);
         }
-        grid.attach (compression_scale, 0, 5, 2, 1);
+        grid.attach (compression_scale, 1, 4, 1, 1);
 
         settings.bind ("export-compression", compression_scale, "value", SettingsBindFlags.DEFAULT);
 
-        // File format.
-        var format_title = section_title (_("Format"));
-        format_title.margin_bottom = 20;
-        grid.attach (format_title, 0, 6, 1, 1);
-
-        var file_format = new Gtk.ComboBoxText ();
-        file_format.append ("png", "PNG");
-        file_format.append ("jpg", "JPG");
-        settings.bind ("export-format", file_format, "active_id", SettingsBindFlags.DEFAULT);
-        file_format.margin_bottom = 20;
-        grid.attach (file_format, 1, 6, 1, 1);
-
         // Resolution.
-        var size_title = section_title (_("Size"));
-        size_title.margin_bottom = 20;
-        grid.attach (size_title, 0, 7, 1, 1);
+        var size_title = section_title (_("Scale:"));
+        grid.attach (size_title, 0, 5, 1, 1);
 
-        var file_size = new Gtk.ComboBoxText ();
-        file_size.append ("1", "1x");
-        file_size.append ("2", "2x");
-        file_size.append ("4", "4x");
-        settings.bind ("export-scale", file_size, "active_id", SettingsBindFlags.DEFAULT);
-        file_size.margin_bottom = 20;
-        grid.attach (file_size, 1, 7, 1, 1);
-
-        // Push the buttons to the bottom.
-        var separator = new Gtk.Grid ();
-        separator.vexpand = true;
-        grid.attach (separator, 0, 8, 2, 1);
+        var scale_button = new Granite.Widgets.ModeButton ();
+        scale_button.halign = Gtk.Align.FILL;
+        scale_button.append_text ("1×");
+        scale_button.append_text ("2×");
+        scale_button.append_text ("4×");
+        scale_button.set_active (settings.export_scale);
+        settings.bind ("export-scale", scale_button, "selected", SettingsBindFlags.DEFAULT);
+        grid.attach (scale_button, 1, 5, 1, 1);
 
         // Buttons.
+        var action_area = new Gtk.Grid ();
+        action_area.column_spacing = 6;
+        action_area.halign = Gtk.Align.END;
+        action_area.valign = Gtk.Align.END;
+        action_area.vexpand = true;
+        grid.attach (action_area, 0, 6, 2, 1);
+
         var cancel_button = new Gtk.Button.with_label (_("Cancel"));
         cancel_button.halign = Gtk.Align.START;
-        grid.attach (cancel_button, 0, 9, 1, 1);
+        action_area.add (cancel_button);
         cancel_button.clicked.connect (() => {
             close ();
         });
@@ -197,18 +201,23 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
         var export_button = new Gtk.Button.with_label (_("Export"));
         export_button.get_style_context ().add_class (Gtk.STYLE_CLASS_SUGGESTED_ACTION);
         export_button.halign = Gtk.Align.END;
-        grid.attach (export_button, 1, 9, 1, 1);
+        action_area.add (export_button);
 
         sidebar.add (grid);
     }
 
+    private void update_format_ui () {
+        jpeg_title.visible = (file_format.active_id == "jpg");
+        quality_scale.visible = (file_format.active_id == "jpg");
+        quality_entry.visible = (file_format.active_id == "jpg");
+
+        png_title.visible = (file_format.active_id == "png");
+        compression_scale.visible = (file_format.active_id == "png");
+    }
+
     private Gtk.Label section_title (string title) {
         var title_label = new Gtk.Label (title);
-        title_label.get_style_context ().add_class ("group-title");
-        title_label.halign = Gtk.Align.START;
-        title_label.valign = Gtk.Align.CENTER;
-        title_label.hexpand = true;
-        title_label.margin_bottom = 5;
+        title_label.halign = Gtk.Align.END;
 
         return title_label;
     }
