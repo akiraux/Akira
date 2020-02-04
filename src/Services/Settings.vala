@@ -102,6 +102,10 @@ public class Akira.Services.Settings : GLib.Settings {
         get { return get_int ("export-quality"); }
         set { set_int ("export-quality", value); }
     }
+    public int export_compression {
+        get { return get_int ("export-compression"); }
+        set { set_int ("export-compression", value); }
+    }
     public string export_format {
         owned get { return get_string ("export-format"); }
         set { set_string ("export-format", value); }

@@ -103,8 +103,14 @@
 
         <key name="export-quality" type="i">
             <default>100</default>
-            <summary>The quality value for exporting images.</summary>
-            <description>The quality value for exporting images in the export dialog.</description>
+            <summary>The quality value for exporting JPG images.</summary>
+            <description>The quality value for exporting JPG images in the export dialog.</description>
+        </key>
+
+        <key name="export-compression" type="i">
+            <default>0</default>
+            <summary>The compression value for exporting PNG images.</summary>
+            <description>The compression value for exporting PNG images in the export dialog.</description>
         </key>
 
         <key name="export-format" type="s">

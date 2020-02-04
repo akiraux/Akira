@@ -27,6 +27,8 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
     public Gtk.Adjustment quality_adj;
     public Gtk.Scale quality_scale;
     public Akira.Partials.InputField quality_entry;
+    public Gtk.Adjustment compression_adj;
+    public Gtk.Scale compression_scale;
 
     public ExportDialog (Akira.Window window) {
         Object (
@@ -48,17 +50,7 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
         sidebar_header.vexpand = true;
         sidebar_header.get_style_context ().add_class ("sidebar-export-header");
         sidebar_header.width_request = 300;
-
-        var close_button = new Gtk.Button.from_icon_name (
-            "window-close-symbolic",
-            Gtk.IconSize.MENU
-        );
-        close_button.margin = 5;
-        close_button.clicked.connect (() => {
-            close ();
-        });
-
-        sidebar_header.add (close_button);
+        sidebar_header.height_request = 34;
 
         var main_header = new Gtk.Grid ();
         main_header.vexpand = true;
@@ -126,13 +118,13 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
         grid.attach (folder_button, 0, 1, 2, 1);
 
         // Quality spinbutton.
-        grid.attach (section_title (_("Quality")), 0, 2, 2, 1);
+        grid.attach (section_title (_("JPEG Quality")), 0, 2, 2, 1);
 
         quality_adj = new Gtk.Adjustment (100.0, 0, 100.0, 0, 0, 0);
         quality_scale = new Gtk.Scale (Gtk.Orientation.HORIZONTAL, quality_adj);
         quality_scale.hexpand = true;
         quality_scale.draw_value = false;
-        quality_scale.round_digits = 1;
+        quality_scale.digits = 0;
         quality_scale.margin_bottom = 20;
         grid.attach (quality_scale, 0, 3, 1, 1);
 
@@ -148,22 +140,38 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
             BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE);
         grid.attach (quality_entry, 1, 3, 1, 1);
 
+        // Compression spinbutton.
+        grid.attach (section_title (_("PNG Compression")), 0, 4, 2, 1);
+
+        compression_adj = new Gtk.Adjustment (0.0, 0, 9.0, 1, 0, 0);
+        compression_scale = new Gtk.Scale (Gtk.Orientation.HORIZONTAL, compression_adj);
+        compression_scale.hexpand = true;
+        compression_scale.draw_value = true;
+        compression_scale.digits = 0;
+        compression_scale.margin_bottom = 20;
+        for (int i = 1; i <= 9; i++) {
+            compression_scale.add_mark (i, Gtk.PositionType.BOTTOM, null);
+        }
+        grid.attach (compression_scale, 0, 5, 2, 1);
+
+        settings.bind ("export-compression", compression_scale, "value", SettingsBindFlags.DEFAULT);
+
         // File format.
         var format_title = section_title (_("Format"));
         format_title.margin_bottom = 20;
-        grid.attach (format_title, 0, 4, 1, 1);
+        grid.attach (format_title, 0, 6, 1, 1);
 
         var file_format = new Gtk.ComboBoxText ();
         file_format.append ("png", "PNG");
         file_format.append ("jpg", "JPG");
         settings.bind ("export-format", file_format, "active_id", SettingsBindFlags.DEFAULT);
         file_format.margin_bottom = 20;
-        grid.attach (file_format, 1, 4, 1, 1);
+        grid.attach (file_format, 1, 6, 1, 1);
 
         // Resolution.
         var size_title = section_title (_("Size"));
         size_title.margin_bottom = 20;
-        grid.attach (size_title, 0, 5, 1, 1);
+        grid.attach (size_title, 0, 7, 1, 1);
 
         var file_size = new Gtk.ComboBoxText ();
         file_size.append ("1", "1x");
@@ -171,17 +179,17 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
         file_size.append ("4", "4x");
         settings.bind ("export-scale", file_size, "active_id", SettingsBindFlags.DEFAULT);
         file_size.margin_bottom = 20;
-        grid.attach (file_size, 1, 5, 1, 1);
+        grid.attach (file_size, 1, 7, 1, 1);
 
         // Push the buttons to the bottom.
         var separator = new Gtk.Grid ();
         separator.vexpand = true;
-        grid.attach (separator, 0, 6, 2, 1);
+        grid.attach (separator, 0, 8, 2, 1);
 
         // Buttons.
         var cancel_button = new Gtk.Button.with_label (_("Cancel"));
         cancel_button.halign = Gtk.Align.START;
-        grid.attach (cancel_button, 0, 7, 1, 1);
+        grid.attach (cancel_button, 0, 9, 1, 1);
         cancel_button.clicked.connect (() => {
             close ();
         });
@@ -189,7 +197,7 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
         var export_button = new Gtk.Button.with_label (_("Export"));
         export_button.get_style_context ().add_class (Gtk.STYLE_CLASS_SUGGESTED_ACTION);
         export_button.halign = Gtk.Align.END;
-        grid.attach (export_button, 1, 7, 1, 1);
+        grid.attach (export_button, 1, 9, 1, 1);
 
         sidebar.add (grid);
     }
