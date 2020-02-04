@@ -30,8 +30,10 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
     public Gtk.Adjustment compression_adj;
     public Gtk.Scale compression_scale;
     public Gtk.ComboBoxText file_format;
-    public Gtk.Label jpeg_title;
+    public Gtk.Label jpg_title;
     public Gtk.Label png_title;
+    public Gtk.Label alpha_title;
+    public Gtk.Switch alpha_switch;
 
     public ExportDialog (Akira.Window window) {
         Object (
@@ -128,13 +130,13 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
         file_format = new Gtk.ComboBoxText ();
         file_format.append ("png", "PNG");
         file_format.append ("jpg", "JPG");
-        file_format.changed.connect (update_format_ui);
-        settings.bind ("export-format", file_format, "active_id", SettingsBindFlags.DEFAULT);
+        //  file_format.changed.connect (update_format_ui);
         grid.attach (file_format, 1, 2, 1, 1);
+        settings.bind ("export-format", file_format, "active_id", SettingsBindFlags.DEFAULT);
 
         // Quality spinbutton.
-        jpeg_title = section_title (_("Quality:"));
-        grid.attach (jpeg_title, 0, 3, 1, 1);
+        jpg_title = section_title (_("Quality:"));
+        grid.attach (jpg_title, 0, 3, 1, 1);
 
         quality_adj = new Gtk.Adjustment (100.0, 0, 100.0, 0, 0, 0);
         quality_scale = new Gtk.Scale (Gtk.Orientation.HORIZONTAL, quality_adj);
@@ -142,17 +144,7 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
         quality_scale.draw_value = true;
         quality_scale.digits = 0;
         grid.attach (quality_scale, 1, 3, 1, 1);
-
-        //  quality_entry = new Akira.Partials.InputField (
-        //      Akira.Partials.InputField.Unit.PERCENTAGE, 7, true, true);
-        //  quality_entry.entry.sensitive = true;
-        //  quality_entry.entry.hexpand = false;
-        //  settings.bind ("export-quality", quality_entry.entry, "value", SettingsBindFlags.DEFAULT);
-
-        //  quality_entry.entry.bind_property (
-        //      "value", quality_adj, "value",
-        //      BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE);
-        //  grid.attach (quality_entry, 1, 4, 1, 1);
+        settings.bind ("export-quality", quality_adj, "value", SettingsBindFlags.DEFAULT);
 
         // Compression spinbutton.
         png_title = section_title (_("Compression:"));
@@ -167,12 +159,20 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
             compression_scale.add_mark (i, Gtk.PositionType.BOTTOM, null);
         }
         grid.attach (compression_scale, 1, 4, 1, 1);
+        settings.bind ("export-compression", compression_adj, "value", SettingsBindFlags.DEFAULT);
 
-        settings.bind ("export-compression", compression_scale, "value", SettingsBindFlags.DEFAULT);
+        alpha_title = section_title (_("Transparency:"));
+        grid.attach (alpha_title, 0, 5, 1, 1);
+
+        alpha_switch = new Gtk.Switch ();
+        alpha_switch.valign = Gtk.Align.CENTER;
+        alpha_switch.halign = Gtk.Align.START;
+        grid.attach (alpha_switch, 1, 5, 1, 1);
+        settings.bind ("export-alpha", alpha_switch, "active", SettingsBindFlags.DEFAULT);
 
         // Resolution.
         var size_title = section_title (_("Scale:"));
-        grid.attach (size_title, 0, 5, 1, 1);
+        grid.attach (size_title, 0, 6, 1, 1);
 
         var scale_button = new Granite.Widgets.ModeButton ();
         scale_button.halign = Gtk.Align.FILL;
@@ -181,7 +181,7 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
         scale_button.append_text ("4×");
         scale_button.set_active (settings.export_scale);
         settings.bind ("export-scale", scale_button, "selected", SettingsBindFlags.DEFAULT);
-        grid.attach (scale_button, 1, 5, 1, 1);
+        grid.attach (scale_button, 1, 6, 1, 1);
 
         // Buttons.
         var action_area = new Gtk.Grid ();
@@ -189,7 +189,7 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
         action_area.halign = Gtk.Align.END;
         action_area.valign = Gtk.Align.END;
         action_area.vexpand = true;
-        grid.attach (action_area, 0, 6, 2, 1);
+        grid.attach (action_area, 0, 7, 2, 1);
 
         var cancel_button = new Gtk.Button.with_label (_("Cancel"));
         cancel_button.halign = Gtk.Align.START;
@@ -207,12 +207,14 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
     }
 
     private void update_format_ui () {
-        jpeg_title.visible = (file_format.active_id == "jpg");
+        jpg_title.visible = (file_format.active_id == "jpg");
         quality_scale.visible = (file_format.active_id == "jpg");
         quality_entry.visible = (file_format.active_id == "jpg");
 
         png_title.visible = (file_format.active_id == "png");
         compression_scale.visible = (file_format.active_id == "png");
+        alpha_title.visible = (file_format.active_id == "png");
+        alpha_switch.visible = (file_format.active_id == "png");
     }
 
     private Gtk.Label section_title (string title) {

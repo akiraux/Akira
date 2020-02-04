@@ -124,5 +124,11 @@
             <summary>The scaled resolution for exporting images.</summary>
             <description>The scaled resolution for exporting images in the export dialog.</description>
         </key>
+
+        <key name="export-alpha" type="b">
+            <default>true</default>
+            <summary>The alpha setting for exporting PNG images.</summary>
+            <description>The alpha setting for exporting PNG images in the export dialog.</description>
+        </key>
     </schema>
 </schemalist>

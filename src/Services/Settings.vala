@@ -114,6 +114,10 @@ public class Akira.Services.Settings : GLib.Settings {
         get { return get_int ("export-scale"); }
         set { set_int ("export-scale", value); }
     }
+    public bool export_alpha {
+        get { return get_boolean ("export-alpha"); }
+        set { set_boolean ("export-alpha", value); }
+    }
 
     public Settings () {
         Object (schema_id: Constants.APP_ID);
