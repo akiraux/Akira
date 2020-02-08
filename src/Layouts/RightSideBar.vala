@@ -113,6 +113,10 @@ public class Akira.Layouts.RightSideBar : Gtk.Grid {
         pages_scroll.add (pages_panel);
 
         attach (pane, 0 , 0 , 1, 1);
+
+        window.event_bus.toggle_sidebar_indicator.connect ((show_indicator) => {
+            indicator.visible = show_indicator;
+        });
     }
 
     private Gtk.Grid build_search_bar () {

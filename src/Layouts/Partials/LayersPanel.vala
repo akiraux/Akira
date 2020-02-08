@@ -197,8 +197,7 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
         }
 
         window.event_bus.change_item_z_index (source.model.item, new_position);
-
-        window.main_window.right_sidebar.indicator.visible = false;
+        window.event_bus.toggle_sidebar_indicator (false);
     }
 
     public bool on_drag_motion (Gdk.DragContext context, int x, int y, uint time) {

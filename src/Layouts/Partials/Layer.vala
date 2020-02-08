@@ -366,7 +366,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
             window.main_window.right_sidebar.indicator.no_show_all = false;
             window.main_window.right_sidebar.indicator.show_all ();
         } else {
-            window.main_window.right_sidebar.indicator.visible = false;
+            window.event_bus.toggle_sidebar_indicator (false);
         }
 
         int row_index = get_index ();
@@ -380,12 +380,8 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
         Gtk.Allocation alloc;
         get_allocation (out alloc);
 
-        //debug (@"RowIndex: $(row_index)");
-
         Gtk.Allocation row_alloc;
         row.get_allocation (out row_alloc);
-
-        //debug (@"Alloc: $(alloc.width) * $(alloc.height)");
 
         int real_y = (row_index * alloc.height) + y;
 
@@ -419,7 +415,6 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 
             if (y >= (alloc.height / 2)) {
                 get_style_context ().add_class ("highlight");
-                //window.main_window.right_sidebar.indicator.visible = false;
             } else {
                 get_style_context ().remove_class ("highlight");
                 window.main_window.right_sidebar.indicator.margin_top =
@@ -451,15 +446,13 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
     }
 
     public void on_drag_leave (Gdk.DragContext context, uint time) {
-        //debug ("On drag leave");
         get_style_context ().remove_class ("highlight");
-        // Remove this visible to prevent indicator flickering between 2 layers
-        //window.main_window.right_sidebar.indicator.visible = false;
+
         should_scroll = false;
     }
 
     public void clear_indicator (Gdk.DragContext context) {
-        window.main_window.right_sidebar.indicator.visible = false;
+        window.event_bus.toggle_sidebar_indicator (false);
     }
 
     public bool on_click_event (Gdk.Event event) {
