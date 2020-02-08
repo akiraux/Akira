@@ -74,7 +74,7 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
 
     private void on_item_inserted (Lib.Models.CanvasItem new_item) {
         var model = new Akira.Models.LayerModel (new_item, list_model);
-        list_model.add_item.begin (model);
+        list_model.add_item.begin (model, false);
 
         // This map is necessary for easily knowing which
         // item is related to which model, since the canvas knows only
@@ -141,7 +141,7 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
         }
 
         list_model.sort ((a, b) => {
-          return a.item.z_index - b.item.z_index;
+          return b.item.z_index - a.item.z_index;
         });
 
         reload_zebra ();
@@ -189,7 +189,11 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
         if (target == null) {
             new_position = -1;
         } else {
-            new_position = target.get_index ();
+            // New position needs to take into account the fact
+            // that the higher the item in the canvas the lower the index
+            // in the list. So the actual new position is the length of the
+            // list minus the index of the element
+            new_position = (int) list_model.get_n_items () - target.get_index ();
         }
 
         if (source == target) {

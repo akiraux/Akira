@@ -197,13 +197,13 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         var root_item = item.get_canvas ().get_root_item ();
 
         switch (position) {
-            case 0:
-                // Put the item at the bottom of the stack
+            case -1:
+                // Put the item at the top of the stack
                 item.lower (null);
                 break;
 
-            case -1:
-                // Put the item on top of the stack
+            case 0:
+                // Put the item on bottom of the stack
                 var canvas_item_at_top_position = root_item.get_n_children () - 11;
                 var canvas_item_at_top = root_item.get_child (canvas_item_at_top_position);
 
