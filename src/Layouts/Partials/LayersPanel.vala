@@ -38,7 +38,8 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
     private const int SCROLL_DELAY = 50;
 
     private const Gtk.TargetEntry TARGET_ENTRIES[] = {
-        { "ARTBOARD", Gtk.TargetFlags.SAME_APP, 0 }
+        { "ARTBOARD", Gtk.TargetFlags.SAME_APP, 0 },
+        { "LAYER", Gtk.TargetFlags.SAME_APP, 0 }
     };
 
     public LayersPanel (Akira.Window window) {
@@ -68,11 +69,12 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
         window.event_bus.item_inserted.connect (on_item_inserted);
         window.event_bus.item_deleted.connect (on_item_deleted);
         window.event_bus.selected_items_changed.connect (on_selected_items_changed);
+        window.event_bus.z_selected_changed.connect (on_z_selected_changed);
     }
 
     private void on_item_inserted (Lib.Models.CanvasItem new_item) {
         var model = new Akira.Models.LayerModel (new_item, list_model);
-        list_model.add_item.begin (model);
+        list_model.add_item.begin (model, false);
 
         // This map is necessary for easily knowing which
         // item is related to which model, since the canvas knows only
@@ -80,7 +82,6 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
         item_model_map.@set (new_item.id, model);
 
         reload_zebra ();
-
         show_all ();
     }
 
@@ -129,6 +130,30 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
         window.event_bus.set_focus_on_canvas ();
     }
 
+    private void on_z_selected_changed () {
+        var n_items = list_model.get_n_items ();
+
+        for (int i = 0; i < n_items; i++) {
+            var layer = list_model.get_item (i) as Akira.Models.LayerModel;
+            if (layer != null) {
+                Lib.Models.CanvasItem.update_z_index (layer.item);
+            }
+        }
+
+        list_model.sort ((a, b) => {
+          return b.item.z_index - a.item.z_index;
+        });
+
+        reload_zebra ();
+
+        show_all ();
+
+        // Activate the selected items again
+        var model = item_model_map.@get (current_selected_item_id);
+
+        model.selected = true;
+    }
+
     private void build_drag_and_drop () {
         Gtk.drag_dest_set (this, Gtk.DestDefaults.ALL, TARGET_ENTRIES, Gdk.DragAction.MOVE);
 
@@ -137,37 +162,51 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
         drag_leave.connect (on_drag_leave);
     }
 
-    private void on_drag_data_received (Gdk.DragContext context, int x, int y,
-        Gtk.SelectionData selection_data, uint target_type, uint time) {
-        Akira.Layouts.Partials.Artboard target;
+    private void on_drag_data_received (
+      Gdk.DragContext context,
+      int x, int y,
+      Gtk.SelectionData selection_data,
+      uint target_type, uint time) {
+        Akira.Layouts.Partials.Layer? target;
         Gtk.Widget row;
-        Akira.Layouts.Partials.Artboard source;
+        Akira.Layouts.Partials.Layer? source;
         int new_position;
 
-        target = (Akira.Layouts.Partials.Artboard) get_row_at_y (y);
+        row = ((Gtk.Widget[]) selection_data.get_data ())[0];
+        source = row as Akira.Layouts.Partials.Layer;
+
+        Gtk.Allocation alloc;
+        source.get_allocation (out alloc);
+
+        // In order to determine which position should the dragged
+        // item occupy, we need to check in which gap it is.
+        // By adding half of the height of a row we know between which
+        // rows we want to inser the dragged layer
+        var target_row_y = y + alloc.height / 2;
+
+        target = (Akira.Layouts.Partials.Layer) get_row_at_y (target_row_y);
 
         if (target == null) {
             new_position = -1;
         } else {
-            new_position = target.get_index ();
+            // New position needs to take into account the fact
+            // that the higher the item in the canvas the lower the index
+            // in the list. So the actual new position is the length of the
+            // list minus the index of the element
+            new_position = (int) list_model.get_n_items () - target.get_index ();
         }
-
-        row = ((Gtk.Widget[]) selection_data.get_data ())[0];
-
-        source = (Akira.Layouts.Partials.Artboard) row.get_ancestor (typeof (Akira.Layouts.Partials.Artboard));
 
         if (source == target) {
             return;
         }
 
-        remove (source);
-        insert (source, new_position);
+        window.event_bus.change_item_z_index (source.model.item, new_position);
+        window.event_bus.toggle_sidebar_indicator (false);
     }
 
     public bool on_drag_motion (Gdk.DragContext context, int x, int y, uint time) {
-        //  var row = (Akira.Layouts.Partials.Artboard) get_row_at_y (y);
-
         check_scroll (y);
+
         if (should_scroll && !scrolling) {
             scrolling = true;
             Timeout.add (SCROLL_DELAY, scroll);

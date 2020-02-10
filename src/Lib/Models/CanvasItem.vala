@@ -66,6 +66,7 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
     public abstract bool selected { get; set; }
     public abstract bool locked { get; set; default = false; }
     public abstract string layer_icon { get; set; }
+    public abstract int z_index { get; set; }
 
     public double get_coords (string coord_id) {
         double _coord = 0.0;
@@ -99,6 +100,14 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
         item.set ("opacity", 100.0);
         item.set ("fill-alpha", 255);
         item.set ("stroke-alpha", 255);
+
+        update_z_index (item);
+    }
+
+    public static void update_z_index (Goo.CanvasItem item) {
+        var z_index = item.get_canvas ().get_root_item ().find_child (item);
+
+        item.set ("z-index", z_index);
     }
 
     public virtual void reset_colors () {

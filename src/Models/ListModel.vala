@@ -45,9 +45,15 @@ public class Akira.Models.ListModel : GLib.Object, GLib.ListModel {
         return typeof (Akira.Models.ItemModel);
     }
 
-    public async void add_item (Akira.Models.ItemModel model_item) {
-        list.append (model_item);
-        items_changed (get_n_items () - 1, 0, 1);
+    public async void add_item (Akira.Models.ItemModel model_item, bool append = true) {
+        if (append) {
+            list.append (model_item);
+            items_changed (get_n_items () - 1, 0, 1);
+            return;
+        }
+
+        list.prepend (model_item);
+        items_changed (0, 0, 1);
     }
 
     public async void remove_item (Object? item_model) {
@@ -65,5 +71,11 @@ public class Akira.Models.ListModel : GLib.Object, GLib.ListModel {
         list.foreach ((item) => {
             remove_item.begin (item);
         });
+    }
+
+    public void sort (CompareFunc<Akira.Models.ItemModel?> sort_fn) {
+        list.sort (sort_fn);
+
+        items_changed (0, list.length (), list.length ());
     }
 }

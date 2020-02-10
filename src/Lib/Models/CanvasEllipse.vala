@@ -56,6 +56,7 @@ public class Akira.Lib.Models.CanvasEllipse : Goo.CanvasEllipse, Models.CanvasIt
     public bool selected { get; set; }
     public bool locked { get; set; }
     public string layer_icon { get; set; default = "shape-circle-symbolic"; }
+    public int z_index { get; set; }
 
     public CanvasEllipse (
         double _center_x = 0,
