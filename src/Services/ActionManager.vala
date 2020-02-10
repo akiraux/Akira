@@ -192,7 +192,7 @@ public class Akira.Services.ActionManager : Object {
     }
 
     private void action_preferences () {
-        var settings_dialog = new Akira.Widgets.SettingsDialog (window);
+        var settings_dialog = new Akira.Dialogs.SettingsDialog (window);
         settings_dialog.show_all ();
         settings_dialog.present ();
         settings_dialog.close.connect (() => {
@@ -209,7 +209,24 @@ public class Akira.Services.ActionManager : Object {
     }
 
     private void action_export_grab () {
-        warning ("export");
+        disable_typing_accels ();
+
+        var export_dialog = new Akira.Dialogs.ExportDialog (window);
+        export_dialog.show_all ();
+        export_dialog.present ();
+
+        export_dialog.update_format_ui ();
+
+        export_dialog.close.connect (() => {
+            int width, height;
+
+            export_dialog.get_size (out width, out height);
+            settings.export_width = width;
+            settings.export_height = height;
+
+            enable_typing_accels ();
+            window.event_bus.set_focus_on_canvas ();
+        });
     }
 
     private void action_zoom_in () {

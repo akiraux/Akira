@@ -8,6 +8,16 @@
     border-left: 1px solid shade (@bg_color, 0.9);
 }
 
+.sidebar-export-header {
+    background-color: shade (@bg_color, 0.95);
+    border-radius: 4px 0 0 0;
+}
+
+.sidebar-export {
+    background-color: shade (@bg_color, 0.95);
+    border-radius: 0 0 0 4px;
+}
+
 .color-picker {
   padding: 8px 5px;
 }
@@ -48,8 +58,8 @@
 }
 
 .group-title {
-    font-size: 8pt;
-    font-weight: 700;
+    font-size: 9pt;
+    font-weight: 600;
     color: alpha (@fg_color, 0.9);
 }
 
@@ -80,4 +90,10 @@
 
 .input-button.down {
     margin-top: -2pt;
+}
+
+paned > separator {
+    min-width: 1px;
+    margin-right: 0;
+    margin-left: 0;
 }

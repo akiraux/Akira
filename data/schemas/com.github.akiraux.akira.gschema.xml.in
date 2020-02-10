@@ -82,5 +82,53 @@
             <summary>Auto Reopen latest file</summary>
             <description>Automatically reopen the latest file on startup.</description>
         </key>
+
+        <key name="export-width" type="i">
+            <default>1000</default>
+            <summary>The saved width of the export dialog.</summary>
+            <description>The saved width of the export dialog.</description>
+        </key>
+
+        <key name="export-height" type="i">
+            <default>600</default>
+            <summary>The saved height of the export dialog.</summary>
+            <description>The saved height of the export dialog.</description>
+        </key>
+
+        <key name="export-paned" type="i">
+            <default>300</default>
+            <summary>The saved position of the export left panel.</summary>
+            <description>The saved position of the left panel in the export dialog.</description>
+        </key>
+
+        <key name="export-quality" type="i">
+            <default>100</default>
+            <summary>The quality value for exporting JPG images.</summary>
+            <description>The quality value for exporting JPG images in the export dialog.</description>
+        </key>
+
+        <key name="export-compression" type="i">
+            <default>0</default>
+            <summary>The compression value for exporting PNG images.</summary>
+            <description>The compression value for exporting PNG images in the export dialog.</description>
+        </key>
+
+        <key name="export-format" type="s">
+            <default>'png'</default>
+            <summary>The format type for exporting images.</summary>
+            <description>The format type for exporting images in the export dialog.</description>
+        </key>
+
+        <key name="export-scale" type="i">
+            <default>0</default>
+            <summary>The scaled resolution for exporting images.</summary>
+            <description>The scaled resolution for exporting images in the export dialog.</description>
+        </key>
+
+        <key name="export-alpha" type="b">
+            <default>true</default>
+            <summary>The alpha setting for exporting PNG images.</summary>
+            <description>The alpha setting for exporting PNG images in the export dialog.</description>
+        </key>
     </schema>
 </schemalist>

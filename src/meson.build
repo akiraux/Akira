@@ -69,7 +69,8 @@ sources = files(
     'Models/ItemModel.vala',
     'Models/ListModel.vala',
 
-    'Widgets/SettingsDialog.vala',
+    'Dialogs/SettingsDialog.vala',
+    'Dialogs/ExportDialog.vala',
 
     'Lib/Canvas.vala',
 

@@ -9,3 +9,7 @@
 .linked-flat button {
     background-color: shade (@bg_color, 1);
 }
+
+.export-titlebar {
+    padding: 0;
+}
