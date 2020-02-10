@@ -84,6 +84,7 @@ sources = files(
     'Lib/Models/CanvasEllipse.vala',
     'Lib/Models/CanvasText.vala',
     'Lib/Models/CanvasImage.vala',
+    'Lib/Models/CanvasArtboard.vala',
 
     'Lib/Selection/Nob.vala',
 )

@@ -24,7 +24,8 @@ public enum Akira.Lib.Models.CanvasItemType {
     RECT,
     ELLIPSE,
     TEXT,
-    IMAGE
+    IMAGE,
+    ARTBOARD
 }
 
 public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasItem {

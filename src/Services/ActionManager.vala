@@ -258,8 +258,8 @@ public class Akira.Services.ActionManager : Object {
     }
 
     private void action_artboard_tool () {
-        //  window.event_bus.insert_item ("artboard");
-        //  window.event_bus.close_popover ("insert");
+        window.event_bus.insert_item ("artboard");
+        window.event_bus.close_popover ("insert");
     }
 
     private void action_rect_tool () {

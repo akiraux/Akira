@@ -218,6 +218,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 selected_bound_manager.reset_selection ();
 
                 var new_item = items_manager.insert_item (event);
+
                 selected_bound_manager.add_item_to_selection (new_item);
 
                 selected_bound_manager.set_initial_coordinates (event.x, event.y);
