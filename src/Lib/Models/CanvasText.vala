@@ -56,6 +56,7 @@ public class Akira.Lib.Models.CanvasText : Goo.CanvasText, Models.CanvasItem {
     public bool selected { get; set; }
     public bool locked { get; set; }
     public string layer_icon { get; set; default = "shape-text-symbolic"; }
+    public int z_index { get; set; }
 
     public CanvasText (
         string _text = "",

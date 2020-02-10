@@ -56,6 +56,7 @@ public class Akira.Lib.Models.CanvasRect : Goo.CanvasRect, Models.CanvasItem {
     public bool selected { get; set; }
     public bool locked { get; set; }
     public string layer_icon { get; set; default = "shape-rectangle-symbolic"; }
+    public int z_index { get; set; }
 
     // Shape's unique identifiers.
     public bool is_radius_uniform { get; set; }
