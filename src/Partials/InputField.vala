@@ -27,7 +27,7 @@ public class Akira.Partials.InputField : Gtk.EventBox {
     public bool rtl { get; construct set; }
     public bool icon_right { get; construct set; }
     public Unit unit { get; construct set; }
-    public string icon { get; set; }
+    public string? icon { get; set; }
 
     public double step { get; set; default = 1; }
 
@@ -35,7 +35,8 @@ public class Akira.Partials.InputField : Gtk.EventBox {
         PIXEL,
         HASH,
         PERCENTAGE,
-        DEGREES
+        DEGREES,
+        NONE
     }
 
     public InputField (
@@ -68,28 +69,33 @@ public class Akira.Partials.InputField : Gtk.EventBox {
         switch (unit) {
             case Unit.HASH:
                 icon = "input-hash-symbolic";
-            break;
+                break;
             case Unit.PERCENTAGE:
                 icon = "input-percentage-symbolic";
-            break;
+                break;
             case Unit.PIXEL:
                 icon = "input-pixel-symbolic";
-            break;
+                break;
             case Unit.DEGREES:
                 icon = "input-degrees-symbolic";
-            break;
+                break;
+            default:
+                icon = null;
+                break;
         }
 
-        if (icon_right) {
-            entry.get_style_context ().add_class ("input-icon-right");
-            entry.secondary_icon_name = icon;
-            entry.secondary_icon_sensitive = false;
-            entry.secondary_icon_activatable = false;
-        } else {
-            entry.get_style_context ().add_class ("input-icon-left");
-            entry.primary_icon_name = icon;
-            entry.primary_icon_sensitive = false;
-            entry.primary_icon_activatable = false;
+        if (icon != null) {
+            if (icon_right) {
+                entry.get_style_context ().add_class ("input-icon-right");
+                entry.secondary_icon_name = icon;
+                entry.secondary_icon_sensitive = false;
+                entry.secondary_icon_activatable = false;
+            } else {
+                entry.get_style_context ().add_class ("input-icon-left");
+                entry.primary_icon_name = icon;
+                entry.primary_icon_sensitive = false;
+                entry.primary_icon_activatable = false;
+            }
         }
 
         if (rtl) {
@@ -129,6 +135,9 @@ public class Akira.Partials.InputField : Gtk.EventBox {
 
     private bool handle_focus_in (Gdk.EventFocus event) {
         Akira.Window window = get_toplevel () as Akira.Window;
+        if (!(window is Akira.Window)) {
+            return true;
+        }
         window.event_bus.disconnect_typing_accel ();
 
         return false;
@@ -136,6 +145,9 @@ public class Akira.Partials.InputField : Gtk.EventBox {
 
     private bool handle_focus_out (Gdk.EventFocus event) {
         Akira.Window window = get_toplevel () as Akira.Window;
+        if (!(window is Akira.Window)) {
+            return true;
+        }
         window.event_bus.connect_typing_accel ();
 
         return false;

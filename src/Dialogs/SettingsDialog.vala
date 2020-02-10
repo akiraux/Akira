@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2019 Alecaddd (http://alecaddd.com)
+* Copyright (c) 2019-2020 Alecaddd (https://alecaddd.com)
 *
 * This file is part of Akira.
 *
@@ -10,16 +10,16 @@
 
 * Akira is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 * GNU General Public License for more details.
 
 * You should have received a copy of the GNU General Public License
-* along with Akira.  If not, see <https://www.gnu.org/licenses/>.
+* along with Akira. If not, see <https://www.gnu.org/licenses/>.
 *
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
 
-public class Akira.Widgets.SettingsDialog : Gtk.Dialog {
+public class Akira.Dialogs.SettingsDialog : Gtk.Dialog {
     public weak Akira.Window window { get; construct; }
     private Gtk.Stack stack;
     private Gtk.Switch dark_theme_switch;
@@ -38,7 +38,7 @@ public class Akira.Widgets.SettingsDialog : Gtk.Dialog {
         Object (
             window: _window,
             border_width: 5,
-            deletable: false,
+            deletable: true,
             resizable: false,
             modal: true,
             title: _("Preferences")
@@ -65,14 +65,6 @@ public class Akira.Widgets.SettingsDialog : Gtk.Dialog {
         grid.attach (stack, 1, 2, 1, 1);
 
         get_content_area ().add (grid);
-
-        var close_button = (Gtk.Button) add_button (_("Close"), 0);
-        close_button.get_style_context ().add_class (Gtk.STYLE_CLASS_SUGGESTED_ACTION);
-
-        close_button.clicked.connect (() => {
-            destroy ();
-            window.event_bus.set_focus_on_canvas ();
-        });
     }
 
     private Gtk.Widget get_general_box () {

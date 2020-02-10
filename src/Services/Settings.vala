@@ -21,6 +21,7 @@
 */
 
 public class Akira.Services.Settings : GLib.Settings {
+    // Main window settings.
     public int pos_x {
         get { return get_int ("pos-x"); }
         set { set_int ("pos-x", value); }
@@ -45,6 +46,8 @@ public class Akira.Services.Settings : GLib.Settings {
         get { return get_int ("left-paned"); }
         set { set_int ("left-paned", value); }
     }
+
+    // Theme settings.
     public bool dark_theme {
         get { return get_boolean ("dark-theme"); }
         set { set_boolean ("dark-theme", value); }
@@ -61,6 +64,8 @@ public class Akira.Services.Settings : GLib.Settings {
         owned get { return get_string ("fill-color"); }
         set { set_string ("fill-color", value); }
     }
+
+    // Default shape settings.
     public bool set_border {
         get { return get_boolean ("set-border"); }
         set { set_boolean ("set-border", value); }
@@ -73,9 +78,45 @@ public class Akira.Services.Settings : GLib.Settings {
         owned get { return get_string ("border-color"); }
         set { set_string ("border-color", value); }
     }
+
+    // File settings.
     public bool open_quick {
         get { return get_boolean ("open-quick"); }
         set { set_boolean ("open-quick", value); }
+    }
+
+    // Export Settings.
+    public int export_width {
+        get { return get_int ("export-width"); }
+        set { set_int ("export-width", value); }
+    }
+    public int export_height {
+        get { return get_int ("export-height"); }
+        set { set_int ("export-height", value); }
+    }
+    public int export_paned {
+        get { return get_int ("export-paned"); }
+        set { set_int ("export-paned", value); }
+    }
+    public int export_quality {
+        get { return get_int ("export-quality"); }
+        set { set_int ("export-quality", value); }
+    }
+    public int export_compression {
+        get { return get_int ("export-compression"); }
+        set { set_int ("export-compression", value); }
+    }
+    public string export_format {
+        owned get { return get_string ("export-format"); }
+        set { set_string ("export-format", value); }
+    }
+    public int export_scale {
+        get { return get_int ("export-scale"); }
+        set { set_int ("export-scale", value); }
+    }
+    public bool export_alpha {
+        get { return get_boolean ("export-alpha"); }
+        set { set_boolean ("export-alpha", value); }
     }
 
     public Settings () {
