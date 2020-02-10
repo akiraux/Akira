@@ -130,7 +130,7 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
         file_format = new Gtk.ComboBoxText ();
         file_format.append ("png", "PNG");
         file_format.append ("jpg", "JPG");
-        //  file_format.changed.connect (update_format_ui);
+        file_format.changed.connect (update_format_ui);
         grid.attach (file_format, 1, 2, 1, 1);
         settings.bind ("export-format", file_format, "active_id", SettingsBindFlags.DEFAULT);
 
