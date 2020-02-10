@@ -99,8 +99,6 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
         });
 
         settings.bind ("export-paned", pane, "position", SettingsBindFlags.DEFAULT);
-
-        update_format_ui ();
     }
 
     private void build_export_sidebar () {
@@ -206,7 +204,7 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
         sidebar.add (grid);
     }
 
-    private void update_format_ui () {
+    public void update_format_ui () {
         jpg_title.visible = (file_format.active_id == "jpg");
         quality_scale.visible = (file_format.active_id == "jpg");
         quality_entry.visible = (file_format.active_id == "jpg");

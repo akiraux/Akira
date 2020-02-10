@@ -214,6 +214,9 @@ public class Akira.Services.ActionManager : Object {
         var export_dialog = new Akira.Dialogs.ExportDialog (window);
         export_dialog.show_all ();
         export_dialog.present ();
+
+        export_dialog.update_format_ui ();
+
         export_dialog.close.connect (() => {
             int width, height;
 
