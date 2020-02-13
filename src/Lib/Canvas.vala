@@ -46,6 +46,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
     public enum EditMode {
         MODE_SELECTION,
+        MODE_EXPORT_AREA,
         MODE_INSERT,
         MODE_PAN,
         MODE_PANNING,
@@ -124,6 +125,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 break;
 
             case EditMode.MODE_INSERT:
+            case EditMode.MODE_EXPORT_AREA:
                 new_cursor = Gdk.CursorType.CROSSHAIR;
                 break;
 
