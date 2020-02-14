@@ -87,6 +87,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
         window.event_bus.request_zoom.connect (on_request_zoom);
         window.event_bus.request_change_cursor.connect (on_request_change_cursor);
+        window.event_bus.request_change_mode.connect (on_request_change_mode);
         window.event_bus.set_focus_on_canvas.connect (on_set_focus_on_canvas);
         window.event_bus.request_escape.connect (on_set_focus_on_canvas);
     }
@@ -357,6 +358,10 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         }
 
         set_cursor (cursor_type);
+    }
+
+    private void on_request_change_mode (EditMode mode) {
+        edit_mode = mode;
     }
 
     private void set_cursor (Gdk.CursorType? cursor_type) {

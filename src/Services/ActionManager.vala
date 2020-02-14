@@ -209,7 +209,7 @@ public class Akira.Services.ActionManager : Object {
     }
 
     private void action_export_grab () {
-        window.main_window.main_canvas.canvas.edit_mode = Akira.Lib.Canvas.EditMode.MODE_EXPORT_AREA;
+        window.event_bus.request_change_mode (Akira.Lib.Canvas.EditMode.MODE_EXPORT_AREA);
 
         return;
         disable_typing_accels ();
@@ -261,12 +261,12 @@ public class Akira.Services.ActionManager : Object {
     }
 
     private void action_artboard_tool () {
-        //  window.main_window.main_canvas.canvas.edit_mode = Akira.Lib.Canvas.EditMode.MODE_INSERT;
+        //  window.event_bus.request_change_mode (Akira.Lib.Canvas.EditMode.MODE_INSERT);
         //  window.event_bus.insert_item ("artboard");
     }
 
     private void action_rect_tool () {
-        window.main_window.main_canvas.canvas.edit_mode = Akira.Lib.Canvas.EditMode.MODE_INSERT;
+        window.event_bus.request_change_mode (Akira.Lib.Canvas.EditMode.MODE_INSERT);
         window.event_bus.insert_item ("rectangle");
     }
 
@@ -281,12 +281,12 @@ public class Akira.Services.ActionManager : Object {
     }
 
     private void action_ellipse_tool () {
-        window.main_window.main_canvas.canvas.edit_mode = Akira.Lib.Canvas.EditMode.MODE_INSERT;
+        window.event_bus.request_change_mode (Akira.Lib.Canvas.EditMode.MODE_INSERT);
         window.event_bus.insert_item ("ellipse");
     }
 
     private void action_text_tool () {
-        window.main_window.main_canvas.canvas.edit_mode = Akira.Lib.Canvas.EditMode.MODE_INSERT;
+        window.event_bus.request_change_mode (Akira.Lib.Canvas.EditMode.MODE_INSERT);
         window.event_bus.insert_item ("text");
     }
 
@@ -299,7 +299,7 @@ public class Akira.Services.ActionManager : Object {
     }
 
     private void on_choose_image_response (Gtk.FileChooserNative dialog, int response_id) {
-        window.main_window.main_canvas.canvas.edit_mode = Akira.Lib.Canvas.EditMode.MODE_SELECTION;
+        window.event_bus.request_change_mode (Akira.Lib.Canvas.EditMode.MODE_SELECTION);
         switch (response_id) {
             case Gtk.ResponseType.ACCEPT:
             case Gtk.ResponseType.OK:
