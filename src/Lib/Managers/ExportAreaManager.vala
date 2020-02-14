@@ -19,4 +19,18 @@
  * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
  */
 
-public class Akira.Lib.Managers.ExportAreaManager : Object {}
+public class Akira.Lib.Managers.ExportAreaManager : Object {
+    private const string STROKE_COLOR = "#41c9fd";
+    private const double LINE_WIDTH = 2.0;
+
+    public weak Akira.Lib.Canvas canvas { get; construct; }
+
+    private double initial_event_x;
+    private double initial_event_y;
+
+    public HoverManager (Akira.Lib.Canvas canvas) {
+        Object (
+            canvas: canvas
+        );
+    }
+}
