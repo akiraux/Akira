@@ -74,6 +74,7 @@ sources = files(
 
     'Lib/Canvas.vala',
 
+    'Lib/Managers/ExportAreaManager.vala',
     'Lib/Managers/HoverManager.vala',
     'Lib/Managers/SelectedBoundManager.vala',
     'Lib/Managers/ItemsManager.vala',

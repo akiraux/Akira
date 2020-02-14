@@ -28,9 +28,29 @@ public class Akira.Lib.Managers.ExportAreaManager : Object {
     private double initial_event_x;
     private double initial_event_y;
 
-    public HoverManager (Akira.Lib.Canvas canvas) {
+    public ExportAreaManager (Akira.Lib.Canvas canvas) {
         Object (
             canvas: canvas
         );
+    }
+
+    public Goo.CanvasRect create_area (Gdk.EventButton event) {
+        var dash = new Goo.CanvasLineDash (2, 5.0, 5.0);
+
+        var area = new Goo.CanvasRect (
+            null,
+            Utils.AffineTransform.fix_size (event.x),
+            Utils.AffineTransform.fix_size (event.y),
+            0.0, 0.0,
+            "line-width", LINE_WIDTH,
+            "stroke-color", STROKE_COLOR,
+            "line-dash", dash,
+            null
+        );
+
+        area.set ("parent", canvas.get_root_item ());
+        area.can_focus = false;
+
+        return area;
     }
 }
