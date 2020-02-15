@@ -20,7 +20,7 @@
  */
 
 public class Akira.Lib.Managers.ExportAreaManager : Object {
-    private const string STROKE_COLOR = "#41c9fd";
+    private const string COLOR = "#41c9fd";
     private const double LINE_WIDTH = 2.0;
 
     public weak Akira.Lib.Canvas canvas { get; construct; }
@@ -36,6 +36,10 @@ public class Akira.Lib.Managers.ExportAreaManager : Object {
 
     public Goo.CanvasRect create_area (Gdk.EventButton event) {
         var dash = new Goo.CanvasLineDash (2, 5.0, 5.0);
+        var rgba_fill = Gdk.RGBA ();
+        rgba_fill.parse (COLOR);
+        rgba_fill.alpha = 0.1;
+        uint fill_color_rgba = Utils.Color.rgba_to_uint (rgba_fill);
 
         var area = new Goo.CanvasRect (
             null,
@@ -43,8 +47,9 @@ public class Akira.Lib.Managers.ExportAreaManager : Object {
             Utils.AffineTransform.fix_size (event.y),
             0.0, 0.0,
             "line-width", LINE_WIDTH,
-            "stroke-color", STROKE_COLOR,
+            "stroke-color", COLOR,
             "line-dash", dash,
+            "fill-color-rgba", fill_color_rgba,
             null
         );
 
