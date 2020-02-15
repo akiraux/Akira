@@ -271,11 +271,6 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 selected_bound_manager.reset_selection ();
 
                 var export_area = export_area_manager.create_area (event);
-                //  selected_bound_manager.add_item_to_selection (new_item);
-
-                //  selected_bound_manager.set_initial_coordinates (event.x, event.y);
-
-                //  nob_manager.selected_nob = Managers.NobManager.Nob.BOTTOM_RIGHT;
                 break;
         }
 
@@ -296,6 +291,11 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         switch (edit_mode) {
             case EditMode.MODE_PANNING:
                 edit_mode = EditMode.MODE_PAN;
+                break;
+
+            case EditMode.MODE_EXPORT_AREA:
+                export_area_manager.create_export_snapshot ();
+                edit_mode = EditMode.MODE_SELECTION;
                 break;
 
             default:
@@ -327,6 +327,10 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
             case EditMode.MODE_PANNING:
                 canvas_moved (event.x, event.y);
+                break;
+
+            case EditMode.MODE_EXPORT_AREA:
+                export_area_manager.resize_area (event.x, event.y);
                 break;
         }
 

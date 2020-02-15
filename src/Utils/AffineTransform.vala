@@ -293,7 +293,7 @@ public class Akira.Utils.AffineTransform : Object {
         item.set_transform (new_matrix);
     }
 
-    public static void set_size (double? width, double? height, CanvasItem item) {
+    public static void set_size (double? width, double? height, Goo.CanvasItem item) {
         if (width != null) {
             item.set ("width", (double) width);
         }
