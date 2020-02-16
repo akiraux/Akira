@@ -121,19 +121,29 @@ public class Akira.Lib.Managers.ExportAreaManager : Object {
     }
 
     public void create_export_snapshot () {
+        // Get the size of the area to export.
+
+        // Clear the area.
         area.remove ();
+
+        // Create pixbuf export.
+
+        // Open Export Dialog with the preview.
         trigger_export_dialog ();
     }
 
     public void trigger_export_dialog () {
+        // Disable all those accels interfering with regular typing.
         canvas.window.event_bus.disconnect_typing_accel ();
 
         var export_dialog = new Akira.Dialogs.ExportDialog (canvas.window);
         export_dialog.show_all ();
         export_dialog.present ();
 
+        // Update the dialog UI based on the stored gsettings options.
         export_dialog.update_format_ui ();
 
+        // Store the dialog size into gsettings users don't get upset.
         export_dialog.close.connect (() => {
             int width, height;
 
