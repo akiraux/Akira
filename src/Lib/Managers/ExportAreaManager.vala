@@ -99,6 +99,14 @@ public class Akira.Lib.Managers.ExportAreaManager : Object {
         Utils.AffineTransform.set_size (new_width, new_height, area);
     }
 
+    public void clear () {
+        if (area == null) {
+            return;
+        }
+
+        area.remove ();
+    }
+
     public void create_export_snapshot () {
         area.remove ();
         trigger_export_dialog ();

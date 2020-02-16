@@ -119,6 +119,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     }
 
     public void set_cursor_by_edit_mode () {
+        hover_manager.remove_hover_effect ();
         // debug ("Calling set_cursor_by_edit_mode");
         Gdk.CursorType? new_cursor;
 
@@ -157,6 +158,8 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         switch (uppercase_keyval) {
             case Gdk.Key.Escape:
                 edit_mode = Akira.Lib.Canvas.EditMode.MODE_SELECTION;
+                // Clear the selected export area to be sure to not leave anything behind.
+                export_area_manager.clear ();
                 break;
 
             case Gdk.Key.Delete:
@@ -312,9 +315,14 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
         window.event_bus.coordinate_change (event.x, event.y);
 
+        // Hover effect on items only if we're not holding any button and
+        // the user is currently in selection mode.
+        if (edit_mode == EditMode.MODE_SELECTION && !holding) {
+            hover_manager.add_hover_effect (event.x, event.y);
+        }
+
         if (!holding) {
             // Only motion_hover_effect
-            hover_manager.add_hover_effect (event.x, event.y);
             return false;
         }
 
@@ -341,6 +349,8 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         edit_mode = EditMode.MODE_SELECTION;
         ctrl_is_pressed = false;
         focus_canvas ();
+        // Clear the selected export area to be sure to not leave anything behind.
+        export_area_manager.clear ();
     }
 
     public void focus_canvas () {
