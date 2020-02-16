@@ -22,6 +22,7 @@
 public class Akira.Lib.Managers.ExportAreaManager : Object {
     private const string COLOR = "#41c9fd";
     private const double LINE_WIDTH = 2.0;
+    private const double MIN_SIZE = 1.0;
 
     public weak Akira.Lib.Canvas canvas { get; construct; }
 
@@ -85,12 +86,24 @@ public class Akira.Lib.Managers.ExportAreaManager : Object {
 
         new_width = initial_width + delta_x;
         new_height = initial_height + delta_y;
-        if (canvas.ctrl_is_pressed && new_height > 1) {
+        if (canvas.ctrl_is_pressed && new_height > MIN_SIZE) {
             new_height = new_width;
+        }
+
+        if (new_width < initial_width) {
+            new_width = initial_width - delta_x;
+            origin_move_delta_x = item_width - new_width;
+        }
+
+        if (new_height < MIN_SIZE) {
+            new_height = initial_height - delta_y;
+            origin_move_delta_y = item_height - new_height;
         }
 
         new_width = Utils.AffineTransform.fix_size (new_width);
         new_height = Utils.AffineTransform.fix_size (new_height);
+        origin_move_delta_x = Utils.AffineTransform.fix_size (origin_move_delta_x);
+        origin_move_delta_y = Utils.AffineTransform.fix_size (origin_move_delta_y);
 
         canvas.convert_from_item_space (area, ref initial_x, ref initial_y);
         area.translate (origin_move_delta_x, origin_move_delta_y);
