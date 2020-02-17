@@ -178,6 +178,9 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
         alpha_switch.halign = Gtk.Align.START;
         grid.attach (alpha_switch, 1, 5, 1, 1);
         settings.bind ("export-alpha", alpha_switch, "active", SettingsBindFlags.DEFAULT);
+        settings.changed["export-alpha"].connect (() => {
+            manager.update_pixbuf ();
+        });
 
         // Resolution.
         var size_title = section_title (_("Scale:"));

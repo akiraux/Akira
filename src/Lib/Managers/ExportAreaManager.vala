@@ -149,6 +149,15 @@ public class Akira.Lib.Managers.ExportAreaManager : Object {
             (int) Math.round (area.height)
         );
         context = new Cairo.Context (surface);
+
+        // Draw a white background if JPG export.
+        if (settings.export_format == "jpg" || !settings.export_alpha) {
+            context.set_source_rgba (1, 1, 1, 1);
+            context.rectangle (0, 0, (int) Math.round (area.width), (int) Math.round (area.height));
+            context.fill ();
+        }
+
+        // Move to the currently selected area.
         context.translate (-area.bounds.x1, -area.bounds.y1);
 
         // Render the selected area.
