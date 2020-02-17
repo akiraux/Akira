@@ -32,6 +32,8 @@ public class Akira.Lib.Managers.ExportAreaManager : Object {
     private double initial_height;
 
     public Goo.CanvasRect area;
+    public Cairo.Surface surface;
+    public Cairo.Context context;
 
     public ExportAreaManager (Akira.Lib.Canvas canvas) {
         Object (
@@ -121,15 +123,25 @@ public class Akira.Lib.Managers.ExportAreaManager : Object {
     }
 
     public void create_export_snapshot () {
-        // Get the size of the area to export.
+        // Create the rendered image with Cairo.
+        surface = new Cairo.ImageSurface (
+            Cairo.Format.ARGB32,
+            (int) Math.round (area.width),
+            (int) Math.round (area.height)
+        );
+        context = new Cairo.Context (surface);
+        context.translate (-area.bounds.x1, -area.bounds.y1);
 
-        // Clear the area.
-        area.remove ();
+        // Hide the area before rendering.
+        area.visibility = Goo.CanvasItemVisibility.INVISIBLE;
 
-        // Create pixbuf export.
+        canvas.render (context, null, 1.0);
+        surface.write_to_png ("img.png");
+        // Create pixbuf from stream.
+
 
         // Open Export Dialog with the preview.
-        trigger_export_dialog ();
+        //  trigger_export_dialog ();
     }
 
     public void trigger_export_dialog () {
@@ -153,6 +165,7 @@ public class Akira.Lib.Managers.ExportAreaManager : Object {
 
             canvas.window.event_bus.connect_typing_accel ();
             canvas.window.event_bus.set_focus_on_canvas ();
+            clear ();
         });
     }
 }
