@@ -177,6 +177,7 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
 
         var scale_button = new Granite.Widgets.ModeButton ();
         scale_button.halign = Gtk.Align.FILL;
+        scale_button.append_text ("0.5×");
         scale_button.append_text ("1×");
         scale_button.append_text ("2×");
         scale_button.append_text ("4×");
@@ -204,25 +205,7 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
         export_button.halign = Gtk.Align.END;
         action_area.add (export_button);
         export_button.clicked.connect (() => {
-            try {
-                if (settings.export_format == "png") {
-                    manager.pixbuf.save (
-                        "test.png",
-                        "png",
-                        "compression",
-                        settings.export_compression.to_string (),
-                        null);
-                } else if (settings.export_format == "jpg") {
-                    manager.pixbuf.save (
-                        "test.jpg",
-                        "jpeg",
-                        "quality",
-                        settings.export_quality.to_string (),
-                        null);
-                }
-            } catch (Error e) {
-                error ("Unable to export images: %s", e.message);
-            }
+            manager.export_images ();
             close ();
         });
 

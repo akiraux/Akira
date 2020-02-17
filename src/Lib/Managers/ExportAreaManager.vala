@@ -138,7 +138,7 @@ public class Akira.Lib.Managers.ExportAreaManager : Object {
         area.visibility = Goo.CanvasItemVisibility.INVISIBLE;
 
         // Render the selected area.
-        canvas.render (context, null, settings.export_scale);
+        canvas.render (context, null, canvas.current_scale);
 
         // Create pixbuf from stream.
         try {
@@ -155,7 +155,7 @@ public class Akira.Lib.Managers.ExportAreaManager : Object {
             }
             return Cairo.Status.SUCCESS;
         });
-        pixbuf = loader.get_pixbuf ();
+        pixbuf = rescale_image (loader.get_pixbuf ());
 
         try {
             loader.close ();
@@ -165,6 +165,46 @@ public class Akira.Lib.Managers.ExportAreaManager : Object {
 
         // Open Export Dialog with the preview.
         trigger_export_dialog ();
+    }
+
+    public Gdk.Pixbuf rescale_image (Gdk.Pixbuf pixbuf) {
+        Gdk.Pixbuf scaled_image;
+
+        switch (settings.export_scale) {
+            case 0:
+                scaled_image = pixbuf.scale_simple (
+                    (int) area.width / 2,
+                    (int) area.height / 2,
+                    Gdk.InterpType.BILINEAR
+                );
+            break;
+
+            case 2:
+                scaled_image = pixbuf.scale_simple (
+                    (int) area.width * 2,
+                    (int) area.height * 2,
+                    Gdk.InterpType.BILINEAR
+                );
+            break;
+
+            case 3:
+                scaled_image = pixbuf.scale_simple (
+                    (int) area.width * 4,
+                    (int) area.height * 4,
+                    Gdk.InterpType.BILINEAR
+                );
+            break;
+
+            default:
+                scaled_image = pixbuf.scale_simple (
+                    (int) area.width * 1,
+                    (int) area.height * 1,
+                    Gdk.InterpType.BILINEAR
+                );
+            break;
+        }
+
+        return scaled_image;
     }
 
     public void trigger_export_dialog () {
@@ -195,5 +235,28 @@ public class Akira.Lib.Managers.ExportAreaManager : Object {
             surface = null;
             clear ();
         });
+    }
+
+    public void export_images () {
+        pixbuf = rescale_image (pixbuf);
+        try {
+            if (settings.export_format == "png") {
+                pixbuf.save (
+                    "test.png",
+                    "png",
+                    "compression",
+                    settings.export_compression.to_string (),
+                    null);
+            } else if (settings.export_format == "jpg") {
+                pixbuf.save (
+                    "test.jpg",
+                    "jpeg",
+                    "quality",
+                    settings.export_quality.to_string (),
+                    null);
+            }
+        } catch (Error e) {
+            error ("Unable to export images: %s", e.message);
+        }
     }
 }
