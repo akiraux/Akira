@@ -34,6 +34,7 @@ public class Akira.Lib.Managers.ExportAreaManager : Object {
     public Goo.CanvasRect area;
     public Cairo.Surface surface;
     public Cairo.Context context;
+    public Gdk.PixbufLoader loader;
     public Gdk.Pixbuf pixbuf;
 
     public ExportAreaManager (Akira.Lib.Canvas canvas) {
@@ -140,7 +141,12 @@ public class Akira.Lib.Managers.ExportAreaManager : Object {
         canvas.render (context, null, settings.export_scale);
 
         // Create pixbuf from stream.
-        var loader = new Gdk.PixbufLoader.with_mime_type("image/png");
+        try {
+            loader = new Gdk.PixbufLoader.with_mime_type ("image/png");
+        } catch (Error e) {
+            error ("Unable to generate PixbufLoader: %s", e.message);
+        }
+
         surface.write_to_png_stream ((data) => {
             try {
                 loader.write ((uint8 []) data);
@@ -150,10 +156,12 @@ public class Akira.Lib.Managers.ExportAreaManager : Object {
             return Cairo.Status.SUCCESS;
         });
         pixbuf = loader.get_pixbuf ();
-        loader.close ();
 
-        //  pixbuf.save ("test.jpg", "jpeg", "quality", "100", null);
-        //  pixbuf.save ("test.png", "png", "compression", "0", null);
+        try {
+            loader.close ();
+        } catch (Error e) {
+            error ("Unable to close PixbufLoader: %s", e.message);
+        }
 
         // Open Export Dialog with the preview.
         trigger_export_dialog ();

@@ -265,15 +265,13 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 break;
 
             case EditMode.MODE_PAN:
-                //set_cursor_by_edit_mode ();
                 edit_mode = EditMode.MODE_PANNING;
                 canvas_scroll_set_origin (event.x, event.y);
                 break;
 
             case EditMode.MODE_EXPORT_AREA:
                 selected_bound_manager.reset_selection ();
-
-                var export_area = export_area_manager.create_area (event);
+                export_area_manager.create_area (event);
                 break;
         }
 
