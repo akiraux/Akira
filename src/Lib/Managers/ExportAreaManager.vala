@@ -25,6 +25,7 @@ public class Akira.Lib.Managers.ExportAreaManager : Object {
     private const double MIN_SIZE = 1.0;
 
     public weak Akira.Lib.Canvas canvas { get; construct; }
+    public Akira.Dialogs.ExportDialog export_dialog;
 
     private double initial_x;
     private double initial_y;
@@ -32,6 +33,7 @@ public class Akira.Lib.Managers.ExportAreaManager : Object {
     private double initial_height;
 
     public Goo.CanvasRect area;
+    public Cairo.Format format;
     public Cairo.Surface surface;
     public Cairo.Context context;
     public Gdk.PixbufLoader loader;
@@ -125,17 +127,29 @@ public class Akira.Lib.Managers.ExportAreaManager : Object {
     }
 
     public void create_export_snapshot () {
+        // Hide the area before rendering.
+        area.visibility = Goo.CanvasItemVisibility.INVISIBLE;
+        // Generate the image to export.
+        generate_pixbuf ();
+        // Open Export Dialog with the preview.
+        trigger_export_dialog ();
+    }
+
+    public void generate_pixbuf () {
+        if (settings.export_format == "png") {
+            format = Cairo.Format.ARGB32;
+        } else if (settings.export_format == "jpg") {
+            format = Cairo.Format.RGB24;
+        }
+
         // Create the rendered image with Cairo.
         surface = new Cairo.ImageSurface (
-            Cairo.Format.ARGB32,
+            format,
             (int) Math.round (area.width),
             (int) Math.round (area.height)
         );
         context = new Cairo.Context (surface);
         context.translate (-area.bounds.x1, -area.bounds.y1);
-
-        // Hide the area before rendering.
-        area.visibility = Goo.CanvasItemVisibility.INVISIBLE;
 
         // Render the selected area.
         canvas.render (context, null, canvas.current_scale);
@@ -162,9 +176,11 @@ public class Akira.Lib.Managers.ExportAreaManager : Object {
         } catch (Error e) {
             error ("Unable to close PixbufLoader: %s", e.message);
         }
+    }
 
-        // Open Export Dialog with the preview.
-        trigger_export_dialog ();
+    public void update_pixbuf () {
+        generate_pixbuf ();
+        export_dialog.generate_export_preview ();
     }
 
     public Gdk.Pixbuf rescale_image (Gdk.Pixbuf pixbuf) {
@@ -211,7 +227,7 @@ public class Akira.Lib.Managers.ExportAreaManager : Object {
         // Disable all those accels interfering with regular typing.
         canvas.window.event_bus.disconnect_typing_accel ();
 
-        var export_dialog = new Akira.Dialogs.ExportDialog (canvas.window, this);
+        export_dialog = new Akira.Dialogs.ExportDialog (canvas.window, this);
         export_dialog.show_all ();
         export_dialog.present ();
 
@@ -242,14 +258,14 @@ public class Akira.Lib.Managers.ExportAreaManager : Object {
         try {
             if (settings.export_format == "png") {
                 pixbuf.save (
-                    "test.png",
+                    settings.export_folder + "/test.png",
                     "png",
                     "compression",
                     settings.export_compression.to_string (),
                     null);
             } else if (settings.export_format == "jpg") {
                 pixbuf.save (
-                    "test.jpg",
+                    settings.export_folder + "/test.jpg",
                     "jpeg",
                     "quality",
                     settings.export_quality.to_string (),

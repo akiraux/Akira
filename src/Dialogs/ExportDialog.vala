@@ -114,15 +114,20 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
         // Folder location.
         grid.attach (section_title (_("Export to:")), 0, 0, 1, 1);
 
+        if (settings.export_folder == "") {
+            settings.export_folder = Environment.get_user_special_dir (UserDirectory.PICTURES);
+        }
+
         folder_button = new Gtk.FileChooserButton (
             _("Select Folder"),
             Gtk.FileChooserAction.SELECT_FOLDER
         );
-        folder_button.set_current_folder (
-            Environment.get_user_special_dir (UserDirectory.PICTURES)
-        );
+        folder_button.set_current_folder (settings.export_folder);
         folder_button.hexpand = true;
         grid.attach (folder_button, 1, 0, 1, 1);
+        folder_button.selection_changed.connect (() => {
+            settings.export_folder = folder_button.get_filename ();
+        });
 
         // File format.
         var format_title = section_title (_("Format:"));
@@ -134,6 +139,9 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
         file_format.changed.connect (update_format_ui);
         grid.attach (file_format, 1, 2, 1, 1);
         settings.bind ("export-format", file_format, "active_id", SettingsBindFlags.DEFAULT);
+        settings.changed["export-format"].connect (() => {
+            manager.update_pixbuf ();
+        });
 
         // Quality spinbutton.
         jpg_title = section_title (_("Quality:"));
@@ -184,6 +192,9 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
         scale_button.set_active (settings.export_scale);
         settings.bind ("export-scale", scale_button, "selected", SettingsBindFlags.DEFAULT);
         grid.attach (scale_button, 1, 6, 1, 1);
+        settings.changed["export-scale"].connect (() => {
+            manager.update_pixbuf ();
+        });
 
         // Buttons.
         var action_area = new Gtk.Grid ();
@@ -224,6 +235,10 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
     }
 
     public void generate_export_preview () {
+        main.@foreach (child => {
+            main.remove (child);
+        });
+
         var preview = new Gtk.Image.from_pixbuf (manager.pixbuf);
         main.add (preview);
         main.show_all ();

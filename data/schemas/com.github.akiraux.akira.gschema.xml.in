@@ -83,6 +83,12 @@
             <description>Automatically reopen the latest file on startup.</description>
         </key>
 
+        <key name="export-folder" type="s">
+            <default>''</default>
+            <summary>Default export folder.</summary>
+            <description>The default folder where exported images will be saved.</description>
+        </key>
+
         <key name="export-width" type="i">
             <default>1000</default>
             <summary>The saved width of the export dialog.</summary>
