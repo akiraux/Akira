@@ -34,6 +34,7 @@ public class Akira.Lib.Managers.ExportAreaManager : Object {
     public Goo.CanvasRect area;
     public Cairo.Surface surface;
     public Cairo.Context context;
+    public Gdk.Pixbuf pixbuf;
 
     public ExportAreaManager (Akira.Lib.Canvas canvas) {
         Object (
@@ -135,25 +136,40 @@ public class Akira.Lib.Managers.ExportAreaManager : Object {
         // Hide the area before rendering.
         area.visibility = Goo.CanvasItemVisibility.INVISIBLE;
 
-        canvas.render (context, null, 1.0);
-        surface.write_to_png ("img.png");
-        // Create pixbuf from stream.
+        // Render the selected area.
+        canvas.render (context, null, settings.export_scale);
 
+        // Create pixbuf from stream.
+        var loader = new Gdk.PixbufLoader.with_mime_type("image/png");
+        surface.write_to_png_stream ((data) => {
+            try {
+                loader.write ((uint8 []) data);
+            } catch (Error e) {
+                return Cairo.Status.DEVICE_ERROR;
+            }
+            return Cairo.Status.SUCCESS;
+        });
+        pixbuf = loader.get_pixbuf ();
+        loader.close ();
+
+        //  pixbuf.save ("test.jpg", "jpeg", "quality", "100", null);
+        //  pixbuf.save ("test.png", "png", "compression", "0", null);
 
         // Open Export Dialog with the preview.
-        //  trigger_export_dialog ();
+        trigger_export_dialog ();
     }
 
     public void trigger_export_dialog () {
         // Disable all those accels interfering with regular typing.
         canvas.window.event_bus.disconnect_typing_accel ();
 
-        var export_dialog = new Akira.Dialogs.ExportDialog (canvas.window);
+        var export_dialog = new Akira.Dialogs.ExportDialog (canvas.window, this);
         export_dialog.show_all ();
         export_dialog.present ();
 
         // Update the dialog UI based on the stored gsettings options.
         export_dialog.update_format_ui ();
+        export_dialog.generate_export_preview ();
 
         // Store the dialog size into gsettings users don't get upset.
         export_dialog.close.connect (() => {
@@ -165,6 +181,10 @@ public class Akira.Lib.Managers.ExportAreaManager : Object {
 
             canvas.window.event_bus.connect_typing_accel ();
             canvas.window.event_bus.set_focus_on_canvas ();
+
+            // Clean up the Manager.
+            context = null;
+            surface = null;
             clear ();
         });
     }

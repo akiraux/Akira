@@ -21,7 +21,9 @@
 
 public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
     public weak Akira.Window window { get; construct; }
+    public weak Akira.Lib.Managers.ExportAreaManager manager { get; construct; }
 
+    private Gtk.Grid main;
     private Gtk.Grid sidebar;
     public Gtk.FileChooserButton folder_button;
     public Gtk.Adjustment quality_adj;
@@ -35,9 +37,10 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
     public Gtk.Label alpha_title;
     public Gtk.Switch alpha_switch;
 
-    public ExportDialog (Akira.Window window) {
+    public ExportDialog (Akira.Window window, Akira.Lib.Managers.ExportAreaManager manager) {
         Object (
             window: window,
+            manager: manager,
             border_width: 0,
             deletable: true,
             resizable: true,
@@ -80,8 +83,8 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
         sidebar.get_style_context ().add_class ("sidebar-export");
         build_export_sidebar ();
 
-        var main = new Gtk.Grid ();
-        main.vexpand = true;
+        main = new Gtk.Grid ();
+        main.expand = true;
         main.get_style_context ().add_class ("layers-panel");
 
         var pane = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);
@@ -213,6 +216,12 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
         compression_scale.visible = (file_format.active_id == "png");
         alpha_title.visible = (file_format.active_id == "png");
         alpha_switch.visible = (file_format.active_id == "png");
+    }
+
+    public void generate_export_preview () {
+        var preview = new Gtk.Image.from_pixbuf (manager.pixbuf);
+        main.add (preview);
+        main.show_all ();
     }
 
     private Gtk.Label section_title (string title) {
