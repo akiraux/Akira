@@ -23,6 +23,7 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
     public weak Akira.Window window { get; construct; }
     public weak Akira.Lib.Managers.ExportAreaManager manager { get; construct; }
 
+    private Gtk.FlowBox flow_box;
     private Gtk.Grid main;
     private Gtk.Grid sidebar;
     public Gtk.FileChooserButton folder_button;
@@ -61,7 +62,6 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
 
         var main_header = new Gtk.Grid ();
         main_header.vexpand = true;
-        main_header.get_style_context ().add_class ("layers-panel");
 
         var pane_header = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);
         pane_header.pack1 (sidebar_header, false, false);
@@ -83,9 +83,23 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
         sidebar.get_style_context ().add_class ("sidebar-export");
         build_export_sidebar ();
 
-        main = new Gtk.Grid ();
+        var main = new Gtk.Grid ();
         main.expand = true;
-        main.get_style_context ().add_class ("layers-panel");
+
+        flow_box = new Gtk.FlowBox ();
+        flow_box.homogeneous = true;
+        flow_box.column_spacing = 10;
+        flow_box.row_spacing = 10;
+        flow_box.min_children_per_line = 1;
+        flow_box.max_children_per_line = 3;
+        flow_box.selection_mode = Gtk.SelectionMode.NONE;
+        flow_box.get_style_context ().add_class ("export-panel");
+
+        var scrolled = new Gtk.ScrolledWindow (null, null);
+        scrolled.expand = true;
+        scrolled.get_style_context ().add_class (Gtk.STYLE_CLASS_VIEW);
+        scrolled.add (flow_box);
+        main.add (scrolled);
 
         var pane = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);
         pane.pack1 (sidebar, false, false);
@@ -238,13 +252,16 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
     }
 
     public void generate_export_preview () {
-        main.@foreach (child => {
-            main.remove (child);
+        flow_box.@foreach (child => {
+            flow_box.remove (child);
         });
 
         var preview = new Gtk.Image.from_pixbuf (manager.pixbuf);
-        main.add (preview);
-        main.show_all ();
+        preview.halign = preview.valign = Gtk.Align.CENTER;
+        preview.get_style_context ().add_class (Granite.STYLE_CLASS_CHECKERBOARD);
+        preview.get_style_context ().add_class (Granite.STYLE_CLASS_CARD);
+        flow_box.add (preview);
+        flow_box.show_all ();
     }
 
     private Gtk.Label section_title (string title) {
