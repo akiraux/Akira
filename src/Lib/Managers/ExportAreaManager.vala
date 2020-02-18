@@ -129,13 +129,34 @@ public class Akira.Lib.Managers.ExportAreaManager : Object {
     public void create_export_snapshot () {
         // Hide the area before rendering.
         area.visibility = Goo.CanvasItemVisibility.INVISIBLE;
-        // Generate the image to export.
-        generate_pixbuf.begin ();
-        // Open Export Dialog with the preview.
+        // Open Export Dialog before we have the preview.
         trigger_export_dialog ();
+        // Generate the image to export.
+        init_generate_pixbuf.begin ();
     }
 
-    public async void generate_pixbuf () {
+    /**
+     * Use multithreading to handle async pixbuf loading without freezing the UI.
+    */
+    public async void init_generate_pixbuf () throws ThreadError {
+        SourceFunc callback = init_generate_pixbuf.callback;
+
+		new Thread <void*> (null, () => {
+			try {
+                generate_pixbuf ();
+                export_dialog.generate_export_preview ();
+			} catch (Error e) {
+                error ("Could not generate export preview: %s", e.message);
+			}
+
+			Idle.add ((owned) callback);
+			return null;
+		});
+
+		yield;
+    }
+
+    public void generate_pixbuf () throws Error {
         if (settings.export_format == "png") {
             format = Cairo.Format.ARGB32;
         } else if (settings.export_format == "jpg") {
@@ -167,7 +188,7 @@ public class Akira.Lib.Managers.ExportAreaManager : Object {
         try {
             loader = new Gdk.PixbufLoader.with_mime_type ("image/png");
         } catch (Error e) {
-            error ("Unable to generate PixbufLoader: %s", e.message);
+            throw (e);
         }
 
         surface.write_to_png_stream ((data) => {
@@ -183,13 +204,8 @@ public class Akira.Lib.Managers.ExportAreaManager : Object {
         try {
             loader.close ();
         } catch (Error e) {
-            error ("Unable to close PixbufLoader: %s", e.message);
+            throw (e);
         }
-    }
-
-    public async void update_pixbuf () {
-        yield generate_pixbuf ();
-        export_dialog.generate_export_preview ();
     }
 
     public Gdk.Pixbuf rescale_image (Gdk.Pixbuf pixbuf) {
@@ -242,7 +258,6 @@ public class Akira.Lib.Managers.ExportAreaManager : Object {
 
         // Update the dialog UI based on the stored gsettings options.
         export_dialog.update_format_ui ();
-        export_dialog.generate_export_preview ();
 
         // Store the dialog size into gsettings users don't get upset.
         export_dialog.close.connect (() => {
