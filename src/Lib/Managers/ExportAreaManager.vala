@@ -57,7 +57,7 @@ public class Akira.Lib.Managers.ExportAreaManager : Object {
             Utils.AffineTransform.fix_size (event.x),
             Utils.AffineTransform.fix_size (event.y),
             1.0, 1.0,
-            "line-width", LINE_WIDTH,
+            "line-width", LINE_WIDTH / canvas.current_scale,
             "stroke-color", COLOR,
             "line-dash", dash,
             "fill-color-rgba", fill_color_rgba,

@@ -340,7 +340,7 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
         grid.name = "main";
 
         var export_selection = create_model_button (
-            _("Export Selection"),
+            _("Export Current Selection"),
             null,
             Akira.Services.ActionManager.ACTION_PREFIX
             + Akira.Services.ActionManager.ACTION_EXPORT_SELECTION);
@@ -355,7 +355,7 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
         separator.margin_top = separator.margin_bottom = 3;
 
         var export_area_grab = create_model_button (
-            _("Export Area to Grab"),
+            _("Highlight Area to Export"),
             null,
             Akira.Services.ActionManager.ACTION_PREFIX
             + Akira.Services.ActionManager.ACTION_EXPORT_GRAB
