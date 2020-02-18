@@ -130,12 +130,12 @@ public class Akira.Lib.Managers.ExportAreaManager : Object {
         // Hide the area before rendering.
         area.visibility = Goo.CanvasItemVisibility.INVISIBLE;
         // Generate the image to export.
-        generate_pixbuf ();
+        generate_pixbuf.begin ();
         // Open Export Dialog with the preview.
         trigger_export_dialog ();
     }
 
-    public void generate_pixbuf () {
+    public async void generate_pixbuf () {
         if (settings.export_format == "png") {
             format = Cairo.Format.ARGB32;
         } else if (settings.export_format == "jpg") {
@@ -187,8 +187,8 @@ public class Akira.Lib.Managers.ExportAreaManager : Object {
         }
     }
 
-    public void update_pixbuf () {
-        generate_pixbuf ();
+    public async void update_pixbuf () {
+        yield generate_pixbuf ();
         export_dialog.generate_export_preview ();
     }
 
