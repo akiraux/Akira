@@ -101,3 +101,7 @@ paned > separator {
 .export-panel {
     background-color: @bg_color;
 }
+
+.export-panel flowboxchild:focus {
+    background-color: transparent;
+}

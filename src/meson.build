@@ -62,12 +62,14 @@ sources = files(
     'Partials/ColorField.vala',
     'Partials/LinkedInput.vala',
     'Partials/PanelSeparator.vala',
+    'Partials/ExportWidget.vala',
 
     'Models/LayerModel.vala',
     'Models/BordersItemModel.vala',
     'Models/FillsItemModel.vala',
     'Models/ItemModel.vala',
     'Models/ListModel.vala',
+    'Models/ExportModel.vala',
 
     'Dialogs/SettingsDialog.vala',
     'Dialogs/ExportDialog.vala',

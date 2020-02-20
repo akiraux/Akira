@@ -141,19 +141,37 @@ public class Akira.Lib.Managers.ExportAreaManager : Object {
     public async void init_generate_pixbuf () throws ThreadError {
         SourceFunc callback = init_generate_pixbuf.callback;
 
-		new Thread <void*> (null, () => {
-			try {
+        new Thread <void*> (null, () => {
+            try {
                 generate_pixbuf ();
-                export_dialog.generate_export_preview ();
-			} catch (Error e) {
+                export_dialog.generate_export_preview.begin ();
+            } catch (Error e) {
                 error ("Could not generate export preview: %s", e.message);
-			}
+            }
 
-			Idle.add ((owned) callback);
-			return null;
-		});
+            Idle.add ((owned) callback);
+            return null;
+        });
 
-		yield;
+        yield;
+    }
+
+    public async void init_update_pixbuf () throws ThreadError {
+        SourceFunc callback = init_update_pixbuf.callback;
+
+        new Thread <void*> (null, () => {
+            try {
+                generate_pixbuf ();
+                export_dialog.update_export_preview.begin ();
+            } catch (Error e) {
+                error ("Could not update export preview: %s", e.message);
+            }
+
+            Idle.add ((owned) callback);
+            return null;
+        });
+
+        yield;
     }
 
     public void generate_pixbuf () throws Error {
