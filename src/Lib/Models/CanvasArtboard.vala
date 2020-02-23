@@ -58,6 +58,7 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
     public bool selected { get; set; }
     public bool locked { get; set; }
     public string layer_icon { get; set; default = "shape-rectangle-symbolic"; }
+    public int z_index { get; set; }
 
     // Shape's unique identifiers.
     public bool is_radius_uniform { get; set; }
@@ -68,14 +69,20 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
     public double y { get; set; }
     public double width { get; set; }
     public double height { get; set; }
+    public Goo.CanvasItem parent { get; set; }
 
     private double label_height;
 
     public CanvasArtboard (
         double _x = 0,
         double _y = 0,
-        Goo.CanvasItem? parent = null
+        Goo.CanvasItem? _parent = null
     ) {
+        parent = _parent;
+
+        canvas = parent.get_canvas ();
+        parent.add_child (this, -1);
+
         item_type = Models.CanvasItemType.ARTBOARD;
         id = Models.CanvasItem.create_item_id (this);
         Models.CanvasItem.init_item (this);
@@ -84,9 +91,6 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
         height = 1;
         x = 0;
         y = 0;
-
-        canvas = parent.get_canvas ();
-        parent.add_child (this, -1);
 
         show_border_radius_panel = false;
         show_fill_panel = false;
