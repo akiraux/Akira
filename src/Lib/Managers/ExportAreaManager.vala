@@ -144,7 +144,6 @@ public class Akira.Lib.Managers.ExportAreaManager : Object {
         new Thread <void*> (null, () => {
             try {
                 generate_pixbuf ();
-                export_dialog.generate_export_preview.begin ();
             } catch (Error e) {
                 error ("Could not generate export preview: %s", e.message);
             }
@@ -154,6 +153,8 @@ public class Akira.Lib.Managers.ExportAreaManager : Object {
         });
 
         yield;
+
+        export_dialog.generate_export_preview.begin ();
     }
 
     public async void init_update_pixbuf () throws ThreadError {
@@ -162,7 +163,6 @@ public class Akira.Lib.Managers.ExportAreaManager : Object {
         new Thread <void*> (null, () => {
             try {
                 generate_pixbuf ();
-                export_dialog.update_export_preview.begin ();
             } catch (Error e) {
                 error ("Could not update export preview: %s", e.message);
             }
@@ -172,9 +172,12 @@ public class Akira.Lib.Managers.ExportAreaManager : Object {
         });
 
         yield;
+
+        export_dialog.update_export_preview.begin ();
     }
 
     public void generate_pixbuf () throws Error {
+        canvas.window.event_bus.generating_preview ();
         if (settings.export_format == "png") {
             format = Cairo.Format.ARGB32;
         } else if (settings.export_format == "jpg") {
@@ -224,6 +227,7 @@ public class Akira.Lib.Managers.ExportAreaManager : Object {
         } catch (Error e) {
             throw (e);
         }
+        canvas.window.event_bus.preview_completed ();
     }
 
     public Gdk.Pixbuf rescale_image (Gdk.Pixbuf pixbuf) {

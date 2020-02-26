@@ -51,6 +51,9 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
     }
 
     construct {
+        window.event_bus.generating_preview.connect (on_generating_preview);
+        window.event_bus.preview_completed.connect (on_preview_completed);
+
         transient_for = window;
         use_header_bar = 1;
         default_width = settings.export_width;
@@ -275,5 +278,13 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
         title_label.halign = Gtk.Align.END;
 
         return title_label;
+    }
+
+    private void on_generating_preview () {
+        debug ("disable UI");
+    }
+
+    private void on_preview_completed () {
+        debug ("enable UI");
     }
 }

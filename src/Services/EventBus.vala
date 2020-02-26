@@ -64,6 +64,10 @@ public class Akira.Services.EventBus : Object {
     public signal void disconnect_typing_accel ();
     public signal void connect_typing_accel ();
 
+    // Export signals.
+    public signal void generating_preview ();
+    public signal void preview_completed ();
+
     public void test (string caller_id) {
         debug (@"Test from EventBus called by $(caller_id)");
     }
