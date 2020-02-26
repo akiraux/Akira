@@ -43,12 +43,20 @@ public class Akira.Partials.ExportWidget : Gtk.Grid {
         image_container = new Gtk.Grid ();
         image_container.get_style_context ().add_class (Granite.STYLE_CLASS_CHECKERBOARD);
         get_image.begin ();
+        model.notify["pixbuf"].connect (() => {
+            image_container.@foreach ((image) => {
+                image_container.remove (image);
+            });
+            get_image.begin ();
+            show_all ();
+        });
 
         // Filename with editable entry.
         var input = new Gtk.Entry ();
         input.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
         input.margin = 3;
-        input.text = model.filename;
+        model.bind_property ("filename", input, "text",
+            BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE);
 
         attach (image_container, 0, 0);
         attach (input, 0, 1);
