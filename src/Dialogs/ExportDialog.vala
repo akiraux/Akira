@@ -39,6 +39,9 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
     public Gtk.Label alpha_title;
     public Gtk.Switch alpha_switch;
 
+    private Gtk.Overlay main_overlay;
+    private Granite.Widgets.OverlayBar overlaybar;
+
     public ExportDialog (Akira.Window window, Akira.Lib.Managers.ExportAreaManager manager) {
         Object (
             window: window,
@@ -87,6 +90,11 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
         sidebar.get_style_context ().add_class ("sidebar-export");
         build_export_sidebar ();
 
+        main_overlay = new Gtk.Overlay ();
+        overlaybar = new Granite.Widgets.OverlayBar (main_overlay);
+        overlaybar.label = _("Generating preview, please wait...");
+        overlaybar.active = true;
+
         var main = new Gtk.Grid ();
         main.expand = true;
 
@@ -108,9 +116,11 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
         scrolled.add (export_grid);
         main.add (scrolled);
 
+        main_overlay.add (main);
+
         var pane = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);
         pane.pack1 (sidebar, false, false);
-        pane.pack2 (main, true, false);
+        pane.pack2 (main_overlay, true, false);
 
         var content_area = get_content_area ();
         content_area.border_width = 0;
@@ -139,11 +149,7 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
             settings.export_folder = Environment.get_user_special_dir (UserDirectory.PICTURES);
         }
 
-        folder_button = new Gtk.FileChooserButton (
-            _("Select Folder"),        //  input.text = model.filename;
-
-            Gtk.FileChooserAction.SELECT_FOLDER
-        );
+        folder_button = new Gtk.FileChooserButton (_("Select Folder"), Gtk.FileChooserAction.SELECT_FOLDER);
         folder_button.set_current_folder (settings.export_folder);
         folder_button.hexpand = true;
         grid.attach (folder_button, 1, 0, 1, 1);
@@ -280,11 +286,17 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
         return title_label;
     }
 
-    private void on_generating_preview () {
-        debug ("disable UI");
+    private async void on_generating_preview () {
+        overlaybar.visible = true;
+        sidebar.@foreach ((child) => {
+            child.sensitive = false;
+        });
     }
 
-    private void on_preview_completed () {
-        debug ("enable UI");
+    private async void on_preview_completed () {
+        sidebar.@foreach ((child) => {
+            child.sensitive = true;
+        });
+        overlaybar.visible = false;
     }
 }
