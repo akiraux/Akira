@@ -168,7 +168,7 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
         grid.attach (file_format, 1, 2, 1, 1);
         settings.bind ("export-format", file_format, "active_id", SettingsBindFlags.DEFAULT);
         settings.changed["export-format"].connect (() => {
-            manager.init_update_pixbuf.begin ();
+            manager.init_generate_pixbuf.begin ();
         });
 
         // Quality spinbutton.
@@ -207,7 +207,7 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
         grid.attach (alpha_switch, 1, 5, 1, 1);
         settings.bind ("export-alpha", alpha_switch, "active", SettingsBindFlags.DEFAULT);
         settings.changed["export-alpha"].connect (() => {
-            manager.init_update_pixbuf.begin ();
+            manager.init_generate_pixbuf.begin ();
         });
 
         // Resolution.
@@ -224,7 +224,7 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
         settings.bind ("export-scale", scale_button, "selected", SettingsBindFlags.DEFAULT);
         grid.attach (scale_button, 1, 6, 1, 1);
         settings.changed["export-scale"].connect (() => {
-            manager.init_update_pixbuf.begin ();
+            manager.init_generate_pixbuf.begin ();
         });
 
         // Buttons.
@@ -266,16 +266,16 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
     }
 
     public async void generate_export_preview () {
+        if (list_store.get_n_items () > 0) {
+            for (int i = 0; i < list_store.get_n_items (); i++) {
+                var model = (Akira.Models.ExportModel) list_store.get_object (i);
+                model.pixbuf = manager.pixbuf;
+            }
+            return;
+        }
         for (int i = 0; i < 1; i++) {
             var model = new Akira.Models.ExportModel (manager.pixbuf, "Untitled-%i".printf (i));
             list_store.append (model);
-        }
-    }
-
-    public async void update_export_preview () {
-        for (int i = 0; i < list_store.get_n_items (); i++) {
-            var model = (Akira.Models.ExportModel) list_store.get_object (i);
-            model.pixbuf = manager.pixbuf;
         }
     }
 

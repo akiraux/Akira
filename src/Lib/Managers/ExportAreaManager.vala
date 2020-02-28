@@ -137,42 +137,33 @@ public class Akira.Lib.Managers.ExportAreaManager : Object {
 
     /**
      * Use multithreading to handle async pixbuf loading without freezing the UI.
-    */
-    public async void init_generate_pixbuf () {
-        Idle.add (() => {
-            new Thread <void*> ("generate_pixbuf", () => {
-                try {
-                    generate_pixbuf ();
-                    export_dialog.generate_export_preview.begin ();
-                } catch (Error e) {
-                    error ("Could not generate export preview: %s", e.message);
-                }
-                return null;
-            });
+     */
+    public async void init_generate_pixbuf () throws ThreadError {
+        if (Thread.supported () == false) {
+            error ("Threads are not supported!");
+        }
 
-            return false;
+        canvas.window.event_bus.generating_preview ();
+        SourceFunc callback = init_generate_pixbuf.callback;
+
+        new Thread<void*> (null, () => {
+			try {
+				generate_pixbuf ();
+			} catch (Error e) {
+				error ("Could not generate export preview: %s", e.message);
+			}
+
+			Idle.add ((owned) callback);
+            export_dialog.generate_export_preview.begin ();
+            canvas.window.event_bus.preview_completed ();
+            Thread.exit (null);
+			return null;
         });
-    }
 
-    public async void init_update_pixbuf () {
-        Idle.add (() => {
-            new Thread <void*> ("update_pixbuf", () => {
-                try {
-                    generate_pixbuf ();
-                    export_dialog.update_export_preview.begin ();
-                } catch (Error e) {
-                    error ("Could not update export preview: %s", e.message);
-                }
-                return null;
-            });
-
-            return false;
-        });
+		yield;
     }
 
     public void generate_pixbuf () throws Error {
-        canvas.window.event_bus.generating_preview ();
-
         if (settings.export_format == "png") {
             format = Cairo.Format.ARGB32;
         } else if (settings.export_format == "jpg") {
@@ -215,15 +206,14 @@ public class Akira.Lib.Managers.ExportAreaManager : Object {
             }
             return Cairo.Status.SUCCESS;
         });
-        pixbuf = rescale_image (loader.get_pixbuf ());
+        var scaled = rescale_image (loader.get_pixbuf ());
 
         try {
             loader.close ();
         } catch (Error e) {
             throw (e);
         }
-
-        canvas.window.event_bus.preview_completed ();
+        pixbuf = scaled;
     }
 
     public Gdk.Pixbuf rescale_image (Gdk.Pixbuf pixbuf) {

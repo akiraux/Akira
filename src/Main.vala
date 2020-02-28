@@ -25,6 +25,9 @@ public const string TERMINAL_NAME = "akira";
 public static bool verbose = false;
 
 public static int main (string[] args) {
+    X.init_threads(); // welcome to the pain
+    Gtk.init (ref args);
+
     verbose = "-d" in args;
 
     Environment.set_application_name (APP_NAME);

@@ -93,6 +93,7 @@ sources = files(
 
 deps = [
     gtk_dependency,
+    x11_dependency,
     granite_dependency,
     gee_dependency,
     libxml_dependency,
