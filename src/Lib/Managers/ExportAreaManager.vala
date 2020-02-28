@@ -147,20 +147,20 @@ public class Akira.Lib.Managers.ExportAreaManager : Object {
         SourceFunc callback = init_generate_pixbuf.callback;
 
         new Thread<void*> (null, () => {
-			try {
-				generate_pixbuf ();
-			} catch (Error e) {
-				error ("Could not generate export preview: %s", e.message);
-			}
+            try {
+                generate_pixbuf ();
+            } catch (Error e) {
+                error ("Could not generate export preview: %s", e.message);
+            }
 
-			Idle.add ((owned) callback);
+            Idle.add ((owned) callback);
             export_dialog.generate_export_preview.begin ();
             canvas.window.event_bus.preview_completed ();
             Thread.exit (null);
-			return null;
+            return null;
         });
 
-		yield;
+        yield;
     }
 
     public void generate_pixbuf () throws Error {
@@ -226,7 +226,7 @@ public class Akira.Lib.Managers.ExportAreaManager : Object {
                     (int) area.height / 2,
                     Gdk.InterpType.BILINEAR
                 );
-            break;
+                break;
 
             case 2:
                 scaled_image = pixbuf.scale_simple (
@@ -234,7 +234,7 @@ public class Akira.Lib.Managers.ExportAreaManager : Object {
                     (int) area.height * 2,
                     Gdk.InterpType.BILINEAR
                 );
-            break;
+                break;
 
             case 3:
                 scaled_image = pixbuf.scale_simple (
@@ -242,7 +242,7 @@ public class Akira.Lib.Managers.ExportAreaManager : Object {
                     (int) area.height * 4,
                     Gdk.InterpType.BILINEAR
                 );
-            break;
+                break;
 
             default:
                 scaled_image = pixbuf.scale_simple (
@@ -250,7 +250,7 @@ public class Akira.Lib.Managers.ExportAreaManager : Object {
                     (int) area.height * 1,
                     Gdk.InterpType.BILINEAR
                 );
-            break;
+                break;
         }
 
         return scaled_image;
