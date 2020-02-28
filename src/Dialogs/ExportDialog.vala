@@ -92,7 +92,7 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
 
         main_overlay = new Gtk.Overlay ();
         overlaybar = new Granite.Widgets.OverlayBar (main_overlay);
-        overlaybar.label = _("Generating preview, please wait...");
+        overlaybar.label = _("Generating preview, please wait…");
         overlaybar.active = true;
 
         var main = new Gtk.Grid ();
