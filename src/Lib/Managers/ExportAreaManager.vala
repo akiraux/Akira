@@ -154,13 +154,15 @@ public class Akira.Lib.Managers.ExportAreaManager : Object {
             }
 
             Idle.add ((owned) callback);
-            export_dialog.generate_export_preview.begin ();
-            canvas.window.event_bus.preview_completed ();
             Thread.exit (null);
+
             return null;
         });
 
         yield;
+
+        export_dialog.generate_export_preview.begin ();
+        canvas.window.event_bus.preview_completed ();
     }
 
     public void generate_pixbuf () throws Error {
