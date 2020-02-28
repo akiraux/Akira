@@ -17,6 +17,7 @@
 * along with Akira. If not, see <https://www.gnu.org/licenses/>.
 *
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
+* Authored by: Giacomo Alberini <giacomoalbe@gmail.com>
 */
 
 public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
@@ -30,7 +31,6 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
         { "LAYER", Gtk.TargetFlags.SAME_APP, 0 }
     };
 
-    public string layer_name { get; construct; }
     public Gtk.Label label;
     public Gtk.Entry entry;
     public Gtk.EventBox handle;
@@ -40,22 +40,24 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
     public Gtk.ListBox container;
     public int layers_count { get; set; default = 0; }
 
+    public Akira.Models.LayerModel model { get; construct; }
+
     private bool _editing { get; set; default = false; }
     public bool editing {
         get { return _editing; } set { _editing = value; }
     }
 
-    public Artboard (Akira.Window window, string name) {
+    public Artboard (Akira.Window window, Akira.Models.LayerModel model) {
         Object (
             window: window,
-            layer_name: name
+            model: model
         );
     }
 
     construct {
         get_style_context ().add_class ("artboard");
 
-        label = new Gtk.Label (layer_name);
+        label = new Gtk.Label (model.name);
         label.get_style_context ().add_class ("artboard-name");
         label.halign = Gtk.Align.FILL;
         label.xalign = 0;
@@ -66,7 +68,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
         entry.expand = true;
         entry.visible = false;
         entry.no_show_all = true;
-        entry.set_text (layer_name);
+        entry.set_text (model.name);
         entry.focus_in_event.connect (handle_focus_in);
         entry.focus_out_event.connect (handle_focus_out);
 
@@ -126,6 +128,15 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
         });
 
         key_press_event.connect (on_key_pressed);
+
+        model.notify["selected"].connect (() => {
+            if (model.selected) {
+              activate ();
+              return;
+            }
+
+            (parent as Gtk.ListBox).unselect_row (this);
+        });
     }
 
     private void on_drag_data_received (Gdk.DragContext context, int x, int y, Gtk.SelectionData selection_data,
@@ -315,21 +326,6 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
     }
 
     public bool on_click_event (Gdk.Event event) {
-        if (event.type == Gdk.EventType.BUTTON_PRESS) {
-            window.main_window.right_sidebar.layers_panel.selection_mode = Gtk.SelectionMode.SINGLE;
-
-            window.main_window.right_sidebar.layers_panel.foreach ((child) => {
-                if (child is Akira.Layouts.Partials.Artboard) {
-                    Akira.Layouts.Partials.Artboard artboard = (Akira.Layouts.Partials.Artboard) child;
-
-                    window.main_window.right_sidebar.layers_panel.unselect_row (artboard);
-                    artboard.container.unselect_all ();
-                }
-            });
-
-            activate ();
-        }
-
         if (event.type == Gdk.EventType.@2BUTTON_PRESS) {
             entry.visible = true;
             entry.no_show_all = false;
@@ -344,14 +340,21 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
             });
         }
 
+        if (event.type == Gdk.EventType.BUTTON_PRESS) {
+          activate ();
+
+          handle.grab_focus ();
+          window.event_bus.request_add_item_to_selection (model.item);
+        }
+
         return false;
     }
 
     private bool on_key_pressed (Gtk.Widget source, Gdk.EventKey key) {
         switch (key.keyval) {
             case Gdk.Key.Delete:
-            case Gdk.Key.BackSpace:
-                return delete_object ();
+                window.event_bus.request_delete_item (model.item);
+                break;
         }
 
         return false;
@@ -422,9 +425,6 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
     }
 
     private void update_label () {
-        var new_label = entry.get_text ();
-        label.label = new_label;
-
         entry.visible = false;
         entry.no_show_all = true;
         label.visible = true;
@@ -433,6 +433,14 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
         editing = false;
 
         activate ();
+
+        var new_label = entry.get_text ();
+
+        if (label.label == new_label) {
+            return;
+        }
+
+        label.label = model.name = new_label;
     }
 
     public void count_layers () {

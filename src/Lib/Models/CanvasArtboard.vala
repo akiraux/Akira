@@ -26,7 +26,16 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
     // Identifiers.
     public Models.CanvasItemType item_type { get; set; }
     public string id { get; set; }
-    public string name { get; set; }
+    private string _name;
+    public string name {
+      get {
+        return _name;
+      }
+      set {
+        _name = value;
+        changed (false);
+      }
+    }
 
     // Transform Panel attributes.
     public double opacity { get; set; }
@@ -146,14 +155,18 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
         cr.set_font_size (LABEL_FONT_SIZE);
 
         cr.move_to (x, y - LABEL_BOTTOM_PADDING);
-        cr.show_text (id);
-        cr.move_to (x, y);
-        cr.line_to (x, y + height);
-        cr.line_to (x + width, y + height);
-        cr.line_to (x + width, y);
-        cr.line_to (x, y);
+        cr.show_text (name != null ? name : id);
+
+        // Add a bit of "emulated" shadow around the Artboard
+        cr.set_source_rgba (0.90, 0.90, 0.90, 1);
+        cr.save ();
+        cr.translate (2, 2);
+        cr.rectangle (x, y, width, height);
+        cr.restore ();
+        cr.fill ();
 
         cr.set_source_rgba (1, 1, 1, 1);
+        cr.rectangle (x, y, width, height);
         cr.fill ();
     }
 
