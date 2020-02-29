@@ -66,17 +66,15 @@ public class Akira.Partials.ExportWidget : Gtk.Grid {
 
     /**
      * Generate the image from the pixbuf model and resize it if bigger than
-     * half of the export dialog.
+     * half of the width of the export dialog.
      */
     public async void get_image () {
         var resized_image = model.pixbuf;
         if (resized_image.width > (settings.export_width / 2)) {
             // Keep the aspect ratio consistent.
-            var ratio = resized_image.width / resized_image.height;
-            var new_width = (settings.export_width / 2);
-            var new_height = (int) GLib.Math.round (new_width / ratio);
-
-            resized_image = resized_image.scale_simple (new_width, new_height, Gdk.InterpType.BILINEAR);
+            var w = (settings.export_width / 2);
+            var h = (resized_image.height * w) / resized_image.width;
+            resized_image = resized_image.scale_simple (w, h, Gdk.InterpType.BILINEAR);
         }
 
         var image = new Gtk.Image.from_pixbuf (resized_image);
