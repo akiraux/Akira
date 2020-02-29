@@ -288,25 +288,28 @@ public class Akira.Lib.Managers.ExportAreaManager : Object {
     }
 
     public void export_images () {
-        pixbuf = rescale_image (pixbuf);
-        try {
-            if (settings.export_format == "png") {
-                pixbuf.save (
-                    settings.export_folder + "/test.png",
-                    "png",
-                    "compression",
-                    settings.export_compression.to_string (),
-                    null);
-            } else if (settings.export_format == "jpg") {
-                pixbuf.save (
-                    settings.export_folder + "/test.jpg",
-                    "jpeg",
-                    "quality",
-                    settings.export_quality.to_string (),
-                    null);
+        for (int i = 0; i < export_dialog.list_store.get_n_items (); i++) {
+            var model = (Akira.Models.ExportModel) export_dialog.list_store.get_object (i);
+
+            try {
+                if (settings.export_format == "png") {
+                    model.pixbuf.save (
+                        settings.export_folder + "/" + model.filename + ".png",
+                        "png",
+                        "compression",
+                        settings.export_compression.to_string (),
+                        null);
+                } else if (settings.export_format == "jpg") {
+                    model.pixbuf.save (
+                        settings.export_folder + "/" + model.filename + ".jpg",
+                        "jpeg",
+                        "quality",
+                        settings.export_quality.to_string (),
+                        null);
+                }
+            } catch (Error e) {
+                error ("Unable to export images: %s", e.message);
             }
-        } catch (Error e) {
-            error ("Unable to export images: %s", e.message);
         }
     }
 }
