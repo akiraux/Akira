@@ -105,3 +105,14 @@ paned > separator {
 .export-panel flowboxchild:focus {
     background-color: transparent;
 }
+
+.export-filename {
+    background: none;
+    border: none;
+    box-shadow: none;
+}
+
+.export-info {
+    color: alpha (@fg_color, 0.7);
+    font-size: 0.85em;
+}

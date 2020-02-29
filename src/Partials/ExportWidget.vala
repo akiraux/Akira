@@ -22,6 +22,7 @@
 public class Akira.Partials.ExportWidget : Gtk.Grid {
     public Akira.Models.ExportModel model { get; set construct; }
 
+    private Gtk.Label info;
     private Gtk.Grid image_container;
 
     public ExportWidget (Akira.Models.ExportModel model) {
@@ -32,16 +33,21 @@ public class Akira.Partials.ExportWidget : Gtk.Grid {
     }
 
     construct {
-        get_style_context ().add_class (Granite.STYLE_CLASS_CARD);
         halign = Gtk.Align.CENTER;
         valign = Gtk.Align.CENTER;
         column_spacing = 6;
-        row_spacing = 6;
         expand = true;
+
+        // Label for image size info. We need to create this before calling get_image ().
+        info = new Gtk.Label ("");
+        info.get_style_context ().add_class ("export-info");
+        info.hexpand = false;
+        info.halign = Gtk.Align.END;
 
         // Image preview container with checker.
         image_container = new Gtk.Grid ();
         image_container.get_style_context ().add_class (Granite.STYLE_CLASS_CHECKERBOARD);
+        image_container.get_style_context ().add_class (Granite.STYLE_CLASS_CARD);
         get_image.begin ();
         model.notify["pixbuf"].connect (() => {
             image_container.@foreach ((image) => {
@@ -53,13 +59,14 @@ public class Akira.Partials.ExportWidget : Gtk.Grid {
 
         // Filename with editable entry.
         var input = new Gtk.Entry ();
-        input.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
-        input.margin = 3;
+        input.get_style_context ().add_class ("export-filename");
+        input.hexpand = true;
         model.bind_property ("filename", input, "text",
             BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE);
 
-        attach (image_container, 0, 0);
-        attach (input, 0, 1);
+        attach (input, 0, 0);
+        attach (info, 1, 0);
+        attach (image_container, 0, 1, 2);
 
         show_all ();
     }
@@ -79,5 +86,6 @@ public class Akira.Partials.ExportWidget : Gtk.Grid {
 
         var image = new Gtk.Image.from_pixbuf (resized_image);
         image_container.add (image);
+        info.label = ("%i × %i px").printf (model.pixbuf.width, model.pixbuf.height);
     }
 }
