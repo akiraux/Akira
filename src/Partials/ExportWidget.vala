@@ -93,6 +93,6 @@ public class Akira.Partials.ExportWidget : Gtk.Grid {
         info.label = ("%i × %i px · %0.1fMB").printf (
             model.pixbuf.width,
             model.pixbuf.height,
-            (full_bytes / (1024*1024)));
+            (full_bytes / (1024 * 1024)));
     }
 }
