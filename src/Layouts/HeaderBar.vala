@@ -374,10 +374,6 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
     }
 
     private void build_signals () {
-        window.event_bus.close_popover.connect (() => {
-            popover_insert.closed ();
-        });
-
         window.event_bus.selected_items_changed.connect (on_selected_items_changed);
         window.event_bus.z_selected_changed.connect (() => {
             update_button_sensitivity (false);
@@ -415,7 +411,7 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
         move_top.sensitive = (selected_item != null);
         move_bottom.sensitive = (selected_item != null);
 
-        if (selected_item == null) {
+        if (selected_item == null || selected_item.get_canvas () == null) {
             return;
         }
 

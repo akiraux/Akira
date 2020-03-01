@@ -258,15 +258,11 @@ public class Akira.Services.ActionManager : Object {
     }
 
     private void action_artboard_tool () {
-        //  window.main_window.main_canvas.canvas.edit_mode = Akira.Lib.Canvas.EditMode.MODE_INSERT;
-        //  window.event_bus.insert_item ("artboard");
-        //  window.event_bus.close_popover ("insert");
+        window.event_bus.insert_item ("artboard");
     }
 
     private void action_rect_tool () {
-        window.main_window.main_canvas.canvas.edit_mode = Akira.Lib.Canvas.EditMode.MODE_INSERT;
         window.event_bus.insert_item ("rectangle");
-        window.event_bus.close_popover ("insert");
     }
 
     private void action_delete () {}
@@ -280,15 +276,11 @@ public class Akira.Services.ActionManager : Object {
     }
 
     private void action_ellipse_tool () {
-        window.main_window.main_canvas.canvas.edit_mode = Akira.Lib.Canvas.EditMode.MODE_INSERT;
         window.event_bus.insert_item ("ellipse");
-        window.event_bus.close_popover ("insert");
     }
 
     private void action_text_tool () {
-        window.main_window.main_canvas.canvas.edit_mode = Akira.Lib.Canvas.EditMode.MODE_INSERT;
         window.event_bus.insert_item ("text");
-        window.event_bus.close_popover ("insert");
     }
 
     private void action_image_tool () {
@@ -297,7 +289,6 @@ public class Akira.Services.ActionManager : Object {
         dialog.select_multiple = true;
         dialog.response.connect ((response_id) => on_choose_image_response (dialog, response_id));
         dialog.show ();
-        window.event_bus.close_popover ("insert");
     }
 
     private void on_choose_image_response (Gtk.FileChooserNative dialog, int response_id) {

@@ -88,6 +88,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         window.event_bus.request_change_cursor.connect (on_request_change_cursor);
         window.event_bus.set_focus_on_canvas.connect (on_set_focus_on_canvas);
         window.event_bus.request_escape.connect (on_set_focus_on_canvas);
+        window.event_bus.insert_item.connect (on_insert_item);
     }
 
     public void insert_item_default (Akira.Lib.Models.CanvasItem item, bool select) {
@@ -217,6 +218,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 selected_bound_manager.reset_selection ();
 
                 var new_item = items_manager.insert_item (event);
+
                 selected_bound_manager.add_item_to_selection (new_item);
 
                 selected_bound_manager.set_initial_coordinates (event.x, event.y);
@@ -315,6 +317,10 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         }
 
         return true;
+    }
+
+    public void on_insert_item () {
+        edit_mode = EditMode.MODE_INSERT;
     }
 
     public void on_set_focus_on_canvas () {

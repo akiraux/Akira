@@ -23,14 +23,8 @@
 public class Akira.Lib.Managers.ItemsManager : Object {
     public weak Akira.Lib.Canvas canvas { get; construct; }
 
-    public enum InsertType {
-        RECT,
-        ELLIPSE,
-        TEXT
-    }
-
     private List<Models.CanvasItem> items;
-    private InsertType? insert_type { get; set; }
+    private Models.CanvasItemType? insert_type { get; set; }
     private Goo.CanvasItem root;
     private int border_size;
     private Gdk.RGBA border_color;
@@ -54,48 +48,28 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         canvas.window.event_bus.change_item_z_index.connect (on_change_item_z_index);
     }
 
-    public bool set_insert_type_from_key (uint keyval) {
-        // TODO: take those values from preferences/settings and not from hardcoded values
-        if (keyval > Gdk.Key.Z || keyval < Gdk.Key.A) {
-            return false;
-        }
-
-        switch (keyval) {
-            case Gdk.Key.R:
-                set_item_to_insert ("rectangle");
-                break;
-
-            case Gdk.Key.E:
-                set_item_to_insert ("ellipse");
-                break;
-
-            case Gdk.Key.T:
-                set_item_to_insert ("text");
-                break;
-            default:
-                return false;
-        }
-
-        return true;
-    }
-
     public Models.CanvasItem? insert_item (Gdk.EventButton event) {
         udpate_default_values ();
 
         Models.CanvasItem? new_item;
 
         switch (insert_type) {
-            case InsertType.RECT:
+            case Models.CanvasItemType.RECT:
                 new_item = add_rect (event);
                 break;
 
-            case InsertType.ELLIPSE:
+            case Models.CanvasItemType.ELLIPSE:
                 new_item = add_ellipse (event);
                 break;
 
-            case InsertType.TEXT:
+            case Models.CanvasItemType.TEXT:
                 new_item = add_text (event);
                 break;
+
+            case Models.CanvasItemType.ARTBOARD:
+                new_item = add_artboard (event);
+                break;
+
             default:
                 new_item = null;
                 break;
@@ -117,6 +91,16 @@ public class Akira.Lib.Managers.ItemsManager : Object {
     public void on_request_delete_item (Lib.Models.CanvasItem item) {
         item.delete ();
         canvas.window.event_bus.item_deleted (item);
+    }
+
+    public Models.CanvasItem add_artboard (Gdk.EventButton event) {
+        var artboard = new Models.CanvasArtboard (
+            Utils.AffineTransform.fix_size (event.x),
+            Utils.AffineTransform.fix_size (event.y),
+            root
+        );
+
+        return artboard as Models.CanvasItem;
     }
 
     public Models.CanvasItem add_rect (Gdk.EventButton event) {
@@ -168,15 +152,19 @@ public class Akira.Lib.Managers.ItemsManager : Object {
     private void set_item_to_insert (string type) {
         switch (type) {
             case "rectangle":
-                insert_type = InsertType.RECT;
+                insert_type = Models.CanvasItemType.RECT;
                 break;
 
             case "ellipse":
-                insert_type = InsertType.ELLIPSE;
+                insert_type = Models.CanvasItemType.ELLIPSE;
                 break;
 
             case "text":
-                insert_type = InsertType.TEXT;
+                insert_type = Models.CanvasItemType.TEXT;
+                break;
+
+            case "artboard":
+                insert_type = Models.CanvasItemType.ARTBOARD;
                 break;
         }
     }

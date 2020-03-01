@@ -68,6 +68,12 @@ public class Akira.Models.LayerModel : Models.ItemModel {
         }
     }
 
+    public bool is_artboard {
+        get {
+            return item is Akira.Lib.Models.CanvasArtboard;
+        }
+    }
+
     public LayerModel (
         Lib.Models.CanvasItem item,
         Akira.Models.ListModel list_model

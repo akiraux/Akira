@@ -60,7 +60,13 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
         bind_model (list_model, item => {
             // TODO: Differentiate between layer and artboard
             // based upon item "type" of some sort
-            return new Akira.Layouts.Partials.Layer (window, (Akira.Models.LayerModel) item);
+            var layer_model = (Akira.Models.LayerModel) item;
+
+            if (layer_model.is_artboard) {
+              return new Akira.Layouts.Partials.Artboard (window, layer_model);
+            }
+
+            return new Akira.Layouts.Partials.Layer (window, layer_model);
         });
 
         build_drag_and_drop ();
