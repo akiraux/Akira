@@ -34,6 +34,12 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
     public Gtk.Label label;
     public Gtk.Entry entry;
     public Gtk.EventBox handle;
+    public Gtk.Image icon_locked;
+    public Gtk.Image icon_unlocked;
+    public Gtk.Image icon_hidden;
+    public Gtk.Image icon_visible;
+    public Gtk.ToggleButton button_locked;
+    public Gtk.ToggleButton button_hidden;
     public Gtk.ToggleButton button;
     public Gtk.Image button_icon;
     public Gtk.Revealer revealer;
@@ -98,6 +104,41 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
         handle.add (label_grid);
         handle.event.connect (on_click_event);
 
+        button_locked = new Gtk.ToggleButton ();
+        button_locked.tooltip_text = _("Lock Layer");
+        button_locked.get_style_context ().remove_class ("button");
+        button_locked.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
+        button_locked.get_style_context ().add_class ("layer-action");
+        button_locked.valign = Gtk.Align.CENTER;
+        icon_locked = new Gtk.Image.from_icon_name ("changes-allow-symbolic", Gtk.IconSize.MENU);
+        icon_unlocked = new Gtk.Image.from_icon_name ("changes-prevent-symbolic", Gtk.IconSize.MENU);
+        icon_unlocked.visible = false;
+        icon_unlocked.no_show_all = true;
+
+        button_hidden = new Gtk.ToggleButton ();
+        button_hidden.tooltip_text = _("Hide Layer");
+        button_hidden.get_style_context ().remove_class ("button");
+        button_hidden.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
+        button_hidden.get_style_context ().add_class ("layer-action");
+        button_hidden.valign = Gtk.Align.CENTER;
+        icon_hidden = new Gtk.Image.from_icon_name ("layer-visible-symbolic", Gtk.IconSize.MENU);
+        icon_visible = new Gtk.Image.from_icon_name ("layer-hidden-symbolic", Gtk.IconSize.MENU);
+        icon_visible.visible = false;
+        icon_visible.no_show_all = true;
+
+        var button_locked_grid = new Gtk.Grid ();
+        button_locked_grid.margin_end = 6;
+        button_locked_grid.attach (icon_locked, 0, 0, 1, 1);
+        button_locked_grid.attach (icon_unlocked, 1, 0, 1, 1);
+
+        var button_hidden_grid = new Gtk.Grid ();
+        button_hidden_grid.margin_end = 14;
+        button_hidden_grid.attach (icon_hidden, 0, 0, 1, 1);
+        button_hidden_grid.attach (icon_visible, 1, 0, 1, 1);
+
+        button_hidden.add (button_hidden_grid);
+        button_locked.add (button_locked_grid);
+
         button = new Gtk.ToggleButton ();
         button.active = true;
         button.get_style_context ().remove_class ("button");
@@ -106,10 +147,16 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
         button_icon = new Gtk.Image.from_icon_name ("pan-down-symbolic", Gtk.IconSize.MENU);
         button.add (button_icon);
 
+        var artboard_handle = new Gtk.Grid ();
+        artboard_handle.get_style_context ().add_class ("artboard-handle");
+        artboard_handle.attach (handle, 0, 0, 1, 1);
+        artboard_handle.attach (button_locked, 1, 0, 1, 1);
+        artboard_handle.attach (button_hidden, 2, 0, 1, 1);
+        artboard_handle.attach (button, 3, 0, 1, 1);
+
         var grid = new Gtk.Grid ();
-        grid.attach (handle, 0, 0, 1, 1);
-        grid.attach (button, 1, 0, 1, 1);
-        grid.attach (revealer, 0, 1, 2, 1);
+        grid.attach (artboard_handle, 0, 0, 1, 1);
+        grid.attach (revealer, 0, 1, 1, 1);
 
         add (grid);
 
@@ -136,6 +183,16 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
             }
 
             (parent as Gtk.ListBox).unselect_row (this);
+        });
+
+        handle.enter_notify_event.connect (event => {
+            get_style_context ().add_class ("hover");
+            return false;
+        });
+
+        handle.leave_notify_event.connect (event => {
+            get_style_context ().remove_class ("hover");
+            return false;
         });
     }
 
