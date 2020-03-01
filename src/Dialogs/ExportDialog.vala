@@ -21,7 +21,7 @@
 
 public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
     public weak Akira.Window window { get; construct; }
-    public weak Akira.Lib.Managers.ExportAreaManager manager { get; construct; }
+    public weak Akira.Lib.Managers.ExportManager manager { get; construct; }
 
     public GLib.ListStore list_store;
 
@@ -42,7 +42,7 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
     private Gtk.Overlay main_overlay;
     private Granite.Widgets.OverlayBar overlaybar;
 
-    public ExportDialog (Akira.Window window, Akira.Lib.Managers.ExportAreaManager manager) {
+    public ExportDialog (Akira.Window window, Akira.Lib.Managers.ExportManager manager) {
         Object (
             window: window,
             manager: manager,
@@ -267,16 +267,28 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
 
     public async void generate_export_preview () {
         if (list_store.get_n_items () > 0) {
-            for (int i = 0; i < list_store.get_n_items (); i++) {
-                var model = (Akira.Models.ExportModel) list_store.get_object (i);
-                model.pixbuf = manager.pixbuf;
-            }
+            // The specific models were already created.
             return;
         }
-        for (int i = 0; i < 1; i++) {
-            var model = new Akira.Models.ExportModel (manager.pixbuf, "Untitled-%i".printf (i));
-            list_store.append (model);
-        }
+
+        var model = new Akira.Models.ExportModel (
+            manager.pixbuf,
+            "Untitled",
+            settings.export_format,
+            settings.export_quality,
+            settings.export_compression
+        );
+
+        model.bind_property ("pixbuf", manager, "pixbuf",
+            BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE);
+        model.bind_property ("format", settings, "export-format",
+            BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE);
+        model.bind_property ("quality", settings, "export-quality",
+            BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE);
+        model.bind_property ("compression", settings, "export-compression",
+            BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE);
+
+        list_store.append (model);
     }
 
     private Gtk.Label section_title (string title) {

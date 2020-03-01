@@ -19,7 +19,7 @@
  * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
  */
 
-public class Akira.Lib.Managers.ExportAreaManager : Object {
+public class Akira.Lib.Managers.ExportManager : Object {
     private const string COLOR = "#41c9fd";
     private const double LINE_WIDTH = 2.0;
     private const double MIN_SIZE = 1.0;
@@ -37,9 +37,9 @@ public class Akira.Lib.Managers.ExportAreaManager : Object {
     public Cairo.Surface surface;
     public Cairo.Context context;
     public Gdk.PixbufLoader loader;
-    public Gdk.Pixbuf pixbuf;
+    public Gdk.Pixbuf pixbuf { get; set; }
 
-    public ExportAreaManager (Akira.Lib.Canvas canvas) {
+    public ExportManager (Akira.Lib.Canvas canvas) {
         Object (
             canvas: canvas
         );

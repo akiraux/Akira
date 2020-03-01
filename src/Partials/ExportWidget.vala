@@ -1,29 +1,30 @@
 /*
-* Copyright (c) 2020 Alecaddd (https://alecaddd.com)
-*
-* This file is part of Akira.
-*
-* Akira is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
+ * Copyright (c) 2020 Alecaddd (https://alecaddd.com)
+ *
+ * This file is part of Akira.
+ *
+ * Akira is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
 
-* Akira is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-* GNU General Public License for more details.
+ * Akira is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
 
-* You should have received a copy of the GNU General Public License
-* along with Akira. If not, see <https://www.gnu.org/licenses/>.
-*
-* Authored by: Alessandro "alecaddd" Castellani <castellani.ale@gmail.com>
-*/
+ * You should have received a copy of the GNU General Public License
+ * along with Akira. If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Authored by: Alessandro "alecaddd" Castellani <castellani.ale@gmail.com>
+ */
 
 public class Akira.Partials.ExportWidget : Gtk.Grid {
     public Akira.Models.ExportModel model { get; set construct; }
 
     private Gtk.Label info;
     private Gtk.Grid image_container;
+    private uint8[]? imagedata;
 
     public ExportWidget (Akira.Models.ExportModel model) {
         Object (
@@ -86,6 +87,12 @@ public class Akira.Partials.ExportWidget : Gtk.Grid {
 
         var image = new Gtk.Image.from_pixbuf (resized_image);
         image_container.add (image);
+        yield update_file_size ();
+    }
+
+    public async void update_file_size () {
+        //  yield get_image_buffer_size ();
+        //  stdout.write (imagedata);
 
         var bytes = model.pixbuf.read_pixel_bytes ();
         double full_bytes = (double) bytes.length;
@@ -94,5 +101,27 @@ public class Akira.Partials.ExportWidget : Gtk.Grid {
             model.pixbuf.width,
             model.pixbuf.height,
             (full_bytes / (1024 * 1024)));
+    }
+
+    private async void get_image_buffer_size () {
+        try {
+            if (model.format == "png") {
+                //  model.pixbuf.save_to_buffer (
+                //      out imagedata,
+                //      "png",
+                //      "compression",
+                //      model.compression.to_string (),
+                //      null);
+            } else if (model.format == "jpg") {
+                //  model.pixbuf.save_to_buffer (
+                //      out imagedata,
+                //      "jpeg",
+                //      "quality",
+                //      model.quality.to_string (),
+                //      null);
+            }
+        } catch (Error e) {
+            //  error ("Unable to create image buffer: %s", e.message);
+        }
     }
 }

@@ -52,7 +52,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         MODE_PANNING,
     }
 
-    public Managers.ExportAreaManager export_area_manager;
+    public Managers.ExportManager export_area_manager;
     public Managers.SelectedBoundManager selected_bound_manager;
     private Managers.ItemsManager items_manager;
     private Managers.NobManager nob_manager;
@@ -81,7 +81,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         events |= Gdk.EventMask.TOUCHPAD_GESTURE_MASK;
         events |= Gdk.EventMask.TOUCH_MASK;
 
-        export_area_manager = new Managers.ExportAreaManager (this);
+        export_area_manager = new Managers.ExportManager (this);
         selected_bound_manager = new Managers.SelectedBoundManager (this);
         items_manager = new Managers.ItemsManager (this);
         nob_manager = new Managers.NobManager (this);
