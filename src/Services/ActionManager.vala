@@ -241,12 +241,10 @@ public class Akira.Services.ActionManager : Object {
     }
 
     private void action_artboard_tool () {
-        //  window.event_bus.request_change_mode (Akira.Lib.Canvas.EditMode.MODE_INSERT);
-        //  window.event_bus.insert_item ("artboard");
+        window.event_bus.insert_item ("artboard");
     }
 
     private void action_rect_tool () {
-        window.event_bus.request_change_mode (Akira.Lib.Canvas.EditMode.MODE_INSERT);
         window.event_bus.insert_item ("rectangle");
     }
 
@@ -261,12 +259,10 @@ public class Akira.Services.ActionManager : Object {
     }
 
     private void action_ellipse_tool () {
-        window.event_bus.request_change_mode (Akira.Lib.Canvas.EditMode.MODE_INSERT);
         window.event_bus.insert_item ("ellipse");
     }
 
     private void action_text_tool () {
-        window.event_bus.request_change_mode (Akira.Lib.Canvas.EditMode.MODE_INSERT);
         window.event_bus.insert_item ("text");
     }
 

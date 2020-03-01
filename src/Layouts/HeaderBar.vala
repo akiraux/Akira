@@ -411,7 +411,7 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
         move_top.sensitive = (selected_item != null);
         move_bottom.sensitive = (selected_item != null);
 
-        if (selected_item == null) {
+        if (selected_item == null || selected_item.get_canvas () == null) {
             return;
         }
 
