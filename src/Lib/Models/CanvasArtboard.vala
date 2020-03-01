@@ -1,23 +1,23 @@
 /*
-* Copyright (c) 2019-2020 Alecaddd (https://alecaddd.com)
-*
-* This file is part of Akira.
-*
-* Akira is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
+ * Copyright (c) 2019-2020 Alecaddd (https://alecaddd.com)
+ *
+ * This file is part of Akira.
+ *
+ * Akira is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
 
-* Akira is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-* GNU General Public License for more details.
+ * Akira is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
 
-* You should have received a copy of the GNU General Public License
-* along with Akira. If not, see <https://www.gnu.org/licenses/>.
-*
-* Authored by: Giacomo Alberini <giacomoalbe@gmail.com>
-*/
+ * You should have received a copy of the GNU General Public License
+ * along with Akira. If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Authored by: Giacomo Alberini <giacomoalbe@gmail.com>
+ */
 
 public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasItem, Models.CanvasItem {
     private const double LABEL_FONT_SIZE = 14.0;
@@ -28,13 +28,13 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
     public string id { get; set; }
     private string _name;
     public string name {
-      get {
-        return _name;
-      }
-      set {
-        _name = value;
-        changed (false);
-      }
+        get {
+            return _name;
+        }
+        set {
+            _name = value;
+            changed (false);
+        }
     }
 
     // Transform Panel attributes.
@@ -66,7 +66,7 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
     // Layers panel attributes.
     public bool selected { get; set; }
     public bool locked { get; set; }
-    public string layer_icon { get; set; default = "shape-rectangle-symbolic"; }
+    public string layer_icon { get; set; default = null; }
     public int z_index { get; set; }
 
     // Shape's unique identifiers.
@@ -78,7 +78,7 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
     public double y { get; set; }
     public double width { get; set; }
     public double height { get; set; }
-    public Goo.CanvasItem parent { get; set; }
+    public Goo.CanvasItem parent_item { get; set; }
 
     private double label_height;
 
@@ -87,10 +87,10 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
         double _y = 0,
         Goo.CanvasItem? _parent = null
     ) {
-        parent = _parent;
+        parent_item = _parent;
 
-        canvas = parent.get_canvas ();
-        parent.add_child (this, -1);
+        canvas = parent_item.get_canvas ();
+        parent_item.add_child (this, -1);
 
         item_type = Models.CanvasItemType.ARTBOARD;
         id = Models.CanvasItem.create_item_id (this);
