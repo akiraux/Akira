@@ -21,7 +21,11 @@
 
 public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
     public weak Akira.Window window { get; construct; }
+    public weak Akira.Lib.Managers.ExportAreaManager manager { get; construct; }
 
+    public GLib.ListStore list_store;
+
+    private Gtk.FlowBox export_grid;
     private Gtk.Grid sidebar;
     public Gtk.FileChooserButton folder_button;
     public Gtk.Adjustment quality_adj;
@@ -35,9 +39,13 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
     public Gtk.Label alpha_title;
     public Gtk.Switch alpha_switch;
 
-    public ExportDialog (Akira.Window window) {
+    private Gtk.Overlay main_overlay;
+    private Granite.Widgets.OverlayBar overlaybar;
+
+    public ExportDialog (Akira.Window window, Akira.Lib.Managers.ExportAreaManager manager) {
         Object (
             window: window,
+            manager: manager,
             border_width: 0,
             deletable: true,
             resizable: true,
@@ -46,6 +54,9 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
     }
 
     construct {
+        window.event_bus.generating_preview.connect (on_generating_preview);
+        window.event_bus.preview_completed.connect (on_preview_completed);
+
         transient_for = window;
         use_header_bar = 1;
         default_width = settings.export_width;
@@ -58,7 +69,6 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
 
         var main_header = new Gtk.Grid ();
         main_header.vexpand = true;
-        main_header.get_style_context ().add_class ("layers-panel");
 
         var pane_header = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);
         pane_header.pack1 (sidebar_header, false, false);
@@ -80,13 +90,37 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
         sidebar.get_style_context ().add_class ("sidebar-export");
         build_export_sidebar ();
 
+        main_overlay = new Gtk.Overlay ();
+        overlaybar = new Granite.Widgets.OverlayBar (main_overlay);
+        overlaybar.label = _("Generating preview, please wait…");
+        overlaybar.active = true;
+
         var main = new Gtk.Grid ();
-        main.vexpand = true;
-        main.get_style_context ().add_class ("layers-panel");
+        main.expand = true;
+
+        list_store = new GLib.ListStore (typeof (Akira.Models.ExportModel));
+
+        export_grid = new Gtk.FlowBox ();
+        export_grid.activate_on_single_click = false;
+        export_grid.max_children_per_line = 1;
+        export_grid.selection_mode = Gtk.SelectionMode.NONE;
+        export_grid.get_style_context ().add_class ("export-panel");
+
+        export_grid.bind_model (list_store, model => {
+            return new Akira.Partials.ExportWidget (model as Akira.Models.ExportModel);
+        });
+
+        var scrolled = new Gtk.ScrolledWindow (null, null);
+        scrolled.expand = true;
+        scrolled.get_style_context ().add_class (Gtk.STYLE_CLASS_VIEW);
+        scrolled.add (export_grid);
+        main.add (scrolled);
+
+        main_overlay.add (main);
 
         var pane = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);
         pane.pack1 (sidebar, false, false);
-        pane.pack2 (main, true, false);
+        pane.pack2 (main_overlay, true, false);
 
         var content_area = get_content_area ();
         content_area.border_width = 0;
@@ -111,15 +145,17 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
         // Folder location.
         grid.attach (section_title (_("Export to:")), 0, 0, 1, 1);
 
-        folder_button = new Gtk.FileChooserButton (
-            _("Select Folder"),
-            Gtk.FileChooserAction.SELECT_FOLDER
-        );
-        folder_button.set_current_folder (
-            Environment.get_user_special_dir (UserDirectory.PICTURES)
-        );
+        if (settings.export_folder == "") {
+            settings.export_folder = Environment.get_user_special_dir (UserDirectory.PICTURES);
+        }
+
+        folder_button = new Gtk.FileChooserButton (_("Select Folder"), Gtk.FileChooserAction.SELECT_FOLDER);
+        folder_button.set_current_folder (settings.export_folder);
         folder_button.hexpand = true;
         grid.attach (folder_button, 1, 0, 1, 1);
+        folder_button.selection_changed.connect (() => {
+            settings.export_folder = folder_button.get_filename ();
+        });
 
         // File format.
         var format_title = section_title (_("Format:"));
@@ -131,6 +167,9 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
         file_format.changed.connect (update_format_ui);
         grid.attach (file_format, 1, 2, 1, 1);
         settings.bind ("export-format", file_format, "active_id", SettingsBindFlags.DEFAULT);
+        settings.changed["export-format"].connect (() => {
+            manager.init_generate_pixbuf.begin ();
+        });
 
         // Quality spinbutton.
         jpg_title = section_title (_("Quality:"));
@@ -167,6 +206,9 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
         alpha_switch.halign = Gtk.Align.START;
         grid.attach (alpha_switch, 1, 5, 1, 1);
         settings.bind ("export-alpha", alpha_switch, "active", SettingsBindFlags.DEFAULT);
+        settings.changed["export-alpha"].connect (() => {
+            manager.init_generate_pixbuf.begin ();
+        });
 
         // Resolution.
         var size_title = section_title (_("Scale:"));
@@ -174,12 +216,16 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
 
         var scale_button = new Granite.Widgets.ModeButton ();
         scale_button.halign = Gtk.Align.FILL;
+        scale_button.append_text ("0.5×");
         scale_button.append_text ("1×");
         scale_button.append_text ("2×");
         scale_button.append_text ("4×");
         scale_button.set_active (settings.export_scale);
         settings.bind ("export-scale", scale_button, "selected", SettingsBindFlags.DEFAULT);
         grid.attach (scale_button, 1, 6, 1, 1);
+        settings.changed["export-scale"].connect (() => {
+            manager.init_generate_pixbuf.begin ();
+        });
 
         // Buttons.
         var action_area = new Gtk.Grid ();
@@ -200,6 +246,10 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
         export_button.get_style_context ().add_class (Gtk.STYLE_CLASS_SUGGESTED_ACTION);
         export_button.halign = Gtk.Align.END;
         action_area.add (export_button);
+        export_button.clicked.connect (() => {
+            manager.export_images ();
+            close ();
+        });
 
         sidebar.add (grid);
     }
@@ -215,10 +265,38 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
         alpha_switch.visible = (file_format.active_id == "png");
     }
 
+    public async void generate_export_preview () {
+        if (list_store.get_n_items () > 0) {
+            for (int i = 0; i < list_store.get_n_items (); i++) {
+                var model = (Akira.Models.ExportModel) list_store.get_object (i);
+                model.pixbuf = manager.pixbuf;
+            }
+            return;
+        }
+        for (int i = 0; i < 1; i++) {
+            var model = new Akira.Models.ExportModel (manager.pixbuf, "Untitled-%i".printf (i));
+            list_store.append (model);
+        }
+    }
+
     private Gtk.Label section_title (string title) {
         var title_label = new Gtk.Label (title);
         title_label.halign = Gtk.Align.END;
 
         return title_label;
+    }
+
+    private async void on_generating_preview () {
+        overlaybar.visible = true;
+        sidebar.@foreach ((child) => {
+            child.sensitive = false;
+        });
+    }
+
+    private async void on_preview_completed () {
+        sidebar.@foreach ((child) => {
+            child.sensitive = true;
+        });
+        overlaybar.visible = false;
     }
 }

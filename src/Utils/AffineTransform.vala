@@ -171,9 +171,8 @@ public class Akira.Utils.AffineTransform : Object {
                 break;
         }
 
-        origin_move_delta_x = GLib.Math.round (origin_move_delta_x);
-        origin_move_delta_y = GLib.Math.round (origin_move_delta_y);
-
+        origin_move_delta_x = fix_size (origin_move_delta_x);
+        origin_move_delta_y = fix_size (origin_move_delta_y);
         new_width = fix_size (new_width);
         new_height = fix_size (new_height);
 
@@ -293,7 +292,7 @@ public class Akira.Utils.AffineTransform : Object {
         item.set_transform (new_matrix);
     }
 
-    public static void set_size (double? width, double? height, CanvasItem item) {
+    public static void set_size (double? width, double? height, Goo.CanvasItem item) {
         if (width != null) {
             item.set ("width", (double) width);
         }

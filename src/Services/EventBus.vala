@@ -31,6 +31,7 @@ public class Akira.Services.EventBus : Object {
     public signal void item_inserted (Lib.Models.CanvasItem item);
     public signal void move_item_from_canvas (Gdk.EventKey event);
     public signal void request_change_cursor (Gdk.CursorType? cursor_type);
+    public signal void request_change_mode (Lib.Canvas.EditMode mode);
     public signal void request_escape ();
     public signal void request_zoom (string direction);
     public signal void set_focus_on_canvas ();
@@ -62,6 +63,10 @@ public class Akira.Services.EventBus : Object {
     // Others.
     public signal void disconnect_typing_accel ();
     public signal void connect_typing_accel ();
+
+    // Export signals.
+    public signal void generating_preview ();
+    public signal void preview_completed ();
 
     public void test (string caller_id) {
         debug (@"Test from EventBus called by $(caller_id)");

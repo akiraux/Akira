@@ -209,24 +209,7 @@ public class Akira.Services.ActionManager : Object {
     }
 
     private void action_export_grab () {
-        disable_typing_accels ();
-
-        var export_dialog = new Akira.Dialogs.ExportDialog (window);
-        export_dialog.show_all ();
-        export_dialog.present ();
-
-        export_dialog.update_format_ui ();
-
-        export_dialog.close.connect (() => {
-            int width, height;
-
-            export_dialog.get_size (out width, out height);
-            settings.export_width = width;
-            settings.export_height = height;
-
-            enable_typing_accels ();
-            window.event_bus.set_focus_on_canvas ();
-        });
+        window.event_bus.request_change_mode (Akira.Lib.Canvas.EditMode.MODE_EXPORT_AREA);
     }
 
     private void action_zoom_in () {
@@ -292,7 +275,7 @@ public class Akira.Services.ActionManager : Object {
     }
 
     private void on_choose_image_response (Gtk.FileChooserNative dialog, int response_id) {
-        window.main_window.main_canvas.canvas.edit_mode = Akira.Lib.Canvas.EditMode.MODE_SELECTION;
+        window.event_bus.request_change_mode (Akira.Lib.Canvas.EditMode.MODE_SELECTION);
         switch (response_id) {
             case Gtk.ResponseType.ACCEPT:
             case Gtk.ResponseType.OK:

@@ -86,6 +86,10 @@ public class Akira.Services.Settings : GLib.Settings {
     }
 
     // Export Settings.
+    public string export_folder {
+        owned get { return get_string ("export-folder"); }
+        set { set_string ("export-folder", value); }
+    }
     public int export_width {
         get { return get_int ("export-width"); }
         set { set_int ("export-width", value); }

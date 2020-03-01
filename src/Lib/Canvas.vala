@@ -46,11 +46,13 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
     public enum EditMode {
         MODE_SELECTION,
+        MODE_EXPORT_AREA,
         MODE_INSERT,
         MODE_PAN,
         MODE_PANNING,
     }
 
+    public Managers.ExportAreaManager export_area_manager;
     public Managers.SelectedBoundManager selected_bound_manager;
     private Managers.ItemsManager items_manager;
     private Managers.NobManager nob_manager;
@@ -79,6 +81,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         events |= Gdk.EventMask.TOUCHPAD_GESTURE_MASK;
         events |= Gdk.EventMask.TOUCH_MASK;
 
+        export_area_manager = new Managers.ExportAreaManager (this);
         selected_bound_manager = new Managers.SelectedBoundManager (this);
         items_manager = new Managers.ItemsManager (this);
         nob_manager = new Managers.NobManager (this);
@@ -86,6 +89,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
         window.event_bus.request_zoom.connect (on_request_zoom);
         window.event_bus.request_change_cursor.connect (on_request_change_cursor);
+        window.event_bus.request_change_mode.connect (on_request_change_mode);
         window.event_bus.set_focus_on_canvas.connect (on_set_focus_on_canvas);
         window.event_bus.request_escape.connect (on_set_focus_on_canvas);
         window.event_bus.insert_item.connect (on_insert_item);
@@ -116,6 +120,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     }
 
     public void set_cursor_by_edit_mode () {
+        hover_manager.remove_hover_effect ();
         // debug ("Calling set_cursor_by_edit_mode");
         Gdk.CursorType? new_cursor;
 
@@ -125,6 +130,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 break;
 
             case EditMode.MODE_INSERT:
+            case EditMode.MODE_EXPORT_AREA:
                 new_cursor = Gdk.CursorType.CROSSHAIR;
                 break;
 
@@ -153,6 +159,8 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         switch (uppercase_keyval) {
             case Gdk.Key.Escape:
                 edit_mode = Akira.Lib.Canvas.EditMode.MODE_SELECTION;
+                // Clear the selected export area to be sure to not leave anything behind.
+                export_area_manager.clear ();
                 break;
 
             case Gdk.Key.Delete:
@@ -259,9 +267,13 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 break;
 
             case EditMode.MODE_PAN:
-                //set_cursor_by_edit_mode ();
                 edit_mode = EditMode.MODE_PANNING;
                 canvas_scroll_set_origin (event.x, event.y);
+                break;
+
+            case EditMode.MODE_EXPORT_AREA:
+                selected_bound_manager.reset_selection ();
+                export_area_manager.create_area (event);
                 break;
         }
 
@@ -284,6 +296,11 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 edit_mode = EditMode.MODE_PAN;
                 break;
 
+            case EditMode.MODE_EXPORT_AREA:
+                export_area_manager.create_export_snapshot ();
+                edit_mode = EditMode.MODE_SELECTION;
+                break;
+
             default:
                 edit_mode = EditMode.MODE_SELECTION;
                 break;
@@ -298,9 +315,14 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
         window.event_bus.coordinate_change (event.x, event.y);
 
+        // Hover effect on items only if we're not holding any button and
+        // the user is currently in selection mode.
+        if (edit_mode == EditMode.MODE_SELECTION && !holding) {
+            hover_manager.add_hover_effect (event.x, event.y);
+        }
+
         if (!holding) {
             // Only motion_hover_effect
-            hover_manager.add_hover_effect (event.x, event.y);
             return false;
         }
 
@@ -313,6 +335,10 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
             case EditMode.MODE_PANNING:
                 canvas_moved (event.x, event.y);
+                break;
+
+            case EditMode.MODE_EXPORT_AREA:
+                export_area_manager.resize_area (event.x, event.y);
                 break;
         }
 
@@ -327,6 +353,8 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         edit_mode = EditMode.MODE_SELECTION;
         ctrl_is_pressed = false;
         focus_canvas ();
+        // Clear the selected export area to be sure to not leave anything behind.
+        export_area_manager.clear ();
     }
 
     public void focus_canvas () {
@@ -361,6 +389,10 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         }
 
         set_cursor (cursor_type);
+    }
+
+    private void on_request_change_mode (EditMode mode) {
+        edit_mode = mode;
     }
 
     private void set_cursor (Gdk.CursorType? cursor_type) {
