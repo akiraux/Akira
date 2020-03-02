@@ -22,17 +22,11 @@
 public class Akira.Models.ExportModel : GLib.Object {
     public Gdk.Pixbuf pixbuf { get; set construct; }
     public string filename { get; set construct; }
-    public string format { get; set construct; }
-    public int quality { get; set construct; }
-    public int compression { get; set construct; }
 
-    public ExportModel (Gdk.Pixbuf pixbuf, string filename, string format, int quality, int compression) {
+    public ExportModel (Gdk.Pixbuf pixbuf, string filename) {
         Object (
             pixbuf: pixbuf,
-            filename: filename,
-            format: format,
-            quality: quality,
-            compression: compression
+            filename: filename
         );
     }
 

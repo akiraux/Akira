@@ -20,10 +20,14 @@
  */
 
 public class Akira.Partials.ExportWidget : Gtk.Grid {
+    private const int MB = 1024 * 1024;
+    private const int KB = 1024;
+
     public Akira.Models.ExportModel model { get; set construct; }
 
     private Gtk.Label info;
     private Gtk.Grid image_container;
+    private Gtk.Image image;
     private uint8[]? imagedata;
 
     public ExportWidget (Akira.Models.ExportModel model) {
@@ -49,18 +53,20 @@ public class Akira.Partials.ExportWidget : Gtk.Grid {
         image_container = new Gtk.Grid ();
         image_container.get_style_context ().add_class (Granite.STYLE_CLASS_CHECKERBOARD);
         image_container.get_style_context ().add_class (Granite.STYLE_CLASS_CARD);
+
+        image = new Gtk.Image ();
+        image_container.add (image);
         get_image.begin ();
+
         model.notify["pixbuf"].connect (() => {
-            image_container.@foreach ((image) => {
-                image_container.remove (image);
-            });
+            image.clear ();
             get_image.begin ();
-            show_all ();
         });
 
         // Filename with editable entry.
         var input = new Gtk.Entry ();
         input.get_style_context ().add_class ("export-filename");
+        input.width_chars = 1;
         input.hexpand = true;
         model.bind_property ("filename", input, "text",
             BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE);
@@ -85,43 +91,56 @@ public class Akira.Partials.ExportWidget : Gtk.Grid {
             resized_image = resized_image.scale_simple (w, h, Gdk.InterpType.BILINEAR);
         }
 
-        var image = new Gtk.Image.from_pixbuf (resized_image);
-        image_container.add (image);
+        image.set_from_pixbuf (resized_image);
+
+        yield get_image_buffer_size ();
         yield update_file_size ();
     }
 
     public async void update_file_size () {
-        //  yield get_image_buffer_size ();
-        //  stdout.write (imagedata);
+        double bytes = (double) imagedata.length;
+        double full_bytes = imagedata.length > MB
+            ? bytes / MB : bytes / KB;
+        var size = imagedata.length > MB
+            ? ("%0.1fMB").printf (full_bytes)
+            : ("%0.1fKB").printf (full_bytes);
 
-        var bytes = model.pixbuf.read_pixel_bytes ();
-        double full_bytes = (double) bytes.length;
-
-        info.label = ("%i × %i px · %0.1fMB").printf (
+        info.label = ("%i × %i px · %s").printf (
             model.pixbuf.width,
             model.pixbuf.height,
-            (full_bytes / (1024 * 1024)));
+            size);
     }
 
     private async void get_image_buffer_size () {
-        try {
-            if (model.format == "png") {
-                //  model.pixbuf.save_to_buffer (
-                //      out imagedata,
-                //      "png",
-                //      "compression",
-                //      model.compression.to_string (),
-                //      null);
-            } else if (model.format == "jpg") {
-                //  model.pixbuf.save_to_buffer (
-                //      out imagedata,
-                //      "jpeg",
-                //      "quality",
-                //      model.quality.to_string (),
-                //      null);
+        SourceFunc callback = get_image_buffer_size.callback;
+
+        new Thread<void*> (null, () => {
+            try {
+                if (settings.export_format == "png") {
+                    model.pixbuf.save_to_buffer (
+                        out imagedata,
+                        "png",
+                        "compression",
+                        settings.export_compression.to_string (),
+                        null);
+                } else if (settings.export_format == "jpg") {
+                    model.pixbuf.save_to_buffer (
+                        out imagedata,
+                        "jpeg",
+                        "quality",
+                        settings.export_quality.to_string (),
+                        null);
+                }
+            } catch (Error e) {
+                error ("Unable to create image buffer: %s", e.message);
             }
-        } catch (Error e) {
-            //  error ("Unable to create image buffer: %s", e.message);
-        }
+
+            Idle.add ((owned) callback);
+            Thread.exit (null);
+
+            return null;
+        });
+
+        yield;
     }
 }

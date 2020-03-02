@@ -56,7 +56,7 @@ public class Akira.Lib.Managers.ExportManager : Object {
             null,
             Utils.AffineTransform.fix_size (event.x),
             Utils.AffineTransform.fix_size (event.y),
-            1.0, 1.0,
+            2.0, 2.0,
             "line-width", LINE_WIDTH / canvas.current_scale,
             "stroke-color", COLOR,
             "line-dash", dash,
@@ -161,7 +161,7 @@ public class Akira.Lib.Managers.ExportManager : Object {
 
         yield;
 
-        export_dialog.generate_export_preview.begin ();
+        yield export_dialog.generate_export_preview ();
         canvas.window.event_bus.preview_completed ();
     }
 

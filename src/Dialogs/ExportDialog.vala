@@ -271,23 +271,8 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
             return;
         }
 
-        var model = new Akira.Models.ExportModel (
-            manager.pixbuf,
-            "Untitled",
-            settings.export_format,
-            settings.export_quality,
-            settings.export_compression
-        );
-
-        model.bind_property ("pixbuf", manager, "pixbuf",
-            BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE);
-        model.bind_property ("format", settings, "export-format",
-            BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE);
-        model.bind_property ("quality", settings, "export-quality",
-            BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE);
-        model.bind_property ("compression", settings, "export-compression",
-            BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE);
-
+        var model = new Akira.Models.ExportModel (manager.pixbuf, "Untitled");
+        manager.bind_property ("pixbuf", model, "pixbuf");
         list_store.append (model);
     }
 
