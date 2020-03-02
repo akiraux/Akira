@@ -76,6 +76,13 @@ public class Akira.Partials.ExportWidget : Gtk.Grid {
         attach (image_container, 0, 1, 2);
 
         show_all ();
+
+        settings.changed["export-quality"].connect (() => {
+            update_file_size.begin ();
+        });
+        settings.changed["export-compression"].connect (() => {
+            update_file_size.begin ();
+        });
     }
 
     /**
@@ -93,11 +100,12 @@ public class Akira.Partials.ExportWidget : Gtk.Grid {
 
         image.set_from_pixbuf (resized_image);
 
-        yield get_image_buffer_size ();
         yield update_file_size ();
     }
 
     public async void update_file_size () {
+        yield get_image_buffer_size ();
+
         double bytes = (double) imagedata.length;
         double full_bytes = imagedata.length > MB
             ? bytes / MB : bytes / KB;
