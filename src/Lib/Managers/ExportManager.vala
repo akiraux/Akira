@@ -143,7 +143,7 @@ public class Akira.Lib.Managers.ExportManager : Object {
             error ("Threads are not supported!");
         }
 
-        canvas.window.event_bus.generating_preview ();
+        canvas.window.event_bus.busy_export_dialog (_("Generating preview, please wait…"));
         SourceFunc callback = init_generate_pixbuf.callback;
 
         new Thread<void*> (null, () => {
@@ -162,7 +162,7 @@ public class Akira.Lib.Managers.ExportManager : Object {
         yield;
 
         yield export_dialog.generate_export_preview ();
-        canvas.window.event_bus.preview_completed ();
+        canvas.window.event_bus.export_completed ();
     }
 
     public void generate_pixbuf () throws Error {
@@ -287,29 +287,44 @@ public class Akira.Lib.Managers.ExportManager : Object {
         });
     }
 
-    public void export_images () {
-        for (int i = 0; i < export_dialog.list_store.get_n_items (); i++) {
-            var model = (Akira.Models.ExportModel) export_dialog.list_store.get_object (i);
+    public async void export_images () {
+        canvas.window.event_bus.busy_export_dialog (_("Exporting images, please wait…"));
 
-            try {
-                if (settings.export_format == "png") {
-                    model.pixbuf.save (
-                        settings.export_folder + "/" + model.filename + ".png",
-                        "png",
-                        "compression",
-                        settings.export_compression.to_string (),
-                        null);
-                } else if (settings.export_format == "jpg") {
-                    model.pixbuf.save (
-                        settings.export_folder + "/" + model.filename + ".jpg",
-                        "jpeg",
-                        "quality",
-                        settings.export_quality.to_string (),
-                        null);
+        SourceFunc callback = export_images.callback;
+
+        new Thread<void*> (null, () => {
+            for (int i = 0; i < export_dialog.list_store.get_n_items (); i++) {
+                var model = (Akira.Models.ExportModel) export_dialog.list_store.get_object (i);
+
+                try {
+                    if (settings.export_format == "png") {
+                        model.pixbuf.save (
+                            settings.export_folder + "/" + model.filename + ".png",
+                            "png",
+                            "compression",
+                            settings.export_compression.to_string (),
+                            null);
+                    } else if (settings.export_format == "jpg") {
+                        model.pixbuf.save (
+                            settings.export_folder + "/" + model.filename + ".jpg",
+                            "jpeg",
+                            "quality",
+                            settings.export_quality.to_string (),
+                            null);
+                    }
+                } catch (Error e) {
+                    error ("Unable to export images: %s", e.message);
                 }
-            } catch (Error e) {
-                error ("Unable to export images: %s", e.message);
             }
-        }
+
+            Idle.add ((owned) callback);
+            Thread.exit (null);
+
+            return null;
+        });
+
+        yield;
+
+        canvas.window.event_bus.export_completed ();
     }
 }

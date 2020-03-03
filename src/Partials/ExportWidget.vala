@@ -51,6 +51,7 @@ public class Akira.Partials.ExportWidget : Gtk.Grid {
 
         // Image preview container with checker.
         image_container = new Gtk.Grid ();
+        image_container.halign = Gtk.Align.CENTER;
         image_container.get_style_context ().add_class (Granite.STYLE_CLASS_CHECKERBOARD);
         image_container.get_style_context ().add_class (Granite.STYLE_CLASS_CARD);
 
@@ -66,7 +67,7 @@ public class Akira.Partials.ExportWidget : Gtk.Grid {
         // Filename with editable entry.
         var input = new Gtk.Entry ();
         input.get_style_context ().add_class ("export-filename");
-        input.width_chars = 1;
+        input.width_chars = 10;
         input.hexpand = true;
         model.bind_property ("filename", input, "text",
             BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE);
@@ -113,13 +114,14 @@ public class Akira.Partials.ExportWidget : Gtk.Grid {
             ? ("%0.1fMB").printf (full_bytes)
             : ("%0.1fKB").printf (full_bytes);
 
-        info.label = ("%i × %i px · %s").printf (
+        info.label = _("%i × %i px · %s").printf (
             model.pixbuf.width,
             model.pixbuf.height,
             size);
     }
 
     private async void get_image_buffer_size () {
+        info.label = _("Fetching image size…");
         SourceFunc callback = get_image_buffer_size.callback;
 
         new Thread<void*> (null, () => {

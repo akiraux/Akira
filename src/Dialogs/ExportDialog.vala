@@ -54,8 +54,8 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
     }
 
     construct {
-        window.event_bus.generating_preview.connect (on_generating_preview);
-        window.event_bus.preview_completed.connect (on_preview_completed);
+        window.event_bus.busy_export_dialog.connect (on_busy_export_dialog);
+        window.event_bus.export_completed.connect (on_export_completed);
 
         transient_for = window;
         use_header_bar = 1;
@@ -92,7 +92,6 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
 
         main_overlay = new Gtk.Overlay ();
         overlaybar = new Granite.Widgets.OverlayBar (main_overlay);
-        overlaybar.label = _("Generating preview, please wait…");
         overlaybar.active = true;
 
         var main = new Gtk.Grid ();
@@ -247,7 +246,7 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
         export_button.halign = Gtk.Align.END;
         action_area.add (export_button);
         export_button.clicked.connect (() => {
-            manager.export_images ();
+            manager.export_images.begin ();
             close ();
         });
 
@@ -283,14 +282,15 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
         return title_label;
     }
 
-    private async void on_generating_preview () {
+    private async void on_busy_export_dialog (string message) {
+        overlaybar.label = message;
         overlaybar.visible = true;
         sidebar.@foreach ((child) => {
             child.sensitive = false;
         });
     }
 
-    private async void on_preview_completed () {
+    private async void on_export_completed () {
         sidebar.@foreach ((child) => {
             child.sensitive = true;
         });
