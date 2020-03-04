@@ -30,6 +30,7 @@ public class Akira.Layouts.MainCanvas : Gtk.Grid {
 
     private Gtk.Overlay main_overlay;
     private Granite.Widgets.OverlayBar overlaybar;
+    private Granite.Widgets.Toast notification;
 
     private double scroll_origin_x = 0;
     private double scroll_origin_y = 0;
@@ -45,6 +46,8 @@ public class Akira.Layouts.MainCanvas : Gtk.Grid {
         get_allocation (out main_window_size);
 
         main_overlay = new Gtk.Overlay ();
+        notification = new Granite.Widgets.Toast (_("Button was pressed!"));
+
         main_scroll = new Gtk.ScrolledWindow (null, null);
         main_scroll.expand = true;
 
@@ -99,6 +102,7 @@ public class Akira.Layouts.MainCanvas : Gtk.Grid {
         main_scroll.vadjustment.value = CANVAS_SIZE / 2;
 
         main_overlay.add (main_scroll);
+        main_overlay.add_overlay (notification);
 
         add (main_overlay);
     }
@@ -150,5 +154,11 @@ public class Akira.Layouts.MainCanvas : Gtk.Grid {
     private async void on_export_completed () {
         main_overlay.remove (overlaybar);
         overlaybar = null;
+        yield trigger_notification (_("Export completed!"));
+    }
+
+    private async void trigger_notification (string message) {
+        notification.title = message;
+        notification.send_notification ();
     }
 }
