@@ -37,12 +37,13 @@ public class Akira.Lib.Managers.ExportManager : Object {
     public Cairo.Surface surface;
     public Cairo.Context context;
     public Gdk.PixbufLoader loader;
-    public Gdk.Pixbuf pixbuf { get; set; }
+    public Array<Gdk.Pixbuf> pixbufs { get; set construct; }
 
     public ExportManager (Akira.Lib.Canvas canvas) {
         Object (
             canvas: canvas
         );
+        pixbufs = new Array<Gdk.Pixbuf> ();
     }
 
     public Goo.CanvasRect create_area (Gdk.EventButton event) {
@@ -166,6 +167,10 @@ public class Akira.Lib.Managers.ExportManager : Object {
     }
 
     public void generate_pixbuf () throws Error {
+        // Clear pixbuf array directly as we're dealing with an area export
+        // therefore only one value is present.
+        pixbufs._remove_index (0);
+
         if (settings.export_format == "png") {
             format = Cairo.Format.ARGB32;
         } else if (settings.export_format == "jpg") {
@@ -215,7 +220,8 @@ public class Akira.Lib.Managers.ExportManager : Object {
         } catch (Error e) {
             throw (e);
         }
-        pixbuf = scaled;
+
+        pixbufs.append_val (scaled);
     }
 
     public Gdk.Pixbuf rescale_image (Gdk.Pixbuf pixbuf) {

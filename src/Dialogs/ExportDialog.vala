@@ -266,13 +266,17 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
 
     public async void generate_export_preview () {
         if (list_store.get_n_items () > 0) {
-            // The specific models were already created.
+            for (int i = 0; i < list_store.get_n_items () ; i++) {
+                var model = (Akira.Models.ExportModel) list_store.get_object (i);
+                model.pixbuf = manager.pixbufs.index (i);
+            }
             return;
         }
 
-        var model = new Akira.Models.ExportModel (manager.pixbuf, "Untitled");
-        manager.bind_property ("pixbuf", model, "pixbuf");
-        list_store.append (model);
+        for (int i = 0; i < manager.pixbufs.length ; i++) {
+            var model = new Akira.Models.ExportModel (manager.pixbufs.index (i), "Untitled");
+            list_store.append (model);
+        }
     }
 
     private Gtk.Label section_title (string title) {
