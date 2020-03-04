@@ -143,7 +143,7 @@ public class Akira.Lib.Managers.ExportManager : Object {
             error ("Threads are not supported!");
         }
 
-        canvas.window.event_bus.busy_export_dialog (_("Generating preview, please wait…"));
+        canvas.window.event_bus.export_preview (_("Generating preview, please wait…"));
         SourceFunc callback = init_generate_pixbuf.callback;
 
         new Thread<void*> (null, () => {
@@ -162,7 +162,7 @@ public class Akira.Lib.Managers.ExportManager : Object {
         yield;
 
         yield export_dialog.generate_export_preview ();
-        canvas.window.event_bus.export_completed ();
+        canvas.window.event_bus.preview_completed ();
     }
 
     public void generate_pixbuf () throws Error {
@@ -288,7 +288,7 @@ public class Akira.Lib.Managers.ExportManager : Object {
     }
 
     public async void export_images () {
-        canvas.window.event_bus.busy_export_dialog (_("Exporting images, please wait…"));
+        canvas.window.event_bus.exporting (_("Exporting images…"));
 
         SourceFunc callback = export_images.callback;
 

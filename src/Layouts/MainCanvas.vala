@@ -28,6 +28,9 @@ public class Akira.Layouts.MainCanvas : Gtk.Grid {
     public Gtk.Allocation main_window_size;
     public weak Akira.Window window { get; construct; }
 
+    private Gtk.Overlay main_overlay;
+    private Granite.Widgets.OverlayBar overlaybar;
+
     private double scroll_origin_x = 0;
     private double scroll_origin_y = 0;
 
@@ -36,8 +39,12 @@ public class Akira.Layouts.MainCanvas : Gtk.Grid {
     }
 
     construct {
+        window.event_bus.exporting.connect (on_exporting);
+        window.event_bus.export_completed.connect (on_export_completed);
+
         get_allocation (out main_window_size);
 
+        main_overlay = new Gtk.Overlay ();
         main_scroll = new Gtk.ScrolledWindow (null, null);
         main_scroll.expand = true;
 
@@ -91,7 +98,9 @@ public class Akira.Layouts.MainCanvas : Gtk.Grid {
         main_scroll.hadjustment.value = CANVAS_SIZE / 2;
         main_scroll.vadjustment.value = CANVAS_SIZE / 2;
 
-        attach (main_scroll, 0, 0, 1, 1);
+        main_overlay.add (main_scroll);
+
+        add (main_overlay);
     }
 
     public bool on_scroll (Gdk.EventScroll event) {
@@ -129,5 +138,17 @@ public class Akira.Layouts.MainCanvas : Gtk.Grid {
             main_scroll.hadjustment.value += delta_x * 10;
         }
         return true;
+    }
+
+    private async void on_exporting (string message) {
+        overlaybar = new Granite.Widgets.OverlayBar (main_overlay);
+        overlaybar.label = message;
+        overlaybar.active = true;
+        show_all ();
+    }
+
+    private async void on_export_completed () {
+        main_overlay.remove (overlaybar);
+        overlaybar = null;
     }
 }

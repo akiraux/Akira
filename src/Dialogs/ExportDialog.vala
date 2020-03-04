@@ -54,8 +54,8 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
     }
 
     construct {
-        window.event_bus.busy_export_dialog.connect (on_busy_export_dialog);
-        window.event_bus.export_completed.connect (on_export_completed);
+        window.event_bus.export_preview.connect (on_export_preview);
+        window.event_bus.preview_completed.connect (on_preview_completed);
 
         transient_for = window;
         use_header_bar = 1;
@@ -282,7 +282,7 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
         return title_label;
     }
 
-    private async void on_busy_export_dialog (string message) {
+    private async void on_export_preview (string message) {
         overlaybar.label = message;
         overlaybar.visible = true;
         sidebar.@foreach ((child) => {
@@ -290,7 +290,7 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
         });
     }
 
-    private async void on_export_completed () {
+    private async void on_preview_completed () {
         sidebar.@foreach ((child) => {
             child.sensitive = true;
         });
