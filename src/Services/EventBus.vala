@@ -37,6 +37,7 @@ public class Akira.Services.EventBus : Object {
     public signal void set_focus_on_canvas ();
     public signal void update_nob_size ();
     public signal void zoom ();
+    public signal void canvas_notification (string message);
 
     // Options panel signals.
     public signal void align_items (string align_action);
@@ -65,8 +66,10 @@ public class Akira.Services.EventBus : Object {
     public signal void connect_typing_accel ();
 
     // Export signals.
-    public signal void generating_preview ();
+    public signal void export_preview (string message);
     public signal void preview_completed ();
+    public signal void exporting (string message);
+    public signal void export_completed ();
 
     public void test (string caller_id) {
         debug (@"Test from EventBus called by $(caller_id)");

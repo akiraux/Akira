@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2019 Alecaddd (http://alecaddd.com)
+* Copyright (c) 2019-2020 Alecaddd (https://alecaddd.com)
 *
 * This file is part of Akira.
 *
@@ -10,11 +10,11 @@
 
 * Akira is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 * GNU General Public License for more details.
 
 * You should have received a copy of the GNU General Public License
-* along with Akira.  If not, see <https://www.gnu.org/licenses/>.
+* along with Akira. If not, see <https://www.gnu.org/licenses/>.
 *
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 * Authored by: Giacomo "giacomoalbe" Alberini <giacomoalbe@gmail.com>
@@ -28,6 +28,10 @@ public class Akira.Layouts.MainCanvas : Gtk.Grid {
     public Gtk.Allocation main_window_size;
     public weak Akira.Window window { get; construct; }
 
+    private Gtk.Overlay main_overlay;
+    private Granite.Widgets.OverlayBar overlaybar;
+    private Granite.Widgets.Toast notification;
+
     private double scroll_origin_x = 0;
     private double scroll_origin_y = 0;
 
@@ -36,7 +40,14 @@ public class Akira.Layouts.MainCanvas : Gtk.Grid {
     }
 
     construct {
+        window.event_bus.exporting.connect (on_exporting);
+        window.event_bus.export_completed.connect (on_export_completed);
+        window.event_bus.canvas_notification.connect (trigger_notification);
+
         get_allocation (out main_window_size);
+
+        main_overlay = new Gtk.Overlay ();
+        notification = new Granite.Widgets.Toast (_("Button was pressed!"));
 
         main_scroll = new Gtk.ScrolledWindow (null, null);
         main_scroll.expand = true;
@@ -91,7 +102,10 @@ public class Akira.Layouts.MainCanvas : Gtk.Grid {
         main_scroll.hadjustment.value = CANVAS_SIZE / 2;
         main_scroll.vadjustment.value = CANVAS_SIZE / 2;
 
-        attach (main_scroll, 0, 0, 1, 1);
+        main_overlay.add (main_scroll);
+        main_overlay.add_overlay (notification);
+
+        add (main_overlay);
     }
 
     public bool on_scroll (Gdk.EventScroll event) {
@@ -129,5 +143,23 @@ public class Akira.Layouts.MainCanvas : Gtk.Grid {
             main_scroll.hadjustment.value += delta_x * 10;
         }
         return true;
+    }
+
+    private async void on_exporting (string message) {
+        overlaybar = new Granite.Widgets.OverlayBar (main_overlay);
+        overlaybar.label = message;
+        overlaybar.active = true;
+        show_all ();
+    }
+
+    private async void on_export_completed () {
+        main_overlay.remove (overlaybar);
+        overlaybar = null;
+        yield trigger_notification (_("Export completed!"));
+    }
+
+    private async void trigger_notification (string message) {
+        notification.title = message;
+        notification.send_notification ();
     }
 }

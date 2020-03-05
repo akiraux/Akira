@@ -19,7 +19,7 @@
  * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
  */
 
-public class Akira.Lib.Managers.ExportAreaManager : Object {
+public class Akira.Lib.Managers.ExportManager : Object {
     private const string COLOR = "#41c9fd";
     private const double LINE_WIDTH = 2.0;
     private const double MIN_SIZE = 1.0;
@@ -37,12 +37,13 @@ public class Akira.Lib.Managers.ExportAreaManager : Object {
     public Cairo.Surface surface;
     public Cairo.Context context;
     public Gdk.PixbufLoader loader;
-    public Gdk.Pixbuf pixbuf;
+    public Array<Gdk.Pixbuf> pixbufs { get; set construct; }
 
-    public ExportAreaManager (Akira.Lib.Canvas canvas) {
+    public ExportManager (Akira.Lib.Canvas canvas) {
         Object (
             canvas: canvas
         );
+        pixbufs = new Array<Gdk.Pixbuf> ();
     }
 
     public Goo.CanvasRect create_area (Gdk.EventButton event) {
@@ -56,7 +57,7 @@ public class Akira.Lib.Managers.ExportAreaManager : Object {
             null,
             Utils.AffineTransform.fix_size (event.x),
             Utils.AffineTransform.fix_size (event.y),
-            1.0, 1.0,
+            2.0, 2.0,
             "line-width", LINE_WIDTH / canvas.current_scale,
             "stroke-color", COLOR,
             "line-dash", dash,
@@ -143,7 +144,7 @@ public class Akira.Lib.Managers.ExportAreaManager : Object {
             error ("Threads are not supported!");
         }
 
-        canvas.window.event_bus.generating_preview ();
+        canvas.window.event_bus.export_preview (_("Generating preview, please wait…"));
         SourceFunc callback = init_generate_pixbuf.callback;
 
         new Thread<void*> (null, () => {
@@ -161,11 +162,15 @@ public class Akira.Lib.Managers.ExportAreaManager : Object {
 
         yield;
 
-        export_dialog.generate_export_preview.begin ();
+        yield export_dialog.generate_export_preview ();
         canvas.window.event_bus.preview_completed ();
     }
 
     public void generate_pixbuf () throws Error {
+        // Clear pixbuf array directly as we're dealing with an area export
+        // therefore only one value is present.
+        pixbufs._remove_index (0);
+
         if (settings.export_format == "png") {
             format = Cairo.Format.ARGB32;
         } else if (settings.export_format == "jpg") {
@@ -215,7 +220,8 @@ public class Akira.Lib.Managers.ExportAreaManager : Object {
         } catch (Error e) {
             throw (e);
         }
-        pixbuf = scaled;
+
+        pixbufs.append_val (scaled);
     }
 
     public Gdk.Pixbuf rescale_image (Gdk.Pixbuf pixbuf) {
@@ -287,29 +293,44 @@ public class Akira.Lib.Managers.ExportAreaManager : Object {
         });
     }
 
-    public void export_images () {
-        for (int i = 0; i < export_dialog.list_store.get_n_items (); i++) {
-            var model = (Akira.Models.ExportModel) export_dialog.list_store.get_object (i);
+    public async void export_images () {
+        canvas.window.event_bus.exporting (_("Exporting images…"));
 
-            try {
-                if (settings.export_format == "png") {
-                    model.pixbuf.save (
-                        settings.export_folder + "/" + model.filename + ".png",
-                        "png",
-                        "compression",
-                        settings.export_compression.to_string (),
-                        null);
-                } else if (settings.export_format == "jpg") {
-                    model.pixbuf.save (
-                        settings.export_folder + "/" + model.filename + ".jpg",
-                        "jpeg",
-                        "quality",
-                        settings.export_quality.to_string (),
-                        null);
+        SourceFunc callback = export_images.callback;
+
+        new Thread<void*> (null, () => {
+            for (int i = 0; i < export_dialog.list_store.get_n_items (); i++) {
+                var model = (Akira.Models.ExportModel) export_dialog.list_store.get_object (i);
+
+                try {
+                    if (settings.export_format == "png") {
+                        model.pixbuf.save (
+                            settings.export_folder + "/" + model.filename + ".png",
+                            "png",
+                            "compression",
+                            settings.export_compression.to_string (),
+                            null);
+                    } else if (settings.export_format == "jpg") {
+                        model.pixbuf.save (
+                            settings.export_folder + "/" + model.filename + ".jpg",
+                            "jpeg",
+                            "quality",
+                            settings.export_quality.to_string (),
+                            null);
+                    }
+                } catch (Error e) {
+                    error ("Unable to export images: %s", e.message);
                 }
-            } catch (Error e) {
-                error ("Unable to export images: %s", e.message);
             }
-        }
+
+            Idle.add ((owned) callback);
+            Thread.exit (null);
+
+            return null;
+        });
+
+        yield;
+
+        canvas.window.event_bus.export_completed ();
     }
 }

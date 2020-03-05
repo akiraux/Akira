@@ -21,7 +21,7 @@
 
 public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
     public weak Akira.Window window { get; construct; }
-    public weak Akira.Lib.Managers.ExportAreaManager manager { get; construct; }
+    public weak Akira.Lib.Managers.ExportManager manager { get; construct; }
 
     public GLib.ListStore list_store;
 
@@ -42,7 +42,7 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
     private Gtk.Overlay main_overlay;
     private Granite.Widgets.OverlayBar overlaybar;
 
-    public ExportDialog (Akira.Window window, Akira.Lib.Managers.ExportAreaManager manager) {
+    public ExportDialog (Akira.Window window, Akira.Lib.Managers.ExportManager manager) {
         Object (
             window: window,
             manager: manager,
@@ -54,7 +54,7 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
     }
 
     construct {
-        window.event_bus.generating_preview.connect (on_generating_preview);
+        window.event_bus.export_preview.connect (on_export_preview);
         window.event_bus.preview_completed.connect (on_preview_completed);
 
         transient_for = window;
@@ -92,7 +92,6 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
 
         main_overlay = new Gtk.Overlay ();
         overlaybar = new Granite.Widgets.OverlayBar (main_overlay);
-        overlaybar.label = _("Generating preview, please wait…");
         overlaybar.active = true;
 
         var main = new Gtk.Grid ();
@@ -247,7 +246,7 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
         export_button.halign = Gtk.Align.END;
         action_area.add (export_button);
         export_button.clicked.connect (() => {
-            manager.export_images ();
+            manager.export_images.begin ();
             close ();
         });
 
@@ -267,14 +266,15 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
 
     public async void generate_export_preview () {
         if (list_store.get_n_items () > 0) {
-            for (int i = 0; i < list_store.get_n_items (); i++) {
+            for (int i = 0; i < list_store.get_n_items () ; i++) {
                 var model = (Akira.Models.ExportModel) list_store.get_object (i);
-                model.pixbuf = manager.pixbuf;
+                model.pixbuf = manager.pixbufs.index (i);
             }
             return;
         }
-        for (int i = 0; i < 1; i++) {
-            var model = new Akira.Models.ExportModel (manager.pixbuf, "Untitled-%i".printf (i));
+
+        for (int i = 0; i < manager.pixbufs.length ; i++) {
+            var model = new Akira.Models.ExportModel (manager.pixbufs.index (i), "Untitled");
             list_store.append (model);
         }
     }
@@ -286,7 +286,8 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
         return title_label;
     }
 
-    private async void on_generating_preview () {
+    private async void on_export_preview (string message) {
+        overlaybar.label = message;
         overlaybar.visible = true;
         sidebar.@foreach ((child) => {
             child.sensitive = false;
