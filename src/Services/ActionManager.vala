@@ -201,11 +201,19 @@ public class Akira.Services.ActionManager : Object {
     }
 
     private void action_export_selection () {
-        warning ("export");
+        weak Akira.Lib.Canvas canvas = window.main_window.main_canvas.canvas;
+        if (canvas.selected_bound_manager.selected_items.length () == 0) {
+            // Check if an element is currently selected.
+            window.event_bus.canvas_notification (_("Nothing selected to export!"));
+            return;
+        }
+        // TODO: Trigger selection pixbuf generation.
     }
 
     private void action_export_artboards () {
-        warning ("export");
+        // Check if at least an artboard is present.
+        window.event_bus.canvas_notification (_("No Artboard available!"));
+        // TODO: Trigger artboards pixbuf generation.
     }
 
     private void action_export_grab () {
