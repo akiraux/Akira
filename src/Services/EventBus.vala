@@ -38,6 +38,8 @@ public class Akira.Services.EventBus : Object {
     public signal void update_nob_size ();
     public signal void zoom ();
     public signal void canvas_notification (string message);
+    public signal void hide_select_effect ();
+    public signal void show_select_effect ();
 
     // Options panel signals.
     public signal void align_items (string align_action);

@@ -24,6 +24,12 @@ public class Akira.Lib.Managers.ExportManager : Object {
     private const double LINE_WIDTH = 2.0;
     private const double MIN_SIZE = 1.0;
 
+    public enum Type {
+        AREA,
+        SELECTION,
+        ARTBOARD
+    }
+
     public weak Akira.Lib.Canvas canvas { get; construct; }
     public Akira.Dialogs.ExportDialog export_dialog;
 
@@ -127,29 +133,55 @@ public class Akira.Lib.Managers.ExportManager : Object {
         area.remove ();
     }
 
-    public void create_export_snapshot () {
+    /**
+     * Trigger the creation of the pixbuf for the export_area action.
+     */
+    public void create_area_snapshot () {
         // Hide the area before rendering.
         area.visibility = Goo.CanvasItemVisibility.INVISIBLE;
         // Open Export Dialog before we have the preview.
-        trigger_export_dialog ();
+        trigger_export_dialog (Type.AREA);
         // Generate the image to export.
-        init_generate_pixbuf.begin ();
+        init_generate_area_pixbuf.begin ();
+    }
+
+    /**
+     * Trigger the creation of the pixbuf for the export_selection action.
+     */
+    public void create_selection_snapshot () {
+        canvas.window.event_bus.hide_select_effect ();
+        // Open Export Dialog before we have the preview.
+        trigger_export_dialog (Type.SELECTION);
+        // Generate the image to export.
+        init_generate_selection_pixbuf.begin ();
+    }
+
+    public void regenerate_pixbuf (Type type) {
+        switch (type) {
+            case AREA:
+                init_generate_area_pixbuf.begin ();
+                break;
+            case SELECTION:
+                canvas.window.event_bus.hide_select_effect ();
+                init_generate_selection_pixbuf.begin ();
+                break;
+        }
     }
 
     /**
      * Use multithreading to handle async pixbuf loading without freezing the UI.
      */
-    public async void init_generate_pixbuf () throws ThreadError {
+    public async void init_generate_area_pixbuf () throws ThreadError {
         if (Thread.supported () == false) {
             error ("Threads are not supported!");
         }
 
         canvas.window.event_bus.export_preview (_("Generating preview, please wait…"));
-        SourceFunc callback = init_generate_pixbuf.callback;
+        SourceFunc callback = init_generate_area_pixbuf.callback;
 
         new Thread<void*> (null, () => {
             try {
-                generate_pixbuf ();
+                generate_area_pixbuf ();
             } catch (Error e) {
                 error ("Could not generate export preview: %s", e.message);
             }
@@ -166,7 +198,35 @@ public class Akira.Lib.Managers.ExportManager : Object {
         canvas.window.event_bus.preview_completed ();
     }
 
-    public void generate_pixbuf () throws Error {
+    public async void init_generate_selection_pixbuf () throws ThreadError {
+        if (Thread.supported () == false) {
+            error ("Threads are not supported!");
+        }
+
+        canvas.window.event_bus.export_preview (_("Generating preview, please wait…"));
+        SourceFunc callback = init_generate_selection_pixbuf.callback;
+
+        new Thread<void*> (null, () => {
+            try {
+                generate_selection_pixbuf ();
+            } catch (Error e) {
+                error ("Could not generate export preview: %s", e.message);
+            }
+
+            Idle.add ((owned) callback);
+            Thread.exit (null);
+
+            return null;
+        });
+
+        yield;
+
+        yield export_dialog.generate_export_preview ();
+        canvas.window.event_bus.preview_completed ();
+        canvas.window.event_bus.show_select_effect ();
+    }
+
+    public void generate_area_pixbuf () throws Error {
         // Clear pixbuf array directly as we're dealing with an area export
         // therefore only one value is present.
         pixbufs._remove_index (0);
@@ -224,38 +284,108 @@ public class Akira.Lib.Managers.ExportManager : Object {
         pixbufs.append_val (scaled);
     }
 
-    public Gdk.Pixbuf rescale_image (Gdk.Pixbuf pixbuf) {
+    public void generate_selection_pixbuf () throws Error {
+        // Clear pixbuf array from previously stored values.
+        for (int i = 0; i < pixbufs.length; i++) {
+            pixbufs._remove_index (i);
+        }
+
+        if (settings.export_format == "png") {
+            format = Cairo.Format.ARGB32;
+        } else if (settings.export_format == "jpg") {
+            format = Cairo.Format.RGB24;
+        }
+
+        // Loop through all the currently selected elements.
+        for (var i = 0; i < canvas.selected_bound_manager.selected_items.length (); i++) {
+            var item = canvas.selected_bound_manager.selected_items.nth_data (i);
+
+            // Create the rendered image with Cairo.
+            surface = new Cairo.ImageSurface (
+                format,
+                (int) Math.round (item.get_coords ("width")),
+                (int) Math.round (item.get_coords ("height"))
+            );
+            context = new Cairo.Context (surface);
+
+            // Draw a white background if JPG export.
+            if (settings.export_format == "jpg" || !settings.export_alpha) {
+                context.set_source_rgba (1, 1, 1, 1);
+                context.rectangle (
+                    0, 0,
+                    (int) Math.round (item.get_coords ("width")),
+                    (int) Math.round (item.get_coords ("height")));
+                context.fill ();
+            }
+
+            // Move to the currently selected item.
+            context.translate (-item.bounds.x1, -item.bounds.y1);
+
+            // Render the selected item.
+            canvas.render (context, null, canvas.current_scale);
+
+            // Create pixbuf from stream.
+            try {
+                loader = new Gdk.PixbufLoader.with_mime_type ("image/png");
+            } catch (Error e) {
+                throw (e);
+            }
+
+            surface.write_to_png_stream ((data) => {
+                try {
+                    loader.write ((uint8 []) data);
+                } catch (Error e) {
+                    return Cairo.Status.DEVICE_ERROR;
+                }
+                return Cairo.Status.SUCCESS;
+            });
+            var scaled = rescale_image (loader.get_pixbuf (), item);
+
+            try {
+                loader.close ();
+            } catch (Error e) {
+                throw (e);
+            }
+
+            pixbufs.append_val (scaled);
+        }
+    }
+
+    public Gdk.Pixbuf rescale_image (Gdk.Pixbuf pixbuf, Lib.Models.CanvasItem? item = null) {
         Gdk.Pixbuf scaled_image;
+
+        var width = item != null ? item.get_coords ("width") : area.width;
+        var height = item != null ? item.get_coords ("height") : area.height;
 
         switch (settings.export_scale) {
             case 0:
                 scaled_image = pixbuf.scale_simple (
-                    (int) area.width / 2,
-                    (int) area.height / 2,
+                    (int) width / 2,
+                    (int) height / 2,
                     Gdk.InterpType.BILINEAR
                 );
                 break;
 
             case 2:
                 scaled_image = pixbuf.scale_simple (
-                    (int) area.width * 2,
-                    (int) area.height * 2,
+                    (int) width * 2,
+                    (int) height * 2,
                     Gdk.InterpType.BILINEAR
                 );
                 break;
 
             case 3:
                 scaled_image = pixbuf.scale_simple (
-                    (int) area.width * 4,
-                    (int) area.height * 4,
+                    (int) width * 4,
+                    (int) height * 4,
                     Gdk.InterpType.BILINEAR
                 );
                 break;
 
             default:
                 scaled_image = pixbuf.scale_simple (
-                    (int) area.width * 1,
-                    (int) area.height * 1,
+                    (int) width * 1,
+                    (int) height * 1,
                     Gdk.InterpType.BILINEAR
                 );
                 break;
@@ -264,11 +394,11 @@ public class Akira.Lib.Managers.ExportManager : Object {
         return scaled_image;
     }
 
-    public void trigger_export_dialog () {
+    public void trigger_export_dialog (Type type) {
         // Disable all those accels interfering with regular typing.
         canvas.window.event_bus.disconnect_typing_accel ();
 
-        export_dialog = new Akira.Dialogs.ExportDialog (canvas.window, this);
+        export_dialog = new Akira.Dialogs.ExportDialog (canvas.window, this, type);
         export_dialog.show_all ();
         export_dialog.present ();
 
