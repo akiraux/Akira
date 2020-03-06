@@ -208,6 +208,7 @@ public class Akira.Services.ActionManager : Object {
             return;
         }
         // TODO: Trigger selection pixbuf generation.
+        canvas.export_manager.create_selection_snapshot ();
     }
 
     private void action_export_artboards () {

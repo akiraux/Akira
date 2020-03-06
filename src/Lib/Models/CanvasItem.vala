@@ -124,9 +124,9 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
 
         var rgba_fill = Gdk.RGBA ();
         rgba_fill = color;
-        //  debug (fill_alpha.to_string ());
+        // debug (fill_alpha.to_string ());
         rgba_fill.alpha = ((double) fill_alpha) / 255 * opacity / 100;
-        //  debug (rgba_fill.alpha.to_string ());
+        // debug (rgba_fill.alpha.to_string ());
 
         uint fill_color_rgba = Utils.Color.rgba_to_uint (rgba_fill);
         set ("fill-color-rgba", fill_color_rgba);

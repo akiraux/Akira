@@ -73,6 +73,8 @@ public class Akira.Lib.Managers.NobManager : Object {
 
         canvas.window.event_bus.selected_items_changed.connect (on_add_select_effect);
         canvas.window.event_bus.zoom.connect (on_canvas_zoom);
+        canvas.window.event_bus.hide_select_effect.connect (on_hide_select_effect);
+        canvas.window.event_bus.show_select_effect.connect (on_show_select_effect);
     }
 
     private void on_canvas_zoom () {
@@ -374,5 +376,19 @@ public class Akira.Lib.Managers.NobManager : Object {
         _height = height;
         x = left;
         y = top;
+    }
+
+    private async void on_hide_select_effect () {
+        for (int i = 0; i < 9; i++) {
+            nobs[i].set ("visibility", Goo.CanvasItemVisibility.HIDDEN);
+        }
+        select_effect.set ("visibility", Goo.CanvasItemVisibility.HIDDEN);
+    }
+
+    private async void on_show_select_effect () {
+        for (int i = 0; i < 9; i++) {
+            nobs[i].set ("visibility", Goo.CanvasItemVisibility.VISIBLE);
+        }
+        select_effect.set ("visibility", Goo.CanvasItemVisibility.VISIBLE);
     }
 }

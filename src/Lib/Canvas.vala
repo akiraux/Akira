@@ -52,7 +52,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         MODE_PANNING,
     }
 
-    public Managers.ExportManager export_area_manager;
+    public Managers.ExportManager export_manager;
     public Managers.SelectedBoundManager selected_bound_manager;
     private Managers.ItemsManager items_manager;
     private Managers.NobManager nob_manager;
@@ -81,7 +81,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         events |= Gdk.EventMask.TOUCHPAD_GESTURE_MASK;
         events |= Gdk.EventMask.TOUCH_MASK;
 
-        export_area_manager = new Managers.ExportManager (this);
+        export_manager = new Managers.ExportManager (this);
         selected_bound_manager = new Managers.SelectedBoundManager (this);
         items_manager = new Managers.ItemsManager (this);
         nob_manager = new Managers.NobManager (this);
@@ -160,7 +160,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
             case Gdk.Key.Escape:
                 edit_mode = Akira.Lib.Canvas.EditMode.MODE_SELECTION;
                 // Clear the selected export area to be sure to not leave anything behind.
-                export_area_manager.clear ();
+                export_manager.clear ();
                 break;
 
             case Gdk.Key.Delete:
@@ -273,7 +273,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
             case EditMode.MODE_EXPORT_AREA:
                 selected_bound_manager.reset_selection ();
-                export_area_manager.create_area (event);
+                export_manager.create_area (event);
                 break;
         }
 
@@ -297,7 +297,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 break;
 
             case EditMode.MODE_EXPORT_AREA:
-                export_area_manager.create_export_snapshot ();
+                export_manager.create_area_snapshot ();
                 edit_mode = EditMode.MODE_SELECTION;
                 break;
 
@@ -338,7 +338,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 break;
 
             case EditMode.MODE_EXPORT_AREA:
-                export_area_manager.resize_area (event.x, event.y);
+                export_manager.resize_area (event.x, event.y);
                 break;
         }
 
@@ -354,7 +354,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         ctrl_is_pressed = false;
         focus_canvas ();
         // Clear the selected export area to be sure to not leave anything behind.
-        export_area_manager.clear ();
+        export_manager.clear ();
     }
 
     public void focus_canvas () {

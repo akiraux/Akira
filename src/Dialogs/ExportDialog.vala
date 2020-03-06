@@ -22,6 +22,7 @@
 public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
     public weak Akira.Window window { get; construct; }
     public weak Akira.Lib.Managers.ExportManager manager { get; construct; }
+    public weak Akira.Lib.Managers.ExportManager.Type export_type { get; construct; }
 
     public GLib.ListStore list_store;
 
@@ -42,10 +43,15 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
     private Gtk.Overlay main_overlay;
     private Granite.Widgets.OverlayBar overlaybar;
 
-    public ExportDialog (Akira.Window window, Akira.Lib.Managers.ExportManager manager) {
+    public ExportDialog (
+        Akira.Window window,
+        Akira.Lib.Managers.ExportManager manager,
+        Akira.Lib.Managers.ExportManager.Type export_type
+    ) {
         Object (
             window: window,
             manager: manager,
+            export_type: export_type,
             border_width: 0,
             deletable: true,
             resizable: true,
@@ -167,7 +173,7 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
         grid.attach (file_format, 1, 2, 1, 1);
         settings.bind ("export-format", file_format, "active_id", SettingsBindFlags.DEFAULT);
         settings.changed["export-format"].connect (() => {
-            manager.init_generate_pixbuf.begin ();
+            manager.regenerate_pixbuf (export_type);
         });
 
         // Quality spinbutton.
@@ -206,7 +212,7 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
         grid.attach (alpha_switch, 1, 5, 1, 1);
         settings.bind ("export-alpha", alpha_switch, "active", SettingsBindFlags.DEFAULT);
         settings.changed["export-alpha"].connect (() => {
-            manager.init_generate_pixbuf.begin ();
+            manager.regenerate_pixbuf (export_type);
         });
 
         // Resolution.
@@ -223,7 +229,7 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
         settings.bind ("export-scale", scale_button, "selected", SettingsBindFlags.DEFAULT);
         grid.attach (scale_button, 1, 6, 1, 1);
         settings.changed["export-scale"].connect (() => {
-            manager.init_generate_pixbuf.begin ();
+            manager.regenerate_pixbuf (export_type);
         });
 
         // Buttons.
