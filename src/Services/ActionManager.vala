@@ -54,6 +54,7 @@ public class Akira.Services.ActionManager : Object {
     public const string ACTION_FLIP_H = "action_flip_h";
     public const string ACTION_FLIP_V = "action_flip_v";
     public const string ACTION_ESCAPE = "action_escape";
+    public const string ACTION_SHORTCUTS = "action_shortcuts";
 
     public static Gee.MultiMap<string, string> action_accelerators = new Gee.HashMultiMap<string, string> ();
     public static Gee.MultiMap<string, string> typing_accelerators = new Gee.HashMultiMap<string, string> ();
@@ -87,6 +88,7 @@ public class Akira.Services.ActionManager : Object {
         { ACTION_FLIP_H, action_flip_h },
         { ACTION_FLIP_V, action_flip_v },
         { ACTION_ESCAPE, action_escape },
+        { ACTION_SHORTCUTS, action_shortcuts },
     };
 
     public ActionManager (Akira.Application akira_app, Akira.Window window) {
@@ -120,6 +122,7 @@ public class Akira.Services.ActionManager : Object {
         action_accelerators.set (ACTION_FLIP_H, "<Control>bracketleft");
         action_accelerators.set (ACTION_FLIP_V, "<Control>bracketright");
         action_accelerators.set (ACTION_ESCAPE, "Escape");
+        action_accelerators.set (ACTION_SHORTCUTS, "F1");
 
         typing_accelerators.set (ACTION_ARTBOARD_TOOL, "a");
         typing_accelerators.set (ACTION_RECT_TOOL, "r");
@@ -308,6 +311,12 @@ public class Akira.Services.ActionManager : Object {
 
     private void action_escape () {
         window.event_bus.request_escape ();
+    }
+
+    private void action_shortcuts () {
+        var dialog = new Akira.Dialogs.ShortcutsDialog (window);
+        dialog.show_all ();
+        dialog.present ();
     }
 
     public static void action_from_group (string action_name, ActionGroup? action_group) {

@@ -71,6 +71,7 @@ sources = files(
     'Models/ListModel.vala',
     'Models/ExportModel.vala',
 
+    'Dialogs/ShortcutsDialog.vala',
     'Dialogs/SettingsDialog.vala',
     'Dialogs/ExportDialog.vala',
 
