@@ -49,7 +49,7 @@ public class Akira.Dialogs.ShortcutsDialog : Gtk.Dialog {
         column_start.attach (new ShortcutLabel ({"Ctrl", ","}), 1, 2);
         column_start.attach (new NameLabel (_("Quit:")), 0, 3);
         column_start.attach (new ShortcutLabel ({"Ctrl", "Q"}), 1, 3);
-        column_start.attach (new NameLabel (_("Presentation Mode:")), 0, 4);
+        column_start.attach (new NameLabel (_("Presentation mode:")), 0, 4);
         column_start.attach (new ShortcutLabel ({"Ctrl", "."}), 1, 4);
 
         column_start.attach (new Granite.HeaderLabel (_("File")), 0, 5, 2);
@@ -57,15 +57,15 @@ public class Akira.Dialogs.ShortcutsDialog : Gtk.Dialog {
         column_start.attach (new ShortcutLabel ({"Ctrl", "O"}), 1, 6);
         column_start.attach (new NameLabel (_("Save:")), 0, 7);
         column_start.attach (new ShortcutLabel ({"Ctrl", "S"}), 1, 7);
-        column_start.attach (new NameLabel (_("Save As:")), 0, 8);
+        column_start.attach (new NameLabel (_("Save as:")), 0, 8);
         column_start.attach (new ShortcutLabel ({"Ctrl", "Shift", "S"}), 1, 8);
 
         column_start.attach (new Granite.HeaderLabel (_("Export")), 0, 9, 2);
-        column_start.attach (new NameLabel (_("Export Artboards:")), 0, 10);
+        column_start.attach (new NameLabel (_("Export artboards:")), 0, 10);
         column_start.attach (new ShortcutLabel ({"Ctrl", "Alt", "A"}), 1, 10);
-        column_start.attach (new NameLabel (_("Export Selection:")), 0, 11);
+        column_start.attach (new NameLabel (_("Export selection:")), 0, 11);
         column_start.attach (new ShortcutLabel ({"Ctrl", "Alt", "E"}), 1, 11);
-        column_start.attach (new NameLabel (_("Highlight Area to Export:")), 0, 12);
+        column_start.attach (new NameLabel (_("Highlight area to export:")), 0, 12);
         column_start.attach (new ShortcutLabel ({"Ctrl", "Alt", "G"}), 1, 12);
 
         var column_end = new Gtk.Grid ();
