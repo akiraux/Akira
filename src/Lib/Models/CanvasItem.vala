@@ -69,6 +69,8 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
     public abstract string layer_icon { get; set; }
     public abstract int z_index { get; set; }
 
+    public abstract Akira.Lib.Canvas canvas { get; set; }
+
     public double get_coords (string coord_id) {
         double _coord = 0.0;
         get (coord_id, out _coord);
@@ -106,9 +108,17 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
     }
 
     public static void update_z_index (Goo.CanvasItem item) {
-        var z_index = item.get_canvas ().get_root_item ().find_child (item);
+        //var z_index = (item as Models.CanvasItej).canvas.get_root_item ().find_child (item);
 
-        item.set ("z-index", z_index);
+        //item.set ("z-index", z_index);
+    }
+
+    public virtual void move (double delta_x, double delta_y) {
+      if (this is Models.CanvasArtboard) {
+        (this as Models.CanvasArtboard).move_items (delta_x, delta_y);
+      }
+
+      this.translate (delta_x, delta_y);
     }
 
     public virtual void reset_colors () {

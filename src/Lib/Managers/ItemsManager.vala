@@ -24,6 +24,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
     public weak Akira.Lib.Canvas canvas { get; construct; }
 
     private List<Models.CanvasItem> items;
+    private List<Models.CanvasArtboard> artboards;
     private Models.CanvasItemType? insert_type { get; set; }
     private Goo.CanvasItem root;
     private int border_size;
@@ -38,7 +39,9 @@ public class Akira.Lib.Managers.ItemsManager : Object {
 
     construct {
         root = canvas.get_root_item ();
+
         items = new List<Models.CanvasItem> ();
+        artboards = new List<Models.CanvasArtboard> ();
 
         border_color = Gdk.RGBA ();
         fill_color = Gdk.RGBA ();
@@ -49,39 +52,59 @@ public class Akira.Lib.Managers.ItemsManager : Object {
     }
 
     public Models.CanvasItem? insert_item (Gdk.EventButton event) {
-        udpate_default_values ();
+      udpate_default_values ();
 
-        Models.CanvasItem? new_item;
+      Models.CanvasItem? new_item;
+      Goo.CanvasItem parent = root;
 
-        switch (insert_type) {
-            case Models.CanvasItemType.RECT:
-                new_item = add_rect (event);
-                break;
+      foreach (var artboard in artboards) {
+        if (artboard.is_inside (event.x, event.y)) {
+          parent = artboard as Goo.CanvasItem;
+        }
+      }
 
-            case Models.CanvasItemType.ELLIPSE:
-                new_item = add_ellipse (event);
-                break;
+      debug (@"Event.x $(event.x) Event.y $(event.y)");
 
-            case Models.CanvasItemType.TEXT:
-                new_item = add_text (event);
-                break;
+      switch (insert_type) {
+        case Models.CanvasItemType.RECT:
+          new_item = add_rect (event, root);
+          break;
 
-            case Models.CanvasItemType.ARTBOARD:
-                new_item = add_artboard (event);
-                break;
+        case Models.CanvasItemType.ELLIPSE:
+          new_item = add_ellipse (event, root);
+          break;
 
-            default:
-                new_item = null;
-                break;
+        case Models.CanvasItemType.TEXT:
+          new_item = add_text (event, root);
+          break;
+
+        case Models.CanvasItemType.ARTBOARD:
+          new_item = add_artboard (event);
+          break;
+
+        default:
+          new_item = null;
+          break;
+      }
+
+      if (new_item != null) {
+        if (new_item is Akira.Lib.Models.CanvasArtboard) {
+          artboards.append ((Models.CanvasArtboard) new_item);
+        } else {
+          items.append (new_item);
+
+          if (parent != root) {
+            var artboard = parent as Models.CanvasArtboard;
+
+            debug (@"Adding $(new_item.id) to $(artboard.id)");
+            artboard.add_child (new_item, -1);
+          }
         }
 
-        if (new_item != null) {
-            items.append (new_item);
+        canvas.window.event_bus.item_inserted (new_item);
+      }
 
-            canvas.window.event_bus.item_inserted (new_item);
-        }
-
-        return new_item;
+      return new_item;
     }
 
     public void add_item (Akira.Lib.Models.CanvasItem item) {
@@ -103,7 +126,8 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         return artboard as Models.CanvasItem;
     }
 
-    public Models.CanvasItem add_rect (Gdk.EventButton event) {
+    public Models.CanvasItem add_rect (Gdk.EventButton event, Goo.CanvasItem parent) {
+        debug (@"Add rect parent is null: $(parent == null)");
         var rect = new Models.CanvasRect (
             Utils.AffineTransform.fix_size (event.x),
             Utils.AffineTransform.fix_size (event.y),
@@ -112,14 +136,14 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             border_size,
             border_color,
             fill_color,
-            root
+            parent
         );
 
 
         return rect;
     }
 
-    public Models.CanvasEllipse add_ellipse (Gdk.EventButton event) {
+    public Models.CanvasEllipse add_ellipse (Gdk.EventButton event, Goo.CanvasItem parent) {
         var ellipse = new Models.CanvasEllipse (
             Utils.AffineTransform.fix_size (event.x),
             Utils.AffineTransform.fix_size (event.y),
@@ -128,13 +152,13 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             border_size,
             border_color,
             fill_color,
-            root
-            );
+            parent
+        );
 
         return ellipse;
     }
 
-    public Models.CanvasText add_text (Gdk.EventButton event) {
+    public Models.CanvasText add_text (Gdk.EventButton event, Goo.CanvasItem parent) {
         var text = new Models.CanvasText (
             "Add text here",
             Utils.AffineTransform.fix_size (event.x),
@@ -143,8 +167,8 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             25f,
             Goo.CanvasAnchorType.NW,
             "Open Sans 18",
-            root
-            );
+            parent
+        );
 
         return text;
     }
@@ -215,5 +239,4 @@ public class Akira.Lib.Managers.ItemsManager : Object {
 
         canvas.window.event_bus.z_selected_changed ();
     }
-
 }

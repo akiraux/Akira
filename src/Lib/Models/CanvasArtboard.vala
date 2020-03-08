@@ -80,7 +80,10 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
     public double height { get; set; }
     public Goo.CanvasItem parent_item { get; set; }
 
+    // Artboard related properties
     private double label_height;
+    private List<Models.CanvasItem> items;
+    public new Akira.Lib.Canvas canvas { get; set; }
 
     public CanvasArtboard (
         double _x = 0,
@@ -89,7 +92,7 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
     ) {
         parent_item = _parent;
 
-        canvas = parent_item.get_canvas ();
+        canvas = parent_item.get_canvas () as Akira.Lib.Canvas;
         parent_item.add_child (this, -1);
 
         item_type = Models.CanvasItemType.ARTBOARD;
@@ -118,6 +121,35 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
 
         // Get artboard name pixel extent
         get_label_extent ();
+
+        // Init items list
+        items = new List<Models.CanvasItem> ();
+    }
+
+    public uint get_items_length () {
+      return this.items.length ();
+    }
+
+    public void move_items (double delta_x, double delta_y) {
+      foreach (var item in items) {
+        item.move (delta_x, delta_y);
+      }
+    }
+
+    public bool is_inside (double x, double y) {
+      return x <= this.bounds.x2
+        && x >= this.bounds.x1
+        && y >= this.bounds.y1
+        && y <= this.bounds.y2;
+    }
+
+    public void add_child (Goo.CanvasItem item, int position = -1) {
+      debug (@"Adding child: $((item as Models.CanvasItem).id)");
+      this.items.append (item as Models.CanvasItem);
+
+      item.set_parent (this);
+
+      request_update ();
     }
 
     private void get_label_extent () {
@@ -168,6 +200,12 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
         cr.set_source_rgba (1, 1, 1, 1);
         cr.rectangle (x, y, width, height);
         cr.fill ();
+
+        if (items.length () > 0) {
+          foreach (var item in items) {
+            item.request_update ();
+          }
+        }
     }
 
     public override bool simple_is_item_at (double x, double y, Cairo.Context cr, bool is_pointer_event) {

@@ -57,7 +57,7 @@ public class Akira.Utils.AffineTransform : Object {
         double delta_x = GLib.Math.round (x - initial_x);
         double delta_y = GLib.Math.round (y - initial_y);
 
-        selected_item.translate (delta_x, delta_y);
+        selected_item.move (delta_x, delta_y);
     }
 
     public static void scale_from_event (

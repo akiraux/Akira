@@ -58,6 +58,8 @@ public class Akira.Lib.Models.CanvasText : Goo.CanvasText, Models.CanvasItem {
     public string layer_icon { get; set; default = "shape-text-symbolic"; }
     public int z_index { get; set; }
 
+    public new Akira.Lib.Canvas canvas { get; set; }
+
     public CanvasText (
         string _text = "",
         double _x = 0,
@@ -75,6 +77,9 @@ public class Akira.Lib.Models.CanvasText : Goo.CanvasText, Models.CanvasItem {
             width: _width,
             height: _height
         );
+
+        canvas = parent.get_canvas () as Akira.Lib.Canvas;
+        parent.add_child (this, -1);
 
         item_type = Models.CanvasItemType.TEXT;
         id = Models.CanvasItem.create_item_id (this);

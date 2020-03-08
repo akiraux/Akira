@@ -66,10 +66,15 @@ public class Akira.Lib.Models.CanvasImage : Goo.CanvasImage, CanvasItem {
     public string layer_icon { get; set; default = "shape-image-symbolic"; }
     public int z_index { get; set; }
 
+    public new Akira.Lib.Canvas canvas { get; set; }
+
     public CanvasImage (Akira.Services.ImageProvider provider, Goo.CanvasItem? parent = null) {
         Object (
             parent: parent
         );
+
+        canvas = parent.get_canvas () as Akira.Lib.Canvas;
+        parent.add_child (this, -1);
 
         item_type = Models.CanvasItemType.IMAGE;
         id = Models.CanvasItem.create_item_id (this);

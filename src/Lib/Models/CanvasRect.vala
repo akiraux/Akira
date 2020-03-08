@@ -72,6 +72,8 @@ public class Akira.Lib.Models.CanvasRect : Goo.CanvasRect, Models.CanvasItem {
     public bool is_radius_uniform { get; set; }
     public bool is_radius_autoscale { get; set; }
 
+    public new Akira.Lib.Canvas canvas { get; set; }
+
     public CanvasRect (
         double _x = 0,
         double _y = 0,
@@ -85,6 +87,9 @@ public class Akira.Lib.Models.CanvasRect : Goo.CanvasRect, Models.CanvasItem {
         Object (
             parent: parent
         );
+
+        canvas = parent.get_canvas () as Akira.Lib.Canvas;
+        parent.add_child (this, -1);
 
         item_type = Models.CanvasItemType.RECT;
         id = Models.CanvasItem.create_item_id (this);

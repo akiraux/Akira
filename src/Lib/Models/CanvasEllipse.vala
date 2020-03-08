@@ -58,6 +58,8 @@ public class Akira.Lib.Models.CanvasEllipse : Goo.CanvasEllipse, Models.CanvasIt
     public string layer_icon { get; set; default = "shape-circle-symbolic"; }
     public int z_index { get; set; }
 
+    public new Akira.Lib.Canvas canvas { get; set; }
+
     public CanvasEllipse (
         double _center_x = 0,
         double _center_y = 0,
@@ -71,6 +73,8 @@ public class Akira.Lib.Models.CanvasEllipse : Goo.CanvasEllipse, Models.CanvasIt
         Object (
             parent: parent
         );
+        canvas = parent.get_canvas () as Akira.Lib.Canvas;
+        parent.add_child (this, -1);
 
         item_type = Models.CanvasItemType.ELLIPSE;
         id = Models.CanvasItem.create_item_id (this);
