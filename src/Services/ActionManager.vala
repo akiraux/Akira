@@ -301,6 +301,7 @@ public class Akira.Services.ActionManager : Object {
                     var select = files.index (file) + 1 == files.length () ? true : false;
 
                     canvas.insert_item_default (item, select);
+                    canvas.window.event_bus.item_inserted (item);
                 });
 
                 break;

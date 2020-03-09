@@ -234,15 +234,27 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
 
             switch (event.keyval) {
                 case Gdk.Key.Up:
+                    if (item is Models.CanvasEllipse) {
+                        amount--;
+                    }
                     Utils.AffineTransform.set_position (item, null, position["y"] - amount);
                     break;
                 case Gdk.Key.Down:
+                    if (item is Models.CanvasEllipse) {
+                        amount++;
+                    }
                     Utils.AffineTransform.set_position (item, null, position["y"] + amount);
                     break;
                 case Gdk.Key.Right:
+                    if (item is Models.CanvasEllipse) {
+                        amount++;
+                    }
                     Utils.AffineTransform.set_position (item, position["x"] + amount);
                     break;
                 case Gdk.Key.Left:
+                    if (item is Models.CanvasEllipse) {
+                        amount--;
+                    }
                     Utils.AffineTransform.set_position (item, position["x"] - amount);
                     break;
             }
