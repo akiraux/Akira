@@ -125,6 +125,9 @@ public class Akira.Layouts.RightSideBar : Gtk.Grid {
         search.margin = 5;
         search.placeholder_text = _("Search Layer");
 
+        search.focus_in_event.connect (handle_focus_in);
+        search.focus_out_event.connect (handle_focus_out);
+
         search.activate.connect (() => {
             warning ("search");
         });
@@ -134,6 +137,24 @@ public class Akira.Layouts.RightSideBar : Gtk.Grid {
         search_grid.add (search);
 
         return search_grid;
+    }
+
+    private bool handle_focus_in (Gdk.EventFocus event) {
+        if (!(window is Akira.Window)) {
+            return true;
+        }
+        window.event_bus.disconnect_typing_accel ();
+
+        return false;
+    }
+
+    private bool handle_focus_out (Gdk.EventFocus event) {
+        if (!(window is Akira.Window)) {
+            return true;
+        }
+        window.event_bus.connect_typing_accel ();
+
+        return false;
     }
 
     public void toggle () {
