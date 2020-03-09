@@ -59,6 +59,7 @@ public class Akira.Lib.Models.CanvasEllipse : Goo.CanvasEllipse, Models.CanvasIt
     public int z_index { get; set; }
 
     public new Akira.Lib.Canvas canvas { get; set; }
+    public Models.CanvasArtboard artboard { get; set; }
 
     public CanvasEllipse (
         double _center_x = 0,

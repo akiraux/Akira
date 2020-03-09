@@ -70,9 +70,11 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
     public abstract int z_index { get; set; }
 
     public abstract Akira.Lib.Canvas canvas { get; set; }
+    public abstract Models.CanvasArtboard artboard { get; set; }
 
     public double get_coords (string coord_id) {
         double _coord = 0.0;
+
         get (coord_id, out _coord);
 
         return _coord;
@@ -113,7 +115,7 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
         //item.set ("z-index", z_index);
     }
 
-    public virtual void move (double delta_x, double delta_y) {
+    public virtual void move (double delta_x, double delta_y, double initial_x = 0.0, double initial_y = 0.0) {
       if (this is Models.CanvasArtboard) {
         (this as Models.CanvasArtboard).move_items (delta_x, delta_y);
       }

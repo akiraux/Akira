@@ -84,6 +84,7 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
     private double label_height;
     private List<Models.CanvasItem> items;
     public new Akira.Lib.Canvas canvas { get; set; }
+    public Models.CanvasArtboard artboard { get; set; }
 
     public CanvasArtboard (
         double _x = 0,
@@ -94,6 +95,9 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
 
         canvas = parent_item.get_canvas () as Akira.Lib.Canvas;
         parent_item.add_child (this, -1);
+
+        // Artboards can't be nested
+        artboard = null;
 
         item_type = Models.CanvasItemType.ARTBOARD;
         id = Models.CanvasItem.create_item_id (this);
@@ -144,7 +148,6 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
     }
 
     public void add_child (Goo.CanvasItem item, int position = -1) {
-      debug (@"Adding child: $((item as Models.CanvasItem).id)");
       this.items.append (item as Models.CanvasItem);
 
       item.set_parent (this);

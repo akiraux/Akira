@@ -73,6 +73,7 @@ public class Akira.Lib.Models.CanvasRect : Goo.CanvasRect, Models.CanvasItem {
     public bool is_radius_autoscale { get; set; }
 
     public new Akira.Lib.Canvas canvas { get; set; }
+    public Models.CanvasArtboard artboard { get; set; }
 
     public CanvasRect (
         double _x = 0,
@@ -82,10 +83,12 @@ public class Akira.Lib.Models.CanvasRect : Goo.CanvasRect, Models.CanvasItem {
         int _border_size = 1,
         Gdk.RGBA _border_color,
         Gdk.RGBA _fill_color,
-        Goo.CanvasItem? parent = null
+        Goo.CanvasItem? parent = null,
+        Models.CanvasArtboard? artboard = null
     ) {
         Object (
-            parent: parent
+            parent: parent,
+            artboard: artboard
         );
 
         canvas = parent.get_canvas () as Akira.Lib.Canvas;

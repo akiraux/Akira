@@ -35,7 +35,24 @@ public class Akira.Utils.AffineTransform : Object {
         double item_x = item.get_coords ("x");
         double item_y = item.get_coords ("y");
 
+        // debug (@"item x: $(item_x) y: $(item_y)");
+        // debug (@"Item has artboard: $(item.artboard != null)");
+
         item.canvas.convert_from_item_space (item, ref item_x, ref item_y);
+
+        if (item.artboard != null) {
+            double artboard_origin_x = 0.0;
+            double artboard_origin_y = 0.0;
+
+            item.canvas.convert_from_item_space (item.artboard, ref artboard_origin_x, ref artboard_origin_y);
+
+            // Strange bug in getting the proper
+            // canvas wise position of an item.
+            // The value gets doubled, so we need to double
+            // the amount we remove from item_x and item_y
+            item_x -= 2 * artboard_origin_x;
+            item_y -= 2 * artboard_origin_y;
+        }
 
         array.insert ("x", item_x);
         array.insert ("y", item_y);
@@ -57,7 +74,7 @@ public class Akira.Utils.AffineTransform : Object {
         double delta_x = GLib.Math.round (x - initial_x);
         double delta_y = GLib.Math.round (y - initial_y);
 
-        selected_item.move (delta_x, delta_y);
+        selected_item.move (delta_x, delta_y, initial_x, initial_y);
     }
 
     public static void scale_from_event (
@@ -287,8 +304,21 @@ public class Akira.Utils.AffineTransform : Object {
         double new_x = (x != null) ? x : matrix.x0;
         double new_y = (y != null) ? y : matrix.y0;
 
-        var new_matrix = Cairo.Matrix (matrix.xx, matrix.yx, matrix.xy, matrix.yy, new_x, new_y);
+        if (item.artboard != null) {
+          var artboard_origin_x = 0.0;
+          var artboard_origin_y = 0.0;
 
+          item.canvas.convert_from_item_space (item.artboard, ref artboard_origin_x, ref artboard_origin_y);
+
+          // x and y are relative to the artboard containing
+          // the items, so we need to take into account the
+          // position of the artboard to compute the actual
+          // (canvas wise) position of the item
+          new_x += x != null ? artboard_origin_x : 0;
+          new_y += y != null ? artboard_origin_y : 0;
+        }
+
+        var new_matrix = Cairo.Matrix (matrix.xx, matrix.yx, matrix.xy, matrix.yy, new_x, new_y);
         item.set_transform (new_matrix);
     }
 

@@ -55,19 +55,17 @@ public class Akira.Lib.Managers.ItemsManager : Object {
       udpate_default_values ();
 
       Models.CanvasItem? new_item;
-      Goo.CanvasItem parent = root;
+      Models.CanvasArtboard? artboard = null;
 
-      foreach (var artboard in artboards) {
-        if (artboard.is_inside (event.x, event.y)) {
-          parent = artboard as Goo.CanvasItem;
+      foreach (var _artboard in artboards) {
+        if (_artboard.is_inside (event.x, event.y)) {
+          artboard = _artboard;
         }
       }
 
-      debug (@"Event.x $(event.x) Event.y $(event.y)");
-
       switch (insert_type) {
         case Models.CanvasItemType.RECT:
-          new_item = add_rect (event, root);
+          new_item = add_rect (event, root, artboard);
           break;
 
         case Models.CanvasItemType.ELLIPSE:
@@ -93,10 +91,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         } else {
           items.append (new_item);
 
-          if (parent != root) {
-            var artboard = parent as Models.CanvasArtboard;
-
-            debug (@"Adding $(new_item.id) to $(artboard.id)");
+          if (artboard != null) {
             artboard.add_child (new_item, -1);
           }
         }
@@ -126,8 +121,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         return artboard as Models.CanvasItem;
     }
 
-    public Models.CanvasItem add_rect (Gdk.EventButton event, Goo.CanvasItem parent) {
-        debug (@"Add rect parent is null: $(parent == null)");
+    public Models.CanvasItem add_rect (Gdk.EventButton event, Goo.CanvasItem parent, Models.CanvasArtboard? artboard) {
         var rect = new Models.CanvasRect (
             Utils.AffineTransform.fix_size (event.x),
             Utils.AffineTransform.fix_size (event.y),
@@ -136,9 +130,9 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             border_size,
             border_color,
             fill_color,
-            parent
+            parent,
+            artboard
         );
-
 
         return rect;
     }

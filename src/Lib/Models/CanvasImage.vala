@@ -67,6 +67,7 @@ public class Akira.Lib.Models.CanvasImage : Goo.CanvasImage, CanvasItem {
     public int z_index { get; set; }
 
     public new Akira.Lib.Canvas canvas { get; set; }
+    public Models.CanvasArtboard artboard { get; set; }
 
     public CanvasImage (Akira.Services.ImageProvider provider, Goo.CanvasItem? parent = null) {
         Object (
