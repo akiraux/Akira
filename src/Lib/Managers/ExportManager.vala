@@ -303,8 +303,8 @@ public class Akira.Lib.Managers.ExportManager : Object {
             // Create the rendered image with Cairo.
             surface = new Cairo.ImageSurface (
                 format,
-                (int) Math.round (item.get_coords ("width")),
-                (int) Math.round (item.get_coords ("height"))
+                (int) Math.round (item.bounds.x2 - item.bounds.x1),
+                (int) Math.round (item.bounds.y2 - item.bounds.y1)
             );
             context = new Cairo.Context (surface);
 
@@ -313,8 +313,8 @@ public class Akira.Lib.Managers.ExportManager : Object {
                 context.set_source_rgba (1, 1, 1, 1);
                 context.rectangle (
                     0, 0,
-                    (int) Math.round (item.get_coords ("width")),
-                    (int) Math.round (item.get_coords ("height")));
+                    (int) Math.round (item.bounds.x2 - item.bounds.x1),
+                    (int) Math.round (item.bounds.y2 - item.bounds.y1));
                 context.fill ();
             }
 
@@ -354,8 +354,8 @@ public class Akira.Lib.Managers.ExportManager : Object {
     public Gdk.Pixbuf rescale_image (Gdk.Pixbuf pixbuf, Lib.Models.CanvasItem? item = null) {
         Gdk.Pixbuf scaled_image;
 
-        var width = item != null ? item.get_coords ("width") : area.width;
-        var height = item != null ? item.get_coords ("height") : area.height;
+        var width = item != null ? item.bounds.x2 - item.bounds.x1 : area.width;
+        var height = item != null ? item.bounds.y2 - item.bounds.y1 : area.height;
 
         switch (settings.export_scale) {
             case 0:
