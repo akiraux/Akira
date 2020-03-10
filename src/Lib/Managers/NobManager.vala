@@ -157,7 +157,6 @@ public class Akira.Lib.Managers.NobManager : Object {
     private void update_select_effect (List<Models.CanvasItem> selected_items) {
         double x = 0.0;
         double y = 0.0;
-        double line_width = 0.0;
         double width = 0.0;
         double height = 0.0;
 
@@ -167,7 +166,6 @@ public class Akira.Lib.Managers.NobManager : Object {
             selected_items,
             ref x, ref y,
             ref transform,
-            ref line_width,
             ref width, ref height
         );
 
@@ -194,7 +192,6 @@ public class Akira.Lib.Managers.NobManager : Object {
     private void update_nob_position (List<Models.CanvasItem> selected_items) {
         var transform = Cairo.Matrix.identity ();
 
-        double line_width = 0.0;
         double x = 0.0;
         double y = 0.0;
         double width = 0.0;
@@ -204,7 +201,6 @@ public class Akira.Lib.Managers.NobManager : Object {
             selected_items,
             ref x, ref y,
             ref transform,
-            ref line_width,
             ref width, ref height
         );
 
@@ -348,7 +344,6 @@ public class Akira.Lib.Managers.NobManager : Object {
         ref double x,
         ref double y,
         ref Cairo.Matrix transform,
-        ref double line_width,
         ref double _width,
         ref double _height
     ) {
@@ -356,7 +351,6 @@ public class Akira.Lib.Managers.NobManager : Object {
             var item = selected_items.nth_data (0);
 
             item.get_transform (out transform);
-            item.get ("line_width", out line_width);
             item.get ("width", out _width);
             item.get ("height", out _height);
             item.get ("x", out x);
@@ -365,7 +359,6 @@ public class Akira.Lib.Managers.NobManager : Object {
             return;
         }
 
-        line_width = 0.0;
         _width = width;
         _height = height;
         x = left;

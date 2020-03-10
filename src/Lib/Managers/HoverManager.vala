@@ -78,18 +78,12 @@ public class Akira.Lib.Managers.HoverManager : Object {
             return;
         }
 
-        double line_width = 0.0;
-        item.get ("line-width", out line_width);
-
         // Each item is always at 0,0 relative to its coordinate system
-        double x = 0 - line_width / 2;
-        double y = 0 - line_width / 2;
+        double x = 0;
+        double y = 0;
 
         double width = item.get_coords ("width");
         double height = item.get_coords ("height");
-
-        width += line_width;
-        height += line_width;
 
         if (!item.selected) {
             hover_effect = new Goo.CanvasRect (
