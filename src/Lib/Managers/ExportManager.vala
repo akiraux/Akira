@@ -300,6 +300,14 @@ public class Akira.Lib.Managers.ExportManager : Object {
         for (var i = 0; i < canvas.selected_bound_manager.selected_items.length (); i++) {
             var item = canvas.selected_bound_manager.selected_items.nth_data (i);
 
+            // Weird goocanvas issue which sets the border to 0.**** instead of 0
+            // which causes a half pixel white border on export.
+            if (item.line_width < 1) {
+                var fill_color = item.fill_color_rgba;
+                item.set ("stroke-color-rgba", fill_color);
+                item.set ("line-width", 0.0);
+            }
+
             // Create the rendered image with Cairo.
             surface = new Cairo.ImageSurface (
                 format,
