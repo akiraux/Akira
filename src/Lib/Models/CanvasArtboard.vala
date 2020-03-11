@@ -90,7 +90,7 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
         double _x = 0,
         double _y = 0,
         Goo.CanvasItem? _parent = null
-    ) {
+        ) {
         parent_item = _parent;
 
         canvas = parent_item.get_canvas () as Akira.Lib.Canvas;
@@ -131,28 +131,32 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
     }
 
     public uint get_items_length () {
-      return this.items.length ();
+        return this.items.length ();
     }
 
     public void move_items (double delta_x, double delta_y) {
-      foreach (var item in items) {
-        item.move (delta_x, delta_y);
-      }
+        foreach (var item in items) {
+            item.translate (delta_x, delta_y);
+        }
     }
 
     public bool is_inside (double x, double y) {
-      return x <= this.bounds.x2
-        && x >= this.bounds.x1
-        && y >= this.bounds.y1
-        && y <= this.bounds.y2;
+        return x <= this.bounds.x2
+            && x >= this.bounds.x1
+            && y >= this.bounds.y1
+            && y <= this.bounds.y2;
     }
 
     public void add_child (Goo.CanvasItem item, int position = -1) {
-      this.items.append (item as Models.CanvasItem);
+        var canvas_item = item as Models.CanvasItem;
 
-      item.set_parent (this);
+        if (canvas_item.id == null) {
+            return;
+        }
 
-      request_update ();
+        this.items.append (canvas_item);
+        item.set_parent (this);
+        request_update ();
     }
 
     private void get_label_extent () {
@@ -164,7 +168,7 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
             "Sans",
             Cairo.FontSlant.NORMAL,
             Cairo.FontWeight.NORMAL
-        );
+            );
         cr.set_font_size (LABEL_FONT_SIZE);
 
         cr.text_extents (id, out extents);
@@ -186,7 +190,7 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
             "Sans",
             Cairo.FontSlant.NORMAL,
             Cairo.FontWeight.NORMAL
-        );
+            );
         cr.set_font_size (LABEL_FONT_SIZE);
 
         cr.move_to (x, y - LABEL_BOTTOM_PADDING);
@@ -205,9 +209,17 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
         cr.fill ();
 
         if (items.length () > 0) {
-          foreach (var item in items) {
-            item.request_update ();
-          }
+            foreach (var item in items) {
+                cr.save ();
+
+                cr.translate (item.relative_x, item.relative_y);
+
+                if (item is Goo.CanvasItemSimple) {
+                    (item as Goo.CanvasRect).simple_paint (cr, bounds);
+                }
+
+                cr.restore ();
+            }
         }
     }
 

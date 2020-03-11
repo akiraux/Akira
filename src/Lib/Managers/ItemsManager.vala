@@ -90,10 +90,6 @@ public class Akira.Lib.Managers.ItemsManager : Object {
           artboards.append ((Models.CanvasArtboard) new_item);
         } else {
           items.append (new_item);
-
-          if (artboard != null) {
-            artboard.add_child (new_item, -1);
-          }
         }
 
         canvas.window.event_bus.item_inserted (new_item);

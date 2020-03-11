@@ -41,23 +41,65 @@ public class Akira.Utils.AffineTransform : Object {
         item.canvas.convert_from_item_space (item, ref item_x, ref item_y);
 
         if (item.artboard != null) {
-            double artboard_origin_x = 0.0;
-            double artboard_origin_y = 0.0;
+          item_x = item.relative_x;
+          item_y = item.relative_y;
 
-            item.canvas.convert_from_item_space (item.artboard, ref artboard_origin_x, ref artboard_origin_y);
+          /*
+          double artboard_origin_x = 0.0;
+          double artboard_origin_y = 0.0;
 
-            // Strange bug in getting the proper
-            // canvas wise position of an item.
-            // The value gets doubled, so we need to double
-            // the amount we remove from item_x and item_y
-            item_x -= 2 * artboard_origin_x;
-            item_y -= 2 * artboard_origin_y;
+          item.canvas.convert_from_item_space (item.artboard, ref artboard_origin_x, ref artboard_origin_y);
+
+          // Strange bug in getting the proper
+          // canvas wise position of an item.
+          // The value gets doubled, so we need to double
+          // the amount we remove from item_x and item_y
+          item_x -= 2 * artboard_origin_x;
+          item_y -= 2 * artboard_origin_y;
+          */
         }
 
         array.insert ("x", item_x);
         array.insert ("y", item_y);
 
         return array;
+    }
+
+    public static void set_position (CanvasItem item, double? x = null, double? y = null) {
+        if (item.artboard != null) {
+          /*
+          var artboard_origin_x = 0.0;
+          var artboard_origin_y = 0.0;
+
+          item.canvas.convert_from_item_space (item.artboard, ref artboard_origin_x, ref artboard_origin_y);
+
+          // x and y are relative to the artboard containing
+          // the items, so we need to take into account the
+          // position of the artboard to compute the actual
+          // (canvas wise) position of the item
+          new_x += x != null ? artboard_origin_x : 0;
+          new_y += y != null ? artboard_origin_y : 0;
+          */
+
+          var delta_x = x != null ? x - item.relative_x : 0.0;
+          var delta_y = y != null ? y - item.relative_y : 0.0;
+
+          item.relative_x = x != null ? x : item.relative_x;
+          item.relative_y = y != null ? y : item.relative_y;
+
+          item.translate (delta_x, delta_y);
+
+          return;
+        }
+
+        Cairo.Matrix matrix;
+        item.get_transform (out matrix);
+
+        double new_x = (x != null) ? x : matrix.x0;
+        double new_y = (y != null) ? y : matrix.y0;
+
+        var new_matrix = Cairo.Matrix (matrix.xx, matrix.yx, matrix.xy, matrix.yy, new_x, new_y);
+        item.set_transform (new_matrix);
     }
 
     public static void move_from_event (
@@ -295,31 +337,6 @@ public class Akira.Utils.AffineTransform : Object {
 
         // Reset rotation to prevent infinite rotation loops.
         prev_rotation_difference = 0.0;
-    }
-
-    public static void set_position (CanvasItem item, double? x = null, double? y = null) {
-        Cairo.Matrix matrix;
-        item.get_transform (out matrix);
-
-        double new_x = (x != null) ? x : matrix.x0;
-        double new_y = (y != null) ? y : matrix.y0;
-
-        if (item.artboard != null) {
-          var artboard_origin_x = 0.0;
-          var artboard_origin_y = 0.0;
-
-          item.canvas.convert_from_item_space (item.artboard, ref artboard_origin_x, ref artboard_origin_y);
-
-          // x and y are relative to the artboard containing
-          // the items, so we need to take into account the
-          // position of the artboard to compute the actual
-          // (canvas wise) position of the item
-          new_x += x != null ? artboard_origin_x : 0;
-          new_y += y != null ? artboard_origin_y : 0;
-        }
-
-        var new_matrix = Cairo.Matrix (matrix.xx, matrix.yx, matrix.xy, matrix.yy, new_x, new_y);
-        item.set_transform (new_matrix);
     }
 
     public static void set_size (double? width, double? height, Goo.CanvasItem item) {

@@ -75,6 +75,9 @@ public class Akira.Lib.Models.CanvasRect : Goo.CanvasRect, Models.CanvasItem {
     public new Akira.Lib.Canvas canvas { get; set; }
     public Models.CanvasArtboard artboard { get; set; }
 
+    public double relative_x { get; set; }
+    public double relative_y { get; set; }
+
     public CanvasRect (
         double _x = 0,
         double _y = 0,
@@ -87,7 +90,7 @@ public class Akira.Lib.Models.CanvasRect : Goo.CanvasRect, Models.CanvasItem {
         Models.CanvasArtboard? artboard = null
     ) {
         Object (
-            parent: parent,
+            parent: artboard,
             artboard: artboard
         );
 
@@ -104,6 +107,8 @@ public class Akira.Lib.Models.CanvasRect : Goo.CanvasRect, Models.CanvasItem {
         height = 1;
         x = 0;
         y = 0;
+        relative_x = 0;
+        relative_y = 0;
 
         show_border_radius_panel = true;
         show_fill_panel = true;
@@ -111,10 +116,25 @@ public class Akira.Lib.Models.CanvasRect : Goo.CanvasRect, Models.CanvasItem {
         is_radius_uniform = true;
         is_radius_autoscale = false;
 
+        if (artboard != null) {
+            artboard.add_child (this, -1);
+
+            double item_x_from_artboard = _x;
+            double item_y_from_artboard = _y;
+
+            canvas.convert_to_item_space (artboard, ref item_x_from_artboard, ref item_y_from_artboard);
+
+            relative_x = item_x_from_artboard;
+            relative_y = item_y_from_artboard;
+        } else {
+            parent.add_child (this, -1);
+        }
+
         set_transform (Cairo.Matrix.identity ());
         // Keep the item always in the origin
         // move the entire coordinate system every time
         translate (_x, _y);
+
 
         color = _fill_color;
         has_border = settings.set_border;
