@@ -257,7 +257,7 @@ public class Akira.Utils.AffineTransform : Object {
         // initial_event, in order to convert it to the "new" translated
         // item space after the transformation has been applied.
         canvas.convert_from_item_space (selected_item, ref initial_x, ref initial_y);
-        selected_item.translate (origin_move_delta_x, origin_move_delta_y);
+        selected_item.move (origin_move_delta_x, origin_move_delta_y);
         canvas.convert_to_item_space (selected_item, ref initial_x, ref initial_y);
 
         set_size (new_width, new_height, selected_item);

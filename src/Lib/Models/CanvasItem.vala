@@ -123,6 +123,13 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
         (this as Models.CanvasArtboard).move_items (delta_x, delta_y);
       }
 
+      if (this.artboard != null) {
+        this.relative_x += delta_x;
+        this.relative_y += delta_y;
+
+        return;
+      }
+
       this.translate (delta_x, delta_y);
     }
 
