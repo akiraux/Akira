@@ -70,7 +70,7 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
     public abstract int z_index { get; set; }
 
     public abstract Akira.Lib.Canvas canvas { get; set; }
-    public abstract Models.CanvasArtboard artboard { get; set; }
+    public abstract Models.CanvasArtboard? artboard { get; set; }
 
     public abstract double relative_x { get; set; }
     public abstract double relative_y { get; set; }

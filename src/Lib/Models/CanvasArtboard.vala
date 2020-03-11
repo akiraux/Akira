@@ -84,7 +84,7 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
     private double label_height;
     private List<Models.CanvasItem> items;
     public new Akira.Lib.Canvas canvas { get; set; }
-    public Models.CanvasArtboard artboard { get; set; }
+    public Models.CanvasArtboard? artboard { get; set; }
 
     public CanvasArtboard (
         double _x = 0,

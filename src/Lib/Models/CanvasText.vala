@@ -59,7 +59,7 @@ public class Akira.Lib.Models.CanvasText : Goo.CanvasText, Models.CanvasItem {
     public int z_index { get; set; }
 
     public new Akira.Lib.Canvas canvas { get; set; }
-    public Models.CanvasArtboard artboard { get; set; }
+    public Models.CanvasArtboard? artboard { get; set; }
 
     public double relative_x { get; set; }
     public double relative_y { get; set; }
