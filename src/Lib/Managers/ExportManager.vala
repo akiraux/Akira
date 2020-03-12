@@ -298,6 +298,7 @@ public class Akira.Lib.Managers.ExportManager : Object {
 
         // Loop through all the currently selected elements.
         for (var i = 0; i < canvas.selected_bound_manager.selected_items.length (); i++) {
+            var label_height = 0.0;
             var item = canvas.selected_bound_manager.selected_items.nth_data (i);
 
             // Weird goocanvas issue which sets the border to 0.**** instead of 0
@@ -308,11 +309,17 @@ public class Akira.Lib.Managers.ExportManager : Object {
                 item.set ("line-width", 0.0);
             }
 
+            // If the item is an artboard, account for the label's height.
+            if (item is Akira.Lib.Models.CanvasArtboard) {
+                var artboard = item as Akira.Lib.Models.CanvasArtboard;
+                label_height = artboard.get_label_height ();
+            }
+
             // Create the rendered image with Cairo.
             surface = new Cairo.ImageSurface (
                 format,
                 (int) Math.round (item.bounds.x2 - item.bounds.x1),
-                (int) Math.round (item.bounds.y2 - item.bounds.y1)
+                (int) Math.round (item.bounds.y2 - item.bounds.y1 - label_height)
             );
             context = new Cairo.Context (surface);
 
@@ -322,12 +329,12 @@ public class Akira.Lib.Managers.ExportManager : Object {
                 context.rectangle (
                     0, 0,
                     (int) Math.round (item.bounds.x2 - item.bounds.x1),
-                    (int) Math.round (item.bounds.y2 - item.bounds.y1));
+                    (int) Math.round (item.bounds.y2 - item.bounds.y1 - label_height));
                 context.fill ();
             }
 
             // Move to the currently selected item.
-            context.translate (-item.bounds.x1, -item.bounds.y1);
+            context.translate (-item.bounds.x1, -item.bounds.y1 - label_height);
 
             // Render the selected item.
             canvas.render (context, null, canvas.current_scale);
@@ -361,9 +368,16 @@ public class Akira.Lib.Managers.ExportManager : Object {
 
     public Gdk.Pixbuf rescale_image (Gdk.Pixbuf pixbuf, Lib.Models.CanvasItem? item = null) {
         Gdk.Pixbuf scaled_image;
+        var label_height = 0.0;
+
+        // If the item is an artboard, account for the label's height.
+        if (item != null && item is Akira.Lib.Models.CanvasArtboard) {
+            var artboard = item as Akira.Lib.Models.CanvasArtboard;
+            label_height = artboard.get_label_height ();
+        }
 
         var width = item != null ? item.bounds.x2 - item.bounds.x1 : area.width;
-        var height = item != null ? item.bounds.y2 - item.bounds.y1 : area.height;
+        var height = item != null ? item.bounds.y2 - item.bounds.y1 - label_height : area.height;
 
         switch (settings.export_scale) {
             case 0:
