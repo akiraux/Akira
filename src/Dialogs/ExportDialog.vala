@@ -272,15 +272,16 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
 
     public async void generate_export_preview () {
         if (list_store.get_n_items () > 0) {
+            var array = manager.pixbufs.values.to_array ();
             for (int i = 0; i < list_store.get_n_items () ; i++) {
                 var model = (Akira.Models.ExportModel) list_store.get_object (i);
-                model.pixbuf = manager.pixbufs.index (i);
+                model.pixbuf = array[i];
             }
             return;
         }
 
-        for (int i = 0; i < manager.pixbufs.length ; i++) {
-            var model = new Akira.Models.ExportModel (manager.pixbufs.index (i), "Untitled");
+        foreach (var entry in manager.pixbufs.entries) {
+            var model = new Akira.Models.ExportModel (entry.value, entry.key);
             list_store.append (model);
         }
     }

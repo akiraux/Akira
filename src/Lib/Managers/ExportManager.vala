@@ -43,13 +43,13 @@ public class Akira.Lib.Managers.ExportManager : Object {
     public Cairo.Surface surface;
     public Cairo.Context context;
     public Gdk.PixbufLoader loader;
-    public Array<Gdk.Pixbuf> pixbufs { get; set construct; }
+    public Gee.HashMap<string, Gdk.Pixbuf> pixbufs { get; set construct; }
 
     public ExportManager (Akira.Lib.Canvas canvas) {
         Object (
             canvas: canvas
         );
-        pixbufs = new Array<Gdk.Pixbuf> ();
+        pixbufs = new Gee.HashMap<string, Gdk.Pixbuf> ();
     }
 
     public Goo.CanvasRect create_area (Gdk.EventButton event) {
@@ -227,9 +227,8 @@ public class Akira.Lib.Managers.ExportManager : Object {
     }
 
     public void generate_area_pixbuf () throws Error {
-        // Clear pixbuf array directly as we're dealing with an area export
-        // therefore only one value is present.
-        pixbufs._remove_index (0);
+        // Clear pixbuf array from previously stored values.
+        pixbufs.clear ();
 
         if (settings.export_format == "png") {
             format = Cairo.Format.ARGB32;
@@ -281,14 +280,12 @@ public class Akira.Lib.Managers.ExportManager : Object {
             throw (e);
         }
 
-        pixbufs.append_val (scaled);
+        pixbufs.set (_("Untitled"), scaled);
     }
 
     public void generate_selection_pixbuf () throws Error {
         // Clear pixbuf array from previously stored values.
-        for (int i = 0; i < pixbufs.length; i++) {
-            pixbufs._remove_index (i);
-        }
+        pixbufs.clear ();
 
         if (settings.export_format == "png") {
             format = Cairo.Format.ARGB32;
@@ -300,6 +297,7 @@ public class Akira.Lib.Managers.ExportManager : Object {
         for (var i = 0; i < canvas.selected_bound_manager.selected_items.length (); i++) {
             var label_height = 0.0;
             var item = canvas.selected_bound_manager.selected_items.nth_data (i);
+            var name = _("Untitled %i").printf (i);
 
             // Weird goocanvas issue which sets the border to 0.**** instead of 0
             // which causes a half pixel white border on export.
@@ -313,6 +311,7 @@ public class Akira.Lib.Managers.ExportManager : Object {
             if (item is Akira.Lib.Models.CanvasArtboard) {
                 var artboard = item as Akira.Lib.Models.CanvasArtboard;
                 label_height = artboard.get_label_height ();
+                name = artboard.name != null ? artboard.name : name;
             }
 
             // Create the rendered image with Cairo.
@@ -362,7 +361,7 @@ public class Akira.Lib.Managers.ExportManager : Object {
                 throw (e);
             }
 
-            pixbufs.append_val (scaled);
+            pixbufs.set (name, scaled);
         }
     }
 
