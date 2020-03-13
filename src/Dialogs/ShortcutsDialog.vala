@@ -25,7 +25,7 @@ public class Akira.Dialogs.ShortcutsDialog : Gtk.Dialog {
     public ShortcutsDialog (Akira.Window window) {
         Object (
             window: window,
-            border_width: 0,
+            border_width: 10,
             deletable: true,
             resizable: true,
             modal: true
