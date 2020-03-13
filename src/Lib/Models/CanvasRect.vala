@@ -29,6 +29,16 @@ public class Akira.Lib.Models.CanvasRect : Goo.CanvasRect, Models.CanvasItem {
     // Transform Panel attributes.
     public double opacity { get; set; }
     public double rotation { get; set; }
+    private double _global_radius { get; set; }
+    public double global_radius {
+        get {
+            return _global_radius;
+        }
+        set {
+            _global_radius = Math.round (value);
+            update_border ();
+        }
+    }
 
     // Fill Panel attributes.
     public bool has_fill { get; set; default = true; }
@@ -80,7 +90,7 @@ public class Akira.Lib.Models.CanvasRect : Goo.CanvasRect, Models.CanvasItem {
         id = Models.CanvasItem.create_item_id (this);
         Models.CanvasItem.init_item (this);
 
-        radius_x = _radius_x;
+        _global_radius = radius_x = _radius_x;
         radius_y = _radius_y;
         width = 1;
         height = 1;
@@ -111,8 +121,8 @@ public class Akira.Lib.Models.CanvasRect : Goo.CanvasRect, Models.CanvasItem {
 
     public void update_border () {
         if (is_radius_uniform) {
-            set ("radius-x", radius_x);
-            set ("radius-y", radius_x);
+            set ("radius-x", global_radius);
+            set ("radius-y", global_radius);
         }
 
         // TODO: handle uneven border radius.

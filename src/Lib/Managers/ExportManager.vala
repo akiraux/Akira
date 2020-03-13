@@ -43,13 +43,13 @@ public class Akira.Lib.Managers.ExportManager : Object {
     public Cairo.Surface surface;
     public Cairo.Context context;
     public Gdk.PixbufLoader loader;
-    public Array<Gdk.Pixbuf> pixbufs { get; set construct; }
+    public Gee.HashMap<string, Gdk.Pixbuf> pixbufs { get; set construct; }
 
     public ExportManager (Akira.Lib.Canvas canvas) {
         Object (
             canvas: canvas
         );
-        pixbufs = new Array<Gdk.Pixbuf> ();
+        pixbufs = new Gee.HashMap<string, Gdk.Pixbuf> ();
     }
 
     public Goo.CanvasRect create_area (Gdk.EventButton event) {
@@ -227,9 +227,8 @@ public class Akira.Lib.Managers.ExportManager : Object {
     }
 
     public void generate_area_pixbuf () throws Error {
-        // Clear pixbuf array directly as we're dealing with an area export
-        // therefore only one value is present.
-        pixbufs._remove_index (0);
+        // Clear pixbuf array from previously stored values.
+        pixbufs.clear ();
 
         if (settings.export_format == "png") {
             format = Cairo.Format.ARGB32;
@@ -281,14 +280,12 @@ public class Akira.Lib.Managers.ExportManager : Object {
             throw (e);
         }
 
-        pixbufs.append_val (scaled);
+        pixbufs.set (_("Untitled"), scaled);
     }
 
     public void generate_selection_pixbuf () throws Error {
         // Clear pixbuf array from previously stored values.
-        for (int i = 0; i < pixbufs.length; i++) {
-            pixbufs._remove_index (i);
-        }
+        pixbufs.clear ();
 
         if (settings.export_format == "png") {
             format = Cairo.Format.ARGB32;
@@ -298,13 +295,30 @@ public class Akira.Lib.Managers.ExportManager : Object {
 
         // Loop through all the currently selected elements.
         for (var i = 0; i < canvas.selected_bound_manager.selected_items.length (); i++) {
+            var label_height = 0.0;
             var item = canvas.selected_bound_manager.selected_items.nth_data (i);
+            var name = _("Untitled %i").printf (i);
+
+            // Weird goocanvas issue which sets the border to 0.**** instead of 0
+            // which causes a half pixel white border on export.
+            if (item.line_width < 1) {
+                var fill_color = item.fill_color_rgba;
+                item.set ("stroke-color-rgba", fill_color);
+                item.set ("line-width", 0.0);
+            }
+
+            // If the item is an artboard, account for the label's height.
+            if (item is Akira.Lib.Models.CanvasArtboard) {
+                var artboard = item as Akira.Lib.Models.CanvasArtboard;
+                label_height = artboard.get_label_height ();
+                name = artboard.name != null ? artboard.name : name;
+            }
 
             // Create the rendered image with Cairo.
             surface = new Cairo.ImageSurface (
                 format,
-                (int) Math.round (item.get_coords ("width")),
-                (int) Math.round (item.get_coords ("height"))
+                (int) Math.round (item.bounds.x2 - item.bounds.x1),
+                (int) Math.round (item.bounds.y2 - item.bounds.y1 - label_height)
             );
             context = new Cairo.Context (surface);
 
@@ -313,13 +327,13 @@ public class Akira.Lib.Managers.ExportManager : Object {
                 context.set_source_rgba (1, 1, 1, 1);
                 context.rectangle (
                     0, 0,
-                    (int) Math.round (item.get_coords ("width")),
-                    (int) Math.round (item.get_coords ("height")));
+                    (int) Math.round (item.bounds.x2 - item.bounds.x1),
+                    (int) Math.round (item.bounds.y2 - item.bounds.y1 - label_height));
                 context.fill ();
             }
 
             // Move to the currently selected item.
-            context.translate (-item.bounds.x1, -item.bounds.y1);
+            context.translate (-item.bounds.x1, -item.bounds.y1 - label_height);
 
             // Render the selected item.
             canvas.render (context, null, canvas.current_scale);
@@ -347,15 +361,22 @@ public class Akira.Lib.Managers.ExportManager : Object {
                 throw (e);
             }
 
-            pixbufs.append_val (scaled);
+            pixbufs.set (name, scaled);
         }
     }
 
     public Gdk.Pixbuf rescale_image (Gdk.Pixbuf pixbuf, Lib.Models.CanvasItem? item = null) {
         Gdk.Pixbuf scaled_image;
+        var label_height = 0.0;
 
-        var width = item != null ? item.get_coords ("width") : area.width;
-        var height = item != null ? item.get_coords ("height") : area.height;
+        // If the item is an artboard, account for the label's height.
+        if (item != null && item is Akira.Lib.Models.CanvasArtboard) {
+            var artboard = item as Akira.Lib.Models.CanvasArtboard;
+            label_height = artboard.get_label_height ();
+        }
+
+        var width = item != null ? item.bounds.x2 - item.bounds.x1 : area.width;
+        var height = item != null ? item.bounds.y2 - item.bounds.y1 - label_height : area.height;
 
         switch (settings.export_scale) {
             case 0:

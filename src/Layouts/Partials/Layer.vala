@@ -198,11 +198,13 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 
         handle.enter_notify_event.connect (event => {
             get_style_context ().add_class ("hover");
+            window.event_bus.hover_over_layer (model.item);
             return false;
         });
 
         handle.leave_notify_event.connect (event => {
             get_style_context ().remove_class ("hover");
+            window.event_bus.hover_over_layer (null);
             return false;
         });
 
@@ -486,6 +488,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 
             handle.grab_focus ();
             window.event_bus.request_add_item_to_selection (model.item);
+            window.event_bus.hover_over_layer (null);
         }
 
         if (event.type == Gdk.EventType.BUTTON_RELEASE) {

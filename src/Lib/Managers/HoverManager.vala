@@ -37,6 +37,10 @@ public class Akira.Lib.Managers.HoverManager : Object {
         );
     }
 
+    construct {
+        canvas.window.event_bus.hover_over_layer.connect (on_layer_hovered);
+    }
+
     public void set_initial_coordinates (double event_x, double event_y) {
         initial_event_x = event_x;
         initial_event_y = event_y;
@@ -74,44 +78,48 @@ public class Akira.Lib.Managers.HoverManager : Object {
         remove_hover_effect ();
         current_hover_item = item;
 
-        if (item.locked) {
-            return;
-        }
-
-        double line_width = 0.0;
-        item.get ("line-width", out line_width);
-
-        // Each item is always at 0,0 relative to its coordinate system
-        double x = 0 - line_width / 2;
-        double y = 0 - line_width / 2;
-
-        double width = item.get_coords ("width");
-        double height = item.get_coords ("height");
-
-        width += line_width;
-        height += line_width;
+        create_hover_effect (item);
 
         if (!item.selected) {
-            hover_effect = new Goo.CanvasRect (
-                null,
-                x, y,
-                width, height,
-                "line-width", LINE_WIDTH / canvas.current_scale,
-                "stroke-color", STROKE_COLOR,
-                null
-            );
-
-            var transform = Cairo.Matrix.identity ();
-            item.get_transform (out transform);
-            hover_effect.set_transform (transform);
-
-            hover_effect.set ("parent", canvas.get_root_item ());
-            hover_effect.can_focus = false;
-
             canvas.window.event_bus.hover_over_item (item);
         }
 
         set_cursor_for_nob (Managers.NobManager.Nob.NONE);
+    }
+
+    private void on_layer_hovered (Models.CanvasItem? item) {
+        if (item == null) {
+            remove_hover_effect ();
+            return;
+        }
+
+        remove_hover_effect ();
+        create_hover_effect (item);
+    }
+
+    private void create_hover_effect (Models.CanvasItem? item) {
+        if (item.locked || item.selected) {
+            return;
+        }
+
+        double width = item.get_coords ("width");
+        double height = item.get_coords ("height");
+
+        hover_effect = new Goo.CanvasRect (
+            null,
+            0, 0,
+            width, height,
+            "line-width", LINE_WIDTH / canvas.current_scale,
+            "stroke-color", STROKE_COLOR,
+            null
+        );
+
+        var transform = Cairo.Matrix.identity ();
+        item.get_transform (out transform);
+        hover_effect.set_transform (transform);
+
+        hover_effect.set ("parent", canvas.get_root_item ());
+        hover_effect.can_focus = false;
     }
 
     public void remove_hover_effect () {

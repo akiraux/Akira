@@ -133,9 +133,11 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
     }
 
     private void reset_border () {
+        // Set a default border color in case no border is used
+        // to avoid half pixel transparency during export.
         if (hidden_border || !has_border) {
-            set ("stroke-color-rgba", null);
-            set ("line-width", null);
+            set ("stroke-color-rgba", fill_color_rgba);
+            set ("line-width", 0.0);
             return;
         }
 
