@@ -62,6 +62,8 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         if (selected_items.length () == 1) {
             var selected_item = selected_items.nth_data (0);
 
+            selected_item.store_relative_position ();
+
             initial_event_x = event_x;
             initial_event_y = event_y;
 

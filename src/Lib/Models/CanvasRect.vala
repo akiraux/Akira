@@ -78,6 +78,9 @@ public class Akira.Lib.Models.CanvasRect : Goo.CanvasRect, Models.CanvasItem {
     public double relative_x { get; set; }
     public double relative_y { get; set; }
 
+    public double initial_relative_x { get; set; }
+    public double initial_relative_y { get; set; }
+
     public CanvasRect (
         double _x = 0,
         double _y = 0,

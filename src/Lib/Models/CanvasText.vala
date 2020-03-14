@@ -64,6 +64,9 @@ public class Akira.Lib.Models.CanvasText : Goo.CanvasText, Models.CanvasItem {
     public double relative_x { get; set; }
     public double relative_y { get; set; }
 
+    public double initial_relative_x { get; set; }
+    public double initial_relative_y { get; set; }
+
     public CanvasText (
         string _text = "",
         double _x = 0,

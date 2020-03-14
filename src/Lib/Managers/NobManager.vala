@@ -350,12 +350,7 @@ public class Akira.Lib.Managers.NobManager : Object {
         if (selected_items.length () == 1) {
             var item = selected_items.nth_data (0);
 
-            if (item.artboard == null) {
-                item.get_transform (out transform);
-            } else {
-                item.artboard.get_transform (out transform);
-                transform.translate (item.relative_x, item.relative_y);
-            }
+            transform = item.get_real_transform ();
 
             item.get ("line_width", out line_width);
             item.get ("width", out _width);

@@ -88,6 +88,9 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
     public double relative_x { get; set; }
     public double relative_y { get; set; }
 
+    public double initial_relative_x { get; set; }
+    public double initial_relative_y { get; set; }
+
     public CanvasArtboard (
         double _x = 0,
         double _y = 0,

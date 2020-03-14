@@ -72,6 +72,9 @@ public class Akira.Lib.Models.CanvasImage : Goo.CanvasImage, CanvasItem {
     public double relative_x { get; set; }
     public double relative_y { get; set; }
 
+    public double initial_relative_x { get; set; }
+    public double initial_relative_y { get; set; }
+
     public CanvasImage (Akira.Services.ImageProvider provider, Goo.CanvasItem? parent = null) {
         Object (
             parent: parent
