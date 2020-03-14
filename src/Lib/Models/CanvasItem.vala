@@ -171,4 +171,29 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
         set ("stroke-color-rgba", stroke_color_rgba);
         set ("line-width", (double) border_size);
     }
+
+    public bool simple_is_item_at (double x, double y, Cairo.Context cr, bool is_pointer_event) {
+      var width = get_coords ("width");
+      var height = get_coords ("height");
+
+      var item_x = relative_x;
+      var item_y = relative_y;
+
+      canvas.convert_from_item_space (
+        this.artboard,
+        ref item_x,
+        ref item_y
+      );
+
+      if (
+        x >= item_x
+        && x <= item_x + width
+        && y >= item_y
+        && y <= item_y + height
+      ) {
+        return true;
+      }
+
+      return false;
+    }
 }

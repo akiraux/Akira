@@ -234,4 +234,38 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
     public double get_label_height () {
         return label_height + LABEL_BOTTOM_PADDING;
     }
+
+    public unowned GLib.List<Goo.CanvasItem> get_items_at (
+      double x, double y,
+      Cairo.Context cr, bool is_pointer_event,
+      bool parent_is_visible, GLib.List<Goo.CanvasItem> found_items) {
+      var artboard_x = x;
+      var artboard_y = y;
+
+      canvas.convert_to_item_space (this, ref artboard_x, ref artboard_y);
+      if (simple_is_item_at (
+          artboard_x, artboard_y,
+          cr, is_pointer_event)
+      ) {
+        found_items.append (this);
+      }
+
+      foreach (var item in items) {
+        var item_x = x;
+        var item_y = y;
+
+        canvas.convert_to_item_space (item, ref item_x, ref item_y);
+
+        var item_is_inside = item.simple_is_item_at (
+          x, y,
+          cr, is_pointer_event
+        );
+
+        if (item_is_inside) {
+          found_items.append (item);
+        }
+      }
+
+      return found_items;
+    }
 }

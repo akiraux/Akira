@@ -194,6 +194,7 @@ public class Akira.Utils.AffineTransform : Object {
             case NobManager.Nob.BOTTOM_RIGHT:
                 new_width = initial_width + delta_x;
                 new_height = initial_height + delta_y;
+
                 if ((canvas.ctrl_is_pressed || selected_item.size_locked) && new_height > MIN_SIZE) {
                     new_height = GLib.Math.round (new_width / selected_item.size_ratio);
                 }
