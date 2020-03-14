@@ -50,7 +50,6 @@ public class Akira.FileFormat.ZipArchiveHandler : GLib.Object {
         file_collector = new FileCollector (unarchived_location);
     }
 
-
     protected static string get_content_from_file (File file) {
         try {
             string data;

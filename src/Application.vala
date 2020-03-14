@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2019 Alecaddd (http://alecaddd.com)
+* Copyright (c) 2019-2020 Alecaddd (https://alecaddd.com)
 *
 * This file is part of Akira.
 *
@@ -10,11 +10,11 @@
 
 * Akira is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 * GNU General Public License for more details.
 
 * You should have received a copy of the GNU General Public License
-* along with Akira.  If not, see <https://www.gnu.org/licenses/>.
+* along with Akira. If not, see <https://www.gnu.org/licenses/>.
 *
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
@@ -40,11 +40,12 @@ public class Akira.Application : Gtk.Application {
     public override void open (File[] files, string hint) {
         foreach (var file in files) {
             if (is_file_opened (file)) {
-                // Preset active window with file
+                // Present active window with currently opened file.
+                // We don't allow opening the same file on multiple windows.
                 var window = get_window_from_file (file);
                 window.show_app ();
             } else {
-                // Open New window
+                // Open a new window.
                 var window = new Akira.Window (this);
                 this.add_window (window);
 
