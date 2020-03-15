@@ -39,6 +39,10 @@
                "type": "git",
                "url": "https://gitlab.gnome.org/GNOME/goocanvas",
                "branch": "goocanvas-2.0"
+            },
+            {
+               "type": "patch",
+               "path": "goocanvas-bump-gettext-version.patch"
             }
          ]
       },
