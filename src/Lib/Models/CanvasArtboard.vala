@@ -149,6 +149,19 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
       items.remove (item);
     }
 
+    public void remove_all_items () {
+      Models.CanvasItem item;
+
+      while (items != null) {
+        // Get the new head of the list
+        item = items.nth_data (0);
+
+        canvas.window.event_bus.request_delete_item (item);
+      }
+
+      items = new List<Models.CanvasItem> ();
+    }
+
     public bool is_inside (double x, double y) {
         return x <= this.bounds.x2
             && x >= this.bounds.x1

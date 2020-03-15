@@ -87,8 +87,14 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
     }
 
     public void delete () {
+      debug (@"Removing item: $(id)");
+
         if (this.artboard != null) {
           this.artboard.remove_item (this);
+        }
+
+        if (this is Models.CanvasArtboard) {
+          (this as Models.CanvasArtboard).remove_all_items ();
         }
 
         remove ();
