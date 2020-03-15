@@ -29,7 +29,7 @@
 
 ## Your Environment (for bugs)
 <!--- Include as many relevant details about the environment you experienced the bug in -->
-<!--- If you can also run the folowing command and put the output here, that would be super helpful!  -->
+<!--- If you can also run the following command and put the output here, that would be super helpful!  -->
 <!---                   uname -a && cat /etc/os-release          -->
 
 - Akira Version:

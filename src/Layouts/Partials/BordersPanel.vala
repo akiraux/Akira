@@ -108,11 +108,11 @@ public class Akira.Layouts.Partials.BordersPanel : Gtk.Grid {
         // Listen to the model changes when adding/removing items.
         list_model.items_changed.connect ((position, removed, added) => {
             if (selected_item != null) {
-                // If an item is still selected, udpate the has_border property
-                // to TRUE or FALSE based on the model cahnges.
+                // If an item is still selected, update the has_border property
+                // to TRUE or FALSE based on the model changes.
 
                 // This will need to be updated in the future once we're dealing
-                // with multiple border colors, udpating to FALSE only if all
+                // with multiple border colors, updating to FALSE only if all
                 // the borders have been deleted.
                 selected_item.has_border = (added == 1);
             }
