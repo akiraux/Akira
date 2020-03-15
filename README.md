@@ -55,7 +55,7 @@ You can install Akira by compiling it from the source
  - `libxml-2.0`
  - `gtksourceview-3.0`
  - `libjson-glib-1.0`
- - `goocanvas-2.0`
+ - `goocanvas-3.0`
  - `libarchive`
  - `gettext`
  - `cairo`

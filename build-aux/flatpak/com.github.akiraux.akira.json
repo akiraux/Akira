@@ -35,7 +35,7 @@
             {
                "type": "git",
                "url": "https://gitlab.gnome.org/GNOME/goocanvas",
-               "branch": "goocanvas-2.0"
+               "branch": "goocanvas-3.0"
             },
             {
                "type": "patch",

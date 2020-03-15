@@ -45,7 +45,7 @@ These are mostly guidelines, not rules. Use your best judgment, and feel free to
         * `gobject-2.0`
         * `libxml-2.0`
         * `gtksourceview-3.0`
-        * `goocanvas-2.0`
+        * `goocanvas-3.0`
         * `cairo`
         * `meson`
 
@@ -54,7 +54,7 @@ These are mostly guidelines, not rules. Use your best judgment, and feel free to
     * Debian (Elementary/Ubuntu/Linux Mint)
 
         ```sh
-        sudo apt-get install gtk+-3.0 elementary-sdk glib-2.0 gee-0.8 gobject-2.0 libxml2 gtksourceview-3.0 libjson-glib-1.0 goocanvas-2.0 libarchive-dev libcairo2-dev meson valac
+        sudo apt-get install gtk+-3.0 elementary-sdk glib-2.0 gee-0.8 gobject-2.0 libxml2 gtksourceview-3.0 libjson-glib-1.0 goocanvas-3.0-dev libarchive-dev libcairo2-dev meson valac
         ```
 
     2. Building:

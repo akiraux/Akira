@@ -14,7 +14,7 @@ granite_dependency = dependency('granite', version: '>= 5.3.0')
 gee_dependency = dependency('gee-0.8')
 libxml_dependency = dependency('libxml-2.0')
 cairo_dependency = dependency('cairo', version: '>=1.14')
-goocanvas_dependency = dependency('goocanvas-2.0')
+goocanvas_dependency = dependency('goocanvas-3.0')
 libarchive_dependency = dependency('libarchive')
 json_glib_dependency = dependency('json-glib-1.0')
 
