@@ -215,7 +215,7 @@ public abstract class Akira.FileFormat.JsonObject : GLib.Object {
     }
 
     /**
-     * Get's a string representation of this object. Useful for serialization
+     * Gets a string representation of this object. Useful for serialization
      */
     public string to_string (bool prettyfied) {
         var node = new Json.Node.alloc ();

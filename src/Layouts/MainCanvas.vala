@@ -126,7 +126,7 @@ public class Akira.Layouts.MainCanvas : Gtk.Grid {
                 main_scroll.vadjustment.value += delta_y * 10;
             }
         } else if (delta_y > SCROLL_DISTANCE) {
-            // Scoll DOWN
+            // Scroll DOWN
             if (is_ctrl) {
                 // Zoom out
                 window.headerbar.zoom.zoom_out ();

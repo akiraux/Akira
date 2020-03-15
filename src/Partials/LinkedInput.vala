@@ -29,7 +29,7 @@ public class Akira.Partials.LinkedInput : Gtk.Grid {
     public Akira.Partials.InputField input_field { get; construct set; }
 
     /**
-    * Indicates wheter the label or the entry should be first
+    * Indicates whether the label or the entry should be first
     */
     public bool reversed { get; construct set; }
     public string unit { get; construct set; }

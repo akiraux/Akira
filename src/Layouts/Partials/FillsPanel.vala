@@ -109,11 +109,11 @@ public class Akira.Layouts.Partials.FillsPanel : Gtk.Grid {
         // Listen to the model changes when adding/removing items.
         list_model.items_changed.connect ((position, removed, added) => {
             if (selected_item != null) {
-                // If an item is still selected, udpate the has_fill property
-                // to TRUE or FALSE based on the model cahnges.
+                // If an item is still selected, update the has_fill property
+                // to TRUE or FALSE based on the model changes.
 
                 // This will need to be updated in the future once we're dealing
-                // with multiple fill colors, udpating to FALSE only if all
+                // with multiple fill colors, updating to FALSE only if all
                 // the fills have been deleted.
                 selected_item.has_fill = (added == 1);
             }
