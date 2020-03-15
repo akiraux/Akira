@@ -127,6 +127,7 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
       }
 
       if (this.artboard != null) {
+        debug (@"Moving item inside artboard by $(delta_x) $(delta_y)");
         this.relative_x = this.initial_relative_x + delta_x;
         this.relative_y = this.initial_relative_y + delta_y;
 
