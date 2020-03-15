@@ -258,6 +258,7 @@ public class Akira.Utils.AffineTransform : Object {
         // initial_event, in order to convert it to the "new" translated
         // item space after the transformation has been applied.
         canvas.convert_from_item_space (selected_item, ref initial_x, ref initial_y);
+
         // The CanvasItem.move function expects delta to be the difference
         // between current position and the initial movement one,
         // which is not the case for scaling, since the delta

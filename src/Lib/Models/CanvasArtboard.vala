@@ -145,6 +145,10 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
         }
     }
 
+    public void remove_item (Models.CanvasItem item) {
+      items.remove (item);
+    }
+
     public bool is_inside (double x, double y) {
         return x <= this.bounds.x2
             && x >= this.bounds.x1
