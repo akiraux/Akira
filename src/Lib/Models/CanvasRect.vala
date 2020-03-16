@@ -120,24 +120,7 @@ public class Akira.Lib.Models.CanvasRect : Goo.CanvasRect, Models.CanvasItem {
 
         set_transform (Cairo.Matrix.identity ());
 
-        if (artboard != null) {
-            artboard.add_child (this, -1);
-
-            double item_x_from_artboard = _x;
-            double item_y_from_artboard = _y;
-
-            canvas.convert_to_item_space (artboard, ref item_x_from_artboard, ref item_y_from_artboard);
-
-            relative_x = item_x_from_artboard;
-            relative_y = item_y_from_artboard;
-        } else {
-            parent.add_child (this, -1);
-
-
-            // Keep the item always in the origin
-            // move the entire coordinate system every time
-            translate (_x, _y);
-        }
+        position_item (_x, _y);
 
         color = _fill_color;
         has_border = settings.set_border;

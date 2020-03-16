@@ -75,18 +75,19 @@ public class Akira.Lib.Models.CanvasText : Goo.CanvasText, Models.CanvasItem {
         double _height = 0,
         Goo.CanvasAnchorType _anchor = Goo.CanvasAnchorType.NW,
         string _font = "Open Sans 16",
-        Goo.CanvasItem? parent = null
+        Goo.CanvasItem? _parent = null,
+        Models.CanvasArtboard? _artboard = null
     ) {
         Object (
-            parent: parent,
             x: _x,
             y: _y,
             width: _width,
             height: _height
         );
 
+        artboard = _artboard;
+        parent = _artboard != null ? _artboard : _parent;
         canvas = parent.get_canvas () as Akira.Lib.Canvas;
-        parent.add_child (this, -1);
 
         item_type = Models.CanvasItemType.TEXT;
         id = Models.CanvasItem.create_item_id (this);
@@ -102,8 +103,7 @@ public class Akira.Lib.Models.CanvasText : Goo.CanvasText, Models.CanvasItem {
         set ("height", _height);
 
         set_transform (Cairo.Matrix.identity ());
-        // Keep the item always in the origin
-        // move the entire coordinate system every time
-        translate (_x, _y);
+
+        position_item (_x, _y);
     }
 }

@@ -408,7 +408,7 @@ public class Akira.Utils.AffineTransform : Object {
         return GLib.Math.round (size);
     }
 
-    public static double degToRad (double deg) {
+    public static double deg_to_rad (double deg) {
         return deg * Math.PI / 180.0;
     }
 }

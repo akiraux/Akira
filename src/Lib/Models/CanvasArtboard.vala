@@ -237,7 +237,7 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
                 cr.transform (item.compute_transform (Cairo.Matrix.identity ()));
 
                 if (item is Goo.CanvasItemSimple) {
-                    (item as Goo.CanvasRect).simple_paint (cr, bounds);
+                  (item as Goo.CanvasItemSimple).simple_paint (cr, bounds);
                 }
 
                 cr.restore ();

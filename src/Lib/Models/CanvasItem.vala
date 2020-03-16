@@ -128,6 +128,28 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
         //item.set ("z-index", z_index);
     }
 
+    public virtual void position_item (double _x, double _y) {
+      if (artboard != null) {
+        artboard.add_child (this, -1);
+
+        double item_x_from_artboard = _x;
+        double item_y_from_artboard = _y;
+
+        canvas.convert_to_item_space (artboard, ref item_x_from_artboard, ref item_y_from_artboard);
+
+        relative_x = item_x_from_artboard;
+        relative_y = item_y_from_artboard;
+      } else {
+        parent.add_child (this, -1);
+
+
+        // Keep the item always in the origin
+        // move the entire coordinate system every time
+        translate (_x, _y);
+      }
+    }
+
+
     public virtual void move (
       double delta_x, double delta_y,
       double delta_x_accumulator = 0.0, double delta_y_accumulator = 0.0) {
@@ -172,7 +194,7 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
         // Rotate around the center by the amount
         // in item.rotation
         transform.translate (width / 2, height / 2);
-        transform.rotate (Utils.AffineTransform.degToRad (rotation));
+        transform.rotate (Utils.AffineTransform.deg_to_rad (rotation));
         transform.translate (- (width / 2), - (height / 2));
 
         return transform;

@@ -69,11 +69,11 @@ public class Akira.Lib.Managers.ItemsManager : Object {
           break;
 
         case Models.CanvasItemType.ELLIPSE:
-          new_item = add_ellipse (event, root);
+          new_item = add_ellipse (event, root, artboard);
           break;
 
         case Models.CanvasItemType.TEXT:
-          new_item = add_text (event, root);
+          new_item = add_text (event, root, artboard);
           break;
 
         case Models.CanvasItemType.ARTBOARD:
@@ -103,6 +103,12 @@ public class Akira.Lib.Managers.ItemsManager : Object {
     }
 
     public void on_request_delete_item (Lib.Models.CanvasItem item) {
+        if (item is Models.CanvasArtboard) {
+          artboards.remove (item as Models.CanvasArtboard);
+        } else {
+          items.remove (item);
+        }
+
         item.delete ();
         canvas.window.event_bus.item_deleted (item);
     }
@@ -133,7 +139,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         return rect;
     }
 
-    public Models.CanvasEllipse add_ellipse (Gdk.EventButton event, Goo.CanvasItem parent) {
+    public Models.CanvasEllipse add_ellipse (Gdk.EventButton event, Goo.CanvasItem parent, Models.CanvasArtboard? artboard) {
         var ellipse = new Models.CanvasEllipse (
             Utils.AffineTransform.fix_size (event.x),
             Utils.AffineTransform.fix_size (event.y),
@@ -142,13 +148,14 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             border_size,
             border_color,
             fill_color,
-            parent
+            parent,
+            artboard
         );
 
         return ellipse;
     }
 
-    public Models.CanvasText add_text (Gdk.EventButton event, Goo.CanvasItem parent) {
+    public Models.CanvasText add_text (Gdk.EventButton event, Goo.CanvasItem parent, Models.CanvasArtboard? artboard) {
         var text = new Models.CanvasText (
             "Add text here",
             Utils.AffineTransform.fix_size (event.x),
@@ -157,7 +164,8 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             25f,
             Goo.CanvasAnchorType.NW,
             "Open Sans 18",
-            parent
+            parent,
+            artboard
         );
 
         return text;
