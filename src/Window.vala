@@ -63,6 +63,8 @@ public class Akira.Window : Gtk.ApplicationWindow {
         show_app ();
 
         main_window.main_canvas.canvas.focus_canvas ();
+        event_bus.file_edited.connect (on_file_edited);
+        event_bus.file_saved.connect (on_file_saved);
     }
 
     private void build_ui () {
@@ -92,6 +94,14 @@ public class Akira.Window : Gtk.ApplicationWindow {
         resize (settings.window_width, settings.window_height);
         main_window.pane.position = settings.left_paned;
         main_window.pane2.position = settings.right_paned;
+    }
+
+    private void on_file_edited () {
+        edited = true;
+    }
+
+    private void on_file_saved () {
+        edited = false;
     }
 
     public bool before_destroy () {

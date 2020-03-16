@@ -79,6 +79,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             items.append (new_item);
 
             canvas.window.event_bus.item_inserted (new_item);
+            canvas.window.event_bus.file_edited ();
         }
 
         return new_item;
@@ -86,11 +87,13 @@ public class Akira.Lib.Managers.ItemsManager : Object {
 
     public void add_item (Akira.Lib.Models.CanvasItem item) {
         items.append (item);
+        canvas.window.event_bus.file_edited ();
     }
 
     public void on_request_delete_item (Lib.Models.CanvasItem item) {
         item.delete ();
         canvas.window.event_bus.item_deleted (item);
+        canvas.window.event_bus.file_edited ();
     }
 
     public Models.CanvasItem add_artboard (Gdk.EventButton event) {

@@ -22,22 +22,10 @@
 public class Akira.FileFormat.FileManager : Object {
     public weak Akira.Window window { get; construct; }
 
-    // Keep track of edited status.
-    public bool edited { get; set; default = false; }
-
     public FileManager (Akira.Window window) {
        Object (
           window: window
        );
-    }
-
-    construct {
-        // Listen for events.
-        window.event_bus.file_edited.connect (on_file_edited);
-    }
-
-    private void on_file_edited () {
-        edited = true;
     }
 
     // Save file.
@@ -45,6 +33,7 @@ public class Akira.FileFormat.FileManager : Object {
         // Check if we already have a file open to save or save a new one.
         if (window.akira_file != null) {
             window.akira_file.save_file ();
+            window.event_bus.file_saved (null);
             return;
         }
 
@@ -99,6 +88,7 @@ public class Akira.FileFormat.FileManager : Object {
                    file = File.new_for_path (path + ".akira");
                 }
                 window.save_new_file (file);
+                window.event_bus.file_saved (dialog.get_current_name ());
                 break;
         }
         dialog.destroy ();
@@ -125,6 +115,8 @@ public class Akira.FileFormat.FileManager : Object {
                 File[] files = {};
                 files += dialog.get_file ();
                 window.app.open (files, "");
+                var file_name = dialog.get_filename ().replace (dialog.get_current_folder () + "/", "");
+                window.event_bus.file_saved (file_name);
                 info ("opened: %s\n", (dialog.get_filename ()));
                 break;
 
