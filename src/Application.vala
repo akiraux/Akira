@@ -44,14 +44,24 @@ public class Akira.Application : Gtk.Application {
                 // We don't allow opening the same file on multiple windows.
                 var window = get_window_from_file (file);
                 window.show_app ();
-            } else {
-                // Open a new window.
-                var window = new Akira.Window (this);
-                this.add_window (window);
-
-                window.open_file (file);
-                window.show_app ();
+                continue;
             }
+
+            // If the current window is empty, load the file in this one.
+            var current_window = active_window as Akira.Window;
+            if (current_window.akira_file == null && !current_window.edited) {
+                current_window.open_file (file);
+                current_window.event_bus.file_saved (file.get_basename ());
+                continue;
+            }
+
+            // Open a new window.
+            var window = new Akira.Window (this);
+            this.add_window (window);
+
+            window.open_file (file);
+            window.show_app ();
+            window.event_bus.file_saved (file.get_basename ());
         }
     }
 
@@ -79,6 +89,11 @@ public class Akira.Application : Gtk.Application {
 
     public bool is_file_opened (File file) {
         return opened_files.has_key (file.get_uri ());
+    }
+
+    public void remove_file_from_opened (File file) {
+        opened_files.remove (file.get_uri (), null);
+        debug ("cleared: %i", opened_files.size);
     }
 
     public void new_window () {
