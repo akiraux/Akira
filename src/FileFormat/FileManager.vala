@@ -115,8 +115,6 @@ public class Akira.FileFormat.FileManager : Object {
                 File[] files = {};
                 files += dialog.get_file ();
                 window.app.open (files, "");
-                var file_name = dialog.get_filename ().replace (dialog.get_current_folder () + "/", "");
-                window.event_bus.file_saved (file_name);
                 info ("opened: %s\n", (dialog.get_filename ()));
                 break;
 
