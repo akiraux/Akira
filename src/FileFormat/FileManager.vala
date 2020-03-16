@@ -26,7 +26,7 @@ public class Akira.FileFormat.FileManager : Object {
     public bool edited { get; set; default = false; }
 
     public FileManager (Akira.Window window) {
-       Object(
+       Object (
           window: window
        );
     }
