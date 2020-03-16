@@ -172,7 +172,7 @@ public class Akira.FileFormat.ZipArchiveHandler : GLib.Object {
     }
 
     /**
-     * Get's a random file inside the archive at the location specified
+     * Gets a random file inside the archive at the location specified
      * using a guid-like name.
      *
      * @param location Location inside of the archive where the file will live at.

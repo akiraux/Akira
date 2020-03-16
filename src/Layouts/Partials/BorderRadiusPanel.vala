@@ -261,7 +261,7 @@ public class Akira.Layouts.Partials.BorderRadiusPanel : Gtk.Grid {
             return;
         }
 
-        // Calculate the radius percentage and udpate the value on shape resize.
+        // Calculate the radius percentage and update the value on shape resize.
         var percentage = Math.round (border_radius_scale.get_value () / max_size * 100);
         border_radius_scale.set_value (Math.round (percentage * max_size / 100));
     }
@@ -298,7 +298,7 @@ public class Akira.Layouts.Partials.BorderRadiusPanel : Gtk.Grid {
     }
 
     private void disconnect_previous_item () {
-        // Disconnect the model binding if an item was previsouly stored.
+        // Disconnect the model binding if an item was previously stored.
         // This is necessary to prevent GObject Critical errors.
         if (selected_item != null) {
             selected_item.notify["width"].disconnect (on_size_change);
