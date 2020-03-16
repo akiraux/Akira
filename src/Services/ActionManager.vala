@@ -175,15 +175,15 @@ public class Akira.Services.ActionManager : Object {
     }
 
     private void action_open () {
-        warning ("open");
+        window.file_manager.open_file ();
     }
 
     private void action_save () {
-        warning ("save");
+        window.file_manager.save_file ();
     }
 
     private void action_save_as () {
-        warning ("save_as");
+        window.file_manager.save_file_as ();
     }
 
     private void action_show_pixel_grid () {

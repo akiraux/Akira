@@ -21,6 +21,7 @@
 
 public class Akira.Window : Gtk.ApplicationWindow {
     public FileFormat.AkiraFile? akira_file = null;
+    public FileFormat.FileManager file_manager;
 
     public weak Akira.Application app { get; construct; }
     public Akira.Services.EventBus event_bus;
@@ -50,6 +51,7 @@ public class Akira.Window : Gtk.ApplicationWindow {
 
         event_bus = new Akira.Services.EventBus ();
         action_manager = new Akira.Services.ActionManager (app, this);
+        file_manager = new Akira.FileFormat.FileManager (this);
         headerbar = new Akira.Layouts.HeaderBar (this);
         main_window = new Akira.Layouts.MainWindow (this);
         dialogs = new Akira.Utils.Dialogs (this);
@@ -148,13 +150,17 @@ public class Akira.Window : Gtk.ApplicationWindow {
     }
 
     public void open_file (File file) {
-        save_and_close_current_file ();
-
         app.register_file_to_window (file, this);
         akira_file = new FileFormat.AkiraFile (file);
 
         akira_file.prepare ();
         akira_file.load_file ();
+    }
+
+    public void save_new_file (File file) {
+        app.register_file_to_window (file, this);
+        akira_file = new FileFormat.AkiraFile (file);
+        akira_file.save_file ();
     }
 
     private void save_and_close_current_file () {

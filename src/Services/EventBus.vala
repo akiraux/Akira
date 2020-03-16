@@ -21,6 +21,9 @@
  */
 
 public class Akira.Services.EventBus : Object {
+    // File signals.
+    public signal void file_edited ();
+
     // Layout signals.
     public signal void change_sensitivity (string type);
     public signal void request_widget_redraw ();

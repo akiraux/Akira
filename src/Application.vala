@@ -63,6 +63,16 @@ public class Akira.Application : Gtk.Application {
         }
     }
 
+    public File? get_file_from_window (Akira.Window window) {
+        foreach (var entry in opened_files.entries) {
+            if (entry.value == window) {
+                return File.new_for_path (entry.key);
+            }
+        }
+
+        return null;
+    }
+
     public Akira.Window get_window_from_file (File file) {
         return opened_files.get (file.get_uri ());
     }

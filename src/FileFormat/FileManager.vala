@@ -25,7 +25,6 @@ public class Akira.FileFormat.FileManager : Object {
     // Keep track of edited status.
     public bool edited { get; set; default = false; }
 
-    // Construct
     public FileManager (Akira.Window window) {
        Object(
           window: window
@@ -42,9 +41,97 @@ public class Akira.FileFormat.FileManager : Object {
     }
 
     // Save file.
-    // Check if we already have a file open to save or save a new one.
+    public void save_file () {
+        // Check if we already have a file open to save or save a new one.
+        if (window.akira_file != null) {
+            window.akira_file.save_file ();
+            return;
+        }
+
+        save_file_as ();
+    }
 
     //  Save as.
+    public void save_file_as () {
+        var dialog = new Gtk.FileChooserNative (
+            _("Save Akira file"), window,
+            Gtk.FileChooserAction.SAVE,
+            _("Save"), _("Cancel"));
 
-    //  Open.
+        dialog.set_do_overwrite_confirmation (true);
+        add_filters (dialog);
+        dialog.set_modal (true);
+        if (window.akira_file != null) {
+            var file = window.app.get_file_from_window (window);
+            try {
+                dialog.set_file (file);
+            }
+            catch (GLib.Error error) {
+                info ("%s\n", error.message);
+            }
+        }
+
+        dialog.response.connect ((response_id) => save_file_as_response (dialog, response_id));
+        dialog.show ();
+    }
+
+    private void add_filters (Gtk.FileChooserNative chooser) {
+        Gtk.FileFilter filter = new Gtk.FileFilter ();
+        filter.add_pattern ("*.akira");
+        filter.set_filter_name (_("Akira files"));
+        chooser.add_filter (filter);
+
+        filter = new Gtk.FileFilter ();
+        filter.add_pattern ("*");
+        filter.set_filter_name (_("All files"));
+        chooser.add_filter (filter);
+    }
+
+    private void save_file_as_response (Gtk.FileChooserNative dialog, int response_id) {
+        switch (response_id) {
+            case Gtk.ResponseType.ACCEPT:
+                File file;
+                var save_file = dialog.get_file ();
+                var path = save_file.get_path ();
+                if (path.has_suffix (".akira")) {
+                   file = save_file;
+                } else {
+                   file = File.new_for_path (path + ".akira");
+                }
+                window.save_new_file (file);
+                break;
+        }
+        dialog.destroy ();
+    }
+
+    // Open file.
+    public void open_file () {
+        var dialog = new Gtk.FileChooserNative (
+            _("Open Akira file"), window,
+            Gtk.FileChooserAction.OPEN,
+            _("Open"), _("Cancel"));
+
+        add_filters (dialog);
+        dialog.local_only = true;
+        dialog.select_multiple = false;
+        dialog.response.connect ((response_id) => open_file_response (dialog, response_id));
+        dialog.show ();
+    }
+
+    private void open_file_response (Gtk.FileChooserNative dialog, int response_id) {
+        switch (response_id) {
+            case Gtk.ResponseType.ACCEPT:
+            case Gtk.ResponseType.OK:
+                File[] files = {};
+                files += dialog.get_file ();
+                window.app.open (files, "");
+                info ("opened: %s\n", (dialog.get_filename ()));
+                break;
+
+            case Gtk.ResponseType.CANCEL:
+                info ("Cancelled: FileChooserAction.OPEN\n");
+                break;
+        }
+        dialog.destroy ();
+    }
 }
