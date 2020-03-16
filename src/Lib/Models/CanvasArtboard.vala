@@ -81,7 +81,7 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
     public Goo.CanvasItem parent_item { get; set; }
 
     // Artboard related properties
-    private double label_height;
+    private Cairo.TextExtents label_extents;
     private List<Models.CanvasItem> items;
     public new Akira.Lib.Canvas canvas { get; set; }
     public Models.CanvasArtboard? artboard { get; set; }
@@ -95,7 +95,7 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
         double _x = 0,
         double _y = 0,
         Goo.CanvasItem? _parent = null
-        ) {
+    ) {
         parent_item = _parent;
 
         canvas = parent_item.get_canvas () as Akira.Lib.Canvas;
@@ -141,7 +141,7 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
 
     public void move_items (double delta_x, double delta_y) {
         foreach (var item in items) {
-            item.translate (delta_x, delta_y);
+            // item.translate (delta_x, delta_y);
         }
     }
 
@@ -176,8 +176,9 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
             return;
         }
 
-        this.items.append (canvas_item);
+        this.items.prepend (canvas_item);
         item.set_parent (this);
+
         request_update ();
     }
 
@@ -185,22 +186,20 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
         Cairo.ImageSurface surface = new Cairo.ImageSurface (Cairo.Format.ARGB32, 290, 256);
         Cairo.Context cr = new Cairo.Context (surface);
 
-        Cairo.TextExtents extents;
         cr.select_font_face (
             "Sans",
             Cairo.FontSlant.NORMAL,
             Cairo.FontWeight.NORMAL
-            );
+        );
+
         cr.set_font_size (LABEL_FONT_SIZE);
 
-        cr.text_extents (id, out extents);
-
-        label_height = extents.height;
+        cr.text_extents (id, out label_extents);
     }
 
     public override void simple_update (Cairo.Context cr) {
         this.bounds.x1 = x;
-        this.bounds.y1 = y - label_height - LABEL_BOTTOM_PADDING;
+        this.bounds.y1 = y - label_extents.height - LABEL_BOTTOM_PADDING;
         this.bounds.x2 = x + width;
         this.bounds.y2 = y + height;
     }
@@ -212,7 +211,8 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
             "Sans",
             Cairo.FontSlant.NORMAL,
             Cairo.FontWeight.NORMAL
-            );
+        );
+
         cr.set_font_size (LABEL_FONT_SIZE);
 
         cr.move_to (x, y - LABEL_BOTTOM_PADDING);
@@ -234,7 +234,7 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
             foreach (var item in items) {
                 cr.save ();
 
-                cr.translate (item.relative_x, item.relative_y);
+                cr.transform (item.compute_transform (Cairo.Matrix.identity ()));
 
                 if (item is Goo.CanvasItemSimple) {
                     (item as Goo.CanvasRect).simple_paint (cr, bounds);
@@ -246,7 +246,12 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
     }
 
     public override bool simple_is_item_at (double x, double y, Cairo.Context cr, bool is_pointer_event) {
-        var is_on_handle = y < 0;
+        // To select an Artboard you should put the arrow
+        // ontop of the Artboard label
+        var is_on_handle =
+          y < 0
+          && y > - (label_extents.height + LABEL_BOTTOM_PADDING)
+          && x < (label_extents.width);
 
         return is_on_handle;
     }

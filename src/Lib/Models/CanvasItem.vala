@@ -87,8 +87,6 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
     }
 
     public void delete () {
-      debug (@"Removing item: $(id)");
-
         if (this.artboard != null) {
           this.artboard.remove_item (this);
         }
@@ -130,14 +128,20 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
         //item.set ("z-index", z_index);
     }
 
-    public virtual void move (double delta_x, double delta_y, double initial_x = 0.0, double initial_y = 0.0) {
+    public virtual void move (
+      double delta_x, double delta_y,
+      double delta_x_accumulator = 0.0, double delta_y_accumulator = 0.0) {
       if (this is Models.CanvasArtboard) {
         (this as Models.CanvasArtboard).move_items (delta_x, delta_y);
       }
 
       if (this.artboard != null) {
-        this.relative_x = this.initial_relative_x + delta_x;
-        this.relative_y = this.initial_relative_y + delta_y;
+        var transformed_delta_x = delta_x_accumulator;
+        var transformed_delta_y = delta_y_accumulator;
+
+        this.relative_x = this.initial_relative_x + transformed_delta_x;
+        this.relative_y = this.initial_relative_y + transformed_delta_y;
+
 
         return;
       }
@@ -152,10 +156,26 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
         get_transform (out transform);
       } else {
         artboard.get_transform (out transform);
-        transform.translate (relative_x, relative_y);
+
+        transform = compute_transform (transform);
       }
 
       return transform;
+    }
+
+    public virtual Cairo.Matrix compute_transform (Cairo.Matrix transform) {
+        transform.translate (relative_x, relative_y);
+
+        var width = get_coords ("width");
+        var height = get_coords ("height");
+
+        // Rotate around the center by the amount
+        // in item.rotation
+        transform.translate (width / 2, height / 2);
+        transform.rotate (Utils.AffineTransform.degToRad (rotation));
+        transform.translate (- (width / 2), - (height / 2));
+
+        return transform;
     }
 
     public virtual double get_real_coord (string coord_id) {

@@ -43,20 +43,6 @@ public class Akira.Utils.AffineTransform : Object {
         if (item.artboard != null) {
           item_x = item.relative_x;
           item_y = item.relative_y;
-
-          /*
-          double artboard_origin_x = 0.0;
-          double artboard_origin_y = 0.0;
-
-          item.canvas.convert_from_item_space (item.artboard, ref artboard_origin_x, ref artboard_origin_y);
-
-          // Strange bug in getting the proper
-          // canvas wise position of an item.
-          // The value gets doubled, so we need to double
-          // the amount we remove from item_x and item_y
-          item_x -= 2 * artboard_origin_x;
-          item_y -= 2 * artboard_origin_y;
-          */
         }
 
         array.insert ("x", item_x);
@@ -105,18 +91,25 @@ public class Akira.Utils.AffineTransform : Object {
     public static void move_from_event (
         double x,
         double y,
-        double initial_x,
-        double initial_y,
+        ref double initial_x,
+        ref double initial_y,
+        ref double delta_x_accumulator,
+        ref double delta_y_accumulator,
         CanvasItem selected_item
     ) {
-        var canvas = selected_item.canvas;
-
-        canvas.convert_to_item_space (selected_item, ref x, ref y);
-
         double delta_x = GLib.Math.round (x - initial_x);
         double delta_y = GLib.Math.round (y - initial_y);
 
-        selected_item.move (delta_x, delta_y, initial_x, initial_y);
+        delta_x_accumulator += delta_x;
+        delta_y_accumulator += delta_y;
+
+        selected_item.move (
+          delta_x, delta_y,
+          delta_x_accumulator, delta_y_accumulator
+        );
+
+        initial_x = x;
+        initial_y = y;
     }
 
     public static void scale_from_event (
@@ -124,25 +117,26 @@ public class Akira.Utils.AffineTransform : Object {
         double y,
         ref double initial_x,
         ref double initial_y,
+        ref double delta_x_accumulator,
+        ref double delta_y_accumulator,
         double initial_width,
         double initial_height,
         NobManager.Nob selected_nob,
         CanvasItem selected_item
     ) {
-        var canvas = selected_item.canvas as Akira.Lib.Canvas;
-        canvas.convert_to_item_space (selected_item, ref x, ref y);
+        double delta_x = Math.round (x - initial_x);
+        double delta_y = Math.round (y - initial_y);
 
-        double delta_x = x - initial_x;
-        double delta_y = y - initial_y;
+        var canvas = selected_item.canvas;
+
+        double origin_move_delta_x = 0;
+        double origin_move_delta_y = 0;
 
         double item_width = selected_item.get_coords ("width");
         double item_height = selected_item.get_coords ("height");
 
-        double new_width = item_width;
-        double new_height = item_height;
-
-        double origin_move_delta_x = 0.0;
-        double origin_move_delta_y = 0.0;
+        double new_width = -1;
+        double new_height = -1;
 
         switch (selected_nob) {
             case NobManager.Nob.TOP_LEFT:
@@ -186,6 +180,7 @@ public class Akira.Utils.AffineTransform : Object {
 
             case NobManager.Nob.RIGHT_CENTER:
                 new_width = initial_width + delta_x;
+
                 if ((canvas.ctrl_is_pressed || selected_item.size_locked) && new_width > MIN_SIZE) {
                     new_height = GLib.Math.round (new_width / selected_item.size_ratio);
                 }
@@ -202,6 +197,7 @@ public class Akira.Utils.AffineTransform : Object {
 
             case NobManager.Nob.BOTTOM_CENTER:
                 new_height = initial_height + delta_y;
+
                 if ((canvas.ctrl_is_pressed || selected_item.size_locked) && new_height > MIN_SIZE) {
                     new_width = GLib.Math.round (new_height * selected_item.size_ratio);
                 }
@@ -233,8 +229,10 @@ public class Akira.Utils.AffineTransform : Object {
 
         origin_move_delta_x = fix_size (origin_move_delta_x);
         origin_move_delta_y = fix_size (origin_move_delta_y);
+
         new_width = fix_size (new_width);
         new_height = fix_size (new_height);
+
 
         if (new_width == MIN_SIZE) {
             origin_move_delta_x = 0.0;
@@ -244,6 +242,19 @@ public class Akira.Utils.AffineTransform : Object {
             origin_move_delta_y = 0.0;
         }
 
+        delta_x_accumulator += origin_move_delta_x;
+        delta_y_accumulator += origin_move_delta_y;
+
+        selected_item.move (
+          origin_move_delta_x,
+          origin_move_delta_y,
+          delta_x_accumulator,
+          delta_y_accumulator
+        );
+
+        set_size (new_width, new_height, selected_item);
+
+        /*
         if (new_width < MIN_SIZE) {
             canvas.window.event_bus.flip_item (false);
             return;
@@ -257,7 +268,7 @@ public class Akira.Utils.AffineTransform : Object {
         // Before translating, recover the original "canvas" position of
         // initial_event, in order to convert it to the "new" translated
         // item space after the transformation has been applied.
-        canvas.convert_from_item_space (selected_item, ref initial_x, ref initial_y);
+        //canvas.convert_from_item_space (selected_item, ref initial_x, ref initial_y);
 
         // The CanvasItem.move function expects delta to be the difference
         // between current position and the initial movement one,
@@ -265,12 +276,10 @@ public class Akira.Utils.AffineTransform : Object {
         // is calculated again at each iteration, so the we should
         // update the initial_relative coordinate each time we call
         // move from here
-        selected_item.store_relative_position ();
+        //selected_item.store_relative_position ();
 
-        selected_item.move (origin_move_delta_x, origin_move_delta_y);
-        canvas.convert_to_item_space (selected_item, ref initial_x, ref initial_y);
-
-        set_size (new_width, new_height, selected_item);
+        //canvas.convert_to_item_space (selected_item, ref initial_x, ref initial_y);
+        */
     }
 
     public static void rotate_from_event (
@@ -349,13 +358,13 @@ public class Akira.Utils.AffineTransform : Object {
         prev_rotation_difference = 0.0;
     }
 
-    public static void set_size (double? width, double? height, Goo.CanvasItem item) {
-        if (width != null) {
-            item.set ("width", (double) width);
+    public static void set_size (double width, double height, Goo.CanvasItem item) {
+        if (width != -1) {
+            item.set ("width", width);
         }
 
-        if (height != null) {
-            item.set ("height", (double) height);
+        if (height != -1) {
+            item.set ("height", height);
         }
     }
 
@@ -395,39 +404,11 @@ public class Akira.Utils.AffineTransform : Object {
         item.set_transform (transform);
     }
 
-    /*
-    private static double fix_x_position (double x, double width, double delta_x) {
-        var min_delta = Math.round (MIN_POS - width);
-        var max_delta = Math.round (BOUNDS_H - MIN_POS);
-
-        var new_x = Math.round (x + delta_x);
-
-        if (new_x < min_delta) {
-            return 0;
-        } else if (new_x > max_delta) {
-            return 0;
-        } else {
-            return delta_x;
-        }
-    }
-
-    private static double fix_y_position (double y, double height, double delta_y) {
-        var min_delta = Math.round (MIN_POS - height);
-        var max_delta = Math.round (BOUNDS_H - MIN_POS);
-
-        var new_y = Math.round (y + delta_y);
-
-        if (new_y < min_delta) {
-            return 0;
-        } else if (new_y > max_delta) {
-            return 0;
-        } else {
-            return delta_y;
-        }
-    }
-    */
-
     public static double fix_size (double size) {
         return GLib.Math.round (size);
+    }
+
+    public static double degToRad (double deg) {
+        return deg * Math.PI / 180.0;
     }
 }

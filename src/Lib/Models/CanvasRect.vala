@@ -118,6 +118,8 @@ public class Akira.Lib.Models.CanvasRect : Goo.CanvasRect, Models.CanvasItem {
         is_radius_uniform = true;
         is_radius_autoscale = false;
 
+        set_transform (Cairo.Matrix.identity ());
+
         if (artboard != null) {
             artboard.add_child (this, -1);
 
@@ -130,13 +132,12 @@ public class Akira.Lib.Models.CanvasRect : Goo.CanvasRect, Models.CanvasItem {
             relative_y = item_y_from_artboard;
         } else {
             parent.add_child (this, -1);
+
+
+            // Keep the item always in the origin
+            // move the entire coordinate system every time
+            translate (_x, _y);
         }
-
-        set_transform (Cairo.Matrix.identity ());
-        // Keep the item always in the origin
-        // move the entire coordinate system every time
-        translate (_x, _y);
-
 
         color = _fill_color;
         has_border = settings.set_border;
