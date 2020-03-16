@@ -24,7 +24,6 @@ namespace Akira {
 }
 
 public class Akira.Application : Gtk.Application {
-    private Gee.HashMap<string, Akira.Window> opened_files;
     public GLib.List<Window> windows;
 
     construct {
@@ -32,7 +31,6 @@ public class Akira.Application : Gtk.Application {
 
         settings = new Akira.Services.Settings ();
         windows = new GLib.List<Window> ();
-        opened_files = new Gee.HashMap<string, Akira.Window> ();
 
         application_id = Constants.APP_ID;
     }
@@ -55,30 +53,24 @@ public class Akira.Application : Gtk.Application {
         }
     }
 
-    public void register_file_to_window (File file, Akira.Window window) {
-        if (!is_file_opened (file)) {
-            opened_files.set (file.get_uri (), window);
-        } else {
-            warning ("File was opened in two separate windows");
-        }
-    }
-
-    public File? get_file_from_window (Akira.Window window) {
-        foreach (var entry in opened_files.entries) {
-            if (entry.value == window) {
-                return File.new_for_path (entry.key);
+    public Akira.Window? get_window_from_file (File file) {
+        foreach (Akira.Window window in windows) {
+            if (window.akira_file != null && window.akira_file.opened_file == file) {
+                return window;
             }
         }
 
         return null;
     }
 
-    public Akira.Window get_window_from_file (File file) {
-        return opened_files.get (file.get_uri ());
-    }
-
     public bool is_file_opened (File file) {
-        return opened_files.has_key (file.get_uri ());
+        foreach (Akira.Window window in windows) {
+            if (window.akira_file != null && window.akira_file.opened_file == file) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public void new_window () {

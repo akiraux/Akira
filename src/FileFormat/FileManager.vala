@@ -51,7 +51,7 @@ public class Akira.FileFormat.FileManager : Object {
         add_filters (dialog);
         dialog.set_modal (true);
         if (window.akira_file != null) {
-            var file = window.app.get_file_from_window (window);
+            var file = File.new_for_path (window.akira_file.path);
             try {
                 dialog.set_file (file);
             }

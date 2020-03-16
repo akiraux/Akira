@@ -1,20 +1,23 @@
 /*
- *  Copyright (C) 2019 Felipe Escoto <felescoto95@hotmail.com>
+ * Copyright (c) 2019-2020 Alecaddd (https://alecaddd.com)
  *
- *  This program or library is free software; you can redistribute it
- *  and/or modify it under the terms of the GNU Lesser General Public
- *  License as published by the Free Software Foundation; either
- *  version 3 of the License, or (at your option) any later version.
+ * This file is part of Akira.
  *
- *  This library is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- *  Lesser General Public License for more details.
+ * Akira is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+
+ * Akira is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+
+ * You should have received a copy of the GNU General Public License
+ * along with Akira. If not, see <https://www.gnu.org/licenses/>.
  *
- *  You should have received a copy of the GNU Lesser General
- *  Public License along with this library; if not, write to the
- *  Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
- *  Boston, MA 02110-1301 USA.
+ * Authored by: Felipe Escoto <felescoto95@hotmail.com>
+ * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
  */
 
 public class Akira.FileFormat.AkiraFile : Akira.FileFormat.ZipArchiveHandler {
@@ -25,8 +28,13 @@ public class Akira.FileFormat.AkiraFile : Akira.FileFormat.ZipArchiveHandler {
 
     public FileFormat.Version version_data { get; private set; }
 
-    private File content_file { get; private set; }
-    private File version_file { get; private set; }
+    private File content_file { get; set; }
+    private File version_file { get; set; }
+    public string path {
+        owned get {
+            return opened_file.get_parent ().get_path () + opened_file.get_basename ();
+        }
+    }
 
     public AkiraFile (File _gzipped_file) {
         Object (opened_file: _gzipped_file.dup ());
