@@ -179,8 +179,6 @@ public class Akira.Window : Gtk.ApplicationWindow {
         if (akira_file != null) {
             akira_file.save_file ();
             akira_file.close ();
-            var file = app.get_file_from_window (this);
-            app.remove_file_from_opened (file);
         }
     }
 }

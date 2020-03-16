@@ -65,7 +65,7 @@ public class Akira.Application : Gtk.Application {
 
     public Akira.Window? get_window_from_file (File file) {
         foreach (Akira.Window window in windows) {
-            if (window.akira_file != null && window.akira_file.opened_file == file) {
+            if (window.akira_file != null && window.akira_file.opened_file.get_path () == file.get_path ()) {
                 return window;
             }
         }
@@ -75,17 +75,12 @@ public class Akira.Application : Gtk.Application {
 
     public bool is_file_opened (File file) {
         foreach (Akira.Window window in windows) {
-            if (window.akira_file != null && window.akira_file.opened_file == file) {
+            if (window.akira_file != null && window.akira_file.opened_file.get_path () == file.get_path ()) {
                 return true;
             }
         }
 
         return false;
-    }
-
-    public void remove_file_from_opened (File file) {
-        opened_files.remove (file.get_uri (), null);
-        debug ("cleared: %i", opened_files.size);
     }
 
     public void new_window () {
