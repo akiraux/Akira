@@ -160,6 +160,8 @@ public class Akira.Window : Gtk.ApplicationWindow {
     public void save_new_file (File file) {
         app.register_file_to_window (file, this);
         akira_file = new FileFormat.AkiraFile (file);
+
+        akira_file.prepare ();
         akira_file.save_file ();
     }
 

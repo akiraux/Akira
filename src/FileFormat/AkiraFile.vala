@@ -47,6 +47,7 @@ public class Akira.FileFormat.AkiraFile : Akira.FileFormat.ZipArchiveHandler {
 
     public void save_file () {
         try {
+            version_data = new FileFormat.Version (new Json.Object ());
             version_data.file_version = Constants.VERSION;
 
             write_content_to_file (version_file, version_data.to_string (false));
