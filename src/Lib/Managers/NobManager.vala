@@ -352,7 +352,7 @@ public class Akira.Lib.Managers.NobManager : Object {
 
             transform = item.get_real_transform ();
 
-            item.get ("line_width", out line_width);
+            // item.get ("line_width", out line_width);
             item.get ("width", out _width);
             item.get ("height", out _height);
             item.get ("x", out x);

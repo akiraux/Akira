@@ -257,7 +257,7 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
     }
 
     public double get_label_height () {
-        return label_height + LABEL_BOTTOM_PADDING;
+        return label_extents.height + LABEL_BOTTOM_PADDING;
     }
 
     public unowned GLib.List<Goo.CanvasItem> get_items_at (
