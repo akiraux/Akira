@@ -24,7 +24,7 @@
     color: @fg_color;
 }
 
-artboard:selected {
+.artboard:selected {
     box-shadow: inset 4px 0 0 @primary;
 }
 
