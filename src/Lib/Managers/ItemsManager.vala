@@ -19,7 +19,6 @@
  * Authored by: Giacomo Alberini <giacomoalbe@gmail.com>
  */
 
-
 public class Akira.Lib.Managers.ItemsManager : Object {
     public weak Akira.Lib.Canvas canvas { get; construct; }
 
@@ -34,7 +33,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
     public ItemsManager (Akira.Lib.Canvas canvas) {
         Object (
             canvas: canvas
-        );
+            );
     }
 
     construct {
@@ -52,50 +51,50 @@ public class Akira.Lib.Managers.ItemsManager : Object {
     }
 
     public Models.CanvasItem? insert_item (Gdk.EventButton event) {
-      udpate_default_values ();
+        udpate_default_values ();
 
-      Models.CanvasItem? new_item;
-      Models.CanvasArtboard? artboard = null;
+        Models.CanvasItem? new_item;
+        Models.CanvasArtboard? artboard = null;
 
-      foreach (var _artboard in artboards) {
-        if (_artboard.is_inside (event.x, event.y)) {
-          artboard = _artboard;
-        }
-      }
-
-      switch (insert_type) {
-        case Models.CanvasItemType.RECT:
-          new_item = add_rect (event, root, artboard);
-          break;
-
-        case Models.CanvasItemType.ELLIPSE:
-          new_item = add_ellipse (event, root, artboard);
-          break;
-
-        case Models.CanvasItemType.TEXT:
-          new_item = add_text (event, root, artboard);
-          break;
-
-        case Models.CanvasItemType.ARTBOARD:
-          new_item = add_artboard (event);
-          break;
-
-        default:
-          new_item = null;
-          break;
-      }
-
-      if (new_item != null) {
-        if (new_item is Akira.Lib.Models.CanvasArtboard) {
-          artboards.append ((Models.CanvasArtboard) new_item);
-        } else {
-          items.append (new_item);
+        foreach (var _artboard in artboards) {
+            if (_artboard.is_inside (event.x, event.y)) {
+                artboard = _artboard;
+            }
         }
 
-        canvas.window.event_bus.item_inserted (new_item);
-      }
+        switch (insert_type) {
+            case Models.CanvasItemType.RECT:
+                new_item = add_rect (event, root, artboard);
+                break;
 
-      return new_item;
+            case Models.CanvasItemType.ELLIPSE:
+                new_item = add_ellipse (event, root, artboard);
+                break;
+
+            case Models.CanvasItemType.TEXT:
+                new_item = add_text (event, root, artboard);
+                break;
+
+            case Models.CanvasItemType.ARTBOARD:
+                new_item = add_artboard (event);
+                break;
+
+            default:
+                new_item = null;
+                break;
+        }
+
+        if (new_item != null) {
+            if (new_item is Akira.Lib.Models.CanvasArtboard) {
+                artboards.append ((Models.CanvasArtboard) new_item);
+            } else {
+                items.append (new_item);
+            }
+
+            canvas.window.event_bus.item_inserted (new_item);
+        }
+
+        return new_item;
     }
 
     public void add_item (Akira.Lib.Models.CanvasItem item) {
@@ -104,9 +103,9 @@ public class Akira.Lib.Managers.ItemsManager : Object {
 
     public void on_request_delete_item (Lib.Models.CanvasItem item) {
         if (item is Models.CanvasArtboard) {
-          artboards.remove (item as Models.CanvasArtboard);
+            artboards.remove (item as Models.CanvasArtboard);
         } else {
-          items.remove (item);
+            items.remove (item);
         }
 
         item.delete ();
@@ -118,7 +117,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             Utils.AffineTransform.fix_size (event.x),
             Utils.AffineTransform.fix_size (event.y),
             root
-        );
+            );
 
         return artboard as Models.CanvasItem;
     }
@@ -134,7 +133,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             fill_color,
             parent,
             artboard
-        );
+            );
 
         return rect;
     }
@@ -150,7 +149,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             fill_color,
             parent,
             artboard
-        );
+            );
 
         return ellipse;
     }
@@ -166,7 +165,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             "Open Sans 18",
             parent,
             artboard
-        );
+            );
 
         return text;
     }

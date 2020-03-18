@@ -95,7 +95,7 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
         double _x = 0,
         double _y = 0,
         Goo.CanvasItem? _parent = null
-    ) {
+        ) {
         parent_item = _parent;
 
         canvas = parent_item.get_canvas () as Akira.Lib.Canvas;
@@ -146,20 +146,20 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
     }
 
     public void remove_item (Models.CanvasItem item) {
-      items.remove (item);
+        items.remove (item);
     }
 
     public void remove_all_items () {
-      Models.CanvasItem item;
+        Models.CanvasItem item;
 
-      while (items != null) {
-        // Get the new head of the list
-        item = items.nth_data (0);
+        while (items != null) {
+            // Get the new head of the list
+            item = items.nth_data (0);
 
-        canvas.window.event_bus.request_delete_item (item);
-      }
+            canvas.window.event_bus.request_delete_item (item);
+        }
 
-      items = new List<Models.CanvasItem> ();
+        items = new List<Models.CanvasItem> ();
     }
 
     public bool is_inside (double x, double y) {
@@ -190,7 +190,7 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
             "Sans",
             Cairo.FontSlant.NORMAL,
             Cairo.FontWeight.NORMAL
-        );
+            );
 
         cr.set_font_size (LABEL_FONT_SIZE);
 
@@ -211,7 +211,7 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
             "Sans",
             Cairo.FontSlant.NORMAL,
             Cairo.FontWeight.NORMAL
-        );
+            );
 
         cr.set_font_size (LABEL_FONT_SIZE);
 
@@ -237,7 +237,7 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
                 cr.transform (item.compute_transform (Cairo.Matrix.identity ()));
 
                 if (item is Goo.CanvasItemSimple) {
-                  (item as Goo.CanvasItemSimple).simple_paint (cr, bounds);
+                    (item as Goo.CanvasItemSimple).simple_paint (cr, bounds);
                 }
 
                 cr.restore ();
@@ -249,9 +249,9 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
         // To select an Artboard you should put the arrow
         // ontop of the Artboard label
         var is_on_handle =
-          y < 0
-          && y > - (label_extents.height + LABEL_BOTTOM_PADDING)
-          && x < (label_extents.width);
+            y < 0
+            && y > - (label_extents.height + LABEL_BOTTOM_PADDING)
+            && x < (label_extents.width);
 
         return is_on_handle;
     }
@@ -260,37 +260,34 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
         return label_extents.height + LABEL_BOTTOM_PADDING;
     }
 
-    public unowned GLib.List<Goo.CanvasItem> get_items_at (
-      double x, double y,
-      Cairo.Context cr, bool is_pointer_event,
-      bool parent_is_visible, GLib.List<Goo.CanvasItem> found_items) {
-      var artboard_x = x;
-      var artboard_y = y;
+    public unowned GLib.List<Goo.CanvasItem> get_items_at (double x, double y, Cairo.Context cr, bool is_pointer_event, bool parent_is_visible, GLib.List<Goo.CanvasItem> found_items) {
+        var artboard_x = x;
+        var artboard_y = y;
 
-      canvas.convert_to_item_space (this, ref artboard_x, ref artboard_y);
-      if (simple_is_item_at (
-          artboard_x, artboard_y,
-          cr, is_pointer_event)
-      ) {
-        found_items.append (this);
-      }
-
-      foreach (var item in items) {
-        var item_x = x;
-        var item_y = y;
-
-        canvas.convert_to_item_space (item, ref item_x, ref item_y);
-
-        var item_is_inside = item.simple_is_item_at (
-          x, y,
-          cr, is_pointer_event
-        );
-
-        if (item_is_inside) {
-          found_items.append (item);
+        canvas.convert_to_item_space (this, ref artboard_x, ref artboard_y);
+        if (simple_is_item_at (
+                artboard_x, artboard_y,
+                cr, is_pointer_event)
+           ) {
+            found_items.append (this);
         }
-      }
 
-      return found_items;
+        foreach (var item in items) {
+            var item_x = x;
+            var item_y = y;
+
+            canvas.convert_to_item_space (item, ref item_x, ref item_y);
+
+            var item_is_inside = item.simple_is_item_at (
+                x, y,
+                cr, is_pointer_event
+                );
+
+            if (item_is_inside) {
+                found_items.append (item);
+            }
+        }
+
+        return found_items;
     }
 }
