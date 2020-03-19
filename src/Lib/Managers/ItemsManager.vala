@@ -33,7 +33,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
     public ItemsManager (Akira.Lib.Canvas canvas) {
         Object (
             canvas: canvas
-            );
+        );
     }
 
     construct {

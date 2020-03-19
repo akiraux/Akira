@@ -91,6 +91,7 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
             this.artboard.remove_item (this);
         }
 
+
         if (this is Models.CanvasArtboard) {
             (this as Models.CanvasArtboard).remove_all_items ();
         }
@@ -152,9 +153,6 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
     public virtual void move (
         double delta_x, double delta_y,
         double delta_x_accumulator = 0.0, double delta_y_accumulator = 0.0) {
-        if (this is Models.CanvasArtboard) {
-            (this as Models.CanvasArtboard).move_items (delta_x, delta_y);
-        }
 
         if (this.artboard != null) {
             var transformed_delta_x = delta_x_accumulator;

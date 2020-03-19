@@ -96,9 +96,6 @@ public class Akira.Lib.Models.CanvasRect : Goo.CanvasRect, Models.CanvasItem {
         parent = _artboard != null ? _artboard : _parent;
         canvas = parent.get_canvas () as Akira.Lib.Canvas;
 
-        canvas = parent.get_canvas () as Akira.Lib.Canvas;
-        parent.add_child (this, -1);
-
         item_type = Models.CanvasItemType.RECT;
         id = Models.CanvasItem.create_item_id (this);
         Models.CanvasItem.init_item (this);

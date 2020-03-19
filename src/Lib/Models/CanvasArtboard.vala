@@ -139,12 +139,6 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
         return this.items.length ();
     }
 
-    public void move_items (double delta_x, double delta_y) {
-        foreach (var item in items) {
-            // item.translate (delta_x, delta_y);
-        }
-    }
-
     public void remove_item (Models.CanvasItem item) {
         items.remove (item);
     }
