@@ -1,26 +1,28 @@
 /*
- *  Copyright (C) 2019 Felipe Escoto <felescoto95@hotmail.com>
+ * Copyright (c) 2019-2020 Alecaddd (https://alecaddd.com)
  *
- *  This program or library is free software; you can redistribute it
- *  and/or modify it under the terms of the GNU Lesser General Public
- *  License as published by the Free Software Foundation; either
- *  version 3 of the License, or (at your option) any later version.
+ * This file is part of Akira.
  *
- *  This library is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- *  Lesser General Public License for more details.
+ * Akira is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+
+ * Akira is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+
+ * You should have received a copy of the GNU General Public License
+ * along with Akira. If not, see <https://www.gnu.org/licenses/>.
  *
- *  You should have received a copy of the GNU Lesser General
- *  Public License along with this library; if not, write to the
- *  Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
- *  Boston, MA 02110-1301 USA.
+ * Authored by: Felipe Escoto <felescoto95@hotmail.com>
+ * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
  */
 
 public abstract class Akira.FileFormat.JsonObject : GLib.Object {
-
     /**
-     *Triggered when a property of the object has been set, if it was not
+     * Triggered when a property of the object has been set, if it was not
      * prevented by an override of internal_changed
      */
     [Signal (no_recurse = true, run = "first", action = true, no_hooks = true, detailed = true)]

@@ -144,7 +144,6 @@ public class Akira.FileFormat.ZipArchiveHandler : GLib.Object {
         file_collector.delete_files_marked_for_deletion ();
 
         // Saving to a temp file first to avoid dataloss on a crash
-
         var tmp_file = File.new_for_path (opened_file.get_path () + ".tmp");
 
         compress (unarchived_location, tmp_file);
@@ -175,13 +174,11 @@ public class Akira.FileFormat.ZipArchiveHandler : GLib.Object {
      * Gets a random file inside the archive at the location specified
      * using a guid-like name.
      *
-     * @param location Location inside of the archive where the file will live at.
-     *
-     * @param extension The extension the file created will have
-     *
-     * @param format The format for the file. The character "?" will be replaced
-     * with a random character. For example, XXXX-XX can become a5b7-Df.
-     * The default is "XXXXXXXX-XXXX-XX"
+     * @param location - Location inside of the archive where the file will live at.
+     * @param extension - The extension the file created will have.
+     * @param format - The format for the file. The character "?" will be replaced
+     *                 with a random character. For example, XXXX-XX can become a5b7-Df.
+     *                 The default is "XXXXXXXX-XXXX-XX".
      */
     public File get_random_file_name (File location, string extension, string format = "XXXXXXXX-XXXX-XX") {
         do {
@@ -260,6 +257,7 @@ public class Akira.FileFormat.ZipArchiveHandler : GLib.Object {
 
         unowned Archive.Entry entry;
         Archive.Result last_result;
+
         while ((last_result = archive.next_header (out entry)) == Archive.Result.OK) {
             entry.set_pathname (Path.build_filename (location.get_path (), entry.pathname ()));
 
@@ -373,7 +371,7 @@ public class Akira.FileFormat.ZipArchiveHandler : GLib.Object {
     /**
      * Takes care of the reference counting for files inside the archive.
      * This allows to multiple objects to reference the same file, and only
-     * mark the file for deletion it if no other object is using it.
+     * mark the file for deletion if no other object is using it.
      */
     protected class FileCollector {
         private unowned File unarchived_location;
@@ -392,12 +390,7 @@ public class Akira.FileFormat.ZipArchiveHandler : GLib.Object {
          */
         public int file_references (File file) {
             var file_basename = file.get_basename ();
-
-            if (ref_counter.has_key (file_basename)) {
-                return ref_counter.get (file_basename);
-            } else {
-                return 0;
-            }
+            return ref_counter.has_key (file_basename) ? ref_counter.get (file_basename) : 0;
         }
 
         /**

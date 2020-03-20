@@ -42,10 +42,9 @@ public class Akira.FileFormat.FileManager : Object {
 
     //  Save as.
     public void save_file_as () {
-        var dialog = new Gtk.FileChooserNative (
-            _("Save Akira file"), window,
-            Gtk.FileChooserAction.SAVE,
-            _("Save"), _("Cancel"));
+        var dialog = new Gtk.FileChooserNative (_("Save Akira file"), window,
+                                                Gtk.FileChooserAction.SAVE,
+                                                _("Save"), _("Cancel"));
 
         dialog.set_do_overwrite_confirmation (true);
         add_filters (dialog);
@@ -96,10 +95,9 @@ public class Akira.FileFormat.FileManager : Object {
 
     // Open file.
     public void open_file () {
-        var dialog = new Gtk.FileChooserNative (
-            _("Open Akira file"), window,
-            Gtk.FileChooserAction.OPEN,
-            _("Open"), _("Cancel"));
+        var dialog = new Gtk.FileChooserNative (_("Open Akira file"), window,
+                                                Gtk.FileChooserAction.OPEN,
+                                                _("Open"), _("Cancel"));
 
         add_filters (dialog);
         dialog.local_only = true;
