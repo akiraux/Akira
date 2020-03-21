@@ -241,13 +241,10 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
 
     public override bool simple_is_item_at (double x, double y, Cairo.Context cr, bool is_pointer_event) {
         // To select an Artboard you should put the arrow
-        // ontop of the Artboard label
-        var is_on_handle =
-            y < 0
+        // over the Artboard label
+        return y < 0
             && y > - (label_extents.height + LABEL_BOTTOM_PADDING)
             && x < (label_extents.width);
-
-        return is_on_handle;
     }
 
     public double get_label_height () {
@@ -259,10 +256,8 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
         var artboard_y = y;
 
         canvas.convert_to_item_space (this, ref artboard_x, ref artboard_y);
-        if (simple_is_item_at (
-                artboard_x, artboard_y,
-                cr, is_pointer_event)
-           ) {
+
+        if (simple_is_item_at (artboard_x, artboard_y, cr, is_pointer_event)) {
             found_items.append (this);
         }
 

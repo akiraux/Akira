@@ -104,8 +104,8 @@ public class Akira.Utils.AffineTransform : Object {
         delta_y_accumulator += delta_y;
 
         selected_item.move (
-          delta_x, delta_y,
-          delta_x_accumulator, delta_y_accumulator
+            delta_x, delta_y,
+            delta_x_accumulator, delta_y_accumulator
         );
 
         initial_x = x;
@@ -246,24 +246,23 @@ public class Akira.Utils.AffineTransform : Object {
         delta_y_accumulator += origin_move_delta_y;
 
         selected_item.move (
-          origin_move_delta_x,
-          origin_move_delta_y,
-          delta_x_accumulator,
-          delta_y_accumulator
+            origin_move_delta_x,
+            origin_move_delta_y,
+            delta_x_accumulator,
+            delta_y_accumulator
         );
 
         set_size (new_width, new_height, selected_item);
-
         /*
-        if (new_width < MIN_SIZE) {
-            canvas.window.event_bus.flip_item (false);
-            return;
-        }
+           if (new_width < MIN_SIZE) {
+           canvas.window.event_bus.flip_item (false);
+           return;
+           }
 
-        if (new_height < MIN_SIZE) {
-            canvas.window.event_bus.flip_item (false, true);
-            return;
-        }
+           if (new_height < MIN_SIZE) {
+           canvas.window.event_bus.flip_item (false, true);
+           return;
+           }
 
         // Before translating, recover the original "canvas" position of
         // initial_event, in order to convert it to the "new" translated
@@ -279,7 +278,7 @@ public class Akira.Utils.AffineTransform : Object {
         //selected_item.store_relative_position ();
 
         //canvas.convert_to_item_space (selected_item, ref initial_x, ref initial_y);
-        */
+         */
     }
 
     public static void rotate_from_event (
