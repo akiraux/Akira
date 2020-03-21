@@ -194,6 +194,14 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
             get_style_context ().remove_class ("hover");
             return false;
         });
+
+        container.bind_model (model.items, item => {
+            // TODO: Differentiate between layer and artboard
+            // based upon item "type" of some sort
+            var layer_model = (Akira.Models.LayerModel) item;
+
+            return new Akira.Layouts.Partials.Layer (window, layer_model);
+        });
     }
 
     private void on_drag_data_received (Gdk.DragContext context, int x, int y, Gtk.SelectionData selection_data,

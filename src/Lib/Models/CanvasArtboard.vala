@@ -82,7 +82,7 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
 
     // Artboard related properties
     private Cairo.TextExtents label_extents;
-    private List<Models.CanvasItem> items;
+    public List<Models.CanvasItem> items;
     public new Akira.Lib.Canvas canvas { get; set; }
     public Models.CanvasArtboard? artboard { get; set; }
     public double relative_x { get; set; }

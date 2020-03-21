@@ -45,6 +45,16 @@ public class Akira.Models.ListModel : GLib.Object, GLib.ListModel {
         return typeof (Akira.Models.ItemModel);
     }
 
+    public Akira.Models.ItemModel? find_item (Akira.Lib.Models.CanvasItem item) {
+        for (var i = 0; i < list.length (); i++) {
+            if (list.nth_data (i).item == item) {
+                return get_item (i) as Akira.Models.ItemModel;
+            }
+        }
+
+        return null;
+    }
+
     public async void add_item (Akira.Models.ItemModel model_item, bool append = true) {
         if (append) {
             list.append (model_item);
