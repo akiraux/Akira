@@ -479,8 +479,6 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
         }
 
         if (event.type == Gdk.EventType.BUTTON_PRESS) {
-            activate ();
-
             // Selected layers cannot be hovering
             // We need to reflect the status of the canvas item
             get_style_context ().remove_class ("hovered");

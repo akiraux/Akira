@@ -73,7 +73,6 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
 
         window.event_bus.item_inserted.connect (on_item_inserted);
         window.event_bus.item_deleted.connect (on_item_deleted);
-        window.event_bus.selected_items_changed.connect (on_selected_items_changed);
         window.event_bus.z_selected_changed.connect (on_z_selected_changed);
     }
 
@@ -106,53 +105,6 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
 
         reload_zebra ();
         show_all ();
-    }
-
-    private void on_selected_items_changed (List<Lib.Models.CanvasItem> selected_items) {
-        // After activating a row it is necessary to
-        // put (keyboard) focus back to the canvas
-        window.event_bus.set_focus_on_canvas ();
-
-        /*
-        if (selected_items.length () == 0) {
-            var current_selected_item = item_model_map.@get (current_selected_item_id);
-
-            if (current_selected_item != null) {
-                current_selected_item.selected = false;
-            }
-
-            current_selected_item_id = null;
-            return;
-        }
-
-        var selected_item = selected_items.nth_data (0);
-
-        // Never select the same layer twice
-        if (selected_item.id == current_selected_item_id) {
-            return;
-        }
-
-        var current_selected_model = item_model_map.@get (current_selected_item_id);
-
-        // Remove select effect is not item is selected
-        if (current_selected_model != null) {
-            current_selected_model.selected = false;
-        }
-
-        // if item is inside an artboard, propagate the selection
-        // to that artboard
-        if (selected_item.artboard != null) {
-            item_model_map.@get (item.artboard.id).select_child_item (item);
-        } else {
-            var new_selected_model = item_model_map.@get (selected_item.id);
-
-            if (new_selected_model != null) {
-                new_selected_model.selected = true;
-            }
-            current_selected_item_id = selected_item.id;
-        }
-
-        */
     }
 
     private void on_z_selected_changed () {

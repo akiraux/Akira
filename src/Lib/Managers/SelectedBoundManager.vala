@@ -145,6 +145,10 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
 
         item.selected = true;
         selected_items.append (item);
+
+        // After activating a row it is necessary to
+        // put (keyboard) focus back to the canvas
+        canvas.window.event_bus.set_focus_on_canvas ();
     }
 
     public void delete_selection () {
