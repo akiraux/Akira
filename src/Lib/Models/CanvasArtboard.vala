@@ -230,8 +230,10 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
 
                 cr.transform (item.compute_transform (Cairo.Matrix.identity ()));
 
-                if (item is Goo.CanvasItemSimple) {
-                    (item as Goo.CanvasItemSimple).simple_paint (cr, bounds);
+                var canvas_item = item as Goo.CanvasItemSimple;
+
+                if (canvas_item != null && item.visibility == Goo.CanvasItemVisibility.VISIBLE) {
+                    canvas_item.simple_paint (cr, bounds);
                 }
 
                 cr.restore ();

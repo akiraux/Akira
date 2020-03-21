@@ -121,10 +121,19 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
         item.set ("stroke-alpha", 255);
 
         update_z_index (item);
+
+        var canvas_item = item as Models.CanvasItem;
+
+        if (canvas_item.artboard != null) {
+            canvas_item.notify.connect (() => {
+                canvas_item.artboard.changed (true);
+            });
+        }
+
     }
 
     public static void update_z_index (Goo.CanvasItem item) {
-        //var z_index = (item as Models.CanvasItej).canvas.get_root_item ().find_child (item);
+        //var z_index = (item as Models.CanvasItem).canvas.get_root_item ().find_child (item);
 
         //item.set ("z-index", z_index);
     }
