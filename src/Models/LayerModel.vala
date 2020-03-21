@@ -65,6 +65,7 @@ public class Akira.Models.LayerModel : Models.ItemModel {
         }
         set {
             item.selected = value;
+            debug (@"Setting selected: $(value) to $(item.id)");
         }
     }
 

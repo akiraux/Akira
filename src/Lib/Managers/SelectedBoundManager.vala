@@ -134,6 +134,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         if (selected_items.index (item) != -1) {
             return;
         }
+
         // Just 1 selected element at the same time
         // TODO: allow for multi selection with shift pressed
         reset_selection ();

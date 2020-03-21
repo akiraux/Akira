@@ -194,7 +194,6 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
         build_drag_and_drop ();
 
         handle.event.connect (on_click_event);
-        handle.key_release_event.connect (on_key_release_event);
 
         handle.enter_notify_event.connect (event => {
             get_style_context ().add_class ("hover");
@@ -208,7 +207,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
             return false;
         });
 
-        model.notify["selected"].connect (() => {
+        model.item.notify["selected"].connect (() => {
             if (model.selected) {
                 get_style_context ().remove_class ("hovered");
                 activate ();
@@ -348,10 +347,10 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
     }
 
     private void on_drag_data_get (
-      Gtk.Widget widget,
-      Gdk.DragContext context,
-      Gtk.SelectionData selection_data,
-      uint target_type, uint time) {
+        Gtk.Widget widget,
+        Gdk.DragContext context,
+        Gtk.SelectionData selection_data,
+        uint target_type, uint time) {
 
         uchar[] data = new uchar[(sizeof (Akira.Layouts.Partials.Layer))];
 
@@ -359,7 +358,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 
         selection_data.set (
             Gdk.Atom.intern_static_string ("LAYER"), 32, data
-        );
+            );
     }
 
     public bool on_drag_motion (Gdk.DragContext context, int x, int y, uint time) {
@@ -486,11 +485,13 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
             // We need to reflect the status of the canvas item
             get_style_context ().remove_class ("hovered");
 
-            handle.grab_focus ();
             window.event_bus.request_add_item_to_selection (model.item);
             window.event_bus.hover_over_layer (null);
+
+            return true;
         }
 
+        /*
         if (event.type == Gdk.EventType.BUTTON_RELEASE) {
             if (entry.visible == true) {
                 return false;
@@ -549,16 +550,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 
             return true;
         }
-
-        return false;
-    }
-
-    public bool on_key_release_event (Gdk.EventKey event) {
-        switch (event.keyval) {
-            case Gdk.Key.Delete:
-                window.event_bus.request_delete_item (model.item);
-                break;
-        }
+        */
 
         return false;
     }
@@ -607,8 +599,6 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 
         editing = false;
 
-        activate ();
-
         var new_label = entry.get_text ();
 
         if (label.label == new_label) {
@@ -616,6 +606,8 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
         }
 
         label.label = model.name = new_label;
+
+        window.event_bus.set_focus_on_canvas ();
     }
 
     private void lock_actions () {

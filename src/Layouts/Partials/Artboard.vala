@@ -93,7 +93,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 
         container = new Gtk.ListBox ();
         container.get_style_context ().add_class ("artboard-container");
-        container.activate_on_single_click = true;
+        container.activate_on_single_click = false;
         container.selection_mode = Gtk.SelectionMode.SINGLE;
         Gtk.drag_dest_set (container, Gtk.DestDefaults.ALL, TARGET_ENTRIES_LAYER, Gdk.DragAction.MOVE);
         container.drag_data_received.connect (on_drag_data_received);
@@ -174,9 +174,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
             }
         });
 
-        key_press_event.connect (on_key_pressed);
-
-        model.notify["selected"].connect (() => {
+        model.item.notify["selected"].connect (() => {
             if (model.selected) {
               activate ();
               return;
@@ -406,20 +404,9 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
         }
 
         if (event.type == Gdk.EventType.BUTTON_PRESS) {
-          activate ();
+            window.event_bus.request_add_item_to_selection (model.item);
 
-          handle.grab_focus ();
-          window.event_bus.request_add_item_to_selection (model.item);
-        }
-
-        return false;
-    }
-
-    private bool on_key_pressed (Gtk.Widget source, Gdk.EventKey key) {
-        switch (key.keyval) {
-            case Gdk.Key.Delete:
-                window.event_bus.request_delete_item (model.item);
-                break;
+            return true;
         }
 
         return false;
@@ -497,8 +484,6 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 
         editing = false;
 
-        activate ();
-
         var new_label = entry.get_text ();
 
         if (label.label == new_label) {
@@ -506,6 +491,8 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
         }
 
         label.label = model.name = new_label;
+
+        window.event_bus.set_focus_on_canvas ();
     }
 
     public void count_layers () {
