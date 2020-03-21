@@ -8,7 +8,14 @@
     font-weight: bold;
     padding: 6px 10px;
     text-shadow: 0 1px 0 @bg_color;
-    border-bottom: 1px solid shade (@bg_color, 0.8);
+}
+
+.artboard .artboard-handle {
+  border-bottom: 1px solid shade (@bg_color, 0.8);
+}
+
+.artboard.hover .layer-action {
+  opacity: 0.5;
 }
 
 .artboard:hover,

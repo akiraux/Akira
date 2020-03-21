@@ -259,6 +259,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                     if ((clicked_item as Models.CanvasItem).locked) {
                         return true;
                     }
+
                     // Item has been selected
                     selected_bound_manager.add_item_to_selection (clicked_item as Models.CanvasItem);
                 }

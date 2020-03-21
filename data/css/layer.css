@@ -78,7 +78,6 @@
     border: none;
     box-shadow: none;
     background: transparent;
-    border-bottom: 1px solid shade (@bg_color, 0.8);
 }
 
 .revealer-button image {

@@ -72,6 +72,15 @@ public class Akira.Lib.Models.CanvasRect : Goo.CanvasRect, Models.CanvasItem {
     public bool is_radius_uniform { get; set; }
     public bool is_radius_autoscale { get; set; }
 
+    public new Akira.Lib.Canvas canvas { get; set; }
+    public Models.CanvasArtboard? artboard { get; set; }
+
+    public double relative_x { get; set; }
+    public double relative_y { get; set; }
+
+    public double initial_relative_x { get; set; }
+    public double initial_relative_y { get; set; }
+
     public CanvasRect (
         double _x = 0,
         double _y = 0,
@@ -80,11 +89,12 @@ public class Akira.Lib.Models.CanvasRect : Goo.CanvasRect, Models.CanvasItem {
         int _border_size = 1,
         Gdk.RGBA _border_color,
         Gdk.RGBA _fill_color,
-        Goo.CanvasItem? parent = null
+        Goo.CanvasItem? _parent = null,
+        Models.CanvasArtboard? _artboard = null
     ) {
-        Object (
-            parent: parent
-        );
+        artboard = _artboard;
+        parent = _artboard != null ? _artboard : _parent;
+        canvas = parent.get_canvas () as Akira.Lib.Canvas;
 
         item_type = Models.CanvasItemType.RECT;
         id = Models.CanvasItem.create_item_id (this);
@@ -96,6 +106,8 @@ public class Akira.Lib.Models.CanvasRect : Goo.CanvasRect, Models.CanvasItem {
         height = 1;
         x = 0;
         y = 0;
+        relative_x = 0;
+        relative_y = 0;
 
         show_border_radius_panel = true;
         show_fill_panel = true;
@@ -104,9 +116,8 @@ public class Akira.Lib.Models.CanvasRect : Goo.CanvasRect, Models.CanvasItem {
         is_radius_autoscale = false;
 
         set_transform (Cairo.Matrix.identity ());
-        // Keep the item always in the origin
-        // move the entire coordinate system every time
-        translate (_x, _y);
+
+        position_item (_x, _y);
 
         color = _fill_color;
         has_border = settings.set_border;

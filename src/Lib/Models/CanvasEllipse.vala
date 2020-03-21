@@ -58,6 +58,15 @@ public class Akira.Lib.Models.CanvasEllipse : Goo.CanvasEllipse, Models.CanvasIt
     public string layer_icon { get; set; default = "shape-circle-symbolic"; }
     public int z_index { get; set; }
 
+    public new Akira.Lib.Canvas canvas { get; set; }
+    public Models.CanvasArtboard? artboard { get; set; }
+
+    public double relative_x { get; set; }
+    public double relative_y { get; set; }
+
+    public double initial_relative_x { get; set; }
+    public double initial_relative_y { get; set; }
+
     public CanvasEllipse (
         double _center_x = 0,
         double _center_y = 0,
@@ -66,11 +75,12 @@ public class Akira.Lib.Models.CanvasEllipse : Goo.CanvasEllipse, Models.CanvasIt
         int _border_size = 1,
         Gdk.RGBA _border_color,
         Gdk.RGBA _fill_color,
-        Goo.CanvasItem? parent = null
+        Goo.CanvasItem? _parent = null,
+        Models.CanvasArtboard? _artboard = null
     ) {
-        Object (
-            parent: parent
-        );
+        artboard = _artboard;
+        parent = _artboard != null ? _artboard : _parent;
+        canvas = parent.get_canvas () as Akira.Lib.Canvas;
 
         item_type = Models.CanvasItemType.ELLIPSE;
         id = Models.CanvasItem.create_item_id (this);
@@ -86,11 +96,12 @@ public class Akira.Lib.Models.CanvasEllipse : Goo.CanvasEllipse, Models.CanvasIt
         center_y = - 0.5;
         show_fill_panel = true;
         show_border_panel = true;
+        relative_x = 0;
+        relative_y = 0;
 
         set_transform (Cairo.Matrix.identity ());
-        // Keep the item always in the origin
-        // move the entire coordinate system every time
-        translate (_center_x, _center_y);
+
+        position_item (_center_x, _center_y);
 
         color = _fill_color;
         has_border = settings.set_border;

@@ -69,15 +69,33 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
     public abstract string layer_icon { get; set; }
     public abstract int z_index { get; set; }
 
+    public abstract Akira.Lib.Canvas canvas { get; set; }
+    public abstract Models.CanvasArtboard? artboard { get; set; }
+
+    public abstract double relative_x { get; set; }
+    public abstract double relative_y { get; set; }
+
+    public abstract double initial_relative_x { get; set; }
+    public abstract double initial_relative_y { get; set; }
+
     public double get_coords (string coord_id) {
         double _coord = 0.0;
+
         get (coord_id, out _coord);
 
         return _coord;
     }
 
     public void delete () {
-        // TODO: emit signal to update SideMenu
+        if (this.artboard != null) {
+            this.artboard.remove_item (this);
+        }
+
+
+        if (this is Models.CanvasArtboard) {
+            (this as Models.CanvasArtboard).remove_all_items ();
+        }
+
         remove ();
     }
 
@@ -106,9 +124,99 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
     }
 
     public static void update_z_index (Goo.CanvasItem item) {
-        var z_index = item.get_canvas ().get_root_item ().find_child (item);
+        //var z_index = (item as Models.CanvasItej).canvas.get_root_item ().find_child (item);
 
-        item.set ("z-index", z_index);
+        //item.set ("z-index", z_index);
+    }
+
+    public virtual void position_item (double _x, double _y) {
+        if (artboard != null) {
+            artboard.add_child (this, -1);
+
+            double item_x_from_artboard = _x;
+            double item_y_from_artboard = _y;
+
+            canvas.convert_to_item_space (artboard, ref item_x_from_artboard, ref item_y_from_artboard);
+
+            relative_x = item_x_from_artboard;
+            relative_y = item_y_from_artboard;
+        } else {
+            parent.add_child (this, -1);
+
+
+            // Keep the item always in the origin
+            // move the entire coordinate system every time
+            translate (_x, _y);
+        }
+    }
+
+    public virtual void move (
+        double delta_x, double delta_y,
+        double delta_x_accumulator = 0.0, double delta_y_accumulator = 0.0) {
+
+        if (this.artboard != null) {
+            var transformed_delta_x = delta_x_accumulator;
+            var transformed_delta_y = delta_y_accumulator;
+
+            this.relative_x = this.initial_relative_x + transformed_delta_x;
+            this.relative_y = this.initial_relative_y + transformed_delta_y;
+
+
+            return;
+        }
+
+        this.translate (delta_x, delta_y);
+    }
+
+    public virtual Cairo.Matrix get_real_transform () {
+        Cairo.Matrix transform = Cairo.Matrix.identity ();
+
+        if (artboard == null) {
+            get_transform (out transform);
+        } else {
+            artboard.get_transform (out transform);
+
+            transform = compute_transform (transform);
+        }
+
+        return transform;
+    }
+
+    public virtual Cairo.Matrix compute_transform (Cairo.Matrix transform) {
+        transform.translate (relative_x, relative_y);
+
+        var width = get_coords ("width");
+        var height = get_coords ("height");
+
+        // Rotate around the center by the amount
+        // in item.rotation
+        transform.translate (width / 2, height / 2);
+        transform.rotate (Utils.AffineTransform.deg_to_rad (rotation));
+        transform.translate (- (width / 2), - (height / 2));
+
+        return transform;
+    }
+
+    public virtual double get_real_coord (string coord_id) {
+        var offset_x = this.artboard == null ? 0 : relative_x;
+        var offset_y = this.artboard == null ? 0 : relative_y;
+
+        var item_x = get_coords ("x") - offset_x;
+        var item_y = get_coords ("y") - offset_y;
+
+        switch (coord_id) {
+            case "x":
+                return item_x;
+            case "y":
+                return item_y;
+            default:
+                return 0.0;
+        }
+    }
+
+    public virtual void store_relative_position () {
+        this.initial_relative_x = this.relative_x;
+        this.initial_relative_y = this.relative_y;
     }
 
     public virtual void reset_colors () {
@@ -148,5 +256,30 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
         uint stroke_color_rgba = Utils.Color.rgba_to_uint (rgba_stroke);
         set ("stroke-color-rgba", stroke_color_rgba);
         set ("line-width", (double) border_size);
+    }
+
+    public bool simple_is_item_at (double x, double y, Cairo.Context cr, bool is_pointer_event) {
+        var width = get_coords ("width");
+        var height = get_coords ("height");
+
+        var item_x = relative_x;
+        var item_y = relative_y;
+
+        canvas.convert_from_item_space (
+            this.artboard,
+            ref item_x,
+            ref item_y
+            );
+
+        if (
+            x >= item_x
+            && x <= item_x + width
+            && y >= item_y
+            && y <= item_y + height
+           ) {
+            return true;
+        }
+
+        return false;
     }
 }
