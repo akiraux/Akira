@@ -114,8 +114,7 @@ public class Akira.Lib.Managers.HoverManager : Object {
             null
         );
 
-        var transform = Cairo.Matrix.identity ();
-        item.get_transform (out transform);
+        var transform = item.get_real_transform ();
         hover_effect.set_transform (transform);
 
         hover_effect.set ("parent", canvas.get_root_item ());
