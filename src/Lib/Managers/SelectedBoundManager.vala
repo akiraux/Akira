@@ -134,6 +134,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         if (selected_items.index (item) != -1) {
             return;
         }
+
         // Just 1 selected element at the same time
         // TODO: allow for multi selection with shift pressed
         reset_selection ();
@@ -144,6 +145,9 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
 
         item.selected = true;
         selected_items.append (item);
+
+        // Move focus back to the canvas.
+        canvas.window.event_bus.set_focus_on_canvas ();
     }
 
     public void delete_selection () {

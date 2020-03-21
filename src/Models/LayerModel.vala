@@ -65,6 +65,7 @@ public class Akira.Models.LayerModel : Models.ItemModel {
         }
         set {
             item.selected = value;
+            debug (@"Setting selected: $(value) to $(item.id)");
         }
     }
 
@@ -74,6 +75,8 @@ public class Akira.Models.LayerModel : Models.ItemModel {
         }
     }
 
+    public Akira.Models.ListModel items { get; set; }
+
     public LayerModel (
         Lib.Models.CanvasItem item,
         Akira.Models.ListModel list_model
@@ -82,9 +85,35 @@ public class Akira.Models.LayerModel : Models.ItemModel {
             item: item,
             list_model: list_model
         );
+
+        if (is_artboard) {
+            items = new Akira.Models.ListModel ();
+        }
+    }
+
+    public void add_child_item (Akira.Lib.Models.CanvasItem item) {
+        if (!is_artboard) {
+            return;
+        }
+
+        items.add_item.begin (new Akira.Models.LayerModel (item, items));
+    }
+
+    public void remove_child_item (Akira.Lib.Models.CanvasItem item) {
+        if (!is_artboard) {
+            return;
+        }
+
+        var item_model = items.find_item (item);
+
+        if (item_model == null) {
+            return;
+        }
+
+        items.remove_item.begin (item_model);
     }
 
     public string to_string () {
-        return "Layer: %s Hidden: %d Lock: %d".printf (item.id, 0, 0);
+        return "Layer: %s Label: %s Hidden: %d Lock: %d".printf (item.id, name, 0, 0);
     }
 }
