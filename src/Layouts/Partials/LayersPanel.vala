@@ -73,66 +73,38 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
 
         window.event_bus.item_inserted.connect (on_item_inserted);
         window.event_bus.item_deleted.connect (on_item_deleted);
-        window.event_bus.selected_items_changed.connect (on_selected_items_changed);
         window.event_bus.z_selected_changed.connect (on_z_selected_changed);
     }
 
-    private void on_item_inserted (Lib.Models.CanvasItem new_item) {
-        var model = new Akira.Models.LayerModel (new_item, list_model);
-        list_model.add_item.begin (model, false);
+    private void on_item_inserted (Lib.Models.CanvasItem item) {
+        if (item.artboard != null) {
+            item_model_map.@get (item.artboard.id).add_child_item (item);
+        } else {
+            var model = new Akira.Models.LayerModel (item, list_model);
 
-        // This map is necessary for easily knowing which
-        // item is related to which model, since the canvas knows only
-        // real items and the layers panel only knows items model
-        item_model_map.@set (new_item.id, model);
+            list_model.add_item.begin (model, false);
+
+            // This map is necessary for easily knowing which
+            // item is related to which model, since the canvas knows only
+            // real items and the layers panel only knows items model
+            item_model_map.@set (item.id, model);
+        }
 
         reload_zebra ();
         show_all ();
     }
 
     private void on_item_deleted (Lib.Models.CanvasItem item) {
-        var model = item_model_map.@get (item.id);
+        if (item.artboard != null) {
+            item_model_map.@get (item.artboard.id).remove_child_item (item);
+        } else {
+            var model = item_model_map.@get (item.id);
 
-        list_model.remove_item.begin (model);
+            list_model.remove_item.begin (model);
+        }
 
         reload_zebra ();
-    }
-
-    private void on_selected_items_changed (List<Lib.Models.CanvasItem> selected_items) {
-        if (selected_items.length () == 0) {
-            var current_selected_item = item_model_map.@get (current_selected_item_id);
-
-            if (current_selected_item != null) {
-                current_selected_item.selected = false;
-            }
-
-            current_selected_item_id = null;
-            return;
-        }
-
-        var selected_item = selected_items.nth_data (0);
-
-        if (selected_item.id == current_selected_item_id) {
-            return;
-        }
-
-        var new_selected_model = item_model_map.@get (selected_item.id);
-
-        if (new_selected_model != null) {
-            new_selected_model.selected = true;
-        }
-
-        var current_selected_model = item_model_map.@get (current_selected_item_id);
-
-        if (current_selected_model != null) {
-            current_selected_model.selected = false;
-        }
-
-        current_selected_item_id = selected_item.id;
-
-        // After activating a row it is necessary to
-        // put (keyboard) focus back to the canvas
-        window.event_bus.set_focus_on_canvas ();
+        show_all ();
     }
 
     private void on_z_selected_changed () {

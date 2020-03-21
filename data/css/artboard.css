@@ -14,7 +14,7 @@
   border-bottom: 1px solid shade (@bg_color, 0.8);
 }
 
-.artboard.hover .layer-action {
+.artboard.hover > grid > grid > .layer-action {
   opacity: 0.5;
 }
 
