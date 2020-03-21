@@ -80,7 +80,7 @@ public class Akira.Lib.Managers.HoverManager : Object {
 
         create_hover_effect (item);
 
-        if (!item.selected) {
+        if (!item.selected && !item.locked) {
             canvas.window.event_bus.hover_over_item (item);
         }
 
