@@ -49,6 +49,7 @@ You can install Akira by compiling it from the source
  - `libjson-glib-1.0`
  - `goocanvas-2.0`
  - `libarchive`
+ - `gettext`
  - `cairo`
  - `meson`
 
