@@ -374,7 +374,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 
         var layers_panel = (parent as Akira.Layouts.Partials.LayersPanel);
 
-        var row = (Akira.Layouts.Partials.Layer) layers_panel.get_row_at_index (row_index);
+        var row = (Akira.Layouts.Partials.Layer) (parent as Gtk.ListBox).get_row_at_index (row_index);
         var last_adjust = 0;
         var group_y = 0;
 

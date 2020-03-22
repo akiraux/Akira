@@ -8,6 +8,10 @@
     border-left: 1px solid shade (@bg_color, 0.9);
 }
 
+.layers-panel {
+    background-color: alpha (@base_color, 0.7);
+}
+
 .sidebar-export-header {
     background-color: shade (@bg_color, 0.95);
     border-radius: 4px 0 0 0;
