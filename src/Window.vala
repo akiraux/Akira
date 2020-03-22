@@ -24,6 +24,7 @@ public class Akira.Window : Gtk.ApplicationWindow {
 
     public weak Akira.Application app { get; construct; }
     public Akira.Services.EventBus event_bus;
+    public Akira.Lib.Managers.ItemsManager items_manager;
 
     public Akira.Services.ActionManager action_manager;
     public Akira.Layouts.HeaderBar headerbar;
@@ -53,6 +54,7 @@ public class Akira.Window : Gtk.ApplicationWindow {
         headerbar = new Akira.Layouts.HeaderBar (this);
         main_window = new Akira.Layouts.MainWindow (this);
         dialogs = new Akira.Utils.Dialogs (this);
+        items_manager = new Akira.Lib.Managers.ItemsManager (this);
 
         build_ui ();
 
