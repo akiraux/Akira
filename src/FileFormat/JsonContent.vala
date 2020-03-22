@@ -19,14 +19,14 @@
  * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
  */
 
-public class Akira.FileFormat.Content : Object {
+public class Akira.FileFormat.JsonContent : Object {
     public weak Akira.Window window { get; construct; }
 
     private Akira.Lib.Canvas canvas;
     private Json.Generator generator;
     private Json.Builder builder;
 
-    public Content (Akira.Window window) {
+    public JsonContent (Akira.Window window) {
         Object (window: window);
     }
 
@@ -44,39 +44,44 @@ public class Akira.FileFormat.Content : Object {
         builder.add_double_value (canvas.get_scale ());
     }
 
-    public async string save_content () {
+    public async void save_content () {
         // TODO: properly loop through artboards and items.
-        for (int i = 0; i < canvas.get_root_item ().get_n_children (); i++) {
-           Goo.CanvasItem item = canvas.get_root_item ().get_child (i);
-           if (item.get_data<bool> ("ignore")) {
-               continue;
-           }
-           Json.Node node = Json.gobject_serialize (item);
-           builder.begin_object ();
-           builder.set_member_name ("type");
-           builder.add_string_value (item.get_type ().name ());
-           builder.set_member_name ("item");
-           builder.add_value (node);
-           var transform = Cairo.Matrix.identity ();
-           item.get_transform (out transform);
-           builder.set_member_name ("transform");
-           builder.begin_object ();
-           builder.set_member_name ("xx");
-           builder.add_double_value (transform.xx);
-           builder.set_member_name ("yx");
-           builder.add_double_value (transform.yx);
-           builder.set_member_name ("xy");
-           builder.add_double_value (transform.xy);
-           builder.set_member_name("yy");
-           builder.add_double_value (transform.yy);
-           builder.set_member_name ("x0");
-           builder.add_double_value (transform.x0);
-           builder.set_member_name ("y0");
-           builder.add_double_value (transform.y0);
-           builder.end_object ();
-           builder.end_object ();
-        }
+        builder.set_member_name ("items");
+        builder.begin_array ();
+        //  for (int i = 0; i < canvas.get_root_item ().get_n_children (); i++) {
+        //     Goo.CanvasItem item = canvas.get_root_item ().get_child (i);
+        //     if (item.get_data<bool> ("ignore")) {
+        //         continue;
+        //     }
+        //     Json.Node node = Json.gobject_serialize (item);
+        //     builder.begin_object ();
+        //     builder.set_member_name ("type");
+        //     builder.add_string_value (item.get_type ().name ());
+        //     builder.set_member_name ("item");
+        //     builder.add_value (node);
+        //     var transform = Cairo.Matrix.identity ();
+        //     item.get_transform (out transform);
+        //     builder.set_member_name ("transform");
+        //     builder.begin_object ();
+        //     builder.set_member_name ("xx");
+        //     builder.add_double_value (transform.xx);
+        //     builder.set_member_name ("yx");
+        //     builder.add_double_value (transform.yx);
+        //     builder.set_member_name ("xy");
+        //     builder.add_double_value (transform.xy);
+        //     builder.set_member_name ("yy");
+        //     builder.add_double_value (transform.yy);
+        //     builder.set_member_name ("x0");
+        //     builder.add_double_value (transform.x0);
+        //     builder.set_member_name ("y0");
+        //     builder.add_double_value (transform.y0);
+        //     builder.end_object ();
+        //     builder.end_object ();
+        //  }
         builder.end_array ();
+    }
+
+    public string finalize_content () {
         builder.end_object ();
 
         Json.Node root = builder.get_root ();
