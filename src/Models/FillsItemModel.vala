@@ -20,7 +20,7 @@
 * Authored by: Alessandro "alecaddd" Castellani <castellani.ale@gmail.com>
 */
 
-public class Akira.Models.FillsItemModel : Models.ItemModel {
+public class Akira.Models.FillsItemModel : Models.BaseModel {
     public string color {
         owned get {
             return item.color.to_string ();

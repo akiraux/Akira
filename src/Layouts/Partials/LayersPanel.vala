@@ -71,8 +71,10 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.Grid {
 
         item_model_map = new Gee.HashMap<string, Akira.Models.LayerModel> ();
 
-        items_list.bind_model (items_list_model, item => {
-            var layer_model = (Akira.Models.LayerModel) item;
+        items_list.bind_model (window.items_manager.free_items, item => {
+            var item_model = item as Akira.Models.ItemModel;
+
+            var layer_model = new Akira.Models.LayerModel (item_model.item, window.items_manager.free_items);
 
             return new Akira.Layouts.Partials.Layer (window, layer_model);
         });
@@ -140,28 +142,26 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.Grid {
 
     private void on_z_selected_changed () {
         /*
-        var n_items = list_model.get_n_items ();
+        var n_items = items_list_model.get_n_items ();
 
         for (int i = 0; i < n_items; i++) {
-            var layer = list_model.get_item (i) as Akira.Models.LayerModel;
+            var layer = items_list_model.get_item (i) as Akira.Models.LayerModel;
             if (layer != null) {
                 Lib.Models.CanvasItem.update_z_index (layer.item);
             }
         }
 
-        list_model.sort ((a, b) => {
+        items_list_model.sort ((a, b) => {
           return b.item.z_index - a.item.z_index;
         });
+        */
 
         reload_zebra ();
-
         show_all ();
 
         // Activate the selected items again
-        var model = item_model_map.@get (current_selected_item_id);
-
-        model.selected = true;
-        */
+        // var model = item_model_map.@get (current_selected_item_id);
+        // model.selected = true;
     }
 
     private void build_drag_and_drop () {

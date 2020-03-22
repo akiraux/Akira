@@ -23,8 +23,8 @@
 public class Akira.Lib.Managers.ItemsManager : Object {
     public weak Akira.Window window { get; construct; }
 
-    public List<Models.CanvasItem> items;
-    public List<Models.CanvasArtboard> artboards;
+    public Akira.Models.ListModel free_items;
+    public Akira.Models.ListModel artboards;
     private Models.CanvasItemType? insert_type { get; set; }
     private Goo.CanvasItem root;
     private int border_size;
@@ -38,10 +38,8 @@ public class Akira.Lib.Managers.ItemsManager : Object {
     }
 
     construct {
-        root = window.main_window.main_canvas.canvas.get_root_item ();
-
-        items = new List<Models.CanvasItem> ();
-        artboards = new List<Models.CanvasArtboard> ();
+        free_items = new Akira.Models.ListModel ();
+        artboards = new Akira.Models.ListModel ();
 
         border_color = Gdk.RGBA ();
         fill_color = Gdk.RGBA ();
@@ -57,11 +55,15 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         Models.CanvasItem? new_item;
         Models.CanvasArtboard? artboard = null;
 
+        root = window.main_window.main_canvas.canvas.get_root_item ();
+
+        /*
         foreach (var _artboard in artboards) {
             if (_artboard.is_inside (event.x, event.y)) {
                 artboard = _artboard;
             }
         }
+        */
 
         switch (insert_type) {
             case Models.CanvasItemType.RECT:
@@ -86,10 +88,18 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         }
 
         if (new_item != null) {
-            if (new_item is Akira.Lib.Models.CanvasArtboard) {
-                artboards.append ((Models.CanvasArtboard) new_item);
-            } else {
-                items.append (new_item);
+            switch (new_item.item_type) {
+                case Akira.Lib.Models.CanvasItemType.ARTBOARD:
+                    artboards.add ((Models.CanvasArtboard) new_item);
+                    break;
+
+                default:
+                    if (new_item.artboard == null) {
+                        // Add it to "free items"
+                        free_items.add (new_item);
+                    }
+
+                    break;
             }
 
             window.event_bus.item_inserted (new_item);
@@ -100,15 +110,22 @@ public class Akira.Lib.Managers.ItemsManager : Object {
     }
 
     public void add_item (Akira.Lib.Models.CanvasItem item) {
-        items.append (item);
+        free_items.add (item);
         window.event_bus.file_edited ();
     }
 
     public void on_request_delete_item (Lib.Models.CanvasItem item) {
-        if (item is Models.CanvasArtboard) {
-            artboards.remove (item as Models.CanvasArtboard);
-        } else {
-            items.remove (item);
+        switch (item.item_type) {
+            case Akira.Lib.Models.CanvasItemType.ARTBOARD:
+                artboards.remove (item as Models.CanvasArtboard);
+                break;
+
+            default:
+                if (item.artboard != null) {
+                    free_items.remove (item);
+                }
+
+                break;
         }
 
         item.delete ();
@@ -174,6 +191,24 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         return text;
     }
 
+    public int get_item_position (Lib.Models.CanvasItem item) {
+        if (item.artboard != null) {
+            return -1;
+        }
+
+        return free_items.index (item);
+    }
+
+    public Lib.Models.CanvasItem get_item_at_position (uint position) {
+        var item_model = free_items.get_item (position) as Akira.Models.ItemModel;
+
+        return item_model.item;
+    }
+
+    public uint get_free_items_count () {
+        return free_items.get_n_items ();
+    }
+
     private void set_item_to_insert (string type) {
         switch (type) {
             case "rectangle":
@@ -192,6 +227,14 @@ public class Akira.Lib.Managers.ItemsManager : Object {
                 insert_type = Models.CanvasItemType.ARTBOARD;
                 break;
         }
+    }
+
+    public void swap_items (int source, int target) {
+        // Remove item at source position
+        var item_to_swap = free_items.remove_at (source);
+
+        // Insert item at target position
+        free_items.insert_at (target, item_to_swap);
     }
 
     private void udpate_default_values () {

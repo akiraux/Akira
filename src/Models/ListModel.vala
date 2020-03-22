@@ -21,10 +21,10 @@
 */
 
 public class Akira.Models.ListModel : GLib.Object, GLib.ListModel {
-    private GLib.List<Akira.Models.ItemModel?> list;
+    private GLib.List<Akira.Models.BaseModel?> list;
 
     construct {
-        list = new GLib.List<Akira.Models.ItemModel?> ();
+        list = new GLib.List<Akira.Models.BaseModel?> ();
     }
 
     public uint get_n_items () {
@@ -45,17 +45,29 @@ public class Akira.Models.ListModel : GLib.Object, GLib.ListModel {
         return typeof (Akira.Models.ItemModel);
     }
 
-    public Akira.Models.ItemModel? find_item (Akira.Lib.Models.CanvasItem item) {
+    public Akira.Models.BaseModel? find_item (Akira.Lib.Models.CanvasItem item) {
         for (var i = 0; i < list.length (); i++) {
             if (list.nth_data (i).item == item) {
-                return get_item (i) as Akira.Models.ItemModel;
+                return get_item (i) as Akira.Models.BaseModel;
             }
         }
 
         return null;
     }
 
-    public async void add_item (Akira.Models.ItemModel model_item, bool append = true) {
+    public int index (Akira.Lib.Models.CanvasItem item) {
+        return (int) list.index (find_item (item));
+    }
+
+    public void add (Akira.Lib.Models.CanvasItem item, bool append = true) {
+        add_item.begin (new Akira.Models.ItemModel (item, this), append);
+    }
+
+    public void remove (Akira.Lib.Models.CanvasItem item) {
+        remove_item.begin (find_item (item));
+    }
+
+    public async void add_item (Akira.Models.BaseModel model_item, bool append = true) {
         if (append) {
             list.append (model_item);
             items_changed (get_n_items () - 1, 0, 1);
@@ -71,10 +83,28 @@ public class Akira.Models.ListModel : GLib.Object, GLib.ListModel {
             return;
         }
 
-        var model = (Akira.Models.ItemModel) item_model;
+        var model = (Akira.Models.BaseModel) item_model;
         var position = list.index (model);
+
         list.remove (model);
         items_changed (position, 1, 0);
+    }
+
+    public void insert_at (int position, Akira.Lib.Models.CanvasItem item) {
+        var item_model = new Akira.Models.ItemModel (item, this);
+
+        list.insert (item_model, position);
+
+        items_changed (position, 0, 1);
+    }
+
+    public Akira.Lib.Models.CanvasItem? remove_at (int position) {
+        var item = list.nth_data (position);
+        list.remove (item);
+
+        items_changed (position, 1, 0);
+
+        return item.item;
     }
 
     public async void clear () {
@@ -85,7 +115,6 @@ public class Akira.Models.ListModel : GLib.Object, GLib.ListModel {
 
     public void sort (CompareFunc<Akira.Models.ItemModel?> sort_fn) {
         list.sort (sort_fn);
-
         items_changed (0, list.length (), list.length ());
     }
 }

@@ -51,12 +51,12 @@ public class Akira.Window : Gtk.ApplicationWindow {
         add_accel_group (accel_group);
 
         event_bus = new Akira.Services.EventBus ();
+        items_manager = new Akira.Lib.Managers.ItemsManager (this);
         action_manager = new Akira.Services.ActionManager (app, this);
         file_manager = new Akira.FileFormat.FileManager (this);
         headerbar = new Akira.Layouts.HeaderBar (this);
         main_window = new Akira.Layouts.MainWindow (this);
         dialogs = new Akira.Utils.Dialogs (this);
-        items_manager = new Akira.Lib.Managers.ItemsManager (this);
 
         build_ui ();
 

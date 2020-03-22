@@ -19,7 +19,7 @@
 * Authored by: Giacomo Alberini <giacomoalbe@gmail.com>
 */
 
-public class Akira.Models.LayerModel : Models.ItemModel {
+public class Akira.Models.LayerModel : Models.BaseModel {
     public string name {
         owned get {
             return item.name != null ? item.name : item.id;

@@ -22,6 +22,7 @@
 
 public class Akira.Lib.Managers.SelectedBoundManager : Object {
     public weak Akira.Lib.Canvas canvas { get; construct; }
+    public weak Akira.Window window { get; construct; }
 
     private unowned List<Models.CanvasItem> _selected_items;
     public unowned List<Models.CanvasItem> selected_items {
@@ -44,7 +45,8 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
 
     public SelectedBoundManager (Akira.Lib.Canvas canvas) {
         Object (
-            canvas: canvas
+            canvas: canvas,
+            window: canvas.window
         );
 
         canvas.window.event_bus.change_z_selected.connect (change_z_selected);
@@ -186,15 +188,49 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         }
 
         Models.CanvasItem selected_item = selected_items.nth_data (0);
-        var root_item = canvas.get_root_item ();
-        var pos_selected = root_item.find_child (selected_item);
+
+        var pos_selected = window.items_manager.get_item_position (selected_item);
 
         // Interrupt if item position doesn't exist.
         if (pos_selected == -1) {
             return;
         }
 
+        var items_count = window.items_manager.get_free_items_count ();
+
+        int target_position = -1;
+
+        if (raise) {
+            if (pos_selected < (items_count - 1)) {
+                target_position = pos_selected + 1;
+            }
+        } else {
+            if (pos_selected > 0) {
+                target_position = pos_selected - 1;
+            }
+        }
+
+        if (target_position == -1) {
+            // Invalid position, return
+            return;
+        }
+
+        window.items_manager.swap_items (pos_selected, target_position);
+
+        Models.CanvasItem target_item = window.items_manager.get_item_at_position (target_position - 1);
+
+        if (raise) {
+            selected_item.raise (target_item);
+        } else {
+            selected_item.lower (target_item);
+        }
+
+        canvas.window.event_bus.z_selected_changed ();
+
+        /*
+
         int target_item_pos;
+
         if (total) {
             // Account for nobs and select effect.
             target_item_pos = raise ? (root_item.get_n_children () - 11): 0;
@@ -214,7 +250,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
             selected_item.lower (target_item);
         }
 
-        canvas.window.event_bus.z_selected_changed ();
+        */
     }
 
     private void on_flip_item (bool clicked, bool vertical) {
