@@ -273,11 +273,10 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.Grid {
         loop = 0;
 
         items_list.@foreach (row => {
-            if (!(row is Akira.Layouts.Partials.Artboard)) {
-                zebra_layer ((Akira.Layouts.Partials.Layer) row);
-                return;
-            }
+            zebra_layer ((Akira.Layouts.Partials.Layer) row);
+        });
 
+        artboards_list.@foreach (row => {
             zebra_artboard ((Akira.Layouts.Partials.Artboard) row);
         });
     }
@@ -287,6 +286,7 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.Grid {
             if (!(row is Akira.Layouts.Partials.Layer)) {
                 return;
             }
+
             zebra_layer ((Akira.Layouts.Partials.Layer) row);
         });
     }
