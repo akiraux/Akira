@@ -20,7 +20,7 @@
  */
 
 public class Akira.Lib.Managers.ItemsManager : Object {
-    public weak Akira.Lib.Canvas canvas { get; construct; }
+    public weak Akira.Window window { get; construct; }
 
     private List<Models.CanvasItem> items;
     private List<Models.CanvasArtboard> artboards;
@@ -30,14 +30,14 @@ public class Akira.Lib.Managers.ItemsManager : Object {
     private Gdk.RGBA border_color;
     private Gdk.RGBA fill_color;
 
-    public ItemsManager (Akira.Lib.Canvas canvas) {
+    public ItemsManager (Akira.Window window) {
         Object (
-            canvas: canvas
+            window: window
         );
     }
 
     construct {
-        root = canvas.get_root_item ();
+        root = window.main_window.main_canvas.canvas.get_root_item ();
 
         items = new List<Models.CanvasItem> ();
         artboards = new List<Models.CanvasArtboard> ();
@@ -45,9 +45,9 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         border_color = Gdk.RGBA ();
         fill_color = Gdk.RGBA ();
 
-        canvas.window.event_bus.insert_item.connect (set_item_to_insert);
-        canvas.window.event_bus.request_delete_item.connect (on_request_delete_item);
-        canvas.window.event_bus.change_item_z_index.connect (on_change_item_z_index);
+        window.event_bus.insert_item.connect (set_item_to_insert);
+        window.event_bus.request_delete_item.connect (on_request_delete_item);
+        window.event_bus.change_item_z_index.connect (on_change_item_z_index);
     }
 
     public Models.CanvasItem? insert_item (Gdk.EventButton event) {
@@ -91,7 +91,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
                 items.append (new_item);
             }
 
-            canvas.window.event_bus.item_inserted (new_item);
+            window.event_bus.item_inserted (new_item);
         }
 
         return new_item;
@@ -109,7 +109,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         }
 
         item.delete ();
-        canvas.window.event_bus.item_deleted (item);
+        window.event_bus.item_deleted (item);
     }
 
     public Models.CanvasItem add_artboard (Gdk.EventButton event) {
@@ -234,6 +234,6 @@ public class Akira.Lib.Managers.ItemsManager : Object {
                 break;
         }
 
-        canvas.window.event_bus.z_selected_changed ();
+        window.event_bus.z_selected_changed ();
     }
 }

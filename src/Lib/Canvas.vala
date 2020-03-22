@@ -54,7 +54,6 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
     public Managers.ExportManager export_manager;
     public Managers.SelectedBoundManager selected_bound_manager;
-    private Managers.ItemsManager items_manager;
     private Managers.NobManager nob_manager;
     private Managers.HoverManager hover_manager;
 
@@ -83,7 +82,6 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
         export_manager = new Managers.ExportManager (this);
         selected_bound_manager = new Managers.SelectedBoundManager (this);
-        items_manager = new Managers.ItemsManager (this);
         nob_manager = new Managers.NobManager (this);
         hover_manager = new Managers.HoverManager (this);
 
@@ -106,7 +104,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
             );
         }
 
-        items_manager.add_item (item);
+        window.items_manager.add_item (item);
         Utils.AffineTransform.set_position (item, start_x, start_y);
 
         if (select) {
@@ -225,7 +223,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
             case EditMode.MODE_INSERT:
                 selected_bound_manager.reset_selection ();
 
-                var new_item = items_manager.insert_item (event);
+                var new_item = window.items_manager.insert_item (event);
 
                 selected_bound_manager.add_item_to_selection (new_item);
 
