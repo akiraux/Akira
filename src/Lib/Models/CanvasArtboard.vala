@@ -246,6 +246,7 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
         // over the Artboard label
         return y < 0
             && y > - (label_extents.height + LABEL_BOTTOM_PADDING)
+            && x > 0
             && x < (label_extents.width);
     }
 
