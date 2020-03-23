@@ -44,52 +44,45 @@ public class Akira.FileFormat.JsonContent : Object {
         builder.add_double_value (canvas.get_scale ());
     }
 
-    public async void save_content () {
+    public void save_content () {
         // Convert Artboards to JSON.
         if (window.items_manager.artboards.length () > 0) {
-            yield save_artboards ();
+            save_artboards ();
         }
-        //  for (int i = 0; i < canvas.get_root_item ().get_n_children (); i++) {
-        //     Goo.CanvasItem item = canvas.get_root_item ().get_child (i);
-        //     if (item.get_data<bool> ("ignore")) {
-        //         continue;
-        //     }
-        //     Json.Node node = Json.gobject_serialize (item);
-        //     builder.begin_object ();
-        //     builder.set_member_name ("type");
-        //     builder.add_string_value (item.get_type ().name ());
-        //     builder.set_member_name ("item");
-        //     builder.add_value (node);
-        //     var transform = Cairo.Matrix.identity ();
-        //     item.get_transform (out transform);
-        //     builder.set_member_name ("transform");
-        //     builder.begin_object ();
-        //     builder.set_member_name ("xx");
-        //     builder.add_double_value (transform.xx);
-        //     builder.set_member_name ("yx");
-        //     builder.add_double_value (transform.yx);
-        //     builder.set_member_name ("xy");
-        //     builder.add_double_value (transform.xy);
-        //     builder.set_member_name ("yy");
-        //     builder.add_double_value (transform.yy);
-        //     builder.set_member_name ("x0");
-        //     builder.add_double_value (transform.x0);
-        //     builder.set_member_name ("y0");
-        //     builder.add_double_value (transform.y0);
-        //     builder.end_object ();
-        //     builder.end_object ();
-        //  }
-        //  builder.end_array ();
+
+        // Convert Items to JSON.
+        if (window.items_manager.items.length () > 0) {
+            save_items ();
+        }
     }
 
-    private async void save_artboards () {
+    private void save_artboards () {
         builder.set_member_name ("artboards");
         builder.begin_array ();
 
         foreach (var artboard in window.items_manager.artboards) {
             var item = new JsonObject (artboard);
             builder.begin_object ();
+            builder.set_member_name ("type");
+            builder.add_string_value (artboard.get_type ().name ());
             builder.set_member_name ("artboard");
+            builder.add_value (item.get_node ());
+            builder.end_object ();
+        }
+
+        builder.end_array ();
+    }
+
+    private void save_items () {
+        builder.set_member_name ("items");
+        builder.begin_array ();
+
+        foreach (var _item in window.items_manager.items) {
+            var item = new JsonObject (_item);
+            builder.begin_object ();
+            builder.set_member_name ("type");
+            builder.add_string_value (_item.get_type ().name ());
+            builder.set_member_name ("item");
             builder.add_value (item.get_node ());
             builder.end_object ();
         }
