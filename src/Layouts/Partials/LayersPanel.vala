@@ -27,15 +27,10 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.Grid {
     private bool scroll_up = false;
     private bool scrolling = false;
     private bool should_scroll = false;
-    private string current_selected_item_id;
 
     public Gtk.Adjustment vadjustment;
     private Gtk.ListBox items_list;
     private Gtk.ListBox artboards_list;
-
-    private Akira.Models.ListModel items_list_model;
-    private Akira.Models.ListModel artboards_list_model;
-    private Gee.HashMap<string, Akira.Models.LayerModel> item_model_map;
 
     private const int SCROLL_STEP_SIZE = 5;
     private const int SCROLL_DISTANCE = 30;
@@ -66,20 +61,15 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.Grid {
         artboards_list.activate_on_single_click = false;
         artboards_list.selection_mode = Gtk.SelectionMode.SINGLE;
 
-        items_list_model = new Akira.Models.ListModel ();
-        artboards_list_model = new Akira.Models.ListModel ();
-
-        item_model_map = new Gee.HashMap<string, Akira.Models.LayerModel> ();
-
         items_list.bind_model (window.items_manager.free_items, item => {
             var item_model = item as Akira.Models.ItemModel;
 
             var layer_model = new Akira.Models.LayerModel (item_model.item, window.items_manager.free_items);
 
-            return new Akira.Layouts.Partials.Layer (window, layer_model);
+            return new Akira.Layouts.Partials.Layer (window, layer_model, items_list);
         });
 
-        artboards_list.bind_model (artboards_list_model, item => {
+        artboards_list.bind_model (window.items_manager.artboards, item => {
             var layer_model = (Akira.Models.LayerModel) item;
 
             return new Akira.Layouts.Partials.Artboard (window, layer_model);
@@ -92,76 +82,16 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.Grid {
         attach (artboards_list, 0, 2);
 
         // build_drag_and_drop ();
-        reload_zebra ();
+        redraw_list ();
 
-        window.event_bus.item_inserted.connect (on_item_inserted);
-        window.event_bus.item_deleted.connect (on_item_deleted);
-        window.event_bus.z_selected_changed.connect (on_z_selected_changed);
+        window.event_bus.item_inserted.connect (redraw_list);
+        window.event_bus.item_deleted.connect (redraw_list);
+        window.event_bus.z_selected_changed.connect (redraw_list);
     }
 
-    private void on_item_inserted (Lib.Models.CanvasItem item) {
-        if (item.artboard != null) {
-            item_model_map.@get (item.artboard.id).add_child_item (item);
-        } else {
-            Akira.Models.LayerModel model;
-
-            if (item is Akira.Lib.Models.CanvasArtboard) {
-                model = new Akira.Models.LayerModel (item, artboards_list_model);
-                artboards_list_model.add_item.begin (model, false);
-            } else {
-                model = new Akira.Models.LayerModel (item, items_list_model);
-                items_list_model.add_item.begin (model, false);
-            }
-
-            // This map is necessary for easily knowing which
-            // item is related to which model, since the canvas knows only
-            // real items and the layers panel only knows items model
-            item_model_map.@set (item.id, model);
-        }
-
+    private void redraw_list () {
         reload_zebra ();
         show_all ();
-    }
-
-    private void on_item_deleted (Lib.Models.CanvasItem item) {
-        if (item.artboard != null) {
-            item_model_map.@get (item.artboard.id).remove_child_item (item);
-        } else {
-            var model = item_model_map.@get (item.id);
-
-            if (model.is_artboard) {
-                artboards_list_model.remove_item.begin (model);
-            } else {
-                items_list_model.remove_item.begin (model);
-            }
-        }
-
-        reload_zebra ();
-        show_all ();
-    }
-
-    private void on_z_selected_changed () {
-        /*
-        var n_items = items_list_model.get_n_items ();
-
-        for (int i = 0; i < n_items; i++) {
-            var layer = items_list_model.get_item (i) as Akira.Models.LayerModel;
-            if (layer != null) {
-                Lib.Models.CanvasItem.update_z_index (layer.item);
-            }
-        }
-
-        items_list_model.sort ((a, b) => {
-          return b.item.z_index - a.item.z_index;
-        });
-        */
-
-        reload_zebra ();
-        show_all ();
-
-        // Activate the selected items again
-        // var model = item_model_map.@get (current_selected_item_id);
-        // model.selected = true;
     }
 
     private void build_drag_and_drop () {

@@ -121,7 +121,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
                 break;
 
             default:
-                if (item.artboard != null) {
+                if (item.artboard == null) {
                     free_items.remove (item);
                 }
 

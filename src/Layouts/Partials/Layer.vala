@@ -86,13 +86,16 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
     public Layer (
         Akira.Window window,
         Akira.Models.LayerModel model,
-        Layouts.Partials.Artboard? artboard = null
+        Gtk.ListBox? list = null
     ) {
         Object (
             window: window,
-            model: model,
-            artboard: artboard
+            model: model
         );
+
+        if (model.item.selected && list != null) {
+            list.select_row (this);
+        }
     }
 
     construct {
