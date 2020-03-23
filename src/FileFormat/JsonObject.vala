@@ -23,6 +23,7 @@
 public class Akira.FileFormat.JsonObject : GLib.Object {
     public Goo.CanvasItem item { get; construct; }
 
+    private Json.Object object;
     private ObjectClass obj_class;
 
     public JsonObject (Goo.CanvasItem item) {
@@ -30,10 +31,38 @@ public class Akira.FileFormat.JsonObject : GLib.Object {
     }
 
     construct {
+        object = new Json.Object ();
         obj_class = (ObjectClass) item.get_type ().class_ref ();
 
         foreach (ParamSpec spec in obj_class.list_properties ()) {
-            debug ("%s\n", spec.get_name ());
+            write_key (spec);
+        }
+    }
+
+    public Json.Node get_node () {
+        var node = new Json.Node.alloc ();
+        node.set_object (object);
+
+        return node;
+    }
+
+    private void write_key (ParamSpec spec) {
+        var type = spec.value_type;
+
+        if (type == typeof (int)) {
+            object.set_int_member (spec.get_name (), spec.get_default_value ().get_int ());
+        } else if (type == typeof (uint)) {
+            object.set_int_member (spec.get_name (), spec.get_default_value ().get_uint ());
+        } else if (type == typeof (double)) {
+            object.set_double_member (spec.get_name (), spec.get_default_value ().get_double ());
+        } else if (type == typeof (string)) {
+            object.set_string_member (spec.get_name (), spec.get_default_value ().get_string ());
+        } else if (type == typeof (bool)) {
+            object.set_boolean_member (spec.get_name (), spec.get_default_value ().get_boolean ());
+        } else if (type == typeof (int64)) {
+            object.set_int_member (spec.get_name (), spec.get_default_value ().get_int64 ());
+        } else {
+            warning ("Property type %s not yet supported: %s\n", type.name (), spec.get_name ());
         }
     }
 

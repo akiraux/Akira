@@ -88,11 +88,10 @@ public class Akira.FileFormat.JsonContent : Object {
 
         foreach (var artboard in window.items_manager.artboards) {
             var item = new JsonObject (artboard);
-            //  Json.Node node = Json.gobject_serialize (item);
-            //  builder.begin_object ();
-            //  builder.set_member_name ("artboard");
-            //  builder.add_value (node);
-            //  builder.end_object ();
+            builder.begin_object ();
+            builder.set_member_name ("artboard");
+            builder.add_value (item.get_node ());
+            builder.end_object ();
         }
 
         builder.end_array ();
