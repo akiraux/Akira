@@ -35,7 +35,6 @@ public class Akira.Lib.Selection.Nob : Goo.CanvasRect {
         handle_id = _handle_id;
         set_rectangle ();
         can_focus = false;
-        set_data<bool> ("ignore", true);
 
         (canvas as Akira.Lib.Canvas).window.event_bus.update_nob_size.connect (update_size);
     }

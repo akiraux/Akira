@@ -23,8 +23,8 @@
 public class Akira.Lib.Managers.ItemsManager : Object {
     public weak Akira.Window window { get; construct; }
 
-    private List<Models.CanvasItem> items;
-    private List<Models.CanvasArtboard> artboards;
+    public List<Models.CanvasItem> items;
+    public List<Models.CanvasArtboard> artboards;
     private Models.CanvasItemType? insert_type { get; set; }
     private Goo.CanvasItem root;
     private int border_size;

@@ -180,7 +180,6 @@ public class Akira.Lib.Managers.NobManager : Object {
                 "stroke-color", STROKE_COLOR,
                 null
             );
-            select_effect.set_data<bool> ("ignore", true);
             select_effect.set ("parent", root);
         }
 
