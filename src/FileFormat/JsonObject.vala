@@ -24,6 +24,7 @@ public class Akira.FileFormat.JsonObject : GLib.Object {
     public Lib.Models.CanvasItem? item { get; construct; }
 
     private Json.Object object;
+    private Json.Object transform;
     private ObjectClass obj_class;
 
     public JsonObject (Lib.Models.CanvasItem? item) {
@@ -37,6 +38,9 @@ public class Akira.FileFormat.JsonObject : GLib.Object {
         foreach (ParamSpec spec in obj_class.list_properties ()) {
             write_key (spec);
         }
+
+        transform = new Json.Object ();
+        write_transform ();
     }
 
     public Json.Node get_node () {
@@ -77,5 +81,19 @@ public class Akira.FileFormat.JsonObject : GLib.Object {
         } else {
             //  warning ("Property type %s not yet supported: %s\n", type.name (), spec.get_name ());
         }
+    }
+
+    private void write_transform () {
+        var matrix = Cairo.Matrix.identity ();
+        item.get_transform (out matrix);
+
+        transform.set_double_member ("xx", matrix.xx);
+        transform.set_double_member ("yx", matrix.yx);
+        transform.set_double_member ("xy", matrix.xy);
+        transform.set_double_member ("yy", matrix.yy);
+        transform.set_double_member ("x0", matrix.x0);
+        transform.set_double_member ("y0", matrix.y0);
+
+        object.set_object_member ("transform", transform);
     }
 }
