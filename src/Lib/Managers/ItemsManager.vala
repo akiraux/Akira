@@ -207,6 +207,14 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         return item_model.item;
     }
 
+    public int get_item_z_index (Models.CanvasItem item) {
+        return get_free_items_count () - 1 - free_items.index (item);
+    }
+
+    public int get_item_top_position () {
+        return get_free_items_count () - 1;
+    }
+
     public int get_free_items_count () {
         return (int) free_items.get_n_items ();
     }

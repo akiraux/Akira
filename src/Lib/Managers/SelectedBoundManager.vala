@@ -192,8 +192,6 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         int items_count = window.items_manager.get_free_items_count ();
         int pos_selected = items_count - 1 - window.items_manager.get_item_position (selected_item);
 
-        debug (@"Pos selected: $(pos_selected)");
-
         // Interrupt if item position doesn't exist.
         if (pos_selected == -1) {
             return;
@@ -224,11 +222,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
             return;
         }
 
-        debug (@"Target position: $(target_position)");
-
         Models.CanvasItem target_item = window.items_manager.get_item_at_z_index (target_position);
-
-        debug (@"Target item: $(target_item.id)");
 
         window.items_manager.swap_items (pos_selected, target_position);
 
@@ -239,31 +233,6 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         }
 
         canvas.window.event_bus.z_selected_changed ();
-
-        /*
-
-        int target_item_pos;
-
-        if (total) {
-            // Account for nobs and select effect.
-            target_item_pos = raise ? (root_item.get_n_children () - 11): 0;
-        } else {
-            target_item_pos = pos_selected + (raise ? 1 : -1);
-        }
-
-        var target_item = root_item.get_child (target_item_pos);
-        // Don't change z-index if the target item is not an a CanvasItem (eg. nob or select_effect).
-        if (target_item == null || (!(target_item is Models.CanvasItem) && !total)) {
-            return;
-        }
-
-        if (raise) {
-            selected_item.raise (target_item);
-        } else {
-            selected_item.lower (target_item);
-        }
-
-        */
     }
 
     private void on_flip_item (bool clicked, bool vertical) {
