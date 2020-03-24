@@ -63,8 +63,6 @@ public class Akira.FileFormat.JsonContent : Object {
         foreach (var artboard in window.items_manager.artboards) {
             var item = new JsonObject (artboard);
             builder.begin_object ();
-            builder.set_member_name ("type");
-            builder.add_string_value (artboard.get_type ().name ());
             builder.set_member_name ("artboard");
             builder.add_value (item.get_node ());
             builder.end_object ();
@@ -80,8 +78,6 @@ public class Akira.FileFormat.JsonContent : Object {
         foreach (var _item in window.items_manager.items) {
             var item = new JsonObject (_item);
             builder.begin_object ();
-            builder.set_member_name ("type");
-            builder.add_string_value (_item.get_type ().name ());
             builder.set_member_name ("item");
             builder.add_value (item.get_node ());
             builder.end_object ();

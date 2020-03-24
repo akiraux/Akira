@@ -35,8 +35,10 @@ public class Akira.FileFormat.JsonObject : GLib.Object {
         object = new Json.Object ();
         obj_class = (ObjectClass) item.get_type ().class_ref ();
 
+        object.set_string_member ("type", item.get_type ().name ());
+
         foreach (ParamSpec spec in obj_class.list_properties ()) {
-            write_key (spec);
+            write_key (spec, object);
         }
 
         transform = new Json.Object ();
@@ -50,34 +52,39 @@ public class Akira.FileFormat.JsonObject : GLib.Object {
         return node;
     }
 
-    private void write_key (ParamSpec spec) {
+    private void write_key (ParamSpec spec, Json.Object obj) {
         var type = spec.value_type;
         var val = Value (type);
 
         if (type == typeof (int)) {
             item.get_property (spec.get_name (), ref val);
-            object.set_int_member (spec.get_name (), val.get_int ());
+            obj.set_int_member (spec.get_name (), val.get_int ());
             //  debug ("%s: %i", spec.get_name (), val.get_int ());
         } else if (type == typeof (uint)) {
             item.get_property (spec.get_name (), ref val);
-            object.set_int_member (spec.get_name (), val.get_uint ());
+            obj.set_int_member (spec.get_name (), val.get_uint ());
             //  debug ("%s: %s", spec.get_name (), val.get_uint ().to_string ());
         } else if (type == typeof (double)) {
             item.get_property (spec.get_name (), ref val);
-            object.set_double_member (spec.get_name (), val.get_double ());
+            obj.set_double_member (spec.get_name (), val.get_double ());
             //  debug ("%s: %f", spec.get_name (), val.get_double ());
         } else if (type == typeof (string)) {
             item.get_property (spec.get_name (), ref val);
-            object.set_string_member (spec.get_name (), val.get_string ());
+            obj.set_string_member (spec.get_name (), val.get_string ());
             //  debug ("%s: %s", spec.get_name (), val.get_string ());
         } else if (type == typeof (bool)) {
             item.get_property (spec.get_name (), ref val);
-            object.set_boolean_member (spec.get_name (), val.get_boolean ());
+            obj.set_boolean_member (spec.get_name (), val.get_boolean ());
             //  debug ("%s: %s", spec.get_name (), val.get_boolean ().to_string ());
         } else if (type == typeof (int64)) {
             item.get_property (spec.get_name (), ref val);
-            object.set_int_member (spec.get_name (), val.get_int64 ());
+            obj.set_int_member (spec.get_name (), val.get_int64 ());
             //  debug ("%s: %s", spec.get_name (), val.get_int64 ().to_string ());
+        } else if (type == typeof (Akira.Lib.Models.CanvasArtboard)) {
+            item.get_property (spec.get_name (), ref val);
+            if (val.strdup_contents () != "NULL") {
+                obj.set_string_member (spec.get_name (), (val as Akira.Lib.Models.CanvasArtboard).id);
+            }
         } else {
             //  warning ("Property type %s not yet supported: %s\n", type.name (), spec.get_name ());
         }
