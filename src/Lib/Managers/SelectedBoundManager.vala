@@ -189,14 +189,15 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
 
         Models.CanvasItem selected_item = selected_items.nth_data (0);
 
-        var pos_selected = window.items_manager.get_item_position (selected_item);
+        int items_count = window.items_manager.get_free_items_count ();
+        int pos_selected = items_count - 1 - window.items_manager.get_item_position (selected_item);
+
+        debug (@"Pos selected: $(pos_selected)");
 
         // Interrupt if item position doesn't exist.
         if (pos_selected == -1) {
             return;
         }
-
-        var items_count = window.items_manager.get_free_items_count ();
 
         int target_position = -1;
 
@@ -215,9 +216,13 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
             return;
         }
 
-        window.items_manager.swap_items (pos_selected, target_position);
+        debug (@"Target position: $(target_position)");
 
-        Models.CanvasItem target_item = window.items_manager.get_item_at_position (target_position - 1);
+        Models.CanvasItem target_item = window.items_manager.get_item_at_z_index (target_position);
+
+        debug (@"Target item: $(target_item.id)");
+
+        window.items_manager.swap_items (pos_selected, target_position);
 
         if (raise) {
             selected_item.raise (target_item);

@@ -96,7 +96,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
                 default:
                     if (new_item.artboard == null) {
                         // Add it to "free items"
-                        free_items.add (new_item);
+                        free_items.add (new_item, false);
                     }
 
                     break;
@@ -110,7 +110,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
     }
 
     public void add_item (Akira.Lib.Models.CanvasItem item) {
-        free_items.add (item);
+        free_items.add (item, false);
         window.event_bus.file_edited ();
     }
 
@@ -199,14 +199,16 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         return free_items.index (item);
     }
 
-    public Lib.Models.CanvasItem get_item_at_position (uint position) {
-        var item_model = free_items.get_item (position) as Akira.Models.ItemModel;
+    public Lib.Models.CanvasItem get_item_at_z_index (uint z_index) {
+        var item_position = free_items.get_n_items () - 1 - z_index;
+
+        var item_model = free_items.get_item (item_position) as Akira.Models.ItemModel;
 
         return item_model.item;
     }
 
-    public uint get_free_items_count () {
-        return free_items.get_n_items ();
+    public int get_free_items_count () {
+        return (int) free_items.get_n_items ();
     }
 
     private void set_item_to_insert (string type) {
@@ -229,7 +231,15 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         }
     }
 
-    public void swap_items (int source, int target) {
+    public void swap_items (int source_z_index, int target_z_index) {
+        // z-index is the exact opposite of items placement
+        // inside the free_items list
+        // last in is the topmost element
+        var free_items_length = get_free_items_count ();
+
+        var source = free_items_length - 1 - source_z_index;
+        var target = free_items_length - 1 - target_z_index;
+
         // Remove item at source position
         var item_to_swap = free_items.remove_at (source);
 
