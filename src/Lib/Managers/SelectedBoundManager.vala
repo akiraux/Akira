@@ -205,9 +205,17 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
             if (pos_selected < (items_count - 1)) {
                 target_position = pos_selected + 1;
             }
+
+            if (total) {
+                target_position = items_count - 1;
+            }
         } else {
             if (pos_selected > 0) {
                 target_position = pos_selected - 1;
+            }
+
+            if (total) {
+                target_position = 0;
             }
         }
 
