@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2019 Alecaddd (http://alecaddd.com)
+* Copyright (c) 2019-2020 Alecaddd (https://alecaddd.com)
 *
 * This file is part of Akira.
 *
@@ -10,11 +10,11 @@
 
 * Akira is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 * GNU General Public License for more details.
 
 * You should have received a copy of the GNU General Public License
-* along with Akira.  If not, see <https://www.gnu.org/licenses/>.
+* along with Akira. If not, see <https://www.gnu.org/licenses/>.
 *
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
@@ -24,7 +24,6 @@ namespace Akira {
 }
 
 public class Akira.Application : Gtk.Application {
-    private Gee.HashMap<string, Akira.Window> opened_files;
     public GLib.List<Window> windows;
 
     construct {
@@ -32,7 +31,6 @@ public class Akira.Application : Gtk.Application {
 
         settings = new Akira.Services.Settings ();
         windows = new GLib.List<Window> ();
-        opened_files = new Gee.HashMap<string, Akira.Window> ();
 
         application_id = Constants.APP_ID;
     }
@@ -40,34 +38,49 @@ public class Akira.Application : Gtk.Application {
     public override void open (File[] files, string hint) {
         foreach (var file in files) {
             if (is_file_opened (file)) {
-                // Preset active window with file
+                // Present active window with currently opened file.
+                // We don't allow opening the same file on multiple windows.
                 var window = get_window_from_file (file);
                 window.show_app ();
-            } else {
-                // Open New window
-                var window = new Akira.Window (this);
-                this.add_window (window);
+                continue;
+            }
 
-                window.open_file (file);
-                window.show_app ();
+            // If the current window is empty, load the file in this one.
+            var current_window = active_window as Akira.Window;
+            if (current_window.akira_file == null && !current_window.edited) {
+                current_window.open_file (file);
+                current_window.event_bus.file_saved (file.get_basename ());
+                continue;
+            }
+
+            // Open a new window.
+            var window = new Akira.Window (this);
+            this.add_window (window);
+
+            window.open_file (file);
+            window.show_app ();
+            window.event_bus.file_saved (file.get_basename ());
+        }
+    }
+
+    public Akira.Window? get_window_from_file (File file) {
+        foreach (Akira.Window window in windows) {
+            if (window.akira_file != null && window.akira_file.opened_file.get_path () == file.get_path ()) {
+                return window;
             }
         }
-    }
 
-    public void register_file_to_window (File file, Akira.Window window) {
-        if (!is_file_opened (file)) {
-            opened_files.set (file.get_uri (), window);
-        } else {
-            warning ("File was opened in two separate windows");
-        }
-    }
-
-    public Akira.Window get_window_from_file (File file) {
-        return opened_files.get (file.get_uri ());
+        return null;
     }
 
     public bool is_file_opened (File file) {
-        return opened_files.has_key (file.get_uri ());
+        foreach (Akira.Window window in windows) {
+            if (window.akira_file != null && window.akira_file.opened_file.get_path () == file.get_path ()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public void new_window () {

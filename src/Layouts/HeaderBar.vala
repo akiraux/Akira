@@ -66,6 +66,7 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
 
     construct {
         set_show_close_button (true);
+        title = _("Untitled");
 
         menu = new Akira.Partials.MenuButton ("document-open", _("Menu"), null);
         var menu_popover = build_main_menu_popover ();
@@ -374,6 +375,8 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
     }
 
     private void build_signals () {
+        window.event_bus.file_edited.connect (on_file_edited);
+        window.event_bus.file_saved.connect (on_file_saved);
         window.event_bus.selected_items_changed.connect (on_selected_items_changed);
         window.event_bus.z_selected_changed.connect (() => {
             update_button_sensitivity (false);
@@ -386,10 +389,27 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
 
     /**
      * TODO: Fetch the recently opened files from GSettings
-     * and add them to the grid
+     * and add them to the menu grid
      */
     public void fetch_recent_files () {
         recent_files_grid.show_all ();
+    }
+
+    private void on_file_edited () {
+        if (title.has_suffix ("*")) {
+            return;
+        }
+
+        title = ("%s*").printf (title);
+    }
+
+    private void on_file_saved (string? file_name) {
+        if (file_name == null) {
+            title = title.has_suffix ("*") ? title.slice (0, title.length - 1) : title;
+            return;
+        }
+
+        title = file_name.has_suffix (".akira") ? file_name.replace (".akira", "") : file_name;
     }
 
     private void on_selected_items_changed (List<Lib.Models.CanvasItem> selected_items) {

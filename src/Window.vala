@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2019 Alecaddd (http://alecaddd.com)
+* Copyright (c) 2019-2020 Alecaddd (https://alecaddd.com)
 *
 * This file is part of Akira.
 *
@@ -10,17 +10,18 @@
 
 * Akira is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 * GNU General Public License for more details.
 
 * You should have received a copy of the GNU General Public License
-* along with Akira.  If not, see <https://www.gnu.org/licenses/>.
+* along with Akira. If not, see <https://www.gnu.org/licenses/>.
 *
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
 
 public class Akira.Window : Gtk.ApplicationWindow {
     public FileFormat.AkiraFile? akira_file = null;
+    public FileFormat.FileManager file_manager;
 
     public weak Akira.Application app { get; construct; }
     public Akira.Services.EventBus event_bus;
@@ -51,6 +52,7 @@ public class Akira.Window : Gtk.ApplicationWindow {
 
         event_bus = new Akira.Services.EventBus ();
         action_manager = new Akira.Services.ActionManager (app, this);
+        file_manager = new Akira.FileFormat.FileManager (this);
         headerbar = new Akira.Layouts.HeaderBar (this);
         main_window = new Akira.Layouts.MainWindow (this);
         dialogs = new Akira.Utils.Dialogs (this);
@@ -63,6 +65,8 @@ public class Akira.Window : Gtk.ApplicationWindow {
         show_app ();
 
         main_window.main_canvas.canvas.focus_canvas ();
+        event_bus.file_edited.connect (on_file_edited);
+        event_bus.file_saved.connect (on_file_saved);
     }
 
     private void build_ui () {
@@ -94,6 +98,14 @@ public class Akira.Window : Gtk.ApplicationWindow {
         main_window.pane2.position = settings.right_paned;
     }
 
+    private void on_file_edited () {
+        edited = true;
+    }
+
+    private void on_file_saved () {
+        edited = false;
+    }
+
     public bool before_destroy () {
         update_status ();
 
@@ -109,7 +121,7 @@ public class Akira.Window : Gtk.ApplicationWindow {
                 _("Are you sure you want to quit?"),
                 _("All unsaved data will be lost and impossible to recover."),
                 "system-shutdown",
-                _("Yes, Quit!"));
+                _("Quit without saving!"));
 
             if (confirmed) {
                 app.get_active_window ().destroy ();
@@ -150,13 +162,17 @@ public class Akira.Window : Gtk.ApplicationWindow {
     }
 
     public void open_file (File file) {
-        save_and_close_current_file ();
-
-        app.register_file_to_window (file, this);
-        akira_file = new FileFormat.AkiraFile (file);
+        akira_file = new FileFormat.AkiraFile (file, this);
 
         akira_file.prepare ();
         akira_file.load_file ();
+    }
+
+    public void save_new_file (File file) {
+        akira_file = new FileFormat.AkiraFile (file, this);
+
+        akira_file.prepare ();
+        akira_file.save_file ();
     }
 
     private void save_and_close_current_file () {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Alecaddd (http://alecaddd.com)
+ * Copyright (c) 2019-2020 Alecaddd (http://alecaddd.com)
  *
  * This file is part of Akira.
  *
@@ -17,13 +17,14 @@
  * along with Akira.  If not, see <https://www.gnu.org/licenses/>.
  *
  * Authored by: Giacomo Alberini <giacomoalbe@gmail.com>
+ * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
  */
 
 public class Akira.Lib.Managers.ItemsManager : Object {
     public weak Akira.Window window { get; construct; }
 
-    private List<Models.CanvasItem> items;
-    private List<Models.CanvasArtboard> artboards;
+    public List<Models.CanvasItem> items;
+    public List<Models.CanvasArtboard> artboards;
     private Models.CanvasItemType? insert_type { get; set; }
     private Goo.CanvasItem root;
     private int border_size;
@@ -92,6 +93,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             }
 
             window.event_bus.item_inserted (new_item);
+            window.event_bus.file_edited ();
         }
 
         return new_item;
@@ -99,6 +101,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
 
     public void add_item (Akira.Lib.Models.CanvasItem item) {
         items.append (item);
+        window.event_bus.file_edited ();
     }
 
     public void on_request_delete_item (Lib.Models.CanvasItem item) {
@@ -110,6 +113,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
 
         item.delete ();
         window.event_bus.item_deleted (item);
+        window.event_bus.file_edited ();
     }
 
     public Models.CanvasItem add_artboard (Gdk.EventButton event) {

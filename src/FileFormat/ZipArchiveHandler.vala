@@ -1,24 +1,26 @@
 /*
- *  Copyright (C) 2019 Felipe Escoto <felescoto95@hotmail.com>
+ * Copyright (c) 2019-2020 Alecaddd (https://alecaddd.com)
  *
- *  This program or library is free software; you can redistribute it
- *  and/or modify it under the terms of the GNU Lesser General Public
- *  License as published by the Free Software Foundation; either
- *  version 3 of the License, or (at your option) any later version.
+ * This file is part of Akira.
  *
- *  This library is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- *  Lesser General Public License for more details.
+ * Akira is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+
+ * Akira is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+
+ * You should have received a copy of the GNU General Public License
+ * along with Akira. If not, see <https://www.gnu.org/licenses/>.
  *
- *  You should have received a copy of the GNU Lesser General
- *  Public License along with this library; if not, write to the
- *  Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
- *  Boston, MA 02110-1301 USA.
+ * Authored by: Felipe Escoto <felescoto95@hotmail.com>
+ * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
  */
 
 public class Akira.FileFormat.ZipArchiveHandler : GLib.Object {
-
     // Prefix to be added at the beginning of the folder name when a gzipped file is opened.
     // Should start with a period to hide the folder by default.
     private const string UNARCHIVED_PREFIX = ".~lock.akira.";
@@ -49,7 +51,6 @@ public class Akira.FileFormat.ZipArchiveHandler : GLib.Object {
 
         file_collector = new FileCollector (unarchived_location);
     }
-
 
     protected static string get_content_from_file (File file) {
         try {
@@ -143,7 +144,6 @@ public class Akira.FileFormat.ZipArchiveHandler : GLib.Object {
         file_collector.delete_files_marked_for_deletion ();
 
         // Saving to a temp file first to avoid dataloss on a crash
-
         var tmp_file = File.new_for_path (opened_file.get_path () + ".tmp");
 
         compress (unarchived_location, tmp_file);
@@ -174,13 +174,11 @@ public class Akira.FileFormat.ZipArchiveHandler : GLib.Object {
      * Gets a random file inside the archive at the location specified
      * using a guid-like name.
      *
-     * @param location Location inside of the archive where the file will live at.
-     *
-     * @param extension The extension the file created will have
-     *
-     * @param format The format for the file. The character "?" will be replaced
-     * with a random character. For example, XXXX-XX can become a5b7-Df.
-     * The default is "XXXXXXXX-XXXX-XX"
+     * @param location - Location inside of the archive where the file will live at.
+     * @param extension - The extension the file created will have.
+     * @param format - The format for the file. The character "?" will be replaced
+     *                 with a random character. For example, XXXX-XX can become a5b7-Df.
+     *                 The default is "XXXXXXXX-XXXX-XX".
      */
     public File get_random_file_name (File location, string extension, string format = "XXXXXXXX-XXXX-XX") {
         do {
@@ -259,6 +257,7 @@ public class Akira.FileFormat.ZipArchiveHandler : GLib.Object {
 
         unowned Archive.Entry entry;
         Archive.Result last_result;
+
         while ((last_result = archive.next_header (out entry)) == Archive.Result.OK) {
             entry.set_pathname (Path.build_filename (location.get_path (), entry.pathname ()));
 
@@ -372,7 +371,7 @@ public class Akira.FileFormat.ZipArchiveHandler : GLib.Object {
     /**
      * Takes care of the reference counting for files inside the archive.
      * This allows to multiple objects to reference the same file, and only
-     * mark the file for deletion it if no other object is using it.
+     * mark the file for deletion if no other object is using it.
      */
     protected class FileCollector {
         private unowned File unarchived_location;
@@ -391,12 +390,7 @@ public class Akira.FileFormat.ZipArchiveHandler : GLib.Object {
          */
         public int file_references (File file) {
             var file_basename = file.get_basename ();
-
-            if (ref_counter.has_key (file_basename)) {
-                return ref_counter.get (file_basename);
-            } else {
-                return 0;
-            }
+            return ref_counter.has_key (file_basename) ? ref_counter.get (file_basename) : 0;
         }
 
         /**
