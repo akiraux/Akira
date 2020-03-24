@@ -85,8 +85,11 @@ public class Akira.FileFormat.JsonObject : GLib.Object {
             if (val.strdup_contents () != "NULL") {
                 obj.set_string_member (spec.get_name (), (val as Akira.Lib.Models.CanvasArtboard).id);
             }
+        } else if (type == typeof (Goo.CanvasItemVisibility)) {
+            item.get_property (spec.get_name (), ref val);
+            obj.set_int_member (spec.get_name (), val.get_enum ());
         } else {
-            //  warning ("Property type %s not yet supported: %s\n", type.name (), spec.get_name ());
+            warning ("Property type %s not yet supported: %s\n", type.name (), spec.get_name ());
         }
     }
 
