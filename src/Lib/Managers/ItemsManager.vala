@@ -193,6 +193,15 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         item.set ("flipped_v", obj.get_boolean_member ("flipped-v"));
         item.set ("locked", obj.get_boolean_member ("locked"));
 
+        // If item is inside an artboard.
+        if (obj.has_member ("artboard")) {
+            foreach (var artboard in artboards) {
+                if (artboard.id == obj.get_string_member ("artboard")) {
+                    item.artboard = artboard;
+                    break;
+                }
+            }
+        }
         item.set ("relative-x", obj.get_double_member ("relative-x"));
         item.set ("relative-y", obj.get_double_member ("relative-y"));
         item.set ("initial-relative-x", obj.get_double_member ("initial-relative-x"));
