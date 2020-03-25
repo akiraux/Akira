@@ -382,6 +382,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     }
 
     private void on_set_scale (double scale) {
+        current_scale = scale;
         set_scale (scale);
     }
 

@@ -130,16 +130,30 @@ public class Akira.Lib.Managers.ItemsManager : Object {
     public void load_artboard (Json.Object obj) {
         var transform = obj.get_member ("transform").get_object ();
         var artboard = new Models.CanvasArtboard (
-            Utils.AffineTransform.fix_size (0.0),
-            Utils.AffineTransform.fix_size (0.0),
+            Utils.AffineTransform.fix_size (transform.get_double_member ("x0")),
+            Utils.AffineTransform.fix_size (transform.get_double_member ("y0")),
             root
             );
 
+        if (obj.get_string_member ("name") != null) {
+            artboard.set ("name", obj.get_string_member ("name"));
+        }
+        artboard.set ("id", obj.get_string_member ("id"));
         artboard.set ("width", obj.get_double_member ("width"));
         artboard.set ("height", obj.get_double_member ("height"));
+        artboard.set ("opacity", obj.get_double_member ("opacity"));
+        artboard.set ("size_locked", obj.get_boolean_member ("size-locked"));
+        artboard.set ("size_ratio", obj.get_double_member ("size-ratio"));
+        artboard.set ("flipped_h", obj.get_boolean_member ("flipped-h"));
+        artboard.set ("flipped_v", obj.get_boolean_member ("flipped-v"));
+        artboard.set ("locked", obj.get_boolean_member ("locked"));
 
         artboards.append (artboard);
         window.event_bus.item_inserted (artboard);
+
+        if (obj.get_boolean_member ("selected")) {
+            window.main_window.main_canvas.canvas.selected_bound_manager.add_item_to_selection (artboard);
+        }
     }
 
     public Models.CanvasItem add_rect (Gdk.EventButton event, Goo.CanvasItem parent, Models.CanvasArtboard? artboard) {
