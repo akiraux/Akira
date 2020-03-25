@@ -36,10 +36,17 @@ public class Akira.FileFormat.JsonLoader : Object {
 
     public void load_content () {
         // Load saved Artboards.
-        Json.Array array = obj.get_member ("artboards").get_array ();
-        foreach (unowned Json.Node node in array.get_elements ()) {
+        Json.Array artboards = obj.get_member ("artboards").get_array ();
+        foreach (unowned Json.Node node in artboards.get_elements ()) {
             var object = node.get_object ();
             load_artboard (object);
+        }
+
+        // Load saved Items.
+        Json.Array items = obj.get_member ("items").get_array ();
+        foreach (unowned Json.Node node in items.get_elements ()) {
+            var object = node.get_object ();
+            load_item (object);
         }
 
         window.event_bus.set_scale (obj.get_double_member ("scale"));
@@ -49,12 +56,13 @@ public class Akira.FileFormat.JsonLoader : Object {
         var artboard = obj.get_member ("artboard").get_object ();
         if (artboard != null) {
             window.items_manager.load_artboard (artboard);
-            //  var transform = obj.get_member ("transform").get_object ();
-            //  Utils.AffineTransform.set_position (
-            //      artboard,
-            //      transform.get_double_member ("x0"),
-            //      transform.get_double_member ("y0")
-            //  );
+        }
+    }
+
+    private void load_item (Json.Object obj) {
+        var item = obj.get_member ("item").get_object ();
+        if (item != null) {
+            window.items_manager.load_item (item);
         }
     }
 }

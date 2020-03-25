@@ -151,8 +151,17 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         artboards.append (artboard);
         window.event_bus.item_inserted (artboard);
 
-        if (obj.get_boolean_member ("selected")) {
-            window.main_window.main_canvas.canvas.selected_bound_manager.add_item_to_selection (artboard);
+        restore_selection (obj.get_boolean_member ("selected"), artboard);
+    }
+
+    // Create an item loaded from an opened file.
+    public void load_item (Json.Object obj) {
+        var transform = obj.get_member ("transform").get_object ();
+    }
+
+    private void restore_selection (bool selected, Models.CanvasItem item) {
+        if (selected) {
+            window.main_window.main_canvas.canvas.selected_bound_manager.add_item_to_selection (item);
         }
     }
 
