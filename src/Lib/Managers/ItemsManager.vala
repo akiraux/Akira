@@ -51,7 +51,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         window.event_bus.change_item_z_index.connect (on_change_item_z_index);
     }
 
-    public Models.CanvasItem? insert_item (Gdk.EventButton event) {
+    public Models.CanvasItem? insert_item (Gdk.EventButton event, Json.Object? obj = null) {
         udpate_default_values ();
 
         Models.CanvasItem? new_item;
@@ -86,6 +86,11 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         }
 
         if (new_item != null) {
+            // Restore the attributes of an item loaded from a saved file.
+            if (obj != null) {
+                restore_attributes (new_item, obj);
+            }
+
             if (new_item is Akira.Lib.Models.CanvasArtboard) {
                 artboards.append ((Models.CanvasArtboard) new_item);
             } else {
@@ -93,7 +98,11 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             }
 
             window.event_bus.item_inserted (new_item);
-            window.event_bus.file_edited ();
+
+            // Don't trigger the edit file signal if the item was loaded from a saved file.
+            if (obj == null) {
+                window.event_bus.file_edited ();
+            }
         }
 
         return new_item;
@@ -126,37 +135,79 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         return artboard as Models.CanvasItem;
     }
 
-    // Create an artboard loaded from an opened file.
-    public void load_artboard (Json.Object obj) {
-        var transform = obj.get_member ("transform").get_object ();
-        var artboard = new Models.CanvasArtboard (
-            Utils.AffineTransform.fix_size (transform.get_double_member ("x0")),
-            Utils.AffineTransform.fix_size (transform.get_double_member ("y0")),
-            root
-            );
-
-        if (obj.get_string_member ("name") != null) {
-            artboard.set ("name", obj.get_string_member ("name"));
-        }
-        artboard.set ("id", obj.get_string_member ("id"));
-        artboard.set ("width", obj.get_double_member ("width"));
-        artboard.set ("height", obj.get_double_member ("height"));
-        artboard.set ("opacity", obj.get_double_member ("opacity"));
-        artboard.set ("size_locked", obj.get_boolean_member ("size-locked"));
-        artboard.set ("size_ratio", obj.get_double_member ("size-ratio"));
-        artboard.set ("flipped_h", obj.get_boolean_member ("flipped-h"));
-        artboard.set ("flipped_v", obj.get_boolean_member ("flipped-v"));
-        artboard.set ("locked", obj.get_boolean_member ("locked"));
-
-        artboards.append (artboard);
-        window.event_bus.item_inserted (artboard);
-
-        restore_selection (obj.get_boolean_member ("selected"), artboard);
-    }
-
     // Create an item loaded from an opened file.
     public void load_item (Json.Object obj) {
         var transform = obj.get_member ("transform").get_object ();
+        var event = new Gdk.Event (Gdk.EventType.BUTTON_PRESS);
+
+        var new_x = transform.get_double_member ("x0");
+        var new_y = transform.get_double_member ("y0");
+        // If item is inside an artboard update the coordinates accordingly.
+        if (obj.has_member ("artboard")) {
+            foreach (var artboard in artboards) {
+                if (artboard.id == obj.get_string_member ("artboard")) {
+                    var matrix = Cairo.Matrix.identity ();
+                    artboard.get_transform (out matrix);
+                    new_x = matrix.x0 + obj.get_double_member ("initial-relative-x");
+                    new_y = matrix.y0 + obj.get_double_member ("initial-relative-y");
+                    break;
+                }
+            }
+        }
+
+        ((Gdk.EventButton) event).x = new_x;
+        ((Gdk.EventButton) event).y = new_y;
+
+        switch (obj.get_string_member ("type")) {
+            case "AkiraLibModelsCanvasRect":
+                insert_type = Models.CanvasItemType.RECT;
+                break;
+
+            case "AkiraLibModelsCanvasEllipse":
+                insert_type = Models.CanvasItemType.ELLIPSE;
+                break;
+
+            case "AkiraLibModelsCanvasText":
+                insert_type = Models.CanvasItemType.TEXT;
+                break;
+
+            case "AkiraLibModelsCanvasArtboard":
+                insert_type = Models.CanvasItemType.ARTBOARD;
+                break;
+        }
+        var item = insert_item ((Gdk.EventButton) event, obj);
+        restore_selection (obj.get_boolean_member ("selected"), item);
+    }
+
+    private void restore_attributes (Models.CanvasItem item, Json.Object obj) {
+        if (obj.get_string_member ("name") != null) {
+            item.set ("name", obj.get_string_member ("name"));
+        }
+        item.set ("id", obj.get_string_member ("id"));
+        item.set ("width", obj.get_double_member ("width"));
+        item.set ("height", obj.get_double_member ("height"));
+        item.set ("opacity", obj.get_double_member ("opacity"));
+        item.set ("size_locked", obj.get_boolean_member ("size-locked"));
+        item.set ("size_ratio", obj.get_double_member ("size-ratio"));
+        item.set ("flipped_h", obj.get_boolean_member ("flipped-h"));
+        item.set ("flipped_v", obj.get_boolean_member ("flipped-v"));
+        item.set ("locked", obj.get_boolean_member ("locked"));
+
+        //  // If item is inside an artboard.
+        if (obj.has_member ("artboard")) {
+            foreach (var artboard in artboards) {
+                if (artboard.id == obj.get_string_member ("artboard")) {
+                    item.set ("artboard", artboard);
+                    break;
+                }
+            }
+        }
+        item.set ("relative-x", obj.get_double_member ("relative-x"));
+        item.set ("relative-y", obj.get_double_member ("relative-y"));
+        item.set ("initial-relative-x", obj.get_double_member ("initial-relative-x"));
+        item.set ("initial-relative-y", obj.get_double_member ("initial-relative-y"));
+
+        // Update fills and borders.
     }
 
     private void restore_selection (bool selected, Models.CanvasItem item) {

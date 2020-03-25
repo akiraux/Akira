@@ -39,8 +39,7 @@ public class Akira.FileFormat.JsonLoader : Object {
         if (obj.get_member ("artboards") != null) {
             Json.Array artboards = obj.get_member ("artboards").get_array ();
             foreach (unowned Json.Node node in artboards.get_elements ()) {
-                var object = node.get_object ();
-                load_artboard (object);
+                load_item (node.get_object (), "artboard");
             }
         }
 
@@ -48,8 +47,7 @@ public class Akira.FileFormat.JsonLoader : Object {
         if (obj.get_member ("items") != null) {
             Json.Array items = obj.get_member ("items").get_array ();
             foreach (unowned Json.Node node in items.get_elements ()) {
-                var object = node.get_object ();
-                load_item (object);
+                load_item (node.get_object (), "item");
             }
         }
 
@@ -58,15 +56,8 @@ public class Akira.FileFormat.JsonLoader : Object {
         window.main_window.main_canvas.main_scroll.vadjustment.value = obj.get_double_member ("vadjustment");
     }
 
-    private void load_artboard (Json.Object obj) {
-        var artboard = obj.get_member ("artboard").get_object ();
-        if (artboard != null) {
-            window.items_manager.load_artboard (artboard);
-        }
-    }
-
-    private void load_item (Json.Object obj) {
-        var item = obj.get_member ("item").get_object ();
+    private void load_item (Json.Object obj, string type) {
+        var item = obj.get_member (type).get_object ();
         if (item != null) {
             window.items_manager.load_item (item);
         }
