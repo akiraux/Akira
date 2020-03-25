@@ -126,6 +126,22 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         return artboard as Models.CanvasItem;
     }
 
+    // Create an artboard loaded from an opened file.
+    public void load_artboard (Json.Object obj) {
+        var transform = obj.get_member ("transform").get_object ();
+        var artboard = new Models.CanvasArtboard (
+            Utils.AffineTransform.fix_size (0.0),
+            Utils.AffineTransform.fix_size (0.0),
+            root
+            );
+
+        artboard.set ("width", obj.get_double_member ("width"));
+        artboard.set ("height", obj.get_double_member ("height"));
+
+        artboards.append (artboard);
+        window.event_bus.item_inserted (artboard);
+    }
+
     public Models.CanvasItem add_rect (Gdk.EventButton event, Goo.CanvasItem parent, Models.CanvasArtboard? artboard) {
         var rect = new Models.CanvasRect (
             Utils.AffineTransform.fix_size (event.x),

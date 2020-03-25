@@ -41,10 +41,10 @@ public class Akira.FileFormat.AkiraFile : Akira.FileFormat.ZipArchiveHandler {
         try {
             open_archive ();
 
-            //  var version_json = get_content_as_json (version_file);
-            //  version_data = new FileFormat.Version (version_json != null ? version_json : new Json.Object ());
+            var content_json = get_content_as_json (content_file);
+            new FileFormat.JsonLoader (window, content_json);
 
-            //  debug ("Version from file: %s", version_data.file_version);
+            debug ("Version from file: %s", content_json.get_string_member ("version"));
         } catch (Error e) {
             error ("Could not load file: %s", e.message);
         }
