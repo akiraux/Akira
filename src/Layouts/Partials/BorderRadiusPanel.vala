@@ -295,6 +295,8 @@ public class Akira.Layouts.Partials.BorderRadiusPanel : Gtk.Grid {
 
         selected_item.notify["width"].connect (on_size_change);
         selected_item.notify["height"].connect (on_size_change);
+
+        on_size_change ();
     }
 
     private void disconnect_previous_item () {

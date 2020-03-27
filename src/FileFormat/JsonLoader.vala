@@ -59,6 +59,7 @@ public class Akira.FileFormat.JsonLoader : Object {
     private void load_item (Json.Object obj, string type) {
         var item = obj.get_member (type).get_object ();
         if (item != null) {
+            //  debug ("loading %s", type);
             window.items_manager.load_item (item);
         }
     }
