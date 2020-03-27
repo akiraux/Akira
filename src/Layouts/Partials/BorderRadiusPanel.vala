@@ -267,6 +267,8 @@ public class Akira.Layouts.Partials.BorderRadiusPanel : Gtk.Grid {
     }
 
     private void enable () {
+        on_size_change ();
+
         uniform_switch.active = selected_item.is_radius_uniform;
         autoscale_switch.active = selected_item.is_radius_autoscale;
 
@@ -285,18 +287,16 @@ public class Akira.Layouts.Partials.BorderRadiusPanel : Gtk.Grid {
         //  }
 
         radius_binding = radius_adj.bind_property (
-            "value", selected_item, "global_radius",
+            "value", selected_item, "global-radius",
             BindingFlags.SYNC_CREATE | BindingFlags.BIDIRECTIONAL);
 
         uniform_binding = uniform_switch.bind_property (
-            "active", selected_item, "is_radius_uniform");
+            "active", selected_item, "is-radius-uniform");
         autoscale_binding = autoscale_switch.bind_property (
-            "active", selected_item, "is_radius_autoscale");
+            "active", selected_item, "is-radius-autoscale");
 
         selected_item.notify["width"].connect (on_size_change);
         selected_item.notify["height"].connect (on_size_change);
-
-        on_size_change ();
     }
 
     private void disconnect_previous_item () {

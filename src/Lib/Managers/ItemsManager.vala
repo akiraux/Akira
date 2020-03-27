@@ -363,10 +363,16 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         if (!(item is Models.CanvasArtboard)) {
             item.set ("has-fill", obj.get_boolean_member ("has-fill"));
             item.set ("hidden-fill", obj.get_boolean_member ("hidden-fill"));
+            item.set ("fill-alpha", obj.get_int_member ("fill-alpha"));
+            item.set ("fill-color-rgba", obj.get_int_member ("fill-color-rgba"));
 
             item.set ("has-border", obj.get_boolean_member ("has-border"));
             item.set ("hidden-border", obj.get_boolean_member ("hidden-border"));
             item.set ("border-size", obj.get_int_member ("border-size"));
+            item.set ("stroke-alpha", obj.get_int_member ("stroke-alpha"));
+            item.set ("stroke-color-rgba", obj.get_int_member ("stroke-color-rgba"));
+
+            item.reset_colors ();
         }
     }
 
