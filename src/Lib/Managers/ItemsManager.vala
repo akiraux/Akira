@@ -364,15 +364,15 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             item.has_fill = obj.get_boolean_member ("has-fill");
             item.hidden_fill = obj.get_boolean_member ("hidden-fill");
             item.fill_alpha = (int) obj.get_int_member ("fill-alpha");
-            item.color = Utils.Color.uint_to_rgba ((uint) obj.get_int_member ("fill-color-rgba"));
+            item.color_string = obj.get_string_member ("color-string");
 
             item.has_border = obj.get_boolean_member ("has-border");
             item.hidden_border = obj.get_boolean_member ("hidden-border");
             item.border_size = (int) obj.get_int_member ("border-size");
             item.stroke_alpha = (int) obj.get_int_member ("stroke-alpha");
-            item.border_color = Utils.Color.uint_to_rgba ((uint) obj.get_int_member ("stroke-color-rgba"));
+            item.border_color_string = obj.get_string_member ("border-color-string");
 
-            item.reset_colors ();
+            item.load_colors ();
         }
     }
 
