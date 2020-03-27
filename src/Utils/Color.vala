@@ -65,4 +65,15 @@ public class Akira.Utils.Color : Object {
 
         return uint_rgba;
     }
+
+    public static Gdk.RGBA uint_to_rgba (uint color) {
+        var rgba = Gdk.RGBA ();
+
+        rgba.alpha = color >> 24 & 255;
+        rgba.blue = color >> 16 & 255;
+        rgba.green = color >> 8 & 255;
+        rgba.red = color >> 0 & 255;
+
+        return rgba;
+    }
 }
