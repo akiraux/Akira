@@ -374,6 +374,11 @@ public class Akira.Lib.Managers.ItemsManager : Object {
 
             item.load_colors ();
         }
+
+         item.set ("relative-x", obj.get_double_member ("relative-x"));
+         item.set ("relative-y", obj.get_double_member ("relative-y"));
+         item.set ("initial-relative-x", obj.get_double_member ("initial-relative-x"));
+         item.set ("initial-relative-y", obj.get_double_member ("initial-relative-y"));
     }
 
     private void restore_selection (bool selected, Models.CanvasItem item) {
