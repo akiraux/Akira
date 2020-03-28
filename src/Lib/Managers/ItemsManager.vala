@@ -323,8 +323,8 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         } else {
             items.append (item);
         }
-        restore_attributes (item, obj);
         window.event_bus.item_inserted (item);
+        restore_attributes (item, obj);
         window.event_bus.item_value_changed ();
 
         restore_selection (obj.get_boolean_member ("selected"), item);
@@ -357,7 +357,20 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         }
 
         // Restore layer options.
-        item.set ("locked", obj.get_boolean_member ("locked"));
+        var model = window.main_window.right_sidebar.layers_panel.list_model.find_item (item)
+            as Akira.Models.LayerModel;
+        if (model != null) {
+            model.is_visible = obj.get_int_member ("visibility") == 2;
+            model.is_locked = obj.get_boolean_member ("locked");
+        }
+
+        if (obj.has_member ("artboard")) {
+            var child_model = window.main_window.right_sidebar.layers_panel.item_model_map.@get (item.artboard.id).get_child_item (item);
+            if (child_model != null) {
+                child_model.is_visible = obj.get_int_member ("visibility") == 2;
+                child_model.is_locked = obj.get_boolean_member ("locked");
+            }
+        }
 
         // Restore fill and border.
         if (!(item is Models.CanvasArtboard)) {
@@ -375,10 +388,10 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             item.load_colors ();
         }
 
-         item.set ("relative-x", obj.get_double_member ("relative-x"));
-         item.set ("relative-y", obj.get_double_member ("relative-y"));
-         item.set ("initial-relative-x", obj.get_double_member ("initial-relative-x"));
-         item.set ("initial-relative-y", obj.get_double_member ("initial-relative-y"));
+        item.set ("relative-x", obj.get_double_member ("relative-x"));
+        item.set ("relative-y", obj.get_double_member ("relative-y"));
+        item.set ("initial-relative-x", obj.get_double_member ("initial-relative-x"));
+        item.set ("initial-relative-y", obj.get_double_member ("initial-relative-y"));
     }
 
     private void restore_selection (bool selected, Models.CanvasItem item) {

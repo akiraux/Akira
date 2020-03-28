@@ -113,6 +113,14 @@ public class Akira.Models.LayerModel : Models.ItemModel {
         items.remove_item.begin (item_model);
     }
 
+    public Akira.Models.LayerModel? get_child_item (Akira.Lib.Models.CanvasItem item) {
+        if (!is_artboard) {
+            return null;
+        }
+
+        return items.find_item (item) as Akira.Models.LayerModel;
+    }
+
     public string to_string () {
         return "Layer: %s Label: %s Hidden: %d Lock: %d".printf (item.id, name, 0, 0);
     }

@@ -29,8 +29,8 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.ListBox {
     private bool should_scroll = false;
     private string current_selected_item_id;
 
-    private Akira.Models.ListModel list_model;
-    private Gee.HashMap<string, Akira.Models.LayerModel> item_model_map;
+    public Akira.Models.ListModel list_model;
+    public Gee.HashMap<string, Akira.Models.LayerModel> item_model_map;
     public Gtk.Adjustment vadjustment;
 
     private const int SCROLL_STEP_SIZE = 5;
