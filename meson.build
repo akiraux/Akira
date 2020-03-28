@@ -17,7 +17,7 @@ endif
 i18n = import('i18n')
 # Dependencies
 gtk_dependency = dependency('gtk+-3.0')
-granite_dependency = dependency('granite', version: '>= 5.2.0')
+granite_dependency = dependency('granite', version: '>= 5.3.0')
 gee_dependency = dependency('gee-0.8')
 libxml_dependency = dependency('libxml-2.0')
 cairo_dependency = dependency('cairo', version: '>=1.14')
