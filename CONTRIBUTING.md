@@ -39,7 +39,7 @@ These are mostly guidelines, not rules. Use your best judgment, and feel free to
     1. Install required dependencies:
 
         * `gtk+-3.0>=3.18`
-        * `granite>=0.5.0`
+        * `granite>=5.3.0`
         * `glib-2.0`
         * `gee-0.8`
         * `gobject-2.0`
@@ -82,7 +82,7 @@ If you think you have found a bug in Akira, first make sure that you are testing
 
 If the issue has not been reported before, simply create [a new issue](https://github.com/akiraux/Akira/issues/new) via the [**Issues** section](https://github.com/akiraux/Akira/issues)
 
-It is very helpful if you can prepare a reproduction of the bug. In other words, provide all the steps as well as a GIF demonstrating the bug. It makes it easier to find the problem and to fix it. 
+It is very helpful if you can prepare a reproduction of the bug. In other words, provide all the steps as well as a GIF demonstrating the bug. It makes it easier to find the problem and to fix it.
 
 Please adhere to the issue template and make sure you have provided as much information as possible. This helps the maintainers in resolving these issues considerably.
 
