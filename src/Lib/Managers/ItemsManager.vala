@@ -49,7 +49,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         window.event_bus.change_item_z_index.connect (on_change_item_z_index);
     }
 
-    public Models.CanvasItem? insert_item (Gdk.EventButton event) {
+    public Models.CanvasItem? insert_item (double x, double y) {
         udpate_default_values ();
 
         Models.CanvasItem? new_item;
@@ -58,26 +58,26 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         root = window.main_window.main_canvas.canvas.get_root_item ();
 
         foreach (Models.CanvasArtboard _artboard in artboards) {
-            if (_artboard.is_inside (event.x, event.y)) {
+            if (_artboard.is_inside (x, y)) {
                 artboard = _artboard;
             }
         }
 
         switch (insert_type) {
             case Models.CanvasItemType.RECT:
-                new_item = add_rect (event, root, artboard);
+                new_item = add_rect (x, y, root, artboard);
                 break;
 
             case Models.CanvasItemType.ELLIPSE:
-                new_item = add_ellipse (event, root, artboard);
+                new_item = add_ellipse (x, y, root, artboard);
                 break;
 
             case Models.CanvasItemType.TEXT:
-                new_item = add_text (event, root, artboard);
+                new_item = add_text (x, y, root, artboard);
                 break;
 
             case Models.CanvasItemType.ARTBOARD:
-                new_item = add_artboard (event);
+                new_item = add_artboard (x, y);
                 break;
 
             default:
@@ -129,22 +129,23 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         item.delete ();
         window.event_bus.item_deleted (item);
         window.event_bus.file_edited ();
+
     }
 
-    public Models.CanvasItem add_artboard (Gdk.EventButton event) {
+    public Models.CanvasItem add_artboard (double x, double y) {
         var artboard = new Models.CanvasArtboard (
-            Utils.AffineTransform.fix_size (event.x),
-            Utils.AffineTransform.fix_size (event.y),
+            Utils.AffineTransform.fix_size (x),
+            Utils.AffineTransform.fix_size (y),
             root
             );
 
         return artboard as Models.CanvasItem;
     }
 
-    public Models.CanvasItem add_rect (Gdk.EventButton event, Goo.CanvasItem parent, Models.CanvasArtboard? artboard) {
+    public Models.CanvasItem add_rect (double x, double y, Goo.CanvasItem parent, Models.CanvasArtboard? artboard) {
         var rect = new Models.CanvasRect (
-            Utils.AffineTransform.fix_size (event.x),
-            Utils.AffineTransform.fix_size (event.y),
+            Utils.AffineTransform.fix_size (x),
+            Utils.AffineTransform.fix_size (y),
             0.0,
             0.0,
             border_size,
@@ -157,10 +158,10 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         return rect;
     }
 
-    public Models.CanvasEllipse add_ellipse (Gdk.EventButton event, Goo.CanvasItem parent, Models.CanvasArtboard? artboard) {
+    public Models.CanvasEllipse add_ellipse (double x, double y, Goo.CanvasItem parent, Models.CanvasArtboard? artboard) {
         var ellipse = new Models.CanvasEllipse (
-            Utils.AffineTransform.fix_size (event.x),
-            Utils.AffineTransform.fix_size (event.y),
+            Utils.AffineTransform.fix_size (x),
+            Utils.AffineTransform.fix_size (y),
             0.0,
             0.0,
             border_size,
@@ -173,11 +174,11 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         return ellipse;
     }
 
-    public Models.CanvasText add_text (Gdk.EventButton event, Goo.CanvasItem parent, Models.CanvasArtboard? artboard) {
+    public Models.CanvasText add_text (double x, double y, Goo.CanvasItem parent, Models.CanvasArtboard? artboard) {
         var text = new Models.CanvasText (
             "Akira is awesome :)",
-            Utils.AffineTransform.fix_size (event.x),
-            Utils.AffineTransform.fix_size (event.y),
+            Utils.AffineTransform.fix_size (x),
+            Utils.AffineTransform.fix_size (y),
             200,
             25f,
             Goo.CanvasAnchorType.NW,
@@ -217,7 +218,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         return (int) free_items.get_n_items ();
     }
 
-    private void set_item_to_insert (string type) {
+    public void set_item_to_insert (string type) {
         switch (type) {
             case "rectangle":
                 insert_type = Models.CanvasItemType.RECT;

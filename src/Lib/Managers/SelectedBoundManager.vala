@@ -162,6 +162,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
             canvas.window.event_bus.request_delete_item (item);
         }
 
+
         // By emptying the selected_items list, the select_effect gets dropped
         selected_items = new List<Models.CanvasItem> ();
     }
