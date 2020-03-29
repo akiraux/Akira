@@ -365,7 +365,8 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         }
 
         if (obj.has_member ("artboard")) {
-            var child_model = window.main_window.right_sidebar.layers_panel.item_model_map.@get (item.artboard.id).get_child_item (item);
+            var child_model = window.main_window.right_sidebar.layers_panel.item_model_map.
+                @get (item.artboard.id).get_child_item (item);
             if (child_model != null) {
                 child_model.is_visible = obj.get_int_member ("visibility") == 2;
                 child_model.is_locked = obj.get_boolean_member ("locked");

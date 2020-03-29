@@ -22,8 +22,8 @@
 
 public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
     public weak Akira.Window window { get; construct; }
-    public Akira.Layouts.Partials.Artboard? artboard { construct set; get; }
-    public Akira.Layouts.Partials.Layer? layer_group { construct set; get; }
+    public Akira.Layouts.Partials.Artboard? artboard { get; construct set; }
+    public Akira.Layouts.Partials.Layer? layer_group { get; construct set; }
     public string layer_name { get; construct; }
     public string icon_name { get; construct; }
     public Goo.CanvasItemSimple item { get; construct; }
@@ -609,9 +609,11 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
     }
 
     private void lock_actions () {
+        button_locked.bind_property ("active", model.item, "locked",
+            BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE);
+
         button_locked.toggled.connect (() => {
             var active = button_locked.get_active ();
-
             button_locked.tooltip_text = active ? _("Unlock Layer") : _("Lock Layer");
 
             if (active) {
@@ -626,8 +628,6 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
             icon_locked.visible = ! active;
             icon_locked.no_show_all = active;
 
-            model.is_locked = active;
-
             if (active) {
                 window.event_bus.item_locked (model.item);
             }
@@ -637,9 +637,23 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
     }
 
     private void hide_actions () {
+        button_hidden.bind_property ("active", model.item, "visibility",
+            BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE,
+            (binding, srcval, ref targetval) => {
+                Goo.CanvasItemVisibility status = (bool) srcval.get_boolean ()
+                    ? Goo.CanvasItemVisibility.INVISIBLE
+                    : Goo.CanvasItemVisibility.VISIBLE;
+                targetval.set_enum (status);
+                return true;
+            },
+            (binding, srcval, ref targetval) => {
+                var status = ((Goo.CanvasItemVisibility) srcval.get_enum ()) == Goo.CanvasItemVisibility.INVISIBLE;
+                targetval.set_boolean (status);
+                return true;
+            });
+
         button_hidden.toggled.connect (() => {
             var active = button_hidden.get_active ();
-
             button_hidden.tooltip_text = active ? _("Show Layer") : _("Hide Layer");
 
             if (active) {
@@ -647,8 +661,6 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
             } else {
                 button_hidden.get_style_context ().remove_class ("show");
             }
-
-            model.is_visible = !active;
 
             icon_visible.visible = active;
             icon_visible.no_show_all = ! active;

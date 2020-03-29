@@ -53,7 +53,7 @@ public class Akira.Models.LayerModel : Models.ItemModel {
         set {
             item.locked = value;
 
-            if (item.locked) {
+            if (item.locked && selected) {
                 selected = false;
             }
         }
