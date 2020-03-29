@@ -218,7 +218,7 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
     }
 
     private void on_delete_item () {
-        model.list_model.remove_item.begin (model);
+        model.list_model<Akira.Models.FillsItemModel>.remove_item.begin (model);
         model.item.reset_colors ();
         window.event_bus.fill_deleted ();
     }

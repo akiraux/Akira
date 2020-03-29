@@ -25,7 +25,7 @@ public class Akira.Layouts.Partials.FillsPanel : Gtk.Grid {
 
     public Gtk.Button add_btn;
     public Gtk.ListBox fills_list_container;
-    public Akira.Models.ListModel list_model;
+    public Akira.Models.ListModel<Akira.Models.FillsItemModel> list_model;
     public Gtk.Grid title_cont;
     private Lib.Models.CanvasItem selected_item;
 
@@ -67,7 +67,7 @@ public class Akira.Layouts.Partials.FillsPanel : Gtk.Grid {
         title_cont.attach (label, 0, 0, 1, 1);
         title_cont.attach (add_btn, 1, 0, 1, 1);
 
-        list_model = new Akira.Models.ListModel ();
+        list_model = new Akira.Models.ListModel<Akira.Models.FillsItemModel> ();
 
         fills_list_container = new Gtk.ListBox ();
         fills_list_container.margin_top = 5;

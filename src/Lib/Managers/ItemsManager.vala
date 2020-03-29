@@ -23,8 +23,8 @@
 public class Akira.Lib.Managers.ItemsManager : Object {
     public weak Akira.Window window { get; construct; }
 
-    public Akira.Models.ListModel free_items;
-    public Akira.Models.ListModel artboards;
+    public Akira.Models.ListModel<Lib.Models.CanvasItem> free_items;
+    public Akira.Models.ListModel<Lib.Models.CanvasArtboard> artboards;
     private Models.CanvasItemType? insert_type { get; set; }
     private Goo.CanvasItem root;
     private int border_size;
@@ -38,8 +38,8 @@ public class Akira.Lib.Managers.ItemsManager : Object {
     }
 
     construct {
-        free_items = new Akira.Models.ListModel ();
-        artboards = new Akira.Models.ListModel ();
+        free_items = new Akira.Models.ListModel<Lib.Models.CanvasItem> ();
+        artboards = new Akira.Models.ListModel<Lib.Models.CanvasArtboard> ();
 
         border_color = Gdk.RGBA ();
         fill_color = Gdk.RGBA ();
@@ -57,13 +57,11 @@ public class Akira.Lib.Managers.ItemsManager : Object {
 
         root = window.main_window.main_canvas.canvas.get_root_item ();
 
-        /*
-        foreach (var _artboard in artboards) {
+        foreach (Models.CanvasArtboard _artboard in artboards) {
             if (_artboard.is_inside (event.x, event.y)) {
                 artboard = _artboard;
             }
         }
-        */
 
         switch (insert_type) {
             case Models.CanvasItemType.RECT:
@@ -90,13 +88,13 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         if (new_item != null) {
             switch (new_item.item_type) {
                 case Akira.Lib.Models.CanvasItemType.ARTBOARD:
-                    artboards.add ((Models.CanvasArtboard) new_item);
+                    artboards.add_item ((Models.CanvasArtboard) new_item);
                     break;
 
                 default:
                     if (new_item.artboard == null) {
                         // Add it to "free items"
-                        free_items.add (new_item, false);
+                        free_items.add_item (new_item, false);
                     }
 
                     break;
@@ -110,19 +108,19 @@ public class Akira.Lib.Managers.ItemsManager : Object {
     }
 
     public void add_item (Akira.Lib.Models.CanvasItem item) {
-        free_items.add (item, false);
+        free_items.add_item (item, false);
         window.event_bus.file_edited ();
     }
 
     public void on_request_delete_item (Lib.Models.CanvasItem item) {
         switch (item.item_type) {
             case Akira.Lib.Models.CanvasItemType.ARTBOARD:
-                artboards.remove (item as Models.CanvasArtboard);
+                artboards.remove_item (item as Models.CanvasArtboard);
                 break;
 
             default:
                 if (item.artboard == null) {
-                    free_items.remove (item);
+                    free_items.remove_item (item);
                 }
 
                 break;
@@ -177,7 +175,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
 
     public Models.CanvasText add_text (Gdk.EventButton event, Goo.CanvasItem parent, Models.CanvasArtboard? artboard) {
         var text = new Models.CanvasText (
-            "Add text here",
+            "Akira is awesome :)",
             Utils.AffineTransform.fix_size (event.x),
             Utils.AffineTransform.fix_size (event.y),
             200,
@@ -202,9 +200,9 @@ public class Akira.Lib.Managers.ItemsManager : Object {
     public Lib.Models.CanvasItem get_item_at_z_index (uint z_index) {
         var item_position = free_items.get_n_items () - 1 - z_index;
 
-        var item_model = free_items.get_item (item_position) as Akira.Models.ItemModel;
+        var item_model = free_items.get_item (item_position) as Akira.Lib.Models.CanvasItem;
 
-        return item_model.item;
+        return item_model;
     }
 
     public int get_item_z_index (Models.CanvasItem item) {

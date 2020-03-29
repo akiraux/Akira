@@ -64,10 +64,8 @@ sources = files(
     'Partials/PanelSeparator.vala',
     'Partials/ExportWidget.vala',
 
-    'Models/LayerModel.vala',
     'Models/BordersItemModel.vala',
     'Models/FillsItemModel.vala',
-    'Models/ItemModel.vala',
     'Models/BaseModel.vala',
     'Models/ListModel.vala',
     'Models/ExportModel.vala',

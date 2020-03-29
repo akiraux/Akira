@@ -62,19 +62,14 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.Grid {
         artboards_list.selection_mode = Gtk.SelectionMode.SINGLE;
 
         items_list.bind_model (window.items_manager.free_items, item => {
-            var item_model = item as Akira.Models.ItemModel;
-
-            var layer_model = new Akira.Models.LayerModel (item_model.item, window.items_manager.free_items);
-
-            return new Akira.Layouts.Partials.Layer (window, layer_model, items_list);
+            var item_model = item as Lib.Models.CanvasItem;
+            return new Akira.Layouts.Partials.Layer (window, item_model, items_list);
         });
 
         artboards_list.bind_model (window.items_manager.artboards, item => {
-            var layer_model = (Akira.Models.LayerModel) item;
-
-            return new Akira.Layouts.Partials.Artboard (window, layer_model);
+            var artboard_model = item as Akira.Lib.Models.CanvasArtboard;
+            return new Akira.Layouts.Partials.Artboard (window, artboard_model);
         });
-
 
         get_style_context ().add_class ("layers-panel");
 

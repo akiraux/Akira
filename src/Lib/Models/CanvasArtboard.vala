@@ -82,7 +82,7 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
 
     // Artboard related properties
     private Cairo.TextExtents label_extents;
-    public List<Models.CanvasItem> items;
+    public Akira.Models.ListModel<Models.CanvasItem> items;
     public new Akira.Lib.Canvas canvas { get; set; }
     public Models.CanvasArtboard? artboard { get; set; }
     public double relative_x { get; set; }
@@ -132,15 +132,15 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
         get_label_extent ();
 
         // Init items list
-        items = new List<Models.CanvasItem> ();
+        items = new Akira.Models.ListModel<Models.CanvasItem> ();
     }
 
     public uint get_items_length () {
-        return this.items.length ();
+        return this.items.get_n_items ();
     }
 
     public void remove_item (Models.CanvasItem item) {
-        items.remove (item);
+        items.remove_item (item);
     }
 
     public void remove_all_items () {
@@ -148,12 +148,12 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
 
         while (items != null) {
             // Get the new head of the list
-            item = items.nth_data (0);
+            item = items.get_item (0) as Lib.Models.CanvasItem;
 
             canvas.window.event_bus.request_delete_item (item);
         }
 
-        items = new List<Models.CanvasItem> ();
+        items = new Akira.Models.ListModel<Models.CanvasItem> ();
     }
 
     public bool is_inside (double x, double y) {
@@ -170,7 +170,7 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
             return;
         }
 
-        this.items.prepend (canvas_item);
+        this.items.add_item (canvas_item, false);
         item.set_parent (this);
 
         request_update ();
@@ -224,8 +224,8 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
         cr.rectangle (x, y, width, height);
         cr.fill ();
 
-        if (items.length () > 0) {
-            foreach (var item in items) {
+        if (items.get_n_items () > 0) {
+            foreach (Lib.Models.CanvasItem item in items) {
                 cr.save ();
 
                 cr.transform (item.compute_transform (Cairo.Matrix.identity ()));
@@ -264,7 +264,7 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
             found_items.append (this);
         }
 
-        foreach (var item in items) {
+        foreach (Lib.Models.CanvasItem item in items) {
             var item_x = x;
             var item_y = y;
 

@@ -20,11 +20,11 @@
 * Authored by: Alessandro "alecaddd" Castellani <castellani.ale@gmail.com>
 */
 
-public class Akira.Models.ListModel : GLib.Object, GLib.ListModel {
-    private GLib.List<Akira.Models.BaseModel?> list;
+public class Akira.Models.ListModel<Model> : GLib.Object, GLib.ListModel {
+    private GLib.List<Model?> list;
 
     construct {
-        list = new GLib.List<Akira.Models.BaseModel?> ();
+        list = new GLib.List<Model> ();
     }
 
     public uint get_n_items () {
@@ -32,42 +32,28 @@ public class Akira.Models.ListModel : GLib.Object, GLib.ListModel {
     }
 
     public Object? get_item (uint position) {
-        Object? o = null;
-        o = list.nth_data (position);
-        if (o != null) {
-            return o as Object;
-        }
-
-        return null;
+        return list.nth_data (position) as Object;
     }
 
     public Type get_item_type () {
-        return typeof (Akira.Models.ItemModel);
+        return typeof (Model);
     }
 
-    public Akira.Models.BaseModel? find_item (Akira.Lib.Models.CanvasItem item) {
+    public Model? find_item (Model item) {
         for (var i = 0; i < list.length (); i++) {
-            if (list.nth_data (i).item == item) {
-                return get_item (i) as Akira.Models.BaseModel;
+            if (list.nth_data (i) == item) {
+                return get_item (i);
             }
         }
 
         return null;
     }
 
-    public int index (Akira.Lib.Models.CanvasItem item) {
+    public int index (Model item) {
         return (int) list.index (find_item (item));
     }
 
-    public void add (Akira.Lib.Models.CanvasItem item, bool append = true) {
-        add_item.begin (new Akira.Models.ItemModel (item, this), append);
-    }
-
-    public void remove (Akira.Lib.Models.CanvasItem item) {
-        remove_item.begin (find_item (item));
-    }
-
-    public async void add_item (Akira.Models.BaseModel model_item, bool append = true) {
+    public async void add_item (Model model_item, bool append = true) {
         if (append) {
             list.append (model_item);
             items_changed (get_n_items () - 1, 0, 1);
@@ -78,33 +64,29 @@ public class Akira.Models.ListModel : GLib.Object, GLib.ListModel {
         items_changed (0, 0, 1);
     }
 
-    public async void remove_item (Object? item_model) {
-        if (item_model == null) {
+    public async void remove_item (Model? model) {
+        if (model == null) {
             return;
         }
 
-        var model = (Akira.Models.BaseModel) item_model;
         var position = list.index (model);
 
         list.remove (model);
         items_changed (position, 1, 0);
     }
 
-    public void insert_at (int position, Akira.Lib.Models.CanvasItem item) {
-        var item_model = new Akira.Models.ItemModel (item, this);
-
-        list.insert (item_model, position);
-
+    public void insert_at (int position, Model item) {
+        list.insert (item, position);
         items_changed (position, 0, 1);
     }
 
-    public Akira.Lib.Models.CanvasItem? remove_at (int position) {
+    public Model? remove_at (int position) {
         var item = list.nth_data (position);
         list.remove (item);
 
         items_changed (position, 1, 0);
 
-        return item.item;
+        return item;
     }
 
     public async void clear () {
@@ -113,8 +95,31 @@ public class Akira.Models.ListModel : GLib.Object, GLib.ListModel {
         });
     }
 
-    public void sort (CompareFunc<Akira.Models.ItemModel?> sort_fn) {
+    public void sort (CompareFunc<Model> sort_fn) {
         list.sort (sort_fn);
         items_changed (0, list.length (), list.length ());
+    }
+
+    public Iterator<Model> iterator () {
+        return new Iterator<Model> (this);
+    }
+
+    public class Iterator<Model> {
+        private int index;
+        private int length;
+        private ListModel<Model> model;
+
+        public Iterator (ListModel<Model> model) {
+            this.model = model;
+            this.length = (int) model.list.length ();
+        }
+
+        public bool next () {
+            return index < length;
+        }
+
+        public Model get () {
+            return model.list.nth_data (this.index++);
+        }
     }
 }
