@@ -46,24 +46,24 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
     public Gtk.ListBox container;
     public int layers_count { get; set; default = 0; }
 
-    public Akira.Lib.Models.CanvasArtboard artboard_model { get; construct; }
+    public Akira.Lib.Models.CanvasArtboard model { get; construct; }
 
     private bool _editing { get; set; default = false; }
     public bool editing {
         get { return _editing; } set { _editing = value; }
     }
 
-    public Artboard (Akira.Window window, Akira.Lib.Models.CanvasArtboard artboard_model) {
+    public Artboard (Akira.Window window, Akira.Lib.Models.CanvasArtboard model) {
         Object (
             window: window,
-            artboard_model: artboard_model
+            model: model
         );
     }
 
     construct {
         get_style_context ().add_class ("artboard");
 
-        label = new Gtk.Label (artboard_model.name);
+        label = new Gtk.Label (model.name);
         label.get_style_context ().add_class ("artboard-name");
         label.halign = Gtk.Align.FILL;
         label.xalign = 0;
@@ -74,7 +74,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
         entry.expand = true;
         entry.visible = false;
         entry.no_show_all = true;
-        entry.set_text (artboard_model.name);
+        entry.set_text (model.name);
         entry.focus_in_event.connect (handle_focus_in);
         entry.focus_out_event.connect (handle_focus_out);
 
@@ -174,8 +174,8 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
             }
         });
 
-        artboard_model.notify["selected"].connect (() => {
-            if (artboard_model.selected) {
+        model.notify["selected"].connect (() => {
+            if (model.selected) {
               activate ();
               return;
             }
@@ -193,12 +193,10 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
             return false;
         });
 
-        container.bind_model (artboard_model.items, item => {
+        container.bind_model (model.items, item => {
             // TODO: Differentiate between layer and artboard
             // based upon item "type" of some sort
             var item_model = item as Akira.Lib.Models.CanvasItem;
-
-            debug (@"New item inside artboard: $(artboard_model.id) item: $(item_model.id)");
             return new Akira.Layouts.Partials.Layer (window, item_model);
         });
     }
@@ -405,7 +403,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
         }
 
         if (event.type == Gdk.EventType.BUTTON_PRESS) {
-            window.event_bus.request_add_item_to_selection (artboard_model);
+            window.event_bus.request_add_item_to_selection (model);
 
             return true;
         }
@@ -491,7 +489,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
             return;
         }
 
-        label.label = artboard_model.name = new_label;
+        label.label = model.name = new_label;
 
         window.event_bus.set_focus_on_canvas ();
     }

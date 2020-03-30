@@ -207,6 +207,9 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.Grid {
     }
 
     private void zebra_artboard (Akira.Layouts.Partials.Artboard artboard) {
+        // Handle zebra striped separately for each artboard
+        loop = 0;
+
         artboard.container.foreach (row => {
             if (!(row is Akira.Layouts.Partials.Layer)) {
                 return;

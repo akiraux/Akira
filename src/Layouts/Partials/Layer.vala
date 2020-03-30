@@ -26,7 +26,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
     public Akira.Layouts.Partials.Layer? layer_group { construct set; get; }
     public string layer_name { get; construct; }
     public string icon_name { get; construct; }
-    public Akira.Lib.Models.CanvasItem item_model { get; construct; }
+    public Akira.Lib.Models.CanvasItem model { get; construct; }
 
     private bool scroll_up = false;
     private bool scrolling = false;
@@ -84,15 +84,15 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 
     public Layer (
         Akira.Window window,
-        Akira.Lib.Models.CanvasItem item_model,
+        Akira.Lib.Models.CanvasItem model,
         Gtk.ListBox? list = null
     ) {
         Object (
             window: window,
-            item_model: item_model
+            model: model
         );
 
-        if (item_model.selected && list != null) {
+        if (model.selected && list != null) {
             list.select_row (this);
         }
     }
@@ -101,7 +101,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
         can_focus = true;
         get_style_context ().add_class ("layer");
 
-        label = new Gtk.Label (item_model.name);
+        label = new Gtk.Label (model.name);
         label.halign = Gtk.Align.FILL;
         label.xalign = 0;
         label.expand = true;
@@ -114,7 +114,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
         entry.expand = true;
         entry.visible = false;
         entry.no_show_all = true;
-        entry.set_text (item_model.name);
+        entry.set_text (model.name);
 
         entry.activate.connect (update_on_enter);
         entry.focus_out_event.connect (update_on_leave);
@@ -122,7 +122,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
         entry.focus_in_event.connect (handle_focus_in);
         entry.focus_out_event.connect (handle_focus_out);
 
-        icon = new Gtk.Image.from_icon_name (item_model.layer_icon, Gtk.IconSize.MENU);
+        icon = new Gtk.Image.from_icon_name (model.layer_icon, Gtk.IconSize.MENU);
         icon.margin_start = icon_name != "folder-symbolic" ? 16 : 0;
         icon.margin_end = 10;
         icon.vexpand = true;
@@ -199,7 +199,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 
         handle.enter_notify_event.connect (event => {
             get_style_context ().add_class ("hover");
-            window.event_bus.hover_over_layer (item_model);
+            window.event_bus.hover_over_layer (model);
             return false;
         });
 
@@ -209,8 +209,8 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
             return false;
         });
 
-        item_model.notify["selected"].connect (() => {
-            if (item_model.selected) {
+        model.notify["selected"].connect (() => {
+            if (model.selected) {
                 get_style_context ().remove_class ("hovered");
                 activate ();
                 return;
@@ -227,7 +227,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
     }
 
     private void on_hover_over_item (Lib.Models.CanvasItem? item) {
-        if (item == item_model) {
+        if (item == model) {
             get_style_context ().add_class ("hovered");
             return;
         }
@@ -485,7 +485,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
             // We need to reflect the status of the canvas item
             get_style_context ().remove_class ("hovered");
 
-            window.event_bus.request_add_item_to_selection (item_model);
+            window.event_bus.request_add_item_to_selection (model);
             window.event_bus.hover_over_layer (null);
 
             return true;
@@ -605,7 +605,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
             return;
         }
 
-        label.label = item_model.name = new_label;
+        label.label = model.name = new_label;
 
         window.event_bus.set_focus_on_canvas ();
     }
@@ -628,10 +628,10 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
             icon_locked.visible = ! active;
             icon_locked.no_show_all = active;
 
-            item_model.locked = active;
+            model.locked = active;
 
             if (active) {
-                window.event_bus.item_locked (item_model);
+                window.event_bus.item_locked (model);
             }
 
             window.event_bus.set_focus_on_canvas ();
@@ -650,7 +650,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
                 button_hidden.get_style_context ().remove_class ("show");
             }
 
-            item_model.set_visible (!active);
+            model.set_visible (!active);
 
             icon_visible.visible = active;
             icon_visible.no_show_all = ! active;

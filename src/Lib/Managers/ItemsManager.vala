@@ -55,7 +55,12 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         Models.CanvasItem? new_item;
         Models.CanvasArtboard? artboard = null;
 
-        root = window.main_window.main_canvas.canvas.get_root_item ();
+        // Populate root item here and not in the construct @since
+        // there the canvas is not yet defined, so we need to wait for
+        // the first item to be created to fill this variable
+        if (root == null) {
+            root = window.main_window.main_canvas.canvas.get_root_item ();
+        }
 
         foreach (Models.CanvasArtboard _artboard in artboards) {
             if (_artboard.is_inside (x, y)) {

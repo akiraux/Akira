@@ -14,7 +14,8 @@
 * You should have received a copy of the GNU General Public License
 * along with Akira. If not, see <https://www.gnu.org/licenses/>.
 *
-* Authored by: Giacomo Alberini <giacomoalbe@gmail.com>
+* Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
+* Authored by: Giacomo "giacomoalbe" Alberini <giacomoalbe@gmail.com>
 */
 
 public abstract class Akira.Models.BaseModel : GLib.Object {
