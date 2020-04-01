@@ -49,6 +49,7 @@ parts:
       snapcraftctl build
       sed -i 's|Icon=com.github.akiraux.akira|Icon=${SNAP}/usr/share/icons/hicolor/scalable/apps/com.github.akiraux.akira.svg|' ${SNAPCRAFT_PART_INSTALL}/usr/share/applications/com.github.akiraux.akira.desktop
     build-packages:
+      - gettext
       - libgtk-3-dev
       - valac
       - libgranite-dev
