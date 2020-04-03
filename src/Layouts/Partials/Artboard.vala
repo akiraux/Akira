@@ -411,30 +411,30 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
         return false;
     }
 
-    private bool delete_object () {
-        if (is_selected () && !editing) {
-            window.main_window.right_sidebar.layers_panel.remove (this);
+    //  private bool delete_object () {
+    //      if (is_selected () && !editing) {
+    //          window.main_window.right_sidebar.layers_panel.remove (this);
 
-            return true;
-        }
+    //          return true;
+    //      }
 
-        var layers = container.get_selected_rows ();
+    //      var layers = container.get_selected_rows ();
 
-        check_delete_object (layers);
+    //      check_delete_object (layers);
 
-        container.foreach (child => {
-            if (child is Akira.Layouts.Partials.Layer) {
-                Akira.Layouts.Partials.Layer layer = (Akira.Layouts.Partials.Layer) child;
-                if (layer.grouped) {
-                    check_delete_object (layer.container.get_selected_rows ());
-                }
-            }
-        });
+    //      container.foreach (child => {
+    //          if (child is Akira.Layouts.Partials.Layer) {
+    //              Akira.Layouts.Partials.Layer layer = (Akira.Layouts.Partials.Layer) child;
+    //              if (layer.grouped) {
+    //                  check_delete_object (layer.container.get_selected_rows ());
+    //              }
+    //          }
+    //      });
 
-        window.main_window.right_sidebar.layers_panel.reload_zebra ();
+    //      window.main_window.right_sidebar.layers_panel.reload_zebra ();
 
-        return true;
-    }
+    //      return true;
+    //  }
 
     public void check_delete_object (GLib.List<weak Gtk.ListBoxRow> layers) {
         layers.foreach (row => {

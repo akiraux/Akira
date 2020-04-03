@@ -89,13 +89,13 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.Grid {
         show_all ();
     }
 
-    private void build_drag_and_drop () {
-        Gtk.drag_dest_set (this, Gtk.DestDefaults.ALL, TARGET_ENTRIES, Gdk.DragAction.MOVE);
+    //  private void build_drag_and_drop () {
+    //      Gtk.drag_dest_set (this, Gtk.DestDefaults.ALL, TARGET_ENTRIES, Gdk.DragAction.MOVE);
 
-        // drag_data_received.connect (on_drag_data_received);
-        drag_motion.connect (on_drag_motion);
-        drag_leave.connect (on_drag_leave);
-    }
+    //      // drag_data_received.connect (on_drag_data_received);
+    //      drag_motion.connect (on_drag_motion);
+    //      drag_leave.connect (on_drag_leave);
+    //  }
 
     /*
     private void on_drag_data_received (

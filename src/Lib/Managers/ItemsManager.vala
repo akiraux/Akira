@@ -93,13 +93,13 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         if (new_item != null) {
             switch (new_item.item_type) {
                 case Akira.Lib.Models.CanvasItemType.ARTBOARD:
-                    artboards.add_item ((Models.CanvasArtboard) new_item);
+                    artboards.add_item.begin ((Models.CanvasArtboard) new_item);
                     break;
 
                 default:
                     if (new_item.artboard == null) {
                         // Add it to "free items"
-                        free_items.add_item (new_item, false);
+                        free_items.add_item.begin (new_item, false);
                     }
 
                     break;
@@ -113,19 +113,19 @@ public class Akira.Lib.Managers.ItemsManager : Object {
     }
 
     public void add_item (Akira.Lib.Models.CanvasItem item) {
-        free_items.add_item (item, false);
+        free_items.add_item.begin (item, false);
         window.event_bus.file_edited ();
     }
 
     public void on_request_delete_item (Lib.Models.CanvasItem item) {
         switch (item.item_type) {
             case Akira.Lib.Models.CanvasItemType.ARTBOARD:
-                artboards.remove_item (item as Models.CanvasArtboard);
+                artboards.remove_item.begin (item as Models.CanvasArtboard);
                 break;
 
             default:
                 if (item.artboard == null) {
-                    free_items.remove_item (item);
+                    free_items.remove_item.begin (item);
                 }
 
                 break;
