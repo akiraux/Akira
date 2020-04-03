@@ -19,7 +19,7 @@
 * Authored by: Alessandro "alecaddd" Castellani <castellani.ale@gmail.com>
 */
 
-public class Akira.Models.BordersItemModel : Models.ItemModel {
+public class Akira.Models.BordersItemModel : Models.BaseModel {
     public string color {
         owned get {
             return item.border_color.to_string ();
@@ -60,7 +60,7 @@ public class Akira.Models.BordersItemModel : Models.ItemModel {
 
     public BordersItemModel (
         Lib.Models.CanvasItem item,
-        Akira.Models.ListModel list_model
+        Akira.Models.ListModel<Akira.Models.BordersItemModel> list_model
     ) {
         Object (
             item: item,

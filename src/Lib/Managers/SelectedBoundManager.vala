@@ -22,6 +22,7 @@
 
 public class Akira.Lib.Managers.SelectedBoundManager : Object {
     public weak Akira.Lib.Canvas canvas { get; construct; }
+    public weak Akira.Window window { get; construct; }
 
     private unowned List<Models.CanvasItem> _selected_items;
     public unowned List<Models.CanvasItem> selected_items {
@@ -44,7 +45,8 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
 
     public SelectedBoundManager (Akira.Lib.Canvas canvas) {
         Object (
-            canvas: canvas
+            canvas: canvas,
+            window: canvas.window
         );
 
         canvas.window.event_bus.change_z_selected.connect (change_z_selected);
@@ -186,27 +188,43 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         }
 
         Models.CanvasItem selected_item = selected_items.nth_data (0);
-        var root_item = canvas.get_root_item ();
-        var pos_selected = root_item.find_child (selected_item);
+
+        int items_count = window.items_manager.get_free_items_count ();
+        int pos_selected = items_count - 1 - window.items_manager.get_item_position (selected_item);
 
         // Interrupt if item position doesn't exist.
         if (pos_selected == -1) {
             return;
         }
 
-        int target_item_pos;
-        if (total) {
-            // Account for nobs and select effect.
-            target_item_pos = raise ? (root_item.get_n_children () - 11): 0;
+        int target_position = -1;
+
+        if (raise) {
+            if (pos_selected < (items_count - 1)) {
+                target_position = pos_selected + 1;
+            }
+
+            if (total) {
+                target_position = items_count - 1;
+            }
         } else {
-            target_item_pos = pos_selected + (raise ? 1 : -1);
+            if (pos_selected > 0) {
+                target_position = pos_selected - 1;
+            }
+
+            if (total) {
+                target_position = 0;
+            }
         }
 
-        var target_item = root_item.get_child (target_item_pos);
-        // Don't change z-index if the target item is not an a CanvasItem (eg. nob or select_effect).
-        if (target_item == null || (!(target_item is Models.CanvasItem) && !total)) {
+        if (target_position == -1) {
+            // Invalid position, return
             return;
         }
+
+        Models.CanvasItem target_item = window.items_manager.get_item_at_z_index (target_position);
+
+        window.items_manager.swap_items (pos_selected, target_position);
 
         if (raise) {
             selected_item.raise (target_item);

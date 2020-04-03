@@ -86,6 +86,12 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
         return _coord;
     }
 
+    public virtual void set_visible (bool visible) {
+        this.visibility = visible
+            ? Goo.CanvasItemVisibility.VISIBLE
+            : Goo.CanvasItemVisibility.INVISIBLE;
+    }
+
     public void delete () {
         if (this.artboard != null) {
             this.artboard.remove_item (this);
@@ -124,12 +130,15 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
 
         var canvas_item = item as Models.CanvasItem;
 
+        // Populate the name with the item's id
+        // to show it when added to the LayersPanel
+        canvas_item.name = canvas_item.id;
+
         if (canvas_item.artboard != null) {
             canvas_item.notify.connect (() => {
                 canvas_item.artboard.changed (true);
             });
         }
-
     }
 
     public static void update_z_index (Goo.CanvasItem item) {

@@ -39,15 +39,12 @@ public class Akira.FillsItemTest : Akira.TestSuite {
             // TRUE: The canvas was properly generated.
             assert (canvas is Akira.Lib.Canvas);
 
-            var root = canvas.get_root_item ();
             var list_model = window.main_window.left_sidebar.fills_panel.list_model;
 
             // Create 1000 Items and quickly select/deselect them to stress test the canvas.
             for (var i = 0; i < 10; i++) {
-                var item = new Akira.Lib.Models.CanvasRect (
-                    10, 10, 10, 10, 1, Gdk.RGBA (), Gdk.RGBA (), root);
-
-                item.set ("parent", root);
+                window.items_manager.set_item_to_insert ("rectangle");
+                var item = window.items_manager.insert_item (10, 10);
 
                 // We don't need to set any other parameter or create other widgets like the layer
                 // panel since we're only interested in testing the selection effect and the fill model.

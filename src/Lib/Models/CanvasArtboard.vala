@@ -82,7 +82,7 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
 
     // Artboard related properties
     private Cairo.TextExtents label_extents;
-    public List<Models.CanvasItem> items;
+    public Akira.Models.ListModel<Models.CanvasItem> items;
     public new Akira.Lib.Canvas canvas { get; set; }
     public Models.CanvasArtboard? artboard { get; set; }
     public double relative_x { get; set; }
@@ -132,15 +132,15 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
         get_label_extent ();
 
         // Init items list
-        items = new List<Models.CanvasItem> ();
+        items = new Akira.Models.ListModel<Models.CanvasItem> ();
     }
 
     public uint get_items_length () {
-        return this.items.length ();
+        return items.get_n_items ();
     }
 
     public void remove_item (Models.CanvasItem item) {
-        items.remove (item);
+        items.remove_item.begin (item);
     }
 
     public void remove_all_items () {
@@ -148,19 +148,19 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
 
         while (items != null) {
             // Get the new head of the list
-            item = items.nth_data (0);
+            item = items.get_item (0) as Lib.Models.CanvasItem;
 
             canvas.window.event_bus.request_delete_item (item);
         }
 
-        items = new List<Models.CanvasItem> ();
+        items = new Akira.Models.ListModel<Models.CanvasItem> ();
     }
 
     public bool is_inside (double x, double y) {
-        return x <= this.bounds.x2
-            && x >= this.bounds.x1
-            && y >= this.bounds.y1
-            && y <= this.bounds.y2;
+        return x <= bounds.x2
+            && x >= bounds.x1
+            && y >= bounds.y1
+            && y <= bounds.y2;
     }
 
     public void add_child (Goo.CanvasItem item, int position = -1) {
@@ -170,7 +170,7 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
             return;
         }
 
-        this.items.prepend (canvas_item);
+        items.add_item.begin (canvas_item, false);
         item.set_parent (this);
 
         request_update ();
@@ -192,10 +192,10 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
     }
 
     public override void simple_update (Cairo.Context cr) {
-        this.bounds.x1 = x;
-        this.bounds.y1 = y - label_extents.height - LABEL_BOTTOM_PADDING;
-        this.bounds.x2 = x + width;
-        this.bounds.y2 = y + height;
+        bounds.x1 = x;
+        bounds.y1 = y - label_extents.height - LABEL_BOTTOM_PADDING;
+        bounds.x2 = x + width;
+        bounds.y2 = y + height;
     }
 
     public override void simple_paint (Cairo.Context cr, Goo.CanvasBounds bounds) {
@@ -224,8 +224,8 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
         cr.rectangle (x, y, width, height);
         cr.fill ();
 
-        if (items.length () > 0) {
-            foreach (var item in items) {
+        if (items.get_n_items () > 0) {
+            foreach (Lib.Models.CanvasItem item in items) {
                 cr.save ();
 
                 cr.transform (item.compute_transform (Cairo.Matrix.identity ()));
@@ -246,6 +246,7 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
         // over the Artboard label
         return y < 0
             && y > - (label_extents.height + LABEL_BOTTOM_PADDING)
+            && x > 0
             && x < (label_extents.width);
     }
 
@@ -263,7 +264,7 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
             found_items.append (this);
         }
 
-        foreach (var item in items) {
+        foreach (Lib.Models.CanvasItem item in items) {
             var item_x = x;
             var item_y = y;
 

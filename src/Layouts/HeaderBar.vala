@@ -435,22 +435,18 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
             return;
         }
 
-        var root_item = selected_item.get_canvas ().get_root_item ();
-        var item_position = root_item.find_child (selected_item);
+        var item_position = window.items_manager.get_item_z_index (selected_item);
+
         if (item_position == 0) {
             move_down.sensitive = false;
             move_bottom.sensitive = false;
         }
 
         // Account for nobs and select effect.
-        var top_position = root_item.get_n_children () - (selected ? 1 : 11);
-        if (item_position == top_position) {
+        if (item_position == window.items_manager.get_item_top_position ()) {
             move_up.sensitive = false;
             move_top.sensitive = false;
         }
-
-        //  debug (item_position.to_string ());
-        //  debug (top_position.to_string ());
     }
 
     private Gtk.ModelButton create_model_button (string text, string? icon, string? accels = null) {

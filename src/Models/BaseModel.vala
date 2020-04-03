@@ -14,10 +14,11 @@
 * You should have received a copy of the GNU General Public License
 * along with Akira. If not, see <https://www.gnu.org/licenses/>.
 *
-* Authored by: Alessandro "alecaddd" Castellani <castellani.ale@gmail.com>
+* Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
+* Authored by: Giacomo "giacomoalbe" Alberini <giacomoalbe@gmail.com>
 */
 
-public abstract class Akira.Models.ItemModel : GLib.Object {
+public abstract class Akira.Models.BaseModel : GLib.Object {
     public Lib.Models.CanvasItem item { get; construct; }
-    public Akira.Models.ListModel list_model { get; set; }
+    public Akira.Models.ListModel<Akira.Models.BaseModel> list_model { get; set; }
 }
