@@ -225,7 +225,14 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
         cr.fill ();
 
         if (items.get_n_items () > 0) {
-            foreach (Lib.Models.CanvasItem item in items) {
+            var items_length = items.get_n_items ();
+
+            // Painting items in reversed order in order to
+            // print last item inserted (top of the stack) on top
+            // of the items inserted before
+            for (var i = 0; i < items_length; i++) {
+                var item = items.nth_data (items_length - 1 - i);
+
                 cr.save ();
 
                 cr.transform (item.compute_transform (Cairo.Matrix.identity ()));
