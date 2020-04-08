@@ -231,7 +231,7 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
             // print last item inserted (top of the stack) on top
             // of the items inserted before
             for (var i = 0; i < items_length; i++) {
-                var item = items.nth_data (items_length - 1 - i);
+                var item = items[items_length - 1 - i];
 
                 cr.save ();
 

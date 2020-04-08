@@ -189,6 +189,11 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
 
         Models.CanvasItem selected_item = selected_items.nth_data (0);
 
+        // Cannot move artboard z-index wise
+        if (selected_item is Models.CanvasArtboard) {
+            return;
+        }
+
         int items_count = window.items_manager.get_free_items_count ();
         int pos_selected = items_count - 1 - window.items_manager.get_item_position (selected_item);
 

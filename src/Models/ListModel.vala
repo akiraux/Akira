@@ -35,8 +35,8 @@ public class Akira.Models.ListModel<Model> : GLib.Object, GLib.ListModel {
         return list.nth_data (position) as Object;
     }
 
-    public Model? nth_data (uint position) {
-        return list.nth_data (position);
+    public new Model get (uint index) {
+        return list.nth_data (index);
     }
 
     public Type get_item_type () {

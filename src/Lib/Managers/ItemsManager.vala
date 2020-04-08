@@ -134,7 +134,6 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         item.delete ();
         window.event_bus.item_deleted (item);
         window.event_bus.file_edited ();
-
     }
 
     public Models.CanvasItem add_artboard (double x, double y) {
