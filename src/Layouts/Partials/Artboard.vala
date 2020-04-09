@@ -197,7 +197,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
             // TODO: Differentiate between layer and artboard
             // based upon item "type" of some sort
             var item_model = item as Akira.Lib.Models.CanvasItem;
-            return new Akira.Layouts.Partials.Layer (window, item_model);
+            return new Akira.Layouts.Partials.Layer (window, item_model, container);
         });
     }
 

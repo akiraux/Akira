@@ -194,8 +194,17 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
             return;
         }
 
-        int items_count = window.items_manager.get_free_items_count ();
-        int pos_selected = items_count - 1 - window.items_manager.get_item_position (selected_item);
+        int items_count = 0;
+        int pos_selected = -1;
+
+        if (selected_item.artboard != null) {
+            // Inside an artboard
+            items_count = (int) selected_item.artboard.items.get_n_items ();
+            pos_selected = items_count - 1 - selected_item.artboard.items.index (selected_item);
+        } else {
+            items_count = window.items_manager.get_free_items_count ();
+            pos_selected = items_count - 1 - window.items_manager.get_item_position (selected_item);
+        }
 
         // Interrupt if item position doesn't exist.
         if (pos_selected == -1) {
@@ -227,9 +236,28 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
             return;
         }
 
-        Models.CanvasItem target_item = window.items_manager.get_item_at_z_index (target_position);
+        Models.CanvasItem target_item = null;
 
-        window.items_manager.swap_items (pos_selected, target_position);
+        // z-index is the exact opposite of items placement
+        // inside the free_items list
+        // last in is the topmost element
+        var source = items_count - 1 - pos_selected;
+        var target = items_count - 1 - target_position;
+
+        if (selected_item.artboard != null) {
+            selected_item.artboard.items.swap_items (source, target);
+
+            canvas.window.event_bus.z_selected_changed ();
+            selected_item.artboard.changed (true);
+
+            // There is no need to raise or lower the selection
+            // since the z stacking is done inside the paint method
+            // and it is calculated based on the artboard's children list index
+            return;
+        }
+
+        target_item = window.items_manager.get_item_at_z_index (target_position);
+        window.items_manager.free_items.swap_items (source, target);
 
         if (raise) {
             selected_item.raise (target_item);

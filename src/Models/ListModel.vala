@@ -79,6 +79,13 @@ public class Akira.Models.ListModel<Model> : GLib.Object, GLib.ListModel {
         items_changed (position, 1, 0);
     }
 
+    public void swap_items (int source_index, int target_index) {
+        // Remove item at source position
+        var item_to_swap = remove_at (source_index);
+        // Insert item at target position
+        insert_at (target_index, item_to_swap);
+    }
+
     public void insert_at (int position, Model item) {
         list.insert (item, position);
         items_changed (position, 0, 1);
