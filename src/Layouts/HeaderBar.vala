@@ -445,7 +445,7 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
         }
 
         // Account for nobs and select effect.
-        if (item_position == window.items_manager.get_item_top_position ()) {
+        if (item_position == window.items_manager.get_item_top_position (selected_item)) {
             move_up.sensitive = false;
             move_top.sensitive = false;
         }
