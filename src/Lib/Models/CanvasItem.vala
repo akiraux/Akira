@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2019-202 Alecaddd (https://alecaddd.com)
+* Copyright (c) 2019-2020 Alecaddd (https://alecaddd.com)
 *
 * This file is part of Akira.
 *
@@ -93,13 +93,9 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
     }
 
     public void delete () {
-        if (this.artboard != null) {
+        if (this.artboard != null && !(this is Models.CanvasArtboard)) {
             this.artboard.remove_item (this);
-        }
-
-
-        if (this is Models.CanvasArtboard) {
-            (this as Models.CanvasArtboard).remove_all_items ();
+            return;
         }
 
         remove ();
