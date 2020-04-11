@@ -35,6 +35,10 @@ public class Akira.Models.ListModel<Model> : GLib.Object, GLib.ListModel {
         return list.nth_data (position) as Object;
     }
 
+    public new Model get (uint index) {
+        return list.nth_data (index);
+    }
+
     public Type get_item_type () {
         return typeof (Model);
     }
@@ -73,6 +77,13 @@ public class Akira.Models.ListModel<Model> : GLib.Object, GLib.ListModel {
 
         list.remove (model);
         items_changed (position, 1, 0);
+    }
+
+    public void swap_items (int source_index, int target_index) {
+        // Remove item at source position
+        var item_to_swap = remove_at (source_index);
+        // Insert item at target position
+        insert_at (target_index, item_to_swap);
     }
 
     public void insert_at (int position, Model item) {

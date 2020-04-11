@@ -210,10 +210,19 @@ public class Akira.Lib.Managers.ItemsManager : Object {
     }
 
     public int get_item_z_index (Models.CanvasItem item) {
+        if (item.artboard != null) {
+            var items_count = (int) item.artboard.items.get_n_items ();
+            return items_count - 1 - item.artboard.items.index (item);
+        }
+
         return get_free_items_count () - 1 - free_items.index (item);
     }
 
-    public int get_item_top_position () {
+    public int get_item_top_position (Models.CanvasItem item) {
+        if (item.artboard != null) {
+            return (int) item.artboard.items.get_n_items () - 1;
+        }
+
         return get_free_items_count () - 1;
     }
 
