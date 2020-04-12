@@ -20,7 +20,7 @@
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
 
-public class Akira.Lib.Models.CanvasImage : Goo.CanvasImage, CanvasItem {
+public class Akira.Lib.Models.CanvasImage : Goo.CanvasImage, Models.CanvasItem {
     // Identifiers.
     public Models.CanvasItemType item_type { get; set; }
     public string id { get; set; }
@@ -31,7 +31,6 @@ public class Akira.Lib.Models.CanvasImage : Goo.CanvasImage, CanvasItem {
         get {
             return alpha * 100.0;
         }
-
         set {
             set ("alpha", value / 100.0);
         }
@@ -75,13 +74,16 @@ public class Akira.Lib.Models.CanvasImage : Goo.CanvasImage, CanvasItem {
     public double initial_relative_x { get; set; }
     public double initial_relative_y { get; set; }
 
-    public CanvasImage (Akira.Services.ImageProvider provider, Goo.CanvasItem? parent = null) {
-        Object (
-            parent: parent
-        );
-
+    public CanvasImage (
+        double _x = 0,
+        double _y = 0,
+        Services.ImageProvider provider,
+        Goo.CanvasItem? _parent = null,
+        Models.CanvasArtboard? _artboard = null
+    ) {
+        artboard = _artboard;
+        parent = _artboard != null ? _artboard : _parent;
         canvas = parent.get_canvas () as Akira.Lib.Canvas;
-        parent.add_child (this, -1);
 
         item_type = Models.CanvasItemType.IMAGE;
         id = Models.CanvasItem.create_item_id (this);
@@ -91,9 +93,13 @@ public class Akira.Lib.Models.CanvasImage : Goo.CanvasImage, CanvasItem {
         height = 1;
         x = 0;
         y = 0;
+        relative_x = 0;
+        relative_y = 0;
         scale_to_fit = true;
 
         set_transform (Cairo.Matrix.identity ());
+
+        position_item (_x, _y);
 
         provider.get_pixbuf.begin (-1, -1, (obj, res) => {
             try {

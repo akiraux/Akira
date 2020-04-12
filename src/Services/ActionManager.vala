@@ -288,25 +288,16 @@ public class Akira.Services.ActionManager : Object {
 
     private void on_choose_image_response (Gtk.FileChooserNative dialog, int response_id) {
         window.event_bus.request_change_mode (Akira.Lib.Canvas.EditMode.MODE_SELECTION);
+
         switch (response_id) {
             case Gtk.ResponseType.ACCEPT:
             case Gtk.ResponseType.OK:
                 SList<File> files = dialog.get_files ();
-                weak Akira.Lib.Canvas canvas = window.main_window.main_canvas.canvas;
                 files.@foreach ((file) => {
                     var provider = new Akira.Services.FileImageProvider (file);
-                    var item = new Akira.Lib.Models.CanvasImage (
-                        provider, canvas.get_root_item ()
-                    );
-                    var select = files.index (file) + 1 == files.length () ? true : false;
-
-                    canvas.insert_item_default (item, select);
-                    canvas.window.event_bus.item_inserted (item);
+                    window.items_manager.insert_image (provider);
                 });
-
                 break;
-        default:
-            break;
         }
     }
 
