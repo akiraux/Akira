@@ -86,7 +86,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
     ) {
         udpate_default_values ();
 
-        Models.CanvasItem? new_item;
+        Models.CanvasItem? new_item = null;
         Models.CanvasArtboard? artboard = null;
 
         // Populate root item here and not in the construct @since
@@ -122,10 +122,6 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             case Models.CanvasItemType.IMAGE:
                 new_item = add_image (x, y, provider, root, artboard);
                 break;
-
-            default:
-                new_item = null;
-                break;
         }
 
         if (new_item != null) {
@@ -139,7 +135,6 @@ public class Akira.Lib.Managers.ItemsManager : Object {
                         // Add it to "free items"
                         free_items.add_item.begin (new_item, false);
                     }
-
                     break;
             }
 
@@ -184,7 +179,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
     }
 
     public Models.CanvasItem add_rect (double x, double y, Goo.CanvasItem parent, Models.CanvasArtboard? artboard) {
-        var rect = new Models.CanvasRect (
+        return new Models.CanvasRect (
             Utils.AffineTransform.fix_size (x),
             Utils.AffineTransform.fix_size (y),
             0.0,
@@ -193,14 +188,11 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             border_color,
             fill_color,
             parent,
-            artboard
-            );
-
-        return rect;
+            artboard);
     }
 
     public Models.CanvasEllipse add_ellipse (double x, double y, Goo.CanvasItem parent, Models.CanvasArtboard? artboard) {
-        var ellipse = new Models.CanvasEllipse (
+        return new Models.CanvasEllipse (
             Utils.AffineTransform.fix_size (x),
             Utils.AffineTransform.fix_size (y),
             0.0,
@@ -209,14 +201,11 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             border_color,
             fill_color,
             parent,
-            artboard
-            );
-
-        return ellipse;
+            artboard);
     }
 
     public Models.CanvasText add_text (double x, double y, Goo.CanvasItem parent, Models.CanvasArtboard? artboard) {
-        var text = new Models.CanvasText (
+        return new Models.CanvasText (
             "Akira is awesome :)",
             Utils.AffineTransform.fix_size (x),
             Utils.AffineTransform.fix_size (y),
@@ -225,10 +214,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             Goo.CanvasAnchorType.NW,
             "Open Sans 18",
             parent,
-            artboard
-            );
-
-        return text;
+            artboard);
     }
 
     public Models.CanvasImage add_image (
@@ -238,14 +224,12 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         Goo.CanvasItem parent,
         Models.CanvasArtboard? artboard
     ) {
-        var image = new Models.CanvasImage (
+        return new Models.CanvasImage (
             Utils.AffineTransform.fix_size (x),
             Utils.AffineTransform.fix_size (y),
             provider,
             parent,
             artboard);
-
-        return image;
     }
 
     public int get_item_position (Lib.Models.CanvasItem item) {
@@ -258,7 +242,6 @@ public class Akira.Lib.Managers.ItemsManager : Object {
 
     public Lib.Models.CanvasItem get_item_at_z_index (uint z_index) {
         var item_position = free_items.get_n_items () - 1 - z_index;
-
         var item_model = free_items.get_item (item_position) as Akira.Lib.Models.CanvasItem;
 
         return item_model;
@@ -372,12 +355,15 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         window.event_bus.z_selected_changed ();
     }
 
-    // Create an item loaded from an opened file.
+    /*
+     * Create an item loaded from an opened file.
+     *
+     * @param Json.Object obj - The json object containing the item to load.
+     */
     public void load_item (Json.Object obj) {
         udpate_default_values ();
 
         Models.CanvasItem? item = null;
-        Models.CanvasArtboard? artboard = null;
 
         var transform = obj.get_member ("transform").get_object ();
         var pos_x = transform.get_double_member ("x0");
@@ -385,13 +371,12 @@ public class Akira.Lib.Managers.ItemsManager : Object {
 
         // If item is inside an artboard update the coordinates accordingly.
         if (obj.has_member ("artboard")) {
-            foreach (var _artboard in artboards) {
-                if (_artboard.id == obj.get_string_member ("artboard")) {
+            foreach (var artboard in artboards) {
+                if (artboard.id == obj.get_string_member ("artboard")) {
                     var matrix = Cairo.Matrix.identity ();
-                    _artboard.get_transform (out matrix);
+                    artboard.get_transform (out matrix);
                     pos_x = matrix.x0 + obj.get_double_member ("initial-relative-x");
                     pos_y = matrix.y0 + obj.get_double_member ("initial-relative-y");
-                    artboard = _artboard;
                     break;
                 }
             }
@@ -399,68 +384,36 @@ public class Akira.Lib.Managers.ItemsManager : Object {
 
         switch (obj.get_string_member ("type")) {
             case "AkiraLibModelsCanvasRect":
-                item = new Models.CanvasRect (
-                    pos_x,
-                    pos_y,
-                    0.0,
-                    0.0,
-                    border_size,
-                    border_color,
-                    fill_color,
-                    root,
-                    artboard
-                    );
+                insert_type = Models.CanvasItemType.RECT;
+                item = insert_item (pos_x, pos_y);
                 break;
 
             case "AkiraLibModelsCanvasEllipse":
-                item = new Models.CanvasEllipse (
-                    pos_x,
-                    pos_y,
-                    0.0,
-                    0.0,
-                    border_size,
-                    border_color,
-                    fill_color,
-                    root,
-                    artboard
-                    );
+                insert_type = Models.CanvasItemType.ELLIPSE;
+                item = insert_item (pos_x, pos_y);
                 break;
 
             case "AkiraLibModelsCanvasText":
-                item = new Models.CanvasText (
-                    "Add text here",
-                    pos_x,
-                    pos_y,
-                    200,
-                    25f,
-                    Goo.CanvasAnchorType.NW,
-                    "Open Sans 18",
-                    root,
-                    artboard
-                    );
+                insert_type = Models.CanvasItemType.TEXT;
+                item = insert_item (pos_x, pos_y);
                 break;
 
             case "AkiraLibModelsCanvasArtboard":
-                item = new Models.CanvasArtboard (pos_x, pos_y, root);
+                insert_type = Models.CanvasItemType.ARTBOARD;
+                item = insert_item (pos_x, pos_y);
                 break;
         }
 
-        if (item == null) {
-            return;
-        }
-
-        if (item is Akira.Lib.Models.CanvasArtboard) {
-            artboards.add_item.begin ((Models.CanvasArtboard) item);
-        } else {
-            free_items.add_item.begin (item, false);
-        }
-        window.event_bus.item_inserted (item);
         restore_attributes (item, obj);
-        window.event_bus.item_value_changed ();
-
         restore_selection (obj.get_boolean_member ("selected"), item);
     }
 
+    /*
+     * Restore the saved attributes of a loaded object.
+     *
+     * @param Models.CanvasItem item - The newly created item.
+     * @param Json.Object obj - The json object containing the item's attributes.
+     */
     private void restore_attributes (Models.CanvasItem item, Json.Object obj) {
         // Restore identifiers.
         if (obj.get_string_member ("name") != null) {
@@ -488,21 +441,11 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         }
 
         // Restore layer options.
-        //  var model = window.main_window.right_sidebar.layers_panel.list_model.find_item (item)
-        //      as Akira.Models.BaseModel;
-        //  if (model != null) {
-        //      model.is_visible = obj.get_int_member ("visibility") == 2;
-        //      model.is_locked = obj.get_boolean_member ("locked");
-        //  }
-
-        //  if (obj.has_member ("artboard")) {
-        //      var child_model = window.main_window.right_sidebar.layers_panel.item_model_map.
-        //          @get (item.artboard.id).get_child_item (item);
-        //      if (child_model != null) {
-        //          child_model.is_visible = obj.get_int_member ("visibility") == 2;
-        //          child_model.is_locked = obj.get_boolean_member ("locked");
-        //      }
-        //  }
+        item.locked = obj.get_boolean_member ("locked");
+        item.visibility =
+            obj.get_int_member ("visibility") == 2
+            ? Goo.CanvasItemVisibility.VISIBLE
+            : Goo.CanvasItemVisibility.INVISIBLE;
 
         // Restore fill and border.
         if (!(item is Models.CanvasArtboard)) {
@@ -526,6 +469,12 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         item.set ("initial-relative-y", obj.get_double_member ("initial-relative-y"));
     }
 
+    /*
+     * Restore the selected status of an object.
+     *
+     * @param bool selected - If the object is selected.
+     * @param Models.CanvasItem item - The newly created item.
+     */
     private void restore_selection (bool selected, Models.CanvasItem item) {
         if (selected) {
             window.main_window.main_canvas.canvas.selected_bound_manager.add_item_to_selection (item);
