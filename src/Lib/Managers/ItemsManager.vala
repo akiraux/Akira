@@ -450,9 +450,9 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         }
 
         if (item is Akira.Lib.Models.CanvasArtboard) {
-            artboards.append ((Models.CanvasArtboard) item);
+            artboards.add_item.begin ((Models.CanvasArtboard) item);
         } else {
-            items.append (item);
+            free_items.add_item.begin (item, false);
         }
         window.event_bus.item_inserted (item);
         restore_attributes (item, obj);
@@ -488,21 +488,21 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         }
 
         // Restore layer options.
-        var model = window.main_window.right_sidebar.layers_panel.list_model.find_item (item)
-            as Akira.Models.LayerModel;
-        if (model != null) {
-            model.is_visible = obj.get_int_member ("visibility") == 2;
-            model.is_locked = obj.get_boolean_member ("locked");
-        }
+        //  var model = window.main_window.right_sidebar.layers_panel.list_model.find_item (item)
+        //      as Akira.Models.BaseModel;
+        //  if (model != null) {
+        //      model.is_visible = obj.get_int_member ("visibility") == 2;
+        //      model.is_locked = obj.get_boolean_member ("locked");
+        //  }
 
-        if (obj.has_member ("artboard")) {
-            var child_model = window.main_window.right_sidebar.layers_panel.item_model_map.
-                @get (item.artboard.id).get_child_item (item);
-            if (child_model != null) {
-                child_model.is_visible = obj.get_int_member ("visibility") == 2;
-                child_model.is_locked = obj.get_boolean_member ("locked");
-            }
-        }
+        //  if (obj.has_member ("artboard")) {
+        //      var child_model = window.main_window.right_sidebar.layers_panel.item_model_map.
+        //          @get (item.artboard.id).get_child_item (item);
+        //      if (child_model != null) {
+        //          child_model.is_visible = obj.get_int_member ("visibility") == 2;
+        //          child_model.is_locked = obj.get_boolean_member ("locked");
+        //      }
+        //  }
 
         // Restore fill and border.
         if (!(item is Models.CanvasArtboard)) {

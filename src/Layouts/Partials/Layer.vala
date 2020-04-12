@@ -608,7 +608,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
     }
 
     private void lock_actions () {
-        button_locked.bind_property ("active", model.item, "locked",
+        button_locked.bind_property ("active", model, "locked",
             BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE);
 
         button_locked.toggled.connect (() => {
@@ -627,8 +627,6 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
             icon_locked.visible = ! active;
             icon_locked.no_show_all = active;
 
-            model.locked = active;
-
             if (active) {
                 window.event_bus.item_locked (model);
             }
@@ -638,7 +636,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
     }
 
     private void hide_actions () {
-        button_hidden.bind_property ("active", model.item, "visibility",
+        button_hidden.bind_property ("active", model, "visibility",
             BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE,
             (binding, srcval, ref targetval) => {
                 Goo.CanvasItemVisibility status = (bool) srcval.get_boolean ()
@@ -662,8 +660,6 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
             } else {
                 button_hidden.get_style_context ().remove_class ("show");
             }
-
-            model.set_visible (!active);
 
             icon_visible.visible = active;
             icon_visible.no_show_all = ! active;

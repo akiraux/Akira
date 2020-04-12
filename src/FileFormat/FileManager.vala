@@ -40,11 +40,13 @@ public class Akira.FileFormat.FileManager : Object {
         save_file_as ();
     }
 
-    //  Save as.
+    // Save as.
     public void save_file_as () {
-        var dialog = new Gtk.FileChooserNative (_("Save Akira file"), window,
-                                                Gtk.FileChooserAction.SAVE,
-                                                _("Save"), _("Cancel"));
+        var dialog = new Gtk.FileChooserNative (
+            _("Save Akira file"), window,
+            Gtk.FileChooserAction.SAVE,
+            _("Save"),
+            _("Cancel"));
 
         dialog.set_do_overwrite_confirmation (true);
         add_filters (dialog);

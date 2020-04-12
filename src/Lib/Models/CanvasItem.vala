@@ -88,12 +88,6 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
         return _coord;
     }
 
-    public virtual void set_visible (bool visible) {
-        this.visibility = visible
-            ? Goo.CanvasItemVisibility.VISIBLE
-            : Goo.CanvasItemVisibility.INVISIBLE;
-    }
-
     public void delete () {
         if (artboard != null) {
             artboard.remove_item (this);
