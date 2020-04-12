@@ -42,6 +42,6 @@
     background-color: @bg_color;
 }
 
-.artboard-container > .layer:last-child {
+.layer:last-child {
     border-bottom: 1px solid shade (@bg_color, 0.8);
 }

@@ -54,12 +54,12 @@ public class Akira.FileFormat.JsonContent : Object {
         builder.add_double_value (window.main_window.main_canvas.main_scroll.vadjustment.value);
 
         // Convert Artboards to JSON.
-        if (window.items_manager.artboards.length () > 0) {
+        if (window.items_manager.artboards.get_n_items () > 0) {
             save_artboards ();
         }
 
         // Convert Items to JSON.
-        if (window.items_manager.items.length () > 0) {
+        if (window.items_manager.free_items.get_n_items () > 0) {
             save_items ();
         }
     }
@@ -83,7 +83,7 @@ public class Akira.FileFormat.JsonContent : Object {
         builder.set_member_name ("items");
         builder.begin_array ();
 
-        foreach (var _item in window.items_manager.items) {
+        foreach (var _item in window.items_manager.free_items) {
             var item = new JsonObject (_item);
             builder.begin_object ();
             builder.set_member_name ("item");

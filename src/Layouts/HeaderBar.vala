@@ -431,31 +431,29 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
     }
 
     private void update_button_sensitivity (bool selected) {
-        move_up.sensitive = (selected_item != null);
-        move_down.sensitive = (selected_item != null);
-        move_top.sensitive = (selected_item != null);
-        move_bottom.sensitive = (selected_item != null);
+        var z_buttons_sensitive = selected_item != null && !(selected_item is Lib.Models.CanvasArtboard);
 
-        if (selected_item == null || selected_item.get_canvas () == null) {
+        move_up.sensitive = z_buttons_sensitive;
+        move_down.sensitive = z_buttons_sensitive;
+        move_top.sensitive = z_buttons_sensitive;
+        move_bottom.sensitive = z_buttons_sensitive;
+
+        if (!z_buttons_sensitive || selected_item.get_canvas () == null) {
             return;
         }
 
-        var root_item = selected_item.get_canvas ().get_root_item ();
-        var item_position = root_item.find_child (selected_item);
+        var item_position = window.items_manager.get_item_z_index (selected_item);
+
         if (item_position == 0) {
             move_down.sensitive = false;
             move_bottom.sensitive = false;
         }
 
         // Account for nobs and select effect.
-        var top_position = root_item.get_n_children () - (selected ? 1 : 11);
-        if (item_position == top_position) {
+        if (item_position == window.items_manager.get_item_top_position (selected_item)) {
             move_up.sensitive = false;
             move_top.sensitive = false;
         }
-
-        //  debug (item_position.to_string ());
-        //  debug (top_position.to_string ());
     }
 
     private Gtk.ModelButton create_model_button (string text, string? icon, string? accels = null) {

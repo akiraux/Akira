@@ -224,7 +224,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
             case EditMode.MODE_INSERT:
                 selected_bound_manager.reset_selection ();
 
-                var new_item = window.items_manager.insert_item (event);
+                var new_item = window.items_manager.insert_item (event.x, event.y);
 
                 selected_bound_manager.add_item_to_selection (new_item);
 

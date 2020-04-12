@@ -46,14 +46,14 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
     public Gtk.ListBox container;
     public int layers_count { get; set; default = 0; }
 
-    public Akira.Models.LayerModel model { get; construct; }
+    public Akira.Lib.Models.CanvasArtboard model { get; construct; }
 
     private bool _editing { get; set; default = false; }
     public bool editing {
         get { return _editing; } set { _editing = value; }
     }
 
-    public Artboard (Akira.Window window, Akira.Models.LayerModel model) {
+    public Artboard (Akira.Window window, Akira.Lib.Models.CanvasArtboard model) {
         Object (
             window: window,
             model: model
@@ -174,7 +174,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
             }
         });
 
-        model.item.notify["selected"].connect (() => {
+        model.notify["selected"].connect (() => {
             if (model.selected) {
               activate ();
               return;
@@ -196,9 +196,8 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
         container.bind_model (model.items, item => {
             // TODO: Differentiate between layer and artboard
             // based upon item "type" of some sort
-            var layer_model = (Akira.Models.LayerModel) item;
-
-            return new Akira.Layouts.Partials.Layer (window, layer_model);
+            var item_model = item as Akira.Lib.Models.CanvasItem;
+            return new Akira.Layouts.Partials.Layer (window, item_model, container);
         });
     }
 
@@ -404,7 +403,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
         }
 
         if (event.type == Gdk.EventType.BUTTON_PRESS) {
-            window.event_bus.request_add_item_to_selection (model.item);
+            window.event_bus.request_add_item_to_selection (model);
 
             return true;
         }
@@ -412,30 +411,30 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
         return false;
     }
 
-    private bool delete_object () {
-        if (is_selected () && !editing) {
-            window.main_window.right_sidebar.layers_panel.remove (this);
+    //  private bool delete_object () {
+    //      if (is_selected () && !editing) {
+    //          window.main_window.right_sidebar.layers_panel.remove (this);
 
-            return true;
-        }
+    //          return true;
+    //      }
 
-        var layers = container.get_selected_rows ();
+    //      var layers = container.get_selected_rows ();
 
-        check_delete_object (layers);
+    //      check_delete_object (layers);
 
-        container.foreach (child => {
-            if (child is Akira.Layouts.Partials.Layer) {
-                Akira.Layouts.Partials.Layer layer = (Akira.Layouts.Partials.Layer) child;
-                if (layer.grouped) {
-                    check_delete_object (layer.container.get_selected_rows ());
-                }
-            }
-        });
+    //      container.foreach (child => {
+    //          if (child is Akira.Layouts.Partials.Layer) {
+    //              Akira.Layouts.Partials.Layer layer = (Akira.Layouts.Partials.Layer) child;
+    //              if (layer.grouped) {
+    //                  check_delete_object (layer.container.get_selected_rows ());
+    //              }
+    //          }
+    //      });
 
-        window.main_window.right_sidebar.layers_panel.reload_zebra ();
+    //      window.main_window.right_sidebar.layers_panel.reload_zebra ();
 
-        return true;
-    }
+    //      return true;
+    //  }
 
     public void check_delete_object (GLib.List<weak Gtk.ListBoxRow> layers) {
         layers.foreach (row => {

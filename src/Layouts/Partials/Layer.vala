@@ -26,8 +26,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
     public Akira.Layouts.Partials.Layer? layer_group { get; construct set; }
     public string layer_name { get; construct; }
     public string icon_name { get; construct; }
-    public Goo.CanvasItemSimple item { get; construct; }
-    public Akira.Models.LayerModel model { get; construct; }
+    public Akira.Lib.Models.CanvasItem model { get; construct; }
 
     private bool scroll_up = false;
     private bool scrolling = false;
@@ -85,14 +84,17 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 
     public Layer (
         Akira.Window window,
-        Akira.Models.LayerModel model,
-        Layouts.Partials.Artboard? artboard = null
+        Akira.Lib.Models.CanvasItem model,
+        Gtk.ListBox? list = null
     ) {
         Object (
             window: window,
-            model: model,
-            artboard: artboard
+            model: model
         );
+
+        if (model.selected && list != null) {
+            list.select_row (this);
+        }
     }
 
     construct {
@@ -120,7 +122,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
         entry.focus_in_event.connect (handle_focus_in);
         entry.focus_out_event.connect (handle_focus_out);
 
-        icon = new Gtk.Image.from_icon_name (model.icon, Gtk.IconSize.MENU);
+        icon = new Gtk.Image.from_icon_name (model.layer_icon, Gtk.IconSize.MENU);
         icon.margin_start = icon_name != "folder-symbolic" ? 16 : 0;
         icon.margin_end = 10;
         icon.vexpand = true;
@@ -197,7 +199,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 
         handle.enter_notify_event.connect (event => {
             get_style_context ().add_class ("hover");
-            window.event_bus.hover_over_layer (model.item);
+            window.event_bus.hover_over_layer (model);
             return false;
         });
 
@@ -207,7 +209,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
             return false;
         });
 
-        model.item.notify["selected"].connect (() => {
+        model.notify["selected"].connect (() => {
             if (model.selected) {
                 get_style_context ().remove_class ("hovered");
                 activate ();
@@ -225,7 +227,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
     }
 
     private void on_hover_over_item (Lib.Models.CanvasItem? item) {
-        if (item == model.item) {
+        if (item == model) {
             get_style_context ().add_class ("hovered");
             return;
         }
@@ -371,10 +373,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
         }
 
         int row_index = get_index ();
-
-        var layers_panel = (parent as Akira.Layouts.Partials.LayersPanel);
-
-        var row = (Akira.Layouts.Partials.Layer) layers_panel.get_row_at_index (row_index);
+        var row = (Akira.Layouts.Partials.Layer) (parent as Gtk.ListBox).get_row_at_index (row_index);
         var last_adjust = 0;
         var group_y = 0;
 
@@ -483,7 +482,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
             // We need to reflect the status of the canvas item
             get_style_context ().remove_class ("hovered");
 
-            window.event_bus.request_add_item_to_selection (model.item);
+            window.event_bus.request_add_item_to_selection (model);
             window.event_bus.hover_over_layer (null);
 
             return true;
@@ -628,8 +627,10 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
             icon_locked.visible = ! active;
             icon_locked.no_show_all = active;
 
+            model.locked = active;
+
             if (active) {
-                window.event_bus.item_locked (model.item);
+                window.event_bus.item_locked (model);
             }
 
             window.event_bus.set_focus_on_canvas ();
@@ -661,6 +662,8 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
             } else {
                 button_hidden.get_style_context ().remove_class ("show");
             }
+
+            model.set_visible (!active);
 
             icon_visible.visible = active;
             icon_visible.no_show_all = ! active;

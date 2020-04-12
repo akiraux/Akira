@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2019-202 Alecaddd (https://alecaddd.com)
+* Copyright (c) 2019-2020 Alecaddd (https://alecaddd.com)
 *
 * This file is part of Akira.
 *
@@ -88,14 +88,16 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
         return _coord;
     }
 
+    public virtual void set_visible (bool visible) {
+        this.visibility = visible
+            ? Goo.CanvasItemVisibility.VISIBLE
+            : Goo.CanvasItemVisibility.INVISIBLE;
+    }
+
     public void delete () {
-        if (this.artboard != null) {
-            this.artboard.remove_item (this);
-        }
-
-
-        if (this is Models.CanvasArtboard) {
-            (this as Models.CanvasArtboard).remove_all_items ();
+        if (artboard != null) {
+            artboard.remove_item (this);
+            return;
         }
 
         remove ();
@@ -126,12 +128,15 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
 
         var canvas_item = item as Models.CanvasItem;
 
+        // Populate the name with the item's id
+        // to show it when added to the LayersPanel
+        canvas_item.name = canvas_item.id;
+
         if (canvas_item.artboard != null) {
             canvas_item.notify.connect (() => {
                 canvas_item.artboard.changed (true);
             });
         }
-
     }
 
     public static void update_z_index (Goo.CanvasItem item) {
@@ -165,7 +170,7 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
         double delta_x, double delta_y,
         double delta_x_accumulator = 0.0, double delta_y_accumulator = 0.0) {
 
-        if (this.artboard != null) {
+        if (artboard != null) {
             var transformed_delta_x = delta_x_accumulator;
             var transformed_delta_y = delta_y_accumulator;
 
@@ -209,8 +214,8 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
     }
 
     public virtual double get_real_coord (string coord_id) {
-        var offset_x = this.artboard == null ? 0 : relative_x;
-        var offset_y = this.artboard == null ? 0 : relative_y;
+        var offset_x = artboard == null ? 0 : relative_x;
+        var offset_y = artboard == null ? 0 : relative_y;
 
         var item_x = get_coords ("x") - offset_x;
         var item_y = get_coords ("y") - offset_y;
@@ -312,7 +317,7 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
         var item_y = relative_y;
 
         canvas.convert_from_item_space (
-            this.artboard,
+            artboard,
             ref item_x,
             ref item_y
             );
