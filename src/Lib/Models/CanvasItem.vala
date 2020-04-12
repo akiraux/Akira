@@ -122,8 +122,6 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
         item.set ("fill-alpha", 255);
         item.set ("stroke-alpha", 255);
 
-        update_z_index (item);
-
         var canvas_item = item as Models.CanvasItem;
 
         // Populate the name with the item's id
@@ -135,12 +133,6 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
                 canvas_item.artboard.changed (true);
             });
         }
-    }
-
-    public static void update_z_index (Goo.CanvasItem item) {
-        //var z_index = (item as Models.CanvasItem).canvas.get_root_item ().find_child (item);
-
-        //item.set ("z-index", z_index);
     }
 
     public virtual void position_item (double _x, double _y) {
@@ -156,7 +148,6 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
             relative_y = item_y_from_artboard;
         } else {
             parent.add_child (this, -1);
-
 
             // Keep the item always in the origin
             // move the entire coordinate system every time
@@ -175,7 +166,6 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
             this.relative_x = this.initial_relative_x + transformed_delta_x;
             this.relative_y = this.initial_relative_y + transformed_delta_y;
 
-
             return;
         }
 
@@ -189,7 +179,6 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
             get_transform (out transform);
         } else {
             artboard.get_transform (out transform);
-
             transform = compute_transform (transform);
         }
 

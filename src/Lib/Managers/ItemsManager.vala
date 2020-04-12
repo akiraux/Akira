@@ -10,11 +10,11 @@
 
  * Akira is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
 
  * You should have received a copy of the GNU General Public License
- * along with Akira.  If not, see <https://www.gnu.org/licenses/>.
+ * along with Akira. If not, see <https://www.gnu.org/licenses/>.
  *
  * Authored by: Giacomo Alberini <giacomoalbe@gmail.com>
  * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
@@ -49,7 +49,41 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         window.event_bus.change_item_z_index.connect (on_change_item_z_index);
     }
 
-    public Models.CanvasItem? insert_item (double x, double y) {
+    public void insert_image (Services.FileImageProvider provider) {
+        var selected_bound_manager = window.main_window.main_canvas.canvas.selected_bound_manager;
+
+        double start_x, start_y, scale, rotation;
+        start_x = Akira.Layouts.MainCanvas.CANVAS_SIZE / 2;
+        start_y = Akira.Layouts.MainCanvas.CANVAS_SIZE / 2;
+
+        if (selected_bound_manager.selected_items.length () > 0) {
+            var item = selected_bound_manager.selected_items.nth_data (0);
+
+            if (item.artboard == null) {
+                item.get_simple_transform (
+                    out start_x, out start_y, out scale, out rotation
+                );
+            } else {
+                item.artboard.get_simple_transform (
+                    out start_x, out start_y, out scale, out rotation
+                );
+                start_x += item.relative_x;
+                start_y += item.relative_y;
+            }
+        }
+
+        set_item_to_insert ("image");
+        var new_item = insert_item (start_x, start_y, provider);
+
+        selected_bound_manager.add_item_to_selection (new_item);
+        selected_bound_manager.set_initial_coordinates (start_x, start_y);
+    }
+
+    public Models.CanvasItem? insert_item (
+        double x,
+        double y,
+        Services.FileImageProvider? provider = null
+    ) {
         udpate_default_values ();
 
         Models.CanvasItem? new_item;
@@ -83,6 +117,10 @@ public class Akira.Lib.Managers.ItemsManager : Object {
 
             case Models.CanvasItemType.ARTBOARD:
                 new_item = add_artboard (x, y);
+                break;
+
+            case Models.CanvasItemType.IMAGE:
+                new_item = add_image (x, y, provider, root, artboard);
                 break;
 
             default:
@@ -193,6 +231,23 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         return text;
     }
 
+    public Models.CanvasImage add_image (
+        double x,
+        double y,
+        Services.FileImageProvider provider,
+        Goo.CanvasItem parent,
+        Models.CanvasArtboard? artboard
+    ) {
+        var image = new Models.CanvasImage (
+            Utils.AffineTransform.fix_size (x),
+            Utils.AffineTransform.fix_size (y),
+            provider,
+            parent,
+            artboard);
+
+        return image;
+    }
+
     public int get_item_position (Lib.Models.CanvasItem item) {
         if (item.artboard != null) {
             return -1;
@@ -246,6 +301,10 @@ public class Akira.Lib.Managers.ItemsManager : Object {
 
             case "artboard":
                 insert_type = Models.CanvasItemType.ARTBOARD;
+                break;
+
+            case "image":
+                insert_type = Models.CanvasItemType.IMAGE;
                 break;
         }
     }
