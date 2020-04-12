@@ -87,6 +87,7 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
     public Akira.Models.ListModel<Models.CanvasItem> items;
     public new Akira.Lib.Canvas canvas { get; set; }
     public Models.CanvasArtboard? artboard { get; set; }
+
     public double relative_x { get; set; }
     public double relative_y { get; set; }
 
