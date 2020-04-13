@@ -42,6 +42,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
     private double delta_y_accumulator;
     private double initial_width;
     private double initial_height;
+    private int initial_rotation;
 
     public SelectedBoundManager (Akira.Lib.Canvas canvas) {
         Object (
@@ -74,10 +75,12 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
             initial_event_x = event_x;
             initial_event_y = event_y;
 
-            // canvas.convert_to_item_space (selected_item, ref initial_event_x, ref initial_event_y);
-
             initial_width = selected_item.get_coords ("width");
             initial_height = selected_item.get_coords ("height");
+
+            if (selected_item.artboard != null) {
+                initial_rotation = (int) selected_item.rotation;
+            }
 
             return;
         }
@@ -111,6 +114,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
                 Utils.AffineTransform.rotate_from_event (
                     event_x, event_y,
                     initial_event_x, initial_event_y,
+                    initial_rotation,
                     selected_item
                 );
                 break;

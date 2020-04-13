@@ -286,10 +286,15 @@ public class Akira.Utils.AffineTransform : Object {
         double y,
         double initial_x,
         double initial_y,
+        int initial_rotation,
         CanvasItem selected_item
     ) {
         var canvas = selected_item.canvas as Akira.Lib.Canvas;
-        canvas.convert_to_item_space (selected_item, ref x, ref y);
+
+        var initial_x_relative = initial_x;
+        var initial_y_relative = initial_y;
+        var x_relative = x;
+        var y_relative = y;
 
         var initial_width = selected_item.get_coords ("width");
         var initial_height = selected_item.get_coords ("height");
@@ -297,26 +302,29 @@ public class Akira.Utils.AffineTransform : Object {
         var center_x = initial_width / 2;
         var center_y = initial_height / 2;
         var do_rotation = true;
-        double rotation_amount = 0;
+
+        if (selected_item.artboard != null) {
+            canvas.convert_to_item_space (selected_item.artboard, ref initial_x_relative, ref initial_y_relative);
+            canvas.convert_to_item_space (selected_item.artboard, ref x_relative, ref y_relative);
+
+            center_x += selected_item.relative_x;
+            center_y += selected_item.relative_y;
+        }
 
         var start_radians = GLib.Math.atan2 (
-            center_y - initial_y,
-            initial_x - center_x
+            center_y - initial_y_relative,
+            initial_x_relative - center_x
         );
 
-        double current_x, current_y, current_scale, current_rotation;
-        selected_item.get_simple_transform (out current_x, out current_y, out current_scale, out current_rotation);
-        var radians = GLib.Math.atan2 (center_y - y, x - center_x);
+        var radians = GLib.Math.atan2 (center_y - y_relative, x_relative - center_x);
         radians = start_radians - radians;
         var rotation = radians * (180 / Math.PI) + prev_rotation_difference;
-
-        initial_x = x;
-        initial_y = y;
 
         if (canvas.ctrl_is_pressed) {
             do_rotation = false;
         }
 
+        /*
         if (canvas.ctrl_is_pressed && rotation.abs () > ROTATION_FIXED_STEP) {
             do_rotation = true;
 
@@ -341,16 +349,17 @@ public class Akira.Utils.AffineTransform : Object {
             var prev_rotation = rotation;
             rotation = rotation > 0 ? rotation_amount : -rotation_amount;
             prev_rotation_difference = prev_rotation - rotation;
+        }*/
+
+        if (canvas.ctrl_is_pressed) {
+            do_rotation = (int) rotation % ROTATION_FIXED_STEP == 0;
         }
 
+
         if (do_rotation) {
-            canvas.convert_from_item_space (selected_item, ref initial_x, ref initial_y);
-            // Round rotation in order to avoid sub degree issue
-            rotation = GLib.Math.round (rotation);
             // Cap new_rotation to the [0, 360] range
-            var new_rotation = GLib.Math.fmod (selected_item.rotation + rotation, 360);
+            var new_rotation = (((int) rotation) + initial_rotation + 360) % 360;
             set_rotation (new_rotation, selected_item);
-            canvas.convert_to_item_space (selected_item, ref initial_x, ref initial_y);
         }
 
         // Reset rotation to prevent infinite rotation loops.
@@ -368,6 +377,25 @@ public class Akira.Utils.AffineTransform : Object {
     }
 
     public static void set_rotation (double rotation, CanvasItem item) {
+        double current_x, current_y, current_scale, current_rotation;
+
+        item.get_simple_transform (
+            out current_x,
+            out current_y,
+            out current_scale,
+            out current_rotation
+        );
+
+        item.set_simple_transform (
+            current_x,
+            current_y,
+            current_scale,
+            rotation
+        );
+
+        item.rotation = rotation;
+
+        /*
         var center_x = item.get_coords ("width") / 2;
         var center_y = item.get_coords ("height") / 2;
 
@@ -376,6 +404,7 @@ public class Akira.Utils.AffineTransform : Object {
         item.rotate (actual_rotation, center_x, center_y);
 
         item.rotation += actual_rotation;
+        */
     }
 
     public static void flip_item (bool clicked, CanvasItem item, double sx, double sy) {
@@ -409,5 +438,9 @@ public class Akira.Utils.AffineTransform : Object {
 
     public static double deg_to_rad (double deg) {
         return deg * Math.PI / 180.0;
+    }
+
+    public static double rad_to_deg (double rad) {
+        return rad / Math.PI * 180.0;
     }
 }
