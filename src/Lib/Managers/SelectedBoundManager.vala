@@ -78,9 +78,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
             initial_width = selected_item.get_coords ("width");
             initial_height = selected_item.get_coords ("height");
 
-            if (selected_item.artboard != null) {
-                initial_rotation = (int) selected_item.rotation;
-            }
+            initial_rotation = (int) selected_item.rotation;
 
             return;
         }

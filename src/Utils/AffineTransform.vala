@@ -28,8 +28,6 @@ public class Akira.Utils.AffineTransform : Object {
     private const int MIN_POS = 10;
     private const double ROTATION_FIXED_STEP = 15.0;
 
-    public static double prev_rotation_difference = 0.0;
-
     public static HashTable<string, double?> get_position (CanvasItem item) {
         HashTable<string, double?> array = new HashTable<string, double?> (str_hash, str_equal);
         double item_x = item.get_coords ("x");
@@ -309,6 +307,9 @@ public class Akira.Utils.AffineTransform : Object {
 
             center_x += selected_item.relative_x;
             center_y += selected_item.relative_y;
+        } else {
+            canvas.convert_to_item_space (selected_item, ref initial_x_relative, ref initial_y_relative);
+            canvas.convert_to_item_space (selected_item, ref x_relative, ref y_relative);
         }
 
         var start_radians = GLib.Math.atan2 (
@@ -318,38 +319,11 @@ public class Akira.Utils.AffineTransform : Object {
 
         var radians = GLib.Math.atan2 (center_y - y_relative, x_relative - center_x);
         radians = start_radians - radians;
-        var rotation = radians * (180 / Math.PI) + prev_rotation_difference;
+        var rotation = radians * (180 / Math.PI);
 
         if (canvas.ctrl_is_pressed) {
             do_rotation = false;
         }
-
-        /*
-        if (canvas.ctrl_is_pressed && rotation.abs () > ROTATION_FIXED_STEP) {
-            do_rotation = true;
-
-            // The rotation amount needs to take into consideration
-            // the current rotation in order to anchor the item to truly
-            // "fixed" rotation step instead of simply adding ROTATION_FIXED_STEP
-            // to the current rotation, which might lead to a situation in which you
-            // cannot "reset" item rotation to rounded values (0, 90, 180, ...) without
-            // manually resetting the rotation input field in the properties panel
-            var current_rotation_int = ((int) GLib.Math.round (current_rotation));
-
-            rotation_amount = ROTATION_FIXED_STEP;
-
-            // Strange glitch: when current_rotation == 30.0, the fmod
-            // function does not work properly.
-            // 30.00000 % 15.00000 != 0 => rotation_amount becomes 0.
-            // That's why here is used the int representation of current_rotation
-            if (current_rotation_int % ROTATION_FIXED_STEP != 0) {
-                rotation_amount -= GLib.Math.fmod (current_rotation, ROTATION_FIXED_STEP);
-            }
-
-            var prev_rotation = rotation;
-            rotation = rotation > 0 ? rotation_amount : -rotation_amount;
-            prev_rotation_difference = prev_rotation - rotation;
-        }*/
 
         if (canvas.ctrl_is_pressed) {
             do_rotation = (int) rotation % ROTATION_FIXED_STEP == 0;
@@ -361,9 +335,6 @@ public class Akira.Utils.AffineTransform : Object {
             var new_rotation = (((int) rotation) + initial_rotation + 360) % 360;
             set_rotation (new_rotation, selected_item);
         }
-
-        // Reset rotation to prevent infinite rotation loops.
-        prev_rotation_difference = 0.0;
     }
 
     public static void set_size (double width, double height, Goo.CanvasItem item) {
@@ -377,25 +348,13 @@ public class Akira.Utils.AffineTransform : Object {
     }
 
     public static void set_rotation (double rotation, CanvasItem item) {
-        double current_x, current_y, current_scale, current_rotation;
+        if (item.artboard != null) {
+            // Just update item's rotation, the CanvasArtboard paint
+            // method is in charge of doing all the necessary transformations
+            item.rotation = rotation;
+            return;
+        }
 
-        item.get_simple_transform (
-            out current_x,
-            out current_y,
-            out current_scale,
-            out current_rotation
-        );
-
-        item.set_simple_transform (
-            current_x,
-            current_y,
-            current_scale,
-            rotation
-        );
-
-        item.rotation = rotation;
-
-        /*
         var center_x = item.get_coords ("width") / 2;
         var center_y = item.get_coords ("height") / 2;
 
@@ -403,8 +362,7 @@ public class Akira.Utils.AffineTransform : Object {
 
         item.rotate (actual_rotation, center_x, center_y);
 
-        item.rotation += actual_rotation;
-        */
+        item.rotation = rotation;
     }
 
     public static void flip_item (bool clicked, CanvasItem item, double sx, double sy) {
