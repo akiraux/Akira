@@ -24,7 +24,6 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
     public weak Akira.Window window { get; construct; }
     public Akira.Layouts.Partials.Artboard? artboard { get; construct set; }
     public Akira.Layouts.Partials.Layer? layer_group { get; construct set; }
-    public string layer_name { get; construct; }
     public string icon_name { get; construct; }
     public Akira.Lib.Models.CanvasItem model { get; construct; }
 
@@ -101,26 +100,27 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
         can_focus = true;
         get_style_context ().add_class ("layer");
 
-        label = new Gtk.Label (model.name);
+        label = new Gtk.Label ("");
         label.halign = Gtk.Align.FILL;
         label.xalign = 0;
         label.expand = true;
         label.set_ellipsize (Pango.EllipsizeMode.END);
 
+        model.bind_property ("name", label, "label",
+            BindingFlags.SYNC_CREATE | BindingFlags.BIDIRECTIONAL);
+
         entry = new Gtk.Entry ();
-        entry.margin_top = 5;
-        entry.margin_bottom = 5;
+        entry.margin_top = entry.margin_bottom = 4;
         entry.margin_end = 10;
         entry.expand = true;
         entry.visible = false;
         entry.no_show_all = true;
-        entry.set_text (model.name);
+        entry.text = model.name;
 
         entry.activate.connect (update_on_enter);
-        entry.focus_out_event.connect (update_on_leave);
         entry.key_release_event.connect (update_on_escape);
         entry.focus_in_event.connect (handle_focus_in);
-        entry.focus_out_event.connect (handle_focus_out);
+        entry.focus_out_event.connect (update_on_leave);
 
         icon = new Gtk.Image.from_icon_name (model.layer_icon, Gtk.IconSize.MENU);
         icon.margin_start = icon_name != "folder-symbolic" ? 16 : 0;
@@ -457,6 +457,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 
     public bool on_click_event (Gdk.Event event) {
         if (event.type == Gdk.EventType.@2BUTTON_PRESS) {
+            entry.text = label.label;
             entry.visible = true;
             entry.no_show_all = false;
             label.visible = false;
@@ -571,6 +572,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 
     public bool update_on_leave () {
         update_label ();
+        window.event_bus.connect_typing_accel ();
         return false;
     }
 
@@ -579,6 +581,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
             entry.text = label.label;
 
             update_label ();
+            window.event_bus.request_escape ();
         }
         return false;
     }
@@ -602,7 +605,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
             return;
         }
 
-        label.label = model.name = new_label;
+        label.label = new_label;
 
         window.event_bus.set_focus_on_canvas ();
     }
@@ -710,11 +713,6 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 
     private bool handle_focus_in (Gdk.EventFocus event) {
         window.event_bus.disconnect_typing_accel ();
-        return false;
-    }
-
-    private bool handle_focus_out (Gdk.EventFocus event) {
-        window.event_bus.connect_typing_accel ();
         return false;
     }
 }

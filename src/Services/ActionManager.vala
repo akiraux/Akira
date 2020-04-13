@@ -121,9 +121,9 @@ public class Akira.Services.ActionManager : Object {
         action_accelerators.set (ACTION_MOVE_BOTTOM, "<Control><Shift>Down");
         action_accelerators.set (ACTION_FLIP_H, "<Control>bracketleft");
         action_accelerators.set (ACTION_FLIP_V, "<Control>bracketright");
-        action_accelerators.set (ACTION_ESCAPE, "Escape");
         action_accelerators.set (ACTION_SHORTCUTS, "F1");
 
+        typing_accelerators.set (ACTION_ESCAPE, "Escape");
         typing_accelerators.set (ACTION_ARTBOARD_TOOL, "a");
         typing_accelerators.set (ACTION_RECT_TOOL, "r");
         typing_accelerators.set (ACTION_ELLIPSE_TOOL, "e");

@@ -91,6 +91,17 @@ public class Akira.FileFormat.JsonContent : Object {
             builder.end_object ();
         }
 
+        // Save all the items inside this Artboard.
+        foreach (var artboard in window.items_manager.artboards) {
+            foreach (var _item in artboard.items) {
+                var child_item = new JsonObject (_item);
+                builder.begin_object ();
+                builder.set_member_name ("item");
+                builder.add_value (child_item.get_node ());
+                builder.end_object ();
+            }
+        }
+
         builder.end_array ();
     }
 

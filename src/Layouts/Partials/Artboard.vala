@@ -63,24 +63,28 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
     construct {
         get_style_context ().add_class ("artboard");
 
-        label = new Gtk.Label (model.name);
+        label = new Gtk.Label ("");
         label.get_style_context ().add_class ("artboard-name");
         label.halign = Gtk.Align.FILL;
         label.xalign = 0;
         label.hexpand = true;
         label.set_ellipsize (Pango.EllipsizeMode.END);
 
+        model.bind_property ("name", label, "label",
+            BindingFlags.SYNC_CREATE | BindingFlags.BIDIRECTIONAL);
+
         entry = new Gtk.Entry ();
+        entry.margin_top = entry.margin_bottom = 2;
+        entry.margin_start = 6;
         entry.expand = true;
         entry.visible = false;
         entry.no_show_all = true;
-        entry.set_text (model.name);
-        entry.focus_in_event.connect (handle_focus_in);
-        entry.focus_out_event.connect (handle_focus_out);
+        entry.text = model.name;
 
         entry.activate.connect (update_on_enter);
-        entry.focus_out_event.connect (update_on_leave);
         entry.key_release_event.connect (update_on_escape);
+        entry.focus_in_event.connect (handle_focus_in);
+        entry.focus_out_event.connect (update_on_leave);
 
         var label_grid = new Gtk.Grid ();
         label_grid.expand = true;
@@ -389,6 +393,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 
     public bool on_click_event (Gdk.Event event) {
         if (event.type == Gdk.EventType.@2BUTTON_PRESS) {
+            entry.text = label.label;
             entry.visible = true;
             entry.no_show_all = false;
             label.visible = false;
@@ -463,6 +468,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 
     public bool update_on_leave () {
         update_label ();
+        window.event_bus.connect_typing_accel ();
         return false;
     }
 
@@ -471,6 +477,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
             entry.text = label.label;
 
             update_label ();
+            window.event_bus.request_escape ();
         }
         return false;
     }
@@ -489,7 +496,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
             return;
         }
 
-        label.label = model.name = new_label;
+        label.label = new_label;
 
         window.event_bus.set_focus_on_canvas ();
     }
@@ -506,11 +513,6 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 
     private bool handle_focus_in (Gdk.EventFocus event) {
         window.event_bus.disconnect_typing_accel ();
-        return false;
-    }
-
-    private bool handle_focus_out (Gdk.EventFocus event) {
-        window.event_bus.connect_typing_accel ();
         return false;
     }
 }
