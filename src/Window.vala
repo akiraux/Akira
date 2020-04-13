@@ -109,9 +109,8 @@ public class Akira.Window : Gtk.ApplicationWindow {
     public bool before_destroy () {
         update_status ();
 
-        save_and_close_current_file ();
-
         if (!edited) {
+            close_current_file ();
             app.get_active_window ().destroy ();
             on_destroy ();
         }
@@ -124,6 +123,7 @@ public class Akira.Window : Gtk.ApplicationWindow {
                 _("Quit without saving!"));
 
             if (confirmed) {
+                close_current_file ();
                 app.get_active_window ().destroy ();
                 on_destroy ();
             }
@@ -175,9 +175,8 @@ public class Akira.Window : Gtk.ApplicationWindow {
         akira_file.save_file ();
     }
 
-    private void save_and_close_current_file () {
+    private void close_current_file () {
         if (akira_file != null) {
-            akira_file.save_file ();
             akira_file.close ();
         }
     }

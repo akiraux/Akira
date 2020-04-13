@@ -45,12 +45,14 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
     public bool has_fill { get; set; default = true; }
     public int fill_alpha { get; set; }
     public Gdk.RGBA color { get; set; }
+    public string color_string { get; set; }
     public bool hidden_fill { get; set; }
 
     // Border Panel attributes.
     public bool has_border { get; set; default = true; }
     public int border_size { get; set; }
     public Gdk.RGBA border_color { get; set; }
+    public string border_color_string { get; set; }
     public int stroke_alpha { get; set; }
     public bool hidden_border { get; set; }
 
@@ -92,11 +94,7 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
     public double initial_relative_x { get; set; }
     public double initial_relative_y { get; set; }
 
-    public CanvasArtboard (
-        double _x = 0,
-        double _y = 0,
-        Goo.CanvasItem? _parent = null
-        ) {
+    public CanvasArtboard (double _x = 0, double _y = 0, Goo.CanvasItem? _parent = null) {
         parent_item = _parent;
 
         canvas = parent_item.get_canvas () as Akira.Lib.Canvas;

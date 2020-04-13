@@ -22,6 +22,7 @@ sources = files(
     'FileFormat/AkiraFile.vala',
     'FileFormat/FileManager.vala',
     'FileFormat/JsonContent.vala',
+    'FileFormat/JsonLoader.vala',
     'FileFormat/JsonObject.vala',
     'FileFormat/ZipArchiveHandler.vala',
 

@@ -41,12 +41,14 @@ public class Akira.Lib.Models.CanvasImage : Goo.CanvasImage, Models.CanvasItem {
     public bool has_fill { get; set; default = false; }
     public int fill_alpha { get; set; }
     public Gdk.RGBA color { get; set; }
+    public string color_string { get; set; }
     public bool hidden_fill { get; set; }
 
     // Border Panel attributes.
     public bool has_border { get; set; default = false; }
     public int border_size { get; set; }
     public Gdk.RGBA border_color { get; set; }
+    public string border_color_string { get; set; }
     public int stroke_alpha { get; set; }
     public bool hidden_border { get; set; }
 

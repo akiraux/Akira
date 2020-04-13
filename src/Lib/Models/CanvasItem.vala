@@ -44,6 +44,7 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
     public abstract bool has_fill { get; set; default = true; }
     public abstract int fill_alpha { get; set; }
     public abstract Gdk.RGBA color { get; set; }
+    public abstract string color_string { get; set; }
     public abstract bool hidden_fill { get; set; default = false; }
 
     // Border Panel attributes.
@@ -51,6 +52,7 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
     public abstract bool has_border { get; set; default = true; }
     public abstract int border_size { get; set; }
     public abstract Gdk.RGBA border_color { get; set; }
+    public abstract string border_color_string { get; set; }
     public abstract int stroke_alpha { get; set; }
     public abstract bool hidden_border { get; set; default = false; }
 
@@ -84,12 +86,6 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
         get (coord_id, out _coord);
 
         return _coord;
-    }
-
-    public virtual void set_visible (bool visible) {
-        this.visibility = visible
-            ? Goo.CanvasItemVisibility.VISIBLE
-            : Goo.CanvasItemVisibility.INVISIBLE;
     }
 
     public void delete () {
@@ -230,14 +226,14 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
     private void reset_fill () {
         if (hidden_fill || !has_fill) {
             set ("fill-color-rgba", null);
+            color_string = "";
             return;
         }
 
         var rgba_fill = Gdk.RGBA ();
         rgba_fill = color;
-        // debug (fill_alpha.to_string ());
         rgba_fill.alpha = ((double) fill_alpha) / 255 * opacity / 100;
-        // debug (rgba_fill.alpha.to_string ());
+        color_string = Utils.Color.rgba_to_hex (rgba_fill.to_string ());
 
         uint fill_color_rgba = Utils.Color.rgba_to_uint (rgba_fill);
         set ("fill-color-rgba", fill_color_rgba);
@@ -249,16 +245,51 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
         if (hidden_border || !has_border) {
             set ("stroke-color-rgba", fill_color_rgba);
             set ("line-width", 0.0);
+            border_color_string = "";
             return;
         }
 
         var rgba_stroke = Gdk.RGBA ();
         rgba_stroke = border_color;
         rgba_stroke.alpha = ((double) stroke_alpha) / 255 * opacity / 100;
+        border_color_string = Utils.Color.rgba_to_hex (rgba_stroke.to_string ());
 
         uint stroke_color_rgba = Utils.Color.rgba_to_uint (rgba_stroke);
         set ("stroke-color-rgba", stroke_color_rgba);
         set ("line-width", (double) border_size);
+    }
+
+    public void load_colors () {
+        load_fill ();
+        load_border ();
+        reset_colors ();
+    }
+
+    private void load_fill () {
+        if (hidden_fill || !has_fill) {
+            set ("fill-color-rgba", null);
+            color_string = "";
+            return;
+        }
+
+        var rgba_fill = Gdk.RGBA ();
+        rgba_fill.parse (color_string);
+        rgba_fill.alpha = ((double) fill_alpha) / 255 * opacity / 100;
+        color = rgba_fill;
+    }
+
+    private void load_border () {
+        if (hidden_border || !has_border) {
+            set ("stroke-color-rgba", fill_color_rgba);
+            set ("line-width", 0.0);
+            border_color_string = "";
+            return;
+        }
+
+        var rgba_stroke = Gdk.RGBA ();
+        rgba_stroke.parse (border_color_string);
+        rgba_stroke.alpha = ((double) stroke_alpha) / 255 * opacity / 100;
+        border_color = rgba_stroke;
     }
 
     public bool simple_is_item_at (double x, double y, Cairo.Context cr, bool is_pointer_event) {

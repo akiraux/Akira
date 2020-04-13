@@ -40,6 +40,7 @@ public class Akira.Services.EventBus : Object {
     public signal void request_zoom (string direction);
     public signal void set_focus_on_canvas ();
     public signal void update_nob_size ();
+    public signal void set_scale (double scale);
     public signal void zoom ();
     public signal void canvas_notification (string message);
     public signal void hide_select_effect ();
