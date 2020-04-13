@@ -165,7 +165,7 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
             return;
         }
 
-        this.translate (delta_x, delta_y);
+        translate (delta_x, delta_y);
     }
 
     public virtual Cairo.Matrix get_real_transform () {

@@ -95,8 +95,31 @@ public class Akira.Utils.AffineTransform : Object {
         ref double delta_y_accumulator,
         CanvasItem selected_item
     ) {
-        double delta_x = GLib.Math.round (x - initial_x);
-        double delta_y = GLib.Math.round (y - initial_y);
+        var x_relative = x;
+        var y_relative = y;
+        var initial_x_relative = initial_x;
+        var initial_y_relative = initial_y;
+
+        if (selected_item.artboard == null) {
+            // I need to convert the event and the initial coordinates
+            // in order to account for item's coordinate space rotation
+            // that might affect the direction of the delta vector
+            // but ONLY when the item is not inside an Artboard
+            selected_item.canvas.convert_to_item_space (
+                selected_item,
+                ref x_relative,
+                ref y_relative
+            );
+
+            selected_item.canvas.convert_to_item_space (
+                selected_item,
+                ref initial_x_relative,
+                ref initial_y_relative
+            );
+        }
+
+        double delta_x = GLib.Math.round (x_relative - initial_x_relative);
+        double delta_y = GLib.Math.round (y_relative - initial_y_relative);
 
         delta_x_accumulator += delta_x;
         delta_y_accumulator += delta_y;
