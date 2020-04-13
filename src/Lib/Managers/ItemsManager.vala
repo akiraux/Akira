@@ -99,6 +99,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         foreach (Models.CanvasArtboard _artboard in artboards) {
             if (_artboard.is_inside (x, y)) {
                 artboard = _artboard;
+                break;
             }
         }
 
@@ -172,8 +173,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         var artboard = new Models.CanvasArtboard (
             Utils.AffineTransform.fix_size (x),
             Utils.AffineTransform.fix_size (y),
-            root
-            );
+            root);
 
         return artboard as Models.CanvasItem;
     }
@@ -361,9 +361,8 @@ public class Akira.Lib.Managers.ItemsManager : Object {
      * @param Json.Object obj - The json object containing the item to load.
      */
     public void load_item (Json.Object obj) {
-        udpate_default_values ();
-
         Models.CanvasItem? item = null;
+        Models.CanvasArtboard? artboard = null;
 
         var transform = obj.get_member ("transform").get_object ();
         var pos_x = transform.get_double_member ("x0");
@@ -371,12 +370,13 @@ public class Akira.Lib.Managers.ItemsManager : Object {
 
         // If item is inside an artboard update the coordinates accordingly.
         if (obj.has_member ("artboard")) {
-            foreach (var artboard in artboards) {
-                if (artboard.id == obj.get_string_member ("artboard")) {
-                    var matrix = Cairo.Matrix.identity ();
-                    artboard.get_transform (out matrix);
-                    pos_x = matrix.x0 + obj.get_double_member ("initial-relative-x");
-                    pos_y = matrix.y0 + obj.get_double_member ("initial-relative-y");
+            foreach (var _artboard in artboards) {
+                if (_artboard.id == obj.get_string_member ("artboard")) {
+                    //  var matrix = Cairo.Matrix.identity ();
+                    //  _artboard.get_transform (out matrix);
+                    //  pos_x = matrix.x0 + obj.get_double_member ("initial-relative-x");
+                    //  pos_y = matrix.y0 + obj.get_double_member ("initial-relative-y");
+                    artboard = _artboard;
                     break;
                 }
             }
@@ -404,7 +404,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
                 break;
         }
 
-        restore_attributes (item, obj);
+        restore_attributes (item, artboard, obj);
         restore_selection (obj.get_boolean_member ("selected"), item);
     }
 
@@ -414,7 +414,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
      * @param Models.CanvasItem item - The newly created item.
      * @param Json.Object obj - The json object containing the item's attributes.
      */
-    private void restore_attributes (Models.CanvasItem item, Json.Object obj) {
+    private void restore_attributes (Models.CanvasItem item, Models.CanvasArtboard? artboard, Json.Object obj) {
         // Restore identifiers.
         if (obj.get_string_member ("name") != null) {
             item.name = obj.get_string_member ("name");
@@ -461,6 +461,11 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             item.border_color_string = obj.get_string_member ("border-color-string");
 
             item.load_colors ();
+        }
+
+        // If item is inside an artboard.
+        if (obj.has_member ("artboard") && artboard != null) {
+            item.artboard = artboard;
         }
 
         item.set ("relative-x", obj.get_double_member ("relative-x"));

@@ -79,6 +79,8 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
         entry.expand = true;
         entry.visible = false;
         entry.no_show_all = true;
+        // NOTE: We can't bind the entry to the model.name otherwise we won't be
+        // able to handle the ESC key to restore the previous entry.
         entry.text = model.name;
 
         entry.activate.connect (update_on_enter);
