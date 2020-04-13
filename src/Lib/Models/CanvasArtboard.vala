@@ -94,11 +94,7 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
     public double initial_relative_x { get; set; }
     public double initial_relative_y { get; set; }
 
-    public CanvasArtboard (
-        double _x = 0,
-        double _y = 0,
-        Goo.CanvasItem? _parent = null
-        ) {
+    public CanvasArtboard (double _x = 0, double _y = 0, Goo.CanvasItem? _parent = null) {
         parent_item = _parent;
 
         canvas = parent_item.get_canvas () as Akira.Lib.Canvas;

@@ -372,10 +372,10 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         if (obj.has_member ("artboard")) {
             foreach (var _artboard in artboards) {
                 if (_artboard.id == obj.get_string_member ("artboard")) {
-                    //  var matrix = Cairo.Matrix.identity ();
-                    //  _artboard.get_transform (out matrix);
-                    //  pos_x = matrix.x0 + obj.get_double_member ("initial-relative-x");
-                    //  pos_y = matrix.y0 + obj.get_double_member ("initial-relative-y");
+                    var matrix = Cairo.Matrix.identity ();
+                    _artboard.get_transform (out matrix);
+                    pos_x = matrix.x0 + obj.get_double_member ("initial-relative-x");
+                    pos_y = matrix.y0 + obj.get_double_member ("initial-relative-y");
                     artboard = _artboard;
                     break;
                 }
@@ -444,8 +444,8 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         item.locked = obj.get_boolean_member ("locked");
         item.visibility =
             obj.get_int_member ("visibility") == 2
-            ? Goo.CanvasItemVisibility.VISIBLE
-            : Goo.CanvasItemVisibility.INVISIBLE;
+                ? Goo.CanvasItemVisibility.VISIBLE
+                : Goo.CanvasItemVisibility.INVISIBLE;
 
         // Restore fill and border.
         if (!(item is Models.CanvasArtboard)) {
@@ -463,15 +463,20 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             item.load_colors ();
         }
 
-        // If item is inside an artboard.
-        if (obj.has_member ("artboard") && artboard != null) {
-            item.artboard = artboard;
-        }
-
         item.set ("relative-x", obj.get_double_member ("relative-x"));
         item.set ("relative-y", obj.get_double_member ("relative-y"));
         item.set ("initial-relative-x", obj.get_double_member ("initial-relative-x"));
         item.set ("initial-relative-y", obj.get_double_member ("initial-relative-y"));
+
+        // If the item is an Artboard, we need to restore bounding coordinates otherwise
+        // new child items won't be properly restored into it.
+        if (item is Models.CanvasArtboard) {
+            var transform = obj.get_member ("transform").get_object ();
+            item.bounds.x1 = transform.get_double_member ("x0");
+            item.bounds.y1 = transform.get_double_member ("y0");
+            item.bounds.x2 = transform.get_double_member ("x0") + obj.get_double_member ("width");
+            item.bounds.y2 = transform.get_double_member ("y0") + obj.get_double_member ("height");
+        }
     }
 
     /*

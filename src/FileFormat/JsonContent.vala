@@ -54,14 +54,10 @@ public class Akira.FileFormat.JsonContent : Object {
         builder.add_double_value (window.main_window.main_canvas.main_scroll.vadjustment.value);
 
         // Convert Artboards to JSON.
-        if (window.items_manager.artboards.get_n_items () > 0) {
-            save_artboards ();
-        }
+        save_artboards ();
 
         // Convert Items to JSON.
-        if (window.items_manager.free_items.get_n_items () > 0) {
-            save_items ();
-        }
+        save_items ();
     }
 
     private void save_artboards () {
