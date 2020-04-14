@@ -460,16 +460,16 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
             // Remove the item from the free items.
             window.items_manager.free_items.remove_item.begin (item);
+            item.parent.remove_child (item.parent.find_child (item));
             window.event_bus.item_deleted (item);
 
             // Attach the item to the Artboard.
             item.artboard = new_artboard;
-            item.position_item (x, y);
-            item.connect_to_artboard ();
-            item.store_relative_position ();
 
             // Insert the item back into the Artboard, add the Layer,
             // reset its position, and add it back to the selection.
+            item.position_item (x, y);
+            item.connect_to_artboard ();
 
             window.event_bus.item_inserted (item);
             window.event_bus.request_add_item_to_selection (item);
