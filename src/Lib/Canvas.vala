@@ -428,12 +428,6 @@ public class Akira.Lib.Canvas : Goo.Canvas {
             return;
         }
 
-        // If the item was already inside an artbaord, remove it from it.
-        //  if (item.artboard != null && new_artboard != null) {
-        //      debug ("")
-        //      item.artboard.remove_item (item);
-        //  }
-
         // Clear everything if the item was moved on the empty canvas.
         if (item.artboard != null && new_artboard == null) {
             // Save the coordinates before removing the item.
@@ -447,8 +441,8 @@ public class Akira.Lib.Canvas : Goo.Canvas {
             // Attach the item to the Canvas.
             item.set_parent (this.get_root_item ());
 
-            // Insert the item back into the Canvas, reset its position,
-            // and add it back tot he selection.
+            // Insert the item back into the Canvas, add the Layer,
+            // reset its position, and add it back to the selection.
             window.items_manager.add_item (item);
             item.position_item (x, y);
             window.event_bus.item_inserted (item);
@@ -458,17 +452,36 @@ public class Akira.Lib.Canvas : Goo.Canvas {
             return;
         }
 
-        //  if (item.artboard == null) {
-        //      window.items_manager.free_items.remove_item.begin (item);
-        //      item.parent = new_artboard;
-        //      item.artboard = new_artboard;
-        //      item.position_item (item.get_global_coord ("x"), item.get_global_coord ("y"));
+        // Add a free item to an artboard.
+        if (item.artboard == null && new_artboard != null) {
+            // Save the coordinates before removing the item.
+            var x = item.get_global_coord ("x");
+            var y = item.get_global_coord ("y");
 
-        //      item.notify.connect (() => {
-        //          item.artboard.changed (true);
-        //      });
-        //      return;
-        //  }
+            // Remove the item from the free items.
+            window.items_manager.free_items.remove_item.begin (item);
+            window.event_bus.item_deleted (item);
+            new_artboard.changed (true);
+            new_artboard.request_update ();
+
+            // Attach the item to the Artboard.
+            item.artboard = new_artboard;
+            item.set_parent (item.artboard);
+            //  item.artboard.changed (false);
+            //  item.artboard.request_update ();
+
+            // Insert the item back into the Artboard, add the Layer,
+            // reset its position, and add it back to the selection.
+            //  new_artboard.items.add_item.begin (item, false);
+            item.connect_to_canvas ();
+            item.position_item (x, y);
+
+            window.event_bus.item_inserted (item);
+            window.event_bus.request_add_item_to_selection (item);
+
+            window.event_bus.file_edited ();
+            return;
+        }
 
         //  copy.artboard = new_artboard;
         //  copy.artboard.add_child (copy, -1);

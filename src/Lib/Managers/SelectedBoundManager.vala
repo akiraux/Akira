@@ -178,7 +178,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         selected_items = new List<Models.CanvasItem> ();
     }
 
-    public void update_selected_items () {
+    private void update_selected_items () {
         canvas.window.event_bus.selected_items_changed (selected_items);
     }
 
