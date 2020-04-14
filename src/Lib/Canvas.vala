@@ -285,7 +285,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
             default:
                 edit_mode = EditMode.MODE_SELECTION;
-                on_hold_release ();
+                window.event_bus.hold_released ();
                 break;
         }
 
@@ -389,93 +389,5 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
         var cursor = new Gdk.Cursor.for_display (Gdk.Display.get_default (), cursor_type);
         get_window ().set_cursor (cursor);
-    }
-
-    /**
-     * Handle the aftermath of an item transformation, like size changes or movement.
-     */
-    private void on_hold_release () {
-        if (selected_bound_manager.selected_items.length () == 0) {
-            return;
-        }
-
-        // Interrupt if no artboard is currently present.
-        if (window.items_manager.artboards.get_n_items () == 0) {
-            return;
-        }
-
-        // Check if any of the currently moved items was dropped inside or outside any artboard.
-        var items = selected_bound_manager.selected_items.copy ();
-        foreach (var item in items) {
-            if (item is Models.CanvasArtboard) {
-                continue;
-            }
-
-            foreach (Models.CanvasArtboard artboard in window.items_manager.artboards) {
-                var new_artboard = artboard.dropped_inside (item) ? artboard : null;
-                change_artboard (item, new_artboard);
-            }
-        }
-    }
-
-    /**
-     * Add or remove an item from an artboard.
-     */
-    public void change_artboard (Models.CanvasItem item, Models.CanvasArtboard? new_artboard) {
-        // Interrupt if the item was moved within its original artboard.
-        if (item.artboard == new_artboard) {
-            debug ("Same artboard");
-            return;
-        }
-
-        // Clear everything if the item was moved on the empty canvas.
-        if (item.artboard != null && new_artboard == null) {
-            // Save the coordinates before removing the item.
-            var x = item.get_global_coord ("x");
-            var y = item.get_global_coord ("y");
-
-            // Remove the item from the Artboard.
-            item.artboard.remove_item (item);
-            window.event_bus.item_deleted (item);
-
-            // Attach the item to the Canvas.
-            item.set_parent (this.get_root_item ());
-
-            // Insert the item back into the Canvas, add the Layer,
-            // reset its position, and add it back to the selection.
-            window.items_manager.add_item (item);
-            item.position_item (x, y);
-            window.event_bus.item_inserted (item);
-            window.event_bus.request_add_item_to_selection (item);
-
-            window.event_bus.file_edited ();
-            return;
-        }
-
-        // Add a free item to an artboard.
-        if (item.artboard == null && new_artboard != null) {
-            // Save the coordinates before removing the item.
-            var x = item.get_global_coord ("x");
-            var y = item.get_global_coord ("y");
-
-            // Remove the item from the free items.
-            window.items_manager.free_items.remove_item.begin (item);
-            item.parent.remove_child (item.parent.find_child (item));
-            window.event_bus.item_deleted (item);
-
-            // Attach the item to the Artboard.
-            item.artboard = new_artboard;
-
-            // Insert the item back into the Artboard, add the Layer,
-            // reset its position, and add it back to the selection.
-            item.position_item (x, y);
-            item.connect_to_artboard ();
-
-            window.event_bus.item_inserted (item);
-            window.event_bus.request_add_item_to_selection (item);
-
-            window.event_bus.file_edited ();
-            return;
-        }
     }
 }

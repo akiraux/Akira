@@ -47,6 +47,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         window.event_bus.insert_item.connect (set_item_to_insert);
         window.event_bus.request_delete_item.connect (on_request_delete_item);
         window.event_bus.change_item_z_index.connect (on_change_item_z_index);
+        window.event_bus.hold_released.connect (on_hold_released);
     }
 
     public void insert_image (Services.FileImageProvider provider) {
@@ -488,6 +489,97 @@ public class Akira.Lib.Managers.ItemsManager : Object {
     private void restore_selection (bool selected, Models.CanvasItem item) {
         if (selected) {
             window.main_window.main_canvas.canvas.selected_bound_manager.add_item_to_selection (item);
+        }
+    }
+
+    /**
+     * Handle the aftermath of an item transformation, like size changes or movement.
+     */
+    private void on_hold_released () {
+        // We need to copy the array of selected items as we need to remove and add items once
+        // moved to force the natural redraw of the canvas.
+        var items = window.main_window.main_canvas.canvas.selected_bound_manager.selected_items.copy ();
+
+        if (items.length () == 0) {
+            return;
+        }
+
+        // Interrupt if no artboard is currently present.
+        if (artboards.get_n_items () == 0) {
+            return;
+        }
+
+        // Check if any of the currently moved items was dropped inside or outside any artboard.
+        foreach (var item in items) {
+            if (item is Models.CanvasArtboard) {
+                continue;
+            }
+
+            foreach (Models.CanvasArtboard artboard in artboards) {
+                var new_artboard = artboard.dropped_inside (item) ? artboard : null;
+                change_artboard (item, new_artboard);
+            }
+        }
+    }
+
+    /**
+     * Add or remove an item from an artboard.
+     */
+    public void change_artboard (Models.CanvasItem item, Models.CanvasArtboard? new_artboard) {
+        // Interrupt if the item was moved within its original artboard.
+        if (item.artboard == new_artboard) {
+            debug ("Same artboard");
+            return;
+        }
+
+        // Clear everything if the item was moved on the empty canvas.
+        if (item.artboard != null && new_artboard == null) {
+            // Save the coordinates before removing the item.
+            var x = item.get_global_coord ("x");
+            var y = item.get_global_coord ("y");
+
+            // Remove the item from the Artboard.
+            item.artboard.remove_item (item);
+            window.event_bus.item_deleted (item);
+
+            // Attach the item to the Canvas.
+            item.set_parent (root);
+
+            // Insert the item back into the Canvas, add the Layer,
+            // reset its position, and add it back to the selection.
+            add_item (item);
+            item.position_item (x, y);
+            window.event_bus.item_inserted (item);
+            window.event_bus.request_add_item_to_selection (item);
+
+            window.event_bus.file_edited ();
+            return;
+        }
+
+        // Add a free item to an artboard.
+        if (item.artboard == null && new_artboard != null) {
+            // Save the coordinates before removing the item.
+            var x = item.get_global_coord ("x");
+            var y = item.get_global_coord ("y");
+
+            // Remove the item from the free items.
+            free_items.remove_item.begin (item);
+            item.parent.remove_child (item.parent.find_child (item));
+            window.event_bus.item_deleted (item);
+
+            // Attach the item to the Artboard.
+            item.artboard = new_artboard;
+
+            // Insert the item back into the Artboard, add the Layer,
+            // reset its position, and add it back to the selection.
+            item.position_item (x, y);
+            item.connect_to_artboard ();
+
+            window.event_bus.item_inserted (item);
+            window.event_bus.request_add_item_to_selection (item);
+
+            window.event_bus.file_edited ();
+            return;
         }
     }
 }

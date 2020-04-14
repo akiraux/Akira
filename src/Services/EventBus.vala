@@ -60,6 +60,7 @@ public class Akira.Services.EventBus : Object {
     public signal void request_delete_item (Lib.Models.CanvasItem item);
     public signal void selected_items_changed (List<Lib.Models.CanvasItem> selected_items);
     public signal void z_selected_changed ();
+    public signal void hold_released();
 
     // Layers panel signals.
     public signal void hover_over_item (Lib.Models.CanvasItem? item);
