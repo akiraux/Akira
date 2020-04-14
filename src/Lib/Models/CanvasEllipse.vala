@@ -87,6 +87,9 @@ public class Akira.Lib.Models.CanvasEllipse : Goo.CanvasEllipse, Models.CanvasIt
         item_type = Models.CanvasItemType.ELLIPSE;
         id = Models.CanvasItem.create_item_id (this);
         Models.CanvasItem.init_item (this);
+        if (artboard != null) {
+            connect_to_canvas ();
+        }
 
         radius_x = _radius_x;
         radius_y = _radius_y;

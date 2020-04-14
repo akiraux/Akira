@@ -17,6 +17,7 @@
  * along with Akira. If not, see <https://www.gnu.org/licenses/>.
  *
  * Authored by: Giacomo Alberini <giacomoalbe@gmail.com>
+ * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
  */
 
 public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasItem, Models.CanvasItem {
@@ -139,7 +140,10 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
     }
 
     public void remove_item (Models.CanvasItem item) {
+        item.disconnect_from_canvas ();
         items.remove_item.begin (item);
+        item.artboard = null;
+        changed (true);
     }
 
     public bool is_inside (double x, double y) {
@@ -147,6 +151,23 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
             && x >= bounds.x1
             && y >= bounds.y1
             && y <= bounds.y2;
+    }
+
+    public bool dropped_inside (Models.CanvasItem item) {
+        var x1 = item.get_global_coord ("x");
+        var x2 = x1 + item.get_coords ("width");
+        var y1 = item.get_global_coord ("y");
+        var y2 = y1 + item.get_coords ("height");
+
+        //  debug ("X %f < %f | %s", x1, bounds.x2, (x1 < bounds.x2).to_string ());
+        //  debug ("X2 %f > %f | %s", x2, bounds.x1, (x2 > bounds.x1).to_string ());
+        //  debug ("Y %f < %f | %s", y1, bounds.y2, (y1 < bounds.y2).to_string ());
+        //  debug ("Y2 %f > %f | %s", y2, bounds.y1, (y2 > bounds.y1).to_string ());
+
+        return x1 < bounds.x2
+            && x2 > bounds.x1
+            && y1 < bounds.y2
+            && y2 > bounds.y1;
     }
 
     public void add_child (Goo.CanvasItem item, int position = -1) {

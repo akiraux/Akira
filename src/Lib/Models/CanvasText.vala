@@ -94,6 +94,9 @@ public class Akira.Lib.Models.CanvasText : Goo.CanvasText, Models.CanvasItem {
         item_type = Models.CanvasItemType.TEXT;
         id = Models.CanvasItem.create_item_id (this);
         Models.CanvasItem.init_item (this);
+        if (artboard != null) {
+            connect_to_canvas ();
+        }
 
         text = _text;
         x = 0.0;

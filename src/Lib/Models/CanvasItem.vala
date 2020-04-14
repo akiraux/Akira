@@ -1,24 +1,24 @@
 /*
-* Copyright (c) 2019-2020 Alecaddd (https://alecaddd.com)
-*
-* This file is part of Akira.
-*
-* Akira is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
+ * Copyright (c) 2019-2020 Alecaddd (https://alecaddd.com)
+ *
+ * This file is part of Akira.
+ *
+ * Akira is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
 
-* Akira is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-* GNU General Public License for more details.
+ * Akira is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
 
-* You should have received a copy of the GNU General Public License
-* along with Akira. If not, see <https://www.gnu.org/licenses/>.
-*
-* Authored by: Giacomo Alberini <giacomoalbe@gmail.com>
-* Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
-*/
+ * You should have received a copy of the GNU General Public License
+ * along with Akira. If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Authored by: Giacomo Alberini <giacomoalbe@gmail.com>
+ * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
+ */
 
 public enum Akira.Lib.Models.CanvasItemType {
     RECT,
@@ -123,12 +123,18 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
         // Populate the name with the item's id
         // to show it when added to the LayersPanel
         canvas_item.name = canvas_item.id;
+    }
 
-        if (canvas_item.artboard != null) {
-            canvas_item.notify.connect (() => {
-                canvas_item.artboard.changed (true);
-            });
-        }
+    public virtual void connect_to_canvas () {
+        notify.connect (on_item_notify);
+    }
+
+    public virtual void disconnect_from_canvas () {
+        notify.disconnect (on_item_notify);
+    }
+
+    private void on_item_notify () {
+        artboard.changed (true);
     }
 
     public virtual void position_item (double _x, double _y) {
@@ -202,6 +208,23 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
 
         var item_x = get_coords ("x") - offset_x;
         var item_y = get_coords ("y") - offset_y;
+
+        switch (coord_id) {
+            case "x":
+                return item_x;
+            case "y":
+                return item_y;
+            default:
+                return 0.0;
+        }
+    }
+
+    public virtual double get_global_coord (string coord_id) {
+        Goo.CanvasBounds bounds;
+        get_bounds (out bounds);
+
+        var item_x = artboard != null ? relative_x + artboard.bounds.x1 : bounds.x1;
+        var item_y = artboard != null ? relative_y + artboard.bounds.y1 : bounds.y1;
 
         switch (coord_id) {
             case "x":
@@ -302,15 +325,14 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
         canvas.convert_from_item_space (
             artboard,
             ref item_x,
-            ref item_y
-            );
+            ref item_y);
 
         if (
             x >= item_x
             && x <= item_x + width
             && y >= item_y
             && y <= item_y + height
-           ) {
+        ) {
             return true;
         }
 
