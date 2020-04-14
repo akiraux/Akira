@@ -515,10 +515,22 @@ public class Akira.Lib.Managers.ItemsManager : Object {
                 continue;
             }
 
-            foreach (Models.CanvasArtboard artboard in artboards) {
-                var new_artboard = artboard.dropped_inside (item) ? artboard : null;
-                change_artboard (item, new_artboard);
+            // Interrupt if the item is already inside an artboard and was only moved within it.
+            if (item.artboard != null && item.artboard.dropped_inside (item)) {
+                continue;
             }
+
+            Models.CanvasArtboard? new_artboard = null;
+
+            foreach (Models.CanvasArtboard artboard in artboards) {
+                // Interrupt the loop if we find an artboard that matches the dropped coordinate.
+                if (artboard.dropped_inside (item)) {
+                    new_artboard = artboard;
+                    break;
+                }
+            }
+
+            change_artboard (item, new_artboard);
         }
     }
 
@@ -528,16 +540,16 @@ public class Akira.Lib.Managers.ItemsManager : Object {
     public void change_artboard (Models.CanvasItem item, Models.CanvasArtboard? new_artboard) {
         // Interrupt if the item was moved within its original artboard.
         if (item.artboard == new_artboard) {
-            debug ("Same artboard");
             return;
         }
 
-        // Clear everything if the item was moved on the empty canvas.
-        if (item.artboard != null && new_artboard == null) {
-            // Save the coordinates before removing the item.
-            var x = item.get_global_coord ("x");
-            var y = item.get_global_coord ("y");
+        // Save the coordinates before removing the item.
+        var x = item.get_global_coord ("x");
+        var y = item.get_global_coord ("y");
 
+        // If the item was moved from inside an Artboard to the emtpy Canvas.
+        if (item.artboard != null && new_artboard == null) {
+            debug ("Artbord => Free Item");
             // Remove the item from the Artboard.
             item.artboard.remove_item (item);
             window.event_bus.item_deleted (item);
@@ -549,19 +561,18 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             // reset its position, and add it back to the selection.
             add_item (item);
             item.position_item (x, y);
+
+            // Trigger the canvas repaint after the item was added back.
             window.event_bus.item_inserted (item);
             window.event_bus.request_add_item_to_selection (item);
-
             window.event_bus.file_edited ();
+
             return;
         }
 
-        // Add a free item to an artboard.
+        // If the item was moved from the empty Canvas to an Artboard.
         if (item.artboard == null && new_artboard != null) {
-            // Save the coordinates before removing the item.
-            var x = item.get_global_coord ("x");
-            var y = item.get_global_coord ("y");
-
+            debug ("Free Item => Artboard");
             // Remove the item from the free items.
             free_items.remove_item.begin (item);
             item.parent.remove_child (item.parent.find_child (item));
@@ -575,10 +586,34 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             item.position_item (x, y);
             item.connect_to_artboard ();
 
+            // Trigger the canvas repaint after the item was added back.
             window.event_bus.item_inserted (item);
             window.event_bus.request_add_item_to_selection (item);
-
             window.event_bus.file_edited ();
+
+            return;
+        }
+
+        // If the item was moved from inside an Artboard to another Artboard.
+        if (item.artboard != null && new_artboard != null) {
+            debug ("Artbord => Artboard");
+            // Remove the item from the Artboard.
+            item.artboard.remove_item (item);
+            window.event_bus.item_deleted (item);
+
+            // Attach the item to the Artboard.
+            item.artboard = new_artboard;
+
+            // Insert the item back into the Artboard, add the Layer,
+            // reset its position, and add it back to the selection.
+            item.position_item (x, y);
+            item.connect_to_artboard ();
+
+            // Trigger the canvas repaint after the item was added back.
+            window.event_bus.item_inserted (item);
+            window.event_bus.request_add_item_to_selection (item);
+            window.event_bus.file_edited ();
+
             return;
         }
     }
