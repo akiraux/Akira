@@ -74,8 +74,6 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
             initial_event_x = event_x;
             initial_event_y = event_y;
 
-            // canvas.convert_to_item_space (selected_item, ref initial_event_x, ref initial_event_y);
-
             initial_width = selected_item.get_coords ("width");
             initial_height = selected_item.get_coords ("height");
 

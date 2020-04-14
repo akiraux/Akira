@@ -461,20 +461,15 @@ public class Akira.Lib.Canvas : Goo.Canvas {
             // Remove the item from the free items.
             window.items_manager.free_items.remove_item.begin (item);
             window.event_bus.item_deleted (item);
-            new_artboard.changed (true);
-            new_artboard.request_update ();
 
             // Attach the item to the Artboard.
             item.artboard = new_artboard;
-            item.set_parent (item.artboard);
-            //  item.artboard.changed (false);
-            //  item.artboard.request_update ();
+            item.position_item (x, y);
+            item.connect_to_artboard ();
+            item.store_relative_position ();
 
             // Insert the item back into the Artboard, add the Layer,
             // reset its position, and add it back to the selection.
-            //  new_artboard.items.add_item.begin (item, false);
-            item.connect_to_canvas ();
-            item.position_item (x, y);
 
             window.event_bus.item_inserted (item);
             window.event_bus.request_add_item_to_selection (item);
@@ -482,9 +477,5 @@ public class Akira.Lib.Canvas : Goo.Canvas {
             window.event_bus.file_edited ();
             return;
         }
-
-        //  copy.artboard = new_artboard;
-        //  copy.artboard.add_child (copy, -1);
-        //  copy.artboard.changed (true);
     }
 }

@@ -125,11 +125,11 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
         canvas_item.name = canvas_item.id;
     }
 
-    public virtual void connect_to_canvas () {
+    public virtual void connect_to_artboard () {
         notify.connect (on_item_notify);
     }
 
-    public virtual void disconnect_from_canvas () {
+    public virtual void disconnect_from_artboard () {
         notify.disconnect (on_item_notify);
     }
 
@@ -138,6 +138,8 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
     }
 
     public virtual void position_item (double _x, double _y) {
+        //  debug (initial_relative_x.to_string ());
+        //  debug (initial_relative_y.to_string ());
         if (artboard != null) {
             artboard.add_child (this, -1);
 
@@ -165,13 +167,13 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
             var transformed_delta_x = delta_x_accumulator;
             var transformed_delta_y = delta_y_accumulator;
 
-            this.relative_x = this.initial_relative_x + transformed_delta_x;
-            this.relative_y = this.initial_relative_y + transformed_delta_y;
+            relative_x = initial_relative_x + transformed_delta_x;
+            relative_y = initial_relative_y + transformed_delta_y;
 
             return;
         }
 
-        this.translate (delta_x, delta_y);
+        translate (delta_x, delta_y);
     }
 
     public virtual Cairo.Matrix get_real_transform () {
@@ -223,8 +225,14 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
         Goo.CanvasBounds bounds;
         get_bounds (out bounds);
 
-        var item_x = artboard != null ? relative_x + artboard.bounds.x1 : bounds.x1;
-        var item_y = artboard != null ? relative_y + artboard.bounds.y1 : bounds.y1;
+        var item_x =
+            artboard != null
+                ? relative_x + artboard.bounds.x1
+                : bounds.x1;
+        var item_y =
+            artboard != null
+                ? relative_y + artboard.bounds.y1 + artboard.get_label_height ()
+                : bounds.y1;
 
         switch (coord_id) {
             case "x":
@@ -237,8 +245,8 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
     }
 
     public virtual void store_relative_position () {
-        this.initial_relative_x = this.relative_x;
-        this.initial_relative_y = this.relative_y;
+        initial_relative_x = relative_x;
+        initial_relative_y = relative_y;
     }
 
     public virtual void reset_colors () {

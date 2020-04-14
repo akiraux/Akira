@@ -140,7 +140,7 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
     }
 
     public void remove_item (Models.CanvasItem item) {
-        item.disconnect_from_canvas ();
+        item.disconnect_from_artboard ();
         items.remove_item.begin (item);
         item.artboard = null;
         changed (true);
@@ -158,11 +158,6 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
         var x2 = x1 + item.get_coords ("width");
         var y1 = item.get_global_coord ("y");
         var y2 = y1 + item.get_coords ("height");
-
-        //  debug ("X %f < %f | %s", x1, bounds.x2, (x1 < bounds.x2).to_string ());
-        //  debug ("X2 %f > %f | %s", x2, bounds.x1, (x2 > bounds.x1).to_string ());
-        //  debug ("Y %f < %f | %s", y1, bounds.y2, (y1 < bounds.y2).to_string ());
-        //  debug ("Y2 %f > %f | %s", y2, bounds.y1, (y2 > bounds.y1).to_string ());
 
         return x1 < bounds.x2
             && x2 > bounds.x1
