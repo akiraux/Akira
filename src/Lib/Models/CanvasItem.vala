@@ -140,6 +140,7 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
     public virtual void position_item (double _x, double _y) {
         //  debug (initial_relative_x.to_string ());
         //  debug (initial_relative_y.to_string ());
+
         if (artboard != null) {
             artboard.add_child (this, -1);
 
@@ -153,9 +154,29 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
         } else {
             parent.add_child (this, -1);
 
+            // Always reset the translation matrix when position an item
+            // in the "free canvas" space. This is to avoid previous coordinate
+            // space translations to be applied twice
+            var transform = Cairo.Matrix.identity ();
+
             // Keep the item always in the origin
             // move the entire coordinate system every time
-            translate (_x, _y);
+            transform.translate (_x, _y);
+
+            /*
+            // We only need to take into account the rotation relative
+            // to the center of the item.
+            // But this patch can only be applied once the AffineTransform PR
+            // would land, now it'll cause issues when moving a rotated item.
+            var width = get_coords ("width");
+            var height = get_coords ("height");
+
+            transform.translate (width / 2, height / 2);
+            transform.rotate (Utils.AffineTransform.deg_to_rad (rotation));
+            transform.translate (- (width / 2), - (height / 2));
+            */
+
+            set_transform (transform);
         }
     }
 
