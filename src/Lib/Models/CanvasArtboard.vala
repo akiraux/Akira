@@ -125,9 +125,6 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
         // move the entire coordinate system every time
         translate (_x, _y);
 
-        // Get colors from settings
-        // TODO
-
         // Get artboard name pixel extent
         get_label_extent ();
 
@@ -201,13 +198,9 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
     }
 
     public override void simple_paint (Cairo.Context cr, Goo.CanvasBounds bounds) {
-        cr.set_source_rgba (0.3, 0.3, 0.3, 1);
+        cr.set_source_rgba (0, 0, 0, 0.5);
 
-        cr.select_font_face (
-            "Sans",
-            Cairo.FontSlant.NORMAL,
-            Cairo.FontWeight.NORMAL
-            );
+        cr.select_font_face ("Sans", Cairo.FontSlant.NORMAL, Cairo.FontWeight.NORMAL);
 
         cr.set_font_size (LABEL_FONT_SIZE);
 
@@ -215,7 +208,7 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
         cr.show_text (name != null ? name : id);
 
         // Add a bit of "emulated" shadow around the Artboard
-        cr.set_source_rgba (0.90, 0.90, 0.90, 1);
+        cr.set_source_rgba (0, 0, 0, 0.1);
         cr.save ();
         cr.translate (2, 2);
         cr.rectangle (x, y, width, height);
@@ -263,7 +256,14 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
         return label_extents.height + LABEL_BOTTOM_PADDING;
     }
 
-    public unowned GLib.List<Goo.CanvasItem> get_items_at (double x, double y, Cairo.Context cr, bool is_pointer_event, bool parent_is_visible, GLib.List<Goo.CanvasItem> found_items) {
+    public unowned GLib.List<Goo.CanvasItem> get_items_at (
+        double x,
+        double y,
+        Cairo.Context cr,
+        bool is_pointer_event,
+        bool parent_is_visible,
+        GLib.List<Goo.CanvasItem> found_items
+    ) {
         var artboard_x = x;
         var artboard_y = y;
 
@@ -279,10 +279,7 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
 
             canvas.convert_to_item_space (item, ref item_x, ref item_y);
 
-            var item_is_inside = item.simple_is_item_at (
-                x, y,
-                cr, is_pointer_event
-                );
+            var item_is_inside = item.simple_is_item_at (x, y, cr, is_pointer_event);
 
             if (item_is_inside) {
                 found_items.append (item);
