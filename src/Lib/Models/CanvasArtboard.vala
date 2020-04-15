@@ -21,7 +21,7 @@
  */
 
 public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasItem, Models.CanvasItem {
-    private const double LABEL_FONT_SIZE = 14.0;
+    private const double LABEL_FONT_SIZE = 15.0;
     private const double LABEL_BOTTOM_PADDING = 8.0;
 
     // Identifiers.
@@ -130,6 +130,8 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
 
         // Init items list
         items = new Akira.Models.ListModel<Models.CanvasItem> ();
+
+        canvas.window.event_bus.zoom.connect (on_canvas_zoom);
     }
 
     public uint get_items_length () {
@@ -185,7 +187,7 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
             Cairo.FontWeight.NORMAL
             );
 
-        cr.set_font_size (LABEL_FONT_SIZE);
+        cr.set_font_size (LABEL_FONT_SIZE / (canvas as Lib.Canvas).current_scale);
 
         cr.text_extents (id, out label_extents);
     }
@@ -202,7 +204,7 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
 
         cr.select_font_face ("Sans", Cairo.FontSlant.NORMAL, Cairo.FontWeight.NORMAL);
 
-        cr.set_font_size (LABEL_FONT_SIZE);
+        cr.set_font_size (LABEL_FONT_SIZE / (canvas as Lib.Canvas).current_scale);
 
         cr.move_to (x, y - LABEL_BOTTOM_PADDING);
         cr.show_text (name != null ? name : id);
@@ -287,5 +289,13 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
         }
 
         return found_items;
+    }
+
+    /**
+     * React to the canvas zoom changes.
+     */
+    public void on_canvas_zoom () {
+        // Force the redraw of the font size.
+        changed (false);
     }
 }
