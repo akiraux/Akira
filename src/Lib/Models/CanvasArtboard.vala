@@ -140,7 +140,7 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
         item.disconnect_from_artboard ();
         items.remove_item.begin (item);
         item.artboard = null;
-        changed (true);
+        changed (false);
     }
 
     public bool is_inside (double x, double y) {
