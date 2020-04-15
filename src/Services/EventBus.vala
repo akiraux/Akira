@@ -28,6 +28,7 @@ public class Akira.Services.EventBus : Object {
     // Layout signals.
     public signal void change_sensitivity (string type);
     public signal void request_widget_redraw ();
+    public signal void change_theme ();
 
     // Canvas signals.
     public signal void coordinate_change (double x, double y);

@@ -21,7 +21,7 @@
  */
 
 public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasItem, Models.CanvasItem {
-    private const double LABEL_FONT_SIZE = 15.0;
+    private const double LABEL_FONT_SIZE = 16.0;
     private const double LABEL_BOTTOM_PADDING = 8.0;
 
     // Identifiers.
@@ -131,7 +131,8 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
         // Init items list
         items = new Akira.Models.ListModel<Models.CanvasItem> ();
 
-        canvas.window.event_bus.zoom.connect (on_canvas_zoom);
+        canvas.window.event_bus.zoom.connect (trigger_change);
+        canvas.window.event_bus.change_theme.connect (trigger_change);
     }
 
     public uint get_items_length () {
@@ -201,6 +202,10 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
 
     public override void simple_paint (Cairo.Context cr, Goo.CanvasBounds bounds) {
         cr.set_source_rgba (0, 0, 0, 0.5);
+
+        if (settings.dark_theme) {
+            cr.set_source_rgba (1, 1, 1, 0.5);
+        }
 
         cr.select_font_face ("Sans", Cairo.FontSlant.NORMAL, Cairo.FontWeight.NORMAL);
 
@@ -292,9 +297,9 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
     }
 
     /**
-     * React to the canvas zoom changes.
+     * Programmatically trigger the simple_paint() method when the UI requires an update.
      */
-    public void on_canvas_zoom () {
+    public void trigger_change () {
         // Force the redraw of the font size.
         changed (false);
     }
