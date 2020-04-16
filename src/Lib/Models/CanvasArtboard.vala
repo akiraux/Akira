@@ -221,6 +221,9 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
         if (items.get_n_items () > 0) {
             var items_length = items.get_n_items ();
 
+            // Force the redraw of the canvas in case an item is partially outside.
+            canvas.queue_draw ();
+
             // Painting items in reversed order in order to
             // print last item inserted (top of the stack) on top
             // of the items inserted before
