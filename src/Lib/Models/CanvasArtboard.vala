@@ -201,10 +201,10 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
     }
 
     public override void simple_paint (Cairo.Context cr, Goo.CanvasBounds bounds) {
-        cr.set_source_rgba (0, 0, 0, 0.5);
+        cr.set_source_rgba (0, 0, 0, 0.6);
 
         if (settings.dark_theme) {
-            cr.set_source_rgba (1, 1, 1, 0.5);
+            cr.set_source_rgba (1, 1, 1, 0.6);
         }
 
         cr.select_font_face ("Sans", Cairo.FontSlant.NORMAL, Cairo.FontWeight.NORMAL);
@@ -213,14 +213,6 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
 
         cr.move_to (x, y - LABEL_BOTTOM_PADDING);
         cr.show_text (name != null ? name : id);
-
-        // Add a bit of "emulated" shadow around the Artboard
-        cr.set_source_rgba (0, 0, 0, 0.1);
-        cr.save ();
-        cr.translate (2, 2);
-        cr.rectangle (x, y, width, height);
-        cr.restore ();
-        cr.fill ();
 
         cr.set_source_rgba (1, 1, 1, 1);
         cr.rectangle (x, y, width, height);
