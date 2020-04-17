@@ -29,7 +29,7 @@ public class Akira.FileFormat.AkiraFile : Akira.FileFormat.ZipArchiveHandler {
     private File content_file { get; set; }
     public string path {
         owned get {
-            return opened_file.get_parent ().get_path () + opened_file.get_basename ();
+            return opened_file.get_parent ().get_path () + "/" + opened_file.get_basename ();
         }
     }
 
@@ -44,6 +44,7 @@ public class Akira.FileFormat.AkiraFile : Akira.FileFormat.ZipArchiveHandler {
             var content_json = get_content_as_json (content_file);
             new FileFormat.JsonLoader (window, content_json);
 
+            update_recent_list ();
             debug ("Version from file: %s", content_json.get_string_member ("version"));
         } catch (Error e) {
             error ("Could not load file: %s", e.message);
@@ -85,5 +86,30 @@ public class Akira.FileFormat.AkiraFile : Akira.FileFormat.ZipArchiveHandler {
         content_file = File.new_for_path (Path.build_filename (base_path, "content.json"));
 
         make_file (content_file);
+    }
+
+    /**
+     * Update the GSettings array of recently opened files.
+     */
+    private void update_recent_list() {
+        string[] array = {};
+        // Add the last opened file always on top.
+        array += path;
+
+        for (var i = 0; i <= settings.recently_opened.length; i++) {
+            // Don't store more than 10 files.
+            if (i == 9) {
+                break;
+            }
+
+            // If the same file was already in the list, don't save it again.
+            if (path == settings.recently_opened[i]) {
+                continue;
+            }
+
+            array += settings.recently_opened[i];
+        }
+
+        settings.set_strv ("recently-opened", array);
     }
 }

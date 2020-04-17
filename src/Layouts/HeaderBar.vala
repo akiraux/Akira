@@ -57,6 +57,8 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
         }
     }
 
+    private bool fetched = false;
+
     public HeaderBar (Akira.Window window) {
         Object (
             toggled: true,
@@ -191,11 +193,11 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
         recent_files_grid.add (back_button);
         recent_files_grid.add (sub_separator);
         recent_files_grid.show_all ();
-        fetch_recent_files ();
 
         var open_recent_button = new Gtk.ModelButton ();
         open_recent_button.text = _("Open Recent");
         open_recent_button.menu_name = "files-menu";
+        open_recent_button.clicked.connect (fetch_recent_files);
 
         var separator2 = new Gtk.Separator (Gtk.Orientation.HORIZONTAL);
         separator2.margin_top = separator2.margin_bottom = 3;
@@ -393,11 +395,40 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
     }
 
     /**
-     * TODO: Fetch the recently opened files from GSettings
-     * and add them to the menu grid
+     * Fetch the recently opened files from GSettings and add them to the list
+     * if those files still exists.
      */
-    public void fetch_recent_files () {
+    public async void fetch_recent_files () {
+        // Interrupt if the list was already fetched. We don't want/need to
+        // refresh this list at every opening.
+        if (fetched) {
+            return;
+        }
+
+        for (var i = 0; i <= settings.recently_opened.length; i++) {
+            // Skip if the record is empty.
+            if (settings.recently_opened[i] == null) {
+                continue;
+            }
+
+            // Skip if the file doesn't exist.
+
+            var button = new Gtk.ModelButton ();
+
+            // Add quick accelerators only for the first 3 items.
+            if (i < 3) {
+                button.get_child ().destroy ();
+                var label = new Gtk.Label (settings.recently_opened[i]);
+                button.add (label);
+                // button.action_name = accels;
+            } else {
+                button.text = settings.recently_opened[i];
+            }
+
+            recent_files_grid.add (button);
+        }
         recent_files_grid.show_all ();
+        fetched = true;
     }
 
     private void on_file_edited () {

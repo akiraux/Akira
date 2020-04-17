@@ -85,7 +85,7 @@ public class Akira.Services.Settings : GLib.Settings {
         set { set_boolean ("open-quick", value); }
     }
     public string[] recently_opened {
-        get { return get_strv ("recently-opened"); }
+        owned get { return get_strv ("recently-opened"); }
         set { set_strv ("recently-opened", value); }
     }
 
