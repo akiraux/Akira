@@ -90,6 +90,9 @@ public class Akira.Lib.Models.CanvasImage : Goo.CanvasImage, Models.CanvasItem {
         item_type = Models.CanvasItemType.IMAGE;
         id = Models.CanvasItem.create_item_id (this);
         Models.CanvasItem.init_item (this);
+        if (artboard != null) {
+            connect_to_artboard ();
+        }
 
         width = 1;
         height = 1;

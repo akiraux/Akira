@@ -92,6 +92,7 @@ public class Akira.Dialogs.SettingsDialog : Gtk.Dialog {
 
         dark_theme_switch.notify["active"].connect (() => {
             Gtk.Settings.get_default ().gtk_application_prefer_dark_theme = settings.dark_theme;
+            window.event_bus.change_theme ();
         });
 
         grid.attach (new SettingsHeader (_("ToolBar Style")), 0, 2, 2, 1);
