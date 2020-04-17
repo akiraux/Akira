@@ -91,7 +91,7 @@ public class Akira.FileFormat.AkiraFile : Akira.FileFormat.ZipArchiveHandler {
     /**
      * Update the GSettings array of recently opened files.
      */
-    private void update_recent_list() {
+    private void update_recent_list () {
         string[] array = {};
         // Add the last opened file always on top.
         array += path;
