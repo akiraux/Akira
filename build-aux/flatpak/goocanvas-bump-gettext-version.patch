@@ -1,0 +1,25 @@
+From 8cdd3af093e41c5dc148b806e0332acf71db67be Mon Sep 17 00:00:00 2001
+From: Bilal Elmoussaoui <bil.elmoussaoui@gmail.com>
+Date: Tue, 7 Jan 2020 19:28:40 +0100
+Subject: [PATCH 218/218] Bump gettext version
+
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 86d774c..f3c3d0f 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -37,7 +37,7 @@ AC_SUBST(PACKAGE_LIBS)
+ 
+ # i18n stuff
+ AM_GNU_GETTEXT([external])
+-AM_GNU_GETTEXT_VERSION([0.19.4])
++AM_GNU_GETTEXT_VERSION([0.20])
+ 
+ GETTEXT_PACKAGE=goocanvas3
+ AC_SUBST(GETTEXT_PACKAGE)
+-- 
+2.25.1
+
