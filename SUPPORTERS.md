@@ -1,4 +1,4 @@
-# List of Akir Supporters
+# List of Akira Supporters
 
 :tada: All the awesome people that donated to the project :tada:
 
