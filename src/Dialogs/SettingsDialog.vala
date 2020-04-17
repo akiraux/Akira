@@ -190,7 +190,7 @@ public class Akira.Dialogs.SettingsDialog : Gtk.Dialog {
         grid.halign = Gtk.Align.CENTER;
 
         var app_icon = new Gtk.Image ();
-        app_icon.gicon = new ThemedIcon ("com.github.akiraux.akira");
+        app_icon.gicon = new ThemedIcon (Constants.APP_ID);
         app_icon.pixel_size = 64;
         app_icon.margin_top = 12;
 
