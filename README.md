@@ -96,4 +96,4 @@ Contact: [http://tysontan.com](http://tysontan.com)  / [tysontan@mail.com](mailt
 ## 📜 License
 #### [GNU GPLv3 / Creative Commons BY-SA](./COPYING)
 
-Copyright © 2019 Akira Project.
+Copyright © 2019-2020 Akira Project.
