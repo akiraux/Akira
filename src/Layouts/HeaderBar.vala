@@ -412,21 +412,58 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
             }
 
             // Skip if the file doesn't exist.
+            var file = File.new_for_path (settings.recently_opened[i]);
+            if (!file.query_exists ()) {
+                continue;
+            }
+
+            // Get the file name.
+            string[] split_string = settings.recently_opened[i].split ("/");
+            var file_name = split_string[split_string.length - 1].replace (".akira", "");
 
             var button = new Gtk.ModelButton ();
 
             // Add quick accelerators only for the first 3 items.
+            string? accels = null;
             if (i < 3) {
+                switch (i) {
+                    case 0:
+                        accels = Akira.Services.ActionManager.ACTION_PREFIX
+                            + Akira.Services.ActionManager.ACTION_LOAD_FIRST;
+                        break;
+                    case 1:
+                        accels = Akira.Services.ActionManager.ACTION_PREFIX
+                            + Akira.Services.ActionManager.ACTION_LOAD_SECOND;
+                        break;
+                    case 2:
+                        accels = Akira.Services.ActionManager.ACTION_PREFIX
+                            + Akira.Services.ActionManager.ACTION_LOAD_THIRD;
+                        break;
+                }
+
                 button.get_child ().destroy ();
-                var label = new Gtk.Label (settings.recently_opened[i]);
+                var label = new Granite.AccelLabel.from_action_name (file_name, accels);
                 button.add (label);
-                // button.action_name = accels;
+                button.action_name = accels;
             } else {
-                button.text = settings.recently_opened[i];
+                button.text = file_name;
             }
+
+            button.tooltip_text = settings.recently_opened[i];
+
+            button.clicked.connect (() => {
+                if (file != null) {
+                    File[] files = {};
+                    files += file;
+                    window.app.open (files, "");
+                } else {
+                    warning ("unable to open file");
+                }
+            });
 
             recent_files_grid.add (button);
         }
+
         recent_files_grid.show_all ();
         fetched = true;
     }
