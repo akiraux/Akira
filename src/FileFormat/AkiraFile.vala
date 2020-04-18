@@ -44,7 +44,7 @@ public class Akira.FileFormat.AkiraFile : Akira.FileFormat.ZipArchiveHandler {
             var content_json = get_content_as_json (content_file);
             new FileFormat.JsonLoader (window, content_json);
 
-            update_recent_list ();
+            update_recent_list.begin ();
             debug ("Version from file: %s", content_json.get_string_member ("version"));
         } catch (Error e) {
             error ("Could not load file: %s", e.message);
@@ -91,14 +91,25 @@ public class Akira.FileFormat.AkiraFile : Akira.FileFormat.ZipArchiveHandler {
     /**
      * Update the GSettings array of recently opened files.
      */
-    private void update_recent_list () {
+    private async void update_recent_list () {
         string[] array = {};
         // Add the last opened file always on top.
         array += path;
 
         for (var i = 0; i <= settings.recently_opened.length; i++) {
+            // Skip if the record is empty.
+            if (settings.recently_opened[i] == null) {
+                continue;
+            }
+
+            // If the file doesn't exist anymore, remove it from the list.
+            var file = File.new_for_path (settings.recently_opened[i]);
+            if (!file.query_exists ()) {
+                continue;
+            }
+
             // Don't store more than 10 files.
-            if (i == 9) {
+            if (i >= 9) {
                 break;
             }
 
