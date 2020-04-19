@@ -195,7 +195,7 @@ public class Akira.Services.ActionManager : Object {
         window.file_manager.save_file_as ();
     }
 
-    private void action_load_first () {
+    public void action_load_first () {
         if (settings.recently_opened.length == 0 || settings.recently_opened[0] == null) {
             window.event_bus.canvas_notification (_("No recently opened file available!"));
             return;

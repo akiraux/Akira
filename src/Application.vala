@@ -106,5 +106,10 @@ public class Akira.Application : Gtk.Application {
 
         var window = new Akira.Window (this);
         this.add_window (window);
+
+        // Load the most recently opened/saved file.
+        if (settings.open_quick) {
+            window.action_manager.action_load_first ();
+        }
     }
 }
