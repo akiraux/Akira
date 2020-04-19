@@ -1,5 +1,11 @@
 <schemalist>
     <schema id="@SCHEMA_ID@" path="@SCHEMA_PATH@" gettext-domain="@GETTEXT_PACKAGE@">
+        <key name="version" type="d">
+            <default>0.0.0</default>
+            <summary>The currently installed version.</summary>
+            <description>The currently installed version of Akira, updated only after the user launched the app. This is used to know when to trigger the Release Dialog.</description>
+        </key>
+
         <key name="pos-x" type="i">
             <default>360</default>
             <summary>The saved horizontal position of the window.</summary>

@@ -74,6 +74,7 @@ sources = files(
     'Dialogs/ShortcutsDialog.vala',
     'Dialogs/SettingsDialog.vala',
     'Dialogs/ExportDialog.vala',
+    'Dialogs/ReleaseDialog.vala',
 
     'Lib/Canvas.vala',
 
