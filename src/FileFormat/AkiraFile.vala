@@ -123,5 +123,7 @@ public class Akira.FileFormat.AkiraFile : Akira.FileFormat.ZipArchiveHandler {
         }
 
         settings.set_strv ("recently-opened", array);
+
+        window.app.update_recent_files_list ();
     }
 }

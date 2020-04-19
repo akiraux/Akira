@@ -97,6 +97,12 @@ public class Akira.Application : Gtk.Application {
         base.window_removed (window);
     }
 
+    public void update_recent_files_list () {
+        foreach (Akira.Window window in windows) {
+            window.event_bus.update_recent_files_list ();
+        }
+    }
+
     protected override void activate () {
         Gtk.Settings.get_default ().set_property ("gtk-icon-theme-name", "elementary");
         Gtk.Settings.get_default ().set_property ("gtk-theme-name", "elementary");

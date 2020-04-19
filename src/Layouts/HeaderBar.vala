@@ -57,8 +57,6 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
         }
     }
 
-    private bool fetched = false;
-
     public HeaderBar (Akira.Window window) {
         Object (
             toggled: true,
@@ -180,19 +178,6 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
         recent_files_grid.orientation = Gtk.Orientation.VERTICAL;
         recent_files_grid.width_request = 220;
         recent_files_grid.name = "files-menu";
-
-        var back_button = new Gtk.ModelButton ();
-        back_button.text = _("Main Menu");
-        back_button.inverted = true;
-        back_button.menu_name = "main";
-        back_button.expand = true;
-
-        var sub_separator = new Gtk.Separator (Gtk.Orientation.HORIZONTAL);
-        sub_separator.margin_top = sub_separator.margin_bottom = 3;
-
-        recent_files_grid.add (back_button);
-        recent_files_grid.add (sub_separator);
-        recent_files_grid.show_all ();
 
         var open_recent_button = new Gtk.ModelButton ();
         open_recent_button.text = _("Open Recent");
@@ -384,6 +369,7 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
             update_button_sensitivity (false);
         });
         window.event_bus.set_scale.connect (on_set_scale);
+        window.event_bus.update_recent_files_list.connect (fetch_recent_files);
     }
 
     private void on_set_scale (double scale) {
@@ -399,11 +385,22 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
      * if those files still exists.
      */
     public async void fetch_recent_files () {
-        // Interrupt if the list was already fetched. We don't want/need to
-        // refresh this list at every opening.
-        if (fetched) {
-            return;
-        }
+        recent_files_grid.@foreach (child => {
+            recent_files_grid.remove (child);
+        });
+
+        // Add default buttons.
+        var back_button = new Gtk.ModelButton ();
+        back_button.text = _("Main Menu");
+        back_button.inverted = true;
+        back_button.menu_name = "main";
+        back_button.expand = true;
+
+        var sub_separator = new Gtk.Separator (Gtk.Orientation.HORIZONTAL);
+        sub_separator.margin_top = sub_separator.margin_bottom = 3;
+
+        recent_files_grid.add (back_button);
+        recent_files_grid.add (sub_separator);
 
         // Loop a first time to clear missing files and prevent wrong accelerators.
         string[] all_files = {};
@@ -488,7 +485,6 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
         }
 
         recent_files_grid.show_all ();
-        fetched = true;
     }
 
     private void on_file_edited () {
