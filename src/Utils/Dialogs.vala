@@ -28,22 +28,27 @@ public class Akira.Utils.Dialogs : Object {
         );
     }
 
-    public bool message_dialog (string title, string description, string icon, string primary_button) {
+    public Granite.MessageDialog message_dialog (
+        string title,
+        string description,
+        string icon,
+        string primary_button,
+        string? secondary_button = null
+    ) {
         var dialog = new Granite.MessageDialog.with_image_from_icon_name (
             title, description, icon, Gtk.ButtonsType.CANCEL);
         dialog.transient_for = window;
+
+        if (secondary_button != null) {
+            var button2 = new Gtk.Button.with_label (secondary_button);
+            button2.get_style_context ().add_class (Gtk.STYLE_CLASS_SUGGESTED_ACTION);
+            dialog.add_action_widget (button2, 2);
+        }
 
         var button = new Gtk.Button.with_label (primary_button);
         button.get_style_context ().add_class (Gtk.STYLE_CLASS_DESTRUCTIVE_ACTION);
         dialog.add_action_widget (button, Gtk.ResponseType.ACCEPT);
 
-        dialog.show_all ();
-        if (dialog.run () == Gtk.ResponseType.ACCEPT) {
-            dialog.destroy ();
-            return true;
-        }
-
-        dialog.destroy ();
-        return false;
+        return dialog;
     }
 }

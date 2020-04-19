@@ -36,7 +36,6 @@ public class Akira.Window : Gtk.ApplicationWindow {
     public Gtk.AccelGroup accel_group { get; construct; }
 
     public bool edited { get; set; default = false; }
-    public bool confirmed { get; set; default = false; }
 
     public Window (Akira.Application akira_app) {
         Object (
@@ -116,17 +115,35 @@ public class Akira.Window : Gtk.ApplicationWindow {
         }
 
         if (edited) {
-            confirmed = dialogs.message_dialog (
+            var dialog = dialogs.message_dialog (
                 _("Are you sure you want to quit?"),
                 _("All unsaved data will be lost and impossible to recover."),
                 "system-shutdown",
-                _("Quit without saving!"));
+                _("Quit without saving!"),
+                _("Save file")
+            );
 
-            if (confirmed) {
-                close_current_file ();
-                app.get_active_window ().destroy ();
-                on_destroy ();
-            }
+            dialog.show_all ();
+
+            dialog.response.connect ((id) => {
+                switch (id) {
+                    case Gtk.ResponseType.ACCEPT:
+                        dialog.destroy ();
+                        close_current_file ();
+                        app.get_active_window ().destroy ();
+                        on_destroy ();
+                        break;
+                    case 2:
+                        dialog.destroy ();
+                        file_manager.save_file ();
+                        break;
+                    default:
+                        dialog.destroy ();
+                        break;
+                }
+            });
+
+            dialog.run ();
         }
 
         return true;

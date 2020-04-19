@@ -97,6 +97,15 @@ public class Akira.Application : Gtk.Application {
         base.window_removed (window);
     }
 
+    /**
+     * Update the list of recently opened files in all the currently opened Windows.
+     */
+    public void update_recent_files_list () {
+        foreach (Akira.Window window in windows) {
+            window.event_bus.update_recent_files_list ();
+        }
+    }
+
     protected override void activate () {
         Gtk.Settings.get_default ().set_property ("gtk-icon-theme-name", "elementary");
         Gtk.Settings.get_default ().set_property ("gtk-theme-name", "elementary");
@@ -106,5 +115,10 @@ public class Akira.Application : Gtk.Application {
 
         var window = new Akira.Window (this);
         this.add_window (window);
+
+        // Load the most recently opened/saved file.
+        if (settings.open_quick) {
+            window.action_manager.action_load_first ();
+        }
     }
 }
