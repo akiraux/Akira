@@ -109,9 +109,9 @@ public class Akira.Services.ActionManager : Object {
         action_accelerators.set (ACTION_OPEN, "<Control>o");
         action_accelerators.set (ACTION_SAVE, "<Control>s");
         action_accelerators.set (ACTION_SAVE_AS, "<Control><Shift>s");
-        action_accelerators.set (ACTION_LOAD_FIRST, "<Control><Shift>1");
-        action_accelerators.set (ACTION_LOAD_SECOND, "<Control><Shift>2");
-        action_accelerators.set (ACTION_LOAD_THIRD, "<Control><Shift>3");
+        action_accelerators.set (ACTION_LOAD_FIRST, "<Control><Alt>1");
+        action_accelerators.set (ACTION_LOAD_SECOND, "<Control><Alt>2");
+        action_accelerators.set (ACTION_LOAD_THIRD, "<Control><Alt>3");
         action_accelerators.set (ACTION_SHOW_PIXEL_GRID, "<Control><Shift>p");
         action_accelerators.set (ACTION_SHOW_UI_GRID, "<Control><Shift>g");
         action_accelerators.set (ACTION_PRESENTATION, "<Control>period");
@@ -196,12 +196,60 @@ public class Akira.Services.ActionManager : Object {
     }
 
     private void action_load_first () {
+        if (settings.recently_opened.length == 0 || settings.recently_opened[0] == null) {
+            window.event_bus.canvas_notification (_("No recently opened file available!"));
+            return;
+        }
+
+        var file = File.new_for_path (settings.recently_opened[0]);
+        if (!file.query_exists ()) {
+            window.event_bus.canvas_notification (
+                _("Unable to open file at '%s'").printf (settings.recently_opened[0])
+            );
+            return;
+        }
+
+        File[] files = {};
+        files += file;
+        window.app.open (files, "");
     }
 
     private void action_load_second () {
+        if (settings.recently_opened.length < 1 || settings.recently_opened[1] == null) {
+            window.event_bus.canvas_notification (_("No second most recently opened file available!"));
+            return;
+        }
+
+        var file = File.new_for_path (settings.recently_opened[1]);
+        if (!file.query_exists ()) {
+            window.event_bus.canvas_notification (
+                _("Unable to open file at '%s'").printf (settings.recently_opened[1])
+            );
+            return;
+        }
+
+        File[] files = {};
+        files += file;
+        window.app.open (files, "");
     }
 
     private void action_load_third () {
+        if (settings.recently_opened.length < 2 || settings.recently_opened[2] == null) {
+            window.event_bus.canvas_notification (_("No third most recently opened file available!"));
+            return;
+        }
+
+        var file = File.new_for_path (settings.recently_opened[2]);
+        if (!file.query_exists ()) {
+            window.event_bus.canvas_notification (
+                _("Unable to open file at '%s'").printf (settings.recently_opened[2])
+            );
+            return;
+        }
+
+        File[] files = {};
+        files += file;
+        window.app.open (files, "");
     }
 
     private void action_show_pixel_grid () {

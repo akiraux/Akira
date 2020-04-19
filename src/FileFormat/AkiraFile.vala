@@ -60,6 +60,7 @@ public class Akira.FileFormat.AkiraFile : Akira.FileFormat.ZipArchiveHandler {
             write_content_to_file (content_file, json);
 
             write_to_archive ();
+            update_recent_list.begin ();
         } catch (Error e) {
             warning ("%s\n", e.message);
         }

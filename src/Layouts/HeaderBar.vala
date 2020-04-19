@@ -197,7 +197,7 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
         var open_recent_button = new Gtk.ModelButton ();
         open_recent_button.text = _("Open Recent");
         open_recent_button.menu_name = "files-menu";
-        open_recent_button.clicked.connect (fetch_recent_files);
+        fetch_recent_files.begin ();
 
         var separator2 = new Gtk.Separator (Gtk.Orientation.HORIZONTAL);
         separator2.margin_top = separator2.margin_bottom = 3;
@@ -405,6 +405,8 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
             return;
         }
 
+        // Loop a first time to clear missing files and prevent wrong accelerators.
+        string[] all_files = {};
         for (var i = 0; i <= settings.recently_opened.length; i++) {
             // Skip if the record is empty.
             if (settings.recently_opened[i] == null) {
@@ -417,8 +419,23 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
                 continue;
             }
 
+            all_files += settings.recently_opened[i];
+        }
+
+        // Update the GSettings to prevent loading an unavailable file.
+        settings.set_strv ("recently-opened", all_files);
+
+        for (var i = 0; i <= all_files.length; i++) {
+            // Skip if the record is empty.
+            if (all_files[i] == null) {
+                continue;
+            }
+
+            // Store the full path in a variable before the split() method explodes the string.
+            var full_path = all_files[i];
+
             // Get the file name.
-            string[] split_string = settings.recently_opened[i].split ("/");
+            string[] split_string = all_files[i].split ("/");
             var file_name = split_string[split_string.length - 1].replace (".akira", "");
 
             var button = new Gtk.ModelButton ();
@@ -447,19 +464,25 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
                 button.action_name = accels;
             } else {
                 button.text = file_name;
-            }
 
-            button.tooltip_text = settings.recently_opened[i];
+                // Define the open action on click only for those files that don't
+                // have an accelerator to prevent double calls.
+                button.clicked.connect (() => {
+                    var file = File.new_for_path (full_path);
+                    if (!file.query_exists ()) {
+                        window.event_bus.canvas_notification (
+                            _("Unable to open file at '%s'").printf (full_path)
+                        );
+                        return;
+                    }
 
-            button.clicked.connect (() => {
-                if (file != null) {
                     File[] files = {};
                     files += file;
                     window.app.open (files, "");
-                } else {
-                    warning ("unable to open file");
-                }
-            });
+                });
+            }
+
+            button.tooltip_text = all_files[i];
 
             recent_files_grid.add (button);
         }
