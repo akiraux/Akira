@@ -23,7 +23,7 @@
 public class Akira.Services.Settings : GLib.Settings {
     // Main window settings.
     public string version {
-        get { return get_string ("version"); }
+        owned get { return get_string ("version"); }
         set { set_string ("version", value); }
     }
     public int pos_x {
