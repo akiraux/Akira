@@ -36,9 +36,14 @@ public class Akira.Dialogs.ReleaseDialog : Gtk.Dialog {
         transient_for = window;
         default_width = 800;
 
+        var banner = new Gtk.Image.from_resource ("/com/github/akiraux/akira/akira-banner.jpg");
+        banner.get_style_context ().add_class ("banner");
+
         var grid = new Gtk.Grid ();
         grid.column_spacing = 12;
         grid.hexpand = true;
+
+        grid.attach (banner, 0, 0);
 
         var content_area = get_content_area ();
         content_area.border_width = 12;

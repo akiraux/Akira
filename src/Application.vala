@@ -106,5 +106,11 @@ public class Akira.Application : Gtk.Application {
 
         var window = new Akira.Window (this);
         this.add_window (window);
+
+        if (settings.version != Constants.VERSION) {
+            var dialog = new Akira.Dialogs.ReleaseDialog (window);
+            dialog.show_all ();
+            dialog.present ();
+        }
     }
 }
