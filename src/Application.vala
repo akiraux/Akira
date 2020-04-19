@@ -97,6 +97,9 @@ public class Akira.Application : Gtk.Application {
         base.window_removed (window);
     }
 
+    /**
+     * Update the list of recently opened files in all the currently opened Windows.
+     */
     public void update_recent_files_list () {
         foreach (Akira.Window window in windows) {
             window.event_bus.update_recent_files_list ();
