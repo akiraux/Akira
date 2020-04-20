@@ -120,6 +120,9 @@ public class Akira.Application : Gtk.Application {
             var dialog = new Akira.Dialogs.ReleaseDialog (window);
             dialog.show_all ();
             dialog.present ();
+
+            // Update the settings so we don't show the same dialog again.
+            settings.version = Constants.VERSION;
         }
 
         // Load the most recently opened/saved file.
