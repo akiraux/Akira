@@ -20,7 +20,6 @@
  */
 
 public class Akira.Lib.Managers.ImageManager : Object {
-    public static uint FILEID = 0;
     const string FILENAME = "/akira-%s-img-%u.%s";
 
     private uint file_id;
@@ -49,14 +48,14 @@ public class Akira.Lib.Managers.ImageManager : Object {
     };
 
     public ImageManager.from_data (string _extension, string _base64_data) {
-        file_id = FILEID++;
+        file_id += 1;
         image_extension = _extension != "" ? _extension : "png";
         base64_image = _base64_data;
         url = data_to_file (_base64_data);
     }
 
     public ImageManager.from_file (File file) {
-        file_id = FILEID++;
+        file_id += 1;
         replace (file);
     }
 
