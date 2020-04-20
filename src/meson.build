@@ -81,6 +81,7 @@ sources = files(
     'Lib/Managers/HoverManager.vala',
     'Lib/Managers/SelectedBoundManager.vala',
     'Lib/Managers/ItemsManager.vala',
+    'Lib/Managers/ImageManager.vala',
     'Lib/Managers/NobManager.vala',
 
     'Lib/Models/CanvasItem.vala',
