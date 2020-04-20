@@ -91,15 +91,6 @@ public class Akira.Dialogs.ReleaseDialog : Gtk.Dialog {
 
         scrolled.add (release_info);
 
-        // <p>Experimental Alpha Release, say Hi to Akira!</p>
-        // <ul>
-        //   <li>Create Artboards and nested basic shapes
-        //   <li>Manage the fill and border properties of shapes
-        //   <li>Import images
-        //   <li>Export custom areas, selections, and artboards
-        //   <li>So many crashes and missing features you wouldn't believe, but hey, this is an experimental alpha…
-        // </ul>
-
         // Button grid at the bottom of the dialog.
         var button_grid = new Gtk.ButtonBox (Gtk.Orientation.HORIZONTAL);
         button_grid.halign = Gtk.Align.CENTER;
