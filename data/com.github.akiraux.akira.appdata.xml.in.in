@@ -10,9 +10,10 @@
     <p>
       A modern UX Design Application for UI and UX Designers
     </p>
-    <p>⚠ WARNING! Akira is still under development and not ready for production. Missing features, random bugs, and black holes opening in your kitchen are to be expected.</p>
     <p>
-     Akira is a native Linux Design application built in Vala and Gtk. Akira focuses on offering a modern and fast approach to UI and UX Design, mainly targeting web and graphic designers. The main goal is to offer a valid and professional solution for designers who want to use Linux as their main OS.
+      ⚠ WARNING! Akira is still under development and not ready for production. Missing features, random bugs, and black holes opening in your kitchen are to be expected.</p>
+    <p>
+      Akira is a native Linux Design application built in Vala and Gtk. Akira focuses on offering a modern and fast approach to UI and UX Design, mainly targeting web and graphic designers. The main goal is to offer a valid and professional solution for designers who want to use Linux as their main OS.
     </p>
     <p>
       Features Include:
@@ -31,7 +32,7 @@
 		<binary>@APP_ID@</binary>
 	</provides>
   <releases>
-    <release version="0.0.1" date="2020-04-26">
+    <release version="0.0.1" date="2020-04-19">
       <description>
         <p>🚀 Experimental Alpha Release, say Hi to Akira!</p>
         <ul>

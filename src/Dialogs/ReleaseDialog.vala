@@ -54,9 +54,22 @@ public class Akira.Dialogs.ReleaseDialog : Gtk.Dialog {
 
         var warning_grid = new Gtk.Grid ();
         warning_grid.halign = Gtk.Align.CENTER;
-        warning_grid.margin_top = disclaimer.margin_bottom = 12;
+        warning_grid.margin_top = warning_grid.margin_bottom = 12;
         warning_grid.get_style_context ().add_class ("warning-message");
         warning_grid.add (disclaimer);
+
+        var app_version = new Gtk.Label ("v" + Constants.VERSION + " - alpha");
+        app_version.get_style_context ().add_class ("h2");
+        app_version.selectable = true;
+
+        var version_date = new Gtk.Label ("Apr 26th, 2020");
+        version_date.get_style_context ().add_class ("dim-label");
+
+        var header_grid = new Gtk.Grid ();
+        header_grid.halign = Gtk.Align.CENTER;
+        header_grid.margin_bottom = 12;
+        header_grid.attach (app_version, 0, 0);
+        header_grid.attach (version_date, 0, 1);
 
         // <p>Experimental Alpha Release, say Hi to Akira!</p>
         // <ul>
@@ -110,6 +123,7 @@ public class Akira.Dialogs.ReleaseDialog : Gtk.Dialog {
 
         grid.attach (banner_grid, 0, 0);
         grid.attach (warning_grid, 0, 1);
+        grid.attach (header_grid, 0, 2);
         grid.attach (button_grid, 0, 8);
 
         var content_area = get_content_area ();
