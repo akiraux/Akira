@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Copyright (c) 2017 Alessandro Castellani (https://github.com/akiraux/akira) -->
+<!-- Copyright (c) 2019-2020 Alessandro Castellani (https://github.com/akiraux/akira) -->
 <component type="desktop-application">
   <id>@APP_ID@</id>
   <metadata_license>CC0-1.0</metadata_license>
@@ -8,28 +8,38 @@
   <summary>The Linux Design Tool</summary>
   <description>
     <p>
-      A modern UX Design Application for Graphic Designers
+      A modern UX Design Application for UI and UX Designers
     </p>
+    <p>⚠ WARNING! Akira is still under development and not ready for production. Missing features, random bugs, and black holes opening in your kitchen are to be expected.</p>
     <p>
-     Akira is a native Linux Design application built in Vala and Gtk. Akira focuses on offering a modern and fast approach to UI and UX Design, mainly targeting web designers and graphic designers. The main goal is to offer a valid and professional solution for designers who want to use Linux as their main OS.
+     Akira is a native Linux Design application built in Vala and Gtk. Akira focuses on offering a modern and fast approach to UI and UX Design, mainly targeting web and graphic designers. The main goal is to offer a valid and professional solution for designers who want to use Linux as their main OS.
     </p>
     <p>
       Features Include:
     </p>
     <ul>
       <li>Fully vector canvas for infinite resizing without quality loss</li>
-      <li>Modern interface for quick UI prototyping</li>
-      <li>Free hand tool for scribbling and notes</li>
+      <li>Smart option panel that shows the editable features of a selected item</li>
+      <li>Layers panel with easy Drag and Drop and smart ordering</li>
+      <li>Create Artboards to better organize your design iterations and views</li>
+      <li>Control the size and quality of exported images</li>
+      <li>Customizable icon set</li>
+      <li>And so much more…</li>
     </ul>
   </description>
+  <provides>
+		<binary>@APP_ID@</binary>
+	</provides>
   <releases>
-    <release version="0.0.1" date="2018-6-01">
+    <release version="0.0.1" date="2020-04-26">
       <description>
-        <p>Initial Release, say Hi to Akira!</p>
+        <p>🚀 Experimental Alpha Release, say Hi to Akira!</p>
         <ul>
           <li>Create Artboards and nested basic shapes</li>
           <li>Manage the fill and border properties of shapes</li>
-          <li>Infinite canvas with zoom options</li>
+          <li>Import images</li>
+          <li>Export custom areas, selections, and artboards</li>
+          <li>So many crashes and missing features you wouldn't believe, but hey, this is an experimental alpha…</li>
         </ul>
       </description>
     </release>
@@ -53,6 +63,7 @@
   <url type="homepage">https://github.com/akiraux/akira</url>
   <url type="bugtracker">https://github.com/akiraux/akira/issues</url>
   <url type="help">https://github.com/akiraux/akira/issues</url>
+  <url type="donation">https://www.paypal.me/alecaddd</url>
   <update_contact>castellani.ale@gmail.com</update_contact>
   <translation type="gettext">@GETTEXT_PACKAGE@</translation>
   <kudos>
@@ -61,6 +72,7 @@
         https://gitlab.gnome.org/GNOME/gnome-software/blob/master/doc/kudos.md
       -->
       <kudo>ModernToolkit</kudo>
+      <kudo>HighContrast</kudo>
       <kudo>HiDpiIcon</kudo>
   </kudos>
   <content_rating type="oars-1.1">

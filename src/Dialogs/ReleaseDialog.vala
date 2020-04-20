@@ -36,11 +36,11 @@ public class Akira.Dialogs.ReleaseDialog : Gtk.Dialog {
         transient_for = window;
         default_width = 824;
 
-        var banner = new Gtk.Grid ();
-        banner.get_style_context ().add_class ("banner");
-        banner.halign = Gtk.Align.CENTER;
-        banner.width_request = 800;
-        banner.height_request = 267;
+        var banner_grid = new Gtk.Grid ();
+        banner_grid.get_style_context ().add_class ("banner");
+        banner_grid.halign = Gtk.Align.CENTER;
+        banner_grid.width_request = 800;
+        banner_grid.height_request = 267;
 
         var disclaimer = new Gtk.Label (
             _("WARNING!\nAkira is still under development and not ready for production. Missing features, random bugs, and black holes opening in your kitchen are to be expected."
@@ -52,18 +52,65 @@ public class Akira.Dialogs.ReleaseDialog : Gtk.Dialog {
         disclaimer.max_width_chars = 80;
         disclaimer.wrap = true;
 
-        var warning = new Gtk.Grid ();
-        warning.halign = Gtk.Align.CENTER;
-        warning.margin_top = disclaimer.margin_bottom = 12;
-        warning.get_style_context ().add_class ("warning-message");
-        warning.add (disclaimer);
+        var warning_grid = new Gtk.Grid ();
+        warning_grid.halign = Gtk.Align.CENTER;
+        warning_grid.margin_top = disclaimer.margin_bottom = 12;
+        warning_grid.get_style_context ().add_class ("warning-message");
+        warning_grid.add (disclaimer);
+
+        // <p>Experimental Alpha Release, say Hi to Akira!</p>
+        // <ul>
+        //   <li>Create Artboards and nested basic shapes</li>
+        //   <li>Manage the fill and border properties of shapes</li>
+        //   <li>Import images</li>
+        //   <li>Export custom areas, selections, and artboards</li>
+        //   <li>So many crashes and missing features you wouldn't believe, but hey, this is an experimental alpha…</li>
+        // </ul>
+
+        // Button grid at the bottom of the dialog.
+        var button_grid = new Gtk.ButtonBox (Gtk.Orientation.HORIZONTAL);
+        button_grid.halign = Gtk.Align.CENTER;
+        button_grid.spacing = 6;
+        button_grid.margin_top = 12;
+
+        var donate_button = new Gtk.Button.with_label (_("Make a Donation"));
+        donate_button.clicked.connect (() => {
+            try {
+                AppInfo.launch_default_for_uri ("https://github.com/akiraux/Akira#-support", null);
+            } catch (Error e) {
+                warning (e.message);
+            }
+        });
+
+        var translate_button = new Gtk.Button.with_label (_("Suggest Translations"));
+        translate_button.clicked.connect (() => {
+            try {
+                AppInfo.launch_default_for_uri ("https://github.com/akiraux/Akira/issues", null);
+            } catch (Error e) {
+                warning (e.message);
+            }
+        });
+
+        var bug_button = new Gtk.Button.with_label (_("Report a Problem"));
+        bug_button.clicked.connect (() => {
+            try {
+                AppInfo.launch_default_for_uri ("https://github.com/akiraux/Akira/issues", null);
+            } catch (Error e) {
+                warning (e.message);
+            }
+        });
+
+        button_grid.add (donate_button);
+        button_grid.add (translate_button);
+        button_grid.add (bug_button);
 
         var grid = new Gtk.Grid ();
         grid.column_spacing = 12;
         grid.hexpand = true;
 
-        grid.attach (banner, 0, 0);
-        grid.attach (warning, 0, 1);
+        grid.attach (banner_grid, 0, 0);
+        grid.attach (warning_grid, 0, 1);
+        grid.attach (button_grid, 0, 8);
 
         var content_area = get_content_area ();
         content_area.border_width = 12;
