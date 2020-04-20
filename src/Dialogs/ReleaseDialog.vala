@@ -41,6 +41,7 @@ public class Akira.Dialogs.ReleaseDialog : Gtk.Dialog {
         banner_grid.halign = Gtk.Align.CENTER;
         banner_grid.width_request = 800;
         banner_grid.height_request = 267;
+        banner_grid.margin_bottom = 6;
 
         var disclaimer = new Gtk.Label (
             _("WARNING!\nAkira is still under development and not ready for production. Missing features, random bugs, and black holes opening in your kitchen are to be expected."
@@ -54,9 +55,12 @@ public class Akira.Dialogs.ReleaseDialog : Gtk.Dialog {
 
         var warning_grid = new Gtk.Grid ();
         warning_grid.halign = Gtk.Align.CENTER;
-        warning_grid.margin_top = warning_grid.margin_bottom = 12;
+        warning_grid.margin_bottom = 24;
         warning_grid.get_style_context ().add_class ("warning-message");
         warning_grid.add (disclaimer);
+
+        var version_title = new Gtk.Label ("Experimental Alpha Release, say Hi to Akira!");
+        version_title.get_style_context ().add_class ("h3");
 
         var app_version = new Gtk.Label ("v" + Constants.VERSION + " - alpha");
         app_version.get_style_context ().add_class ("h2");
@@ -68,16 +72,32 @@ public class Akira.Dialogs.ReleaseDialog : Gtk.Dialog {
         var header_grid = new Gtk.Grid ();
         header_grid.halign = Gtk.Align.CENTER;
         header_grid.margin_bottom = 12;
-        header_grid.attach (app_version, 0, 0);
-        header_grid.attach (version_date, 0, 1);
+        header_grid.attach (version_title, 0, 0);
+        header_grid.attach (app_version, 0, 1);
+        header_grid.attach (version_date, 0, 2);
+
+        var scrolled = new Gtk.ScrolledWindow (null, null);
+        scrolled.min_content_height = 200;
+        scrolled.expand = true;
+
+        var release_info = new Gtk.TextView ();
+        release_info.buffer.text = "✓ Create Artboards and nested basic shapes\n✓ Manage the fill and border properties of shapes\n✓ Import images\n✓ Export custom areas, selections, and artboards\n✓ So many crashes and missing features you wouldn't believe, but hey, this is an experimental alpha…";
+        release_info.pixels_below_lines = 3;
+        release_info.border_width = 12;
+        release_info.wrap_mode = Gtk.WrapMode.WORD;
+        release_info.cursor_visible = false;
+        release_info.editable = false;
+        release_info.get_style_context ().add_class (Granite.STYLE_CLASS_TERMINAL);
+
+        scrolled.add (release_info);
 
         // <p>Experimental Alpha Release, say Hi to Akira!</p>
         // <ul>
-        //   <li>Create Artboards and nested basic shapes</li>
-        //   <li>Manage the fill and border properties of shapes</li>
-        //   <li>Import images</li>
-        //   <li>Export custom areas, selections, and artboards</li>
-        //   <li>So many crashes and missing features you wouldn't believe, but hey, this is an experimental alpha…</li>
+        //   <li>Create Artboards and nested basic shapes
+        //   <li>Manage the fill and border properties of shapes
+        //   <li>Import images
+        //   <li>Export custom areas, selections, and artboards
+        //   <li>So many crashes and missing features you wouldn't believe, but hey, this is an experimental alpha…
         // </ul>
 
         // Button grid at the bottom of the dialog.
@@ -124,7 +144,8 @@ public class Akira.Dialogs.ReleaseDialog : Gtk.Dialog {
         grid.attach (banner_grid, 0, 0);
         grid.attach (warning_grid, 0, 1);
         grid.attach (header_grid, 0, 2);
-        grid.attach (button_grid, 0, 8);
+        grid.attach (scrolled, 0, 3);
+        grid.attach (button_grid, 0, 4);
 
         var content_area = get_content_area ();
         content_area.border_width = 12;
