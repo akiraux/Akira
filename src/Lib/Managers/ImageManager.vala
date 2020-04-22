@@ -72,39 +72,48 @@ public class Akira.Lib.Managers.ImageManager : Object {
     //     return filename;
     // }
 
-    // /**
-    //  * Check if the filename has a picture file extension.
-    //  */
-    // public bool is_valid_image (GLib.File file) {
-    //     try {
-    //         var file_info = file.query_info ("standard::*", 0);
+    /**
+    * Check if the filename has a picture file extension.
+    */
+    public bool is_valid_image (GLib.File file) {
+       try {
+           var file_info = file.query_info ("standard::*", 0);
 
-    //         // Check for correct file type, don't try to load directories.
-    //         if (file_info.get_file_type () != GLib.FileType.REGULAR) {
-    //             return false;
-    //         }
-    //         try {
-    //             var pixbuf = new Gdk.Pixbuf.from_file (file.get_path ());
-    //             var width = pixbuf.get_width ();
-    //             var height = pixbuf.get_height ();
+           // Check for correct file type, don't try to load directories.
+           if (file_info.get_file_type () != GLib.FileType.REGULAR) {
+               return false;
+           }
+           try {
+               var pixbuf = new Gdk.Pixbuf.from_file (file.get_path ());
+               var width = pixbuf.get_width ();
+               var height = pixbuf.get_height ();
 
-    //             if (width < 1 || height < 1) return false;
-    //         } catch (Error e) {
-    //             warning ("Invalid image loaded: %s", e.message);
-    //             return false;
-    //         }
+               if (width < 1 || height < 1) return false;
+           } catch (Error e) {
+               warning ("Invalid image loaded: %s", e.message);
+               return false;
+           }
 
-    //         foreach (var type in ACCEPTED_TYPES) {
-    //             if (GLib.ContentType.equals (file_info.get_content_type (), type)) {
-    //                 return true;
-    //             }
-    //         }
-    //     } catch (Error e) {
-    //         warning ("Could not get file info: %s", e.message);
-    //     }
+           foreach (var type in ACCEPTED_TYPES) {
+               if (GLib.ContentType.equals (file_info.get_content_type (), type)) {
+                   return true;
+               }
+           }
+       } catch (Error e) {
+           warning ("Could not get file info: %s", e.message);
+       }
 
-    //     return false;
-    // }
+       return false;
+    }
+
+    public string get_extension (GLib.File file) {
+        var parts = file.get_basename ().split (".");
+        if (parts.length > 1) {
+            return parts[parts.length - 1];
+        } else {
+            return "png";
+        }
+    }
 
     // public string file_to_base64 (File file) {
     //     uint8[] data;
