@@ -50,7 +50,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         window.event_bus.hold_released.connect (on_hold_released);
     }
 
-    public void insert_image (Services.FileImageProvider provider) {
+    public void insert_image (Lib.Managers.ImageManager manager) {
         var selected_bound_manager = window.main_window.main_canvas.canvas.selected_bound_manager;
 
         double start_x, start_y, scale, rotation;
@@ -74,17 +74,13 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         }
 
         set_item_to_insert ("image");
-        var new_item = insert_item (start_x, start_y, provider);
+        var new_item = insert_item (start_x, start_y, manager);
 
         selected_bound_manager.add_item_to_selection (new_item);
         selected_bound_manager.set_initial_coordinates (start_x, start_y);
     }
 
-    public Models.CanvasItem? insert_item (
-        double x,
-        double y,
-        Services.FileImageProvider? provider = null
-    ) {
+    public Models.CanvasItem? insert_item (double x, double y, Lib.Managers.ImageManager? manager = null) {
         udpate_default_values ();
 
         Models.CanvasItem? new_item = null;
@@ -122,7 +118,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
                 break;
 
             case Models.CanvasItemType.IMAGE:
-                new_item = add_image (x, y, provider, root, artboard);
+                new_item = add_image (x, y, manager, root, artboard);
                 break;
         }
 
@@ -221,14 +217,14 @@ public class Akira.Lib.Managers.ItemsManager : Object {
     public Models.CanvasImage add_image (
         double x,
         double y,
-        Services.FileImageProvider provider,
+        Lib.Managers.ImageManager manager,
         Goo.CanvasItem parent,
         Models.CanvasArtboard? artboard
     ) {
         return new Models.CanvasImage (
             Utils.AffineTransform.fix_size (x),
             Utils.AffineTransform.fix_size (y),
-            provider,
+            manager,
             parent,
             artboard);
     }

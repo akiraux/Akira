@@ -29,12 +29,12 @@ sources = files(
     'Services/Settings.vala',
     'Services/ActionManager.vala',
     'Services/EventBus.vala',
-    'Services/ImageProvider.vala',
 
     'Utils/Dialogs.vala',
     'Utils/BlendingMode.vala',
     'Utils/AffineTransform.vala',
     'Utils/Color.vala',
+    'Utils/Image.vala',
 
     'Layouts/HeaderBar.vala',
     'Layouts/LeftSideBar.vala',

@@ -79,7 +79,7 @@ public class Akira.Lib.Models.CanvasImage : Goo.CanvasImage, Models.CanvasItem {
     public CanvasImage (
         double _x = 0,
         double _y = 0,
-        Services.ImageProvider provider,
+        Lib.Managers.ImageManager manager,
         Goo.CanvasItem? _parent = null,
         Models.CanvasArtboard? _artboard = null
     ) {
@@ -106,9 +106,9 @@ public class Akira.Lib.Models.CanvasImage : Goo.CanvasImage, Models.CanvasItem {
 
         position_item (_x, _y);
 
-        provider.get_pixbuf.begin (-1, -1, (obj, res) => {
+        manager.get_pixbuf.begin (-1, -1, (obj, res) => {
             try {
-                var _pixbuf = provider.get_pixbuf.end (res);
+                var _pixbuf = manager.get_pixbuf.end (res);
                 pixbuf = _pixbuf;
                 width = _pixbuf.get_width ();
                 height = _pixbuf.get_height ();
