@@ -76,16 +76,23 @@ public class Akira.Lib.Models.CanvasImage : Goo.CanvasImage, Models.CanvasItem {
     public double initial_relative_x { get; set; }
     public double initial_relative_y { get; set; }
 
+    public Lib.Managers.ImageManager manager { get; set; }
+    public string? base64_image = null;
+
     public CanvasImage (
         double _x = 0,
         double _y = 0,
-        Lib.Managers.ImageManager manager,
+        Lib.Managers.ImageManager _manager,
         Goo.CanvasItem? _parent = null,
         Models.CanvasArtboard? _artboard = null
     ) {
         artboard = _artboard;
         parent = _artboard != null ? _artboard : _parent;
         canvas = parent.get_canvas () as Akira.Lib.Canvas;
+
+        // Set the ImageManager and CanvasImage unique attributes.
+        manager = _manager;
+        base64_image = manager.file_to_base64 ();
 
         item_type = Models.CanvasItemType.IMAGE;
         id = Models.CanvasItem.create_item_id (this);

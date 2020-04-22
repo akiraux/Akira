@@ -23,7 +23,7 @@
 public class Akira.Lib.Managers.ImageManager : Object {
     public GLib.File file { get; construct; }
 
-    public string? base64 = null;
+    //  public string? base64 = null;
 
     const string FILENAME = "/akira-%s-img-%u.%s";
 
@@ -74,17 +74,17 @@ public class Akira.Lib.Managers.ImageManager : Object {
     //     return filename;
     // }
 
-    // public string file_to_base64 (File file) {
-    //     uint8[] data;
+    public string file_to_base64 () {
+       uint8[] data;
 
-    //     try {
-    //         FileUtils.get_data (file.get_path (), out data);
-    //     } catch (Error e) {
-    //         warning ("Could not get file data: %s", e.message);
-    //     }
+       try {
+           FileUtils.get_data (file.get_path (), out data);
+       } catch (Error e) {
+           warning ("Could not get file data: %s", e.message);
+       }
 
-    //     return Base64.encode (data);
-    // }
+       return Base64.encode (data);
+    }
 
     // public void base64_to_file (string filename, string base64_data) {
     //     var data = Base64.decode (base64_data);
