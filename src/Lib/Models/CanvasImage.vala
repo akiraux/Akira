@@ -122,7 +122,7 @@ public class Akira.Lib.Models.CanvasImage : Goo.CanvasImage, Models.CanvasItem {
                 fix_image_size ();
             } catch (Error e) {
                 warning (e.message);
-                // TODO: handle error here
+                canvas.window.event_bus.canvas_notification (e.message);
             }
         });
 
