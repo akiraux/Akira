@@ -23,9 +23,7 @@
 public class Akira.Lib.Managers.ImageManager : Object {
     public GLib.File file { get; construct; }
 
-    //  public string? base64 = null;
-
-    const string FILENAME = "/akira-%s-img-%u.%s";
+    //  const string FILENAME = "/akira-%s-img-%u.%s";
 
     private const string[] ACCEPTED_TYPES = {
         "image/jpeg",

@@ -76,7 +76,9 @@ public class Akira.Lib.Models.CanvasImage : Goo.CanvasImage, Models.CanvasItem {
     public double initial_relative_x { get; set; }
     public double initial_relative_y { get; set; }
 
+    // CanvasImage unique attributes.
     public Lib.Managers.ImageManager manager { get; set; }
+    private Gdk.Pixbuf original_pixbuf;
     public string? base64_image = null;
 
     public CanvasImage (
@@ -116,6 +118,8 @@ public class Akira.Lib.Models.CanvasImage : Goo.CanvasImage, Models.CanvasItem {
         manager.get_pixbuf.begin (-1, -1, (obj, res) => {
             try {
                 var _pixbuf = manager.get_pixbuf.end (res);
+                // Save the unedited pixbuf to enable resampling and restoring.
+                original_pixbuf = _pixbuf;
                 pixbuf = _pixbuf;
                 width = _pixbuf.get_width ();
                 height = _pixbuf.get_height ();
@@ -129,8 +133,10 @@ public class Akira.Lib.Models.CanvasImage : Goo.CanvasImage, Models.CanvasItem {
         reset_colors ();
     }
 
-    public void fix_image_size () {
-        // Imported images should keep their aspect ratio by default.
+    /**
+     * Imported images should keep their aspect ratio by default.
+     */
+     public void fix_image_size () {
         size_ratio = width / height;
         size_locked = true;
     }
