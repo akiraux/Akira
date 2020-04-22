@@ -20,25 +20,9 @@
  */
 
 public class Akira.Lib.Managers.ImageManager : Object {
+    public weak Akira.Window window { get; construct; }
+
     const string FILENAME = "/akira-%s-img-%u.%s";
-
-    private uint file_id;
-
-    public bool valid = false;
-    private string? base64_image = null;
-    public string image_extension { get; private set; }
-
-    private string _url = "";
-    public string url {
-        get {
-            return _url;
-        } set {
-            _url = value;
-            var file = File.new_for_path (value);
-            valid = (file.query_exists () && is_valid_image (file));
-        }
-    }
-
     private const string[] ACCEPTED_TYPES = {
         "image/jpeg",
         "image/png",
@@ -47,100 +31,99 @@ public class Akira.Lib.Managers.ImageManager : Object {
         "image/gif"
     };
 
-    public ImageManager.from_data (string _extension, string _base64_data) {
-        file_id += 1;
-        image_extension = _extension != "" ? _extension : "png";
-        base64_image = _base64_data;
-        url = data_to_file (_base64_data);
+    public ImageManager (Akira.Window window) {
+        Object (
+            window: window
+        );
     }
 
-    public ImageManager.from_file (File file) {
-        file_id += 1;
-        replace (file);
-    }
+    public async Gdk.Pixbuf get_pixbuf (File file, int width = -1, int height = -1) throws Error {
+        FileInputStream stream;
 
-    public void replace (File file) {
-        image_extension = get_extension (file.get_basename ());
-        base64_image = file_to_base64 (file);
-        url = data_to_file (base64_image);
-    }
-
-    public string serialize () {
-        return """"image":"%s", "image-data":"%s" """.printf (image_extension, base64_image);
-    }
-
-    private string get_extension (string filename) {
-        var parts = filename.split (".");
-        if (parts.length > 1) {
-            return parts[parts.length - 1];
-        } else {
-            return "png";
-        }
-    }
-
-    private string data_to_file (string data) {
-        var filename =
-            Environment.get_tmp_dir () + FILENAME.printf (
-                Environment.get_user_name (),
-                file_id, image_extension
-            );
-        base64_to_file (filename, data);
-
-        return filename;
-    }
-
-    /**
-     * Check if the filename has a picture file extension.
-     */
-    public bool is_valid_image (GLib.File file) {
         try {
-            var file_info = file.query_info ("standard::*", 0);
+            stream = yield file.read_async ();
+        } catch (Error e) {
+            throw e;
+        }
 
-            // Check for correct file type, don't try to load directories.
-            if (file_info.get_file_type () != GLib.FileType.REGULAR) {
-                return false;
-            }
+        if (width != -1 && height != -1) {
             try {
-                var pixbuf = new Gdk.Pixbuf.from_file (file.get_path ());
-                var width = pixbuf.get_width ();
-                var height = pixbuf.get_height ();
-
-                if (width < 1 || height < 1) return false;
+                return yield new Gdk.Pixbuf.from_stream_at_scale_async (stream, width, height, false);
             } catch (Error e) {
-                warning ("Invalid image loaded: %s", e.message);
-                return false;
+                throw e;
             }
-
-            foreach (var type in ACCEPTED_TYPES) {
-                if (GLib.ContentType.equals (file_info.get_content_type (), type)) {
-                    return true;
-                }
+        } else {
+            try {
+                return yield new Gdk.Pixbuf.from_stream_async (stream);
+            } catch (Error e) {
+                throw e;
             }
-        } catch (Error e) {
-            warning ("Could not get file info: %s", e.message);
-        }
-
-        return false;
-    }
-
-    public string file_to_base64 (File file) {
-        uint8[] data;
-
-        try {
-            FileUtils.get_data (file.get_path (), out data);
-        } catch (Error e) {
-            warning ("Could not get file data: %s", e.message);
-        }
-
-        return Base64.encode (data);
-    }
-
-    public void base64_to_file (string filename, string base64_data) {
-        var data = Base64.decode (base64_data);
-        try {
-           FileUtils.set_data (filename, data);
-        } catch (Error e) {
-            warning ("Could not save data to file: %s", e.message);
         }
     }
+
+    // private string data_to_file (string data) {
+    //     var filename =
+    //         Environment.get_tmp_dir () + FILENAME.printf (
+    //             Environment.get_user_name (),
+    //             file_id, image_extension
+    //         );
+    //     base64_to_file (filename, data);
+
+    //     return filename;
+    // }
+
+    // /**
+    //  * Check if the filename has a picture file extension.
+    //  */
+    // public bool is_valid_image (GLib.File file) {
+    //     try {
+    //         var file_info = file.query_info ("standard::*", 0);
+
+    //         // Check for correct file type, don't try to load directories.
+    //         if (file_info.get_file_type () != GLib.FileType.REGULAR) {
+    //             return false;
+    //         }
+    //         try {
+    //             var pixbuf = new Gdk.Pixbuf.from_file (file.get_path ());
+    //             var width = pixbuf.get_width ();
+    //             var height = pixbuf.get_height ();
+
+    //             if (width < 1 || height < 1) return false;
+    //         } catch (Error e) {
+    //             warning ("Invalid image loaded: %s", e.message);
+    //             return false;
+    //         }
+
+    //         foreach (var type in ACCEPTED_TYPES) {
+    //             if (GLib.ContentType.equals (file_info.get_content_type (), type)) {
+    //                 return true;
+    //             }
+    //         }
+    //     } catch (Error e) {
+    //         warning ("Could not get file info: %s", e.message);
+    //     }
+
+    //     return false;
+    // }
+
+    // public string file_to_base64 (File file) {
+    //     uint8[] data;
+
+    //     try {
+    //         FileUtils.get_data (file.get_path (), out data);
+    //     } catch (Error e) {
+    //         warning ("Could not get file data: %s", e.message);
+    //     }
+
+    //     return Base64.encode (data);
+    // }
+
+    // public void base64_to_file (string filename, string base64_data) {
+    //     var data = Base64.decode (base64_data);
+    //     try {
+    //        FileUtils.set_data (filename, data);
+    //     } catch (Error e) {
+    //         warning ("Could not save data to file: %s", e.message);
+    //     }
+    // }
 }
