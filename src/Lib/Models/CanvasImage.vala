@@ -79,7 +79,6 @@ public class Akira.Lib.Models.CanvasImage : Goo.CanvasImage, Models.CanvasItem {
     // CanvasImage unique attributes.
     public Lib.Managers.ImageManager manager { get; set; }
     private Gdk.Pixbuf original_pixbuf;
-    public string? base64_image = null;
 
     public CanvasImage (
         double _x = 0,
@@ -94,7 +93,6 @@ public class Akira.Lib.Models.CanvasImage : Goo.CanvasImage, Models.CanvasItem {
 
         // Set the ImageManager and CanvasImage unique attributes.
         manager = _manager;
-        base64_image = manager.file_to_base64 ();
 
         item_type = Models.CanvasItemType.IMAGE;
         id = Models.CanvasItem.create_item_id (this);

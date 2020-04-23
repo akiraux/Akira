@@ -21,9 +21,9 @@
  */
 
 public class Akira.Lib.Managers.ImageManager : Object {
-    public GLib.File file { get; construct; }
+    public GLib.File file { get; set; }
 
-    //  const string FILENAME = "/akira-%s-img-%u.%s";
+    public string filename;
 
     private const string[] ACCEPTED_TYPES = {
         "image/jpeg",
@@ -33,8 +33,19 @@ public class Akira.Lib.Managers.ImageManager : Object {
         "image/gif"
     };
 
-    public ImageManager (GLib.File file) {
-        Object (file: file);
+    public ImageManager (GLib.File _file) {
+        file = _file;
+
+        var timestamp = new GLib.DateTime.now_utc ();
+        filename = ("akira-img-%s.%s").printf (
+            timestamp.to_unix ().to_string (),
+            Utils.Image.get_extension (file)
+        );
+    }
+
+    public ImageManager.from_archive (GLib.File _file, string _filename) {
+        file = _file;
+        filename = _filename;
     }
 
     public async Gdk.Pixbuf get_pixbuf (int width = -1, int height = -1) throws Error {
@@ -60,36 +71,4 @@ public class Akira.Lib.Managers.ImageManager : Object {
             }
         }
     }
-
-    // private string data_to_file (string data) {
-    //     var filename =
-    //         Environment.get_tmp_dir () + FILENAME.printf (
-    //             Environment.get_user_name (),
-    //             file_id, image_extension
-    //         );
-    //     base64_to_file (filename, data);
-
-    //     return filename;
-    // }
-
-    public string file_to_base64 () {
-       uint8[] data;
-
-       try {
-           FileUtils.get_data (file.get_path (), out data);
-       } catch (Error e) {
-           warning ("Could not get file data: %s", e.message);
-       }
-
-       return Base64.encode (data);
-    }
-
-    // public void base64_to_file (string filename, string base64_data) {
-    //     var data = Base64.decode (base64_data);
-    //     try {
-    //        FileUtils.set_data (filename, data);
-    //     } catch (Error e) {
-    //         warning ("Could not save data to file: %s", e.message);
-    //     }
-    // }
 }

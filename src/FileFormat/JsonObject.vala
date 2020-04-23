@@ -46,7 +46,6 @@ public class Akira.FileFormat.JsonObject : GLib.Object {
 
         transform = new Json.Object ();
 
-        save_image ();
         write_transform ();
     }
 
@@ -93,27 +92,13 @@ public class Akira.FileFormat.JsonObject : GLib.Object {
         } else if (type == typeof (Goo.CanvasItemVisibility)) {
             item.get_property (spec.get_name (), ref val);
             obj.set_int_member (spec.get_name (), val.get_enum ());
+        } else if (type == typeof (Akira.Lib.Managers.ImageManager)) {
+            var canvas_image = item as Akira.Lib.Models.CanvasImage;
+            obj.set_string_member ("image_id", canvas_image.manager.filename);
         } else {
             // Leave this comment for debug purpose.
             // warning ("Property type %s not yet supported: %s\n", type.name (), spec.get_name ());
         }
-    }
-
-    /**
-     * If the item is a CanvasImage, save the file image from the pixbuf.
-     */
-    private void save_image () {
-        if (item.get_type ().name () != "AkiraLibModelsCanvasImage") {
-            return;
-        }
-
-        var image = item as Lib.Models.CanvasImage;
-        //  var save_file = GLib.File.new_for_path ();
-        //  try {
-        //      image.manager.file.copy_async.begin ();
-        //  } catch (Error e) {
-        //      error ("Unable to save image: %s", e.message);
-        //  }
     }
 
     private void write_transform () {
