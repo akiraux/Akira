@@ -137,16 +137,19 @@ public class Akira.FileFormat.AkiraFile : Akira.FileFormat.ZipArchiveHandler {
                 Path.build_filename (pictures_folder.get_path (), image.manager.filename)
             );
 
-            try {
-                image.manager.file.copy (image_file, 0, null, (current_num_bytes, total_num_bytes) => {
-                    // Report copy-status:
-                    print ("%" + int64.FORMAT + " bytes of %" + int64.FORMAT + " bytes copied.\n",
-                        current_num_bytes, total_num_bytes);
-                });
-                file_collector.ref_file (image_file);
-            } catch (Error e) {
-                print ("Error: %s\n", e.message);
+            if (!image_file.query_exists ()) {
+                copy_image (image.manager.file, image_file);
             }
+        }
+    }
+
+    public async void remove_image (Akira.Lib.Managers.ImageManager manager) {
+        var image_file = File.new_for_path (
+            Path.build_filename (pictures_folder.get_path (), manager.filename)
+        );
+
+        if (image_file.query_exists ()) {
+            file_collector.unref_file (image_file);
         }
     }
 }

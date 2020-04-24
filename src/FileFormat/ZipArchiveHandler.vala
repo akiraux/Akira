@@ -367,6 +367,19 @@ public class Akira.FileFormat.ZipArchiveHandler : GLib.Object {
         }
     }
 
+    public virtual void copy_image (GLib.File old_file, GLib.File new_file) {
+        try {
+            old_file.copy (new_file, 0, null, (current_num_bytes, total_num_bytes) => {
+                // Report copy-status:
+                print ("%" + int64.FORMAT + " bytes of %" + int64.FORMAT + " bytes copied.\n",
+                    current_num_bytes, total_num_bytes);
+            });
+            file_collector.ref_file (new_file);
+        } catch (Error e) {
+            print ("Error: %s\n", e.message);
+        }
+    }
+
 
     /**
      * Takes care of the reference counting for files inside the archive.

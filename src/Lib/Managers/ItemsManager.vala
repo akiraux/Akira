@@ -168,6 +168,12 @@ public class Akira.Lib.Managers.ItemsManager : Object {
                 // Remove the image from the list so we don't keep it in the saved file.
                 if (item.item_type == Akira.Lib.Models.CanvasItemType.IMAGE) {
                     images.remove_item.begin ((item as Akira.Lib.Models.CanvasImage));
+
+                    if (window.akira_file != null) {
+                        window.akira_file.remove_image.begin (
+                            (item as Akira.Lib.Models.CanvasImage).manager
+                        );
+                    }
                 }
 
                 if (item.artboard == null) {
