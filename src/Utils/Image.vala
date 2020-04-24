@@ -70,25 +70,4 @@ public class Akira.Utils.Image : Object {
 
         return parts.length > 1 ? parts[parts.length - 1] : "png";
     }
-
-    // public string file_to_base64 (File file) {
-    //     uint8[] data;
-
-    //     try {
-    //         FileUtils.get_data (file.get_path (), out data);
-    //     } catch (Error e) {
-    //         warning ("Could not get file data: %s", e.message);
-    //     }
-
-    //     return Base64.encode (data);
-    // }
-
-    // public void base64_to_file (string filename, string base64_data) {
-    //     var data = Base64.decode (base64_data);
-    //     try {
-    //        FileUtils.set_data (filename, data);
-    //     } catch (Error e) {
-    //         warning ("Could not save data to file: %s", e.message);
-    //     }
-    // }
 }
