@@ -7,9 +7,7 @@
 .banner {
     background-color: @bg_color;
     background-image:
-        -gtk-scaled(
-            url("/com/github/akiraux/akira/akira-banner.jpg")
-        ),
+        url("/com/github/akiraux/akira/akira-banner.jpg"),
         linear-gradient(
             to bottom,
             shade(@bg_color, 1.02),
@@ -17,6 +15,7 @@
         );
     background-position: center center;
     background-repeat: no-repeat;
+    background-size: cover;
     border: 1px solid alpha(black, 0.15);
     border-radius: 6px;
     box-shadow:

@@ -34,13 +34,13 @@ public class Akira.Dialogs.ReleaseDialog : Gtk.Dialog {
 
     construct {
         transient_for = window;
-        default_width = 824;
+        default_width = 624;
 
         var banner_grid = new Gtk.Grid ();
         banner_grid.get_style_context ().add_class ("banner");
         banner_grid.halign = Gtk.Align.CENTER;
-        banner_grid.width_request = 800;
-        banner_grid.height_request = 267;
+        banner_grid.width_request = 600;
+        banner_grid.height_request = 200;
         banner_grid.margin_bottom = 6;
 
         var disclaimer = new Gtk.Label (
@@ -59,12 +59,12 @@ public class Akira.Dialogs.ReleaseDialog : Gtk.Dialog {
         warning_grid.get_style_context ().add_class ("warning-message");
         warning_grid.add (disclaimer);
 
-        var version_title = new Gtk.Label ("Experimental Alpha Release, say Hi to Akira!");
-        version_title.get_style_context ().add_class ("h3");
-
         var app_version = new Gtk.Label ("v" + Constants.VERSION + " - alpha");
         app_version.get_style_context ().add_class ("h2");
         app_version.selectable = true;
+
+        var version_title = new Gtk.Label ("Experimental Alpha Release, say Hi to Akira!");
+        version_title.get_style_context ().add_class ("h3");
 
         var version_date = new Gtk.Label ("Apr 26th, 2020");
         version_date.get_style_context ().add_class ("dim-label");
@@ -72,8 +72,8 @@ public class Akira.Dialogs.ReleaseDialog : Gtk.Dialog {
         var header_grid = new Gtk.Grid ();
         header_grid.halign = Gtk.Align.CENTER;
         header_grid.margin_bottom = 12;
-        header_grid.attach (version_title, 0, 0);
-        header_grid.attach (app_version, 0, 1);
+        header_grid.attach (app_version, 0, 0);
+        header_grid.attach (version_title, 0, 1);
         header_grid.attach (version_date, 0, 2);
 
         var scrolled = new Gtk.ScrolledWindow (null, null);
