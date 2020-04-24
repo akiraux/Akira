@@ -1,10 +1,15 @@
+assets_dir = join_paths(akira_datadir, 'pixmaps', application_id)
+install_data(
+    'assets/akira-banner.jpg',
+    install_dir: assets_dir
+)
+
 icon_sizes = ['16', '24', '32', '48', '64', '128']
 icons_dir = join_paths(akira_datadir, 'icons', 'hicolor')
 foreach size : icon_sizes
     install_data(
         join_paths('icons', size + 'x' + size, application_id + '.svg'),
         install_dir: join_paths(icons_dir, size + 'x' + size, 'apps')
-
     )
     install_data(
         join_paths('icons', size + 'x' + size, application_id + '.svg'),

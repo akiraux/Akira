@@ -211,6 +211,7 @@ public class Akira.Dialogs.SettingsDialog : Gtk.Dialog {
             )
         );
         disclaimer.justify = Gtk.Justification.CENTER;
+        disclaimer.get_style_context ().add_class ("warning-message");
         disclaimer.max_width_chars = 60;
         disclaimer.wrap = true;
         disclaimer.margin_top = disclaimer.margin_bottom = 12;
