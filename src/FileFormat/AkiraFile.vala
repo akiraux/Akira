@@ -26,7 +26,7 @@ public class Akira.FileFormat.AkiraFile : Akira.FileFormat.ZipArchiveHandler {
     public File pictures_folder { get; private set; }
     public File thumbnails_folder { get; private set; }
 
-    public bool first_save = true;
+    public bool overwrite = false;
 
     private File content_file { get; set; }
     public string path {
@@ -47,7 +47,6 @@ public class Akira.FileFormat.AkiraFile : Akira.FileFormat.ZipArchiveHandler {
             new FileFormat.JsonLoader (window, content_json);
 
             update_recent_list.begin ();
-            first_save = false;
 
             debug ("Version from file: %s", content_json.get_string_member ("version"));
         } catch (Error e) {
@@ -66,7 +65,6 @@ public class Akira.FileFormat.AkiraFile : Akira.FileFormat.ZipArchiveHandler {
 
             write_to_archive ();
             update_recent_list.begin ();
-            first_save = false;
         } catch (Error e) {
             warning ("%s\n", e.message);
         }
@@ -137,10 +135,9 @@ public class Akira.FileFormat.AkiraFile : Akira.FileFormat.ZipArchiveHandler {
      * Save all the images used in the Canvas and make a copy in the Pictures folder.
      */
     public async void save_images () {
-        // Clear potential leftover images if this is the first time we're saving this file.
-        // This is to clear images potentially left inside the Pictures folder of an .akira
-        // file that was selected to be replaced by a new file.
-        if (first_save) {
+        // Clear potential leftover images if we're overwriting an existing file.
+        if (overwrite) {
+            debug ("overwrite");
             try {
                 Dir dir = Dir.open (pictures_folder.get_path (), 0);
                 string? name = null;
@@ -151,6 +148,7 @@ public class Akira.FileFormat.AkiraFile : Akira.FileFormat.ZipArchiveHandler {
             } catch (FileError err) {
                 stderr.printf (err.message);
             }
+            overwrite = false;
         }
 
         foreach (var image in window.items_manager.images) {
@@ -162,11 +160,6 @@ public class Akira.FileFormat.AkiraFile : Akira.FileFormat.ZipArchiveHandler {
             if (!image_file.query_exists ()) {
                 copy_image (image.manager.file, image_file);
                 continue;
-            }
-
-            // Unmark the existing file if this is the first time we're saving.
-            if (first_save) {
-                file_collector.unmark_for_deletion (image_file);
             }
         }
     }
