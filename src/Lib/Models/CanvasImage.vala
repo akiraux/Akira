@@ -147,12 +147,6 @@ public class Akira.Lib.Models.CanvasImage : Goo.CanvasImage, Models.CanvasItem {
             return;
         }
 
-        // If the new size is bigger than the original pixbuf size, reset to original size.
-        if (width > original_pixbuf.get_width () && height > original_pixbuf.get_height ()) {
-            resize_pixbuf ((int) original_pixbuf.get_width (), (int) original_pixbuf.get_height ());
-            return;
-        }
-
         resize_pixbuf ((int) width, (int) height);
     }
 
