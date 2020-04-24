@@ -169,9 +169,10 @@ public class Akira.Lib.Managers.ItemsManager : Object {
                 if (item.item_type == Akira.Lib.Models.CanvasItemType.IMAGE) {
                     images.remove_item.begin ((item as Akira.Lib.Models.CanvasImage));
 
+                    // Mark it for removal if we have a saved file.
                     if (window.akira_file != null) {
                         window.akira_file.remove_image.begin (
-                            (item as Akira.Lib.Models.CanvasImage).manager
+                            (item as Akira.Lib.Models.CanvasImage).manager.filename
                         );
                     }
                 }
