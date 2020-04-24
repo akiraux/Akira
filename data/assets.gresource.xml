@@ -8,8 +8,11 @@
     <file alias="layer.css" compressed="true">css/layer.css</file>
     <file alias="headerbar.css" compressed="true">css/headerbar.css</file>
     <file alias="option-panel.css" compressed="true">css/option-panel.css</file>
+    <file alias="dialogs.css" compressed="true">css/dialogs.css</file>
   </gresource>
   <gresource prefix="/com/github/akiraux/akira">
+    <file alias="akira-banner.jpg">assets/akira-banner.jpg</file>
+
     <file alias="stylesheet.css" compressed="true">css/stylesheet.css</file>
     <file alias="bool-difference-symbolic.svg">icons/symbolic/bool-difference-symbolic.svg</file>
     <file alias="bool-interesect-symbolic.svg">icons/symbolic/bool-intersect-symbolic.svg</file>

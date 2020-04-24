@@ -1,0 +1,30 @@
+.warning-message {
+    background-color: alpha (@STRAWBERRY_300, 0.2);
+    border: 1px solid @STRAWBERRY_500;
+    border-radius: 4px;
+}
+
+.banner {
+    background-color: @bg_color;
+    background-image:
+        url("/com/github/akiraux/akira/akira-banner.jpg"),
+        linear-gradient(
+            to bottom,
+            shade(@bg_color, 1.02),
+            shade(@bg_color, 0.98)
+        );
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    border: 1px solid alpha(black, 0.15);
+    border-radius: 6px;
+    box-shadow:
+        inset 0 0 0 1px alpha(white, 0.05),
+        inset 0 1px 0 0 alpha(white, 0.45),
+        inset 0 -1px 0 0 alpha(white, 0.15),
+        0 3px 2px -1px alpha(black, 0.15),
+        0 3px 5px alpha(black, 0.1);
+    color: @fg_color;
+    font-size: 32px;
+    font-weight: 300;
+}
