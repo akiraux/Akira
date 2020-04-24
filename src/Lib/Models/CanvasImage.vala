@@ -91,7 +91,7 @@ public class Akira.Lib.Models.CanvasImage : Goo.CanvasImage, Models.CanvasItem {
         parent = _artboard != null ? _artboard : _parent;
         canvas = parent.get_canvas () as Akira.Lib.Canvas;
 
-        // Set the ImageManager and CanvasImage unique attributes.
+        // Set the ImageManager.
         manager = _manager;
 
         item_type = Models.CanvasItemType.IMAGE;
@@ -134,8 +134,48 @@ public class Akira.Lib.Models.CanvasImage : Goo.CanvasImage, Models.CanvasItem {
     /**
      * Imported images should keep their aspect ratio by default.
      */
-     public void fix_image_size () {
+    public void fix_image_size () {
         size_ratio = width / height;
         size_locked = true;
+    }
+
+    /**
+     * Trigger the pixbuf resampling only if the image size changed.
+     */
+    public void check_resize_pixbuf () {
+        if (width == manager.pixbuf.get_width () && height == manager.pixbuf.get_height ()) {
+            return;
+        }
+
+        // If the new size is bigger than the original pixbuf size, reset to original size.
+        if (width > original_pixbuf.get_width () && height > original_pixbuf.get_height ()) {
+            resize_pixbuf ((int) original_pixbuf.get_width (), (int) original_pixbuf.get_height ());
+            return;
+        }
+
+        resize_pixbuf ((int) width, (int) height);
+    }
+
+    /**
+     * Resample the pixbuf size.
+     *
+     * @param {int} w - The new width.
+     * @param {int} h - The new height.
+     * @param {bool} update - If the updated pixbuf size should be applied to the CanvasItem.
+     */
+    public void resize_pixbuf (int w, int h, bool update = false) {
+        manager.get_pixbuf.begin (w, h, (obj, res) => {
+            try {
+                var _pixbuf = manager.get_pixbuf.end (res);
+                pixbuf = _pixbuf;
+                if (update) {
+                    width = _pixbuf.get_width ();
+                    height = _pixbuf.get_height ();
+                }
+            } catch (Error e) {
+                warning (e.message);
+                canvas.window.event_bus.canvas_notification (e.message);
+            }
+        });
     }
 }

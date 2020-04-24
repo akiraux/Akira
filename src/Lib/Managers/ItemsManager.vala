@@ -472,6 +472,15 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             item.set ("global-radius", obj.get_double_member ("global-radius"));
         }
 
+        // Restore image size.
+        if (item is Models.CanvasImage) {
+            (item as Models.CanvasImage).resize_pixbuf (
+                (int) obj.get_double_member ("width"),
+                (int) obj.get_double_member ("height"),
+                true
+            );
+        }
+
         // Restore layer options.
         item.locked = obj.get_boolean_member ("locked");
         item.visibility =
@@ -511,7 +520,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         }
     }
 
-    /*
+    /**
      * Restore the selected status of an object.
      *
      * @param bool selected - If the object is selected.
@@ -533,6 +542,15 @@ public class Akira.Lib.Managers.ItemsManager : Object {
 
         if (items.length () == 0) {
             return;
+        }
+
+        // If we have images in the canvas, check if they're part of the selection to recalculate the size.
+        if (images.get_n_items () > 0) {
+            foreach (var image in images) {
+                if (items.find (image) != null) {
+                    image.check_resize_pixbuf ();
+                }
+            }
         }
 
         // Interrupt if no artboard is currently present.

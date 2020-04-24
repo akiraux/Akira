@@ -23,6 +23,9 @@
 public class Akira.Lib.Managers.ImageManager : Object {
     public GLib.File file { get; set; }
 
+    // Save the generated Pixbuf for later reference.
+    public Gdk.Pixbuf pixbuf;
+    // The unique name of the loaded image, including the current timestamp.
     public string filename;
 
     private const string[] ACCEPTED_TYPES = {
@@ -43,11 +46,26 @@ public class Akira.Lib.Managers.ImageManager : Object {
         );
     }
 
+    /**
+     * Initialize a new ImageManager from a previously saved file.
+     * We use this to avoid changing the filename which should be unique.
+     *
+     * @param {GLib.File} _file - The file loaded from the saved archive.
+     * @param {string} _filename - The original filename of the saved file.
+     */
     public ImageManager.from_archive (GLib.File _file, string _filename) {
         file = _file;
         filename = _filename;
     }
 
+    /**
+     * Generate the Pixbuf from the given file. This method is also called to
+     * resample the quality of the pixbuf when the image is resized.
+     *
+     * @param {int} width - The requested width for the resample.
+     * @param {int} height - The requested height for the resample.
+     * @return Gdk.Pixbuf
+     */
     public async Gdk.Pixbuf get_pixbuf (int width = -1, int height = -1) throws Error {
         FileInputStream stream;
 
@@ -59,13 +77,15 @@ public class Akira.Lib.Managers.ImageManager : Object {
 
         if (width != -1 && height != -1) {
             try {
-                return yield new Gdk.Pixbuf.from_stream_at_scale_async (stream, width, height, false);
+                pixbuf = yield new Gdk.Pixbuf.from_stream_at_scale_async (stream, width, height, false);
+                return pixbuf;
             } catch (Error e) {
                 throw e;
             }
         } else {
             try {
-                return yield new Gdk.Pixbuf.from_stream_async (stream);
+                pixbuf = yield new Gdk.Pixbuf.from_stream_async (stream);
+                return pixbuf;
             } catch (Error e) {
                 throw e;
             }
