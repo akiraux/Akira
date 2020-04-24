@@ -60,6 +60,7 @@ public class Akira.FileFormat.AkiraFile : Akira.FileFormat.ZipArchiveHandler {
             write_content_to_file (content_file, json);
 
             write_to_archive ();
+            save_images.begin ();
             update_recent_list.begin ();
         } catch (Error e) {
             warning ("%s\n", e.message);
@@ -125,5 +126,27 @@ public class Akira.FileFormat.AkiraFile : Akira.FileFormat.ZipArchiveHandler {
         settings.set_strv ("recently-opened", array);
 
         window.app.update_recent_files_list ();
+    }
+
+    /**
+     * Save all the images used in the Canvas and make a copy in the Pictures folder.
+     */
+    public async void save_images () {
+        foreach (var image in window.items_manager.images) {
+            var image_file = File.new_for_path (
+                Path.build_filename (pictures_folder.get_path (), image.manager.filename)
+            );
+
+            try {
+                image.manager.file.copy (image_file, 0, null, (current_num_bytes, total_num_bytes) => {
+                    // Report copy-status:
+                    print ("%" + int64.FORMAT + " bytes of %" + int64.FORMAT + " bytes copied.\n",
+                        current_num_bytes, total_num_bytes);
+                });
+                file_collector.ref_file (image_file);
+            } catch (Error e) {
+                print ("Error: %s\n", e.message);
+            }
+        }
     }
 }

@@ -25,6 +25,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
 
     public Akira.Models.ListModel<Lib.Models.CanvasItem> free_items;
     public Akira.Models.ListModel<Lib.Models.CanvasArtboard> artboards;
+    public Akira.Models.ListModel<Lib.Models.CanvasImage> images;
     private Models.CanvasItemType? insert_type { get; set; }
     private Goo.CanvasItem root;
     private int border_size;
@@ -40,6 +41,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
     construct {
         free_items = new Akira.Models.ListModel<Lib.Models.CanvasItem> ();
         artboards = new Akira.Models.ListModel<Lib.Models.CanvasArtboard> ();
+        images = new Akira.Models.ListModel<Lib.Models.CanvasImage> ();
 
         border_color = Gdk.RGBA ();
         fill_color = Gdk.RGBA ();
@@ -128,7 +130,14 @@ public class Akira.Lib.Managers.ItemsManager : Object {
                     artboards.add_item.begin ((Models.CanvasArtboard) new_item);
                     break;
 
+                case Akira.Lib.Models.CanvasItemType.IMAGE:
                 default:
+                    // We need to store images in a dedicated list since we will need
+                    // to easily access them and save them in the .akira/Pictures folder.
+                    if (new_item.item_type == Akira.Lib.Models.CanvasItemType.IMAGE) {
+                        images.add_item.begin ((new_item as Akira.Lib.Models.CanvasImage), false);
+                    }
+
                     if (new_item.artboard == null) {
                         // Add it to "free items"
                         free_items.add_item.begin (new_item, false);
@@ -154,7 +163,13 @@ public class Akira.Lib.Managers.ItemsManager : Object {
                 artboards.remove_item.begin (item as Models.CanvasArtboard);
                 break;
 
+            case Akira.Lib.Models.CanvasItemType.IMAGE:
             default:
+                // Remove the image from the list so we don't keep it in the saved file.
+                if (item.item_type == Akira.Lib.Models.CanvasItemType.IMAGE) {
+                    images.remove_item.begin ((item as Akira.Lib.Models.CanvasImage));
+                }
+
                 if (item.artboard == null) {
                     free_items.remove_item.begin (item);
                 }
