@@ -421,6 +421,19 @@ public class Akira.Lib.Managers.ItemsManager : Object {
                 insert_type = Models.CanvasItemType.ARTBOARD;
                 item = insert_item (pos_x, pos_y);
                 break;
+
+            case "AkiraLibModelsCanvasImage":
+                insert_type = Models.CanvasItemType.IMAGE;
+                var filename = obj.get_string_member ("image_id");
+                var file = File.new_for_path (
+                    Path.build_filename (
+                        window.akira_file.pictures_folder.get_path (),
+                        filename
+                    )
+                );
+                var manager = new Akira.Lib.Managers.ImageManager.from_archive (file, filename);
+                item = insert_item (pos_x, pos_y, manager);
+                break;
         }
 
         restore_attributes (item, artboard, obj);
