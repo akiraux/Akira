@@ -367,7 +367,9 @@ public class Akira.Services.ActionManager : Object {
                     }
 
                     var ext = Akira.Utils.Image.get_extension (file);
-                    window.event_bus.canvas_notification (_("%s file type not supported!").printf (ext));
+                    window.event_bus.canvas_notification (
+                        _("Error! .%s files are not supported!"
+                    ).printf (ext));
                 });
                 break;
         }
