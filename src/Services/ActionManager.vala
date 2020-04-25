@@ -361,7 +361,7 @@ public class Akira.Services.ActionManager : Object {
                 SList<File> files = dialog.get_files ();
                 files.@foreach ((file) => {
                     if (Akira.Utils.Image.is_valid_image (file)) {
-                        var manager = new Akira.Lib.Managers.ImageManager (file);
+                        var manager = new Akira.Lib.Managers.ImageManager (file, files.index (file));
                         window.items_manager.insert_image (manager);
                         return;
                     }

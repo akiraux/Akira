@@ -36,11 +36,12 @@ public class Akira.Lib.Managers.ImageManager : Object {
         "image/gif"
     };
 
-    public ImageManager (GLib.File _file) {
+    public ImageManager (GLib.File _file, int id) {
         file = _file;
 
         var timestamp = new GLib.DateTime.now_utc ();
-        filename = ("akira-img-%s.%s").printf (
+        filename = ("akira-img-%i-%s.%s").printf (
+            id,
             timestamp.to_unix ().to_string (),
             Utils.Image.get_extension (file)
         );
