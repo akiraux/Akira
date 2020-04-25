@@ -113,15 +113,13 @@ public class Akira.Lib.Models.CanvasImage : Goo.CanvasImage, Models.CanvasItem {
 
         position_item (_x, _y);
 
+        // Save the unedited pixbuf to enable resampling and restoring.
         manager.get_pixbuf.begin (-1, -1, (obj, res) => {
             try {
-                var _pixbuf = manager.get_pixbuf.end (res);
-                // Save the unedited pixbuf to enable resampling and restoring.
-                original_pixbuf = _pixbuf;
-                pixbuf = _pixbuf;
-                width = _pixbuf.get_width ();
-                height = _pixbuf.get_height ();
-                fix_image_size ();
+                original_pixbuf = manager.get_pixbuf.end (res);
+                // Imported images should keep their aspect ratio by default.
+                size_ratio = original_pixbuf.get_width () / original_pixbuf.get_height ();
+                size_locked = true;
             } catch (Error e) {
                 warning (e.message);
                 canvas.window.event_bus.canvas_notification (e.message);
@@ -129,14 +127,6 @@ public class Akira.Lib.Models.CanvasImage : Goo.CanvasImage, Models.CanvasItem {
         });
 
         reset_colors ();
-    }
-
-    /**
-     * Imported images should keep their aspect ratio by default.
-     */
-    public void fix_image_size () {
-        size_ratio = width / height;
-        size_locked = true;
     }
 
     /**
