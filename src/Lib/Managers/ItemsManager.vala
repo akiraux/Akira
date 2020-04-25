@@ -83,7 +83,12 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         selected_bound_manager.set_initial_coordinates (start_x, start_y);
     }
 
-    public Models.CanvasItem? insert_item (double x, double y, Lib.Managers.ImageManager? manager = null) {
+    public Models.CanvasItem? insert_item (
+        double x,
+        double y,
+        Lib.Managers.ImageManager? manager = null,
+        bool loaded = false
+    ) {
         udpate_default_values ();
 
         Models.CanvasItem? new_item = null;
@@ -105,15 +110,15 @@ public class Akira.Lib.Managers.ItemsManager : Object {
 
         switch (insert_type) {
             case Models.CanvasItemType.RECT:
-                new_item = add_rect (x, y, root, artboard);
+                new_item = add_rect (x, y, root, artboard, loaded);
                 break;
 
             case Models.CanvasItemType.ELLIPSE:
-                new_item = add_ellipse (x, y, root, artboard);
+                new_item = add_ellipse (x, y, root, artboard, loaded);
                 break;
 
             case Models.CanvasItemType.TEXT:
-                new_item = add_text (x, y, root, artboard);
+                new_item = add_text (x, y, root, artboard, loaded);
                 break;
 
             case Models.CanvasItemType.ARTBOARD:
@@ -121,7 +126,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
                 break;
 
             case Models.CanvasItemType.IMAGE:
-                new_item = add_image (x, y, manager, root, artboard);
+                new_item = add_image (x, y, manager, root, artboard, loaded);
                 break;
         }
 
@@ -136,12 +141,12 @@ public class Akira.Lib.Managers.ItemsManager : Object {
                     // We need to store images in a dedicated list since we will need
                     // to easily access them and save them in the .akira/Pictures folder.
                     if (new_item.item_type == Akira.Lib.Models.CanvasItemType.IMAGE) {
-                        images.add_item.begin ((new_item as Akira.Lib.Models.CanvasImage), false);
+                        images.add_item.begin ((new_item as Akira.Lib.Models.CanvasImage), loaded);
                     }
 
                     if (new_item.artboard == null) {
                         // Add it to "free items"
-                        free_items.add_item.begin (new_item, false);
+                        free_items.add_item.begin (new_item, loaded);
                     }
                     break;
             }
@@ -198,7 +203,13 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         return artboard as Models.CanvasItem;
     }
 
-    public Models.CanvasItem add_rect (double x, double y, Goo.CanvasItem parent, Models.CanvasArtboard? artboard) {
+    public Models.CanvasItem add_rect (
+        double x,
+        double y,
+        Goo.CanvasItem parent,
+        Models.CanvasArtboard? artboard,
+        bool loaded
+    ) {
         return new Models.CanvasRect (
             Utils.AffineTransform.fix_size (x),
             Utils.AffineTransform.fix_size (y),
@@ -208,10 +219,18 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             border_color,
             fill_color,
             parent,
-            artboard);
+            artboard,
+            loaded
+        );
     }
 
-    public Models.CanvasEllipse add_ellipse (double x, double y, Goo.CanvasItem parent, Models.CanvasArtboard? artboard) {
+    public Models.CanvasEllipse add_ellipse (
+        double x,
+        double y,
+        Goo.CanvasItem parent,
+        Models.CanvasArtboard? artboard,
+        bool loaded
+    ) {
         return new Models.CanvasEllipse (
             Utils.AffineTransform.fix_size (x),
             Utils.AffineTransform.fix_size (y),
@@ -221,10 +240,18 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             border_color,
             fill_color,
             parent,
-            artboard);
+            artboard,
+            loaded
+        );
     }
 
-    public Models.CanvasText add_text (double x, double y, Goo.CanvasItem parent, Models.CanvasArtboard? artboard) {
+    public Models.CanvasText add_text (
+        double x,
+        double y,
+        Goo.CanvasItem parent,
+        Models.CanvasArtboard? artboard,
+        bool loaded
+    ) {
         return new Models.CanvasText (
             "Akira is awesome :)",
             Utils.AffineTransform.fix_size (x),
@@ -234,7 +261,9 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             Goo.CanvasAnchorType.NW,
             "Open Sans 18",
             parent,
-            artboard);
+            artboard,
+            loaded
+        );
     }
 
     public Models.CanvasImage add_image (
@@ -242,14 +271,17 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         double y,
         Lib.Managers.ImageManager manager,
         Goo.CanvasItem parent,
-        Models.CanvasArtboard? artboard
+        Models.CanvasArtboard? artboard,
+        bool loaded
     ) {
         return new Models.CanvasImage (
             Utils.AffineTransform.fix_size (x),
             Utils.AffineTransform.fix_size (y),
             manager,
             parent,
-            artboard);
+            artboard,
+            loaded
+        );
     }
 
     public int get_item_position (Lib.Models.CanvasItem item) {
@@ -405,22 +437,22 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         switch (obj.get_string_member ("type")) {
             case "AkiraLibModelsCanvasRect":
                 insert_type = Models.CanvasItemType.RECT;
-                item = insert_item (pos_x, pos_y);
+                item = insert_item (pos_x, pos_y, null, true);
                 break;
 
             case "AkiraLibModelsCanvasEllipse":
                 insert_type = Models.CanvasItemType.ELLIPSE;
-                item = insert_item (pos_x, pos_y);
+                item = insert_item (pos_x, pos_y, null, true);
                 break;
 
             case "AkiraLibModelsCanvasText":
                 insert_type = Models.CanvasItemType.TEXT;
-                item = insert_item (pos_x, pos_y);
+                item = insert_item (pos_x, pos_y, null, true);
                 break;
 
             case "AkiraLibModelsCanvasArtboard":
                 insert_type = Models.CanvasItemType.ARTBOARD;
-                item = insert_item (pos_x, pos_y);
+                item = insert_item (pos_x, pos_y, null, true);
                 break;
 
             case "AkiraLibModelsCanvasImage":
@@ -433,7 +465,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
                     )
                 );
                 var manager = new Akira.Lib.Managers.ImageManager.from_archive (file, filename);
-                item = insert_item (pos_x, pos_y, manager);
+                item = insert_item (pos_x, pos_y, manager, true);
                 break;
         }
 

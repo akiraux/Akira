@@ -76,6 +76,9 @@ public class Akira.Lib.Models.CanvasImage : Goo.CanvasImage, Models.CanvasItem {
     public double initial_relative_x { get; set; }
     public double initial_relative_y { get; set; }
 
+    // Knows if an item was created or loaded for ordering purpose.
+    public bool loaded { get; set; default = false; }
+
     // CanvasImage unique attributes.
     public Lib.Managers.ImageManager manager { get; set; }
     private Gdk.Pixbuf original_pixbuf;
@@ -85,8 +88,10 @@ public class Akira.Lib.Models.CanvasImage : Goo.CanvasImage, Models.CanvasItem {
         double _y = 0,
         Lib.Managers.ImageManager _manager,
         Goo.CanvasItem? _parent = null,
-        Models.CanvasArtboard? _artboard = null
+        Models.CanvasArtboard? _artboard = null,
+        bool _loaded = false
     ) {
+        loaded = _loaded;
         artboard = _artboard;
         parent = _artboard != null ? _artboard : _parent;
         canvas = parent.get_canvas () as Akira.Lib.Canvas;

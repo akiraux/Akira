@@ -137,7 +137,6 @@ public class Akira.FileFormat.AkiraFile : Akira.FileFormat.ZipArchiveHandler {
     public async void save_images () {
         // Clear potential leftover images if we're overwriting an existing file.
         if (overwrite) {
-            debug ("overwrite");
             try {
                 Dir dir = Dir.open (pictures_folder.get_path (), 0);
                 string? name = null;
