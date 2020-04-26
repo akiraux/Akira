@@ -69,6 +69,9 @@ public class Akira.Lib.Models.CanvasText : Goo.CanvasText, Models.CanvasItem {
     public double initial_relative_x { get; set; }
     public double initial_relative_y { get; set; }
 
+    // Knows if an item was created or loaded for ordering purpose.
+    public bool loaded { get; set; default = false; }
+
     public CanvasText (
         string _text = "",
         double _x = 0,
@@ -78,7 +81,8 @@ public class Akira.Lib.Models.CanvasText : Goo.CanvasText, Models.CanvasItem {
         Goo.CanvasAnchorType _anchor = Goo.CanvasAnchorType.NW,
         string _font = "Open Sans 16",
         Goo.CanvasItem? _parent = null,
-        Models.CanvasArtboard? _artboard = null
+        Models.CanvasArtboard? _artboard = null,
+        bool _loaded = false
     ) {
         Object (
             x: _x,
@@ -87,6 +91,7 @@ public class Akira.Lib.Models.CanvasText : Goo.CanvasText, Models.CanvasItem {
             height: _height
         );
 
+        loaded = _loaded;
         artboard = _artboard;
         parent = _artboard != null ? _artboard : _parent;
         canvas = parent.get_canvas () as Akira.Lib.Canvas;

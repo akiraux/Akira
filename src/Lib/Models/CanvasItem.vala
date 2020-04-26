@@ -80,6 +80,9 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
     public abstract double initial_relative_x { get; set; }
     public abstract double initial_relative_y { get; set; }
 
+    // Knows if an item was created or loaded for ordering purpose.
+    public abstract bool loaded { get; set; default = false; }
+
     public double get_coords (string coord_id) {
         double _coord = 0.0;
 

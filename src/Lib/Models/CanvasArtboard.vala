@@ -95,6 +95,9 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
     public double initial_relative_x { get; set; }
     public double initial_relative_y { get; set; }
 
+    // Knows if an item was created or loaded for ordering purpose.
+    public bool loaded { get; set; default = false; }
+
     public CanvasArtboard (double _x = 0, double _y = 0, Goo.CanvasItem? _parent = null) {
         parent_item = _parent;
 
@@ -172,7 +175,7 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
             return;
         }
 
-        items.add_item.begin (canvas_item, false);
+        items.add_item.begin (canvas_item, (item as Models.CanvasItem).loaded);
         item.set_parent (this);
 
         request_update ();

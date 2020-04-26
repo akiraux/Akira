@@ -83,6 +83,9 @@ public class Akira.Lib.Models.CanvasRect : Goo.CanvasRect, Models.CanvasItem {
     public double initial_relative_x { get; set; }
     public double initial_relative_y { get; set; }
 
+    // Knows if an item was created or loaded for ordering purpose.
+    public bool loaded { get; set; default = false; }
+
     public CanvasRect (
         double _x = 0,
         double _y = 0,
@@ -92,8 +95,10 @@ public class Akira.Lib.Models.CanvasRect : Goo.CanvasRect, Models.CanvasItem {
         Gdk.RGBA _border_color,
         Gdk.RGBA _fill_color,
         Goo.CanvasItem? _parent = null,
-        Models.CanvasArtboard? _artboard = null
+        Models.CanvasArtboard? _artboard = null,
+        bool _loaded = false
     ) {
+        loaded = _loaded;
         artboard = _artboard;
         parent = _artboard != null ? _artboard : _parent;
         canvas = parent.get_canvas () as Akira.Lib.Canvas;

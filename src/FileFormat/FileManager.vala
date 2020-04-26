@@ -78,6 +78,8 @@ public class Akira.FileFormat.FileManager : Object {
     }
 
     private void save_file_as_response (Gtk.FileChooserNative dialog, int response_id) {
+        bool overwrite = false;
+
         switch (response_id) {
             case Gtk.ResponseType.ACCEPT:
                 File file;
@@ -85,10 +87,11 @@ public class Akira.FileFormat.FileManager : Object {
                 var path = save_file.get_path ();
                 if (path.has_suffix (".akira")) {
                    file = save_file;
+                   overwrite = true;
                 } else {
                    file = File.new_for_path (path + ".akira");
                 }
-                window.save_new_file (file);
+                window.save_new_file (file, overwrite);
                 window.event_bus.file_saved (dialog.get_current_name ());
                 break;
         }

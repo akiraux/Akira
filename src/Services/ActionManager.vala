@@ -360,8 +360,16 @@ public class Akira.Services.ActionManager : Object {
             case Gtk.ResponseType.OK:
                 SList<File> files = dialog.get_files ();
                 files.@foreach ((file) => {
-                    var provider = new Akira.Services.FileImageProvider (file);
-                    window.items_manager.insert_image (provider);
+                    if (Akira.Utils.Image.is_valid_image (file)) {
+                        var manager = new Akira.Lib.Managers.ImageManager (file, files.index (file));
+                        window.items_manager.insert_image (manager);
+                        return;
+                    }
+
+                    var ext = Akira.Utils.Image.get_extension (file);
+                    window.event_bus.canvas_notification (
+                        _("Error! .%s files are not supported!"
+                    ).printf (ext));
                 });
                 break;
         }

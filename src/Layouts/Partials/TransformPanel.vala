@@ -341,6 +341,8 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
             y.value = position["y"];
             y.notify["value"].connect (y_notify_value);
         }
+
+        window.event_bus.file_edited ();
     }
 
     public void x_notify_value () {

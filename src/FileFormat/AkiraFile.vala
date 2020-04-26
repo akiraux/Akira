@@ -26,6 +26,8 @@ public class Akira.FileFormat.AkiraFile : Akira.FileFormat.ZipArchiveHandler {
     public File pictures_folder { get; private set; }
     public File thumbnails_folder { get; private set; }
 
+    public bool overwrite = false;
+
     private File content_file { get; set; }
     public string path {
         owned get {
@@ -45,6 +47,7 @@ public class Akira.FileFormat.AkiraFile : Akira.FileFormat.ZipArchiveHandler {
             new FileFormat.JsonLoader (window, content_json);
 
             update_recent_list.begin ();
+
             debug ("Version from file: %s", content_json.get_string_member ("version"));
         } catch (Error e) {
             error ("Could not load file: %s", e.message);
@@ -53,6 +56,7 @@ public class Akira.FileFormat.AkiraFile : Akira.FileFormat.ZipArchiveHandler {
 
     public void save_file () {
         try {
+            save_images.begin ();
             var content = new FileFormat.JsonContent (window);
 
             content.save_content ();
@@ -125,5 +129,51 @@ public class Akira.FileFormat.AkiraFile : Akira.FileFormat.ZipArchiveHandler {
         settings.set_strv ("recently-opened", array);
 
         window.app.update_recent_files_list ();
+    }
+
+    /**
+     * Save all the images used in the Canvas and make a copy in the Pictures folder.
+     */
+    public async void save_images () {
+        // Clear potential leftover images if we're overwriting an existing file.
+        if (overwrite) {
+            try {
+                Dir dir = Dir.open (pictures_folder.get_path (), 0);
+                string? name = null;
+                while ((name = dir.read_name ()) != null) {
+                    var file = File.new_for_path (Path.build_filename (pictures_folder.get_path (), name));
+                    file_collector.mark_for_deletion (file);
+                }
+            } catch (FileError err) {
+                stderr.printf (err.message);
+            }
+            overwrite = false;
+        }
+
+        foreach (var image in window.items_manager.images) {
+            var image_file = File.new_for_path (
+                Path.build_filename (pictures_folder.get_path (), image.manager.filename)
+            );
+
+            // Copy the file if it doesn't exist, or increase the reference count.
+            if (!image_file.query_exists ()) {
+                copy_image (image.manager.file, image_file);
+                continue;
+            }
+        }
+    }
+
+    /**
+     * Decrease the reference count to an existing image, which will cause its
+     * deletion if the count reaches 0.
+     */
+    public async void remove_image (string filename) {
+        var image_file = File.new_for_path (
+            Path.build_filename (pictures_folder.get_path (), filename)
+        );
+
+        if (image_file.query_exists ()) {
+            file_collector.unref_file (image_file);
+        }
     }
 }

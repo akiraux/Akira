@@ -185,8 +185,9 @@ public class Akira.Window : Gtk.ApplicationWindow {
         akira_file.load_file ();
     }
 
-    public void save_new_file (File file) {
+    public void save_new_file (File file, bool overwrite = false) {
         akira_file = new FileFormat.AkiraFile (file, this);
+        akira_file.overwrite = overwrite;
 
         akira_file.prepare ();
         akira_file.save_file ();
