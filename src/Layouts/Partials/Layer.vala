@@ -334,9 +334,10 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
         drag_begin.connect (on_drag_begin);
         // drag_data_get.connect (on_drag_data_get);
 
-        // Gtk.drag_dest_set (this, Gtk.DestDefaults.MOTION, TARGET_ENTRIES, Gdk.DragAction.MOVE);
-        // drag_motion.connect (on_drag_motion);
-        // drag_leave.connect (on_drag_leave);
+        // Make this widget a DnD destination.
+        Gtk.drag_dest_set (this, Gtk.DestDefaults.MOTION, TARGET_ENTRIES, Gdk.DragAction.MOVE);
+        drag_motion.connect (on_drag_motion);
+        drag_leave.connect (on_drag_leave);
 
         drag_end.connect (clear_indicator);
     }
@@ -389,18 +390,10 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
     }
 
     public bool on_drag_motion (Gdk.DragContext context, int x, int y, uint time) {
-        if (!scrolling) {
-            window.main_window.right_sidebar.indicator.visible = true;
-            window.main_window.right_sidebar.indicator.no_show_all = false;
-            window.main_window.right_sidebar.indicator.show_all ();
-        } else {
-            window.event_bus.toggle_sidebar_indicator (false);
-        }
+        motion_revealer.reveal_child = true;
 
         int row_index = get_index ();
         var row = (Akira.Layouts.Partials.Layer) (parent as Gtk.ListBox).get_row_at_index (row_index);
-        var last_adjust = 0;
-        var group_y = 0;
 
         Gtk.Allocation alloc;
         get_allocation (out alloc);
@@ -417,62 +410,11 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
             Timeout.add (SCROLL_DELAY, scroll);
         }
 
-        if (layer_group != null) {
-            group_y = layer_group.get_index () * alloc.height;
-            window.main_window.right_sidebar.indicator.margin_start = 40;
-        } else {
-            window.main_window.right_sidebar.indicator.margin_start = 20;
-        }
-
-        vadjustment = window.main_window.right_sidebar.layers_scroll.vadjustment;
-
-        if (vadjustment == null) {
-            vadjustment.value = 0;
-        }
-
-        if (row_index == 0 && layer_group == null && !grouped) {
-            last_adjust = 6;
-        }
-
-        // Highlight the correct dropping area
-        if (grouped) {
-            handle_grid.get_allocation (out alloc);
-
-            if (y >= (alloc.height / 2)) {
-                get_style_context ().add_class ("highlight");
-            } else {
-                get_style_context ().remove_class ("highlight");
-                window.main_window.right_sidebar.indicator.margin_top =
-                    (row_index * alloc.height) - 6 - (int)vadjustment.value + group_y - last_adjust;
-            }
-
-            return true;
-        }
-
-        var new_margin_top = 0;
-
-        if (y > (alloc.height / 2)) {
-          // We are trying to move this into the *next* layer
-          new_margin_top = (row_index + 1) * alloc.height;
-        } else {
-          // Still moving this in the current layer
-          new_margin_top = row_index * alloc.height;
-        }
-
-        // Account for vadjustment and group_y
-        new_margin_top += - (int)vadjustment.value + group_y;
-
-        // Prevent negative allocation, which does give warning
-        new_margin_top = new_margin_top > 0 ? new_margin_top : 0;
-
-        window.main_window.right_sidebar.indicator.margin_top = new_margin_top;
-
         return true;
     }
 
     public void on_drag_leave (Gdk.DragContext context, uint time) {
-        get_style_context ().remove_class ("highlight");
-
+        motion_revealer.reveal_child = false;
         should_scroll = false;
     }
 
