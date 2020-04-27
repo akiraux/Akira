@@ -40,6 +40,10 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
         { "LAYER", Gtk.TargetFlags.SAME_APP, 0 }
     };
 
+    // Drag and Drop properties.
+    public Gtk.Revealer motion_revealer;
+    public Gtk.Revealer main_revealer;
+
     public Gtk.Image icon;
     public Gtk.Image icon_folder_open;
     public Gtk.Image icon_locked;
@@ -176,6 +180,14 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
         button_hidden_grid.attach (icon_visible, 1, 0, 1, 1);
         button_hidden.add (button_hidden_grid);
 
+        var motion_grid = new Gtk.Grid ();
+        motion_grid.get_style_context ().add_class ("grid-motion");
+        motion_grid.height_request = 2;
+
+        motion_revealer = new Gtk.Revealer ();
+        motion_revealer.transition_type = Gtk.RevealerTransitionType.SLIDE_DOWN;
+        motion_revealer.add (motion_grid);
+
         handle_grid = new Gtk.Grid ();
         handle_grid.expand = true;
         handle_grid.attach (icon_layer_grid, 0, 0, 1, 1);
@@ -190,14 +202,16 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 
         label_grid = new Gtk.Grid ();
         label_grid.expand = true;
-        label_grid.attach (handle, 1, 0, 1, 1);
-        label_grid.attach (button_locked, 2, 0, 1, 1);
-        label_grid.attach (button_hidden, 3, 0, 1, 1);
+        label_grid.attach (handle, 0, 0, 1, 1);
+        label_grid.attach (button_locked, 1, 0, 1, 1);
+        label_grid.attach (button_hidden, 2, 0, 1, 1);
+        label_grid.attach (motion_revealer, 0, 1, 3, 1);
 
         is_group ();
         build_drag_and_drop ();
 
-        handle.event.connect (on_click_event);
+        handle.button_press_event.connect (on_click_event);
+        // handle.button_release_event.connect (on_release_event);
 
         handle.enter_notify_event.connect (event => {
             get_style_context ().add_class ("hover");
@@ -238,8 +252,13 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
     }
 
     private void is_group () {
-        if (! grouped) {
-            add (label_grid);
+        main_revealer = new Gtk.Revealer ();
+        main_revealer.reveal_child = true;
+        main_revealer.transition_type = Gtk.RevealerTransitionType.SLIDE_DOWN;
+
+        if (!grouped) {
+            main_revealer.add (label_grid);
+            add (main_revealer);
             return;
         }
 
@@ -276,7 +295,8 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
         group_grid.attach (label_grid, 0, 0, 1, 1);
         group_grid.attach (revealer, 0, 1, 1, 1);
 
-        add (group_grid);
+        main_revealer.add (group_grid);
+        add (main_revealer);
     }
 
     private void reveal_actions () {
@@ -308,14 +328,15 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
     }
 
     private void build_drag_and_drop () {
+        // Make this a draggable widget.
         Gtk.drag_source_set (this, Gdk.ModifierType.BUTTON1_MASK, TARGET_ENTRIES, Gdk.DragAction.MOVE);
 
         drag_begin.connect (on_drag_begin);
-        drag_data_get.connect (on_drag_data_get);
+        // drag_data_get.connect (on_drag_data_get);
 
-        Gtk.drag_dest_set (this, Gtk.DestDefaults.MOTION, TARGET_ENTRIES, Gdk.DragAction.MOVE);
-        drag_motion.connect (on_drag_motion);
-        drag_leave.connect (on_drag_leave);
+        // Gtk.drag_dest_set (this, Gtk.DestDefaults.MOTION, TARGET_ENTRIES, Gdk.DragAction.MOVE);
+        // drag_motion.connect (on_drag_motion);
+        // drag_leave.connect (on_drag_leave);
 
         drag_end.connect (clear_indicator);
     }
@@ -348,6 +369,8 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
         if (artboard != null) {
             artboard.count_layers ();
         }
+
+        main_revealer.reveal_child = false;
     }
 
     private void on_drag_data_get (
@@ -454,9 +477,15 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
     }
 
     public void clear_indicator (Gdk.DragContext context) {
-        window.event_bus.toggle_sidebar_indicator (false);
+        main_revealer.reveal_child = true;
     }
 
+    /**
+     * Handle the click event for the EventBox to manage item selection and name editing.
+     *
+     * @param {Gdk.Event} event - The button click event.
+     * @return {bool} True to stop propagation, False to let other events run.
+     */
     public bool on_click_event (Gdk.Event event) {
         if (event.type == Gdk.EventType.@2BUTTON_PRESS) {
             entry.text = label.label;
@@ -477,83 +506,89 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
                 return false;
             });
 
-            return false;
+            return true;
         }
 
         if (event.type == Gdk.EventType.BUTTON_PRESS) {
-            // Selected layers cannot be hovering
-            // We need to reflect the status of the canvas item
+            // Selected layers cannot be hovering.
+            // We need to reflect the status of the canvas item.
             get_style_context ().remove_class ("hovered");
 
             window.event_bus.request_add_item_to_selection (model);
             window.event_bus.hover_over_layer (null);
-
-            return true;
         }
-
-        /*
-        if (event.type == Gdk.EventType.BUTTON_RELEASE) {
-            if (entry.visible == true) {
-                return false;
-            }
-
-            Gdk.ModifierType state;
-            event.get_state (out state);
-
-            if (state.to_string () == "GDK_CONTROL_MASK") {
-                artboard.container.selection_mode = Gtk.SelectionMode.MULTIPLE;
-
-                if (layer_group != null) {
-                    layer_group.container.selection_mode = Gtk.SelectionMode.MULTIPLE;
-
-                    if (!layer_group.is_selected ()) {
-                        Timeout.add (1, () => {
-                            artboard.container.unselect_row (layer_group);
-                            return false;
-                        });
-                    }
-                }
-
-                if (is_selected ()) {
-                    Timeout.add (1, () => {
-                        artboard.container.unselect_row (this);
-                        return false;
-                    });
-                }
-
-                return true;
-            }
-
-            if (artboard != null) {
-                artboard.container.selection_mode = Gtk.SelectionMode.SINGLE;
-            }
-
-            window.main_window.right_sidebar.layers_panel.foreach (child => {
-                if (child is Akira.Layouts.Partials.Artboard) {
-                    Akira.Layouts.Partials.Artboard artboard = (Akira.Layouts.Partials.Artboard) child;
-
-                    window.main_window.right_sidebar.layers_panel.unselect_row (artboard);
-                    artboard.container.unselect_all ();
-
-                    unselect_groups (artboard.container);
-                }
-            });
-
-            if (layer_group != null) {
-                artboard.container.selection_mode = Gtk.SelectionMode.NONE;
-                artboard.container.unselect_row (layer_group);
-            }
-
-            if (artboard != null) {
-                window.main_window.right_sidebar.layers_panel.unselect_row (artboard);
-            }
-
-            return true;
-        }
-        */
 
         return false;
     }
+
+    /**
+     * Handle the release event for the EventBox to manage multi select.
+     *
+     * @param {Gdk.Event} event - The button click event.
+     * @return {bool} True to stop propagation, False to let other events run.
+     */
+    // public bool on_release_event (Gdk.Event event) {
+    //     if (event.type == Gdk.EventType.BUTTON_RELEASE) {
+    //         if (entry.visible == true) {
+    //             return false;
+    //         }
+
+    //         Gdk.ModifierType state;
+    //         event.get_state (out state);
+
+    //         if (state.to_string () == "GDK_CONTROL_MASK") {
+    //             artboard.container.selection_mode = Gtk.SelectionMode.MULTIPLE;
+
+    //             if (layer_group != null) {
+    //                 layer_group.container.selection_mode = Gtk.SelectionMode.MULTIPLE;
+
+    //                 if (!layer_group.is_selected ()) {
+    //                     Timeout.add (1, () => {
+    //                         artboard.container.unselect_row (layer_group);
+    //                         return false;
+    //                     });
+    //                 }
+    //             }
+
+    //             if (is_selected ()) {
+    //                 Timeout.add (1, () => {
+    //                     artboard.container.unselect_row (this);
+    //                     return false;
+    //                 });
+    //             }
+
+    //             return true;
+    //         }
+
+    //         if (artboard != null) {
+    //             artboard.container.selection_mode = Gtk.SelectionMode.SINGLE;
+    //         }
+
+    //         window.main_window.right_sidebar.layers_panel.foreach (child => {
+    //             if (child is Akira.Layouts.Partials.Artboard) {
+    //                 Akira.Layouts.Partials.Artboard artboard = (Akira.Layouts.Partials.Artboard) child;
+
+    //                 window.main_window.right_sidebar.layers_panel.unselect_row (artboard);
+    //                 artboard.container.unselect_all ();
+
+    //                 unselect_groups (artboard.container);
+    //             }
+    //         });
+
+    //         if (layer_group != null) {
+    //             artboard.container.selection_mode = Gtk.SelectionMode.NONE;
+    //             artboard.container.unselect_row (layer_group);
+    //         }
+
+    //         if (artboard != null) {
+    //             window.main_window.right_sidebar.layers_panel.unselect_row (artboard);
+    //         }
+
+    //         return true;
+    //     }
+
+    //     return false;
+    // }
 
     private void unselect_groups (Gtk.ListBox container) {
         container.foreach (child => {

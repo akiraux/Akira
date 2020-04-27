@@ -102,12 +102,16 @@
     padding-left: 15px;
 }
 
-.indicator {
+/*.indicator {
     background-color: @primary;
     border-radius: 0 2px 2px 0;
 }
 
 .indicator-circle {
     border-radius: 50%;
+    background-color: @primary;
+}*/
+
+.grid-motion {
     background-color: @primary;
 }
