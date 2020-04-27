@@ -314,11 +314,17 @@ public class Akira.Lib.Managers.ExportManager : Object {
                 name = artboard.name != null ? artboard.name : name;
             }
 
+            // Account for items inside or outside artboards.
+            double x1 = item.get_global_coord ("x");
+            double x2 = x1 + item.get_coords ("width");
+            double y1 = item.get_global_coord ("y");
+            double y2 = y1 + item.get_coords ("height");
+
             // Create the rendered image with Cairo.
             surface = new Cairo.ImageSurface (
                 format,
-                (int) Math.round (item.bounds.x2 - item.bounds.x1),
-                (int) Math.round (item.bounds.y2 - item.bounds.y1 - label_height)
+                (int) Math.round (x2 - x1),
+                (int) Math.round (y2 - y1 - label_height)
             );
             context = new Cairo.Context (surface);
 
@@ -327,13 +333,13 @@ public class Akira.Lib.Managers.ExportManager : Object {
                 context.set_source_rgba (1, 1, 1, 1);
                 context.rectangle (
                     0, 0,
-                    (int) Math.round (item.bounds.x2 - item.bounds.x1),
-                    (int) Math.round (item.bounds.y2 - item.bounds.y1 - label_height));
+                    (int) Math.round (x2 - x1),
+                    (int) Math.round (y2 - y1 - label_height));
                 context.fill ();
             }
 
             // Move to the currently selected item.
-            context.translate (-item.bounds.x1, -item.bounds.y1 - label_height);
+            context.translate (-x1, -y1 - label_height);
 
             // Render the selected item.
             canvas.render (context, null, canvas.current_scale);
@@ -375,8 +381,14 @@ public class Akira.Lib.Managers.ExportManager : Object {
             label_height = artboard.get_label_height ();
         }
 
-        var width = item != null ? item.bounds.x2 - item.bounds.x1 : area.width;
-        var height = item != null ? item.bounds.y2 - item.bounds.y1 - label_height : area.height;
+        // Account for items inside or outside artboards.
+        double x1 = item.get_global_coord ("x");
+        double x2 = x1 + item.get_coords ("width");
+        double y1 = item.get_global_coord ("y");
+        double y2 = y1 + item.get_coords ("height");
+
+        var width = item != null ? x2 - x1 : area.width;
+        var height = item != null ? y2 - y1 - label_height : area.height;
 
         switch (settings.export_scale) {
             case 0:

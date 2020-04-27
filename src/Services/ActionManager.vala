@@ -276,7 +276,7 @@ public class Akira.Services.ActionManager : Object {
             window.event_bus.canvas_notification (_("Nothing selected to export!"));
             return;
         }
-        // TODO: Trigger selection pixbuf generation.
+
         canvas.export_manager.create_selection_snapshot ();
     }
 
