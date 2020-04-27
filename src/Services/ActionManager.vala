@@ -276,13 +276,13 @@ public class Akira.Services.ActionManager : Object {
             window.event_bus.canvas_notification (_("Nothing selected to export!"));
             return;
         }
-        // TODO: Trigger selection pixbuf generation.
+
         canvas.export_manager.create_selection_snapshot ();
     }
 
     private void action_export_artboards () {
         // Check if at least an artboard is present.
-        window.event_bus.canvas_notification (_("No Artboard available!"));
+        window.event_bus.canvas_notification (_("Export of Artbords currently unavailable…sorry 😑️"));
         // TODO: Trigger artboards pixbuf generation.
     }
 
