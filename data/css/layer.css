@@ -48,12 +48,12 @@
     box-shadow: none;
 }
 
-.layer.hover > grid > .layer-action,
-.layer.hover > grid > grid > .layer-action {
+.layer.hover > revealer > grid > .layer-action,
+.layer.hover > revealer > grid > grid > .layer-action {
     opacity: 0.5;
 }
 
-.layer.hover > grid > .layer-action:hover,
+.layer.hover > revealer > grid > .layer-action:hover,
 .layer-action:hover {
     opacity: 1;
 }
@@ -101,16 +101,6 @@
 .group-container .layer {
     padding-left: 15px;
 }
-
-/*.indicator {
-    background-color: @primary;
-    border-radius: 0 2px 2px 0;
-}
-
-.indicator-circle {
-    border-radius: 50%;
-    background-color: @primary;
-}*/
 
 .grid-motion {
     background-color: @primary;
