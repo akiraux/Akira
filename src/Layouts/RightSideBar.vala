@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2019 Alecaddd (http://alecaddd.com)
+* Copyright (c) 2019-2020 Alecaddd (https://alecaddd.com)
 *
 * This file is part of Akira.
 *
@@ -10,11 +10,11 @@
 
 * Akira is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 * GNU General Public License for more details.
 
 * You should have received a copy of the GNU General Public License
-* along with Akira.  If not, see <https://www.gnu.org/licenses/>.
+* along with Akira. If not, see <https://www.gnu.org/licenses/>.
 *
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
@@ -35,6 +35,14 @@ public class Akira.Layouts.RightSideBar : Gtk.Grid {
             no_show_all = !value;
         }
     }
+
+    // Drag and Drop properties.
+    private Gtk.Revealer motion_revealer;
+
+    private const Gtk.TargetEntry TARGET_ENTRIES[] = {
+        { "ARTBOARD", Gtk.TargetFlags.SAME_APP, 0 },
+        { "LAYER", Gtk.TargetFlags.SAME_APP, 0 }
+    };
 
     public RightSideBar (Akira.Window window) {
         Object (
@@ -68,9 +76,19 @@ public class Akira.Layouts.RightSideBar : Gtk.Grid {
             ((Gtk.Container) scrolled_child).set_focus_vadjustment (new Gtk.Adjustment (0, 0, 0, 0, 0, 0));
         }
 
+        // Motion revealer for Drag and Drop on the top search bar.
+        var motion_grid = new Gtk.Grid ();
+        motion_grid.get_style_context ().add_class ("grid-motion");
+        motion_grid.height_request = 2;
+
+        motion_revealer = new Gtk.Revealer ();
+        motion_revealer.transition_type = Gtk.RevealerTransitionType.SLIDE_DOWN;
+        motion_revealer.add (motion_grid);
+
         var top_panel = new Gtk.Grid ();
         top_panel.attach (build_search_bar (), 0, 0, 1, 1);
-        top_panel.attach (layers_scroll, 0, 1, 1, 1);
+        top_panel.attach (motion_revealer, 0, 1, 1, 1);
+        top_panel.attach (layers_scroll, 0, 2, 1, 1);
 
         pane.pack1 (top_panel, false, false);
 
@@ -99,7 +117,32 @@ public class Akira.Layouts.RightSideBar : Gtk.Grid {
         search_grid.get_style_context ().add_class ("border-bottom");
         search_grid.add (search);
 
+        // Build Drag and Drop for layers moving atop the search entry.
+        Gtk.drag_dest_set (search, Gtk.DestDefaults.ALL, TARGET_ENTRIES, Gdk.DragAction.MOVE);
+        search.drag_motion.connect (on_drag_motion);
+        search.drag_leave.connect (on_drag_leave);
+        search.drag_end.connect (on_drag_end);
+
+        // Build Drag and Drop for layers moving atop the search grid.
+        Gtk.drag_dest_set (search_grid, Gtk.DestDefaults.ALL, TARGET_ENTRIES, Gdk.DragAction.MOVE);
+        search_grid.drag_motion.connect (on_drag_motion);
+        search_grid.drag_leave.connect (on_drag_leave);
+        search_grid.drag_end.connect (on_drag_end);
+
         return search_grid;
+    }
+
+    private bool on_drag_motion (Gdk.DragContext context, int x, int y, uint time) {
+        motion_revealer.reveal_child = true;
+        return true;
+    }
+
+    private void on_drag_leave (Gdk.DragContext context, uint time) {
+        motion_revealer.reveal_child = false;
+    }
+
+    private void on_drag_end (Gdk.DragContext context) {
+        motion_revealer.reveal_child = true;
     }
 
     private bool handle_focus_in (Gdk.EventFocus event) {

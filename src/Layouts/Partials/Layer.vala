@@ -388,7 +388,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
         // );
     }
 
-    public bool on_drag_motion (Gdk.DragContext context, int x, int y, uint time) {
+    private bool on_drag_motion (Gdk.DragContext context, int x, int y, uint time) {
         motion_revealer.reveal_child = true;
 
         int row_index = get_index ();
@@ -412,12 +412,12 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
         return true;
     }
 
-    public void on_drag_leave (Gdk.DragContext context, uint time) {
+    private void on_drag_leave (Gdk.DragContext context, uint time) {
         motion_revealer.reveal_child = false;
         should_scroll = false;
     }
 
-    public void on_drag_end (Gdk.DragContext context) {
+    private void on_drag_end (Gdk.DragContext context) {
         main_revealer.reveal_child = true;
     }
 
