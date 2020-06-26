@@ -42,8 +42,8 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 
     // Drag and Drop properties.
     public Gtk.Revealer motion_revealer;
-    public Gtk.Revealer main_revealer;
 
+    public Gtk.Revealer main_revealer;
     public Gtk.Image icon;
     public Gtk.Image icon_folder_open;
     public Gtk.Image icon_locked;
@@ -330,9 +330,8 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
     private void build_drag_and_drop () {
         // Make this a draggable widget.
         Gtk.drag_source_set (this, Gdk.ModifierType.BUTTON1_MASK, TARGET_ENTRIES, Gdk.DragAction.MOVE);
-
         drag_begin.connect (on_drag_begin);
-        // drag_data_get.connect (on_drag_data_get);
+        drag_data_get.connect (on_drag_data_get);
 
         // Make this widget a DnD destination.
         Gtk.drag_dest_set (this, Gtk.DestDefaults.MOTION, TARGET_ENTRIES, Gdk.DragAction.MOVE);
@@ -380,13 +379,13 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
         Gtk.SelectionData selection_data,
         uint target_type, uint time) {
 
-        uchar[] data = new uchar[(sizeof (Akira.Layouts.Partials.Layer))];
+        // uchar[] data = new uchar[(sizeof (Akira.Layouts.Partials.Layer))];
 
-        ((Gtk.Widget[])data)[0] = widget;
+        // ((Gtk.Widget[])data)[0] = widget;
 
-        selection_data.set (
-            Gdk.Atom.intern_static_string ("LAYER"), 32, data
-            );
+        // selection_data.set (
+        //     Gdk.Atom.intern_static_string ("LAYER"), 32, data
+        // );
     }
 
     public bool on_drag_motion (Gdk.DragContext context, int x, int y, uint time) {

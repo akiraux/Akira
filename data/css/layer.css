@@ -88,11 +88,6 @@
     -gtk-icon-transform: rotate(-90deg);
 }
 
-/* drag and drop */
-.layer.highlight > grid > grid {
-    box-shadow: inset 0 0 0 2px @primary;
-}
-
 /* group */
 .group-container {
     background-color: @bg_color;
@@ -102,6 +97,7 @@
     padding-left: 15px;
 }
 
+/* drag and drop */
 .grid-motion {
     background-color: @primary;
 }

@@ -48,6 +48,9 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 
     public Akira.Lib.Models.CanvasArtboard model { get; construct; }
 
+    // Drag and Drop properties.
+    public Gtk.Revealer motion_revealer;
+
     private bool _editing { get; set; default = false; }
     public bool editing {
         get { return _editing; } set { _editing = value; }
@@ -104,6 +107,14 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
         Gtk.drag_dest_set (container, Gtk.DestDefaults.ALL, TARGET_ENTRIES_LAYER, Gdk.DragAction.MOVE);
         container.drag_data_received.connect (on_drag_data_received);
         revealer.add (container);
+
+        var motion_grid = new Gtk.Grid ();
+        motion_grid.get_style_context ().add_class ("grid-motion");
+        motion_grid.height_request = 2;
+
+        motion_revealer = new Gtk.Revealer ();
+        motion_revealer.transition_type = Gtk.RevealerTransitionType.SLIDE_DOWN;
+        motion_revealer.add (motion_grid);
 
         handle = new Gtk.EventBox ();
         handle.hexpand = true;
@@ -162,7 +173,8 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 
         var grid = new Gtk.Grid ();
         grid.attach (artboard_handle, 0, 0, 1, 1);
-        grid.attach (revealer, 0, 1, 1, 1);
+        grid.attach (motion_revealer, 0, 1, 1, 1);
+        grid.attach (revealer, 0, 2, 1, 1);
 
         add (grid);
 
@@ -344,11 +356,14 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
     }
 
     private void build_drag_and_drop () {
+        // Make this a draggable widget.
         Gtk.drag_source_set (this, Gdk.ModifierType.BUTTON1_MASK, TARGET_ENTRIES, Gdk.DragAction.MOVE);
-
         drag_begin.connect (on_drag_begin);
         drag_data_get.connect (on_drag_data_get);
 
+        // Make this widget a DnD destination.
+        Gtk.drag_dest_set (this, Gtk.DestDefaults.MOTION, TARGET_ENTRIES_LAYER, Gdk.DragAction.MOVE);
+        drag_motion.connect (on_drag_motion);
         drag_leave.connect (on_drag_leave);
     }
 
@@ -388,9 +403,13 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
         );
     }
 
+    public bool on_drag_motion (Gdk.DragContext context, int x, int y, uint time) {
+        motion_revealer.reveal_child = true;
+        return true;
+    }
+
     public void on_drag_leave (Gdk.DragContext context, uint time) {
-        get_style_context ().remove_class ("highlight");
-        window.main_window.right_sidebar.indicator.visible = false;
+        motion_revealer.reveal_child = false;
     }
 
     public bool on_click_event (Gdk.Event event) {
