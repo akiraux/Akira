@@ -221,7 +221,6 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 
     private void on_drag_data_received (Gdk.DragContext context, int x, int y, Gtk.SelectionData selection_data,
         uint target_type, uint time) {
-        window.main_window.right_sidebar.indicator.visible = false;
 
         Akira.Layouts.Partials.Layer target;
         Gtk.Widget row;

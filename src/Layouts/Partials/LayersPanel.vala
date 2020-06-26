@@ -138,7 +138,6 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.Grid {
         }
 
         window.event_bus.change_item_z_index (source.model.item, new_position);
-        window.event_bus.toggle_sidebar_indicator (false);
     }
     */
 

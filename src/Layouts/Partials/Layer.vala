@@ -338,7 +338,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
         drag_motion.connect (on_drag_motion);
         drag_leave.connect (on_drag_leave);
 
-        drag_end.connect (clear_indicator);
+        drag_end.connect (on_drag_end);
     }
 
     private void on_drag_begin (Gtk.Widget widget, Gdk.DragContext context) {
@@ -417,7 +417,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
         should_scroll = false;
     }
 
-    public void clear_indicator (Gdk.DragContext context) {
+    public void on_drag_end (Gdk.DragContext context) {
         main_revealer.reveal_child = true;
     }
 
