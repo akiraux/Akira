@@ -44,7 +44,6 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
     public Gtk.Image button_icon;
     public Gtk.Revealer revealer;
     public Gtk.ListBox container;
-    public int layers_count { get; set; default = 0; }
 
     public Akira.Lib.Models.CanvasArtboard model { get; construct; }
 
@@ -104,8 +103,12 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
         container.get_style_context ().add_class ("artboard-container");
         container.activate_on_single_click = false;
         container.selection_mode = Gtk.SelectionMode.SINGLE;
-        Gtk.drag_dest_set (container, Gtk.DestDefaults.ALL, TARGET_ENTRIES_LAYER, Gdk.DragAction.MOVE);
-        container.drag_data_received.connect (on_drag_data_received);
+
+        // Block all the events from bubbling up and triggering the Artbord's events.
+        container.event.connect (() => {
+            return true;
+        });
+
         revealer.add (container);
 
         var motion_grid = new Gtk.Grid ();
@@ -114,12 +117,13 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 
         motion_revealer = new Gtk.Revealer ();
         motion_revealer.transition_type = Gtk.RevealerTransitionType.SLIDE_DOWN;
+        motion_revealer.reveal_child = false;
         motion_revealer.add (motion_grid);
 
         handle = new Gtk.EventBox ();
         handle.hexpand = true;
         handle.add (label_grid);
-        handle.event.connect (on_click_event);
+        handle.event.connect (on_handle_event);
 
         button_locked = new Gtk.ToggleButton ();
         button_locked.tooltip_text = _("Lock Layer");
@@ -219,141 +223,6 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
         });
     }
 
-    private void on_drag_data_received (Gdk.DragContext context, int x, int y, Gtk.SelectionData selection_data,
-        uint target_type, uint time) {
-
-        Akira.Layouts.Partials.Layer target;
-        Gtk.Widget row;
-        Akira.Layouts.Partials.Layer source;
-        int new_position;
-        var before_group = false;
-
-        target = (Akira.Layouts.Partials.Layer) container.get_row_at_y (y);
-        row = ((Gtk.Widget[]) selection_data.get_data ())[0];
-        source = (Akira.Layouts.Partials.Layer) row.get_ancestor (typeof (Akira.Layouts.Partials.Layer));
-        int index = target.get_index ();
-        Gtk.Allocation alloc;
-
-        if (target == null) {
-            new_position = -1;
-        } else if (target.grouped && source.layer_group == null) {
-            source.get_allocation (out alloc);
-            y = y - (index * alloc.height);
-
-            var group = (Akira.Layouts.Partials.Layer) target.container.get_row_at_y (y);
-
-            if (group is Akira.Layouts.Partials.Layer) {
-                new_position = group.get_index ();
-            } else {
-                new_position = -1;
-            }
-
-            if ((y + alloc.height) < (alloc.height / 2)) {
-                new_position = target.get_index () > 1 && source.get_index () > new_position ?
-                    target.get_index () - 1 : target.get_index ();
-                debug ("Layer dropped ABOVE group: %i", new_position);
-                before_group = true;
-            } else {
-                before_group = false;
-                debug ("Layer dropped INSIDE a group from OUTSIDE: %i", new_position);
-
-                if (y > ((new_position * alloc.height) - (alloc.height / 2)) && new_position > 1) {
-                    debug ("drop below");
-                    new_position++;
-                }
-            }
-        } else if (target.grouped && source.layer_group != null) {
-            source.get_allocation (out alloc);
-            y = y - (index * alloc.height);
-
-            var group = (Akira.Layouts.Partials.Layer) target.container.get_row_at_y (y);
-
-            if (group is Akira.Layouts.Partials.Layer) {
-                new_position = group.get_index ();
-            } else {
-                new_position = -1;
-            }
-
-            if ((y + alloc.height) < (alloc.height / 2)) {
-                new_position = target.get_index () > 1 && source.get_index () > new_position ?
-                    target.get_index () - 1 : target.get_index ();
-                debug ("Layer dropped ABOVE group: %i", new_position);
-                before_group = true;
-            } else {
-                before_group = false;
-                debug ("%i", y);
-                debug ("%i", new_position);
-                debug ("%i", (new_position * alloc.height) - (alloc.height / 2));
-
-                if (y > ((new_position * alloc.height) - (alloc.height / 2)) && source.get_index () > new_position) {
-                    debug ("dropped below");
-                    new_position++;
-                } else if (y <= ((new_position * alloc.height) - (alloc.height / 2))
-                    && source.get_index () < new_position) {
-                    debug ("dropped above");
-                    new_position--;
-                }
-                debug ("Layer dropped WHITIN group: %i", new_position);
-            }
-        } else if (!target.grouped && source.layer_group != null) {
-            var parent = (Akira.Layouts.Partials.Artboard) target.get_ancestor (
-                typeof (Akira.Layouts.Partials.Artboard));
-            var group = parent.container.get_row_at_y (y);
-            group.get_allocation (out alloc);
-
-            if (group is Akira.Layouts.Partials.Layer) {
-                new_position = group.get_index ();
-            } else {
-                new_position = -1;
-            }
-
-            if (y > ((new_position * alloc.height) - (alloc.height / 2))) {
-                debug ("drop below");
-                new_position++;
-            }
-
-            debug ("Layer dropped OUTSIDE from INSIDE a group: %i", new_position);
-        } else {
-            target.get_allocation (out alloc);
-            new_position = target.get_index ();
-
-            if (y <= ((new_position * alloc.height) - (alloc.height / 2))
-                && new_position > 1 && source.get_index () < new_position) {
-                new_position--;
-            }
-            debug ("Layer dropped: %i", new_position);
-        }
-
-        if (source == target) {
-            return;
-        }
-
-        if (source.layer_group != null) {
-            source.layer_group.container.remove (source);
-            source.layer_group = null;
-        } else {
-            container.remove (source);
-        }
-
-        if (before_group) {
-            container.insert (source, new_position);
-        } else if (target.grouped && source.layer_group == null) {
-            source.layer_group = target;
-            target.container.insert (source, new_position);
-        } else if (target.grouped && source.layer_group != null) {
-            source.layer_group = target;
-            target.container.insert (source, new_position);
-        } else if (!target.grouped && source.layer_group != null) {
-            source.layer_group = null;
-            container.insert (source, new_position);
-        } else {
-            container.insert (source, new_position);
-        }
-
-        window.main_window.right_sidebar.layers_panel.reload_zebra ();
-        show_all ();
-    }
-
     private void build_drag_and_drop () {
         // Make this a draggable widget.
         Gtk.drag_source_set (this, Gdk.ModifierType.BUTTON1_MASK, TARGET_ENTRIES, Gdk.DragAction.MOVE);
@@ -411,75 +280,30 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
         motion_revealer.reveal_child = false;
     }
 
-    public bool on_click_event (Gdk.Event event) {
-        if (event.type == Gdk.EventType.@2BUTTON_PRESS) {
-            entry.text = label.label;
-            entry.visible = true;
-            entry.no_show_all = false;
-            label.visible = false;
-            label.no_show_all = true;
+    private bool on_handle_event (Gdk.Event event) {
+        switch (event.type) {
+            case Gdk.EventType.@2BUTTON_PRESS:
+                entry.text = label.label;
+                entry.visible = true;
+                entry.no_show_all = false;
+                label.visible = false;
+                label.no_show_all = true;
 
-            editing = true;
+                editing = true;
 
-            Timeout.add (200, () => {
-                entry.grab_focus ();
-                return false;
-            });
-        }
+                Timeout.add (200, () => {
+                    entry.grab_focus ();
+                    return false;
+                });
 
-        if (event.type == Gdk.EventType.BUTTON_PRESS) {
-            window.event_bus.request_add_item_to_selection (model);
+                return true;
 
-            return true;
+            case Gdk.EventType.BUTTON_PRESS:
+                window.event_bus.request_add_item_to_selection (model);
+                return true;
         }
 
         return false;
-    }
-
-    //  private bool delete_object () {
-    //      if (is_selected () && !editing) {
-    //          window.main_window.right_sidebar.layers_panel.remove (this);
-
-    //          return true;
-    //      }
-
-    //      var layers = container.get_selected_rows ();
-
-    //      check_delete_object (layers);
-
-    //      container.foreach (child => {
-    //          if (child is Akira.Layouts.Partials.Layer) {
-    //              Akira.Layouts.Partials.Layer layer = (Akira.Layouts.Partials.Layer) child;
-    //              if (layer.grouped) {
-    //                  check_delete_object (layer.container.get_selected_rows ());
-    //              }
-    //          }
-    //      });
-
-    //      window.main_window.right_sidebar.layers_panel.reload_zebra ();
-
-    //      return true;
-    //  }
-
-    public void check_delete_object (GLib.List<weak Gtk.ListBoxRow> layers) {
-        layers.foreach (row => {
-            Akira.Layouts.Partials.Layer layer = (Akira.Layouts.Partials.Layer) row;
-            do_delete_object (layer);
-
-            if (layer.grouped) {
-                check_delete_object (layer.container.get_selected_rows ());
-            }
-        });
-    }
-
-    public void do_delete_object (Akira.Layouts.Partials.Layer layer) {
-        if (layer.is_selected () && !layer.editing) {
-            if (layer.layer_group != null) {
-                layer.layer_group.container.remove (layer);
-            } else {
-                container.remove (layer);
-            }
-        }
     }
 
     public void update_on_enter () {
@@ -519,16 +343,6 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
         label.label = new_label;
 
         window.event_bus.set_focus_on_canvas ();
-    }
-
-    public void count_layers () {
-        layers_count = 0;
-
-        container.foreach (child => {
-            if (child is Akira.Layouts.Partials.Layer) {
-                layers_count++;
-            }
-        });
     }
 
     private bool handle_focus_in (Gdk.EventFocus event) {

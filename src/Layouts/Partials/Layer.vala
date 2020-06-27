@@ -22,7 +22,7 @@
 
 public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
     public weak Akira.Window window { get; construct; }
-    public Akira.Layouts.Partials.Artboard? artboard { get; construct set; }
+    // public Akira.Layouts.Partials.Artboard? artboard { get; construct set; }
     public Akira.Layouts.Partials.Layer? layer_group { get; construct set; }
     public string icon_name { get; construct; }
     public Akira.Lib.Models.CanvasItem model { get; construct; }
@@ -186,6 +186,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 
         motion_revealer = new Gtk.Revealer ();
         motion_revealer.transition_type = Gtk.RevealerTransitionType.SLIDE_DOWN;
+        motion_revealer.reveal_child = false;
         motion_revealer.add (motion_grid);
 
         handle_grid = new Gtk.Grid ();
@@ -282,6 +283,12 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
         container.get_style_context ().add_class ("group-container");
         container.activate_on_single_click = true;
         container.selection_mode = Gtk.SelectionMode.SINGLE;
+
+        // Block all the events from bubbling up and triggering the Artbord's events.
+        container.event.connect (() => {
+            return true;
+        });
+
         revealer.add (container);
 
         if (revealer.get_reveal_child ()) {
@@ -300,7 +307,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
     }
 
     private void reveal_actions () {
-        if (! grouped) {
+        if (!grouped) {
             return;
         }
 
@@ -366,10 +373,6 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 
         Gtk.drag_set_icon_surface (context, surface);
 
-        if (artboard != null) {
-            artboard.count_layers ();
-        }
-
         main_revealer.reveal_child = false;
     }
 
@@ -428,35 +431,42 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
      * @return {bool} True to stop propagation, False to let other events run.
      */
     public bool on_click_event (Gdk.Event event) {
-        if (event.type == Gdk.EventType.@2BUTTON_PRESS) {
-            entry.text = label.label;
-            entry.visible = true;
-            entry.no_show_all = false;
-            label.visible = false;
-            label.no_show_all = true;
+        switch (event.type) {
+            case Gdk.EventType.@2BUTTON_PRESS:
+                entry.text = label.label;
+                entry.visible = true;
+                entry.no_show_all = false;
+                label.visible = false;
+                label.no_show_all = true;
 
-            button_locked.visible = false;
-            button_locked.no_show_all = true;
-            button_hidden.visible = false;
-            button_hidden.no_show_all = true;
+                button_locked.visible = false;
+                button_locked.no_show_all = true;
+                button_hidden.visible = false;
+                button_hidden.no_show_all = true;
 
-            editing = true;
+                editing = true;
 
-            Timeout.add (200, () => {
-                entry.grab_focus ();
-                return false;
-            });
+                Timeout.add (200, () => {
+                    entry.grab_focus ();
+                    return false;
+                });
 
-            return true;
-        }
+                return true;
 
-        if (event.type == Gdk.EventType.BUTTON_PRESS) {
-            // Selected layers cannot be hovering.
-            // We need to reflect the status of the canvas item.
-            get_style_context ().remove_class ("hovered");
+            case Gdk.EventType.BUTTON_PRESS:
+                // Selected layers cannot be hovering.
+                // We need to reflect the status of the canvas item.
+                get_style_context ().remove_class ("hovered");
 
-            window.event_bus.request_add_item_to_selection (model);
-            window.event_bus.hover_over_layer (null);
+                window.event_bus.request_add_item_to_selection (model);
+                window.event_bus.hover_over_layer (null);
+
+                // We need this in case the user clicks on a layer right after being unlocked.
+                if (!is_selected ()) {
+                    (parent as Gtk.ListBox).select_row (this);
+                }
+
+                break;
         }
 
         return false;
@@ -610,6 +620,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 
             if (active) {
                 window.event_bus.item_locked (model);
+                (parent as Gtk.ListBox).unselect_row (this);
             }
 
             window.event_bus.set_focus_on_canvas ();
