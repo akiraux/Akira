@@ -344,6 +344,8 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
         Gtk.drag_dest_set (this, Gtk.DestDefaults.MOTION, TARGET_ENTRIES, Gdk.DragAction.MOVE);
         drag_motion.connect (on_drag_motion);
         drag_leave.connect (on_drag_leave);
+        drag_drop.connect (on_drag_drop);
+        drag_data_received.connect (on_drag_data_received);
 
         drag_end.connect (on_drag_end);
     }
@@ -380,15 +382,86 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
         Gtk.Widget widget,
         Gdk.DragContext context,
         Gtk.SelectionData selection_data,
-        uint target_type, uint time) {
+        uint target_type, uint time
+    ) {
+        uchar[] data = new uchar[(sizeof (Akira.Layouts.Partials.Layer))];
+        ((Gtk.Widget[])data)[0] = widget;
 
-        // uchar[] data = new uchar[(sizeof (Akira.Layouts.Partials.Layer))];
+        selection_data.set (
+            Gdk.Atom.intern_static_string ("LAYER"), 32, data
+        );
+    }
 
-        // ((Gtk.Widget[])data)[0] = widget;
+    /**
+     * Handle the received layer, find the position of the targeted layer and trigger
+     * a z-index update.
+     */
+    private void on_drag_data_received (
+        Gdk.DragContext context, int x, int y,
+        Gtk.SelectionData selection_data,
+        uint target_type, uint time
+    ) {
+        // This works thanks to on_drag_data_get ().
+        var layer = (Layer) ((Gtk.Widget[]) selection_data.get_data ())[0];
 
-        // selection_data.set (
-        //     Gdk.Atom.intern_static_string ("LAYER"), 32, data
-        // );
+        int items_count = 0;
+        int pos_source = -1;
+        int pos_target = 0;
+
+        // If the layers belong to the same Artboard.
+        if (model.artboard != null && model.artboard == layer.model.artboard) {
+            items_count = (int) model.artboard.items.get_n_items ();
+            pos_source = items_count - 1 - model.artboard.items.index (layer.model);
+            pos_target = items_count - 1 - model.artboard.items.index (model);
+
+            // Interrupt if item position doesn't exist.
+            if (pos_source == -1) {
+                return;
+            }
+
+            // z-index is the exact opposite of items placement as the last item
+            // is the topmost element. Because of this, we need some trickery to
+            // properly handle the list's order.
+            var source = items_count - 1 - pos_source;
+            var target = items_count - 1 - pos_target;
+
+            // Interrupt if the item was dropped in the same position.
+            if (source - 1 == target) {
+                return;
+            }
+
+            // Since the top position is handled by the artboard drop method,
+            // if the drop target is in position 0, it means the layer should
+            // be added underneath it, at position 1.
+            if (target == 0) {
+                target = 1;
+            }
+
+            // We need to reveal the item before removing it.
+            layer.main_revealer.reveal_child = true;
+
+            // Remove item at source position
+            var item_to_swap = model.artboard.items.remove_at (source);
+
+            // Insert item at target position
+            model.artboard.items.insert_at (target, item_to_swap);
+
+            window.event_bus.z_selected_changed ();
+            model.artboard.changed (true);
+        }
+    }
+
+    /**
+     * Receive the signal when an item is dropped on top of the layer.
+     * If it's a valid layer, get the correct target type and trigger on_drag_data_received ().
+     */
+    private bool on_drag_drop (Gtk.Widget widget, Gdk.DragContext context, int x, int y, uint time) {
+        if (context.list_targets () != null) {
+            var target_type = (Gdk.Atom) context.list_targets ().nth_data (0);
+            Gtk.drag_get_data (widget, context, target_type, time);
+        }
+
+        return false;
     }
 
     private bool on_drag_motion (Gdk.DragContext context, int x, int y, uint time) {
@@ -454,14 +527,14 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
                 return true;
 
             case Gdk.EventType.BUTTON_PRESS:
-                // Selected layers cannot be hovering.
+                // Selected layers can't show hover effect.
                 // We need to reflect the status of the canvas item.
                 get_style_context ().remove_class ("hovered");
 
                 window.event_bus.request_add_item_to_selection (model);
                 window.event_bus.hover_over_layer (null);
 
-                // We need this in case the user clicks on a layer right after being unlocked.
+                // We need this in case the user clicks on the layer right after being unlocked.
                 if (!is_selected ()) {
                     (parent as Gtk.ListBox).select_row (this);
                 }
