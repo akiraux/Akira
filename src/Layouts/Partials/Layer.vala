@@ -459,6 +459,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
             if (layer.model.artboard != null) {
                 item_to_swap.artboard.remove_item (item_to_swap);
                 window.event_bus.item_deleted (item_to_swap);
+                item_to_swap.artboard = null;
                 item_to_swap.set_parent (window.main_window.main_canvas.canvas.get_root_item ());
             } else {
                 item_to_swap = window.items_manager.free_items.remove_at (source);
