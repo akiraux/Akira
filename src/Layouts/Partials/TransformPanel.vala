@@ -189,6 +189,14 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         }
 
         selected_item = selected_items.nth_data (0);
+
+        if (selected_item is Lib.Models.CanvasArtboard) {
+            hflip_button.hide ();
+            vflip_button.hide ();
+        } else {
+            hflip_button.show ();
+            vflip_button.show ();
+        }
     }
 
     private void disconnect_previous_item () {
