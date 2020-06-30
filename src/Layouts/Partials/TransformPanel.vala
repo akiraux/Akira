@@ -70,8 +70,8 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
             height.enabled = has_item;
             width.enabled = has_item;
             rotation.enabled = has_item && !(_selected_item is Lib.Models.CanvasArtboard);
-            hflip_button.sensitive = has_item;
-            vflip_button.sensitive = has_item;
+            hflip_button.sensitive = has_item && !(_selected_item is Lib.Models.CanvasArtboard);
+            vflip_button.sensitive = has_item && !(_selected_item is Lib.Models.CanvasArtboard);
             opacity_entry.entry.sensitive = has_item && !(_selected_item is Lib.Models.CanvasArtboard);
             scale.sensitive = has_item && !(_selected_item is Lib.Models.CanvasArtboard);
             lock_changes.sensitive = has_item;
@@ -189,6 +189,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         }
 
         selected_item = selected_items.nth_data (0);
+
     }
 
     private void disconnect_previous_item () {
