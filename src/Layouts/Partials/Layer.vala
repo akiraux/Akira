@@ -413,70 +413,10 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
         var x_pos = layer.model.get_global_coord ("x");
         var y_pos = layer.model.get_global_coord ("y");
 
-        // If the layer is a free item.
-        if (model.artboard == null) {
-            items_count = (int) window.items_manager.free_items.get_n_items ();
-            pos_target = items_count - 1 - window.items_manager.free_items.index (model);
-
-            // If the source belongs to an artboard.
-            if (layer.model.artboard != null) {
-                items_count_artboard = (int) layer.model.artboard.items.get_n_items ();
-                pos_source = items_count_artboard - 1 - layer.model.artboard.items.index (layer.model);
-            } else {
-                pos_source = items_count - 1 - window.items_manager.free_items.index (layer.model);
-            }
-
-            // Interrupt if item position doesn't exist.
-            if (pos_source == -1) {
-                return;
-            }
-
-            // z-index is the exact opposite of items placement as the last item
-            // is the topmost element. Because of this, we need some trickery to
-            // properly handle the list's order.
-            var target = items_count - 1 - pos_target;
-            var source = layer.model.artboard != null ?
-                items_count_artboard - 1 - pos_source :
-                items_count - 1 - pos_source;
-
-            // Interrupt if the item was dropped in the same position.
-            if (layer.model.artboard == null && source - 1 == target) {
-                return;
-            }
-
-            // Since the top position is handled by the emtpy panel drop method,
-            // if the drop target is in position 0, it means the layer should
-            // be added underneath it, at position 1.
-            if (target == 0) {
-                target = 1;
-            }
-
-            // We need to reveal the item before removing it.
-            layer.main_revealer.reveal_child = true;
-
-            var item_to_swap = layer.model;
-            // Remove item at source position.
-            if (layer.model.artboard != null) {
-                item_to_swap.artboard.remove_item (item_to_swap);
-                window.event_bus.item_deleted (item_to_swap);
-                item_to_swap.artboard = null;
-                item_to_swap.set_parent (window.main_window.main_canvas.canvas.get_root_item ());
-            } else {
-                item_to_swap = window.items_manager.free_items.remove_at (source);
-            }
-
-            // Insert item at target position.
-            item_to_swap.position_item (x_pos, y_pos);
-            window.items_manager.free_items.insert_at (target, item_to_swap);
-
-            window.event_bus.request_add_item_to_selection (item_to_swap);
-            window.event_bus.z_selected_changed ();
-
-            return;
-        }
-
-        // If the layers belong to the same artboard.
+        // If the dragged and target layer belong to the same artboard.
         if (model.artboard != null && model.artboard == layer.model.artboard) {
+            debug ("Same Artboard");
+
             items_count = (int) model.artboard.items.get_n_items ();
             pos_target = items_count - 1 - model.artboard.items.index (model);
             pos_source = items_count - 1 - model.artboard.items.index (layer.model);
@@ -519,9 +459,132 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
             return;
         }
 
+        // If the dragged layer gets dropped inside the Free Items.
+        if (model.artboard == null) {
+            debug ("Dropped in Free Items");
+
+            items_count = (int) window.items_manager.free_items.get_n_items ();
+            pos_target = items_count - 1 - window.items_manager.free_items.index (model);
+
+            // If the source belongs to an artboard.
+            if (layer.model.artboard != null) {
+                debug ("Coming from Artboard");
+
+                items_count_artboard = (int) layer.model.artboard.items.get_n_items ();
+                pos_source = items_count_artboard - 1 - layer.model.artboard.items.index (layer.model);
+            } else {
+                pos_source = items_count - 1 - window.items_manager.free_items.index (layer.model);
+            }
+
+            // Interrupt if item position doesn't exist.
+            if (pos_source == -1) {
+                return;
+            }
+
+            // z-index is the exact opposite of items placement as the last item
+            // is the topmost element. Because of this, we need some trickery to
+            // properly handle the list's order.
+            var target = items_count - 1 - pos_target;
+            var source = layer.model.artboard != null ?
+                items_count_artboard - 1 - pos_source :
+                items_count - 1 - pos_source;
+
+            // Interrupt if the item was dropped in the same position.
+            if (layer.model.artboard == null && source - 1 == target) {
+                return;
+            }
+
+            // Since the top position is handled by the emtpy panel drop method,
+            // if the drop target is in position 0, it means the layer should
+            // be added underneath it, at position 1.
+            if (target == 0) {
+                target = 1;
+            }
+
+            // We need to reveal the item before removing it.
+            layer.main_revealer.reveal_child = true;
+
+            var item_to_swap = layer.model;
+
+            // Remove item at source position, clear the parent if it came
+            // from an artboard.
+            if (layer.model.artboard != null) {
+                item_to_swap.artboard.remove_item (item_to_swap);
+                window.event_bus.item_deleted (item_to_swap);
+                item_to_swap.artboard = null;
+                item_to_swap.set_parent (window.main_window.main_canvas.canvas.get_root_item ());
+
+                // Insert item at target position.
+                item_to_swap.position_item (x_pos, y_pos);
+            } else {
+                item_to_swap = window.items_manager.free_items.remove_at (source);
+            }
+
+            window.items_manager.free_items.insert_at (target, item_to_swap);
+
+            window.event_bus.request_add_item_to_selection (item_to_swap);
+            window.event_bus.z_selected_changed ();
+
+            return;
+        }
+
         // If the source and target artboards don't match
         if (model.artboard != null && model.artboard != layer.model.artboard) {
-            // todo
+            debug ("Artboard => Artboard");
+
+            items_count = (int) model.artboard.items.get_n_items ();
+            pos_target = items_count - 1 - model.artboard.items.index (model);
+
+            if (layer.model.artboard != null) {
+                items_count_artboard = (int) layer.model.artboard.items.get_n_items ();
+                pos_source = items_count_artboard - 1 - layer.model.artboard.items.index (layer.model);
+            } else {
+                pos_source = items_count - 1 - window.items_manager.free_items.index (layer.model);
+            }
+
+            // Interrupt if item position doesn't exist.
+            if (pos_source == -1) {
+                return;
+            }
+
+            // z-index is the exact opposite of items placement as the last item
+            // is the topmost element. Because of this, we need some trickery to
+            // properly handle the list's order.
+            var target = items_count - 1 - pos_target;
+            var source = layer.model.artboard != null ?
+                items_count_artboard - 1 - pos_source :
+                items_count - 1 - pos_source;
+            // Since the top position is handled by the artboard drop method,
+            // if the drop target is in position 0, it means the layer should
+            // be added underneath it, at position 1.
+            if (target == 0) {
+                target = 1;
+            }
+
+            // We need to reveal the item before removing it.
+            layer.main_revealer.reveal_child = true;
+
+            var item_to_swap = layer.model;
+
+            if (layer.model.artboard != null) {
+                item_to_swap.artboard.remove_item (item_to_swap);
+                window.event_bus.item_deleted (item_to_swap);
+
+                // Insert item at target position.
+                item_to_swap.position_item (x_pos, y_pos);
+            } else {
+                item_to_swap = window.items_manager.free_items.remove_at (source);
+            }
+
+            // Attach the item to the Artboard.
+            item_to_swap.artboard = model.artboard;
+
+            // Insert item at target position
+            model.artboard.items.insert_at (target, item_to_swap);
+            item_to_swap.connect_to_artboard ();
+
+            window.event_bus.request_add_item_to_selection (item_to_swap);
+            window.event_bus.z_selected_changed ();
         }
     }
 
