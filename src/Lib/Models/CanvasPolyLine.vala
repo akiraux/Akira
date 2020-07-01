@@ -103,7 +103,6 @@ public class Akira.Lib.Models.CanvasPolyLine : Goo.CanvasPolyline, Models.Canvas
         if (artboard != null) {
             connect_to_artboard ();
         }
-        stdout.printf ("Hello world!");
 
         width = 10;
         height = 10;
