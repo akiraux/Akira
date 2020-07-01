@@ -64,17 +64,6 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
     public Gtk.Revealer revealer;
     public Gtk.ListBox container;
 
-    private bool _locked { get; set; default = false; }
-    public bool locked {
-        get { return _locked; } set { _locked = value; }
-    }
-
-    // Keep __hidden with double underscore for FreeBSD compatibility
-    private bool __hidden { get; set; default = false; }
-    public bool hidden {
-        get { return __hidden; } set { __hidden = value; }
-    }
-
     private bool _editing { get; set; default = false; }
     public bool editing {
         get { return _editing; } set { _editing = value; }
@@ -507,6 +496,10 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
      * @return {bool} True to stop propagation, False to let other events run.
      */
     public bool on_click_event (Gdk.Event event) {
+        if (model.locked) {
+            return true;
+        }
+
         switch (event.type) {
             case Gdk.EventType.@2BUTTON_PRESS:
                 entry.text = label.label;
@@ -542,7 +535,8 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
                     (parent as Gtk.ListBox).select_row (this);
                 }
 
-                break;
+                // We're returning false to not interrupt the natural bubbling of the click event.
+                return false;
         }
 
         return false;
@@ -734,8 +728,6 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 
             icon_hidden.visible = ! active;
             icon_hidden.no_show_all = active;
-
-            hidden = active;
         });
     }
 
