@@ -109,6 +109,10 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         }
 
         switch (insert_type) {
+            case Models.CanvasItemType.POLYLINE:
+                new_item = add_line (x, y, root, artboard, loaded);
+                break;
+
             case Models.CanvasItemType.RECT:
                 new_item = add_rect (x, y, root, artboard, loaded);
                 break;
@@ -201,6 +205,27 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             root);
 
         return artboard as Models.CanvasItem;
+    }
+
+    public Models.CanvasItem add_line (
+        double x,
+        double y,
+        Goo.CanvasItem parent,
+        Models.CanvasArtboard? artboard,
+        bool loaded
+    ) {
+        return new Models.CanvasPolyLine (
+            x,
+            y,
+            100.0,
+            100.0,
+            border_size,
+            border_color,
+            fill_color,
+            parent,
+            artboard,
+            loaded
+        );
     }
 
     public Models.CanvasItem add_rect (
@@ -322,6 +347,10 @@ public class Akira.Lib.Managers.ItemsManager : Object {
 
     public void set_item_to_insert (string type) {
         switch (type) {
+            case "line":
+                insert_type = Models.CanvasItemType.POLYLINE;
+                break;
+
             case "rectangle":
                 insert_type = Models.CanvasItemType.RECT;
                 break;
@@ -435,6 +464,11 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         }
 
         switch (obj.get_string_member ("type")) {
+            case "AkariLibModelsCanvasPolyLine":
+                insert_type = Models.CanvasItemType.POLYLINE;
+                item = insert_item (pos_x, pos_y, null, true);
+                break;
+
             case "AkiraLibModelsCanvasRect":
                 insert_type = Models.CanvasItemType.RECT;
                 item = insert_item (pos_x, pos_y, null, true);

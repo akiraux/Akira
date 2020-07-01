@@ -53,6 +53,7 @@
     <file alias="shape-image-symbolic.svg">icons/symbolic/shape-image-symbolic.svg</file>
     <file alias="shape-bezier-symbolic.svg">icons/symbolic/shape-bezier-symbolic.svg</file>
     <file alias="shape-pencil-symbolic.svg">icons/symbolic/shape-pencil-symbolic.svg</file>
+    <file alias="shape-line-symbolic.svg">icons/symbolic/shape-line-symbolic.svg</file>
     <file alias="shape-rectangle-symbolic.svg">icons/symbolic/shape-rectangle-symbolic.svg</file>
     <file alias="shape-triangle-symbolic.svg">icons/symbolic/shape-triangle-symbolic.svg</file>
     <file alias="shape-circle-symbolic.svg">icons/symbolic/shape-circle-symbolic.svg</file>

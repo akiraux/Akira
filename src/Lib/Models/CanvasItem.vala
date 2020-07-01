@@ -21,6 +21,7 @@
  */
 
 public enum Akira.Lib.Models.CanvasItemType {
+    POLYLINE,
     RECT,
     ELLIPSE,
     TEXT,

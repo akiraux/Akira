@@ -259,6 +259,12 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
         var sub_separator = new Gtk.Separator (Gtk.Orientation.HORIZONTAL);
         sub_separator.margin_top = sub_separator.margin_bottom = 3;
 
+        var polyline = create_model_button (
+            _("Line"),
+            "shape-line-symbolic",
+            Akira.Services.ActionManager.ACTION_PREFIX +
+            Akira.Services.ActionManager.ACTION_RECT_TOOL);
+
         var rectangle = create_model_button (
             _("Rectangle"),
             "shape-rectangle-symbolic",
@@ -273,6 +279,7 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
 
         shapes_grid.add (back_button);
         shapes_grid.add (sub_separator);
+        shapes_grid.add (polyline);
         shapes_grid.add (rectangle);
         shapes_grid.add (ellipse);
         shapes_grid.show_all ();

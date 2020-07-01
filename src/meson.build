@@ -86,6 +86,7 @@ sources = files(
     'Lib/Managers/NobManager.vala',
 
     'Lib/Models/CanvasItem.vala',
+    'Lib/Models/CanvasPolyLine.vala',
     'Lib/Models/CanvasRect.vala',
     'Lib/Models/CanvasEllipse.vala',
     'Lib/Models/CanvasText.vala',

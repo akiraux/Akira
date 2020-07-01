@@ -49,6 +49,7 @@ public class Akira.Services.ActionManager : Object {
     public const string ACTION_MOVE_TOP = "action_move_top";
     public const string ACTION_MOVE_BOTTOM = "action_move_bottom";
     public const string ACTION_ARTBOARD_TOOL = "action_artboard_tool";
+    public const string ACTION_LINE_TOOL = "action_line_tool";
     public const string ACTION_RECT_TOOL = "action_rect_tool";
     public const string ACTION_ELLIPSE_TOOL = "action_ellipse_tool";
     public const string ACTION_TEXT_TOOL = "action_text_tool";
@@ -86,6 +87,7 @@ public class Akira.Services.ActionManager : Object {
         { ACTION_MOVE_BOTTOM, action_move_bottom },
         { ACTION_ZOOM_RESET, action_zoom_reset },
         { ACTION_ARTBOARD_TOOL, action_artboard_tool },
+        { ACTION_LINE_TOOL, action_line_tool },
         { ACTION_RECT_TOOL, action_rect_tool },
         { ACTION_ELLIPSE_TOOL, action_ellipse_tool },
         { ACTION_TEXT_TOOL, action_text_tool },
@@ -134,6 +136,7 @@ public class Akira.Services.ActionManager : Object {
 
         typing_accelerators.set (ACTION_ESCAPE, "Escape");
         typing_accelerators.set (ACTION_ARTBOARD_TOOL, "a");
+        typing_accelerators.set (ACTION_LINE_TOOL, "l");
         typing_accelerators.set (ACTION_RECT_TOOL, "r");
         typing_accelerators.set (ACTION_ELLIPSE_TOOL, "e");
         typing_accelerators.set (ACTION_TEXT_TOOL, "t");
@@ -334,6 +337,10 @@ public class Akira.Services.ActionManager : Object {
 
     private void action_flip_v () {
         window.event_bus.flip_item (true, true);
+    }
+
+    private void action_line_tool () {
+        window.event_bus.insert_item ("line");
     }
 
     private void action_ellipse_tool () {
