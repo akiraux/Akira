@@ -31,6 +31,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
         { "LAYER", Gtk.TargetFlags.SAME_APP, 0 }
     };
 
+    private Gtk.Grid artboard_handle;
     public Gtk.Label label;
     public Gtk.Entry entry;
     public Gtk.EventBox handle;
@@ -168,7 +169,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
         button_icon = new Gtk.Image.from_icon_name ("pan-down-symbolic", Gtk.IconSize.MENU);
         button.add (button_icon);
 
-        var artboard_handle = new Gtk.Grid ();
+        artboard_handle = new Gtk.Grid ();
         artboard_handle.get_style_context ().add_class ("artboard-handle");
         artboard_handle.attach (handle, 0, 0, 1, 1);
         artboard_handle.attach (button_locked, 1, 0, 1, 1);
@@ -233,12 +234,17 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
         Gtk.drag_dest_set (this, Gtk.DestDefaults.MOTION, TARGET_ENTRIES_LAYER, Gdk.DragAction.MOVE);
         drag_motion.connect (on_drag_motion);
         drag_leave.connect (on_drag_leave);
+        drag_drop.connect (on_drag_drop);
+        drag_data_received.connect (on_drag_data_received);
     }
 
     private void on_drag_begin (Gtk.Widget widget, Gdk.DragContext context) {
-        var row = (Akira.Layouts.Partials.Artboard) widget.get_ancestor (typeof (Akira.Layouts.Partials.Artboard));
+        // Close the layers container.
+        button.active = false;
+
+        var row = (widget as Akira.Layouts.Partials.Artboard);
         Gtk.Allocation alloc;
-        row.get_allocation (out alloc);
+        row.artboard_handle.get_allocation (out alloc);
 
         var surface = new Cairo.ImageSurface (Cairo.Format.ARGB32, alloc.width, alloc.height);
         var cr = new Cairo.Context (surface);
@@ -256,9 +262,11 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
         cr.rectangle (0, 0, alloc.width, alloc.height);
         cr.fill ();
 
-        row.draw (cr);
+        row.artboard_handle.draw (cr);
 
         Gtk.drag_set_icon_surface (context, surface);
+
+        //  main_revealer.reveal_child = false;
     }
 
     private void on_drag_data_get (Gtk.Widget widget, Gdk.DragContext context, Gtk.SelectionData selection_data,
@@ -278,6 +286,32 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 
     public void on_drag_leave (Gdk.DragContext context, uint time) {
         motion_revealer.reveal_child = false;
+    }
+
+    /**
+     * Receive the signal when an item is dropped on top of the layer.
+     * If it's a valid layer, get the correct target type and trigger on_drag_data_received ().
+     */
+    private bool on_drag_drop (Gtk.Widget widget, Gdk.DragContext context, int x, int y, uint time) {
+        if (context.list_targets () != null) {
+            var target_type = (Gdk.Atom) context.list_targets ().nth_data (0);
+            Gtk.drag_get_data (widget, context, target_type, time);
+        }
+
+        return false;
+    }
+
+    /**
+     * Handle the received layer, find the position of the targeted layer and trigger
+     * a z-index update.
+     */
+    private void on_drag_data_received (
+        Gdk.DragContext context, int x, int y,
+        Gtk.SelectionData selection_data,
+        uint target_type, uint time
+    ) {
+        // This works thanks to on_drag_data_get ().
+        // var layer = (Layer) ((Gtk.Widget[]) selection_data.get_data ())[0];
     }
 
     private bool on_handle_event (Gdk.Event event) {
@@ -300,7 +334,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 
             case Gdk.EventType.BUTTON_PRESS:
                 window.event_bus.request_add_item_to_selection (model);
-                return true;
+                return false;
         }
 
         return false;

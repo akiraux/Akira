@@ -30,7 +30,8 @@
 
 .artboard:selected,
 .artboard:selected .revealer-button image,
-.artboard:selected .layer-action image {
+.artboard:selected .layer-action image,
+.artboard:selected .artboard-container image {
     color: @fg_color;
 }
 
