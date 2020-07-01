@@ -404,187 +404,53 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
         // This works thanks to on_drag_data_get ().
         var layer = (Layer) ((Gtk.Widget[]) selection_data.get_data ())[0];
 
-        int items_count = 0;
-        int items_count_artboard = 0;
-        int pos_source = -1;
-        int pos_target = 0;
+        // Change artboard if necessary.
+        window.items_manager.change_artboard (layer.model, model.artboard);
 
-        // Save the coordinates before removing the item.
-        var x_pos = layer.model.get_global_coord ("x");
-        var y_pos = layer.model.get_global_coord ("y");
+        // Store the source of our items.
+        var items_source = model.artboard == null
+            ? window.items_manager.free_items
+            : model.artboard.items;
 
-        // If the dragged and target layer belong to the same artboard.
-        if (model.artboard != null && model.artboard == layer.model.artboard) {
-            debug ("Same Artboard");
+        var items_count = (int) items_source.get_n_items ();
+        var pos_target = items_count - 1 - items_source.index (model);
+        var pos_source = items_count - 1 - items_source.index (layer.model);
 
-            items_count = (int) model.artboard.items.get_n_items ();
-            pos_target = items_count - 1 - model.artboard.items.index (model);
-            pos_source = items_count - 1 - model.artboard.items.index (layer.model);
+        // Interrupt if item position doesn't exist.
+        if (pos_source == -1) {
+            return;
+        }
 
-            // Interrupt if item position doesn't exist.
-            if (pos_source == -1) {
-                return;
-            }
+        // z-index is the exact opposite of items placement as the last item
+        // is the topmost element. Because of this, we need some trickery to
+        // properly handle the list's order.
+        var source = items_count - 1 - pos_source;
+        var target = items_count - 1 - pos_target;
 
-            // z-index is the exact opposite of items placement as the last item
-            // is the topmost element. Because of this, we need some trickery to
-            // properly handle the list's order.
-            var source = items_count - 1 - pos_source;
-            var target = items_count - 1 - pos_target;
+        // Interrupt if the item was dropped in the same position.
+        if (source - 1 == target) {
+            return;
+        }
 
-            // Interrupt if the item was dropped in the same position.
-            if (source - 1 == target) {
-                return;
-            }
+        // Since the top position is handled by the empty panel drop method,
+        // if the drop target is in position 0, it means the layer should
+        // be added underneath it, at position 1.
+        if (target == 0) {
+            target = 1;
+        }
 
-            // Since the top position is handled by the artboard drop method,
-            // if the drop target is in position 0, it means the layer should
-            // be added underneath it, at position 1.
-            if (target == 0) {
-                target = 1;
-            }
+        // We need to reveal the item before removing it.
+        layer.main_revealer.reveal_child = true;
 
-            // We need to reveal the item before removing it.
-            layer.main_revealer.reveal_child = true;
+        // Remove item at source position
+        var item_to_swap = items_source.remove_at (source);
 
-            // Remove item at source position
-            var item_to_swap = model.artboard.items.remove_at (source);
+        // Insert item at target position
+        items_source.insert_at (target, item_to_swap);
+        window.event_bus.z_selected_changed ();
 
-            // Insert item at target position
-            model.artboard.items.insert_at (target, item_to_swap);
-
-            window.event_bus.z_selected_changed ();
+        if (model.artboard != null) {
             model.artboard.changed (true);
-
-            return;
-        }
-
-        // If the dragged layer gets dropped inside the Free Items.
-        if (model.artboard == null) {
-            debug ("Dropped in Free Items");
-
-            items_count = (int) window.items_manager.free_items.get_n_items ();
-            pos_target = items_count - 1 - window.items_manager.free_items.index (model);
-
-            // If the source belongs to an artboard.
-            if (layer.model.artboard != null) {
-                debug ("Coming from Artboard");
-
-                items_count_artboard = (int) layer.model.artboard.items.get_n_items ();
-                pos_source = items_count_artboard - 1 - layer.model.artboard.items.index (layer.model);
-            } else {
-                pos_source = items_count - 1 - window.items_manager.free_items.index (layer.model);
-            }
-
-            // Interrupt if item position doesn't exist.
-            if (pos_source == -1) {
-                return;
-            }
-
-            // z-index is the exact opposite of items placement as the last item
-            // is the topmost element. Because of this, we need some trickery to
-            // properly handle the list's order.
-            var target = items_count - 1 - pos_target;
-            var source = layer.model.artboard != null ?
-                items_count_artboard - 1 - pos_source :
-                items_count - 1 - pos_source;
-
-            // Interrupt if the item was dropped in the same position.
-            if (layer.model.artboard == null && source - 1 == target) {
-                return;
-            }
-
-            // Since the top position is handled by the emtpy panel drop method,
-            // if the drop target is in position 0, it means the layer should
-            // be added underneath it, at position 1.
-            if (target == 0) {
-                target = 1;
-            }
-
-            // We need to reveal the item before removing it.
-            layer.main_revealer.reveal_child = true;
-
-            var item_to_swap = layer.model;
-
-            // Remove item at source position, clear the parent if it came
-            // from an artboard.
-            if (layer.model.artboard != null) {
-                item_to_swap.artboard.remove_item (item_to_swap);
-                window.event_bus.item_deleted (item_to_swap);
-                item_to_swap.artboard = null;
-                item_to_swap.set_parent (window.main_window.main_canvas.canvas.get_root_item ());
-
-                // Insert item at target position.
-                item_to_swap.position_item (x_pos, y_pos);
-            } else {
-                item_to_swap = window.items_manager.free_items.remove_at (source);
-            }
-
-            window.items_manager.free_items.insert_at (target, item_to_swap);
-
-            window.event_bus.request_add_item_to_selection (item_to_swap);
-            window.event_bus.z_selected_changed ();
-
-            return;
-        }
-
-        // If the source and target artboards don't match
-        if (model.artboard != null && model.artboard != layer.model.artboard) {
-            debug ("Artboard => Artboard");
-
-            items_count = (int) model.artboard.items.get_n_items ();
-            pos_target = items_count - 1 - model.artboard.items.index (model);
-
-            if (layer.model.artboard != null) {
-                items_count_artboard = (int) layer.model.artboard.items.get_n_items ();
-                pos_source = items_count_artboard - 1 - layer.model.artboard.items.index (layer.model);
-            } else {
-                pos_source = items_count - 1 - window.items_manager.free_items.index (layer.model);
-            }
-
-            // Interrupt if item position doesn't exist.
-            if (pos_source == -1) {
-                return;
-            }
-
-            // z-index is the exact opposite of items placement as the last item
-            // is the topmost element. Because of this, we need some trickery to
-            // properly handle the list's order.
-            var target = items_count - 1 - pos_target;
-            var source = layer.model.artboard != null ?
-                items_count_artboard - 1 - pos_source :
-                items_count - 1 - pos_source;
-            // Since the top position is handled by the artboard drop method,
-            // if the drop target is in position 0, it means the layer should
-            // be added underneath it, at position 1.
-            if (target == 0) {
-                target = 1;
-            }
-
-            // We need to reveal the item before removing it.
-            layer.main_revealer.reveal_child = true;
-
-            var item_to_swap = layer.model;
-
-            if (layer.model.artboard != null) {
-                item_to_swap.artboard.remove_item (item_to_swap);
-                window.event_bus.item_deleted (item_to_swap);
-
-                // Insert item at target position.
-                item_to_swap.position_item (x_pos, y_pos);
-            } else {
-                item_to_swap = window.items_manager.free_items.remove_at (source);
-            }
-
-            // Attach the item to the Artboard.
-            item_to_swap.artboard = model.artboard;
-
-            // Insert item at target position
-            model.artboard.items.insert_at (target, item_to_swap);
-            item_to_swap.connect_to_artboard ();
-
-            window.event_bus.request_add_item_to_selection (item_to_swap);
-            window.event_bus.z_selected_changed ();
         }
     }
 
