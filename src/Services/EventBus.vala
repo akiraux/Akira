@@ -24,10 +24,12 @@ public class Akira.Services.EventBus : Object {
     // File signals.
     public signal void file_edited ();
     public signal void file_saved (string? file_name);
+    public signal void update_recent_files_list ();
 
     // Layout signals.
     public signal void change_sensitivity (string type);
     public signal void request_widget_redraw ();
+    public signal void change_theme ();
 
     // Canvas signals.
     public signal void coordinate_change (double x, double y);
@@ -60,6 +62,7 @@ public class Akira.Services.EventBus : Object {
     public signal void request_delete_item (Lib.Models.CanvasItem item);
     public signal void selected_items_changed (List<Lib.Models.CanvasItem> selected_items);
     public signal void z_selected_changed ();
+    public signal void hold_released ();
 
     // Layers panel signals.
     public signal void hover_over_item (Lib.Models.CanvasItem? item);
@@ -67,7 +70,6 @@ public class Akira.Services.EventBus : Object {
     public signal void item_deleted (Lib.Models.CanvasItem item);
     public signal void item_locked (Lib.Models.CanvasItem item);
     public signal void change_item_z_index (Lib.Models.CanvasItem item, int position);
-    public signal void toggle_sidebar_indicator (bool show);
 
     // Others.
     public signal void disconnect_typing_accel ();

@@ -83,6 +83,9 @@ public class Akira.Lib.Models.CanvasRect : Goo.CanvasRect, Models.CanvasItem {
     public double initial_relative_x { get; set; }
     public double initial_relative_y { get; set; }
 
+    // Knows if an item was created or loaded for ordering purpose.
+    public bool loaded { get; set; default = false; }
+
     public CanvasRect (
         double _x = 0,
         double _y = 0,
@@ -92,8 +95,10 @@ public class Akira.Lib.Models.CanvasRect : Goo.CanvasRect, Models.CanvasItem {
         Gdk.RGBA _border_color,
         Gdk.RGBA _fill_color,
         Goo.CanvasItem? _parent = null,
-        Models.CanvasArtboard? _artboard = null
+        Models.CanvasArtboard? _artboard = null,
+        bool _loaded = false
     ) {
+        loaded = _loaded;
         artboard = _artboard;
         parent = _artboard != null ? _artboard : _parent;
         canvas = parent.get_canvas () as Akira.Lib.Canvas;
@@ -101,6 +106,9 @@ public class Akira.Lib.Models.CanvasRect : Goo.CanvasRect, Models.CanvasItem {
         item_type = Models.CanvasItemType.RECT;
         id = Models.CanvasItem.create_item_id (this);
         Models.CanvasItem.init_item (this);
+        if (artboard != null) {
+            connect_to_artboard ();
+        }
 
         _global_radius = radius_x = _radius_x;
         radius_y = _radius_y;
@@ -116,8 +124,6 @@ public class Akira.Lib.Models.CanvasRect : Goo.CanvasRect, Models.CanvasItem {
         show_border_panel = true;
         is_radius_uniform = true;
         is_radius_autoscale = false;
-
-        set_transform (Cairo.Matrix.identity ());
 
         position_item (_x, _y);
 

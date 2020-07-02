@@ -1,3 +1,7 @@
+.main-canvas {
+    background-color: alpha (@fg_color, 0.05);
+}
+
 .sidebar-l {
     background-color: shade (@bg_color, 0.95);
     border-right: 1px solid shade (@bg_color, 0.9);

@@ -30,12 +30,9 @@
 
 .artboard:selected,
 .artboard:selected .revealer-button image,
-.artboard:selected .layer-action image {
+.artboard:selected .layer-action image,
+.artboard:selected .artboard-container image {
     color: @fg_color;
-}
-
-.highlight-drop-area .artboard:last-child {
-    box-shadow: inset 0 -2px 0 shade (@bg_color, 0.5);
 }
 
 .artboard-container {

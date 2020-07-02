@@ -17,10 +17,11 @@
  * along with Akira. If not, see <https://www.gnu.org/licenses/>.
  *
  * Authored by: Giacomo Alberini <giacomoalbe@gmail.com>
+ * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
  */
 
 public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasItem, Models.CanvasItem {
-    private const double LABEL_FONT_SIZE = 14.0;
+    private const double LABEL_FONT_SIZE = 16.0;
     private const double LABEL_BOTTOM_PADDING = 8.0;
 
     // Identifiers.
@@ -94,6 +95,9 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
     public double initial_relative_x { get; set; }
     public double initial_relative_y { get; set; }
 
+    // Knows if an item was created or loaded for ordering purpose.
+    public bool loaded { get; set; default = false; }
+
     public CanvasArtboard (double _x = 0, double _y = 0, Goo.CanvasItem? _parent = null) {
         parent_item = _parent;
 
@@ -124,14 +128,14 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
         // move the entire coordinate system every time
         translate (_x, _y);
 
-        // Get colors from settings
-        // TODO
-
         // Get artboard name pixel extent
         get_label_extent ();
 
         // Init items list
         items = new Akira.Models.ListModel<Models.CanvasItem> ();
+
+        canvas.window.event_bus.zoom.connect (trigger_change);
+        canvas.window.event_bus.change_theme.connect (trigger_change);
     }
 
     public uint get_items_length () {
@@ -139,7 +143,10 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
     }
 
     public void remove_item (Models.CanvasItem item) {
+        item.disconnect_from_artboard ();
         items.remove_item.begin (item);
+        item.artboard = null;
+        changed (false);
     }
 
     public bool is_inside (double x, double y) {
@@ -149,6 +156,18 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
             && y <= bounds.y2;
     }
 
+    public bool dropped_inside (Models.CanvasItem item) {
+        var x1 = item.get_global_coord ("x");
+        var x2 = x1 + item.get_coords ("width");
+        var y1 = item.get_global_coord ("y");
+        var y2 = y1 + item.get_coords ("height");
+
+        return x1 < bounds.x2
+            && x2 > bounds.x1
+            && y1 < bounds.y2
+            && y2 > bounds.y1;
+    }
+
     public void add_child (Goo.CanvasItem item, int position = -1) {
         var canvas_item = item as Models.CanvasItem;
 
@@ -156,7 +175,7 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
             return;
         }
 
-        items.add_item.begin (canvas_item, false);
+        items.add_item.begin (canvas_item, (item as Models.CanvasItem).loaded);
         item.set_parent (this);
 
         request_update ();
@@ -172,7 +191,7 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
             Cairo.FontWeight.NORMAL
             );
 
-        cr.set_font_size (LABEL_FONT_SIZE);
+        cr.set_font_size (LABEL_FONT_SIZE / (canvas as Lib.Canvas).current_scale);
 
         cr.text_extents (id, out label_extents);
     }
@@ -185,26 +204,18 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
     }
 
     public override void simple_paint (Cairo.Context cr, Goo.CanvasBounds bounds) {
-        cr.set_source_rgba (0.3, 0.3, 0.3, 1);
+        cr.set_source_rgba (0, 0, 0, 0.6);
 
-        cr.select_font_face (
-            "Sans",
-            Cairo.FontSlant.NORMAL,
-            Cairo.FontWeight.NORMAL
-            );
+        if (settings.dark_theme) {
+            cr.set_source_rgba (1, 1, 1, 0.6);
+        }
 
-        cr.set_font_size (LABEL_FONT_SIZE);
+        cr.select_font_face ("Sans", Cairo.FontSlant.NORMAL, Cairo.FontWeight.NORMAL);
+
+        cr.set_font_size (LABEL_FONT_SIZE / (canvas as Lib.Canvas).current_scale);
 
         cr.move_to (x, y - LABEL_BOTTOM_PADDING);
         cr.show_text (name != null ? name : id);
-
-        // Add a bit of "emulated" shadow around the Artboard
-        cr.set_source_rgba (0.90, 0.90, 0.90, 1);
-        cr.save ();
-        cr.translate (2, 2);
-        cr.rectangle (x, y, width, height);
-        cr.restore ();
-        cr.fill ();
 
         cr.set_source_rgba (1, 1, 1, 1);
         cr.rectangle (x, y, width, height);
@@ -212,6 +223,9 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
 
         if (items.get_n_items () > 0) {
             var items_length = items.get_n_items ();
+
+            // Force the redraw of the canvas in case an item is partially outside.
+            canvas.queue_draw ();
 
             // Painting items in reversed order in order to
             // print last item inserted (top of the stack) on top
@@ -247,7 +261,14 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
         return label_extents.height + LABEL_BOTTOM_PADDING;
     }
 
-    public unowned GLib.List<Goo.CanvasItem> get_items_at (double x, double y, Cairo.Context cr, bool is_pointer_event, bool parent_is_visible, GLib.List<Goo.CanvasItem> found_items) {
+    public unowned GLib.List<Goo.CanvasItem> get_items_at (
+        double x,
+        double y,
+        Cairo.Context cr,
+        bool is_pointer_event,
+        bool parent_is_visible,
+        GLib.List<Goo.CanvasItem> found_items
+    ) {
         var artboard_x = x;
         var artboard_y = y;
 
@@ -263,10 +284,7 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
 
             canvas.convert_to_item_space (item, ref item_x, ref item_y);
 
-            var item_is_inside = item.simple_is_item_at (
-                x, y,
-                cr, is_pointer_event
-                );
+            var item_is_inside = item.simple_is_item_at (x, y, cr, is_pointer_event);
 
             if (item_is_inside) {
                 found_items.append (item);
@@ -274,5 +292,13 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
         }
 
         return found_items;
+    }
+
+    /**
+     * Programmatically trigger the simple_paint() method when the UI requires an update.
+     */
+    public void trigger_change () {
+        // Force the redraw of the font size.
+        changed (false);
     }
 }

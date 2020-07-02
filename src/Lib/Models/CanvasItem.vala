@@ -1,24 +1,24 @@
 /*
-* Copyright (c) 2019-2020 Alecaddd (https://alecaddd.com)
-*
-* This file is part of Akira.
-*
-* Akira is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
+ * Copyright (c) 2019-2020 Alecaddd (https://alecaddd.com)
+ *
+ * This file is part of Akira.
+ *
+ * Akira is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
 
-* Akira is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-* GNU General Public License for more details.
+ * Akira is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
 
-* You should have received a copy of the GNU General Public License
-* along with Akira. If not, see <https://www.gnu.org/licenses/>.
-*
-* Authored by: Giacomo Alberini <giacomoalbe@gmail.com>
-* Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
-*/
+ * You should have received a copy of the GNU General Public License
+ * along with Akira. If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Authored by: Giacomo Alberini <giacomoalbe@gmail.com>
+ * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
+ */
 
 public enum Akira.Lib.Models.CanvasItemType {
     RECT,
@@ -80,6 +80,9 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
     public abstract double initial_relative_x { get; set; }
     public abstract double initial_relative_y { get; set; }
 
+    // Knows if an item was created or loaded for ordering purpose.
+    public abstract bool loaded { get; set; default = false; }
+
     public double get_coords (string coord_id) {
         double _coord = 0.0;
 
@@ -123,15 +126,24 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
         // Populate the name with the item's id
         // to show it when added to the LayersPanel
         canvas_item.name = canvas_item.id;
+    }
 
-        if (canvas_item.artboard != null) {
-            canvas_item.notify.connect (() => {
-                canvas_item.artboard.changed (true);
-            });
-        }
+    public virtual void connect_to_artboard () {
+        notify.connect (on_item_notify);
+    }
+
+    public virtual void disconnect_from_artboard () {
+        notify.disconnect (on_item_notify);
+    }
+
+    private void on_item_notify () {
+        artboard.changed (true);
     }
 
     public virtual void position_item (double _x, double _y) {
+        //  debug (initial_relative_x.to_string ());
+        //  debug (initial_relative_y.to_string ());
+
         if (artboard != null) {
             artboard.add_child (this, -1);
 
@@ -145,9 +157,29 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
         } else {
             parent.add_child (this, -1);
 
+            // Always reset the translation matrix when position an item
+            // in the "free canvas" space. This is to avoid previous coordinate
+            // space translations to be applied twice
+            var transform = Cairo.Matrix.identity ();
+
             // Keep the item always in the origin
             // move the entire coordinate system every time
-            translate (_x, _y);
+            transform.translate (_x, _y);
+
+            /*
+            // We only need to take into account the rotation relative
+            // to the center of the item.
+            // But this patch can only be applied once the AffineTransform PR
+            // would land, now it'll cause issues when moving a rotated item.
+            var width = get_coords ("width");
+            var height = get_coords ("height");
+
+            transform.translate (width / 2, height / 2);
+            transform.rotate (Utils.AffineTransform.deg_to_rad (rotation));
+            transform.translate (- (width / 2), - (height / 2));
+            */
+
+            set_transform (transform);
         }
     }
 
@@ -159,8 +191,8 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
             var transformed_delta_x = delta_x_accumulator;
             var transformed_delta_y = delta_y_accumulator;
 
-            this.relative_x = this.initial_relative_x + transformed_delta_x;
-            this.relative_y = this.initial_relative_y + transformed_delta_y;
+            relative_x = initial_relative_x + transformed_delta_x;
+            relative_y = initial_relative_y + transformed_delta_y;
 
             return;
         }
@@ -213,9 +245,32 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
         }
     }
 
+    public virtual double get_global_coord (string coord_id) {
+        Goo.CanvasBounds bounds;
+        get_bounds (out bounds);
+
+        var item_x =
+            artboard != null
+                ? relative_x + artboard.bounds.x1
+                : bounds.x1;
+        var item_y =
+            artboard != null
+                ? relative_y + artboard.bounds.y1 + artboard.get_label_height ()
+                : bounds.y1;
+
+        switch (coord_id) {
+            case "x":
+                return item_x;
+            case "y":
+                return item_y;
+            default:
+                return 0.0;
+        }
+    }
+
     public virtual void store_relative_position () {
-        this.initial_relative_x = this.relative_x;
-        this.initial_relative_y = this.relative_y;
+        initial_relative_x = relative_x;
+        initial_relative_y = relative_y;
     }
 
     public virtual void reset_colors () {
@@ -302,15 +357,14 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
         canvas.convert_from_item_space (
             artboard,
             ref item_x,
-            ref item_y
-            );
+            ref item_y);
 
         if (
             x >= item_x
             && x <= item_x + width
             && y >= item_y
             && y <= item_y + height
-           ) {
+        ) {
             return true;
         }
 

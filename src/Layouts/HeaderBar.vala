@@ -179,23 +179,10 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
         recent_files_grid.width_request = 220;
         recent_files_grid.name = "files-menu";
 
-        var back_button = new Gtk.ModelButton ();
-        back_button.text = _("Main Menu");
-        back_button.inverted = true;
-        back_button.menu_name = "main";
-        back_button.expand = true;
-
-        var sub_separator = new Gtk.Separator (Gtk.Orientation.HORIZONTAL);
-        sub_separator.margin_top = sub_separator.margin_bottom = 3;
-
-        recent_files_grid.add (back_button);
-        recent_files_grid.add (sub_separator);
-        recent_files_grid.show_all ();
-        fetch_recent_files ();
-
         var open_recent_button = new Gtk.ModelButton ();
         open_recent_button.text = _("Open Recent");
         open_recent_button.menu_name = "files-menu";
+        fetch_recent_files.begin ();
 
         var separator2 = new Gtk.Separator (Gtk.Orientation.HORIZONTAL);
         separator2.margin_top = separator2.margin_bottom = 3;
@@ -382,6 +369,7 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
             update_button_sensitivity (false);
         });
         window.event_bus.set_scale.connect (on_set_scale);
+        window.event_bus.update_recent_files_list.connect (fetch_recent_files);
     }
 
     private void on_set_scale (double scale) {
@@ -393,10 +381,109 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
     }
 
     /**
-     * TODO: Fetch the recently opened files from GSettings
-     * and add them to the menu grid
+     * Fetch the recently opened files from GSettings and add them to the list
+     * if those files still exists.
      */
-    public void fetch_recent_files () {
+    public async void fetch_recent_files () {
+        recent_files_grid.@foreach (child => {
+            recent_files_grid.remove (child);
+        });
+
+        // Add default buttons.
+        var back_button = new Gtk.ModelButton ();
+        back_button.text = _("Main Menu");
+        back_button.inverted = true;
+        back_button.menu_name = "main";
+        back_button.expand = true;
+
+        var sub_separator = new Gtk.Separator (Gtk.Orientation.HORIZONTAL);
+        sub_separator.margin_top = sub_separator.margin_bottom = 3;
+
+        recent_files_grid.add (back_button);
+        recent_files_grid.add (sub_separator);
+
+        // Loop a first time to clear missing files and prevent wrong accelerators.
+        string[] all_files = {};
+        for (var i = 0; i <= settings.recently_opened.length; i++) {
+            // Skip if the record is empty.
+            if (settings.recently_opened[i] == null) {
+                continue;
+            }
+
+            // Skip if the file doesn't exist.
+            var file = File.new_for_path (settings.recently_opened[i]);
+            if (!file.query_exists ()) {
+                continue;
+            }
+
+            all_files += settings.recently_opened[i];
+        }
+
+        // Update the GSettings to prevent loading an unavailable file.
+        settings.set_strv ("recently-opened", all_files);
+
+        for (var i = 0; i <= all_files.length; i++) {
+            // Skip if the record is empty.
+            if (all_files[i] == null) {
+                continue;
+            }
+
+            // Store the full path in a variable before the split() method explodes the string.
+            var full_path = all_files[i];
+
+            // Get the file name.
+            string[] split_string = all_files[i].split ("/");
+            var file_name = split_string[split_string.length - 1].replace (".akira", "");
+
+            var button = new Gtk.ModelButton ();
+
+            // Add quick accelerators only for the first 3 items.
+            string? accels = null;
+            if (i < 3) {
+                switch (i) {
+                    case 0:
+                        accels = Akira.Services.ActionManager.ACTION_PREFIX
+                            + Akira.Services.ActionManager.ACTION_LOAD_FIRST;
+                        break;
+                    case 1:
+                        accels = Akira.Services.ActionManager.ACTION_PREFIX
+                            + Akira.Services.ActionManager.ACTION_LOAD_SECOND;
+                        break;
+                    case 2:
+                        accels = Akira.Services.ActionManager.ACTION_PREFIX
+                            + Akira.Services.ActionManager.ACTION_LOAD_THIRD;
+                        break;
+                }
+
+                button.get_child ().destroy ();
+                var label = new Granite.AccelLabel.from_action_name (file_name, accels);
+                button.add (label);
+                button.action_name = accels;
+            } else {
+                button.text = file_name;
+
+                // Define the open action on click only for those files that don't
+                // have an accelerator to prevent double calls.
+                button.clicked.connect (() => {
+                    var file = File.new_for_path (full_path);
+                    if (!file.query_exists ()) {
+                        window.event_bus.canvas_notification (
+                            _("Unable to open file at '%s'").printf (full_path)
+                        );
+                        return;
+                    }
+
+                    File[] files = {};
+                    files += file;
+                    window.app.open (files, "");
+                });
+            }
+
+            button.tooltip_text = all_files[i];
+
+            recent_files_grid.add (button);
+        }
+
         recent_files_grid.show_all ();
     }
 

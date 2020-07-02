@@ -57,7 +57,7 @@ public class Akira.Models.ListModel<Model> : GLib.Object, GLib.ListModel {
         return (int) list.index (find_item (item));
     }
 
-    public async void add_item (Model model_item, bool append = true) {
+    public async void add_item (Model model_item, bool append = false) {
         if (append) {
             list.append (model_item);
             items_changed (get_n_items () - 1, 0, 1);

@@ -271,7 +271,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
     }
 
     private void on_flip_item (bool clicked, bool vertical) {
-        if (selected_items.length () == 0) {
+        if (selected_items.length () == 0 || selected_items.nth_data (0) is Lib.Models.CanvasArtboard) {
             return;
         }
 

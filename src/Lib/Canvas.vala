@@ -236,6 +236,8 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
                 if (clicked_item is Models.CanvasItem) {
                     if ((clicked_item as Models.CanvasItem).locked) {
+                        selected_bound_manager.reset_selection ();
+                        holding = false;
                         return true;
                     }
 
@@ -283,6 +285,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
             default:
                 edit_mode = EditMode.MODE_SELECTION;
+                window.event_bus.hold_released ();
                 break;
         }
 

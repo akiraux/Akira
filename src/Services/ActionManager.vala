@@ -30,6 +30,9 @@ public class Akira.Services.ActionManager : Object {
     public const string ACTION_OPEN = "action_open";
     public const string ACTION_SAVE = "action_save";
     public const string ACTION_SAVE_AS = "action_save_as";
+    public const string ACTION_LOAD_FIRST = "action_load_first";
+    public const string ACTION_LOAD_SECOND = "action_load_second";
+    public const string ACTION_LOAD_THIRD = "action_load_third";
     public const string ACTION_SHOW_PIXEL_GRID = "action-show-pixel-grid";
     public const string ACTION_SHOW_UI_GRID = "action-show-ui-grid";
     public const string ACTION_PRESENTATION = "action_presentation";
@@ -64,6 +67,9 @@ public class Akira.Services.ActionManager : Object {
         { ACTION_OPEN, action_open },
         { ACTION_SAVE, action_save },
         { ACTION_SAVE_AS, action_save_as },
+        { ACTION_LOAD_FIRST, action_load_first },
+        { ACTION_LOAD_SECOND, action_load_second },
+        { ACTION_LOAD_THIRD, action_load_third },
         { ACTION_SHOW_PIXEL_GRID, action_show_pixel_grid },
         { ACTION_SHOW_UI_GRID, action_show_ui_grid },
         { ACTION_PRESENTATION, action_presentation },
@@ -103,6 +109,9 @@ public class Akira.Services.ActionManager : Object {
         action_accelerators.set (ACTION_OPEN, "<Control>o");
         action_accelerators.set (ACTION_SAVE, "<Control>s");
         action_accelerators.set (ACTION_SAVE_AS, "<Control><Shift>s");
+        action_accelerators.set (ACTION_LOAD_FIRST, "<Control><Alt>1");
+        action_accelerators.set (ACTION_LOAD_SECOND, "<Control><Alt>2");
+        action_accelerators.set (ACTION_LOAD_THIRD, "<Control><Alt>3");
         action_accelerators.set (ACTION_SHOW_PIXEL_GRID, "<Control><Shift>p");
         action_accelerators.set (ACTION_SHOW_UI_GRID, "<Control><Shift>g");
         action_accelerators.set (ACTION_PRESENTATION, "<Control>period");
@@ -186,6 +195,63 @@ public class Akira.Services.ActionManager : Object {
         window.file_manager.save_file_as ();
     }
 
+    public void action_load_first () {
+        if (settings.recently_opened.length == 0 || settings.recently_opened[0] == null) {
+            window.event_bus.canvas_notification (_("No recently opened file available!"));
+            return;
+        }
+
+        var file = File.new_for_path (settings.recently_opened[0]);
+        if (!file.query_exists ()) {
+            window.event_bus.canvas_notification (
+                _("Unable to open file at '%s'").printf (settings.recently_opened[0])
+            );
+            return;
+        }
+
+        File[] files = {};
+        files += file;
+        window.app.open (files, "");
+    }
+
+    private void action_load_second () {
+        if (settings.recently_opened.length < 1 || settings.recently_opened[1] == null) {
+            window.event_bus.canvas_notification (_("No second most recently opened file available!"));
+            return;
+        }
+
+        var file = File.new_for_path (settings.recently_opened[1]);
+        if (!file.query_exists ()) {
+            window.event_bus.canvas_notification (
+                _("Unable to open file at '%s'").printf (settings.recently_opened[1])
+            );
+            return;
+        }
+
+        File[] files = {};
+        files += file;
+        window.app.open (files, "");
+    }
+
+    private void action_load_third () {
+        if (settings.recently_opened.length < 2 || settings.recently_opened[2] == null) {
+            window.event_bus.canvas_notification (_("No third most recently opened file available!"));
+            return;
+        }
+
+        var file = File.new_for_path (settings.recently_opened[2]);
+        if (!file.query_exists ()) {
+            window.event_bus.canvas_notification (
+                _("Unable to open file at '%s'").printf (settings.recently_opened[2])
+            );
+            return;
+        }
+
+        File[] files = {};
+        files += file;
+        window.app.open (files, "");
+    }
+
     private void action_show_pixel_grid () {
         warning ("show pixel grid");
     }
@@ -210,13 +276,13 @@ public class Akira.Services.ActionManager : Object {
             window.event_bus.canvas_notification (_("Nothing selected to export!"));
             return;
         }
-        // TODO: Trigger selection pixbuf generation.
+
         canvas.export_manager.create_selection_snapshot ();
     }
 
     private void action_export_artboards () {
         // Check if at least an artboard is present.
-        window.event_bus.canvas_notification (_("No Artboard available!"));
+        window.event_bus.canvas_notification (_("Export of Artbords currently unavailable…sorry 😑️"));
         // TODO: Trigger artboards pixbuf generation.
     }
 
@@ -294,8 +360,16 @@ public class Akira.Services.ActionManager : Object {
             case Gtk.ResponseType.OK:
                 SList<File> files = dialog.get_files ();
                 files.@foreach ((file) => {
-                    var provider = new Akira.Services.FileImageProvider (file);
-                    window.items_manager.insert_image (provider);
+                    if (Akira.Utils.Image.is_valid_image (file)) {
+                        var manager = new Akira.Lib.Managers.ImageManager (file, files.index (file));
+                        window.items_manager.insert_image (manager);
+                        return;
+                    }
+
+                    var ext = Akira.Utils.Image.get_extension (file);
+                    window.event_bus.canvas_notification (
+                        _("Error! .%s files are not supported!"
+                    ).printf (ext));
                 });
                 break;
         }

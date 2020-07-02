@@ -25,6 +25,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
 
     public Akira.Models.ListModel<Lib.Models.CanvasItem> free_items;
     public Akira.Models.ListModel<Lib.Models.CanvasArtboard> artboards;
+    public Akira.Models.ListModel<Lib.Models.CanvasImage> images;
     private Models.CanvasItemType? insert_type { get; set; }
     private Goo.CanvasItem root;
     private int border_size;
@@ -40,6 +41,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
     construct {
         free_items = new Akira.Models.ListModel<Lib.Models.CanvasItem> ();
         artboards = new Akira.Models.ListModel<Lib.Models.CanvasArtboard> ();
+        images = new Akira.Models.ListModel<Lib.Models.CanvasImage> ();
 
         border_color = Gdk.RGBA ();
         fill_color = Gdk.RGBA ();
@@ -47,9 +49,10 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         window.event_bus.insert_item.connect (set_item_to_insert);
         window.event_bus.request_delete_item.connect (on_request_delete_item);
         window.event_bus.change_item_z_index.connect (on_change_item_z_index);
+        window.event_bus.hold_released.connect (on_hold_released);
     }
 
-    public void insert_image (Services.FileImageProvider provider) {
+    public void insert_image (Lib.Managers.ImageManager manager) {
         var selected_bound_manager = window.main_window.main_canvas.canvas.selected_bound_manager;
 
         double start_x, start_y, scale, rotation;
@@ -73,7 +76,8 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         }
 
         set_item_to_insert ("image");
-        var new_item = insert_item (start_x, start_y, provider);
+        var new_item = insert_item (start_x, start_y, manager);
+        (new_item as Models.CanvasImage).resize_pixbuf (-1, -1, true);
 
         selected_bound_manager.add_item_to_selection (new_item);
         selected_bound_manager.set_initial_coordinates (start_x, start_y);
@@ -82,7 +86,8 @@ public class Akira.Lib.Managers.ItemsManager : Object {
     public Models.CanvasItem? insert_item (
         double x,
         double y,
-        Services.FileImageProvider? provider = null
+        Lib.Managers.ImageManager? manager = null,
+        bool loaded = false
     ) {
         udpate_default_values ();
 
@@ -105,15 +110,15 @@ public class Akira.Lib.Managers.ItemsManager : Object {
 
         switch (insert_type) {
             case Models.CanvasItemType.RECT:
-                new_item = add_rect (x, y, root, artboard);
+                new_item = add_rect (x, y, root, artboard, loaded);
                 break;
 
             case Models.CanvasItemType.ELLIPSE:
-                new_item = add_ellipse (x, y, root, artboard);
+                new_item = add_ellipse (x, y, root, artboard, loaded);
                 break;
 
             case Models.CanvasItemType.TEXT:
-                new_item = add_text (x, y, root, artboard);
+                new_item = add_text (x, y, root, artboard, loaded);
                 break;
 
             case Models.CanvasItemType.ARTBOARD:
@@ -121,7 +126,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
                 break;
 
             case Models.CanvasItemType.IMAGE:
-                new_item = add_image (x, y, provider, root, artboard);
+                new_item = add_image (x, y, manager, root, artboard, loaded);
                 break;
         }
 
@@ -131,10 +136,17 @@ public class Akira.Lib.Managers.ItemsManager : Object {
                     artboards.add_item.begin ((Models.CanvasArtboard) new_item);
                     break;
 
+                case Akira.Lib.Models.CanvasItemType.IMAGE:
                 default:
+                    // We need to store images in a dedicated list since we will need
+                    // to easily access them and save them in the .akira/Pictures folder.
+                    if (new_item.item_type == Akira.Lib.Models.CanvasItemType.IMAGE) {
+                        images.add_item.begin ((new_item as Akira.Lib.Models.CanvasImage), loaded);
+                    }
+
                     if (new_item.artboard == null) {
                         // Add it to "free items"
-                        free_items.add_item.begin (new_item, false);
+                        free_items.add_item.begin (new_item, loaded);
                     }
                     break;
             }
@@ -147,7 +159,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
     }
 
     public void add_item (Akira.Lib.Models.CanvasItem item) {
-        free_items.add_item.begin (item, false);
+        free_items.add_item.begin (item);
         window.event_bus.file_edited ();
     }
 
@@ -157,7 +169,20 @@ public class Akira.Lib.Managers.ItemsManager : Object {
                 artboards.remove_item.begin (item as Models.CanvasArtboard);
                 break;
 
+            case Akira.Lib.Models.CanvasItemType.IMAGE:
             default:
+                // Remove the image from the list so we don't keep it in the saved file.
+                if (item.item_type == Akira.Lib.Models.CanvasItemType.IMAGE) {
+                    images.remove_item.begin ((item as Akira.Lib.Models.CanvasImage));
+
+                    // Mark it for removal if we have a saved file.
+                    if (window.akira_file != null) {
+                        window.akira_file.remove_image.begin (
+                            (item as Akira.Lib.Models.CanvasImage).manager.filename
+                        );
+                    }
+                }
+
                 if (item.artboard == null) {
                     free_items.remove_item.begin (item);
                 }
@@ -178,7 +203,13 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         return artboard as Models.CanvasItem;
     }
 
-    public Models.CanvasItem add_rect (double x, double y, Goo.CanvasItem parent, Models.CanvasArtboard? artboard) {
+    public Models.CanvasItem add_rect (
+        double x,
+        double y,
+        Goo.CanvasItem parent,
+        Models.CanvasArtboard? artboard,
+        bool loaded
+    ) {
         return new Models.CanvasRect (
             Utils.AffineTransform.fix_size (x),
             Utils.AffineTransform.fix_size (y),
@@ -188,10 +219,18 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             border_color,
             fill_color,
             parent,
-            artboard);
+            artboard,
+            loaded
+        );
     }
 
-    public Models.CanvasEllipse add_ellipse (double x, double y, Goo.CanvasItem parent, Models.CanvasArtboard? artboard) {
+    public Models.CanvasEllipse add_ellipse (
+        double x,
+        double y,
+        Goo.CanvasItem parent,
+        Models.CanvasArtboard? artboard,
+        bool loaded
+    ) {
         return new Models.CanvasEllipse (
             Utils.AffineTransform.fix_size (x),
             Utils.AffineTransform.fix_size (y),
@@ -201,10 +240,18 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             border_color,
             fill_color,
             parent,
-            artboard);
+            artboard,
+            loaded
+        );
     }
 
-    public Models.CanvasText add_text (double x, double y, Goo.CanvasItem parent, Models.CanvasArtboard? artboard) {
+    public Models.CanvasText add_text (
+        double x,
+        double y,
+        Goo.CanvasItem parent,
+        Models.CanvasArtboard? artboard,
+        bool loaded
+    ) {
         return new Models.CanvasText (
             "Akira is awesome :)",
             Utils.AffineTransform.fix_size (x),
@@ -214,22 +261,27 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             Goo.CanvasAnchorType.NW,
             "Open Sans 18",
             parent,
-            artboard);
+            artboard,
+            loaded
+        );
     }
 
     public Models.CanvasImage add_image (
         double x,
         double y,
-        Services.FileImageProvider provider,
+        Lib.Managers.ImageManager manager,
         Goo.CanvasItem parent,
-        Models.CanvasArtboard? artboard
+        Models.CanvasArtboard? artboard,
+        bool loaded
     ) {
         return new Models.CanvasImage (
             Utils.AffineTransform.fix_size (x),
             Utils.AffineTransform.fix_size (y),
-            provider,
+            manager,
             parent,
-            artboard);
+            artboard,
+            loaded
+        );
     }
 
     public int get_item_position (Lib.Models.CanvasItem item) {
@@ -385,22 +437,35 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         switch (obj.get_string_member ("type")) {
             case "AkiraLibModelsCanvasRect":
                 insert_type = Models.CanvasItemType.RECT;
-                item = insert_item (pos_x, pos_y);
+                item = insert_item (pos_x, pos_y, null, true);
                 break;
 
             case "AkiraLibModelsCanvasEllipse":
                 insert_type = Models.CanvasItemType.ELLIPSE;
-                item = insert_item (pos_x, pos_y);
+                item = insert_item (pos_x, pos_y, null, true);
                 break;
 
             case "AkiraLibModelsCanvasText":
                 insert_type = Models.CanvasItemType.TEXT;
-                item = insert_item (pos_x, pos_y);
+                item = insert_item (pos_x, pos_y, null, true);
                 break;
 
             case "AkiraLibModelsCanvasArtboard":
                 insert_type = Models.CanvasItemType.ARTBOARD;
-                item = insert_item (pos_x, pos_y);
+                item = insert_item (pos_x, pos_y, null, true);
+                break;
+
+            case "AkiraLibModelsCanvasImage":
+                insert_type = Models.CanvasItemType.IMAGE;
+                var filename = obj.get_string_member ("image_id");
+                var file = File.new_for_path (
+                    Path.build_filename (
+                        window.akira_file.pictures_folder.get_path (),
+                        filename
+                    )
+                );
+                var manager = new Akira.Lib.Managers.ImageManager.from_archive (file, filename);
+                item = insert_item (pos_x, pos_y, manager, true);
                 break;
         }
 
@@ -440,6 +505,15 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             item.set ("global-radius", obj.get_double_member ("global-radius"));
         }
 
+        // Restore image size.
+        if (item is Models.CanvasImage) {
+            (item as Models.CanvasImage).resize_pixbuf (
+                (int) obj.get_double_member ("width"),
+                (int) obj.get_double_member ("height"),
+                true
+            );
+        }
+
         // Restore layer options.
         item.locked = obj.get_boolean_member ("locked");
         item.visibility =
@@ -477,9 +551,15 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             item.bounds.x2 = transform.get_double_member ("x0") + obj.get_double_member ("width");
             item.bounds.y2 = transform.get_double_member ("y0") + obj.get_double_member ("height");
         }
+
+        // Since free items are loaded upside down, always raise to the top position
+        // the newly added free item.
+        if (artboard == null & !(item is Models.CanvasArtboard)) {
+            item.lower (null);
+        }
     }
 
-    /*
+    /**
      * Restore the selected status of an object.
      *
      * @param bool selected - If the object is selected.
@@ -488,6 +568,141 @@ public class Akira.Lib.Managers.ItemsManager : Object {
     private void restore_selection (bool selected, Models.CanvasItem item) {
         if (selected) {
             window.main_window.main_canvas.canvas.selected_bound_manager.add_item_to_selection (item);
+        }
+    }
+
+    /**
+     * Handle the aftermath of an item transformation, like size changes or movement.
+     */
+    private void on_hold_released () {
+        // We need to copy the array of selected items as we need to remove and add items once
+        // moved to force the natural redraw of the canvas.
+        var items = window.main_window.main_canvas.canvas.selected_bound_manager.selected_items.copy ();
+
+        if (items.length () == 0) {
+            return;
+        }
+
+        // If we have images in the canvas, check if they're part of the selection to recalculate the size.
+        if (images.get_n_items () > 0) {
+            foreach (var image in images) {
+                if (items.find (image) != null) {
+                    image.check_resize_pixbuf ();
+                }
+            }
+        }
+
+        // Interrupt if no artboard is currently present.
+        if (artboards.get_n_items () == 0) {
+            return;
+        }
+
+        // Check if any of the currently moved items was dropped inside or outside any artboard.
+        foreach (var item in items) {
+            if (item is Models.CanvasArtboard) {
+                continue;
+            }
+
+            // Interrupt if the item is already inside an artboard and was only moved within it.
+            if (item.artboard != null && item.artboard.dropped_inside (item)) {
+                continue;
+            }
+
+            Models.CanvasArtboard? new_artboard = null;
+
+            foreach (Models.CanvasArtboard artboard in artboards) {
+                // Interrupt the loop if we find an artboard that matches the dropped coordinate.
+                if (artboard.dropped_inside (item)) {
+                    new_artboard = artboard;
+                    break;
+                }
+            }
+
+            change_artboard (item, new_artboard);
+        }
+    }
+
+    /**
+     * Add or remove an item from an artboard.
+     */
+    public void change_artboard (Models.CanvasItem item, Models.CanvasArtboard? new_artboard) {
+        // Interrupt if the item was moved within its original artboard.
+        if (item.artboard == new_artboard) {
+            return;
+        }
+
+        // Save the coordinates before removing the item.
+        var x = item.get_global_coord ("x");
+        var y = item.get_global_coord ("y");
+
+        // If the item was moved from inside an Artboard to the emtpy Canvas.
+        if (item.artboard != null && new_artboard == null) {
+            debug ("Artbord => Free Item");
+            // Remove the item from the Artboard.
+            item.artboard.remove_item (item);
+            window.event_bus.item_deleted (item);
+
+            // Attach the item to the Canvas.
+            item.set_parent (root);
+
+            // Insert the item back into the Canvas, add the Layer,
+            // reset its position, and add it back to the selection.
+            add_item (item);
+            item.position_item (x, y);
+
+            // Trigger the canvas repaint after the item was added back.
+            window.event_bus.item_inserted (item);
+            window.event_bus.request_add_item_to_selection (item);
+            window.event_bus.file_edited ();
+
+            return;
+        }
+
+        // If the item was moved from the empty Canvas to an Artboard.
+        if (item.artboard == null && new_artboard != null) {
+            debug ("Free Item => Artboard");
+            // Remove the item from the free items.
+            free_items.remove_item.begin (item);
+            item.parent.remove_child (item.parent.find_child (item));
+            window.event_bus.item_deleted (item);
+
+            // Attach the item to the Artboard.
+            item.artboard = new_artboard;
+
+            // Insert the item back into the Artboard, add the Layer,
+            // reset its position, and add it back to the selection.
+            item.position_item (x, y);
+            item.connect_to_artboard ();
+
+            // Trigger the canvas repaint after the item was added back.
+            window.event_bus.item_inserted (item);
+            window.event_bus.request_add_item_to_selection (item);
+            window.event_bus.file_edited ();
+
+            return;
+        }
+
+        // If the item was moved from inside an Artboard to another Artboard.
+        if (item.artboard != null && new_artboard != null) {
+            debug ("Artbord => Artboard");
+            // Remove the item from the Artboard.
+            item.artboard.remove_item (item);
+            window.event_bus.item_deleted (item);
+
+            // Attach the item to the Artboard.
+            item.artboard = new_artboard;
+
+            // Insert the item back into the Artboard, add the Layer,
+            // reset its position, and add it back to the selection.
+            item.position_item (x, y);
+            item.connect_to_artboard ();
+
+            // Trigger the canvas repaint after the item was added back.
+            window.event_bus.item_inserted (item);
+            window.event_bus.request_add_item_to_selection (item);
+            window.event_bus.file_edited ();
+
+            return;
         }
     }
 }
