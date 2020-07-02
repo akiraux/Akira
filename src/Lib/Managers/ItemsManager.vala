@@ -159,7 +159,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
     }
 
     public void add_item (Akira.Lib.Models.CanvasItem item) {
-        free_items.add_item.begin (item, false);
+        free_items.add_item.begin (item);
         window.event_bus.file_edited ();
     }
 
@@ -550,6 +550,12 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             item.bounds.y1 = transform.get_double_member ("y0");
             item.bounds.x2 = transform.get_double_member ("x0") + obj.get_double_member ("width");
             item.bounds.y2 = transform.get_double_member ("y0") + obj.get_double_member ("height");
+        }
+
+        // Since free items are loaded upside down, always raise to the top position
+        // the newly added free item.
+        if (artboard == null & !(item is Models.CanvasArtboard)) {
+            item.lower (null);
         }
     }
 
