@@ -41,9 +41,9 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
     };
 
     // Drag and Drop properties.
-    public Gtk.Revealer motion_revealer;
+    private Gtk.Revealer motion_revealer;
+    private bool dragged = false;
 
-    public Gtk.Revealer main_revealer;
     public Gtk.Image icon;
     public Gtk.Image icon_folder_open;
     public Gtk.Image icon_locked;
@@ -242,13 +242,8 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
     }
 
     private void is_group () {
-        main_revealer = new Gtk.Revealer ();
-        main_revealer.reveal_child = true;
-        main_revealer.transition_type = Gtk.RevealerTransitionType.SLIDE_DOWN;
-
         if (!grouped) {
-            main_revealer.add (label_grid);
-            add (main_revealer);
+            add (label_grid);
             return;
         }
 
@@ -291,8 +286,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
         group_grid.attach (label_grid, 0, 0, 1, 1);
         group_grid.attach (revealer, 0, 1, 1, 1);
 
-        main_revealer.add (group_grid);
-        add (main_revealer);
+        add (group_grid);
     }
 
     private void reveal_actions () {
@@ -364,7 +358,8 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 
         Gtk.drag_set_icon_surface (context, surface);
 
-        main_revealer.reveal_child = false;
+        get_style_context ().add_class ("transparent");
+        dragged = true;
     }
 
     private void on_drag_data_get (
@@ -428,9 +423,6 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
             target = 1;
         }
 
-        // We need to reveal the item before removing it.
-        layer.main_revealer.reveal_child = true;
-
         // Remove item at source position
         var item_to_swap = items_source.remove_at (source);
 
@@ -441,6 +433,9 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
         if (model.artboard != null) {
             model.artboard.changed (true);
         }
+
+        get_style_context ().remove_class ("transparent");
+        dragged = false;
     }
 
     /**
@@ -457,10 +452,12 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
     }
 
     private bool on_drag_motion (Gdk.DragContext context, int x, int y, uint time) {
-        motion_revealer.reveal_child = true;
-
         int row_index = get_index ();
         var row = (Akira.Layouts.Partials.Layer) (parent as Gtk.ListBox).get_row_at_index (row_index);
+
+        if (!dragged) {
+            motion_revealer.reveal_child = true;
+        }
 
         Gtk.Allocation alloc;
         get_allocation (out alloc);
@@ -486,7 +483,8 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
     }
 
     private void on_drag_end (Gdk.DragContext context) {
-        main_revealer.reveal_child = true;
+        get_style_context ().remove_class ("transparent");
+        dragged = false;
     }
 
     /**

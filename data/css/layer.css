@@ -3,6 +3,10 @@
     transition: all 240ms ease;
 }
 
+.layer.transparent {
+    opacity: 0.5;
+}
+
 /* selected status */
 .layer,
 .layer:selected {
@@ -48,12 +52,12 @@
     box-shadow: none;
 }
 
-.layer.hover > revealer > grid > .layer-action,
-.layer.hover > revealer > grid > grid > .layer-action {
+.layer.hover > grid > .layer-action,
+.layer.hover > grid > grid > .layer-action {
     opacity: 0.5;
 }
 
-.layer.hover > revealer > grid > .layer-action:hover,
+.layer.hover > grid > .layer-action:hover,
 .layer-action:hover {
     opacity: 1;
 }
