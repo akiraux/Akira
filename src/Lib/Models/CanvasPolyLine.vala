@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2019-2020 Alecaddd (https://alecaddd.com)
+* Copyright (c) 2020 Alecaddd (https://alecaddd.com)
 *
 * This file is part of Akira.
 *
@@ -16,7 +16,7 @@
 * You should have received a copy of the GNU General Public License
 * along with Akira. If not, see <https://www.gnu.org/licenses/>.
 *
-* Authored by: Alessandro "alecaddd" Castellani <castellani.ale@gmail.com>
+* Authored by: Tim "TimHal" Hallyburton <tim.hallyburton@gmx.de>
 */
 
 public class Akira.Lib.Models.CanvasPolyLine : Goo.CanvasPolyline, Models.CanvasItem {
@@ -77,14 +77,17 @@ public class Akira.Lib.Models.CanvasPolyLine : Goo.CanvasPolyline, Models.Canvas
     public double x2 { get; set; }
     public double y2 { get; set; }
 
+    public double width { get; set; }
+    public double height { get; set; }
+    
     // Knows if an item was created or loaded for ordering purpose.
     public bool loaded { get; set; default = false; }
 
     public CanvasPolyLine (
         double _x1 = 0,
         double _y1 = 0,
-        double _x2 = 100,
-        double _y2 = 100,
+        double _x2 = 10,
+        double _y2 = 10,
         int _border_size = 1,
         Gdk.RGBA _border_color,
         Gdk.RGBA _fill_color,
@@ -104,15 +107,16 @@ public class Akira.Lib.Models.CanvasPolyLine : Goo.CanvasPolyline, Models.Canvas
             connect_to_artboard ();
         }
 
-        width = 10;
-        height = 10;
-        relative_x = 0;
-        relative_y = 0;
+        points = new Goo.CanvasPoints (2);
+        points.set_point  (0, 10, 10);
+        points.set_point  (1, 100, 100);
+        close_path = true;
 
-        x1 = _x1;
-        y1 = _y1; 
-        x2 = _x2; 
-        y2 = _y2;
+        line_width = 1;
+        width = 1;
+        height = 1;
+        x = _x1;
+        y = _y1;
 
         show_border_radius_panel = true;
         show_fill_panel = true;
@@ -120,7 +124,7 @@ public class Akira.Lib.Models.CanvasPolyLine : Goo.CanvasPolyline, Models.Canvas
         is_radius_uniform = true;
         is_radius_autoscale = false;
 
-        position_item (x1, y1);
+        position_item (x, y);
 
         color = _fill_color;
         has_border = settings.set_border;

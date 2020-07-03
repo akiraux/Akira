@@ -217,8 +217,8 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         return new Models.CanvasPolyLine (
             x,
             y,
-            100.0,
-            100.0,
+            20.0 + x,
+            20.0 + y,
             border_size,
             border_color,
             fill_color,

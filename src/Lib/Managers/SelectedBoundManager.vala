@@ -177,6 +177,9 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
     }
 
     private void update_selected_items () {
+        if (selected_items.nth_data(0) is Lib.Models.CanvasPolyLine) {
+            debug ("Polyline selected!");
+        }
         canvas.window.event_bus.selected_items_changed (selected_items);
     }
 
