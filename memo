@@ -1,0 +1,2 @@
+/usr/bin/com.github.akiraux.akiraDevel --gtk-debug=all --gtk-no-debug=layout,interactive,resize --gdk-debug=all &> akira.log
+G_MESSAGES_DEBUG=Akira ./src/com.github.akiraux.akiraDevel 
