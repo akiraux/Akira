@@ -385,7 +385,6 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
         Gtk.SelectionData selection_data,
         uint target_type, uint time
     ) {
-        debug ("dropped");
         // This works thanks to on_drag_data_get ().
         var layer = (Layer) ((Gtk.Widget[]) selection_data.get_data ())[0];
 

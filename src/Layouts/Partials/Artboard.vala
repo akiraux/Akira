@@ -231,11 +231,11 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
         drag_data_get.connect (on_drag_data_get);
 
         // Make this widget a DnD destination.
-        Gtk.drag_dest_set (this, Gtk.DestDefaults.MOTION, TARGET_ENTRIES_LAYER, Gdk.DragAction.MOVE);
-        drag_motion.connect (on_drag_motion);
-        drag_leave.connect (on_drag_leave);
-        drag_drop.connect (on_drag_drop);
-        drag_data_received.connect (on_drag_data_received);
+        Gtk.drag_dest_set (artboard_handle, Gtk.DestDefaults.MOTION, TARGET_ENTRIES_LAYER, Gdk.DragAction.MOVE);
+        artboard_handle.drag_motion.connect (on_drag_motion);
+        artboard_handle.drag_leave.connect (on_drag_leave);
+        artboard_handle.drag_drop.connect (on_drag_drop);
+        artboard_handle.drag_data_received.connect (on_drag_data_received);
     }
 
     private void on_drag_begin (Gtk.Widget widget, Gdk.DragContext context) {
@@ -330,7 +330,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
         var source = items_count - 1 - pos_source;
 
         // Interrupt if the item was dropped in the same position.
-        if (source - 1 == 0) {
+        if (source == 0) {
             debug ("same position");
             return;
         }
