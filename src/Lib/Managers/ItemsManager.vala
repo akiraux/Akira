@@ -557,6 +557,9 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         if (artboard == null & !(item is Models.CanvasArtboard)) {
             item.lower (null);
         }
+
+        // Reset the loaded attribute to prevent sorting issues inside artboards.
+        item.loaded = false;
     }
 
     /**
