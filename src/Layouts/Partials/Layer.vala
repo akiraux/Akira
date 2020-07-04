@@ -449,9 +449,6 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
             target = items_count - 1 - items_source.index (item_to_swap);
             root.add_child (item_to_swap, target);
         }
-
-        get_style_context ().remove_class ("transparent");
-        dragged = false;
     }
 
     /**

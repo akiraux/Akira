@@ -122,12 +122,14 @@ public class Akira.Layouts.RightSideBar : Gtk.Grid {
         search.drag_motion.connect (on_drag_motion);
         search.drag_leave.connect (on_drag_leave);
         search.drag_end.connect (on_drag_end);
+        search.drag_data_received.connect (on_drag_data_received);
 
         // Build Drag and Drop for layers moving atop the search grid.
         Gtk.drag_dest_set (search_grid, Gtk.DestDefaults.ALL, TARGET_ENTRIES, Gdk.DragAction.MOVE);
         search_grid.drag_motion.connect (on_drag_motion);
         search_grid.drag_leave.connect (on_drag_leave);
         search_grid.drag_end.connect (on_drag_end);
+        search_grid.drag_data_received.connect (on_drag_data_received);
 
         return search_grid;
     }
@@ -143,6 +145,60 @@ public class Akira.Layouts.RightSideBar : Gtk.Grid {
 
     private void on_drag_end (Gdk.DragContext context) {
         motion_revealer.reveal_child = true;
+    }
+
+    /**
+     * Handle the received layer, find the position of the targeted layer and trigger
+     * a z-index update.
+     */
+    private void on_drag_data_received (
+        Gdk.DragContext context, int x, int y,
+        Gtk.SelectionData selection_data,
+        uint target_type, uint time
+    ) {
+        // This works thanks to on_drag_data_get ().
+        var layer = (Akira.Layouts.Partials.Layer) ((Gtk.Widget[]) selection_data.get_data ())[0];
+        var artboard = layer.model.artboard;
+
+        // Change artboard if necessary.
+        window.items_manager.change_artboard (layer.model, null);
+
+        // If the moved layer had an artboard, no need to do anything else.
+        if (artboard != null) {
+            return;
+        }
+
+        var items_count = (int) window.items_manager.free_items.get_n_items ();
+        var pos_source = items_count - 1 - window.items_manager.free_items.index (layer.model);
+
+        // Interrupt if item position doesn't exist.
+        if (pos_source == -1) {
+            return;
+        }
+
+        // z-index is the exact opposite of items placement as the last item
+        // is the topmost element. Because of this, we need some trickery to
+        // properly handle the list's order.
+        var source = items_count - 1 - pos_source;
+
+        // Interrupt if the item was dropped in the same position.
+        if (source == 0) {
+            debug ("same position");
+            return;
+        }
+
+        // Remove item at source position.
+        var item_to_swap = window.items_manager.free_items.remove_at (source);
+        item_to_swap.parent.remove_child (item_to_swap.parent.find_child (item_to_swap));
+
+        // Insert item at target position.
+        window.items_manager.free_items.insert_at (0, item_to_swap);
+        window.event_bus.z_selected_changed ();
+
+        var root = window.main_window.main_canvas.canvas.get_root_item ();
+        // Fetch the new correct position.
+        var target = items_count - 1 - window.items_manager.free_items.index (item_to_swap);
+        root.add_child (item_to_swap, target);
     }
 
     private bool handle_focus_in (Gdk.EventFocus event) {
