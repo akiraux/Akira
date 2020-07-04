@@ -628,6 +628,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
     public void change_artboard (Models.CanvasItem item, Models.CanvasArtboard? new_artboard) {
         // Interrupt if the item was moved within its original artboard.
         if (item.artboard == new_artboard) {
+            debug ("Same parent");
             return;
         }
 

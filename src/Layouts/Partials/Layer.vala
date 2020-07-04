@@ -385,6 +385,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
         Gtk.SelectionData selection_data,
         uint target_type, uint time
     ) {
+        debug ("dropped");
         // This works thanks to on_drag_data_get ().
         var layer = (Layer) ((Gtk.Widget[]) selection_data.get_data ())[0];
 
@@ -413,15 +414,18 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 
         // Interrupt if the item was dropped in the same position.
         if (source - 1 == target) {
+            debug ("same position");
             return;
         }
 
-        // Since the top position is handled by the empty panel drop method,
-        // if the drop target is in position 0, it means the layer should
-        // be added underneath it, at position 1.
-        if (target == 0) {
-            target = 1;
+        // If the initial position is higher than the targeted dropped layer, it
+        // means the layer was dragged from the bottom up, therefore we need to
+        // increase the dropped target by 1 since we don't deal with location 0.
+        if (source > target) {
+            target++;
         }
+
+        debug ("%i - %i", source, target);
 
         // Remove item at source position
         var item_to_swap = items_source.remove_at (source);
@@ -432,6 +436,8 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 
         if (model.artboard != null) {
             model.artboard.changed (true);
+        } else {
+            window.main_window.main_canvas.canvas.update ();
         }
 
         get_style_context ().remove_class ("transparent");
