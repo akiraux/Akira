@@ -430,14 +430,25 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
         // Remove item at source position
         var item_to_swap = items_source.remove_at (source);
 
+        // If the item is a free item, we need to remove it from the Canvas.
+        if (layer.model.artboard == null) {
+            item_to_swap.parent.remove_child (item_to_swap.parent.find_child (item_to_swap));
+        }
+
         // Insert item at target position
         items_source.insert_at (target, item_to_swap);
         window.event_bus.z_selected_changed ();
 
         if (model.artboard != null) {
             model.artboard.changed (true);
-        } else {
-            window.main_window.main_canvas.canvas.update ();
+        }
+
+        // If the item is a free item, we need to add it to the Canvas root element.
+        if (layer.model.artboard == null) {
+            var root = window.main_window.main_canvas.canvas.get_root_item ();
+            // Fetch the new correct position.
+            target = items_count - 1 - items_source.index (item_to_swap);
+            root.add_child (item_to_swap, target);
         }
 
         get_style_context ().remove_class ("transparent");
