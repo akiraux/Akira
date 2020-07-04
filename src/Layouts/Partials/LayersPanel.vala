@@ -76,7 +76,7 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.Grid {
         attach (items_list, 0, 1);
         attach (artboards_list, 0, 2);
 
-        // build_drag_and_drop ();
+        build_drag_and_drop ();
         redraw_list ();
 
         window.event_bus.item_inserted.connect (redraw_list);
@@ -89,57 +89,13 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.Grid {
         show_all ();
     }
 
-    //  private void build_drag_and_drop () {
-    //      Gtk.drag_dest_set (this, Gtk.DestDefaults.ALL, TARGET_ENTRIES, Gdk.DragAction.MOVE);
+    private void build_drag_and_drop () {
+        Gtk.drag_dest_set (this, Gtk.DestDefaults.ALL, TARGET_ENTRIES, Gdk.DragAction.MOVE);
 
-    //      // drag_data_received.connect (on_drag_data_received);
-    //      drag_motion.connect (on_drag_motion);
-    //      drag_leave.connect (on_drag_leave);
-    //  }
-
-    /*
-    private void on_drag_data_received (
-        Gdk.DragContext context,
-        int x, int y,
-        Gtk.SelectionData selection_data,
-        uint target_type, uint time) {
-
-        Akira.Layouts.Partials.Layer? target;
-        Gtk.Widget row;
-        Akira.Layouts.Partials.Layer? source;
-        int new_position;
-
-        row = ((Gtk.Widget[]) selection_data.get_data ())[0];
-        source = row as Akira.Layouts.Partials.Layer;
-
-        Gtk.Allocation alloc;
-        source.get_allocation (out alloc);
-
-        // In order to determine which position should the dragged
-        // item occupy, we need to check in which gap it is.
-        // By adding half of the height of a row we know between which
-        // rows we want to inser the dragged layer
-        var target_row_y = y + alloc.height / 2;
-
-        target = (Akira.Layouts.Partials.Layer) items_list.get_row_at_y (target_row_y);
-
-        if (target == null) {
-            new_position = -1;
-        } else {
-            // New position needs to take into account the fact
-            // that the higher the item in the canvas the lower the index
-            // in the list. So the actual new position is the length of the
-            // list minus the index of the element
-            new_position = (int) list_model.get_n_items () - target.get_index ();
-        }
-
-        if (source == target) {
-            return;
-        }
-
-        window.event_bus.change_item_z_index (source.model.item, new_position);
+        drag_motion.connect (on_drag_motion);
+        drag_leave.connect (on_drag_leave);
+        drag_data_received.connect (on_drag_data_received);
     }
-    */
 
     public bool on_drag_motion (Gdk.DragContext context, int x, int y, uint time) {
         check_scroll (y);
@@ -154,6 +110,18 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.Grid {
 
     public void on_drag_leave (Gdk.DragContext context, uint time) {
         should_scroll = false;
+    }
+
+    /**
+     * Handle the received layer, find the position of the targeted layer and trigger
+     * a z-index update.
+     */
+    private void on_drag_data_received (
+        Gdk.DragContext context, int x, int y,
+        Gtk.SelectionData selection_data,
+        uint target_type, uint time
+    ) {
+        debug ("dropped");
     }
 
     private void check_scroll (int y) {

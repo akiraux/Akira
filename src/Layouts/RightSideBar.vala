@@ -40,7 +40,6 @@ public class Akira.Layouts.RightSideBar : Gtk.Grid {
     private Gtk.Revealer motion_revealer;
 
     private const Gtk.TargetEntry TARGET_ENTRIES[] = {
-        { "ARTBOARD", Gtk.TargetFlags.SAME_APP, 0 },
         { "LAYER", Gtk.TargetFlags.SAME_APP, 0 }
     };
 
