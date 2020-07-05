@@ -49,7 +49,8 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
     public Akira.Lib.Models.CanvasArtboard model { get; construct; }
 
     // Drag and Drop properties.
-    public Gtk.Revealer motion_revealer;
+    private Gtk.Revealer motion_revealer;
+    public Gtk.Revealer motion_artboard_revealer;
 
     private bool _editing { get; set; default = false; }
     public bool editing {
@@ -121,6 +122,15 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
         motion_revealer.reveal_child = false;
         motion_revealer.add (motion_grid);
 
+        var motion_artboard_grid = new Gtk.Grid ();
+        motion_artboard_grid.get_style_context ().add_class ("grid-motion");
+        motion_artboard_grid.height_request = 2;
+
+        motion_artboard_revealer = new Gtk.Revealer ();
+        motion_artboard_revealer.transition_type = Gtk.RevealerTransitionType.SLIDE_DOWN;
+        motion_artboard_revealer.reveal_child = false;
+        motion_artboard_revealer.add (motion_artboard_grid);
+
         handle = new Gtk.EventBox ();
         handle.hexpand = true;
         handle.add (label_grid);
@@ -180,6 +190,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
         grid.attach (artboard_handle, 0, 0, 1, 1);
         grid.attach (motion_revealer, 0, 1, 1, 1);
         grid.attach (revealer, 0, 2, 1, 1);
+        grid.attach (motion_artboard_revealer, 0, 3, 1, 1);
 
         add (grid);
 
@@ -265,8 +276,6 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
         row.artboard_handle.draw (cr);
 
         Gtk.drag_set_icon_surface (context, surface);
-
-        //  main_revealer.reveal_child = false;
     }
 
     private void on_drag_data_get (Gtk.Widget widget, Gdk.DragContext context, Gtk.SelectionData selection_data,
