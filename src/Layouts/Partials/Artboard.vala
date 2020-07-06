@@ -25,11 +25,11 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 
     private Gtk.TargetList drop_targets { get; set; default = null; }
 
-    private const Gtk.TargetEntry TARGET_ENTRIES[] = {
+    private const Gtk.TargetEntry ARTBOARD_ENTRY[] = {
         { "ARTBOARD", Gtk.TargetFlags.SAME_APP, 0 }
     };
 
-    private const Gtk.TargetEntry TARGET_ENTRIES_ALL[] = {
+    private const Gtk.TargetEntry TARGET_ENTRIES[] = {
         { "ARTBOARD", Gtk.TargetFlags.SAME_APP, 0 },
         { "LAYER", Gtk.TargetFlags.SAME_APP, 0 }
     };
@@ -69,7 +69,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 
     construct {
         get_style_context ().add_class ("artboard");
-        drop_targets = new Gtk.TargetList (TARGET_ENTRIES_ALL);
+        drop_targets = new Gtk.TargetList (TARGET_ENTRIES);
 
         label = new Gtk.Label ("");
         label.get_style_context ().add_class ("artboard-name");
@@ -241,12 +241,12 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 
     private void build_drag_and_drop () {
         // Make the artboard layer a draggable widget.
-        Gtk.drag_source_set (this, Gdk.ModifierType.BUTTON1_MASK, TARGET_ENTRIES, Gdk.DragAction.MOVE);
+        Gtk.drag_source_set (this, Gdk.ModifierType.BUTTON1_MASK, ARTBOARD_ENTRY, Gdk.DragAction.MOVE);
         drag_begin.connect (on_drag_begin);
         drag_data_get.connect (on_drag_data_get);
 
         // Make the artboard handle widget a DnD destination.
-        Gtk.drag_dest_set (artboard_handle, Gtk.DestDefaults.MOTION, TARGET_ENTRIES_ALL, Gdk.DragAction.MOVE);
+        Gtk.drag_dest_set (artboard_handle, Gtk.DestDefaults.MOTION, TARGET_ENTRIES, Gdk.DragAction.MOVE);
         artboard_handle.drag_motion.connect (on_drag_motion);
         artboard_handle.drag_leave.connect (on_drag_leave);
         artboard_handle.drag_drop.connect (on_drag_drop);
@@ -335,9 +335,43 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
         Gtk.SelectionData selection_data,
         uint target_type, uint time
     ) {
-        var target = Gtk.drag_dest_find_target (this, context, drop_targets);
-        if (target == Gdk.Atom.intern_static_string ("ARTBOARD")) {
-            debug ("Dropped on Artboard");
+        int items_count, pos_source, pos_target, source, target;
+
+        var type = Gtk.drag_dest_find_target (this, context, drop_targets);
+
+        if (type == Gdk.Atom.intern_static_string ("ARTBOARD")) {
+            var artboard = (Layouts.Partials.Artboard) (
+                (Gtk.Widget[]) selection_data.get_data ()
+            )[0];
+
+            items_count = (int) window.items_manager.artboards.get_n_items ();
+            pos_target = items_count - 1 - window.items_manager.artboards.index (model);
+            pos_source = items_count - 1 - window.items_manager.artboards.index (artboard.model);
+
+            // Interrupt if item position doesn't exist.
+            if (pos_source == -1) {
+                return;
+            }
+
+            // z-index is the exact opposite of items placement as the last item
+            // is the topmost element. Because of this, we need some trickery to
+            // properly handle the list's order.
+            source = items_count - 1 - pos_source;
+            target = items_count - 1 - pos_target;
+
+            // Interrupt if the item was dropped in the same position.
+            if (source == target) {
+                debug ("same position");
+                return;
+            }
+
+            // Remove item at source position.
+            var artboard_to_swap = window.items_manager.artboards.remove_at (source);
+
+            // Insert item at target position.
+            window.items_manager.artboards.insert_at (target, artboard_to_swap);
+            window.event_bus.z_selected_changed ();
+
             return;
         }
 
@@ -346,8 +380,8 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
         // Change artboard if necessary.
         window.items_manager.change_artboard (layer.model, model);
 
-        var items_count = (int) model.items.get_n_items ();
-        var pos_source = items_count - 1 - model.items.index (layer.model);
+        items_count = (int) model.items.get_n_items ();
+        pos_source = items_count - 1 - model.items.index (layer.model);
 
         // Interrupt if item position doesn't exist.
         if (pos_source == -1) {
@@ -357,7 +391,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
         // z-index is the exact opposite of items placement as the last item
         // is the topmost element. Because of this, we need some trickery to
         // properly handle the list's order.
-        var source = items_count - 1 - pos_source;
+        source = items_count - 1 - pos_source;
 
         // Interrupt if the item was dropped in the same position.
         if (source == 0) {
