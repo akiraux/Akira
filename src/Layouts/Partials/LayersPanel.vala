@@ -205,7 +205,6 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.Grid {
             return;
         }
 
-        debug ("dropped");
         var layer = (Layouts.Partials.Layer) ((Gtk.Widget[]) selection_data.get_data ())[0];
         var layer_artboard = layer.model.artboard;
 
