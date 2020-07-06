@@ -365,6 +365,13 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
                 return;
             }
 
+            // If the initial position is higher than the targeted dropped layer, it
+            // means the layer was dragged from the bottom up, therefore we need to
+            // increase the dropped target by 1 since we don't deal with location 0.
+            if (source > target) {
+                target++;
+            }
+
             // Remove item at source position.
             var artboard_to_swap = window.items_manager.artboards.remove_at (source);
 
