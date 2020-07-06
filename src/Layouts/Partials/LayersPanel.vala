@@ -31,20 +31,21 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.Grid {
     public Gtk.Adjustment vadjustment;
     private Gtk.ListBox items_list;
     private Gtk.ListBox artboards_list;
+    private Gtk.Grid empty_area;
 
     private const int SCROLL_STEP_SIZE = 5;
     private const int SCROLL_DISTANCE = 30;
     private const int SCROLL_DELAY = 50;
 
     // Drag and Drop properties.
-    private Gtk.Revealer motion_revealer;
+    private Gtk.Revealer motion_layer_revealer;
+    private Gtk.Revealer motion_artboard_revealer;
 
-    private const Gtk.TargetEntry LAYER_ENTRY[] = {
+    private Gtk.TargetList drop_targets { get; set; default = null; }
+
+    private const Gtk.TargetEntry TARGET_ENTRIES[] = {
+        { "ARTBOARD", Gtk.TargetFlags.SAME_APP, 0 },
         { "LAYER", Gtk.TargetFlags.SAME_APP, 0 }
-    };
-
-    private const Gtk.TargetEntry ARTBOARD_ENTRY[] = {
-        { "ARTBOARD", Gtk.TargetFlags.SAME_APP, 0 }
     };
 
     public LayersPanel (Akira.Window window) {
@@ -57,6 +58,7 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.Grid {
 
     construct {
         expand = true;
+        drop_targets = new Gtk.TargetList (TARGET_ENTRIES);
 
         items_list = new Gtk.ListBox ();
         artboards_list = new Gtk.ListBox ();
@@ -79,18 +81,32 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.Grid {
 
         get_style_context ().add_class ("layers-panel");
 
-        // Motion revealer for Drag and Drop on the top search bar.
+        // Motion revealer for layers Drag and Drop on the empty area.
         var motion_grid = new Gtk.Grid ();
         motion_grid.get_style_context ().add_class ("grid-motion");
         motion_grid.height_request = 2;
 
-        motion_revealer = new Gtk.Revealer ();
-        motion_revealer.transition_type = Gtk.RevealerTransitionType.SLIDE_DOWN;
-        motion_revealer.add (motion_grid);
+        motion_layer_revealer = new Gtk.Revealer ();
+        motion_layer_revealer.transition_type = Gtk.RevealerTransitionType.SLIDE_DOWN;
+        motion_layer_revealer.add (motion_grid);
+
+        // Motion revealer for layers Drag and Drop on the empty area.
+        var motion_artboard_grid = new Gtk.Grid ();
+        motion_artboard_grid.get_style_context ().add_class ("grid-motion");
+        motion_artboard_grid.height_request = 2;
+
+        motion_artboard_revealer = new Gtk.Revealer ();
+        motion_artboard_revealer.transition_type = Gtk.RevealerTransitionType.SLIDE_DOWN;
+        motion_artboard_revealer.add (motion_artboard_grid);
+
+        empty_area = new Gtk.Grid ();
+        empty_area.expand = true;
 
         attach (items_list, 0, 1);
-        attach (motion_revealer, 0, 2);
+        attach (motion_layer_revealer, 0, 2);
         attach (artboards_list, 0, 3);
+        attach (motion_artboard_revealer, 0, 4);
+        attach (empty_area, 0, 5);
 
         build_drag_and_drop ();
         redraw_list ();
@@ -103,26 +119,24 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.Grid {
     private void redraw_list () {
         reload_zebra ();
         show_all ();
-
-        artboards_list.expand = window.items_manager.artboards.get_n_items () > 0;
     }
 
     private void build_drag_and_drop () {
-        // Make this panel a drop area for scroll motion and free items sorting.
-        Gtk.drag_dest_set (this, Gtk.DestDefaults.ALL, LAYER_ENTRY, Gdk.DragAction.MOVE);
-        drag_motion.connect (on_drag_motion);
-        drag_leave.connect (on_drag_leave);
-        drag_data_received.connect (on_drag_data_received);
-
-        // Make the Artboards list a drop area for artboards reordering.
-        Gtk.drag_dest_set (artboards_list, Gtk.DestDefaults.ALL, ARTBOARD_ENTRY, Gdk.DragAction.MOVE);
-        artboards_list.drag_motion.connect (on_artboard_drag_motion);
-        artboards_list.drag_leave.connect (on_artboard_drag_leave);
-        artboards_list.drag_data_received.connect (on_artboard_drag_data_received);
+        // Make the empty area of the panel a drop area for scroll motion and items sorting.
+        Gtk.drag_dest_set (empty_area, Gtk.DestDefaults.ALL, TARGET_ENTRIES, Gdk.DragAction.MOVE);
+        empty_area.drag_motion.connect (on_drag_motion);
+        empty_area.drag_leave.connect (on_drag_leave);
+        empty_area.drag_data_received.connect (on_drag_data_received);
     }
 
     private bool on_drag_motion (Gdk.DragContext context, int x, int y, uint time) {
-        motion_revealer.reveal_child = true;
+        var type = Gtk.drag_dest_find_target (this, context, drop_targets);
+        if (type == Gdk.Atom.intern_static_string ("ARTBOARD")) {
+            motion_artboard_revealer.reveal_child = true;
+        } else {
+            motion_layer_revealer.reveal_child = true;
+        }
+
         check_scroll (y);
 
         if (should_scroll && !scrolling) {
@@ -134,7 +148,13 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.Grid {
     }
 
     private void on_drag_leave (Gdk.DragContext context, uint time) {
-        motion_revealer.reveal_child = false;
+        var type = Gtk.drag_dest_find_target (this, context, drop_targets);
+        if (type == Gdk.Atom.intern_static_string ("ARTBOARD")) {
+            motion_artboard_revealer.reveal_child = false;
+        } else {
+            motion_layer_revealer.reveal_child = false;
+        }
+
         should_scroll = false;
     }
 
@@ -147,20 +167,58 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.Grid {
         Gtk.SelectionData selection_data,
         uint target_type, uint time
     ) {
+        int items_count, pos_source, source;
+
+        var type = Gtk.drag_dest_find_target (this, context, drop_targets);
+
+        if (type == Gdk.Atom.intern_static_string ("ARTBOARD")) {
+            var artboard = (Layouts.Partials.Artboard) (
+                (Gtk.Widget[]) selection_data.get_data ()
+            )[0];
+
+            items_count = (int) window.items_manager.artboards.get_n_items ();
+            pos_source = items_count - 1 - window.items_manager.artboards.index (artboard.model);
+
+            // Interrupt if item position doesn't exist.
+            if (pos_source == -1) {
+                return;
+            }
+
+            // z-index is the exact opposite of items placement as the last item
+            // is the topmost element. Because of this, we need some trickery to
+            // properly handle the list's order.
+            source = items_count - 1 - pos_source;
+
+            // Interrupt if the item was dropped in the same position.
+            if (source == items_count - 1) {
+                debug ("same position");
+                return;
+            }
+
+            // Remove item at source position.
+            var artboard_to_swap = window.items_manager.artboards.remove_at (source);
+
+            // Insert item at target position.
+            window.items_manager.artboards.insert_at (items_count - 1, artboard_to_swap);
+            window.event_bus.z_selected_changed ();
+
+            return;
+        }
+
         debug ("dropped");
-        var layer = (Akira.Layouts.Partials.Layer) ((Gtk.Widget[]) selection_data.get_data ())[0];
-        var artboard = layer.model.artboard;
+        var layer = (Layouts.Partials.Layer) ((Gtk.Widget[]) selection_data.get_data ())[0];
+        var layer_artboard = layer.model.artboard;
 
         // Change artboard if necessary.
         window.items_manager.change_artboard (layer.model, null);
 
         // If the moved layer had an artboard, no need to do anything else.
-        if (artboard != null) {
+        if (layer_artboard != null) {
             return;
         }
 
-        var items_count = (int) window.items_manager.free_items.get_n_items ();
-        var pos_source = items_count - 1 - window.items_manager.free_items.index (layer.model);
+        items_count = (int) window.items_manager.free_items.get_n_items ();
+        pos_source = items_count - 1 - window.items_manager.free_items.index (layer.model);
 
         // Interrupt if item position doesn't exist.
         if (pos_source == -1) {
@@ -170,7 +228,7 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.Grid {
         // z-index is the exact opposite of items placement as the last item
         // is the topmost element. Because of this, we need some trickery to
         // properly handle the list's order.
-        var source = items_count - 1 - pos_source;
+        source = items_count - 1 - pos_source;
 
         // Interrupt if the item was dropped in the same position.
         if (source == items_count - 1) {
@@ -190,27 +248,6 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.Grid {
         // Fetch the new correct position.
         var target = items_count - 1 - window.items_manager.free_items.index (item_to_swap);
         root.add_child (item_to_swap, target);
-    }
-
-    private bool on_artboard_drag_motion (Gdk.DragContext context, int x, int y, uint time) {
-        // Show artboard drop
-        return true;
-    }
-
-    private void on_artboard_drag_leave (Gdk.DragContext context, uint time) {
-        // Hide artboard drop
-    }
-
-    /**
-     * Handle the received artboard, find the position of the targeted artboard and trigger
-     * a z-index update.
-     */
-    private void on_artboard_drag_data_received (
-        Gdk.DragContext context, int x, int y,
-        Gtk.SelectionData selection_data,
-        uint target_type, uint time
-    ) {
-        debug ("artboard dropped");
     }
 
     private void check_scroll (int y) {

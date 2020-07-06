@@ -23,11 +23,14 @@
 public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
     public weak Akira.Window window { get; construct; }
 
+    private Gtk.TargetList drop_targets { get; set; default = null; }
+
     private const Gtk.TargetEntry TARGET_ENTRIES[] = {
         { "ARTBOARD", Gtk.TargetFlags.SAME_APP, 0 }
     };
 
-    private const Gtk.TargetEntry TARGET_ENTRIES_LAYER[] = {
+    private const Gtk.TargetEntry TARGET_ENTRIES_ALL[] = {
+        { "ARTBOARD", Gtk.TargetFlags.SAME_APP, 0 },
         { "LAYER", Gtk.TargetFlags.SAME_APP, 0 }
     };
 
@@ -66,6 +69,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 
     construct {
         get_style_context ().add_class ("artboard");
+        drop_targets = new Gtk.TargetList (TARGET_ENTRIES_ALL);
 
         label = new Gtk.Label ("");
         label.get_style_context ().add_class ("artboard-name");
@@ -236,13 +240,13 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
     }
 
     private void build_drag_and_drop () {
-        // Make this a draggable widget.
+        // Make the artboard layer a draggable widget.
         Gtk.drag_source_set (this, Gdk.ModifierType.BUTTON1_MASK, TARGET_ENTRIES, Gdk.DragAction.MOVE);
         drag_begin.connect (on_drag_begin);
         drag_data_get.connect (on_drag_data_get);
 
-        // Make this widget a DnD destination.
-        Gtk.drag_dest_set (artboard_handle, Gtk.DestDefaults.MOTION, TARGET_ENTRIES_LAYER, Gdk.DragAction.MOVE);
+        // Make the artboard handle widget a DnD destination.
+        Gtk.drag_dest_set (artboard_handle, Gtk.DestDefaults.MOTION, TARGET_ENTRIES_ALL, Gdk.DragAction.MOVE);
         artboard_handle.drag_motion.connect (on_drag_motion);
         artboard_handle.drag_leave.connect (on_drag_leave);
         artboard_handle.drag_drop.connect (on_drag_drop);
@@ -289,12 +293,24 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
     }
 
     public bool on_drag_motion (Gdk.DragContext context, int x, int y, uint time) {
-        motion_revealer.reveal_child = true;
+        var target = Gtk.drag_dest_find_target (this, context, drop_targets);
+
+        if (target == Gdk.Atom.intern_static_string ("ARTBOARD")) {
+            motion_artboard_revealer.reveal_child = true;
+        } else {
+            motion_revealer.reveal_child = true;
+        }
         return true;
     }
 
     public void on_drag_leave (Gdk.DragContext context, uint time) {
-        motion_revealer.reveal_child = false;
+        var target = Gtk.drag_dest_find_target (this, context, drop_targets);
+
+        if (target == Gdk.Atom.intern_static_string ("ARTBOARD")) {
+            motion_artboard_revealer.reveal_child = false;
+        } else {
+            motion_revealer.reveal_child = false;
+        }
     }
 
     /**
@@ -319,7 +335,12 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
         Gtk.SelectionData selection_data,
         uint target_type, uint time
     ) {
-        // This works thanks to on_drag_data_get ().
+        var target = Gtk.drag_dest_find_target (this, context, drop_targets);
+        if (target == Gdk.Atom.intern_static_string ("ARTBOARD")) {
+            debug ("Dropped on Artboard");
+            return;
+        }
+
         var layer = (Layer) ((Gtk.Widget[]) selection_data.get_data ())[0];
 
         // Change artboard if necessary.
