@@ -385,7 +385,6 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
         Gtk.SelectionData selection_data,
         uint target_type, uint time
     ) {
-        // This works thanks to on_drag_data_get ().
         var layer = (Layer) ((Gtk.Widget[]) selection_data.get_data ())[0];
 
         // Change artboard if necessary.
@@ -413,18 +412,26 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 
         // Interrupt if the item was dropped in the same position.
         if (source - 1 == target) {
+            debug ("same position");
             return;
         }
 
-        // Since the top position is handled by the empty panel drop method,
-        // if the drop target is in position 0, it means the layer should
-        // be added underneath it, at position 1.
-        if (target == 0) {
-            target = 1;
+        // If the initial position is higher than the targeted dropped layer, it
+        // means the layer was dragged from the bottom up, therefore we need to
+        // increase the dropped target by 1 since we don't deal with location 0.
+        if (source > target) {
+            target++;
         }
+
+        debug ("%i - %i", source, target);
 
         // Remove item at source position
         var item_to_swap = items_source.remove_at (source);
+
+        // If the item is a free item, we need to remove it from the Canvas.
+        if (layer.model.artboard == null) {
+            item_to_swap.parent.remove_child (item_to_swap.parent.find_child (item_to_swap));
+        }
 
         // Insert item at target position
         items_source.insert_at (target, item_to_swap);
@@ -434,8 +441,13 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
             model.artboard.changed (true);
         }
 
-        get_style_context ().remove_class ("transparent");
-        dragged = false;
+        // If the item is a free item, we need to add it to the Canvas root element.
+        if (layer.model.artboard == null) {
+            var root = window.main_window.main_canvas.canvas.get_root_item ();
+            // Fetch the new correct position.
+            target = items_count - 1 - items_source.index (item_to_swap);
+            root.add_child (item_to_swap, target);
+        }
     }
 
     /**

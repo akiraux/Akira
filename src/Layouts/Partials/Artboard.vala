@@ -23,11 +23,14 @@
 public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
     public weak Akira.Window window { get; construct; }
 
-    private const Gtk.TargetEntry TARGET_ENTRIES[] = {
+    private Gtk.TargetList drop_targets { get; set; default = null; }
+
+    private const Gtk.TargetEntry ARTBOARD_ENTRY[] = {
         { "ARTBOARD", Gtk.TargetFlags.SAME_APP, 0 }
     };
 
-    private const Gtk.TargetEntry TARGET_ENTRIES_LAYER[] = {
+    private const Gtk.TargetEntry TARGET_ENTRIES[] = {
+        { "ARTBOARD", Gtk.TargetFlags.SAME_APP, 0 },
         { "LAYER", Gtk.TargetFlags.SAME_APP, 0 }
     };
 
@@ -49,7 +52,8 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
     public Akira.Lib.Models.CanvasArtboard model { get; construct; }
 
     // Drag and Drop properties.
-    public Gtk.Revealer motion_revealer;
+    private Gtk.Revealer motion_revealer;
+    public Gtk.Revealer motion_artboard_revealer;
 
     private bool _editing { get; set; default = false; }
     public bool editing {
@@ -65,6 +69,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 
     construct {
         get_style_context ().add_class ("artboard");
+        drop_targets = new Gtk.TargetList (TARGET_ENTRIES);
 
         label = new Gtk.Label ("");
         label.get_style_context ().add_class ("artboard-name");
@@ -120,6 +125,15 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
         motion_revealer.transition_type = Gtk.RevealerTransitionType.SLIDE_DOWN;
         motion_revealer.reveal_child = false;
         motion_revealer.add (motion_grid);
+
+        var motion_artboard_grid = new Gtk.Grid ();
+        motion_artboard_grid.get_style_context ().add_class ("grid-motion");
+        motion_artboard_grid.height_request = 2;
+
+        motion_artboard_revealer = new Gtk.Revealer ();
+        motion_artboard_revealer.transition_type = Gtk.RevealerTransitionType.SLIDE_DOWN;
+        motion_artboard_revealer.reveal_child = false;
+        motion_artboard_revealer.add (motion_artboard_grid);
 
         handle = new Gtk.EventBox ();
         handle.hexpand = true;
@@ -180,6 +194,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
         grid.attach (artboard_handle, 0, 0, 1, 1);
         grid.attach (motion_revealer, 0, 1, 1, 1);
         grid.attach (revealer, 0, 2, 1, 1);
+        grid.attach (motion_artboard_revealer, 0, 3, 1, 1);
 
         add (grid);
 
@@ -225,17 +240,17 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
     }
 
     private void build_drag_and_drop () {
-        // Make this a draggable widget.
-        Gtk.drag_source_set (this, Gdk.ModifierType.BUTTON1_MASK, TARGET_ENTRIES, Gdk.DragAction.MOVE);
+        // Make the artboard layer a draggable widget.
+        Gtk.drag_source_set (this, Gdk.ModifierType.BUTTON1_MASK, ARTBOARD_ENTRY, Gdk.DragAction.MOVE);
         drag_begin.connect (on_drag_begin);
         drag_data_get.connect (on_drag_data_get);
 
-        // Make this widget a DnD destination.
-        Gtk.drag_dest_set (this, Gtk.DestDefaults.MOTION, TARGET_ENTRIES_LAYER, Gdk.DragAction.MOVE);
-        drag_motion.connect (on_drag_motion);
-        drag_leave.connect (on_drag_leave);
-        drag_drop.connect (on_drag_drop);
-        drag_data_received.connect (on_drag_data_received);
+        // Make the artboard handle widget a DnD destination.
+        Gtk.drag_dest_set (artboard_handle, Gtk.DestDefaults.MOTION, TARGET_ENTRIES, Gdk.DragAction.MOVE);
+        artboard_handle.drag_motion.connect (on_drag_motion);
+        artboard_handle.drag_leave.connect (on_drag_leave);
+        artboard_handle.drag_drop.connect (on_drag_drop);
+        artboard_handle.drag_data_received.connect (on_drag_data_received);
     }
 
     private void on_drag_begin (Gtk.Widget widget, Gdk.DragContext context) {
@@ -265,8 +280,6 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
         row.artboard_handle.draw (cr);
 
         Gtk.drag_set_icon_surface (context, surface);
-
-        //  main_revealer.reveal_child = false;
     }
 
     private void on_drag_data_get (Gtk.Widget widget, Gdk.DragContext context, Gtk.SelectionData selection_data,
@@ -280,12 +293,24 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
     }
 
     public bool on_drag_motion (Gdk.DragContext context, int x, int y, uint time) {
-        motion_revealer.reveal_child = true;
+        var target = Gtk.drag_dest_find_target (this, context, drop_targets);
+
+        if (target == Gdk.Atom.intern_static_string ("ARTBOARD")) {
+            motion_artboard_revealer.reveal_child = true;
+        } else {
+            motion_revealer.reveal_child = true;
+        }
         return true;
     }
 
     public void on_drag_leave (Gdk.DragContext context, uint time) {
-        motion_revealer.reveal_child = false;
+        var target = Gtk.drag_dest_find_target (this, context, drop_targets);
+
+        if (target == Gdk.Atom.intern_static_string ("ARTBOARD")) {
+            motion_artboard_revealer.reveal_child = false;
+        } else {
+            motion_revealer.reveal_child = false;
+        }
     }
 
     /**
@@ -310,8 +335,85 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
         Gtk.SelectionData selection_data,
         uint target_type, uint time
     ) {
-        // This works thanks to on_drag_data_get ().
-        // var layer = (Layer) ((Gtk.Widget[]) selection_data.get_data ())[0];
+        int items_count, pos_source, pos_target, source, target;
+
+        var type = Gtk.drag_dest_find_target (this, context, drop_targets);
+
+        if (type == Gdk.Atom.intern_static_string ("ARTBOARD")) {
+            var artboard = (Layouts.Partials.Artboard) (
+                (Gtk.Widget[]) selection_data.get_data ()
+            )[0];
+
+            items_count = (int) window.items_manager.artboards.get_n_items ();
+            pos_target = items_count - 1 - window.items_manager.artboards.index (model);
+            pos_source = items_count - 1 - window.items_manager.artboards.index (artboard.model);
+
+            // Interrupt if item position doesn't exist.
+            if (pos_source == -1) {
+                return;
+            }
+
+            // z-index is the exact opposite of items placement as the last item
+            // is the topmost element. Because of this, we need some trickery to
+            // properly handle the list's order.
+            source = items_count - 1 - pos_source;
+            target = items_count - 1 - pos_target;
+
+            // Interrupt if the item was dropped in the same position.
+            if (source == target) {
+                debug ("same position");
+                return;
+            }
+
+            // If the initial position is higher than the targeted dropped layer, it
+            // means the layer was dragged from the bottom up, therefore we need to
+            // increase the dropped target by 1 since we don't deal with location 0.
+            if (source > target) {
+                target++;
+            }
+
+            // Remove item at source position.
+            var artboard_to_swap = window.items_manager.artboards.remove_at (source);
+
+            // Insert item at target position.
+            window.items_manager.artboards.insert_at (target, artboard_to_swap);
+            window.event_bus.z_selected_changed ();
+
+            return;
+        }
+
+        var layer = (Layer) ((Gtk.Widget[]) selection_data.get_data ())[0];
+
+        // Change artboard if necessary.
+        window.items_manager.change_artboard (layer.model, model);
+
+        items_count = (int) model.items.get_n_items ();
+        pos_source = items_count - 1 - model.items.index (layer.model);
+
+        // Interrupt if item position doesn't exist.
+        if (pos_source == -1) {
+            return;
+        }
+
+        // z-index is the exact opposite of items placement as the last item
+        // is the topmost element. Because of this, we need some trickery to
+        // properly handle the list's order.
+        source = items_count - 1 - pos_source;
+
+        // Interrupt if the item was dropped in the same position.
+        if (source == 0) {
+            debug ("same position");
+            return;
+        }
+
+        // Remove item at source position
+        var item_to_swap = model.items.remove_at (source);
+
+        // Insert item at target position
+        model.items.insert_at (0, item_to_swap);
+        window.event_bus.z_selected_changed ();
+
+        model.changed (true);
     }
 
     private bool on_handle_event (Gdk.Event event) {
