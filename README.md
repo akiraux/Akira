@@ -21,7 +21,7 @@
     <a href="#-license">License</a>
 </p>
 
-![screenshot](akira-screenshot.png)
+![screenshot](data/screenshots/screenshot-1.png)
 
 Akira is a native Linux Design application built in Vala and GTK. Akira focuses on offering a modern and fast approach to UI and UX Design, mainly targeting web designers and graphic designers. The main goal is to offer a valid and professional solution for designers who want to use Linux as their main OS.
 
