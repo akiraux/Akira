@@ -138,6 +138,8 @@ public class Akira.Services.ActionManager : Object {
         typing_accelerators.set (ACTION_ELLIPSE_TOOL, "e");
         typing_accelerators.set (ACTION_TEXT_TOOL, "t");
         typing_accelerators.set (ACTION_IMAGE_TOOL, "i");
+        typing_accelerators.set (ACTION_DELETE, "Delete");
+        typing_accelerators.set (ACTION_DELETE, "BackSpace");
     }
 
     construct {
@@ -326,7 +328,10 @@ public class Akira.Services.ActionManager : Object {
         window.event_bus.insert_item ("rectangle");
     }
 
-    private void action_delete () {}
+    // Delete the currently selected items.
+    private void action_delete () {
+        window.main_window.main_canvas.canvas.selected_bound_manager.delete_selection ();
+    }
 
     private void action_flip_h () {
         window.event_bus.flip_item (true);
