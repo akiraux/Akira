@@ -53,20 +53,6 @@ public class Akira.Utils.AffineTransform : Object {
 
     public static void set_position (CanvasItem item, double? x = null, double? y = null) {
         if (item.artboard != null) {
-          /*
-          var artboard_origin_x = 0.0;
-          var artboard_origin_y = 0.0;
-
-          item.canvas.convert_from_item_space (item.artboard, ref artboard_origin_x, ref artboard_origin_y);
-
-          // x and y are relative to the artboard containing
-          // the items, so we need to take into account the
-          // position of the artboard to compute the actual
-          // (canvas wise) position of the item
-          new_x += x != null ? artboard_origin_x : 0;
-          new_y += y != null ? artboard_origin_y : 0;
-          */
-
           var delta_x = x != null ? x - item.relative_x : 0.0;
           var delta_y = y != null ? y - item.relative_y : 0.0;
 
