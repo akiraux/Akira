@@ -142,10 +142,6 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 export_manager.clear ();
                 break;
 
-            case Gdk.Key.Delete:
-                selected_bound_manager.delete_selection ();
-                break;
-
             case Gdk.Key.space:
                 if (edit_mode != EditMode.MODE_PANNING) {
                     edit_mode = EditMode.MODE_PAN;
