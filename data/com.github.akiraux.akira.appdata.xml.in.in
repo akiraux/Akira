@@ -32,11 +32,11 @@
 		<binary>@APP_ID@</binary>
 	</provides>
   <releases>
-    <release version="0.0.1" date="2020-04-19">
+    <release version="0.0.1" date="2020-07-06">
       <description>
         <p>🚀 Experimental Alpha Release, say Hi to Akira!</p>
         <ul>
-          <li>Create Artboards and nested basic shapes</li>
+          <li>Create Artboards and basic shapes</li>
           <li>Manage the fill and border properties of shapes</li>
           <li>Import images</li>
           <li>Export custom areas, selections, and artboards</li>
@@ -47,16 +47,16 @@
   </releases>
   <screenshots>
     <screenshot type="default">
-      <image>https://raw.githubusercontent.com/akiraux/akira/master/akira-screenshot.png</image>
+      <image>https://raw.githubusercontent.com/akiraux/akira/master/data/screenshots/screenshot-1.png</image>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/akiraux/akira/master/akira-screenshot1.png</image>
+      <image>https://raw.githubusercontent.com/akiraux/akira/master/data/screenshots/screenshot-2.png</image>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/akiraux/akira/master/akira-screenshot2.png</image>
+      <image>https://raw.githubusercontent.com/akiraux/akira/master/data/screenshots/screenshot-3.png</image>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/akiraux/akira/master/akira-screenshot3.png</image>
+      <image>https://raw.githubusercontent.com/akiraux/akira/master/data/screenshots/screenshot-4.png</image>
     </screenshot>
   </screenshots>
   <launchable type="desktop-id">@APP_ID@.desktop</launchable>

@@ -164,7 +164,7 @@ public class Akira.Lib.Managers.HoverManager : Object {
                 selected_cursor = Gdk.CursorType.LEFT_SIDE;
                 break;
             case Managers.NobManager.Nob.ROTATE:
-                selected_cursor = Gdk.CursorType.ICON;
+                selected_cursor = Gdk.CursorType.EXCHANGE;
                 break;
         }
 
