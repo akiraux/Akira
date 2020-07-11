@@ -87,23 +87,30 @@ public class Akira.Dialogs.SettingsDialog : Gtk.Dialog {
 
         grid.attach (new SettingsLabel (_("Use Dark Theme:")), 0, 1, 1, 1);
         dark_theme_switch = new SettingsSwitch ("dark-theme");
-
         grid.attach (dark_theme_switch, 1, 1, 1, 1);
+
+        grid.attach (new SettingsLabel (_("Invert Panels Order:")), 0, 2, 1, 1);
+        symbolic_switch = new SettingsSwitch ("invert-sidebar");
+        grid.attach (symbolic_switch, 1, 2, 1, 1);
+
+        var panels_helper_label = new Gtk.Label (_("Restart application to apply this change."));
+        panels_helper_label.get_style_context ().add_class ("dim-label");
+        grid.attach (panels_helper_label, 1, 3, 1, 1);
+
+        grid.attach (new SettingsHeader (_("ToolBar Style")), 0, 4, 2, 1);
+
+        grid.attach (new SettingsLabel (_("Show Button Labels:")), 0, 5, 1, 1);
+        label_switch = new SettingsSwitch ("show-label");
+        grid.attach (label_switch, 1, 5, 1, 1);
+
+        grid.attach (new SettingsLabel (_("Use Symbolic Icons:")), 0, 6, 1, 1);
+        symbolic_switch = new SettingsSwitch ("use-symbolic");
+        grid.attach (symbolic_switch, 1, 6, 1, 1);
 
         dark_theme_switch.notify["active"].connect (() => {
             Gtk.Settings.get_default ().gtk_application_prefer_dark_theme = settings.dark_theme;
             window.event_bus.change_theme ();
         });
-
-        grid.attach (new SettingsHeader (_("ToolBar Style")), 0, 2, 2, 1);
-
-        grid.attach (new SettingsLabel (_("Show Button Labels:")), 0, 3, 1, 1);
-        label_switch = new SettingsSwitch ("show-label");
-        grid.attach (label_switch, 1, 3, 1, 1);
-
-        grid.attach (new SettingsLabel (_("Use Symbolic Icons:")), 0, 4, 1, 1);
-        symbolic_switch = new SettingsSwitch ("use-symbolic");
-        grid.attach (symbolic_switch, 1, 4, 1, 1);
 
         return grid;
     }
