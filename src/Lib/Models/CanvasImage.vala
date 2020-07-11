@@ -123,8 +123,7 @@ public class Akira.Lib.Models.CanvasImage : Goo.CanvasImage, Models.CanvasItem {
             try {
                 original_pixbuf = manager.get_pixbuf.end (res);
                 // Imported images should keep their aspect ratio by default.
-                size_ratio = original_pixbuf.get_width () / original_pixbuf.get_height ();
-                size_locked = true;
+                canvas.window.event_bus.lock_ratio ();
             } catch (Error e) {
                 warning (e.message);
                 canvas.window.event_bus.canvas_notification (e.message);

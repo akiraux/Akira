@@ -180,6 +180,9 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
 
         window.event_bus.selected_items_changed.connect (on_selected_items_changed);
         window.event_bus.item_coord_changed.connect (on_item_coord_changed);
+        window.event_bus.lock_ratio.connect (() => {
+            lock_changes.active = true;
+        });
     }
 
     private void on_selected_items_changed (List<Lib.Models.CanvasItem> selected_items) {
