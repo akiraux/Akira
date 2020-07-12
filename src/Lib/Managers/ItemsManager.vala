@@ -546,6 +546,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         item.get_transform (out matrix);
         var transform = obj.get_member ("transform").get_object ();
 
+        // Apply the Cairo Matrix to properly update position and rotation.
         var new_matrix = Cairo.Matrix (
             transform.get_double_member ("xx"),
             transform.get_double_member ("yx"),
