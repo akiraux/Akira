@@ -542,10 +542,24 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         item.set ("initial-relative-x", obj.get_double_member ("initial-relative-x"));
         item.set ("initial-relative-y", obj.get_double_member ("initial-relative-y"));
 
+        Cairo.Matrix matrix;
+        item.get_transform (out matrix);
+        var transform = obj.get_member ("transform").get_object ();
+
+        // Apply the Cairo Matrix to properly update position and rotation.
+        var new_matrix = Cairo.Matrix (
+            transform.get_double_member ("xx"),
+            transform.get_double_member ("yx"),
+            transform.get_double_member ("xy"),
+            transform.get_double_member ("yy"),
+            transform.get_double_member ("x0"),
+            transform.get_double_member ("y0")
+        );
+        item.set_transform (new_matrix);
+
         // If the item is an Artboard, we need to restore bounding coordinates otherwise
         // new child items won't be properly restored into it.
         if (item is Models.CanvasArtboard) {
-            var transform = obj.get_member ("transform").get_object ();
             item.bounds.x1 = transform.get_double_member ("x0");
             item.bounds.y1 = transform.get_double_member ("y0");
             item.bounds.x2 = transform.get_double_member ("x0") + obj.get_double_member ("width");
