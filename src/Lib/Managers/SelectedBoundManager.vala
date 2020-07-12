@@ -97,10 +97,10 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         switch (selected_nob) {
             case Managers.NobManager.Nob.NONE:
                 Utils.AffineTransform.move_from_event (
+                    selected_item,
                     event_x, event_y,
                     ref initial_event_x, ref initial_event_y,
-                    ref delta_x_accumulator, ref delta_y_accumulator,
-                    selected_item
+                    ref delta_x_accumulator, ref delta_y_accumulator
                 );
                 update_selected_items ();
                 break;

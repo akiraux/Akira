@@ -41,8 +41,8 @@ public class Akira.Utils.AffineTransform : Object {
         item.canvas.convert_from_item_space (item, ref item_x, ref item_y);
 
         if (item.artboard != null) {
-          item_x = item.relative_x;
-          item_y = item.relative_y;
+            item_x = item.relative_x;
+            item_y = item.relative_y;
         }
 
         array.insert ("x", item_x);
@@ -53,15 +53,15 @@ public class Akira.Utils.AffineTransform : Object {
 
     public static void set_position (CanvasItem item, double? x = null, double? y = null) {
         if (item.artboard != null) {
-          var delta_x = x != null ? x - item.relative_x : 0.0;
-          var delta_y = y != null ? y - item.relative_y : 0.0;
+            var delta_x = x != null ? x - item.relative_x : 0.0;
+            var delta_y = y != null ? y - item.relative_y : 0.0;
 
-          item.relative_x = x != null ? x : item.relative_x;
-          item.relative_y = y != null ? y : item.relative_y;
+            item.relative_x = x != null ? x : item.relative_x;
+            item.relative_y = y != null ? y : item.relative_y;
 
-          item.translate (delta_x, delta_y);
+            item.translate (delta_x, delta_y);
 
-          return;
+            return;
         }
 
         Cairo.Matrix matrix;
@@ -75,27 +75,41 @@ public class Akira.Utils.AffineTransform : Object {
     }
 
     public static void move_from_event (
-        double x,
-        double y,
-        ref double initial_x,
-        ref double initial_y,
+        CanvasItem item,
+        double event_x,
+        double event_y,
+        ref double initial_event_x,
+        ref double initial_event_y,
         ref double delta_x_accumulator,
-        ref double delta_y_accumulator,
-        CanvasItem selected_item
+        ref double delta_y_accumulator
     ) {
-        double delta_x = GLib.Math.round (x - initial_x);
-        double delta_y = GLib.Math.round (y - initial_y);
+        Cairo.Matrix matrix;
+
+        var delta_x = event_x - initial_event_x;
+        var delta_y = event_y - initial_event_y;
+
+        if (item.artboard != null) {
+            item.artboard.get_transform (out matrix);
+
+            item.relative_x += delta_x;
+            item.relative_y += delta_y;
+
+            item.translate (delta_x, delta_y);
+        } else {
+            item.get_transform (out matrix);
+
+            var new_matrix = Cairo.Matrix (
+                matrix.xx, matrix.yx, matrix.xy, matrix.yy,
+                (matrix.x0 + delta_x), (matrix.y0 + delta_y)
+            );
+            item.set_transform (new_matrix);
+        }
 
         delta_x_accumulator += delta_x;
         delta_y_accumulator += delta_y;
 
-        selected_item.move (
-            delta_x, delta_y,
-            delta_x_accumulator, delta_y_accumulator
-        );
-
-        initial_x = x;
-        initial_y = y;
+        initial_event_x = event_x;
+        initial_event_y = event_y;
     }
 
     public static void scale_from_event (

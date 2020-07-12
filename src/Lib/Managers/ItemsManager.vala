@@ -492,6 +492,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         item.set ("size-locked", obj.get_boolean_member ("size-locked"));
         item.set ("size-ratio", obj.get_double_member ("size-ratio"));
         item.set ("rotation", obj.get_double_member ("rotation"));
+        // Utils.AffineTransform.set_rotation (obj.get_double_member ("rotation"), item);
         item.set ("flipped-h", obj.get_boolean_member ("flipped-h"));
         item.set ("flipped-v", obj.get_boolean_member ("flipped-v"));
         item.set ("opacity", obj.get_double_member ("opacity"));
