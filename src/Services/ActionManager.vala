@@ -358,11 +358,10 @@ public class Akira.Services.ActionManager : Object {
     private void action_image_tool () {
         dialog = new Gtk.FileChooserNative (
             _("Choose image file"), window, Gtk.FileChooserAction.OPEN, _("Select"), _("Close"));
-        dialog.set_current_folder (settings.export_folder);
 
-        preview_image = new Gtk.Image();
+        preview_image = new Gtk.Image ();
         dialog.preview_widget = preview_image;
-        dialog.update_preview.connect(on_update_preview);
+        dialog.update_preview.connect (on_update_preview);
 
         dialog.select_multiple = true;
 
@@ -425,13 +424,6 @@ public class Akira.Services.ActionManager : Object {
             case Gtk.ResponseType.OK:
                 SList<File> files = dialog.get_files ();
                 files.@foreach ((file) => {
-                    // try {
-                    //     debug ("set folder");
-                    //     dialog.set_current_folder_file (file);
-                    // } catch (Error e) {
-                    //     warning (e.message);
-                    // }
-
                     if (!Akira.Utils.Image.is_valid_image (file)) {
                         window.event_bus.canvas_notification (
                             _("Error! .%s files are not supported!"
@@ -444,6 +436,7 @@ public class Akira.Services.ActionManager : Object {
                 });
                 break;
         }
+        dialog.destroy();
     }
 
     private void action_escape () {
