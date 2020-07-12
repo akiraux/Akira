@@ -23,6 +23,12 @@ public class Akira.Services.ActionManager : Object {
     public weak Akira.Application app { get; construct; }
     public weak Akira.Window window { get; construct; }
 
+    private const int PREVIEW_SIZE = 300;
+    private const int PREVIEW_PADDING = 3;
+
+    private Gtk.FileChooserNative dialog;
+    private Gtk.Image preview_image;
+
     public SimpleActionGroup actions { get; construct; }
 
     public const string ACTION_PREFIX = "win.";
@@ -350,11 +356,65 @@ public class Akira.Services.ActionManager : Object {
     }
 
     private void action_image_tool () {
-        var dialog = new Gtk.FileChooserNative (
+        dialog = new Gtk.FileChooserNative (
             _("Choose image file"), window, Gtk.FileChooserAction.OPEN, _("Select"), _("Close"));
+        dialog.set_current_folder (settings.export_folder);
+
+        preview_image = new Gtk.Image();
+        dialog.preview_widget = preview_image;
+        dialog.update_preview.connect(on_update_preview);
+
         dialog.select_multiple = true;
+
         dialog.response.connect ((response_id) => on_choose_image_response (dialog, response_id));
         dialog.show ();
+    }
+
+    private void on_update_preview () {
+        string? filename = dialog.get_preview_filename ();
+        if (filename == null) {
+            dialog.set_preview_widget_active (false);
+            return;
+        }
+
+        // Read the image format data first.
+        int width = 0;
+        int height = 0;
+        Gdk.PixbufFormat? format = Gdk.Pixbuf.get_file_info (filename, out width, out height);
+
+        if (format == null) {
+            dialog.set_preview_widget_active (false);
+            return;
+        }
+
+        // If the image is too big, resize it.
+        Gdk.Pixbuf pixbuf;
+        try {
+            pixbuf = new Gdk.Pixbuf.from_file_at_scale (filename, PREVIEW_SIZE, PREVIEW_SIZE, true);
+        } catch (Error e) {
+            dialog.set_preview_widget_active (false);
+            return;
+        }
+
+        if (pixbuf == null) {
+            dialog.set_preview_widget_active (false);
+            return;
+        }
+
+        pixbuf = pixbuf.apply_embedded_orientation ();
+
+        // Distribute the extra space around the image.
+        int extra_space = PREVIEW_SIZE - pixbuf.width;
+        int smaller_half = extra_space / 2;
+        int larger_half = extra_space - smaller_half;
+
+        // Pad the image manually and avoids rounding errors.
+        preview_image.set_margin_start (PREVIEW_PADDING + smaller_half);
+        preview_image.set_margin_end (PREVIEW_PADDING + larger_half);
+
+        // Show the preview.
+        preview_image.set_from_pixbuf (pixbuf);
+        dialog.set_preview_widget_active (true);
     }
 
     private void on_choose_image_response (Gtk.FileChooserNative dialog, int response_id) {
@@ -365,16 +425,22 @@ public class Akira.Services.ActionManager : Object {
             case Gtk.ResponseType.OK:
                 SList<File> files = dialog.get_files ();
                 files.@foreach ((file) => {
-                    if (Akira.Utils.Image.is_valid_image (file)) {
-                        var manager = new Akira.Lib.Managers.ImageManager (file, files.index (file));
-                        window.items_manager.insert_image (manager);
+                    // try {
+                    //     debug ("set folder");
+                    //     dialog.set_current_folder_file (file);
+                    // } catch (Error e) {
+                    //     warning (e.message);
+                    // }
+
+                    if (!Akira.Utils.Image.is_valid_image (file)) {
+                        window.event_bus.canvas_notification (
+                            _("Error! .%s files are not supported!"
+                        ).printf (Akira.Utils.Image.get_extension (file)));
                         return;
                     }
 
-                    var ext = Akira.Utils.Image.get_extension (file);
-                    window.event_bus.canvas_notification (
-                        _("Error! .%s files are not supported!"
-                    ).printf (ext));
+                    var manager = new Akira.Lib.Managers.ImageManager (file, files.index (file));
+                    window.items_manager.insert_image (manager);
                 });
                 break;
         }
