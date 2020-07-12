@@ -74,6 +74,9 @@ public class Akira.Utils.AffineTransform : Object {
         item.set_transform (new_matrix);
     }
 
+    /**
+     * Move the item based on the mouse click and drag event.
+     */
     public static void move_from_event (
         CanvasItem item,
         double event_x,
