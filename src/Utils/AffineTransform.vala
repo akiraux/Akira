@@ -133,8 +133,8 @@ public class Akira.Utils.AffineTransform : Object {
         double item_width = selected_item.get_coords ("width");
         double item_height = selected_item.get_coords ("height");
 
-        double new_width = -1;
-        double new_height = -1;
+        double new_width = initial_width;
+        double new_height = initial_height;
 
         switch (selected_nob) {
             case NobManager.Nob.TOP_LEFT:
@@ -231,7 +231,6 @@ public class Akira.Utils.AffineTransform : Object {
         new_width = fix_size (new_width);
         new_height = fix_size (new_height);
 
-
         if (new_width == MIN_SIZE) {
             origin_move_delta_x = 0.0;
         }
@@ -250,47 +249,25 @@ public class Akira.Utils.AffineTransform : Object {
             delta_y_accumulator
         );
 
+        // Prevent negative values by forcing a min size of 1px.
+        new_width = new_width < MIN_SIZE ? MIN_SIZE : new_width;
+        new_height = new_height < MIN_SIZE ? MIN_SIZE : new_height;
+
         set_size (new_width, new_height, selected_item);
-        /*
-           if (new_width < MIN_SIZE) {
-           canvas.window.event_bus.flip_item (false);
-           return;
-           }
-
-           if (new_height < MIN_SIZE) {
-           canvas.window.event_bus.flip_item (false, true);
-           return;
-           }
-
-        // Before translating, recover the original "canvas" position of
-        // initial_event, in order to convert it to the "new" translated
-        // item space after the transformation has been applied.
-        //canvas.convert_from_item_space (selected_item, ref initial_x, ref initial_y);
-
-        // The CanvasItem.move function expects delta to be the difference
-        // between current position and the initial movement one,
-        // which is not the case for scaling, since the delta
-        // is calculated again at each iteration, so the we should
-        // update the initial_relative coordinate each time we call
-        // move from here
-        //selected_item.store_relative_position ();
-
-        //canvas.convert_to_item_space (selected_item, ref initial_x, ref initial_y);
-         */
     }
 
     public static void rotate_from_event (
+        CanvasItem item,
         double x,
         double y,
         double initial_x,
-        double initial_y,
-        CanvasItem selected_item
+        double initial_y
     ) {
-        var canvas = selected_item.canvas as Akira.Lib.Canvas;
-        canvas.convert_to_item_space (selected_item, ref x, ref y);
+        var canvas = item.canvas as Akira.Lib.Canvas;
+        canvas.convert_to_item_space (item, ref x, ref y);
 
-        var initial_width = selected_item.get_coords ("width");
-        var initial_height = selected_item.get_coords ("height");
+        var initial_width = item.get_coords ("width");
+        var initial_height = item.get_coords ("height");
 
         var center_x = initial_width / 2;
         var center_y = initial_height / 2;
@@ -303,8 +280,9 @@ public class Akira.Utils.AffineTransform : Object {
         );
 
         double current_x, current_y, current_scale, current_rotation;
-        selected_item.get_simple_transform (out current_x, out current_y, out current_scale, out current_rotation);
+        item.get_simple_transform (out current_x, out current_y, out current_scale, out current_rotation);
         var radians = GLib.Math.atan2 (center_y - y, x - center_x);
+
         radians = start_radians - radians;
         var rotation = radians * (180 / Math.PI) + prev_rotation_difference;
 
@@ -342,13 +320,13 @@ public class Akira.Utils.AffineTransform : Object {
         }
 
         if (do_rotation) {
-            canvas.convert_from_item_space (selected_item, ref initial_x, ref initial_y);
+            canvas.convert_from_item_space (item, ref initial_x, ref initial_y);
             // Round rotation in order to avoid sub degree issue
             rotation = GLib.Math.round (rotation);
             // Cap new_rotation to the [0, 360] range
-            var new_rotation = GLib.Math.fmod (selected_item.rotation + rotation, 360);
-            set_rotation (new_rotation, selected_item);
-            canvas.convert_to_item_space (selected_item, ref initial_x, ref initial_y);
+            var new_rotation = GLib.Math.fmod (item.rotation + rotation, 360);
+            set_rotation (new_rotation, item);
+            canvas.convert_to_item_space (item, ref initial_x, ref initial_y);
         }
 
         // Reset rotation to prevent infinite rotation loops.
@@ -366,6 +344,8 @@ public class Akira.Utils.AffineTransform : Object {
     }
 
     public static void set_rotation (double rotation, CanvasItem item) {
+        debug ("%f", rotation);
+
         var center_x = item.get_coords ("width") / 2;
         var center_y = item.get_coords ("height") / 2;
 
