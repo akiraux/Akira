@@ -60,6 +60,12 @@
             <description>Allow user to choose between normal and symbolic icons in HeaderBar.</description>
         </key>
 
+        <key name="invert-sidebar" type="b">
+            <default>false</default>
+            <summary>Invert Panels Order</summary>
+            <description>Allow user to choose between default and inverted panels order.</description>
+        </key>
+
         <key name="fill-color" type="s">
             <default>'#CCCCCC'</default>
             <summary>Default Shape Color.</summary>
