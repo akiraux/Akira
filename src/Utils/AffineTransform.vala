@@ -79,9 +79,7 @@ public class Akira.Utils.AffineTransform : Object {
         double event_x,
         double event_y,
         ref double initial_event_x,
-        ref double initial_event_y,
-        ref double delta_x_accumulator,
-        ref double delta_y_accumulator
+        ref double initial_event_y
     ) {
         Cairo.Matrix matrix;
 
@@ -104,9 +102,6 @@ public class Akira.Utils.AffineTransform : Object {
             );
             item.set_transform (new_matrix);
         }
-
-        delta_x_accumulator += delta_x;
-        delta_y_accumulator += delta_y;
 
         initial_event_x = event_x;
         initial_event_y = event_y;
