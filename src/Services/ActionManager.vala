@@ -436,7 +436,7 @@ public class Akira.Services.ActionManager : Object {
                 });
                 break;
         }
-        dialog.destroy();
+        dialog.destroy ();
     }
 
     private void action_escape () {
