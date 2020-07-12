@@ -492,7 +492,6 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         item.set ("size-locked", obj.get_boolean_member ("size-locked"));
         item.set ("size-ratio", obj.get_double_member ("size-ratio"));
         item.set ("rotation", obj.get_double_member ("rotation"));
-        // Utils.AffineTransform.set_rotation (obj.get_double_member ("rotation"), item);
         item.set ("flipped-h", obj.get_boolean_member ("flipped-h"));
         item.set ("flipped-v", obj.get_boolean_member ("flipped-v"));
         item.set ("opacity", obj.get_double_member ("opacity"));
@@ -543,10 +542,23 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         item.set ("initial-relative-x", obj.get_double_member ("initial-relative-x"));
         item.set ("initial-relative-y", obj.get_double_member ("initial-relative-y"));
 
+        Cairo.Matrix matrix;
+        item.get_transform (out matrix);
+        var transform = obj.get_member ("transform").get_object ();
+
+        var new_matrix = Cairo.Matrix (
+            transform.get_double_member ("xx"),
+            transform.get_double_member ("yx"),
+            transform.get_double_member ("xy"),
+            transform.get_double_member ("yy"),
+            transform.get_double_member ("x0"),
+            transform.get_double_member ("y0")
+        );
+        item.set_transform (new_matrix);
+
         // If the item is an Artboard, we need to restore bounding coordinates otherwise
         // new child items won't be properly restored into it.
         if (item is Models.CanvasArtboard) {
-            var transform = obj.get_member ("transform").get_object ();
             item.bounds.x1 = transform.get_double_member ("x0");
             item.bounds.y1 = transform.get_double_member ("y0");
             item.bounds.x2 = transform.get_double_member ("x0") + obj.get_double_member ("width");
