@@ -180,9 +180,6 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
 
         window.event_bus.selected_items_changed.connect (on_selected_items_changed);
         window.event_bus.item_coord_changed.connect (on_item_coord_changed);
-        window.event_bus.lock_ratio.connect (() => {
-            lock_changes.active = true;
-        });
     }
 
     private void on_selected_items_changed (List<Lib.Models.CanvasItem> selected_items) {
@@ -252,7 +249,9 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
                 var icon = val.get_boolean () ? "changes-prevent-symbolic" : "changes-allow-symbolic";
                 lock_changes.image = new Gtk.Image.from_icon_name (icon, Gtk.IconSize.BUTTON);
                 res = val.get_boolean ();
-                update_size_ratio ();
+                if (val.get_boolean ()) {
+                    update_size_ratio ();
+                }
                 return true;
             });
 
