@@ -290,7 +290,7 @@ public class Akira.Services.ActionManager : Object {
 
     private void action_export_artboards () {
         // Check if at least an artboard is present.
-        window.event_bus.canvas_notification (_("Export of Artbords currently unavailable…sorry 😑️"));
+        window.event_bus.canvas_notification (_("Export of Artboards currently unavailable…sorry 😑️"));
         // TODO: Trigger artboards pixbuf generation.
     }
 

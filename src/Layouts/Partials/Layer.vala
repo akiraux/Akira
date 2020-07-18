@@ -268,7 +268,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
         container.activate_on_single_click = true;
         container.selection_mode = Gtk.SelectionMode.SINGLE;
 
-        // Block all the events from bubbling up and triggering the Artbord's events.
+        // Block all the events from bubbling up and triggering the Artboard's events.
         container.event.connect (() => {
             return true;
         });
@@ -668,14 +668,13 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
         editing = false;
 
         var new_label = entry.get_text ();
+        window.event_bus.set_focus_on_canvas ();
 
         if (label.label == new_label) {
             return;
         }
 
         label.label = new_label;
-
-        window.event_bus.set_focus_on_canvas ();
     }
 
     private void lock_actions () {

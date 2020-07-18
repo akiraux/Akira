@@ -344,8 +344,6 @@ public class Akira.Utils.AffineTransform : Object {
     }
 
     public static void set_rotation (double rotation, CanvasItem item) {
-        debug ("%f", rotation);
-
         var center_x = item.get_coords ("width") / 2;
         var center_y = item.get_coords ("height") / 2;
 

@@ -658,7 +658,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
 
         // If the item was moved from inside an Artboard to the emtpy Canvas.
         if (item.artboard != null && new_artboard == null) {
-            debug ("Artbord => Free Item");
+            debug ("Artboard => Free Item");
             // Remove the item from the Artboard.
             item.artboard.remove_item (item);
             window.event_bus.item_deleted (item);
@@ -705,7 +705,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
 
         // If the item was moved from inside an Artboard to another Artboard.
         if (item.artboard != null && new_artboard != null) {
-            debug ("Artbord => Artboard");
+            debug ("Artboard => Artboard");
             // Remove the item from the Artboard.
             item.artboard.remove_item (item);
             window.event_bus.item_deleted (item);
