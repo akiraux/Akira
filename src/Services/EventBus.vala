@@ -54,7 +54,6 @@ public class Akira.Services.EventBus : Object {
     public signal void fill_deleted ();
     public signal void item_coord_changed ();
     public signal void item_value_changed ();
-    public signal void lock_ratio ();
 
     // Item signals.
     public signal void change_z_selected (bool raise, bool total);

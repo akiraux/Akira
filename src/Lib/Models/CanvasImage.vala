@@ -122,6 +122,13 @@ public class Akira.Lib.Models.CanvasImage : Goo.CanvasImage, Models.CanvasItem {
         manager.get_pixbuf.begin (-1, -1, (obj, res) => {
             try {
                 original_pixbuf = manager.get_pixbuf.end (res);
+                pixbuf = original_pixbuf;
+                width = original_pixbuf.get_width ();
+                height = original_pixbuf.get_height ();
+
+                // Imported images should have their size ratio locked by default.
+                size_locked = true;
+                size_ratio = width / height;
             } catch (Error e) {
                 warning (e.message);
                 canvas.window.event_bus.canvas_notification (e.message);

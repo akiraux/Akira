@@ -77,12 +77,8 @@ public class Akira.Lib.Managers.ItemsManager : Object {
 
         set_item_to_insert ("image");
         var new_item = insert_item (start_x, start_y, manager);
-        (new_item as Models.CanvasImage).resize_pixbuf (-1, -1, true);
 
         selected_bound_manager.add_item_to_selection (new_item);
-
-        // Imported images should keep their aspect ratio by default.
-        window.event_bus.lock_ratio ();
         selected_bound_manager.set_initial_coordinates (start_x, start_y);
     }
 
