@@ -122,6 +122,13 @@ public class Akira.Partials.InputField : Gtk.EventBox {
             return true;
         }
 
+        // Enter or Escape
+        if (event.keyval == Gdk.Key.Return || event.keyval == Gdk.Key.Escape) {
+            Akira.Window window = get_toplevel () as Akira.Window;
+            window.event_bus.set_focus_on_canvas ();
+            return true;
+        }
+
         return false;
     }
 
