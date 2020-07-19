@@ -144,6 +144,7 @@ public class Akira.Utils.AffineTransform : Object {
                 new_height = -delta_y;
                 new_width = -delta_x;
 
+                // Height size constraints.
                 if (fix_size (event_y) > item_y + item_height && item_height != 1) {
                     // If the mouse event goes beyond the available height of the item
                     // super quickly, collapse the size to 1 and maintain the position.
@@ -161,6 +162,7 @@ public class Akira.Utils.AffineTransform : Object {
                     new_height = 0;
                 }
 
+                // Width size constraints.
                 if (fix_size (event_x) > item_x + item_width && item_width != 1) {
                     // If the mouse event goes beyond the available width of the item
                     // super quickly, collapse the size to 1 and maintain the position.
@@ -187,6 +189,7 @@ public class Akira.Utils.AffineTransform : Object {
                 new_y = delta_y;
                 new_height = -delta_y;
 
+                // Height size constraints.
                 if (fix_size (event_y) > item_y + item_height && item_height != 1) {
                     // If the mouse event goes beyond the available height of the item
                     // super quickly, collapse the size to 1 and maintain the position.
@@ -214,6 +217,7 @@ public class Akira.Utils.AffineTransform : Object {
                 new_height = -delta_y;
                 new_width = delta_x;
 
+                // Height size constraints.
                 if (fix_size (event_y) > item_y + item_height && item_height != 1) {
                     // If the mouse event goes beyond the available height of the item
                     // super quickly, collapse the size to 1 and maintain the position.
@@ -231,6 +235,21 @@ public class Akira.Utils.AffineTransform : Object {
                     new_height = 0;
                 }
 
+                // Width size constraints.
+                if (fix_size (event_x) < item_x && item_width != 1) {
+                    // If the mouse event goes beyond the available width of the item
+                    // super quickly, collapse the size to 1 and maintain the position.
+                    new_width = -item_width + 1;
+                } else if (fix_size (event_x) < item_x) {
+                    // If the user keeps moving the mouse beyond the available width of the item
+                    // prevent any size changes.
+                    new_width = 0;
+                } else if (item_width == 1 && delta_x <= 0) {
+                    // Don't update the size or position if the delta keeps increasing,
+                    // meaning the user is still moving left.
+                    new_width = 0;
+                }
+
                 if (canvas.ctrl_is_pressed || item.size_locked) {
                     new_height = new_width / item.size_ratio;
                 }
@@ -238,6 +257,21 @@ public class Akira.Utils.AffineTransform : Object {
 
             case NobManager.Nob.RIGHT_CENTER:
                 new_width = delta_x;
+
+                // Width size constraints.
+                if (fix_size (event_x) < item_x && item_width != 1) {
+                    // If the mouse event goes beyond the available width of the item
+                    // super quickly, collapse the size to 1 and maintain the position.
+                    new_width = -item_width + 1;
+                } else if (fix_size (event_x) < item_x) {
+                    // If the user keeps moving the mouse beyond the available width of the item
+                    // prevent any size changes.
+                    new_width = 0;
+                } else if (item_width == 1 && delta_x <= 0) {
+                    // Don't update the size or position if the delta keeps increasing,
+                    // meaning the user is still moving left.
+                    new_width = 0;
+                }
 
                 if (canvas.ctrl_is_pressed || item.size_locked) {
                     new_height = new_width / item.size_ratio;
@@ -247,6 +281,36 @@ public class Akira.Utils.AffineTransform : Object {
             case NobManager.Nob.BOTTOM_RIGHT:
                 new_width = delta_x;
                 new_height = delta_y;
+
+                // Width size constraints.
+                if (fix_size (event_x) < item_x && item_width != 1) {
+                    // If the mouse event goes beyond the available width of the item
+                    // super quickly, collapse the size to 1 and maintain the position.
+                    new_width = -item_width + 1;
+                } else if (fix_size (event_x) < item_x) {
+                    // If the user keeps moving the mouse beyond the available width of the item
+                    // prevent any size changes.
+                    new_width = 0;
+                } else if (item_width == 1 && delta_x <= 0) {
+                    // Don't update the size or position if the delta keeps increasing,
+                    // meaning the user is still moving left.
+                    new_width = 0;
+                }
+
+                // Height size constraints.
+                if (fix_size (event_y) < item_y && item_height != 1) {
+                    // If the mouse event goes beyond the available height of the item
+                    // super quickly, collapse the size to 1 and maintain the position.
+                    new_height = -item_height + 1;
+                } else if (fix_size (event_y) < item_y) {
+                    // If the user keeps moving the mouse beyond the available height of the item
+                    // prevent any size changes.
+                    new_height = 0;
+                } else if (item_height == 1 && delta_y <= 0) {
+                    // Don't update the size or position if the delta keeps increasing,
+                    // meaning the user is still moving down.
+                    new_height = 0;
+                }
 
                 if (canvas.ctrl_is_pressed || item.size_locked) {
                     new_height = new_width / item.size_ratio;
@@ -259,6 +323,7 @@ public class Akira.Utils.AffineTransform : Object {
             case NobManager.Nob.BOTTOM_CENTER:
                 new_height = delta_y;
 
+                // Height size constraints.
                 if (fix_size (event_y) < item_y && item_height != 1) {
                     // If the mouse event goes beyond the available height of the item
                     // super quickly, collapse the size to 1 and maintain the position.
@@ -283,6 +348,7 @@ public class Akira.Utils.AffineTransform : Object {
                 new_width = -delta_x;
                 new_height = delta_y;
 
+                // Width size contraints.
                 if (fix_size (event_x) > item_x + item_width && item_width != 1) {
                     // If the mouse event goes beyond the available width of the item
                     // super quickly, collapse the size to 1 and maintain the position.
@@ -300,6 +366,21 @@ public class Akira.Utils.AffineTransform : Object {
                     new_width = 0;
                 }
 
+                // Height size constraints.
+                if (fix_size (event_y) < item_y && item_height != 1) {
+                    // If the mouse event goes beyond the available height of the item
+                    // super quickly, collapse the size to 1 and maintain the position.
+                    new_height = -item_height + 1;
+                } else if (fix_size (event_y) < item_y) {
+                    // If the user keeps moving the mouse beyond the available height of the item
+                    // prevent any size changes.
+                    new_height = 0;
+                } else if (item_height == 1 && delta_y <= 0) {
+                    // Don't update the size or position if the delta keeps increasing,
+                    // meaning the user is still moving down.
+                    new_height = 0;
+                }
+
                 if (canvas.ctrl_is_pressed || item.size_locked) {
                     new_width = new_height * item.size_ratio;
                 }
@@ -309,6 +390,7 @@ public class Akira.Utils.AffineTransform : Object {
                 new_x = delta_x;
                 new_width = -delta_x;
 
+                // Width size constraints.
                 if (fix_size (event_x) > item_x + item_width && item_width != 1) {
                     // If the mouse event goes beyond the available width of the item
                     // super quickly, collapse the size to 1 and maintain the position.
