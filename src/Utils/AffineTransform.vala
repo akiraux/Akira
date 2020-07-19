@@ -139,21 +139,48 @@ public class Akira.Utils.AffineTransform : Object {
 
         switch (nob) {
             case NobManager.Nob.TOP_LEFT:
-                // new_height = initial_height - delta_y;
-                // new_width = initial_width - delta_x;
-                // new_height = initial_height - delta_y;
-                // new_width = initial_width - delta_x;
-                // if (canvas.ctrl_is_pressed || item.size_locked) {
-                //     new_width = GLib.Math.round (new_height * item.size_ratio);
-                // }
+                new_y = delta_y;
+                new_x = delta_x;
+                new_height = -delta_y;
+                new_width = -delta_x;
 
-                // if (item_height > MIN_SIZE) {
-                //     origin_move_delta_y = item_height - new_height;
-                // }
+                if (fix_size (event_y) > item_y + item_height && item_height != 1) {
+                    // If the mouse event goes beyond the available height of the item
+                    // super quickly, collapse the size to 1 and maintain the position.
+                    new_y = item_height - 1;
+                    new_height = -item_height + 1;
+                } else if (fix_size (event_y) > item_y + item_height) {
+                    // If the user keeps moving the mouse beyond the available height of the item
+                    // prevent any size changes.
+                    new_y = 0;
+                    new_height = 0;
+                } else if (item_height == 1 && delta_y >= 0) {
+                    // Don't update the size or position if the delta keeps increasing,
+                    // meaning the user is still moving down.
+                    new_y = 0;
+                    new_height = 0;
+                }
 
-                // if (item_width > MIN_SIZE) {
-                //     origin_move_delta_x = item_width - new_width;
-                // }
+                if (fix_size (event_x) > item_x + item_width && item_width != 1) {
+                    // If the mouse event goes beyond the available width of the item
+                    // super quickly, collapse the size to 1 and maintain the position.
+                    new_x = item_width - 1;
+                    new_width = -item_width + 1;
+                } else if (fix_size (event_x) > item_x + item_width) {
+                    // If the user keeps moving the mouse beyond the available width of the item
+                    // prevent any size changes.
+                    new_x = 0;
+                    new_width = 0;
+                } else if (item_width == 1 && delta_x >= 0) {
+                    // Don't update the size or position if the delta keeps increasing,
+                    // meaning the user is still moving right.
+                    new_x = 0;
+                    new_width = 0;
+                }
+
+                if (canvas.ctrl_is_pressed || item.size_locked) {
+                    new_width = new_height * item.size_ratio;
+                }
                 break;
 
             case NobManager.Nob.TOP_CENTER:
@@ -166,7 +193,7 @@ public class Akira.Utils.AffineTransform : Object {
                     new_y = item_height - 1;
                     new_height = -item_height + 1;
                 } else if (fix_size (event_y) > item_y + item_height) {
-                    // If the user keeps mouving the mouse beyond the available height of the item
+                    // If the user keeps moving the mouse beyond the available height of the item
                     // prevent any size changes.
                     new_y = 0;
                     new_height = 0;
@@ -183,15 +210,30 @@ public class Akira.Utils.AffineTransform : Object {
                 break;
 
             case NobManager.Nob.TOP_RIGHT:
-                // new_width = initial_width + delta_x;
-                // new_height = initial_height - delta_y;
-                // if (canvas.ctrl_is_pressed || item.size_locked) {
-                //     new_height = GLib.Math.round (new_width / item.size_ratio);
-                // }
+                new_y = delta_y;
+                new_height = -delta_y;
+                new_width = delta_x;
 
-                // if (item_height > MIN_SIZE) {
-                //     origin_move_delta_y = item_height - new_height;
-                // }
+                if (fix_size (event_y) > item_y + item_height && item_height != 1) {
+                    // If the mouse event goes beyond the available height of the item
+                    // super quickly, collapse the size to 1 and maintain the position.
+                    new_y = item_height - 1;
+                    new_height = -item_height + 1;
+                } else if (fix_size (event_y) > item_y + item_height) {
+                    // If the user keeps moving the mouse beyond the available height of the item
+                    // prevent any size changes.
+                    new_y = 0;
+                    new_height = 0;
+                } else if (item_height == 1 && delta_y >= 0) {
+                    // Don't update the size or position if the delta keeps increasing,
+                    // meaning the user is still moving down.
+                    new_y = 0;
+                    new_height = 0;
+                }
+
+                if (canvas.ctrl_is_pressed || item.size_locked) {
+                    new_height = new_width / item.size_ratio;
+                }
                 break;
 
             case NobManager.Nob.RIGHT_CENTER:
@@ -208,6 +250,9 @@ public class Akira.Utils.AffineTransform : Object {
 
                 if (canvas.ctrl_is_pressed || item.size_locked) {
                     new_height = new_width / item.size_ratio;
+                    if (item.size_ratio == 1 && item_width != item_height) {
+                        new_height = item_width - item_height;
+                    }
                 }
                 break;
 
@@ -220,30 +265,33 @@ public class Akira.Utils.AffineTransform : Object {
                 break;
 
             case NobManager.Nob.BOTTOM_LEFT:
-                // new_height = initial_height + delta_y;
-                // new_width = initial_width - delta_x;
+                new_x = delta_x;
+                new_width = -delta_x;
                 new_height = delta_y;
-                // new_width = initial_width - delta_x;
-                // if (canvas.ctrl_is_pressed || item.size_locked) {
-                //     new_width = GLib.Math.round (new_height * item.size_ratio);
-                // }
 
-                // if (item_width > MIN_SIZE) {
-                //     origin_move_delta_x = item_width - new_width;
-                // }
+                if (fix_size (event_x) > item_x + item_width && item_width != 1) {
+                    // If the mouse event goes beyond the available width of the item
+                    // super quickly, collapse the size to 1 and maintain the position.
+                    new_x = item_width - 1;
+                    new_width = -item_width + 1;
+                } else if (fix_size (event_x) > item_x + item_width) {
+                    // If the user keeps moving the mouse beyond the available width of the item
+                    // prevent any size changes.
+                    new_x = 0;
+                    new_width = 0;
+                } else if (item_width == 1 && delta_x >= 0) {
+                    // Don't update the size or position if the delta keeps increasing,
+                    // meaning the user is still moving right.
+                    new_x = 0;
+                    new_width = 0;
+                }
+
+                if (canvas.ctrl_is_pressed || item.size_locked) {
+                    new_width = new_height * item.size_ratio;
+                }
                 break;
 
             case NobManager.Nob.LEFT_CENTER:
-                // debug ((initial_event_x - event_x).to_string ());
-                // origin_move_delta_x = x - delta_x;
-                // new_width = initial_width - delta_x;
-                // if (canvas.ctrl_is_pressed || item.size_locked) {
-                //     new_height = GLib.Math.round (new_width / item.size_ratio);
-                // }
-
-                // if (new_width >= MIN_SIZE) {
-                //     origin_move_delta_x = item_width - new_width;
-                // }
                 new_x = delta_x;
                 new_width = -delta_x;
 
@@ -253,13 +301,13 @@ public class Akira.Utils.AffineTransform : Object {
                     new_x = item_width - 1;
                     new_width = -item_width + 1;
                 } else if (fix_size (event_x) > item_x + item_width) {
-                    // If the user keeps mouving the mouse beyond the available width of the item
+                    // If the user keeps moving the mouse beyond the available width of the item
                     // prevent any size changes.
                     new_x = 0;
                     new_width = 0;
                 } else if (item_width == 1 && delta_x >= 0) {
                     // Don't update the size or position if the delta keeps increasing,
-                    // meaning the user is still moving down.
+                    // meaning the user is still moving right.
                     new_x = 0;
                     new_width = 0;
                 }
@@ -270,6 +318,7 @@ public class Akira.Utils.AffineTransform : Object {
                 break;
         }
 
+        // Update the initial coordiante to keep getting the correct delta.
         initial_event_x = event_x;
         initial_event_y = event_y;
 

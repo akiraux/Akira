@@ -122,6 +122,7 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
         item.set ("stroke-alpha", 255);
 
         var canvas_item = item as Models.CanvasItem;
+        canvas_item.size_ratio = 1.0;
 
         // Populate the name with the item's id
         // to show it when added to the LayersPanel
