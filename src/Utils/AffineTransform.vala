@@ -127,9 +127,9 @@ public class Akira.Utils.AffineTransform : Object {
 
         var canvas = item.canvas;
 
-        // double item_width = item.get_coords ("width");
+        double item_width = item.get_coords ("width");
         double item_height = item.get_coords ("height");
-        // double item_x = item.get_global_coord ("x");
+        double item_x = item.get_global_coord ("x");
         double item_y = item.get_global_coord ("y");
 
         double new_width = 0;
@@ -196,27 +196,27 @@ public class Akira.Utils.AffineTransform : Object {
 
             case NobManager.Nob.RIGHT_CENTER:
                 new_width = delta_x;
-                // new_width = item_x - event_x;
 
-                // if (canvas.ctrl_is_pressed || item.size_locked) {
-                //     new_height = GLib.Math.round (new_width / item.size_ratio);
-                // }
+                if (canvas.ctrl_is_pressed || item.size_locked) {
+                    new_height = new_width / item.size_ratio;
+                }
                 break;
 
             case NobManager.Nob.BOTTOM_RIGHT:
                 new_width = delta_x;
                 new_height = delta_y;
-                // if (canvas.ctrl_is_pressed || item.size_locked) {
-                //     new_height = GLib.Math.round (new_width / item.size_ratio);
-                // }
+
+                if (canvas.ctrl_is_pressed || item.size_locked) {
+                    new_height = new_width / item.size_ratio;
+                }
                 break;
 
             case NobManager.Nob.BOTTOM_CENTER:
-                // new_height = initial_height + delta_y;
                 new_height = delta_y;
-                // if (canvas.ctrl_is_pressed || item.size_locked) {
-                //     new_width = GLib.Math.round (new_height * item.size_ratio);
-                // }
+
+                if (canvas.ctrl_is_pressed || item.size_locked) {
+                    new_width = new_height * item.size_ratio;
+                }
                 break;
 
             case NobManager.Nob.BOTTOM_LEFT:
@@ -244,6 +244,29 @@ public class Akira.Utils.AffineTransform : Object {
                 // if (new_width >= MIN_SIZE) {
                 //     origin_move_delta_x = item_width - new_width;
                 // }
+                new_x = delta_x;
+                new_width = -delta_x;
+
+                if (fix_size (event_x) > item_x + item_width && item_width != 1) {
+                    // If the mouse event goes beyond the available width of the item
+                    // super quickly, collapse the size to 1 and maintain the position.
+                    new_x = item_width - 1;
+                    new_width = -item_width + 1;
+                } else if (fix_size (event_x) > item_x + item_width) {
+                    // If the user keeps mouving the mouse beyond the available width of the item
+                    // prevent any size changes.
+                    new_x = 0;
+                    new_width = 0;
+                } else if (item_width == 1 && delta_x >= 0) {
+                    // Don't update the size or position if the delta keeps increasing,
+                    // meaning the user is still moving down.
+                    new_x = 0;
+                    new_width = 0;
+                }
+
+                if (canvas.ctrl_is_pressed || item.size_locked) {
+                    new_height = new_width * item.size_ratio;
+                }
                 break;
         }
 
