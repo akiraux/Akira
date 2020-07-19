@@ -343,4 +343,10 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
 
         return false;
     }
+
+    // Update the size ratio to respect the udpated size.
+    public void update_size_ratio () {
+        debug ("update");
+        size_ratio = get_coords ("width") / get_coords ("height");
+    }
 }

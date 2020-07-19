@@ -142,6 +142,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         }
 
         item.selected = true;
+        item.update_size_ratio ();
         selected_items.append (item);
 
         // Move focus back to the canvas.
