@@ -180,22 +180,6 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
         }
     }
 
-    // public virtual void move (
-    //     double delta_x, double delta_y,
-    //     double delta_x_accumulator = 0.0, double delta_y_accumulator = 0.0) {
-
-    //     if (artboard != null) {
-    //         var transformed_delta_x = delta_x_accumulator;
-    //         var transformed_delta_y = delta_y_accumulator;
-
-    //         relative_x = initial_relative_x + transformed_delta_x;
-    //         relative_y = initial_relative_y + transformed_delta_y;
-
-    //         return;
-    //     }
-
-    //     translate (delta_x, delta_y);
-    // }
     public virtual void move (double x, double y) {
         if (artboard != null) {
             relative_x += x;
