@@ -111,149 +111,147 @@ public class Akira.Utils.AffineTransform : Object {
     }
 
     public static void scale_from_event (
-        double x,
-        double y,
-        ref double initial_x,
-        ref double initial_y,
+        CanvasItem item,
+        NobManager.Nob nob,
+        double event_x,
+        double event_y,
+        ref double initial_event_x,
+        ref double initial_event_y,
         ref double delta_x_accumulator,
         ref double delta_y_accumulator,
         double initial_width,
-        double initial_height,
-        NobManager.Nob selected_nob,
-        CanvasItem selected_item
+        double initial_height
     ) {
-        double delta_x = Math.round (x - initial_x);
-        double delta_y = Math.round (y - initial_y);
+        double delta_x = fix_size (event_x - initial_event_x);
+        double delta_y = fix_size (event_y - initial_event_y);
 
-        var canvas = selected_item.canvas;
+        var canvas = item.canvas;
 
-        double origin_move_delta_x = 0;
-        double origin_move_delta_y = 0;
+        // double item_width = item.get_coords ("width");
+        double item_height = item.get_coords ("height");
+        // double item_x = item.get_global_coord ("x");
+        double item_y = item.get_global_coord ("y");
 
-        double item_width = selected_item.get_coords ("width");
-        double item_height = selected_item.get_coords ("height");
+        double new_width = 0;
+        double new_height = 0;
+        double new_x = 0;
+        double new_y = 0;
 
-        double new_width = initial_width;
-        double new_height = initial_height;
-
-        switch (selected_nob) {
+        switch (nob) {
             case NobManager.Nob.TOP_LEFT:
-                new_height = initial_height - delta_y;
-                new_width = initial_width - delta_x;
-                if ((canvas.ctrl_is_pressed || selected_item.size_locked) && new_height > MIN_SIZE) {
-                    new_width = GLib.Math.round (new_height * selected_item.size_ratio);
-                }
+                // new_height = initial_height - delta_y;
+                // new_width = initial_width - delta_x;
+                // new_height = initial_height - delta_y;
+                // new_width = initial_width - delta_x;
+                // if (canvas.ctrl_is_pressed || item.size_locked) {
+                //     new_width = GLib.Math.round (new_height * item.size_ratio);
+                // }
 
-                if (item_height > MIN_SIZE) {
-                    origin_move_delta_y = item_height - new_height;
-                }
+                // if (item_height > MIN_SIZE) {
+                //     origin_move_delta_y = item_height - new_height;
+                // }
 
-                if (item_width > MIN_SIZE) {
-                    origin_move_delta_x = item_width - new_width;
-                }
+                // if (item_width > MIN_SIZE) {
+                //     origin_move_delta_x = item_width - new_width;
+                // }
                 break;
 
             case NobManager.Nob.TOP_CENTER:
-                new_height = initial_height - delta_y;
-                if ((canvas.ctrl_is_pressed || selected_item.size_locked) && new_height > MIN_SIZE) {
-                    new_width = GLib.Math.round (new_height * selected_item.size_ratio);
+                new_y = delta_y;
+                new_height = -delta_y;
+
+                if (fix_size (event_y) > item_y + item_height && item_height != 1) {
+                    // If the mouse event goes beyond the available height of the item
+                    // super quickly, collapse the size to 1 and maintain the position.
+                    new_y = item_height - 1;
+                    new_height = -item_height + 1;
+                } else if (fix_size (event_y) > item_y + item_height) {
+                    // If the user keeps mouving the mouse beyond the available height of the item
+                    // prevent any size changes.
+                    new_y = 0;
+                    new_height = 0;
+                } else if (item_height == 1 && delta_y >= 0) {
+                    // Don't update the size or position if the delta keeps increasing,
+                    // meaning the user is still moving down.
+                    new_y = 0;
+                    new_height = 0;
                 }
 
-                if (item_height > MIN_SIZE) {
-                    origin_move_delta_y = item_height - new_height;
+                if (canvas.ctrl_is_pressed || item.size_locked) {
+                    new_width = new_height * item.size_ratio;
                 }
                 break;
 
             case NobManager.Nob.TOP_RIGHT:
-                new_width = initial_width + delta_x;
-                new_height = initial_height - delta_y;
-                if ((canvas.ctrl_is_pressed || selected_item.size_locked) && new_height > MIN_SIZE) {
-                    new_height = GLib.Math.round (new_width / selected_item.size_ratio);
-                }
+                // new_width = initial_width + delta_x;
+                // new_height = initial_height - delta_y;
+                // if (canvas.ctrl_is_pressed || item.size_locked) {
+                //     new_height = GLib.Math.round (new_width / item.size_ratio);
+                // }
 
-                if (item_height > MIN_SIZE) {
-                    origin_move_delta_y = item_height - new_height;
-                }
+                // if (item_height > MIN_SIZE) {
+                //     origin_move_delta_y = item_height - new_height;
+                // }
                 break;
 
             case NobManager.Nob.RIGHT_CENTER:
-                new_width = initial_width + delta_x;
+                new_width = delta_x;
+                // new_width = item_x - event_x;
 
-                if ((canvas.ctrl_is_pressed || selected_item.size_locked) && new_width > MIN_SIZE) {
-                    new_height = GLib.Math.round (new_width / selected_item.size_ratio);
-                }
+                // if (canvas.ctrl_is_pressed || item.size_locked) {
+                //     new_height = GLib.Math.round (new_width / item.size_ratio);
+                // }
                 break;
 
             case NobManager.Nob.BOTTOM_RIGHT:
-                new_width = initial_width + delta_x;
-                new_height = initial_height + delta_y;
-
-                if ((canvas.ctrl_is_pressed || selected_item.size_locked) && new_height > MIN_SIZE) {
-                    new_height = GLib.Math.round (new_width / selected_item.size_ratio);
-                }
+                new_width = delta_x;
+                new_height = delta_y;
+                // if (canvas.ctrl_is_pressed || item.size_locked) {
+                //     new_height = GLib.Math.round (new_width / item.size_ratio);
+                // }
                 break;
 
             case NobManager.Nob.BOTTOM_CENTER:
-                new_height = initial_height + delta_y;
-
-                if ((canvas.ctrl_is_pressed || selected_item.size_locked) && new_height > MIN_SIZE) {
-                    new_width = GLib.Math.round (new_height * selected_item.size_ratio);
-                }
+                // new_height = initial_height + delta_y;
+                new_height = delta_y;
+                // if (canvas.ctrl_is_pressed || item.size_locked) {
+                //     new_width = GLib.Math.round (new_height * item.size_ratio);
+                // }
                 break;
 
             case NobManager.Nob.BOTTOM_LEFT:
-                new_height = initial_height + delta_y;
-                new_width = initial_width - delta_x;
-                if ((canvas.ctrl_is_pressed || selected_item.size_locked) && new_height > MIN_SIZE) {
-                    new_width = GLib.Math.round (new_height * selected_item.size_ratio);
-                }
+                // new_height = initial_height + delta_y;
+                // new_width = initial_width - delta_x;
+                new_height = delta_y;
+                // new_width = initial_width - delta_x;
+                // if (canvas.ctrl_is_pressed || item.size_locked) {
+                //     new_width = GLib.Math.round (new_height * item.size_ratio);
+                // }
 
-                if (item_width > MIN_SIZE) {
-                    origin_move_delta_x = item_width - new_width;
-                }
+                // if (item_width > MIN_SIZE) {
+                //     origin_move_delta_x = item_width - new_width;
+                // }
                 break;
 
             case NobManager.Nob.LEFT_CENTER:
-                new_width = initial_width - delta_x;
-                if ((canvas.ctrl_is_pressed || selected_item.size_locked) && new_width > MIN_SIZE) {
-                    new_height = GLib.Math.round (new_width / selected_item.size_ratio);
-                }
+                // debug ((initial_event_x - event_x).to_string ());
+                // origin_move_delta_x = x - delta_x;
+                // new_width = initial_width - delta_x;
+                // if (canvas.ctrl_is_pressed || item.size_locked) {
+                //     new_height = GLib.Math.round (new_width / item.size_ratio);
+                // }
 
-                if (item_width > MIN_SIZE) {
-                    origin_move_delta_x = item_width - new_width;
-                }
+                // if (new_width >= MIN_SIZE) {
+                //     origin_move_delta_x = item_width - new_width;
+                // }
                 break;
         }
 
-        origin_move_delta_x = fix_size (origin_move_delta_x);
-        origin_move_delta_y = fix_size (origin_move_delta_y);
+        initial_event_x = event_x;
+        initial_event_y = event_y;
 
-        new_width = fix_size (new_width);
-        new_height = fix_size (new_height);
-
-        if (new_width == MIN_SIZE) {
-            origin_move_delta_x = 0.0;
-        }
-
-        if (new_height == MIN_SIZE) {
-            origin_move_delta_y = 0.0;
-        }
-
-        delta_x_accumulator += origin_move_delta_x;
-        delta_y_accumulator += origin_move_delta_y;
-
-        selected_item.move (
-            origin_move_delta_x,
-            origin_move_delta_y,
-            delta_x_accumulator,
-            delta_y_accumulator
-        );
-
-        // Prevent negative values by forcing a min size of 1px.
-        new_width = new_width < MIN_SIZE ? MIN_SIZE : new_width;
-        new_height = new_height < MIN_SIZE ? MIN_SIZE : new_height;
-
-        set_size (new_width, new_height, selected_item);
+        item.move (new_x, new_y);
+        set_size (item, new_width, new_height);
     }
 
     public static void rotate_from_event (
@@ -333,13 +331,17 @@ public class Akira.Utils.AffineTransform : Object {
         prev_rotation_difference = 0.0;
     }
 
-    public static void set_size (double width, double height, Goo.CanvasItem item) {
-        if (width != -1) {
-            item.set ("width", width);
+    public static void set_size (Goo.CanvasItem item, double x, double y) {
+        double width, height;
+        item.get ("width", out width, "height", out height);
+
+        // Prevent accidental negative values.
+        if (width + x > 0) {
+            item.set ("width", fix_size (width + x));
         }
 
-        if (height != -1) {
-            item.set ("height", height);
+        if (height + y > 0) {
+            item.set ("height", fix_size (height + y));
         }
     }
 

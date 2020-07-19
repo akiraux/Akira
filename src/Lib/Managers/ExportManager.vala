@@ -122,7 +122,7 @@ public class Akira.Lib.Managers.ExportManager : Object {
         area.translate (origin_move_delta_x, origin_move_delta_y);
         canvas.convert_to_item_space (area, ref initial_x, ref initial_y);
 
-        Utils.AffineTransform.set_size (new_width, new_height, area);
+        Utils.AffineTransform.set_size (area, new_width, new_height);
     }
 
     public void clear () {
