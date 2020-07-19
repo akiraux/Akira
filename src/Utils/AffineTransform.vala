@@ -259,6 +259,20 @@ public class Akira.Utils.AffineTransform : Object {
             case NobManager.Nob.BOTTOM_CENTER:
                 new_height = delta_y;
 
+                if (fix_size (event_y) < item_y && item_height != 1) {
+                    // If the mouse event goes beyond the available height of the item
+                    // super quickly, collapse the size to 1 and maintain the position.
+                    new_height = -item_height + 1;
+                } else if (fix_size (event_y) < item_y) {
+                    // If the user keeps moving the mouse beyond the available height of the item
+                    // prevent any size changes.
+                    new_height = 0;
+                } else if (item_height == 1 && delta_y <= 0) {
+                    // Don't update the size or position if the delta keeps increasing,
+                    // meaning the user is still moving down.
+                    new_height = 0;
+                }
+
                 if (canvas.ctrl_is_pressed || item.size_locked) {
                     new_width = new_height * item.size_ratio;
                 }
