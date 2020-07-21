@@ -77,9 +77,6 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
     public abstract double relative_x { get; set; }
     public abstract double relative_y { get; set; }
 
-    public abstract double initial_relative_x { get; set; }
-    public abstract double initial_relative_y { get; set; }
-
     // Knows if an item was created or loaded for ordering purpose.
     public abstract bool loaded { get; set; default = false; }
 
@@ -142,42 +139,44 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
     }
 
     public virtual void position_item (double _x, double _y) {
-        //  debug (initial_relative_x.to_string ());
-        //  debug (initial_relative_y.to_string ());
+        //  debug (@"item x: $(_x) - y: $(_y)");
+
+        // Always reset the translation matrix when position an item
+        // in the "free canvas" space. This is to avoid previous coordinate
+        // space translations to be applied twice
+        var transform = Cairo.Matrix.identity ();
+
+        // Keep the item always in the origin
+        // move the entire coordinate system every time
+        transform.translate (_x, _y);
+
+        // We only need to take into account the rotation relative
+        // to the center of the item.
+        var width = get_coords ("width");
+        var height = get_coords ("height");
+
+        transform.translate (width / 2, height / 2);
+        transform.rotate (Utils.AffineTransform.deg_to_rad (rotation));
+        transform.translate (- (width / 2), - (height / 2));
+
+        set_transform (transform);
 
         if (artboard != null) {
             artboard.add_child (this, -1);
 
-            double item_x_from_artboard = _x;
-            double item_y_from_artboard = _y;
+            double item_x_from_artboard = transform.x0;
+            double item_y_from_artboard = transform.y0;
 
             canvas.convert_to_item_space (artboard, ref item_x_from_artboard, ref item_y_from_artboard);
 
             relative_x = item_x_from_artboard;
             relative_y = item_y_from_artboard;
-        } else {
-            parent.add_child (this, -1);
 
-            // Always reset the translation matrix when position an item
-            // in the "free canvas" space. This is to avoid previous coordinate
-            // space translations to be applied twice
-            var transform = Cairo.Matrix.identity ();
-
-            // Keep the item always in the origin
-            // move the entire coordinate system every time
-            transform.translate (_x, _y);
-
-            // We only need to take into account the rotation relative
-            // to the center of the item.
-            var width = get_coords ("width");
-            var height = get_coords ("height");
-
-            transform.translate (width / 2, height / 2);
-            transform.rotate (Utils.AffineTransform.deg_to_rad (rotation));
-            transform.translate (- (width / 2), - (height / 2));
-
-            set_transform (transform);
+            debug (@"relative X: $(relative_x) - Y: $(relative_y)");
+            return;
         }
+
+        parent.add_child (this, -1);
     }
 
     public virtual void move (double x, double y) {
@@ -204,16 +203,26 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
     }
 
     public virtual Cairo.Matrix compute_transform (Cairo.Matrix transform) {
+        debug ("here");
         transform.translate (relative_x, relative_y);
 
         var width = get_coords ("width");
         var height = get_coords ("height");
 
-        // Rotate around the center by the amount
-        // in item.rotation
+        // Rotate around the center by the amount in item.rotation.
         transform.translate (width / 2, height / 2);
         transform.rotate (Utils.AffineTransform.deg_to_rad (rotation));
         transform.translate (- (width / 2), - (height / 2));
+
+        //  if (artboard != null) {
+        //      double item_x_from_artboard = transform.x0;
+        //      double item_y_from_artboard = transform.y0;
+
+        //      canvas.convert_to_item_space (artboard, ref item_x_from_artboard, ref item_y_from_artboard);
+
+        //      relative_x = item_x_from_artboard;
+        //      relative_y = item_y_from_artboard;
+        //  }
 
         return transform;
     }
@@ -239,11 +248,6 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
             default:
                 return 0.0;
         }
-    }
-
-    public virtual void store_relative_position () {
-        initial_relative_x = relative_x;
-        initial_relative_y = relative_y;
     }
 
     public virtual void reset_colors () {

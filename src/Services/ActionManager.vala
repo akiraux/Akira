@@ -340,11 +340,11 @@ public class Akira.Services.ActionManager : Object {
     }
 
     private void action_flip_h () {
-        window.event_bus.flip_item (true);
+        window.event_bus.flip_item ();
     }
 
     private void action_flip_v () {
-        window.event_bus.flip_item (true, true);
+        window.event_bus.flip_item (true);
     }
 
     private void action_ellipse_tool () {

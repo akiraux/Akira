@@ -32,13 +32,16 @@ public class Akira.Utils.AffineTransform : Object {
 
     public static HashTable<string, double?> get_position (CanvasItem item) {
         HashTable<string, double?> array = new HashTable<string, double?> (str_hash, str_equal);
-        double item_x = item.get_coords ("x");
-        double item_y = item.get_coords ("y");
+        //  double item_x = item.get_coords ("x");
+        //  double item_y = item.get_coords ("y");
+        double item_x = item.bounds.x1;
+        double item_y = item.bounds.y1;
 
-        // debug (@"item x: $(item_x) y: $(item_y)");
+        //  debug (@"item x: $(item_x) y: $(item_y)");
+        //  debug (@"item x: $(item.bounds.x1) y: $(item.bounds.y1)");
         // debug (@"Item has artboard: $(item.artboard != null)");
 
-        item.canvas.convert_from_item_space (item, ref item_x, ref item_y);
+        //  item.canvas.convert_from_item_space (item, ref item_x, ref item_y);
 
         if (item.artboard != null) {
             item_x = item.relative_x;
@@ -516,36 +519,26 @@ public class Akira.Utils.AffineTransform : Object {
     public static void set_rotation (double rotation, CanvasItem item) {
         var center_x = item.get_coords ("width") / 2;
         var center_y = item.get_coords ("height") / 2;
-
         var actual_rotation = rotation - item.rotation;
 
         item.rotate (actual_rotation, center_x, center_y);
-
         item.rotation += actual_rotation;
     }
 
-    public static void flip_item (bool clicked, CanvasItem item, double sx, double sy) {
-        if (clicked) {
-            double x, y, width, height;
-            item.get ("x", out x, "y", out y, "width", out width, "height", out height);
-            var center_x = x + width / 2;
-            var center_y = y + height / 2;
-
-            var transform = Cairo.Matrix.identity ();
-            item.get_transform (out transform);
-            double radians = item.rotation * (Math.PI / 180);
-            transform.translate (center_x, center_y);
-            transform.rotate (-radians);
-            transform.scale (sx, sy);
-            transform.rotate (radians);
-            transform.translate (-center_x, -center_y);
-            item.set_transform (transform);
-            return;
-        }
+    public static void flip_item (CanvasItem item, double sx, double sy) {
+        double x, y, width, height;
+        item.get ("x", out x, "y", out y, "width", out width, "height", out height);
+        var center_x = x + width / 2;
+        var center_y = y + height / 2;
 
         var transform = Cairo.Matrix.identity ();
         item.get_transform (out transform);
+        double radians = item.rotation * (Math.PI / 180);
+        transform.translate (center_x, center_y);
+        transform.rotate (-radians);
         transform.scale (sx, sy);
+        transform.rotate (radians);
+        transform.translate (-center_x, -center_y);
         item.set_transform (transform);
     }
 

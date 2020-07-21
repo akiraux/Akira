@@ -66,8 +66,6 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         if (selected_items.length () == 1) {
             var selected_item = selected_items.nth_data (0);
 
-            selected_item.store_relative_position ();
-
             delta_x_accumulator = 0.0;
             delta_y_accumulator = 0.0;
 
@@ -265,7 +263,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         canvas.window.event_bus.z_selected_changed ();
     }
 
-    private void on_flip_item (bool clicked, bool vertical) {
+    private void on_flip_item (bool vertical) {
         if (selected_items.length () == 0 || selected_items.nth_data (0) is Lib.Models.CanvasArtboard) {
             return;
         }
@@ -273,12 +271,12 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         selected_items.foreach ((item) => {
             if (vertical) {
                 item.flipped_v = !item.flipped_v;
-                Utils.AffineTransform.flip_item (clicked, item, 1, -1);
+                Utils.AffineTransform.flip_item (item, 1, -1);
                 update_selected_items ();
                 return;
             }
             item.flipped_h = !item.flipped_h;
-            Utils.AffineTransform.flip_item (clicked, item, -1, 1);
+            Utils.AffineTransform.flip_item (item, -1, 1);
             update_selected_items ();
         });
     }
