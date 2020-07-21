@@ -122,6 +122,7 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
         item.set ("stroke-alpha", 255);
 
         var canvas_item = item as Models.CanvasItem;
+        canvas_item.size_ratio = 1.0;
 
         // Populate the name with the item's id
         // to show it when added to the LayersPanel
@@ -179,21 +180,14 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
         }
     }
 
-    public virtual void move (
-        double delta_x, double delta_y,
-        double delta_x_accumulator = 0.0, double delta_y_accumulator = 0.0) {
-
+    public virtual void move (double x, double y) {
         if (artboard != null) {
-            var transformed_delta_x = delta_x_accumulator;
-            var transformed_delta_y = delta_y_accumulator;
-
-            relative_x = initial_relative_x + transformed_delta_x;
-            relative_y = initial_relative_y + transformed_delta_y;
-
+            relative_x += x;
+            relative_y += y;
             return;
         }
 
-        translate (delta_x, delta_y);
+        translate (x, y);
     }
 
     public virtual Cairo.Matrix get_real_transform () {
@@ -222,23 +216,6 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
         transform.translate (- (width / 2), - (height / 2));
 
         return transform;
-    }
-
-    public virtual double get_real_coord (string coord_id) {
-        var offset_x = artboard == null ? 0 : relative_x;
-        var offset_y = artboard == null ? 0 : relative_y;
-
-        var item_x = get_coords ("x") - offset_x;
-        var item_y = get_coords ("y") - offset_y;
-
-        switch (coord_id) {
-            case "x":
-                return item_x;
-            case "y":
-                return item_y;
-            default:
-                return 0.0;
-        }
     }
 
     public virtual double get_global_coord (string coord_id) {
@@ -365,5 +342,10 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
         }
 
         return false;
+    }
+
+    // Update the size ratio to respect the updated size.
+    public void update_size_ratio () {
+        size_ratio = get_coords ("width") / get_coords ("height");
     }
 }

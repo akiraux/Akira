@@ -608,6 +608,14 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             }
         }
 
+        // Update the size ratio to always be faithful to the udpated size.
+        foreach (var item in items) {
+            if (item is Models.CanvasArtboard) {
+                continue;
+            }
+            item.update_size_ratio ();
+        }
+
         // Interrupt if no artboard is currently present.
         if (artboards.get_n_items () == 0) {
             return;

@@ -113,12 +113,12 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
 
             default:
                 Utils.AffineTransform.scale_from_event (
+                    selected_item,
+                    selected_nob,
                     event_x, event_y,
                     ref initial_event_x, ref initial_event_y,
                     ref delta_x_accumulator, ref delta_y_accumulator,
-                    initial_width, initial_height,
-                    selected_nob,
-                    selected_item
+                    initial_width, initial_height
                 );
                 break;
         }
@@ -142,6 +142,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         }
 
         item.selected = true;
+        item.update_size_ratio ();
         selected_items.append (item);
 
         // Move focus back to the canvas.

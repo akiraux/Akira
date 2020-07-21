@@ -363,7 +363,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         if (height.value == 0) {
             return;
         }
-        selected_item.size_ratio = width.value / height.value;
+        selected_item.update_size_ratio ();
     }
 
     private Gtk.Label group_title (string title) {
