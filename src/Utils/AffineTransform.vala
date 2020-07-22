@@ -187,7 +187,7 @@ public class Akira.Utils.AffineTransform : Object {
 
                 if (canvas.ctrl_is_pressed || item.size_locked) {
                     new_width = new_height * item.size_ratio;
-                    new_x = -(new_width / 2);
+                    new_x = - (new_width / 2);
                 }
                 break;
 
@@ -220,7 +220,7 @@ public class Akira.Utils.AffineTransform : Object {
 
                 if (canvas.ctrl_is_pressed || item.size_locked) {
                     new_height = new_width / item.size_ratio;
-                    new_y = -(new_height / 2);
+                    new_y = - (new_height / 2);
                 }
                 break;
 
@@ -247,7 +247,7 @@ public class Akira.Utils.AffineTransform : Object {
 
                 if (canvas.ctrl_is_pressed || item.size_locked) {
                     new_width = new_height * item.size_ratio;
-                    new_x = -(new_width / 2);
+                    new_x = - (new_width / 2);
                 }
                 break;
 
@@ -288,7 +288,7 @@ public class Akira.Utils.AffineTransform : Object {
 
                 if (canvas.ctrl_is_pressed || item.size_locked) {
                     new_height = new_width * item.size_ratio;
-                    new_y = -(new_height / 2);
+                    new_y = - (new_height / 2);
                 }
                 break;
         }
