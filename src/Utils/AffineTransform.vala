@@ -32,16 +32,12 @@ public class Akira.Utils.AffineTransform : Object {
 
     public static HashTable<string, double?> get_position (CanvasItem item) {
         HashTable<string, double?> array = new HashTable<string, double?> (str_hash, str_equal);
-        //  double item_x = item.get_coords ("x");
-        //  double item_y = item.get_coords ("y");
         double item_x = item.bounds.x1;
         double item_y = item.bounds.y1;
 
-        //  debug (@"item x: $(item_x) y: $(item_y)");
-        //  debug (@"item x: $(item.bounds.x1) y: $(item.bounds.y1)");
+        // debug (@"item x: $(item_x) y: $(item_y)");
+        // debug (@"item x: $(item.bounds.x1) y: $(item.bounds.y1)");
         // debug (@"Item has artboard: $(item.artboard != null)");
-
-        //  item.canvas.convert_from_item_space (item, ref item_x, ref item_y);
 
         if (item.artboard != null) {
             item_x = item.relative_x;
@@ -56,25 +52,18 @@ public class Akira.Utils.AffineTransform : Object {
 
     public static void set_position (CanvasItem item, double? x = null, double? y = null) {
         if (item.artboard != null) {
-            var delta_x = x != null ? x - item.relative_x : 0.0;
-            var delta_y = y != null ? y - item.relative_y : 0.0;
-
             item.relative_x = x != null ? x : item.relative_x;
             item.relative_y = y != null ? y : item.relative_y;
-
-            item.translate (delta_x, delta_y);
-
             return;
         }
 
         Cairo.Matrix matrix;
         item.get_transform (out matrix);
 
-        double new_x = (x != null) ? x : matrix.x0;
-        double new_y = (y != null) ? y : matrix.y0;
+        matrix.x0 = (x != null) ? x : matrix.x0;
+        matrix.y0 = (y != null) ? y : matrix.y0;
 
-        var new_matrix = Cairo.Matrix (matrix.xx, matrix.yx, matrix.xy, matrix.yy, new_x, new_y);
-        item.set_transform (new_matrix);
+        item.set_transform (matrix);
     }
 
     /**
@@ -87,26 +76,21 @@ public class Akira.Utils.AffineTransform : Object {
         ref double initial_event_x,
         ref double initial_event_y
     ) {
-        Cairo.Matrix matrix;
 
         var delta_x = event_x - initial_event_x;
         var delta_y = event_y - initial_event_y;
 
         if (item.artboard != null) {
-            item.artboard.get_transform (out matrix);
-
             item.relative_x += delta_x;
             item.relative_y += delta_y;
-
-            item.translate (delta_x, delta_y);
         } else {
+            Cairo.Matrix matrix;
             item.get_transform (out matrix);
 
-            var new_matrix = Cairo.Matrix (
-                matrix.xx, matrix.yx, matrix.xy, matrix.yy,
-                (matrix.x0 + delta_x), (matrix.y0 + delta_y)
-            );
-            item.set_transform (new_matrix);
+            matrix.x0 += delta_x;
+            matrix.y0 += delta_y;
+
+            item.set_transform (matrix);
         }
 
         initial_event_x = event_x;
@@ -470,7 +454,7 @@ public class Akira.Utils.AffineTransform : Object {
             rotation = GLib.Math.round (rotation);
             // Cap new_rotation to the [0, 360] range
             var new_rotation = GLib.Math.fmod (item.rotation + rotation, 360);
-            set_rotation (new_rotation, item);
+            set_rotation (item, new_rotation);
             canvas.convert_to_item_space (item, ref initial_x, ref initial_y);
         }
 
@@ -492,7 +476,7 @@ public class Akira.Utils.AffineTransform : Object {
         }
     }
 
-    public static void set_rotation (double rotation, CanvasItem item) {
+    public static void set_rotation (CanvasItem item, double rotation) {
         var center_x = item.get_coords ("width") / 2;
         var center_y = item.get_coords ("height") / 2;
         var actual_rotation = rotation - item.rotation;

@@ -139,30 +139,36 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
     }
 
     public virtual void position_item (double _x, double _y) {
-        //  debug (@"item x: $(_x) - y: $(_y)");
+        // debug (@"item x: $(_x) - y: $(_y)");
 
-        // Always reset the translation matrix when position an item
+        // Always reset the translation matrix when positioning an item
         // in the "free canvas" space. This is to avoid previous coordinate
-        // space translations to be applied twice
+        // space translations to be applied twice.
         var transform = Cairo.Matrix.identity ();
 
-        // Keep the item always in the origin
-        // move the entire coordinate system every time
+        // Keep the item always in the origin and move the entire coordinate
+        // system every time.
         transform.translate (_x, _y);
 
         // We only need to take into account the rotation relative
         // to the center of the item.
-        var width = get_coords ("width");
-        var height = get_coords ("height");
+        var center_x = get_coords ("width") / 2;
+        var center_y = get_coords ("height") / 2;
 
-        transform.translate (width / 2, height / 2);
+        transform.translate (center_x, center_y);
         transform.rotate (Utils.AffineTransform.deg_to_rad (rotation));
-        transform.translate (- (width / 2), - (height / 2));
+        transform.translate (-center_x, -center_y);
 
         set_transform (transform);
 
         if (artboard != null) {
+            debug ("get_position");
             artboard.add_child (this, -1);
+
+            // canvas.convert_to_item_space (artboard, ref transform.x0, ref transform.y0);
+
+            // relative_x = transform.x0;
+            // relative_y = transform.y0;
 
             double item_x_from_artboard = transform.x0;
             double item_y_from_artboard = transform.y0;
@@ -172,7 +178,7 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
             relative_x = item_x_from_artboard;
             relative_y = item_y_from_artboard;
 
-            debug (@"relative X: $(relative_x) - Y: $(relative_y)");
+            // debug (@"relative X: $(relative_x) - Y: $(relative_y)");
             return;
         }
 
@@ -203,26 +209,47 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
     }
 
     public virtual Cairo.Matrix compute_transform (Cairo.Matrix transform) {
-        debug ("here");
-        transform.translate (relative_x, relative_y);
+        // transform.translate (relative_x, relative_y);
 
-        var width = get_coords ("width");
-        var height = get_coords ("height");
+        // var matrix = Cairo.Matrix.identity ();
+        double x = relative_x;
+        double y = relative_y;
+        // debug (@"relative X: $(x) - Y: $(y)");
+
+        canvas.convert_from_item_space (artboard, ref x, ref y);
+        transform.translate (x, y);
+
+        // debug (@"initial X: $(matrix.x0) - Y: $(matrix.y0)");
+
+        var center_x = get_coords ("width") / 2;
+        var center_y = get_coords ("height") / 2;
 
         // Rotate around the center by the amount in item.rotation.
-        transform.translate (width / 2, height / 2);
+        transform.translate (center_x, center_y);
         transform.rotate (Utils.AffineTransform.deg_to_rad (rotation));
-        transform.translate (- (width / 2), - (height / 2));
+        transform.translate (-center_x, -center_y);
 
-        //  if (artboard != null) {
-        //      double item_x_from_artboard = transform.x0;
-        //      double item_y_from_artboard = transform.y0;
+        // var item_x = get_coords ("width") / 2;
+        // var item_y = get_coords ("height") / 2;
 
-        //      canvas.convert_to_item_space (artboard, ref item_x_from_artboard, ref item_y_from_artboard);
+        // matrix.translate (item_x, item_y);
+        // matrix.rotate (Utils.AffineTransform.deg_to_rad (rotation));
+        // matrix.translate (-item_x, -item_y);
 
-        //      relative_x = item_x_from_artboard;
-        //      relative_y = item_y_from_artboard;
-        //  }
+        // debug (@"rotated X: $(matrix.x0) - Y: $(matrix.y0)");
+
+        // double new_x = matrix.x0;
+        // double new_y = matrix.y0;
+
+        canvas.convert_to_item_space (artboard, ref transform.x0, ref transform.y0);
+        // debug (@"rotated X: $(transform.x0) - Y: $(transform.y0)");
+
+        // set_transform (transform);
+
+        // transform.translate (new_x, new_y);
+
+        // relative_x = transform.x0;
+        // relative_y = transform.y0;
 
         return transform;
     }

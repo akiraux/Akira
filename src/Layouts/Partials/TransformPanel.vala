@@ -285,7 +285,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
             (binding, srcval, ref targetval) => {
                 double src = (double) srcval;
                 targetval.set_double (src);
-                Utils.AffineTransform.set_rotation (src, selected_item);
+                Utils.AffineTransform.set_rotation (selected_item, src);
                 return true;
             });
 

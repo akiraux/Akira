@@ -240,7 +240,7 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
             for (var i = 0; i < items_length; i++) {
                 var item = items[items_length - 1 - i];
 
-                // Force the redraw of the canvas if an item is partially outside.
+                // Check if the item is partially outside.
                 if (is_outside (item)) {
                     force_redraw = true;
                 }
