@@ -66,9 +66,6 @@ public class Akira.Lib.Models.CanvasEllipse : Goo.CanvasEllipse, Models.CanvasIt
     public double relative_x { get; set; }
     public double relative_y { get; set; }
 
-    public double initial_relative_x { get; set; }
-    public double initial_relative_y { get; set; }
-
     // Knows if an item was created or loaded for ordering purpose.
     public bool loaded { get; set; default = false; }
 

@@ -285,7 +285,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
             (binding, srcval, ref targetval) => {
                 double src = (double) srcval;
                 targetval.set_double (src);
-                Utils.AffineTransform.set_rotation (src, selected_item);
+                Utils.AffineTransform.set_rotation (selected_item, src);
                 return true;
             });
 
@@ -297,7 +297,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
             "active", selected_item, "flipped-h", BindingFlags.BIDIRECTIONAL,
             (binding, val, ref res) => {
                 res = val.get_boolean ();
-                window.event_bus.flip_item (true);
+                window.event_bus.flip_item ();
                 on_item_coord_changed ();
                 return true;
             });
@@ -306,7 +306,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
             "active", selected_item, "flipped-v", BindingFlags.BIDIRECTIONAL,
             (binding, val, ref res) => {
                 res = val.get_boolean ();
-                window.event_bus.flip_item (true, true);
+                window.event_bus.flip_item (true);
                 on_item_coord_changed ();
                 return true;
             });

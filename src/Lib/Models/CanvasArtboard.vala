@@ -92,9 +92,6 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
     public double relative_x { get; set; }
     public double relative_y { get; set; }
 
-    public double initial_relative_x { get; set; }
-    public double initial_relative_y { get; set; }
-
     // Knows if an item was created or loaded for ordering purpose.
     public bool loaded { get; set; default = false; }
 
@@ -156,6 +153,18 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
             && y <= bounds.y2;
     }
 
+    public bool is_outside (Models.CanvasItem item) {
+        var x1 = item.get_global_coord ("x");
+        var x2 = x1 + item.get_coords ("width");
+        var y1 = item.get_global_coord ("y");
+        var y2 = y1 + item.get_coords ("height");
+
+        return x1 < bounds.x1
+            || x2 > bounds.x2
+            || y1 < bounds.y1
+            || y2 > bounds.y2;
+    }
+
     public bool dropped_inside (Models.CanvasItem item) {
         var x1 = item.get_global_coord ("x");
         var x2 = x1 + item.get_coords ("width");
@@ -204,6 +213,7 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
     }
 
     public override void simple_paint (Cairo.Context cr, Goo.CanvasBounds bounds) {
+        bool force_redraw = false;
         cr.set_source_rgba (0, 0, 0, 0.6);
 
         if (settings.dark_theme) {
@@ -224,14 +234,16 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
         if (items.get_n_items () > 0) {
             var items_length = items.get_n_items ();
 
-            // Force the redraw of the canvas in case an item is partially outside.
-            canvas.queue_draw ();
-
             // Painting items in reversed order in order to
             // print last item inserted (top of the stack) on top
             // of the items inserted before
             for (var i = 0; i < items_length; i++) {
                 var item = items[items_length - 1 - i];
+
+                // Check if the item is partially outside.
+                if (is_outside (item)) {
+                    force_redraw = true;
+                }
 
                 cr.save ();
 
@@ -244,6 +256,10 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
                 }
 
                 cr.restore ();
+            }
+
+            if (force_redraw) {
+                canvas.queue_draw ();
             }
         }
     }
