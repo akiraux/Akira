@@ -60,8 +60,13 @@ public class Akira.Utils.AffineTransform : Object {
         Cairo.Matrix matrix;
         item.get_transform (out matrix);
 
-        matrix.x0 = (x != null) ? x : matrix.x0;
-        matrix.y0 = (y != null) ? y : matrix.y0;
+        // Account for the item rotation and get the difference between
+        // its bounds and matrix coordinates.
+        var diff_x = item.bounds.x1 - matrix.x0;
+        var diff_y = item.bounds.y1 - matrix.y0;
+
+        matrix.x0 = (x != null) ? x - diff_x : matrix.x0;
+        matrix.y0 = (y != null) ? y - diff_y : matrix.y0;
 
         item.set_transform (matrix);
     }
