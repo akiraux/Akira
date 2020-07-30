@@ -425,8 +425,8 @@ public class Akira.Lib.Managers.ItemsManager : Object {
                 if (_artboard.id == obj.get_string_member ("artboard")) {
                     var matrix = Cairo.Matrix.identity ();
                     _artboard.get_transform (out matrix);
-                    pos_x = matrix.x0 + obj.get_double_member ("initial-relative-x");
-                    pos_y = matrix.y0 + obj.get_double_member ("initial-relative-y");
+                    pos_x = matrix.x0 + obj.get_double_member ("relative-x");
+                    pos_y = matrix.y0 + obj.get_double_member ("relative-y");
                     artboard = _artboard;
                     break;
                 }
@@ -538,8 +538,6 @@ public class Akira.Lib.Managers.ItemsManager : Object {
 
         item.set ("relative-x", obj.get_double_member ("relative-x"));
         item.set ("relative-y", obj.get_double_member ("relative-y"));
-        item.set ("initial-relative-x", obj.get_double_member ("initial-relative-x"));
-        item.set ("initial-relative-y", obj.get_double_member ("initial-relative-y"));
 
         Cairo.Matrix matrix;
         item.get_transform (out matrix);
