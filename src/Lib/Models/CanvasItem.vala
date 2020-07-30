@@ -162,13 +162,7 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
         set_transform (transform);
 
         if (artboard != null) {
-            debug ("get_position");
             artboard.add_child (this, -1);
-
-            // canvas.convert_to_item_space (artboard, ref transform.x0, ref transform.y0);
-
-            // relative_x = transform.x0;
-            // relative_y = transform.y0;
 
             double item_x_from_artboard = transform.x0;
             double item_y_from_artboard = transform.y0;
@@ -209,17 +203,7 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
     }
 
     public virtual Cairo.Matrix compute_transform (Cairo.Matrix transform) {
-        // transform.translate (relative_x, relative_y);
-
-        // var matrix = Cairo.Matrix.identity ();
-        double x = relative_x;
-        double y = relative_y;
-        // debug (@"relative X: $(x) - Y: $(y)");
-
-        canvas.convert_from_item_space (artboard, ref x, ref y);
-        transform.translate (x, y);
-
-        // debug (@"initial X: $(matrix.x0) - Y: $(matrix.y0)");
+        transform.translate (relative_x, relative_y);
 
         var center_x = get_coords ("width") / 2;
         var center_y = get_coords ("height") / 2;
@@ -228,28 +212,6 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
         transform.translate (center_x, center_y);
         transform.rotate (Utils.AffineTransform.deg_to_rad (rotation));
         transform.translate (-center_x, -center_y);
-
-        // var item_x = get_coords ("width") / 2;
-        // var item_y = get_coords ("height") / 2;
-
-        // matrix.translate (item_x, item_y);
-        // matrix.rotate (Utils.AffineTransform.deg_to_rad (rotation));
-        // matrix.translate (-item_x, -item_y);
-
-        // debug (@"rotated X: $(matrix.x0) - Y: $(matrix.y0)");
-
-        // double new_x = matrix.x0;
-        // double new_y = matrix.y0;
-
-        canvas.convert_to_item_space (artboard, ref transform.x0, ref transform.y0);
-        // debug (@"rotated X: $(transform.x0) - Y: $(transform.y0)");
-
-        // set_transform (transform);
-
-        // transform.translate (new_x, new_y);
-
-        // relative_x = transform.x0;
-        // relative_y = transform.y0;
 
         return transform;
     }
