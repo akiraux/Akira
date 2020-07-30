@@ -217,9 +217,6 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
     }
 
     public virtual double get_global_coord (string coord_id) {
-        Goo.CanvasBounds bounds;
-        get_bounds (out bounds);
-
         var item_x =
             artboard != null
                 ? relative_x + artboard.bounds.x1
