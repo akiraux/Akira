@@ -32,21 +32,18 @@ public class Akira.Utils.AffineTransform : Object {
 
     public static HashTable<string, double?> get_position (CanvasItem item) {
         HashTable<string, double?> array = new HashTable<string, double?> (str_hash, str_equal);
-        double item_x = item.bounds.x1;
-        double item_y = item.bounds.y1;
+        double item_x = item.bounds_manager.bounds.x1;
+        double item_y = item.bounds_manager.bounds.y1;
 
         // debug (@"item x: $(item_x) y: $(item_y)");
-        // debug (@"item x: $(item.bounds.x1) y: $(item.bounds.y1)");
-        // debug (@"Item has artboard: $(item.artboard != null)");
 
         if (item.artboard != null) {
-            item_x = item.relative_x;
-            item_y = item.relative_y;
+            item_x -= item.artboard.bounds.x1;
+            item_y -= item.artboard.bounds.y1 + item.artboard.get_label_height ();
         }
 
         array.insert ("x", item_x);
         array.insert ("y", item_y);
-
         return array;
     }
 

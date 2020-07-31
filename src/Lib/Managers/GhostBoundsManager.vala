@@ -36,6 +36,12 @@ public class Akira.Lib.Managers.GhostBoundsManager : Object {
     // Bounding Box item to be generated on the fly when the user requires it.
     private Goo.CanvasRect ghost;
 
+    public Goo.CanvasBounds bounds {
+        get {
+            return item.bounds;
+        }
+    }
+
     public GhostBoundsManager (Models.CanvasItem original_item) {
         canvas = original_item.canvas;
         item = new Goo.CanvasRect (null, 0, 0, 1, 1, "line-width", 0, null);
@@ -44,6 +50,9 @@ public class Akira.Lib.Managers.GhostBoundsManager : Object {
         item.can_focus = false;
     }
 
+    /*
+     * Update the item to match size and transform matrix of the original item.
+     */
     public void update (Models.CanvasItem original_item) {
         double width, height;
         original_item.get ("width", out width, "height", out height);
@@ -58,10 +67,9 @@ public class Akira.Lib.Managers.GhostBoundsManager : Object {
         hide ();
     }
 
-    public Goo.CanvasBounds bounds () {
-        return item.bounds;
-    }
-
+    /*
+     * Show the ghost effect.
+     */
     public void show () {
         if (ghost != null) {
             return;
@@ -79,6 +87,9 @@ public class Akira.Lib.Managers.GhostBoundsManager : Object {
         ghost.can_focus = false;
     }
 
+    /*
+     * Hide the ghost effect.
+     */
     public void hide () {
         ghost.remove ();
         ghost = null;
