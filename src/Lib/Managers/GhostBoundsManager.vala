@@ -60,6 +60,13 @@ public class Akira.Lib.Managers.GhostBoundsManager : Object {
         item.set ("width", width);
         item.set ("height", height);
         item.set_transform (original_item.get_real_transform ());
+
+        if (ghost != null) {
+            ghost.x = item.bounds.x1;
+            ghost.y = item.bounds.y1;
+            ghost.width = item.bounds.x2 - item.bounds.x1;
+            ghost.height = item.bounds.y2 - item.bounds.y1;
+        }
     }
 
     public void delete () {
@@ -93,5 +100,12 @@ public class Akira.Lib.Managers.GhostBoundsManager : Object {
     public void hide () {
         ghost.remove ();
         ghost = null;
+    }
+
+    public Cairo.Matrix get_transform () {
+        Cairo.Matrix matrix;
+        item.get_transform (out matrix);
+
+        return matrix;
     }
 }
