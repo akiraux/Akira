@@ -48,19 +48,29 @@ public class Akira.Utils.AffineTransform : Object {
     }
 
     public static void set_position (CanvasItem item, double? x = null, double? y = null) {
+        Cairo.Matrix matrix;
+        var diff_x = 0.0;
+        var diff_y = 0.0;
+
         if (item.artboard != null) {
-            item.relative_x = x != null ? x : item.relative_x;
-            item.relative_y = y != null ? y : item.relative_y;
+            // Account for the item rotation and get the difference between
+            // its bounds and matrix coordinates.
+            diff_x = item.bounds_manager.bounds.x1 - item.artboard.bounds.x1 - item.relative_x;
+            diff_y =
+                item.bounds_manager.bounds.y1 - item.artboard.bounds.y1
+                - item.artboard.get_label_height () - item.relative_y;
+
+            item.relative_x = x != null ? x - diff_x : item.relative_x;
+            item.relative_y = y != null ? y - diff_y : item.relative_y;
             return;
         }
 
-        Cairo.Matrix matrix;
         item.get_transform (out matrix);
 
         // Account for the item rotation and get the difference between
         // its bounds and matrix coordinates.
-        var diff_x = item.bounds.x1 - matrix.x0;
-        var diff_y = item.bounds.y1 - matrix.y0;
+        diff_x = item.bounds_manager.bounds.x1 - matrix.x0;
+        diff_y = item.bounds_manager.bounds.y1 - matrix.y0;
 
         matrix.x0 = (x != null) ? x - diff_x : matrix.x0;
         matrix.y0 = (y != null) ? y - diff_y : matrix.y0;

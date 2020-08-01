@@ -188,8 +188,8 @@ public class Akira.Lib.Managers.ItemsManager : Object {
                 break;
         }
 
-        item.delete ();
         item.bounds_manager.delete ();
+        item.delete ();
         window.event_bus.item_deleted (item);
         window.event_bus.file_edited ();
     }

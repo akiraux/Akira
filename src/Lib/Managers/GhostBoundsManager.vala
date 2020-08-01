@@ -98,6 +98,10 @@ public class Akira.Lib.Managers.GhostBoundsManager : Object {
      * Hide the ghost effect.
      */
     public void hide () {
+        if (ghost == null) {
+            return;
+        }
+
         ghost.remove ();
         ghost = null;
     }

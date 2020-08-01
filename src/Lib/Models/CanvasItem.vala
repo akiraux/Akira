@@ -214,13 +214,16 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
         return transform;
     }
 
+    /*
+     * Compute the Matrix transform of an item inside an Artboard.
+     */
     public virtual Cairo.Matrix compute_transform (Cairo.Matrix transform) {
         transform.translate (relative_x, relative_y);
 
         var center_x = get_coords ("width") / 2;
         var center_y = get_coords ("height") / 2;
 
-        // Rotate around the center by the amount in item.rotation.
+        // Rotate around the center by the rotation amount.
         transform.translate (center_x, center_y);
         transform.rotate (Utils.AffineTransform.deg_to_rad (rotation));
         transform.translate (-center_x, -center_y);
@@ -231,20 +234,11 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
     }
 
     public virtual double get_global_coord (string coord_id) {
-        var item_x =
-            artboard != null
-                ? relative_x + artboard.bounds.x1
-                : bounds.x1;
-        var item_y =
-            artboard != null
-                ? relative_y + artboard.bounds.y1 + artboard.get_label_height ()
-                : bounds.y1;
-
         switch (coord_id) {
             case "x":
-                return item_x;
+                return bounds_manager.bounds.x1;
             case "y":
-                return item_y;
+                return bounds_manager.bounds.y1;
             default:
                 return 0.0;
         }
