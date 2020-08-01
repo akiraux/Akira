@@ -75,8 +75,6 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
     public abstract Models.CanvasArtboard? artboard { get; set; }
     public abstract Managers.GhostBoundsManager bounds_manager { get; set; }
 
-    // TODO: Create a new Cairo.Matrix, apply translation and rotation after converting
-    // the current values to canvas space, then get the bounds and save them for reference.
     public abstract double relative_x { get; set; }
     public abstract double relative_y { get; set; }
 

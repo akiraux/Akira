@@ -48,23 +48,22 @@ public class Akira.Utils.AffineTransform : Object {
     }
 
     public static void set_position (CanvasItem item, double? x = null, double? y = null) {
-        Cairo.Matrix matrix;
         var diff_x = 0.0;
         var diff_y = 0.0;
 
         if (item.artboard != null) {
-            // Account for the item rotation and get the difference between
-            // its bounds and matrix coordinates.
+            // Account for the different between the current position and the
+            // the item's bounds.
             diff_x = item.bounds_manager.bounds.x1 - item.artboard.bounds.x1 - item.relative_x;
-            diff_y =
-                item.bounds_manager.bounds.y1 - item.artboard.bounds.y1
-                - item.artboard.get_label_height () - item.relative_y;
+            diff_y = item.bounds_manager.bounds.y1 - item.artboard.bounds.y1
+                     - item.artboard.get_label_height () - item.relative_y;
 
             item.relative_x = x != null ? x - diff_x : item.relative_x;
             item.relative_y = y != null ? y - diff_y : item.relative_y;
             return;
         }
 
+        Cairo.Matrix matrix;
         item.get_transform (out matrix);
 
         // Account for the item rotation and get the difference between
@@ -491,8 +490,12 @@ public class Akira.Utils.AffineTransform : Object {
             item.set ("height", fix_size (height + y));
         }
 
-        var model_item = item as CanvasItem;
-        model_item.bounds_manager.update (model_item);
+        // Don't update the bounds manager if a native goocanvas_rect was used,
+        // meaning no Akira Models was used and we don't need the bounds.
+        if (!(item is Goo.CanvasRect)) {
+            var model_item = item as CanvasItem;
+            model_item.bounds_manager.update (model_item);
+        }
     }
 
     public static void set_rotation (CanvasItem item, double rotation) {

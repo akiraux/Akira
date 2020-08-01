@@ -327,11 +327,14 @@ public class Akira.Lib.Managers.ExportManager : Object {
                 name = artboard.name != null ? artboard.name : name;
             }
 
+            // Hide the ghost item.
+            item.bounds_manager.hide ();
+
             // Account for items inside or outside artboards.
-            double x1 = item.get_global_coord ("x");
-            double x2 = x1 + item.get_coords ("width");
-            double y1 = item.get_global_coord ("y");
-            double y2 = y1 + item.get_coords ("height");
+            double x1 = item.bounds_manager.bounds.x1;
+            double x2 = item.bounds_manager.bounds.x2;
+            double y1 = item.bounds_manager.bounds.y1;
+            double y2 = item.bounds_manager.bounds.y2;
 
             // Create the rendered image with Cairo.
             surface = new Cairo.ImageSurface (
@@ -389,19 +392,27 @@ public class Akira.Lib.Managers.ExportManager : Object {
         var label_height = 0.0;
 
         // If the item is an artboard, account for the label's height.
-        if (item != null && item is Akira.Lib.Models.CanvasArtboard) {
-            var artboard = item as Akira.Lib.Models.CanvasArtboard;
+        if (item != null && item is Lib.Models.CanvasArtboard) {
+            var artboard = item as Lib.Models.CanvasArtboard;
             label_height = artboard.get_label_height ();
         }
 
-        // Account for items inside or outside artboards.
-        double x1 = item.get_global_coord ("x");
-        double x2 = x1 + item.get_coords ("width");
-        double y1 = item.get_global_coord ("y");
-        double y2 = y1 + item.get_coords ("height");
+        double width, height;
 
-        var width = item != null ? x2 - x1 : area.width;
-        var height = item != null ? y2 - y1 - label_height : area.height;
+        // If the item is null it mean we're dealing with a custom area and we
+        // don't have the bounds manager.
+        if (item != null) {
+            double x1 = item.bounds_manager.bounds.x1;
+            double x2 = item.bounds_manager.bounds.x2;
+            double y1 = item.bounds_manager.bounds.y1;
+            double y2 = item.bounds_manager.bounds.y2;
+
+            width = x2 - x1;
+            height = y2 - y1 - label_height;
+        } else {
+            width = area.width;
+            height = area.height;
+        }
 
         switch (settings.export_scale) {
             case 0:
