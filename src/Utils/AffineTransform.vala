@@ -32,28 +32,34 @@ public class Akira.Utils.AffineTransform : Object {
 
     public static HashTable<string, double?> get_position (CanvasItem item) {
         HashTable<string, double?> array = new HashTable<string, double?> (str_hash, str_equal);
-        double item_x = item.bounds.x1;
-        double item_y = item.bounds.y1;
+        double item_x = item.bounds_manager.bounds.x1;
+        double item_y = item.bounds_manager.bounds.y1;
 
         // debug (@"item x: $(item_x) y: $(item_y)");
-        // debug (@"item x: $(item.bounds.x1) y: $(item.bounds.y1)");
-        // debug (@"Item has artboard: $(item.artboard != null)");
 
         if (item.artboard != null) {
-            item_x = item.relative_x;
-            item_y = item.relative_y;
+            item_x -= item.artboard.bounds.x1;
+            item_y -= item.artboard.bounds.y1 + item.artboard.get_label_height ();
         }
 
         array.insert ("x", item_x);
         array.insert ("y", item_y);
-
         return array;
     }
 
     public static void set_position (CanvasItem item, double? x = null, double? y = null) {
+        var diff_x = 0.0;
+        var diff_y = 0.0;
+
         if (item.artboard != null) {
-            item.relative_x = x != null ? x : item.relative_x;
-            item.relative_y = y != null ? y : item.relative_y;
+            // Account for the different between the current position and the
+            // the item's bounds.
+            diff_x = item.bounds_manager.bounds.x1 - item.artboard.bounds.x1 - item.relative_x;
+            diff_y = item.bounds_manager.bounds.y1 - item.artboard.bounds.y1
+                     - item.artboard.get_label_height () - item.relative_y;
+
+            item.relative_x = x != null ? x - diff_x : item.relative_x;
+            item.relative_y = y != null ? y - diff_y : item.relative_y;
             return;
         }
 
@@ -62,13 +68,14 @@ public class Akira.Utils.AffineTransform : Object {
 
         // Account for the item rotation and get the difference between
         // its bounds and matrix coordinates.
-        var diff_x = item.bounds.x1 - matrix.x0;
-        var diff_y = item.bounds.y1 - matrix.y0;
+        diff_x = item.bounds_manager.bounds.x1 - matrix.x0;
+        diff_y = item.bounds_manager.bounds.y1 - matrix.y0;
 
         matrix.x0 = (x != null) ? x - diff_x : matrix.x0;
         matrix.y0 = (y != null) ? y - diff_y : matrix.y0;
 
         item.set_transform (matrix);
+        item.bounds_manager.update (item);
     }
 
     /**
@@ -81,7 +88,6 @@ public class Akira.Utils.AffineTransform : Object {
         ref double initial_event_x,
         ref double initial_event_y
     ) {
-
         var delta_x = event_x - initial_event_x;
         var delta_y = event_y - initial_event_y;
 
@@ -100,6 +106,8 @@ public class Akira.Utils.AffineTransform : Object {
 
         initial_event_x = event_x;
         initial_event_y = event_y;
+
+        item.bounds_manager.update (item);
     }
 
     public static void scale_from_event (
@@ -288,6 +296,8 @@ public class Akira.Utils.AffineTransform : Object {
 
         item.move (new_x, new_y);
         set_size (item, new_width, new_height);
+
+        item.bounds_manager.update (item);
     }
 
     // Width size constraints.
@@ -479,6 +489,13 @@ public class Akira.Utils.AffineTransform : Object {
         if (height + y > 0) {
             item.set ("height", fix_size (height + y));
         }
+
+        // Don't update the bounds manager if a native goocanvas_rect was used,
+        // meaning no Akira Models was used and we don't need the bounds.
+        if (!(item is Goo.CanvasRect)) {
+            var model_item = item as CanvasItem;
+            model_item.bounds_manager.update (model_item);
+        }
     }
 
     public static void set_rotation (CanvasItem item, double rotation) {
@@ -488,6 +505,8 @@ public class Akira.Utils.AffineTransform : Object {
 
         item.rotate (actual_rotation, center_x, center_y);
         item.rotation += actual_rotation;
+
+        item.bounds_manager.update (item);
     }
 
     public static void flip_item (CanvasItem item, double sx, double sy) {
@@ -505,6 +524,8 @@ public class Akira.Utils.AffineTransform : Object {
         transform.rotate (radians);
         transform.translate (-center_x, -center_y);
         item.set_transform (transform);
+
+        item.bounds_manager.update (item);
     }
 
     public static double fix_size (double size) {

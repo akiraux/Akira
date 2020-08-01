@@ -69,6 +69,7 @@ public class Akira.Lib.Models.CanvasImage : Goo.CanvasImage, Models.CanvasItem {
 
     public new Akira.Lib.Canvas canvas { get; set; }
     public Models.CanvasArtboard? artboard { get; set; }
+    public Managers.GhostBoundsManager bounds_manager { get; set; }
 
     public double relative_x { get; set; }
     public double relative_y { get; set; }
@@ -133,6 +134,9 @@ public class Akira.Lib.Models.CanvasImage : Goo.CanvasImage, Models.CanvasItem {
         });
 
         reset_colors ();
+
+        // Create the GhostBoundsManager to keep track of the global canvas bounds.
+        bounds_manager = new Managers.GhostBoundsManager (this);
     }
 
     /**

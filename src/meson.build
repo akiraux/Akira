@@ -79,11 +79,12 @@ sources = files(
     'Lib/Canvas.vala',
 
     'Lib/Managers/ExportManager.vala',
+    'Lib/Managers/GhostBoundsManager.vala',
     'Lib/Managers/HoverManager.vala',
-    'Lib/Managers/SelectedBoundManager.vala',
-    'Lib/Managers/ItemsManager.vala',
     'Lib/Managers/ImageManager.vala',
+    'Lib/Managers/ItemsManager.vala',
     'Lib/Managers/NobManager.vala',
+    'Lib/Managers/SelectedBoundManager.vala',
 
     'Lib/Models/CanvasItem.vala',
     'Lib/Models/CanvasRect.vala',

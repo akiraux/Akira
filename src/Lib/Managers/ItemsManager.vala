@@ -188,6 +188,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
                 break;
         }
 
+        item.bounds_manager.delete ();
         item.delete ();
         window.event_bus.item_deleted (item);
         window.event_bus.file_edited ();
@@ -197,7 +198,8 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         var artboard = new Models.CanvasArtboard (
             Utils.AffineTransform.fix_size (x),
             Utils.AffineTransform.fix_size (y),
-            root);
+            root
+        );
 
         return artboard as Models.CanvasItem;
     }

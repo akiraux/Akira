@@ -153,6 +153,11 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 ctrl_is_pressed = true;
                 break;
 
+            case Gdk.Key.Alt_L:
+            case Gdk.Key.Alt_R:
+                toggle_item_ghost (true);
+                break;
+
             case Gdk.Key.Up:
             case Gdk.Key.Down:
             case Gdk.Key.Right:
@@ -175,6 +180,11 @@ public class Akira.Lib.Canvas : Goo.Canvas {
             case Gdk.Key.Control_L:
             case Gdk.Key.Control_R:
                 ctrl_is_pressed = false;
+                break;
+
+            case Gdk.Key.Alt_L:
+            case Gdk.Key.Alt_R:
+                toggle_item_ghost (false);
                 break;
         }
 
@@ -237,7 +247,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                         return true;
                     }
 
-                    // Item has been selected
+                    // Item has been selected.
                     selected_bound_manager.add_item_to_selection (clicked_item as Models.CanvasItem);
                 }
 
@@ -385,5 +395,25 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
         var cursor = new Gdk.Cursor.for_display (Gdk.Display.get_default (), cursor_type);
         get_window ().set_cursor (cursor);
+    }
+
+    /*
+     * Show or hide the ghost bounding box of the selected items
+     */
+    private void toggle_item_ghost (bool show) {
+        // If no items is selected we can't show anything.
+        if (selected_bound_manager.selected_items.length () == 0) {
+            return;
+        }
+
+        // Temporarily get the first item until multi select is implemented.
+        var item = selected_bound_manager.selected_items.nth_data (0);
+
+        if (!show) {
+            item.bounds_manager.hide ();
+            return;
+        }
+
+        item.bounds_manager.show ();
     }
 }

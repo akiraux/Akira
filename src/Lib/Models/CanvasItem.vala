@@ -73,6 +73,7 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
 
     public abstract Akira.Lib.Canvas canvas { get; set; }
     public abstract Models.CanvasArtboard? artboard { get; set; }
+    public abstract Managers.GhostBoundsManager bounds_manager { get; set; }
 
     public abstract double relative_x { get; set; }
     public abstract double relative_y { get; set; }
@@ -139,7 +140,33 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
     }
 
     public virtual void position_item (double _x, double _y) {
-        // debug (@"item x: $(_x) - y: $(_y)");
+        if (artboard != null) {
+            // Add item to the parent Artboard.
+            artboard.add_child (this, -1);
+
+            // Convert the coordinates for the artboard space.
+            canvas.convert_to_item_space (artboard, ref _x, ref _y);
+
+            // Account for the strange 0.5 shift at the center of the Ellipse.
+            if (this is CanvasEllipse) {
+                _x += 1;
+                _y += 1;
+            }
+
+            // Account for the border width when positioning an item inside an Artboard.
+            if (border_size > 0) {
+                _x += border_size / 2;
+                _y += border_size / 2;
+            }
+
+            relative_x = _x;
+            relative_y = _y;
+
+            return;
+        }
+
+        // Add the item to the base Canvas.
+        parent.add_child (this, -1);
 
         // Always reset the translation matrix when positioning an item
         // in the "free canvas" space. This is to avoid previous coordinate
@@ -160,23 +187,6 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
         transform.translate (-center_x, -center_y);
 
         set_transform (transform);
-
-        if (artboard != null) {
-            artboard.add_child (this, -1);
-
-            double item_x_from_artboard = transform.x0;
-            double item_y_from_artboard = transform.y0;
-
-            canvas.convert_to_item_space (artboard, ref item_x_from_artboard, ref item_y_from_artboard);
-
-            relative_x = item_x_from_artboard;
-            relative_y = item_y_from_artboard;
-
-            // debug (@"relative X: $(relative_x) - Y: $(relative_y)");
-            return;
-        }
-
-        parent.add_child (this, -1);
     }
 
     public virtual void move (double x, double y) {
@@ -202,35 +212,31 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
         return transform;
     }
 
+    /*
+     * Compute the Matrix transform of an item inside an Artboard.
+     */
     public virtual Cairo.Matrix compute_transform (Cairo.Matrix transform) {
         transform.translate (relative_x, relative_y);
 
         var center_x = get_coords ("width") / 2;
         var center_y = get_coords ("height") / 2;
 
-        // Rotate around the center by the amount in item.rotation.
+        // Rotate around the center by the rotation amount.
         transform.translate (center_x, center_y);
         transform.rotate (Utils.AffineTransform.deg_to_rad (rotation));
         transform.translate (-center_x, -center_y);
+
+        set_transform (transform);
 
         return transform;
     }
 
     public virtual double get_global_coord (string coord_id) {
-        var item_x =
-            artboard != null
-                ? relative_x + artboard.bounds.x1
-                : bounds.x1;
-        var item_y =
-            artboard != null
-                ? relative_y + artboard.bounds.y1 + artboard.get_label_height ()
-                : bounds.y1;
-
         switch (coord_id) {
             case "x":
-                return item_x;
+                return bounds_manager.bounds.x1;
             case "y":
-                return item_y;
+                return bounds_manager.bounds.y1;
             default:
                 return 0.0;
         }

@@ -88,6 +88,7 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
     public Akira.Models.ListModel<Models.CanvasItem> items;
     public new Akira.Lib.Canvas canvas { get; set; }
     public Models.CanvasArtboard? artboard { get; set; }
+    public Managers.GhostBoundsManager bounds_manager { get; set; }
 
     public double relative_x { get; set; }
     public double relative_y { get; set; }
@@ -101,7 +102,7 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
         canvas = parent_item.get_canvas () as Akira.Lib.Canvas;
         parent_item.add_child (this, -1);
 
-        // Artboards can't be nested
+        // Artboards can't be nested.
         artboard = null;
 
         item_type = Models.CanvasItemType.ARTBOARD;
@@ -122,14 +123,16 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
         set_transform (Cairo.Matrix.identity ());
 
         // Keep the item always in the origin
-        // move the entire coordinate system every time
+        // move the entire coordinate system every time.
         translate (_x, _y);
 
-        // Get artboard name pixel extent
+        // Get artboard name pixel extent.
         get_label_extent ();
 
-        // Init items list
+        // Init items list.
         items = new Akira.Models.ListModel<Models.CanvasItem> ();
+        // Create the GhostBoundsManager to keep track of the global canvas bounds.
+        bounds_manager = new Managers.GhostBoundsManager (this);
 
         canvas.window.event_bus.zoom.connect (trigger_change);
         canvas.window.event_bus.change_theme.connect (trigger_change);
@@ -248,6 +251,7 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
                 cr.save ();
 
                 cr.transform (item.compute_transform (Cairo.Matrix.identity ()));
+                item.bounds_manager.update (item);
 
                 var canvas_item = item as Goo.CanvasItemSimple;
 
