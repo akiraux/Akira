@@ -103,9 +103,8 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
 
             case Managers.NobManager.Nob.ROTATE:
                 Utils.AffineTransform.rotate_from_event (
-                    selected_item,
-                    event_x, event_y,
-                    initial_event_x, initial_event_y
+                    selected_item, event_x, event_y,
+                    ref initial_event_x, ref initial_event_y
                 );
                 break;
 
