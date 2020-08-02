@@ -251,7 +251,7 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
                 cr.save ();
 
                 cr.transform (item.compute_transform (Cairo.Matrix.identity ()));
-                item.bounds_manager.update (item);
+                item.bounds_manager.update ();
 
                 var canvas_item = item as Goo.CanvasItemSimple;
 
