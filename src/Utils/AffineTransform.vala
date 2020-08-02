@@ -407,6 +407,7 @@ public class Akira.Utils.AffineTransform : Object {
     ) {
         var canvas = item.canvas as Akira.Lib.Canvas;
         canvas.convert_to_item_space (item, ref x, ref y);
+        canvas.convert_to_item_space (item, ref initial_x, ref initial_y);
 
         var initial_width = item.get_coords ("width");
         var initial_height = item.get_coords ("height");
@@ -417,16 +418,17 @@ public class Akira.Utils.AffineTransform : Object {
         double rotation_amount = 0;
 
         var start_radians = GLib.Math.atan2 (
-            center_y - initial_y,
-            initial_x - center_x
+            initial_x - center_x,
+            center_y - initial_y
         );
 
         double current_x, current_y, current_scale, current_rotation;
         item.get_simple_transform (out current_x, out current_y, out current_scale, out current_rotation);
-        var radians = GLib.Math.atan2 (center_y - y, x - center_x);
+        var radians = GLib.Math.atan2 (x - center_x, center_y - y);
 
         radians = start_radians - radians;
         var rotation = radians * (180 / Math.PI) + prev_rotation_difference;
+        rotation = -rotation;
 
         initial_x = x;
         initial_y = y;
@@ -466,8 +468,7 @@ public class Akira.Utils.AffineTransform : Object {
             // Round rotation in order to avoid sub degree issue
             rotation = GLib.Math.round (rotation);
             // Cap new_rotation to the [0, 360] range
-            var new_rotation = GLib.Math.fmod (item.rotation + rotation, 360);
-            set_rotation (item, new_rotation);
+            set_rotation (item, rotation);
             canvas.convert_to_item_space (item, ref initial_x, ref initial_y);
         }
 
