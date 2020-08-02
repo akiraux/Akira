@@ -35,8 +35,6 @@ public class Akira.Utils.AffineTransform : Object {
         double item_x = item.bounds_manager.bounds.x1;
         double item_y = item.bounds_manager.bounds.y1;
 
-        // debug (@"item x: $(item_x) y: $(item_y)");
-
         if (item.artboard != null) {
             item_x -= item.artboard.bounds.x1;
             item_y -= item.artboard.bounds.y1 + item.artboard.get_label_height ();
