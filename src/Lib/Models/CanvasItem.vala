@@ -139,7 +139,7 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
         artboard.changed (true);
     }
 
-    public virtual void position_item (double _x, double _y) {
+    public virtual void init_position (double _x, double _y) {
         if (artboard != null) {
             // Add item to the parent Artboard.
             artboard.add_child (this, -1);
@@ -147,21 +147,8 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
             // Convert the coordinates for the artboard space.
             canvas.convert_to_item_space (artboard, ref _x, ref _y);
 
-            // Account for the strange 0.5 shift at the center of the Ellipse.
-            if (this is CanvasEllipse) {
-                _x += 1;
-                _y += 1;
-            }
-
-            // Account for the border width when positioning an item inside an Artboard.
-            if (border_size > 0) {
-                _x += border_size / 2;
-                _y += border_size / 2;
-            }
-
             relative_x = _x;
             relative_y = _y;
-
             return;
         }
 
@@ -187,6 +174,45 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
         transform.translate (-center_x, -center_y);
 
         set_transform (transform);
+    }
+
+    public virtual void position_item (double _x, double _y) {
+        if (artboard != null) {
+            // Add item to the parent Artboard.
+            artboard.add_child (this, -1);
+
+            // If the item is rotated we need to reset it to get the correct
+            // relative position based on the original matrix transform.
+            if (rotation != 0) {
+                Cairo.Matrix transform;
+                get_transform (out transform);
+
+                var center_x = get_coords ("width") / 2;
+                var center_y = get_coords ("height") / 2;
+
+                // Reset the rotation.
+                transform.translate (center_x, center_y);
+                transform.rotate (Utils.AffineTransform.deg_to_rad (-rotation));
+                transform.translate (-center_x, -center_y);
+
+                _x = transform.x0;
+                _y = transform.y0;
+            }
+
+            // Convert the coordinates for the artboard space.
+            canvas.convert_to_item_space (artboard, ref _x, ref _y);
+
+            relative_x = _x;
+            relative_y = _y;
+            return;
+        }
+
+        // Add the item to the base Canvas.
+        parent.add_child (this, -1);
+
+        // Reset the relative coordinates in case the item came from an artboard.
+        relative_x = 0;
+        relative_y = 0;
     }
 
     public virtual void move (double x, double y) {

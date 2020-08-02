@@ -114,7 +114,7 @@ public class Akira.Lib.Models.CanvasImage : Goo.CanvasImage, Models.CanvasItem {
 
         set_transform (Cairo.Matrix.identity ());
 
-        position_item (_x, _y);
+        init_position (_x, _y);
 
         // Save the unedited pixbuf to enable resampling and restoring.
         manager.get_pixbuf.begin (-1, -1, (obj, res) => {
