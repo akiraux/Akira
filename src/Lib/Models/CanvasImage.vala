@@ -127,6 +127,9 @@ public class Akira.Lib.Models.CanvasImage : Goo.CanvasImage, Models.CanvasItem {
                 // Imported images should have their size ratio locked by default.
                 size_locked = true;
                 size_ratio = width / height;
+
+                // Create the GhostBoundsManager to keep track of the global canvas bounds.
+                bounds_manager = new Managers.GhostBoundsManager (this);
             } catch (Error e) {
                 warning (e.message);
                 canvas.window.event_bus.canvas_notification (e.message);
@@ -134,9 +137,6 @@ public class Akira.Lib.Models.CanvasImage : Goo.CanvasImage, Models.CanvasItem {
         });
 
         reset_colors ();
-
-        // Create the GhostBoundsManager to keep track of the global canvas bounds.
-        bounds_manager = new Managers.GhostBoundsManager (this);
     }
 
     /**
