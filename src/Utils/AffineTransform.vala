@@ -406,8 +406,14 @@ public class Akira.Utils.AffineTransform : Object {
         ref double initial_y
     ) {
         var canvas = item.canvas as Akira.Lib.Canvas;
-        canvas.convert_to_item_space (item, ref x, ref y);
-        canvas.convert_to_item_space (item, ref initial_x, ref initial_y);
+
+        if (item.artboard != null) {
+            canvas.convert_to_item_space (item.artboard, ref x, ref y);
+            canvas.convert_to_item_space (item.artboard, ref initial_x, ref initial_y);
+        } else {
+            canvas.convert_to_item_space (item, ref x, ref y);
+            canvas.convert_to_item_space (item, ref initial_x, ref initial_y);
+        }
 
         var center_x = item.get_coords ("width") / 2;
         var center_y = item.get_coords ("height") / 2;
@@ -429,7 +435,11 @@ public class Akira.Utils.AffineTransform : Object {
         }
 
         // Revert the coordinates to the canvas and udpate their references.
-        canvas.convert_from_item_space (item, ref x, ref y);
+        if (item.artboard != null) {
+            canvas.convert_from_item_space (item.artboard, ref x, ref y);
+        } else {
+            canvas.convert_from_item_space (item, ref x, ref y);
+        }
         initial_x = x;
         initial_y = y;
 
@@ -461,7 +471,8 @@ public class Akira.Utils.AffineTransform : Object {
 
         if (do_rotation) {
             // Round rotation in order to avoid sub degree issue.
-            set_rotation (item, GLib.Math.round (rotation + item.rotation));
+            var new_rotation = GLib.Math.fmod (item.rotation + rotation, 360);
+            set_rotation (item, GLib.Math.round (new_rotation));
         }
 
         // Reset rotation to prevent infinite rotation loops.
