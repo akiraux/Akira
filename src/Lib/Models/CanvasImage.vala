@@ -114,7 +114,7 @@ public class Akira.Lib.Models.CanvasImage : Goo.CanvasImage, Models.CanvasItem {
 
         set_transform (Cairo.Matrix.identity ());
 
-        position_item (_x, _y);
+        init_position (_x, _y);
 
         // Save the unedited pixbuf to enable resampling and restoring.
         manager.get_pixbuf.begin (-1, -1, (obj, res) => {
@@ -127,6 +127,9 @@ public class Akira.Lib.Models.CanvasImage : Goo.CanvasImage, Models.CanvasItem {
                 // Imported images should have their size ratio locked by default.
                 size_locked = true;
                 size_ratio = width / height;
+
+                // Create the GhostBoundsManager to keep track of the global canvas bounds.
+                bounds_manager = new Managers.GhostBoundsManager (this);
             } catch (Error e) {
                 warning (e.message);
                 canvas.window.event_bus.canvas_notification (e.message);
@@ -134,9 +137,6 @@ public class Akira.Lib.Models.CanvasImage : Goo.CanvasImage, Models.CanvasItem {
         });
 
         reset_colors ();
-
-        // Create the GhostBoundsManager to keep track of the global canvas bounds.
-        bounds_manager = new Managers.GhostBoundsManager (this);
     }
 
     /**
