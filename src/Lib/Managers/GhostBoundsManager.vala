@@ -29,6 +29,8 @@ public class Akira.Lib.Managers.GhostBoundsManager : Object {
     private const string STROKE_COLOR = "#41c9fd";
     private const double LINE_WIDTH = 1.0;
 
+    // Matches the original item in order to keep the translation and rotation accurate.
+    private weak Models.CanvasItem original_item;
     public weak Akira.Lib.Canvas canvas;
 
     // Matches the original item in order to keep the translation and rotation accurate.
@@ -42,7 +44,8 @@ public class Akira.Lib.Managers.GhostBoundsManager : Object {
         }
     }
 
-    public GhostBoundsManager (Models.CanvasItem original_item) {
+    public GhostBoundsManager (Models.CanvasItem new_item) {
+        original_item = new_item;
         canvas = original_item.canvas;
         item = new Goo.CanvasRect (null, 0, 0, 1, 1, "line-width", 0, null);
         item.visibility = Goo.CanvasItemVisibility.HIDDEN;
@@ -53,7 +56,7 @@ public class Akira.Lib.Managers.GhostBoundsManager : Object {
     /*
      * Update the item to match size and transform matrix of the original item.
      */
-    public void update (Models.CanvasItem original_item) {
+    public void update () {
         double width, height;
         original_item.get ("width", out width, "height", out height);
 

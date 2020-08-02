@@ -35,8 +35,6 @@ public class Akira.Utils.AffineTransform : Object {
         double item_x = item.bounds_manager.bounds.x1;
         double item_y = item.bounds_manager.bounds.y1;
 
-        // debug (@"item x: $(item_x) y: $(item_y)");
-
         if (item.artboard != null) {
             item_x -= item.artboard.bounds.x1;
             item_y -= item.artboard.bounds.y1 + item.artboard.get_label_height ();
@@ -75,7 +73,7 @@ public class Akira.Utils.AffineTransform : Object {
         matrix.y0 = (y != null) ? y - diff_y : matrix.y0;
 
         item.set_transform (matrix);
-        item.bounds_manager.update (item);
+        item.bounds_manager.update ();
     }
 
     /**
@@ -107,7 +105,7 @@ public class Akira.Utils.AffineTransform : Object {
         initial_event_x = event_x;
         initial_event_y = event_y;
 
-        item.bounds_manager.update (item);
+        item.bounds_manager.update ();
     }
 
     public static void scale_from_event (
@@ -297,7 +295,7 @@ public class Akira.Utils.AffineTransform : Object {
         item.move (new_x, new_y);
         set_size (item, new_width, new_height);
 
-        item.bounds_manager.update (item);
+        item.bounds_manager.update ();
     }
 
     // Width size constraints.
@@ -494,7 +492,7 @@ public class Akira.Utils.AffineTransform : Object {
         // meaning no Akira Models was used and we don't need the bounds.
         if (!(item is Goo.CanvasRect)) {
             var model_item = item as CanvasItem;
-            model_item.bounds_manager.update (model_item);
+            model_item.bounds_manager.update ();
         }
     }
 
@@ -506,7 +504,7 @@ public class Akira.Utils.AffineTransform : Object {
         item.rotate (actual_rotation, center_x, center_y);
         item.rotation += actual_rotation;
 
-        item.bounds_manager.update (item);
+        item.bounds_manager.update ();
     }
 
     public static void flip_item (CanvasItem item, double sx, double sy) {
@@ -523,7 +521,7 @@ public class Akira.Utils.AffineTransform : Object {
 
         item.set_transform (transform);
 
-        item.bounds_manager.update (item);
+        item.bounds_manager.update ();
     }
 
     public static double fix_size (double size) {

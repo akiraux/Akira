@@ -471,6 +471,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         }
 
         restore_attributes (item, artboard, obj);
+        item.bounds_manager.update ();
     }
 
     /*
