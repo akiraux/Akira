@@ -405,11 +405,22 @@ public class Akira.Utils.AffineTransform : Object {
         ref double initial_x,
         ref double initial_y
     ) {
+        var diff_x = 0.0;
+        var diff_y = 0.0;
         var canvas = item.canvas as Akira.Lib.Canvas;
 
         if (item.artboard != null) {
             canvas.convert_to_item_space (item.artboard, ref x, ref y);
             canvas.convert_to_item_space (item.artboard, ref initial_x, ref initial_y);
+
+            diff_x = item.bounds_manager.bounds.x1 - item.artboard.bounds.x1;
+            diff_y = item.bounds_manager.bounds.y1 - item.artboard.bounds.y1
+                     - item.artboard.get_label_height ();
+
+            x -= diff_x;
+            y -= diff_y;
+            initial_x -= diff_x;
+            initial_y -= diff_y;
         } else {
             canvas.convert_to_item_space (item, ref x, ref y);
             canvas.convert_to_item_space (item, ref initial_x, ref initial_y);
@@ -437,6 +448,8 @@ public class Akira.Utils.AffineTransform : Object {
         // Revert the coordinates to the canvas and udpate their references.
         if (item.artboard != null) {
             canvas.convert_from_item_space (item.artboard, ref x, ref y);
+            x += diff_x;
+            y += diff_y;
         } else {
             canvas.convert_from_item_space (item, ref x, ref y);
         }
@@ -470,8 +483,9 @@ public class Akira.Utils.AffineTransform : Object {
         }
 
         if (do_rotation) {
-            // Round rotation in order to avoid sub degree issue.
+            // Cap new_rotation to the [0, 360] range.
             var new_rotation = GLib.Math.fmod (item.rotation + rotation, 360);
+            // Round rotation in order to avoid sub degree issue.
             set_rotation (item, GLib.Math.round (new_rotation));
         }
 
