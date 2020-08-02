@@ -298,7 +298,6 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
             (binding, val, ref res) => {
                 res = val.get_boolean ();
                 window.event_bus.flip_item ();
-                on_item_coord_changed ();
                 return true;
             });
 
@@ -307,7 +306,6 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
             (binding, val, ref res) => {
                 res = val.get_boolean ();
                 window.event_bus.flip_item (true);
-                on_item_coord_changed ();
                 return true;
             });
 

@@ -199,6 +199,21 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
                 _y = transform.y0;
             }
 
+            // Account for mirrored items.
+            if (flipped_h || flipped_v) {
+                var center_x = get_coords ("width") / 2;
+                var center_y = get_coords ("height") / 2;
+                var radians = Utils.AffineTransform.deg_to_rad (rotation);
+
+                var sx = flipped_v ? 1 : -1;
+                var sy = flipped_h ? 1 : -1;
+                transform.translate (center_x, center_y);
+                transform.rotate (-radians);
+                transform.scale (sx, sy);
+                transform.rotate (radians);
+                transform.translate (-center_x, -center_y);
+            }
+
             // Convert the coordinates for the artboard space.
             canvas.convert_to_item_space (artboard, ref _x, ref _y);
 
@@ -246,11 +261,23 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
 
         var center_x = get_coords ("width") / 2;
         var center_y = get_coords ("height") / 2;
+        var radians = Utils.AffineTransform.deg_to_rad (rotation);
 
         // Rotate around the center by the rotation amount.
         transform.translate (center_x, center_y);
-        transform.rotate (Utils.AffineTransform.deg_to_rad (rotation));
+        transform.rotate (radians);
         transform.translate (-center_x, -center_y);
+
+        // Account for mirrored items.
+        if (flipped_h || flipped_v) {
+            var sx = flipped_v ? 1 : -1;
+            var sy = flipped_h ? 1 : -1;
+            transform.translate (center_x, center_y);
+            transform.rotate (-radians);
+            transform.scale (sx, sy);
+            transform.rotate (radians);
+            transform.translate (-center_x, -center_y);
+        }
 
         set_transform (transform);
 
