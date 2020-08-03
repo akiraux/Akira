@@ -21,7 +21,7 @@
  */
 
 public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasItem, Models.CanvasItem {
-    private const double LABEL_FONT_SIZE = 16.0;
+    private const double LABEL_FONT_SIZE = 15.0;
     private const double LABEL_BOTTOM_PADDING = 8.0;
 
     // Identifiers.
