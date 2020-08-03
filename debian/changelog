@@ -1,5 +1,10 @@
-com.github.akiraux.akira (0.1) precise; urgency=low
+com.github.akiraux.akira (0.0.1) precise; urgency=low
 
-  * Initial Release.
+  * Experimental Alpha Release, say Hi to Akira!
+  * Create Artboards and basic shapes.
+  * Manage the fill and border properties of shapes.
+  * Import images.
+  * Export custom areas, selections, and artboards.
+  * So many crashes and missing features you wouldn't believe, but hey, this is an experimental alpha…
 
- -- Alessandro Castellani <castellani.ale@gmail.com>  Sat, 5 Aug 2017 04:53:39 -0500
+ -- Alessandro Castellani <castellani.ale@gmail.com>  Sun, 2 Aug 2020 05:25:00 -0800
