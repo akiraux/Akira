@@ -348,7 +348,7 @@ public class Akira.FileFormat.ZipArchiveHandler : GLib.Object {
 
                     // Add the actual content of the file
                     size_t bytes_read;
-                    uint8[64] buffer = new uint8[64];
+                    uint8[] buffer = new uint8[64];
                     while (data_input_stream.read_all (buffer, out bytes_read)) {
                         if (bytes_read <= 0) {
                             break;
