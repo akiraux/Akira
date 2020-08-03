@@ -28,6 +28,7 @@ public class Akira.Utils.AffineTransform : Object {
     private const int MIN_POS = 10;
     private const double ROTATION_FIXED_STEP = 15.0;
 
+    public static double temp_rotation = 0.0;
     public static double prev_rotation_difference = 0.0;
 
     public static HashTable<string, double?> get_position (CanvasItem item) {
@@ -456,8 +457,16 @@ public class Akira.Utils.AffineTransform : Object {
         initial_x = x;
         initial_y = y;
 
-        if (canvas.ctrl_is_pressed && rotation.abs () > ROTATION_FIXED_STEP) {
-            do_rotation = true;
+        if (canvas.ctrl_is_pressed) {
+            // Temporarily sum the current rotation delta to determine when the user
+            // surpasses the ROTATION_FIXED_STEP threshold.
+            temp_rotation += rotation;
+
+            if (temp_rotation.abs () > ROTATION_FIXED_STEP) {
+                do_rotation = true;
+                // Reset the temp_rotation to restart the sum count.
+                temp_rotation = 0;
+            }
 
             // The rotation amount needs to take into consideration
             // the current rotation in order to anchor the item to truly
@@ -472,7 +481,7 @@ public class Akira.Utils.AffineTransform : Object {
             // Strange glitch: when item.rotation == 30.0, the fmod
             // function does not work properly.
             // 30.00000 % 15.00000 != 0 => rotation_amount becomes 0.
-            // That's why here is used the int representation of item.rotation
+            // That's why here is used the int representation of item.rotation.
             if (current_rotation_int % ROTATION_FIXED_STEP != 0) {
                 rotation_amount -= GLib.Math.fmod (item.rotation, ROTATION_FIXED_STEP);
             }
