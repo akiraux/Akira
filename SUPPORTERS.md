@@ -93,3 +93,15 @@
 * Thomas Höß
 * Brian Hinton
 * Ryan Halliday
+* janowhatever
+* Darshak Parikh
+* Pawel Kozlowski
+* Dave Lane
+* Sebastian 
+* Maïtané
+* Bogdan Vatulya
+* Saku Tiihonen
+* Somebody 
+* I Sutter
+* Bailey
+* Marie Ingabire
