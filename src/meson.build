@@ -4,7 +4,7 @@ conf_data.set('PREFIX', akira_prefix)
 conf_data.set('DATADIR', akira_datadir)
 conf_data.set('PKGDATADIR',akira_pkgdatadir)
 conf_data.set('GETTEXT_PACKAGE', gettext_package)
-conf_data.set('VERSION', '0.0.1')
+conf_data.set('VERSION', '0.0.1-alpha')
 conf_data.set('PROFILE', profile)
 conf_data.set('APP_ID', application_id)
 
