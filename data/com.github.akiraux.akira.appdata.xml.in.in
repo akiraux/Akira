@@ -32,6 +32,18 @@
 		<binary>@APP_ID@</binary>
 	</provides>
   <releases>
+    <release version="0.0.11" date="2020-08-04">
+      <description>
+        <p>🚀 Experimental Alpha Release, say Hi to Akira!</p>
+        <ul>
+          <li>Create Artboards and basic shapes</li>
+          <li>Manage the fill and border properties of shapes</li>
+          <li>Import images</li>
+          <li>Export custom areas, selections, and artboards</li>
+          <li>So many crashes and missing features you wouldn't believe, but hey, this is an experimental alpha…</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.0.1-alpha" date="2020-08-03">
       <description>
         <p>🚀 Experimental Alpha Release, say Hi to Akira!</p>
