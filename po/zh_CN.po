@@ -65,7 +65,7 @@ msgstr ""
 
 #: Dialogs/ReleaseDialog.vala:100 Dialogs/SettingsDialog.vala:249
 msgid "Make a Donation"
-msgstr "作出捐献"
+msgstr "捐献我们"
 
 #: Dialogs/ReleaseDialog.vala:109 Dialogs/SettingsDialog.vala:258
 msgid "Suggest Translations"
