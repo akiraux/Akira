@@ -299,14 +299,7 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
         }
 
         foreach (Lib.Models.CanvasItem item in items) {
-            var item_x = x;
-            var item_y = y;
-
-            canvas.convert_to_item_space (item, ref item_x, ref item_y);
-
-            var item_is_inside = item.simple_is_item_at (x, y, cr, is_pointer_event);
-
-            if (item_is_inside) {
+            if (item.simple_is_item_at (x, y, cr, is_pointer_event)) {
                 found_items.append (item);
             }
         }

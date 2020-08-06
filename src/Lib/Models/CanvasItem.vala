@@ -370,27 +370,18 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
     }
 
     public bool simple_is_item_at (double x, double y, Cairo.Context cr, bool is_pointer_event) {
-        var width = get_coords ("width");
-        var height = get_coords ("height");
-
-        var item_x = relative_x;
-        var item_y = relative_y;
-
-        canvas.convert_from_item_space (
-            artboard,
-            ref item_x,
-            ref item_y);
+        canvas.convert_to_item_space (artboard, ref x, ref y);
 
         if (
-            x >= item_x
-            && x <= item_x + width
-            && y >= item_y
-            && y <= item_y + height
+            x < relative_x
+            || (x > relative_x + get_coords ("width"))
+            || y < relative_y
+            || (y > relative_y + get_coords ("height"))
         ) {
-            return true;
+            return false;
         }
 
-        return false;
+        return true;
     }
 
     // Update the size ratio to respect the updated size.
