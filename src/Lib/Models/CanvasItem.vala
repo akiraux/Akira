@@ -370,13 +370,11 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
     }
 
     public bool simple_is_item_at (double x, double y, Cairo.Context cr, bool is_pointer_event) {
-        canvas.convert_to_item_space (artboard, ref x, ref y);
-
         if (
-            x < relative_x
-            || (x > relative_x + get_coords ("width"))
-            || y < relative_y
-            || (y > relative_y + get_coords ("height"))
+            x < bounds_manager.bounds.x1
+            || (x > bounds_manager.bounds.x2)
+            || y < bounds_manager.bounds.y1
+            || (y > bounds_manager.bounds.y2)
         ) {
             return false;
         }
