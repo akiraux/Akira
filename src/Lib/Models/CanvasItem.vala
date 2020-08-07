@@ -287,9 +287,9 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
     public virtual double get_global_coord (string coord_id) {
         switch (coord_id) {
             case "x":
-                return bounds_manager.bounds.x1;
+                return bounds_manager.x1;
             case "y":
-                return bounds_manager.bounds.y1;
+                return bounds_manager.y1;
             default:
                 return 0.0;
         }
@@ -370,11 +370,33 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
     }
 
     public bool simple_is_item_at (double x, double y, Cairo.Context cr, bool is_pointer_event) {
+        // Goo.CanvasItemSimple *class = get_class ();
+        // Goo.CanvasItemSimpleData simple_data = simple_data;
+        // Goo.CanvasPointerEvents pointer_events = Goo.CanvasPointerEvents.ALL;
+
+        // var simple = this as Goo.CanvasItemSimple;
+
+        // debug (item.simple_data.tooltip);
+
+        // if (is_pointer_event) {
+        //     pointer_events = data.pointer_events;
+        // }
+
+        /* Use the virtual method subclasses define to create the path. */
+        // class->simple_create_path (simple, cr);
+
+        // if (goo_canvas_item_simple_check_in_path (simple, x, y, cr, pointer_events))
+        //     return TRUE;
+
+        // return FALSE;
+
+        // canvas.convert_to_item_space (artboard, ref x, ref y);
+
         if (
-            x < bounds_manager.bounds.x1
-            || (x > bounds_manager.bounds.x2)
-            || y < bounds_manager.bounds.y1
-            || (y > bounds_manager.bounds.y2)
+            x < bounds_manager.x1
+            || (x > bounds_manager.x2)
+            || y < bounds_manager.y1
+            || (y > bounds_manager.y2)
         ) {
             return false;
         }

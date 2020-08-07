@@ -33,8 +33,8 @@ public class Akira.Utils.AffineTransform : Object {
 
     public static HashTable<string, double?> get_position (CanvasItem item) {
         HashTable<string, double?> array = new HashTable<string, double?> (str_hash, str_equal);
-        double item_x = item.bounds_manager.bounds.x1;
-        double item_y = item.bounds_manager.bounds.y1;
+        double item_x = item.bounds_manager.x1;
+        double item_y = item.bounds_manager.y1;
 
         if (item.artboard != null) {
             item_x -= item.artboard.bounds.x1;
@@ -53,8 +53,8 @@ public class Akira.Utils.AffineTransform : Object {
         if (item.artboard != null) {
             // Account for the different between the current position and the
             // the item's bounds.
-            diff_x = item.bounds_manager.bounds.x1 - item.artboard.bounds.x1 - item.relative_x;
-            diff_y = item.bounds_manager.bounds.y1 - item.artboard.bounds.y1
+            diff_x = item.bounds_manager.x1 - item.artboard.bounds.x1 - item.relative_x;
+            diff_y = item.bounds_manager.y1 - item.artboard.bounds.y1
                      - item.artboard.get_label_height () - item.relative_y;
 
             item.relative_x = x != null ? x - diff_x : item.relative_x;
@@ -67,8 +67,8 @@ public class Akira.Utils.AffineTransform : Object {
 
         // Account for the item rotation and get the difference between
         // its bounds and matrix coordinates.
-        diff_x = item.bounds_manager.bounds.x1 - matrix.x0;
-        diff_y = item.bounds_manager.bounds.y1 - matrix.y0;
+        diff_x = item.bounds_manager.x1 - matrix.x0;
+        diff_y = item.bounds_manager.y1 - matrix.y0;
 
         matrix.x0 = (x != null) ? x - diff_x : matrix.x0;
         matrix.y0 = (y != null) ? y - diff_y : matrix.y0;
@@ -414,8 +414,8 @@ public class Akira.Utils.AffineTransform : Object {
             canvas.convert_to_item_space (item.artboard, ref x, ref y);
             canvas.convert_to_item_space (item.artboard, ref initial_x, ref initial_y);
 
-            diff_x = item.bounds_manager.bounds.x1 - item.artboard.bounds.x1;
-            diff_y = item.bounds_manager.bounds.y1 - item.artboard.bounds.y1
+            diff_x = item.bounds_manager.x1 - item.artboard.bounds.x1;
+            diff_y = item.bounds_manager.y1 - item.artboard.bounds.y1
                      - item.artboard.get_label_height ();
 
             x -= diff_x;

@@ -38,9 +38,24 @@ public class Akira.Lib.Managers.GhostBoundsManager : Object {
     // Bounding Box item to be generated on the fly when the user requires it.
     private Goo.CanvasRect ghost;
 
-    public Goo.CanvasBounds bounds {
+    public double x1 {
         get {
-            return item.bounds;
+            return item.bounds.x1;
+        }
+    }
+    public double x2 {
+        get {
+            return item.bounds.x2;
+        }
+    }
+    public double y1 {
+        get {
+            return item.bounds.y1;
+        }
+    }
+    public double y2 {
+        get {
+            return item.bounds.y2;
         }
     }
 

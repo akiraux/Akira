@@ -645,8 +645,8 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         }
 
         // Save the coordinates before removing the item.
-        var x = item.bounds_manager.bounds.x1;
-        var y = item.bounds_manager.bounds.y1;
+        var x = item.bounds_manager.x1;
+        var y = item.bounds_manager.y1;
 
         // If the item was moved from inside an Artboard to the emtpy Canvas.
         if (item.artboard != null && new_artboard == null) {
