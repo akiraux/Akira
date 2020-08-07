@@ -370,8 +370,6 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
     }
 
     public bool simple_is_item_at (double x, double y, Cairo.Context cr, bool is_pointer_event) {
-        Goo.CanvasItemSimpleData data = simple_data;
-
         if (
             x < bounds_manager.x1
             || (x > bounds_manager.x2)
