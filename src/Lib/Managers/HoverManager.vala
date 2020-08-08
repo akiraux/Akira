@@ -68,6 +68,10 @@ public class Akira.Lib.Managers.HoverManager : Object {
         }
 
         var item = target as Models.CanvasItem;
+        // If the selected item has a real_item, it means that we
+        // probably selected the ghost item used inside an artboard and
+        // we have to get the actual real_item.
+        item = item.real_item != null ? item.real_item : item;
 
         if (current_hover_item != null && item.id == current_hover_item.id) {
             // We already have the hover effect rendered correctly
