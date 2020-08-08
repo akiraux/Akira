@@ -58,6 +58,9 @@ public class Akira.Lib.Managers.GhostBoundsManager : Object {
     public GhostBoundsManager (Models.CanvasItem new_item) {
         item = new_item.canvas.window.items_manager.duplicate_item (new_item);
 
+        // Store the real item so we can easily reference it for hovering and selecting.
+        item.real_item = new_item;
+
         // Reset any possible applied border.
         item.set ("line-width", 0.0);
         item.visibility = Goo.CanvasItemVisibility.HIDDEN;
@@ -70,11 +73,11 @@ public class Akira.Lib.Managers.GhostBoundsManager : Object {
      */
     public void update () {
         double width, height;
-        item.original_item.get ("width", out width, "height", out height);
+        item.real_item.get ("width", out width, "height", out height);
 
         item.set ("width", width);
         item.set ("height", height);
-        item.set_transform (item.original_item.get_real_transform ());
+        item.set_transform (item.real_item.get_real_transform ());
 
         if (ghost != null) {
             ghost.x = item.bounds.x1;
@@ -101,7 +104,7 @@ public class Akira.Lib.Managers.GhostBoundsManager : Object {
             null,
             item.bounds.x1, item.bounds.y1,
             item.bounds.x2 - item.bounds.x1, item.bounds.y2 - item.bounds.y1,
-            "line-width", LINE_WIDTH / item.original_item.canvas.current_scale,
+            "line-width", LINE_WIDTH / item.real_item.canvas.current_scale,
             "stroke-color", STROKE_COLOR,
             null
         );

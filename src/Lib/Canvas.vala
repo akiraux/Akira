@@ -243,10 +243,10 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 if (clicked_item is Models.CanvasItem) {
                     var item = clicked_item as Models.CanvasItem;
 
-                    // If the selected item has an original_item, it means it we
+                    // If the selected item has a real_item, it means that we
                     // probably selected the ghost item used inside an artboard and
-                    // we have to get the actual original_item.
-                    item = item.original_item != null ? item.original_item : item;
+                    // we have to get the actual real_item.
+                    item = item.real_item != null ? item.real_item : item;
 
                     if (item.locked) {
                         selected_bound_manager.reset_selection ();

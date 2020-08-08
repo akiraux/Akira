@@ -78,7 +78,7 @@ public class Akira.Lib.Models.CanvasRect : Goo.CanvasRect, Models.CanvasItem {
     public Models.CanvasArtboard? artboard { get; set; }
     public Managers.GhostBoundsManager bounds_manager { get; set; }
     // Reference the original item when an item gets duplicated.
-    public unowned Models.CanvasItem? original_item { get; set; default = null; }
+    public unowned Models.CanvasItem? real_item { get; set; default = null; }
 
     public double relative_x { get; set; }
     public double relative_y { get; set; }

@@ -325,8 +325,6 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         item.get_transform (out transform);
         new_item.set_transform (transform);
 
-        new_item.original_item = item;
-
         return new_item;
     }
 

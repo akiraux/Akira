@@ -75,7 +75,7 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
     public abstract Models.CanvasArtboard? artboard { get; set; }
     public abstract Managers.GhostBoundsManager bounds_manager { get; set; }
     // Reference the original item when an item gets duplicated.
-    public abstract Models.CanvasItem? original_item { get; set; default = null; }
+    public abstract Models.CanvasItem? real_item { get; set; default = null; }
 
     public abstract double relative_x { get; set; }
     public abstract double relative_y { get; set; }
