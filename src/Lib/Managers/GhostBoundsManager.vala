@@ -29,12 +29,8 @@ public class Akira.Lib.Managers.GhostBoundsManager : Object {
     private const string STROKE_COLOR = "#41c9fd";
     private const double LINE_WIDTH = 1.0;
 
-    // Matches the original item in order to keep the translation and rotation accurate.
-    private weak Models.CanvasItem original_item;
-    public weak Akira.Lib.Canvas canvas;
-
-    // Matches the original item in order to keep the translation and rotation accurate.
-    private Goo.CanvasRect item;
+    // Duplicate the original item in order to keep the translation and rotation accurate.
+    public Models.CanvasItem item;
     // Bounding Box item to be generated on the fly when the user requires it.
     private Goo.CanvasRect ghost;
 
@@ -60,11 +56,12 @@ public class Akira.Lib.Managers.GhostBoundsManager : Object {
     }
 
     public GhostBoundsManager (Models.CanvasItem new_item) {
-        original_item = new_item;
-        canvas = original_item.canvas;
-        item = new Goo.CanvasRect (null, 0, 0, 1, 1, "line-width", 0, null);
+        item = new_item.canvas.window.items_manager.duplicate_item (new_item);
+
+        // Reset any possible applied border.
+        item.set ("line-width", 0.0);
         item.visibility = Goo.CanvasItemVisibility.HIDDEN;
-        item.set ("parent", canvas.get_root_item ());
+        item.set ("parent", new_item.canvas.get_root_item ());
         item.can_focus = false;
     }
 
@@ -73,11 +70,11 @@ public class Akira.Lib.Managers.GhostBoundsManager : Object {
      */
     public void update () {
         double width, height;
-        original_item.get ("width", out width, "height", out height);
+        item.original_item.get ("width", out width, "height", out height);
 
         item.set ("width", width);
         item.set ("height", height);
-        item.set_transform (original_item.get_real_transform ());
+        item.set_transform (item.original_item.get_real_transform ());
 
         if (ghost != null) {
             ghost.x = item.bounds.x1;
@@ -104,7 +101,7 @@ public class Akira.Lib.Managers.GhostBoundsManager : Object {
             null,
             item.bounds.x1, item.bounds.y1,
             item.bounds.x2 - item.bounds.x1, item.bounds.y2 - item.bounds.y1,
-            "line-width", LINE_WIDTH / canvas.current_scale,
+            "line-width", LINE_WIDTH / item.original_item.canvas.current_scale,
             "stroke-color", STROKE_COLOR,
             null
         );

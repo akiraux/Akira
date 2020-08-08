@@ -86,9 +86,12 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
     // Artboard related properties
     private Cairo.TextExtents label_extents;
     public Akira.Models.ListModel<Models.CanvasItem> items;
+
     public new Akira.Lib.Canvas canvas { get; set; }
     public Models.CanvasArtboard? artboard { get; set; }
     public Managers.GhostBoundsManager bounds_manager { get; set; }
+    // Reference the original item when an item gets duplicated.
+    public unowned Models.CanvasItem? original_item { get; set; default = null; }
 
     public double relative_x { get; set; }
     public double relative_y { get; set; }
@@ -131,8 +134,6 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
 
         // Init items list.
         items = new Akira.Models.ListModel<Models.CanvasItem> ();
-        // Create the GhostBoundsManager to keep track of the global canvas bounds.
-        bounds_manager = new Managers.GhostBoundsManager (this);
 
         canvas.window.event_bus.zoom.connect (trigger_change);
         canvas.window.event_bus.change_theme.connect (trigger_change);
@@ -299,9 +300,9 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
         }
 
         foreach (Lib.Models.CanvasItem item in items) {
-            if (item.simple_is_item_at (x, y, cr, is_pointer_event)) {
-                found_items.append (item);
-            }
+            found_items = item.bounds_manager.item.get_items_at (
+                x, y, cr, false, parent_is_visible, found_items
+            );
         }
 
         return found_items;

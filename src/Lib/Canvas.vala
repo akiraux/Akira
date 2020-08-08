@@ -241,14 +241,21 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 nob_manager.selected_nob = clicked_nob_name;
 
                 if (clicked_item is Models.CanvasItem) {
-                    if ((clicked_item as Models.CanvasItem).locked) {
+                    var item = clicked_item as Models.CanvasItem;
+
+                    // If the selected item has an original_item, it means it we
+                    // probably selected the ghost item used inside an artboard and
+                    // we have to get the actual original_item.
+                    item = item.original_item != null ? item.original_item : item;
+
+                    if (item.locked) {
                         selected_bound_manager.reset_selection ();
                         holding = false;
                         return true;
                     }
 
                     // Item has been selected.
-                    selected_bound_manager.add_item_to_selection (clicked_item as Models.CanvasItem);
+                    selected_bound_manager.add_item_to_selection (item);
                 }
 
                 selected_bound_manager.set_initial_coordinates (event.x, event.y);

@@ -74,6 +74,8 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
     public abstract Akira.Lib.Canvas canvas { get; set; }
     public abstract Models.CanvasArtboard? artboard { get; set; }
     public abstract Managers.GhostBoundsManager bounds_manager { get; set; }
+    // Reference the original item when an item gets duplicated.
+    public abstract Models.CanvasItem? original_item { get; set; default = null; }
 
     public abstract double relative_x { get; set; }
     public abstract double relative_y { get; set; }
@@ -367,19 +369,6 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
         rgba_stroke.parse (border_color_string);
         rgba_stroke.alpha = ((double) stroke_alpha) / 255 * opacity / 100;
         border_color = rgba_stroke;
-    }
-
-    public bool simple_is_item_at (double x, double y, Cairo.Context cr, bool is_pointer_event) {
-        if (
-            x < bounds_manager.x1
-            || (x > bounds_manager.x2)
-            || y < bounds_manager.y1
-            || (y > bounds_manager.y2)
-        ) {
-            return false;
-        }
-
-        return true;
     }
 
     // Update the size ratio to respect the updated size.

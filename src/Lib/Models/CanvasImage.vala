@@ -70,6 +70,8 @@ public class Akira.Lib.Models.CanvasImage : Goo.CanvasImage, Models.CanvasItem {
     public new Akira.Lib.Canvas canvas { get; set; }
     public Models.CanvasArtboard? artboard { get; set; }
     public Managers.GhostBoundsManager bounds_manager { get; set; }
+    // Reference the original item when an item gets duplicated.
+    public unowned Models.CanvasItem? original_item { get; set; default = null; }
 
     public double relative_x { get; set; }
     public double relative_y { get; set; }
@@ -115,9 +117,6 @@ public class Akira.Lib.Models.CanvasImage : Goo.CanvasImage, Models.CanvasItem {
         set_transform (Cairo.Matrix.identity ());
 
         init_position (_x, _y);
-
-        // Create the GhostBoundsManager to keep track of the global canvas bounds.
-        bounds_manager = new Managers.GhostBoundsManager (this);
 
         // Save the unedited pixbuf to enable resampling and restoring.
         manager.get_pixbuf.begin (-1, -1, (obj, res) => {

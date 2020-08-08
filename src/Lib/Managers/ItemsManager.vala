@@ -150,6 +150,9 @@ public class Akira.Lib.Managers.ItemsManager : Object {
                     break;
             }
 
+            // Create the GhostBoundsManager to keep track of the global canvas bounds.
+            new_item.bounds_manager = new Managers.GhostBoundsManager (new_item);
+
             window.event_bus.item_inserted (new_item);
             window.event_bus.file_edited ();
         }
@@ -283,6 +286,48 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             artboard,
             loaded
         );
+    }
+
+    /*
+     * Duplicate an item and apply the current matrix transformation.
+     */
+    public Models.CanvasItem? duplicate_item (Models.CanvasItem? item) {
+        Models.CanvasItem? new_item = null;
+        var root = item.canvas.get_root_item ();
+
+        switch (item.item_type) {
+            case Models.CanvasItemType.RECT:
+                new_item = add_rect (0, 0, root, null, false);
+                break;
+
+            case Models.CanvasItemType.ELLIPSE:
+                new_item = add_ellipse (0, 0, root, null, false);
+                break;
+
+            case Models.CanvasItemType.TEXT:
+                new_item = add_text (0, 0, root, null, false);
+                break;
+
+            case Models.CanvasItemType.ARTBOARD:
+                new_item = add_artboard (0, 0);
+                break;
+
+            case Models.CanvasItemType.IMAGE:
+                new_item = add_image (0, 0, (item as Models.CanvasImage).manager, root, null, false);
+                break;
+        }
+
+        if (new_item == null) {
+            return null;
+        }
+
+        Cairo.Matrix transform;
+        item.get_transform (out transform);
+        new_item.set_transform (transform);
+
+        new_item.original_item = item;
+
+        return new_item;
     }
 
     public int get_item_position (Lib.Models.CanvasItem item) {
