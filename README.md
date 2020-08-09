@@ -25,7 +25,9 @@
 
 Akira is a native Linux Design application built in Vala and GTK. Akira focuses on offering a modern and fast approach to UI and UX Design, mainly targeting web designers and graphic designers. The main goal is to offer a valid and professional solution for designers who want to use Linux as their main OS.
 
-**AKIRA IS CURRENTLY IN EARLY DEVELOPMENT, NOT READY TO BE USED!**
+⚠️⚠️ **AKIRA IS CURRENTLY IN EARLY DEVELOPMENT, NOT READY TO BE USED FOR PRODUCTION!** ⚠️⚠️
+
+Feel free to download the Alpha and help us testing it.
 
 ## 📦 Install
 
@@ -76,7 +78,9 @@ ninja && sudo ninja install
 ## 🤔 Questions
 
 If you want to ask any questions about the project, we have a public Matrix channel you can join at: https://matrix.to/#/!TpdMwUVwILHQgLjNpe:matrix.org
+
 We also have a dedicated Discord channel available to any [Patreon](https://www.patreon.com/akiraux) supporters where we offer more direct support, and we're open to discussing new features and implementations.
+
 If you are trying out Akira and you encounter an error or any problem feel free to just open an issue here on GitHub.
 
 ## 👨‍💻 Contributing
