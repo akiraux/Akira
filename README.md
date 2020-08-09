@@ -14,7 +14,7 @@
 <p align="center">
     <a href="#-install">Install</a> •
     <a href="#-compile">Compile</a> •
-    <a href="#-questions-issues">Questions</a> •
+    <a href="#-questions">Questions</a> •
     <a href="#-contributing">Contributing</a> •
     <a href="#-support">Support</a> •
     <a href="#-mascot">Mascot</a> •
@@ -31,7 +31,13 @@ Akira is a native Linux Design application built in Vala and GTK. Akira focuses 
 
 | elementaryOS AppCenter 	| FlatHub       	| Snapcraft Store 	|
 |------------------------	|---------------	|-----------------	|
-| Coming Soon!          	| Coming Soon! 	    | Coming Soon!   	|
+|[![Get it on AppCenter](https://appcenter.elementary.io/badge.svg)](https://appcenter.elementary.io/com.github.akiraux.akira/)|<a href="#-flathub"><img src="https://flathub.org/assets/badges/flathub-badge-i-en.svg" width="160px" alt="Get it from Flathub!"></a>|[![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-white.svg)](https://snapcraft.io/akira)|
+
+### Flathub Beta
+```
+flatpak remote-add flathub-beta https://flathub.org/beta-repo/flathub-beta.flatpakrepo
+flatpak install akira
+```
 
 ## 🛠 Compile
 
@@ -67,9 +73,11 @@ ninja && sudo ninja install
 
 > _**Note:** Replace the `-Dprofile=default` with `-Dprofile=development` to compile and install Akira in **development** mode where you can make changes._
 
-## 🤔 Questions &amp; Issues
+## 🤔 Questions
 
-If you want to ask any questions about the project, we have a dedicated Discord channel available to any [Patreon](https://www.patreon.com/akiraux) supporters. If you are trying out Akira and you encounter an error or any problem feel free to just open an issue.
+If you want to ask any questions about the project, we have a public Matrix channel you can join at: https://matrix.to/#/!TpdMwUVwILHQgLjNpe:matrix.org
+We also have a dedicated Discord channel available to any [Patreon](https://www.patreon.com/akiraux) supporters where we offer more direct support, and we're open to discussing new features and implementations.
+If you are trying out Akira and you encounter an error or any problem feel free to just open an issue here on GitHub.
 
 ## 👨‍💻 Contributing
 
