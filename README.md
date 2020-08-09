@@ -31,7 +31,7 @@ Akira is a native Linux Design application built in Vala and GTK. Akira focuses 
 
 | elementaryOS AppCenter 	| FlatHub       	| Snapcraft Store 	|
 |------------------------	|---------------	|-----------------	|
-|[![Get it on AppCenter](https://appcenter.elementary.io/badge.svg)](https://appcenter.elementary.io/com.github.akiraux.akira/)|<a href="#-flathub"><img src="https://flathub.org/assets/badges/flathub-badge-i-en.svg" width="160px" alt="Get it from Flathub!"></a>|[![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-white.svg)](https://snapcraft.io/akira)|
+|[![Get it on AppCenter](https://appcenter.elementary.io/badge.svg)](https://appcenter.elementary.io/com.github.akiraux.akira/)|<a href="#flathub-beta"><img src="https://flathub.org/assets/badges/flathub-badge-i-en.svg" width="160px" alt="Get it from Flathub!"></a>|[![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-white.svg)](https://snapcraft.io/akira)|
 
 ### Flathub Beta
 ```
