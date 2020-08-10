@@ -131,8 +131,6 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
 
         // Init items list.
         items = new Akira.Models.ListModel<Models.CanvasItem> ();
-        // Create the GhostBoundsManager to keep track of the global canvas bounds.
-        bounds_manager = new Managers.GhostBoundsManager (this);
 
         canvas.window.event_bus.zoom.connect (trigger_change);
         canvas.window.event_bus.change_theme.connect (trigger_change);

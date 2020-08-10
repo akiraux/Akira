@@ -116,9 +116,6 @@ public class Akira.Lib.Models.CanvasImage : Goo.CanvasImage, Models.CanvasItem {
 
         init_position (_x, _y);
 
-        // Create the GhostBoundsManager to keep track of the global canvas bounds.
-        bounds_manager = new Managers.GhostBoundsManager (this);
-
         // Save the unedited pixbuf to enable resampling and restoring.
         manager.get_pixbuf.begin (-1, -1, (obj, res) => {
             try {
