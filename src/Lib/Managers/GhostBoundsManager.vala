@@ -31,25 +31,38 @@ public class Akira.Lib.Managers.GhostBoundsManager : Object {
 
     // Matches the original item in order to keep the translation and rotation accurate.
     private weak Models.CanvasItem original_item;
-    public weak Akira.Lib.Canvas canvas;
 
     // Matches the original item in order to keep the translation and rotation accurate.
     private Goo.CanvasRect item;
     // Bounding Box item to be generated on the fly when the user requires it.
     private Goo.CanvasRect ghost;
 
-    public Goo.CanvasBounds bounds {
+    public double x1 {
         get {
-            return item.bounds;
+            return item.bounds.x1;
+        }
+    }
+    public double x2 {
+        get {
+            return item.bounds.x2;
+        }
+    }
+    public double y1 {
+        get {
+            return item.bounds.y1;
+        }
+    }
+    public double y2 {
+        get {
+            return item.bounds.y2;
         }
     }
 
     public GhostBoundsManager (Models.CanvasItem new_item) {
         original_item = new_item;
-        canvas = original_item.canvas;
         item = new Goo.CanvasRect (null, 0, 0, 1, 1, "line-width", 0, null);
         item.visibility = Goo.CanvasItemVisibility.HIDDEN;
-        item.set ("parent", canvas.get_root_item ());
+        item.set ("parent", original_item.canvas.get_root_item ());
         item.can_focus = false;
     }
 
@@ -89,7 +102,7 @@ public class Akira.Lib.Managers.GhostBoundsManager : Object {
             null,
             item.bounds.x1, item.bounds.y1,
             item.bounds.x2 - item.bounds.x1, item.bounds.y2 - item.bounds.y1,
-            "line-width", LINE_WIDTH / canvas.current_scale,
+            "line-width", LINE_WIDTH / original_item.canvas.current_scale,
             "stroke-color", STROKE_COLOR,
             null
         );

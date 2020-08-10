@@ -331,10 +331,10 @@ public class Akira.Lib.Managers.ExportManager : Object {
             item.bounds_manager.hide ();
 
             // Account for items inside or outside artboards.
-            double x1 = item.bounds_manager.bounds.x1;
-            double x2 = item.bounds_manager.bounds.x2;
-            double y1 = item.bounds_manager.bounds.y1;
-            double y2 = item.bounds_manager.bounds.y2;
+            double x1 = item.bounds_manager.x1;
+            double x2 = item.bounds_manager.x2;
+            double y1 = item.bounds_manager.y1;
+            double y2 = item.bounds_manager.y2;
 
             // Create the rendered image with Cairo.
             surface = new Cairo.ImageSurface (
@@ -402,10 +402,10 @@ public class Akira.Lib.Managers.ExportManager : Object {
         // If the item is null it mean we're dealing with a custom area and we
         // don't have the bounds manager.
         if (item != null) {
-            double x1 = item.bounds_manager.bounds.x1;
-            double x2 = item.bounds_manager.bounds.x2;
-            double y1 = item.bounds_manager.bounds.y1;
-            double y2 = item.bounds_manager.bounds.y2;
+            double x1 = item.bounds_manager.x1;
+            double x2 = item.bounds_manager.x2;
+            double y1 = item.bounds_manager.y1;
+            double y2 = item.bounds_manager.y2;
 
             width = x2 - x1;
             height = y2 - y1 - label_height;
