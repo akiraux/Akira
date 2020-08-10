@@ -48,7 +48,6 @@ public class Akira.Lib.Managers.ItemsManager : Object {
 
         window.event_bus.insert_item.connect (set_item_to_insert);
         window.event_bus.request_delete_item.connect (on_request_delete_item);
-        window.event_bus.change_item_z_index.connect (on_change_item_z_index);
         window.event_bus.hold_released.connect (on_hold_released);
     }
 
@@ -369,43 +368,6 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             border_size = (int) settings.border_size;
             border_color.parse (settings.border_color);
         }
-    }
-
-    private void on_change_item_z_index (Lib.Models.CanvasItem item, int position) {
-        // Lower `item` behind the item at index `position` or raise
-        // it above the item at index `position - 1`
-        var root_item = item.get_canvas ().get_root_item ();
-
-        switch (position) {
-            case -1:
-                // Put the item at the top of the stack
-                item.lower (null);
-                break;
-
-            case 0:
-                // Put the item on bottom of the stack
-                var canvas_item_at_top_position = root_item.get_n_children () - 11;
-                var canvas_item_at_top = root_item.get_child (canvas_item_at_top_position);
-
-                item.raise (canvas_item_at_top);
-                break;
-
-            default:
-                Goo.CanvasItem item_at_position = null;
-
-                var current_position = root_item.find_child (item);
-
-                if (current_position > position) {
-                    item_at_position = root_item.get_child (position);
-                    item.lower (item_at_position);
-                } else {
-                    item_at_position = root_item.get_child (position - 1);
-                    item.raise (item_at_position);
-                }
-                break;
-        }
-
-        window.event_bus.z_selected_changed ();
     }
 
     /*
