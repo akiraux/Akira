@@ -99,7 +99,7 @@ namespace Goo {
 	}
 	[CCode (cheader_filename = "goocanvas.h", type_id = "goo_canvas_ellipse_get_type ()")]
 	public class CanvasEllipse : Goo.CanvasItemSimple, Goo.CanvasItem {
-		public Goo.CanvasEllipseData ellipse_data;
+		public Goo.CanvasEllipseData? ellipse_data;
 		[CCode (has_construct_function = false, type = "GooCanvasItem*")]
 		public CanvasEllipse (Goo.CanvasItem? parent, double center_x, double center_y, double radius_x, double radius_y, ...);
 		[NoAccessorMethod]
@@ -143,7 +143,7 @@ namespace Goo {
 	}
 	[CCode (cheader_filename = "goocanvas.h", type_id = "goo_canvas_grid_get_type ()")]
 	public class CanvasGrid : Goo.CanvasItemSimple, Goo.CanvasItem {
-		public Goo.CanvasGridData grid_data;
+		public Goo.CanvasGridData? grid_data;
 		[CCode (has_construct_function = false, type = "GooCanvasItem*")]
 		public CanvasGrid (Goo.CanvasItem? parent, double x, double y, double width, double height, double x_step, double y_step, double x_offset, double y_offset, ...);
 		[NoAccessorMethod]
@@ -302,7 +302,7 @@ namespace Goo {
 	}
 	[CCode (cheader_filename = "goocanvas.h", type_id = "goo_canvas_image_get_type ()")]
 	public class CanvasImage : Goo.CanvasItemSimple, Goo.CanvasItem {
-		public Goo.CanvasImageData image_data;
+		public Goo.CanvasImageData? image_data;
 		[CCode (has_construct_function = false, type = "GooCanvasItem*")]
 		public CanvasImage (Goo.CanvasItem? parent, Gdk.Pixbuf? pixbuf, double x, double y, ...);
 		[NoAccessorMethod]
@@ -412,7 +412,7 @@ namespace Goo {
 		public uint need_entire_subtree_update;
 		public uint need_update;
 		public weak Goo.CanvasItem parent;
-		public Goo.CanvasItemSimpleData simple_data;
+		public Goo.CanvasItemSimpleData? simple_data;
 		[CCode (has_construct_function = false)]
 		protected CanvasItemSimple ();
 		public void changed (bool recompute_bounds);
@@ -499,7 +499,7 @@ namespace Goo {
 	}
 	[CCode (cheader_filename = "goocanvas.h", type_id = "goo_canvas_path_get_type ()")]
 	public class CanvasPath : Goo.CanvasItemSimple, Goo.CanvasItem {
-		public Goo.CanvasPathData path_data;
+		public Goo.CanvasPathData? path_data;
 		[CCode (has_construct_function = false, type = "GooCanvasItem*")]
 		public CanvasPath (Goo.CanvasItem? parent, string path_data, ...);
 		[NoAccessorMethod]
@@ -547,7 +547,7 @@ namespace Goo {
 	}
 	[CCode (cheader_filename = "goocanvas.h", type_id = "goo_canvas_polyline_get_type ()")]
 	public class CanvasPolyline : Goo.CanvasItemSimple, Goo.CanvasItem {
-		public Goo.CanvasPolylineData polyline_data;
+		public Goo.CanvasPolylineData? polyline_data;
 		[CCode (has_construct_function = false, type = "GooCanvasItem*")]
 		public CanvasPolyline (Goo.CanvasItem? parent, bool close_path, int num_points, ...);
 		[CCode (has_construct_function = false, type = "GooCanvasItem*")]
@@ -607,7 +607,7 @@ namespace Goo {
 	}
 	[CCode (cheader_filename = "goocanvas.h", type_id = "goo_canvas_rect_get_type ()")]
 	public class CanvasRect : Goo.CanvasItemSimple, Goo.CanvasItem {
-		public Goo.CanvasRectData rect_data;
+		public Goo.CanvasRectData? rect_data;
 		[CCode (has_construct_function = false, type = "GooCanvasItem*")]
 		public CanvasRect (Goo.CanvasItem? parent, double x, double y, double width, double height, ...);
 		[NoAccessorMethod]
@@ -657,7 +657,7 @@ namespace Goo {
 	}
 	[CCode (cheader_filename = "goocanvas.h", type_id = "goo_canvas_table_get_type ()")]
 	public class CanvasTable : Goo.CanvasGroup, Goo.CanvasItem {
-		public Goo.CanvasTableData table_data;
+		public Goo.CanvasTableData? table_data;
 		[CCode (has_construct_function = false, type = "GooCanvasItem*")]
 		public CanvasTable (Goo.CanvasItem? parent, ...);
 		[NoAccessorMethod]
@@ -706,7 +706,7 @@ namespace Goo {
 	[CCode (cheader_filename = "goocanvas.h", type_id = "goo_canvas_text_get_type ()")]
 	public class CanvasText : Goo.CanvasItemSimple, Goo.CanvasItem {
 		public double layout_width;
-		public Goo.CanvasTextData text_data;
+		public Goo.CanvasTextData? text_data;
 		[CCode (has_construct_function = false, type = "GooCanvasItem*")]
 		public CanvasText (Goo.CanvasItem? parent, string string, double x, double y, double width, Goo.CanvasAnchorType anchor, ...);
 		public void get_natural_extents (out Pango.Rectangle ink_rect, out Pango.Rectangle logical_rect);
@@ -934,7 +934,7 @@ namespace Goo {
 		public virtual signal void child_notify (GLib.ParamSpec pspec);
 		public virtual signal void child_removed (int child_num);
 	}
-	[CCode (cheader_filename = "goocanvas.h", type_id = "goo_canvas_bounds_get_type ()")]
+	[CCode (cheader_filename = "goocanvas.h", copy_function = "g_boxed_copy", free_function = "g_boxed_free", type_id = "goo_canvas_bounds_get_type ()")]
 	public struct CanvasBounds {
 		public double x1;
 		public double y1;
@@ -978,10 +978,10 @@ namespace Goo {
 	}
 	[CCode (cheader_filename = "goocanvas.h", has_type_id = false)]
 	public struct CanvasItemSimpleData {
-		public weak Goo.CanvasStyle style;
+		public Goo.CanvasStyle style;
 		public Cairo.Matrix? transform;
 		public GLib.Array<Goo.CanvasPathCommand?> clip_path_commands;
-		public weak string tooltip;
+		public string tooltip;
 		public double visibility_threshold;
 		public uint visibility;
 		public uint pointer_events;
@@ -1047,18 +1047,18 @@ namespace Goo {
 		public double arrow_length;
 		public double arrow_tip_length;
 		[CCode (array_length = false)]
-		public weak double line_start[2];
+		public double line_start[2];
 		[CCode (array_length = false)]
-		public weak double line_end[2];
+		public double line_end[2];
 		[CCode (array_length = false)]
-		public weak double start_arrow_coords[10];
+		public double start_arrow_coords[10];
 		[CCode (array_length = false)]
-		public weak double end_arrow_coords[10];
+		public double end_arrow_coords[10];
 	}
 	[CCode (cheader_filename = "goocanvas.h", has_type_id = false)]
 	public struct CanvasPolylineData {
 		public double coords;
-		public Goo.CanvasPolylineArrowData arrow_data;
+		public Goo.CanvasPolylineArrowData? arrow_data;
 		public uint num_points;
 		public uint close_path;
 		public uint start_arrow;
@@ -1084,10 +1084,10 @@ namespace Goo {
 		public double width;
 		public double height;
 		[CCode (array_length = false)]
-		public weak Goo.CanvasTableDimension dimensions[2];
+		public Goo.CanvasTableDimension dimensions[2];
 		public double border_width;
-		public weak GLib.Array<void*> children;
-		public weak Goo.CanvasTableLayoutData layout_data;
+		public GLib.Array<void*> children;
+		public Goo.CanvasTableLayoutData? layout_data;
 	}
 	[CCode (cheader_filename = "goocanvas.h", has_type_id = false)]
 	public struct CanvasTableDimension {
@@ -1098,7 +1098,7 @@ namespace Goo {
 	}
 	[CCode (cheader_filename = "goocanvas.h", has_type_id = false)]
 	public struct CanvasTextData {
-		public weak string text;
+		public string text;
 		public double x;
 		public double y;
 		public double width;
