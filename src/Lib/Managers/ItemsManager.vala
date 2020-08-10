@@ -149,6 +149,9 @@ public class Akira.Lib.Managers.ItemsManager : Object {
                     break;
             }
 
+            // Create the GhostBoundsManager to keep track of the global canvas bounds.
+            new_item.bounds_manager = new Managers.GhostBoundsManager (new_item);
+
             window.event_bus.item_inserted (new_item);
             window.event_bus.file_edited ();
         }

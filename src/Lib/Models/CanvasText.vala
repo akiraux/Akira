@@ -113,8 +113,5 @@ public class Akira.Lib.Models.CanvasText : Goo.CanvasText, Models.CanvasItem {
         set_transform (Cairo.Matrix.identity ());
 
         init_position (_x, _y);
-
-        // Create the GhostBoundsManager to keep track of the global canvas bounds.
-        bounds_manager = new Managers.GhostBoundsManager (this);
     }
 }
