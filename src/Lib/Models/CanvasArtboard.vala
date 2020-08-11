@@ -192,7 +192,7 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
 
     public override void simple_update (Cairo.Context cr) {
         bounds.x1 = x;
-        bounds.y1 = y - label_extents.height - LABEL_BOTTOM_PADDING;
+        bounds.y1 = y - get_label_height ();
         bounds.x2 = x + width;
         bounds.y2 = y + height;
     }
@@ -253,7 +253,7 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
     public override bool simple_is_item_at (double x, double y, Cairo.Context cr, bool is_pointer_event) {
         // To select an Artboard you should put the arrow over the Artboard label.
         return y < 0
-            && y > - (label_extents.height + LABEL_BOTTOM_PADDING)
+            && y > - get_label_height ()
             && x > 0
             && x < (label_extents.width);
     }
@@ -280,14 +280,7 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
         }
 
         foreach (Lib.Models.CanvasItem item in items) {
-            var item_x = x;
-            var item_y = y;
-
-            canvas.convert_to_item_space (item, ref item_x, ref item_y);
-
-            var item_is_inside = item.simple_is_item_at (x, y, cr, is_pointer_event);
-
-            if (item_is_inside) {
+            if (item.simple_is_item_at (x, y, cr, is_pointer_event)) {
                 found_items.append (item);
             }
         }
