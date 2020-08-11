@@ -155,27 +155,17 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
     }
 
     public bool is_outside (Models.CanvasItem item) {
-        var x1 = item.get_global_coord ("x");
-        var x2 = x1 + item.get_coords ("width");
-        var y1 = item.get_global_coord ("y");
-        var y2 = y1 + item.get_coords ("height");
-
-        return x1 < bounds.x1
-            || x2 > bounds.x2
-            || y1 < bounds.y1
-            || y2 > bounds.y2;
+        return item.bounds_manager.x1 < bounds.x1
+            || item.bounds_manager.x2 > bounds.x2
+            || item.bounds_manager.y1 < bounds.y1
+            || item.bounds_manager.y2 > bounds.y2;
     }
 
     public bool dropped_inside (Models.CanvasItem item) {
-        var x1 = item.get_global_coord ("x");
-        var x2 = x1 + item.get_coords ("width");
-        var y1 = item.get_global_coord ("y");
-        var y2 = y1 + item.get_coords ("height");
-
-        return x1 < bounds.x2
-            && x2 > bounds.x1
-            && y1 < bounds.y2
-            && y2 > bounds.y1;
+        return item.bounds_manager.x1 < bounds.x2
+            && item.bounds_manager.x2 > bounds.x1
+            && item.bounds_manager.y1 < bounds.y2
+            && item.bounds_manager.y2 > bounds.y1;
     }
 
     public void add_child (Goo.CanvasItem item, int position = -1) {
@@ -195,14 +185,8 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
         Cairo.ImageSurface surface = new Cairo.ImageSurface (Cairo.Format.ARGB32, 290, 256);
         Cairo.Context cr = new Cairo.Context (surface);
 
-        cr.select_font_face (
-            "Sans",
-            Cairo.FontSlant.NORMAL,
-            Cairo.FontWeight.NORMAL
-            );
-
+        cr.select_font_face ("Sans", Cairo.FontSlant.NORMAL, Cairo.FontWeight.NORMAL);
         cr.set_font_size (LABEL_FONT_SIZE / (canvas as Lib.Canvas).current_scale);
-
         cr.text_extents (id, out label_extents);
     }
 
@@ -237,7 +221,7 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
 
             // Painting items in reversed order in order to
             // print last item inserted (top of the stack) on top
-            // of the items inserted before
+            // of the items inserted before.
             for (var i = 0; i < items_length; i++) {
                 var item = items[items_length - 1 - i];
 
@@ -267,8 +251,7 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
     }
 
     public override bool simple_is_item_at (double x, double y, Cairo.Context cr, bool is_pointer_event) {
-        // To select an Artboard you should put the arrow
-        // over the Artboard label
+        // To select an Artboard you should put the arrow over the Artboard label.
         return y < 0
             && y > - (label_extents.height + LABEL_BOTTOM_PADDING)
             && x > 0
