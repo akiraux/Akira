@@ -284,17 +284,6 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
         return transform;
     }
 
-    public virtual double get_global_coord (string coord_id) {
-        switch (coord_id) {
-            case "x":
-                return bounds_manager.x1;
-            case "y":
-                return bounds_manager.y1;
-            default:
-                return 0.0;
-        }
-    }
-
     public virtual void reset_colors () {
         reset_fill ();
         reset_border ();
