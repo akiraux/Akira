@@ -241,8 +241,8 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         if (selected_item.artboard != null) {
             selected_item.artboard.items.swap_items (source, target);
 
-            canvas.window.event_bus.z_selected_changed ();
             selected_item.artboard.changed (true);
+            canvas.window.event_bus.z_selected_changed ();
 
             // There is no need to raise or lower the selection
             // since the z stacking is done inside the paint method

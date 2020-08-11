@@ -216,37 +216,8 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.Grid {
             return;
         }
 
-        items_count = (int) window.items_manager.free_items.get_n_items ();
-        pos_source = items_count - 1 - window.items_manager.free_items.index (layer.model);
-
-        // Interrupt if item position doesn't exist.
-        if (pos_source == -1) {
-            return;
-        }
-
-        // z-index is the exact opposite of items placement as the last item
-        // is the topmost element. Because of this, we need some trickery to
-        // properly handle the list's order.
-        source = items_count - 1 - pos_source;
-
-        // Interrupt if the item was dropped in the same position.
-        if (source == items_count - 1) {
-            debug ("same position");
-            return;
-        }
-
-        // Remove item at source position.
-        var item_to_swap = window.items_manager.free_items.remove_at (source);
-        item_to_swap.parent.remove_child (item_to_swap.parent.find_child (item_to_swap));
-
-        // Insert item at target position.
-        window.items_manager.free_items.insert_at (items_count - 1, item_to_swap);
-        window.event_bus.z_selected_changed ();
-
-        var root = window.main_window.main_canvas.canvas.get_root_item ();
-        // Fetch the new correct position.
-        var target = items_count - 1 - window.items_manager.free_items.index (item_to_swap);
-        root.add_child (item_to_swap, target);
+        // Use the existing action to push an item all the way to the bottom.
+        window.event_bus.change_z_selected (false, true);
     }
 
     private void check_scroll (int y) {

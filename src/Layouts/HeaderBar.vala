@@ -85,24 +85,23 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
 
         move_up = new Akira.Partials.HeaderBarButton (window, "selection-raise",
             _("Up"), {"<Ctrl>Up"}, "single");
-        move_up.button.clicked.connect (() => {
-            window.event_bus.change_z_selected (true, false);
-        });
+        move_up.button.action_name = Akira.Services.ActionManager.ACTION_PREFIX
+            + Akira.Services.ActionManager.ACTION_MOVE_UP;
+
         move_down = new Akira.Partials.HeaderBarButton (window, "selection-lower",
             _("Down"), {"<Ctrl>Down"}, "single");
-        move_down.button.clicked.connect (() => {
-            window.event_bus.change_z_selected (false, false);
-        });
+        move_down.button.action_name = Akira.Services.ActionManager.ACTION_PREFIX
+            + Akira.Services.ActionManager.ACTION_MOVE_DOWN;
+
         move_top = new Akira.Partials.HeaderBarButton (window, "selection-top",
             _("Top"), {"<Ctrl><Shift>Up"}, "single");
-        move_top.button.clicked.connect (() => {
-            window.event_bus.change_z_selected (true, true);
-        });
+        move_top.button.action_name = Akira.Services.ActionManager.ACTION_PREFIX
+            + Akira.Services.ActionManager.ACTION_MOVE_TOP;
+
         move_bottom = new Akira.Partials.HeaderBarButton (window, "selection-bottom",
             _("Bottom"), {"<Ctrl><Shift>Down"}, "single");
-        move_bottom.button.clicked.connect (() => {
-            window.event_bus.change_z_selected (false, true);
-        });
+        move_bottom.button.action_name = Akira.Services.ActionManager.ACTION_PREFIX
+            + Akira.Services.ActionManager.ACTION_MOVE_BOTTOM;
 
         preferences = new Akira.Partials.HeaderBarButton (window, "open-menu",
             _("Settings"), {"<Ctrl>comma"});
@@ -365,9 +364,7 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
         window.event_bus.file_edited.connect (on_file_edited);
         window.event_bus.file_saved.connect (on_file_saved);
         window.event_bus.selected_items_changed.connect (on_selected_items_changed);
-        window.event_bus.z_selected_changed.connect (() => {
-            update_button_sensitivity (false);
-        });
+        window.event_bus.z_selected_changed.connect (update_button_sensitivity);
         window.event_bus.set_scale.connect (on_set_scale);
         window.event_bus.update_recent_files_list.connect (fetch_recent_files);
     }
@@ -507,17 +504,17 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
     private void on_selected_items_changed (List<Lib.Models.CanvasItem> selected_items) {
         if (selected_items.length () == 0) {
             selected_item = null;
-            update_button_sensitivity (true);
+            update_button_sensitivity ();
             return;
         }
 
         if (selected_item == null || selected_item != selected_items.nth_data (0)) {
             selected_item = selected_items.nth_data (0);
-            update_button_sensitivity (true);
+            update_button_sensitivity ();
         }
     }
 
-    private void update_button_sensitivity (bool selected) {
+    private void update_button_sensitivity () {
         var z_buttons_sensitive = selected_item != null && !(selected_item is Lib.Models.CanvasArtboard);
 
         move_up.sensitive = z_buttons_sensitive;

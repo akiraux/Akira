@@ -387,31 +387,8 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
         // Change artboard if necessary.
         window.items_manager.change_artboard (layer.model, model);
 
-        items_count = (int) model.items.get_n_items ();
-        pos_source = items_count - 1 - model.items.index (layer.model);
-
-        // Interrupt if item position doesn't exist.
-        if (pos_source == -1) {
-            return;
-        }
-
-        // z-index is the exact opposite of items placement as the last item
-        // is the topmost element. Because of this, we need some trickery to
-        // properly handle the list's order.
-        source = items_count - 1 - pos_source;
-
-        // Interrupt if the item was dropped in the same position.
-        if (source == 0) {
-            debug ("same position");
-            return;
-        }
-
-        // Remove item at source position
-        var item_to_swap = model.items.remove_at (source);
-
-        // Insert item at target position
-        model.items.insert_at (0, item_to_swap);
-        window.event_bus.z_selected_changed ();
+        // Use the existing action to push an item all the way to the top.
+        window.event_bus.change_z_selected (true, true);
 
         model.changed (true);
     }

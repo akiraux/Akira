@@ -435,7 +435,6 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 
         // Insert item at target position
         items_source.insert_at (target, item_to_swap);
-        window.event_bus.z_selected_changed ();
 
         if (model.artboard != null) {
             model.artboard.changed (true);
@@ -448,6 +447,8 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
             target = items_count - 1 - items_source.index (item_to_swap);
             root.add_child (item_to_swap, target);
         }
+
+        window.event_bus.z_selected_changed ();
     }
 
     /**
