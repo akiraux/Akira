@@ -32,6 +32,16 @@
 		<binary>@APP_ID@</binary>
 	</provides>
   <releases>
+    <release version="0.0.12" date="2020-08-11">
+      <description>
+        <p>Bug fixes and improvements</p>
+        <ul>
+          <li>Fix items reordering with the layers panel drag and drop</li>
+          <li>Fix random segfault at startup while setting accelerators</li>
+          <li>Updated goocanvas vapi</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.0.11" date="2020-08-04">
       <description>
         <p>🚀 Experimental Alpha Release, say Hi to Akira!</p>
