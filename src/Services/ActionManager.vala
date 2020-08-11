@@ -153,8 +153,9 @@ public class Akira.Services.ActionManager : Object {
         actions.add_action_entries (ACTION_ENTRIES, this);
         window.insert_action_group ("win", actions);
 
-        foreach (var action in action_accelerators.get_keys ()) {
-            app.set_accels_for_action (ACTION_PREFIX + action, action_accelerators[action].to_array ());
+        var iter = action_accelerators.map_iterator ();
+        while (iter.next ()) {
+            app.set_accels_for_action (ACTION_PREFIX + iter.get_key (), { iter.get_value () });
         }
 
         enable_typing_accels ();
@@ -165,15 +166,17 @@ public class Akira.Services.ActionManager : Object {
 
     // Temporarily disable all the accelerators that might interfere with input fields.
     private void disable_typing_accels () {
-        foreach (var action in typing_accelerators.get_keys ()) {
-            app.set_accels_for_action (ACTION_PREFIX + action, {});
+        var iter = typing_accelerators.map_iterator ();
+        while (iter.next ()) {
+            app.set_accels_for_action (ACTION_PREFIX + iter.get_key (), {});
         }
     }
 
     // Enable all the accelerators that might interfere with input fields.
     private void enable_typing_accels () {
-        foreach (var action in typing_accelerators.get_keys ()) {
-            app.set_accels_for_action (ACTION_PREFIX + action, typing_accelerators[action].to_array ());
+        var iter = typing_accelerators.map_iterator ();
+        while (iter.next ()) {
+            app.set_accels_for_action (ACTION_PREFIX + iter.get_key (), { iter.get_value () });
         }
     }
 
