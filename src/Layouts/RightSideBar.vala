@@ -228,12 +228,13 @@ public class Akira.Layouts.RightSideBar : Gtk.Grid {
 
         // Insert item at target position.
         window.items_manager.free_items.insert_at (0, item_to_swap);
-        window.event_bus.z_selected_changed ();
 
         var root = window.main_window.main_canvas.canvas.get_root_item ();
         // Fetch the new correct position.
         var target = items_count - 1 - window.items_manager.free_items.index (item_to_swap);
         root.add_child (item_to_swap, target);
+
+        window.event_bus.z_selected_changed ();
     }
 
     private bool handle_focus_in (Gdk.EventFocus event) {
