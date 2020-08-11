@@ -364,9 +364,7 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
         window.event_bus.file_edited.connect (on_file_edited);
         window.event_bus.file_saved.connect (on_file_saved);
         window.event_bus.selected_items_changed.connect (on_selected_items_changed);
-        window.event_bus.z_selected_changed.connect (() => {
-            update_button_sensitivity (false);
-        });
+        window.event_bus.z_selected_changed.connect (update_button_sensitivity);
         window.event_bus.set_scale.connect (on_set_scale);
         window.event_bus.update_recent_files_list.connect (fetch_recent_files);
     }
@@ -506,17 +504,17 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
     private void on_selected_items_changed (List<Lib.Models.CanvasItem> selected_items) {
         if (selected_items.length () == 0) {
             selected_item = null;
-            update_button_sensitivity (true);
+            update_button_sensitivity ();
             return;
         }
 
         if (selected_item == null || selected_item != selected_items.nth_data (0)) {
             selected_item = selected_items.nth_data (0);
-            update_button_sensitivity (true);
+            update_button_sensitivity ();
         }
     }
 
-    private void update_button_sensitivity (bool selected) {
+    private void update_button_sensitivity () {
         var z_buttons_sensitive = selected_item != null && !(selected_item is Lib.Models.CanvasArtboard);
 
         move_up.sensitive = z_buttons_sensitive;
