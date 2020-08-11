@@ -85,24 +85,23 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
 
         move_up = new Akira.Partials.HeaderBarButton (window, "selection-raise",
             _("Up"), {"<Ctrl>Up"}, "single");
-        move_up.button.clicked.connect (() => {
-            window.event_bus.change_z_selected (true, false);
-        });
+        move_up.button.action_name = Akira.Services.ActionManager.ACTION_PREFIX
+            + Akira.Services.ActionManager.ACTION_MOVE_UP;
+
         move_down = new Akira.Partials.HeaderBarButton (window, "selection-lower",
             _("Down"), {"<Ctrl>Down"}, "single");
-        move_down.button.clicked.connect (() => {
-            window.event_bus.change_z_selected (false, false);
-        });
+        move_down.button.action_name = Akira.Services.ActionManager.ACTION_PREFIX
+            + Akira.Services.ActionManager.ACTION_MOVE_DOWN;
+
         move_top = new Akira.Partials.HeaderBarButton (window, "selection-top",
             _("Top"), {"<Ctrl><Shift>Up"}, "single");
-        move_top.button.clicked.connect (() => {
-            window.event_bus.change_z_selected (true, true);
-        });
+        move_top.button.action_name = Akira.Services.ActionManager.ACTION_PREFIX
+            + Akira.Services.ActionManager.ACTION_MOVE_TOP;
+
         move_bottom = new Akira.Partials.HeaderBarButton (window, "selection-bottom",
             _("Bottom"), {"<Ctrl><Shift>Down"}, "single");
-        move_bottom.button.clicked.connect (() => {
-            window.event_bus.change_z_selected (false, true);
-        });
+        move_bottom.button.action_name = Akira.Services.ActionManager.ACTION_PREFIX
+            + Akira.Services.ActionManager.ACTION_MOVE_BOTTOM;
 
         preferences = new Akira.Partials.HeaderBarButton (window, "open-menu",
             _("Settings"), {"<Ctrl>comma"});
