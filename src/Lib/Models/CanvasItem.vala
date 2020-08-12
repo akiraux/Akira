@@ -358,28 +358,16 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
         border_color = rgba_stroke;
     }
 
+    /*
+     * TODO: This method needs to account for the actual path of the item and not
+     * just the bounding box. I don't know if this is possible directly with goocanvas
+     * or it needs some cairo trickery to make it work.
+     */
     public bool simple_is_item_at (double x, double y, Cairo.Context cr, bool is_pointer_event) {
-        var width = get_coords ("width");
-        var height = get_coords ("height");
-
-        var item_x = relative_x;
-        var item_y = relative_y;
-
-        canvas.convert_from_item_space (
-            artboard,
-            ref item_x,
-            ref item_y);
-
-        if (
-            x >= item_x
-            && x <= item_x + width
-            && y >= item_y
-            && y <= item_y + height
-        ) {
-            return true;
-        }
-
-        return false;
+        return x >= bounds_manager.x1
+            && x <= bounds_manager.x2
+            && y >= bounds_manager.y1
+            && y <= bounds_manager.y2;
     }
 
     // Update the size ratio to respect the updated size.
