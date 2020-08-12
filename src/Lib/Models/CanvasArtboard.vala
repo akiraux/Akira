@@ -229,17 +229,19 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
                 cr.save ();
                 cr.transform (item.compute_transform (Cairo.Matrix.identity ()));
 
+                // TEMPORARILY REMOVED.
+                // This won't work until the official goocanvas PPA gets the fixed VAPI.
                 // Clip the item if it comes with a path mask.
-                if (canvas_item.simple_data.clip_path_commands != null) {
-                    Goo.Canvas.create_path (canvas_item.simple_data.clip_path_commands, cr);
-                    Cairo.FillRule fill_rule =
-                        canvas_item.simple_data.clip_fill_rule == 0
-                        ? Cairo.FillRule.EVEN_ODD
-                        : Cairo.FillRule.WINDING;
+                // if (canvas_item.simple_data.clip_path_commands != null) {
+                //     Goo.Canvas.create_path (canvas_item.simple_data.clip_path_commands, cr);
+                //     Cairo.FillRule fill_rule =
+                //         canvas_item.simple_data.clip_fill_rule == 0
+                //         ? Cairo.FillRule.EVEN_ODD
+                //         : Cairo.FillRule.WINDING;
 
-                    cr.set_fill_rule (fill_rule);
-                    cr.clip ();
-                }
+                //     cr.set_fill_rule (fill_rule);
+                //     cr.clip ();
+                // }
 
                 canvas_item.simple_paint (cr, bounds);
                 cr.restore ();
