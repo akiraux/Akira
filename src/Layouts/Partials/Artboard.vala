@@ -223,11 +223,13 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 
         handle.enter_notify_event.connect (event => {
             get_style_context ().add_class ("hover");
+            window.event_bus.hover_over_layer (model);
             return false;
         });
 
         handle.leave_notify_event.connect (event => {
             get_style_context ().remove_class ("hover");
+            window.event_bus.hover_over_layer (null);
             return false;
         });
 
@@ -240,6 +242,17 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 
         lock_actions ();
         hide_actions ();
+
+        window.event_bus.hover_over_item.connect (on_hover_over_item);
+    }
+
+    private void on_hover_over_item (Lib.Models.CanvasItem? item) {
+        if (item == model) {
+            get_style_context ().add_class ("hovered");
+            return;
+        }
+
+        get_style_context ().remove_class ("hovered");
     }
 
     private void build_drag_and_drop () {
@@ -491,6 +504,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
             }
 
             window.event_bus.set_focus_on_canvas ();
+            window.event_bus.file_edited ();
         });
     }
 
@@ -525,6 +539,9 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 
             icon_hidden.visible = ! active;
             icon_hidden.no_show_all = active;
+
+            window.event_bus.set_focus_on_canvas ();
+            window.event_bus.file_edited ();
         });
     }
 }
