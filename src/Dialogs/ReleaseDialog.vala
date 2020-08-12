@@ -63,10 +63,10 @@ public class Akira.Dialogs.ReleaseDialog : Gtk.Dialog {
         app_version.get_style_context ().add_class ("h2");
         app_version.selectable = true;
 
-        var version_title = new Gtk.Label ("Experimental Alpha Release, say Hi to Akira!");
+        var version_title = new Gtk.Label ("Bug fixes and Artboards improvements");
         version_title.get_style_context ().add_class ("h3");
 
-        var version_date = new Gtk.Label ("Apr 26th, 2020");
+        var version_date = new Gtk.Label ("Aug 12th, 2020");
         version_date.get_style_context ().add_class ("dim-label");
 
         var header_grid = new Gtk.Grid ();
@@ -81,7 +81,7 @@ public class Akira.Dialogs.ReleaseDialog : Gtk.Dialog {
         scrolled.expand = true;
 
         var release_info = new Gtk.TextView ();
-        release_info.buffer.text = "✓ Create Artboards and nested basic shapes\n✓ Manage the fill and border properties of shapes\n✓ Import images\n✓ Export custom areas, selections, and artboards\n✓ So many crashes and missing features you wouldn't believe, but hey, this is an experimental alpha…";
+        release_info.buffer.text = "✓ Control Artboards background color.\n✓ Hide and Lock Artbaords from the Layers panel.\n✓ Items inside Artboards are masked when extending outside the edges of the Artboard.\n✓ Fix items reordering with the layers panel drag and drop.\n✓ Fix random segfault at startup while setting accelerators.\n✓ Updated goocanvas vapi.";
         release_info.pixels_below_lines = 3;
         release_info.border_width = 12;
         release_info.wrap_mode = Gtk.WrapMode.WORD;

@@ -7,7 +7,7 @@ com.github.akiraux.akira (0.0.12) xenial; urgency=medium
   * Fix random segfault at startup while setting accelerators.
   * Updated goocanvas vapi.
 
- -- Alessandro Castellani <castellani.ale@gmail.com>  Sun, 11 Aug 2020 09:00:00 -0800
+ -- Alessandro Castellani <castellani.ale@gmail.com>  Sun, 12 Aug 2020 09:00:00 -0800
 
 com.github.akiraux.akira (0.0.11) xenial; urgency=medium
 

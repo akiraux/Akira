@@ -32,16 +32,16 @@
 		<binary>@APP_ID@</binary>
 	</provides>
   <releases>
-    <release version="0.0.12" date="2020-08-11">
+    <release version="0.0.12" date="2020-08-12">
       <description>
         <p>Bug fixes and Artboards improvements</p>
         <ul>
           <li>Control Artboards background color.</li>
           <li>Hide and Lock Artbaords from the Layers panel.</li>
           <li>Items inside Artboards are masked when extending outside the edges of the Artboard.</li>
-          <li>Fix items reordering with the layers panel drag and drop</li>
-          <li>Fix random segfault at startup while setting accelerators</li>
-          <li>Updated goocanvas vapi</li>
+          <li>Fix items reordering with the layers panel drag and drop.</li>
+          <li>Fix random segfault at startup while setting accelerators.</li>
+          <li>Updated goocanvas vapi.</li>
         </ul>
       </description>
     </release>
@@ -145,6 +145,6 @@
   <custom>
     <value key="x-appcenter-color-primary">#3f3f3f</value>
     <value key="x-appcenter-color-primary-text">#ffffff</value>
-    <value key="x-appcenter-suggested-price">35</value>
+    <value key="x-appcenter-suggested-price">15</value>
   </custom>
 </component>
