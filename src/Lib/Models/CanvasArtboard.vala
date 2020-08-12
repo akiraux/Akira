@@ -271,6 +271,21 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
         bool parent_is_visible,
         GLib.List<Goo.CanvasItem> found_items
     ) {
+        // Check if the item needs a paint update.
+        if (need_update == 1) {
+            ensure_updated ();
+        }
+
+        // Skip the item if the point isn't in the item's bounds.
+        if (bounds.x1 > x || bounds.x2 < x || bounds.y1 > y || bounds.y2 < y) {
+            return found_items;
+        }
+
+        // Skip the item if is not visible or locked.
+        if (visibility != Goo.CanvasItemVisibility.VISIBLE || locked == true) {
+            return found_items;
+        }
+
         var artboard_x = x;
         var artboard_y = y;
 
