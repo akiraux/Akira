@@ -212,8 +212,12 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
         cr.move_to (x, y - LABEL_BOTTOM_PADDING);
         cr.show_text (name != null ? name : id);
 
-        cr.set_source_rgba (1, 1, 1, 1);
+        // Mask items outside Artboard.
         cr.rectangle (x, y, width, height);
+        cr.clip ();
+
+        cr.rectangle (x, y, width, height);
+        cr.set_source_rgba (1, 1, 1, 1);
         cr.fill ();
 
         if (items.get_n_items () > 0) {
@@ -230,18 +234,30 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
                     force_redraw = true;
                 }
 
-                cr.save ();
-
-                cr.transform (item.compute_transform (Cairo.Matrix.identity ()));
-                item.bounds_manager.update ();
-
                 var canvas_item = item as Goo.CanvasItemSimple;
-
-                if (canvas_item != null && item.visibility == Goo.CanvasItemVisibility.VISIBLE) {
-                    canvas_item.simple_paint (cr, bounds);
+                if (canvas_item == null || item.visibility != Goo.CanvasItemVisibility.VISIBLE) {
+                    continue;
                 }
 
+                cr.save ();
+                cr.transform (item.compute_transform (Cairo.Matrix.identity ()));
+
+                // Clip the item if it comes with a path mask.
+                if (canvas_item.simple_data.clip_path_commands != null) {
+                    Goo.Canvas.create_path (canvas_item.simple_data.clip_path_commands, cr);
+                    Cairo.FillRule fill_rule =
+                        canvas_item.simple_data.clip_fill_rule == 0
+                        ? Cairo.FillRule.EVEN_ODD
+                        : Cairo.FillRule.WINDING;
+
+                    cr.set_fill_rule (fill_rule);
+                    cr.clip ();
+                }
+
+                canvas_item.simple_paint (cr, bounds);
                 cr.restore ();
+
+                item.bounds_manager.update ();
             }
 
             if (force_redraw) {
@@ -255,7 +271,7 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
         return y < 0
             && y > - get_label_height ()
             && x > 0
-            && x < (label_extents.width);
+            && x < label_extents.width;
     }
 
     public double get_label_height () {

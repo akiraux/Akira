@@ -137,7 +137,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
         switch (uppercase_keyval) {
             case Gdk.Key.Escape:
-                edit_mode = Akira.Lib.Canvas.EditMode.MODE_SELECTION;
+                edit_mode = EditMode.MODE_SELECTION;
                 // Clear the selected export area to be sure to not leave anything behind.
                 export_manager.clear ();
                 break;
