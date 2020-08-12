@@ -223,11 +223,13 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 
         handle.enter_notify_event.connect (event => {
             get_style_context ().add_class ("hover");
+            window.event_bus.hover_over_layer (model);
             return false;
         });
 
         handle.leave_notify_event.connect (event => {
             get_style_context ().remove_class ("hover");
+            window.event_bus.hover_over_layer (null);
             return false;
         });
 
@@ -237,6 +239,20 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
             var item_model = item as Akira.Lib.Models.CanvasItem;
             return new Akira.Layouts.Partials.Layer (window, item_model, container);
         });
+
+        lock_actions ();
+        hide_actions ();
+
+        window.event_bus.hover_over_item.connect (on_hover_over_item);
+    }
+
+    private void on_hover_over_item (Lib.Models.CanvasItem? item) {
+        if (item == model) {
+            get_style_context ().add_class ("hovered");
+            return;
+        }
+
+        get_style_context ().remove_class ("hovered");
     }
 
     private void build_drag_and_drop () {
@@ -460,5 +476,72 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
     private bool handle_focus_in (Gdk.EventFocus event) {
         window.event_bus.disconnect_typing_accel ();
         return false;
+    }
+
+    private void lock_actions () {
+        button_locked.bind_property ("active", model, "locked",
+            BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE);
+
+        button_locked.toggled.connect (() => {
+            var active = button_locked.get_active ();
+            button_locked.tooltip_text = active ? _("Unlock Layer") : _("Lock Layer");
+
+            if (active) {
+                button_locked.get_style_context ().add_class ("show");
+            } else {
+                button_locked.get_style_context ().remove_class ("show");
+            }
+
+            icon_unlocked.visible = active;
+            icon_unlocked.no_show_all = ! active;
+
+            icon_locked.visible = ! active;
+            icon_locked.no_show_all = active;
+
+            if (active) {
+                window.event_bus.item_locked (model);
+                (parent as Gtk.ListBox).unselect_row (this);
+            }
+
+            window.event_bus.set_focus_on_canvas ();
+            window.event_bus.file_edited ();
+        });
+    }
+
+    private void hide_actions () {
+        button_hidden.bind_property ("active", model, "visibility",
+            BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE,
+            (binding, srcval, ref targetval) => {
+                Goo.CanvasItemVisibility status = (bool) srcval.get_boolean ()
+                    ? Goo.CanvasItemVisibility.INVISIBLE
+                    : Goo.CanvasItemVisibility.VISIBLE;
+                targetval.set_enum (status);
+                return true;
+            },
+            (binding, srcval, ref targetval) => {
+                var status = ((Goo.CanvasItemVisibility) srcval.get_enum ()) == Goo.CanvasItemVisibility.INVISIBLE;
+                targetval.set_boolean (status);
+                return true;
+            });
+
+        button_hidden.toggled.connect (() => {
+            var active = button_hidden.get_active ();
+            button_hidden.tooltip_text = active ? _("Show Layer") : _("Hide Layer");
+
+            if (active) {
+                button_hidden.get_style_context ().add_class ("show");
+            } else {
+                button_hidden.get_style_context ().remove_class ("show");
+            }
+
+            icon_visible.visible = active;
+            icon_visible.no_show_all = ! active;
+
+            icon_hidden.visible = ! active;
+            icon_hidden.no_show_all = active;
+
+            window.event_bus.set_focus_on_canvas ();
+            window.event_bus.file_edited ();
+        });
     }
 }

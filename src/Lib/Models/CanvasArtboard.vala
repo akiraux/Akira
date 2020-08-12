@@ -115,10 +115,14 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
         y = 0;
 
         show_border_radius_panel = false;
-        show_fill_panel = false;
+        show_fill_panel = true;
         show_border_panel = false;
         is_radius_uniform = true;
         is_radius_autoscale = false;
+
+        var fill_rgba = Gdk.RGBA ();
+        fill_rgba.parse ("rgba (255, 255, 255, 1)");
+        color = fill_rgba;
 
         set_transform (Cairo.Matrix.identity ());
 
@@ -209,7 +213,10 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
         cr.clip ();
 
         cr.rectangle (x, y, width, height);
-        cr.set_source_rgba (1, 1, 1, 1);
+
+        // If the user hides or delete the fill color, set the opacity to 0.
+        var alpha = hidden_fill || !has_fill ? 0 : color.alpha;
+        cr.set_source_rgba (color.red, color.green, color.blue, alpha);
         cr.fill ();
 
         if (items.get_n_items () > 0) {
