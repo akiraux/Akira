@@ -1,5 +1,6 @@
 com.github.akiraux.akira (0.0.12) xenial; urgency=medium
 
+  * Items inside Artboards are masked when extending outside the edges of the Artboard.
   * Fix items reordering with the layers panel drag and drop.
   * Fix random segfault at startup while setting accelerators.
   * Updated goocanvas vapi.
