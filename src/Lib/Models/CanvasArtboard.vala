@@ -154,13 +154,6 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
             && y <= bounds.y2;
     }
 
-    public bool is_outside (Models.CanvasItem item) {
-        return item.bounds_manager.x1 < bounds.x1
-            || item.bounds_manager.x2 > bounds.x2
-            || item.bounds_manager.y1 < bounds.y1
-            || item.bounds_manager.y2 > bounds.y2;
-    }
-
     public bool dropped_inside (Models.CanvasItem item) {
         return item.bounds_manager.x1 < bounds.x2
             && item.bounds_manager.x2 > bounds.x1
@@ -198,7 +191,6 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
     }
 
     public override void simple_paint (Cairo.Context cr, Goo.CanvasBounds bounds) {
-        bool force_redraw = false;
         cr.set_source_rgba (0, 0, 0, 0.6);
 
         if (settings.dark_theme) {
@@ -229,11 +221,6 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
             for (var i = 0; i < items_length; i++) {
                 var item = items[items_length - 1 - i];
 
-                // Check if the item is partially outside.
-                if (is_outside (item)) {
-                    force_redraw = true;
-                }
-
                 var canvas_item = item as Goo.CanvasItemSimple;
                 if (canvas_item == null || item.visibility != Goo.CanvasItemVisibility.VISIBLE) {
                     continue;
@@ -258,10 +245,6 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
                 cr.restore ();
 
                 item.bounds_manager.update ();
-            }
-
-            if (force_redraw) {
-                canvas.queue_draw ();
             }
         }
     }
