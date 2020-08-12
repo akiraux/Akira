@@ -128,8 +128,8 @@ public class Akira.Utils.AffineTransform : Object {
 
         double item_width = item.get_coords ("width");
         double item_height = item.get_coords ("height");
-        double item_x = item.get_global_coord ("x");
-        double item_y = item.get_global_coord ("y");
+        double item_x = item.bounds_manager.x1;
+        double item_y = item.bounds_manager.y1;
 
         double new_width = 0;
         double new_height = 0;

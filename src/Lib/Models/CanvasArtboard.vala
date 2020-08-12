@@ -154,28 +154,11 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
             && y <= bounds.y2;
     }
 
-    public bool is_outside (Models.CanvasItem item) {
-        var x1 = item.get_global_coord ("x");
-        var x2 = x1 + item.get_coords ("width");
-        var y1 = item.get_global_coord ("y");
-        var y2 = y1 + item.get_coords ("height");
-
-        return x1 < bounds.x1
-            || x2 > bounds.x2
-            || y1 < bounds.y1
-            || y2 > bounds.y2;
-    }
-
     public bool dropped_inside (Models.CanvasItem item) {
-        var x1 = item.get_global_coord ("x");
-        var x2 = x1 + item.get_coords ("width");
-        var y1 = item.get_global_coord ("y");
-        var y2 = y1 + item.get_coords ("height");
-
-        return x1 < bounds.x2
-            && x2 > bounds.x1
-            && y1 < bounds.y2
-            && y2 > bounds.y1;
+        return item.bounds_manager.x1 < bounds.x2
+            && item.bounds_manager.x2 > bounds.x1
+            && item.bounds_manager.y1 < bounds.y2
+            && item.bounds_manager.y2 > bounds.y1;
     }
 
     public void add_child (Goo.CanvasItem item, int position = -1) {
@@ -195,26 +178,19 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
         Cairo.ImageSurface surface = new Cairo.ImageSurface (Cairo.Format.ARGB32, 290, 256);
         Cairo.Context cr = new Cairo.Context (surface);
 
-        cr.select_font_face (
-            "Sans",
-            Cairo.FontSlant.NORMAL,
-            Cairo.FontWeight.NORMAL
-            );
-
+        cr.select_font_face ("Sans", Cairo.FontSlant.NORMAL, Cairo.FontWeight.NORMAL);
         cr.set_font_size (LABEL_FONT_SIZE / (canvas as Lib.Canvas).current_scale);
-
         cr.text_extents (id, out label_extents);
     }
 
     public override void simple_update (Cairo.Context cr) {
         bounds.x1 = x;
-        bounds.y1 = y - label_extents.height - LABEL_BOTTOM_PADDING;
+        bounds.y1 = y - get_label_height ();
         bounds.x2 = x + width;
         bounds.y2 = y + height;
     }
 
     public override void simple_paint (Cairo.Context cr, Goo.CanvasBounds bounds) {
-        bool force_redraw = false;
         cr.set_source_rgba (0, 0, 0, 0.6);
 
         if (settings.dark_theme) {
@@ -228,8 +204,12 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
         cr.move_to (x, y - LABEL_BOTTOM_PADDING);
         cr.show_text (name != null ? name : id);
 
-        cr.set_source_rgba (1, 1, 1, 1);
+        // Mask items outside Artboard.
         cr.rectangle (x, y, width, height);
+        cr.clip ();
+
+        cr.rectangle (x, y, width, height);
+        cr.set_source_rgba (1, 1, 1, 1);
         cr.fill ();
 
         if (items.get_n_items () > 0) {
@@ -237,42 +217,46 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
 
             // Painting items in reversed order in order to
             // print last item inserted (top of the stack) on top
-            // of the items inserted before
+            // of the items inserted before.
             for (var i = 0; i < items_length; i++) {
                 var item = items[items_length - 1 - i];
 
-                // Check if the item is partially outside.
-                if (is_outside (item)) {
-                    force_redraw = true;
+                var canvas_item = item as Goo.CanvasItemSimple;
+                if (canvas_item == null || item.visibility != Goo.CanvasItemVisibility.VISIBLE) {
+                    continue;
                 }
 
                 cr.save ();
-
                 cr.transform (item.compute_transform (Cairo.Matrix.identity ()));
-                item.bounds_manager.update ();
 
-                var canvas_item = item as Goo.CanvasItemSimple;
+                // TEMPORARILY REMOVED.
+                // This won't work until the official goocanvas PPA gets the fixed VAPI.
+                // Clip the item if it comes with a path mask.
+                // if (canvas_item.simple_data.clip_path_commands != null) {
+                //     Goo.Canvas.create_path (canvas_item.simple_data.clip_path_commands, cr);
+                //     Cairo.FillRule fill_rule =
+                //         canvas_item.simple_data.clip_fill_rule == 0
+                //         ? Cairo.FillRule.EVEN_ODD
+                //         : Cairo.FillRule.WINDING;
 
-                if (canvas_item != null && item.visibility == Goo.CanvasItemVisibility.VISIBLE) {
-                    canvas_item.simple_paint (cr, bounds);
-                }
+                //     cr.set_fill_rule (fill_rule);
+                //     cr.clip ();
+                // }
 
+                canvas_item.simple_paint (cr, bounds);
                 cr.restore ();
-            }
 
-            if (force_redraw) {
-                canvas.queue_draw ();
+                item.bounds_manager.update ();
             }
         }
     }
 
     public override bool simple_is_item_at (double x, double y, Cairo.Context cr, bool is_pointer_event) {
-        // To select an Artboard you should put the arrow
-        // over the Artboard label
+        // To select an Artboard you should put the arrow over the Artboard label.
         return y < 0
-            && y > - (label_extents.height + LABEL_BOTTOM_PADDING)
+            && y > - get_label_height ()
             && x > 0
-            && x < (label_extents.width);
+            && x < label_extents.width;
     }
 
     public double get_label_height () {
@@ -287,6 +271,21 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
         bool parent_is_visible,
         GLib.List<Goo.CanvasItem> found_items
     ) {
+        // Check if the item needs a paint update.
+        if (need_update == 1) {
+            ensure_updated ();
+        }
+
+        // Skip the item if the point isn't in the item's bounds.
+        if (bounds.x1 > x || bounds.x2 < x || bounds.y1 > y || bounds.y2 < y) {
+            return found_items;
+        }
+
+        // Skip the item if is not visible or locked.
+        if (visibility != Goo.CanvasItemVisibility.VISIBLE || locked == true) {
+            return found_items;
+        }
+
         var artboard_x = x;
         var artboard_y = y;
 
@@ -297,14 +296,7 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
         }
 
         foreach (Lib.Models.CanvasItem item in items) {
-            var item_x = x;
-            var item_y = y;
-
-            canvas.convert_to_item_space (item, ref item_x, ref item_y);
-
-            var item_is_inside = item.simple_is_item_at (x, y, cr, is_pointer_event);
-
-            if (item_is_inside) {
+            if (item.simple_is_item_at (x, y, cr, is_pointer_event)) {
                 found_items.append (item);
             }
         }
