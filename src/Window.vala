@@ -153,7 +153,7 @@ public class Akira.Window : Gtk.ApplicationWindow {
         uint length = app.windows.length ();
 
         if (length == 0) {
-            Gtk.main_quit ();
+            app.quit ();
         }
     }
 
