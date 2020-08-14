@@ -19,13 +19,13 @@
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 * Authored by: Giacomo "giacomoalbe" Alberini <giacomoalbe@gmail.com>
 */
+
 public class Akira.Layouts.MainCanvas : Gtk.Grid {
     public const int CANVAS_SIZE = 100000;
     public const double SCROLL_DISTANCE = 0;
 
     public Gtk.ScrolledWindow main_scroll;
     public Akira.Lib.Canvas canvas;
-    public Gtk.Allocation main_window_size;
     public weak Akira.Window window { get; construct; }
 
     private Gtk.Overlay main_overlay;
@@ -40,12 +40,6 @@ public class Akira.Layouts.MainCanvas : Gtk.Grid {
     }
 
     construct {
-        window.event_bus.exporting.connect (on_exporting);
-        window.event_bus.export_completed.connect (on_export_completed);
-        window.event_bus.canvas_notification.connect (trigger_notification);
-
-        get_allocation (out main_window_size);
-
         get_style_context ().add_class ("main-canvas");
 
         main_overlay = new Gtk.Overlay ();
@@ -61,12 +55,8 @@ public class Akira.Layouts.MainCanvas : Gtk.Grid {
         main_scroll.set_policy (Gtk.PolicyType.NEVER, Gtk.PolicyType.NEVER);
 
         canvas = new Akira.Lib.Canvas (window);
-
-        canvas.set_size_request (main_window_size.width, main_window_size.height);
         canvas.set_bounds (0, 0, CANVAS_SIZE, CANVAS_SIZE);
         canvas.set_scale (1.0);
-
-        canvas.update_bounds ();
 
         canvas.canvas_moved.connect ((event_x, event_y) => {
             // Move scroll window according to normalized mouse delta
@@ -108,6 +98,10 @@ public class Akira.Layouts.MainCanvas : Gtk.Grid {
         main_overlay.add_overlay (notification);
 
         add (main_overlay);
+
+        window.event_bus.exporting.connect (on_exporting);
+        window.event_bus.export_completed.connect (on_export_completed);
+        window.event_bus.canvas_notification.connect (trigger_notification);
     }
 
     public bool on_scroll (Gdk.EventScroll event) {
@@ -144,6 +138,9 @@ public class Akira.Layouts.MainCanvas : Gtk.Grid {
         } else if (delta_x > SCROLL_DISTANCE) {
             main_scroll.hadjustment.value += delta_x * 10;
         }
+
+        update_visible_area ();
+
         return true;
     }
 
@@ -163,5 +160,11 @@ public class Akira.Layouts.MainCanvas : Gtk.Grid {
     private async void trigger_notification (string message) {
         notification.title = message;
         notification.send_notification ();
+    }
+
+    private void update_visible_area () {
+        // debug (@"
+        // W: $(main_window_size.width)
+        // Y: $(main_window_size.height)");
     }
 }
