@@ -99,6 +99,7 @@ public class Akira.Layouts.MainCanvas : Gtk.Grid {
 
         add (main_overlay);
 
+        // Set up event listeners.
         window.event_bus.exporting.connect (on_exporting);
         window.event_bus.export_completed.connect (on_export_completed);
         window.event_bus.canvas_notification.connect (trigger_notification);
@@ -139,8 +140,6 @@ public class Akira.Layouts.MainCanvas : Gtk.Grid {
             main_scroll.hadjustment.value += delta_x * 10;
         }
 
-        update_visible_area ();
-
         return true;
     }
 
@@ -160,11 +159,5 @@ public class Akira.Layouts.MainCanvas : Gtk.Grid {
     private async void trigger_notification (string message) {
         notification.title = message;
         notification.send_notification ();
-    }
-
-    private void update_visible_area () {
-        // debug (@"
-        // W: $(main_window_size.width)
-        // Y: $(main_window_size.height)");
     }
 }

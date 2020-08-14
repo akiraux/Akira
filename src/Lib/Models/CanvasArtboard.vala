@@ -194,9 +194,11 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
         bounds.y2 = y + height;
     }
 
-    public override void simple_paint (Cairo.Context cr, Goo.CanvasBounds bounds) {
-        // Don't paint the artboard if is outside the visible area.
-
+    /*
+     * Paint the artbaord and all its child elements. This method is not called
+     * if the artboard is outside the visible canvas area. Goocanvas does this automatically.
+     */
+    public override void simple_paint (Cairo.Context cr, Goo.CanvasBounds area_bounds) {
         cr.set_source_rgba (0, 0, 0, 0.6);
 
         if (settings.dark_theme) {
