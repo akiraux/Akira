@@ -208,21 +208,24 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
      * if the artboard is outside the visible canvas area. Goocanvas does this automatically.
      */
     public override void simple_paint (Cairo.Context cr, Goo.CanvasBounds area_bounds) {
-        cr.set_source_rgba (0, 0, 0, 0);
-        cr.fill ();
+        // Don't render the box shadow if the artboard doesn't have a background color.
+        if (!hidden_fill && has_fill) {
+            cr.set_source_rgba (0, 0, 0, 0);
+            cr.fill ();
 
-        cr.set_operator (Cairo.Operator.OVER);
-        cr.save ();
-        cr.scale (1, 1);
-        style_context.save ();
-        if (css_class != null) {
-            style_context.add_class (css_class);
+            cr.set_operator (Cairo.Operator.OVER);
+            cr.save ();
+            cr.scale (1, 1);
+            style_context.save ();
+            if (css_class != null) {
+                style_context.add_class (css_class);
+            }
+
+            style_context.set_scale (1);
+            style_context.render_background (cr, 5, 5, width - 5 * 2, height - 5 * 2);
+            style_context.restore ();
+            cr.restore ();
         }
-
-        style_context.set_scale (1);
-        style_context.render_background (cr, 5, 5, width - 5 * 2, height - 5 * 2);
-        style_context.restore ();
-        cr.restore ();
 
         cr.set_source_rgba (0, 0, 0, 0.6);
 
