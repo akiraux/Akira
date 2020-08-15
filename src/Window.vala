@@ -20,6 +20,7 @@
 */
 
 public class Akira.Window : Gtk.ApplicationWindow {
+    public Gtk.CssProvider css_provider;
     public FileFormat.AkiraFile? akira_file = null;
     public FileFormat.FileManager file_manager;
 
@@ -87,7 +88,7 @@ public class Akira.Window : Gtk.ApplicationWindow {
     private void apply_user_settings () {
         Gtk.Settings.get_default ().gtk_application_prefer_dark_theme = settings.dark_theme;
 
-        var css_provider = new Gtk.CssProvider ();
+        css_provider = new Gtk.CssProvider ();
         css_provider.load_from_resource ("/com/github/akiraux/akira/stylesheet.css");
 
         Gtk.StyleContext.add_provider_for_screen (
