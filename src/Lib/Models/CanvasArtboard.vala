@@ -224,8 +224,6 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
         style_context.restore ();
         cr.restore ();
 
-        cr.paint ();
-
         cr.set_source_rgba (0, 0, 0, 0.6);
 
         if (settings.dark_theme) {
@@ -233,10 +231,8 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
         }
 
         cr.select_font_face ("Sans", Cairo.FontSlant.NORMAL, Cairo.FontWeight.NORMAL);
-
         cr.set_font_size (LABEL_FONT_SIZE / (canvas as Lib.Canvas).current_scale);
-
-        cr.move_to (x, y - LABEL_BOTTOM_PADDING);
+        cr.move_to (x, y - (LABEL_BOTTOM_PADDING / (canvas as Lib.Canvas).current_scale));
         cr.show_text (name != null ? name : id);
 
         // Mask items outside Artboard.
