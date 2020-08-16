@@ -64,6 +64,8 @@ public class Akira.Services.ActionManager : Object {
     public const string ACTION_FLIP_V = "action_flip_v";
     public const string ACTION_ESCAPE = "action_escape";
     public const string ACTION_SHORTCUTS = "action_shortcuts";
+    public const string ACTION_COPY = "action_copy";
+    public const string ACTION_PASTE = "action_paste";
 
     public static Gee.MultiMap<string, string> action_accelerators = new Gee.HashMultiMap<string, string> ();
     public static Gee.MultiMap<string, string> typing_accelerators = new Gee.HashMultiMap<string, string> ();
@@ -101,6 +103,8 @@ public class Akira.Services.ActionManager : Object {
         { ACTION_FLIP_V, action_flip_v },
         { ACTION_ESCAPE, action_escape },
         { ACTION_SHORTCUTS, action_shortcuts },
+        { ACTION_COPY, action_copy },
+        { ACTION_PASTE, action_paste },
     };
 
     public ActionManager (Akira.Application akira_app, Akira.Window window) {
@@ -136,6 +140,8 @@ public class Akira.Services.ActionManager : Object {
         action_accelerators.set (ACTION_MOVE_BOTTOM, "<Control><Shift>Down");
         action_accelerators.set (ACTION_FLIP_H, "<Control>bracketleft");
         action_accelerators.set (ACTION_FLIP_V, "<Control>bracketright");
+        typing_accelerators.set (ACTION_COPY, "<Control>c");
+        typing_accelerators.set (ACTION_PASTE, "<Control>v");
         action_accelerators.set (ACTION_SHORTCUTS, "F1");
 
         typing_accelerators.set (ACTION_ESCAPE, "Escape");
@@ -340,6 +346,33 @@ public class Akira.Services.ActionManager : Object {
     // Delete the currently selected items.
     private void action_delete () {
         window.main_window.main_canvas.canvas.selected_bound_manager.delete_selection ();
+    }
+
+    private void action_copy () {
+        //  var selected_item = window.main_window.main_canvas.canvas.selected_bound_manager.selected_items.nth_data (0);
+        //  window.main_window.main_canvas.canvas.selected_bound_manager.add_item_to_selection (selected_item as Akira.Lib.Models.CanvasItem);
+        //  bool output = window.main_windows.main_canvas.canvasselected_bound_manager.get_selected();
+        //window.event_bus.insert_item ("rectangle");
+    }
+
+    private void action_paste () {
+        // Got the list of selected items
+        var list = window.main_window.main_canvas.canvas.selected_bound_manager.selected_items.copy();
+        var  selected_item = list.nth_data (0); // this is wrong but don't know the intializing statement in vala, just working 
+        // iterate over the list to find the selected item
+         for (var i = 0; i < list.length (); i++) {
+            if (list.nth_data (i).selected == true) {
+                selected_item = list.nth_data (i);
+                break; // not good coding please improve
+            }
+        }
+        
+        if(selected_item != null) {
+            window.items_manager.set_item_to_insert (selected_item.name);
+            window.items_manager.insert_item (selected_item.relative_x, selected_item.relative_y);
+            window.main_window.main_canvas.canvas.selected_bound_manager.add_item_to_selection (selected_item as Akira.Lib.Models.CanvasItem);
+        }
+        
     }
 
     private void action_flip_h () {
