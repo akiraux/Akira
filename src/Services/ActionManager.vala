@@ -349,6 +349,8 @@ public class Akira.Services.ActionManager : Object {
     }
 
     private void action_copy () {
+        // If mouse click adds the selected item to list then we don't need this method
+        
         //  var selected_item = window.main_window.main_canvas.canvas.selected_bound_manager.selected_items.nth_data (0);
         //  window.main_window.main_canvas.canvas.selected_bound_manager.add_item_to_selection (selected_item as Akira.Lib.Models.CanvasItem);
         //  bool output = window.main_windows.main_canvas.canvasselected_bound_manager.get_selected();
