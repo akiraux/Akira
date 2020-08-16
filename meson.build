@@ -1,4 +1,3 @@
-# project name and programming language
 project('com.github.akiraux.akira', 'vala', 'c')
 
 akira_prefix = get_option('prefix')
