@@ -194,7 +194,7 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
         bounds.y2 = y + height;
     }
 
-    public override void simple_paint (Cairo.Context cr, Goo.CanvasBounds bounds) {
+    public override void simple_paint (Cairo.Context cr, Goo.CanvasBounds new_bounds) {
         cr.set_source_rgba (0, 0, 0, 0.6);
 
         if (settings.dark_theme) {
@@ -219,42 +219,45 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
         cr.set_source_rgba (color.red, color.green, color.blue, alpha);
         cr.fill ();
 
-        if (items.get_n_items () > 0) {
-            var items_length = items.get_n_items ();
+        // Interrupt if no item is present in the artboard.
+        if (items.get_n_items () == 0) {
+            return;
+        }
 
-            // Painting items in reversed order in order to
-            // print last item inserted (top of the stack) on top
-            // of the items inserted before.
-            for (var i = 0; i < items_length; i++) {
-                var item = items[items_length - 1 - i];
+        var items_length = items.get_n_items ();
 
-                var canvas_item = item as Goo.CanvasItemSimple;
-                if (canvas_item == null || item.visibility != Goo.CanvasItemVisibility.VISIBLE) {
-                    continue;
-                }
+        // Painting items in reversed order in order to
+        // print last item inserted (top of the stack) on top
+        // of the items inserted before.
+        for (var i = 0; i < items_length; i++) {
+            var item = items[items_length - 1 - i];
 
-                cr.save ();
-                cr.transform (item.compute_transform (Cairo.Matrix.identity ()));
-
-                // TEMPORARILY REMOVED.
-                // This won't work until the official goocanvas PPA gets the fixed VAPI.
-                // Clip the item if it comes with a path mask.
-                // if (canvas_item.simple_data.clip_path_commands != null) {
-                //     Goo.Canvas.create_path (canvas_item.simple_data.clip_path_commands, cr);
-                //     Cairo.FillRule fill_rule =
-                //         canvas_item.simple_data.clip_fill_rule == 0
-                //         ? Cairo.FillRule.EVEN_ODD
-                //         : Cairo.FillRule.WINDING;
-
-                //     cr.set_fill_rule (fill_rule);
-                //     cr.clip ();
-                // }
-
-                canvas_item.simple_paint (cr, bounds);
-                cr.restore ();
-
-                item.bounds_manager.update ();
+            var canvas_item = item as Goo.CanvasItemSimple;
+            if (canvas_item == null || item.visibility != Goo.CanvasItemVisibility.VISIBLE) {
+                continue;
             }
+
+            cr.save ();
+            cr.transform (item.compute_transform (Cairo.Matrix.identity ()));
+
+            // TEMPORARILY REMOVED.
+            // This won't work until the official goocanvas PPA gets the fixed VAPI.
+            // Clip the item if it comes with a path mask.
+            // if (canvas_item.simple_data.clip_path_commands != null) {
+            //     Goo.Canvas.create_path (canvas_item.simple_data.clip_path_commands, cr);
+            //     Cairo.FillRule fill_rule =
+            //         canvas_item.simple_data.clip_fill_rule == 0
+            //         ? Cairo.FillRule.EVEN_ODD
+            //         : Cairo.FillRule.WINDING;
+
+            //     cr.set_fill_rule (fill_rule);
+            //     cr.clip ();
+            // }
+
+            canvas_item.simple_paint (cr, bounds);
+            cr.restore ();
+
+            item.bounds_manager.update ();
         }
     }
 
