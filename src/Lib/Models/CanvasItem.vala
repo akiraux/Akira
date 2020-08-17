@@ -237,11 +237,6 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
             return;
         }
 
-        // Force the redraw of the visible canvas for the label and shadow.
-        if (this is Models.CanvasArtboard) {
-            canvas.queue_draw ();
-        }
-
         translate (x, y);
         bounds_manager.update ();
     }
