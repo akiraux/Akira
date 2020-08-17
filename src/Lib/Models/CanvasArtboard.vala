@@ -24,6 +24,9 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
     private const double LABEL_FONT_SIZE = 15.0;
     private const double LABEL_BOTTOM_PADDING = 8.0;
 
+    static Gtk.StyleContext style_context;
+    public string? css_class { get; set; default = null; }
+
     // Identifiers.
     public Models.CanvasItemType item_type { get; set; }
     public string id { get; set; }
@@ -138,6 +141,12 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
 
         canvas.window.event_bus.zoom.connect (trigger_change);
         canvas.window.event_bus.change_theme.connect (trigger_change);
+
+        var style_path = new Gtk.WidgetPath ();
+        style_context = new Gtk.StyleContext ();
+        style_context.add_provider (canvas.window.css_provider, Gtk.STYLE_PROVIDER_PRIORITY_FALLBACK);
+        style_context.add_class ("artboard-shadow");
+        style_context.set_path (style_path);
     }
 
     public uint get_items_length () {
@@ -194,7 +203,30 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
         bounds.y2 = y + height;
     }
 
-    public override void simple_paint (Cairo.Context cr, Goo.CanvasBounds new_bounds) {
+    /*
+     * Paint the artbaord and all its child elements. This method is not called
+     * if the artboard is outside the visible canvas area. Goocanvas does this automatically.
+     */
+    public override void simple_paint (Cairo.Context cr, Goo.CanvasBounds area_bounds) {
+        // Don't render the box shadow if the artboard doesn't have a background color.
+        if (!hidden_fill && has_fill) {
+            cr.set_source_rgba (0, 0, 0, 0);
+            cr.fill ();
+
+            cr.set_operator (Cairo.Operator.OVER);
+            cr.save ();
+            cr.scale (1, 1);
+            style_context.save ();
+            if (css_class != null) {
+                style_context.add_class (css_class);
+            }
+
+            style_context.set_scale (1);
+            style_context.render_background (cr, 5, 5, width - 5 * 2, height - 5 * 2);
+            style_context.restore ();
+            cr.restore ();
+        }
+
         cr.set_source_rgba (0, 0, 0, 0.6);
 
         if (settings.dark_theme) {
@@ -202,10 +234,8 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
         }
 
         cr.select_font_face ("Sans", Cairo.FontSlant.NORMAL, Cairo.FontWeight.NORMAL);
-
         cr.set_font_size (LABEL_FONT_SIZE / (canvas as Lib.Canvas).current_scale);
-
-        cr.move_to (x, y - LABEL_BOTTOM_PADDING);
+        cr.move_to (x, y - (LABEL_BOTTOM_PADDING / (canvas as Lib.Canvas).current_scale));
         cr.show_text (name != null ? name : id);
 
         // Mask items outside Artboard.

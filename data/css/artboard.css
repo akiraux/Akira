@@ -47,3 +47,8 @@
 .layer:last-child {
     border-bottom: 1px solid shade (@bg_color, 0.8);
 }
+
+.artboard-shadow {
+    /*box-shadow: 0 4px 6px -4px alpha(#000, 0.35);*/
+    box-shadow: 0 5px 5px -5px alpha(#000, 0.5);
+}

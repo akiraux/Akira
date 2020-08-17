@@ -102,6 +102,11 @@ public class Akira.Utils.AffineTransform : Object {
 
             item.set_transform (matrix);
             item.bounds_manager.update ();
+
+            // Force the redraw of the visible canvas for the label and shadow.
+            if (item is Lib.Models.CanvasArtboard) {
+                item.canvas.queue_draw ();
+            }
         }
 
         initial_event_x = event_x;
