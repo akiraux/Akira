@@ -487,20 +487,29 @@ public class Akira.Lib.Managers.ItemsManager : Object {
                 ? Goo.CanvasItemVisibility.VISIBLE
                 : Goo.CanvasItemVisibility.INVISIBLE;
 
-        // Restore fill and border.
-        if (!(item is Models.CanvasArtboard)) {
-            item.has_fill = obj.get_boolean_member ("has-fill");
-            item.hidden_fill = obj.get_boolean_member ("hidden-fill");
-            item.fill_alpha = (int) obj.get_int_member ("fill-alpha");
-            item.color_string = obj.get_string_member ("color-string");
+        // Restore the fill attributes.
+        item.has_fill = obj.get_boolean_member ("has-fill");
+        item.hidden_fill = obj.get_boolean_member ("hidden-fill");
+        item.fill_alpha = (int) obj.get_int_member ("fill-alpha");
+        // If an item doesn't have any fill color, set a default white in case
+        // this is an artboard and it needs to be rendered.
+        item.color_string =
+            obj.get_string_member ("color-string") != null
+            ? obj.get_string_member ("color-string")
+            : "#ffffff";
 
-            item.has_border = obj.get_boolean_member ("has-border");
-            item.hidden_border = obj.get_boolean_member ("hidden-border");
-            item.border_size = (int) obj.get_int_member ("border-size");
-            item.stroke_alpha = (int) obj.get_int_member ("stroke-alpha");
-            item.border_color_string = obj.get_string_member ("border-color-string");
+        // Restore the border attributes.
+        item.has_border = obj.get_boolean_member ("has-border");
+        item.hidden_border = obj.get_boolean_member ("hidden-border");
+        item.border_size = (int) obj.get_int_member ("border-size");
+        item.stroke_alpha = (int) obj.get_int_member ("stroke-alpha");
+        item.border_color_string = obj.get_string_member ("border-color-string");
 
-            item.load_colors ();
+        item.load_colors ();
+
+        // Trigger the simple_update () method for artboards.
+        if (item is Models.CanvasArtboard) {
+            (item as Models.CanvasArtboard).trigger_change ();
         }
 
         item.set ("relative-x", obj.get_double_member ("relative-x"));
