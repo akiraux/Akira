@@ -30,7 +30,6 @@ public enum Akira.Lib.Models.CanvasItemType {
 
 public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasItem {
     // Identifiers.
-    public static int global_id = 0;
     public abstract Models.CanvasItemType item_type { get; set; }
     public abstract string id { get; set; }
     public abstract string name { get; set; }
@@ -102,7 +101,21 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
         string[] type_slug_tokens = item.item_type.to_string ().split ("_");
         string type_slug = type_slug_tokens[type_slug_tokens.length - 1];
 
-        return "%s %d".printf (capitalize (type_slug.down ()), global_id++);
+        // Make sure the initial ID is the current count of the total amount
+        // of items with the same item type in the same artboard.
+        int count = 0;
+        var items = item.artboard != null ? item.artboard.items : item.canvas.window.items_manager.free_items;
+        if (item is Models.CanvasArtboard) {
+            items = item.canvas.window.items_manager.artboards;
+        }
+
+        foreach (var _item in items) {
+            if (_item.item_type == item.item_type) {
+                count++;
+            }
+        }
+
+        return "%s %d".printf (capitalize (type_slug.down ()), count);
     }
 
     public static string capitalize (string s) {
