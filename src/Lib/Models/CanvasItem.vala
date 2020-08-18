@@ -238,6 +238,7 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
         }
 
         translate (x, y);
+        bounds_manager.update ();
     }
 
     public virtual Cairo.Matrix get_real_transform () {
@@ -278,8 +279,6 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
             transform.rotate (radians);
             transform.translate (-center_x, -center_y);
         }
-
-        set_transform (transform);
 
         return transform;
     }

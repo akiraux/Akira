@@ -616,6 +616,10 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         // If the item was moved from inside an Artboard to the emtpy Canvas.
         if (item.artboard != null && new_artboard == null) {
             debug ("Artboard => Free Item");
+
+            // Apply the matrix transform before removing the item from the artboard.
+            item.set_transform (item.get_real_transform ());
+
             // Remove the item from the Artboard.
             item.artboard.remove_item (item);
             window.event_bus.item_deleted (item);

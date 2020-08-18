@@ -60,10 +60,6 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     public bool ctrl_is_pressed = false;
     private bool holding;
     public double current_scale = 1.0;
-    private double bounds_x;
-    private double bounds_y;
-    private double bounds_w;
-    private double bounds_h;
     private Gdk.CursorType current_cursor = Gdk.CursorType.ARROW;
 
     public Canvas (Akira.Window window) {
@@ -92,10 +88,6 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         window.event_bus.set_focus_on_canvas.connect (on_set_focus_on_canvas);
         window.event_bus.request_escape.connect (on_set_focus_on_canvas);
         window.event_bus.insert_item.connect (on_insert_item);
-    }
-
-    public void update_bounds () {
-        get_bounds (out bounds_x, out bounds_y, out bounds_w, out bounds_h);
     }
 
     public void set_cursor_by_edit_mode () {

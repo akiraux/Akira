@@ -70,8 +70,8 @@ public class Akira.Utils.AffineTransform : Object {
         diff_x = item.bounds_manager.x1 - matrix.x0;
         diff_y = item.bounds_manager.y1 - matrix.y0;
 
-        matrix.x0 = (x != null) ? x - diff_x : matrix.x0;
-        matrix.y0 = (y != null) ? y - diff_y : matrix.y0;
+        matrix.x0 = x != null ? x - diff_x : matrix.x0;
+        matrix.y0 = y != null ? y - diff_y : matrix.y0;
 
         item.set_transform (matrix);
         item.bounds_manager.update ();
@@ -101,12 +101,11 @@ public class Akira.Utils.AffineTransform : Object {
             matrix.y0 += delta_y;
 
             item.set_transform (matrix);
+            item.bounds_manager.update ();
         }
 
         initial_event_x = event_x;
         initial_event_y = event_y;
-
-        item.bounds_manager.update ();
     }
 
     public static void scale_from_event (
@@ -295,8 +294,6 @@ public class Akira.Utils.AffineTransform : Object {
 
         item.move (new_x, new_y);
         set_size (item, new_width, new_height);
-
-        item.bounds_manager.update ();
     }
 
     // Width size constraints.
@@ -531,7 +528,9 @@ public class Akira.Utils.AffineTransform : Object {
         item.rotate (actual_rotation, center_x, center_y);
         item.rotation += actual_rotation;
 
-        item.bounds_manager.update ();
+        if (item.artboard == null) {
+            item.bounds_manager.update ();
+        }
     }
 
     public static void flip_item (CanvasItem item, double sx, double sy) {
@@ -548,7 +547,9 @@ public class Akira.Utils.AffineTransform : Object {
 
         item.set_transform (transform);
 
-        item.bounds_manager.update ();
+        if (item.artboard == null) {
+            item.bounds_manager.update ();
+        }
     }
 
     public static double fix_size (double size) {

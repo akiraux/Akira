@@ -63,7 +63,9 @@ public class Akira.Window : Gtk.ApplicationWindow {
 
         show_app ();
 
+        // Let the canvas grab the focus after the app is visible.
         main_window.main_canvas.canvas.focus_canvas ();
+
         event_bus.file_edited.connect (on_file_edited);
         event_bus.file_saved.connect (on_file_saved);
     }
