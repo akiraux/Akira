@@ -1,3 +1,10 @@
+com.github.akiraux.akira (0.0.13) xenial; urgency=medium
+
+  * Fix loading Artboards background color when opening a file.
+  * General code improvements and optimization.
+
+ -- Alessandro Castellani <castellani.ale@gmail.com>  Sun, 17 Aug 2020 09:00:00 -0800
+
 com.github.akiraux.akira (0.0.12) xenial; urgency=medium
 
   * Control Artboards background color.
