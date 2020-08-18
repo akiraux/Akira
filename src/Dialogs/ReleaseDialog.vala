@@ -63,7 +63,7 @@ public class Akira.Dialogs.ReleaseDialog : Gtk.Dialog {
         app_version.get_style_context ().add_class ("h2");
         app_version.selectable = true;
 
-        var version_title = new Gtk.Label ("Bug fixes and Artboards improvements");
+        var version_title = new Gtk.Label ("Bug fixes and improvements");
         version_title.get_style_context ().add_class ("h3");
 
         var version_date = new Gtk.Label ("Aug 12th, 2020");
@@ -81,7 +81,7 @@ public class Akira.Dialogs.ReleaseDialog : Gtk.Dialog {
         scrolled.expand = true;
 
         var release_info = new Gtk.TextView ();
-        release_info.buffer.text = "✓ Control Artboards background color.\n✓ Hide and Lock Artbaords from the Layers panel.\n✓ Items inside Artboards are masked when extending outside the edges of the Artboard.\n✓ Fix items reordering with the layers panel drag and drop.\n✓ Fix random segfault at startup while setting accelerators.\n✓ Updated goocanvas vapi.";
+        release_info.buffer.text = "✓ Fix loading Artboards background color when opening a file.\n✓ General code improvements and optimization.\n";
         release_info.pixels_below_lines = 3;
         release_info.border_width = 12;
         release_info.wrap_mode = Gtk.WrapMode.WORD;
