@@ -37,6 +37,7 @@
         <p>Bug fixes and improvements</p>
         <ul>
           <li>Fix loading Artboards background color when opening a file.</li>
+          <li>Fix numbering of newly created items.</li>
           <li>General code improvements and optimization.</li>
         </ul>
       </description>
