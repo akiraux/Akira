@@ -32,6 +32,15 @@
 		<binary>@APP_ID@</binary>
 	</provides>
   <releases>
+    <release version="0.0.13" date="2020-08-17">
+      <description>
+        <p>Bug fixes and improvements</p>
+        <ul>
+          <li>Fix loading Artboards background color when opening a file.</li>
+          <li>General code improvements and optimization.</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.0.12" date="2020-08-12">
       <description>
         <p>Bug fixes and Artboards improvements</p>
