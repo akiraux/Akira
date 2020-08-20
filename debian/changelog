@@ -2,6 +2,7 @@ com.github.akiraux.akira (0.0.13) xenial; urgency=medium
 
   * Fix loading Artboards background color when opening a file.
   * Fix numbering of newly created items.
+  * Fix Gtk-CRITICAL warning when opening the Export Dialog.
   * General code improvements and optimization.
 
  -- Alessandro Castellani <castellani.ale@gmail.com>  Sun, 17 Aug 2020 09:00:00 -0800

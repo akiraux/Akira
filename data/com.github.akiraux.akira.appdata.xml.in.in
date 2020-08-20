@@ -38,6 +38,7 @@
         <ul>
           <li>Fix loading Artboards background color when opening a file.</li>
           <li>Fix numbering of newly created items.</li>
+          <li>Fix Gtk-CRITICAL warning when opening the Export Dialog.</li>
           <li>General code improvements and optimization.</li>
         </ul>
       </description>
