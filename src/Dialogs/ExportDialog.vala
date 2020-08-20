@@ -31,7 +31,6 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
     public Gtk.FileChooserButton folder_button;
     public Gtk.Adjustment quality_adj;
     public Gtk.Scale quality_scale;
-    public Akira.Partials.InputField quality_entry;
     public Gtk.Adjustment compression_adj;
     public Gtk.Scale compression_scale;
     public Gtk.ComboBoxText file_format;
@@ -138,6 +137,7 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
         });
 
         settings.bind ("export-paned", pane, "position", SettingsBindFlags.DEFAULT);
+        settings.bind ("export-format", file_format, "active_id", SettingsBindFlags.DEFAULT);
     }
 
     private void build_export_sidebar () {
@@ -171,7 +171,6 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
         file_format.append ("jpg", "JPG");
         file_format.changed.connect (update_format_ui);
         grid.attach (file_format, 1, 2, 1, 1);
-        settings.bind ("export-format", file_format, "active_id", SettingsBindFlags.DEFAULT);
         settings.changed["export-format"].connect (() => {
             manager.regenerate_pixbuf (export_type);
         });
@@ -262,7 +261,6 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
     public void update_format_ui () {
         jpg_title.visible = (file_format.active_id == "jpg");
         quality_scale.visible = (file_format.active_id == "jpg");
-        quality_entry.visible = (file_format.active_id == "jpg");
 
         png_title.visible = (file_format.active_id == "png");
         compression_scale.visible = (file_format.active_id == "png");

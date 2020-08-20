@@ -81,7 +81,7 @@ public class Akira.Dialogs.ReleaseDialog : Gtk.Dialog {
         scrolled.expand = true;
 
         var release_info = new Gtk.TextView ();
-        release_info.buffer.text = "✓ Fix loading Artboards background color when opening a file.\n✓ General code improvements and optimization.\n✓ Fix numbering of newly created items.\n";
+        release_info.buffer.text = "✓ Fix loading Artboards background color when opening a file.\n✓ General code improvements and optimization.\n✓ Fix numbering of newly created items.\n✓ Fix Gtk-CRITICAL warning when opening the Export Dialog.\n";
         release_info.pixels_below_lines = 3;
         release_info.border_width = 12;
         release_info.wrap_mode = Gtk.WrapMode.WORD;
