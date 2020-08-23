@@ -112,24 +112,28 @@ public class Akira.Layouts.MainCanvas : Gtk.Grid {
         double delta_x, delta_y;
         event.get_scroll_deltas (out delta_x, out delta_y);
 
+        int width, height;
+        width = main_scroll.get_allocated_width ();
+        height = main_scroll.get_allocated_height ();
+
         if (delta_y < -SCROLL_DISTANCE) {
             // Scroll UP
             if (is_ctrl) {
                 double old_zoom = canvas.get_scale ();
-                //The regular zoom mode shifts the visible viewing area 
-                //to center itself (it already has one translation applied) 
+                //The regular zoom mode shifts the visible viewing area
+                //to center itself (it already has one translation applied)
                 //so you cannot just move the viewing area by the distance
                 //of the current mouse location and the new mouse location
 
                 //If you want to zoom to your mouse you need to find the
                 //difference between the distances of the current mouse location
                 //in the current view scale to the left view border and the new
-                //mouse location that has the new canvas scale applied to the 
+                //mouse location that has the new canvas scale applied to the
                 //new left view border and shift the view by that difference
-                
+
                 // Zoom in
                 window.headerbar.zoom.zoom_in ();
-               
+
                 var center_x = main_scroll.hadjustment.value + (width / 2);
                 var center_y = main_scroll.vadjustment.value + (height / 2);
 
@@ -138,7 +142,7 @@ public class Akira.Layouts.MainCanvas : Gtk.Grid {
 
                 var new_event_x = (event.x / old_zoom) * canvas.get_scale ();
                 var new_event_y = (event.y / old_zoom) * canvas.get_scale ();
-                
+
                 var old_hadjustment = old_center_x - (width / 2);
                 var old_vadjustment = old_center_y - (height / 2);
 
@@ -154,7 +158,7 @@ public class Akira.Layouts.MainCanvas : Gtk.Grid {
             // Scroll DOWN
             if (is_ctrl) {
                 double old_zoom = canvas.get_scale ();
-                
+
                 // Zoom out
                 window.headerbar.zoom.zoom_out ();
 
@@ -166,7 +170,7 @@ public class Akira.Layouts.MainCanvas : Gtk.Grid {
 
                 var new_event_x = (event.x / old_zoom) * canvas.get_scale ();
                 var new_event_y = (event.y / old_zoom) * canvas.get_scale ();
-                
+
                 var old_hadjustment = old_center_x - (width / 2);
                 var old_vadjustment = old_center_y - (height / 2);
 
