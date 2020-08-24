@@ -194,39 +194,6 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
             // Add item to the parent Artboard.
             artboard.add_child (this, -1);
 
-            // If the item is rotated we need to reset it to get the correct
-            // relative position based on the original matrix transform.
-            if (rotation != 0) {
-                Cairo.Matrix transform;
-                get_transform (out transform);
-
-                var center_x = get_coords ("width") / 2;
-                var center_y = get_coords ("height") / 2;
-
-                // Reset the rotation.
-                transform.translate (center_x, center_y);
-                transform.rotate (Utils.AffineTransform.deg_to_rad (-rotation));
-                transform.translate (-center_x, -center_y);
-
-                _x = transform.x0;
-                _y = transform.y0;
-            }
-
-            // Account for mirrored items.
-            if (flipped_h || flipped_v) {
-                var center_x = get_coords ("width") / 2;
-                var center_y = get_coords ("height") / 2;
-                var radians = Utils.AffineTransform.deg_to_rad (rotation);
-
-                var sx = flipped_h ? -1 : 1;
-                var sy = flipped_v ? -1 : 1;
-                transform.translate (center_x, center_y);
-                transform.rotate (-radians);
-                transform.scale (sx, sy);
-                transform.rotate (radians);
-                transform.translate (-center_x, -center_y);
-            }
-
             // Convert the coordinates for the artboard space.
             canvas.convert_to_item_space (artboard, ref _x, ref _y);
 
