@@ -218,8 +218,8 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
                 var center_y = get_coords ("height") / 2;
                 var radians = Utils.AffineTransform.deg_to_rad (rotation);
 
-                var sx = flipped_v ? 1 : -1;
-                var sy = flipped_h ? 1 : -1;
+                var sx = flipped_h ? -1 : 1;
+                var sy = flipped_v ? -1 : 1;
                 transform.translate (center_x, center_y);
                 transform.rotate (-radians);
                 transform.scale (sx, sy);
@@ -284,8 +284,8 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
 
         // Account for mirrored items.
         if (flipped_h || flipped_v) {
-            var sx = flipped_v ? 1 : -1;
-            var sy = flipped_h ? 1 : -1;
+            var sx = flipped_h ? -1 : 1;
+            var sy = flipped_v ? -1 : 1;
             transform.translate (center_x, center_y);
             transform.rotate (-radians);
             transform.scale (sx, sy);
