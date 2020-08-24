@@ -39,6 +39,9 @@
           <li>Fix loading Artboards background color when opening a file.</li>
           <li>Fix numbering of newly created items.</li>
           <li>Fix Gtk-CRITICAL warning when opening the Export Dialog.</li>
+          <li>Fix flipping items inside Artbaords.</li>
+          <li>Fix crash when dropping flipped items inside Artbaords.</li>
+          <li>Zooming with mouse wheel follows the position of the cursor.</li>
           <li>General code improvements and optimization.</li>
         </ul>
       </description>
