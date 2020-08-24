@@ -652,6 +652,10 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         // If the item was moved from the empty Canvas to an Artboard.
         if (item.artboard == null && new_artboard != null) {
             debug ("Free Item => Artboard");
+
+            // Apply the matrix transform before removing the item from the artboard.
+            item.set_transform (item.get_real_transform ());
+
             // Remove the item from the free items.
             free_items.remove_item.begin (item);
             item.parent.remove_child (item.parent.find_child (item));

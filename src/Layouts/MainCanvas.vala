@@ -112,71 +112,29 @@ public class Akira.Layouts.MainCanvas : Gtk.Grid {
         double delta_x, delta_y;
         event.get_scroll_deltas (out delta_x, out delta_y);
 
-        int width, height;
-        width = main_scroll.get_allocated_width ();
-        height = main_scroll.get_allocated_height ();
-
         if (delta_y < -SCROLL_DISTANCE) {
-            // Scroll UP
+            // Scroll UP.
             if (is_ctrl) {
+                // Get the current zoom before zooming.
                 double old_zoom = canvas.get_scale ();
-                //The regular zoom mode shifts the visible viewing area
-                //to center itself (it already has one translation applied)
-                //so you cannot just move the viewing area by the distance
-                //of the current mouse location and the new mouse location
-
-                //If you want to zoom to your mouse you need to find the
-                //difference between the distances of the current mouse location
-                //in the current view scale to the left view border and the new
-                //mouse location that has the new canvas scale applied to the
-                //new left view border and shift the view by that difference
-
-                // Zoom in
+                // Zoom in.
                 window.headerbar.zoom.zoom_in ();
-
-                var center_x = main_scroll.hadjustment.value + (width / 2);
-                var center_y = main_scroll.vadjustment.value + (height / 2);
-
-                var old_center_x = (center_x / canvas.get_scale ()) * old_zoom;
-                var old_center_y = (center_y / canvas.get_scale ()) * old_zoom;
-
-                var new_event_x = (event.x / old_zoom) * canvas.get_scale ();
-                var new_event_y = (event.y / old_zoom) * canvas.get_scale ();
-
-                var old_hadjustment = old_center_x - (width / 2);
-                var old_vadjustment = old_center_y - (height / 2);
-
-                main_scroll.hadjustment.value += (new_event_x - main_scroll.hadjustment.value) - (event.x - old_hadjustment);
-                main_scroll.vadjustment.value += (new_event_y - main_scroll.vadjustment.value) - (event.y - old_vadjustment);
-
+                // Adjust zoom based on cursor position.
+                zoom_on_cursor (event, old_zoom);
             } else if (is_shift) {
                 main_scroll.hadjustment.value += delta_y * 10;
             } else {
                 main_scroll.vadjustment.value += delta_y * 10;
             }
         } else if (delta_y > SCROLL_DISTANCE) {
-            // Scroll DOWN
+            // Scroll DOWN.
             if (is_ctrl) {
+                // Get the current zoom before zooming.
                 double old_zoom = canvas.get_scale ();
-
-                // Zoom out
+                // Zoom out.
                 window.headerbar.zoom.zoom_out ();
-
-                var center_x = main_scroll.hadjustment.value + (width / 2);
-                var center_y = main_scroll.vadjustment.value + (height / 2);
-
-                var old_center_x = (center_x / canvas.get_scale ()) * old_zoom;
-                var old_center_y = (center_y / canvas.get_scale ()) * old_zoom;
-
-                var new_event_x = (event.x / old_zoom) * canvas.get_scale ();
-                var new_event_y = (event.y / old_zoom) * canvas.get_scale ();
-
-                var old_hadjustment = old_center_x - (width / 2);
-                var old_vadjustment = old_center_y - (height / 2);
-
-                main_scroll.hadjustment.value += (new_event_x - main_scroll.hadjustment.value) - (event.x - old_hadjustment);
-                main_scroll.vadjustment.value += (new_event_y - main_scroll.vadjustment.value) - (event.y - old_vadjustment);
-
+                // Adjust zoom based on cursor position.
+                zoom_on_cursor (event, old_zoom);
             } else if (is_shift) {
                 main_scroll.hadjustment.value += delta_y * 10;
             } else {
@@ -191,6 +149,38 @@ public class Akira.Layouts.MainCanvas : Gtk.Grid {
         }
 
         return true;
+    }
+
+    private void zoom_on_cursor (Gdk.EventScroll event, double old_zoom) {
+        // The regular zoom mode shifts the visible viewing area
+        // to center itself (it already has one translation applied)
+        // so you cannot just move the viewing area by the distance
+        // of the current mouse location and the new mouse location.
+
+        // If you want to zoom to your mouse you need to find the
+        // difference between the distances of the current mouse location
+        // in the current view scale to the left view border and the new
+        // mouse location that has the new canvas scale applied to the
+        // new left view border and shift the view by that difference.
+        int width = main_scroll.get_allocated_width ();
+        int height = main_scroll.get_allocated_height ();
+
+        var center_x = main_scroll.hadjustment.value + (width / 2);
+        var center_y = main_scroll.vadjustment.value + (height / 2);
+
+        var old_center_x = (center_x / canvas.get_scale ()) * old_zoom;
+        var old_center_y = (center_y / canvas.get_scale ()) * old_zoom;
+
+        var new_event_x = (event.x / old_zoom) * canvas.get_scale ();
+        var new_event_y = (event.y / old_zoom) * canvas.get_scale ();
+
+        var old_hadjustment = old_center_x - (width / 2);
+        var old_vadjustment = old_center_y - (height / 2);
+
+        main_scroll.hadjustment.value +=
+            (new_event_x - main_scroll.hadjustment.value) - (event.x - old_hadjustment);
+        main_scroll.vadjustment.value +=
+            (new_event_y - main_scroll.vadjustment.value) - (event.y - old_vadjustment);
     }
 
     private async void on_exporting (string message) {

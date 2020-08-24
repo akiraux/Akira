@@ -3,6 +3,9 @@ com.github.akiraux.akira (0.0.13) xenial; urgency=medium
   * Fix loading Artboards background color when opening a file.
   * Fix numbering of newly created items.
   * Fix Gtk-CRITICAL warning when opening the Export Dialog.
+  * Fix flipping items inside Artboards.
+  * Fix crash when dropping flipped items inside Artboards.
+  * Zooming with mouse wheel follows the position of the cursor.
   * General code improvements and optimization.
 
  -- Alessandro Castellani <castellani.ale@gmail.com>  Sun, 17 Aug 2020 09:00:00 -0800
@@ -10,7 +13,7 @@ com.github.akiraux.akira (0.0.13) xenial; urgency=medium
 com.github.akiraux.akira (0.0.12) xenial; urgency=medium
 
   * Control Artboards background color.
-  * Hide and Lock Artbaords from the Layers panel.
+  * Hide and Lock Artboards from the Layers panel.
   * Items inside Artboards are masked when extending outside the edges of the Artboard.
   * Fix items reordering with the layers panel drag and drop.
   * Fix random segfault at startup while setting accelerators.
