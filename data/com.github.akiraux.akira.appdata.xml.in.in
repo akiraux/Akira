@@ -39,8 +39,8 @@
           <li>Fix loading Artboards background color when opening a file.</li>
           <li>Fix numbering of newly created items.</li>
           <li>Fix Gtk-CRITICAL warning when opening the Export Dialog.</li>
-          <li>Fix flipping items inside Artbaords.</li>
-          <li>Fix crash when dropping flipped items inside Artbaords.</li>
+          <li>Fix flipping items inside Artboards.</li>
+          <li>Fix crash when dropping flipped items inside Artboards.</li>
           <li>Zooming with mouse wheel follows the position of the cursor.</li>
           <li>General code improvements and optimization.</li>
         </ul>
@@ -51,7 +51,7 @@
         <p>Bug fixes and Artboards improvements</p>
         <ul>
           <li>Control Artboards background color.</li>
-          <li>Hide and Lock Artbaords from the Layers panel.</li>
+          <li>Hide and Lock Artboards from the Layers panel.</li>
           <li>Items inside Artboards are masked when extending outside the edges of the Artboard.</li>
           <li>Fix items reordering with the layers panel drag and drop.</li>
           <li>Fix random segfault at startup while setting accelerators.</li>
