@@ -60,7 +60,7 @@ msgid ""
 msgstr ""
 "ATENÇÃO!\n"
 "Akira está sob desenvolvimento e não está pronto para produção. É de se "
-"esperar mal funcionamento e inexistência de funções."
+"esperar o mau funcionamento e a inexistência de algumas funcionalidades."
 
 #: Dialogs/ReleaseDialog.vala:100 Dialogs/SettingsDialog.vala:249
 msgid "Make a Donation"
@@ -129,7 +129,7 @@ msgstr "Cores padrão"
 
 #: Dialogs/SettingsDialog.vala:131
 msgid "Define the default style used when creating a new shape."
-msgstr "Define o estilo padrão ao criar uma nova forma."
+msgstr "Define o estilo padrão a ser usado para criar uma nova forma."
 
 #: Dialogs/SettingsDialog.vala:136
 msgid "Fill Color:"
@@ -201,7 +201,7 @@ msgstr "Exportar seleção:"
 
 #: Dialogs/ShortcutsDialog.vala:68
 msgid "Highlight area to export:"
-msgstr "Destacar área a exportar:"
+msgstr "Selecionar área para exportar:"
 
 #: Dialogs/ShortcutsDialog.vala:77
 msgid "Canvas"
@@ -409,7 +409,7 @@ msgstr "Exportar Pranchetas"
 
 #: Layouts/HeaderBar.vala:345
 msgid "Highlight Area to Export"
-msgstr "Destacar Área a Exportar"
+msgstr "Selecionar Área para Exportar"
 
 #: Layouts/HeaderBar.vala:391
 msgid "Main Menu"
