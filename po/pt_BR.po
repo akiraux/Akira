@@ -153,7 +153,7 @@ msgstr "A ferramenta de design para Linux"
 
 #: Dialogs/SettingsDialog.vala:226
 msgid "Thanks to our awesome supporters!"
-msgstr "Obrigado a nosso apoiadores incríveis!"
+msgstr "Obrigado aos nossos apoiadores incríveis!"
 
 #: Dialogs/SettingsDialog.vala:231
 msgid "View the list of supporters"
