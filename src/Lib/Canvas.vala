@@ -190,8 +190,8 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
         holding = true;
 
-        event.x /= current_scale;
-        event.y /= current_scale;
+        event.x = Math.round (event.x / current_scale);
+        event.y = Math.round (event.y / current_scale);
 
         hover_manager.remove_hover_effect ();
 
@@ -293,8 +293,8 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     }
 
     public override bool motion_notify_event (Gdk.EventMotion event) {
-        event.x /= current_scale;
-        event.y /= current_scale;
+        event.x = Math.round (event.x / current_scale);
+        event.y = Math.round (event.y / current_scale);
 
         window.event_bus.coordinate_change (event.x, event.y);
 
