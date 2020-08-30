@@ -41,9 +41,8 @@ public class Akira.Lib.ColorPicker : Gtk.Window {
         //    and https://github.com/RonnyDo/ColorPicker/issues/19
         int snapsize = 31;
         int min_zoomlevel = 2;
-        int max_zoomlevel = 14;
-        //int max_zoomlevel = 7;
-        int zoomlevel = 3;
+        int max_zoomlevel = 7;
+        int zoomlevel = 6;
         int shadow_width = 15;
 
         private Gdk.Cursor magnifier = null;
