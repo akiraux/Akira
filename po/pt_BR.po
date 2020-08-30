@@ -113,7 +113,7 @@ msgstr "Reinicie a aplicação para aplicar a mudança."
 
 #: Dialogs/SettingsDialog.vala:100
 msgid "ToolBar Style"
-msgstr "Etilo da barra de ferramentas"
+msgstr "Estilo da barra de ferramentas"
 
 #: Dialogs/SettingsDialog.vala:102
 msgid "Show Button Labels:"
@@ -573,7 +573,7 @@ msgstr "Buscar Camada"
 
 #: Lib/Managers/ExportManager.vala:192 Lib/Managers/ExportManager.vala:219
 msgid "Generating preview, please wait…"
-msgstr "Gerando previsualização, aguarde…"
+msgstr "Gerando pré-visualização, aguarde por favor…"
 
 #: Lib/Managers/ExportManager.vala:313
 #, c-format
