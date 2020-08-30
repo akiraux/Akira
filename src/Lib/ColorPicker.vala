@@ -25,11 +25,11 @@ public class Akira.Lib.ColorPicker : Gtk.Window {
         public signal void cancelled ();
         public signal void moved (Gdk.RGBA color);
 
-        const string dark_border_color_string = "#333333";
-        private Gdk.RGBA dark_border_color = Gdk.RGBA();
+        const string DARK_BORDER_COLOR_STRING = "#333333";
+        private Gdk.RGBA dark_border_color = Gdk.RGBA ();
 
-        const string bright_border_color_string = "#FFFFFF";
-        private Gdk.RGBA bright_border_color = Gdk.RGBA();
+        const string BRIGHT_BORDER_COLOR_STRING = "#FFFFFF";
+        private Gdk.RGBA bright_border_color = Gdk.RGBA ();
 
 
         // 1. Snapsize is the amount of pixel going to be magnified by the zoomlevel.
@@ -65,10 +65,10 @@ public class Akira.Lib.ColorPicker : Gtk.Window {
             set_keep_above (true);
 
 
-            dark_border_color.parse (dark_border_color_string);
-            bright_border_color.parse (bright_border_color_string);
+            dark_border_color.parse (DARK_BORDER_COLOR_STRING);
+            bright_border_color.parse (BRIGHT_BORDER_COLOR_STRING);
 
-            // Todo remove
+            // TODO remove the zoom level restauration if we do not need it
             // restore zoomlevel
             // if (settings.zoomlevel >= min_zoomlevel && settings.zoomlevel <= max_zoomlevel) {
             //    zoomlevel = settings.zoomlevel;
@@ -91,7 +91,7 @@ public class Akira.Lib.ColorPicker : Gtk.Window {
                 cancelled ();
             }
 
-            return true;            
+            return true;
         }
 
 
@@ -100,7 +100,7 @@ public class Akira.Lib.ColorPicker : Gtk.Window {
        }
 
 
-        public override bool motion_notify_event (Gdk.EventMotion e) {  
+        public override bool motion_notify_event (Gdk.EventMotion e) {
             Gdk.RGBA color = get_color_at ((int) e.x_root, (int) e.y_root);
 
             moved (color);
@@ -111,7 +111,7 @@ public class Akira.Lib.ColorPicker : Gtk.Window {
         }
 
 
-        public override bool scroll_event (Gdk.EventScroll e)  {
+        public override bool scroll_event (Gdk.EventScroll e) {
             switch (e.direction) {
                 case Gdk.ScrollDirection.UP:
                     if (zoomlevel < max_zoomlevel) {
@@ -128,11 +128,10 @@ public class Akira.Lib.ColorPicker : Gtk.Window {
                 default:
                     break;
              }
-             
+
              return true;
-        }            
-        
-        
+        }
+
         public void set_magnifier_cursor () {
             var manager = Gdk.Display.get_default ().get_default_seat ();
 
@@ -146,20 +145,29 @@ public class Akira.Lib.ColorPicker : Gtk.Window {
              var snapped_pixbuf = snap (px - snapsize / 2, py - snapsize / 2, snapsize, snapsize);
 
              // Zoom that screenshot up, and grab a snapsize-sized piece from the middle
-             var scaled_pb = snapped_pixbuf.scale_simple (snapsize * zoomlevel + shadow_width * 2 , snapsize * zoomlevel + shadow_width * 2 , Gdk.InterpType.NEAREST);
+             var scaled_pb = snapped_pixbuf.scale_simple (
+                snapsize * zoomlevel + shadow_width * 2 ,
+                snapsize * zoomlevel + shadow_width * 2 ,
+                Gdk.InterpType.NEAREST
+            );
 
 
              // Create the base surface for our cursor
-             var base_surface = new Cairo.ImageSurface (Cairo.Format.ARGB32, snapsize * zoomlevel + shadow_width * 2 , snapsize * zoomlevel + shadow_width * 2);
+             var base_surface = new Cairo.ImageSurface (
+                Cairo.Format.ARGB32,
+                snapsize * zoomlevel + shadow_width * 2 ,
+                snapsize * zoomlevel + shadow_width * 2
+            );
+
              var base_context = new Cairo.Context (base_surface);
 
 
              // Create the circular path on our base surface
              base_context.arc (radius + shadow_width, radius + shadow_width, radius, 0, 2 * Math.PI);
- 
+
              // Paste in the screenshot
              Gdk.cairo_set_source_pixbuf (base_context, scaled_pb, 0, 0);
- 
+
              // Clip to that circular path, keeping the path around for later, and paint the pasted screenshot
              base_context.save ();
              base_context.clip_preserve ();
@@ -168,37 +176,40 @@ public class Akira.Lib.ColorPicker : Gtk.Window {
 
 
              // Draw a shadow as outside magnifier border
-             double shadow_alpha = 0.6;       
+             double shadow_alpha = 0.6;
              base_context.set_line_width (1);
-             
+
              for (int i = 0; i <= shadow_width; i++) {
-                 base_context.arc (radius + shadow_width, radius + shadow_width, radius + shadow_width- i, 0, 2 * Math.PI);
-                 Gdk.RGBA shadow_color = Gdk.RGBA();
-                 shadow_color.parse(dark_border_color_string);  
-                 shadow_color.alpha = shadow_alpha / ((shadow_width - i + 1)*(shadow_width - i + 1));   
-                 Gdk.cairo_set_source_rgba (base_context, shadow_color); 
+                 base_context.arc (
+                    radius + shadow_width, radius + shadow_width,
+                    radius + shadow_width - i, 0, 2 * Math.PI
+                );
+                 Gdk.RGBA shadow_color = Gdk.RGBA ();
+                 shadow_color.parse (DARK_BORDER_COLOR_STRING);
+                 shadow_color.alpha = shadow_alpha / ((shadow_width - i + 1) * (shadow_width - i + 1));
+                 Gdk.cairo_set_source_rgba (base_context, shadow_color);
                  base_context.stroke ();
              }
-             
-        
+
+
             // Draw an outside bright magnifier border  
             Gdk.cairo_set_source_rgba (base_context, bright_border_color);
             base_context.arc (radius + shadow_width, radius + shadow_width, radius - 1, 0, 2 * Math.PI);
-            base_context.stroke(); 
+            base_context.stroke ();
 
 
             // Draw inside square
             base_context.set_line_width (1);
-            
-            Gdk.cairo_set_source_rgba (base_context, dark_border_color); 
+
+            Gdk.cairo_set_source_rgba (base_context, dark_border_color);
             base_context.move_to (radius + shadow_width - zoomlevel, radius + shadow_width - zoomlevel);
             base_context.line_to (radius + shadow_width + zoomlevel, radius + shadow_width - zoomlevel);
             base_context.line_to (radius + shadow_width + zoomlevel, radius + shadow_width + zoomlevel);
             base_context.line_to (radius + shadow_width - zoomlevel, radius + shadow_width + zoomlevel);
             base_context.close_path ();
-            base_context.stroke ();             
+            base_context.stroke ();
 
-            Gdk.cairo_set_source_rgba (base_context, bright_border_color);        
+            Gdk.cairo_set_source_rgba (base_context, bright_border_color);
             base_context.move_to (radius + shadow_width - zoomlevel + 1, radius + shadow_width - zoomlevel + 1);
             base_context.line_to (radius + shadow_width + zoomlevel - 1, radius + shadow_width - zoomlevel + 1);
             base_context.line_to (radius + shadow_width + zoomlevel - 1, radius + shadow_width + zoomlevel - 1);
@@ -207,10 +218,10 @@ public class Akira.Lib.ColorPicker : Gtk.Window {
             base_context.stroke ();
 
 
-            magnifier = new Gdk.Cursor.from_surface(
-                get_screen ().get_display (),                
+            magnifier = new Gdk.Cursor.from_surface (
+                get_screen ().get_display (),
                 base_surface,
-                base_surface.get_width () / 2, 
+                base_surface.get_width () / 2,
                 base_surface.get_height () / 2);
 
             // Set the cursor
@@ -222,13 +233,13 @@ public class Akira.Lib.ColorPicker : Gtk.Window {
                 new Gdk.Event (Gdk.EventType.BUTTON_PRESS | Gdk.EventType.MOTION_NOTIFY | Gdk.EventType.SCROLL),
                 null);
 
-        }     
-         
-        
+        }
+
+
         public Gdk.Pixbuf? snap (int x, int y, int w, int h) {
             var root = Gdk.get_default_root_window ();
-            
-            var screenshot = Gdk.pixbuf_get_from_window (root, x, y, w, h);                
+
+            var screenshot = Gdk.pixbuf_get_from_window (root, x, y, w, h);
             return screenshot;
         }
 
@@ -259,47 +270,48 @@ public class Akira.Lib.ColorPicker : Gtk.Window {
                     manager.get_pointer ().warp (get_screen (), px + 1, py);
                     break;
             }
-           
-            return true;            
+
+            return true;
         }
 
         public Gdk.RGBA get_color_at (int x, int y) {
             var root = Gdk.get_default_root_window ();
             Gdk.Pixbuf? pixbuf = Gdk.pixbuf_get_from_window (root, x, y, 1, 1);
 
-            if (pixbuf != null) {                
+            if (pixbuf != null) {
                 // see https://hackage.haskell.org/package/gtk3-0.14.6/docs/Graphics-UI-Gtk-Gdk-Pixbuf.html
-                uint8 red = pixbuf.get_pixels()[0];
-                uint8 green = pixbuf.get_pixels()[1];
-                uint8 blue = pixbuf.get_pixels()[2];
-                
-                Gdk.RGBA color = Gdk.RGBA();
-                string spec = "rgb(" + red.to_string() + "," + green.to_string() + "," + blue.to_string() + ")";
+                uint8 red = pixbuf.get_pixels ()[0];
+                uint8 green = pixbuf.get_pixels ()[1];
+                uint8 blue = pixbuf.get_pixels ()[2];
+
+                Gdk.RGBA color = Gdk.RGBA ();
+                string spec = "rgb(" + red.to_string () + "," + green.to_string () + "," + blue.to_string () + ")";
                 if (color.parse (spec)) {
-                    return color;                   
+                    return color;
                 } else {
-                    stdout.printf("ERROR: Parse pixel rgb values failed.");
-                }                
+                    stdout.printf ("ERROR: Parse pixel rgb values failed.");
+                }
             }
-            
+
             // fallback: default RGBA color
-            stdout.printf("ERROR: Gdk.pixbuf_get_from_window failed");
+            stdout.printf ("ERROR: Gdk.pixbuf_get_from_window failed");
             return Gdk.RGBA ();
         }
 
 
         public override void show_all () {
-            base.show_all ();                            
+            base.show_all ();
 
             var manager = Gdk.Display.get_default ().get_default_seat ();
             var window = get_window ();
 
-            var status = manager.grab (window,
-                        Gdk.SeatCapabilities.ALL,
-                        false,
-                        new Gdk.Cursor.for_display (window.get_display (), Gdk.CursorType.CROSSHAIR),
-                        new Gdk.Event (Gdk.EventType.BUTTON_PRESS | Gdk.EventType.BUTTON_RELEASE | Gdk.EventType.MOTION_NOTIFY),
-                        null);
+            var status = manager.grab (
+                window,
+                Gdk.SeatCapabilities.ALL,
+                false,
+                new Gdk.Cursor.for_display (window.get_display (), Gdk.CursorType.CROSSHAIR),
+                new Gdk.Event (Gdk.EventType.BUTTON_PRESS | Gdk.EventType.BUTTON_RELEASE | Gdk.EventType.MOTION_NOTIFY),
+                null);
 
             if (status != Gdk.GrabStatus.SUCCESS) {
                 manager.ungrab ();
@@ -307,10 +319,10 @@ public class Akira.Lib.ColorPicker : Gtk.Window {
 
             // show magnifier
             set_magnifier_cursor ();
-        }        
+        }
 
         public new void close () {
-            // Todo remove
+            // TODO remove the zoom level saving if we do not need it
             // save zoomlevel
             // settings.zoomlevel = zoomlevel;
 

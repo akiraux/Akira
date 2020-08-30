@@ -210,7 +210,7 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
     }
 
     private void create_event_bindings () {
-        eye_dropper_button.clicked.connect(on_eye_dropper_click);
+        eye_dropper_button.clicked.connect (on_eye_dropper_click);
         delete_button.clicked.connect (on_delete_item);
         hidden_button.clicked.connect (toggle_visibility);
         model.notify.connect (on_model_changed);
@@ -219,16 +219,16 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
 
     private void on_eye_dropper_click () {
         eye_dropper = new Akira.Lib.ColorPicker ();
-        eye_dropper.show_all();
+        eye_dropper.show_all ();
 
-        eye_dropper.picked.connect((picked_color) => {
+        eye_dropper.picked.connect ((picked_color) => {
             alpha = ((int)(picked_color.alpha * 255));
             color_chooser_widget.set_rgba (picked_color);
-            on_color_changed();
+            on_color_changed ();
             eye_dropper.close ();
         });
-        
-        eye_dropper.cancelled.connect(() => {
+
+        eye_dropper.cancelled.connect (() => {
             eye_dropper.close ();
         });
     }
