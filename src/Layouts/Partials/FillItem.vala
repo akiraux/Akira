@@ -24,6 +24,7 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
     public weak Akira.Window window { get; construct; }
 
     private Gtk.Grid fill_chooser;
+    private Gtk.Button eye_dropper_button;
     private Gtk.Button hidden_button;
     private Gtk.Button delete_button;
     private Gtk.Image hidden_button_icon;
@@ -33,6 +34,7 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
     private Gtk.Popover color_popover;
     private Gtk.Grid color_picker;
     private Gtk.ColorChooserWidget color_chooser_widget;
+    private Akira.Lib.ColorPicker eye_dropper;
 
     public Akira.Models.FillsItemModel model { get; construct; }
 
@@ -166,6 +168,14 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         fill_chooser.attach (color_container, 1, 0, 1, 1);
         fill_chooser.attach (opacity_container, 2, 0, 1, 1);
 
+        eye_dropper_button = new Gtk.Button ();
+        eye_dropper_button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
+        eye_dropper_button.get_style_context ().add_class ("button-rounded");
+        eye_dropper_button.can_focus = false;
+        eye_dropper_button.valign = Gtk.Align.CENTER;
+        eye_dropper_button.add (new Gtk.Image.from_icon_name ("user-trash-symbolic",
+            Gtk.IconSize.SMALL_TOOLBAR));
+
         hidden_button = new Gtk.Button ();
         hidden_button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
         hidden_button.get_style_context ().add_class ("button-rounded");
@@ -191,18 +201,36 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         color_popover.add (color_picker);
 
         attach (fill_chooser, 0, 0, 1, 1);
-        attach (hidden_button, 1, 0, 1, 1);
-        attach (delete_button, 2, 0, 1, 1);
+        attach (eye_dropper_button, 1, 0, 1, 1);
+        attach (hidden_button, 2, 0, 1, 1);
+        attach (delete_button, 3, 0, 1, 1);
 
         set_color_chooser_color ();
         set_button_color ();
     }
 
     private void create_event_bindings () {
+        eye_dropper_button.clicked.connect(on_eye_dropper_click);
         delete_button.clicked.connect (on_delete_item);
         hidden_button.clicked.connect (toggle_visibility);
         model.notify.connect (on_model_changed);
         color_chooser_widget.notify["rgba"].connect (on_color_changed);
+    }
+
+    private void on_eye_dropper_click () {
+        eye_dropper = new Akira.Lib.ColorPicker ();
+        eye_dropper.show_all();
+
+        eye_dropper.picked.connect((picked_color) => {
+            alpha = ((int)(picked_color.alpha * 255));
+            color_chooser_widget.set_rgba (picked_color);
+            on_color_changed();
+            eye_dropper.close ();
+        });
+        
+        eye_dropper.cancelled.connect(() => {
+            eye_dropper.close ();
+        });
     }
 
     private void on_model_changed () {
