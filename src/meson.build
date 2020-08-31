@@ -94,8 +94,8 @@ sources = files(
     'Lib/Models/CanvasArtboard.vala',
 
     'Lib/Selection/Nob.vala',
-    
-    'Lib/ColorPicker.vala',
+
+    'Utils/ColorPicker.vala',
 )
 
 deps = [

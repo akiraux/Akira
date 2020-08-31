@@ -20,7 +20,7 @@
 * Ported from: https://github.com/ColorPicker/RonnyDo
 */
 
-public class Akira.Lib.ColorPicker : Gtk.Window {
+public class Akira.Utils.ColorPicker : Gtk.Window {
         public signal void picked (Gdk.RGBA color);
         public signal void cancelled ();
         public signal void moved (Gdk.RGBA color);

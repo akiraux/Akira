@@ -34,7 +34,7 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
     private Gtk.Popover color_popover;
     private Gtk.Grid color_picker;
     private Gtk.ColorChooserWidget color_chooser_widget;
-    private Akira.Lib.ColorPicker eyedropper;
+    private Akira.Utils.ColorPicker eyedropper;
 
     public Akira.Models.FillsItemModel model { get; construct; }
 
@@ -219,7 +219,7 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
     }
 
     private void on_eyedropper_click () {
-        eyedropper = new Akira.Lib.ColorPicker ();
+        eyedropper = new Akira.Utils.ColorPicker ();
         eyedropper.show_all ();
 
         eyedropper.picked.connect ((picked_color) => {
