@@ -173,7 +173,8 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         eye_dropper_button.get_style_context ().add_class ("button-rounded");
         eye_dropper_button.can_focus = false;
         eye_dropper_button.valign = Gtk.Align.CENTER;
-        eye_dropper_button.add (new Gtk.Image.from_icon_name ("user-trash-symbolic",
+        eye_dropper_button.set_tooltip_text (_("Pick color"));
+        eye_dropper_button.add (new Gtk.Image.from_icon_name ("preferences-color-symbolic",
             Gtk.IconSize.SMALL_TOOLBAR));
 
         hidden_button = new Gtk.Button ();
