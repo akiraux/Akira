@@ -178,7 +178,7 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         delete_button.get_style_context ().add_class ("button-rounded");
         delete_button.can_focus = false;
         delete_button.valign = Gtk.Align.CENTER;
-        delete_button.set_tooltip_text (_("Remove"));
+        delete_button.set_tooltip_text (_("Remove fill color"));
         delete_button.add (new Gtk.Image.from_icon_name ("user-trash-symbolic",
             Gtk.IconSize.SMALL_TOOLBAR));
 
@@ -246,11 +246,11 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
     private void toggle_ui_visibility () {
         if (hidden) {
             get_style_context ().add_class ("disabled");
-            hidden_button.set_tooltip_text (_("Show"));
+            hidden_button.set_tooltip_text (_("Show fill color"));
             return;
         }
 
-        hidden_button.set_tooltip_text (_("Hide"));
+        hidden_button.set_tooltip_text (_("Hide fill color"));
         get_style_context ().remove_class ("disabled");
     }
 
