@@ -61,6 +61,7 @@ public class Akira.Layouts.Partials.BordersPanel : Gtk.Grid {
         add_btn.can_focus = false;
         add_btn.valign = Gtk.Align.CENTER;
         add_btn.halign = Gtk.Align.CENTER;
+        add_btn.set_tooltip_text (_("Add border"));
         add_btn.add (new Gtk.Image.from_icon_name ("list-add-symbolic", Gtk.IconSize.SMALL_TOOLBAR));
 
         title_cont.attach (label, 0, 0, 1, 1);
