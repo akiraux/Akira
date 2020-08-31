@@ -18,6 +18,7 @@
  *
  * Authored by: Giacomo "giacomoalbe" Alberini <giacomoalbe@gmail.com>
  * Authored by: Alessandro "alecaddd" Castellani <castellani.ale@gmail.com>
+ * Authored by: Ivan "isneezy" Vilanculo <ivilanculo@gmail.com>
  */
 
 public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
