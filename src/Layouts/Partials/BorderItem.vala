@@ -216,7 +216,7 @@ public class Akira.Layouts.Partials.BorderItem : Gtk.Grid {
         model.notify.connect (on_model_changed);
         color_chooser_widget.notify["rgba"].connect (on_color_changed);
     }
-    
+
     private void on_eyedropper_click () {
         eyedropper = new Akira.Utils.ColorPicker ();
         eyedropper.show_all ();
