@@ -24,7 +24,7 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
     public weak Akira.Window window { get; construct; }
 
     private Gtk.Grid fill_chooser;
-    private Gtk.Button eye_dropper_button;
+    private Gtk.Button eyedropper_button;
     private Gtk.Button hidden_button;
     private Gtk.Button delete_button;
     private Gtk.Image hidden_button_icon;
@@ -34,7 +34,7 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
     private Gtk.Popover color_popover;
     private Gtk.Grid color_picker;
     private Gtk.ColorChooserWidget color_chooser_widget;
-    private Akira.Lib.ColorPicker eye_dropper;
+    private Akira.Lib.ColorPicker eyedropper;
 
     public Akira.Models.FillsItemModel model { get; construct; }
 
@@ -168,13 +168,13 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         fill_chooser.attach (color_container, 1, 0, 1, 1);
         fill_chooser.attach (opacity_container, 2, 0, 1, 1);
 
-        eye_dropper_button = new Gtk.Button ();
-        eye_dropper_button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
-        eye_dropper_button.get_style_context ().add_class ("button-rounded");
-        eye_dropper_button.can_focus = false;
-        eye_dropper_button.valign = Gtk.Align.CENTER;
-        eye_dropper_button.set_tooltip_text (_("Pick color"));
-        eye_dropper_button.add (new Gtk.Image.from_icon_name ("preferences-color-symbolic",
+        eyedropper_button = new Gtk.Button ();
+        eyedropper_button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
+        eyedropper_button.get_style_context ().add_class ("button-rounded");
+        eyedropper_button.can_focus = false;
+        eyedropper_button.valign = Gtk.Align.CENTER;
+        eyedropper_button.set_tooltip_text (_("Pick color"));
+        eyedropper_button.add (new Gtk.Image.from_icon_name ("preferences-color-symbolic",
             Gtk.IconSize.SMALL_TOOLBAR));
 
         hidden_button = new Gtk.Button ();
@@ -202,7 +202,7 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         color_popover.add (color_picker);
 
         attach (fill_chooser, 0, 0, 1, 1);
-        attach (eye_dropper_button, 1, 0, 1, 1);
+        attach (eyedropper_button, 1, 0, 1, 1);
         attach (hidden_button, 2, 0, 1, 1);
         attach (delete_button, 3, 0, 1, 1);
 
@@ -211,26 +211,26 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
     }
 
     private void create_event_bindings () {
-        eye_dropper_button.clicked.connect (on_eye_dropper_click);
+        eyedropper_button.clicked.connect (on_eyedropper_click);
         delete_button.clicked.connect (on_delete_item);
         hidden_button.clicked.connect (toggle_visibility);
         model.notify.connect (on_model_changed);
         color_chooser_widget.notify["rgba"].connect (on_color_changed);
     }
 
-    private void on_eye_dropper_click () {
-        eye_dropper = new Akira.Lib.ColorPicker ();
-        eye_dropper.show_all ();
+    private void on_eyedropper_click () {
+        eyedropper = new Akira.Lib.ColorPicker ();
+        eyedropper.show_all ();
 
-        eye_dropper.picked.connect ((picked_color) => {
+        eyedropper.picked.connect ((picked_color) => {
             alpha = ((int)(picked_color.alpha * 255));
             color_chooser_widget.set_rgba (picked_color);
             on_color_changed ();
-            eye_dropper.close ();
+            eyedropper.close ();
         });
 
-        eye_dropper.cancelled.connect (() => {
-            eye_dropper.close ();
+        eyedropper.cancelled.connect (() => {
+            eyedropper.close ();
         });
     }
 
