@@ -134,6 +134,7 @@ public class Akira.Layouts.Partials.BorderRadiusPanel : Gtk.Grid {
         options_button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
         options_button.add (options_image);
         options_button.can_focus = false;
+        options_button.set_tooltip_text (_("Border radius options"));
         panel_grid.attach (options_button, 2, 2, 1, 1);
 
         options_revealer = new Gtk.Revealer ();
