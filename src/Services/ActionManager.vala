@@ -17,6 +17,7 @@
 * along with Akira. If not, see <https://www.gnu.org/licenses/>.
 *
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
+* Authored by: Ivan "isneezy" Vilanculo <vilanculoivan@gmail.com>
 */
 
 public class Akira.Services.ActionManager : Object {
@@ -64,6 +65,7 @@ public class Akira.Services.ActionManager : Object {
     public const string ACTION_FLIP_V = "action_flip_v";
     public const string ACTION_ESCAPE = "action_escape";
     public const string ACTION_SHORTCUTS = "action_shortcuts";
+    public const string ACTION_PICK_COLOR = "action_pick_color";
 
     public static Gee.MultiMap<string, string> action_accelerators = new Gee.HashMultiMap<string, string> ();
     public static Gee.MultiMap<string, string> typing_accelerators = new Gee.HashMultiMap<string, string> ();
@@ -101,6 +103,7 @@ public class Akira.Services.ActionManager : Object {
         { ACTION_FLIP_V, action_flip_v },
         { ACTION_ESCAPE, action_escape },
         { ACTION_SHORTCUTS, action_shortcuts },
+        { ACTION_PICK_COLOR, action_pick_color },
     };
 
     public ActionManager (Akira.Application akira_app, Akira.Window window) {
@@ -137,6 +140,7 @@ public class Akira.Services.ActionManager : Object {
         action_accelerators.set (ACTION_FLIP_H, "<Control>bracketleft");
         action_accelerators.set (ACTION_FLIP_V, "<Control>bracketright");
         action_accelerators.set (ACTION_SHORTCUTS, "F1");
+        action_accelerators.set (ACTION_PICK_COLOR, "<Alt>c");
 
         typing_accelerators.set (ACTION_ESCAPE, "Escape");
         typing_accelerators.set (ACTION_ARTBOARD_TOOL, "a");
@@ -450,6 +454,45 @@ public class Akira.Services.ActionManager : Object {
         var dialog = new Akira.Dialogs.ShortcutsDialog (window);
         dialog.show_all ();
         dialog.present ();
+    }
+
+    private void action_pick_color () {
+        if (window.main_window.main_canvas.canvas.selected_bound_manager.selected_items.length() == 0) {
+            return;
+        }
+        bool is_holding_shift = false;
+        var color_picker = new Akira.Utils.ColorPicker ();
+        color_picker.show_all();
+        color_picker.key_press_event.connect((e) => {
+            if (e.keyval == Gdk.Key.Shift_R) {
+                is_holding_shift = true;
+            }
+            return true;
+        });
+        color_picker.key_release_event.connect((e) => {
+            if (e.keyval == Gdk.Key.Shift_R) {
+                is_holding_shift = false;
+            }
+            return true;
+        });
+        color_picker.cancelled.connect(() => {
+            color_picker.close();
+        });
+        color_picker.picked.connect(color => {
+            if (!is_holding_shift) {
+                // TODO change current selected shape fill color
+                for (int i = 0; i <= window.main_window.main_canvas.canvas.selected_bound_manager.selected_items.length (); i ++) {
+                    var item = window.main_window.main_canvas.canvas.selected_bound_manager.selected_items.nth_data(i);
+                    if(item != null) {
+                        item.color = color;
+                    }
+                }
+            } else {
+                // TODO change current selected shape border color
+                // window.main_window.main_canvas.canvas.selected_bound_manager.delete_selection ();
+            }
+            color_picker.close();
+        });
     }
 
     public static void action_from_group (string action_name, ActionGroup? action_group) {
