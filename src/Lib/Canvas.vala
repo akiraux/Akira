@@ -346,6 +346,16 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
     private void on_update_scale (double zoom) {
         current_scale += zoom;
+        // Prevent the canvas from shrinking below 2%;
+        if (current_scale < 0.02) {
+            current_scale = 0.02;
+        }
+
+        // Prevent the canvas from growing above 5000%;
+        if (current_scale > 50) {
+            current_scale = 50;
+        }
+
         window.event_bus.set_scale (current_scale);
     }
 

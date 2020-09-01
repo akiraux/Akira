@@ -118,7 +118,7 @@ public class Akira.Layouts.MainCanvas : Gtk.Grid {
                 // Get the current zoom before zooming.
                 double old_zoom = canvas.get_scale ();
                 // Zoom in.
-                window.headerbar.zoom.zoom_in ();
+                window.event_bus.update_scale (delta_y * -1);
                 // Adjust zoom based on cursor position.
                 zoom_on_cursor (event, old_zoom);
             } else if (is_shift) {
@@ -132,7 +132,7 @@ public class Akira.Layouts.MainCanvas : Gtk.Grid {
                 // Get the current zoom before zooming.
                 double old_zoom = canvas.get_scale ();
                 // Zoom out.
-                window.headerbar.zoom.zoom_out ();
+                window.event_bus.update_scale (-delta_y);
                 // Adjust zoom based on cursor position.
                 zoom_on_cursor (event, old_zoom);
             } else if (is_shift) {
