@@ -81,7 +81,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         nob_manager = new Managers.NobManager (this);
         hover_manager = new Managers.HoverManager (this);
 
-        window.event_bus.request_zoom.connect (on_request_zoom);
+        window.event_bus.update_scale.connect (on_update_scale);
         window.event_bus.set_scale.connect (on_set_scale);
         window.event_bus.request_change_cursor.connect (on_request_change_cursor);
         window.event_bus.request_change_mode.connect (on_request_change_mode);
@@ -344,29 +344,15 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         grab_focus (get_root_item ());
     }
 
-    private void on_request_zoom (string direction) {
-        switch (direction) {
-            case "in":
-                current_scale += 0.1;
-                break;
-            case "out":
-                if (current_scale == 0.1) {
-                    break;
-                }
-                current_scale -= 0.1;
-                break;
-            case "reset":
-                current_scale = 1.0;
-                break;
-        }
-
-        set_scale (current_scale);
-        window.event_bus.zoom ();
+    private void on_update_scale (double zoom) {
+        current_scale += zoom;
+        window.event_bus.set_scale (current_scale);
     }
 
     private void on_set_scale (double scale) {
         current_scale = scale;
         set_scale (scale);
+        window.event_bus.zoom ();
     }
 
     private void on_request_change_cursor (Gdk.CursorType? cursor_type) {
