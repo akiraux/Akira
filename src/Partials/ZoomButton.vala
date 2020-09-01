@@ -97,8 +97,8 @@ public class Akira.Partials.ZoomButton : Gtk.Grid {
 
     public void zoom_in () {
         var zoom = int.parse (zoom_default_button.label) + 10;
-        zoom_in_button.sensitive = (zoom < 1000);
-        if (zoom > 1000) {
+        zoom_in_button.sensitive = (zoom < 10000);
+        if (zoom > 10000) {
             return;
         }
 
