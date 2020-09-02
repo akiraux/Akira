@@ -24,6 +24,8 @@ public class Akira.Utils.ColorPicker : Gtk.Window {
     public signal void picked (Gdk.RGBA color);
     public signal void cancelled ();
     public signal void moved (Gdk.RGBA color);
+    public signal void key_pressed (Gdk.EventKey e);
+    public signal void key_released (Gdk.EventKey e);
 
     const string DARK_BORDER_COLOR_STRING = "#333333";
     private Gdk.RGBA dark_border_color = Gdk.RGBA ();
@@ -270,6 +272,14 @@ public class Akira.Utils.ColorPicker : Gtk.Window {
                 manager.get_pointer ().warp (get_screen (), px + 1, py);
                 break;
         }
+
+        key_pressed (e);
+
+        return true;
+    }
+
+    public override bool key_release_event (Gdk.EventKey e) {
+        key_released (e);
 
         return true;
     }

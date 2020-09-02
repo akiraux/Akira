@@ -469,13 +469,11 @@ public class Akira.Services.ActionManager : Object {
         bool is_holding_shift = false;
         var color_picker = new Akira.Utils.ColorPicker ();
         color_picker.show_all ();
-        color_picker.key_press_event.connect (e => {
+        color_picker.key_pressed.connect (e => {
             is_holding_shift = e.keyval == Gdk.Key.Shift_L;
-            return true;
         });
-        color_picker.key_release_event.connect (e => {
+        color_picker.key_released.connect (e => {
             is_holding_shift = e.keyval == Gdk.Key.Shift_L;
-            return true;
         });
         color_picker.cancelled.connect (() => {
             color_picker.close ();
