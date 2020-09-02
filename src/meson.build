@@ -35,6 +35,7 @@ sources = files(
     'Utils/AffineTransform.vala',
     'Utils/Color.vala',
     'Utils/Image.vala',
+    'Utils/ColorPicker.vala',
 
     'Layouts/HeaderBar.vala',
     'Layouts/LeftSideBar.vala',
@@ -94,8 +95,6 @@ sources = files(
     'Lib/Models/CanvasArtboard.vala',
 
     'Lib/Selection/Nob.vala',
-
-    'Utils/ColorPicker.vala',
 )
 
 deps = [
