@@ -115,6 +115,11 @@ public class Akira.Layouts.MainCanvas : Gtk.Grid {
         if (delta_y < -SCROLL_DISTANCE) {
             // Scroll UP.
             if (is_ctrl) {
+                // Divide the delta if it's too high. This fixes the zoom with
+                // the mouse wheel.
+                if (delta_y <= -1) {
+                    delta_y /= 10;
+                }
                 // Get the current zoom before zooming.
                 double old_zoom = canvas.get_scale ();
                 // Zoom in.
@@ -129,6 +134,11 @@ public class Akira.Layouts.MainCanvas : Gtk.Grid {
         } else if (delta_y > SCROLL_DISTANCE) {
             // Scroll DOWN.
             if (is_ctrl) {
+                // Divide the delta if it's too high. This fixes the zoom with
+                // the mouse wheel.
+                if (delta_y >= 1) {
+                    delta_y /= 10;
+                }
                 // Get the current zoom before zooming.
                 double old_zoom = canvas.get_scale ();
                 // Zoom out.
