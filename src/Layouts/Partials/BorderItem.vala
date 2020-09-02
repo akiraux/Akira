@@ -224,9 +224,7 @@ public class Akira.Layouts.Partials.BorderItem : Gtk.Grid {
         eyedropper.show_all ();
 
         eyedropper.picked.connect ((picked_color) => {
-            alpha = ((int)(picked_color.alpha * 255));
             color_chooser_widget.set_rgba (picked_color);
-            on_color_changed ();
             eyedropper.close ();
         });
 
