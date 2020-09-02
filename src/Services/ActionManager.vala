@@ -457,41 +457,39 @@ public class Akira.Services.ActionManager : Object {
     }
 
     private void action_pick_color () {
-        if (window.main_window.main_canvas.canvas.selected_bound_manager.selected_items.length() == 0) {
+        weak Akira.Lib.Canvas canvas = window.main_window.main_canvas.canvas;
+        // Interrupt if no item is selected.
+        if (canvas.selected_bound_manager.selected_items.length () == 0) {
             return;
+        }
+        foreach (var item in canvas.selected_bound_manager.selected_items) {
+            // Hide the ghost bound manager.
+            item.bounds_manager.hide ();
         }
         bool is_holding_shift = false;
         var color_picker = new Akira.Utils.ColorPicker ();
-        color_picker.show_all();
-        color_picker.key_press_event.connect((e) => {
-            if (e.keyval == Gdk.Key.Shift_R) {
-                is_holding_shift = true;
-            }
+        color_picker.show_all ();
+        color_picker.key_press_event.connect (e => {
+            is_holding_shift = e.keyval == Gdk.Key.Shift_L;
             return true;
         });
-        color_picker.key_release_event.connect((e) => {
-            if (e.keyval == Gdk.Key.Shift_R) {
-                is_holding_shift = false;
-            }
+        color_picker.key_release_event.connect (e => {
+            is_holding_shift = e.keyval == Gdk.Key.Shift_L;
             return true;
         });
-        color_picker.cancelled.connect(() => {
-            color_picker.close();
+        color_picker.cancelled.connect (() => {
+            color_picker.close ();
         });
-        color_picker.picked.connect(color => {
-            if (!is_holding_shift) {
-                // TODO change current selected shape fill color
-                for (int i = 0; i <= window.main_window.main_canvas.canvas.selected_bound_manager.selected_items.length (); i ++) {
-                    var item = window.main_window.main_canvas.canvas.selected_bound_manager.selected_items.nth_data(i);
-                    if(item != null) {
-                        item.color = color;
-                    }
+        color_picker.picked.connect (color => {
+            foreach (var item in canvas.selected_bound_manager.selected_items) {
+                if (is_holding_shift) {
+                    item.border_color_string = Utils.Color.rgba_to_hex_string (color);
+                } else {
+                    item.color_string = Utils.Color.rgba_to_hex_string (color);
                 }
-            } else {
-                // TODO change current selected shape border color
-                // window.main_window.main_canvas.canvas.selected_bound_manager.delete_selection ();
+                item.load_colors ();
             }
-            color_picker.close();
+            color_picker.close ();
         });
     }
 
