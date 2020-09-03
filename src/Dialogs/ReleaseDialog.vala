@@ -63,10 +63,10 @@ public class Akira.Dialogs.ReleaseDialog : Gtk.Dialog {
         app_version.get_style_context ().add_class ("h2");
         app_version.selectable = true;
 
-        var version_title = new Gtk.Label ("Bug fixes and improvements");
+        var version_title = new Gtk.Label ("New Features and Bug Fixes");
         version_title.get_style_context ().add_class ("h3");
 
-        var version_date = new Gtk.Label ("Aug 12th, 2020");
+        var version_date = new Gtk.Label ("Sept 2nd, 2020");
         version_date.get_style_context ().add_class ("dim-label");
 
         var header_grid = new Gtk.Grid ();
@@ -81,7 +81,7 @@ public class Akira.Dialogs.ReleaseDialog : Gtk.Dialog {
         scrolled.expand = true;
 
         var release_info = new Gtk.TextView ();
-        release_info.buffer.text = "✓ Fix loading Artboards background color when opening a file.\n✓ General code improvements and optimization.\n✓ Fix numbering of newly created items.\n✓ Fix Gtk-CRITICAL warning when opening the Export Dialog.\n✓ Fix flipping items inside Artboards.\n✓ Fix crash when dropping flipped items inside Artboards.\n✓ Zooming with mouse wheel follows the position of the cursor.\n";
+        release_info.buffer.text = "✓ New color picker for Fills and Borders.\n✓ Zooming with mouse wheel follows the position of the cursor.\n✓ Fix loading Artboards background color when opening a file.\n✓ Fix numbering of newly created items.\n✓ Fix Gtk-CRITICAL warning when opening the Export Dialog.\n✓ Fix flipping items inside Artboards.\n✓ Fix crash when dropping flipped items inside Artboards.\n✓ General code improvements and optimization.\n";
         release_info.pixels_below_lines = 3;
         release_info.border_width = 12;
         release_info.wrap_mode = Gtk.WrapMode.WORD;
