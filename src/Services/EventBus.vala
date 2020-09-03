@@ -39,9 +39,9 @@ public class Akira.Services.EventBus : Object {
     public signal void request_change_cursor (Gdk.CursorType? cursor_type);
     public signal void request_change_mode (Lib.Canvas.EditMode mode);
     public signal void request_escape ();
-    public signal void request_zoom (string direction);
     public signal void set_focus_on_canvas ();
     public signal void update_nob_size ();
+    public signal void update_scale (double scale);
     public signal void set_scale (double scale);
     public signal void zoom ();
     public signal void canvas_notification (string message);

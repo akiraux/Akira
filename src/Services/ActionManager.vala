@@ -49,6 +49,7 @@ public class Akira.Services.ActionManager : Object {
     public const string ACTION_EXPORT_GRAB = "action_export_grab";
     public const string ACTION_QUIT = "action_quit";
     public const string ACTION_ZOOM_IN = "action_zoom_in";
+    public const string ACTION_ZOOM_IN_2 = "action_zoom_in_2";
     public const string ACTION_ZOOM_OUT = "action_zoom_out";
     public const string ACTION_ZOOM_RESET = "action_zoom_reset";
     public const string ACTION_MOVE_UP = "action_move_up";
@@ -87,6 +88,7 @@ public class Akira.Services.ActionManager : Object {
         { ACTION_EXPORT_GRAB, action_export_grab },
         { ACTION_QUIT, action_quit },
         { ACTION_ZOOM_IN, action_zoom_in },
+        { ACTION_ZOOM_IN_2, action_zoom_in_2 },
         { ACTION_ZOOM_OUT, action_zoom_out },
         { ACTION_MOVE_UP, action_move_up },
         { ACTION_MOVE_DOWN, action_move_down },
@@ -129,7 +131,7 @@ public class Akira.Services.ActionManager : Object {
         action_accelerators.set (ACTION_EXPORT_ARTBOARDS, "<Control><Alt>a");
         action_accelerators.set (ACTION_EXPORT_GRAB, "<Control><Alt>g");
         action_accelerators.set (ACTION_QUIT, "<Control>q");
-        action_accelerators.set (ACTION_ZOOM_IN, "<Control>equal");
+        action_accelerators.set (ACTION_ZOOM_IN_2, "<Control>equal");
         action_accelerators.set (ACTION_ZOOM_IN, "<Control>plus");
         action_accelerators.set (ACTION_ZOOM_OUT, "<Control>minus");
         action_accelerators.set (ACTION_ZOOM_RESET, "<Control>0");
@@ -306,15 +308,19 @@ public class Akira.Services.ActionManager : Object {
     }
 
     private void action_zoom_in () {
-        window.headerbar.zoom.zoom_in ();
+        window.event_bus.update_scale (0.1);
+    }
+
+    private void action_zoom_in_2 () {
+        action_zoom_in ();
     }
 
     private void action_zoom_out () {
-        window.headerbar.zoom.zoom_out ();
+        window.event_bus.update_scale (-0.1);
     }
 
     private void action_zoom_reset () {
-        window.headerbar.zoom.zoom_reset ();
+        window.event_bus.set_scale (1);
     }
 
     private void action_move_up () {
