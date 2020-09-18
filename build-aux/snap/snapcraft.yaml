@@ -23,6 +23,8 @@ apps:
       - desktop-legacy
       - opengl
       - x11
+      - home
+      - removable-media
     slots: [ dbus-akira ]
     desktop: usr/share/applications/com.github.akiraux.akira.desktop
     environment:
