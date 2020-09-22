@@ -4,15 +4,21 @@ project('com.github.akiraux.akira', 'vala', 'c')
 akira_prefix = get_option('prefix')
 akira_datadir = join_paths(akira_prefix, get_option('datadir'))
 akira_pkgdatadir = join_paths(akira_datadir, meson.project_name())
+vapi_dir = join_paths(meson.source_root(), 'vapi')
 install_tests = get_option('install-tests')
 
 vala_version = meson.get_compiler('vala').version()
 if vala_version.version_compare('<=0.43.90')
     add_project_arguments(
-        ['--vapidir', join_paths(meson.current_source_dir(), 'vapi')],
+        ['--vapidir', vapi_dir],
         language: 'vala'
     )
 endif
+
+add_project_arguments(
+    ['--vapidir', join_paths(vapi_dir, 'libarchive')],
+    language: 'vala'
+)
 
 # Include the translations module
 i18n = import('i18n')
