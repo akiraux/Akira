@@ -259,6 +259,11 @@ public class Akira.FileFormat.ZipArchiveHandler : GLib.Object {
         Archive.Result last_result;
 
         while ((last_result = archive.next_header (out entry)) == Archive.Result.OK) {
+#if VALA_0_46
+            entry.set_perm (0644);
+#else
+            entry.set_perm (Archive.FileType.IFREG);
+#endif
             entry.set_pathname (Path.build_filename (location.get_path (), entry.pathname ()));
 
             if (extractor.write_header (entry) != Archive.Result.OK) {
@@ -329,11 +334,15 @@ public class Akira.FileFormat.ZipArchiveHandler : GLib.Object {
 #if VALA_0_42
                     entry.set_size ((Archive.int64_t) file_info.get_size ());
                     entry.set_filetype (Archive.FileType.IFREG);
-                    entry.set_perm (Archive.FileType.IFREG);
 #else
                     entry.set_size (file_info.get_size ());
                     entry.set_filetype ((uint) Posix.S_IFREG);
+#endif
+
+#if VALA_0_46
                     entry.set_perm (0644);
+#else
+                    entry.set_perm (Archive.FileType.IFREG);
 #endif
 
                     if (archive.write_header (entry) != Archive.Result.OK) {
