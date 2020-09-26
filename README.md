@@ -61,7 +61,7 @@ You can install Akira by compiling it from the source
  - `cairo`
  - `meson`
 
-> _**Note:** For non-elementary distros, (such as Arch, Debian etc) you are required to install "vala" as additional dependency._
+> _**Note:** For non-elementary distros, (such as Arch, Debian etc) you are required to install "vala", "elementary-theme" and "elementary-icon-theme" as additional dependencies._
 
 ### Compile &amp; Run
 
