@@ -15,12 +15,10 @@ jobs:
     - name: Install Dependencies
       run: |
         apt update
-        apt install -y libarchive-dev libgoocanvas-2.0-dev valac meson appstream-util xvfb at-spi2-core
+        apt install -y libarchive-dev libgoocanvas-2.0-dev valac meson appstream-util xvfb at-spi2-core wget librsvg2-bin appstream elementary-theme elementary-icon-theme libgtk-3-common
     - name: Build
-      # env:
-      #   DESTDIR: out
       run: |
-        meson build
+        meson build --prefix /usr
         ninja -C build
         ninja -C build install
         xvfb-run -a -s "-screen 0 1024x768x24" \
@@ -34,3 +32,30 @@ jobs:
         else
           echo "No xvfb processes to kill"
         fi
+    - name: AppImage
+      run: |
+        APPDIR=$(readlink -f appdir) # Why is this needed?
+        DESTDIR="$APPDIR" ninja -C build install
+        wget -c -q https://github.com/$(wget -q https://github.com/probonopd/go-appimage/releases -O - | grep "appimagetool-.*-x86_64.AppImage" | head -n 1 | cut -d '"' -f 2)
+        chmod +x appimagetool-*.AppImage
+        mkdir -p "$APPDIR"/usr/share/icons/hicolor/256x256/apps/
+        rsvg-convert -w 256 -h 256 "$APPDIR"/usr/share/icons/hicolor/scalable/apps/com.github.akiraux.akira.svg > "$APPDIR"/usr/share/icons/hicolor/256x256/apps/com.github.akiraux.akira.png
+        mkdir -p "$APPDIR"/usr/share/glib-2.0/schemas/ ; cp /usr/share/glib-2.0/schemas/org.gtk.Settings.*.xml "$APPDIR"/usr/share/glib-2.0/schemas/
+        find "$APPDIR"
+        ./appimagetool-*.AppImage -s deploy "$APPDIR"/usr/share/applications/*.desktop --appimage-extract-and-run # Bundle EVERYTHING
+        sed -i -e 's|/usr||g' "$APPDIR"/lib/x86_64-linux-gnu/gdk-pixbuf-2.0/2.10.0/loaders.cache # FIXME in https://github.com/probonopd/go-appimage
+        ( cd "$APPDIR"/usr/share/mime/ ; ln -s /usr/share/mime/mime.cache . ) # FIXME in https://github.com/probonopd/go-appimage; https://github.com/probonopd/go-appimage/issues/58#issuecomment-675010671
+        mkdir -p "$APPDIR"/usr/share/icons ; cp -r /usr/share/icons/elementary "$APPDIR"/usr/share/icons/ # https://github.com/akiraux/Akira/issues/3#issuecomment-674544807 and https://github.com/probonopd/go-appimage/blob/c522796229a3669afdf8b4870b045b597332c5a2/src/appimagetool/appdirtool.go#L715-L722
+        mkdir -p "$APPDIR"/usr/share/themes ; cp -r /usr/share/themes/elementary "$APPDIR"/usr/share/themes/ # https://github.com/akiraux/Akira/issues/3#issuecomment-674544807
+        rm -rf "$APPDIR"/usr/share/themes/Default ; sed -i -e 's|Default|elementary|g' "$APPDIR"/AppRun # Use the elementary theme rather than the Gtk Default theme
+        ./appimagetool-*.AppImage "$APPDIR" --appimage-extract-and-run # turn AppDir into AppImage
+    - name: Release AppImage
+      uses: marvinpinto/action-automatic-releases@latest
+      with:
+        title: AppImage
+        automatic_release_tag: continuous
+        prerelease: true
+        draft: false
+        files: |
+          Akira*.AppImage*
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
