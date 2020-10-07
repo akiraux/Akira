@@ -1,5 +1,723 @@
 msgid ""
 msgstr ""
+"Project-Id-Version: \n"
+"POT-Creation-Date: 2020-10-07 21:17+0200\n"
+"PO-Revision-Date: 2020-10-07 21:56+0200\n"
+"Last-Translator: Yannicka\n"
+"Language-Team: \n"
+"Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
-"Plural-Forms: nplurals=2; plural=n>1;\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 2.4.1\n"
+"X-Poedit-Basepath: .\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"X-Poedit-SearchPath-0: .\n"
+
+#: src/Dialogs/ExportDialog.vala:151
+msgid "Export to:"
+msgstr "Exporter vers :"
+
+#: src/Dialogs/ExportDialog.vala:157
+msgid "Select Folder"
+msgstr "Sélectionner un dossier"
+
+#: src/Dialogs/ExportDialog.vala:166
+msgid "Format:"
+msgstr "Format :"
+
+#: src/Dialogs/ExportDialog.vala:179
+msgid "Quality:"
+msgstr "Qualité :"
+
+#: src/Dialogs/ExportDialog.vala:191
+msgid "Compression:"
+msgstr "Compression :"
+
+#: src/Dialogs/ExportDialog.vala:205
+msgid "Transparency:"
+msgstr "Transparence :"
+
+#: src/Dialogs/ExportDialog.vala:218
+msgid "Scale:"
+msgstr "Échelle :"
+
+#: src/Dialogs/ExportDialog.vala:242 src/FileFormat/FileManager.vala:49
+#: src/FileFormat/FileManager.vala:105
+msgid "Cancel"
+msgstr "Annuler"
+
+#: src/Dialogs/ExportDialog.vala:249 src/Dialogs/ShortcutsDialog.vala:63
+#: src/Layouts/HeaderBar.vala:112
+msgid "Export"
+msgstr "Exporter"
+
+#: src/Dialogs/ReleaseDialog.vala:47 src/Dialogs/SettingsDialog.vala:217
+msgid ""
+"WARNING!\n"
+"Akira is still under development and not ready for production. Missing "
+"features, random bugs, and black holes opening in your kitchen are to be "
+"expected."
+msgstr ""
+"ATTENTION !\n"
+"Akira est encore en cours de développement et n'est pas prêt à être mis en "
+"production. Il faut s'attendre à ce que des fonctionnalités soit "
+"manquantes, qu'il y ait des bugs aléatoires et que des trous noirs "
+"s'ouvrent dans votre cuisine."
+
+#: src/Dialogs/ReleaseDialog.vala:100 src/Dialogs/SettingsDialog.vala:249
+msgid "Make a Donation"
+msgstr "Faire un don"
+
+#: src/Dialogs/ReleaseDialog.vala:109 src/Dialogs/SettingsDialog.vala:258
+msgid "Suggest Translations"
+msgstr "Suggérer des traductions"
+
+#: src/Dialogs/ReleaseDialog.vala:118 src/Dialogs/SettingsDialog.vala:267
+msgid "Report a Problem"
+msgstr "Signaler un problème"
+
+#: src/Dialogs/SettingsDialog.vala:40
+msgid "Preferences"
+msgstr "Préférences"
+
+#: src/Dialogs/SettingsDialog.vala:50 src/Dialogs/SettingsDialog.vala:73
+#: src/Dialogs/ShortcutsDialog.vala:45
+msgid "General"
+msgstr "Général"
+
+#: src/Dialogs/SettingsDialog.vala:51 src/Dialogs/SettingsDialog.vala:86
+msgid "Interface"
+msgstr "Interface"
+
+#: src/Dialogs/SettingsDialog.vala:52 src/Layouts/HeaderBar.vala:280
+msgid "Shapes"
+msgstr "Formes"
+
+#: src/Dialogs/SettingsDialog.vala:53
+msgid "About"
+msgstr "À propos"
+
+#: src/Dialogs/SettingsDialog.vala:74
+msgid "Auto Reopen Latest File:"
+msgstr "Rouvrir automatiquement le dernier fichier :"
+
+#: src/Dialogs/SettingsDialog.vala:88
+msgid "Use Dark Theme:"
+msgstr "Utiliser le thème sombre :"
+
+#: src/Dialogs/SettingsDialog.vala:92
+msgid "Invert Panels Order:"
+msgstr "Inverser l'ordre des panneaux :"
+
+#: src/Dialogs/SettingsDialog.vala:96
+msgid "Restart application to apply this change."
+msgstr "Redémarrer l'application pour appliquer ce changement."
+
+#: src/Dialogs/SettingsDialog.vala:100
+msgid "ToolBar Style"
+msgstr "Style de la barre d'outils"
+
+#: src/Dialogs/SettingsDialog.vala:102
+msgid "Show Button Labels:"
+msgstr "Afficher l'étiquette des boutons :"
+
+#: src/Dialogs/SettingsDialog.vala:106
+msgid "Use Symbolic Icons:"
+msgstr "Utiliser les icônes symboliques :"
+
+#: src/Dialogs/SettingsDialog.vala:129
+msgid "Default Colors"
+msgstr "Couleurs par défaut"
+
+#: src/Dialogs/SettingsDialog.vala:131
+msgid "Define the default style used when creating a new shape."
+msgstr ""
+"Définissez le style par défaut utilisé lors de la création d'une nouvelle "
+"forme."
+
+#: src/Dialogs/SettingsDialog.vala:136
+msgid "Fill Color:"
+msgstr "Couleur de remplissage :"
+
+#: src/Dialogs/SettingsDialog.vala:157
+msgid "Enable Border Style:"
+msgstr "Activer le style de bordure :"
+
+#: src/Dialogs/SettingsDialog.vala:160
+msgid "Border Color:"
+msgstr "Couleur de la bordure :"
+
+#: src/Dialogs/SettingsDialog.vala:181
+msgid "Border Width:"
+msgstr "Largeur de la bordure :"
+
+#: src/Dialogs/SettingsDialog.vala:209
+msgid "The Linux Design Tool"
+msgstr "L'outil de design Linux"
+
+#: src/Dialogs/SettingsDialog.vala:226
+msgid "Thanks to our awesome supporters!"
+msgstr "Merci à tous ceux qui nous soutiennent !"
+
+#: src/Dialogs/SettingsDialog.vala:231
+msgid "View the list of supporters"
+msgstr "Voir la liste des personnes qui soutiennent le projet"
+
+#: src/Dialogs/ShortcutsDialog.vala:46
+msgid "New window:"
+msgstr "Nouvelle fenêtre :"
+
+#: src/Dialogs/ShortcutsDialog.vala:48
+msgid "Preferences:"
+msgstr "Préférences :"
+
+#: src/Dialogs/ShortcutsDialog.vala:50
+msgid "Quit:"
+msgstr "Quitter :"
+
+#: src/Dialogs/ShortcutsDialog.vala:52
+msgid "Presentation mode:"
+msgstr "Mode présentation :"
+
+#: src/Dialogs/ShortcutsDialog.vala:55
+msgid "File"
+msgstr "Ficher"
+
+#: src/Dialogs/ShortcutsDialog.vala:56
+msgid "Open:"
+msgstr "Ouvrir :"
+
+#: src/Dialogs/ShortcutsDialog.vala:58
+msgid "Save:"
+msgstr "Enregistrer :"
+
+#: src/Dialogs/ShortcutsDialog.vala:60
+msgid "Save as:"
+msgstr "Enregistrer sous :"
+
+#: src/Dialogs/ShortcutsDialog.vala:64
+msgid "Export artboards:"
+msgstr "Exporter les plans de travail :"
+
+#: src/Dialogs/ShortcutsDialog.vala:66
+msgid "Export selection:"
+msgstr "Exporter la sélection :"
+
+#: src/Dialogs/ShortcutsDialog.vala:68
+msgid "Highlight area to export:"
+msgstr "Zone en surbrillance à exporter :"
+
+#: src/Dialogs/ShortcutsDialog.vala:77
+msgid "Canvas"
+msgstr "Canevas"
+
+#: src/Dialogs/ShortcutsDialog.vala:78
+msgid "Zoom in:"
+msgstr "Zoomer :"
+
+#: src/Dialogs/ShortcutsDialog.vala:80
+msgid "Zoom out:"
+msgstr "Dézoomer :"
+
+#: src/Dialogs/ShortcutsDialog.vala:82
+msgid "Zoom reset:"
+msgstr "Mise à zéro du zoom :"
+
+#: src/Dialogs/ShortcutsDialog.vala:85
+msgid "Item creation"
+msgstr "Création d'élément"
+
+#: src/Dialogs/ShortcutsDialog.vala:86
+msgid "Artboard:"
+msgstr "Plan de travail :"
+
+#: src/Dialogs/ShortcutsDialog.vala:88
+msgid "Rectangle:"
+msgstr "Rectangle :"
+
+#: src/Dialogs/ShortcutsDialog.vala:90
+msgid "Ellipse:"
+msgstr "Ellipse :"
+
+#: src/Dialogs/ShortcutsDialog.vala:92
+msgid "Text:"
+msgstr "Texte :"
+
+#: src/Dialogs/ShortcutsDialog.vala:94
+msgid "Image:"
+msgstr "Image :"
+
+#: src/Dialogs/ShortcutsDialog.vala:97
+#: src/Layouts/Partials/TransformPanel.vala:174
+msgid "Transform"
+msgstr "Transformer"
+
+#: src/Dialogs/ShortcutsDialog.vala:98
+msgid "Raise selection:"
+msgstr "Augmenter la sélection :"
+
+#: src/Dialogs/ShortcutsDialog.vala:100
+msgid "Lower selection:"
+msgstr "Diminuer la sélection :"
+
+#: src/Dialogs/ShortcutsDialog.vala:102
+msgid "Raise selection to top:"
+msgstr "Monter la sélection :"
+
+#: src/Dialogs/ShortcutsDialog.vala:104
+msgid "Lower selection to bottom:"
+msgstr "Descendre la sélection :"
+
+#: src/Dialogs/ShortcutsDialog.vala:106
+msgid "Flip horizontally:"
+msgstr "Retourner horizontalement :"
+
+#: src/Dialogs/ShortcutsDialog.vala:108
+msgid "Flip vertically:"
+msgstr "Retourner verticalement :"
+
+#: src/FileFormat/FileManager.vala:46
+msgid "Save Akira file"
+msgstr "Enregistrer un fichier Akira"
+
+#: src/FileFormat/FileManager.vala:48 src/Layouts/HeaderBar.vala:190
+msgid "Save"
+msgstr "Enregistrer"
+
+#: src/FileFormat/FileManager.vala:71
+msgid "Akira files"
+msgstr "Fichiers Akira"
+
+#: src/FileFormat/FileManager.vala:76
+msgid "All files"
+msgstr "Tous les fichiers"
+
+#: src/FileFormat/FileManager.vala:103
+msgid "Open Akira file"
+msgstr "Ouvrir un fichier Akira"
+
+#: src/FileFormat/FileManager.vala:105 src/Layouts/HeaderBar.vala:170
+msgid "Open"
+msgstr "Ouvrir"
+
+#: src/Layouts/HeaderBar.vala:69 src/Lib/Managers/ExportManager.vala:296
+msgid "Untitled"
+msgstr "Sans titre"
+
+#: src/Layouts/HeaderBar.vala:71
+msgid "Menu"
+msgstr "Menu"
+
+#: src/Layouts/HeaderBar.vala:75
+msgid "Insert"
+msgstr "Insérer"
+
+#: src/Layouts/HeaderBar.vala:82
+msgid "Group"
+msgstr "Grouper"
+
+#: src/Layouts/HeaderBar.vala:84
+msgid "Ungroup"
+msgstr "Dégrouper"
+
+#: src/Layouts/HeaderBar.vala:87
+msgid "Up"
+msgstr "Monter"
+
+#: src/Layouts/HeaderBar.vala:92
+msgid "Down"
+msgstr "Descendre"
+
+#: src/Layouts/HeaderBar.vala:97
+msgid "Top"
+msgstr "Devant"
+
+#: src/Layouts/HeaderBar.vala:102
+msgid "Bottom"
+msgstr "Derrière"
+
+#: src/Layouts/HeaderBar.vala:107
+msgid "Settings"
+msgstr "Paramètres"
+
+#: src/Layouts/HeaderBar.vala:118
+msgid "Difference"
+msgstr "Différence"
+
+#: src/Layouts/HeaderBar.vala:120
+msgid "Exclusion"
+msgstr "Exclusion"
+
+#: src/Layouts/HeaderBar.vala:122
+msgid "Intersect"
+msgstr "Intersection"
+
+#: src/Layouts/HeaderBar.vala:124
+msgid "Union"
+msgstr "Union"
+
+#: src/Layouts/HeaderBar.vala:161
+msgid "New Window"
+msgstr "Nouvelle fenêtre"
+
+#: src/Layouts/HeaderBar.vala:182
+msgid "Open Recent"
+msgstr "Ouvert récemment"
+
+#: src/Layouts/HeaderBar.vala:195
+msgid "Save As"
+msgstr "Enregistrer sous..."
+
+#: src/Layouts/HeaderBar.vala:204
+msgid "Quit"
+msgstr "Quitter"
+
+#: src/Layouts/HeaderBar.vala:237
+msgid "Artboard"
+msgstr "Plan de travail"
+
+#: src/Layouts/HeaderBar.vala:254
+msgid "Add Items"
+msgstr "Ajouter des éléments"
+
+#: src/Layouts/HeaderBar.vala:262
+msgid "Rectangle"
+msgstr "Rectangle"
+
+#: src/Layouts/HeaderBar.vala:268
+msgid "Ellipse"
+msgstr "Ellipse"
+
+#: src/Layouts/HeaderBar.vala:286
+msgid "Vector"
+msgstr "Vecteur"
+
+#: src/Layouts/HeaderBar.vala:288
+msgid "Pencil"
+msgstr "Crayon"
+
+#: src/Layouts/HeaderBar.vala:291
+msgid "Text"
+msgstr "Texte"
+
+#: src/Layouts/HeaderBar.vala:297
+msgid "Image"
+msgstr "Image"
+
+#: src/Layouts/HeaderBar.vala:330
+msgid "Export Current Selection"
+msgstr "Exporter la sélection courante"
+
+#: src/Layouts/HeaderBar.vala:336
+msgid "Export Artboards"
+msgstr "Exporter les plans de travail"
+
+#: src/Layouts/HeaderBar.vala:345
+msgid "Highlight Area to Export"
+msgstr "Zone en surbrillance à exporter"
+
+#: src/Layouts/HeaderBar.vala:391
+msgid "Main Menu"
+msgstr "Menu principal"
+
+#: src/Layouts/HeaderBar.vala:468 src/Services/ActionManager.vala:224
+#: src/Services/ActionManager.vala:243 src/Services/ActionManager.vala:262
+#, c-format
+msgid "Unable to open file at '%s'"
+msgstr "Impossible d'ouvrir le fichier « %s »"
+
+#: src/Layouts/MainCanvas.vala:46
+msgid "Button was pressed!"
+msgstr "Un bouton a été appuyé !"
+
+#: src/Layouts/MainCanvas.vala:206
+msgid "Export completed!"
+msgstr "Exportation complète !"
+
+#: src/Layouts/Partials/AlignItemsPanel.vala:48
+msgid "Distribute Horizontally"
+msgstr "Distribuer horizontalement"
+
+#: src/Layouts/Partials/AlignItemsPanel.vala:50
+msgid "Distribute Vertically"
+msgstr "Distribuer verticalement"
+
+#: src/Layouts/Partials/AlignItemsPanel.vala:52
+msgid "Align Left"
+msgstr "Aligner à gauche"
+
+#: src/Layouts/Partials/AlignItemsPanel.vala:53
+msgid "Align Center"
+msgstr "Aligner au centre"
+
+#: src/Layouts/Partials/AlignItemsPanel.vala:54
+msgid "Align Right"
+msgstr "Aligner à droite"
+
+#: src/Layouts/Partials/AlignItemsPanel.vala:56
+msgid "Align Top"
+msgstr "Aligner en haut"
+
+#: src/Layouts/Partials/AlignItemsPanel.vala:57
+msgid "Align Middle"
+msgstr "Aligner au milieu"
+
+#: src/Layouts/Partials/AlignItemsPanel.vala:58
+msgid "Align Bottom"
+msgstr "Aligner en bas"
+
+#: src/Layouts/Partials/Artboard.vala:144
+#: src/Layouts/Partials/Artboard.vala:487 src/Layouts/Partials/Layer.vala:139
+#: src/Layouts/Partials/Layer.vala:687
+msgid "Lock Layer"
+msgstr "Verrouiller le calque"
+
+#: src/Layouts/Partials/Artboard.vala:155
+#: src/Layouts/Partials/Artboard.vala:529 src/Layouts/Partials/Layer.vala:156
+#: src/Layouts/Partials/Layer.vala:729
+msgid "Hide Layer"
+msgstr "Cacher le calque"
+
+#: src/Layouts/Partials/Artboard.vala:487 src/Layouts/Partials/Layer.vala:687
+msgid "Unlock Layer"
+msgstr "Dévérouiller le calque"
+
+#: src/Layouts/Partials/Artboard.vala:529 src/Layouts/Partials/Layer.vala:729
+msgid "Show Layer"
+msgstr "Afficher le calque"
+
+#: src/Layouts/Partials/BorderItem.vala:121
+msgid "Choose border color"
+msgstr "Choisir la couleur de la bordure"
+
+#: src/Layouts/Partials/BorderItem.vala:176
+#: src/Layouts/Partials/FillItem.vala:178
+msgid "Pick color"
+msgstr "Choisir une couleur"
+
+#: src/Layouts/Partials/BorderItem.vala:191
+msgid "Remove border"
+msgstr "Supprimer la bordure"
+
+#: src/Layouts/Partials/BorderItem.vala:275
+msgid "Show border"
+msgstr "Afficher la bordure"
+
+#: src/Layouts/Partials/BorderItem.vala:279
+msgid "Hide border"
+msgstr "Masquer la bordure"
+
+#: src/Layouts/Partials/BorderRadiusPanel.vala:86
+msgid "Style"
+msgstr "Style"
+
+#: src/Layouts/Partials/BorderRadiusPanel.vala:103
+msgid "Border Radius"
+msgstr "Arrondi"
+
+#: src/Layouts/Partials/BorderRadiusPanel.vala:137
+msgid "Border radius options"
+msgstr "Options de l'arrondi"
+
+#: src/Layouts/Partials/BorderRadiusPanel.vala:199
+msgid "Autoscale Corners"
+msgstr "Mise à l'échelle automatique des coins"
+
+#: src/Layouts/Partials/BorderRadiusPanel.vala:208
+msgid "Uniform Corners"
+msgstr "Uniformiser les bordures"
+
+#: src/Layouts/Partials/BordersPanel.vala:53
+msgid "Borders"
+msgstr "Bordures"
+
+#: src/Layouts/Partials/BordersPanel.vala:64
+msgid "Add border"
+msgstr "Ajouter une bordure"
+
+#: src/Layouts/Partials/FillItem.vala:114
+msgid "Choose fill color"
+msgstr "Choisir la couleur de remplissage"
+
+#: src/Layouts/Partials/FillItem.vala:193
+msgid "Remove fill color"
+msgstr "Supprimer la couleur de remplissage"
+
+#: src/Layouts/Partials/FillItem.vala:277
+msgid "Show fill color"
+msgstr "Afficher la couleur de remplissage"
+
+#: src/Layouts/Partials/FillItem.vala:281
+msgid "Hide fill color"
+msgstr "Masquer la couleur de remplissage"
+
+#: src/Layouts/Partials/FillsPanel.vala:54
+msgid "Fills"
+msgstr "Remplissages"
+
+#: src/Layouts/Partials/FillsPanel.vala:65
+msgid "Add fill color"
+msgstr "Ajouter une couleur de remplissage"
+
+#: src/Layouts/Partials/TransformPanel.vala:96
+msgid "X"
+msgstr "X"
+
+#: src/Layouts/Partials/TransformPanel.vala:96
+msgid "Horizontal position"
+msgstr "Position horizontale"
+
+#: src/Layouts/Partials/TransformPanel.vala:98
+msgid "Y"
+msgstr "Y"
+
+#: src/Layouts/Partials/TransformPanel.vala:98
+msgid "Vertical position"
+msgstr "Position verticale"
+
+#: src/Layouts/Partials/TransformPanel.vala:100
+msgid "W"
+msgstr "W"
+
+#: src/Layouts/Partials/TransformPanel.vala:100
+msgid "Width"
+msgstr "Largeur"
+
+#: src/Layouts/Partials/TransformPanel.vala:102
+msgid "H"
+msgstr "H"
+
+#: src/Layouts/Partials/TransformPanel.vala:102
+msgid "Height"
+msgstr "Hauteur"
+
+#: src/Layouts/Partials/TransformPanel.vala:107
+msgid "Lock Ratio"
+msgstr "Ratio de verrouillage"
+
+#: src/Layouts/Partials/TransformPanel.vala:114
+msgid "R"
+msgstr "R"
+
+#: src/Layouts/Partials/TransformPanel.vala:114
+msgid "Rotation degrees"
+msgstr "Degrés de rotation"
+
+#: src/Layouts/Partials/TransformPanel.vala:126
+msgid "Flip Horizontally"
+msgstr "Retournement horizontal"
+
+#: src/Layouts/Partials/TransformPanel.vala:137
+msgid "Flip Vertically"
+msgstr "Retournement vertical"
+
+#: src/Layouts/Partials/TransformPanel.vala:165
+msgid "Position"
+msgstr "Position"
+
+#: src/Layouts/Partials/TransformPanel.vala:169
+msgid "Size"
+msgstr "Taille"
+
+#: src/Layouts/Partials/TransformPanel.vala:178
+msgid "Opacity"
+msgstr "Opacité"
+
+#: src/Layouts/RightSideBar.vala:111
+msgid "Search Layer"
+msgstr "Rechercher un calque"
+
+#: src/Lib/Managers/ExportManager.vala:192
+#: src/Lib/Managers/ExportManager.vala:219
+msgid "Generating preview, please wait…"
+msgstr "Génération de l'aperçu, veuillez patienter…"
+
+#: src/Lib/Managers/ExportManager.vala:313
+#, c-format
+msgid "Untitled %i"
+msgstr "Sans titre %i"
+
+#: src/Lib/Managers/ExportManager.vala:484
+msgid "Exporting images…"
+msgstr "Exporter des images…"
+
+#: src/Partials/ExportWidget.vala:117
+#, c-format
+msgid "%i × %i px · %s"
+msgstr "%i × %i px · %s"
+
+#: src/Partials/ExportWidget.vala:124
+msgid "Fetching image size…"
+msgstr "Récupération de la taille de l'image…"
+
+#: src/Partials/ZoomButton.vala:49
+msgid "Zoom Out"
+msgstr "Dézoomer"
+
+#: src/Partials/ZoomButton.vala:55
+msgid "Reset Zoom"
+msgstr "Remettre à zoom à zéro"
+
+#: src/Partials/ZoomButton.vala:62
+msgid "Zoom In"
+msgstr "Zoomer"
+
+#: src/Partials/ZoomButton.vala:68
+msgid "Zoom"
+msgstr "Zoom"
+
+#: src/Services/ActionManager.vala:217
+msgid "No recently opened file available!"
+msgstr "Aucun dossier récemment ouvert n'est disponible !"
+
+#: src/Services/ActionManager.vala:236
+msgid "No second most recently opened file available!"
+msgstr "Pas de deuxième fichier le plus récemment ouvert disponible !"
+
+#: src/Services/ActionManager.vala:255
+msgid "No third most recently opened file available!"
+msgstr "Pas de troisième fichier le plus récemment ouvert disponible !"
+
+#: src/Services/ActionManager.vala:293
+msgid "Nothing selected to export!"
+msgstr "Rien de sélectionné pour l'exportation !"
+
+#: src/Services/ActionManager.vala:302
+msgid "Export of Artboards currently unavailable…sorry 😑️"
+msgstr "Exportation de plans de travail actuellement indisponible… désolé 😑️"
+
+#: src/Services/ActionManager.vala:373
+msgid "Choose image file"
+msgstr "Choisir un fichier image"
+
+#: src/Services/ActionManager.vala:373
+msgid "Select"
+msgstr "Sélectionner"
+
+#: src/Services/ActionManager.vala:373
+msgid "Close"
+msgstr "Fermer"
+
+#: src/Services/ActionManager.vala:442
+#, c-format
+msgid "Error! .%s files are not supported!"
+msgstr "Erreur ! Les fichiers .%s ne sont pas pris en charge !"
+
+#: src/Window.vala:121
+msgid "Are you sure you want to quit?"
+msgstr "Êtes-vous sûr de vouloir quitter ?"
+
+#: src/Window.vala:122
+msgid "All unsaved data will be lost and impossible to recover."
+msgstr ""
+"Toutes les données non sauvegardées seront perdues et impossibles à "
+"récupérer."
+
+#: src/Window.vala:124
+msgid "Quit without saving!"
+msgstr "Quitter sans sauvegarder !"
+
+#: src/Window.vala:125
+msgid "Save file"
+msgstr "Enregistrer le fichier"
