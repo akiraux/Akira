@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "POT-Creation-Date: 2020-10-07 21:17+0200\n"
-"PO-Revision-Date: 2020-10-07 21:56+0200\n"
+"PO-Revision-Date: 2020-10-12 20:45+0200\n"
 "Last-Translator: Yannicka\n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -61,9 +61,8 @@ msgid ""
 msgstr ""
 "ATTENTION !\n"
 "Akira est encore en cours de développement et n'est pas prêt à être mis en "
-"production. Il faut s'attendre à ce que des fonctionnalités soit "
-"manquantes, qu'il y ait des bugs aléatoires et que des trous noirs "
-"s'ouvrent dans votre cuisine."
+"production. Attendez-vous à ce que des fonctionnalités manquent, des bugs "
+"se produisent voire qu'un trou noir s'ouvre dans votre cuisine."
 
 #: src/Dialogs/ReleaseDialog.vala:100 src/Dialogs/SettingsDialog.vala:249
 msgid "Make a Donation"
@@ -112,7 +111,7 @@ msgstr "Inverser l'ordre des panneaux :"
 
 #: src/Dialogs/SettingsDialog.vala:96
 msgid "Restart application to apply this change."
-msgstr "Redémarrer l'application pour appliquer ce changement."
+msgstr "Redémarrez l'application pour appliquer ce changement."
 
 #: src/Dialogs/SettingsDialog.vala:100
 msgid "ToolBar Style"
@@ -133,7 +132,7 @@ msgstr "Couleurs par défaut"
 #: src/Dialogs/SettingsDialog.vala:131
 msgid "Define the default style used when creating a new shape."
 msgstr ""
-"Définissez le style par défaut utilisé lors de la création d'une nouvelle "
+"Définir le style par défaut utilisé lors de la création d'une nouvelle "
 "forme."
 
 #: src/Dialogs/SettingsDialog.vala:136
@@ -154,11 +153,11 @@ msgstr "Largeur de la bordure :"
 
 #: src/Dialogs/SettingsDialog.vala:209
 msgid "The Linux Design Tool"
-msgstr "L'outil de design Linux"
+msgstr "L'outil de conception Linux"
 
 #: src/Dialogs/SettingsDialog.vala:226
 msgid "Thanks to our awesome supporters!"
-msgstr "Merci à tous ceux qui nous soutiennent !"
+msgstr "Merci à toutes les merveilleuses personnes qui nous soutiennent !"
 
 #: src/Dialogs/SettingsDialog.vala:231
 msgid "View the list of supporters"
@@ -198,7 +197,7 @@ msgstr "Enregistrer sous :"
 
 #: src/Dialogs/ShortcutsDialog.vala:64
 msgid "Export artboards:"
-msgstr "Exporter les plans de travail :"
+msgstr "Exporter les espaces de travail :"
 
 #: src/Dialogs/ShortcutsDialog.vala:66
 msgid "Export selection:"
@@ -206,7 +205,7 @@ msgstr "Exporter la sélection :"
 
 #: src/Dialogs/ShortcutsDialog.vala:68
 msgid "Highlight area to export:"
-msgstr "Zone en surbrillance à exporter :"
+msgstr "Sélectionner la zone à exporter :"
 
 #: src/Dialogs/ShortcutsDialog.vala:77
 msgid "Canvas"
@@ -222,7 +221,7 @@ msgstr "Dézoomer :"
 
 #: src/Dialogs/ShortcutsDialog.vala:82
 msgid "Zoom reset:"
-msgstr "Mise à zéro du zoom :"
+msgstr "Réinitialisation du zoom :"
 
 #: src/Dialogs/ShortcutsDialog.vala:85
 msgid "Item creation"
@@ -230,7 +229,7 @@ msgstr "Création d'élément"
 
 #: src/Dialogs/ShortcutsDialog.vala:86
 msgid "Artboard:"
-msgstr "Plan de travail :"
+msgstr "Espace de travail :"
 
 #: src/Dialogs/ShortcutsDialog.vala:88
 msgid "Rectangle:"
@@ -375,7 +374,7 @@ msgstr "Quitter"
 
 #: src/Layouts/HeaderBar.vala:237
 msgid "Artboard"
-msgstr "Plan de travail"
+msgstr "Espace de travail"
 
 #: src/Layouts/HeaderBar.vala:254
 msgid "Add Items"
@@ -411,11 +410,11 @@ msgstr "Exporter la sélection courante"
 
 #: src/Layouts/HeaderBar.vala:336
 msgid "Export Artboards"
-msgstr "Exporter les plans de travail"
+msgstr "Exporter les espaces de travail"
 
 #: src/Layouts/HeaderBar.vala:345
 msgid "Highlight Area to Export"
-msgstr "Zone en surbrillance à exporter"
+msgstr "Sélectionner la zone à exporter"
 
 #: src/Layouts/HeaderBar.vala:391
 msgid "Main Menu"
@@ -429,11 +428,11 @@ msgstr "Impossible d'ouvrir le fichier « %s »"
 
 #: src/Layouts/MainCanvas.vala:46
 msgid "Button was pressed!"
-msgstr "Un bouton a été appuyé !"
+msgstr "Un bouton a été pressé !"
 
 #: src/Layouts/MainCanvas.vala:206
 msgid "Export completed!"
-msgstr "Exportation complète !"
+msgstr "Exportation terminée !"
 
 #: src/Layouts/Partials/AlignItemsPanel.vala:48
 msgid "Distribute Horizontally"
@@ -594,7 +593,7 @@ msgstr "Hauteur"
 
 #: src/Layouts/Partials/TransformPanel.vala:107
 msgid "Lock Ratio"
-msgstr "Ratio de verrouillage"
+msgstr "Verrouiller le ratio"
 
 #: src/Layouts/Partials/TransformPanel.vala:114
 msgid "R"
@@ -602,7 +601,7 @@ msgstr "R"
 
 #: src/Layouts/Partials/TransformPanel.vala:114
 msgid "Rotation degrees"
-msgstr "Degrés de rotation"
+msgstr "Angle de rotation"
 
 #: src/Layouts/Partials/TransformPanel.vala:126
 msgid "Flip Horizontally"
@@ -640,7 +639,7 @@ msgstr "Sans titre %i"
 
 #: src/Lib/Managers/ExportManager.vala:484
 msgid "Exporting images…"
-msgstr "Exporter des images…"
+msgstr "Exportation des images en cours…"
 
 #: src/Partials/ExportWidget.vala:117
 #, c-format
@@ -657,7 +656,7 @@ msgstr "Dézoomer"
 
 #: src/Partials/ZoomButton.vala:55
 msgid "Reset Zoom"
-msgstr "Remettre à zoom à zéro"
+msgstr "Remettre le zoom à zéro"
 
 #: src/Partials/ZoomButton.vala:62
 msgid "Zoom In"
@@ -681,11 +680,13 @@ msgstr "Pas de troisième fichier le plus récemment ouvert disponible !"
 
 #: src/Services/ActionManager.vala:293
 msgid "Nothing selected to export!"
-msgstr "Rien de sélectionné pour l'exportation !"
+msgstr "Aucun élément sélectionné pour l'exportation !"
 
 #: src/Services/ActionManager.vala:302
 msgid "Export of Artboards currently unavailable…sorry 😑️"
-msgstr "Exportation de plans de travail actuellement indisponible… désolé 😑️"
+msgstr ""
+"L'exportation des espaces de travail est actuellement indisponible… pardon "
+"😑️"
 
 #: src/Services/ActionManager.vala:373
 msgid "Choose image file"
