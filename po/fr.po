@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "POT-Creation-Date: 2020-10-07 21:17+0200\n"
-"PO-Revision-Date: 2020-10-12 20:45+0200\n"
+"PO-Revision-Date: 2020-10-13 22:04+0200\n"
 "Last-Translator: Yannicka\n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -132,7 +132,7 @@ msgstr "Couleurs par défaut"
 #: src/Dialogs/SettingsDialog.vala:131
 msgid "Define the default style used when creating a new shape."
 msgstr ""
-"Définir le style par défaut utilisé lors de la création d'une nouvelle "
+"Définit le style par défaut utilisé lors de la création d'une nouvelle "
 "forme."
 
 #: src/Dialogs/SettingsDialog.vala:136
@@ -432,7 +432,7 @@ msgstr "Un bouton a été pressé !"
 
 #: src/Layouts/MainCanvas.vala:206
 msgid "Export completed!"
-msgstr "Exportation terminée !"
+msgstr "Export terminée !"
 
 #: src/Layouts/Partials/AlignItemsPanel.vala:48
 msgid "Distribute Horizontally"
@@ -577,7 +577,7 @@ msgstr "Position verticale"
 
 #: src/Layouts/Partials/TransformPanel.vala:100
 msgid "W"
-msgstr "W"
+msgstr "L"
 
 #: src/Layouts/Partials/TransformPanel.vala:100
 msgid "Width"
@@ -597,7 +597,7 @@ msgstr "Verrouiller le ratio"
 
 #: src/Layouts/Partials/TransformPanel.vala:114
 msgid "R"
-msgstr "R"
+msgstr "A"
 
 #: src/Layouts/Partials/TransformPanel.vala:114
 msgid "Rotation degrees"
@@ -605,11 +605,11 @@ msgstr "Angle de rotation"
 
 #: src/Layouts/Partials/TransformPanel.vala:126
 msgid "Flip Horizontally"
-msgstr "Retournement horizontal"
+msgstr "Retourner horizontalement"
 
 #: src/Layouts/Partials/TransformPanel.vala:137
 msgid "Flip Vertically"
-msgstr "Retournement vertical"
+msgstr "Retourner verticalement"
 
 #: src/Layouts/Partials/TransformPanel.vala:165
 msgid "Position"
@@ -639,7 +639,7 @@ msgstr "Sans titre %i"
 
 #: src/Lib/Managers/ExportManager.vala:484
 msgid "Exporting images…"
-msgstr "Exportation des images en cours…"
+msgstr "Export des images en cours…"
 
 #: src/Partials/ExportWidget.vala:117
 #, c-format
@@ -680,13 +680,12 @@ msgstr "Pas de troisième fichier le plus récemment ouvert disponible !"
 
 #: src/Services/ActionManager.vala:293
 msgid "Nothing selected to export!"
-msgstr "Aucun élément sélectionné pour l'exportation !"
+msgstr "Aucun élément sélectionné pour l'export !"
 
 #: src/Services/ActionManager.vala:302
 msgid "Export of Artboards currently unavailable…sorry 😑️"
 msgstr ""
-"L'exportation des espaces de travail est actuellement indisponible… pardon "
-"😑️"
+"L'export des espaces de travail est actuellement indisponible… pardon 😑️"
 
 #: src/Services/ActionManager.vala:373
 msgid "Choose image file"
