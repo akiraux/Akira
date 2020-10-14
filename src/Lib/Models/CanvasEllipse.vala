@@ -34,12 +34,14 @@ public class Akira.Lib.Models.CanvasEllipse : Goo.CanvasEllipse, Models.CanvasIt
     public bool has_fill { get; set; default = true; }
     public int fill_alpha { get; set; }
     public Gdk.RGBA color { get; set; }
+    public string color_string { get; set; }
     public bool hidden_fill { get; set; }
 
     // Border Panel attributes.
     public bool has_border { get; set; default = true; }
     public int border_size { get; set; }
     public Gdk.RGBA border_color { get; set; }
+    public string border_color_string { get; set; }
     public int stroke_alpha { get; set; }
     public bool hidden_border { get; set; }
 
@@ -60,12 +62,13 @@ public class Akira.Lib.Models.CanvasEllipse : Goo.CanvasEllipse, Models.CanvasIt
 
     public new Akira.Lib.Canvas canvas { get; set; }
     public Models.CanvasArtboard? artboard { get; set; }
+    public Managers.GhostBoundsManager bounds_manager { get; set; }
 
     public double relative_x { get; set; }
     public double relative_y { get; set; }
 
-    public double initial_relative_x { get; set; }
-    public double initial_relative_y { get; set; }
+    // Knows if an item was created or loaded for ordering purpose.
+    public bool loaded { get; set; default = false; }
 
     public CanvasEllipse (
         double _center_x = 0,
@@ -76,8 +79,10 @@ public class Akira.Lib.Models.CanvasEllipse : Goo.CanvasEllipse, Models.CanvasIt
         Gdk.RGBA _border_color,
         Gdk.RGBA _fill_color,
         Goo.CanvasItem? _parent = null,
-        Models.CanvasArtboard? _artboard = null
+        Models.CanvasArtboard? _artboard = null,
+        bool _loaded = false
     ) {
+        loaded = _loaded;
         artboard = _artboard;
         parent = _artboard != null ? _artboard : _parent;
         canvas = parent.get_canvas () as Akira.Lib.Canvas;
@@ -85,6 +90,9 @@ public class Akira.Lib.Models.CanvasEllipse : Goo.CanvasEllipse, Models.CanvasIt
         item_type = Models.CanvasItemType.ELLIPSE;
         id = Models.CanvasItem.create_item_id (this);
         Models.CanvasItem.init_item (this);
+        if (artboard != null) {
+            connect_to_artboard ();
+        }
 
         radius_x = _radius_x;
         radius_y = _radius_y;
@@ -101,7 +109,7 @@ public class Akira.Lib.Models.CanvasEllipse : Goo.CanvasEllipse, Models.CanvasIt
 
         set_transform (Cairo.Matrix.identity ());
 
-        position_item (_center_x, _center_y);
+        init_position (_center_x, _center_y);
 
         color = _fill_color;
         has_border = settings.set_border;

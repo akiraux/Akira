@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2019 Alecaddd (http://alecaddd.com)
+* Copyright (c) 2019-2020 Alecaddd (https://alecaddd.com)
 *
 * This file is part of Akira.
 *
@@ -10,11 +10,11 @@
 
 * Akira is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 * GNU General Public License for more details.
 
 * You should have received a copy of the GNU General Public License
-* along with Akira.  If not, see <https://www.gnu.org/licenses/>.
+* along with Akira. If not, see <https://www.gnu.org/licenses/>.
 *
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 *              Bilal Elmoussaoui <bil.elmoussaoui@gmail.com>
@@ -22,6 +22,10 @@
 
 public class Akira.Services.Settings : GLib.Settings {
     // Main window settings.
+    public string version {
+        owned get { return get_string ("version"); }
+        set { set_string ("version", value); }
+    }
     public int pos_x {
         get { return get_int ("pos-x"); }
         set { set_int ("pos-x", value); }
@@ -83,6 +87,10 @@ public class Akira.Services.Settings : GLib.Settings {
     public bool open_quick {
         get { return get_boolean ("open-quick"); }
         set { set_boolean ("open-quick", value); }
+    }
+    public string[] recently_opened {
+        owned get { return get_strv ("recently-opened"); }
+        set { set_strv ("recently-opened", value); }
     }
 
     // Export Settings.

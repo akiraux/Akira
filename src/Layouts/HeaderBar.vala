@@ -85,24 +85,23 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
 
         move_up = new Akira.Partials.HeaderBarButton (window, "selection-raise",
             _("Up"), {"<Ctrl>Up"}, "single");
-        move_up.button.clicked.connect (() => {
-            window.event_bus.change_z_selected (true, false);
-        });
+        move_up.button.action_name = Akira.Services.ActionManager.ACTION_PREFIX
+            + Akira.Services.ActionManager.ACTION_MOVE_UP;
+
         move_down = new Akira.Partials.HeaderBarButton (window, "selection-lower",
             _("Down"), {"<Ctrl>Down"}, "single");
-        move_down.button.clicked.connect (() => {
-            window.event_bus.change_z_selected (false, false);
-        });
+        move_down.button.action_name = Akira.Services.ActionManager.ACTION_PREFIX
+            + Akira.Services.ActionManager.ACTION_MOVE_DOWN;
+
         move_top = new Akira.Partials.HeaderBarButton (window, "selection-top",
             _("Top"), {"<Ctrl><Shift>Up"}, "single");
-        move_top.button.clicked.connect (() => {
-            window.event_bus.change_z_selected (true, true);
-        });
+        move_top.button.action_name = Akira.Services.ActionManager.ACTION_PREFIX
+            + Akira.Services.ActionManager.ACTION_MOVE_TOP;
+
         move_bottom = new Akira.Partials.HeaderBarButton (window, "selection-bottom",
             _("Bottom"), {"<Ctrl><Shift>Down"}, "single");
-        move_bottom.button.clicked.connect (() => {
-            window.event_bus.change_z_selected (false, true);
-        });
+        move_bottom.button.action_name = Akira.Services.ActionManager.ACTION_PREFIX
+            + Akira.Services.ActionManager.ACTION_MOVE_BOTTOM;
 
         preferences = new Akira.Partials.HeaderBarButton (window, "open-menu",
             _("Settings"), {"<Ctrl>comma"});
@@ -179,23 +178,10 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
         recent_files_grid.width_request = 220;
         recent_files_grid.name = "files-menu";
 
-        var back_button = new Gtk.ModelButton ();
-        back_button.text = _("Main Menu");
-        back_button.inverted = true;
-        back_button.menu_name = "main";
-        back_button.expand = true;
-
-        var sub_separator = new Gtk.Separator (Gtk.Orientation.HORIZONTAL);
-        sub_separator.margin_top = sub_separator.margin_bottom = 3;
-
-        recent_files_grid.add (back_button);
-        recent_files_grid.add (sub_separator);
-        recent_files_grid.show_all ();
-        fetch_recent_files ();
-
         var open_recent_button = new Gtk.ModelButton ();
         open_recent_button.text = _("Open Recent");
         open_recent_button.menu_name = "files-menu";
+        fetch_recent_files.begin ();
 
         var separator2 = new Gtk.Separator (Gtk.Orientation.HORIZONTAL);
         separator2.margin_top = separator2.margin_bottom = 3;
@@ -378,9 +364,13 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
         window.event_bus.file_edited.connect (on_file_edited);
         window.event_bus.file_saved.connect (on_file_saved);
         window.event_bus.selected_items_changed.connect (on_selected_items_changed);
-        window.event_bus.z_selected_changed.connect (() => {
-            update_button_sensitivity (false);
-        });
+        window.event_bus.z_selected_changed.connect (update_button_sensitivity);
+        window.event_bus.set_scale.connect (on_set_scale);
+        window.event_bus.update_recent_files_list.connect (fetch_recent_files);
+    }
+
+    private void on_set_scale (double scale) {
+        zoom.zoom_default_button.label = "%.0f%%".printf (scale * 100);
     }
 
     public void toggle () {
@@ -388,10 +378,109 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
     }
 
     /**
-     * TODO: Fetch the recently opened files from GSettings
-     * and add them to the menu grid
+     * Fetch the recently opened files from GSettings and add them to the list
+     * if those files still exists.
      */
-    public void fetch_recent_files () {
+    public async void fetch_recent_files () {
+        recent_files_grid.@foreach (child => {
+            recent_files_grid.remove (child);
+        });
+
+        // Add default buttons.
+        var back_button = new Gtk.ModelButton ();
+        back_button.text = _("Main Menu");
+        back_button.inverted = true;
+        back_button.menu_name = "main";
+        back_button.expand = true;
+
+        var sub_separator = new Gtk.Separator (Gtk.Orientation.HORIZONTAL);
+        sub_separator.margin_top = sub_separator.margin_bottom = 3;
+
+        recent_files_grid.add (back_button);
+        recent_files_grid.add (sub_separator);
+
+        // Loop a first time to clear missing files and prevent wrong accelerators.
+        string[] all_files = {};
+        for (var i = 0; i <= settings.recently_opened.length; i++) {
+            // Skip if the record is empty.
+            if (settings.recently_opened[i] == null) {
+                continue;
+            }
+
+            // Skip if the file doesn't exist.
+            var file = File.new_for_path (settings.recently_opened[i]);
+            if (!file.query_exists ()) {
+                continue;
+            }
+
+            all_files += settings.recently_opened[i];
+        }
+
+        // Update the GSettings to prevent loading an unavailable file.
+        settings.set_strv ("recently-opened", all_files);
+
+        for (var i = 0; i <= all_files.length; i++) {
+            // Skip if the record is empty.
+            if (all_files[i] == null) {
+                continue;
+            }
+
+            // Store the full path in a variable before the split() method explodes the string.
+            var full_path = all_files[i];
+
+            // Get the file name.
+            string[] split_string = all_files[i].split ("/");
+            var file_name = split_string[split_string.length - 1].replace (".akira", "");
+
+            var button = new Gtk.ModelButton ();
+
+            // Add quick accelerators only for the first 3 items.
+            string? accels = null;
+            if (i < 3) {
+                switch (i) {
+                    case 0:
+                        accels = Akira.Services.ActionManager.ACTION_PREFIX
+                            + Akira.Services.ActionManager.ACTION_LOAD_FIRST;
+                        break;
+                    case 1:
+                        accels = Akira.Services.ActionManager.ACTION_PREFIX
+                            + Akira.Services.ActionManager.ACTION_LOAD_SECOND;
+                        break;
+                    case 2:
+                        accels = Akira.Services.ActionManager.ACTION_PREFIX
+                            + Akira.Services.ActionManager.ACTION_LOAD_THIRD;
+                        break;
+                }
+
+                button.get_child ().destroy ();
+                var label = new Granite.AccelLabel.from_action_name (file_name, accels);
+                button.add (label);
+                button.action_name = accels;
+            } else {
+                button.text = file_name;
+
+                // Define the open action on click only for those files that don't
+                // have an accelerator to prevent double calls.
+                button.clicked.connect (() => {
+                    var file = File.new_for_path (full_path);
+                    if (!file.query_exists ()) {
+                        window.event_bus.canvas_notification (
+                            _("Unable to open file at '%s'").printf (full_path)
+                        );
+                        return;
+                    }
+
+                    File[] files = {};
+                    files += file;
+                    window.app.open (files, "");
+                });
+            }
+
+            button.tooltip_text = all_files[i];
+
+            recent_files_grid.add (button);
+        }
+
         recent_files_grid.show_all ();
     }
 
@@ -415,23 +504,25 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
     private void on_selected_items_changed (List<Lib.Models.CanvasItem> selected_items) {
         if (selected_items.length () == 0) {
             selected_item = null;
-            update_button_sensitivity (true);
+            update_button_sensitivity ();
             return;
         }
 
         if (selected_item == null || selected_item != selected_items.nth_data (0)) {
             selected_item = selected_items.nth_data (0);
-            update_button_sensitivity (true);
+            update_button_sensitivity ();
         }
     }
 
-    private void update_button_sensitivity (bool selected) {
-        move_up.sensitive = (selected_item != null);
-        move_down.sensitive = (selected_item != null);
-        move_top.sensitive = (selected_item != null);
-        move_bottom.sensitive = (selected_item != null);
+    private void update_button_sensitivity () {
+        var z_buttons_sensitive = selected_item != null && !(selected_item is Lib.Models.CanvasArtboard);
 
-        if (selected_item == null || selected_item.get_canvas () == null) {
+        move_up.sensitive = z_buttons_sensitive;
+        move_down.sensitive = z_buttons_sensitive;
+        move_top.sensitive = z_buttons_sensitive;
+        move_bottom.sensitive = z_buttons_sensitive;
+
+        if (!z_buttons_sensitive || selected_item.get_canvas () == null) {
             return;
         }
 
@@ -443,7 +534,7 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
         }
 
         // Account for nobs and select effect.
-        if (item_position == window.items_manager.get_item_top_position ()) {
+        if (item_position == window.items_manager.get_item_top_position (selected_item)) {
             move_up.sensitive = false;
             move_top.sensitive = false;
         }

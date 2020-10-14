@@ -24,10 +24,12 @@ public class Akira.Services.EventBus : Object {
     // File signals.
     public signal void file_edited ();
     public signal void file_saved (string? file_name);
+    public signal void update_recent_files_list ();
 
     // Layout signals.
     public signal void change_sensitivity (string type);
     public signal void request_widget_redraw ();
+    public signal void change_theme ();
 
     // Canvas signals.
     public signal void coordinate_change (double x, double y);
@@ -37,9 +39,10 @@ public class Akira.Services.EventBus : Object {
     public signal void request_change_cursor (Gdk.CursorType? cursor_type);
     public signal void request_change_mode (Lib.Canvas.EditMode mode);
     public signal void request_escape ();
-    public signal void request_zoom (string direction);
     public signal void set_focus_on_canvas ();
     public signal void update_nob_size ();
+    public signal void update_scale (double scale);
+    public signal void set_scale (double scale);
     public signal void zoom ();
     public signal void canvas_notification (string message);
     public signal void hide_select_effect ();
@@ -54,19 +57,18 @@ public class Akira.Services.EventBus : Object {
 
     // Item signals.
     public signal void change_z_selected (bool raise, bool total);
-    public signal void flip_item (bool clicked, bool vertical = false);
+    public signal void flip_item (bool vertical = false);
     public signal void request_add_item_to_selection (Lib.Models.CanvasItem item);
     public signal void request_delete_item (Lib.Models.CanvasItem item);
     public signal void selected_items_changed (List<Lib.Models.CanvasItem> selected_items);
     public signal void z_selected_changed ();
+    public signal void hold_released ();
 
     // Layers panel signals.
     public signal void hover_over_item (Lib.Models.CanvasItem? item);
     public signal void hover_over_layer (Lib.Models.CanvasItem? item);
     public signal void item_deleted (Lib.Models.CanvasItem item);
     public signal void item_locked (Lib.Models.CanvasItem item);
-    public signal void change_item_z_index (Lib.Models.CanvasItem item, int position);
-    public signal void toggle_sidebar_indicator (bool show);
 
     // Others.
     public signal void disconnect_typing_accel ();

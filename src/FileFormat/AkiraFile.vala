@@ -26,10 +26,12 @@ public class Akira.FileFormat.AkiraFile : Akira.FileFormat.ZipArchiveHandler {
     public File pictures_folder { get; private set; }
     public File thumbnails_folder { get; private set; }
 
+    public bool overwrite = false;
+
     private File content_file { get; set; }
     public string path {
         owned get {
-            return opened_file.get_parent ().get_path () + opened_file.get_basename ();
+            return opened_file.get_parent ().get_path () + "/" + opened_file.get_basename ();
         }
     }
 
@@ -41,10 +43,12 @@ public class Akira.FileFormat.AkiraFile : Akira.FileFormat.ZipArchiveHandler {
         try {
             open_archive ();
 
-            //  var version_json = get_content_as_json (version_file);
-            //  version_data = new FileFormat.Version (version_json != null ? version_json : new Json.Object ());
+            var content_json = get_content_as_json (content_file);
+            new FileFormat.JsonLoader (window, content_json);
 
-            //  debug ("Version from file: %s", version_data.file_version);
+            update_recent_list.begin ();
+
+            debug ("Version from file: %s", content_json.get_string_member ("version"));
         } catch (Error e) {
             error ("Could not load file: %s", e.message);
         }
@@ -52,6 +56,7 @@ public class Akira.FileFormat.AkiraFile : Akira.FileFormat.ZipArchiveHandler {
 
     public void save_file () {
         try {
+            save_images.begin ();
             var content = new FileFormat.JsonContent (window);
 
             content.save_content ();
@@ -59,6 +64,7 @@ public class Akira.FileFormat.AkiraFile : Akira.FileFormat.ZipArchiveHandler {
             write_content_to_file (content_file, json);
 
             write_to_archive ();
+            update_recent_list.begin ();
         } catch (Error e) {
             warning ("%s\n", e.message);
         }
@@ -85,5 +91,89 @@ public class Akira.FileFormat.AkiraFile : Akira.FileFormat.ZipArchiveHandler {
         content_file = File.new_for_path (Path.build_filename (base_path, "content.json"));
 
         make_file (content_file);
+    }
+
+    /**
+     * Update the GSettings array of recently opened files.
+     */
+    private async void update_recent_list () {
+        string[] array = {};
+        // Add the last opened file always on top.
+        array += path;
+
+        for (var i = 0; i <= settings.recently_opened.length; i++) {
+            // Skip if the record is empty.
+            if (settings.recently_opened[i] == null) {
+                continue;
+            }
+
+            // If the file doesn't exist anymore, remove it from the list.
+            var file = File.new_for_path (settings.recently_opened[i]);
+            if (!file.query_exists ()) {
+                continue;
+            }
+
+            // Don't store more than 10 files.
+            if (i >= 9) {
+                break;
+            }
+
+            // If the same file was already in the list, don't save it again.
+            if (path == settings.recently_opened[i]) {
+                continue;
+            }
+
+            array += settings.recently_opened[i];
+        }
+
+        settings.set_strv ("recently-opened", array);
+
+        window.app.update_recent_files_list ();
+    }
+
+    /**
+     * Save all the images used in the Canvas and make a copy in the Pictures folder.
+     */
+    public async void save_images () {
+        // Clear potential leftover images if we're overwriting an existing file.
+        if (overwrite) {
+            try {
+                Dir dir = Dir.open (pictures_folder.get_path (), 0);
+                string? name = null;
+                while ((name = dir.read_name ()) != null) {
+                    var file = File.new_for_path (Path.build_filename (pictures_folder.get_path (), name));
+                    file_collector.mark_for_deletion (file);
+                }
+            } catch (FileError err) {
+                stderr.printf (err.message);
+            }
+            overwrite = false;
+        }
+
+        foreach (var image in window.items_manager.images) {
+            var image_file = File.new_for_path (
+                Path.build_filename (pictures_folder.get_path (), image.manager.filename)
+            );
+
+            // Copy the file if it doesn't exist, or increase the reference count.
+            if (!image_file.query_exists ()) {
+                copy_image (image.manager.file, image_file);
+                continue;
+            }
+        }
+    }
+
+    /**
+     * Decrease the reference count to an existing image, which will cause its
+     * deletion if the count reaches 0.
+     */
+    public async void remove_image (string filename) {
+        var image_file = File.new_for_path (
+            Path.build_filename (pictures_folder.get_path (), filename)
+        );
+
+        if (image_file.query_exists ()) {
+            file_collector.unref_file (image_file);
+        }
     }
 }

@@ -4,7 +4,7 @@ conf_data.set('PREFIX', akira_prefix)
 conf_data.set('DATADIR', akira_datadir)
 conf_data.set('PKGDATADIR',akira_pkgdatadir)
 conf_data.set('GETTEXT_PACKAGE', gettext_package)
-conf_data.set('VERSION', '0.0.1')
+conf_data.set('VERSION', '0.0.13')
 conf_data.set('PROFILE', profile)
 conf_data.set('APP_ID', application_id)
 
@@ -22,18 +22,20 @@ sources = files(
     'FileFormat/AkiraFile.vala',
     'FileFormat/FileManager.vala',
     'FileFormat/JsonContent.vala',
+    'FileFormat/JsonLoader.vala',
     'FileFormat/JsonObject.vala',
     'FileFormat/ZipArchiveHandler.vala',
 
     'Services/Settings.vala',
     'Services/ActionManager.vala',
     'Services/EventBus.vala',
-    'Services/ImageProvider.vala',
 
     'Utils/Dialogs.vala',
     'Utils/BlendingMode.vala',
     'Utils/AffineTransform.vala',
     'Utils/Color.vala',
+    'Utils/Image.vala',
+    'Utils/ColorPicker.vala',
 
     'Layouts/HeaderBar.vala',
     'Layouts/LeftSideBar.vala',
@@ -73,14 +75,17 @@ sources = files(
     'Dialogs/ShortcutsDialog.vala',
     'Dialogs/SettingsDialog.vala',
     'Dialogs/ExportDialog.vala',
+    'Dialogs/ReleaseDialog.vala',
 
     'Lib/Canvas.vala',
 
     'Lib/Managers/ExportManager.vala',
+    'Lib/Managers/GhostBoundsManager.vala',
     'Lib/Managers/HoverManager.vala',
-    'Lib/Managers/SelectedBoundManager.vala',
+    'Lib/Managers/ImageManager.vala',
     'Lib/Managers/ItemsManager.vala',
     'Lib/Managers/NobManager.vala',
+    'Lib/Managers/SelectedBoundManager.vala',
 
     'Lib/Models/CanvasItem.vala',
     'Lib/Models/CanvasRect.vala',

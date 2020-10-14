@@ -1,5 +1,11 @@
 <schemalist>
     <schema id="@SCHEMA_ID@" path="@SCHEMA_PATH@" gettext-domain="@GETTEXT_PACKAGE@">
+        <key name="version" type="s">
+            <default>'0.0.0'</default>
+            <summary>The currently installed version.</summary>
+            <description>The currently installed version of Akira, updated only after the user launched the app. This is used to know when to trigger the Release Dialog.</description>
+        </key>
+
         <key name="pos-x" type="i">
             <default>360</default>
             <summary>The saved horizontal position of the window.</summary>
@@ -54,6 +60,12 @@
             <description>Allow user to choose between normal and symbolic icons in HeaderBar.</description>
         </key>
 
+        <key name="invert-sidebar" type="b">
+            <default>false</default>
+            <summary>Invert Panels Order</summary>
+            <description>Allow user to choose between default and inverted panels order.</description>
+        </key>
+
         <key name="fill-color" type="s">
             <default>'#CCCCCC'</default>
             <summary>Default Shape Color.</summary>
@@ -81,6 +93,12 @@
             <default>false</default>
             <summary>Auto Reopen latest file</summary>
             <description>Automatically reopen the latest file on startup.</description>
+        </key>
+
+        <key name="recently-opened" type="as">
+            <default>[]</default>
+            <summary>Recently opened files</summary>
+            <description>Keep track of the 10 most recently opened files.</description>
         </key>
 
         <key name="export-folder" type="s">

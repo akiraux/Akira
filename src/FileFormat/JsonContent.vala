@@ -36,24 +36,28 @@ public class Akira.FileFormat.JsonContent : Object {
 
         builder = new Json.Builder ();
         builder.begin_object ();
-        builder.set_member_name ("version");
-        builder.add_string_value (Constants.VERSION);
 
         canvas = window.main_window.main_canvas.canvas;
-        builder.set_member_name ("scale");
-        builder.add_double_value (canvas.get_scale ());
     }
 
     public void save_content () {
+        // Save the current version of Akira.
+        builder.set_member_name ("version");
+        builder.add_string_value (Constants.VERSION);
+
+        // Save the current Canvas status.
+        builder.set_member_name ("scale");
+        builder.add_double_value (canvas.get_scale ());
+        builder.set_member_name ("hadjustment");
+        builder.add_double_value (window.main_window.main_canvas.main_scroll.hadjustment.value);
+        builder.set_member_name ("vadjustment");
+        builder.add_double_value (window.main_window.main_canvas.main_scroll.vadjustment.value);
+
         // Convert Artboards to JSON.
-        if (window.items_manager.artboards.get_n_items () > 0) {
-            save_artboards ();
-        }
+        save_artboards ();
 
         // Convert Items to JSON.
-        if (window.items_manager.free_items.get_n_items () > 0) {
-            save_items ();
-        }
+        save_items ();
     }
 
     private void save_artboards () {
@@ -81,6 +85,17 @@ public class Akira.FileFormat.JsonContent : Object {
             builder.set_member_name ("item");
             builder.add_value (item.get_node ());
             builder.end_object ();
+        }
+
+        // Save all the items inside this Artboard.
+        foreach (var artboard in window.items_manager.artboards) {
+            foreach (var _item in artboard.items) {
+                var child_item = new JsonObject (_item);
+                builder.begin_object ();
+                builder.set_member_name ("item");
+                builder.add_value (child_item.get_node ());
+                builder.end_object ();
+            }
         }
 
         builder.end_array ();

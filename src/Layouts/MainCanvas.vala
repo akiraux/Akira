@@ -19,13 +19,13 @@
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 * Authored by: Giacomo "giacomoalbe" Alberini <giacomoalbe@gmail.com>
 */
+
 public class Akira.Layouts.MainCanvas : Gtk.Grid {
     public const int CANVAS_SIZE = 100000;
     public const double SCROLL_DISTANCE = 0;
 
     public Gtk.ScrolledWindow main_scroll;
     public Akira.Lib.Canvas canvas;
-    public Gtk.Allocation main_window_size;
     public weak Akira.Window window { get; construct; }
 
     private Gtk.Overlay main_overlay;
@@ -40,11 +40,7 @@ public class Akira.Layouts.MainCanvas : Gtk.Grid {
     }
 
     construct {
-        window.event_bus.exporting.connect (on_exporting);
-        window.event_bus.export_completed.connect (on_export_completed);
-        window.event_bus.canvas_notification.connect (trigger_notification);
-
-        get_allocation (out main_window_size);
+        get_style_context ().add_class ("main-canvas");
 
         main_overlay = new Gtk.Overlay ();
         notification = new Granite.Widgets.Toast (_("Button was pressed!"));
@@ -59,12 +55,8 @@ public class Akira.Layouts.MainCanvas : Gtk.Grid {
         main_scroll.set_policy (Gtk.PolicyType.NEVER, Gtk.PolicyType.NEVER);
 
         canvas = new Akira.Lib.Canvas (window);
-
-        canvas.set_size_request (main_window_size.width, main_window_size.height);
         canvas.set_bounds (0, 0, CANVAS_SIZE, CANVAS_SIZE);
         canvas.set_scale (1.0);
-
-        canvas.update_bounds ();
 
         canvas.canvas_moved.connect ((event_x, event_y) => {
             // Move scroll window according to normalized mouse delta
@@ -106,6 +98,11 @@ public class Akira.Layouts.MainCanvas : Gtk.Grid {
         main_overlay.add_overlay (notification);
 
         add (main_overlay);
+
+        // Set up event listeners.
+        window.event_bus.exporting.connect (on_exporting);
+        window.event_bus.export_completed.connect (on_export_completed);
+        window.event_bus.canvas_notification.connect (trigger_notification);
     }
 
     public bool on_scroll (Gdk.EventScroll event) {
@@ -116,20 +113,38 @@ public class Akira.Layouts.MainCanvas : Gtk.Grid {
         event.get_scroll_deltas (out delta_x, out delta_y);
 
         if (delta_y < -SCROLL_DISTANCE) {
-            // Scroll UP
+            // Scroll UP.
             if (is_ctrl) {
-                // Zoom in
-                window.headerbar.zoom.zoom_in ();
+                // Divide the delta if it's too high. This fixes the zoom with
+                // the mouse wheel.
+                if (delta_y <= -1) {
+                    delta_y /= 10;
+                }
+                // Get the current zoom before zooming.
+                double old_zoom = canvas.get_scale ();
+                // Zoom in.
+                window.event_bus.update_scale (delta_y * -1);
+                // Adjust zoom based on cursor position.
+                zoom_on_cursor (event, old_zoom);
             } else if (is_shift) {
                 main_scroll.hadjustment.value += delta_y * 10;
             } else {
                 main_scroll.vadjustment.value += delta_y * 10;
             }
         } else if (delta_y > SCROLL_DISTANCE) {
-            // Scroll DOWN
+            // Scroll DOWN.
             if (is_ctrl) {
-                // Zoom out
-                window.headerbar.zoom.zoom_out ();
+                // Divide the delta if it's too high. This fixes the zoom with
+                // the mouse wheel.
+                if (delta_y >= 1) {
+                    delta_y /= 10;
+                }
+                // Get the current zoom before zooming.
+                double old_zoom = canvas.get_scale ();
+                // Zoom out.
+                window.event_bus.update_scale (-delta_y);
+                // Adjust zoom based on cursor position.
+                zoom_on_cursor (event, old_zoom);
             } else if (is_shift) {
                 main_scroll.hadjustment.value += delta_y * 10;
             } else {
@@ -142,7 +157,40 @@ public class Akira.Layouts.MainCanvas : Gtk.Grid {
         } else if (delta_x > SCROLL_DISTANCE) {
             main_scroll.hadjustment.value += delta_x * 10;
         }
+
         return true;
+    }
+
+    private void zoom_on_cursor (Gdk.EventScroll event, double old_zoom) {
+        // The regular zoom mode shifts the visible viewing area
+        // to center itself (it already has one translation applied)
+        // so you cannot just move the viewing area by the distance
+        // of the current mouse location and the new mouse location.
+
+        // If you want to zoom to your mouse you need to find the
+        // difference between the distances of the current mouse location
+        // in the current view scale to the left view border and the new
+        // mouse location that has the new canvas scale applied to the
+        // new left view border and shift the view by that difference.
+        int width = main_scroll.get_allocated_width ();
+        int height = main_scroll.get_allocated_height ();
+
+        var center_x = main_scroll.hadjustment.value + (width / 2);
+        var center_y = main_scroll.vadjustment.value + (height / 2);
+
+        var old_center_x = (center_x / canvas.get_scale ()) * old_zoom;
+        var old_center_y = (center_y / canvas.get_scale ()) * old_zoom;
+
+        var new_event_x = (event.x / old_zoom) * canvas.get_scale ();
+        var new_event_y = (event.y / old_zoom) * canvas.get_scale ();
+
+        var old_hadjustment = old_center_x - (width / 2);
+        var old_vadjustment = old_center_y - (height / 2);
+
+        main_scroll.hadjustment.value +=
+            (new_event_x - main_scroll.hadjustment.value) - (event.x - old_hadjustment);
+        main_scroll.vadjustment.value +=
+            (new_event_y - main_scroll.vadjustment.value) - (event.y - old_vadjustment);
     }
 
     private async void on_exporting (string message) {

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Copyright (c) 2017 Alessandro Castellani (https://github.com/akiraux/akira) -->
+<!-- Copyright (c) 2019-2020 Alessandro Castellani (https://github.com/akiraux/akira) -->
 <component type="desktop-application">
   <id>@APP_ID@</id>
   <metadata_license>CC0-1.0</metadata_license>
@@ -8,44 +8,107 @@
   <summary>The Linux Design Tool</summary>
   <description>
     <p>
-      A modern UX Design Application for Graphic Designers
+      A modern UX Design Application for UI and UX Designers
     </p>
     <p>
-     Akira is a native Linux Design application built in Vala and Gtk. Akira focuses on offering a modern and fast approach to UI and UX Design, mainly targeting web designers and graphic designers. The main goal is to offer a valid and professional solution for designers who want to use Linux as their main OS.
+      ⚠ WARNING! Akira is still under development and not ready for production. Missing features, random bugs, and black holes opening in your kitchen are to be expected.</p>
+    <p>
+      Akira is a native Linux Design application built in Vala and Gtk. Akira focuses on offering a modern and fast approach to UI and UX Design, mainly targeting web and graphic designers. The main goal is to offer a valid and professional solution for designers who want to use Linux as their main OS.
     </p>
     <p>
       Features Include:
     </p>
     <ul>
       <li>Fully vector canvas for infinite resizing without quality loss</li>
-      <li>Modern interface for quick UI prototyping</li>
-      <li>Free hand tool for scribbling and notes</li>
+      <li>Smart option panel that shows the editable features of a selected item</li>
+      <li>Layers panel with easy Drag and Drop and smart ordering</li>
+      <li>Create Artboards to better organize your design iterations and views</li>
+      <li>Control the size and quality of exported images</li>
+      <li>Customizable icon set</li>
+      <li>And so much more…</li>
     </ul>
   </description>
+  <provides>
+		<binary>@APP_ID@</binary>
+	</provides>
   <releases>
-    <release version="0.1.0" date="2018-6-01">
+    <release version="0.0.13" date="2020-09-02">
       <description>
-        <p>Initial Release, say Hi to Akira!</p>
+        <p>New Features and Bug Fixes</p>
         <ul>
-          <li>Create Artboards and nested basic shapes</li>
+          <li>New color picker for Fills and Borders.</li>
+          <li>Zooming with mouse wheel follows the position of the cursor.</li>
+          <li>Fix loading Artboards background color when opening a file.</li>
+          <li>Fix numbering of newly created items.</li>
+          <li>Fix Gtk-CRITICAL warning when opening the Export Dialog.</li>
+          <li>Fix flipping items inside Artboards.</li>
+          <li>Fix crash when dropping flipped items inside Artboards.</li>
+          <li>General code improvements and optimization.</li>
+        </ul>
+      </description>
+    </release>
+    <release version="0.0.12" date="2020-08-12">
+      <description>
+        <p>Bug fixes and Artboards improvements</p>
+        <ul>
+          <li>Control Artboards background color.</li>
+          <li>Hide and Lock Artboards from the Layers panel.</li>
+          <li>Items inside Artboards are masked when extending outside the edges of the Artboard.</li>
+          <li>Fix items reordering with the layers panel drag and drop.</li>
+          <li>Fix random segfault at startup while setting accelerators.</li>
+          <li>Updated goocanvas vapi.</li>
+        </ul>
+      </description>
+    </release>
+    <release version="0.0.11" date="2020-08-04">
+      <description>
+        <p>🚀 Experimental Alpha Release, say Hi to Akira!</p>
+        <ul>
+          <li>Create Artboards and basic shapes</li>
           <li>Manage the fill and border properties of shapes</li>
-          <li>Infinite canvas with zoom options</li>
+          <li>Import images</li>
+          <li>Export custom areas, selections, and artboards</li>
+          <li>So many crashes and missing features you wouldn't believe, but hey, this is an experimental alpha…</li>
+        </ul>
+      </description>
+    </release>
+    <release version="0.0.1-alpha" date="2020-08-03">
+      <description>
+        <p>🚀 Experimental Alpha Release, say Hi to Akira!</p>
+        <ul>
+          <li>Create Artboards and basic shapes</li>
+          <li>Manage the fill and border properties of shapes</li>
+          <li>Import images</li>
+          <li>Export custom areas, selections, and artboards</li>
+          <li>So many crashes and missing features you wouldn't believe, but hey, this is an experimental alpha…</li>
+        </ul>
+      </description>
+    </release>
+    <release version="0.0.1" date="2020-08-02">
+      <description>
+        <p>🚀 Experimental Alpha Release, say Hi to Akira!</p>
+        <ul>
+          <li>Create Artboards and basic shapes</li>
+          <li>Manage the fill and border properties of shapes</li>
+          <li>Import images</li>
+          <li>Export custom areas, selections, and artboards</li>
+          <li>So many crashes and missing features you wouldn't believe, but hey, this is an experimental alpha…</li>
         </ul>
       </description>
     </release>
   </releases>
   <screenshots>
     <screenshot type="default">
-      <image>https://raw.githubusercontent.com/akiraux/akira/master/akira-screenshot.png</image>
+      <image>https://raw.githubusercontent.com/akiraux/akira/master/data/screenshots/screenshot-1.png</image>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/akiraux/akira/master/akira-screenshot1.png</image>
+      <image>https://raw.githubusercontent.com/akiraux/akira/master/data/screenshots/screenshot-2.png</image>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/akiraux/akira/master/akira-screenshot2.png</image>
+      <image>https://raw.githubusercontent.com/akiraux/akira/master/data/screenshots/screenshot-3.png</image>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/akiraux/akira/master/akira-screenshot3.png</image>
+      <image>https://raw.githubusercontent.com/akiraux/akira/master/data/screenshots/screenshot-4.png</image>
     </screenshot>
   </screenshots>
   <launchable type="desktop-id">@APP_ID@.desktop</launchable>
@@ -53,6 +116,7 @@
   <url type="homepage">https://github.com/akiraux/akira</url>
   <url type="bugtracker">https://github.com/akiraux/akira/issues</url>
   <url type="help">https://github.com/akiraux/akira/issues</url>
+  <url type="donation">https://www.paypal.me/alecaddd</url>
   <update_contact>castellani.ale@gmail.com</update_contact>
   <translation type="gettext">@GETTEXT_PACKAGE@</translation>
   <kudos>
@@ -61,6 +125,7 @@
         https://gitlab.gnome.org/GNOME/gnome-software/blob/master/doc/kudos.md
       -->
       <kudo>ModernToolkit</kudo>
+      <kudo>HighContrast</kudo>
       <kudo>HiDpiIcon</kudo>
   </kudos>
   <content_rating type="oars-1.1">
@@ -95,6 +160,6 @@
   <custom>
     <value key="x-appcenter-color-primary">#3f3f3f</value>
     <value key="x-appcenter-color-primary-text">#ffffff</value>
-    <value key="x-appcenter-suggested-price">35</value>
+    <value key="x-appcenter-suggested-price">15</value>
   </custom>
 </component>

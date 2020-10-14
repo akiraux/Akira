@@ -17,12 +17,14 @@
  * along with Akira. If not, see <https://www.gnu.org/licenses/>.
  *
  * Authored by: Alessandro "alecaddd" Castellani <castellani.ale@gmail.com>
+ * Authored by: Ivan "isneezy" Vilanculo <ivilanculo@gmail.com>
  */
 
 public class Akira.Layouts.Partials.BorderItem : Gtk.Grid {
     public weak Akira.Window window { get; construct; }
 
     private Gtk.Grid color_chooser;
+    private Gtk.Button eyedropper_button;
     private Gtk.Button hidden_button;
     private Gtk.Button delete_button;
     private Gtk.Image hidden_button_icon;
@@ -31,6 +33,7 @@ public class Akira.Layouts.Partials.BorderItem : Gtk.Grid {
     public Akira.Partials.ColorField color_container;
     private Gtk.Popover color_popover;
     private Gtk.Grid color_picker;
+    private Akira.Utils.ColorPicker eyedropper;
     private Gtk.ColorChooserWidget color_chooser_widget;
 
     public Akira.Models.BordersItemModel model { get; construct; }
@@ -115,6 +118,7 @@ public class Akira.Layouts.Partials.BorderItem : Gtk.Grid {
         selected_color.can_focus = false;
         selected_color.get_style_context ().add_class ("selected-color");
         selected_color.popover = color_popover;
+        selected_color.set_tooltip_text (_("Choose border color"));
 
         var picker_container = new Gtk.Grid ();
         picker_container.margin_end = 10;
@@ -164,6 +168,15 @@ public class Akira.Layouts.Partials.BorderItem : Gtk.Grid {
         color_chooser.attach (color_container, 1, 0, 1, 1);
         color_chooser.attach (tickness_container, 2, 0, 1, 1);
 
+        eyedropper_button = new Gtk.Button ();
+        eyedropper_button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
+        eyedropper_button.get_style_context ().add_class ("button-rounded");
+        eyedropper_button.can_focus = false;
+        eyedropper_button.valign = Gtk.Align.CENTER;
+        eyedropper_button.set_tooltip_text (_("Pick color"));
+        eyedropper_button.add (new Gtk.Image.from_icon_name ("preferences-color-symbolic",
+            Gtk.IconSize.SMALL_TOOLBAR));
+
         hidden_button = new Gtk.Button ();
         hidden_button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
         hidden_button.get_style_context ().add_class ("button-rounded");
@@ -175,6 +188,7 @@ public class Akira.Layouts.Partials.BorderItem : Gtk.Grid {
         delete_button.get_style_context ().add_class ("button-rounded");
         delete_button.can_focus = false;
         delete_button.valign = Gtk.Align.CENTER;
+        delete_button.set_tooltip_text (_("Remove border"));
         delete_button.add (new Gtk.Image.from_icon_name ("user-trash-symbolic",
             Gtk.IconSize.SMALL_TOOLBAR));
 
@@ -189,18 +203,34 @@ public class Akira.Layouts.Partials.BorderItem : Gtk.Grid {
         color_popover.add (color_picker);
 
         attach (color_chooser, 0, 0, 1, 1);
-        attach (hidden_button, 1, 0, 1, 1);
-        attach (delete_button, 2, 0, 1, 1);
+        attach (eyedropper_button, 1, 0, 1, 1);
+        attach (hidden_button, 2, 0, 1, 1);
+        attach (delete_button, 3, 0, 1, 1);
 
         set_color_chooser_color ();
         set_button_color ();
     }
 
     private void create_event_bindings () {
+        eyedropper_button.clicked.connect (on_eyedropper_click);
         delete_button.clicked.connect (on_delete_item);
         hidden_button.clicked.connect (toggle_visibility);
         model.notify.connect (on_model_changed);
         color_chooser_widget.notify["rgba"].connect (on_color_changed);
+    }
+
+    private void on_eyedropper_click () {
+        eyedropper = new Akira.Utils.ColorPicker ();
+        eyedropper.show_all ();
+
+        eyedropper.picked.connect ((picked_color) => {
+            color_chooser_widget.set_rgba (picked_color);
+            eyedropper.close ();
+        });
+
+        eyedropper.cancelled.connect (() => {
+            eyedropper.close ();
+        });
     }
 
     private void on_model_changed () {
@@ -242,9 +272,11 @@ public class Akira.Layouts.Partials.BorderItem : Gtk.Grid {
     private void toggle_ui_visibility () {
         if (hidden) {
             get_style_context ().add_class ("disabled");
+            hidden_button.set_tooltip_text (_("Show border"));
             return;
         }
 
+        hidden_button.set_tooltip_text (_("Hide border"));
         get_style_context ().remove_class ("disabled");
     }
 

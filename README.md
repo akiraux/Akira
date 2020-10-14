@@ -14,24 +14,32 @@
 <p align="center">
     <a href="#-install">Install</a> •
     <a href="#-compile">Compile</a> •
-    <a href="#-questions-issues">Questions</a> •
+    <a href="#-questions">Questions</a> •
     <a href="#-contributing">Contributing</a> •
     <a href="#-support">Support</a> •
     <a href="#-mascot">Mascot</a> •
     <a href="#-license">License</a>
 </p>
 
-![screenshot](akira-screenshot.png)
+![screenshot](data/screenshots/screenshot-1.png)
 
 Akira is a native Linux Design application built in Vala and GTK. Akira focuses on offering a modern and fast approach to UI and UX Design, mainly targeting web designers and graphic designers. The main goal is to offer a valid and professional solution for designers who want to use Linux as their main OS.
 
-**AKIRA IS CURRENTLY IN EARLY DEVELOPMENT, NOT READY TO BE USED!**
+⚠️⚠️ **AKIRA IS CURRENTLY IN EARLY DEVELOPMENT, NOT READY TO BE USED FOR PRODUCTION!** ⚠️⚠️
+
+Feel free to download the Alpha and help us testing it.
 
 ## 📦 Install
 
 | elementaryOS AppCenter 	| FlatHub       	| Snapcraft Store 	|
 |------------------------	|---------------	|-----------------	|
-| Coming Soon!          	| Coming Soon! 	    | Coming Soon!   	|
+|[![Get it on AppCenter](https://appcenter.elementary.io/badge.svg)](https://appcenter.elementary.io/com.github.akiraux.akira/)|<a href="#flathub-beta"><img src="https://flathub.org/assets/badges/flathub-badge-i-en.svg" width="160px" alt="Get it from Flathub!"></a>|[![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-white.svg)](https://snapcraft.io/akira)|
+
+### Flathub Beta
+```
+flatpak remote-add flathub-beta https://flathub.org/beta-repo/flathub-beta.flatpakrepo
+flatpak install akira
+```
 
 ## 🛠 Compile
 
@@ -53,7 +61,7 @@ You can install Akira by compiling it from the source
  - `cairo`
  - `meson`
 
-> _**Note:** For non-elementary distros, (such as Arch, Debian etc) you are required to install "vala" as additional dependency._
+> _**Note:** For non-elementary distros, (such as Arch, Debian etc) you are required to install "vala", "elementary-theme" and "elementary-icon-theme" as additional dependencies._
 
 ### Compile &amp; Run
 
@@ -67,9 +75,14 @@ ninja && sudo ninja install
 
 > _**Note:** Replace the `-Dprofile=default` with `-Dprofile=development` to compile and install Akira in **development** mode where you can make changes._
 
-## 🤔 Questions &amp; Issues
+## 🤔 Questions
 
-If you want to ask any questions about the project, we have a dedicated Discord channel available to any [Patreon](https://www.patreon.com/akiraux) supporters. If you are trying out Akira and you encounter an error or any problem feel free to just open an issue.
+If you want to ask any questions about the project, join us on our public Matrix channel at 
+[#akiraux:matrix.org](https://matrix.to/#/!kpfeTRbpocQrOFCFnJ:matrix.org) or on IRC at #akiraux on Freenode.
+
+We also have a dedicated Discord channel available to any [Patreon](https://www.patreon.com/akiraux) supporters where we offer more direct support, and we're open to discussing new features and implementations.
+
+If you are trying out Akira and you encounter an error or any problem feel free to just open an issue here on GitHub.
 
 ## 👨‍💻 Contributing
 
@@ -96,4 +109,4 @@ Contact: [http://tysontan.com](http://tysontan.com)  / [tysontan@mail.com](mailt
 ## 📜 License
 #### [GNU GPLv3 / Creative Commons BY-SA](./COPYING)
 
-Copyright © 2019 Akira Project.
+Copyright © 2019-2020 Akira Project.

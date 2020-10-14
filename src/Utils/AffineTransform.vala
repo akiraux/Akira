@@ -28,297 +28,442 @@ public class Akira.Utils.AffineTransform : Object {
     private const int MIN_POS = 10;
     private const double ROTATION_FIXED_STEP = 15.0;
 
+    public static double temp_rotation = 0.0;
     public static double prev_rotation_difference = 0.0;
 
     public static HashTable<string, double?> get_position (CanvasItem item) {
         HashTable<string, double?> array = new HashTable<string, double?> (str_hash, str_equal);
-        double item_x = item.get_coords ("x");
-        double item_y = item.get_coords ("y");
-
-        // debug (@"item x: $(item_x) y: $(item_y)");
-        // debug (@"Item has artboard: $(item.artboard != null)");
-
-        item.canvas.convert_from_item_space (item, ref item_x, ref item_y);
+        double item_x = item.bounds_manager.x1;
+        double item_y = item.bounds_manager.y1;
 
         if (item.artboard != null) {
-          item_x = item.relative_x;
-          item_y = item.relative_y;
+            item_x -= item.artboard.bounds.x1;
+            item_y -= item.artboard.bounds.y1 + item.artboard.get_label_height ();
         }
 
         array.insert ("x", item_x);
         array.insert ("y", item_y);
-
         return array;
     }
 
     public static void set_position (CanvasItem item, double? x = null, double? y = null) {
+        var diff_x = 0.0;
+        var diff_y = 0.0;
+
         if (item.artboard != null) {
-          /*
-          var artboard_origin_x = 0.0;
-          var artboard_origin_y = 0.0;
+            // Account for the different between the current position and the
+            // the item's bounds.
+            diff_x = item.bounds_manager.x1 - item.artboard.bounds.x1 - item.relative_x;
+            diff_y = item.bounds_manager.y1 - item.artboard.bounds.y1
+                     - item.artboard.get_label_height () - item.relative_y;
 
-          item.canvas.convert_from_item_space (item.artboard, ref artboard_origin_x, ref artboard_origin_y);
-
-          // x and y are relative to the artboard containing
-          // the items, so we need to take into account the
-          // position of the artboard to compute the actual
-          // (canvas wise) position of the item
-          new_x += x != null ? artboard_origin_x : 0;
-          new_y += y != null ? artboard_origin_y : 0;
-          */
-
-          var delta_x = x != null ? x - item.relative_x : 0.0;
-          var delta_y = y != null ? y - item.relative_y : 0.0;
-
-          item.relative_x = x != null ? x : item.relative_x;
-          item.relative_y = y != null ? y : item.relative_y;
-
-          item.translate (delta_x, delta_y);
-
-          return;
+            item.relative_x = x != null ? x - diff_x : item.relative_x;
+            item.relative_y = y != null ? y - diff_y : item.relative_y;
+            return;
         }
 
         Cairo.Matrix matrix;
         item.get_transform (out matrix);
 
-        double new_x = (x != null) ? x : matrix.x0;
-        double new_y = (y != null) ? y : matrix.y0;
+        // Account for the item rotation and get the difference between
+        // its bounds and matrix coordinates.
+        diff_x = item.bounds_manager.x1 - matrix.x0;
+        diff_y = item.bounds_manager.y1 - matrix.y0;
 
-        var new_matrix = Cairo.Matrix (matrix.xx, matrix.yx, matrix.xy, matrix.yy, new_x, new_y);
-        item.set_transform (new_matrix);
+        matrix.x0 = x != null ? x - diff_x : matrix.x0;
+        matrix.y0 = y != null ? y - diff_y : matrix.y0;
+
+        item.set_transform (matrix);
+        item.bounds_manager.update ();
     }
 
+    /**
+     * Move the item based on the mouse click and drag event.
+     */
     public static void move_from_event (
-        double x,
-        double y,
-        ref double initial_x,
-        ref double initial_y,
-        ref double delta_x_accumulator,
-        ref double delta_y_accumulator,
-        CanvasItem selected_item
+        CanvasItem item,
+        double event_x,
+        double event_y,
+        ref double initial_event_x,
+        ref double initial_event_y
     ) {
-        double delta_x = GLib.Math.round (x - initial_x);
-        double delta_y = GLib.Math.round (y - initial_y);
+        var delta_x = event_x - initial_event_x;
+        var delta_y = event_y - initial_event_y;
 
-        delta_x_accumulator += delta_x;
-        delta_y_accumulator += delta_y;
+        if (item.artboard != null) {
+            item.relative_x += delta_x;
+            item.relative_y += delta_y;
+        } else {
+            Cairo.Matrix matrix;
+            item.get_transform (out matrix);
 
-        selected_item.move (
-            delta_x, delta_y,
-            delta_x_accumulator, delta_y_accumulator
-        );
+            matrix.x0 += delta_x;
+            matrix.y0 += delta_y;
 
-        initial_x = x;
-        initial_y = y;
+            item.set_transform (matrix);
+            item.bounds_manager.update ();
+        }
+
+        initial_event_x = event_x;
+        initial_event_y = event_y;
     }
 
     public static void scale_from_event (
-        double x,
-        double y,
-        ref double initial_x,
-        ref double initial_y,
+        CanvasItem item,
+        NobManager.Nob nob,
+        double event_x,
+        double event_y,
+        ref double initial_event_x,
+        ref double initial_event_y,
         ref double delta_x_accumulator,
         ref double delta_y_accumulator,
         double initial_width,
-        double initial_height,
-        NobManager.Nob selected_nob,
-        CanvasItem selected_item
+        double initial_height
     ) {
-        double delta_x = Math.round (x - initial_x);
-        double delta_y = Math.round (y - initial_y);
+        double delta_x = fix_size (event_x - initial_event_x);
+        double delta_y = fix_size (event_y - initial_event_y);
 
-        var canvas = selected_item.canvas;
+        var canvas = item.canvas;
 
-        double origin_move_delta_x = 0;
-        double origin_move_delta_y = 0;
+        double item_width = item.get_coords ("width");
+        double item_height = item.get_coords ("height");
+        double item_x = item.bounds_manager.x1;
+        double item_y = item.bounds_manager.y1;
 
-        double item_width = selected_item.get_coords ("width");
-        double item_height = selected_item.get_coords ("height");
+        double new_width = 0;
+        double new_height = 0;
+        double new_x = 0;
+        double new_y = 0;
 
-        double new_width = -1;
-        double new_height = -1;
-
-        switch (selected_nob) {
+        switch (nob) {
             case NobManager.Nob.TOP_LEFT:
-                new_height = initial_height - delta_y;
-                new_width = initial_width - delta_x;
-                if ((canvas.ctrl_is_pressed || selected_item.size_locked) && new_height > MIN_SIZE) {
-                    new_width = GLib.Math.round (new_height * selected_item.size_ratio);
-                }
+                new_y = delta_y;
+                new_x = delta_x;
+                new_height = -delta_y;
+                new_width = -delta_x;
 
-                if (item_height > MIN_SIZE) {
-                    origin_move_delta_y = item_height - new_height;
-                }
+                fix_height_origin (
+                    ref delta_y,
+                    ref event_y,
+                    ref item_y,
+                    ref item_height,
+                    ref new_y,
+                    ref new_height
+                );
 
-                if (item_width > MIN_SIZE) {
-                    origin_move_delta_x = item_width - new_width;
+                fix_width_origin (
+                    ref delta_x,
+                    ref event_x,
+                    ref item_x,
+                    ref item_width,
+                    ref new_x,
+                    ref new_width
+                );
+
+                if (canvas.ctrl_is_pressed || item.size_locked) {
+                    new_width = new_height * item.size_ratio;
+                    new_x = -new_width;
+                    new_y = -new_height;
                 }
                 break;
 
             case NobManager.Nob.TOP_CENTER:
-                new_height = initial_height - delta_y;
-                if ((canvas.ctrl_is_pressed || selected_item.size_locked) && new_height > MIN_SIZE) {
-                    new_width = GLib.Math.round (new_height * selected_item.size_ratio);
-                }
+                new_y = delta_y;
+                new_height = -delta_y;
 
-                if (item_height > MIN_SIZE) {
-                    origin_move_delta_y = item_height - new_height;
+                fix_height_origin (
+                    ref delta_y,
+                    ref event_y,
+                    ref item_y,
+                    ref item_height,
+                    ref new_y,
+                    ref new_height
+                );
+
+                if (canvas.ctrl_is_pressed || item.size_locked) {
+                    new_width = new_height * item.size_ratio;
+                    new_x = - (new_width / 2);
                 }
                 break;
 
             case NobManager.Nob.TOP_RIGHT:
-                new_width = initial_width + delta_x;
-                new_height = initial_height - delta_y;
-                if ((canvas.ctrl_is_pressed || selected_item.size_locked) && new_height > MIN_SIZE) {
-                    new_height = GLib.Math.round (new_width / selected_item.size_ratio);
-                }
+                new_y = delta_y;
+                new_height = -delta_y;
+                new_width = delta_x;
 
-                if (item_height > MIN_SIZE) {
-                    origin_move_delta_y = item_height - new_height;
+                fix_height_origin (
+                    ref delta_y,
+                    ref event_y,
+                    ref item_y,
+                    ref item_height,
+                    ref new_y,
+                    ref new_height
+                );
+
+                fix_width (ref delta_x, ref event_x, ref item_x, ref item_width, ref new_width);
+
+                if (canvas.ctrl_is_pressed || item.size_locked) {
+                    new_height = new_width / item.size_ratio;
+                    new_y = -new_height;
                 }
                 break;
 
             case NobManager.Nob.RIGHT_CENTER:
-                new_width = initial_width + delta_x;
+                new_width = delta_x;
 
-                if ((canvas.ctrl_is_pressed || selected_item.size_locked) && new_width > MIN_SIZE) {
-                    new_height = GLib.Math.round (new_width / selected_item.size_ratio);
+                fix_width (ref delta_x, ref event_x, ref item_x, ref item_width, ref new_width);
+
+                if (canvas.ctrl_is_pressed || item.size_locked) {
+                    new_height = new_width / item.size_ratio;
+                    new_y = - (new_height / 2);
                 }
                 break;
 
             case NobManager.Nob.BOTTOM_RIGHT:
-                new_width = initial_width + delta_x;
-                new_height = initial_height + delta_y;
+                new_width = delta_x;
+                new_height = delta_y;
 
-                if ((canvas.ctrl_is_pressed || selected_item.size_locked) && new_height > MIN_SIZE) {
-                    new_height = GLib.Math.round (new_width / selected_item.size_ratio);
+                fix_width (ref delta_x, ref event_x, ref item_x, ref item_width, ref new_width);
+
+                fix_height (ref delta_y, ref event_y, ref item_y, ref item_height, ref new_height);
+
+                if (canvas.ctrl_is_pressed || item.size_locked) {
+                    new_height = new_width / item.size_ratio;
+                    if (item.size_ratio == 1 && item_width != item_height) {
+                        new_height = item_width - item_height;
+                    }
                 }
                 break;
 
             case NobManager.Nob.BOTTOM_CENTER:
-                new_height = initial_height + delta_y;
+                new_height = delta_y;
 
-                if ((canvas.ctrl_is_pressed || selected_item.size_locked) && new_height > MIN_SIZE) {
-                    new_width = GLib.Math.round (new_height * selected_item.size_ratio);
+                fix_height (ref delta_y, ref event_y, ref item_y, ref item_height, ref new_height);
+
+                if (canvas.ctrl_is_pressed || item.size_locked) {
+                    new_width = new_height * item.size_ratio;
+                    new_x = - (new_width / 2);
                 }
                 break;
 
             case NobManager.Nob.BOTTOM_LEFT:
-                new_height = initial_height + delta_y;
-                new_width = initial_width - delta_x;
-                if ((canvas.ctrl_is_pressed || selected_item.size_locked) && new_height > MIN_SIZE) {
-                    new_width = GLib.Math.round (new_height * selected_item.size_ratio);
-                }
+                new_x = delta_x;
+                new_width = -delta_x;
+                new_height = delta_y;
 
-                if (item_width > MIN_SIZE) {
-                    origin_move_delta_x = item_width - new_width;
+                fix_width_origin (
+                    ref delta_x,
+                    ref event_x,
+                    ref item_x,
+                    ref item_width,
+                    ref new_x,
+                    ref new_width
+                );
+
+                fix_height (ref delta_y, ref event_y, ref item_y, ref item_height, ref new_height);
+
+                if (canvas.ctrl_is_pressed || item.size_locked) {
+                    new_width = new_height * item.size_ratio;
+                    new_x = -new_width;
                 }
                 break;
 
             case NobManager.Nob.LEFT_CENTER:
-                new_width = initial_width - delta_x;
-                if ((canvas.ctrl_is_pressed || selected_item.size_locked) && new_width > MIN_SIZE) {
-                    new_height = GLib.Math.round (new_width / selected_item.size_ratio);
-                }
+                new_x = delta_x;
+                new_width = -delta_x;
 
-                if (item_width > MIN_SIZE) {
-                    origin_move_delta_x = item_width - new_width;
+                fix_width_origin (
+                    ref delta_x,
+                    ref event_x,
+                    ref item_x,
+                    ref item_width,
+                    ref new_x,
+                    ref new_width
+                );
+
+                if (canvas.ctrl_is_pressed || item.size_locked) {
+                    new_height = new_width * item.size_ratio;
+                    new_y = - (new_height / 2);
                 }
                 break;
         }
 
-        origin_move_delta_x = fix_size (origin_move_delta_x);
-        origin_move_delta_y = fix_size (origin_move_delta_y);
+        // Update the initial coordiante to keep getting the correct delta.
+        initial_event_x = event_x;
+        initial_event_y = event_y;
 
-        new_width = fix_size (new_width);
-        new_height = fix_size (new_height);
+        item.move (new_x, new_y);
+        set_size (item, new_width, new_height);
+    }
 
-
-        if (new_width == MIN_SIZE) {
-            origin_move_delta_x = 0.0;
+    // Width size constraints.
+    private static void fix_width (
+        ref double delta_x,
+        ref double event_x,
+        ref double item_x,
+        ref double item_width,
+        ref double new_width
+    ) {
+        if (fix_size (event_x) < item_x && item_width != 1) {
+            // If the mouse event goes beyond the available width of the item
+            // super quickly, collapse the size to 1 and maintain the position.
+            new_width = -item_width + 1;
+        } else if (fix_size (event_x) < item_x) {
+            // If the user keeps moving the mouse beyond the available width of the item
+            // prevent any size changes.
+            new_width = 0;
+        } else if (item_width == 1 && delta_x <= 0) {
+            // Don't update the size or position if the delta keeps increasing,
+            // meaning the user is still moving left.
+            new_width = 0;
         }
+    }
 
-        if (new_height == MIN_SIZE) {
-            origin_move_delta_y = 0.0;
+    // Width size constraints and origin point.
+    private static void fix_width_origin (
+        ref double delta_x,
+        ref double event_x,
+        ref double item_x,
+        ref double item_width,
+        ref double new_x,
+        ref double new_width
+    ) {
+        if (fix_size (event_x) > item_x + item_width && item_width != 1) {
+            // If the mouse event goes beyond the available width of the item
+            // super quickly, collapse the size to 1 and maintain the position.
+            new_x = item_width - 1;
+            new_width = -item_width + 1;
+        } else if (fix_size (event_x) > item_x + item_width) {
+            // If the user keeps moving the mouse beyond the available width of the item
+            // prevent any size changes.
+            new_x = 0;
+            new_width = 0;
+        } else if (item_width == 1 && delta_x >= 0) {
+            // Don't update the size or position if the delta keeps increasing,
+            // meaning the user is still moving right.
+            new_x = 0;
+            new_width = 0;
         }
+    }
 
-        delta_x_accumulator += origin_move_delta_x;
-        delta_y_accumulator += origin_move_delta_y;
+    // Height size constraints.
+    private static void fix_height (
+        ref double delta_y,
+        ref double event_y,
+        ref double item_y,
+        ref double item_height,
+        ref double new_height
+    ) {
+        if (fix_size (event_y) < item_y && item_height != 1) {
+            // If the mouse event goes beyond the available height of the item
+            // super quickly, collapse the size to 1 and maintain the position.
+            new_height = -item_height + 1;
+        } else if (fix_size (event_y) < item_y) {
+            // If the user keeps moving the mouse beyond the available height of the item
+            // prevent any size changes.
+            new_height = 0;
+        } else if (item_height == 1 && delta_y <= 0) {
+            // Don't update the size or position if the delta keeps increasing,
+            // meaning the user is still moving down.
+            new_height = 0;
+        }
+    }
 
-        selected_item.move (
-            origin_move_delta_x,
-            origin_move_delta_y,
-            delta_x_accumulator,
-            delta_y_accumulator
-        );
-
-        set_size (new_width, new_height, selected_item);
-        /*
-           if (new_width < MIN_SIZE) {
-           canvas.window.event_bus.flip_item (false);
-           return;
-           }
-
-           if (new_height < MIN_SIZE) {
-           canvas.window.event_bus.flip_item (false, true);
-           return;
-           }
-
-        // Before translating, recover the original "canvas" position of
-        // initial_event, in order to convert it to the "new" translated
-        // item space after the transformation has been applied.
-        //canvas.convert_from_item_space (selected_item, ref initial_x, ref initial_y);
-
-        // The CanvasItem.move function expects delta to be the difference
-        // between current position and the initial movement one,
-        // which is not the case for scaling, since the delta
-        // is calculated again at each iteration, so the we should
-        // update the initial_relative coordinate each time we call
-        // move from here
-        //selected_item.store_relative_position ();
-
-        //canvas.convert_to_item_space (selected_item, ref initial_x, ref initial_y);
-         */
+    // Height size constraints and origin point.
+    private static void fix_height_origin (
+        ref double delta_y,
+        ref double event_y,
+        ref double item_y,
+        ref double item_height,
+        ref double new_y,
+        ref double new_height
+    ) {
+        if (fix_size (event_y) > item_y + item_height && item_height != 1) {
+            // If the mouse event goes beyond the available height of the item
+            // super quickly, collapse the size to 1 and maintain the position.
+            new_y = item_height - 1;
+            new_height = -item_height + 1;
+        } else if (fix_size (event_y) > item_y + item_height) {
+            // If the user keeps moving the mouse beyond the available height of the item
+            // prevent any size changes.
+            new_y = 0;
+            new_height = 0;
+        } else if (item_height == 1 && delta_y >= 0) {
+            // Don't update the size or position if the delta keeps increasing,
+            // meaning the user is still moving down.
+            new_y = 0;
+            new_height = 0;
+        }
     }
 
     public static void rotate_from_event (
+        CanvasItem item,
         double x,
         double y,
-        double initial_x,
-        double initial_y,
-        CanvasItem selected_item
+        ref double initial_x,
+        ref double initial_y
     ) {
-        var canvas = selected_item.canvas as Akira.Lib.Canvas;
-        canvas.convert_to_item_space (selected_item, ref x, ref y);
+        var diff_x = 0.0;
+        var diff_y = 0.0;
+        var canvas = item.canvas as Akira.Lib.Canvas;
 
-        var initial_width = selected_item.get_coords ("width");
-        var initial_height = selected_item.get_coords ("height");
+        if (item.artboard != null) {
+            canvas.convert_to_item_space (item.artboard, ref x, ref y);
+            canvas.convert_to_item_space (item.artboard, ref initial_x, ref initial_y);
 
-        var center_x = initial_width / 2;
-        var center_y = initial_height / 2;
+            diff_x = item.bounds_manager.x1 - item.artboard.bounds.x1;
+            diff_y = item.bounds_manager.y1 - item.artboard.bounds.y1
+                     - item.artboard.get_label_height ();
+
+            x -= diff_x;
+            y -= diff_y;
+            initial_x -= diff_x;
+            initial_y -= diff_y;
+        } else {
+            canvas.convert_to_item_space (item, ref x, ref y);
+            canvas.convert_to_item_space (item, ref initial_x, ref initial_y);
+        }
+
+        var center_x = item.get_coords ("width") / 2;
+        var center_y = item.get_coords ("height") / 2;
         var do_rotation = true;
         double rotation_amount = 0;
 
         var start_radians = GLib.Math.atan2 (
-            center_y - initial_y,
-            initial_x - center_x
+            initial_x - center_x,
+            center_y - initial_y
         );
 
-        double current_x, current_y, current_scale, current_rotation;
-        selected_item.get_simple_transform (out current_x, out current_y, out current_scale, out current_rotation);
-        var radians = GLib.Math.atan2 (center_y - y, x - center_x);
-        radians = start_radians - radians;
-        var rotation = radians * (180 / Math.PI) + prev_rotation_difference;
+        var radians = GLib.Math.atan2 (x - center_x, center_y - y);
+        var new_radians = radians - start_radians;
 
-        initial_x = x;
-        initial_y = y;
+        var rotation = new_radians * (180 / Math.PI) + prev_rotation_difference;
 
         if (canvas.ctrl_is_pressed) {
             do_rotation = false;
         }
 
-        if (canvas.ctrl_is_pressed && rotation.abs () > ROTATION_FIXED_STEP) {
-            do_rotation = true;
+        // Revert the coordinates to the canvas and udpate their references.
+        if (item.artboard != null) {
+            canvas.convert_from_item_space (item.artboard, ref x, ref y);
+            x += diff_x;
+            y += diff_y;
+        } else {
+            canvas.convert_from_item_space (item, ref x, ref y);
+        }
+        initial_x = x;
+        initial_y = y;
+
+        if (canvas.ctrl_is_pressed) {
+            // Temporarily sum the current rotation delta to determine when the user
+            // surpasses the ROTATION_FIXED_STEP threshold.
+            temp_rotation += rotation;
+
+            if (temp_rotation.abs () > ROTATION_FIXED_STEP) {
+                do_rotation = true;
+                // Reset the temp_rotation to restart the sum count.
+                temp_rotation = 0;
+            }
 
             // The rotation amount needs to take into consideration
             // the current rotation in order to anchor the item to truly
@@ -326,16 +471,16 @@ public class Akira.Utils.AffineTransform : Object {
             // to the current rotation, which might lead to a situation in which you
             // cannot "reset" item rotation to rounded values (0, 90, 180, ...) without
             // manually resetting the rotation input field in the properties panel
-            var current_rotation_int = ((int) GLib.Math.round (current_rotation));
+            var current_rotation_int = ((int) GLib.Math.round (item.rotation));
 
             rotation_amount = ROTATION_FIXED_STEP;
 
-            // Strange glitch: when current_rotation == 30.0, the fmod
+            // Strange glitch: when item.rotation == 30.0, the fmod
             // function does not work properly.
             // 30.00000 % 15.00000 != 0 => rotation_amount becomes 0.
-            // That's why here is used the int representation of current_rotation
+            // That's why here is used the int representation of item.rotation.
             if (current_rotation_int % ROTATION_FIXED_STEP != 0) {
-                rotation_amount -= GLib.Math.fmod (current_rotation, ROTATION_FIXED_STEP);
+                rotation_amount -= GLib.Math.fmod (item.rotation, ROTATION_FIXED_STEP);
             }
 
             var prev_rotation = rotation;
@@ -344,63 +489,67 @@ public class Akira.Utils.AffineTransform : Object {
         }
 
         if (do_rotation) {
-            canvas.convert_from_item_space (selected_item, ref initial_x, ref initial_y);
-            // Round rotation in order to avoid sub degree issue
-            rotation = GLib.Math.round (rotation);
-            // Cap new_rotation to the [0, 360] range
-            var new_rotation = GLib.Math.fmod (selected_item.rotation + rotation, 360);
-            set_rotation (new_rotation, selected_item);
-            canvas.convert_to_item_space (selected_item, ref initial_x, ref initial_y);
+            // Cap new_rotation to the [0, 360] range.
+            var new_rotation = GLib.Math.fmod (item.rotation + rotation, 360);
+            // Round rotation in order to avoid sub degree issue.
+            set_rotation (item, GLib.Math.round (new_rotation));
         }
 
         // Reset rotation to prevent infinite rotation loops.
         prev_rotation_difference = 0.0;
     }
 
-    public static void set_size (double width, double height, Goo.CanvasItem item) {
-        if (width != -1) {
-            item.set ("width", width);
+    public static void set_size (Goo.CanvasItem item, double x, double y) {
+        double width, height;
+        item.get ("width", out width, "height", out height);
+
+        // Prevent accidental negative values.
+        if (width + x > 0) {
+            item.set ("width", fix_size (width + x));
         }
 
-        if (height != -1) {
-            item.set ("height", height);
+        if (height + y > 0) {
+            item.set ("height", fix_size (height + y));
+        }
+
+        // Don't update the bounds manager if a native goocanvas_rect was used,
+        // meaning no Akira Models was used and we don't need the bounds.
+        if (!(item is Goo.CanvasRect)) {
+            var model_item = item as CanvasItem;
+            model_item.bounds_manager.update ();
         }
     }
 
-    public static void set_rotation (double rotation, CanvasItem item) {
+    public static void set_rotation (CanvasItem item, double rotation) {
         var center_x = item.get_coords ("width") / 2;
         var center_y = item.get_coords ("height") / 2;
-
         var actual_rotation = rotation - item.rotation;
 
         item.rotate (actual_rotation, center_x, center_y);
-
         item.rotation += actual_rotation;
+
+        if (item.artboard == null) {
+            item.bounds_manager.update ();
+        }
     }
 
-    public static void flip_item (bool clicked, CanvasItem item, double sx, double sy) {
-        if (clicked) {
-            double x, y, width, height;
-            item.get ("x", out x, "y", out y, "width", out width, "height", out height);
-            var center_x = x + width / 2;
-            var center_y = y + height / 2;
+    public static void flip_item (CanvasItem item, double sx, double sy) {
+        var center_x = item.get_coords ("width") / 2;
+        var center_y = item.get_coords ("height") / 2;
+        var transform = item.get_real_transform ();
+        double radians = deg_to_rad (item.rotation);
 
-            var transform = Cairo.Matrix.identity ();
-            item.get_transform (out transform);
-            double radians = item.rotation * (Math.PI / 180);
-            transform.translate (center_x, center_y);
-            transform.rotate (-radians);
-            transform.scale (sx, sy);
-            transform.rotate (radians);
-            transform.translate (-center_x, -center_y);
-            item.set_transform (transform);
-            return;
-        }
-
-        var transform = Cairo.Matrix.identity ();
-        item.get_transform (out transform);
+        transform.translate (center_x, center_y);
+        transform.rotate (-radians);
         transform.scale (sx, sy);
+        transform.rotate (radians);
+        transform.translate (-center_x, -center_y);
+
         item.set_transform (transform);
+
+        if (item.artboard == null) {
+            item.bounds_manager.update ();
+        }
     }
 
     public static double fix_size (double size) {

@@ -259,6 +259,11 @@ public class Akira.FileFormat.ZipArchiveHandler : GLib.Object {
         Archive.Result last_result;
 
         while ((last_result = archive.next_header (out entry)) == Archive.Result.OK) {
+#if VALA_0_46
+            entry.set_perm (0644);
+#else
+            entry.set_perm (Archive.FileType.IFREG);
+#endif
             entry.set_pathname (Path.build_filename (location.get_path (), entry.pathname ()));
 
             if (extractor.write_header (entry) != Archive.Result.OK) {
@@ -329,11 +334,15 @@ public class Akira.FileFormat.ZipArchiveHandler : GLib.Object {
 #if VALA_0_42
                     entry.set_size ((Archive.int64_t) file_info.get_size ());
                     entry.set_filetype (Archive.FileType.IFREG);
-                    entry.set_perm (Archive.FileType.IFREG);
 #else
                     entry.set_size (file_info.get_size ());
                     entry.set_filetype ((uint) Posix.S_IFREG);
+#endif
+
+#if VALA_0_46
                     entry.set_perm (0644);
+#else
+                    entry.set_perm (Archive.FileType.IFREG);
 #endif
 
                     if (archive.write_header (entry) != Archive.Result.OK) {
@@ -348,7 +357,7 @@ public class Akira.FileFormat.ZipArchiveHandler : GLib.Object {
 
                     // Add the actual content of the file
                     size_t bytes_read;
-                    uint8[64] buffer = new uint8[64];
+                    uint8[] buffer = new uint8[64];
                     while (data_input_stream.read_all (buffer, out bytes_read)) {
                         if (bytes_read <= 0) {
                             break;
@@ -364,6 +373,19 @@ public class Akira.FileFormat.ZipArchiveHandler : GLib.Object {
             }
         } catch (Error e) {
             critical ("Error: %s\n", e.message);
+        }
+    }
+
+    public virtual void copy_image (GLib.File old_file, GLib.File new_file) {
+        try {
+            old_file.copy (new_file, 0, null, (current_num_bytes, total_num_bytes) => {
+                // Report copy-status:
+                print ("%" + int64.FORMAT + " bytes of %" + int64.FORMAT + " bytes copied.\n",
+                    current_num_bytes, total_num_bytes);
+            });
+            file_collector.ref_file (new_file);
+        } catch (Error e) {
+            print ("Error: %s\n", e.message);
         }
     }
 

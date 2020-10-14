@@ -59,6 +59,9 @@ public class Akira.Lib.Managers.NobManager : Object {
     private double height;
     private double nob_size;
 
+    // Tracks if an artbaord is part of the current selection.
+    private bool is_artboard;
+
     // If the effect needs to be created or it's only a value update.
     private bool create { get; set; default = true; }
 
@@ -100,13 +103,10 @@ public class Akira.Lib.Managers.NobManager : Object {
         double bb_left = 1e6, bb_top = 1e6, bb_right = 0, bb_bottom = 0;
 
         foreach (var item in selected_items) {
-            Goo.CanvasBounds item_bounds;
-            item.get_bounds (out item_bounds);
-
-            bb_left = double.min (bb_left, item_bounds.x1);
-            bb_top = double.min (bb_top, item_bounds.y1);
-            bb_right = double.max (bb_right, item_bounds.x2);
-            bb_bottom = double.max (bb_bottom, item_bounds.y2);
+            bb_left = double.min (bb_left, item.bounds.x1);
+            bb_top = double.min (bb_top, item.bounds.y1);
+            bb_right = double.max (bb_right, item.bounds.x2);
+            bb_bottom = double.max (bb_bottom, item.bounds.y2);
         }
 
         select_bb = Goo.CanvasBounds () {
@@ -190,6 +190,7 @@ public class Akira.Lib.Managers.NobManager : Object {
     }
 
     private void update_nob_position (List<Models.CanvasItem> selected_items) {
+        is_artboard = false;
         var transform = Cairo.Matrix.identity ();
 
         double x = 0.0;
@@ -204,10 +205,21 @@ public class Akira.Lib.Managers.NobManager : Object {
             ref width, ref height
         );
 
+        foreach (var item in selected_items) {
+            if (item is Models.CanvasArtboard) {
+                is_artboard = true;
+                break;
+            }
+        }
+
         if (create) {
             //  debug ("create nobs");
             for (int i = 0; i < 9; i++) {
                 nobs[i] = new Selection.Nob (root, (Managers.NobManager.Nob) i);
+                // If an artboard is part of the current selection, hide the rotation nob.
+                if (is_artboard && i == 8) {
+                    nobs[i].set ("visibility", Goo.CanvasItemVisibility.HIDDEN);
+                }
             }
         }
 
@@ -352,7 +364,6 @@ public class Akira.Lib.Managers.NobManager : Object {
 
             transform = item.get_real_transform ();
 
-            // item.get ("line_width", out line_width);
             item.get ("width", out _width);
             item.get ("height", out _height);
             item.get ("x", out x);
@@ -376,6 +387,10 @@ public class Akira.Lib.Managers.NobManager : Object {
 
     private async void on_show_select_effect () {
         for (int i = 0; i < 9; i++) {
+            // If an artboard is part of the current selection, don't show the rotation nob.
+            if (is_artboard && i == 8) {
+                continue;
+            }
             nobs[i].set ("visibility", Goo.CanvasItemVisibility.VISIBLE);
         }
         select_effect.set ("visibility", Goo.CanvasItemVisibility.VISIBLE);

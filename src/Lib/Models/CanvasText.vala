@@ -34,12 +34,14 @@ public class Akira.Lib.Models.CanvasText : Goo.CanvasText, Models.CanvasItem {
     public bool has_fill { get; set; default = true; }
     public int fill_alpha { get; set; }
     public Gdk.RGBA color { get; set; }
+    public string color_string { get; set; }
     public bool hidden_fill { get; set; }
 
     // Border Panel attributes.
     public bool has_border { get; set; default = true; }
     public int border_size { get; set; }
     public Gdk.RGBA border_color { get; set; }
+    public string border_color_string { get; set; }
     public int stroke_alpha { get; set; }
     public bool hidden_border { get; set; }
 
@@ -60,12 +62,13 @@ public class Akira.Lib.Models.CanvasText : Goo.CanvasText, Models.CanvasItem {
 
     public new Akira.Lib.Canvas canvas { get; set; }
     public Models.CanvasArtboard? artboard { get; set; }
+    public Managers.GhostBoundsManager bounds_manager { get; set; }
 
     public double relative_x { get; set; }
     public double relative_y { get; set; }
 
-    public double initial_relative_x { get; set; }
-    public double initial_relative_y { get; set; }
+    // Knows if an item was created or loaded for ordering purpose.
+    public bool loaded { get; set; default = false; }
 
     public CanvasText (
         string _text = "",
@@ -76,7 +79,8 @@ public class Akira.Lib.Models.CanvasText : Goo.CanvasText, Models.CanvasItem {
         Goo.CanvasAnchorType _anchor = Goo.CanvasAnchorType.NW,
         string _font = "Open Sans 16",
         Goo.CanvasItem? _parent = null,
-        Models.CanvasArtboard? _artboard = null
+        Models.CanvasArtboard? _artboard = null,
+        bool _loaded = false
     ) {
         Object (
             x: _x,
@@ -85,6 +89,7 @@ public class Akira.Lib.Models.CanvasText : Goo.CanvasText, Models.CanvasItem {
             height: _height
         );
 
+        loaded = _loaded;
         artboard = _artboard;
         parent = _artboard != null ? _artboard : _parent;
         canvas = parent.get_canvas () as Akira.Lib.Canvas;
@@ -92,6 +97,9 @@ public class Akira.Lib.Models.CanvasText : Goo.CanvasText, Models.CanvasItem {
         item_type = Models.CanvasItemType.TEXT;
         id = Models.CanvasItem.create_item_id (this);
         Models.CanvasItem.init_item (this);
+        if (artboard != null) {
+            connect_to_artboard ();
+        }
 
         text = _text;
         x = 0.0;
@@ -104,6 +112,6 @@ public class Akira.Lib.Models.CanvasText : Goo.CanvasText, Models.CanvasItem {
 
         set_transform (Cairo.Matrix.identity ());
 
-        position_item (_x, _y);
+        init_position (_x, _y);
     }
 }

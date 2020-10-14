@@ -66,15 +66,11 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         if (selected_items.length () == 1) {
             var selected_item = selected_items.nth_data (0);
 
-            selected_item.store_relative_position ();
-
             delta_x_accumulator = 0.0;
             delta_y_accumulator = 0.0;
 
             initial_event_x = event_x;
             initial_event_y = event_y;
-
-            // canvas.convert_to_item_space (selected_item, ref initial_event_x, ref initial_event_y);
 
             initial_width = selected_item.get_coords ("width");
             initial_height = selected_item.get_coords ("height");
@@ -99,30 +95,27 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         switch (selected_nob) {
             case Managers.NobManager.Nob.NONE:
                 Utils.AffineTransform.move_from_event (
-                    event_x, event_y,
-                    ref initial_event_x, ref initial_event_y,
-                    ref delta_x_accumulator, ref delta_y_accumulator,
-                    selected_item
+                    selected_item, event_x, event_y,
+                    ref initial_event_x, ref initial_event_y
                 );
                 update_selected_items ();
                 break;
 
             case Managers.NobManager.Nob.ROTATE:
                 Utils.AffineTransform.rotate_from_event (
-                    event_x, event_y,
-                    initial_event_x, initial_event_y,
-                    selected_item
+                    selected_item, event_x, event_y,
+                    ref initial_event_x, ref initial_event_y
                 );
                 break;
 
             default:
                 Utils.AffineTransform.scale_from_event (
+                    selected_item,
+                    selected_nob,
                     event_x, event_y,
                     ref initial_event_x, ref initial_event_y,
                     ref delta_x_accumulator, ref delta_y_accumulator,
-                    initial_width, initial_height,
-                    selected_nob,
-                    selected_item
+                    initial_width, initial_height
                 );
                 break;
         }
@@ -146,6 +139,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         }
 
         item.selected = true;
+        item.update_size_ratio ();
         selected_items.append (item);
 
         // Move focus back to the canvas.
@@ -189,8 +183,22 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
 
         Models.CanvasItem selected_item = selected_items.nth_data (0);
 
-        int items_count = window.items_manager.get_free_items_count ();
-        int pos_selected = items_count - 1 - window.items_manager.get_item_position (selected_item);
+        // Cannot move artboard z-index wise
+        if (selected_item is Models.CanvasArtboard) {
+            return;
+        }
+
+        int items_count = 0;
+        int pos_selected = -1;
+
+        if (selected_item.artboard != null) {
+            // Inside an artboard
+            items_count = (int) selected_item.artboard.items.get_n_items ();
+            pos_selected = items_count - 1 - selected_item.artboard.items.index (selected_item);
+        } else {
+            items_count = window.items_manager.get_free_items_count ();
+            pos_selected = items_count - 1 - window.items_manager.get_item_position (selected_item);
+        }
 
         // Interrupt if item position doesn't exist.
         if (pos_selected == -1) {
@@ -222,9 +230,28 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
             return;
         }
 
-        Models.CanvasItem target_item = window.items_manager.get_item_at_z_index (target_position);
+        Models.CanvasItem target_item = null;
 
-        window.items_manager.swap_items (pos_selected, target_position);
+        // z-index is the exact opposite of items placement
+        // inside the free_items list
+        // last in is the topmost element
+        var source = items_count - 1 - pos_selected;
+        var target = items_count - 1 - target_position;
+
+        if (selected_item.artboard != null) {
+            selected_item.artboard.items.swap_items (source, target);
+
+            selected_item.artboard.changed (true);
+            canvas.window.event_bus.z_selected_changed ();
+
+            // There is no need to raise or lower the selection
+            // since the z stacking is done inside the paint method
+            // and it is calculated based on the artboard's children list index
+            return;
+        }
+
+        target_item = window.items_manager.get_item_at_z_index (target_position);
+        window.items_manager.free_items.swap_items (source, target);
 
         if (raise) {
             selected_item.raise (target_item);
@@ -235,20 +262,20 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         canvas.window.event_bus.z_selected_changed ();
     }
 
-    private void on_flip_item (bool clicked, bool vertical) {
-        if (selected_items.length () == 0) {
+    private void on_flip_item (bool vertical) {
+        if (selected_items.length () == 0 || selected_items.nth_data (0) is Lib.Models.CanvasArtboard) {
             return;
         }
 
         selected_items.foreach ((item) => {
             if (vertical) {
                 item.flipped_v = !item.flipped_v;
-                Utils.AffineTransform.flip_item (clicked, item, 1, -1);
+                Utils.AffineTransform.flip_item (item, 1, -1);
                 update_selected_items ();
                 return;
             }
             item.flipped_h = !item.flipped_h;
-            Utils.AffineTransform.flip_item (clicked, item, -1, 1);
+            Utils.AffineTransform.flip_item (item, -1, 1);
             update_selected_items ();
         });
     }
@@ -265,27 +292,15 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
 
             switch (event.keyval) {
                 case Gdk.Key.Up:
-                    if (item is Models.CanvasEllipse) {
-                        amount--;
-                    }
                     Utils.AffineTransform.set_position (item, null, position["y"] - amount);
                     break;
                 case Gdk.Key.Down:
-                    if (item is Models.CanvasEllipse) {
-                        amount++;
-                    }
                     Utils.AffineTransform.set_position (item, null, position["y"] + amount);
                     break;
                 case Gdk.Key.Right:
-                    if (item is Models.CanvasEllipse) {
-                        amount++;
-                    }
                     Utils.AffineTransform.set_position (item, position["x"] + amount);
                     break;
                 case Gdk.Key.Left:
-                    if (item is Models.CanvasEllipse) {
-                        amount--;
-                    }
                     Utils.AffineTransform.set_position (item, position["x"] - amount);
                     break;
             }

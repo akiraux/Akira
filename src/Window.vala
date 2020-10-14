@@ -36,7 +36,6 @@ public class Akira.Window : Gtk.ApplicationWindow {
     public Gtk.AccelGroup accel_group { get; construct; }
 
     public bool edited { get; set; default = false; }
-    public bool confirmed { get; set; default = false; }
 
     public Window (Akira.Application akira_app) {
         Object (
@@ -64,7 +63,9 @@ public class Akira.Window : Gtk.ApplicationWindow {
 
         show_app ();
 
+        // Let the canvas grab the focus after the app is visible.
         main_window.main_canvas.canvas.focus_canvas ();
+
         event_bus.file_edited.connect (on_file_edited);
         event_bus.file_saved.connect (on_file_saved);
     }
@@ -109,24 +110,42 @@ public class Akira.Window : Gtk.ApplicationWindow {
     public bool before_destroy () {
         update_status ();
 
-        save_and_close_current_file ();
-
         if (!edited) {
+            close_current_file ();
             app.get_active_window ().destroy ();
             on_destroy ();
         }
 
         if (edited) {
-            confirmed = dialogs.message_dialog (
+            var dialog = dialogs.message_dialog (
                 _("Are you sure you want to quit?"),
                 _("All unsaved data will be lost and impossible to recover."),
                 "system-shutdown",
-                _("Quit without saving!"));
+                _("Quit without saving!"),
+                _("Save file")
+            );
 
-            if (confirmed) {
-                app.get_active_window ().destroy ();
-                on_destroy ();
-            }
+            dialog.show_all ();
+
+            dialog.response.connect ((id) => {
+                switch (id) {
+                    case Gtk.ResponseType.ACCEPT:
+                        dialog.destroy ();
+                        close_current_file ();
+                        app.get_active_window ().destroy ();
+                        on_destroy ();
+                        break;
+                    case 2:
+                        dialog.destroy ();
+                        file_manager.save_file ();
+                        break;
+                    default:
+                        dialog.destroy ();
+                        break;
+                }
+            });
+
+            dialog.run ();
         }
 
         return true;
@@ -136,7 +155,7 @@ public class Akira.Window : Gtk.ApplicationWindow {
         uint length = app.windows.length ();
 
         if (length == 0) {
-            Gtk.main_quit ();
+            app.quit ();
         }
     }
 
@@ -168,16 +187,16 @@ public class Akira.Window : Gtk.ApplicationWindow {
         akira_file.load_file ();
     }
 
-    public void save_new_file (File file) {
+    public void save_new_file (File file, bool overwrite = false) {
         akira_file = new FileFormat.AkiraFile (file, this);
+        akira_file.overwrite = overwrite;
 
         akira_file.prepare ();
         akira_file.save_file ();
     }
 
-    private void save_and_close_current_file () {
+    private void close_current_file () {
         if (akira_file != null) {
-            akira_file.save_file ();
             akira_file.close ();
         }
     }

@@ -83,46 +83,59 @@ public class Akira.Lib.Managers.ExportManager : Object {
     }
 
     public void resize_area (double x, double y) {
-        canvas.convert_to_item_space (area, ref x, ref y);
+        double area_width = area.width;
+        double area_height = area.height;
+        double area_x = area.x;
+        double area_y = area.y;
 
         double delta_x = x - initial_x;
         double delta_y = y - initial_y;
 
-        double item_width = area.width;
-        double item_height = area.height;
+        double new_width = delta_x;
+        double new_height = delta_y;
 
-        double new_width = item_width;
-        double new_height = item_height;
+        // Width size constraints.
+        if (Utils.AffineTransform.fix_size (x) < area_x && area_width != 1) {
+            // If the mouse event goes beyond the available width of the area
+            // super quickly, collapse the size to 1 and maintain the position.
+            new_width = -area_width + 1;
+        } else if (Utils.AffineTransform.fix_size (x) < area_x) {
+            // If the user keeps moving the mouse beyond the available width of the area
+            // prevent any size changes.
+            new_width = 0;
+        } else if (area_width == 1 && delta_x <= 0) {
+            // Don't update the size or position if the delta keeps increasing,
+            // meaning the user is still moving left.
+            new_width = 0;
+        }
 
-        double origin_move_delta_x = 0.0;
-        double origin_move_delta_y = 0.0;
+        // Height size constraints.
+        if (Utils.AffineTransform.fix_size (y) < area_y && area_height != 1) {
+            // If the mouse event goes beyond the available height of the area
+            // super quickly, collapse the size to 1 and maintain the position.
+            new_height = -area_height + 1;
+        } else if (Utils.AffineTransform.fix_size (y) < area_y) {
+            // If the user keeps moving the mouse beyond the available height of the area
+            // prevent any size changes.
+            new_height = 0;
+        } else if (area_height == 1 && delta_y <= 0) {
+            // Don't update the size or position if the delta keeps increasing,
+            // meaning the user is still moving down.
+            new_height = 0;
+        }
 
-        new_width = initial_width + delta_x;
-        new_height = initial_height + delta_y;
-        if (canvas.ctrl_is_pressed && new_height > MIN_SIZE) {
+        if (canvas.ctrl_is_pressed) {
             new_height = new_width;
+            if (area_width != area_height) {
+                new_height = area_width - area_height;
+            }
         }
 
-        if (new_width < initial_width) {
-            new_width = initial_width - delta_x;
-            origin_move_delta_x = item_width - new_width;
-        }
+        Utils.AffineTransform.set_size (area, new_width, new_height);
 
-        if (new_height < MIN_SIZE) {
-            new_height = initial_height - delta_y;
-            origin_move_delta_y = item_height - new_height;
-        }
-
-        new_width = Utils.AffineTransform.fix_size (new_width);
-        new_height = Utils.AffineTransform.fix_size (new_height);
-        origin_move_delta_x = Utils.AffineTransform.fix_size (origin_move_delta_x);
-        origin_move_delta_y = Utils.AffineTransform.fix_size (origin_move_delta_y);
-
-        canvas.convert_from_item_space (area, ref initial_x, ref initial_y);
-        area.translate (origin_move_delta_x, origin_move_delta_y);
-        canvas.convert_to_item_space (area, ref initial_x, ref initial_y);
-
-        Utils.AffineTransform.set_size (new_width, new_height, area);
+        // Update the initial coordiante to keep getting the correct delta.
+        initial_x = x;
+        initial_y = y;
     }
 
     public void clear () {
@@ -314,11 +327,20 @@ public class Akira.Lib.Managers.ExportManager : Object {
                 name = artboard.name != null ? artboard.name : name;
             }
 
+            // Hide the ghost item.
+            item.bounds_manager.hide ();
+
+            // Account for items inside or outside artboards.
+            double x1 = item.bounds_manager.x1;
+            double x2 = item.bounds_manager.x2;
+            double y1 = item.bounds_manager.y1;
+            double y2 = item.bounds_manager.y2;
+
             // Create the rendered image with Cairo.
             surface = new Cairo.ImageSurface (
                 format,
-                (int) Math.round (item.bounds.x2 - item.bounds.x1),
-                (int) Math.round (item.bounds.y2 - item.bounds.y1 - label_height)
+                (int) Math.round (x2 - x1),
+                (int) Math.round (y2 - y1 - label_height)
             );
             context = new Cairo.Context (surface);
 
@@ -327,13 +349,13 @@ public class Akira.Lib.Managers.ExportManager : Object {
                 context.set_source_rgba (1, 1, 1, 1);
                 context.rectangle (
                     0, 0,
-                    (int) Math.round (item.bounds.x2 - item.bounds.x1),
-                    (int) Math.round (item.bounds.y2 - item.bounds.y1 - label_height));
+                    (int) Math.round (x2 - x1),
+                    (int) Math.round (y2 - y1 - label_height));
                 context.fill ();
             }
 
             // Move to the currently selected item.
-            context.translate (-item.bounds.x1, -item.bounds.y1 - label_height);
+            context.translate (-x1, -y1 - label_height);
 
             // Render the selected item.
             canvas.render (context, null, canvas.current_scale);
@@ -370,13 +392,27 @@ public class Akira.Lib.Managers.ExportManager : Object {
         var label_height = 0.0;
 
         // If the item is an artboard, account for the label's height.
-        if (item != null && item is Akira.Lib.Models.CanvasArtboard) {
-            var artboard = item as Akira.Lib.Models.CanvasArtboard;
+        if (item != null && item is Lib.Models.CanvasArtboard) {
+            var artboard = item as Lib.Models.CanvasArtboard;
             label_height = artboard.get_label_height ();
         }
 
-        var width = item != null ? item.bounds.x2 - item.bounds.x1 : area.width;
-        var height = item != null ? item.bounds.y2 - item.bounds.y1 - label_height : area.height;
+        double width, height;
+
+        // If the item is null it mean we're dealing with a custom area and we
+        // don't have the bounds manager.
+        if (item != null) {
+            double x1 = item.bounds_manager.x1;
+            double x2 = item.bounds_manager.x2;
+            double y1 = item.bounds_manager.y1;
+            double y2 = item.bounds_manager.y2;
+
+            width = x2 - x1;
+            height = y2 - y1 - label_height;
+        } else {
+            width = area.width;
+            height = area.height;
+        }
 
         switch (settings.export_scale) {
             case 0:

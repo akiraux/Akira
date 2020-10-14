@@ -38,13 +38,19 @@ public class Akira.Layouts.MainWindow : Gtk.Grid {
         right_sidebar = new Akira.Layouts.RightSideBar (window);
         main_canvas = new Akira.Layouts.MainCanvas (window);
 
-        pane2 = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);
-        pane2.pack1 (main_canvas, true, false);
-        pane2.pack2 (right_sidebar, false, false);
-
         pane = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);
-        pane.pack1 (left_sidebar, false, false);
+        pane2 = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);
+
         pane.pack2 (pane2, true, false);
+        pane2.pack1 (main_canvas, true, false);
+
+        if (!settings.get_boolean ("invert-sidebar")) {
+            pane.pack1 (left_sidebar, false, false);
+            pane2.pack2 (right_sidebar, false, false);
+        } else {
+            pane.pack1 (right_sidebar, false, false);
+            pane2.pack2 (left_sidebar, false, false);
+        }
 
         attach (pane, 0, 0, 1, 1);
     }

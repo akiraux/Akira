@@ -24,6 +24,10 @@ public class Akira.Utils.Color : Object {
         var rgba = Gdk.RGBA ();
         rgba.parse (rgba_string);
 
+        return rgba_to_hex_string (rgba);
+    }
+
+    public static string rgba_to_hex_string (Gdk.RGBA rgba) {
         return "#%02x%02x%02x".printf (
             (int) (rgba.red * 255),
             (int) (rgba.green * 255),

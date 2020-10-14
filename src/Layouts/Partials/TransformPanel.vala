@@ -69,11 +69,11 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
             y.enabled = has_item;
             height.enabled = has_item;
             width.enabled = has_item;
-            rotation.enabled = has_item;
-            hflip_button.sensitive = has_item;
-            vflip_button.sensitive = has_item;
-            opacity_entry.entry.sensitive = has_item;
-            scale.sensitive = has_item;
+            rotation.enabled = has_item && !(_selected_item is Lib.Models.CanvasArtboard);
+            hflip_button.sensitive = has_item && !(_selected_item is Lib.Models.CanvasArtboard);
+            vflip_button.sensitive = has_item && !(_selected_item is Lib.Models.CanvasArtboard);
+            opacity_entry.entry.sensitive = has_item && !(_selected_item is Lib.Models.CanvasArtboard);
+            scale.sensitive = has_item && !(_selected_item is Lib.Models.CanvasArtboard);
             lock_changes.sensitive = has_item;
 
             if (!has_item) {
@@ -189,6 +189,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         }
 
         selected_item = selected_items.nth_data (0);
+
     }
 
     private void disconnect_previous_item () {
@@ -248,7 +249,9 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
                 var icon = val.get_boolean () ? "changes-prevent-symbolic" : "changes-allow-symbolic";
                 lock_changes.image = new Gtk.Image.from_icon_name (icon, Gtk.IconSize.BUTTON);
                 res = val.get_boolean ();
-                update_size_ratio ();
+                if (val.get_boolean ()) {
+                    update_size_ratio ();
+                }
                 return true;
             });
 
@@ -282,7 +285,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
             (binding, srcval, ref targetval) => {
                 double src = (double) srcval;
                 targetval.set_double (src);
-                Utils.AffineTransform.set_rotation (src, selected_item);
+                Utils.AffineTransform.set_rotation (selected_item, src);
                 return true;
             });
 
@@ -294,8 +297,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
             "active", selected_item, "flipped-h", BindingFlags.BIDIRECTIONAL,
             (binding, val, ref res) => {
                 res = val.get_boolean ();
-                window.event_bus.flip_item (true);
-                on_item_coord_changed ();
+                window.event_bus.flip_item ();
                 return true;
             });
 
@@ -303,8 +305,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
             "active", selected_item, "flipped-v", BindingFlags.BIDIRECTIONAL,
             (binding, val, ref res) => {
                 res = val.get_boolean ();
-                window.event_bus.flip_item (true, true);
-                on_item_coord_changed ();
+                window.event_bus.flip_item (true);
                 return true;
             });
 
@@ -341,6 +342,8 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
             y.value = position["y"];
             y.notify["value"].connect (y_notify_value);
         }
+
+        window.event_bus.file_edited ();
     }
 
     public void x_notify_value () {
@@ -358,7 +361,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         if (height.value == 0) {
             return;
         }
-        selected_item.size_ratio = width.value / height.value;
+        selected_item.update_size_ratio ();
     }
 
     private Gtk.Label group_title (string title) {

@@ -1,5 +1,56 @@
-com.github.akiraux.akira (0.1) precise; urgency=low
+com.github.akiraux.akira (0.0.13) xenial; urgency=medium
 
-  * Initial Release.
+  * New color picker for Fills and Borders.
+  * Zooming with mouse wheel follows the position of the cursor.
+  * Fix loading Artboards background color when opening a file.
+  * Fix numbering of newly created items.
+  * Fix Gtk-CRITICAL warning when opening the Export Dialog.
+  * Fix flipping items inside Artboards.
+  * Fix crash when dropping flipped items inside Artboards.
+  * General code improvements and optimization.
 
- -- Alessandro Castellani <castellani.ale@gmail.com>  Sat, 5 Aug 2017 04:53:39 -0500
+ -- Alessandro Castellani <castellani.ale@gmail.com>  Wed, 02 Sept 2020 09:00:00 -0800
+
+com.github.akiraux.akira (0.0.12) xenial; urgency=medium
+
+  * Control Artboards background color.
+  * Hide and Lock Artboards from the Layers panel.
+  * Items inside Artboards are masked when extending outside the edges of the Artboard.
+  * Fix items reordering with the layers panel drag and drop.
+  * Fix random segfault at startup while setting accelerators.
+  * Updated goocanvas vapi.
+
+ -- Alessandro Castellani <castellani.ale@gmail.com>  Sun, 12 Aug 2020 09:00:00 -0800
+
+com.github.akiraux.akira (0.0.11) xenial; urgency=medium
+
+  * Experimental Alpha Release, say Hi to Akira!
+  * Create Artboards and basic shapes.
+  * Manage the fill and border properties of shapes.
+  * Import images.
+  * Export custom areas, selections, and artboards.
+  * So many crashes and missing features you wouldn't believe, but hey, this is an experimental alpha…
+
+ -- Alessandro Castellani <castellani.ale@gmail.com>  Sun, 4 Aug 2020 09:00:00 -0800
+
+com.github.akiraux.akira (0.0.1-alpha) xenial; urgency=medium
+
+  * Experimental Alpha Release, say Hi to Akira!
+  * Create Artboards and basic shapes.
+  * Manage the fill and border properties of shapes.
+  * Import images.
+  * Export custom areas, selections, and artboards.
+  * So many crashes and missing features you wouldn't believe, but hey, this is an experimental alpha…
+
+ -- Alessandro Castellani <castellani.ale@gmail.com>  Sun, 3 Aug 2020 09:00:00 -0800
+
+com.github.akiraux.akira (0.0.1) precise; urgency=low
+
+  * Experimental Alpha Release, say Hi to Akira!
+  * Create Artboards and basic shapes.
+  * Manage the fill and border properties of shapes.
+  * Import images.
+  * Export custom areas, selections, and artboards.
+  * So many crashes and missing features you wouldn't believe, but hey, this is an experimental alpha…
+
+ -- Alessandro Castellani <castellani.ale@gmail.com>  Sun, 2 Aug 2020 05:25:00 -0800
