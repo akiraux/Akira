@@ -3,34 +3,17 @@ name: "CI"
 on: [push, pull_request]
 
 jobs:
-  build:
-
+  flatpak:
+    name: "Flatpak"
     runs-on: ubuntu-latest
-
     container:
-      image: elementary/docker:unstable
-
+      image: docker.io/bilelmoussaoui/flatpak-github-actions
+      options: --privileged
     steps:
-    - uses: actions/checkout@v1
-    - name: Install Dependencies
-      run: |
-        apt update
-        apt install -y libarchive-dev libgoocanvas-2.0-dev valac meson appstream-util xvfb at-spi2-core
-    - name: Build
-      # env:
-      #   DESTDIR: out
-      run: |
-        meson build
-        ninja -C build
-        ninja -C build install
-        xvfb-run -a -s "-screen 0 1024x768x24" \
-          dbus-run-session meson test -C build --no-rebuild -v --no-stdsplit --wrap catchsegv
-    - name: cleanup xvfb
-      run: |
-        xvfb_pids=`ps aux | grep tmp/xvfb-run | grep -v grep | awk '{print $2}'`
-        if [ "$xvfb_pids" != "" ]; then
-          echo "Killing the following xvfb processes: $xvfb_pids"
-          sudo kill $xvfb_pids
-        else
-          echo "No xvfb processes to kill"
-        fi
+    - uses: actions/checkout@master
+    - uses: bilelmoussaoui/flatpak-github-actions@master
+      with:
+        bundle: "akira-dev.flatpak"
+        manifest-path: "build-aux/flatpak/com.github.akiraux.akira.json"
+        app-id: "com.github.akiraux.akiraDevel"
+        flatpak-module: "akira"
