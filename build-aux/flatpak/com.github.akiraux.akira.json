@@ -1,10 +1,10 @@
 {
    "app-id": "com.github.akiraux.akiraDevel",
    "runtime": "org.gnome.Platform",
-   "runtime-version": "3.36",
+   "runtime-version": "3.38",
    "sdk": "org.gnome.Sdk",
    "base":"io.elementary.BaseApp",
-   "base-version": "juno-19.08",
+   "base-version": "juno-20.08",
    "command": "com.github.akiraux.akiraDevel",
    "cleanup": [
       "/include",
@@ -51,8 +51,8 @@
          ],
          "sources": [
             {
-               "type": "git",
-               "url": "https://github.com/akiraux/akira"
+               "type": "dir",
+               "path": "../../"
             }
          ]
       }
