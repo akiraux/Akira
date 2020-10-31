@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "POT-Creation-Date: 2020-10-07 21:17+0200\n"
-"PO-Revision-Date: 2020-10-13 22:04+0200\n"
+"PO-Revision-Date: 2020-10-31 14:02+0100\n"
 "Last-Translator: Yannicka\n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -60,9 +60,10 @@ msgid ""
 "expected."
 msgstr ""
 "ATTENTION !\n"
-"Akira est encore en cours de développement et n'est pas prêt à être mis en "
-"production. Attendez-vous à ce que des fonctionnalités manquent, des bugs "
-"se produisent voire qu'un trou noir s'ouvre dans votre cuisine."
+"Akira est encore en cours de développement et n'est pas prêt à être "
+"utilisé en production. Attendez-vous à ce que des fonctionnalités "
+"manquent, des bugs se produisent voire qu'un trou noir s'ouvre dans votre "
+"cuisine."
 
 #: src/Dialogs/ReleaseDialog.vala:100 src/Dialogs/SettingsDialog.vala:249
 msgid "Make a Donation"
@@ -107,7 +108,7 @@ msgstr "Utiliser le thème sombre :"
 
 #: src/Dialogs/SettingsDialog.vala:92
 msgid "Invert Panels Order:"
-msgstr "Inverser l'ordre des panneaux :"
+msgstr "Inverser l'ordre des barres latérales :"
 
 #: src/Dialogs/SettingsDialog.vala:96
 msgid "Restart application to apply this change."
@@ -221,7 +222,7 @@ msgstr "Dézoomer :"
 
 #: src/Dialogs/ShortcutsDialog.vala:82
 msgid "Zoom reset:"
-msgstr "Réinitialisation du zoom :"
+msgstr "Réinitialiser le zoom :"
 
 #: src/Dialogs/ShortcutsDialog.vala:85
 msgid "Item creation"
@@ -254,19 +255,19 @@ msgstr "Transformer"
 
 #: src/Dialogs/ShortcutsDialog.vala:98
 msgid "Raise selection:"
-msgstr "Augmenter la sélection :"
+msgstr "Monter la sélection :"
 
 #: src/Dialogs/ShortcutsDialog.vala:100
 msgid "Lower selection:"
-msgstr "Diminuer la sélection :"
+msgstr "Descendre la sélection :"
 
 #: src/Dialogs/ShortcutsDialog.vala:102
 msgid "Raise selection to top:"
-msgstr "Monter la sélection :"
+msgstr "Monter la sélection tout en haut :"
 
 #: src/Dialogs/ShortcutsDialog.vala:104
 msgid "Lower selection to bottom:"
-msgstr "Descendre la sélection :"
+msgstr "Descendre la sélection tout en bas :"
 
 #: src/Dialogs/ShortcutsDialog.vala:106
 msgid "Flip horizontally:"
@@ -656,7 +657,7 @@ msgstr "Dézoomer"
 
 #: src/Partials/ZoomButton.vala:55
 msgid "Reset Zoom"
-msgstr "Remettre le zoom à zéro"
+msgstr "Réinitialiser le zoom"
 
 #: src/Partials/ZoomButton.vala:62
 msgid "Zoom In"
