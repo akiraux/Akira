@@ -172,7 +172,7 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
             return;
         }
 
-        items.add_item.begin (canvas_item, (item as Models.CanvasItem).loaded);
+        items.add_item.begin (canvas_item, ((Models.CanvasItem) item).loaded);
         item.set_parent (this);
 
         request_update ();
@@ -183,7 +183,7 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
         Cairo.Context cr = new Cairo.Context (surface);
 
         cr.select_font_face ("Sans", Cairo.FontSlant.NORMAL, Cairo.FontWeight.NORMAL);
-        cr.set_font_size (LABEL_FONT_SIZE / (canvas as Lib.Canvas).current_scale);
+        cr.set_font_size (LABEL_FONT_SIZE / ((Lib.Canvas) canvas).current_scale);
         cr.text_extents (id, out label_extents);
     }
 
@@ -206,8 +206,8 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
         }
 
         cr.select_font_face ("Sans", Cairo.FontSlant.NORMAL, Cairo.FontWeight.NORMAL);
-        cr.set_font_size (LABEL_FONT_SIZE / (canvas as Lib.Canvas).current_scale);
-        cr.move_to (x, y - (LABEL_BOTTOM_PADDING / (canvas as Lib.Canvas).current_scale));
+        cr.set_font_size (LABEL_FONT_SIZE / ((Lib.Canvas) canvas).current_scale);
+        cr.move_to (x, y - (LABEL_BOTTOM_PADDING / ((Lib.Canvas) canvas).current_scale));
         cr.show_text (name != null ? name : id);
 
         // Mask items outside Artboard.
