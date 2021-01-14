@@ -218,7 +218,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
               return;
             }
 
-            (parent as Gtk.ListBox).unselect_row (this);
+            ((Gtk.ListBox) parent).unselect_row (this);
         });
 
         handle.enter_notify_event.connect (event => {
@@ -500,7 +500,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 
             if (active) {
                 window.event_bus.item_locked (model);
-                (parent as Gtk.ListBox).unselect_row (this);
+                ((Gtk.ListBox) parent).unselect_row (this);
             }
 
             window.event_bus.set_focus_on_canvas ();

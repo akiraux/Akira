@@ -87,7 +87,7 @@ public class Akira.FileFormat.JsonObject : GLib.Object {
         } else if (type == typeof (Akira.Lib.Models.CanvasArtboard)) {
             item.get_property (spec.get_name (), ref val);
             if (val.strdup_contents () != "NULL") {
-                obj.set_string_member (spec.get_name (), (val as Akira.Lib.Models.CanvasArtboard).id);
+                obj.set_string_member (spec.get_name (), ((Akira.Lib.Models.CanvasArtboard) val).id);
             }
         } else if (type == typeof (Goo.CanvasItemVisibility)) {
             item.get_property (spec.get_name (), ref val);
