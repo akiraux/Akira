@@ -179,7 +179,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
                     // Mark it for removal if we have a saved file.
                     if (window.akira_file != null) {
                         window.akira_file.remove_image.begin (
-                            (item as Akira.Lib.Models.CanvasImage).manager.filename
+                            ((Akira.Lib.Models.CanvasImage) item).manager.filename
                         );
                     }
                 }
@@ -473,7 +473,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
 
         // Restore image size.
         if (item is Models.CanvasImage) {
-            (item as Models.CanvasImage).resize_pixbuf (
+            ((Models.CanvasImage) item).resize_pixbuf (
                 (int) obj.get_double_member ("width"),
                 (int) obj.get_double_member ("height"),
                 true
@@ -509,7 +509,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
 
         // Trigger the simple_update () method for artboards.
         if (item is Models.CanvasArtboard) {
-            (item as Models.CanvasArtboard).trigger_change ();
+            ((Models.CanvasArtboard) item).trigger_change ();
         }
 
         item.set ("relative-x", obj.get_double_member ("relative-x"));

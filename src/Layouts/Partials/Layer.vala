@@ -222,7 +222,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
                 return;
             }
 
-            (parent as Gtk.ListBox).unselect_row (this);
+            ((Gtk.ListBox) parent).unselect_row (this);
         });
 
         lock_actions ();
@@ -466,7 +466,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 
     private bool on_drag_motion (Gdk.DragContext context, int x, int y, uint time) {
         int row_index = get_index ();
-        var row = (Akira.Layouts.Partials.Layer) (parent as Gtk.ListBox).get_row_at_index (row_index);
+        var row = (Akira.Layouts.Partials.Layer) ((Gtk.ListBox) parent).get_row_at_index (row_index);
 
         if (!dragged) {
             motion_revealer.reveal_child = true;
@@ -543,7 +543,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 
                 // We need this in case the user clicks on the layer right after being unlocked.
                 if (!is_selected ()) {
-                    (parent as Gtk.ListBox).select_row (this);
+                    ((Gtk.ListBox) parent).select_row (this);
                 }
 
                 // We're returning false to not interrupt the natural bubbling of the click event.
@@ -622,18 +622,18 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
     //     return false;
     // }
 
-    private void unselect_groups (Gtk.ListBox container) {
-        container.foreach (child => {
-            if (child is Akira.Layouts.Partials.Layer) {
-                Akira.Layouts.Partials.Layer layer = (Akira.Layouts.Partials.Layer) child;
+    //  private void unselect_groups (Gtk.ListBox container) {
+    //      container.foreach (child => {
+    //          if (child is Akira.Layouts.Partials.Layer) {
+    //              Akira.Layouts.Partials.Layer layer = (Akira.Layouts.Partials.Layer) child;
 
-                if (layer.grouped) {
-                    layer.container.unselect_all ();
-                    unselect_groups (layer.container);
-                }
-            }
-        });
-    }
+    //              if (layer.grouped) {
+    //                  layer.container.unselect_all ();
+    //                  unselect_groups (layer.container);
+    //              }
+    //          }
+    //      });
+    //  }
 
     public void update_on_enter () {
         update_label ();
@@ -700,7 +700,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 
             if (active) {
                 window.event_bus.item_locked (model);
-                (parent as Gtk.ListBox).unselect_row (this);
+                ((Gtk.ListBox) parent).unselect_row (this);
             }
 
             window.event_bus.set_focus_on_canvas ();
