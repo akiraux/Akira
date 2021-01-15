@@ -341,7 +341,7 @@ public class Akira.FileFormat.ZipArchiveHandler : GLib.Object {
                         if (bytes_read <= 0) {
                             break;
                         }
-                        
+
                         archive.write_data (buffer[0:bytes_read]);
                     }
                 }
