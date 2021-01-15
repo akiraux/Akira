@@ -267,16 +267,9 @@ public class Akira.FileFormat.ZipArchiveHandler : GLib.Object {
             }
 
             Posix.off_t offset;
-#if VALA_0_42
             uint8[] buffer;
             while (archive.read_data_block (out buffer, out offset) == Archive.Result.OK) {
                 if (extractor.write_data_block (buffer, offset) != Archive.Result.OK) {
-#else
-            void* buffer = null;
-            size_t buffer_length;
-            while (archive.read_data_block (out buffer, out buffer_length, out offset) == Archive.Result.OK) {
-                if (extractor.write_data_block (buffer, buffer_length, offset) != Archive.Result.OK) {
-#endif
                     break;
                 }
             }
@@ -327,13 +320,8 @@ public class Akira.FileFormat.ZipArchiveHandler : GLib.Object {
                     // Add an entry to the archive
                     Archive.Entry entry = new Archive.Entry ();
                     entry.set_pathname (initial_folder.get_relative_path (current_file));
-#if VALA_0_42
                     entry.set_size ((Archive.int64_t) file_info.get_size ());
                     entry.set_filetype (Archive.FileType.IFREG);
-#else
-                    entry.set_size (file_info.get_size ());
-                    entry.set_filetype ((uint) Posix.S_IFREG);
-#endif
                     entry.set_perm (0644);
 
                     if (archive.write_header (entry) != Archive.Result.OK) {
@@ -354,11 +342,7 @@ public class Akira.FileFormat.ZipArchiveHandler : GLib.Object {
                             break;
                         }
 
-#if VALA_0_42
                         archive.write_data (buffer[0:bytes_read]);
-#else
-                        archive.write_data (buffer, bytes_read);
-#endif
                     }
                 }
             }
