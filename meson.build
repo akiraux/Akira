@@ -6,6 +6,10 @@ akira_datadir = join_paths(akira_prefix, get_option('datadir'))
 akira_pkgdatadir = join_paths(akira_datadir, meson.project_name())
 install_tests = get_option('install-tests')
 
+source_root = meson.current_source_dir()
+vapi_dir = join_paths(source_root, 'vapi')
+add_project_arguments('--vapidir=' + vapi_dir, language: 'vala')
+
 # Include the translations module
 i18n = import('i18n')
 # Dependencies
