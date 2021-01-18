@@ -14,10 +14,6 @@
     <file alias="akira-banner.jpg">assets/akira-banner.jpg</file>
 
     <file alias="stylesheet.css" compressed="true">css/stylesheet.css</file>
-    <file alias="bool-difference-symbolic.svg">icons/symbolic/bool-difference-symbolic.svg</file>
-    <file alias="bool-interesect-symbolic.svg">icons/symbolic/bool-intersect-symbolic.svg</file>
-    <file alias="bool-subtract-symbolic.svg">icons/symbolic/bool-subtract-symbolic.svg</file>
-    <file alias="bool-union-symbolic.svg">icons/symbolic/bool-union-symbolic.svg</file>
 
     <file alias="layer-visible-symbolic.svg">icons/symbolic/layer-visible-symbolic.svg</file>
     <file alias="layer-hidden-symbolic.svg">icons/symbolic/layer-hidden-symbolic.svg</file>
@@ -27,36 +23,11 @@
     <file alias="input-pixel-symbolic.svg">icons/symbolic/input-pixel-symbolic.svg</file>
     <file alias="input-degrees-symbolic.svg">icons/symbolic/input-degrees-symbolic.svg</file>
 
-    <file alias="system-settings-filled.svg">icons/filled/system-settings-filled.svg</file>
-    <file alias="system-settings-symbolic.svg">icons/symbolic/system-settings-symbolic.svg</file>
-    <file alias="system-settings-lineart.svg">icons/lineart/system-settings-lineart.svg</file>
-
-    <file alias="layout-grid-filled.svg">icons/filled/layout-grid-filled.svg</file>
-    <file alias="layout-grid-symbolic.svg">icons/symbolic/layout-grid-symbolic.svg</file>
-    <file alias="layout-grid-lineart.svg">icons/lineart/layout-grid-lineart.svg</file>
-    <file alias="layout-pixels-filled.svg">icons/filled/layout-pixels-filled.svg</file>
-    <file alias="layout-pixels-symbolic.svg">icons/symbolic/layout-pixels-symbolic.svg</file>
-    <file alias="layout-pixels-lineart.svg">icons/lineart/layout-pixels-lineart.svg</file>
-    <file alias="layout-panels-filled.svg">icons/filled/layout-panels-filled.svg</file>
-    <file alias="layout-panels-symbolic.svg">icons/symbolic/layout-panels-symbolic.svg</file>
-    <file alias="layout-panels-lineart.svg">icons/lineart/layout-panels-lineart.svg</file>
-
-    <file alias="tool-group-symbolic.svg">icons/symbolic/tool-group-symbolic.svg</file>
-    <file alias="tool-ungroup-symbolic.svg">icons/symbolic/tool-ungroup-symbolic.svg</file>
-    <file alias="tool-slice-symbolic.svg">icons/symbolic/tool-slice-symbolic.svg</file>
-    <file alias="tool-move-above-symbolic.svg">icons/symbolic/tool-move-above-symbolic.svg</file>
-    <file alias="tool-move-below-symbolic.svg">icons/symbolic/tool-move-below-symbolic.svg</file>
-    <file alias="tool-select-node-symbolic.svg">icons/symbolic/tool-select-node-symbolic.svg</file>
-    <file alias="tool-select-symbolic.svg">icons/symbolic/tool-select-symbolic.svg</file>
-
-    <file alias="shape-artboard-symbolic.svg">icons/symbolic/shape-artboard-symbolic.svg</file>
     <file alias="shape-image-symbolic.svg">icons/symbolic/shape-image-symbolic.svg</file>
-    <file alias="shape-bezier-symbolic.svg">icons/symbolic/shape-bezier-symbolic.svg</file>
     <file alias="shape-pencil-symbolic.svg">icons/symbolic/shape-pencil-symbolic.svg</file>
     <file alias="shape-rectangle-symbolic.svg">icons/symbolic/shape-rectangle-symbolic.svg</file>
     <file alias="shape-triangle-symbolic.svg">icons/symbolic/shape-triangle-symbolic.svg</file>
     <file alias="shape-circle-symbolic.svg">icons/symbolic/shape-circle-symbolic.svg</file>
-    <file alias="shape-all-symbolic.svg">icons/symbolic/shape-all-symbolic.svg</file>
     <file alias="shape-text-symbolic.svg">icons/symbolic/shape-text-symbolic.svg</file>
   </gresource>
 </gresources>
