@@ -392,8 +392,17 @@ public class Akira.Lib.Managers.ItemsManager : Object {
                 if (_artboard.id == obj.get_string_member ("artboard")) {
                     var matrix = Cairo.Matrix.identity ();
                     _artboard.get_transform (out matrix);
-                    pos_x = matrix.x0 + obj.get_double_member ("relative-x");
-                    pos_y = matrix.y0 + obj.get_double_member ("relative-y");
+                    // Items inside artboards can have negative origin points.
+                    // If they do we need ignore the value as we first need to
+                    // generate them inside the constraints of the artboard.
+                    pos_x = matrix.x0 + (
+                        obj.get_double_member ("relative-x") < 0
+                        ? 0 : obj.get_double_member ("relative-x")
+                    );
+                    pos_y = matrix.y0 + (
+                        obj.get_double_member ("relative-y") < 0
+                        ? 0 : obj.get_double_member ("relative-y")
+                    );
                     artboard = _artboard;
                     break;
                 }
