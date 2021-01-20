@@ -32,6 +32,9 @@ public class Akira.Lib.Managers.ItemsManager : Object {
     private Gdk.RGBA border_color;
     private Gdk.RGBA fill_color;
 
+    // Keep track of the expensive Artboard change method.
+    private bool is_changing = false;
+
     public ItemsManager (Akira.Window window) {
         Object (
             window: window
@@ -48,7 +51,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
 
         window.event_bus.insert_item.connect (set_item_to_insert);
         window.event_bus.request_delete_item.connect (on_request_delete_item);
-        window.event_bus.hold_released.connect (on_hold_released);
+        window.event_bus.detect_artboard_change.connect (on_detect_artboard_change);
     }
 
     public void insert_image (Lib.Managers.ImageManager manager) {
@@ -559,16 +562,30 @@ public class Akira.Lib.Managers.ItemsManager : Object {
     }
 
     /**
-     * Handle the aftermath of an item transformation, like size changes or movement.
+     * Handle the aftermath of an item transformation, like size changes or movement
+     * to see if we need to add or remove an item to an Artboard.
      */
-    private void on_hold_released () {
+    private void on_detect_artboard_change () {
+        // Interrupt if no artboard is currently present.
+        if (artboards.get_n_items () == 0) {
+            return;
+        }
+
+        // Interrupt if this is already running.
+        if (is_changing) {
+            return;
+        }
+
+        // Interrupt if no item is selected.
+        if (window.main_window.main_canvas.canvas.selected_bound_manager.selected_items.length () == 0) {
+            return;
+        }
+
+        is_changing = true;
+
         // We need to copy the array of selected items as we need to remove and add items once
         // moved to force the natural redraw of the canvas.
         var items = window.main_window.main_canvas.canvas.selected_bound_manager.selected_items.copy ();
-
-        if (items.length () == 0) {
-            return;
-        }
 
         // If we have images in the canvas, check if they're part of the selection to recalculate the size.
         if (images.get_n_items () > 0) {
@@ -585,11 +602,6 @@ public class Akira.Lib.Managers.ItemsManager : Object {
                 continue;
             }
             item.update_size_ratio ();
-        }
-
-        // Interrupt if no artboard is currently present.
-        if (artboards.get_n_items () == 0) {
-            return;
         }
 
         // Check if any of the currently moved items was dropped inside or outside any artboard.
@@ -615,6 +627,8 @@ public class Akira.Lib.Managers.ItemsManager : Object {
 
             change_artboard (item, new_artboard);
         }
+
+        is_changing = false;
     }
 
     /**

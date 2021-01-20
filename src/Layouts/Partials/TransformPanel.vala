@@ -189,7 +189,6 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         }
 
         selected_item = selected_items.nth_data (0);
-
     }
 
     private void disconnect_previous_item () {
