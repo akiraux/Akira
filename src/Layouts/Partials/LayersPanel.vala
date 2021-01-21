@@ -209,7 +209,7 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.Grid {
         var layer_artboard = layer.model.artboard;
 
         // Change artboard if necessary.
-        window.items_manager.change_artboard (layer.model, null);
+        window.items_manager.change_artboard.begin (layer.model, null);
 
         // If the moved layer had an artboard, no need to do anything else.
         if (layer_artboard != null) {
