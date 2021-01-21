@@ -162,7 +162,7 @@ public class Akira.Lib.Models.CanvasArtboard : Goo.CanvasItemSimple, Goo.CanvasI
         return item.bounds_manager.x1 < bounds.x2
             && item.bounds_manager.x2 > bounds.x1
             && item.bounds_manager.y1 < bounds.y2
-            && item.bounds_manager.y2 > bounds.y1;
+            && item.bounds_manager.y2 > bounds.y1 + get_label_height ();
     }
 
     public void add_child (Goo.CanvasItem item, int position = -1) {

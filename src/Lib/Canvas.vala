@@ -157,6 +157,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
             case Gdk.Key.Right:
             case Gdk.Key.Left:
                 window.event_bus.move_item_from_canvas (event);
+                window.event_bus.detect_artboard_change ();
                 break;
         }
 
@@ -283,9 +284,12 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 edit_mode = EditMode.MODE_SELECTION;
                 break;
 
+            case EditMode.MODE_SELECTION:
+                window.event_bus.detect_artboard_change ();
+                break;
+
             default:
                 edit_mode = EditMode.MODE_SELECTION;
-                window.event_bus.hold_released ();
                 break;
         }
 
