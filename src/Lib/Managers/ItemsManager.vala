@@ -557,7 +557,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
      * Handle the aftermath of an item transformation, like size changes or movement
      * to see if we need to add or remove an item to an Artboard.
      */
-    private void on_detect_artboard_change () {
+    private async void on_detect_artboard_change () {
         // Interrupt if no artboard is currently present.
         if (artboards.get_n_items () == 0) {
             return;
@@ -617,7 +617,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
                 }
             }
 
-            change_artboard (item, new_artboard);
+            yield change_artboard (item, new_artboard);
         }
 
         is_changing = false;
@@ -626,7 +626,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
     /**
      * Add or remove an item from an artboard.
      */
-    public void change_artboard (Models.CanvasItem item, Models.CanvasArtboard? new_artboard) {
+    public async void change_artboard (Models.CanvasItem item, Models.CanvasArtboard? new_artboard) {
         // Interrupt if the item was moved within its original artboard.
         if (item.artboard == new_artboard) {
             debug ("Same parent");

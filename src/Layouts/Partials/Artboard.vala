@@ -401,7 +401,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
         var layer = (Layer) ((Gtk.Widget[]) selection_data.get_data ())[0];
 
         // Change artboard if necessary.
-        window.items_manager.change_artboard (layer.model, model);
+        window.items_manager.change_artboard.begin (layer.model, model);
 
         // Use the existing action to push an item all the way to the top.
         window.event_bus.change_z_selected (true, true);

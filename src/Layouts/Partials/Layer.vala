@@ -388,7 +388,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
         var layer = (Layer) ((Gtk.Widget[]) selection_data.get_data ())[0];
 
         // Change artboard if necessary.
-        window.items_manager.change_artboard (layer.model, model.artboard);
+        window.items_manager.change_artboard.begin (layer.model, model.artboard);
 
         // Store the source of our items.
         var items_source = model.artboard == null
