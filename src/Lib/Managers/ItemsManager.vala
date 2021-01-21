@@ -85,12 +85,12 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         double x,
         double y,
         Lib.Managers.ImageManager? manager = null,
-        bool loaded = false
+        bool loaded = false,
+        Models.CanvasArtboard? artboard = null
     ) {
         udpate_default_values ();
 
         Models.CanvasItem? new_item = null;
-        Models.CanvasArtboard? artboard = null;
 
         // Populate root item here and not in the construct @since
         // there the canvas is not yet defined, so we need to wait for
@@ -99,10 +99,12 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             root = window.main_window.main_canvas.canvas.get_root_item ();
         }
 
-        foreach (Models.CanvasArtboard _artboard in artboards) {
-            if (_artboard.is_inside (x, y)) {
-                artboard = _artboard;
-                break;
+        if (artboard == null) {
+            foreach (Models.CanvasArtboard _artboard in artboards) {
+                if (_artboard.is_inside (x, y)) {
+                    artboard = _artboard;
+                    break;
+                }
             }
         }
 
@@ -135,13 +137,12 @@ public class Akira.Lib.Managers.ItemsManager : Object {
                     break;
 
                 case Akira.Lib.Models.CanvasItemType.IMAGE:
-                default:
                     // We need to store images in a dedicated list since we will need
                     // to easily access them and save them in the .akira/Pictures folder.
-                    if (new_item.item_type == Akira.Lib.Models.CanvasItemType.IMAGE) {
-                        images.add_item.begin ((new_item as Akira.Lib.Models.CanvasImage), loaded);
-                    }
+                    images.add_item.begin ((new_item as Akira.Lib.Models.CanvasImage), loaded);
+                    break;
 
+                default:
                     if (new_item.artboard == null) {
                         // Add it to "free items"
                         free_items.add_item.begin (new_item, loaded);
@@ -403,22 +404,22 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         switch (obj.get_string_member ("type")) {
             case "AkiraLibModelsCanvasRect":
                 insert_type = Models.CanvasItemType.RECT;
-                item = insert_item (pos_x, pos_y, null, true);
+                item = insert_item (pos_x, pos_y, null, true, artboard);
                 break;
 
             case "AkiraLibModelsCanvasEllipse":
                 insert_type = Models.CanvasItemType.ELLIPSE;
-                item = insert_item (pos_x, pos_y, null, true);
+                item = insert_item (pos_x, pos_y, null, true, artboard);
                 break;
 
             case "AkiraLibModelsCanvasText":
                 insert_type = Models.CanvasItemType.TEXT;
-                item = insert_item (pos_x, pos_y, null, true);
+                item = insert_item (pos_x, pos_y, null, true, artboard);
                 break;
 
             case "AkiraLibModelsCanvasArtboard":
                 insert_type = Models.CanvasItemType.ARTBOARD;
-                item = insert_item (pos_x, pos_y, null, true);
+                item = insert_item (pos_x, pos_y, null, true, artboard);
                 break;
 
             case "AkiraLibModelsCanvasImage":
@@ -431,7 +432,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
                     )
                 );
                 var manager = new Akira.Lib.Managers.ImageManager.from_archive (file, filename);
-                item = insert_item (pos_x, pos_y, manager, true);
+                item = insert_item (pos_x, pos_y, manager, true, artboard);
                 break;
         }
 
