@@ -210,6 +210,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 selected_bound_manager.add_item_to_selection (new_item);
 
                 selected_bound_manager.set_initial_coordinates (event.x, event.y);
+                window.event_bus.init_panel_coord (event.x, event.y);
 
                 nob_manager.selected_nob = Managers.NobManager.Nob.BOTTOM_RIGHT;
                 break;

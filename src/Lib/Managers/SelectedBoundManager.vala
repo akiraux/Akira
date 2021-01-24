@@ -120,7 +120,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
                 break;
         }
 
-        // Notify the X & Y values in the transform panel.
+        // Notify the change of coordinates to the layout.
         canvas.window.event_bus.item_coord_changed ();
     }
 

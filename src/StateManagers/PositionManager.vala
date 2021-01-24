@@ -22,7 +22,9 @@
 public class Akira.StateManagers.PositionManager : Object {
     public weak Akira.Window window { get; construct; }
 
-    private double x;
+    private Lib.Models.CanvasItem? selected_item;
+    public double x;
+    public double y;
 
     public PositionManager (Akira.Window window) {
         Object (
@@ -30,18 +32,90 @@ public class Akira.StateManagers.PositionManager : Object {
         );
     }
 
-    private void init_position (double init_x) {
-        x = init_x;
+    construct {
+        window.event_bus.selected_items_changed.connect (on_selected_items_changed);
+        window.event_bus.item_coord_changed.connect (on_item_coord_changed);
+        window.event_bus.init_panel_coord.connect (on_init_panel_coord);
+        window.event_bus.panel_x_coord_changed.connect (on_panel_x_coord_changed);
+        window.event_bus.panel_y_coord_changed.connect (on_panel_y_coord_changed);
     }
 
-    private void update_position (string origin) {
+    private void on_selected_items_changed (List<Lib.Models.CanvasItem> selected_items) {
+        if (selected_items.length () == 0) {
+            selected_item = null;
+            x = 0;
+            y = 0;
+            return;
+        }
+
+        // Temporarily handle only 1 item. This will need to change when
+        // implementing multiselection.
+
+        // Interrupt if the selected item didn't change.
+        if (selected_item == selected_items.nth_data (0)) {
+            return;
+        }
+
+        selected_item = selected_items.nth_data (0);
+        on_item_coord_changed ();
+    }
+
+    private void on_init_panel_coord (double init_x, double init_y) {
+        x = init_x;
+        y = init_y;
+
+        update_position (true);
+    }
+
+    private void on_item_coord_changed () {
+        var position = Utils.AffineTransform.get_position (selected_item);
+
+        // Interrupt if nothing changed.
+        if (x == position["x"] && y == position["y"]) {
+            return;
+        }
+
+        x = position["x"];
+        y = position["y"];
+
+        update_position (true);
+    }
+
+    private void on_panel_x_coord_changed (double panel_x) {
+        // Interrupt if nothing changed.
+        if (x == panel_x) {
+            return;
+        }
+
+        x = panel_x;
+
+        update_position ();
+    }
+
+    private void on_panel_y_coord_changed (double panel_y) {
+        // Interrupt if nothing changed.
+        if (y == panel_y) {
+            return;
+        }
+
+        y = panel_y;
+
+        update_position ();
+    }
+
+    private void update_position (bool is_from_shape = false) {
+        // Notify that the file has been edited.
+        window.event_bus.file_edited ();
+
         // If the change request comes from a shape, update the value in the
         // Transform Panel.
-        if (origin == "shape") {
-
+        if (is_from_shape) {
+            window.event_bus.coord_state_changed ();
             return;
         }
 
         // Otherwise, update the value for the selected shape.
+        Utils.AffineTransform.set_position (selected_item, x, y);
+        window.event_bus.item_value_changed ();
     }
 }

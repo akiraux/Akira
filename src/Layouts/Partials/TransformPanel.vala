@@ -179,7 +179,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         attach (opacity_grid, 0, 10, 3);
 
         window.event_bus.selected_items_changed.connect (on_selected_items_changed);
-        window.event_bus.item_coord_changed.connect (on_item_coord_changed);
+        window.event_bus.coord_state_changed.connect (on_coord_state_changed);
     }
 
     private void on_selected_items_changed (List<Lib.Models.CanvasItem> selected_items) {
@@ -230,8 +230,10 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
     }
 
     private void enable () {
-        on_item_coord_changed ();
         canvas = selected_item.canvas as Akira.Lib.Canvas;
+
+        x.notify["value"].connect (x_notify_value);
+        y.notify["value"].connect (y_notify_value);
 
         width.value = selected_item.get_coords ("width");
         height.value = selected_item.get_coords ("height");
@@ -321,38 +323,19 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         }
 
         window.event_bus.item_value_changed ();
-        on_item_coord_changed ();
     }
 
-    // We need to fetch new X and Y values to update the fields.
-    private void on_item_coord_changed () {
-        var position = Utils.AffineTransform.get_position (selected_item);
-
-        if (position["x"] != x.value) {
-            // Prevents X AffineTransform callback loop.
-            x.notify["value"].disconnect (x_notify_value);
-            x.value = position["x"];
-            x.notify["value"].connect (x_notify_value);
-        }
-
-        if (position["y"] != y.value) {
-            // Prevents Y AffineTransform callback loop.
-            y.notify["value"].disconnect (y_notify_value);
-            y.value = position["y"];
-            y.notify["value"].connect (y_notify_value);
-        }
-
-        window.event_bus.file_edited ();
+    private void on_coord_state_changed () {
+        x.value = window.position_manager.x;
+        y.value = window.position_manager.y;
     }
 
     public void x_notify_value () {
-        Utils.AffineTransform.set_position (selected_item, x.value);
-        window.event_bus.item_value_changed ();
+        window.event_bus.panel_x_coord_changed (x.value);
     }
 
     public void y_notify_value () {
-        Utils.AffineTransform.set_position (selected_item, null, y.value);
-        window.event_bus.item_value_changed ();
+        window.event_bus.panel_y_coord_changed (y.value);
     }
 
     public void update_size_ratio () {
