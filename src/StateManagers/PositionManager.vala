@@ -64,6 +64,11 @@ public class Akira.StateManagers.PositionManager : Object {
         x = init_x;
         y = init_y;
 
+        if (selected_item.artboard != null) {
+            x -= selected_item.artboard.bounds.x1;
+            y -= selected_item.artboard.bounds.y1 + selected_item.artboard.get_label_height ();
+        }
+
         update_position (true);
     }
 
