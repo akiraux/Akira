@@ -52,7 +52,7 @@ jobs:
     name: "Flatpak"
     runs-on: ubuntu-latest
     container:
-      image: docker.io/bilelmoussaoui/flatpak-github-actions
+      image: bilelmoussaoui/flatpak-github-actions:elementary-juno
       options: --privileged
     steps:
       - uses: actions/checkout@v2
