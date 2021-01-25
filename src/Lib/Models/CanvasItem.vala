@@ -210,17 +210,6 @@ public interface Akira.Lib.Models.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
         relative_y = 0;
     }
 
-    public virtual void move (double x, double y) {
-        if (artboard != null) {
-            relative_x += x;
-            relative_y += y;
-            return;
-        }
-
-        translate (x, y);
-        bounds_manager.update ();
-    }
-
     public virtual Cairo.Matrix get_real_transform () {
         Cairo.Matrix transform = Cairo.Matrix.identity ();
 

@@ -36,7 +36,7 @@ public class Akira.StateManagers.PositionManager : Object {
                 return;
             }
 
-            _x = Math.round (value);
+            _x = Utils.AffineTransform.fix_size (value);
             update_selected_items ();
         }
     }
@@ -51,7 +51,7 @@ public class Akira.StateManagers.PositionManager : Object {
                 return;
             }
 
-            _y = Math.round (value);
+            _y = Utils.AffineTransform.fix_size (value);
             update_selected_items ();
         }
     }
@@ -70,6 +70,10 @@ public class Akira.StateManagers.PositionManager : Object {
     }
 
     private void on_init_state_coords (double init_x, double init_y, Lib.Models.CanvasArtboard? artboard = null) {
+        if (init_x == x && init_y == y) {
+            return;
+        }
+
         x = init_x;
         y = init_y;
 
@@ -80,25 +84,35 @@ public class Akira.StateManagers.PositionManager : Object {
     }
 
     private void on_update_state_coords (double new_x, double new_y) {
-        x = new_x;
-        y = new_y;
+        if (new_x == 0 && new_y == 0) {
+            return;
+        }
+
+        if (new_x != 0) {
+            x += new_x;
+        }
+
+        if (new_y != 0) {
+            y += new_y;
+        }
     }
 
     private void update_selected_items () {
-        var updated = false;
         foreach (Lib.Models.CanvasItem item in canvas.selected_bound_manager.selected_items) {
-            var position = Utils.AffineTransform.get_position (item);
+            if (item.artboard != null) {
+                item.relative_x = x;
+                item.relative_y = y;
+            } else {
+                Cairo.Matrix matrix;
+                item.get_transform (out matrix);
 
-            if (x == position["x"] && y == position["y"]) {
-                continue;
+                matrix.x0 = x;
+                matrix.y0 = y;
+
+                item.set_transform (matrix);
             }
-
-            Utils.AffineTransform.set_position (item, x, y);
-            updated = true;
         }
 
-        if (updated) {
-            window.event_bus.item_value_changed ();
-        }
+        window.event_bus.item_value_changed ();
     }
 }

@@ -46,69 +46,31 @@ public class Akira.Utils.AffineTransform : Object {
         return array;
     }
 
-    public static void set_position (CanvasItem item, double? x = null, double? y = null) {
-        var diff_x = 0.0;
-        var diff_y = 0.0;
-
-        if (item.artboard != null) {
-            // Account for the different between the current position and the
-            // the item's bounds.
-            diff_x = item.bounds_manager.x1 - item.artboard.bounds.x1 - item.relative_x;
-            diff_y = item.bounds_manager.y1 - item.artboard.bounds.y1
-                     - item.artboard.get_label_height () - item.relative_y;
-
-            item.relative_x = x != null ? x - diff_x : item.relative_x;
-            item.relative_y = y != null ? y - diff_y : item.relative_y;
-            return;
-        }
-
-        Cairo.Matrix matrix;
-        item.get_transform (out matrix);
-
-        // Account for the item rotation and get the difference between
-        // its bounds and matrix coordinates.
-        diff_x = item.bounds_manager.x1 - matrix.x0;
-        diff_y = item.bounds_manager.y1 - matrix.y0;
-
-        matrix.x0 = x != null ? x - diff_x : matrix.x0;
-        matrix.y0 = y != null ? y - diff_y : matrix.y0;
-
-        item.set_transform (matrix);
-        item.bounds_manager.update ();
-    }
-
     /**
      * Move the item based on the mouse click and drag event.
      */
-    public static void move_from_event (
+    public static HashTable<string, double?> move_from_event (
         CanvasItem item,
         double event_x,
         double event_y,
         ref double initial_event_x,
         ref double initial_event_y
     ) {
+        HashTable<string, double?> array = new HashTable<string, double?> (str_hash, str_equal);
+
         var delta_x = event_x - initial_event_x;
         var delta_y = event_y - initial_event_y;
 
-        if (item.artboard != null) {
-            item.relative_x += delta_x;
-            item.relative_y += delta_y;
-        } else {
-            Cairo.Matrix matrix;
-            item.get_transform (out matrix);
-
-            matrix.x0 += delta_x;
-            matrix.y0 += delta_y;
-
-            item.set_transform (matrix);
-            item.bounds_manager.update ();
-        }
-
         initial_event_x = event_x;
         initial_event_y = event_y;
+
+        array.insert ("x", delta_x);
+        array.insert ("y", delta_y);
+
+        return array;
     }
 
-    public static void scale_from_event (
+    public static HashTable<string, double?> scale_from_event (
         CanvasItem item,
         NobManager.Nob nob,
         double event_x,
@@ -120,6 +82,8 @@ public class Akira.Utils.AffineTransform : Object {
         double initial_width,
         double initial_height
     ) {
+        HashTable<string, double?> array = new HashTable<string, double?> (str_hash, str_equal);
+
         double delta_x = fix_size (event_x - initial_event_x);
         double delta_y = fix_size (event_y - initial_event_y);
 
@@ -292,8 +256,11 @@ public class Akira.Utils.AffineTransform : Object {
         initial_event_x = event_x;
         initial_event_y = event_y;
 
-        item.move (new_x, new_y);
         set_size (item, new_width, new_height);
+        array.insert ("x", new_x);
+        array.insert ("y", new_y);
+
+        return array;
     }
 
     // Width size constraints.
@@ -396,13 +363,17 @@ public class Akira.Utils.AffineTransform : Object {
         }
     }
 
-    public static void rotate_from_event (
+    public static HashTable<string, double?> rotate_from_event (
         CanvasItem item,
         double x,
         double y,
         ref double initial_x,
         ref double initial_y
     ) {
+        HashTable<string, double?> array = new HashTable<string, double?> (str_hash, str_equal);
+        array.insert ("x", 0);
+        array.insert ("y", 0);
+
         var diff_x = 0.0;
         var diff_y = 0.0;
         var canvas = item.canvas as Akira.Lib.Canvas;
@@ -471,7 +442,7 @@ public class Akira.Utils.AffineTransform : Object {
             // to the current rotation, which might lead to a situation in which you
             // cannot "reset" item rotation to rounded values (0, 90, 180, ...) without
             // manually resetting the rotation input field in the properties panel
-            var current_rotation_int = ((int) GLib.Math.round (item.rotation));
+            var current_rotation_int = ((int) fix_size (item.rotation));
 
             rotation_amount = ROTATION_FIXED_STEP;
 
@@ -492,11 +463,13 @@ public class Akira.Utils.AffineTransform : Object {
             // Cap new_rotation to the [0, 360] range.
             var new_rotation = GLib.Math.fmod (item.rotation + rotation, 360);
             // Round rotation in order to avoid sub degree issue.
-            set_rotation (item, GLib.Math.round (new_rotation));
+            array = set_rotation (item, fix_size (new_rotation));
         }
 
         // Reset rotation to prevent infinite rotation loops.
         prev_rotation_difference = 0.0;
+
+        return array;
     }
 
     public static void set_size (Goo.CanvasItem item, double x, double y) {
@@ -520,7 +493,10 @@ public class Akira.Utils.AffineTransform : Object {
         }
     }
 
-    public static void set_rotation (CanvasItem item, double rotation) {
+    public static HashTable<string, double?> set_rotation (CanvasItem item, double rotation) {
+        HashTable<string, double?> array = new HashTable<string, double?> (str_hash, str_equal);
+        var initial_transform = item.get_real_transform ();
+
         var center_x = item.get_coords ("width") / 2;
         var center_y = item.get_coords ("height") / 2;
         var actual_rotation = rotation - item.rotation;
@@ -528,9 +504,12 @@ public class Akira.Utils.AffineTransform : Object {
         item.rotate (actual_rotation, center_x, center_y);
         item.rotation += actual_rotation;
 
-        if (item.artboard == null) {
-            item.bounds_manager.update ();
-        }
+        var new_transform = item.get_real_transform ();
+
+        array.insert ("x", new_transform.x0 - initial_transform.x0);
+        array.insert ("y", new_transform.y0 - initial_transform.y0);
+
+        return array;
     }
 
     public static void flip_item (CanvasItem item, double sx, double sy) {
