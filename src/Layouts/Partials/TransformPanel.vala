@@ -36,6 +36,8 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
     private Gtk.Scale scale;
 
     // Bindings.
+    private Binding x_bind;
+    private Binding y_bind;
     private Binding ratio_bind;
     private Binding width_bind;
     private Binding height_bind;
@@ -179,7 +181,6 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         attach (opacity_grid, 0, 10, 3);
 
         window.event_bus.selected_items_changed.connect (on_selected_items_changed);
-        window.event_bus.coord_state_changed.connect (on_coord_state_changed);
     }
 
     private void on_selected_items_changed (List<Lib.Models.CanvasItem> selected_items) {
@@ -203,10 +204,12 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         selected_item.notify["opacity"].disconnect (selected_item.reset_colors);
 
         // Disconnect the signals notification.
-        x.notify["value"].disconnect (x_notify_value);
-        y.notify["value"].disconnect (y_notify_value);
+        //  x.notify["value"].disconnect (x_notify_value);
+        //  y.notify["value"].disconnect (y_notify_value);
 
         // Clear the bindings.
+        x_bind.unbind ();
+        y_bind.unbind ();
         ratio_bind.unbind ();
         width_bind.unbind ();
         height_bind.unbind ();
@@ -232,8 +235,8 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
     private void enable () {
         canvas = selected_item.canvas as Akira.Lib.Canvas;
 
-        x.notify["value"].connect (x_notify_value);
-        y.notify["value"].connect (y_notify_value);
+        //  x.notify["value"].connect (x_notify_value);
+        //  y.notify["value"].connect (y_notify_value);
 
         width.value = selected_item.get_coords ("width");
         height.value = selected_item.get_coords ("height");
@@ -242,6 +245,14 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         lock_changes.active = selected_item.size_locked;
         hflip_button.active = selected_item.flipped_h;
         vflip_button.active = selected_item.flipped_v;
+
+        x_bind = x.bind_property (
+            "value", window.position_manager, "x", BindingFlags.SYNC_CREATE | BindingFlags.BIDIRECTIONAL
+        );
+
+        y_bind = y.bind_property (
+            "value", window.position_manager, "y", BindingFlags.SYNC_CREATE | BindingFlags.BIDIRECTIONAL
+        );
 
         ratio_bind = lock_changes.bind_property (
             "active", selected_item, "size-locked",
@@ -323,19 +334,6 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         }
 
         window.event_bus.item_value_changed ();
-    }
-
-    private void on_coord_state_changed () {
-        x.value = window.position_manager.x;
-        y.value = window.position_manager.y;
-    }
-
-    public void x_notify_value () {
-        window.event_bus.panel_x_coord_changed (x.value);
-    }
-
-    public void y_notify_value () {
-        window.event_bus.panel_y_coord_changed (y.value);
     }
 
     public void update_size_ratio () {

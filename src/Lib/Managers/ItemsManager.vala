@@ -82,7 +82,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
 
         selected_bound_manager.add_item_to_selection (new_item);
         selected_bound_manager.set_initial_coordinates (start_x, start_y);
-        window.event_bus.init_panel_coord (start_x, start_y);
+        window.event_bus.init_state_coords (start_x, start_y, new_item.artboard);
     }
 
     public Models.CanvasItem? insert_item (

@@ -52,12 +52,9 @@ public class Akira.Services.EventBus : Object {
     public signal void align_items (string align_action);
     public signal void border_deleted ();
     public signal void fill_deleted ();
-    public signal void item_coord_changed ();
     public signal void item_value_changed ();
-    public signal void init_panel_coord (double x, double y);
-    public signal void panel_x_coord_changed (double x);
-    public signal void panel_y_coord_changed (double y);
-    public signal void coord_state_changed ();
+    public signal void init_state_coords (double x, double y, Lib.Models.CanvasArtboard? artboard);
+    public signal void update_state_coords (double x, double y);
 
     // Item signals.
     public signal void change_z_selected (bool raise, bool total);

@@ -55,9 +55,9 @@ public class Akira.Window : Gtk.ApplicationWindow {
         items_manager = new Akira.Lib.Managers.ItemsManager (this);
         action_manager = new Akira.Services.ActionManager (app, this);
         file_manager = new Akira.FileFormat.FileManager (this);
-        position_manager = new Akira.StateManagers.PositionManager (this);
         headerbar = new Akira.Layouts.HeaderBar (this);
         main_window = new Akira.Layouts.MainWindow (this);
+        position_manager = new Akira.StateManagers.PositionManager (this);
         dialogs = new Akira.Utils.Dialogs (this);
 
         build_ui ();

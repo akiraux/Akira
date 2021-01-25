@@ -35,7 +35,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         }
     }
 
-    private Goo.CanvasBounds select_bb;
+    //  private Goo.CanvasBounds select_bb;
     private double initial_event_x;
     private double initial_event_y;
     private double delta_x_accumulator;
@@ -63,26 +63,36 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
     }
 
     public void set_initial_coordinates (double event_x, double event_y) {
-        if (selected_items.length () == 1) {
-            var selected_item = selected_items.nth_data (0);
-
-            delta_x_accumulator = 0.0;
-            delta_y_accumulator = 0.0;
-
-            initial_event_x = event_x;
-            initial_event_y = event_y;
-
-            initial_width = selected_item.get_coords ("width");
-            initial_height = selected_item.get_coords ("height");
-
-            return;
-        }
+        delta_x_accumulator = 0.0;
+        delta_y_accumulator = 0.0;
 
         initial_event_x = event_x;
         initial_event_y = event_y;
 
-        initial_width = select_bb.x2 - select_bb.x1;
-        initial_height = select_bb.y2 - select_bb.y1;
+        var selected_item = selected_items.nth_data (0);
+        initial_width = selected_item.get_coords ("width");
+        initial_height = selected_item.get_coords ("height");
+
+        //  if (selected_items.length () == 1) {
+        //      var selected_item = selected_items.nth_data (0);
+
+        //      delta_x_accumulator = 0.0;
+        //      delta_y_accumulator = 0.0;
+
+        //      initial_event_x = event_x;
+        //      initial_event_y = event_y;
+
+        //      initial_width = selected_item.get_coords ("width");
+        //      initial_height = selected_item.get_coords ("height");
+
+        //      return;
+        //  }
+
+        //  initial_event_x = event_x;
+        //  initial_event_y = event_y;
+
+        //  initial_width = select_bb.x2 - select_bb.x1;
+        //  initial_height = select_bb.y2 - select_bb.y1;
     }
 
     public void transform_bound (double event_x, double event_y, Managers.NobManager.Nob selected_nob) {
@@ -119,9 +129,6 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
                 );
                 break;
         }
-
-        // Notify the change of coordinates to the layout.
-        canvas.window.event_bus.item_coord_changed ();
     }
 
     public void add_item_to_selection (Models.CanvasItem item) {
@@ -285,29 +292,51 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
             return;
         }
 
+        // Check how much is the delta variation.
         var amount = (event.state & Gdk.ModifierType.SHIFT_MASK) > 0 ? 10 : 1;
 
-        selected_items.foreach ((item) => {
-            var position = Akira.Utils.AffineTransform.get_position (item);
+        // Find the TOP LEFT origin position of all the selected items.
+        double x = 1e6, y = 1e6;
+        foreach (var item in selected_items) {
+            x = double.min (x, item.bounds.x1);
+            y = double.min (y, item.bounds.y1);
+        }
 
-            switch (event.keyval) {
-                case Gdk.Key.Up:
-                    Utils.AffineTransform.set_position (item, null, position["y"] - amount);
-                    break;
-                case Gdk.Key.Down:
-                    Utils.AffineTransform.set_position (item, null, position["y"] + amount);
-                    break;
-                case Gdk.Key.Right:
-                    Utils.AffineTransform.set_position (item, position["x"] + amount);
-                    break;
-                case Gdk.Key.Left:
-                    Utils.AffineTransform.set_position (item, position["x"] - amount);
-                    break;
-            }
+        switch (event.keyval) {
+            case Gdk.Key.Up:
+                y -= amount;
+                break;
+            case Gdk.Key.Down:
+                y += amount;
+                break;
+            case Gdk.Key.Right:
+                x += amount;
+                break;
+            case Gdk.Key.Left:
+                x -= amount;
+                break;
+        }
 
-            canvas.window.event_bus.item_coord_changed ();
-            update_selected_items ();
-        });
+        window.event_bus.update_state_coords (x, y);
+
+        //  selected_items.foreach ((item) => {
+        //      var position = Akira.Utils.AffineTransform.get_position (item);
+
+        //      switch (event.keyval) {
+        //          case Gdk.Key.Up:
+        //              Utils.AffineTransform.set_position (item, null, position["y"] - amount);
+        //              break;
+        //          case Gdk.Key.Down:
+        //              Utils.AffineTransform.set_position (item, null, position["y"] + amount);
+        //              break;
+        //          case Gdk.Key.Right:
+        //              Utils.AffineTransform.set_position (item, position["x"] + amount);
+        //              break;
+        //          case Gdk.Key.Left:
+        //              Utils.AffineTransform.set_position (item, position["x"] - amount);
+        //              break;
+        //      }
+        //  });
     }
 
     private void remove_item_from_selection (Lib.Models.CanvasItem item) {
