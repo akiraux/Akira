@@ -133,32 +133,37 @@ public class Akira.Lib.Managers.ItemsManager : Object {
                 break;
         }
 
-        if (new_item != null) {
-            switch (new_item.item_type) {
-                case Akira.Lib.Models.CanvasItemType.ARTBOARD:
-                    artboards.add_item.begin ((Models.CanvasArtboard) new_item);
-                    break;
-
-                case Akira.Lib.Models.CanvasItemType.IMAGE:
-                    // We need to store images in a dedicated list since we will need
-                    // to easily access them and save them in the .akira/Pictures folder.
-                    images.add_item.begin ((new_item as Akira.Lib.Models.CanvasImage), loaded);
-                    break;
-
-                default:
-                    if (new_item.artboard == null) {
-                        // Add it to "free items"
-                        free_items.add_item.begin (new_item, loaded);
-                    }
-                    break;
-            }
-
-            // Create the GhostBoundsManager to keep track of the global canvas bounds.
-            new_item.bounds_manager = new Managers.GhostBoundsManager (new_item);
-
-            window.event_bus.item_inserted (new_item);
-            window.event_bus.file_edited ();
+        if (new_item == null) {
+            return null;
         }
+
+        switch (new_item.item_type) {
+            case Akira.Lib.Models.CanvasItemType.ARTBOARD:
+                artboards.add_item.begin ((Models.CanvasArtboard) new_item);
+                break;
+
+            case Akira.Lib.Models.CanvasItemType.IMAGE:
+            default:
+                // Add it to "free items" if it doesn't belong to an artboard.
+                if (new_item.artboard == null) {
+                    free_items.add_item.begin (new_item, loaded);
+                }
+
+                // We need to additionally store images in a dedicated list in order
+                // to easily access them when saving the .akira/Pictures folder.
+                // If we don't curate this dedicated list, it would be a nightamer to
+                // loop through all the free items and artboard items to check for images.
+                if (new_item.item_type == Akira.Lib.Models.CanvasItemType.IMAGE) {
+                    images.add_item.begin ((new_item as Akira.Lib.Models.CanvasImage), loaded);
+                }
+                break;
+        }
+
+        // Create the GhostBoundsManager to keep track of the global canvas bounds.
+        new_item.bounds_manager = new Managers.GhostBoundsManager (new_item);
+
+        window.event_bus.item_inserted (new_item);
+        window.event_bus.file_edited ();
 
         return new_item;
     }
