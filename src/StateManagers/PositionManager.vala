@@ -69,18 +69,40 @@ public class Akira.StateManagers.PositionManager : Object {
         window.event_bus.update_state_coords.connect (on_update_state_coords);
     }
 
-    private void on_init_state_coords (double init_x, double init_y, Lib.Models.CanvasArtboard? artboard = null) {
-        if (init_x == x && init_y == y) {
+    private void on_init_state_coords (Lib.Models.CanvasItem item) {
+        // Get the matrix transform coordinates.
+        Cairo.Matrix matrix;
+        item.get_transform (out matrix);
+
+        //  warning ("MATRIX X: %f - Y: %f", matrix.x0, matrix.y0);
+        //  warning ("BOUNDS X: %f - Y: %f", item.bounds_manager.x1, item.bounds_manager.y1);
+
+        // Store the coordinates into local variables for later manipulation.
+        var new_x = matrix.x0;
+        var new_y = matrix.y0;
+
+        // Account for the item rotation and get the difference between
+        // its bounds and matrix coordinates.
+        //  if (item.rotation != 0) {
+        //      new_x -= (matrix.x0 - item.bounds_manager.x1);
+        //      new_y -= (matrix.y0 - item.bounds_manager.y1);
+        //  }
+
+        // Interrupt if no value has changed.
+        if (new_x == x && new_y == y) {
             return;
         }
 
-        x = init_x;
-        y = init_y;
-
-        if (artboard != null) {
-            x -= artboard.bounds.x1;
-            y -= artboard.bounds.y1 + artboard.get_label_height ();
+        // Update the value to reflect the origin point relative to the parent artboard.
+        if (item.artboard != null) {
+            //  warning ("ARTBOARD");
+            new_x -= item.artboard.bounds.x1;
+            new_y -= item.artboard.bounds.y1 + item.artboard.get_label_height ();
         }
+
+        // Update the values.
+        x = new_x;
+        y = new_y;
     }
 
     private void on_update_state_coords (double new_x, double new_y) {
@@ -111,6 +133,7 @@ public class Akira.StateManagers.PositionManager : Object {
 
                 item.set_transform (matrix);
             }
+            item.bounds_manager.update ();
         }
 
         window.event_bus.item_value_changed ();

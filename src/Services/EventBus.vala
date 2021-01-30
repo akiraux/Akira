@@ -53,7 +53,7 @@ public class Akira.Services.EventBus : Object {
     public signal void border_deleted ();
     public signal void fill_deleted ();
     public signal void item_value_changed ();
-    public signal void init_state_coords (double x, double y, Lib.Models.CanvasArtboard? artboard);
+    public signal void init_state_coords (Lib.Models.CanvasItem item);
     public signal void update_state_coords (double x, double y);
 
     // Item signals.

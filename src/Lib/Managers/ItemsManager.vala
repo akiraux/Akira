@@ -82,7 +82,6 @@ public class Akira.Lib.Managers.ItemsManager : Object {
 
         selected_bound_manager.add_item_to_selection (new_item);
         selected_bound_manager.set_initial_coordinates (start_x, start_y);
-        window.event_bus.init_state_coords (start_x, start_y, new_item.artboard);
     }
 
     public Models.CanvasItem? insert_item (
@@ -156,6 +155,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
 
             // Create the GhostBoundsManager to keep track of the global canvas bounds.
             new_item.bounds_manager = new Managers.GhostBoundsManager (new_item);
+            new_item.bounds_manager.update ();
 
             window.event_bus.item_inserted (new_item);
             window.event_bus.file_edited ();

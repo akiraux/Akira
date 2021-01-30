@@ -63,7 +63,10 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
             if (_selected_item == value) {
                 return;
             }
+
             disconnect_previous_item ();
+            disable ();
+
             _selected_item = value;
 
             bool has_item = _selected_item != null;
@@ -78,12 +81,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
             scale.sensitive = has_item && !(_selected_item is Lib.Models.CanvasArtboard);
             lock_changes.sensitive = has_item;
 
-            if (!has_item) {
-                disable ();
-                return;
-            }
-
-            if (_selected_item != null ) {
+            if (has_item) {
                 enable ();
             }
         }
@@ -231,6 +229,8 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
     private void enable () {
         canvas = selected_item.canvas as Akira.Lib.Canvas;
 
+        x.value = window.position_manager.x;
+        y.value = window.position_manager.y;
         width.value = selected_item.get_coords ("width");
         height.value = selected_item.get_coords ("height");
         rotation.value = selected_item.rotation;

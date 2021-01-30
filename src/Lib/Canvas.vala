@@ -208,9 +208,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 var new_item = window.items_manager.insert_item (event.x, event.y);
 
                 selected_bound_manager.add_item_to_selection (new_item);
-
                 selected_bound_manager.set_initial_coordinates (event.x, event.y);
-                window.event_bus.init_state_coords (event.x, event.y, new_item.artboard);
 
                 nob_manager.selected_nob = Managers.NobManager.Nob.BOTTOM_RIGHT;
                 break;
@@ -247,11 +245,6 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
                     // Item has been selected.
                     selected_bound_manager.add_item_to_selection (item);
-                    window.event_bus.init_state_coords (
-                        item.bounds_manager.x1,
-                        item.bounds_manager.y1,
-                        item.artboard
-                    );
                 }
 
                 selected_bound_manager.set_initial_coordinates (event.x, event.y);

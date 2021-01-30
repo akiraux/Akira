@@ -111,7 +111,6 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         }
 
         canvas.window.event_bus.update_state_coords (position["x"], position["y"]);
-        selected_item.bounds_manager.update ();
     }
 
     public void add_item_to_selection (Models.CanvasItem item) {
@@ -134,6 +133,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
 
         // Move focus back to the canvas.
         canvas.window.event_bus.set_focus_on_canvas ();
+        canvas.window.event_bus.init_state_coords (item);
     }
 
     public void delete_selection () {
