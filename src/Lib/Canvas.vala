@@ -236,14 +236,16 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 nob_manager.selected_nob = clicked_nob_name;
 
                 if (clicked_item is Models.CanvasItem) {
-                    if (((Models.CanvasItem) clicked_item).locked) {
+                    Models.CanvasItem item = clicked_item as Models.CanvasItem;
+
+                    if (item.locked) {
                         selected_bound_manager.reset_selection ();
                         holding = false;
                         return true;
                     }
 
                     // Item has been selected.
-                    selected_bound_manager.add_item_to_selection (clicked_item as Models.CanvasItem);
+                    selected_bound_manager.add_item_to_selection (item);
                 }
 
                 selected_bound_manager.set_initial_coordinates (event.x, event.y);

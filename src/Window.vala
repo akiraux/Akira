@@ -32,6 +32,8 @@ public class Akira.Window : Gtk.ApplicationWindow {
     public Akira.Layouts.MainWindow main_window;
     public Akira.Utils.Dialogs dialogs;
 
+    public Akira.StateManagers.CoordinatesManager coords_manager;
+
     public SimpleActionGroup actions { get; construct; }
     public Gtk.AccelGroup accel_group { get; construct; }
 
@@ -55,6 +57,7 @@ public class Akira.Window : Gtk.ApplicationWindow {
         file_manager = new Akira.FileFormat.FileManager (this);
         headerbar = new Akira.Layouts.HeaderBar (this);
         main_window = new Akira.Layouts.MainWindow (this);
+        coords_manager = new Akira.StateManagers.CoordinatesManager (this);
         dialogs = new Akira.Utils.Dialogs (this);
 
         build_ui ();

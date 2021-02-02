@@ -28,8 +28,16 @@ public class Akira.Utils.AffineTransform : Object {
     private const int MIN_POS = 10;
     private const double ROTATION_FIXED_STEP = 15.0;
 
-    public static double temp_rotation = 0.0;
-    public static double prev_rotation_difference = 0.0;
+    private static double temp_rotation = 0.0;
+    private static double prev_rotation_difference = 0.0;
+
+    // Private attributes for item Cairo.Matrix.
+    private static double old_x;
+    private static double old_y;
+    private static double old_scale;
+    private static double old_rotation;
+
+    private static Goo.CanvasBounds bounds;
 
     public static HashTable<string, double?> get_position (CanvasItem item) {
         HashTable<string, double?> array = new HashTable<string, double?> (str_hash, str_equal);
@@ -85,25 +93,20 @@ public class Akira.Utils.AffineTransform : Object {
         double event_x,
         double event_y,
         ref double initial_event_x,
-        ref double initial_event_y
+        ref double initial_event_y,
+        ref double moved_x,
+        ref double moved_y
     ) {
-        var delta_x = event_x - initial_event_x;
-        var delta_y = event_y - initial_event_y;
+        // Calculate the delta between the initial point and new mouse location.
+        moved_x = event_x - initial_event_x;
+        moved_y = event_y - initial_event_y;
 
-        if (item.artboard != null) {
-            item.relative_x += delta_x;
-            item.relative_y += delta_y;
-        } else {
-            Cairo.Matrix matrix;
-            item.get_transform (out matrix);
+        // Fetch the current Cairo.Matrix attributes of the item.
+        item.get_simple_transform (out old_x, out old_y, out old_scale, out old_rotation);
+        // Update the Cairo.Matrix location based on the delta.
+        item.set_simple_transform (old_x + moved_x, old_y + moved_y, old_scale, old_rotation);
 
-            matrix.x0 += delta_x;
-            matrix.y0 += delta_y;
-
-            item.set_transform (matrix);
-            item.bounds_manager.update ();
-        }
-
+        // Reset the initial mouse pointer so we can recalculate the delta on next call.
         initial_event_x = event_x;
         initial_event_y = event_y;
     }
@@ -118,7 +121,9 @@ public class Akira.Utils.AffineTransform : Object {
         ref double delta_x_accumulator,
         ref double delta_y_accumulator,
         double initial_width,
-        double initial_height
+        double initial_height,
+        ref double moved_x,
+        ref double moved_y
     ) {
         double delta_x = fix_size (event_x - initial_event_x);
         double delta_y = fix_size (event_y - initial_event_y);
@@ -292,8 +297,15 @@ public class Akira.Utils.AffineTransform : Object {
         initial_event_x = event_x;
         initial_event_y = event_y;
 
-        item.move (new_x, new_y);
+        // Always translate the item by its axis in order to properly resize it
+        // even when rotated.
+        item.translate (new_x, new_y);
+        // Update the item size.
         set_size (item, new_width, new_height);
+
+        // Send the coordiantes variations back to the caller method.
+        moved_x = new_x;
+        moved_y = new_y;
     }
 
     // Width size constraints.
@@ -396,12 +408,35 @@ public class Akira.Utils.AffineTransform : Object {
         }
     }
 
+    public static void set_size (Goo.CanvasItem item, double x, double y) {
+        double width, height;
+        item.get ("width", out width, "height", out height);
+
+        // Prevent accidental negative values.
+        if (width + x > 0) {
+            item.set ("width", fix_size (width + x));
+        }
+
+        if (height + y > 0) {
+            item.set ("height", fix_size (height + y));
+        }
+
+        // Don't update the bounds manager if a native goocanvas_rect was used,
+        // meaning no Akira Models was used and we don't need the bounds.
+        if (!(item is Goo.CanvasRect)) {
+            var model_item = item as CanvasItem;
+            model_item.bounds_manager.update ();
+        }
+    }
+
     public static void rotate_from_event (
         CanvasItem item,
         double x,
         double y,
         ref double initial_x,
-        ref double initial_y
+        ref double initial_y,
+        ref double moved_x,
+        ref double moved_y
     ) {
         var diff_x = 0.0;
         var diff_y = 0.0;
@@ -471,7 +506,7 @@ public class Akira.Utils.AffineTransform : Object {
             // to the current rotation, which might lead to a situation in which you
             // cannot "reset" item rotation to rounded values (0, 90, 180, ...) without
             // manually resetting the rotation input field in the properties panel
-            var current_rotation_int = ((int) GLib.Math.round (item.rotation));
+            var current_rotation_int = ((int) fix_size (item.rotation));
 
             rotation_amount = ROTATION_FIXED_STEP;
 
@@ -491,33 +526,21 @@ public class Akira.Utils.AffineTransform : Object {
         if (do_rotation) {
             // Cap new_rotation to the [0, 360] range.
             var new_rotation = GLib.Math.fmod (item.rotation + rotation, 360);
+
+            // Store the current X & Y coordinates of the item's bounding box.
+            var old_x = item.bounds.x1;
+            var old_y = item.bounds.y1;
+
             // Round rotation in order to avoid sub degree issue.
-            set_rotation (item, GLib.Math.round (new_rotation));
+            set_rotation (item, fix_size (new_rotation));
+
+            // Pass the delta of the item's bounding box coordinates after the rotation.
+            moved_x = old_x - item.bounds.x1;
+            moved_y = old_y - item.bounds.y1;
         }
 
         // Reset rotation to prevent infinite rotation loops.
         prev_rotation_difference = 0.0;
-    }
-
-    public static void set_size (Goo.CanvasItem item, double x, double y) {
-        double width, height;
-        item.get ("width", out width, "height", out height);
-
-        // Prevent accidental negative values.
-        if (width + x > 0) {
-            item.set ("width", fix_size (width + x));
-        }
-
-        if (height + y > 0) {
-            item.set ("height", fix_size (height + y));
-        }
-
-        // Don't update the bounds manager if a native goocanvas_rect was used,
-        // meaning no Akira Models was used and we don't need the bounds.
-        if (!(item is Goo.CanvasRect)) {
-            var model_item = item as CanvasItem;
-            model_item.bounds_manager.update ();
-        }
     }
 
     public static void set_rotation (CanvasItem item, double rotation) {
@@ -529,6 +552,7 @@ public class Akira.Utils.AffineTransform : Object {
         item.rotation += actual_rotation;
 
         if (item.artboard == null) {
+            item.get_bounds (out bounds);
             item.bounds_manager.update ();
         }
     }
