@@ -299,7 +299,7 @@ public class Akira.Utils.AffineTransform : Object {
 
         // Always translate the item by its axis in order to properly resize it
         // even when rotated.
-        item.translate (new_x, new_y);
+        item.move (new_x, new_y);
         // Update the item size.
         set_size (item, new_width, new_height);
 

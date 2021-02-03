@@ -110,11 +110,16 @@ public class Akira.StateManagers.CoordinatesManager : Object {
     }
 
     private void update_items_coordinates () {
-        if (!do_update || _x == null || _y == null) {
+        if (_x == null || _y == null) {
             return;
         }
 
         foreach (Lib.Models.CanvasItem item in canvas.selected_bound_manager.selected_items) {
+            if (!do_update) {
+                item.bounds_manager.update ();
+                continue;
+            }
+
             item.get_simple_transform (out old_x, out old_y, out old_scale, out old_rotation);
 
             // Calculate the values which the item should be translated.
