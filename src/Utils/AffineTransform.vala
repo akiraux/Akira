@@ -31,12 +31,6 @@ public class Akira.Utils.AffineTransform : Object {
     private static double temp_rotation = 0.0;
     private static double prev_rotation_difference = 0.0;
 
-    // Private attributes for item Cairo.Matrix.
-    private static double old_x;
-    private static double old_y;
-    private static double old_scale;
-    private static double old_rotation;
-
     private static Goo.CanvasBounds bounds;
 
     public static HashTable<string, double?> get_position (CanvasItem item) {
@@ -101,12 +95,20 @@ public class Akira.Utils.AffineTransform : Object {
         moved_x = event_x - initial_event_x;
         moved_y = event_y - initial_event_y;
 
-        // Fetch the current Cairo.Matrix attributes of the item.
-        item.get_simple_transform (out old_x, out old_y, out old_scale, out old_rotation);
-        // Update the Cairo.Matrix location based on the delta.
-        item.set_simple_transform (old_x + moved_x, old_y + moved_y, old_scale, old_rotation);
+        if (item.artboard != null) {
+            item.relative_x += moved_x;
+            item.relative_y += moved_y;
+        } else {
+            Cairo.Matrix matrix;
+            item.get_transform (out matrix);
 
-        // Reset the initial mouse pointer so we can recalculate the delta on next call.
+            matrix.x0 += moved_x;
+            matrix.y0 += moved_y;
+
+            item.set_transform (matrix);
+            item.bounds_manager.update ();
+        }
+
         initial_event_x = event_x;
         initial_event_y = event_y;
     }

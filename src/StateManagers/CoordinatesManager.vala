@@ -56,12 +56,10 @@ public class Akira.StateManagers.CoordinatesManager : Object {
         }
     }
 
-    // Private attributes to store simple transformation.
-    private double old_x;
-    private double old_y;
-    private double old_scale;
-    private double old_rotation;
+    // The items matrix transformation.
+    private Cairo.Matrix matrix;
 
+    // Allow or deny updating the items position.
     private bool do_update = true;
 
     public CoordinatesManager (Akira.Window window) {
@@ -84,8 +82,8 @@ public class Akira.StateManagers.CoordinatesManager : Object {
 
         // Update the coordiantes if the items is inside an Artboard.
         if (item.artboard != null) {
-            item_x -= item.artboard.bounds.x1;
-            item_y -= item.artboard.bounds.y1 + item.artboard.get_label_height ();
+            item_x = item.relative_x;
+            item_y = item.relative_y;
         }
 
         // Interrupt if no value has changed.
@@ -101,6 +99,7 @@ public class Akira.StateManagers.CoordinatesManager : Object {
     }
 
     private void on_update_state_coords (double moved_x, double moved_y) {
+        // Prevent updating the item since the coordiantes change came from it.
         do_update = false;
 
         x += moved_x;
@@ -120,33 +119,26 @@ public class Akira.StateManagers.CoordinatesManager : Object {
                 continue;
             }
 
-            item.get_simple_transform (out old_x, out old_y, out old_scale, out old_rotation);
+            var diff_x = 0.0;
+            var diff_y = 0.0;
 
-            // Calculate the values which the item should be translated.
-            var new_x = x - item.bounds.x1;
-            var new_y = y - item.bounds.y1;
-
-            // No need to call the translate method if nothing changed.
-            if (new_x == 0 && new_y == 0) {
+            if (item.artboard != null) {
+                item.relative_x = x;
+                item.relative_y = y;
                 continue;
             }
 
-            // Store the border value since it makes a difference
-            // between the item's bounds and the matrix transform.
-            var border = (double) item.border_size / 2;
+            item.get_transform (out matrix);
 
             // Account for the item rotation and get the difference between
             // its bounds and matrix coordinates.
-            var diff_x = item.bounds.x1 - old_x + border;
-            var diff_y = item.bounds.y1 - old_y + border;
+            diff_x = item.bounds_manager.x1 - matrix.x0;
+            diff_y = item.bounds_manager.y1 - matrix.y0;
 
-            // Update the matrix coordinates.
-            old_x += new_x + diff_x;
-            old_y += new_y + diff_y;
+            matrix.x0 = x - diff_x;
+            matrix.y0 = y - diff_y;
 
-            //  warning ("UPDATED X: %f - Y: %f", transform.x0, transform.y0);
-
-            item.set_simple_transform (old_x, old_y, old_scale, old_rotation);
+            item.set_transform (matrix);
             item.bounds_manager.update ();
         }
 
