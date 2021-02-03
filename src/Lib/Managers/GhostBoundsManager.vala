@@ -129,11 +129,4 @@ public class Akira.Lib.Managers.GhostBoundsManager : Object {
         ghost.remove ();
         ghost = null;
     }
-
-    public Cairo.Matrix get_transform () {
-        Cairo.Matrix matrix;
-        item.get_transform (out matrix);
-
-        return matrix;
-    }
 }

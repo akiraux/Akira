@@ -460,16 +460,8 @@ public class Akira.Utils.AffineTransform : Object {
             // Cap new_rotation to the [0, 360] range.
             var new_rotation = GLib.Math.fmod (item.rotation + rotation, 360);
 
-            // Store the current X & Y coordinates of the item's bounding box.
-            var old_x = item.bounds.x1;
-            var old_y = item.bounds.y1;
-
             // Round rotation in order to avoid sub degree issue.
-            set_rotation (item, fix_size (new_rotation));
-
-            // Pass the delta of the item's bounding box coordinates after the rotation.
-            moved_x = old_x - item.bounds.x1;
-            moved_y = old_y - item.bounds.y1;
+            set_rotation (item, fix_size (new_rotation), ref moved_x, ref moved_y);
         }
 
         // Reset rotation to prevent infinite rotation loops.
@@ -497,7 +489,9 @@ public class Akira.Utils.AffineTransform : Object {
         }
     }
 
-    public static void set_rotation (CanvasItem item, double rotation) {
+    public static void set_rotation (CanvasItem item, double rotation, ref double moved_x, ref double moved_y) {
+        warning ("OLD X: %f - Y: %f", moved_x, moved_y);
+
         var center_x = item.get_coords ("width") / 2;
         var center_y = item.get_coords ("height") / 2;
         var actual_rotation = rotation - item.rotation;
@@ -508,6 +502,12 @@ public class Akira.Utils.AffineTransform : Object {
         if (item.artboard == null) {
             item.bounds_manager.update ();
         }
+
+        // Pass the delta of the item's bounding box coordinates after the rotation.
+        moved_x -= item.bounds_manager.x1;
+        moved_y -= item.bounds_manager.y1;
+
+        warning ("NEW X: %f - Y: %f", moved_x, moved_y);
     }
 
     public static void flip_item (CanvasItem item, double sx, double sy) {

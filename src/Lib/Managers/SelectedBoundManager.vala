@@ -104,6 +104,9 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
                 break;
 
             case Managers.NobManager.Nob.ROTATE:
+                moved_y = selected_item.bounds_manager.x1;
+                moved_x = selected_item.bounds_manager.y1;
+
                 Utils.AffineTransform.rotate_from_event (
                     selected_item, event_x, event_y,
                     ref initial_event_x, ref initial_event_y,

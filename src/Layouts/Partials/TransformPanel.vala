@@ -286,11 +286,15 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
 
         rotation_bind = rotation.bind_property (
             "value", selected_item, "rotation",
-            BindingFlags.SYNC_CREATE | BindingFlags.BIDIRECTIONAL,
+            BindingFlags.BIDIRECTIONAL,
             (binding, srcval, ref targetval) => {
+                double moved_x = 0.0;
+                double moved_y = 0.0;
                 double src = (double) srcval;
                 targetval.set_double (src);
-                Utils.AffineTransform.set_rotation (selected_item, src);
+                Utils.AffineTransform.set_rotation (selected_item, src, ref moved_x, ref moved_y);
+                // Notify the X & Y values in the transform panel.
+                canvas.window.event_bus.update_state_coords (moved_x, moved_y, false);
                 return true;
             });
 
