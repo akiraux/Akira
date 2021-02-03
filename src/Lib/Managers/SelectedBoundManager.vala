@@ -125,7 +125,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         }
 
         // Notify the X & Y values in the transform panel.
-        canvas.window.event_bus.update_state_coords (moved_x, moved_y);
+        canvas.window.event_bus.update_state_coords (moved_x, moved_y, false);
 
         // Let the UI know that a redraw is necessary.
         canvas.window.event_bus.item_value_changed ();
@@ -294,28 +294,24 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         }
 
         var amount = (event.state & Gdk.ModifierType.SHIFT_MASK) > 0 ? 10 : 1;
+        double x = 0.0, y = 0.0;
 
-        selected_items.foreach ((item) => {
-            var position = Akira.Utils.AffineTransform.get_position (item);
+        switch (event.keyval) {
+            case Gdk.Key.Up:
+                y -= amount;
+                break;
+            case Gdk.Key.Down:
+                y += amount;
+                break;
+            case Gdk.Key.Right:
+                x += amount;
+                break;
+            case Gdk.Key.Left:
+                x -= amount;
+                break;
+        }
 
-            switch (event.keyval) {
-                case Gdk.Key.Up:
-                    Utils.AffineTransform.set_position (item, null, position["y"] - amount);
-                    break;
-                case Gdk.Key.Down:
-                    Utils.AffineTransform.set_position (item, null, position["y"] + amount);
-                    break;
-                case Gdk.Key.Right:
-                    Utils.AffineTransform.set_position (item, position["x"] + amount);
-                    break;
-                case Gdk.Key.Left:
-                    Utils.AffineTransform.set_position (item, position["x"] - amount);
-                    break;
-            }
-
-            canvas.window.event_bus.item_coord_changed ();
-            update_selected_items ();
-        });
+        window.event_bus.update_state_coords (x, y, true);
     }
 
     private void remove_item_from_selection (Lib.Models.CanvasItem item) {

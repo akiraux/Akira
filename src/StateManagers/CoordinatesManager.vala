@@ -98,9 +98,14 @@ public class Akira.StateManagers.CoordinatesManager : Object {
         _y = item_y;
     }
 
-    private void on_update_state_coords (double moved_x, double moved_y) {
-        // Prevent updating the item since the coordiantes change came from it.
-        do_update = false;
+    /**
+     * Update the coordinates to reflect the new position in the transform panel.
+     * If the update attribute is FALSE, it means updating the selected items Ciaro.Matrix
+     * is not necessary as the coordinates change came from a canvas action that already
+     * moved the item.
+     */
+    private void on_update_state_coords (double moved_x, double moved_y, bool update) {
+        do_update = update;
 
         x += moved_x;
         y += moved_y;

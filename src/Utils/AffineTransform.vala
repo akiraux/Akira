@@ -33,52 +33,6 @@ public class Akira.Utils.AffineTransform : Object {
 
     private static Goo.CanvasBounds bounds;
 
-    public static HashTable<string, double?> get_position (CanvasItem item) {
-        HashTable<string, double?> array = new HashTable<string, double?> (str_hash, str_equal);
-        double item_x = item.bounds_manager.x1;
-        double item_y = item.bounds_manager.y1;
-
-        if (item.artboard != null) {
-            item_x -= item.artboard.bounds.x1;
-            item_y -= item.artboard.bounds.y1 + item.artboard.get_label_height ();
-        }
-
-        array.insert ("x", item_x);
-        array.insert ("y", item_y);
-        return array;
-    }
-
-    public static void set_position (CanvasItem item, double? x = null, double? y = null) {
-        var diff_x = 0.0;
-        var diff_y = 0.0;
-
-        if (item.artboard != null) {
-            // Account for the different between the current position and the
-            // the item's bounds.
-            diff_x = item.bounds_manager.x1 - item.artboard.bounds.x1 - item.relative_x;
-            diff_y = item.bounds_manager.y1 - item.artboard.bounds.y1
-                     - item.artboard.get_label_height () - item.relative_y;
-
-            item.relative_x = x != null ? x - diff_x : item.relative_x;
-            item.relative_y = y != null ? y - diff_y : item.relative_y;
-            return;
-        }
-
-        Cairo.Matrix matrix;
-        item.get_transform (out matrix);
-
-        // Account for the item rotation and get the difference between
-        // its bounds and matrix coordinates.
-        diff_x = item.bounds_manager.x1 - matrix.x0;
-        diff_y = item.bounds_manager.y1 - matrix.y0;
-
-        matrix.x0 = x != null ? x - diff_x : matrix.x0;
-        matrix.y0 = y != null ? y - diff_y : matrix.y0;
-
-        item.set_transform (matrix);
-        item.bounds_manager.update ();
-    }
-
     /**
      * Move the item based on the mouse click and drag event.
      */
