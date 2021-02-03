@@ -31,8 +31,6 @@ public class Akira.Utils.AffineTransform : Object {
     private static double temp_rotation = 0.0;
     private static double prev_rotation_difference = 0.0;
 
-    private static Goo.CanvasBounds bounds;
-
     /**
      * Move the item based on the mouse click and drag event.
      */
@@ -508,7 +506,6 @@ public class Akira.Utils.AffineTransform : Object {
         item.rotation += actual_rotation;
 
         if (item.artboard == null) {
-            item.get_bounds (out bounds);
             item.bounds_manager.update ();
         }
     }
