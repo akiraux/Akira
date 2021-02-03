@@ -179,7 +179,6 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         attach (opacity_grid, 0, 10, 3);
 
         window.event_bus.selected_items_changed.connect (on_selected_items_changed);
-        //  window.event_bus.item_coord_changed.connect (on_item_coord_changed);
     }
 
     private void on_selected_items_changed (List<Lib.Models.CanvasItem> selected_items) {

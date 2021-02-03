@@ -410,27 +410,6 @@ public class Akira.Utils.AffineTransform : Object {
         }
     }
 
-    public static void set_size (Goo.CanvasItem item, double x, double y) {
-        double width, height;
-        item.get ("width", out width, "height", out height);
-
-        // Prevent accidental negative values.
-        if (width + x > 0) {
-            item.set ("width", fix_size (width + x));
-        }
-
-        if (height + y > 0) {
-            item.set ("height", fix_size (height + y));
-        }
-
-        // Don't update the bounds manager if a native goocanvas_rect was used,
-        // meaning no Akira Models was used and we don't need the bounds.
-        if (!(item is Goo.CanvasRect)) {
-            var model_item = item as CanvasItem;
-            model_item.bounds_manager.update ();
-        }
-    }
-
     public static void rotate_from_event (
         CanvasItem item,
         double x,
@@ -543,6 +522,27 @@ public class Akira.Utils.AffineTransform : Object {
 
         // Reset rotation to prevent infinite rotation loops.
         prev_rotation_difference = 0.0;
+    }
+
+    public static void set_size (Goo.CanvasItem item, double x, double y) {
+        double width, height;
+        item.get ("width", out width, "height", out height);
+
+        // Prevent accidental negative values.
+        if (width + x > 0) {
+            item.set ("width", fix_size (width + x));
+        }
+
+        if (height + y > 0) {
+            item.set ("height", fix_size (height + y));
+        }
+
+        // Don't update the bounds manager if a native goocanvas_rect was used,
+        // meaning no Akira Models was used and we don't need the bounds.
+        if (!(item is Goo.CanvasRect)) {
+            var model_item = item as CanvasItem;
+            model_item.bounds_manager.update ();
+        }
     }
 
     public static void set_rotation (CanvasItem item, double rotation) {
