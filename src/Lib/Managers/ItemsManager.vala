@@ -160,8 +160,11 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         }
 
         // We need to force the new item to generate proper bounds before being able to use its coordinates.
-        Goo.CanvasBounds bounds;
-        new_item.get_bounds (out bounds);
+        // But only if it doesn't belong to an artboard.
+        if (new_item.artboard == null) {
+            Goo.CanvasBounds bounds;
+            new_item.get_bounds (out bounds);
+        }
 
         // Create the GhostBoundsManager to keep track of the global canvas bounds.
         new_item.bounds_manager = new Managers.GhostBoundsManager (new_item);

@@ -88,7 +88,6 @@ public class Akira.StateManagers.CoordinatesManager : Object {
 
         // Interrupt if no value has changed.
         if (item_x == x && item_y == y) {
-            //  warning ("SAME");
             return;
         }
 
