@@ -77,8 +77,8 @@ public class Akira.StateManagers.CoordinatesManager : Object {
 
     private void on_init_state_coords (Lib.Models.CanvasItem? item) {
         // Get the items X & Y coordinates.
-        double item_x = item.bounds.x1;
-        double item_y = item.bounds.y1;
+        double item_x = item.bounds_manager.x1;
+        double item_y = item.bounds_manager.y1;
 
         // Update the coordiantes if the items is inside an Artboard.
         if (item.artboard != null) {
@@ -119,7 +119,6 @@ public class Akira.StateManagers.CoordinatesManager : Object {
 
         foreach (Lib.Models.CanvasItem item in canvas.selected_bound_manager.selected_items) {
             if (!do_update) {
-                item.bounds_manager.update ();
                 continue;
             }
 
