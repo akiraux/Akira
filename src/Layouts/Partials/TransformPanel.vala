@@ -229,8 +229,8 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
     private void enable () {
         canvas = selected_item.canvas as Akira.Lib.Canvas;
 
-        x.value = selected_item.bounds.x1;
-        y.value = selected_item.bounds.y1;
+        x.value = selected_item.artboard != null ? selected_item.relative_x : selected_item.bounds.x1;
+        y.value = selected_item.artboard != null ? selected_item.relative_y : selected_item.bounds.y1;
         width.value = selected_item.get_coords ("width");
         height.value = selected_item.get_coords ("height");
         rotation.value = selected_item.rotation;
