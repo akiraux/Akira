@@ -72,18 +72,19 @@ public class Akira.StateManagers.CoordinatesManager : Object {
         canvas = window.main_window.main_canvas.canvas;
 
         window.event_bus.init_state_coords.connect (on_init_state_coords);
+        window.event_bus.reset_state_coords.connect (on_reset_state_coords);
         window.event_bus.update_state_coords.connect (on_update_state_coords);
     }
 
-    private void on_init_state_coords (Lib.Models.CanvasItem? item) {
+    private void on_init_state_coords (Lib.Models.CanvasItem item) {
         // Get the items X & Y coordinates.
         double item_x = item.bounds_manager.x1;
         double item_y = item.bounds_manager.y1;
 
         // Update the coordiantes if the items is inside an Artboard.
         if (item.artboard != null) {
-            item_x = item.relative_x;
-            item_y = item.relative_y;
+            item_x -= item.artboard.bounds.x1;
+            item_y -= item.artboard.bounds.y1 + item.artboard.get_label_height ();
         }
 
         // Interrupt if no value has changed.
@@ -98,16 +99,32 @@ public class Akira.StateManagers.CoordinatesManager : Object {
     }
 
     /**
-     * Update the coordinates to reflect the new position in the transform panel.
-     * If the update attribute is FALSE, it means updating the selected items Ciaro.Matrix
-     * is not necessary as the coordinates change came from a canvas action that already
-     * moved the item.
+     * Update the coordinates to trigger the shapes transformation.
      */
-    private void on_update_state_coords (double moved_x, double moved_y, bool update) {
-        do_update = update;
-
+    private void on_update_state_coords (double moved_x, double moved_y) {
         x += moved_x;
         y += moved_y;
+    }
+
+    /**
+     * Reset the coordinates to get the newly updated coordinates from the item.
+     * The coordinates change came from a canvas action that already moved the items
+     * therefore we set the d_update to false to prevent updating  the selected
+     * items Cairo transform.
+     */
+    private void on_reset_state_coords (Lib.Models.CanvasItem item) {
+        do_update = false;
+
+        double item_x = item.bounds_manager.x1;
+        double item_y = item.bounds_manager.y1;
+
+        if (item.artboard != null) {
+            item_x -= item.artboard.bounds.x1;
+            item_y -= item.artboard.bounds.y1 + item.artboard.get_label_height ();
+        }
+
+        x = item_x;
+        y = item_y;
 
         do_update = true;
     }

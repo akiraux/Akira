@@ -229,8 +229,14 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
     private void enable () {
         canvas = selected_item.canvas as Akira.Lib.Canvas;
 
-        x.value = selected_item.artboard != null ? selected_item.relative_x : selected_item.bounds.x1;
-        y.value = selected_item.artboard != null ? selected_item.relative_y : selected_item.bounds.y1;
+        x.value = selected_item.bounds.x1;
+        y.value = selected_item.bounds.y1;
+
+        if (selected_item.artboard != null) {
+            x.value -= selected_item.artboard.bounds.x1;
+            y.value -= selected_item.artboard.bounds.y1 + selected_item.artboard.get_label_height ();
+        }
+
         width.value = selected_item.get_coords ("width");
         height.value = selected_item.get_coords ("height");
         rotation.value = selected_item.rotation;
@@ -288,13 +294,11 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
             "value", selected_item, "rotation",
             BindingFlags.BIDIRECTIONAL,
             (binding, srcval, ref targetval) => {
-                double moved_x = 0.0;
-                double moved_y = 0.0;
                 double src = (double) srcval;
                 targetval.set_double (src);
-                Utils.AffineTransform.set_rotation (selected_item, src, ref moved_x, ref moved_y);
-                // Notify the X & Y values in the transform panel.
-                canvas.window.event_bus.update_state_coords (moved_x, moved_y, false);
+                Utils.AffineTransform.set_rotation (selected_item, src);
+                // Update the X & Y values in the state manager.
+                canvas.window.event_bus.reset_state_coords (selected_item);
                 return true;
             });
 

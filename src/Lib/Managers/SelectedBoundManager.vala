@@ -36,8 +36,6 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
     }
 
     private Goo.CanvasBounds select_bb;
-    private double moved_x;
-    private double moved_y;
     private double initial_event_x;
     private double initial_event_y;
     private double delta_x_accumulator;
@@ -65,9 +63,6 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
     }
 
     public void set_initial_coordinates (double event_x, double event_y) {
-        moved_y = 0;
-        moved_x = 0;
-
         initial_event_x = event_x;
         initial_event_y = event_y;
 
@@ -98,19 +93,14 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
             case Managers.NobManager.Nob.NONE:
                 Utils.AffineTransform.move_from_event (
                     selected_item, event_x, event_y,
-                    ref initial_event_x, ref initial_event_y,
-                    ref moved_x, ref moved_y
+                    ref initial_event_x, ref initial_event_y
                 );
                 break;
 
             case Managers.NobManager.Nob.ROTATE:
-                moved_y = selected_item.bounds_manager.x1;
-                moved_x = selected_item.bounds_manager.y1;
-
                 Utils.AffineTransform.rotate_from_event (
                     selected_item, event_x, event_y,
-                    ref initial_event_x, ref initial_event_y,
-                    ref moved_x, ref moved_y
+                    ref initial_event_x, ref initial_event_y
                 );
                 break;
 
@@ -121,14 +111,13 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
                     event_x, event_y,
                     ref initial_event_x, ref initial_event_y,
                     ref delta_x_accumulator, ref delta_y_accumulator,
-                    initial_width, initial_height,
-                    ref moved_x, ref moved_y
+                    initial_width, initial_height
                 );
                 break;
         }
 
-        // Notify the X & Y values in the transform panel.
-        canvas.window.event_bus.update_state_coords (moved_x, moved_y, false);
+        // Notify the X & Y values in the state manager.
+        canvas.window.event_bus.reset_state_coords (selected_item);
 
         // Let the UI know that a redraw is necessary.
         canvas.window.event_bus.item_value_changed ();
@@ -314,7 +303,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
                 break;
         }
 
-        window.event_bus.update_state_coords (x, y, true);
+        window.event_bus.update_state_coords (x, y);
     }
 
     private void remove_item_from_selection (Lib.Models.CanvasItem item) {

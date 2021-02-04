@@ -39,23 +39,21 @@ public class Akira.Utils.AffineTransform : Object {
         double event_x,
         double event_y,
         ref double initial_event_x,
-        ref double initial_event_y,
-        ref double moved_x,
-        ref double moved_y
+        ref double initial_event_y
     ) {
         // Calculate the delta between the initial point and new mouse location.
-        moved_x = event_x - initial_event_x;
-        moved_y = event_y - initial_event_y;
+        var delta_x = event_x - initial_event_x;
+        var delta_y = event_y - initial_event_y;
 
         if (item.artboard != null) {
-            item.relative_x += moved_x;
-            item.relative_y += moved_y;
+            item.relative_x += delta_x;
+            item.relative_y += delta_y;
         } else {
             Cairo.Matrix matrix;
             item.get_transform (out matrix);
 
-            matrix.x0 += moved_x;
-            matrix.y0 += moved_y;
+            matrix.x0 += delta_x;
+            matrix.y0 += delta_y;
 
             item.set_transform (matrix);
             item.bounds_manager.update ();
@@ -75,9 +73,7 @@ public class Akira.Utils.AffineTransform : Object {
         ref double delta_x_accumulator,
         ref double delta_y_accumulator,
         double initial_width,
-        double initial_height,
-        ref double moved_x,
-        ref double moved_y
+        double initial_height
     ) {
         double delta_x = fix_size (event_x - initial_event_x);
         double delta_y = fix_size (event_y - initial_event_y);
@@ -256,10 +252,6 @@ public class Akira.Utils.AffineTransform : Object {
         item.move (new_x, new_y);
         // Update the item size.
         set_size (item, new_width, new_height);
-
-        // Send the coordiantes variations back to the caller method.
-        moved_x = new_x;
-        moved_y = new_y;
     }
 
     // Width size constraints.
@@ -367,9 +359,7 @@ public class Akira.Utils.AffineTransform : Object {
         double x,
         double y,
         ref double initial_x,
-        ref double initial_y,
-        ref double moved_x,
-        ref double moved_y
+        ref double initial_y
     ) {
         var diff_x = 0.0;
         var diff_y = 0.0;
@@ -461,7 +451,7 @@ public class Akira.Utils.AffineTransform : Object {
             var new_rotation = GLib.Math.fmod (item.rotation + rotation, 360);
 
             // Round rotation in order to avoid sub degree issue.
-            set_rotation (item, fix_size (new_rotation), ref moved_x, ref moved_y);
+            set_rotation (item, fix_size (new_rotation));
         }
 
         // Reset rotation to prevent infinite rotation loops.
@@ -489,9 +479,7 @@ public class Akira.Utils.AffineTransform : Object {
         }
     }
 
-    public static void set_rotation (CanvasItem item, double rotation, ref double moved_x, ref double moved_y) {
-        warning ("OLD X: %f - Y: %f", moved_x, moved_y);
-
+    public static void set_rotation (CanvasItem item, double rotation) {
         var center_x = item.get_coords ("width") / 2;
         var center_y = item.get_coords ("height") / 2;
         var actual_rotation = rotation - item.rotation;
@@ -502,12 +490,6 @@ public class Akira.Utils.AffineTransform : Object {
         if (item.artboard == null) {
             item.bounds_manager.update ();
         }
-
-        // Pass the delta of the item's bounding box coordinates after the rotation.
-        moved_x -= item.bounds_manager.x1;
-        moved_y -= item.bounds_manager.y1;
-
-        warning ("NEW X: %f - Y: %f", moved_x, moved_y);
     }
 
     public static void flip_item (CanvasItem item, double sx, double sy) {
