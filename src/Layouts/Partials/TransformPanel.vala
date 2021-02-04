@@ -291,7 +291,6 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
                 Utils.AffineTransform.set_rotation (selected_item, src);
                 // Update the X & Y values in the state manager.
                 canvas.window.event_bus.reset_state_coords (selected_item);
-                warning ("here");
                 return true;
             });
 
