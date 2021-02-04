@@ -139,11 +139,14 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
 
         item.selected = true;
         item.update_size_ratio ();
+
+        // Initialize the state manager coordinates before adding the item to the selection.
+        canvas.window.event_bus.init_state_coords (item);
+
         selected_items.append (item);
 
         // Move focus back to the canvas.
         canvas.window.event_bus.set_focus_on_canvas ();
-        canvas.window.event_bus.init_state_coords (item);
     }
 
     public void delete_selection () {

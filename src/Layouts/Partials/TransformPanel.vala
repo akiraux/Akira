@@ -229,14 +229,6 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
     private void enable () {
         canvas = selected_item.canvas as Akira.Lib.Canvas;
 
-        x.value = selected_item.bounds.x1;
-        y.value = selected_item.bounds.y1;
-
-        if (selected_item.artboard != null) {
-            x.value -= selected_item.artboard.bounds.x1;
-            y.value -= selected_item.artboard.bounds.y1 + selected_item.artboard.get_label_height ();
-        }
-
         width.value = selected_item.get_coords ("width");
         height.value = selected_item.get_coords ("height");
         rotation.value = selected_item.rotation;
@@ -245,12 +237,12 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         hflip_button.active = selected_item.flipped_h;
         vflip_button.active = selected_item.flipped_v;
 
-        x_bind = x.bind_property (
-            "value", window.coords_manager, "x", BindingFlags.BIDIRECTIONAL
+        x_bind = window.coords_manager.bind_property (
+            "x", x, "value", BindingFlags.SYNC_CREATE | BindingFlags.BIDIRECTIONAL
         );
 
-        y_bind = y.bind_property (
-            "value", window.coords_manager, "y", BindingFlags.BIDIRECTIONAL
+        y_bind = window.coords_manager.bind_property (
+            "y", y, "value", BindingFlags.SYNC_CREATE | BindingFlags.BIDIRECTIONAL
         );
 
         ratio_bind = lock_changes.bind_property (
@@ -299,6 +291,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
                 Utils.AffineTransform.set_rotation (selected_item, src);
                 // Update the X & Y values in the state manager.
                 canvas.window.event_bus.reset_state_coords (selected_item);
+                warning ("here");
                 return true;
             });
 
