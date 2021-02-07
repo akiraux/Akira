@@ -19,11 +19,18 @@
  * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
  */
 
-public class Akira.Lib.Components.TransformComponent : BaseComponent {
-    public double x { get; set; }
-    public double y { get; set; }
+using Akira.Lib.Components;
 
-    public TransformComponent (Lib.Models.CanvasItem item) {
-        this.item = item;
+public interface Akira.Lib.Items.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasItem {
+    public abstract Gee.ArrayList<Component> components { get; set; }
+
+    public Component? get_component (Type type) {
+        foreach (Component comp in components) {
+            if (comp.get_type () == type) {
+                return comp;
+            }
+        }
+
+        return null;
     }
 }

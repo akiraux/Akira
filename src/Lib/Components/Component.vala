@@ -19,11 +19,11 @@
  * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
  */
 
-public class Akira.Lib.Components.BaseComponent : Object {
+public class Akira.Lib.Components.Component : Object {
     /**
      * This is the base Component class other components will extend.
      * It doesn't do anything other than setting the CanvasItem during construct.
      * It might be removed in the future if deemed unnecessary.
      */
-    public unowned Lib.Models.CanvasItem item { get; construct set; }
+    public unowned Lib.Items.CanvasItem item { get; construct set; }
 }
