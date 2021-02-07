@@ -80,7 +80,7 @@ public class Akira.StateManagers.CoordinatesManager : Object {
      */
     private void on_init_state_coords (Lib.Models.CanvasItem item) {
         // Get the half border size.
-        double half_border = get_border(item.border_size);
+        double half_border = get_border (item.border_size);
 
         // Get the item X & Y coordinates bounds in order to account for the item's rotation.
         double item_x = item.bounds.x1 + half_border;
@@ -123,7 +123,7 @@ public class Akira.StateManagers.CoordinatesManager : Object {
         do_update = false;
 
         // Get the half border size.
-        double half_border = get_border(item.border_size);
+        double half_border = get_border (item.border_size);
 
         // Get the item X & Y coordinates bounds in order to account for the item's rotation.
         double item_x = item.bounds.x1 + half_border;
@@ -182,7 +182,7 @@ public class Akira.StateManagers.CoordinatesManager : Object {
             // If the item is rotated, we need to calculate the delta between the
             // new coordinates and item's bounds coordinates.
             if (item.rotation != 0) {
-                double half_border = get_border(item.border_size);
+                double half_border = get_border (item.border_size);
                 double diff_x = item.bounds.x1 - half_border;
                 double diff_y = item.bounds.y1 - half_border;
 
