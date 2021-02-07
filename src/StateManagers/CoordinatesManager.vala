@@ -79,9 +79,12 @@ public class Akira.StateManagers.CoordinatesManager : Object {
      * Initialize the manager coordinates with the newly created or selected item.
      */
     private void on_init_state_coords (Lib.Models.CanvasItem item) {
+        // Get the half border size.
+        double half_border = get_border(item.border_size);
+
         // Get the item X & Y coordinates bounds in order to account for the item's rotation.
-        double item_x = item.bounds.x1;
-        double item_y = item.bounds.y1;
+        double item_x = item.bounds.x1 + half_border;
+        double item_y = item.bounds.y1 + half_border;
 
         // Update the coordinates if the item is inside an Artboard.
         if (item.artboard != null) {
@@ -106,6 +109,8 @@ public class Akira.StateManagers.CoordinatesManager : Object {
     private void on_update_state_coords (double moved_x, double moved_y) {
         x += moved_x;
         y += moved_y;
+
+        window.event_bus.file_edited ();
     }
 
     /**
@@ -117,9 +122,12 @@ public class Akira.StateManagers.CoordinatesManager : Object {
     private void on_reset_state_coords (Lib.Models.CanvasItem item) {
         do_update = false;
 
+        // Get the half border size.
+        double half_border = get_border(item.border_size);
+
         // Get the item X & Y coordinates bounds in order to account for the item's rotation.
-        double item_x = item.bounds.x1;
-        double item_y = item.bounds.y1;
+        double item_x = item.bounds.x1 + half_border;
+        double item_y = item.bounds.y1 + half_border;
 
         if (item.artboard != null) {
             item_x -= item.artboard.bounds.x1;
@@ -136,6 +144,8 @@ public class Akira.StateManagers.CoordinatesManager : Object {
         y = item_y;
 
         do_update = true;
+
+        window.event_bus.file_edited ();
     }
 
     /**
@@ -172,12 +182,7 @@ public class Akira.StateManagers.CoordinatesManager : Object {
             // If the item is rotated, we need to calculate the delta between the
             // new coordinates and item's bounds coordinates.
             if (item.rotation != 0) {
-                // The item's bounds account also for the border width, but we shouldn't,
-                // so we need to account for half the border width since we're only dealing
-                // with a centered border. In the future, once borders can be inside or outside,
-                // we will need to update this condition.
-                double half_border = item.border_size > 0 ? item.border_size / 2 : 0;
-
+                double half_border = get_border(item.border_size);
                 double diff_x = item.bounds.x1 - half_border;
                 double diff_y = item.bounds.y1 - half_border;
 
@@ -198,5 +203,15 @@ public class Akira.StateManagers.CoordinatesManager : Object {
 
         // Notify the rest of the UI that a value of the select items has changed.
         window.event_bus.item_value_changed ();
+    }
+
+    /**
+     * The item's bounds account also for the border width, but we shouldn't,
+     * so we need to account for half the border width since we're only dealing
+     * with a centered border. In the future, once borders can be inside or outside,
+     * we will need to update this condition.
+     */
+    private double get_border (double size) {
+        return size > 0 ? size / 2 : 0;
     }
 }
