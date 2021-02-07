@@ -75,35 +75,40 @@ public class Akira.Utils.AffineTransform : Object {
         double initial_width,
         double initial_height
     ) {
+        var canvas = item.canvas;
+        // Convert the coordinates from the canvas to the item so we know the real
+        // values even if the item is rotated.
+        canvas.convert_to_item_space (item, ref event_x, ref event_y);
+        canvas.convert_to_item_space (item, ref initial_event_x, ref initial_event_y);
+
         double delta_x = fix_size (event_x - initial_event_x);
         double delta_y = fix_size (event_y - initial_event_y);
-
-        var canvas = item.canvas;
 
         double item_width = item.get_coords ("width");
         double item_height = item.get_coords ("height");
         double item_x = item.bounds_manager.x1;
         double item_y = item.bounds_manager.y1;
+        canvas.convert_to_item_space (item, ref item_x, ref item_y);
 
-        double new_width = 0;
-        double new_height = 0;
-        double new_x = 0;
-        double new_y = 0;
+        double inc_width = 0;
+        double inc_height = 0;
+        double inc_x = 0;
+        double inc_y = 0;
 
         switch (nob) {
             case NobManager.Nob.TOP_LEFT:
-                new_y = delta_y;
-                new_x = delta_x;
-                new_height = -delta_y;
-                new_width = -delta_x;
+                inc_y = delta_y;
+                inc_x = delta_x;
+                inc_height = -delta_y;
+                inc_width = -delta_x;
 
                 fix_height_origin (
                     ref delta_y,
                     ref event_y,
                     ref item_y,
                     ref item_height,
-                    ref new_y,
-                    ref new_height
+                    ref inc_y,
+                    ref inc_height
                 );
 
                 fix_width_origin (
@@ -111,147 +116,148 @@ public class Akira.Utils.AffineTransform : Object {
                     ref event_x,
                     ref item_x,
                     ref item_width,
-                    ref new_x,
-                    ref new_width
+                    ref inc_x,
+                    ref inc_width
                 );
 
                 if (canvas.ctrl_is_pressed || item.size_locked) {
-                    new_width = new_height * item.size_ratio;
-                    new_x = -new_width;
-                    new_y = -new_height;
+                    inc_width = inc_height * item.size_ratio;
+                    inc_x = -inc_width;
+                    inc_y = -inc_height;
                 }
                 break;
 
             case NobManager.Nob.TOP_CENTER:
-                new_y = delta_y;
-                new_height = -delta_y;
+                inc_y = delta_y;
+                inc_height = -delta_y;
 
                 fix_height_origin (
                     ref delta_y,
                     ref event_y,
                     ref item_y,
                     ref item_height,
-                    ref new_y,
-                    ref new_height
+                    ref inc_y,
+                    ref inc_height
                 );
 
                 if (canvas.ctrl_is_pressed || item.size_locked) {
-                    new_width = new_height * item.size_ratio;
-                    new_x = - (new_width / 2);
+                    inc_width = inc_height * item.size_ratio;
+                    inc_x = - (inc_width / 2);
                 }
                 break;
 
             case NobManager.Nob.TOP_RIGHT:
-                new_y = delta_y;
-                new_height = -delta_y;
-                new_width = delta_x;
+                inc_y = delta_y;
+                inc_height = -delta_y;
+                inc_width = delta_x;
 
                 fix_height_origin (
                     ref delta_y,
                     ref event_y,
                     ref item_y,
                     ref item_height,
-                    ref new_y,
-                    ref new_height
+                    ref inc_y,
+                    ref inc_height
                 );
 
-                fix_width (ref delta_x, ref event_x, ref item_x, ref item_width, ref new_width);
+                fix_width (ref delta_x, ref event_x, ref item_x, ref item_width, ref inc_width);
 
                 if (canvas.ctrl_is_pressed || item.size_locked) {
-                    new_height = new_width / item.size_ratio;
-                    new_y = -new_height;
+                    inc_height = inc_width / item.size_ratio;
+                    inc_y = -inc_height;
                 }
                 break;
 
             case NobManager.Nob.RIGHT_CENTER:
-                new_width = delta_x;
+                inc_width = delta_x;
 
-                fix_width (ref delta_x, ref event_x, ref item_x, ref item_width, ref new_width);
+                fix_width (ref delta_x, ref event_x, ref item_x, ref item_width, ref inc_width);
 
                 if (canvas.ctrl_is_pressed || item.size_locked) {
-                    new_height = new_width / item.size_ratio;
-                    new_y = - (new_height / 2);
+                    inc_height = inc_width / item.size_ratio;
+                    inc_y = - (inc_height / 2);
                 }
                 break;
 
             case NobManager.Nob.BOTTOM_RIGHT:
-                new_width = delta_x;
-                new_height = delta_y;
+                inc_width = delta_x;
+                inc_height = delta_y;
 
-                fix_width (ref delta_x, ref event_x, ref item_x, ref item_width, ref new_width);
+                fix_width (ref delta_x, ref event_x, ref item_x, ref item_width, ref inc_width);
 
-                fix_height (ref delta_y, ref event_y, ref item_y, ref item_height, ref new_height);
+                fix_height (ref delta_y, ref event_y, ref item_y, ref item_height, ref inc_height);
 
                 if (canvas.ctrl_is_pressed || item.size_locked) {
-                    new_height = new_width / item.size_ratio;
+                    inc_height = inc_width / item.size_ratio;
                     if (item.size_ratio == 1 && item_width != item_height) {
-                        new_height = item_width - item_height;
+                        inc_height = item_width - item_height;
                     }
                 }
                 break;
 
             case NobManager.Nob.BOTTOM_CENTER:
-                new_height = delta_y;
+                inc_height = delta_y;
 
-                fix_height (ref delta_y, ref event_y, ref item_y, ref item_height, ref new_height);
+                fix_height (ref delta_y, ref event_y, ref item_y, ref item_height, ref inc_height);
 
                 if (canvas.ctrl_is_pressed || item.size_locked) {
-                    new_width = new_height * item.size_ratio;
-                    new_x = - (new_width / 2);
+                    inc_width = inc_height * item.size_ratio;
+                    inc_x = - (inc_width / 2);
                 }
                 break;
 
             case NobManager.Nob.BOTTOM_LEFT:
-                new_x = delta_x;
-                new_width = -delta_x;
-                new_height = delta_y;
+                inc_x = delta_x;
+                inc_width = -delta_x;
+                inc_height = delta_y;
 
                 fix_width_origin (
                     ref delta_x,
                     ref event_x,
                     ref item_x,
                     ref item_width,
-                    ref new_x,
-                    ref new_width
+                    ref inc_x,
+                    ref inc_width
                 );
 
-                fix_height (ref delta_y, ref event_y, ref item_y, ref item_height, ref new_height);
+                fix_height (ref delta_y, ref event_y, ref item_y, ref item_height, ref inc_height);
 
                 if (canvas.ctrl_is_pressed || item.size_locked) {
-                    new_width = new_height * item.size_ratio;
-                    new_x = -new_width;
+                    inc_width = inc_height * item.size_ratio;
+                    inc_x = -inc_width;
                 }
                 break;
 
             case NobManager.Nob.LEFT_CENTER:
-                new_x = delta_x;
-                new_width = -delta_x;
+                inc_x = delta_x;
+                inc_width = -delta_x;
 
                 fix_width_origin (
                     ref delta_x,
                     ref event_x,
                     ref item_x,
                     ref item_width,
-                    ref new_x,
-                    ref new_width
+                    ref inc_x,
+                    ref inc_width
                 );
 
                 if (canvas.ctrl_is_pressed || item.size_locked) {
-                    new_height = new_width * item.size_ratio;
-                    new_y = - (new_height / 2);
+                    inc_height = inc_width * item.size_ratio;
+                    inc_y = - (inc_height / 2);
                 }
                 break;
         }
 
-        // Update the initial coordiante to keep getting the correct delta.
+        // Update the initial coordinates to keep getting the correct delta.
+        canvas.convert_from_item_space (item, ref event_x, ref event_y);
         initial_event_x = event_x;
         initial_event_y = event_y;
 
         // Always translate the item by its axis in order to properly resize it
         // even when rotated.
-        item.move (new_x, new_y);
+        item.move (inc_x, inc_y);
         // Update the item size.
-        set_size (item, new_width, new_height);
+        set_size (item, inc_width, inc_height);
     }
 
     // Width size constraints.
@@ -401,7 +407,7 @@ public class Akira.Utils.AffineTransform : Object {
             do_rotation = false;
         }
 
-        // Revert the coordinates to the canvas and udpate their references.
+        // Revert the coordinates to the canvas and update their references.
         if (item.artboard != null) {
             canvas.convert_from_item_space (item.artboard, ref x, ref y);
             x += diff_x;
