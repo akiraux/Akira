@@ -36,6 +36,8 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
     private Gtk.Scale scale;
 
     // Bindings.
+    private Binding x_bind;
+    private Binding y_bind;
     private Binding ratio_bind;
     private Binding width_bind;
     private Binding height_bind;
@@ -61,10 +63,17 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
             if (_selected_item == value) {
                 return;
             }
-            disconnect_previous_item ();
-            _selected_item = value;
 
+            disconnect_previous_item ();
+            disable ();
+
+            _selected_item = value;
             bool has_item = _selected_item != null;
+
+            if (has_item) {
+                enable ();
+            }
+
             x.enabled = has_item;
             y.enabled = has_item;
             height.enabled = has_item;
@@ -75,15 +84,6 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
             opacity_entry.entry.sensitive = has_item && !(_selected_item is Lib.Models.CanvasArtboard);
             scale.sensitive = has_item && !(_selected_item is Lib.Models.CanvasArtboard);
             lock_changes.sensitive = has_item;
-
-            if (!has_item) {
-                disable ();
-                return;
-            }
-
-            if (_selected_item != null ) {
-                enable ();
-            }
         }
     }
 
@@ -179,7 +179,6 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         attach (opacity_grid, 0, 10, 3);
 
         window.event_bus.selected_items_changed.connect (on_selected_items_changed);
-        window.event_bus.item_coord_changed.connect (on_item_coord_changed);
     }
 
     private void on_selected_items_changed (List<Lib.Models.CanvasItem> selected_items) {
@@ -202,11 +201,9 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         selected_item.notify["rotation"].disconnect (on_item_value_changed);
         selected_item.notify["opacity"].disconnect (selected_item.reset_colors);
 
-        // Disconnect the signals notification.
-        x.notify["value"].disconnect (x_notify_value);
-        y.notify["value"].disconnect (y_notify_value);
-
         // Clear the bindings.
+        x_bind.unbind ();
+        y_bind.unbind ();
         ratio_bind.unbind ();
         width_bind.unbind ();
         height_bind.unbind ();
@@ -230,7 +227,6 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
     }
 
     private void enable () {
-        on_item_coord_changed ();
         canvas = selected_item.canvas as Akira.Lib.Canvas;
 
         width.value = selected_item.get_coords ("width");
@@ -240,6 +236,14 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         lock_changes.active = selected_item.size_locked;
         hflip_button.active = selected_item.flipped_h;
         vflip_button.active = selected_item.flipped_v;
+
+        x_bind = window.coords_manager.bind_property (
+            "x", x, "value", BindingFlags.SYNC_CREATE | BindingFlags.BIDIRECTIONAL
+        );
+
+        y_bind = window.coords_manager.bind_property (
+            "y", y, "value", BindingFlags.SYNC_CREATE | BindingFlags.BIDIRECTIONAL
+        );
 
         ratio_bind = lock_changes.bind_property (
             "active", selected_item, "size-locked",
@@ -280,11 +284,13 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
 
         rotation_bind = rotation.bind_property (
             "value", selected_item, "rotation",
-            BindingFlags.SYNC_CREATE | BindingFlags.BIDIRECTIONAL,
+            BindingFlags.BIDIRECTIONAL,
             (binding, srcval, ref targetval) => {
                 double src = (double) srcval;
                 targetval.set_double (src);
                 Utils.AffineTransform.set_rotation (selected_item, src);
+                // Update the X & Y values in the state manager.
+                canvas.window.event_bus.reset_state_coords (selected_item);
                 return true;
             });
 
@@ -320,38 +326,6 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
             return;
         }
 
-        window.event_bus.item_value_changed ();
-        on_item_coord_changed ();
-    }
-
-    // We need to fetch new X and Y values to update the fields.
-    private void on_item_coord_changed () {
-        var position = Utils.AffineTransform.get_position (selected_item);
-
-        if (position["x"] != x.value) {
-            // Prevents X AffineTransform callback loop.
-            x.notify["value"].disconnect (x_notify_value);
-            x.value = position["x"];
-            x.notify["value"].connect (x_notify_value);
-        }
-
-        if (position["y"] != y.value) {
-            // Prevents Y AffineTransform callback loop.
-            y.notify["value"].disconnect (y_notify_value);
-            y.value = position["y"];
-            y.notify["value"].connect (y_notify_value);
-        }
-
-        window.event_bus.file_edited ();
-    }
-
-    public void x_notify_value () {
-        Utils.AffineTransform.set_position (selected_item, x.value);
-        window.event_bus.item_value_changed ();
-    }
-
-    public void y_notify_value () {
-        Utils.AffineTransform.set_position (selected_item, null, y.value);
         window.event_bus.item_value_changed ();
     }
 

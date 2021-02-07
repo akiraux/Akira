@@ -60,10 +60,18 @@ public class Akira.Lib.Managers.GhostBoundsManager : Object {
 
     public GhostBoundsManager (Models.CanvasItem new_item) {
         original_item = new_item;
+
         item = new Goo.CanvasRect (null, 0, 0, 1, 1, "line-width", 0, null);
         item.visibility = Goo.CanvasItemVisibility.HIDDEN;
         item.set ("parent", original_item.canvas.get_root_item ());
         item.can_focus = false;
+
+        // Update the ghost item to get the proper initial coordinates.
+        update ();
+
+        // Fetch the CanvasBounds to get the proper corodiantes for the Transform Panel.
+        Goo.CanvasBounds bounds;
+        item.get_bounds (out bounds);
     }
 
     /*
@@ -120,12 +128,5 @@ public class Akira.Lib.Managers.GhostBoundsManager : Object {
 
         ghost.remove ();
         ghost = null;
-    }
-
-    public Cairo.Matrix get_transform () {
-        Cairo.Matrix matrix;
-        item.get_transform (out matrix);
-
-        return matrix;
     }
 }

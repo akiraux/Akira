@@ -28,54 +28,8 @@ public class Akira.Utils.AffineTransform : Object {
     private const int MIN_POS = 10;
     private const double ROTATION_FIXED_STEP = 15.0;
 
-    public static double temp_rotation = 0.0;
-    public static double prev_rotation_difference = 0.0;
-
-    public static HashTable<string, double?> get_position (CanvasItem item) {
-        HashTable<string, double?> array = new HashTable<string, double?> (str_hash, str_equal);
-        double item_x = item.bounds_manager.x1;
-        double item_y = item.bounds_manager.y1;
-
-        if (item.artboard != null) {
-            item_x -= item.artboard.bounds.x1;
-            item_y -= item.artboard.bounds.y1 + item.artboard.get_label_height ();
-        }
-
-        array.insert ("x", item_x);
-        array.insert ("y", item_y);
-        return array;
-    }
-
-    public static void set_position (CanvasItem item, double? x = null, double? y = null) {
-        var diff_x = 0.0;
-        var diff_y = 0.0;
-
-        if (item.artboard != null) {
-            // Account for the different between the current position and the
-            // the item's bounds.
-            diff_x = item.bounds_manager.x1 - item.artboard.bounds.x1 - item.relative_x;
-            diff_y = item.bounds_manager.y1 - item.artboard.bounds.y1
-                     - item.artboard.get_label_height () - item.relative_y;
-
-            item.relative_x = x != null ? x - diff_x : item.relative_x;
-            item.relative_y = y != null ? y - diff_y : item.relative_y;
-            return;
-        }
-
-        Cairo.Matrix matrix;
-        item.get_transform (out matrix);
-
-        // Account for the item rotation and get the difference between
-        // its bounds and matrix coordinates.
-        diff_x = item.bounds_manager.x1 - matrix.x0;
-        diff_y = item.bounds_manager.y1 - matrix.y0;
-
-        matrix.x0 = x != null ? x - diff_x : matrix.x0;
-        matrix.y0 = y != null ? y - diff_y : matrix.y0;
-
-        item.set_transform (matrix);
-        item.bounds_manager.update ();
-    }
+    private static double temp_rotation = 0.0;
+    private static double prev_rotation_difference = 0.0;
 
     /**
      * Move the item based on the mouse click and drag event.
@@ -87,6 +41,7 @@ public class Akira.Utils.AffineTransform : Object {
         ref double initial_event_x,
         ref double initial_event_y
     ) {
+        // Calculate the delta between the initial point and new mouse location.
         var delta_x = event_x - initial_event_x;
         var delta_y = event_y - initial_event_y;
 
@@ -121,6 +76,8 @@ public class Akira.Utils.AffineTransform : Object {
         double initial_height
     ) {
         var canvas = item.canvas;
+        // Convert the coordinates from the canvas to the item so we know the real
+        // values even if the item is rotated.
         canvas.convert_to_item_space (item, ref event_x, ref event_y);
         canvas.convert_to_item_space (item, ref initial_event_x, ref initial_event_y);
 
@@ -291,12 +248,15 @@ public class Akira.Utils.AffineTransform : Object {
                 break;
         }
 
-        // Update the initial coordiante to keep getting the correct delta.
+        // Update the initial coordinates to keep getting the correct delta.
         canvas.convert_from_item_space (item, ref event_x, ref event_y);
         initial_event_x = event_x;
         initial_event_y = event_y;
 
+        // Always translate the item by its axis in order to properly resize it
+        // even when rotated.
         item.move (inc_x, inc_y);
+        // Update the item size.
         set_size (item, inc_width, inc_height);
     }
 
@@ -447,7 +407,7 @@ public class Akira.Utils.AffineTransform : Object {
             do_rotation = false;
         }
 
-        // Revert the coordinates to the canvas and udpate their references.
+        // Revert the coordinates to the canvas and update their references.
         if (item.artboard != null) {
             canvas.convert_from_item_space (item.artboard, ref x, ref y);
             x += diff_x;
@@ -475,7 +435,7 @@ public class Akira.Utils.AffineTransform : Object {
             // to the current rotation, which might lead to a situation in which you
             // cannot "reset" item rotation to rounded values (0, 90, 180, ...) without
             // manually resetting the rotation input field in the properties panel
-            var current_rotation_int = ((int) GLib.Math.round (item.rotation));
+            var current_rotation_int = ((int) fix_size (item.rotation));
 
             rotation_amount = ROTATION_FIXED_STEP;
 
@@ -495,8 +455,9 @@ public class Akira.Utils.AffineTransform : Object {
         if (do_rotation) {
             // Cap new_rotation to the [0, 360] range.
             var new_rotation = GLib.Math.fmod (item.rotation + rotation, 360);
+
             // Round rotation in order to avoid sub degree issue.
-            set_rotation (item, GLib.Math.round (new_rotation));
+            set_rotation (item, fix_size (new_rotation));
         }
 
         // Reset rotation to prevent infinite rotation loops.

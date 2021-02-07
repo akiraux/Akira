@@ -63,23 +63,20 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
     }
 
     public void set_initial_coordinates (double event_x, double event_y) {
+        initial_event_x = event_x;
+        initial_event_y = event_y;
+
         if (selected_items.length () == 1) {
             var selected_item = selected_items.nth_data (0);
 
             delta_x_accumulator = 0.0;
             delta_y_accumulator = 0.0;
 
-            initial_event_x = event_x;
-            initial_event_y = event_y;
-
             initial_width = selected_item.get_coords ("width");
             initial_height = selected_item.get_coords ("height");
 
             return;
         }
-
-        initial_event_x = event_x;
-        initial_event_y = event_y;
 
         initial_width = select_bb.x2 - select_bb.x1;
         initial_height = select_bb.y2 - select_bb.y1;
@@ -98,7 +95,6 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
                     selected_item, event_x, event_y,
                     ref initial_event_x, ref initial_event_y
                 );
-                update_selected_items ();
                 break;
 
             case Managers.NobManager.Nob.ROTATE:
@@ -120,8 +116,11 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
                 break;
         }
 
-        // Notify the X & Y values in the transform panel.
-        canvas.window.event_bus.item_coord_changed ();
+        // Notify the X & Y values in the state manager.
+        canvas.window.event_bus.reset_state_coords (selected_item);
+
+        // Let the UI know that a redraw is necessary.
+        canvas.window.event_bus.item_value_changed ();
     }
 
     public void add_item_to_selection (Models.CanvasItem item) {
@@ -140,6 +139,10 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
 
         item.selected = true;
         item.update_size_ratio ();
+
+        // Initialize the state manager coordinates before adding the item to the selection.
+        canvas.window.event_bus.init_state_coords (item);
+
         selected_items.append (item);
 
         // Move focus back to the canvas.
@@ -286,28 +289,24 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         }
 
         var amount = (event.state & Gdk.ModifierType.SHIFT_MASK) > 0 ? 10 : 1;
+        double x = 0.0, y = 0.0;
 
-        selected_items.foreach ((item) => {
-            var position = Akira.Utils.AffineTransform.get_position (item);
+        switch (event.keyval) {
+            case Gdk.Key.Up:
+                y -= amount;
+                break;
+            case Gdk.Key.Down:
+                y += amount;
+                break;
+            case Gdk.Key.Right:
+                x += amount;
+                break;
+            case Gdk.Key.Left:
+                x -= amount;
+                break;
+        }
 
-            switch (event.keyval) {
-                case Gdk.Key.Up:
-                    Utils.AffineTransform.set_position (item, null, position["y"] - amount);
-                    break;
-                case Gdk.Key.Down:
-                    Utils.AffineTransform.set_position (item, null, position["y"] + amount);
-                    break;
-                case Gdk.Key.Right:
-                    Utils.AffineTransform.set_position (item, position["x"] + amount);
-                    break;
-                case Gdk.Key.Left:
-                    Utils.AffineTransform.set_position (item, position["x"] - amount);
-                    break;
-            }
-
-            canvas.window.event_bus.item_coord_changed ();
-            update_selected_items ();
-        });
+        window.event_bus.update_state_coords (x, y);
     }
 
     private void remove_item_from_selection (Lib.Models.CanvasItem item) {

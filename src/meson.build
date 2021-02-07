@@ -95,6 +95,8 @@ sources = files(
     'Lib/Models/CanvasArtboard.vala',
 
     'Lib/Selection/Nob.vala',
+
+    'StateManagers/CoordinatesManager.vala',
 )
 
 deps = [
