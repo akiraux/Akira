@@ -88,8 +88,8 @@ public class Akira.StateManagers.CoordinatesManager : Object {
 
         // Update the coordinates if the item is inside an Artboard.
         if (item.artboard != null) {
-            item_x -= item.artboard.bounds.x1;
-            item_y -= item.artboard.bounds.y1 + item.artboard.get_label_height ();
+            item_x = item.relative_x;
+            item_y = item.relative_y;
         }
 
         // Interrupt if no value has changed.
@@ -130,8 +130,8 @@ public class Akira.StateManagers.CoordinatesManager : Object {
         double item_y = item.bounds.y1 + half_border;
 
         if (item.artboard != null) {
-            item_x -= item.artboard.bounds.x1;
-            item_y -= item.artboard.bounds.y1 + item.artboard.get_label_height ();
+            item_x = item.relative_x;
+            item_y = item.relative_y;
         }
 
         // Interrupt if no value has changed.
