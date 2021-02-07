@@ -76,7 +76,7 @@ public class Akira.Utils.AffineTransform : Object {
         double initial_height
     ) {
         var canvas = item.canvas;
-        // Convert the coordiantes from the canvas to the item so we know the real
+        // Convert the coordinates from the canvas to the item so we know the real
         // values even if the item is rotated.
         canvas.convert_to_item_space (item, ref event_x, ref event_y);
         canvas.convert_to_item_space (item, ref initial_event_x, ref initial_event_y);
@@ -248,7 +248,7 @@ public class Akira.Utils.AffineTransform : Object {
                 break;
         }
 
-        // Update the initial coordiante to keep getting the correct delta.
+        // Update the initial coordinates to keep getting the correct delta.
         canvas.convert_from_item_space (item, ref event_x, ref event_y);
         initial_event_x = event_x;
         initial_event_y = event_y;
@@ -407,7 +407,7 @@ public class Akira.Utils.AffineTransform : Object {
             do_rotation = false;
         }
 
-        // Revert the coordinates to the canvas and udpate their references.
+        // Revert the coordinates to the canvas and update their references.
         if (item.artboard != null) {
             canvas.convert_from_item_space (item.artboard, ref x, ref y);
             x += diff_x;

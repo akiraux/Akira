@@ -66,8 +66,10 @@ public class Akira.StateManagers.CoordinatesManager : Object {
     }
 
     construct {
+        // Get the canvas on construct as we will need to use its methods.
         canvas = window.main_window.main_canvas.canvas;
 
+        // Initialize event listeners.
         window.event_bus.init_state_coords.connect (on_init_state_coords);
         window.event_bus.reset_state_coords.connect (on_reset_state_coords);
         window.event_bus.update_state_coords.connect (on_update_state_coords);
@@ -77,11 +79,9 @@ public class Akira.StateManagers.CoordinatesManager : Object {
      * Initialize the manager coordinates with the newly created or selected item.
      */
     private void on_init_state_coords (Lib.Models.CanvasItem item) {
-        double item_x = 0.0;
-        double item_y = 0.0;
-
-        // Get the item X & Y coordinates relative to the canvas.
-        canvas.convert_from_item_space (item, ref item_x, ref item_y);
+        // Get the item X & Y coordinates bounds in order to account for the item's rotation.
+        double item_x = item.bounds.x1;
+        double item_y = item.bounds.y1;
 
         // Update the coordinates if the item is inside an Artboard.
         if (item.artboard != null) {
@@ -117,11 +117,9 @@ public class Akira.StateManagers.CoordinatesManager : Object {
     private void on_reset_state_coords (Lib.Models.CanvasItem item) {
         do_update = false;
 
-        double item_x = 0.0;
-        double item_y = 0.0;
-
-        // Get the item X & Y coordinates relative to the canvas.
-        canvas.convert_from_item_space (item, ref item_x, ref item_y);
+        // Get the item X & Y coordinates bounds in order to account for the item's rotation.
+        double item_x = item.bounds.x1;
+        double item_y = item.bounds.y1;
 
         if (item.artboard != null) {
             item_x -= item.artboard.bounds.x1;
@@ -156,25 +154,45 @@ public class Akira.StateManagers.CoordinatesManager : Object {
                 continue;
             }
 
-            // Store the new coordinates in local variables so we can manipulate them.
-            double item_x = x;
-            double item_y = y;
-
             // Update the relative coordinates for items inside the canvas.
             // This will need to be removed after we rebuild the artboards.
             if (item.artboard != null) {
-                item.relative_x = item_x;
-                item.relative_y = item_y;
+                item.relative_x = x;
+                item.relative_y = y;
                 continue;
             }
 
-            // Convert the new coordinates to reflect the item's rotation.
-            canvas.convert_to_item_space (item, ref item_x, ref item_y);
+            // Store the new coordinates in local variables so we can manipulate them.
+            double inc_x = x;
+            double inc_y = y;
+
+            // Convert the new coordinates to reflect the item's space on the canvas.
+            canvas.convert_to_item_space (item, ref inc_x, ref inc_y);
+
+            // If the item is rotated, we need to calculate the delta between the
+            // new coordinates and item's bounds coordinates.
+            if (item.rotation != 0) {
+                // The item's bounds account also for the border width, but we shouldn't,
+                // so we need to account for half the border width since we're only dealing
+                // with a centered border. In the future, once borders can be inside or outside,
+                // we will need to update this condition.
+                double half_border = item.border_size > 0 ? item.border_size / 2 : 0;
+
+                double diff_x = item.bounds.x1 - half_border;
+                double diff_y = item.bounds.y1 - half_border;
+
+                // Convert the bounds to the item space to get the proper delta between
+                // the bounds coordinates and the rotation X & Y coordinates.
+                canvas.convert_to_item_space (item, ref diff_x, ref diff_y);
+
+                inc_x -= diff_x;
+                inc_y -= diff_y;
+            }
 
             // Move the item with the new coordinates.
-            item.translate (item_x, item_y);
+            item.translate (inc_x, inc_y);
 
-            // Update the bounds of the ghost item.
+            //  // Update the bounds of the ghost item.
             item.bounds_manager.update ();
         }
 
