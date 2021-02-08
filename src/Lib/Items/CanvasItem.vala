@@ -80,4 +80,29 @@ public interface Akira.Lib.Items.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasIt
             }
         }
     }
+
+    /**
+     * Helper method to get and set the opacity of the item, only if the item
+     * is using the Opacity component.
+     */
+    public double opacity {
+        get {
+            Component? opacity_c = this.get_component (typeof (Components.Opacity));
+
+            if (opacity_c != null) {
+                return ((Components.Opacity) opacity_c).opacity;
+            }
+
+            // If the item doesn't have a global Opacity controller (e.g. Artboards)
+            // return 0 so the slider in the Transform Panel can be reset.
+            return 0.0;
+        }
+        set {
+            Component? opacity_c = this.get_component (typeof (Components.Opacity));
+
+            if (opacity_c != null) {
+                ((Components.Opacity) opacity_c).opacity = value;
+            }
+        }
+    }
 }

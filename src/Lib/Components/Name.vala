@@ -27,6 +27,7 @@ public class Akira.Lib.Components.Name : Component {
     public string name { get; set construct; }
 
     public Name (Lib.Items.CanvasItem item) {
+        this.item = item;
         GLib.Type item_type = item.type ();
         string[] type_slug_tokens = item_type.to_string ().split ("_");
         string type_slug = type_slug_tokens [type_slug_tokens.length - 1];

@@ -71,9 +71,7 @@ public class Akira.Lib.Components.Transform : Component {
         }
     }
 
-    public Transform (Lib.Items.CanvasItem item) {
-        this.item = item;
-    }
+    public Transform () {}
 
     /**
      * The item's bounds account also for the border width, but we shouldn't,

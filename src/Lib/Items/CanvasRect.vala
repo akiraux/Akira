@@ -56,7 +56,11 @@ public class Akira.Lib.Items.CanvasRect : Goo.CanvasRect, Akira.Lib.Items.Canvas
 
         // Add all the components that this item uses.
         components.add (new Components.Type (typeof (CanvasRect)));
+        // Only the Name component needs the class to be passed on construct.
+        // All the other components after this will inherit the class from the
+        // main Component.
         components.add (new Name (this));
-        components.add (new Transform (this));
+        components.add (new Transform ());
+        components.add (new Opacity ());
     }
 }
