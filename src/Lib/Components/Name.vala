@@ -19,7 +19,10 @@
  * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
  */
 
- public class Akira.Lib.Components.Name : Component {
+/**
+ * Name component to handle generating an ID and a unique name on creation.
+ */
+public class Akira.Lib.Components.Name : Component {
     public string id { get; set construct; }
     public string name { get; set construct; }
 
@@ -32,6 +35,7 @@
         // of items with the same item type in the same artboard.
         int count = 0;
         var items = ((Akira.Lib.Canvas) item.canvas).window.items_manager.free_items;
+        // TEMPORARILY DISABLED.
         //  var items = item.artboard != null ? item.artboard.items : item.canvas.window.items_manager.free_items;
         //  if (item is Lib.Items.CanvasArtboard) {
         //      items = item.canvas.window.items_manager.artboards;
@@ -47,6 +51,9 @@
         this.name = this.id;
     }
 
+    /**
+     * Helper method to capitalize the first letter of the item's name.
+     */
     private static string capitalize (string s) {
         string back = s;
         if (s.get_char (0).islower ()) {

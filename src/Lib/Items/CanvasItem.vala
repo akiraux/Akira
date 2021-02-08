@@ -31,7 +31,7 @@ public interface Akira.Lib.Items.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasIt
     public abstract Gee.ArrayList<Component> components { get; set; }
 
     /**
-     *
+     * Find the component attached to the item by its GLib.Type.
      */
     private Component? get_component (GLib.Type type) {
         foreach (Component comp in components) {
@@ -43,6 +43,10 @@ public interface Akira.Lib.Items.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasIt
         return null;
     }
 
+    /**
+     * Helper method to return the GLib.Type of a specific component,
+     * only if the item is actually using that component.
+     */
     public GLib.Type? type () {
         Component? type_c = this.get_component (typeof (Components.Type));
 
@@ -53,6 +57,10 @@ public interface Akira.Lib.Items.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasIt
         return null;
     }
 
+    /**
+     * Helper method to get and set the name of the item, only if the item
+     * is using the Name component.
+     */
     public string name {
         get {
             Component? name_c = this.get_component (typeof (Components.Name));
@@ -61,6 +69,7 @@ public interface Akira.Lib.Items.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasIt
                 return ((Components.Name) name_c).name;
             }
 
+            // Return a generic string to avoid empty names.
             return _("Item");
         }
         set {

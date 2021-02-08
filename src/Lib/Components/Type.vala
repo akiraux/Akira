@@ -19,6 +19,9 @@
  * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
  */
 
+/**
+ * Type component to keep track of the item type. E.g.: CanvasRect, CanvasEllipse, etc.
+ */
 public class Akira.Lib.Components.Type : Component {
     public GLib.Type item_type { get; set construct; }
 

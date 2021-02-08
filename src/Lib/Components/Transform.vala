@@ -19,6 +19,9 @@
  * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
  */
 
+/**
+ * Transform component to keep track of the item's initial coordinates.
+ */
 public class Akira.Lib.Components.Transform : Component {
     private double? _x = null;
     public double x {
@@ -27,12 +30,13 @@ public class Akira.Lib.Components.Transform : Component {
                 return _x;
             }
 
-            //  double item_x = item.bounds.x1 + get_border ();
+            // double item_x = item.bounds.x1 + get_border ();
             double item_x = item.bounds.x1;
 
-            //  if (item.artboard != null) {
-            //      item_x -= item.artboard.bounds.x1;
-            //  }
+            // if (item.artboard != null) {
+            //     double temp_y = 0.0;
+            //     item.canvas.convert_to_item_space (item.artboard, ref item_x, ref temp_y);
+            // }
 
             _x = item_x;
 
@@ -50,12 +54,13 @@ public class Akira.Lib.Components.Transform : Component {
                 return _y;
             }
 
-            //  double item_y = item.bounds.y1 + get_border ();
+            // double item_y = item.bounds.y1 + get_border ();
             double item_y = item.bounds.y1;
 
-            //  if (item.artboard != null) {
-            //      item_y -= item.artboard.bounds.y1 + item.artboard.get_label_height ();
-            //  }
+            // if (item.artboard != null) {
+            //     double temp_x = 0.0;
+            //     item.canvas.convert_to_item_space (item.artboard, ref temp_x, ref item_y);
+            // }
 
             _y = item_y;
 
@@ -76,7 +81,7 @@ public class Akira.Lib.Components.Transform : Component {
      * with a centered border. In the future, once borders can be inside or outside,
      * we will need to update this condition.
      */
-    //  private double get_border () {
-    //      return item.border.size > 0 ? item.border.size / 2 : 0;
-    //  }
+    // private double get_border () {
+    //     return item.border.size > 0 ? item.border.size / 2 : 0;
+    // }
 }

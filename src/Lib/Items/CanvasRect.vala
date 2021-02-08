@@ -21,6 +21,9 @@
 
 using Akira.Lib.Components;
 
+/**
+ * Generate a simple Rectangle.
+ */
 public class Akira.Lib.Items.CanvasRect : Goo.CanvasRect, Akira.Lib.Items.CanvasItem {
     public Gee.ArrayList<Component> components { get; set; }
 
