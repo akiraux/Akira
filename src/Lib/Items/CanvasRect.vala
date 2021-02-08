@@ -62,5 +62,6 @@ public class Akira.Lib.Items.CanvasRect : Goo.CanvasRect, Akira.Lib.Items.Canvas
         components.add (new Name (this));
         components.add (new Transform ());
         components.add (new Opacity ());
+        components.add (new Rotation ());
     }
 }

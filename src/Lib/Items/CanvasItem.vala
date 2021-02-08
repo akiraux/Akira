@@ -93,7 +93,7 @@ public interface Akira.Lib.Items.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasIt
                 return ((Components.Opacity) opacity_c).opacity;
             }
 
-            // If the item doesn't have a global Opacity controller (e.g. Artboards)
+            // If the item doesn't have an Opacity component (e.g. Artboards)
             // return 0 so the slider in the Transform Panel can be reset.
             return 0.0;
         }
@@ -102,6 +102,31 @@ public interface Akira.Lib.Items.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasIt
 
             if (opacity_c != null) {
                 ((Components.Opacity) opacity_c).opacity = value;
+            }
+        }
+    }
+
+    /**
+     * Helper method to get and set the rotation of the item, only if the item
+     * is using the Rotation component.
+     */
+    public double rotation {
+        get {
+            Component? rotation_c = this.get_component (typeof (Components.Rotation));
+
+            if (rotation_c != null) {
+                return ((Components.Rotation) rotation_c).rotation;
+            }
+
+            // If the item doesn't have a Rotation component (e.g. Artboards)
+            // return 0 so the slider in the Transform Panel can be reset.
+            return 0.0;
+        }
+        set {
+            Component? rotation_c = this.get_component (typeof (Components.Rotation));
+
+            if (rotation_c != null) {
+                ((Components.Rotation) rotation_c).rotation = value;
             }
         }
     }
