@@ -21,10 +21,19 @@
 
 using Akira.Lib.Components;
 
+/**
+ * This is the base interface other items will need to extend in order to be created.
+ * This interface shouldn't have any abstract attributes other than the components.
+ * We use components instead of inheritance to keep our items modular and avoid useless
+ * attributes repetitions.
+ */
 public interface Akira.Lib.Items.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasItem {
     public abstract Gee.ArrayList<Component> components { get; set; }
 
-    public Component? get_component (Type type) {
+    /**
+     *
+     */
+    private Component? get_component (GLib.Type type) {
         foreach (Component comp in components) {
             if (comp.get_type () == type) {
                 return comp;
@@ -32,5 +41,34 @@ public interface Akira.Lib.Items.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasIt
         }
 
         return null;
+    }
+
+    public GLib.Type? type () {
+        Component? type_c = this.get_component (typeof (Components.Type));
+
+        if (type_c != null) {
+            return ((Components.Type) type_c).item_type;
+        }
+
+        return null;
+    }
+
+    public string name {
+        get {
+            Component? name_c = this.get_component (typeof (Components.Name));
+
+            if (name_c != null) {
+                return ((Components.Name) name_c).name;
+            }
+
+            return _("Item");
+        }
+        set {
+            Component? name_c = this.get_component (typeof (Components.Name));
+
+            if (name_c != null) {
+                ((Components.Name) name_c).name = value;
+            }
+        }
     }
 }

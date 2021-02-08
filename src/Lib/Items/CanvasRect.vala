@@ -24,8 +24,6 @@ using Akira.Lib.Components;
 public class Akira.Lib.Items.CanvasRect : Goo.CanvasRect, Akira.Lib.Items.CanvasItem {
     public Gee.ArrayList<Component> components { get; set; }
 
-    public Transform transform;
-
     public CanvasRect (
         double _x,
         double _y,
@@ -54,10 +52,8 @@ public class Akira.Lib.Items.CanvasRect : Goo.CanvasRect, Akira.Lib.Items.Canvas
         components = new Gee.ArrayList<Component> ();
 
         // Add all the components that this item uses.
-        transform = new Transform (this);
-        components.add (transform);
-
-        transform.x = x;
-        transform.y = y;
+        components.add (new Components.Type (typeof (CanvasRect)));
+        components.add (new Name (this));
+        components.add (new Transform (this));
     }
 }

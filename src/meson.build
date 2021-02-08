@@ -80,7 +80,9 @@ sources = files(
     'Lib/Canvas.vala',
 
     'Lib/Components/Component.vala',
+    'Lib/Components/Name.vala',
     'Lib/Components/Transform.vala',
+    'Lib/Components/Type.vala',
 
     'Lib/Items/CanvasItem.vala',
     'Lib/Items/CanvasRect.vala',
