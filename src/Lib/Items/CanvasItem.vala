@@ -82,6 +82,40 @@ public interface Akira.Lib.Items.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasIt
     }
 
     /**
+     * Helper method to get and set the item's width. We do it this way because
+     * it's faster than type casting each item to get the property from the
+     * object class (e.g. CanvasRect, CanvasEllipse, etc.)
+     */
+    public double width {
+        get {
+            double item_width = 0.0;
+            get ("width", out item_width);
+
+            return item_width;
+        }
+        set {
+            set ("width", value);
+        }
+    }
+
+    /**
+     * Helper method to get and set the item's height. We do it this way because
+     * it's faster than type casting each item to get the property from the
+     * object class (e.g. CanvasRect, CanvasEllipse, etc.)
+     */
+    public double height {
+        get {
+            double item_height = 0.0;
+            get ("height", out item_height);
+
+            return item_height;
+        }
+        set {
+            set ("height", value);
+        }
+    }
+
+    /**
      * Helper method to get and set the opacity of the item, only if the item
      * is using the Opacity component.
      */
