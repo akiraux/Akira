@@ -26,6 +26,7 @@ using Akira.Lib.Components;
  */
 public class Akira.Lib.Items.CanvasRect : Goo.CanvasRect, Akira.Lib.Items.CanvasItem {
     public Gee.ArrayList<Component> components { get; set; }
+    private Gdk.RGBA init_color { get; set; }
 
     public CanvasRect (
         double _x,
@@ -49,6 +50,9 @@ public class Akira.Lib.Items.CanvasRect : Goo.CanvasRect, Akira.Lib.Items.Canvas
         height = 1;
         radius_x = _radius_x;
         radius_y = _radius_y;
+
+        // Set custom attributes.
+        init_color = _fill_color;
     }
 
     construct {
@@ -63,5 +67,6 @@ public class Akira.Lib.Items.CanvasRect : Goo.CanvasRect, Akira.Lib.Items.Canvas
         components.add (new Transform ());
         components.add (new Opacity ());
         components.add (new Rotation ());
+        components.add (new Fills (init_color));
     }
 }
