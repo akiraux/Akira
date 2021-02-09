@@ -87,6 +87,7 @@ sources = files(
     'Lib/Components/Name.vala',
     'Lib/Components/Opacity.vala',
     'Lib/Components/Rotation.vala',
+    'Lib/Components/Size.vala',
     'Lib/Components/Transform.vala',
     'Lib/Components/Type.vala',
 

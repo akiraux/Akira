@@ -72,7 +72,7 @@ public class Akira.Lib.Components.Fill : Component {
     /**
      * Get the new hexadecimal string defined by the user and update the fill color.
      */
-    // private void set_hex (string new_hex) {
+    // public void set_hex (string new_hex) {
     //     // Interrupt if the value didn't change.
     //     if (new_hex == hex) {
     //         return;

@@ -180,4 +180,27 @@ public interface Akira.Lib.Items.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasIt
             return this.get_component (typeof (Components.Borders)) != null;
         }
     }
+
+    /**
+     * Helper method to get and set the locked size of the item, only if the item
+     * is using the Size component.
+     */
+    public bool? size_locked {
+        get {
+            Component? size = this.get_component (typeof (Components.Size));
+
+            if (size != null) {
+                return ((Components.Size) size).locked;
+            }
+
+            return null;
+        }
+        set {
+            Component? size = this.get_component (typeof (Components.Size));
+
+            if (size != null) {
+                ((Components.Size) size).locked = value;
+            }
+        }
+    }
 }
