@@ -26,16 +26,15 @@ using Akira.Lib.Components;
  */
 public class Akira.Lib.Items.CanvasRect : Goo.CanvasRect, Akira.Lib.Items.CanvasItem {
     public Gee.ArrayList<Component> components { get; set; }
-    private Gdk.RGBA init_color { get; set; }
 
     public CanvasRect (
         double _x,
         double _y,
         double _radius_x,
         double _radius_y,
-        int _border_size,
-        Gdk.RGBA _border_color,
-        Gdk.RGBA _fill_color,
+        int border_size,
+        Gdk.RGBA border_color,
+        Gdk.RGBA fill_color,
         Goo.CanvasItem? _parent,
         Models.CanvasArtboard? _artboard,
         bool _loaded
@@ -51,14 +50,8 @@ public class Akira.Lib.Items.CanvasRect : Goo.CanvasRect, Akira.Lib.Items.Canvas
         radius_x = _radius_x;
         radius_y = _radius_y;
 
-        // Set custom attributes.
-        init_color = _fill_color;
-    }
-
-    construct {
-        components = new Gee.ArrayList<Component> ();
-
         // Add all the components that this item uses.
+        components = new Gee.ArrayList<Component> ();
         components.add (new Components.Type (typeof (CanvasRect)));
         // Only the Name component needs the class to be passed on construct.
         // All the other components after this will inherit the class from the
@@ -67,6 +60,7 @@ public class Akira.Lib.Items.CanvasRect : Goo.CanvasRect, Akira.Lib.Items.Canvas
         components.add (new Transform ());
         components.add (new Opacity ());
         components.add (new Rotation ());
-        components.add (new Fills (init_color));
+        components.add (new Fills (fill_color));
+        components.add (new Borders (border_color, border_size));
     }
 }

@@ -20,27 +20,27 @@
  */
 
 /**
- * Fills component to keep track of the item's filling colors, which have to account
+ * Borders component to keep track of the item's border colors, which have to account
  * for the global opacity as well when rendering the item.
  */
-public class Akira.Lib.Components.Fills : Component {
-    // A list of all the fills the item might have.
-    public Gee.ArrayList<Fill> fills { get; set construct; }
+public class Akira.Lib.Components.Borders : Component {
+    // A list of all the borders the item might have.
+    public Gee.ArrayList<Border> borders { get; set construct; }
 
-    public Fills (Gdk.RGBA init_color) {
-        fills = new Gee.ArrayList<Fill> ();
+    public Borders (Gdk.RGBA init_color, int init_size) {
+        borders = new Gee.ArrayList<Border> ();
 
         int count = this.count ();
-        fills.@set (count, new Fill (init_color, count));
+        borders.@set (count, new Border (init_color, init_size, count));
     }
 
     public int count () {
-        return fills.size;
+        return borders.size;
     }
 
     public void reload () {
-        foreach (Fill fill in fills) {
-            fill.reload ();
+        foreach (Border border in borders) {
+            border.reload ();
         }
     }
 }

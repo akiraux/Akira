@@ -119,7 +119,7 @@ public interface Akira.Lib.Items.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasIt
      * Helper method to get and set the opacity of the item, only if the item
      * is using the Opacity component.
      */
-    public double opacity {
+    public double? opacity {
         get {
             Component? opacity_c = this.get_component (typeof (Components.Opacity));
 
@@ -127,9 +127,7 @@ public interface Akira.Lib.Items.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasIt
                 return ((Components.Opacity) opacity_c).opacity;
             }
 
-            // If the item doesn't have an Opacity component (e.g. Artboards)
-            // return 0 so the slider in the Transform Panel can be reset.
-            return 0.0;
+            return null;
         }
         set {
             Component? opacity_c = this.get_component (typeof (Components.Opacity));
@@ -144,7 +142,7 @@ public interface Akira.Lib.Items.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasIt
      * Helper method to get and set the rotation of the item, only if the item
      * is using the Rotation component.
      */
-    public double rotation {
+    public double? rotation {
         get {
             Component? rotation_c = this.get_component (typeof (Components.Rotation));
 
@@ -152,9 +150,7 @@ public interface Akira.Lib.Items.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasIt
                 return ((Components.Rotation) rotation_c).rotation;
             }
 
-            // If the item doesn't have a Rotation component (e.g. Artboards)
-            // return 0 so the slider in the Transform Panel can be reset.
-            return 0.0;
+            return null;
         }
         set {
             Component? rotation_c = this.get_component (typeof (Components.Rotation));
@@ -162,6 +158,26 @@ public interface Akira.Lib.Items.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasIt
             if (rotation_c != null) {
                 ((Components.Rotation) rotation_c).rotation = value;
             }
+        }
+    }
+
+    /**
+     * Helper method to know if the item implements fillings or not.
+     * Primarily used to disable the Fills area in the Transform Panel.
+     */
+    public bool has_fills {
+        get {
+            return this.get_component (typeof (Components.Fills)) != null;
+        }
+    }
+
+    /**
+     * Helper method to know if the item implements borders or not.
+     * Primarily used to disable the Borders area in the Transform Panel.
+     */
+    public bool has_borders {
+        get {
+            return this.get_component (typeof (Components.Borders)) != null;
         }
     }
 }
