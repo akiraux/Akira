@@ -27,6 +27,8 @@ using Akira.Lib.Components;
 public class Akira.Lib.Items.CanvasRect : Goo.CanvasRect, Akira.Lib.Items.CanvasItem {
     public Gee.ArrayList<Component> components { get; set; }
 
+    public bool is_loaded { get; set construct; }
+
     public CanvasRect (
         double _x,
         double _y,
@@ -37,7 +39,7 @@ public class Akira.Lib.Items.CanvasRect : Goo.CanvasRect, Akira.Lib.Items.Canvas
         Gdk.RGBA fill_color,
         Goo.CanvasItem? _parent,
         Models.CanvasArtboard? _artboard,
-        bool _loaded
+        bool _is_loaded
     ) {
         parent = _artboard != null ? _artboard : _parent;
         canvas = parent.get_canvas () as Akira.Lib.Canvas;
@@ -45,10 +47,8 @@ public class Akira.Lib.Items.CanvasRect : Goo.CanvasRect, Akira.Lib.Items.Canvas
         // Create the rectangle.
         x = _x;
         y = _y;
-        width = 1;
-        height = 1;
-        radius_x = _radius_x;
-        radius_y = _radius_y;
+        width = height = 1;
+        radius_x = radius_y = 0.0;
 
         // Add all the components that this item uses.
         components = new Gee.ArrayList<Component> ();
@@ -63,5 +63,10 @@ public class Akira.Lib.Items.CanvasRect : Goo.CanvasRect, Akira.Lib.Items.Canvas
         components.add (new Fills (fill_color));
         components.add (new Borders (border_color, border_size));
         components.add (new Size ());
+        components.add (new Flipped ());
+        components.add (new BorderRadius ());
+
+        // Add extra attributes.
+        is_loaded = _is_loaded;
     }
 }

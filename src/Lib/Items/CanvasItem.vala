@@ -30,6 +30,9 @@ using Akira.Lib.Components;
 public interface Akira.Lib.Items.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasItem {
     public abstract Gee.ArrayList<Component> components { get; set; }
 
+    // Check if an item was created or it was loaded for ordering purpose.
+    public abstract bool is_loaded { get; set construct; }
+
     /**
      * Find the component attached to the item by its GLib.Type.
      */
@@ -55,6 +58,16 @@ public interface Akira.Lib.Items.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasIt
         }
 
         return null;
+    }
+
+    /**
+     * Helper method to get item icon based on the type.
+     */
+    public string icon {
+        get {
+            Component? type_c = this.get_component (typeof (Components.Type));
+            return ((Components.Type) type_c).icon;
+        }
     }
 
     /**
@@ -201,6 +214,114 @@ public interface Akira.Lib.Items.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasIt
             if (size != null) {
                 ((Components.Size) size).locked = value;
             }
+        }
+    }
+
+    /**
+     * Helper method to get and set the horizontal mirroring of the item, only if the item
+     * is using the Flipped component.
+     */
+    public bool? flipped_h {
+        get {
+            Component? flipped = this.get_component (typeof (Components.Flipped));
+
+            if (flipped != null) {
+                return ((Components.Flipped) flipped).horizontal;
+            }
+
+            return null;
+        }
+        set {
+            Component? flipped = this.get_component (typeof (Components.Flipped));
+
+            if (flipped != null) {
+                ((Components.Flipped) flipped).horizontal = value;
+            }
+        }
+    }
+
+    /**
+     * Helper method to get and set the vertical mirroring of the item, only if the item
+     * is using the Flipped component.
+     */
+    public bool? flipped_v {
+        get {
+            Component? flipped = this.get_component (typeof (Components.Flipped));
+
+            if (flipped != null) {
+                return ((Components.Flipped) flipped).vertical;
+            }
+
+            return null;
+        }
+        set {
+            Component? flipped = this.get_component (typeof (Components.Flipped));
+
+            if (flipped != null) {
+                ((Components.Flipped) flipped).vertical = value;
+            }
+        }
+    }
+
+    /**
+     * Helper method to know if the item implements the border radius or not.
+     * Primarily used to disable the Border Radius area in the Transform Panel.
+     */
+     public bool has_border_radius {
+        get {
+            return this.get_component (typeof (Components.BorderRadius)) != null;
+        }
+    }
+
+    /**
+     * Set and get the boolean attribute to control the uniformity of the border radius.
+     * E.g.: if both the X & Y radii should be identical.
+     */
+    public bool border_radius_uniform {
+        get {
+            Component? border_radius = this.get_component (typeof (Components.BorderRadius));
+            return ((Components.BorderRadius) border_radius).uniform;
+        }
+        set {
+            Component? border_radius = this.get_component (typeof (Components.BorderRadius));
+            ((Components.BorderRadius) border_radius).uniform = value;
+        }
+    }
+
+    /**
+     * Set and get the boolean attribute to control the autoscaling of the border radius.
+     * E.g.: if the X & Y radii should increase when the item is enlarged.
+     */
+    public bool border_radius_autoscale {
+        get {
+            Component? border_radius = this.get_component (typeof (Components.BorderRadius));
+            return ((Components.BorderRadius) border_radius).autoscale;
+        }
+        set {
+            Component? border_radius = this.get_component (typeof (Components.BorderRadius));
+            ((Components.BorderRadius) border_radius).autoscale = value;
+        }
+    }
+
+    public double border_radius_x {
+        get {
+            Component? border_radius = this.get_component (typeof (Components.BorderRadius));
+            return ((Components.BorderRadius) border_radius).x;
+        }
+        set {
+            Component? border_radius = this.get_component (typeof (Components.BorderRadius));
+            ((Components.BorderRadius) border_radius).x = value;
+        }
+    }
+
+    public double border_radius_y {
+        get {
+            Component? border_radius = this.get_component (typeof (Components.BorderRadius));
+            return ((Components.BorderRadius) border_radius).y;
+        }
+        set {
+            Component? border_radius = this.get_component (typeof (Components.BorderRadius));
+            ((Components.BorderRadius) border_radius).y = value;
         }
     }
 }

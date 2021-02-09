@@ -20,19 +20,14 @@
  */
 
 /**
- * Type component to keep track of the item type. E.g.: CanvasRect, CanvasEllipse, etc.
+ * Flipped component to handle the flipped (mirrored) state of an item.
  */
-public class Akira.Lib.Components.Type : Component {
-    public GLib.Type item_type { get; set construct; }
-    public string icon { get; set construct; }
+public class Akira.Lib.Components.Flipped : Component {
+    public bool horizontal { get; set construct; }
+    public bool vertical { get; set construct; }
 
-    public Type (GLib.Type type) {
-        this.item_type = type;
-
-        // Assign the proper icon for the layers panel.
-        // We can't use a switch () method here because the typeof () method is not supported.
-        if (type == typeof (Items.CanvasRect)) {
-            icon = "shape-rectangle-symbolic";
-        }
+    public Flipped () {
+        horizontal = false;
+        vertical = false;
     }
 }

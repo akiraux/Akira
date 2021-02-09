@@ -20,19 +20,27 @@
  */
 
 /**
- * Type component to keep track of the item type. E.g.: CanvasRect, CanvasEllipse, etc.
+ * BorderRadius component to handle the border radius of an item.
  */
-public class Akira.Lib.Components.Type : Component {
-    public GLib.Type item_type { get; set construct; }
-    public string icon { get; set construct; }
+public class Akira.Lib.Components.BorderRadius : Component {
+    public double x { get; set construct; }
+    public double y { get; set construct; }
 
-    public Type (GLib.Type type) {
-        this.item_type = type;
+    public bool uniform { get; set construct; }
+    public bool autoscale { get; set construct; }
 
-        // Assign the proper icon for the layers panel.
-        // We can't use a switch () method here because the typeof () method is not supported.
-        if (type == typeof (Items.CanvasRect)) {
-            icon = "shape-rectangle-symbolic";
+    public BorderRadius () {
+        x = y = 0.0;
+
+        uniform = true;
+        autoscale = false;
+    }
+
+    public void update () {
+        // We use the X value for both radii in case the radius is set to uniform.
+        if (uniform) {
+            item.set ("radius-x", x);
+            item.set ("radius-y", x);
         }
     }
 }
