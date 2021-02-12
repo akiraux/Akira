@@ -23,8 +23,8 @@
  * Size component to keep track of the item's size ratio attributes.
  */
 public class Akira.Lib.Components.Size : Component {
-    public bool locked { get; set construct; }
-    public double ratio { get; set construct; }
+    public bool locked { get; set; }
+    public double ratio { get; set; }
 
     public Size () {
         locked = false;
