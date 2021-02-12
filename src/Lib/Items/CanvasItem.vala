@@ -30,8 +30,11 @@ using Akira.Lib.Components;
 public interface Akira.Lib.Items.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasItem {
     public abstract Gee.ArrayList<Component> components { get; set; }
 
+    // Keep track of the parent artboard if the item belongs to one.
+    public abstract Items.CanvasArtboard? artboard { get; set; }
+
     // Check if an item was created or it was loaded for ordering purpose.
-    public abstract bool is_loaded { get; set construct; }
+    public abstract bool is_loaded { get; set; }
 
     /**
      * Find the component attached to the item by its GLib.Type.
