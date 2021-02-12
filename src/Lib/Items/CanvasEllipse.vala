@@ -22,7 +22,7 @@
 using Akira.Lib.Components;
 
 /**
- * Generate a simple Rectangle.
+ * Generate a simple Ellipse.
  */
 public class Akira.Lib.Items.CanvasEllipse : Goo.CanvasEllipse, Akira.Lib.Items.CanvasItem {
     public Gee.ArrayList<Component> components { get; set; }
@@ -34,8 +34,6 @@ public class Akira.Lib.Items.CanvasEllipse : Goo.CanvasEllipse, Akira.Lib.Items.
     public CanvasEllipse (
         double _center_x,
         double _center_y,
-        double _radius_x,
-        double _radius_y,
         int border_size,
         Gdk.RGBA border_color,
         Gdk.RGBA fill_color,

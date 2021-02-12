@@ -42,5 +42,9 @@ public class Akira.Lib.Components.Type : Component {
         if (type == typeof (Items.CanvasEllipse)) {
             icon = "shape-circle-symbolic";
         }
+
+        if (type == typeof (Items.CanvasText)) {
+            icon = "shape-text-symbolic";
+        }
     }
 }

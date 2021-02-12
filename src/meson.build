@@ -98,6 +98,7 @@ sources = files(
     'Lib/Items/CanvasEllipse.vala',
     'Lib/Items/CanvasItem.vala',
     'Lib/Items/CanvasRect.vala',
+    'Lib/Items/CanvasText.vala',
 
     'Lib/Managers/ExportManager.vala',
     'Lib/Managers/GhostBoundsManager.vala',
