@@ -23,16 +23,24 @@
  * Type component to keep track of the item type. E.g.: CanvasRect, CanvasEllipse, etc.
  */
 public class Akira.Lib.Components.Type : Component {
-    public GLib.Type item_type { get; set construct; }
-    public string icon { get; set construct; }
+    public GLib.Type item_type { get; set; }
+    public string? icon { get; set; }
 
     public Type (GLib.Type type) {
         this.item_type = type;
 
         // Assign the proper icon for the layers panel.
         // We can't use a switch () method here because the typeof () method is not supported.
+        if (type == typeof (Items.CanvasArtboard)) {
+            icon = null;
+        }
+
         if (type == typeof (Items.CanvasRect)) {
             icon = "shape-rectangle-symbolic";
+        }
+
+        if (type == typeof (Items.CanvasEllipse)) {
+            icon = "shape-circle-symbolic";
         }
     }
 }

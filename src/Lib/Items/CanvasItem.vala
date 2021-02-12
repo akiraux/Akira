@@ -64,9 +64,9 @@ public interface Akira.Lib.Items.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasIt
     }
 
     /**
-     * Helper method to get item icon based on the type.
+     * Helper method to get the item's icon based on the type.
      */
-    public string icon {
+    public string? icon {
         get {
             Component? type_c = this.get_component (typeof (Components.Type));
             return ((Components.Type) type_c).icon;

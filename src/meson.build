@@ -95,6 +95,7 @@ sources = files(
     'Lib/Components/Type.vala',
 
     'Lib/Items/CanvasArtboard.vala',
+    'Lib/Items/CanvasEllipse.vala',
     'Lib/Items/CanvasItem.vala',
     'Lib/Items/CanvasRect.vala',
 
