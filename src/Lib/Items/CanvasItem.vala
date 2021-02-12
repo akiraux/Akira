@@ -324,4 +324,34 @@ public interface Akira.Lib.Items.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasIt
             ((Components.BorderRadius) border_radius).y = value;
         }
     }
+
+    /**
+     * Set and get the boolean attribute to control the selected state of an item
+     * in the Layers panel.
+     */
+     public bool selected {
+        get {
+            Component? layer = this.get_component (typeof (Components.Layer));
+            return ((Components.Layer) layer).selected;
+        }
+        set {
+            Component? layer = this.get_component (typeof (Components.Layer));
+            ((Components.Layer) layer).selected = value;
+        }
+    }
+
+    /**
+     * Set and get the boolean attribute to control the locked state of an item
+     * in the Layers panel.
+     */
+     public bool locked {
+        get {
+            Component? layer = this.get_component (typeof (Components.Layer));
+            return ((Components.Layer) layer).locked;
+        }
+        set {
+            Component? layer = this.get_component (typeof (Components.Layer));
+            ((Components.Layer) layer).locked = value;
+        }
+    }
 }

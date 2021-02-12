@@ -30,8 +30,7 @@ public class Akira.Lib.Components.Transform : Component {
                 return _x;
             }
 
-            // double item_x = item.bounds.x1 + get_border ();
-            double item_x = item.bounds.x1;
+            double item_x = item.bounds.x1 + get_border ();
 
             // if (item.artboard != null) {
             //     double temp_y = 0.0;
@@ -54,8 +53,7 @@ public class Akira.Lib.Components.Transform : Component {
                 return _y;
             }
 
-            // double item_y = item.bounds.y1 + get_border ();
-            double item_y = item.bounds.y1;
+            double item_y = item.bounds.y1 + get_border ();
 
             // if (item.artboard != null) {
             //     double temp_x = 0.0;
@@ -79,7 +77,13 @@ public class Akira.Lib.Components.Transform : Component {
      * with a centered border. In the future, once borders can be inside or outside,
      * we will need to update this condition.
      */
-    // private double get_border () {
-    //     return item.border.size > 0 ? item.border.size / 2 : 0;
-    // }
+    private double get_border () {
+        if (!item.has_borders) {
+            return 0;
+        }
+
+        // Temporarily return the current line_width of the item
+        // since we only support 1 border at the time.
+        return item.line_width > 0 ? item.line_width / 2 : 0;
+    }
 }

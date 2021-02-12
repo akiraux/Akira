@@ -65,6 +65,7 @@ public class Akira.Lib.Items.CanvasRect : Goo.CanvasRect, Akira.Lib.Items.Canvas
         components.add (new Size ());
         components.add (new Flipped ());
         components.add (new BorderRadius ());
+        components.add (new Layer ());
 
         // Add extra attributes.
         is_loaded = _is_loaded;
