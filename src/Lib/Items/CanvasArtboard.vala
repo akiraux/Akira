@@ -19,17 +19,49 @@
  * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
  */
 
- using Akira.Lib.Components;
+using Akira.Lib.Components;
 
- /**
-  * Generate a the Artboard, which is based on a simple Rectangle.
-  */
- public class Akira.Lib.Items.CanvasArtboard : Goo.CanvasRect, Akira.Lib.Items.CanvasItem {
-    public Gee.ArrayList<Component> components { get; set; }
+/**
+ * Generate the Artboard, based on the CanvasGroup item, which is basically a rectangle.
+ */
+public class Akira.Lib.Items.CanvasArtboard : Goo.CanvasGroup, Akira.Lib.Items.CanvasItem {
+   public Gee.ArrayList<Component> components { get; set; }
 
-    public Items.CanvasArtboard? artboard { get; set; }
+   public Items.CanvasArtboard? artboard { get; set; }
 
-    public bool is_loaded { get; set; }
+   public bool is_loaded { get; set; }
 
-    public CanvasArtboard () {}
- }
+   public CanvasArtboard (double _x, double _y, Goo.CanvasItem? _parent) {
+      parent = _parent;
+      canvas = parent.get_canvas () as Akira.Lib.Canvas;
+      parent.add_child (this, -1);
+
+      // Artboards can't be nested.
+      artboard = null;
+
+      // Create the Artboard.
+      x = _x;
+      y = _y;
+      width = height = 1;
+
+      // Add all the components that this item uses.
+      components = new Gee.ArrayList<Component> ();
+      components.add (new Components.Type (typeof (CanvasArtboard)));
+      // Only the Name component needs the class to be passed on construct.
+      // All the other components after this will inherit the class from the
+      // main Component.
+      components.add (new Name (this));
+      components.add (new Transform ());
+      components.add (new Opacity ());
+      // Artboards have fills that can be edited, but they always start
+      // with a full white background.
+      var fill_color = Gdk.RGBA ();
+      fill_color.parse ("rgba (255, 255, 255, 1)");
+      components.add (new Fills (fill_color));
+      components.add (new Size ());
+      components.add (new Layer ());
+
+      // Add extra attributes.
+      is_loaded = _is_loaded;
+   }
+}
