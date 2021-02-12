@@ -25,7 +25,7 @@
  */
 public class Akira.Lib.Components.Fills : Component {
     // A list of all the fills the item might have.
-    public Gee.ArrayList<Fill> fills { get; set construct; }
+    public Gee.ArrayList<Fill> fills { get; set; }
 
     public Fills (Gdk.RGBA init_color) {
         fills = new Gee.ArrayList<Fill> ();

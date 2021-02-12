@@ -87,10 +87,10 @@ public class Akira.Lib.Items.CanvasImage : Goo.CanvasImage, Akira.Lib.Items.Canv
 
                 // Imported images should have their size ratio locked by default.
                 size_locked = true;
-                // ratio = width / height;
+                size_ratio = width / height;
             } catch (Error e) {
                 warning (e.message);
-                // canvas.window.event_bus.canvas_notification (e.message);
+                ((Lib.Canvas) canvas).window.event_bus.canvas_notification (e.message);
             }
         });
     }
@@ -124,7 +124,7 @@ public class Akira.Lib.Items.CanvasImage : Goo.CanvasImage, Akira.Lib.Items.Canv
                 }
             } catch (Error e) {
                 warning (e.message);
-                // canvas.window.event_bus.canvas_notification (e.message);
+                ((Lib.Canvas) canvas).window.event_bus.canvas_notification (e.message);
             }
         });
     }

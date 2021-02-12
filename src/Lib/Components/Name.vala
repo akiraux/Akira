@@ -23,8 +23,8 @@
  * Name component to handle generating an ID and a unique name on creation.
  */
 public class Akira.Lib.Components.Name : Component {
-    public string id { get; set construct; }
-    public string name { get; set construct; }
+    public string id { get; set; }
+    public string name { get; set; }
 
     public Name (Lib.Items.CanvasItem item) {
         this.item = item;
@@ -35,12 +35,16 @@ public class Akira.Lib.Components.Name : Component {
         // Make sure the initial ID is the current count of the total amount
         // of items with the same item type in the same artboard.
         int count = 0;
-        var items = ((Akira.Lib.Canvas) item.canvas).window.items_manager.free_items;
-        // TEMPORARILY DISABLED.
-        //  var items = item.artboard != null ? item.artboard.items : item.canvas.window.items_manager.free_items;
-        //  if (item is Lib.Items.CanvasArtboard) {
-        //      items = item.canvas.window.items_manager.artboards;
-        //  }
+        var items = ((Lib.Canvas) item.canvas).window.items_manager.free_items;
+
+        // TEMPORARILY DISABLED because we need to convert from Models.CanvasItem to Items.CanvasItem.
+        // if (item.artboard != null) {
+        //     items = item.artboard.items;
+        // }
+
+        if (item is Lib.Items.CanvasArtboard) {
+            items = ((Lib.Canvas) item.canvas).window.items_manager.artboards;
+        }
 
         foreach (var _item in items) {
             if (_item.item_type == item_type) {

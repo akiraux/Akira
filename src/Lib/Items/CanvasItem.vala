@@ -221,6 +221,40 @@ public interface Akira.Lib.Items.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasIt
     }
 
     /**
+     * Helper method to get and set the size ratio of the item, only if the item
+     * is using the Size component.
+     */
+    public double? size_ratio {
+        get {
+            Component? size = this.get_component (typeof (Components.Size));
+
+            if (size != null) {
+                return ((Components.Size) size).ratio;
+            }
+
+            return null;
+        }
+        set {
+            Component? size = this.get_component (typeof (Components.Size));
+
+            if (size != null) {
+                ((Components.Size) size).ratio = value;
+            }
+        }
+    }
+
+    /**
+     * Helper method to update the size ratio of an item.
+     */
+    public void update_ratio () {
+        Component? size = this.get_component (typeof (Components.Size));
+
+        if (size != null) {
+            ((Components.Size) size).ratio = width / height;
+        }
+    }
+
+    /**
      * Helper method to get and set the horizontal mirroring of the item, only if the item
      * is using the Flipped component.
      */

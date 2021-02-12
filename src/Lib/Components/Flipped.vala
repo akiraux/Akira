@@ -23,8 +23,8 @@
  * Flipped component to handle the flipped (mirrored) state of an item.
  */
 public class Akira.Lib.Components.Flipped : Component {
-    public bool horizontal { get; set construct; }
-    public bool vertical { get; set construct; }
+    public bool horizontal { get; set; }
+    public bool vertical { get; set; }
 
     public Flipped () {
         horizontal = false;

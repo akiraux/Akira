@@ -25,5 +25,5 @@ public class Akira.Lib.Components.Component : Object {
      * It doesn't do anything other than setting the CanvasItem during construct.
      * It might be removed in the future if deemed unnecessary.
      */
-    public unowned Lib.Items.CanvasItem item { get; construct set; }
+    public unowned Lib.Items.CanvasItem item { get; set; }
 }

@@ -30,9 +30,4 @@ public class Akira.Lib.Components.Size : Component {
         locked = false;
         ratio = 1.0;
     }
-
-    // Update the size ratio to respect the updated size.
-    public void update_ratio () {
-        ratio = item.width / item.height;
-    }
 }

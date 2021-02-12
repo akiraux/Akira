@@ -23,11 +23,11 @@
  * BorderRadius component to handle the border radius of an item.
  */
 public class Akira.Lib.Components.BorderRadius : Component {
-    public double x { get; set construct; }
-    public double y { get; set construct; }
+    public double x { get; set; }
+    public double y { get; set; }
 
-    public bool uniform { get; set construct; }
-    public bool autoscale { get; set construct; }
+    public bool uniform { get; set; }
+    public bool autoscale { get; set; }
 
     public BorderRadius () {
         x = y = 0.0;

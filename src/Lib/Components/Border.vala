@@ -25,9 +25,9 @@
 public class Akira.Lib.Components.Border : Component {
     // Since items can have multiple border colors, we need to keep track of each
     // with a unique identifier in order to properly update them.
-    public int id { get; set construct; }
+    public int id { get; set; }
 
-    public Gdk.RGBA color { get; set construct; }
+    public Gdk.RGBA color { get; set; }
 
     // Store the hexadecimal string version of the color (E.g.: #FF00CC)
     public string hex { get; set; }

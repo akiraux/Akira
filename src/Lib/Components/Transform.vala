@@ -32,10 +32,10 @@ public class Akira.Lib.Components.Transform : Component {
 
             double item_x = item.bounds.x1 + get_border ();
 
-            // if (item.artboard != null) {
-            //     double temp_y = 0.0;
-            //     item.canvas.convert_to_item_space (item.artboard, ref item_x, ref temp_y);
-            // }
+            if (item.artboard != null) {
+                double temp_y = 0.0;
+                item.canvas.convert_to_item_space (item.artboard, ref item_x, ref temp_y);
+            }
 
             _x = item_x;
 
@@ -55,10 +55,10 @@ public class Akira.Lib.Components.Transform : Component {
 
             double item_y = item.bounds.y1 + get_border ();
 
-            // if (item.artboard != null) {
-            //     double temp_x = 0.0;
-            //     item.canvas.convert_to_item_space (item.artboard, ref temp_x, ref item_y);
-            // }
+            if (item.artboard != null) {
+                double temp_x = 0.0;
+                item.canvas.convert_to_item_space (item.artboard, ref temp_x, ref item_y);
+            }
 
             _y = item_y;
 

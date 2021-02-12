@@ -24,7 +24,7 @@
  * for all fills and borders colors.
  */
 public class Akira.Lib.Components.Opacity : Component {
-    public double opacity { get; set construct; }
+    public double opacity { get; set; }
 
     public Opacity () {
         // Set opacity to 100% (fully visible) when the item is first created.

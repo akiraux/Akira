@@ -25,7 +25,7 @@
  */
 public class Akira.Lib.Components.Borders : Component {
     // A list of all the borders the item might have.
-    public Gee.ArrayList<Border> borders { get; set construct; }
+    public Gee.ArrayList<Border> borders { get; set; }
 
     public Borders (Gdk.RGBA init_color, int init_size) {
         borders = new Gee.ArrayList<Border> ();
