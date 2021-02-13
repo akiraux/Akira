@@ -109,13 +109,6 @@ sources = files(
     'Lib/Managers/NobManager.vala',
     'Lib/Managers/SelectedBoundManager.vala',
 
-    'Lib/Models/CanvasItem.vala',
-    'Lib/Models/CanvasRect.vala',
-    'Lib/Models/CanvasEllipse.vala',
-    'Lib/Models/CanvasText.vala',
-    'Lib/Models/CanvasImage.vala',
-    'Lib/Models/CanvasArtboard.vala',
-
     'Lib/Selection/Nob.vala',
 
     'StateManagers/CoordinatesManager.vala',
