@@ -25,7 +25,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
     // public Akira.Layouts.Partials.Artboard? artboard { get; construct set; }
     public Akira.Layouts.Partials.Layer? layer_group { get; construct set; }
     public string icon_name { get; construct; }
-    public Akira.Lib.Models.CanvasItem model { get; construct; }
+    public Akira.Lib.Items.CanvasItem model { get; construct; }
 
     private bool scroll_up = false;
     private bool scrolling = false;
@@ -76,7 +76,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 
     public Layer (
         Akira.Window window,
-        Akira.Lib.Models.CanvasItem model,
+        Akira.Lib.Items.CanvasItem model,
         Gtk.ListBox? list = null
     ) {
         Object (
@@ -117,7 +117,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
         entry.focus_in_event.connect (handle_focus_in);
         entry.focus_out_event.connect (update_on_leave);
 
-        icon = new Gtk.Image.from_icon_name (model.layer_icon, Gtk.IconSize.MENU);
+        icon = new Gtk.Image.from_icon_name (model.icon, Gtk.IconSize.MENU);
         icon.margin_start = icon_name != "folder-symbolic" ? 16 : 0;
         icon.margin_end = 10;
         icon.vexpand = true;
@@ -232,7 +232,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
         window.event_bus.hover_over_item.connect (on_hover_over_item);
     }
 
-    private void on_hover_over_item (Lib.Models.CanvasItem? item) {
+    private void on_hover_over_item (Lib.Items.CanvasItem? item) {
         if (item == model) {
             get_style_context ().add_class ("hovered");
             return;

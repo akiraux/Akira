@@ -53,8 +53,8 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         );
     }
 
-    private Lib.Models.CanvasItem? _selected_item;
-    public Lib.Models.CanvasItem? selected_item {
+    private Lib.Items.CanvasItem? _selected_item;
+    public Lib.Items.CanvasItem? selected_item {
         get {
             return _selected_item;
         } set {
@@ -78,11 +78,11 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
             y.enabled = has_item;
             height.enabled = has_item;
             width.enabled = has_item;
-            rotation.enabled = has_item && !(_selected_item is Lib.Models.CanvasArtboard);
-            hflip_button.sensitive = has_item && !(_selected_item is Lib.Models.CanvasArtboard);
-            vflip_button.sensitive = has_item && !(_selected_item is Lib.Models.CanvasArtboard);
-            opacity_entry.entry.sensitive = has_item && !(_selected_item is Lib.Models.CanvasArtboard);
-            scale.sensitive = has_item && !(_selected_item is Lib.Models.CanvasArtboard);
+            rotation.enabled = has_item && !(_selected_item is Lib.Items.CanvasArtboard);
+            hflip_button.sensitive = has_item && !(_selected_item is Lib.Items.CanvasArtboard);
+            vflip_button.sensitive = has_item && !(_selected_item is Lib.Items.CanvasArtboard);
+            opacity_entry.entry.sensitive = has_item && !(_selected_item is Lib.Items.CanvasArtboard);
+            scale.sensitive = has_item && !(_selected_item is Lib.Items.CanvasArtboard);
             lock_changes.sensitive = has_item;
         }
     }
@@ -181,7 +181,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         window.event_bus.selected_items_changed.connect (on_selected_items_changed);
     }
 
-    private void on_selected_items_changed (List<Lib.Models.CanvasItem> selected_items) {
+    private void on_selected_items_changed (List<Lib.Items.CanvasItem> selected_items) {
         if (selected_items.length () == 0) {
             selected_item = null;
             return;
@@ -199,7 +199,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         selected_item.notify["width"].disconnect (on_item_value_changed);
         selected_item.notify["height"].disconnect (on_item_value_changed);
         selected_item.notify["rotation"].disconnect (on_item_value_changed);
-        selected_item.notify["opacity"].disconnect (selected_item.reset_colors);
+        selected_item.notify["opacity"].disconnect (reload_colors);
 
         // Clear the bindings.
         x_bind.unbind ();
@@ -229,8 +229,8 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
     private void enable () {
         canvas = selected_item.canvas as Akira.Lib.Canvas;
 
-        width.value = selected_item.get_coords ("width");
-        height.value = selected_item.get_coords ("height");
+        width.value = selected_item.width;
+        height.value = selected_item.height;
         rotation.value = selected_item.rotation;
         opacity_adj.value = selected_item.opacity;
         lock_changes.active = selected_item.size_locked;
@@ -318,7 +318,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         selected_item.notify["width"].connect (on_item_value_changed);
         selected_item.notify["height"].connect (on_item_value_changed);
         selected_item.notify["rotation"].connect (on_item_value_changed);
-        selected_item.notify["opacity"].connect (selected_item.reset_colors);
+        selected_item.notify["opacity"].connect (reload_colors);
     }
 
     private void on_item_value_changed () {
@@ -329,12 +329,20 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         window.event_bus.item_value_changed ();
     }
 
+    /**
+     * Trigger the methods to reload all fills and borders.
+     */
+    private void reload_colors () {
+        selected_item.reload_fills ();
+        selected_item.reload_borders ();
+    }
+
     public void update_size_ratio () {
         // We can't divide by 0, let's avoid opening a black hole.
         if (height.value == 0) {
             return;
         }
-        selected_item.update_size_ratio ();
+        selected_item.update_ratio ();
     }
 
     private Gtk.Label group_title (string title) {

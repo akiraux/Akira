@@ -29,7 +29,7 @@ public class Akira.Lib.Managers.HoverManager : Object {
     private double initial_event_y;
     private Goo.CanvasItem hover_effect;
     private Lib.Managers.NobManager.Nob current_hovering_nob;
-    private Lib.Models.CanvasItem current_hover_item;
+    private Lib.Items.CanvasItem current_hover_item;
 
     public HoverManager (Akira.Lib.Canvas canvas) {
         Object (
@@ -63,11 +63,11 @@ public class Akira.Lib.Managers.HoverManager : Object {
             return;
         }
 
-        if (!(target is Models.CanvasItem)) {
+        if (!(target is Items.CanvasItem)) {
             return;
         }
 
-        var item = target as Models.CanvasItem;
+        var item = target as Items.CanvasItem;
 
         if (current_hover_item != null && item.id == current_hover_item.id) {
             // We already have the hover effect rendered correctly
@@ -87,7 +87,7 @@ public class Akira.Lib.Managers.HoverManager : Object {
         set_cursor_for_nob (Managers.NobManager.Nob.NONE);
     }
 
-    private void on_layer_hovered (Models.CanvasItem? item) {
+    private void on_layer_hovered (Items.CanvasItem? item) {
         if (item == null) {
             remove_hover_effect ();
             return;
@@ -97,13 +97,13 @@ public class Akira.Lib.Managers.HoverManager : Object {
         create_hover_effect (item);
     }
 
-    private void create_hover_effect (Models.CanvasItem? item) {
+    private void create_hover_effect (Items.CanvasItem? item) {
         if (item.locked || item.selected) {
             return;
         }
 
-        double width = item.get_coords ("width");
-        double height = item.get_coords ("height");
+        double width = item.width;
+        double height = item.height;
 
         hover_effect = new Goo.CanvasRect (
             null,
@@ -114,7 +114,8 @@ public class Akira.Lib.Managers.HoverManager : Object {
             null
         );
 
-        var transform = item.get_real_transform ();
+        Cairo.Matrix transform;
+        item.get_transform (out transform);
         hover_effect.set_transform (transform);
 
         hover_effect.set ("parent", canvas.get_root_item ());

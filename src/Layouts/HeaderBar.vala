@@ -22,7 +22,7 @@
 public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
     public weak Akira.Window window { get; construct; }
 
-    private Lib.Models.CanvasItem selected_item;
+    private Lib.Items.CanvasItem selected_item;
 
     public Akira.Partials.HeaderBarButton new_document;
     public Akira.Partials.HeaderBarButton save_file;
@@ -501,7 +501,7 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
         title = file_name.has_suffix (".akira") ? file_name.replace (".akira", "") : file_name;
     }
 
-    private void on_selected_items_changed (List<Lib.Models.CanvasItem> selected_items) {
+    private void on_selected_items_changed (List<Lib.Items.CanvasItem> selected_items) {
         if (selected_items.length () == 0) {
             selected_item = null;
             update_button_sensitivity ();
@@ -515,7 +515,7 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
     }
 
     private void update_button_sensitivity () {
-        var z_buttons_sensitive = selected_item != null && !(selected_item is Lib.Models.CanvasArtboard);
+        var z_buttons_sensitive = selected_item != null && !(selected_item is Lib.Items.CanvasArtboard);
 
         move_up.sensitive = z_buttons_sensitive;
         move_down.sensitive = z_buttons_sensitive;

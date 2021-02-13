@@ -49,7 +49,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
     public Gtk.Revealer revealer;
     public Gtk.ListBox container;
 
-    public Akira.Lib.Models.CanvasArtboard model { get; construct; }
+    public Akira.Lib.Items.CanvasArtboard model { get; construct; }
 
     // Drag and Drop properties.
     private Gtk.Revealer motion_revealer;
@@ -60,7 +60,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
         get { return _editing; } set { _editing = value; }
     }
 
-    public Artboard (Akira.Window window, Akira.Lib.Models.CanvasArtboard model) {
+    public Artboard (Akira.Window window, Akira.Lib.Items.CanvasArtboard model) {
         Object (
             window: window,
             model: model
@@ -236,7 +236,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
         container.bind_model (model.items, item => {
             // TODO: Differentiate between layer and artboard
             // based upon item "type" of some sort
-            var item_model = item as Akira.Lib.Models.CanvasItem;
+            var item_model = item as Akira.Lib.Items.CanvasItem;
             return new Akira.Layouts.Partials.Layer (window, item_model, container);
         });
 
@@ -246,7 +246,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
         window.event_bus.hover_over_item.connect (on_hover_over_item);
     }
 
-    private void on_hover_over_item (Lib.Models.CanvasItem? item) {
+    private void on_hover_over_item (Lib.Items.CanvasItem? item) {
         if (item == model) {
             get_style_context ().add_class ("hovered");
             return;

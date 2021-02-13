@@ -67,4 +67,14 @@ public class Akira.Lib.Items.CanvasArtboard : Goo.CanvasGroup, Akira.Lib.Items.C
       // Add extra attributes.
       is_loaded = _is_loaded;
    }
+
+   /**
+    * Helper method to determine if a click event happened inside an artboard.
+    */
+   public bool is_inside (double x, double y) {
+      return x <= bounds.x2
+          && x >= bounds.x1
+          && y >= bounds.y1
+          && y <= bounds.y2;
+  }
 }

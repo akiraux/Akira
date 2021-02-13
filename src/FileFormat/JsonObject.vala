@@ -21,13 +21,13 @@
  */
 
 public class Akira.FileFormat.JsonObject : GLib.Object {
-    public Lib.Models.CanvasItem? item { get; construct; }
+    public Lib.Items.CanvasItem? item { get; construct; }
 
     private Json.Object object;
     private Json.Object transform;
     private ObjectClass obj_class;
 
-    public JsonObject (Lib.Models.CanvasItem? item) {
+    public JsonObject (Lib.Items.CanvasItem? item) {
         Object (item: item);
     }
 
@@ -84,16 +84,16 @@ public class Akira.FileFormat.JsonObject : GLib.Object {
             item.get_property (spec.get_name (), ref val);
             obj.set_int_member (spec.get_name (), val.get_int64 ());
             //  debug ("%s: %s", spec.get_name (), val.get_int64 ().to_string ());
-        } else if (type == typeof (Akira.Lib.Models.CanvasArtboard)) {
+        } else if (type == typeof (Akira.Lib.Items.CanvasArtboard)) {
             item.get_property (spec.get_name (), ref val);
             if (val.strdup_contents () != "NULL") {
-                obj.set_string_member (spec.get_name (), ((Akira.Lib.Models.CanvasArtboard) val).id);
+                obj.set_string_member (spec.get_name (), ((Akira.Lib.Items.CanvasArtboard) val).id);
             }
         } else if (type == typeof (Goo.CanvasItemVisibility)) {
             item.get_property (spec.get_name (), ref val);
             obj.set_int_member (spec.get_name (), val.get_enum ());
         } else if (type == typeof (Akira.Lib.Managers.ImageManager)) {
-            var canvas_image = item as Akira.Lib.Models.CanvasImage;
+            var canvas_image = item as Akira.Lib.Items.CanvasImage;
             obj.set_string_member ("image_id", canvas_image.manager.filename);
         } else {
             // Leave this comment for debug purpose.

@@ -234,7 +234,7 @@ public class Akira.Layouts.Partials.BorderItem : Gtk.Grid {
     }
 
     private void on_model_changed () {
-        model.item.reset_colors ();
+        model.item.reload_borders ();
         set_button_color ();
         set_color_chooser_color ();
     }
@@ -247,7 +247,7 @@ public class Akira.Layouts.Partials.BorderItem : Gtk.Grid {
 
     private void on_delete_item () {
         model.list_model.remove_item.begin (model);
-        model.item.reset_colors ();
+        model.item.reload_borders ();
         window.event_bus.border_deleted ();
     }
 

@@ -24,8 +24,8 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
     public weak Akira.Lib.Canvas canvas { get; construct; }
     public weak Akira.Window window { get; construct; }
 
-    private unowned List<Models.CanvasItem> _selected_items;
-    public unowned List<Models.CanvasItem> selected_items {
+    private unowned List<Items.CanvasItem> _selected_items;
+    public unowned List<Items.CanvasItem> selected_items {
         get {
             return _selected_items;
         }
@@ -83,7 +83,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
     }
 
     public void transform_bound (double event_x, double event_y, Managers.NobManager.Nob selected_nob) {
-        Models.CanvasItem selected_item = selected_items.nth_data (0);
+        Items.CanvasItem selected_item = selected_items.nth_data (0);
 
         if (selected_item == null) {
             return;
@@ -123,7 +123,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         canvas.window.event_bus.item_value_changed ();
     }
 
-    public void add_item_to_selection (Models.CanvasItem item) {
+    public void add_item_to_selection (Items.CanvasItem item) {
         // Don't clear and reselect the same element if it's already selected.
         if (selected_items.index (item) != -1) {
             return;
@@ -160,7 +160,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         }
 
         // By emptying the selected_items list, the select_effect gets dropped
-        selected_items = new List<Models.CanvasItem> ();
+        selected_items = new List<Items.CanvasItem> ();
     }
 
     public void reset_selection () {
@@ -172,7 +172,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
             item.selected = false;
         }
 
-        selected_items = new List<Models.CanvasItem> ();
+        selected_items = new List<Items.CanvasItem> ();
     }
 
     private void update_selected_items () {
@@ -184,10 +184,10 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
             return;
         }
 
-        Models.CanvasItem selected_item = selected_items.nth_data (0);
+        Items.CanvasItem selected_item = selected_items.nth_data (0);
 
         // Cannot move artboard z-index wise
-        if (selected_item is Models.CanvasArtboard) {
+        if (selected_item is Items.CanvasArtboard) {
             return;
         }
 
@@ -233,7 +233,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
             return;
         }
 
-        Models.CanvasItem target_item = null;
+        Items.CanvasItem target_item = null;
 
         // z-index is the exact opposite of items placement
         // inside the free_items list
@@ -266,7 +266,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
     }
 
     private void on_flip_item (bool vertical) {
-        if (selected_items.length () == 0 || selected_items.nth_data (0) is Lib.Models.CanvasArtboard) {
+        if (selected_items.length () == 0 || selected_items.nth_data (0) is Lib.Items.CanvasArtboard) {
             return;
         }
 
@@ -309,7 +309,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         window.event_bus.update_state_coords (x, y);
     }
 
-    private void remove_item_from_selection (Lib.Models.CanvasItem item) {
+    private void remove_item_from_selection (Lib.Items.CanvasItem item) {
         if (selected_items.index (item) > -1) {
             selected_items.remove (item);
         }

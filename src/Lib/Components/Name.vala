@@ -37,17 +37,16 @@ public class Akira.Lib.Components.Name : Component {
         int count = 0;
         var items = ((Lib.Canvas) item.canvas).window.items_manager.free_items;
 
-        // TEMPORARILY DISABLED because we need to convert from Models.CanvasItem to Items.CanvasItem.
-        // if (item.artboard != null) {
-        //     items = item.artboard.items;
-        // }
+        if (item.artboard != null) {
+            items = item.artboard.items;
+        }
 
         if (item is Lib.Items.CanvasArtboard) {
             items = ((Lib.Canvas) item.canvas).window.items_manager.artboards;
         }
 
         foreach (var _item in items) {
-            if (_item.item_type == item_type) {
+            if (_item.type () == item_type) {
                 count++;
             }
         }

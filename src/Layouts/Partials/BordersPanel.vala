@@ -26,7 +26,7 @@ public class Akira.Layouts.Partials.BordersPanel : Gtk.Grid {
     public Gtk.ListBox borders_list_container;
     public Akira.Models.ListModel<Akira.Models.BordersItemModel> list_model;
     public Gtk.Grid title_cont;
-    private Lib.Models.CanvasItem selected_item;
+    private Lib.Items.CanvasItem selected_item;
 
     public bool toggled {
         get {
@@ -101,7 +101,7 @@ public class Akira.Layouts.Partials.BordersPanel : Gtk.Grid {
         add_btn.clicked.connect (() => {
             var model_item = create_model ();
             list_model.add_item.begin (model_item);
-            selected_item.reset_colors ();
+            selected_item.reload_borders ();
             add_btn.hide ();
             window.main_window.left_sidebar.queue_resize ();
         });
@@ -115,12 +115,12 @@ public class Akira.Layouts.Partials.BordersPanel : Gtk.Grid {
                 // This will need to be updated in the future once we're dealing
                 // with multiple border colors, updating to FALSE only if all
                 // the borders have been deleted.
-                selected_item.has_border = (added == 1);
+                // selected_item.has_border = (added == 1);
             }
         });
     }
 
-    private void on_selected_items_changed (List<Lib.Models.CanvasItem> selected_items) {
+    private void on_selected_items_changed (List<Lib.Items.CanvasItem> selected_items) {
         if (selected_items.length () == 0) {
             selected_item = null;
             list_model.clear.begin ();
@@ -133,12 +133,12 @@ public class Akira.Layouts.Partials.BordersPanel : Gtk.Grid {
             toggled = true;
             selected_item = selected_items.nth_data (0);
 
-            if (!selected_item.show_border_panel) {
+            if (!selected_item.has_borders) {
                 toggled = false;
                 return;
             }
 
-            if (!selected_item.has_border) {
+            if (selected_item.borders_count == 0) {
                 add_btn.show ();
                 return;
             }

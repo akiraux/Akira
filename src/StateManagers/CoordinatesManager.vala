@@ -78,7 +78,7 @@ public class Akira.StateManagers.CoordinatesManager : Object {
     /**
      * Initialize the manager coordinates with the newly created or selected item.
      */
-    private void on_init_state_coords (Lib.Models.CanvasItem item) {
+    private void on_init_state_coords (Lib.Items.CanvasItem item) {
         // Get the half border size.
         double half_border = get_border (item.border_size);
 
@@ -119,7 +119,7 @@ public class Akira.StateManagers.CoordinatesManager : Object {
      * therefore we set the d_update to false to prevent updating  the selected
      * items Cairo transform.
      */
-    private void on_reset_state_coords (Lib.Models.CanvasItem item) {
+    private void on_reset_state_coords (Lib.Items.CanvasItem item) {
         do_update = false;
 
         // Get the half border size.
@@ -159,7 +159,7 @@ public class Akira.StateManagers.CoordinatesManager : Object {
         // Loop through all the selected items to update their position. This is temporary
         // since we currently support only 1 selected item per time. In the future, we will need
         // to account for multiple items and their relative position between each other.
-        foreach (Lib.Models.CanvasItem item in canvas.selected_bound_manager.selected_items) {
+        foreach (Lib.Items.CanvasItem item in canvas.selected_bound_manager.selected_items) {
             if (!do_update) {
                 continue;
             }

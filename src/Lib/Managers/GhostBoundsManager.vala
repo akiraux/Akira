@@ -30,7 +30,7 @@ public class Akira.Lib.Managers.GhostBoundsManager : Object {
     private const double LINE_WIDTH = 1.0;
 
     // Matches the original item in order to keep the translation and rotation accurate.
-    private weak Models.CanvasItem original_item;
+    private weak Items.CanvasItem original_item;
 
     // Matches the original item in order to keep the translation and rotation accurate.
     private Goo.CanvasRect item;
@@ -58,7 +58,7 @@ public class Akira.Lib.Managers.GhostBoundsManager : Object {
         }
     }
 
-    public GhostBoundsManager (Models.CanvasItem new_item) {
+    public GhostBoundsManager (Items.CanvasItem new_item) {
         original_item = new_item;
 
         item = new Goo.CanvasRect (null, 0, 0, 1, 1, "line-width", 0, null);
@@ -78,12 +78,15 @@ public class Akira.Lib.Managers.GhostBoundsManager : Object {
      * Update the item to match size and transform matrix of the original item.
      */
     public void update () {
+        Cairo.Matrix transform;
+        original_item.get_transform (out transform);
+
         double width, height;
         original_item.get ("width", out width, "height", out height);
 
         item.set ("width", width);
         item.set ("height", height);
-        item.set_transform (original_item.get_real_transform ());
+        item.set_transform (transform);
 
         if (ghost != null) {
             ghost.x = item.bounds.x1;
@@ -110,7 +113,7 @@ public class Akira.Lib.Managers.GhostBoundsManager : Object {
             null,
             item.bounds.x1, item.bounds.y1,
             item.bounds.x2 - item.bounds.x1, item.bounds.y2 - item.bounds.y1,
-            "line-width", LINE_WIDTH / original_item.canvas.current_scale,
+            "line-width", LINE_WIDTH / ((Lib.Canvas) original_item.canvas).current_scale,
             "stroke-color", STROKE_COLOR,
             null
         );

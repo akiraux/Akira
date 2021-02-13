@@ -48,11 +48,11 @@ public class Akira.FillsItemTest : Akira.TestSuite {
 
                 // We don't need to set any other parameter or create other widgets like the layer
                 // panel since we're only interested in testing the selection effect and the fill model.
-                canvas.selected_bound_manager.add_item_to_selection (item as Akira.Lib.Models.CanvasItem);
+                canvas.selected_bound_manager.add_item_to_selection (item as Akira.Lib.Items.CanvasItem);
 
                 // TRUE: We selected the correct item.
                 assert (canvas.selected_bound_manager.selected_items.index (item) == 0);
-                assert ((item as Akira.Lib.Models.CanvasItem).selected == true);
+                assert ((item as Akira.Lib.Items.CanvasItem).selected == true);
 
                 // TRUE: A fill model was created and listed.
                 assert (list_model.get_n_items () == 1);

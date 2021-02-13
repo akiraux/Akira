@@ -235,8 +235,8 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
                 nob_manager.selected_nob = clicked_nob_name;
 
-                if (clicked_item is Models.CanvasItem) {
-                    Models.CanvasItem item = clicked_item as Models.CanvasItem;
+                if (clicked_item is Items.CanvasItem) {
+                    Items.CanvasItem item = clicked_item as Items.CanvasItem;
 
                     if (item.locked) {
                         selected_bound_manager.reset_selection ();

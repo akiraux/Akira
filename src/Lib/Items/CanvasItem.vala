@@ -74,6 +74,20 @@ public interface Akira.Lib.Items.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasIt
     }
 
     /**
+     * Helper method to get and set the item's id.
+     */
+    public string id {
+        get {
+            Component? name_c = this.get_component (typeof (Components.Name));
+            return ((Components.Name) name_c).id;
+        }
+        set {
+            Component? name_c = this.get_component (typeof (Components.Name));
+            ((Components.Name) name_c).id = value;
+        }
+    }
+
+    /**
      * Helper method to get and set the name of the item, only if the item
      * is using the Name component.
      */
@@ -188,12 +202,60 @@ public interface Akira.Lib.Items.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasIt
     }
 
     /**
+     * Helper method to get the number of Fills the item is using.
+     */
+     public int fills_count {
+        get {
+            Component? fills_c = this.get_component (typeof (Components.Fills));
+
+            if (fills_c != null) {
+                return ((Components.Fills) fills_c).count ();
+            }
+        }
+    }
+
+    /**
+     * Helper method to recalculate the colors of all the applied Fills.
+     */
+    public void reload_fills () {
+        Component? fills_c = this.get_component (typeof (Components.Fills));
+
+        if (fills_c != null) {
+            ((Components.Fills) fills_c).reload ();
+        }
+    }
+
+    /**
      * Helper method to know if the item implements borders or not.
      * Primarily used to disable the Borders area in the Transform Panel.
      */
     public bool has_borders {
         get {
             return this.get_component (typeof (Components.Borders)) != null;
+        }
+    }
+
+    /**
+     * Helper method to get the number of Borders the item is using.
+     */
+    public int borders_count {
+        get {
+            Component? borders_c = this.get_component (typeof (Components.Borders));
+
+            if (borders_c != null) {
+                return ((Components.Borders) borders_c).count ();
+            }
+        }
+    }
+
+    /**
+     * Helper method to recalculate the colors of all the applied Borders.
+     */
+    public void reload_borders () {
+        Component? borders_c = this.get_component (typeof (Components.Borders));
+
+        if (borders_c != null) {
+            ((Components.Borders) borders_c).reload ();
         }
     }
 
@@ -390,5 +452,9 @@ public interface Akira.Lib.Items.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasIt
             Component? layer = this.get_component (typeof (Components.Layer));
             ((Components.Layer) layer).locked = value;
         }
+    }
+
+    public void delete () {
+        remove ();
     }
 }

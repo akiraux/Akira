@@ -43,8 +43,8 @@ public class Akira.Layouts.Partials.BorderRadiusPanel : Gtk.Grid {
     private Binding autoscale_binding;
     private double max_value;
 
-    private Akira.Lib.Models.CanvasRect _selected_item;
-    private Akira.Lib.Models.CanvasRect selected_item {
+    private Akira.Lib.Items.CanvasRect _selected_item;
+    private Akira.Lib.Items.CanvasRect selected_item {
         get {
             return _selected_item;
         } set {
@@ -55,7 +55,7 @@ public class Akira.Layouts.Partials.BorderRadiusPanel : Gtk.Grid {
             }
             disconnect_previous_item ();
             _selected_item = value;
-            if (_selected_item == null || !_selected_item.show_border_radius_panel) {
+            if (_selected_item == null || !_selected_item.has_border_radius) {
                 disable ();
                 return;
             }
@@ -233,14 +233,14 @@ public class Akira.Layouts.Partials.BorderRadiusPanel : Gtk.Grid {
         //  border_radius_bottom_left_entry.entry.changed.connect (on_radius_change);
     }
 
-    private void on_selected_items_changed (List<Lib.Models.CanvasItem> selected_items) {
+    private void on_selected_items_changed (List<Lib.Items.CanvasItem> selected_items) {
         if (selected_items.length () == 0) {
             selected_item = null;
             toggled = false;
             return;
         }
 
-        if (!(selected_items.nth_data (0) is Akira.Lib.Models.CanvasRect)) {
+        if (!(selected_items.nth_data (0) is Akira.Lib.Items.CanvasRect)) {
             selected_item = null;
             toggled = false;
             return;
@@ -248,7 +248,7 @@ public class Akira.Layouts.Partials.BorderRadiusPanel : Gtk.Grid {
 
         if (selected_item == null || selected_item != selected_items.nth_data (0)) {
             toggled = true;
-            selected_item = (Akira.Lib.Models.CanvasRect) selected_items.nth_data (0);
+            selected_item = (Akira.Lib.Items.CanvasRect) selected_items.nth_data (0);
         }
     }
 
@@ -258,7 +258,7 @@ public class Akira.Layouts.Partials.BorderRadiusPanel : Gtk.Grid {
         radius_adj.upper = max_value;
         border_radius_entry.set_range (0, max_value);
 
-        if (!selected_item.is_radius_autoscale) {
+        if (!selected_item.border_radius_autoscale) {
             return;
         }
 
@@ -270,17 +270,17 @@ public class Akira.Layouts.Partials.BorderRadiusPanel : Gtk.Grid {
     private void enable () {
         on_size_change ();
 
-        uniform_switch.active = selected_item.is_radius_uniform;
-        autoscale_switch.active = selected_item.is_radius_autoscale;
+        uniform_switch.active = selected_item.border_radius_uniform;
+        autoscale_switch.active = selected_item.border_radius_autoscale;
 
         // Uniform radius
-        if (selected_item.is_radius_uniform) {
-            radius_adj.value = selected_item.global_radius;
+        if (selected_item.border_radius_uniform) {
+            radius_adj.value = selected_item.border_radius_x;
         }
-        update_all_borders (selected_item.is_radius_uniform);
+        update_all_borders (selected_item.border_radius_uniform);
 
         // Non-Uniform radius
-        //  if (!selected_item.is_radius_uniform) {
+        //  if (!selected_item.border_radius_uniform) {
         //      border_radius_top_left_entry.entry.text = selected_item.radius_tl;
         //      border_radius_top_right_entry.entry.text = selected_item.radius_tr;
         //      border_radius_bottom_right_entry.entry.text = selected_item.radius_br;
@@ -292,9 +292,9 @@ public class Akira.Layouts.Partials.BorderRadiusPanel : Gtk.Grid {
             BindingFlags.SYNC_CREATE | BindingFlags.BIDIRECTIONAL);
 
         uniform_binding = uniform_switch.bind_property (
-            "active", selected_item, "is-radius-uniform");
+            "active", selected_item, "border-radius-uniform");
         autoscale_binding = autoscale_switch.bind_property (
-            "active", selected_item, "is-radius-autoscale");
+            "active", selected_item, "border-radius-autoscale");
 
         selected_item.notify["width"].connect (on_size_change);
         selected_item.notify["height"].connect (on_size_change);

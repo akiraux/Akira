@@ -98,7 +98,7 @@ public class Akira.Lib.Managers.NobManager : Object {
         return (Nob) grabbed_id;
     }
 
-    private void update_select_bb_coords (List<Models.CanvasItem> selected_items) {
+    private void update_select_bb_coords (List<Items.CanvasItem> selected_items) {
         // Bounding box edges
         double bb_left = 1e6, bb_top = 1e6, bb_right = 0, bb_bottom = 0;
 
@@ -122,7 +122,7 @@ public class Akira.Lib.Managers.NobManager : Object {
         height = select_bb.y2 - select_bb.y1;
     }
 
-    private void on_add_select_effect (List<Models.CanvasItem> selected_items) {
+    private void on_add_select_effect (List<Items.CanvasItem> selected_items) {
         if (selected_items.length () == 0) {
             remove_select_effect ();
             return;
@@ -154,7 +154,7 @@ public class Akira.Lib.Managers.NobManager : Object {
         //  debug ("removed");
     }
 
-    private void update_select_effect (List<Models.CanvasItem> selected_items) {
+    private void update_select_effect (List<Items.CanvasItem> selected_items) {
         double x = 0.0;
         double y = 0.0;
         double width = 0.0;
@@ -189,7 +189,7 @@ public class Akira.Lib.Managers.NobManager : Object {
         select_effect.set ("line-width", LINE_WIDTH / canvas.current_scale);
     }
 
-    private void update_nob_position (List<Models.CanvasItem> selected_items) {
+    private void update_nob_position (List<Items.CanvasItem> selected_items) {
         is_artboard = false;
         var transform = Cairo.Matrix.identity ();
 
@@ -206,7 +206,7 @@ public class Akira.Lib.Managers.NobManager : Object {
         );
 
         foreach (var item in selected_items) {
-            if (item is Models.CanvasArtboard) {
+            if (item is Items.CanvasArtboard) {
                 is_artboard = true;
                 break;
             }
@@ -352,7 +352,7 @@ public class Akira.Lib.Managers.NobManager : Object {
     }
 
     private void set_bound_coordinates (
-        List<Models.CanvasItem> selected_items,
+        List<Items.CanvasItem> selected_items,
         ref double x,
         ref double y,
         ref Cairo.Matrix transform,

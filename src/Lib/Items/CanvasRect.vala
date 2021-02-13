@@ -43,7 +43,6 @@ public class Akira.Lib.Items.CanvasRect : Goo.CanvasRect, Akira.Lib.Items.Canvas
     ) {
         parent = _artboard != null ? _artboard : _parent;
         artboard = _artboard;
-        canvas = parent.get_canvas () as Akira.Lib.Canvas;
 
         // Create the rectangle.
         x = _x;

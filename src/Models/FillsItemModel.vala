@@ -53,7 +53,7 @@ public class Akira.Models.FillsItemModel : Models.BaseModel {
     public Akira.Utils.BlendingMode blending_mode;
 
     public FillsItemModel (
-        Lib.Models.CanvasItem item,
+        Lib.Items.CanvasItem item,
         Akira.Models.ListModel list_model
     ) {
         Object (

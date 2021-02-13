@@ -59,7 +59,7 @@ public class Akira.Models.BordersItemModel : Models.BaseModel {
     }
 
     public BordersItemModel (
-        Lib.Models.CanvasItem item,
+        Lib.Items.CanvasItem item,
         Akira.Models.ListModel<Akira.Models.BordersItemModel> list_model
     ) {
         Object (
