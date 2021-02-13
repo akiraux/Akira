@@ -79,18 +79,9 @@ public class Akira.StateManagers.CoordinatesManager : Object {
      * Initialize the manager coordinates with the newly created or selected item.
      */
     private void on_init_state_coords (Lib.Items.CanvasItem item) {
-        // Get the half border size.
-        double half_border = get_border (item.border_size);
-
-        // Get the item X & Y coordinates bounds in order to account for the item's rotation.
-        double item_x = item.bounds.x1 + half_border;
-        double item_y = item.bounds.y1 + half_border;
-
-        // Update the coordinates if the item is inside an Artboard.
-        if (item.artboard != null) {
-            item_x = item.relative_x;
-            item_y = item.relative_y;
-        }
+        // Get the item X & Y coordinates.
+        double item_x = item.x;
+        double item_y = item.y;
 
         // Interrupt if no value has changed.
         if (item_x == x && item_y == y) {
@@ -122,17 +113,9 @@ public class Akira.StateManagers.CoordinatesManager : Object {
     private void on_reset_state_coords (Lib.Items.CanvasItem item) {
         do_update = false;
 
-        // Get the half border size.
-        double half_border = get_border (item.border_size);
-
-        // Get the item X & Y coordinates bounds in order to account for the item's rotation.
-        double item_x = item.bounds.x1 + half_border;
-        double item_y = item.bounds.y1 + half_border;
-
-        if (item.artboard != null) {
-            item_x = item.relative_x;
-            item_y = item.relative_y;
-        }
+        // Get the item X & Y coordinates.
+        double item_x = item.x;
+        double item_y = item.y;
 
         // Interrupt if no value has changed.
         if (item_x == x && item_y == y) {
@@ -164,31 +147,31 @@ public class Akira.StateManagers.CoordinatesManager : Object {
                 continue;
             }
 
-            // Update the relative coordinates for items inside the canvas.
-            // This will need to be removed after we rebuild the artboards.
-            if (item.artboard != null) {
-                item.relative_x = x;
-                item.relative_y = y;
-                continue;
-            }
-
             // Store the new coordinates in local variables so we can manipulate them.
             double inc_x = x;
             double inc_y = y;
 
             // Convert the new coordinates to reflect the item's space on the canvas.
-            canvas.convert_to_item_space (item, ref inc_x, ref inc_y);
+            if (item.artboard != null) {
+                canvas.convert_to_item_space (item.artboard, ref inc_x, ref inc_y);
+            } else {
+                canvas.convert_to_item_space (item, ref inc_x, ref inc_y);
+            }
 
             // If the item is rotated, we need to calculate the delta between the
             // new coordinates and item's bounds coordinates.
             if (item.rotation != 0) {
-                double half_border = get_border (item.border_size);
+                double half_border = get_border (item.line_width);
                 double diff_x = item.bounds.x1 - half_border;
                 double diff_y = item.bounds.y1 - half_border;
 
                 // Convert the bounds to the item space to get the proper delta between
                 // the bounds coordinates and the rotation X & Y coordinates.
-                canvas.convert_to_item_space (item, ref diff_x, ref diff_y);
+                if (item.artboard != null) {
+                    canvas.convert_to_item_space (item.artboard, ref diff_x, ref diff_y);
+                } else {
+                    canvas.convert_to_item_space (item, ref diff_x, ref diff_y);
+                }
 
                 inc_x -= diff_x;
                 inc_y -= diff_y;
@@ -196,9 +179,6 @@ public class Akira.StateManagers.CoordinatesManager : Object {
 
             // Move the item with the new coordinates.
             item.translate (inc_x, inc_y);
-
-            //  // Update the bounds of the ghost item.
-            item.bounds_manager.update ();
         }
 
         // Notify the rest of the UI that a value of the select items has changed.

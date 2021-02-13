@@ -72,8 +72,8 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
             delta_x_accumulator = 0.0;
             delta_y_accumulator = 0.0;
 
-            initial_width = selected_item.get_coords ("width");
-            initial_height = selected_item.get_coords ("height");
+            initial_width = selected_item.width;
+            initial_height = selected_item.height;
 
             return;
         }
@@ -138,7 +138,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         }
 
         item.selected = true;
-        item.update_size_ratio ();
+        item.update_ratio ();
 
         // Initialize the state manager coordinates before adding the item to the selection.
         canvas.window.event_bus.init_state_coords (item);
@@ -272,12 +272,10 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
 
         selected_items.foreach ((item) => {
             if (vertical) {
-                item.flipped_v = !item.flipped_v;
                 Utils.AffineTransform.flip_item (item, 1, -1);
                 update_selected_items ();
                 return;
             }
-            item.flipped_h = !item.flipped_h;
             Utils.AffineTransform.flip_item (item, -1, 1);
             update_selected_items ();
         });

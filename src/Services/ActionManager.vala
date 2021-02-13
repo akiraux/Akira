@@ -470,7 +470,7 @@ public class Akira.Services.ActionManager : Object {
         }
         foreach (var item in canvas.selected_bound_manager.selected_items) {
             // Hide the ghost bound manager.
-            item.bounds_manager.hide ();
+            // item.bounds_manager.hide ();
         }
         bool is_holding_shift = false;
         var color_picker = new Akira.Utils.ColorPicker ();
@@ -487,11 +487,12 @@ public class Akira.Services.ActionManager : Object {
         color_picker.picked.connect (color => {
             foreach (var item in canvas.selected_bound_manager.selected_items) {
                 if (is_holding_shift) {
-                    item.border_color_string = Utils.Color.rgba_to_hex_string (color);
+                    // item.border_color_string = Utils.Color.rgba_to_hex_string (color);
+                    item.reload_borders ();
                 } else {
-                    item.color_string = Utils.Color.rgba_to_hex_string (color);
+                    // item.color_string = Utils.Color.rgba_to_hex_string (color);
+                    item.reload_fills ();
                 }
-                item.load_colors ();
             }
             color_picker.close ();
         });

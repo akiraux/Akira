@@ -362,7 +362,7 @@ public class Akira.Lib.Managers.NobManager : Object {
         if (selected_items.length () == 1) {
             var item = selected_items.nth_data (0);
 
-            transform = item.get_real_transform ();
+            item.get_transform (out transform);
 
             item.get ("width", out _width);
             item.get ("height", out _height);

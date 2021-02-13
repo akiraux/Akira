@@ -410,12 +410,5 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
         // Temporarily get the first item until multi select is implemented.
         var item = selected_bound_manager.selected_items.nth_data (0);
-
-        if (!show) {
-            item.bounds_manager.hide ();
-            return;
-        }
-
-        item.bounds_manager.show ();
     }
 }

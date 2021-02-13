@@ -111,6 +111,28 @@ public interface Akira.Lib.Items.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasIt
         }
     }
 
+    public double x {
+        get {
+            Component? transform = this.get_component (typeof (Components.Transform));
+            return ((Components.Transform) transform).x;
+        }
+        set {
+            Component? transform = this.get_component (typeof (Components.Transform));
+            ((Components.Transform) transform).x = value;
+        }
+    }
+
+    public double y {
+        get {
+            Component? transform = this.get_component (typeof (Components.Transform));
+            return ((Components.Transform) transform).y;
+        }
+        set {
+            Component? transform = this.get_component (typeof (Components.Transform));
+            ((Components.Transform) transform).y = value;
+        }
+    }
+
     /**
      * Helper method to get and set the item's width. We do it this way because
      * it's faster than type casting each item to get the property from the
