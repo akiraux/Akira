@@ -404,11 +404,11 @@ public class Akira.Lib.Canvas : Goo.Canvas {
      */
     private void toggle_item_ghost (bool show) {
         // If no items is selected we can't show anything.
-        if (selected_bound_manager.selected_items.length () == 0) {
-            return;
-        }
+        // if (selected_bound_manager.selected_items.length () == 0) {
+        //     return;
+        // }
 
-        // Temporarily get the first item until multi select is implemented.
-        var item = selected_bound_manager.selected_items.nth_data (0);
+        // // Temporarily get the first item until multi select is implemented.
+        // var item = selected_bound_manager.selected_items.nth_data (0);
     }
 }

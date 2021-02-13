@@ -393,7 +393,7 @@ public class Akira.Lib.Managers.ExportManager : Object {
 
         // If the item is an artboard, account for the label's height.
         if (item != null && item is Lib.Items.CanvasArtboard) {
-            var artboard = item as Lib.Items.CanvasArtboard;
+            // var artboard = item as Lib.Items.CanvasArtboard;
             // label_height = artboard.get_label_height ();
         }
 

@@ -233,6 +233,8 @@ public interface Akira.Lib.Items.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasIt
             if (fills_c != null) {
                 return ((Components.Fills) fills_c).count ();
             }
+
+            return 0;
         }
     }
 
@@ -267,6 +269,8 @@ public interface Akira.Lib.Items.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasIt
             if (borders_c != null) {
                 return ((Components.Borders) borders_c).count ();
             }
+
+            return 0;
         }
     }
 

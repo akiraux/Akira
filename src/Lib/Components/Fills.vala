@@ -27,11 +27,21 @@ public class Akira.Lib.Components.Fills : Component {
     // A list of all the fills the item might have.
     public Gee.ArrayList<Fill> fills { get; set; }
 
-    public Fills (Gdk.RGBA init_color) {
+    // Keep track of the newly created Fill child components.
+    private int id { get; set; default = 0; }
+
+    public Fills (Gdk.RGBA color) {
         fills = new Gee.ArrayList<Fill> ();
 
+        add_fill_color (color);
+    }
+
+    public void add_fill_color (Gdk.RGBA color) {
         int count = this.count ();
-        fills.@set (count, new Fill (init_color, count));
+        fills.@set (count, new Fill (color, id));
+
+        // Increase the ID to keep an incremental unique identifier.
+        id++;
     }
 
     public int count () {

@@ -20,43 +20,43 @@
 */
 
 public class Akira.Models.BordersItemModel : Models.BaseModel {
-    public string color {
-        owned get {
-            return item.border_color.to_string ();
-        }
-        set {
-            var new_rgba = Gdk.RGBA ();
-            new_rgba.parse (value);
-            item.border_color = new_rgba;
-        }
-    }
+    // public string color {
+    //     owned get {
+    //         return item.border_color.to_string ();
+    //     }
+    //     set {
+    //         var new_rgba = Gdk.RGBA ();
+    //         new_rgba.parse (value);
+    //         item.border_color = new_rgba;
+    //     }
+    // }
 
-    public int alpha {
-        get {
-            return item.stroke_alpha;
-        }
-        set {
-            item.stroke_alpha = value;
-        }
-    }
+    // public int alpha {
+    //     get {
+    //         return item.stroke_alpha;
+    //     }
+    //     set {
+    //         item.stroke_alpha = value;
+    //     }
+    // }
 
-    public int border_size {
-        get {
-            return item.border_size;
-        }
-        set {
-            item.border_size = value;
-        }
-    }
+    // public int border_size {
+    //     get {
+    //         return item.border_size;
+    //     }
+    //     set {
+    //         item.border_size = value;
+    //     }
+    // }
 
-    public bool hidden {
-        get {
-            return item.hidden_border;
-        }
-        set {
-            item.hidden_border = value;
-        }
-    }
+    // public bool hidden {
+    //     get {
+    //         return item.hidden_border;
+    //     }
+    //     set {
+    //         item.hidden_border = value;
+    //     }
+    // }
 
     public BordersItemModel (
         Lib.Items.CanvasItem item,
@@ -68,12 +68,8 @@ public class Akira.Models.BordersItemModel : Models.BaseModel {
         );
     }
 
-    construct {
-        item.has_border = true;
-    }
-
-    public string to_string () {
-        return "Color: %s\nAlpha: %f\nSize: %i\nHidden: %s".printf (
-            color, alpha, border_size, (hidden ? "1" : "0"));
-    }
+    // public string to_string () {
+    //     return "Color: %s\nAlpha: %f\nSize: %i\nHidden: %s".printf (
+    //         color, alpha, border_size, (hidden ? "1" : "0"));
+    // }
 }

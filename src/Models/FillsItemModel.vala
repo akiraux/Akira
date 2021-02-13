@@ -21,34 +21,34 @@
 */
 
 public class Akira.Models.FillsItemModel : Models.BaseModel {
-    public string color {
-        owned get {
-            return item.color.to_string ();
-        }
-        set {
-            var new_rgba = Gdk.RGBA ();
-            new_rgba.parse (value);
-            item.color = new_rgba;
-        }
-    }
+    // public string color {
+    //     owned get {
+    //         return item.color.to_string ();
+    //     }
+    //     set {
+    //         var new_rgba = Gdk.RGBA ();
+    //         new_rgba.parse (value);
+    //         item.color = new_rgba;
+    //     }
+    // }
 
-    public int alpha {
-        get {
-            return item.fill_alpha;
-        }
-        set {
-            item.fill_alpha = value;
-        }
-    }
+    // public int alpha {
+    //     get {
+    //         return item.fill_alpha;
+    //     }
+    //     set {
+    //         item.fill_alpha = value;
+    //     }
+    // }
 
-    public bool hidden {
-        get {
-            return item.hidden_fill;
-        }
-        set {
-            item.hidden_fill = value;
-        }
-    }
+    // public bool hidden {
+    //     get {
+    //         return item.hidden_fill;
+    //     }
+    //     set {
+    //         item.hidden_fill = value;
+    //     }
+    // }
 
     public Akira.Utils.BlendingMode blending_mode;
 
@@ -63,12 +63,12 @@ public class Akira.Models.FillsItemModel : Models.BaseModel {
     }
 
     construct {
-        item.has_fill = true;
+        // item.add_fill_color ();
         blending_mode = Akira.Utils.BlendingMode.NORMAL;
     }
 
-    public string to_string () {
-        return "Color: %s\nAlpha: %f\nHidden: %s\nBlendingMode: %s".printf (
-            color, alpha, (hidden ? "1" : "0"), blending_mode.to_string ());
-    }
+    // public string to_string () {
+    //     return "Color: %s\nAlpha: %f\nHidden: %s\nBlendingMode: %s".printf (
+    //         color, alpha, (hidden ? "1" : "0"), blending_mode.to_string ());
+    // }
 }
