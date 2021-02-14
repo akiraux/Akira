@@ -140,7 +140,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
 
         // Add it to "free items" if it doesn't belong to an artboard.
         if (new_item.artboard == null) {
-            free_items.add_item.begin (new_item, loaded);
+            free_items.add_item.begin ((Items.CanvasItem) new_item, loaded);
         }
 
         // We need to additionally store images in a dedicated list in order
@@ -435,7 +435,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
     private void restore_attributes (Items.CanvasItem item, Items.CanvasArtboard? artboard, Json.Object obj) {
         // Restore identifiers.
         if (obj.get_string_member ("name") != null) {
-            item.name = obj.get_string_member ("name");
+            item.name.name = obj.get_string_member ("name");
         }
         item.id = obj.get_string_member ("id");
 
@@ -468,7 +468,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         }
 
         // Restore layer options.
-        item.locked = obj.get_boolean_member ("locked");
+        item.layer.locked = obj.get_boolean_member ("locked");
         item.visibility =
             obj.get_int_member ("visibility") == 2
                 ? Goo.CanvasItemVisibility.VISIBLE
@@ -620,7 +620,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         // var x = item.bounds.x1;
         // var y = item.bounds.y1;
 
-        // If the item was moved from inside an Artboard to the emtpy Canvas.
+        // If the item was moved from inside an Artboard to the empty Canvas.
         if (item.artboard != null && new_artboard == null) {
             debug ("Artboard => Free Item");
 

@@ -87,31 +87,14 @@ public interface Akira.Lib.Items.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasIt
         }
     }
 
-    /**
-     * Helper method to get and set the name of the item, only if the item
-     * is using the Name component.
-     */
-    public string name {
+    public unowned Components.Name? name {
         get {
-            Component? name_c = this.get_component (typeof (Components.Name));
-
-            if (name_c != null) {
-                return ((Components.Name) name_c).name;
-            }
-
-            // Return a generic string to avoid empty names.
-            return _("Item");
-        }
-        set {
-            Component? name_c = this.get_component (typeof (Components.Name));
-
-            if (name_c != null) {
-                ((Components.Name) name_c).name = value;
-            }
+            Component? component = this.get_component (typeof (Components.Name));
+            return (Components.Name) component;
         }
     }
 
-    public double x {
+    public double item_x {
         get {
             Component? transform = this.get_component (typeof (Components.Transform));
             return ((Components.Transform) transform).x;
@@ -122,7 +105,7 @@ public interface Akira.Lib.Items.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasIt
         }
     }
 
-    public double y {
+    public double item_y {
         get {
             Component? transform = this.get_component (typeof (Components.Transform));
             return ((Components.Transform) transform).y;
@@ -450,33 +433,10 @@ public interface Akira.Lib.Items.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasIt
         }
     }
 
-    /**
-     * Set and get the boolean attribute to control the selected state of an item
-     * in the Layers panel.
-     */
-     public bool selected {
+    public Components.Layer? layer {
         get {
-            Component? layer = this.get_component (typeof (Components.Layer));
-            return ((Components.Layer) layer).selected;
-        }
-        set {
-            Component? layer = this.get_component (typeof (Components.Layer));
-            ((Components.Layer) layer).selected = value;
-        }
-    }
-
-    /**
-     * Set and get the boolean attribute to control the locked state of an item
-     * in the Layers panel.
-     */
-     public bool locked {
-        get {
-            Component? layer = this.get_component (typeof (Components.Layer));
-            return ((Components.Layer) layer).locked;
-        }
-        set {
-            Component? layer = this.get_component (typeof (Components.Layer));
-            ((Components.Layer) layer).locked = value;
+            Component? component = this.get_component (typeof (Components.Layer));
+            return (Components.Layer) component;
         }
     }
 

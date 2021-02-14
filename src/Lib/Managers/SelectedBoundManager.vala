@@ -133,11 +133,11 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         // TODO: allow for multi selection with shift pressed
         reset_selection ();
 
-        if (item.locked) {
+        if (item.layer.locked) {
             return;
         }
 
-        item.selected = true;
+        item.layer.selected = true;
         item.update_ratio ();
 
         // Initialize the state manager coordinates before adding the item to the selection.
@@ -169,7 +169,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         }
 
         foreach (var item in selected_items) {
-            item.selected = false;
+            item.layer.selected = false;
         }
 
         selected_items = new List<Items.CanvasItem> ();

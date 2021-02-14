@@ -69,7 +69,10 @@ public class Akira.Lib.Components.Transform : Component {
         }
     }
 
-    public Transform () {}
+    public Transform (double new_x, double new_y) {
+        x = new_x;
+        y = new_y;
+    }
 
     /**
      * The item's bounds account also for the border width, but we shouldn't,

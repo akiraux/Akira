@@ -58,7 +58,7 @@ public class Akira.Lib.Items.CanvasEllipse : Goo.CanvasEllipse, Akira.Lib.Items.
         // All the other components after this will inherit the class from the
         // main Component.
         components.add (new Name (this));
-        components.add (new Transform ());
+        components.add (new Transform (center_x, center_y));
         components.add (new Opacity ());
         components.add (new Rotation ());
         components.add (new Fills (fill_color));

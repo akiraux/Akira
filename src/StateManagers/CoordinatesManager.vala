@@ -80,8 +80,8 @@ public class Akira.StateManagers.CoordinatesManager : Object {
      */
     private void on_init_state_coords (Lib.Items.CanvasItem item) {
         // Get the item X & Y coordinates.
-        double item_x = item.x;
-        double item_y = item.y;
+        double item_x = item.item_x;
+        double item_y = item.item_y;
 
         // Interrupt if no value has changed.
         if (item_x == x && item_y == y) {
@@ -114,8 +114,8 @@ public class Akira.StateManagers.CoordinatesManager : Object {
         do_update = false;
 
         // Get the item X & Y coordinates.
-        double item_x = item.x;
-        double item_y = item.y;
+        double item_x = item.item_x;
+        double item_y = item.item_y;
 
         // Interrupt if no value has changed.
         if (item_x == x && item_y == y) {

@@ -54,7 +54,7 @@ public class Akira.Lib.Items.CanvasArtboard : Goo.CanvasGroup, Akira.Lib.Items.C
       // All the other components after this will inherit the class from the
       // main Component.
       components.add (new Name (this));
-      components.add (new Transform ());
+      components.add (new Transform (x, y));
       components.add (new Opacity ());
       // Artboards have fills that can be edited, but they always start
       // with a full white background.

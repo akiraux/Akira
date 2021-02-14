@@ -207,11 +207,11 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
                 var new_item = window.items_manager.insert_item (event.x, event.y);
 
-                selected_bound_manager.add_item_to_selection (new_item);
+                // selected_bound_manager.add_item_to_selection (new_item);
 
                 selected_bound_manager.set_initial_coordinates (event.x, event.y);
 
-                nob_manager.selected_nob = Managers.NobManager.Nob.BOTTOM_RIGHT;
+                // nob_manager.selected_nob = Managers.NobManager.Nob.BOTTOM_RIGHT;
                 break;
 
             case EditMode.MODE_SELECTION:
@@ -238,7 +238,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 if (clicked_item is Items.CanvasItem) {
                     Items.CanvasItem item = clicked_item as Items.CanvasItem;
 
-                    if (item.locked) {
+                    if (item.layer.locked) {
                         selected_bound_manager.reset_selection ();
                         holding = false;
                         return true;

@@ -63,7 +63,7 @@ public class Akira.Lib.Items.CanvasImage : Goo.CanvasImage, Akira.Lib.Items.Canv
         // All the other components after this will inherit the class from the
         // main Component.
         components.add (new Name (this));
-        components.add (new Transform ());
+        components.add (new Transform (x, y));
         components.add (new Opacity ());
         components.add (new Rotation ());
         components.add (new Size ());

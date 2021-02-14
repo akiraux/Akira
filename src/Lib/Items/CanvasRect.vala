@@ -57,11 +57,11 @@ public class Akira.Lib.Items.CanvasRect : Goo.CanvasRect, Akira.Lib.Items.Canvas
         // All the other components after this will inherit the class from the
         // main Component.
         components.add (new Name (this));
-        components.add (new Transform ());
+        components.add (new Transform (x, y));
         components.add (new Opacity ());
         components.add (new Rotation ());
-        components.add (new Fills (fill_color));
-        components.add (new Borders (border_color, border_size));
+        // components.add (new Fills (fill_color));
+        // components.add (new Borders (border_color, border_size));
         components.add (new Size ());
         components.add (new Flipped ());
         components.add (new BorderRadius ());

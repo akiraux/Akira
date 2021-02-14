@@ -84,7 +84,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
             model: model
         );
 
-        if (model.selected && list != null) {
+        if (model.layer.selected && list != null) {
             list.select_row (this);
         }
     }
@@ -99,7 +99,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
         label.expand = true;
         label.set_ellipsize (Pango.EllipsizeMode.END);
 
-        model.bind_property ("name", label, "label",
+        model.name.bind_property ("name", label, "label",
             BindingFlags.SYNC_CREATE | BindingFlags.BIDIRECTIONAL);
 
         entry = new Gtk.Entry ();
@@ -110,7 +110,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
         entry.no_show_all = true;
         // NOTE: We can't bind the entry to the model.name otherwise we won't be
         // able to handle the ESC key to restore the previous entry.
-        entry.text = model.name;
+        entry.text = model.name.name;
 
         entry.activate.connect (update_on_enter);
         entry.key_release_event.connect (update_on_escape);
@@ -215,8 +215,8 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
             return false;
         });
 
-        model.notify["selected"].connect (() => {
-            if (model.selected) {
+        model.layer.notify["selected"].connect (() => {
+            if (model.layer.selected) {
                 get_style_context ().remove_class ("hovered");
                 activate ();
                 return;
@@ -507,7 +507,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
      * @return {bool} True to stop propagation, False to let other events run.
      */
     public bool on_click_event (Gdk.Event event) {
-        if (model.locked) {
+        if (model.layer.locked) {
             return true;
         }
 
@@ -679,7 +679,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
     }
 
     private void lock_actions () {
-        button_locked.bind_property ("active", model, "locked",
+        button_locked.bind_property ("active", model.layer, "locked",
             BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE);
 
         button_locked.toggled.connect (() => {

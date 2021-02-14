@@ -29,7 +29,7 @@ public class Akira.Lib.Components.Name : Component {
     public Name (Lib.Items.CanvasItem item) {
         this.item = item;
         GLib.Type item_type = item.type ();
-        string[] type_slug_tokens = item_type.to_string ().split ("_");
+        string[] type_slug_tokens = item_type.name ().split ("AkiraLibItemsCanvas");
         string type_slug = type_slug_tokens [type_slug_tokens.length - 1];
 
         // Make sure the initial ID is the current count of the total amount
@@ -51,8 +51,8 @@ public class Akira.Lib.Components.Name : Component {
             }
         }
 
-        this.id = capitalize (type_slug.down ()) + " " + count.to_string ();
-        this.name = this.id;
+        id = capitalize (type_slug.down ()) + " " + count.to_string ();
+        name = id;
     }
 
     /**

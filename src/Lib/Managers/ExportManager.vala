@@ -324,7 +324,7 @@ public class Akira.Lib.Managers.ExportManager : Object {
             if (item is Akira.Lib.Items.CanvasArtboard) {
                 var artboard = item as Akira.Lib.Items.CanvasArtboard;
                 // label_height = artboard.get_label_height ();
-                name = artboard.name != null ? artboard.name : name;
+                name = artboard.name.name;
             }
 
             // Hide the ghost item.
@@ -392,10 +392,10 @@ public class Akira.Lib.Managers.ExportManager : Object {
         var label_height = 0.0;
 
         // If the item is an artboard, account for the label's height.
-        if (item != null && item is Lib.Items.CanvasArtboard) {
+        // if (item != null && item is Lib.Items.CanvasArtboard) {
             // var artboard = item as Lib.Items.CanvasArtboard;
             // label_height = artboard.get_label_height ();
-        }
+        // }
 
         double width, height;
 

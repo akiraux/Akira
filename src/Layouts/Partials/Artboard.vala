@@ -89,7 +89,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
         entry.no_show_all = true;
         // NOTE: We can't bind the entry to the model.name otherwise we won't be
         // able to handle the ESC key to restore the previous entry.
-        entry.text = model.name;
+        entry.text = model.name.name;
 
         entry.activate.connect (update_on_enter);
         entry.key_release_event.connect (update_on_escape);
@@ -212,8 +212,8 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
             }
         });
 
-        model.notify["selected"].connect (() => {
-            if (model.selected) {
+        model.layer.notify["selected"].connect (() => {
+            if (model.layer.selected) {
               activate ();
               return;
             }
