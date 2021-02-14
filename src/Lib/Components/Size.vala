@@ -26,8 +26,39 @@ public class Akira.Lib.Components.Size : Component {
     public bool locked { get; set; }
     public double ratio { get; set; }
 
+    public double width {
+        get {
+            double w = 0.0;
+            item.get ("width", out w);
+
+            return w;
+        }
+        set {
+            item.set ("width", value);
+        }
+    }
+
+    public double height {
+        get {
+            double h = 0.0;
+            item.get ("height", out h);
+
+            return h;
+        }
+        set {
+            item.set ("height", value);
+        }
+    }
+
     public Size () {
         locked = false;
         ratio = 1.0;
+    }
+
+    /**
+     * Helper method to update the size ratio of an item.
+     */
+    public void update_ratio () {
+        ratio = width / height;
     }
 }

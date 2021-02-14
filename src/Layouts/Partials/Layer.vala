@@ -117,7 +117,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
         entry.focus_in_event.connect (handle_focus_in);
         entry.focus_out_event.connect (update_on_leave);
 
-        icon = new Gtk.Image.from_icon_name (model.icon, Gtk.IconSize.MENU);
+        icon = new Gtk.Image.from_icon_name (model.item_type.icon, Gtk.IconSize.MENU);
         icon.margin_start = icon_name != "folder-symbolic" ? 16 : 0;
         icon.margin_end = 10;
         icon.vexpand = true;

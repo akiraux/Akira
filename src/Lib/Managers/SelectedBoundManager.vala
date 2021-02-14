@@ -72,8 +72,8 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
             delta_x_accumulator = 0.0;
             delta_y_accumulator = 0.0;
 
-            initial_width = selected_item.width;
-            initial_height = selected_item.height;
+            initial_width = selected_item.size.width;
+            initial_height = selected_item.size.height;
 
             return;
         }
@@ -138,7 +138,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         }
 
         item.layer.selected = true;
-        item.update_ratio ();
+        item.size.update_ratio ();
 
         // Initialize the state manager coordinates before adding the item to the selection.
         canvas.window.event_bus.init_state_coords (item);

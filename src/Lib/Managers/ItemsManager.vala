@@ -134,7 +134,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             return null;
         }
 
-        if (new_item.type () == typeof (Items.CanvasArtboard)) {
+        if (new_item.item_type.item_type == typeof (Items.CanvasArtboard)) {
             artboards.add_item.begin ((Items.CanvasArtboard) new_item);
         }
 
@@ -147,7 +147,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         // to easily access them when saving the .akira/Pictures folder.
         // If we don't curate this dedicated list, it would be a nightamer to
         // loop through all the free items and artboard items to check for images.
-        if (new_item.type () == typeof (Items.CanvasImage)) {
+        if (new_item.item_type.item_type == typeof (Items.CanvasImage)) {
             images.add_item.begin ((new_item as Akira.Lib.Items.CanvasImage), loaded);
         }
 
@@ -163,12 +163,12 @@ public class Akira.Lib.Managers.ItemsManager : Object {
     }
 
     public void on_request_delete_item (Lib.Items.CanvasItem item) {
-        if (item.type () == typeof (Items.CanvasArtboard)) {
+        if (item.item_type.item_type == typeof (Items.CanvasArtboard)) {
             artboards.remove_item.begin (item as Items.CanvasArtboard);
         }
 
         // Remove the image from the list so we don't keep it in the saved file.
-        if (item.type () == typeof (Items.CanvasImage)) {
+        if (item.item_type.item_type == typeof (Items.CanvasImage)) {
             images.remove_item.begin ((item as Akira.Lib.Items.CanvasImage));
 
             // Mark it for removal if we have a saved file.
@@ -377,7 +377,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         // If item is inside an artboard update the coordinates accordingly.
         if (obj.has_member ("artboard")) {
             foreach (var _artboard in artboards) {
-                if (_artboard.id == obj.get_string_member ("artboard")) {
+                if (_artboard.name.id == obj.get_string_member ("artboard")) {
                     var matrix = Cairo.Matrix.identity ();
                     _artboard.get_transform (out matrix);
                     pos_x = matrix.x0 + obj.get_double_member ("relative-x");
@@ -437,7 +437,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         if (obj.get_string_member ("name") != null) {
             item.name.name = obj.get_string_member ("name");
         }
-        item.id = obj.get_string_member ("id");
+        item.name.id = obj.get_string_member ("id");
 
         // Restore transform panel values.
         item.set ("width", obj.get_double_member ("width"));
@@ -576,7 +576,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             if (item is Items.CanvasArtboard) {
                 continue;
             }
-            item.update_ratio ();
+            item.size.update_ratio ();
         }
 
         // Check if any of the currently moved items was dropped inside or outside any artboard.

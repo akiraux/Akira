@@ -80,8 +80,8 @@ public class Akira.StateManagers.CoordinatesManager : Object {
      */
     private void on_init_state_coords (Lib.Items.CanvasItem item) {
         // Get the item X & Y coordinates.
-        double item_x = item.item_x;
-        double item_y = item.item_y;
+        double item_x = item.transform.x;
+        double item_y = item.transform.y;
 
         // Interrupt if no value has changed.
         if (item_x == x && item_y == y) {
@@ -114,8 +114,8 @@ public class Akira.StateManagers.CoordinatesManager : Object {
         do_update = false;
 
         // Get the item X & Y coordinates.
-        double item_x = item.item_x;
-        double item_y = item.item_y;
+        double item_x = item.transform.x;
+        double item_y = item.transform.y;
 
         // Interrupt if no value has changed.
         if (item_x == x && item_y == y) {
@@ -160,7 +160,7 @@ public class Akira.StateManagers.CoordinatesManager : Object {
 
             // If the item is rotated, we need to calculate the delta between the
             // new coordinates and item's bounds coordinates.
-            if (item.rotation != 0) {
+            if (item.rotation.rotation != 0) {
                 double half_border = get_border (item.line_width);
                 double diff_x = item.bounds.x1 - half_border;
                 double diff_y = item.bounds.y1 - half_border;

@@ -83,8 +83,8 @@ public class Akira.Utils.AffineTransform : Object {
         double delta_x = fix_size (event_x - initial_event_x);
         double delta_y = fix_size (event_y - initial_event_y);
 
-        double item_width = item.width;
-        double item_height = item.height;
+        double item_width = item.size.width;
+        double item_height = item.size.height;
         double item_x = item.bounds.x1;
         double item_y = item.bounds.y1;
         canvas.convert_to_item_space (item, ref item_x, ref item_y);
@@ -119,8 +119,8 @@ public class Akira.Utils.AffineTransform : Object {
                     ref inc_width
                 );
 
-                if (canvas.ctrl_is_pressed || item.size_locked) {
-                    inc_width = inc_height * item.size_ratio;
+                if (canvas.ctrl_is_pressed || item.size.locked) {
+                    inc_width = inc_height * item.size.ratio;
                     inc_x = -inc_width;
                     inc_y = -inc_height;
                 }
@@ -139,8 +139,8 @@ public class Akira.Utils.AffineTransform : Object {
                     ref inc_height
                 );
 
-                if (canvas.ctrl_is_pressed || item.size_locked) {
-                    inc_width = inc_height * item.size_ratio;
+                if (canvas.ctrl_is_pressed || item.size.locked) {
+                    inc_width = inc_height * item.size.ratio;
                     inc_x = - (inc_width / 2);
                 }
                 break;
@@ -161,8 +161,8 @@ public class Akira.Utils.AffineTransform : Object {
 
                 fix_width (ref delta_x, ref event_x, ref item_x, ref item_width, ref inc_width);
 
-                if (canvas.ctrl_is_pressed || item.size_locked) {
-                    inc_height = inc_width / item.size_ratio;
+                if (canvas.ctrl_is_pressed || item.size.locked) {
+                    inc_height = inc_width / item.size.ratio;
                     inc_y = -inc_height;
                 }
                 break;
@@ -172,8 +172,8 @@ public class Akira.Utils.AffineTransform : Object {
 
                 fix_width (ref delta_x, ref event_x, ref item_x, ref item_width, ref inc_width);
 
-                if (canvas.ctrl_is_pressed || item.size_locked) {
-                    inc_height = inc_width / item.size_ratio;
+                if (canvas.ctrl_is_pressed || item.size.locked) {
+                    inc_height = inc_width / item.size.ratio;
                     inc_y = - (inc_height / 2);
                 }
                 break;
@@ -186,9 +186,9 @@ public class Akira.Utils.AffineTransform : Object {
 
                 fix_height (ref delta_y, ref event_y, ref item_y, ref item_height, ref inc_height);
 
-                if (canvas.ctrl_is_pressed || item.size_locked) {
-                    inc_height = inc_width / item.size_ratio;
-                    if (item.size_ratio == 1 && item_width != item_height) {
+                if (canvas.ctrl_is_pressed || item.size.locked) {
+                    inc_height = inc_width / item.size.ratio;
+                    if (item.size.ratio == 1 && item_width != item_height) {
                         inc_height = item_width - item_height;
                     }
                 }
@@ -199,8 +199,8 @@ public class Akira.Utils.AffineTransform : Object {
 
                 fix_height (ref delta_y, ref event_y, ref item_y, ref item_height, ref inc_height);
 
-                if (canvas.ctrl_is_pressed || item.size_locked) {
-                    inc_width = inc_height * item.size_ratio;
+                if (canvas.ctrl_is_pressed || item.size.locked) {
+                    inc_width = inc_height * item.size.ratio;
                     inc_x = - (inc_width / 2);
                 }
                 break;
@@ -221,8 +221,8 @@ public class Akira.Utils.AffineTransform : Object {
 
                 fix_height (ref delta_y, ref event_y, ref item_y, ref item_height, ref inc_height);
 
-                if (canvas.ctrl_is_pressed || item.size_locked) {
-                    inc_width = inc_height * item.size_ratio;
+                if (canvas.ctrl_is_pressed || item.size.locked) {
+                    inc_width = inc_height * item.size.ratio;
                     inc_x = -inc_width;
                 }
                 break;
@@ -240,8 +240,8 @@ public class Akira.Utils.AffineTransform : Object {
                     ref inc_width
                 );
 
-                if (canvas.ctrl_is_pressed || item.size_locked) {
-                    inc_height = inc_width * item.size_ratio;
+                if (canvas.ctrl_is_pressed || item.size.locked) {
+                    inc_height = inc_width * item.size.ratio;
                     inc_y = - (inc_height / 2);
                 }
                 break;
@@ -386,8 +386,8 @@ public class Akira.Utils.AffineTransform : Object {
             canvas.convert_to_item_space (item, ref initial_x, ref initial_y);
         }
 
-        var center_x = item.width / 2;
-        var center_y = item.height / 2;
+        var center_x = item.size.width / 2;
+        var center_y = item.size.height / 2;
         var do_rotation = true;
         double rotation_amount = 0;
 
@@ -433,16 +433,16 @@ public class Akira.Utils.AffineTransform : Object {
             // to the current rotation, which might lead to a situation in which you
             // cannot "reset" item rotation to rounded values (0, 90, 180, ...) without
             // manually resetting the rotation input field in the properties panel
-            var current_rotation_int = ((int) fix_size (item.rotation));
+            var current_rotation_int = ((int) fix_size (item.rotation.rotation));
 
             rotation_amount = ROTATION_FIXED_STEP;
 
-            // Strange glitch: when item.rotation == 30.0, the fmod
+            // Strange glitch: when item.rotation.rotation == 30.0, the fmod
             // function does not work properly.
             // 30.00000 % 15.00000 != 0 => rotation_amount becomes 0.
-            // That's why here is used the int representation of item.rotation.
+            // That's why here is used the int representation of item.rotation.rotation.
             if (current_rotation_int % ROTATION_FIXED_STEP != 0) {
-                rotation_amount -= GLib.Math.fmod (item.rotation, ROTATION_FIXED_STEP);
+                rotation_amount -= GLib.Math.fmod (item.rotation.rotation, ROTATION_FIXED_STEP);
             }
 
             var prev_rotation = rotation;
@@ -452,7 +452,7 @@ public class Akira.Utils.AffineTransform : Object {
 
         if (do_rotation) {
             // Cap new_rotation to the [0, 360] range.
-            var new_rotation = GLib.Math.fmod (item.rotation + rotation, 360);
+            var new_rotation = GLib.Math.fmod (item.rotation.rotation + rotation, 360);
 
             // Round rotation in order to avoid sub degree issue.
             set_rotation (item, fix_size (new_rotation));
@@ -477,20 +477,20 @@ public class Akira.Utils.AffineTransform : Object {
     }
 
     public static void set_rotation (CanvasItem item, double rotation) {
-        var center_x = item.width / 2;
-        var center_y = item.height / 2;
-        var actual_rotation = rotation - item.rotation;
+        var center_x = item.size.width / 2;
+        var center_y = item.size.height / 2;
+        var actual_rotation = rotation - item.rotation.rotation;
 
         item.rotate (actual_rotation, center_x, center_y);
-        item.rotation += actual_rotation;
+        item.rotation.rotation += actual_rotation;
     }
 
     public static void flip_item (CanvasItem item, double sx, double sy) {
-        var center_x = item.width / 2;
-        var center_y = item.height / 2;
+        var center_x = item.size.width / 2;
+        var center_y = item.size.height / 2;
         Cairo.Matrix transform;
         item.get_transform (out transform);
-        double radians = deg_to_rad (item.rotation);
+        double radians = deg_to_rad (item.rotation.rotation);
 
         transform.translate (center_x, center_y);
         transform.rotate (-radians);

@@ -102,7 +102,7 @@ public class Akira.Layouts.Partials.FillsPanel : Gtk.Grid {
         add_btn.clicked.connect (() => {
             var model_item = create_model ();
             list_model.add_item.begin (model_item);
-            selected_item.reload_fills ();
+            selected_item.fills.reload ();
             add_btn.hide ();
             window.main_window.left_sidebar.queue_resize ();
         });
@@ -134,12 +134,12 @@ public class Akira.Layouts.Partials.FillsPanel : Gtk.Grid {
             toggled = true;
             selected_item = selected_items.nth_data (0);
 
-            if (!selected_item.has_fills) {
+            if (selected_item.fills != null) {
                 toggled = false;
                 return;
             }
 
-            if (selected_item.fills_count == 0) {
+            if (selected_item.fills.count () == 0) {
                 add_btn.show ();
                 return;
             }

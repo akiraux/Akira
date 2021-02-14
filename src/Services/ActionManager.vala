@@ -488,10 +488,10 @@ public class Akira.Services.ActionManager : Object {
             foreach (var item in canvas.selected_bound_manager.selected_items) {
                 if (is_holding_shift) {
                     // item.border_color_string = Utils.Color.rgba_to_hex_string (color);
-                    item.reload_borders ();
+                    item.borders.reload ();
                 } else {
                     // item.color_string = Utils.Color.rgba_to_hex_string (color);
-                    item.reload_fills ();
+                    item.fills.reload ();
                 }
             }
             color_picker.close ();

@@ -81,7 +81,7 @@ public class Akira.Lib.Components.Transform : Component {
      * we will need to update this condition.
      */
     private double get_border () {
-        if (!item.has_borders) {
+        if (item.borders != null) {
             return 0;
         }
 

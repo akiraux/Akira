@@ -69,7 +69,7 @@ public class Akira.Lib.Managers.HoverManager : Object {
 
         var item = target as Items.CanvasItem;
 
-        if (current_hover_item != null && item.id == current_hover_item.id) {
+        if (current_hover_item != null && item.name.id == current_hover_item.name.id) {
             // We already have the hover effect rendered correctly
             return;
         }
@@ -97,26 +97,26 @@ public class Akira.Lib.Managers.HoverManager : Object {
         create_hover_effect (item);
     }
 
-    private void create_hover_effect (Items.CanvasItem? item) {
+    private void create_hover_effect (Items.CanvasItem item) {
         if (item.layer.locked || item.layer.selected) {
             return;
         }
 
-        double width = item.width;
-        double height = item.height;
+        double x = item.transform.x;
+        double y = item.transform.y;
+        double w = 0.0;
+        item.get ("width", out w);
+        double h = 0.0;
+        item.get ("height", out h);
 
         hover_effect = new Goo.CanvasRect (
             null,
-            0, 0,
-            width, height,
+            x, y,
+            w, h,
             "line-width", LINE_WIDTH / canvas.current_scale,
             "stroke-color", STROKE_COLOR,
             null
         );
-
-        Cairo.Matrix transform;
-        item.get_transform (out transform);
-        hover_effect.set_transform (transform);
 
         hover_effect.set ("parent", canvas.get_root_item ());
         hover_effect.can_focus = false;

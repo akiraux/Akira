@@ -28,7 +28,7 @@ public class Akira.Lib.Components.Name : Component {
 
     public Name (Lib.Items.CanvasItem item) {
         this.item = item;
-        GLib.Type item_type = item.type ();
+        GLib.Type item_type = item.item_type.item_type;
         string[] type_slug_tokens = item_type.name ().split ("AkiraLibItemsCanvas");
         string type_slug = type_slug_tokens [type_slug_tokens.length - 1];
 
@@ -46,7 +46,7 @@ public class Akira.Lib.Components.Name : Component {
         }
 
         foreach (var _item in items) {
-            if (_item.type () == item_type) {
+            if (_item.item_type.item_type == item_type) {
                 count++;
             }
         }

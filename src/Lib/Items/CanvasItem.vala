@@ -49,387 +49,73 @@ public interface Akira.Lib.Items.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasIt
         return null;
     }
 
-    /**
-     * Helper method to return the GLib.Type of a specific component,
-     * only if the item is actually using that component.
-     */
-    public GLib.Type? type () {
-        Component? type_c = this.get_component (typeof (Components.Type));
-
-        if (type_c != null) {
-            return ((Components.Type) type_c).item_type;
-        }
-
-        return null;
-    }
-
-    /**
-     * Helper method to get the item's icon based on the type.
-     */
-    public string? icon {
+    public Components.Type? item_type {
         get {
-            Component? type_c = this.get_component (typeof (Components.Type));
-            return ((Components.Type) type_c).icon;
+            Component? component = this.get_component (typeof (Components.Type));
+            return (Components.Type) component;
         }
     }
 
-    /**
-     * Helper method to get and set the item's id.
-     */
-    public string id {
-        get {
-            Component? name_c = this.get_component (typeof (Components.Name));
-            return ((Components.Name) name_c).id;
-        }
-        set {
-            Component? name_c = this.get_component (typeof (Components.Name));
-            ((Components.Name) name_c).id = value;
-        }
-    }
-
-    public unowned Components.Name? name {
+    public Components.Name? name {
         get {
             Component? component = this.get_component (typeof (Components.Name));
             return (Components.Name) component;
         }
     }
 
-    public double item_x {
+    public Components.Transform? transform {
         get {
-            Component? transform = this.get_component (typeof (Components.Transform));
-            return ((Components.Transform) transform).x;
-        }
-        set {
-            Component? transform = this.get_component (typeof (Components.Transform));
-            ((Components.Transform) transform).x = value;
+            Component? component = this.get_component (typeof (Components.Transform));
+            return (Components.Transform) component;
         }
     }
 
-    public double item_y {
+    public Components.Opacity? opacity {
         get {
-            Component? transform = this.get_component (typeof (Components.Transform));
-            return ((Components.Transform) transform).y;
-        }
-        set {
-            Component? transform = this.get_component (typeof (Components.Transform));
-            ((Components.Transform) transform).y = value;
+            Component? component = this.get_component (typeof (Components.Opacity));
+            return (Components.Opacity) component;
         }
     }
 
-    /**
-     * Helper method to get and set the item's width. We do it this way because
-     * it's faster than type casting each item to get the property from the
-     * object class (e.g. CanvasRect, CanvasEllipse, etc.)
-     */
-    public double width {
+    public Components.Rotation? rotation {
         get {
-            double item_width = 0.0;
-            get ("width", out item_width);
-
-            return item_width;
-        }
-        set {
-            set ("width", value);
+            Component? component = this.get_component (typeof (Components.Rotation));
+            return (Components.Rotation) component;
         }
     }
 
-    /**
-     * Helper method to get and set the item's height. We do it this way because
-     * it's faster than type casting each item to get the property from the
-     * object class (e.g. CanvasRect, CanvasEllipse, etc.)
-     */
-    public double height {
+    public Components.Fills? fills {
         get {
-            double item_height = 0.0;
-            get ("height", out item_height);
-
-            return item_height;
-        }
-        set {
-            set ("height", value);
+            Component? component = this.get_component (typeof (Components.Fills));
+            return (Components.Fills) component;
         }
     }
 
-    /**
-     * Helper method to get and set the opacity of the item, only if the item
-     * is using the Opacity component.
-     */
-    public double? opacity {
+    public Components.Borders? borders {
         get {
-            Component? opacity_c = this.get_component (typeof (Components.Opacity));
-
-            if (opacity_c != null) {
-                return ((Components.Opacity) opacity_c).opacity;
-            }
-
-            return null;
-        }
-        set {
-            Component? opacity_c = this.get_component (typeof (Components.Opacity));
-
-            if (opacity_c != null) {
-                ((Components.Opacity) opacity_c).opacity = value;
-            }
+            Component? component = this.get_component (typeof (Components.Borders));
+            return (Components.Borders) component;
         }
     }
 
-    /**
-     * Helper method to get and set the rotation of the item, only if the item
-     * is using the Rotation component.
-     */
-    public double? rotation {
+    public Components.Size? size {
         get {
-            Component? rotation_c = this.get_component (typeof (Components.Rotation));
-
-            if (rotation_c != null) {
-                return ((Components.Rotation) rotation_c).rotation;
-            }
-
-            return null;
-        }
-        set {
-            Component? rotation_c = this.get_component (typeof (Components.Rotation));
-
-            if (rotation_c != null) {
-                ((Components.Rotation) rotation_c).rotation = value;
-            }
+            Component? component = this.get_component (typeof (Components.Size));
+            return (Components.Size) component;
         }
     }
 
-    /**
-     * Helper method to know if the item implements fillings or not.
-     * Primarily used to disable the Fills area in the Transform Panel.
-     */
-    public bool has_fills {
+    public Components.Flipped? flipped {
         get {
-            return this.get_component (typeof (Components.Fills)) != null;
+            Component? component = this.get_component (typeof (Components.Flipped));
+            return (Components.Flipped) component;
         }
     }
 
-    /**
-     * Helper method to get the number of Fills the item is using.
-     */
-     public int fills_count {
+    public Components.BorderRadius? border_radius {
         get {
-            Component? fills_c = this.get_component (typeof (Components.Fills));
-
-            if (fills_c != null) {
-                return ((Components.Fills) fills_c).count ();
-            }
-
-            return 0;
-        }
-    }
-
-    /**
-     * Helper method to recalculate the colors of all the applied Fills.
-     */
-    public void reload_fills () {
-        Component? fills_c = this.get_component (typeof (Components.Fills));
-
-        if (fills_c != null) {
-            ((Components.Fills) fills_c).reload ();
-        }
-    }
-
-    /**
-     * Helper method to know if the item implements borders or not.
-     * Primarily used to disable the Borders area in the Transform Panel.
-     */
-    public bool has_borders {
-        get {
-            return this.get_component (typeof (Components.Borders)) != null;
-        }
-    }
-
-    /**
-     * Helper method to get the number of Borders the item is using.
-     */
-    public int borders_count {
-        get {
-            Component? borders_c = this.get_component (typeof (Components.Borders));
-
-            if (borders_c != null) {
-                return ((Components.Borders) borders_c).count ();
-            }
-
-            return 0;
-        }
-    }
-
-    /**
-     * Helper method to recalculate the colors of all the applied Borders.
-     */
-    public void reload_borders () {
-        Component? borders_c = this.get_component (typeof (Components.Borders));
-
-        if (borders_c != null) {
-            ((Components.Borders) borders_c).reload ();
-        }
-    }
-
-    /**
-     * Helper method to get and set the locked size of the item, only if the item
-     * is using the Size component.
-     */
-    public bool? size_locked {
-        get {
-            Component? size = this.get_component (typeof (Components.Size));
-
-            if (size != null) {
-                return ((Components.Size) size).locked;
-            }
-
-            return null;
-        }
-        set {
-            Component? size = this.get_component (typeof (Components.Size));
-
-            if (size != null) {
-                ((Components.Size) size).locked = value;
-            }
-        }
-    }
-
-    /**
-     * Helper method to get and set the size ratio of the item, only if the item
-     * is using the Size component.
-     */
-    public double? size_ratio {
-        get {
-            Component? size = this.get_component (typeof (Components.Size));
-
-            if (size != null) {
-                return ((Components.Size) size).ratio;
-            }
-
-            return null;
-        }
-        set {
-            Component? size = this.get_component (typeof (Components.Size));
-
-            if (size != null) {
-                ((Components.Size) size).ratio = value;
-            }
-        }
-    }
-
-    /**
-     * Helper method to update the size ratio of an item.
-     */
-    public void update_ratio () {
-        Component? size = this.get_component (typeof (Components.Size));
-
-        if (size != null) {
-            ((Components.Size) size).ratio = width / height;
-        }
-    }
-
-    /**
-     * Helper method to get and set the horizontal mirroring of the item, only if the item
-     * is using the Flipped component.
-     */
-    public bool? flipped_h {
-        get {
-            Component? flipped = this.get_component (typeof (Components.Flipped));
-
-            if (flipped != null) {
-                return ((Components.Flipped) flipped).horizontal;
-            }
-
-            return null;
-        }
-        set {
-            Component? flipped = this.get_component (typeof (Components.Flipped));
-
-            if (flipped != null) {
-                ((Components.Flipped) flipped).horizontal = value;
-            }
-        }
-    }
-
-    /**
-     * Helper method to get and set the vertical mirroring of the item, only if the item
-     * is using the Flipped component.
-     */
-    public bool? flipped_v {
-        get {
-            Component? flipped = this.get_component (typeof (Components.Flipped));
-
-            if (flipped != null) {
-                return ((Components.Flipped) flipped).vertical;
-            }
-
-            return null;
-        }
-        set {
-            Component? flipped = this.get_component (typeof (Components.Flipped));
-
-            if (flipped != null) {
-                ((Components.Flipped) flipped).vertical = value;
-            }
-        }
-    }
-
-    /**
-     * Helper method to know if the item implements the border radius or not.
-     * Primarily used to disable the Border Radius area in the Transform Panel.
-     */
-     public bool has_border_radius {
-        get {
-            return this.get_component (typeof (Components.BorderRadius)) != null;
-        }
-    }
-
-    /**
-     * Set and get the boolean attribute to control the uniformity of the border radius.
-     * E.g.: if both the X & Y radii should be identical.
-     */
-    public bool border_radius_uniform {
-        get {
-            Component? border_radius = this.get_component (typeof (Components.BorderRadius));
-            return ((Components.BorderRadius) border_radius).uniform;
-        }
-        set {
-            Component? border_radius = this.get_component (typeof (Components.BorderRadius));
-            ((Components.BorderRadius) border_radius).uniform = value;
-        }
-    }
-
-    /**
-     * Set and get the boolean attribute to control the autoscaling of the border radius.
-     * E.g.: if the X & Y radii should increase when the item is enlarged.
-     */
-    public bool border_radius_autoscale {
-        get {
-            Component? border_radius = this.get_component (typeof (Components.BorderRadius));
-            return ((Components.BorderRadius) border_radius).autoscale;
-        }
-        set {
-            Component? border_radius = this.get_component (typeof (Components.BorderRadius));
-            ((Components.BorderRadius) border_radius).autoscale = value;
-        }
-    }
-
-    public double border_radius_x {
-        get {
-            Component? border_radius = this.get_component (typeof (Components.BorderRadius));
-            return ((Components.BorderRadius) border_radius).x;
-        }
-        set {
-            Component? border_radius = this.get_component (typeof (Components.BorderRadius));
-            ((Components.BorderRadius) border_radius).x = value;
-        }
-    }
-
-    public double border_radius_y {
-        get {
-            Component? border_radius = this.get_component (typeof (Components.BorderRadius));
-            return ((Components.BorderRadius) border_radius).y;
-        }
-        set {
-            Component? border_radius = this.get_component (typeof (Components.BorderRadius));
-            ((Components.BorderRadius) border_radius).y = value;
+            Component? component = this.get_component (typeof (Components.BorderRadius));
+            return (Components.BorderRadius) component;
         }
     }
 

@@ -55,7 +55,7 @@ public class Akira.Layouts.Partials.BorderRadiusPanel : Gtk.Grid {
             }
             disconnect_previous_item ();
             _selected_item = value;
-            if (_selected_item == null || !_selected_item.has_border_radius) {
+            if (_selected_item == null || _selected_item.border_radius == null) {
                 disable ();
                 return;
             }
@@ -258,7 +258,7 @@ public class Akira.Layouts.Partials.BorderRadiusPanel : Gtk.Grid {
         radius_adj.upper = max_value;
         border_radius_entry.set_range (0, max_value);
 
-        if (!selected_item.border_radius_autoscale) {
+        if (!selected_item.border_radius.autoscale) {
             return;
         }
 
@@ -270,17 +270,17 @@ public class Akira.Layouts.Partials.BorderRadiusPanel : Gtk.Grid {
     private void enable () {
         on_size_change ();
 
-        uniform_switch.active = selected_item.border_radius_uniform;
-        autoscale_switch.active = selected_item.border_radius_autoscale;
+        uniform_switch.active = selected_item.border_radius.uniform;
+        autoscale_switch.active = selected_item.border_radius.autoscale;
 
         // Uniform radius
-        if (selected_item.border_radius_uniform) {
-            radius_adj.value = selected_item.border_radius_x;
+        if (selected_item.border_radius.uniform) {
+            radius_adj.value = selected_item.border_radius.x;
         }
-        update_all_borders (selected_item.border_radius_uniform);
+        update_all_borders (selected_item.border_radius.uniform);
 
         // Non-Uniform radius
-        //  if (!selected_item.border_radius_uniform) {
+        //  if (!selected_item.border_radius.uniform) {
         //      border_radius_top_left_entry.entry.text = selected_item.radius_tl;
         //      border_radius_top_right_entry.entry.text = selected_item.radius_tr;
         //      border_radius_bottom_right_entry.entry.text = selected_item.radius_br;
@@ -288,13 +288,13 @@ public class Akira.Layouts.Partials.BorderRadiusPanel : Gtk.Grid {
         //  }
 
         radius_binding = radius_adj.bind_property (
-            "value", selected_item, "global-radius",
+            "value", selected_item.border_radius, "x",
             BindingFlags.SYNC_CREATE | BindingFlags.BIDIRECTIONAL);
 
         uniform_binding = uniform_switch.bind_property (
-            "active", selected_item, "border-radius-uniform");
+            "active", selected_item.border_radius, "uniform");
         autoscale_binding = autoscale_switch.bind_property (
-            "active", selected_item, "border-radius-autoscale");
+            "active", selected_item.border_radius, "autoscale");
 
         selected_item.notify["width"].connect (on_size_change);
         selected_item.notify["height"].connect (on_size_change);

@@ -53,7 +53,7 @@ public class Akira.Lib.Components.Fill : Component {
         }
 
         // Keep in consideration the global opacity to properly update the fill color.
-        color.alpha = ((double) alpha) / 255 * item.opacity / 100;
+        color.alpha = ((double) alpha) / 255 * item.opacity.opacity / 100;
         hex = Utils.Color.rgba_to_hex (color.to_string ());
 
         // Temporarily set the item color here. This will be moved to the Fills component
@@ -72,15 +72,15 @@ public class Akira.Lib.Components.Fill : Component {
     /**
      * Get the new hexadecimal string defined by the user and update the fill color.
      */
-    // public void set_hex (string new_hex) {
-    //     // Interrupt if the value didn't change.
-    //     if (new_hex == hex) {
-    //         return;
-    //     }
+    public void set_fill_hex (string new_hex) {
+        // Interrupt if the value didn't change.
+        if (new_hex == hex) {
+            return;
+        }
 
-    //     hex = new_hex;
-    //     color.parse (hex);
+        hex = new_hex;
+        color.parse (hex);
 
-    //     set_fill ();
-    // }
+        set_fill ();
+    }
 }

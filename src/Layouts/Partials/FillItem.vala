@@ -236,7 +236,7 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
     }
 
     private void on_model_changed () {
-        model.item.reload_fills ();
+        model.item.fills.reload ();
         set_button_color ();
         set_color_chooser_color ();
     }
@@ -249,7 +249,7 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
 
     private void on_delete_item () {
         model.list_model<Akira.Models.FillsItemModel>.remove_item.begin (model);
-        model.item.reload_fills ();
+        model.item.fills.reload ();
         window.event_bus.fill_deleted ();
     }
 

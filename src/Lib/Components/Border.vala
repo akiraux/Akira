@@ -56,7 +56,7 @@ public class Akira.Lib.Components.Border : Component {
         }
 
         // Keep in consideration the global opacity to properly update the border color.
-        color.alpha = ((double) alpha) / 255 * item.opacity / 100;
+        color.alpha = ((double) alpha) / 255 * item.opacity.opacity / 100;
         hex = Utils.Color.rgba_to_hex (color.to_string ());
 
         // Temporarily set the item color here. This will be moved to the Borders component
@@ -78,15 +78,15 @@ public class Akira.Lib.Components.Border : Component {
     /**
      * Get the new hexadecimal string defined by the user and update the border color.
      */
-    // public void set_hex (string new_hex) {
-    //     // Interrupt if the value didn't change.
-    //     if (new_hex == hex) {
-    //         return;
-    //     }
+    public void set_border_hex (string new_hex) {
+        // Interrupt if the value didn't change.
+        if (new_hex == hex) {
+            return;
+        }
 
-    //     hex = new_hex;
-    //     color.parse (hex);
+        hex = new_hex;
+        color.parse (hex);
 
-    //     set_border ();
-    // }
+        set_border ();
+    }
 }

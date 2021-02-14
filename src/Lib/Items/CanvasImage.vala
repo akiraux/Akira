@@ -86,13 +86,16 @@ public class Akira.Lib.Items.CanvasImage : Goo.CanvasImage, Akira.Lib.Items.Canv
                 height = original_pixbuf.get_height ();
 
                 // Imported images should have their size ratio locked by default.
-                size_locked = true;
-                size_ratio = width / height;
+                size.locked = true;
+                size.ratio = width / height;
             } catch (Error e) {
                 warning (e.message);
                 ((Lib.Canvas) canvas).window.event_bus.canvas_notification (e.message);
             }
         });
+
+        // Add the newly created item to the Canvas or Artboard.
+        parent.add_child (this, -1);
     }
 
     /**

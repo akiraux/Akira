@@ -70,5 +70,8 @@ public class Akira.Lib.Items.CanvasEllipse : Goo.CanvasEllipse, Akira.Lib.Items.
 
         // Add extra attributes.
         is_loaded = _is_loaded;
+
+        // Add the newly created item to the Canvas or Artboard.
+        parent.add_child (this, -1);
     }
 }
