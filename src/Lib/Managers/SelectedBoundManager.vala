@@ -72,8 +72,8 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
             delta_x_accumulator = 0.0;
             delta_y_accumulator = 0.0;
 
-            initial_width = selected_item.size.width;
-            initial_height = selected_item.size.height;
+            initial_width = selected_item.w;
+            initial_height = selected_item.h;
 
             return;
         }

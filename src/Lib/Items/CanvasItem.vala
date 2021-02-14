@@ -49,6 +49,24 @@ public interface Akira.Lib.Items.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasIt
         return null;
     }
 
+    public double w {
+        get {
+            double coord = 0.0;
+            get ("width", out coord);
+
+            return coord;
+        }
+    }
+
+    public double h {
+        get {
+            double coord = 0.0;
+            get ("height", out coord);
+
+            return coord;
+        }
+    }
+
     public Components.Type? item_type {
         get {
             Component? component = this.get_component (typeof (Components.Type));

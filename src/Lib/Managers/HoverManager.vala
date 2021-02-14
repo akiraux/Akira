@@ -102,21 +102,18 @@ public class Akira.Lib.Managers.HoverManager : Object {
             return;
         }
 
-        double x = item.transform.x;
-        double y = item.transform.y;
-        double w = 0.0;
-        item.get ("width", out w);
-        double h = 0.0;
-        item.get ("height", out h);
-
         hover_effect = new Goo.CanvasRect (
             null,
-            x, y,
-            w, h,
+            item.transform.x, item.transform.y,
+            item.w, item.h,
             "line-width", LINE_WIDTH / canvas.current_scale,
             "stroke-color", STROKE_COLOR,
             null
         );
+
+        double x, y, scale, rotation;
+        item.get_simple_transform (out x, out y, out scale, out rotation);
+        hover_effect.set_simple_transform (x, y, scale, rotation);
 
         hover_effect.set ("parent", canvas.get_root_item ());
         hover_effect.can_focus = false;

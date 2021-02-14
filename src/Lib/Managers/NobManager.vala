@@ -159,18 +159,17 @@ public class Akira.Lib.Managers.NobManager : Object {
         double y = 0.0;
         double width = 0.0;
         double height = 0.0;
-
-        var transform = Cairo.Matrix.identity ();
+        double scale = 1.0;
+        double rotation = 0.0;
 
         set_bound_coordinates (
             selected_items,
             ref x, ref y,
-            ref transform,
+            ref rotation,
             ref width, ref height
         );
 
         if (create) {
-            //  debug ("create effect");
             select_effect = new Goo.CanvasRect (
                 null,
                 x, y,
@@ -183,7 +182,7 @@ public class Akira.Lib.Managers.NobManager : Object {
             select_effect.set ("parent", root);
         }
 
-        select_effect.set_transform (transform);
+        select_effect.set_simple_transform (x, y, scale, rotation);
         select_effect.set ("width", width);
         select_effect.set ("height", height);
         select_effect.set ("line-width", LINE_WIDTH / canvas.current_scale);
@@ -191,17 +190,17 @@ public class Akira.Lib.Managers.NobManager : Object {
 
     private void update_nob_position (List<Items.CanvasItem> selected_items) {
         is_artboard = false;
-        var transform = Cairo.Matrix.identity ();
 
         double x = 0.0;
         double y = 0.0;
         double width = 0.0;
         double height = 0.0;
+        double rotation = 0.0;
 
         set_bound_coordinates (
             selected_items,
             ref x, ref y,
-            ref transform,
+            ref rotation,
             ref width, ref height
         );
 
@@ -232,7 +231,7 @@ public class Akira.Lib.Managers.NobManager : Object {
         var nob_offset = nob_size / 2;
 
         // TOP LEFT nob
-        nobs[Nob.TOP_LEFT].set_transform (transform);
+        // nobs[Nob.TOP_LEFT].set_transform (transform);
         if (print_middle_width_nobs && print_middle_height_nobs) {
             nobs[Nob.TOP_LEFT].translate (x - (nob_offset), y - (nob_offset));
         } else {
@@ -242,7 +241,7 @@ public class Akira.Lib.Managers.NobManager : Object {
 
         if (print_middle_width_nobs) {
             // TOP CENTER nob
-            nobs[Nob.TOP_CENTER].set_transform (transform);
+            // nobs[Nob.TOP_CENTER].set_transform (transform);
             if (print_middle_height_nobs) {
                 nobs[Nob.TOP_CENTER].translate (x + (width / 2) - nob_offset, y - (nob_offset));
             } else {
@@ -256,7 +255,7 @@ public class Akira.Lib.Managers.NobManager : Object {
         nobs[Nob.TOP_CENTER].raise (select_effect);
 
         // TOP RIGHT nob
-        nobs[Nob.TOP_RIGHT].set_transform (transform);
+        // nobs[Nob.TOP_RIGHT].set_transform (transform);
         if (print_middle_width_nobs && print_middle_height_nobs) {
             nobs[Nob.TOP_RIGHT].translate (x + width - (nob_offset), y - (nob_offset));
         } else {
@@ -266,7 +265,7 @@ public class Akira.Lib.Managers.NobManager : Object {
 
         if (print_middle_height_nobs) {
             // RIGHT CENTER nob
-            nobs[Nob.RIGHT_CENTER].set_transform (transform);
+            // nobs[Nob.RIGHT_CENTER].set_transform (transform);
             if (print_middle_width_nobs) {
                 nobs[Nob.RIGHT_CENTER].translate (x + width - (nob_offset), y + (height / 2) - nob_offset);
             } else {
@@ -280,7 +279,7 @@ public class Akira.Lib.Managers.NobManager : Object {
         nobs[Nob.RIGHT_CENTER].raise (select_effect);
 
         // BOTTOM RIGHT nob
-        nobs[Nob.BOTTOM_RIGHT].set_transform (transform);
+        // nobs[Nob.BOTTOM_RIGHT].set_transform (transform);
         if (print_middle_width_nobs && print_middle_height_nobs) {
             nobs[Nob.BOTTOM_RIGHT].translate (
                 x + width - (nob_offset), y + height - (nob_offset)
@@ -292,7 +291,7 @@ public class Akira.Lib.Managers.NobManager : Object {
 
         if (print_middle_width_nobs) {
             // BOTTOM CENTER nob
-            nobs[Nob.BOTTOM_CENTER].set_transform (transform);
+            // nobs[Nob.BOTTOM_CENTER].set_transform (transform);
             if (print_middle_height_nobs) {
                 nobs[Nob.BOTTOM_CENTER].translate (
                     x + (width / 2) - nob_offset, y + height - (nob_offset)
@@ -307,7 +306,7 @@ public class Akira.Lib.Managers.NobManager : Object {
         nobs[Nob.BOTTOM_CENTER].raise (select_effect);
 
         // BOTTOM LEFT nob
-        nobs[Nob.BOTTOM_LEFT].set_transform (transform);
+        // nobs[Nob.BOTTOM_LEFT].set_transform (transform);
         if (print_middle_width_nobs && print_middle_height_nobs) {
             nobs[Nob.BOTTOM_LEFT].translate (x - (nob_offset), y + height - (nob_offset));
         } else {
@@ -317,7 +316,7 @@ public class Akira.Lib.Managers.NobManager : Object {
 
         if (print_middle_height_nobs) {
             // LEFT CENTER nob
-            nobs[Nob.LEFT_CENTER].set_transform (transform);
+            // nobs[Nob.LEFT_CENTER].set_transform (transform);
             if (print_middle_width_nobs) {
                 nobs[Nob.LEFT_CENTER].translate (x - (nob_offset), y + (height / 2) - nob_offset);
             } else {
@@ -338,7 +337,7 @@ public class Akira.Lib.Managers.NobManager : Object {
             distance += (distance / canvas.current_scale) / 4;
         }
 
-        nobs[Nob.ROTATE].set_transform (transform);
+        // nobs[Nob.ROTATE].set_transform (transform);
         nobs[Nob.ROTATE].translate (x + (width / 2) - nob_offset, y - nob_offset - distance);
         nobs[Nob.ROTATE].raise (select_effect);
     }
@@ -355,23 +354,23 @@ public class Akira.Lib.Managers.NobManager : Object {
         List<Items.CanvasItem> selected_items,
         ref double x,
         ref double y,
-        ref Cairo.Matrix transform,
+        ref double rotation,
         ref double _width,
         ref double _height
     ) {
         if (selected_items.length () == 1) {
             var item = selected_items.nth_data (0);
 
-            item.get_transform (out transform);
-
-            item.get ("width", out _width);
-            item.get ("height", out _height);
-            item.get ("x", out x);
-            item.get ("y", out y);
+            rotation = 0.0;
+            _width = item.w;
+            _height = item.h;
+            x = item.transform.x;
+            y = item.transform.y;
 
             return;
         }
 
+        rotation = 0.0;
         _width = width;
         _height = height;
         x = left;
