@@ -233,7 +233,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         // height.value = selected_item.height;
         // rotation.value = selected_item.rotation;
         // opacity_adj.value = selected_item.opacity.opacity;
-        lock_changes.active = selected_item.size.locked;
+        // lock_changes.active = selected_item.size.locked;
         // hflip_button.active = selected_item.flipped_h;
         // vflip_button.active = selected_item.flipped_v;
 

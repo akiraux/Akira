@@ -34,6 +34,9 @@ public class Akira.Lib.Items.CanvasArtboard : Goo.CanvasGroup, Akira.Lib.Items.C
    // Override the list type from he CanvasGroup.
    public new Akira.Models.ListModel<Lib.Items.CanvasItem> items;
 
+   // Private attributes of the Artboard.
+   public Goo.CanvasRect background;
+
    public CanvasArtboard (double _x, double _y, Goo.CanvasItem? _parent) {
       parent = _parent;
 
@@ -44,6 +47,8 @@ public class Akira.Lib.Items.CanvasArtboard : Goo.CanvasGroup, Akira.Lib.Items.C
       x = _x;
       y = _y;
       width = height = 1;
+
+      create_background ();
 
       // Add extra attributes.
       is_loaded = _is_loaded;
@@ -64,10 +69,18 @@ public class Akira.Lib.Items.CanvasArtboard : Goo.CanvasGroup, Akira.Lib.Items.C
       // Artboards have fills that can be edited, but they always start
       // with a full white background.
       var fill_color = Gdk.RGBA ();
-      fill_color.parse ("#fff");
+      fill_color.parse ("rgba(255,255,255,1)");
       components.add (new Fills (this, fill_color));
       components.add (new Size (this));
       components.add (new Layer ());
+   }
+
+   private void create_background () {
+      background = new Goo.CanvasRect (this, 0.0, 0.0, 1.0, 1.0, "line-width", 0.0, null);
+      background.can_focus = false;
+
+      this.bind_property ("width", background, "width", BindingFlags.SYNC_CREATE | BindingFlags.BIDIRECTIONAL);
+      this.bind_property ("height", background, "height", BindingFlags.SYNC_CREATE | BindingFlags.BIDIRECTIONAL);
    }
 
    /**
