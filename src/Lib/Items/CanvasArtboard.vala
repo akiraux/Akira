@@ -36,6 +36,7 @@ public class Akira.Lib.Items.CanvasArtboard : Goo.CanvasGroup, Akira.Lib.Items.C
 
    // Private attributes of the Artboard.
    public Goo.CanvasRect background;
+   public Goo.CanvasText label;
 
    public CanvasArtboard (double _x, double _y, Goo.CanvasItem? _parent) {
       parent = _parent;
@@ -72,14 +73,32 @@ public class Akira.Lib.Items.CanvasArtboard : Goo.CanvasGroup, Akira.Lib.Items.C
       components.add (new Fills (this, fill_color));
       components.add (new Size (this));
       components.add (new Layer ());
+
+      create_label ();
    }
 
    private void create_background () {
       background = new Goo.CanvasRect (this, 0.0, 0.0, 1.0, 1.0, "line-width", 0.0, null);
       background.can_focus = false;
 
-      this.bind_property ("width", background, "width", BindingFlags.SYNC_CREATE | BindingFlags.BIDIRECTIONAL);
-      this.bind_property ("height", background, "height", BindingFlags.SYNC_CREATE | BindingFlags.BIDIRECTIONAL);
+      this.bind_property ("width", background, "width", BindingFlags.SYNC_CREATE);
+      this.bind_property ("height", background, "height", BindingFlags.SYNC_CREATE);
+   }
+
+   private void create_label () {
+      label = new Goo.CanvasText (
+         parent, name.name, x, y, 1.0,
+         Goo.CanvasAnchorType.SW,
+         "font", "Open Sans 10",
+         "ellipsize", Pango.EllipsizeMode.END,
+         null);
+      label.can_focus = false;
+
+      this.transform.bind_property ("x", label, "x", BindingFlags.SYNC_CREATE);
+      this.transform.bind_property ("y", label, "y", BindingFlags.SYNC_CREATE);
+      this.bind_property ("width", label, "width", BindingFlags.SYNC_CREATE);
+
+      this.name.bind_property ("name", label, "text", BindingFlags.SYNC_CREATE);
    }
 
    /**

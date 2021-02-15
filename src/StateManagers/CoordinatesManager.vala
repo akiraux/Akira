@@ -126,6 +126,9 @@ public class Akira.StateManagers.CoordinatesManager : Object {
         x = item_x;
         y = item_y;
 
+        item.transform.x = item_x;
+        item.transform.y = item_y;
+
         do_update = true;
 
         window.event_bus.file_edited ();

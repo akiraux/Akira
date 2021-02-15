@@ -45,18 +45,7 @@ public class Akira.Utils.AffineTransform : Object {
         var delta_x = event_x - initial_event_x;
         var delta_y = event_y - initial_event_y;
 
-        if (item.artboard != null) {
-            // item.relative_x += delta_x;
-            // item.relative_y += delta_y;
-        } else {
-            Cairo.Matrix matrix;
-            item.get_transform (out matrix);
-
-            matrix.x0 += delta_x;
-            matrix.y0 += delta_y;
-
-            item.set_transform (matrix);
-        }
+        item.translate (delta_x, delta_y);
 
         initial_event_x = event_x;
         initial_event_y = event_y;

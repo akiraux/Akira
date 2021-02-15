@@ -23,6 +23,7 @@
  * Transform component to keep track of the item's initial coordinates.
  */
 public class Akira.Lib.Components.Transform : Component {
+    private double _x;
     public double x {
         get {
             double item_x = item.bounds.x1 + get_border ();
@@ -34,8 +35,12 @@ public class Akira.Lib.Components.Transform : Component {
 
             return item_x;
         }
+        set {
+            _x = value;
+        }
     }
 
+    private double _y;
     public double y {
         get {
             double item_y = item.bounds.y1 + get_border ();
@@ -46,6 +51,9 @@ public class Akira.Lib.Components.Transform : Component {
             }
 
             return item_y;
+        }
+        set {
+            _y = value;
         }
     }
 
