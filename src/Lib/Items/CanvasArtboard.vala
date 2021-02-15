@@ -62,7 +62,6 @@ public class Akira.Lib.Items.CanvasArtboard : Goo.CanvasGroup, Akira.Lib.Items.C
 
       // Add all the components that this item uses.
       components = new Gee.ArrayList<Component> ();
-      components.add (new Components.Type (typeof (CanvasArtboard)));
       components.add (new Name (this));
       components.add (new Transform (this));
       components.add (new Opacity (this));

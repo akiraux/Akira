@@ -25,14 +25,49 @@
 public class Akira.Lib.Components.Name : Component {
     public string id { get; set; }
     public string name { get; set; }
+    public string icon { get; set; }
 
     public Name (Lib.Items.CanvasItem item) {
         this.item = item;
-        GLib.Type item_type = item.item_type.item_type;
-        string[] type_slug_tokens = item_type.name ().split ("AkiraLibItemsCanvas");
-        string type_slug = type_slug_tokens [type_slug_tokens.length - 1];
 
-        // Make sure the initial ID is the current count of the total amount
+        set_properties ();
+        update_name ();
+    }
+
+    private void set_properties () {
+        var type = item.get_type ();
+        // Assign the proper icon for the layers panel.
+        // We can't use a switch () method here because the typeof () method is not supported.
+        if (type == typeof (Items.CanvasArtboard)) {
+            icon = null;
+            name = _("Artboard");
+        }
+
+        if (type == typeof (Items.CanvasRect)) {
+            icon = "shape-rectangle-symbolic";
+            name = _("Rectangle");
+        }
+
+        if (type == typeof (Items.CanvasEllipse)) {
+            icon = "shape-circle-symbolic";
+            name = _("Ellipse");
+        }
+
+        if (type == typeof (Items.CanvasText)) {
+            icon = "shape-text-symbolic";
+            name = _("Text");
+        }
+
+        if (type == typeof (Items.CanvasImage)) {
+            icon = "shape-image-symbolic";
+            name = _("Image");
+        }
+    }
+
+    private void update_name () {
+        var type = item.get_type ();
+
+        // Make sure the initial ID includes the current count of the total amount
         // of items with the same item type in the same artboard.
         int count = 0;
         var items = ((Lib.Canvas) item.canvas).window.items_manager.free_items;
@@ -46,24 +81,12 @@ public class Akira.Lib.Components.Name : Component {
         }
 
         foreach (var _item in items) {
-            if (_item.item_type.item_type == item_type) {
+            if (_item.get_type () == type) {
                 count++;
             }
         }
 
-        id = capitalize (type_slug.down ()) + " " + count.to_string ();
+        id = name + " " + count.to_string ();
         name = id;
-    }
-
-    /**
-     * Helper method to capitalize the first letter of the item's name.
-     */
-    private static string capitalize (string s) {
-        string back = s;
-        if (s.get_char (0).islower ()) {
-            back = s.get_char (0).toupper ().to_string () + s.substring (1);
-        }
-
-        return back;
     }
 }

@@ -67,7 +67,6 @@ public class Akira.Lib.Items.CanvasImage : Goo.CanvasImage, Akira.Lib.Items.Canv
 
         // Add all the components that this item uses.
         components = new Gee.ArrayList<Component> ();
-        components.add (new Components.Type (typeof (CanvasImage)));
         components.add (new Name (this));
         components.add (new Transform (this));
         components.add (new Opacity (this));

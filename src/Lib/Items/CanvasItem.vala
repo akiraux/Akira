@@ -49,13 +49,6 @@ public interface Akira.Lib.Items.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasIt
         return null;
     }
 
-    public Components.Type? item_type {
-        get {
-            Component? component = this.get_component (typeof (Components.Type));
-            return (Components.Type) component;
-        }
-    }
-
     public Components.Name? name {
         get {
             Component? component = this.get_component (typeof (Components.Name));

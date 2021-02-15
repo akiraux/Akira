@@ -92,7 +92,6 @@ sources = files(
     'Lib/Components/Rotation.vala',
     'Lib/Components/Size.vala',
     'Lib/Components/Transform.vala',
-    'Lib/Components/Type.vala',
 
     'Lib/Items/CanvasArtboard.vala',
     'Lib/Items/CanvasEllipse.vala',

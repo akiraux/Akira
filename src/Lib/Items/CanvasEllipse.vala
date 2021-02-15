@@ -63,7 +63,6 @@ public class Akira.Lib.Items.CanvasEllipse : Goo.CanvasEllipse, Akira.Lib.Items.
 
         // Add all the components that this item uses.
         components = new Gee.ArrayList<Component> ();
-        components.add (new Components.Type (typeof (CanvasEllipse)));
         components.add (new Name (this));
         components.add (new Transform (this));
         components.add (new Opacity (this));
