@@ -35,30 +35,29 @@ public class Akira.Lib.Components.Name : Component {
     }
 
     private void set_properties () {
-        var type = item.get_type ();
         // Assign the proper icon for the layers panel.
         // We can't use a switch () method here because the typeof () method is not supported.
-        if (type == typeof (Items.CanvasArtboard)) {
+        if (item is Items.CanvasArtboard) {
             icon = null;
             name = _("Artboard");
         }
 
-        if (type == typeof (Items.CanvasRect)) {
+        if (item is Items.CanvasRect) {
             icon = "shape-rectangle-symbolic";
             name = _("Rectangle");
         }
 
-        if (type == typeof (Items.CanvasEllipse)) {
+        if (item is Items.CanvasEllipse) {
             icon = "shape-circle-symbolic";
             name = _("Ellipse");
         }
 
-        if (type == typeof (Items.CanvasText)) {
+        if (item is Items.CanvasText) {
             icon = "shape-text-symbolic";
             name = _("Text");
         }
 
-        if (type == typeof (Items.CanvasImage)) {
+        if (item is Items.CanvasImage) {
             icon = "shape-image-symbolic";
             name = _("Image");
         }

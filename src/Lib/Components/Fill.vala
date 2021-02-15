@@ -48,7 +48,7 @@ public class Akira.Lib.Components.Fill : Component {
     private void set_fill () {
         // Make the item transparent if the color is set by hidden.
         if (hidden) {
-            if (item.get_type () == typeof (Items.CanvasArtboard)) {
+            if (item is Items.CanvasArtboard) {
                 ((Items.CanvasArtboard) item).background.set ("fill-color-rgba", null);
             } else {
                 item.set ("fill-color-rgba", null);
@@ -63,7 +63,7 @@ public class Akira.Lib.Components.Fill : Component {
 
         // Temporarily set the item color here. This will be moved to the Fills component
         // once we enable multiple fillings.
-        if (item.get_type () == typeof (Items.CanvasArtboard)) {
+        if (item is Items.CanvasArtboard) {
             ((Items.CanvasArtboard) item).background.set ("fill-color-rgba", Utils.Color.rgba_to_uint (color));
         } else {
             item.set ("fill-color-rgba", Utils.Color.rgba_to_uint (color));

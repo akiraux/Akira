@@ -235,6 +235,11 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
                 nob_manager.selected_nob = clicked_nob_name;
 
+                // If we're clicking on the Artboard's label, change the target to the Artboard.
+                if (clicked_item is Goo.CanvasText && clicked_item.parent is Items.CanvasArtboard) {
+                    clicked_item = clicked_item.parent as Items.CanvasItem;
+                }
+
                 if (clicked_item is Items.CanvasItem) {
                     Items.CanvasItem item = clicked_item as Items.CanvasItem;
 

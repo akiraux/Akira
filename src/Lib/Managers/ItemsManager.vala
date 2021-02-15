@@ -134,7 +134,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             return null;
         }
 
-        if (new_item.get_type () == typeof (Items.CanvasArtboard)) {
+        if (new_item is Items.CanvasArtboard) {
             artboards.add_item.begin ((Items.CanvasArtboard) new_item);
         } else {
             // Add it to "free items" if it doesn't belong to an artboard.
@@ -146,7 +146,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             // to easily access them when saving the .akira/Pictures folder.
             // If we don't curate this dedicated list, it would be a nightamer to
             // loop through all the free items and artboard items to check for images.
-            if (new_item.get_type () == typeof (Items.CanvasImage)) {
+            if (new_item is Items.CanvasImage) {
                 images.add_item.begin ((new_item as Akira.Lib.Items.CanvasImage), loaded);
             }
         }
@@ -163,12 +163,12 @@ public class Akira.Lib.Managers.ItemsManager : Object {
     }
 
     public void on_request_delete_item (Lib.Items.CanvasItem item) {
-        if (item.get_type () == typeof (Items.CanvasArtboard)) {
+        if (item is Items.CanvasArtboard) {
             artboards.remove_item.begin (item as Items.CanvasArtboard);
         }
 
         // Remove the image from the list so we don't keep it in the saved file.
-        if (item.get_type () == typeof (Items.CanvasImage)) {
+        if (item is Items.CanvasImage) {
             images.remove_item.begin ((item as Akira.Lib.Items.CanvasImage));
 
             // Mark it for removal if we have a saved file.

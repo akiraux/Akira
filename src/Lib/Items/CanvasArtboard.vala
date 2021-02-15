@@ -93,6 +93,7 @@ public class Akira.Lib.Items.CanvasArtboard : Goo.CanvasGroup, Akira.Lib.Items.C
          "ellipsize", Pango.EllipsizeMode.END,
          null);
       label.can_focus = false;
+      label.parent = this;
 
       this.transform.bind_property ("x", label, "x", BindingFlags.SYNC_CREATE);
       this.transform.bind_property ("y", label, "y", BindingFlags.SYNC_CREATE);

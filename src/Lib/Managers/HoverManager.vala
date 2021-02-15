@@ -63,6 +63,11 @@ public class Akira.Lib.Managers.HoverManager : Object {
             return;
         }
 
+        // If we're hovering over the Artboard's label, change the target to the Artboard.
+        if (target is Goo.CanvasText && target.parent is Items.CanvasArtboard) {
+            target = target.parent as Items.CanvasItem;
+        }
+
         if (!(target is Items.CanvasItem)) {
             return;
         }
