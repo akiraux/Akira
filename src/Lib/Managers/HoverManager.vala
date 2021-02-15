@@ -111,7 +111,10 @@ public class Akira.Lib.Managers.HoverManager : Object {
             null
         );
 
-        hover_effect.rotate (item.rotation.rotation, item.size.width / 2, item.size.height / 2);
+        if (item.rotation != null) {
+            hover_effect.rotate (item.rotation.rotation, item.size.width / 2, item.size.height / 2);
+        }
+
         hover_effect.set ("parent", canvas.get_root_item ());
         hover_effect.can_focus = false;
     }

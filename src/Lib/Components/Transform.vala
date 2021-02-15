@@ -66,6 +66,9 @@ public class Akira.Lib.Components.Transform : Component {
 
         // Temporarily return the current line_width of the item
         // since we only support 1 border at the time.
-        return item.line_width > 0 ? item.line_width / 2 : 0;
+        double stroke;
+        item.get ("line-width", out stroke);
+
+        return stroke > 0 ? stroke / 2 : 0;
     }
 }

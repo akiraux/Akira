@@ -45,10 +45,11 @@ public class Akira.Lib.Items.CanvasEllipse : Goo.CanvasEllipse, Akira.Lib.Items.
         artboard = _artboard;
 
         // Create the ellipse.
-        x = center_x = _x;
-        y = center_y = _y;
+        x = _x;
+        y = _y;
         width = height = 1;
-        radius_x = radius_y = 0.0;
+        // The CanvasEllipse needs a starting radius at least half of the width.
+        radius_x = radius_y = 0.5;
 
         // Add extra attributes.
         is_loaded = _is_loaded;
@@ -71,7 +72,6 @@ public class Akira.Lib.Items.CanvasEllipse : Goo.CanvasEllipse, Akira.Lib.Items.
         components.add (new Borders (this, border_color, border_size));
         components.add (new Size (this));
         components.add (new Flipped ());
-        components.add (new BorderRadius (this));
         components.add (new Layer ());
     }
 }
