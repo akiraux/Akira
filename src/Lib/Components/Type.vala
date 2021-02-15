@@ -27,7 +27,7 @@ public class Akira.Lib.Components.Type : Component {
     public string? icon { get; set; }
 
     public Type (GLib.Type type) {
-        this.item_type = type;
+        item_type = type;
 
         // Assign the proper icon for the layers panel.
         // We can't use a switch () method here because the typeof () method is not supported.

@@ -83,8 +83,8 @@ public class Akira.Utils.AffineTransform : Object {
         double delta_x = fix_size (event_x - initial_event_x);
         double delta_y = fix_size (event_y - initial_event_y);
 
-        double item_width = item.w;
-        double item_height = item.h;
+        double item_width = item.size.width;
+        double item_height = item.size.height;
         double item_x = item.bounds.x1;
         double item_y = item.bounds.y1;
         canvas.convert_to_item_space (item, ref item_x, ref item_y);
@@ -386,8 +386,8 @@ public class Akira.Utils.AffineTransform : Object {
             canvas.convert_to_item_space (item, ref initial_x, ref initial_y);
         }
 
-        var center_x = item.w / 2;
-        var center_y = item.h / 2;
+        var center_x = item.size.width / 2;
+        var center_y = item.size.height / 2;
         var do_rotation = true;
         double rotation_amount = 0;
 
@@ -477,8 +477,8 @@ public class Akira.Utils.AffineTransform : Object {
     }
 
     public static void set_rotation (CanvasItem item, double rotation) {
-        var center_x = item.w / 2;
-        var center_y = item.h / 2;
+        var center_x = item.size.width / 2;
+        var center_y = item.size.height / 2;
         var actual_rotation = rotation - item.rotation.rotation;
 
         item.rotate (actual_rotation, center_x, center_y);
@@ -486,8 +486,8 @@ public class Akira.Utils.AffineTransform : Object {
     }
 
     public static void flip_item (CanvasItem item, double sx, double sy) {
-        var center_x = item.w / 2;
-        var center_y = item.h / 2;
+        var center_x = item.size.width / 2;
+        var center_y = item.size.height / 2;
         Cairo.Matrix transform;
         item.get_transform (out transform);
         double radians = deg_to_rad (item.rotation.rotation);

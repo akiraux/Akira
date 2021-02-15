@@ -43,7 +43,6 @@ public class Akira.Lib.Items.CanvasEllipse : Goo.CanvasEllipse, Akira.Lib.Items.
     ) {
         parent = _artboard != null ? _artboard : _parent;
         artboard = _artboard;
-        canvas = parent.get_canvas () as Akira.Lib.Canvas;
 
         // Create the ellipse.
         width = height = 1;
@@ -51,27 +50,24 @@ public class Akira.Lib.Items.CanvasEllipse : Goo.CanvasEllipse, Akira.Lib.Items.
         // The Ellipse has a weird 0.5 value always attached to it on creation.
         center_x = center_y = - 0.5;
 
-        // Add all the components that this item uses.
-        components = new Gee.ArrayList<Component> ();
-        components.add (new Components.Type (typeof (CanvasEllipse)));
-        // Only the Name component needs the class to be passed on construct.
-        // All the other components after this will inherit the class from the
-        // main Component.
-        components.add (new Name (this));
-        components.add (new Transform (center_x, center_y));
-        components.add (new Opacity ());
-        components.add (new Rotation ());
-        components.add (new Fills (fill_color));
-        components.add (new Borders (border_color, border_size));
-        components.add (new Size ());
-        components.add (new Flipped ());
-        components.add (new BorderRadius ());
-        components.add (new Layer ());
-
         // Add extra attributes.
         is_loaded = _is_loaded;
 
         // Add the newly created item to the Canvas or Artboard.
         parent.add_child (this, -1);
+
+        // Add all the components that this item uses.
+        components = new Gee.ArrayList<Component> ();
+        components.add (new Components.Type (typeof (CanvasEllipse)));
+        components.add (new Name (this));
+        components.add (new Transform (this));
+        components.add (new Opacity (this));
+        components.add (new Rotation ());
+        // components.add (new Fills (fill_color));
+        // components.add (new Borders (border_color, border_size));
+        components.add (new Size (this));
+        components.add (new Flipped ());
+        components.add (new BorderRadius ());
+        components.add (new Layer ());
     }
 }

@@ -26,7 +26,8 @@
 public class Akira.Lib.Components.Opacity : Component {
     public double opacity { get; set; }
 
-    public Opacity () {
+    public Opacity (Items.CanvasItem _item) {
+        item = _item;
         // Set opacity to 100% (fully visible) when the item is first created.
         opacity = 100.0;
     }

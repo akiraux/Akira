@@ -72,8 +72,8 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
             delta_x_accumulator = 0.0;
             delta_y_accumulator = 0.0;
 
-            initial_width = selected_item.w;
-            initial_height = selected_item.h;
+            initial_width = selected_item.size.width;
+            initial_height = selected_item.size.height;
 
             return;
         }
@@ -120,7 +120,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         canvas.window.event_bus.reset_state_coords (selected_item);
 
         // Let the UI know that a redraw is necessary.
-        canvas.window.event_bus.item_value_changed ();
+        update_selected_items ();
     }
 
     public void add_item_to_selection (Items.CanvasItem item) {

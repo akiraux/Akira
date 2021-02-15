@@ -211,7 +211,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
                 selected_bound_manager.set_initial_coordinates (event.x, event.y);
 
-                // nob_manager.selected_nob = Managers.NobManager.Nob.BOTTOM_RIGHT;
+                nob_manager.selected_nob = Managers.NobManager.Nob.BOTTOM_RIGHT;
                 break;
 
             case EditMode.MODE_SELECTION:

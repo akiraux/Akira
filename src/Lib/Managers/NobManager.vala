@@ -50,7 +50,7 @@ public class Akira.Lib.Managers.NobManager : Object {
     public Nob selected_nob;
 
     private Goo.CanvasItem root;
-    private Goo.CanvasItem select_effect;
+    private Goo.CanvasRect? select_effect;
     private Goo.CanvasItemSimple[] nobs = new Goo.CanvasItemSimple[9];
     private Goo.CanvasBounds select_bb;
     private double top;
@@ -59,7 +59,7 @@ public class Akira.Lib.Managers.NobManager : Object {
     private double height;
     private double nob_size;
 
-    // Tracks if an artbaord is part of the current selection.
+    // Tracks if an artboard is part of the current selection.
     private bool is_artboard;
 
     // If the effect needs to be created or it's only a value update.
@@ -159,14 +159,13 @@ public class Akira.Lib.Managers.NobManager : Object {
         double y = 0.0;
         double width = 0.0;
         double height = 0.0;
-        double scale = 1.0;
         double rotation = 0.0;
 
         set_bound_coordinates (
             selected_items,
             ref x, ref y,
-            ref rotation,
-            ref width, ref height
+            ref width, ref height,
+            ref rotation
         );
 
         if (create) {
@@ -179,13 +178,17 @@ public class Akira.Lib.Managers.NobManager : Object {
                 "stroke-color", STROKE_COLOR,
                 null
             );
+            select_effect.rotate (rotation, width / 2, height / 2);
             select_effect.set ("parent", root);
+            return;
         }
 
-        select_effect.set_simple_transform (x, y, scale, rotation);
+        select_effect.set ("x", x);
+        select_effect.set ("y", y);
         select_effect.set ("width", width);
         select_effect.set ("height", height);
         select_effect.set ("line-width", LINE_WIDTH / canvas.current_scale);
+        select_effect.rotate (rotation, width / 2, height / 2);
     }
 
     private void update_nob_position (List<Items.CanvasItem> selected_items) {
@@ -200,8 +203,8 @@ public class Akira.Lib.Managers.NobManager : Object {
         set_bound_coordinates (
             selected_items,
             ref x, ref y,
-            ref rotation,
-            ref width, ref height
+            ref width, ref height,
+            ref rotation
         );
 
         foreach (var item in selected_items) {
@@ -212,7 +215,7 @@ public class Akira.Lib.Managers.NobManager : Object {
         }
 
         if (create) {
-            //  debug ("create nobs");
+            // debug ("create nobs");
             for (int i = 0; i < 9; i++) {
                 nobs[i] = new Selection.Nob (root, (Managers.NobManager.Nob) i);
                 // If an artboard is part of the current selection, hide the rotation nob.
@@ -230,22 +233,24 @@ public class Akira.Lib.Managers.NobManager : Object {
 
         var nob_offset = nob_size / 2;
 
-        // TOP LEFT nob
-        // nobs[Nob.TOP_LEFT].set_transform (transform);
+        // TOP LEFT nob.
         if (print_middle_width_nobs && print_middle_height_nobs) {
-            nobs[Nob.TOP_LEFT].translate (x - (nob_offset), y - (nob_offset));
+            nobs[Nob.TOP_LEFT].set ("x", x - (nob_offset));
+            nobs[Nob.TOP_LEFT].set ("y", y - (nob_offset));
         } else {
-            nobs[Nob.TOP_LEFT].translate (x - nob_size, y - nob_size);
+            nobs[Nob.TOP_LEFT].set ("x", x - nob_size);
+            nobs[Nob.TOP_LEFT].set ("y", y - nob_size);
         }
         nobs[Nob.TOP_LEFT].raise (select_effect);
 
         if (print_middle_width_nobs) {
-            // TOP CENTER nob
-            // nobs[Nob.TOP_CENTER].set_transform (transform);
+            // TOP CENTER nob.
             if (print_middle_height_nobs) {
-                nobs[Nob.TOP_CENTER].translate (x + (width / 2) - nob_offset, y - (nob_offset));
+                nobs[Nob.TOP_CENTER].set ("x", x + (width / 2) - nob_offset);
+                nobs[Nob.TOP_CENTER].set ("y", y - (nob_offset));
             } else {
-                nobs[Nob.TOP_CENTER].translate (x + (width / 2) - nob_offset, y - (nob_size));
+                nobs[Nob.TOP_CENTER].set ("x", x + (width / 2) - nob_offset);
+                nobs[Nob.TOP_CENTER].set ("y", y - (nob_size));
             }
             set_nob_visibility (Nob.TOP_CENTER, true);
         } else {
@@ -254,22 +259,24 @@ public class Akira.Lib.Managers.NobManager : Object {
 
         nobs[Nob.TOP_CENTER].raise (select_effect);
 
-        // TOP RIGHT nob
-        // nobs[Nob.TOP_RIGHT].set_transform (transform);
+        // TOP RIGHT nob.
         if (print_middle_width_nobs && print_middle_height_nobs) {
-            nobs[Nob.TOP_RIGHT].translate (x + width - (nob_offset), y - (nob_offset));
+            nobs[Nob.TOP_RIGHT].set ("x", x + width - (nob_offset));
+            nobs[Nob.TOP_RIGHT].set ("y", y - (nob_offset));
         } else {
-            nobs[Nob.TOP_RIGHT].translate (x + width, y - (nob_size));
+            nobs[Nob.TOP_RIGHT].set ("x", x + width);
+            nobs[Nob.TOP_RIGHT].set ("y", y - (nob_size));
         }
         nobs[Nob.TOP_RIGHT].raise (select_effect);
 
         if (print_middle_height_nobs) {
-            // RIGHT CENTER nob
-            // nobs[Nob.RIGHT_CENTER].set_transform (transform);
+            // RIGHT CENTER nob.
             if (print_middle_width_nobs) {
-                nobs[Nob.RIGHT_CENTER].translate (x + width - (nob_offset), y + (height / 2) - nob_offset);
+                nobs[Nob.RIGHT_CENTER].set ("x", x + width - (nob_offset));
+                nobs[Nob.RIGHT_CENTER].set ("y", y + (height / 2) - nob_offset);
             } else {
-                nobs[Nob.RIGHT_CENTER].translate (x + width, y + (height / 2) - nob_offset);
+                nobs[Nob.RIGHT_CENTER].set ("x", x + width);
+                nobs[Nob.RIGHT_CENTER].set ("y", y + (height / 2) - nob_offset);
             }
             set_nob_visibility (Nob.RIGHT_CENTER, true);
         } else {
@@ -278,26 +285,24 @@ public class Akira.Lib.Managers.NobManager : Object {
 
         nobs[Nob.RIGHT_CENTER].raise (select_effect);
 
-        // BOTTOM RIGHT nob
-        // nobs[Nob.BOTTOM_RIGHT].set_transform (transform);
+        // BOTTOM RIGHT nob.
         if (print_middle_width_nobs && print_middle_height_nobs) {
-            nobs[Nob.BOTTOM_RIGHT].translate (
-                x + width - (nob_offset), y + height - (nob_offset)
-            );
+            nobs[Nob.BOTTOM_RIGHT].set ("x", x + width - (nob_offset));
+            nobs[Nob.BOTTOM_RIGHT].set ("y", y + height - (nob_offset));
         } else {
-            nobs[Nob.BOTTOM_RIGHT].translate (x + width, y + height);
+            nobs[Nob.BOTTOM_RIGHT].set ("x", x + width);
+            nobs[Nob.BOTTOM_RIGHT].set ("y", y + height);
         }
         nobs[Nob.BOTTOM_RIGHT].raise (select_effect);
 
         if (print_middle_width_nobs) {
-            // BOTTOM CENTER nob
-            // nobs[Nob.BOTTOM_CENTER].set_transform (transform);
+            // BOTTOM CENTER nob.
             if (print_middle_height_nobs) {
-                nobs[Nob.BOTTOM_CENTER].translate (
-                    x + (width / 2) - nob_offset, y + height - (nob_offset)
-                );
+                nobs[Nob.BOTTOM_CENTER].set ("x", x + (width / 2) - nob_offset);
+                nobs[Nob.BOTTOM_CENTER].set ("y", y + height - (nob_offset));
             } else {
-                nobs[Nob.BOTTOM_CENTER].translate (x + (width / 2) - nob_offset, y + height);
+                nobs[Nob.BOTTOM_CENTER].set ("x", x + (width / 2) - nob_offset);
+                nobs[Nob.BOTTOM_CENTER].set ("y", y + height);
             }
             set_nob_visibility (Nob.BOTTOM_CENTER, true);
         } else {
@@ -306,21 +311,23 @@ public class Akira.Lib.Managers.NobManager : Object {
         nobs[Nob.BOTTOM_CENTER].raise (select_effect);
 
         // BOTTOM LEFT nob
-        // nobs[Nob.BOTTOM_LEFT].set_transform (transform);
         if (print_middle_width_nobs && print_middle_height_nobs) {
-            nobs[Nob.BOTTOM_LEFT].translate (x - (nob_offset), y + height - (nob_offset));
+            nobs[Nob.BOTTOM_LEFT].set ("x", x - (nob_offset));
+            nobs[Nob.BOTTOM_LEFT].set ("y", y + height - (nob_offset));
         } else {
-            nobs[Nob.BOTTOM_LEFT].translate (x - (nob_size), y + height);
+            nobs[Nob.BOTTOM_LEFT].set ("x", x - (nob_size));
+            nobs[Nob.BOTTOM_LEFT].set ("y", y + height);
         }
         nobs[Nob.BOTTOM_LEFT].raise (select_effect);
 
         if (print_middle_height_nobs) {
-            // LEFT CENTER nob
-            // nobs[Nob.LEFT_CENTER].set_transform (transform);
+            // LEFT CENTER nob.
             if (print_middle_width_nobs) {
-                nobs[Nob.LEFT_CENTER].translate (x - (nob_offset), y + (height / 2) - nob_offset);
+                nobs[Nob.LEFT_CENTER].set ("x", x - (nob_offset));
+                nobs[Nob.LEFT_CENTER].set ("y", y + (height / 2) - nob_offset);
             } else {
-                nobs[Nob.LEFT_CENTER].translate (x - (nob_size), y + (height / 2) - nob_offset);
+                nobs[Nob.LEFT_CENTER].set ("x", x - (nob_size));
+                nobs[Nob.LEFT_CENTER].set ("y", y + (height / 2) - nob_offset);
             }
             set_nob_visibility (Nob.LEFT_CENTER, true);
         } else {
@@ -337,8 +344,8 @@ public class Akira.Lib.Managers.NobManager : Object {
             distance += (distance / canvas.current_scale) / 4;
         }
 
-        // nobs[Nob.ROTATE].set_transform (transform);
-        nobs[Nob.ROTATE].translate (x + (width / 2) - nob_offset, y - nob_offset - distance);
+        nobs[Nob.ROTATE].set ("x", x + (width / 2) - nob_offset);
+        nobs[Nob.ROTATE].set ("y", y - nob_offset - distance);
         nobs[Nob.ROTATE].raise (select_effect);
     }
 
@@ -354,27 +361,27 @@ public class Akira.Lib.Managers.NobManager : Object {
         List<Items.CanvasItem> selected_items,
         ref double x,
         ref double y,
-        ref double rotation,
         ref double _width,
-        ref double _height
+        ref double _height,
+        ref double rotation
     ) {
         if (selected_items.length () == 1) {
             var item = selected_items.nth_data (0);
 
-            rotation = 0.0;
-            _width = item.w;
-            _height = item.h;
             x = item.transform.x;
             y = item.transform.y;
+            _width = item.size.width;
+            _height = item.size.height;
+            rotation = item.rotation != null ? item.rotation.rotation : 0.0;
 
             return;
         }
 
-        rotation = 0.0;
-        _width = width;
-        _height = height;
         x = left;
         y = top;
+        _width = width;
+        _height = height;
+        rotation = 0.0;
     }
 
     private async void on_hide_select_effect () {

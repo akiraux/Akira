@@ -23,13 +23,8 @@
  * Transform component to keep track of the item's initial coordinates.
  */
 public class Akira.Lib.Components.Transform : Component {
-    private double? _x = null;
     public double x {
         get {
-            if (_x != null) {
-                return _x;
-            }
-
             double item_x = item.bounds.x1 + get_border ();
 
             if (item.artboard != null) {
@@ -37,22 +32,12 @@ public class Akira.Lib.Components.Transform : Component {
                 item.canvas.convert_to_item_space (item.artboard, ref item_x, ref temp_y);
             }
 
-            _x = item_x;
-
             return item_x;
-        }
-        set {
-            _x = value;
         }
     }
 
-    private double? _y = null;
     public double y {
         get {
-            if (_y != null) {
-                return _y;
-            }
-
             double item_y = item.bounds.y1 + get_border ();
 
             if (item.artboard != null) {
@@ -60,18 +45,12 @@ public class Akira.Lib.Components.Transform : Component {
                 item.canvas.convert_to_item_space (item.artboard, ref temp_x, ref item_y);
             }
 
-            _y = item_y;
-
             return item_y;
-        }
-        set {
-            _y = value;
         }
     }
 
-    public Transform (double new_x, double new_y) {
-        x = new_x;
-        y = new_y;
+    public Transform (Items.CanvasItem _item) {
+        item = _item;
     }
 
     /**
