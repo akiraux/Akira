@@ -34,7 +34,8 @@ public class Akira.Lib.Components.Fill : Component {
     public int alpha { get; set; }
     public bool hidden { get; set; }
 
-    public Fill (Gdk.RGBA init_color, int fill_id) {
+    public Fill (Items.CanvasItem _item, Gdk.RGBA init_color, int fill_id) {
+        item = _item;
         id = fill_id;
         color = init_color;
 

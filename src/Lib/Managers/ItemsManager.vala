@@ -136,19 +136,19 @@ public class Akira.Lib.Managers.ItemsManager : Object {
 
         if (new_item.item_type.item_type == typeof (Items.CanvasArtboard)) {
             artboards.add_item.begin ((Items.CanvasArtboard) new_item);
-        }
+        } else {
+            // Add it to "free items" if it doesn't belong to an artboard.
+            if (new_item.artboard == null) {
+                free_items.add_item.begin ((Items.CanvasItem) new_item, loaded);
+            }
 
-        // Add it to "free items" if it doesn't belong to an artboard.
-        if (new_item.artboard == null) {
-            free_items.add_item.begin ((Items.CanvasItem) new_item, loaded);
-        }
-
-        // We need to additionally store images in a dedicated list in order
-        // to easily access them when saving the .akira/Pictures folder.
-        // If we don't curate this dedicated list, it would be a nightamer to
-        // loop through all the free items and artboard items to check for images.
-        if (new_item.item_type.item_type == typeof (Items.CanvasImage)) {
-            images.add_item.begin ((new_item as Akira.Lib.Items.CanvasImage), loaded);
+            // We need to additionally store images in a dedicated list in order
+            // to easily access them when saving the .akira/Pictures folder.
+            // If we don't curate this dedicated list, it would be a nightamer to
+            // loop through all the free items and artboard items to check for images.
+            if (new_item.item_type.item_type == typeof (Items.CanvasImage)) {
+                images.add_item.begin ((new_item as Akira.Lib.Items.CanvasImage), loaded);
+            }
         }
 
         window.event_bus.item_inserted (new_item);

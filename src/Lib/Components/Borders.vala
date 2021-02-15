@@ -27,11 +27,21 @@ public class Akira.Lib.Components.Borders : Component {
     // A list of all the borders the item might have.
     public Gee.ArrayList<Border> borders { get; set; }
 
-    public Borders (Gdk.RGBA init_color, int init_size) {
+    // Keep track of the newly created Fill child components.
+    private int id { get; set; default = 0; }
+
+    public Borders (Items.CanvasItem _item, Gdk.RGBA init_color, int init_size) {
+        item = _item;
         borders = new Gee.ArrayList<Border> ();
 
-        int count = this.count ();
-        borders.@set (count, new Border (init_color, init_size, count));
+        add_border_color (init_color, init_size);
+    }
+
+    public void add_border_color (Gdk.RGBA init_color, int init_size) {
+        borders.add (new Border (item, init_color, init_size, id));
+
+        // Increase the ID to keep an incremental unique identifier.
+        id++;
     }
 
     public int count () {

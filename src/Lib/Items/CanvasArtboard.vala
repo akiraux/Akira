@@ -51,6 +51,10 @@ public class Akira.Lib.Items.CanvasArtboard : Goo.CanvasGroup, Akira.Lib.Items.C
       // Add the newly created item to the Canvas.
       parent.add_child (this, -1);
 
+      // Force the generation of the item bounds on creation.
+      Goo.CanvasBounds bounds;
+      this.get_bounds (out bounds);
+
       // Add all the components that this item uses.
       components = new Gee.ArrayList<Component> ();
       components.add (new Components.Type (typeof (CanvasArtboard)));
@@ -59,9 +63,9 @@ public class Akira.Lib.Items.CanvasArtboard : Goo.CanvasGroup, Akira.Lib.Items.C
       components.add (new Opacity (this));
       // Artboards have fills that can be edited, but they always start
       // with a full white background.
-      // var fill_color = Gdk.RGBA ();
-      // fill_color.parse ("rgba (255, 255, 255, 1)");
-      // components.add (new Fills (fill_color));
+      var fill_color = Gdk.RGBA ();
+      fill_color.parse ("#fff");
+      components.add (new Fills (this, fill_color));
       components.add (new Size (this));
       components.add (new Layer ());
    }

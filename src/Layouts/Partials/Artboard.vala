@@ -78,7 +78,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
         label.hexpand = true;
         label.set_ellipsize (Pango.EllipsizeMode.END);
 
-        model.bind_property ("name", label, "label",
+        model.name.bind_property ("name", label, "label",
             BindingFlags.SYNC_CREATE | BindingFlags.BIDIRECTIONAL);
 
         entry = new Gtk.Entry ();
@@ -479,7 +479,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
     }
 
     private void lock_actions () {
-        button_locked.bind_property ("active", model, "locked",
+        button_locked.bind_property ("active", model.layer, "locked",
             BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE);
 
         button_locked.toggled.connect (() => {

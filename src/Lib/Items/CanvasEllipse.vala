@@ -32,8 +32,8 @@ public class Akira.Lib.Items.CanvasEllipse : Goo.CanvasEllipse, Akira.Lib.Items.
     public bool is_loaded { get; set; }
 
     public CanvasEllipse (
-        double _center_x,
-        double _center_y,
+        double _x,
+        double _y,
         int border_size,
         Gdk.RGBA border_color,
         Gdk.RGBA fill_color,
@@ -45,16 +45,20 @@ public class Akira.Lib.Items.CanvasEllipse : Goo.CanvasEllipse, Akira.Lib.Items.
         artboard = _artboard;
 
         // Create the ellipse.
+        x = center_x = _x;
+        y = center_y = _y;
         width = height = 1;
         radius_x = radius_y = 0.0;
-        // The Ellipse has a weird 0.5 value always attached to it on creation.
-        center_x = center_y = - 0.5;
 
         // Add extra attributes.
         is_loaded = _is_loaded;
 
         // Add the newly created item to the Canvas or Artboard.
         parent.add_child (this, -1);
+
+        // Force the generation of the item bounds on creation.
+        Goo.CanvasBounds bounds;
+        this.get_bounds (out bounds);
 
         // Add all the components that this item uses.
         components = new Gee.ArrayList<Component> ();
@@ -63,11 +67,11 @@ public class Akira.Lib.Items.CanvasEllipse : Goo.CanvasEllipse, Akira.Lib.Items.
         components.add (new Transform (this));
         components.add (new Opacity (this));
         components.add (new Rotation ());
-        // components.add (new Fills (fill_color));
-        // components.add (new Borders (border_color, border_size));
+        components.add (new Fills (this, fill_color));
+        components.add (new Borders (this, border_color, border_size));
         components.add (new Size (this));
         components.add (new Flipped ());
-        components.add (new BorderRadius ());
+        components.add (new BorderRadius (this));
         components.add (new Layer ());
     }
 }

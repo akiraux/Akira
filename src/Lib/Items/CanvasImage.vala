@@ -61,6 +61,10 @@ public class Akira.Lib.Items.CanvasImage : Goo.CanvasImage, Akira.Lib.Items.Canv
         // Add the newly created item to the Canvas or Artboard.
         parent.add_child (this, -1);
 
+        // Force the generation of the item bounds on creation.
+        Goo.CanvasBounds bounds;
+        this.get_bounds (out bounds);
+
         // Add all the components that this item uses.
         components = new Gee.ArrayList<Component> ();
         components.add (new Components.Type (typeof (CanvasImage)));

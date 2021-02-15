@@ -35,7 +35,8 @@ public class Akira.Lib.Components.Border : Component {
     public int alpha { get; set; }
     public bool hidden { get; set; }
 
-    public Border (Gdk.RGBA init_color, int init_size, int border_id) {
+    public Border (Items.CanvasItem _item, Gdk.RGBA init_color, int init_size, int border_id) {
+        item = _item;
         id = border_id;
         color = init_color;
         size = init_size;
@@ -49,7 +50,7 @@ public class Akira.Lib.Components.Border : Component {
     private void set_border () {
         // Make the item transparent if the color is set by hidden.
         if (hidden) {
-            item.set ("border-color-rgba", null);
+            item.set ("stroke-color-rgba", null);
             item.set ("line-width", 0.0);
             hex = "";
             return;
@@ -61,7 +62,7 @@ public class Akira.Lib.Components.Border : Component {
 
         // Temporarily set the item color here. This will be moved to the Borders component
         // once we enable multiple borders.
-        item.set ("border-color-rgba", Utils.Color.rgba_to_uint (color));
+        item.set ("stroke-color-rgba", Utils.Color.rgba_to_uint (color));
         // The "line-width" property expects a DOUBLE type, but we don't support subpixels
         // so we always handle the border size as INT, therefore we need to type cast it here.
         item.set ("line-width", (double) size);

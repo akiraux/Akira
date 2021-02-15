@@ -29,7 +29,8 @@ public class Akira.Lib.Components.BorderRadius : Component {
     public bool uniform { get; set; }
     public bool autoscale { get; set; }
 
-    public BorderRadius () {
+    public BorderRadius (Items.CanvasItem _item) {
+        item = _item;
         x = y = 0.0;
 
         uniform = true;

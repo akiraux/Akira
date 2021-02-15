@@ -30,15 +30,15 @@ public class Akira.Lib.Components.Fills : Component {
     // Keep track of the newly created Fill child components.
     private int id { get; set; default = 0; }
 
-    public Fills (Gdk.RGBA color) {
+    public Fills (Items.CanvasItem _item, Gdk.RGBA color) {
+        item = _item;
         fills = new Gee.ArrayList<Fill> ();
 
         add_fill_color (color);
     }
 
     public void add_fill_color (Gdk.RGBA color) {
-        int count = this.count ();
-        fills.@set (count, new Fill (color, id));
+        fills.add (new Fill (item, color, id));
 
         // Increase the ID to keep an incremental unique identifier.
         id++;
