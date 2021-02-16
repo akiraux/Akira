@@ -40,6 +40,7 @@ public class Akira.Lib.Components.Border : Component {
         id = border_id;
         color = init_color;
         size = init_size;
+        alpha = 255;
 
         set_border ();
     }
@@ -56,13 +57,17 @@ public class Akira.Lib.Components.Border : Component {
             return;
         }
 
+        // Store the color in a new RGBA variable so we can manipulate it.
+        var rgba_fill = Gdk.RGBA ();
+        rgba_fill = color;
+
         // Keep in consideration the global opacity to properly update the border color.
-        color.alpha = ((double) alpha) / 255 * item.opacity.opacity / 100;
-        hex = Utils.Color.rgba_to_hex (color.to_string ());
+        rgba_fill.alpha = ((double) alpha) / 255 * item.opacity.opacity / 100;
+        hex = Utils.Color.rgba_to_hex (rgba_fill.to_string ());
 
         // Temporarily set the item color here. This will be moved to the Borders component
         // once we enable multiple borders.
-        item.set ("stroke-color-rgba", Utils.Color.rgba_to_uint (color));
+        item.set ("stroke-color-rgba", Utils.Color.rgba_to_uint (rgba_fill));
         // The "line-width" property expects a DOUBLE type, but we don't support subpixels
         // so we always handle the border size as INT, therefore we need to type cast it here.
         item.set ("line-width", (double) size);

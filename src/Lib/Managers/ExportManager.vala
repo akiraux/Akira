@@ -131,7 +131,8 @@ public class Akira.Lib.Managers.ExportManager : Object {
             }
         }
 
-        Utils.AffineTransform.set_size (area, new_width, new_height);
+        area.set ("width", new_width + area.width);
+        area.set ("height", new_height + area.height);
 
         // Update the initial coordinates to keep getting the correct delta.
         initial_x = x;

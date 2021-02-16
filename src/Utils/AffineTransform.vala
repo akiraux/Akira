@@ -371,8 +371,8 @@ public class Akira.Utils.AffineTransform : Object {
             initial_x -= diff_x;
             initial_y -= diff_y;
         } else {
-            canvas.convert_to_item_space (item, ref x, ref y);
-            canvas.convert_to_item_space (item, ref initial_x, ref initial_y);
+            item.canvas.convert_to_item_space (item, ref x, ref y);
+            item.canvas.convert_to_item_space (item, ref initial_x, ref initial_y);
         }
 
         var center_x = item.size.width / 2;
@@ -444,35 +444,39 @@ public class Akira.Utils.AffineTransform : Object {
             var new_rotation = GLib.Math.fmod (item.rotation.rotation + rotation, 360);
 
             // Round rotation in order to avoid sub degree issue.
-            set_rotation (item, fix_size (new_rotation));
+            // set_rotation (item, fix_size (new_rotation));
+            item.rotation.rotation = fix_size (new_rotation);
         }
 
         // Reset rotation to prevent infinite rotation loops.
         prev_rotation_difference = 0.0;
     }
 
-    public static void set_size (Goo.CanvasItem item, double x, double y) {
-        double width, height;
-        item.get ("width", out width, "height", out height);
+    public static void set_size (Lib.Items.CanvasItem item, double x, double y) {
+        // double width, height;
+        // item.get ("width", out width, "height", out height);
+
+        double new_width = fix_size (item.size.width + x);
+        double new_height = fix_size (item.size.height + y);
 
         // Prevent accidental negative values.
-        if (width + x > 0) {
-            item.set ("width", fix_size (width + x));
+        if (new_width > 0) {
+            item.size.width = new_width;
         }
 
-        if (height + y > 0) {
-            item.set ("height", fix_size (height + y));
+        if (new_height > 0) {
+            item.size.height = new_height;
         }
     }
 
-    public static void set_rotation (CanvasItem item, double rotation) {
-        var center_x = item.size.width / 2;
-        var center_y = item.size.height / 2;
-        var actual_rotation = rotation - item.rotation.rotation;
+    // public static void set_rotation (CanvasItem item, double rotation) {
+    //     var center_x = item.size.width / 2;
+    //     var center_y = item.size.height / 2;
+    //     var actual_rotation = rotation - item.rotation.rotation;
 
-        item.rotate (actual_rotation, center_x, center_y);
-        item.rotation.rotation += actual_rotation;
-    }
+    //     item.rotate (actual_rotation, center_x, center_y);
+    //     item.rotation.rotation += actual_rotation;
+    // }
 
     public static void flip_item (CanvasItem item, double sx, double sy) {
         var center_x = item.size.width / 2;

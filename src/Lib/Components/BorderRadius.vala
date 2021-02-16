@@ -35,6 +35,9 @@ public class Akira.Lib.Components.BorderRadius : Component {
 
         uniform = true;
         autoscale = false;
+
+        this.notify["x"].connect (update);
+        this.notify["y"].connect (update);
     }
 
     public void update () {

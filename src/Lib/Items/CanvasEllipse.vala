@@ -66,7 +66,7 @@ public class Akira.Lib.Items.CanvasEllipse : Goo.CanvasEllipse, Akira.Lib.Items.
         components.add (new Name (this));
         components.add (new Transform (this));
         components.add (new Opacity (this));
-        components.add (new Rotation ());
+        components.add (new Rotation (this));
         components.add (new Fills (this, fill_color));
         components.add (new Borders (this, border_color, border_size));
         components.add (new Size (this));

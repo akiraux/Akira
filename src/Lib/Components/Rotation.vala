@@ -23,10 +23,30 @@
  * Rotation component to keep track of the item's rotation.
  */
 public class Akira.Lib.Components.Rotation : Component {
-    public double rotation { get; set; }
+    private double _rotation { get; set; }
+    public double rotation {
+        get {
+            return _rotation;
+        }
+        set {
+            // Interrupt if nothing changed.
+            if (_rotation == value) {
+                return;
+            }
 
-    public Rotation () {
+            var center_x = item.size.width / 2;
+            var center_y = item.size.height / 2;
+            var new_rotation = value - _rotation;
+
+            item.rotate (value, center_x, center_y);
+
+            _rotation = new_rotation;
+        }
+    }
+
+    public Rotation (Items.CanvasItem _item) {
+        item = _item;
         // Set rotation to 0 when the item is first created.
-        rotation = 0.0;
+        _rotation = 0.0;
     }
 }

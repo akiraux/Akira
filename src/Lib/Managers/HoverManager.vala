@@ -75,11 +75,11 @@ public class Akira.Lib.Managers.HoverManager : Object {
         var item = target as Items.CanvasItem;
 
         if (current_hover_item != null && item.name.id == current_hover_item.name.id) {
-            // We already have the hover effect rendered correctly
+            // We already have the hover effect rendered correctly.
             return;
         }
 
-        // We need to recreate it
+        // We need to recreate it.
         remove_hover_effect ();
         current_hover_item = item;
 

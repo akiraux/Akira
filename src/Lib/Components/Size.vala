@@ -54,12 +54,19 @@ public class Akira.Lib.Components.Size : Component {
         item = _item;
         locked = false;
         ratio = 1.0;
+
+        this.notify["locked"].connect (update_ratio);
     }
 
     /**
      * Helper method to update the size ratio of an item.
      */
     public void update_ratio () {
+        // Avoid divding by 0.
+        if (width == 0 || height == 0) {
+            return;
+        }
+
         ratio = width / height;
     }
 }

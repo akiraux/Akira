@@ -30,5 +30,10 @@ public class Akira.Lib.Components.Opacity : Component {
         item = _item;
         // Set opacity to 100% (fully visible) when the item is first created.
         opacity = 100.0;
+
+        this.notify["opacity"].connect (() => {
+            item.fills.reload ();
+            item.borders.reload ();
+        });
     }
 }

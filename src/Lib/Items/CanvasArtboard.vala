@@ -69,7 +69,7 @@ public class Akira.Lib.Items.CanvasArtboard : Goo.CanvasGroup, Akira.Lib.Items.C
       // Artboards have fills that can be edited, but they always start
       // with a full white background.
       var fill_color = Gdk.RGBA ();
-      fill_color.parse ("rgba(255,255,255,1)");
+      fill_color.parse ("#fff");
       components.add (new Fills (this, fill_color));
       components.add (new Size (this));
       components.add (new Layer ());

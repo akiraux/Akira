@@ -69,7 +69,7 @@ public class Akira.Lib.Items.CanvasText : Goo.CanvasText, Akira.Lib.Items.Canvas
         components.add (new Name (this));
         components.add (new Transform (this));
         components.add (new Opacity (this));
-        components.add (new Rotation ());
+        components.add (new Rotation (this));
         components.add (new Size (this));
         components.add (new Flipped ());
         components.add (new Layer ());

@@ -61,6 +61,9 @@ public class Akira.Lib.Items.CanvasImage : Goo.CanvasImage, Akira.Lib.Items.Canv
         // Add the newly created item to the Canvas or Artboard.
         parent.add_child (this, -1);
 
+        // Initialize the imported image.
+        init_pixbuf ();
+
         // Force the generation of the item bounds on creation.
         Goo.CanvasBounds bounds;
         this.get_bounds (out bounds);
@@ -70,12 +73,10 @@ public class Akira.Lib.Items.CanvasImage : Goo.CanvasImage, Akira.Lib.Items.Canv
         components.add (new Name (this));
         components.add (new Transform (this));
         components.add (new Opacity (this));
-        components.add (new Rotation ());
+        components.add (new Rotation (this));
         components.add (new Size (this));
         components.add (new Flipped ());
         components.add (new Layer ());
-
-        init_pixbuf ();
     }
 
     private void init_pixbuf () {

@@ -110,6 +110,10 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         lock_changes.image = lock_image;
         lock_changes.can_focus = false;
         lock_changes.sensitive = false;
+        lock_changes.toggled.connect (() => {
+            var icon = lock_changes.active ? "changes-prevent-symbolic" : "changes-allow-symbolic";
+            lock_changes.image = new Gtk.Image.from_icon_name (icon, Gtk.IconSize.BUTTON);
+        });
 
         rotation = new Akira.Partials.LinkedInput (_("R"), _("Rotation degrees"), "°");
         rotation.input_field.set_range (-360, 360);
@@ -187,19 +191,13 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
             return;
         }
 
-        // selected_item = selected_items.nth_data (0);
+        selected_item = selected_items.nth_data (0);
     }
 
     private void disconnect_previous_item () {
         if (selected_item == null) {
             return;
         }
-
-        // Disconnect the item's value changes.
-        selected_item.notify["width"].disconnect (on_item_value_changed);
-        selected_item.notify["height"].disconnect (on_item_value_changed);
-        selected_item.notify["rotation"].disconnect (on_item_value_changed);
-        selected_item.notify["opacity"].disconnect (reload_colors);
 
         // Clear the bindings.
         x_bind.unbind ();
@@ -229,14 +227,6 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
     private void enable () {
         canvas = selected_item.canvas as Akira.Lib.Canvas;
 
-        // width.value = selected_item.width;
-        // height.value = selected_item.height;
-        // rotation.value = selected_item.rotation;
-        // opacity_adj.value = selected_item.opacity.opacity;
-        // lock_changes.active = selected_item.size.locked;
-        // hflip_button.active = selected_item.flipped_h;
-        // vflip_button.active = selected_item.flipped_v;
-
         x_bind = window.coords_manager.bind_property (
             "x", x, "value", BindingFlags.SYNC_CREATE | BindingFlags.BIDIRECTIONAL
         );
@@ -245,97 +235,58 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
             "y", y, "value", BindingFlags.SYNC_CREATE | BindingFlags.BIDIRECTIONAL
         );
 
-        ratio_bind = lock_changes.bind_property (
-            "active", selected_item.size, "locked",
-            BindingFlags.SYNC_CREATE | BindingFlags.BIDIRECTIONAL,
-            (binding, val, ref res) => {
-                var icon = val.get_boolean () ? "changes-prevent-symbolic" : "changes-allow-symbolic";
-                lock_changes.image = new Gtk.Image.from_icon_name (icon, Gtk.IconSize.BUTTON);
-                res = val.get_boolean ();
-                if (val.get_boolean ()) {
-                    update_size_ratio ();
-                }
-                return true;
-            });
+        ratio_bind = selected_item.size.bind_property (
+            "locked", lock_changes, "active",
+            BindingFlags.SYNC_CREATE | BindingFlags.BIDIRECTIONAL);
 
-        width_bind = width.bind_property (
-            "value", selected_item.size, "width",
+        width_bind = selected_item.size.bind_property (
+            "width", width, "value",
             BindingFlags.SYNC_CREATE | BindingFlags.BIDIRECTIONAL,
             (binding, srcval, ref targetval) => {
                 double src = (double) srcval;
                 targetval.set_double (src);
                 if (selected_item.size.locked) {
-                    height.value = GLib.Math.round (src / selected_item.size.ratio);
+                    height.value = Utils.AffineTransform.fix_size (src / selected_item.size.ratio);
                 }
                 return true;
             });
 
-        height_bind = height.bind_property (
-            "value", selected_item.size, "height",
+        height_bind = selected_item.size.bind_property (
+            "height", height, "value",
             BindingFlags.SYNC_CREATE | BindingFlags.BIDIRECTIONAL,
             (binding, srcval, ref targetval) => {
                 double src = (double) srcval;
                 targetval.set_double (src);
                 if (selected_item.size.locked) {
-                    width.value = GLib.Math.round (src * selected_item.size.ratio);
+                    width.value = Utils.AffineTransform.fix_size (src * selected_item.size.ratio);
                 }
                 return true;
             });
 
-        rotation_bind = rotation.bind_property (
-            "value", selected_item.rotation, "rotation",
+        rotation_bind = selected_item.rotation.bind_property (
+            "rotation", rotation, "value",
             BindingFlags.SYNC_CREATE | BindingFlags.BIDIRECTIONAL);
 
-        opacity_bind = opacity_adj.bind_property (
-            "value", selected_item.opacity, "opacity",
+        opacity_bind = selected_item.opacity.bind_property (
+            "opacity", opacity_adj, "value",
             BindingFlags.SYNC_CREATE | BindingFlags.BIDIRECTIONAL);
 
-        hflip_bind = hflip_button.bind_property (
-            "active", selected_item.flipped, "horizontal", BindingFlags.BIDIRECTIONAL,
-            (binding, val, ref res) => {
-                res = val.get_boolean ();
-                window.event_bus.flip_item ();
-                return true;
-            });
+        hflip_bind = selected_item.flipped.bind_property (
+            "horizontal", hflip_button, "active",
+            BindingFlags.SYNC_CREATE | BindingFlags.BIDIRECTIONAL);
 
-        vflip_bind = vflip_button.bind_property (
-            "active", selected_item.flipped, "vertical", BindingFlags.BIDIRECTIONAL,
-            (binding, val, ref res) => {
-                res = val.get_boolean ();
-                window.event_bus.flip_item (true);
-                return true;
-            });
-
-        // Connect items value changes to redraw the selection bounds.
-        selected_item.notify["width"].connect (on_item_value_changed);
-        selected_item.notify["height"].connect (on_item_value_changed);
-        selected_item.notify["rotation"].connect (on_item_value_changed);
-        selected_item.notify["opacity"].connect (reload_colors);
+        vflip_bind = selected_item.flipped.bind_property (
+            "vertical", vflip_button, "active",
+            BindingFlags.SYNC_CREATE | BindingFlags.BIDIRECTIONAL);
     }
 
-    private void on_item_value_changed () {
-        if (selected_item == null) {
-            return;
-        }
+    // private void on_item_value_changed () {
+    //     if (selected_item == null) {
+    //         return;
+    //     }
 
-        window.event_bus.item_value_changed ();
-    }
-
-    /**
-     * Trigger the methods to reload all fills and borders.
-     */
-    private void reload_colors () {
-        selected_item.fills.reload ();
-        selected_item.borders.reload ();
-    }
-
-    public void update_size_ratio () {
-        // We can't divide by 0, let's avoid opening a black hole.
-        if (height.value == 0) {
-            return;
-        }
-        selected_item.size.update_ratio ();
-    }
+    //     window.event_bus.item_value_changed ();
+    // }
 
     private Gtk.Label group_title (string title) {
         var title_label = new Gtk.Label (title);

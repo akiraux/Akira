@@ -38,6 +38,7 @@ public class Akira.Lib.Components.Fill : Component {
         item = _item;
         id = fill_id;
         color = init_color;
+        alpha = 255;
 
         set_fill ();
     }
@@ -57,16 +58,21 @@ public class Akira.Lib.Components.Fill : Component {
             return;
         }
 
+        // Store the color in a new RGBA variable so we can manipulate it.
+        var rgba_fill = Gdk.RGBA ();
+        rgba_fill = color;
+
         // Keep in consideration the global opacity to properly update the fill color.
-        color.alpha = ((double) alpha) / 255 * item.opacity.opacity / 100;
-        hex = Utils.Color.rgba_to_hex (color.to_string ());
+        rgba_fill.alpha = ((double) alpha) / 255 * item.opacity.opacity / 100;
+        hex = Utils.Color.rgba_to_hex (rgba_fill.to_string ());
+        uint fill_color_rgba = Utils.Color.rgba_to_uint (rgba_fill);
 
         // Temporarily set the item color here. This will be moved to the Fills component
         // once we enable multiple fillings.
         if (item is Items.CanvasArtboard) {
-            ((Items.CanvasArtboard) item).background.set ("fill-color-rgba", Utils.Color.rgba_to_uint (color));
+            ((Items.CanvasArtboard) item).background.set ("fill-color-rgba", fill_color_rgba);
         } else {
-            item.set ("fill-color-rgba", Utils.Color.rgba_to_uint (color));
+            item.set ("fill-color-rgba", fill_color_rgba);
         }
     }
 
