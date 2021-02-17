@@ -57,10 +57,21 @@ public interface Akira.Lib.Items.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasIt
     public void init_position (Items.CanvasItem item, double x, double y) {
         if (item.artboard != null) {
             item.canvas.convert_to_item_space (item.artboard, ref x, ref y);
-            item.artboard.items.add_item.begin (item, item.is_loaded);
         }
 
         item.translate (x, y);
+    }
+
+    /**
+     * Check if the item belongs to an artboard, and if so add it to the
+     * list of items inside the artboard. We do this separately after all
+     * the components have been initialized to avoid issues in retrieving
+     * attributes not yet defined when the list model is updated.
+     */
+    public void check_add_to_artboard (Items.CanvasItem item) {
+        if (item.artboard != null) {
+            item.artboard.items.add_item.begin (item, item.is_loaded);
+        }
     }
 
     public Components.Name? name {

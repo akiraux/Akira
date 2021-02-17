@@ -72,5 +72,7 @@ public class Akira.Lib.Items.CanvasRect : Goo.CanvasRect, Akira.Lib.Items.Canvas
         components.add (new Flipped (this));
         components.add (new BorderRadius (this));
         components.add (new Layer ());
+
+        check_add_to_artboard (this);
     }
 }

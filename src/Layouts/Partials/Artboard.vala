@@ -234,8 +234,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
         });
 
         container.bind_model (model.items, item => {
-            var item_model = item as Lib.Items.CanvasItem;
-            return new Layouts.Partials.Layer (window, item_model, container);
+            return new Layouts.Partials.Layer (window, ((Lib.Items.CanvasItem) item), container);
         });
 
         lock_actions ();

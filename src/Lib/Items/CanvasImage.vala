@@ -77,6 +77,8 @@ public class Akira.Lib.Items.CanvasImage : Goo.CanvasImage, Akira.Lib.Items.Canv
         components.add (new Size (this));
         components.add (new Flipped (this));
         components.add (new Layer ());
+
+        check_add_to_artboard (this);
     }
 
     private void init_pixbuf () {

@@ -27,8 +27,8 @@ public class Akira.Lib.Components.Name : Component {
     public string name { get; set; }
     public string icon { get; set; }
 
-    public Name (Lib.Items.CanvasItem item) {
-        this.item = item;
+    public Name (Lib.Items.CanvasItem _item) {
+        item = _item;
 
         set_properties ();
         update_name ();
