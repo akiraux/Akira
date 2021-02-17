@@ -137,7 +137,6 @@ public interface Akira.Lib.Items.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasIt
         // If we're deleting an Artboard, deal with it inside its class.
         if (this is CanvasArtboard) {
             ((CanvasArtboard) this).delete ();
-            return;
         }
 
         // Remove the item from the artboard before deleting it

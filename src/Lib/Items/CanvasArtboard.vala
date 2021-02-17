@@ -138,16 +138,9 @@ public class Akira.Lib.Items.CanvasArtboard : Goo.CanvasGroup, Akira.Lib.Items.C
    }
 
    public void delete () {
-      foreach (Items.CanvasItem item in items) {
-         items.remove_item.begin (item);
-         item.remove ();
-      }
-
       background.remove ();
       // Reassign the Canvas as parent to the label in order to remove it.
       label.parent = parent;
       label.remove ();
-
-      remove ();
    }
 }

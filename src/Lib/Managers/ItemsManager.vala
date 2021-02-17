@@ -163,6 +163,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
     }
 
     public void on_request_delete_item (Lib.Items.CanvasItem item) {
+        // Remove the layer from the Artboards list if it's an artboard.
         if (item is Items.CanvasArtboard) {
             artboards.remove_item.begin (item as Items.CanvasArtboard);
         }
@@ -179,7 +180,9 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             }
         }
 
-        if (item.artboard == null) {
+        // Remove the layer from the Free Items list only if the item doesn't
+        // belong to an artboard, and it's not an artboard itself.
+        if (item.artboard == null && !(item is Items.CanvasArtboard)) {
             free_items.remove_item.begin (item);
         }
 
