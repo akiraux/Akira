@@ -19,6 +19,7 @@
 * Authored by: Ana Gelez <ana@gelez.xyz>
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
+
 public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
     public weak Akira.Window window { get; construct; }
     public weak Akira.Lib.Canvas canvas;
@@ -296,14 +297,6 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
                 BindingFlags.SYNC_CREATE | BindingFlags.BIDIRECTIONAL);
         }
     }
-
-    // private void on_item_value_changed () {
-    //     if (selected_item == null) {
-    //         return;
-    //     }
-
-    //     window.event_bus.item_value_changed ();
-    // }
 
     private Gtk.Label group_title (string title) {
         var title_label = new Gtk.Label (title);
