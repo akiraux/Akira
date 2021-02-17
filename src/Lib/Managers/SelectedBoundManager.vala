@@ -269,12 +269,10 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
 
         selected_items.foreach ((item) => {
             if (vertical) {
-                Utils.AffineTransform.flip_item (item, 1, -1);
-                update_selected_items ();
+                item.flipped.vertical = !item.flipped.vertical;
                 return;
             }
-            Utils.AffineTransform.flip_item (item, -1, 1);
-            update_selected_items ();
+            item.flipped.horizontal = !item.flipped.horizontal;
         });
     }
 

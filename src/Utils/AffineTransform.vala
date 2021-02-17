@@ -472,22 +472,6 @@ public class Akira.Utils.AffineTransform : Object {
         }
     }
 
-    public static void flip_item (CanvasItem item, double sx, double sy) {
-        var center_x = item.size.width / 2;
-        var center_y = item.size.height / 2;
-        Cairo.Matrix transform;
-        item.get_transform (out transform);
-        double radians = deg_to_rad (item.rotation.rotation);
-
-        transform.translate (center_x, center_y);
-        transform.rotate (-radians);
-        transform.scale (sx, sy);
-        transform.rotate (radians);
-        transform.translate (-center_x, -center_y);
-
-        item.set_transform (transform);
-    }
-
     public static double fix_size (double size) {
         return GLib.Math.round (size);
     }

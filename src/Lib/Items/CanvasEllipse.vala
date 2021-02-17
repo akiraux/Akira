@@ -70,7 +70,7 @@ public class Akira.Lib.Items.CanvasEllipse : Goo.CanvasEllipse, Akira.Lib.Items.
         components.add (new Fills (this, fill_color));
         components.add (new Borders (this, border_color, border_size));
         components.add (new Size (this));
-        components.add (new Flipped ());
+        components.add (new Flipped (this));
         components.add (new Layer ());
     }
 }

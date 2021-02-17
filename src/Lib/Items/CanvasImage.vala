@@ -75,7 +75,7 @@ public class Akira.Lib.Items.CanvasImage : Goo.CanvasImage, Akira.Lib.Items.Canv
         components.add (new Opacity (this));
         components.add (new Rotation (this));
         components.add (new Size (this));
-        components.add (new Flipped ());
+        components.add (new Flipped (this));
         components.add (new Layer ());
     }
 
