@@ -126,6 +126,10 @@ public class Akira.StateManagers.CoordinatesManager : Object {
         x = item_x;
         y = item_y;
 
+        // Update the Transform component reference in case items are using it.
+        item.transform.x = item_x;
+        item.transform.y = item_y;
+
         do_update = true;
 
         window.event_bus.file_edited ();
@@ -179,6 +183,10 @@ public class Akira.StateManagers.CoordinatesManager : Object {
 
             // Move the item with the new coordinates.
             item.translate (inc_x, inc_y);
+
+            // Update the Transform component reference in case items are using it.
+            item.transform.x += inc_x;
+            item.transform.y += inc_y;
         }
 
         // Notify the rest of the UI that a value of the select items has changed.

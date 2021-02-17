@@ -49,6 +49,15 @@ public interface Akira.Lib.Items.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasIt
         return null;
     }
 
+    /**
+     * The X & Y initial coordinates of an item need to be set to 0 and then
+     * the item needs to be translated to the proper position in order to ensure
+     * the generation of the item's Cairo.Matrix which is used across the app.
+     */
+    public void init_position (Items.CanvasItem item, double x, double y) {
+        item.translate (x, y);
+    }
+
     public Components.Name? name {
         get {
             Component? component = this.get_component (typeof (Components.Name));

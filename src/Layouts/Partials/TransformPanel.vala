@@ -205,10 +205,20 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         ratio_bind.unbind ();
         width_bind.unbind ();
         height_bind.unbind ();
-        rotation_bind.unbind ();
-        opacity_bind.unbind ();
-        hflip_bind.unbind ();
-        vflip_bind.unbind ();
+
+        // Unbind only those defined.
+        if (rotation_bind != null) {
+            rotation_bind.unbind ();
+        }
+
+        if (opacity_bind != null) {
+            opacity_bind.unbind ();
+        }
+
+        if (hflip_bind != null) {
+            hflip_bind.unbind ();
+            vflip_bind.unbind ();
+        }
     }
 
     private void disable () {
@@ -263,21 +273,28 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
                 return true;
             });
 
-        rotation_bind = selected_item.rotation.bind_property (
-            "rotation", rotation, "value",
-            BindingFlags.SYNC_CREATE | BindingFlags.BIDIRECTIONAL);
+        // Some items like Artboards don't implement every component.
+        if (selected_item.rotation != null) {
+            rotation_bind = selected_item.rotation.bind_property (
+                "rotation", rotation, "value",
+                BindingFlags.SYNC_CREATE | BindingFlags.BIDIRECTIONAL);
+        }
 
-        opacity_bind = selected_item.opacity.bind_property (
-            "opacity", opacity_adj, "value",
-            BindingFlags.SYNC_CREATE | BindingFlags.BIDIRECTIONAL);
+        if (selected_item.opacity != null) {
+            opacity_bind = selected_item.opacity.bind_property (
+                "opacity", opacity_adj, "value",
+                BindingFlags.SYNC_CREATE | BindingFlags.BIDIRECTIONAL);
+        }
 
-        hflip_bind = selected_item.flipped.bind_property (
-            "horizontal", hflip_button, "active",
-            BindingFlags.SYNC_CREATE | BindingFlags.BIDIRECTIONAL);
+        if (selected_item.flipped != null) {
+            hflip_bind = selected_item.flipped.bind_property (
+                "horizontal", hflip_button, "active",
+                BindingFlags.SYNC_CREATE | BindingFlags.BIDIRECTIONAL);
 
-        vflip_bind = selected_item.flipped.bind_property (
-            "vertical", vflip_button, "active",
-            BindingFlags.SYNC_CREATE | BindingFlags.BIDIRECTIONAL);
+            vflip_bind = selected_item.flipped.bind_property (
+                "vertical", vflip_button, "active",
+                BindingFlags.SYNC_CREATE | BindingFlags.BIDIRECTIONAL);
+        }
     }
 
     // private void on_item_value_changed () {

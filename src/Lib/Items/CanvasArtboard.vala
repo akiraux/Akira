@@ -47,10 +47,7 @@ public class Akira.Lib.Items.CanvasArtboard : Goo.CanvasGroup, Akira.Lib.Items.C
       // Create the Artboard.
       x = y = 0;
       width = height = 1;
-
-      // X & Y need to be set to 0 and then the item needs to be translated
-      // in order to ensure proper coordinates manipulation.
-      translate (_x, _y);
+      init_position (this, _x, _y);
 
       create_background ();
 
@@ -90,6 +87,7 @@ public class Akira.Lib.Items.CanvasArtboard : Goo.CanvasGroup, Akira.Lib.Items.C
    }
 
    private void create_label () {
+      // Create the text with the base Canvas as initial parent.
       label = new Goo.CanvasText (
          parent, name.name, x, y, 1.0,
          Goo.CanvasAnchorType.SW,
@@ -97,6 +95,7 @@ public class Akira.Lib.Items.CanvasArtboard : Goo.CanvasGroup, Akira.Lib.Items.C
          "ellipsize", Pango.EllipsizeMode.END,
          null);
       label.can_focus = false;
+      // Change the parent to allow mouse pointer selection.
       label.parent = this;
 
       this.transform.bind_property ("x", label, "x", BindingFlags.SYNC_CREATE);

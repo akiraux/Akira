@@ -48,10 +48,7 @@ public class Akira.Lib.Items.CanvasRect : Goo.CanvasRect, Akira.Lib.Items.Canvas
         x = y = 0.0;
         width = height = 1;
         radius_x = radius_y = 0.0;
-
-        // X & Y need to be set to 0 and then the item needs to be translated
-        // in order to ensure proper coordinates manipulation.
-        translate (_x, _y);
+        init_position (this, _x, _y);
 
         // Add extra attributes.
         is_loaded = _is_loaded;
