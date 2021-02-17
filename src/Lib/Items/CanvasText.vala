@@ -47,12 +47,15 @@ public class Akira.Lib.Items.CanvasText : Goo.CanvasText, Akira.Lib.Items.Canvas
         artboard = _artboard;
 
         // Create the text item.
-        x = _x;
-        y = _y;
+        x = y = 0;
         width = height = 1;
         text = _text;
         anchor = _anchor;
         font = _font;
+
+        // X & Y need to be set to 0 and then the item needs to be translated
+        // in order to ensure proper coordinates manipulation.
+        translate (_x, _y);
 
         // Add extra attributes.
         is_loaded = _is_loaded;

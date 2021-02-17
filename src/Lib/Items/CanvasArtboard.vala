@@ -45,9 +45,12 @@ public class Akira.Lib.Items.CanvasArtboard : Goo.CanvasGroup, Akira.Lib.Items.C
       artboard = null;
 
       // Create the Artboard.
-      x = _x;
-      y = _y;
+      x = y = 0;
       width = height = 1;
+
+      // X & Y need to be set to 0 and then the item needs to be translated
+      // in order to ensure proper coordinates manipulation.
+      translate (_x, _y);
 
       create_background ();
 
@@ -78,7 +81,8 @@ public class Akira.Lib.Items.CanvasArtboard : Goo.CanvasGroup, Akira.Lib.Items.C
    }
 
    private void create_background () {
-      background = new Goo.CanvasRect (this, 0.0, 0.0, 1.0, 1.0, "line-width", 0.0, null);
+      background = new Goo.CanvasRect (this, 0, 0, 1, 1, "line-width", 0.0, null);
+      background.translate (0, 0);
       background.can_focus = false;
 
       this.bind_property ("width", background, "width", BindingFlags.SYNC_CREATE);

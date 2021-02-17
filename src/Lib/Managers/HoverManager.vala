@@ -109,16 +109,16 @@ public class Akira.Lib.Managers.HoverManager : Object {
 
         hover_effect = new Goo.CanvasRect (
             null,
-            item.transform.x, item.transform.y,
+            0, 0,
             item.size.width, item.size.height,
             "line-width", LINE_WIDTH / canvas.current_scale,
             "stroke-color", STROKE_COLOR,
             null
         );
 
-        if (item.rotation != null) {
-            hover_effect.rotate (item.rotation.rotation, item.size.width / 2, item.size.height / 2);
-        }
+        Cairo.Matrix matrix;
+        item.get_transform (out matrix);
+        hover_effect.set_transform (matrix);
 
         hover_effect.set ("parent", canvas.get_root_item ());
         hover_effect.can_focus = false;

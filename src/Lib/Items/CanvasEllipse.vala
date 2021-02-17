@@ -45,11 +45,14 @@ public class Akira.Lib.Items.CanvasEllipse : Goo.CanvasEllipse, Akira.Lib.Items.
         artboard = _artboard;
 
         // Create the ellipse.
-        x = _x;
-        y = _y;
+        x = y = 0;
         width = height = 1;
-        // The CanvasEllipse needs a starting radius at least half of the width.
+        // The CanvasEllipse needs a starting radius at least half of the initial width.
         radius_x = radius_y = 0.5;
+
+        // X & Y need to be set to 0 and then the item needs to be translated
+        // in order to ensure proper coordinates manipulation.
+        translate (_x, _y);
 
         // Add extra attributes.
         is_loaded = _is_loaded;
