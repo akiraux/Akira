@@ -50,7 +50,6 @@ public class Akira.Services.EventBus : Object {
 
     // Options panel signals.
     public signal void align_items (string align_action);
-    public signal void border_deleted ();
     public signal void init_state_coords (Lib.Items.CanvasItem item);
     public signal void reset_state_coords (Lib.Items.CanvasItem item);
     public signal void update_state_coords (double moved_x, double moved_y);

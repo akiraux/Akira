@@ -20,5 +20,6 @@
 
 public abstract class Akira.Models.BaseModel : GLib.Object {
     public Lib.Components.Fill fill { get; set; }
+    public Lib.Components.Border border { get; set; }
     public Akira.Models.ListModel<Akira.Models.BaseModel> model { get; set; }
 }

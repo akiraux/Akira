@@ -23,7 +23,7 @@ public class Akira.Layouts.LeftSideBar : Gtk.Grid {
     public weak Akira.Window window { get; construct; }
     public Akira.Layouts.Partials.TransformPanel transform_panel;
     public Akira.Layouts.Partials.FillsPanel fills_panel;
-    // public Akira.Layouts.Partials.BordersPanel borders_panel;
+    public Akira.Layouts.Partials.BordersPanel borders_panel;
 
     public bool toggled {
         get {
@@ -51,7 +51,7 @@ public class Akira.Layouts.LeftSideBar : Gtk.Grid {
         transform_panel = new Akira.Layouts.Partials.TransformPanel (window);
         var border_radius_panel = new Akira.Layouts.Partials.BorderRadiusPanel (window);
         fills_panel = new Akira.Layouts.Partials.FillsPanel (window);
-        // borders_panel = new Akira.Layouts.Partials.BordersPanel (window);
+        borders_panel = new Akira.Layouts.Partials.BordersPanel (window);
 
         var scrolled_window = new Gtk.ScrolledWindow (null, null);
         scrolled_window.hscrollbar_policy = Gtk.PolicyType.NEVER;
@@ -61,7 +61,7 @@ public class Akira.Layouts.LeftSideBar : Gtk.Grid {
         scrolled_grid.attach (transform_panel, 0, 0, 1, 1);
         scrolled_grid.attach (border_radius_panel, 0, 1, 1, 1);
         scrolled_grid.attach (fills_panel, 0, 2, 1, 1);
-        // scrolled_grid.attach (borders_panel, 0, 3, 1, 1);
+        scrolled_grid.attach (borders_panel, 0, 3, 1, 1);
         scrolled_window.add (scrolled_grid);
 
         attach (align_items_panel, 0, 0, 1, 1);

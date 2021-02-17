@@ -27,7 +27,7 @@ public class Akira.Layouts.Partials.BorderItem : Gtk.Grid {
     private Gtk.Button eyedropper_button;
     private Gtk.Button hidden_button;
     private Gtk.Button delete_button;
-    // private Gtk.Image hidden_button_icon;
+    private Gtk.Image hidden_button_icon;
     private Gtk.MenuButton selected_color;
     public Akira.Partials.InputField tickness_container;
     public Akira.Partials.ColorField color_container;
@@ -43,39 +43,39 @@ public class Akira.Layouts.Partials.BorderItem : Gtk.Grid {
     // If the color is manually set from the ColorPicker.
     // If true, the ColorChooserWidget doesn't need to be updated.
     private bool color_set_manually = false;
-    // private string color {
-    //     owned get {
-    //         return model.color;
-    //     } set {
-    //         model.color = value;
-    //     }
-    // }
+    private string color {
+        owned get {
+            return model.color;
+        } set {
+            model.color = value;
+        }
+    }
 
-    // private int alpha {
-    //     owned get {
-    //         return model.alpha;
-    //     } set {
-    //         model.alpha = value;
-    //     }
-    // }
+    private int alpha {
+        owned get {
+            return model.alpha;
+        } set {
+            model.alpha = value;
+        }
+    }
 
-    // private int border_size {
-    //     owned get {
-    //         return model.border_size;
-    //     } set {
-    //         model.border_size = value;
-    //     }
-    // }
+    private int border_size {
+        owned get {
+            return model.size;
+        } set {
+            model.size = value;
+        }
+    }
 
-    // private bool hidden {
-    //     owned get {
-    //         return model.hidden;
-    //     } set {
-    //         model.hidden = value;
-    //         set_hidden_button ();
-    //         toggle_ui_visibility ();
-    //     }
-    // }
+    private bool hidden {
+        owned get {
+            return model.hidden;
+        } set {
+            model.hidden = value;
+            set_hidden_button ();
+            toggle_ui_visibility ();
+        }
+    }
 
     public BorderItem (Akira.Window window, Akira.Models.BordersItemModel model) {
         Object (
@@ -96,9 +96,9 @@ public class Akira.Layouts.Partials.BorderItem : Gtk.Grid {
     }
 
     private void update_view () {
-        // hidden = model.hidden;
-        // color = model.color;
-        // old_color = color;
+        hidden = model.hidden;
+        color = model.color;
+        old_color = color;
     }
 
     private void create_ui () {
@@ -127,7 +127,7 @@ public class Akira.Layouts.Partials.BorderItem : Gtk.Grid {
         picker_container.add (selected_color);
 
         color_container = new Akira.Partials.ColorField (window);
-        // color_container.text = Utils.Color.rgba_to_hex (color);
+        color_container.text = Utils.Color.rgba_to_hex (color);
 
         color_container.bind_property (
             "text", model, "color",
@@ -159,10 +159,10 @@ public class Akira.Layouts.Partials.BorderItem : Gtk.Grid {
             Akira.Partials.InputField.Unit.PIXEL, 7, true, true);
         tickness_container.set_range (0, Akira.Layouts.MainCanvas.CANVAS_SIZE);
         tickness_container.entry.sensitive = true;
-        // tickness_container.entry.value = border_size;
+        tickness_container.entry.value = border_size;
 
         tickness_container.entry.bind_property (
-            "value", model, "border_size", BindingFlags.BIDIRECTIONAL);
+            "value", model, "size", BindingFlags.BIDIRECTIONAL);
 
         color_chooser.attach (picker_container, 0, 0, 1, 1);
         color_chooser.attach (color_container, 1, 0, 1, 1);
@@ -240,39 +240,40 @@ public class Akira.Layouts.Partials.BorderItem : Gtk.Grid {
 
     private void on_color_changed () {
         color_set_manually = true;
-        // color = color_chooser_widget.rgba.to_string ();
-        // alpha = ((int)(color_chooser_widget.rgba.alpha * 255));
+        color = color_chooser_widget.rgba.to_string ();
+        alpha = ((int)(color_chooser_widget.rgba.alpha * 255));
     }
 
     private void on_delete_item () {
         model.model.remove_item.begin (model);
-        window.event_bus.border_deleted ();
+        // Actually remove the Border component only if the user requests it.
+        model.border.remove ();
     }
 
-    // private void set_hidden_button () {
-    //     if (hidden_button_icon != null) {
-    //         hidden_button.remove (hidden_button_icon);
-    //     }
+    private void set_hidden_button () {
+        if (hidden_button_icon != null) {
+            hidden_button.remove (hidden_button_icon);
+        }
 
-    //     hidden_button_icon = new Gtk.Image.from_icon_name (
-    //         "layer-%s-symbolic".printf (hidden ? "hidden" : "visible"),
-    //         Gtk.IconSize.SMALL_TOOLBAR);
+        hidden_button_icon = new Gtk.Image.from_icon_name (
+            "layer-%s-symbolic".printf (hidden ? "hidden" : "visible"),
+            Gtk.IconSize.SMALL_TOOLBAR);
 
-    //     hidden_button.add (hidden_button_icon);
-    //     hidden_button_icon.show_all ();
-    // }
+        hidden_button.add (hidden_button_icon);
+        hidden_button_icon.show_all ();
+    }
 
     private void toggle_visibility () {
-        // hidden = !hidden;
+        hidden = !hidden;
         toggle_ui_visibility ();
     }
 
     private void toggle_ui_visibility () {
-        // if (hidden) {
-        //     get_style_context ().add_class ("disabled");
-        //     hidden_button.set_tooltip_text (_("Show border"));
-        //     return;
-        // }
+        if (hidden) {
+            get_style_context ().add_class ("disabled");
+            hidden_button.set_tooltip_text (_("Show border"));
+            return;
+        }
 
         hidden_button.set_tooltip_text (_("Hide border"));
         get_style_context ().remove_class ("disabled");
@@ -305,8 +306,8 @@ public class Akira.Layouts.Partials.BorderItem : Gtk.Grid {
         }
 
         var new_rgba = Gdk.RGBA ();
-        // new_rgba.parse (color);
-        // new_rgba.alpha = (double) alpha / 255;
+        new_rgba.parse (color);
+        new_rgba.alpha = (double) alpha / 255;
 
         color_chooser_widget.set_rgba (new_rgba);
     }

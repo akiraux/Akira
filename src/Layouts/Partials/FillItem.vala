@@ -247,7 +247,7 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
     }
 
     private void on_delete_item () {
-        model.model<Akira.Models.FillsItemModel>.remove_item.begin (model);
+        model.model.remove_item.begin (model);
         // Actually remove the Fill component only if the user requests it.
         model.fill.remove ();
     }

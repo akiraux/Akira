@@ -58,7 +58,7 @@ public class Akira.Lib.Components.Fills : Component {
     }
 
     public void reload () {
-        // If we don't have any fills associated with this item, remove the background color.
+        // If we don't have any fill associated with this item, remove the background color.
         if (count () == 0) {
             if (item is Items.CanvasArtboard) {
                 ((Items.CanvasArtboard) item).background.set ("fill-color-rgba", null);

@@ -84,7 +84,6 @@ public class Akira.Layouts.Partials.BordersPanel : Gtk.Grid {
         attach (title_cont, 0, 0, 1, 1);
         attach (borders_list_container, 0, 1, 1, 1);
         show_all ();
-        add_btn.hide ();
 
         create_event_bindings ();
     }
@@ -93,30 +92,20 @@ public class Akira.Layouts.Partials.BordersPanel : Gtk.Grid {
         toggled = false;
         window.event_bus.selected_items_changed.connect (on_selected_items_changed);
 
-        window.event_bus.border_deleted.connect (() => {
-            add_btn.show ();
-            window.main_window.left_sidebar.queue_resize ();
-        });
-
         add_btn.clicked.connect (() => {
-            // var model_item = create_model ();
-            // list_model.add_item.begin (model_item);
-            // selected_item.borders.reload ();
-            // add_btn.hide ();
-            // window.main_window.left_sidebar.queue_resize ();
+            var border_color = Gdk.RGBA ();
+            border_color.parse (settings.border_color);
+            Lib.Components.Border border =
+                selected_item.borders.add_border_color (border_color, (int) settings.border_size);
+
+            var model_item = create_model (border);
+            list_model.add_item.begin (model_item);
+            selected_item.borders.reload ();
         });
 
         // Listen to the model changes when adding/removing items.
         list_model.items_changed.connect ((position, removed, added) => {
-            if (selected_item != null) {
-                // If an item is still selected, update the has_border property
-                // to TRUE or FALSE based on the model changes.
-
-                // This will need to be updated in the future once we're dealing
-                // with multiple border colors, updating to FALSE only if all
-                // the borders have been deleted.
-                // selected_item.has_border = (added == 1);
-            }
+            window.main_window.left_sidebar.queue_resize ();
         });
     }
 
@@ -124,7 +113,6 @@ public class Akira.Layouts.Partials.BordersPanel : Gtk.Grid {
         if (selected_items.length () == 0) {
             selected_item = null;
             list_model.clear.begin ();
-            add_btn.hide ();
             toggled = false;
             return;
         }
@@ -133,22 +121,19 @@ public class Akira.Layouts.Partials.BordersPanel : Gtk.Grid {
             toggled = true;
             selected_item = selected_items.nth_data (0);
 
-            if (selected_item.borders != null) {
+            if (selected_item.borders == null) {
                 toggled = false;
                 return;
             }
 
-            if (selected_item.borders.count () == 0) {
-                add_btn.show ();
-                return;
+            foreach (Lib.Components.Border border in selected_item.borders.borders) {
+                var model_item = create_model (border);
+                list_model.add_item.begin (model_item);
             }
-
-            // var model_item = create_model ();
-            // list_model.add_item.begin (model_item);
         }
     }
 
-    // private Akira.Models.BordersItemModel create_model () {
-    //     return new Akira.Models.BordersItemModel (selected_item, list_model);
-    // }
+    private Akira.Models.BordersItemModel create_model (Lib.Components.Border border) {
+        return new Akira.Models.BordersItemModel (border, list_model);
+    }
 }

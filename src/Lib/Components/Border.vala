@@ -23,6 +23,7 @@
  * Border component to keep track of a single border, which includes different attributes.
  */
 public class Akira.Lib.Components.Border : Component {
+    public unowned Borders borders { get; set; }
     // Since items can have multiple border colors, we need to keep track of each
     // with a unique identifier in order to properly update them.
     public int id { get; set; }
@@ -35,7 +36,8 @@ public class Akira.Lib.Components.Border : Component {
     public int alpha { get; set; }
     public bool hidden { get; set; }
 
-    public Border (Items.CanvasItem _item, Gdk.RGBA init_color, int init_size, int border_id) {
+    public Border (Borders _borders, Items.CanvasItem _item, Gdk.RGBA init_color, int init_size, int border_id) {
+        borders = _borders;
         item = _item;
         id = border_id;
         color = init_color;
@@ -94,5 +96,9 @@ public class Akira.Lib.Components.Border : Component {
         color.parse (hex);
 
         set_border ();
+    }
+
+    public void remove () {
+        borders.remove_border (this);
     }
 }

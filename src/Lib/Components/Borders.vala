@@ -37,11 +37,20 @@ public class Akira.Lib.Components.Borders : Component {
         add_border_color (init_color, init_size);
     }
 
-    public void add_border_color (Gdk.RGBA init_color, int init_size) {
-        borders.add (new Border (item, init_color, init_size, id));
+    /**
+     * Create a new border color component.
+     *
+     * @param {Gdk.RGBA} color - The initial color of the border.
+     * @return Fill - The newly created border component.
+     */
+    public Border add_border_color (Gdk.RGBA init_color, int init_size) {
+        var new_border = new Border (this, item, init_color, init_size, id);
+        borders.add (new_border);
 
         // Increase the ID to keep an incremental unique identifier.
         id++;
+
+        return new_border;
     }
 
     public int count () {
@@ -49,8 +58,21 @@ public class Akira.Lib.Components.Borders : Component {
     }
 
     public void reload () {
+        // If we don't have any border associated with this item, remove the border color.
+        if (count () == 0) {
+            item.set ("stroke-color-rgba", null);
+            item.set ("line-width", 0.0);
+            return;
+        }
+
+        // Loop through all the configured borders and reload the color.
         foreach (Border border in borders) {
             border.reload ();
         }
+    }
+
+    public void remove_border (Border border) {
+        borders.remove (border);
+        reload ();
     }
 }
