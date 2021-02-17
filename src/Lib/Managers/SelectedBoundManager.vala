@@ -263,17 +263,24 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
     }
 
     private void on_flip_item (bool vertical) {
-        if (selected_items.length () == 0 || selected_items.nth_data (0) is Lib.Items.CanvasArtboard) {
+        if (selected_items.length () == 0) {
             return;
         }
 
-        selected_items.foreach ((item) => {
+        // Loop through all the currently selected items.
+        foreach (Items.CanvasItem item in selected_items) {
+            // Skip if the item is an Artboard.
+            if (item is Items.CanvasArtboard) {
+                continue;
+            }
+
             if (vertical) {
                 item.flipped.vertical = !item.flipped.vertical;
-                return;
+                continue;
             }
+
             item.flipped.horizontal = !item.flipped.horizontal;
-        });
+        }
     }
 
     private void on_move_item_from_canvas (Gdk.EventKey event) {
