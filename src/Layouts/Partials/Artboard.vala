@@ -234,10 +234,8 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
         });
 
         container.bind_model (model.items, item => {
-            // TODO: Differentiate between layer and artboard
-            // based upon item "type" of some sort
-            var item_model = item as Akira.Lib.Items.CanvasItem;
-            return new Akira.Layouts.Partials.Layer (window, item_model, container);
+            var item_model = item as Lib.Items.CanvasItem;
+            return new Layouts.Partials.Layer (window, item_model, container);
         });
 
         lock_actions ();

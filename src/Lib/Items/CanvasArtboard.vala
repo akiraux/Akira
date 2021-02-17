@@ -74,6 +74,9 @@ public class Akira.Lib.Items.CanvasArtboard : Goo.CanvasGroup, Akira.Lib.Items.C
       components.add (new Size (this));
       components.add (new Layer ());
 
+      // Init the items list.
+      items = new Models.ListModel<Items.CanvasItem> ();
+
       create_label ();
    }
 
@@ -123,5 +126,28 @@ public class Akira.Lib.Items.CanvasArtboard : Goo.CanvasGroup, Akira.Lib.Items.C
          && item.bounds.x2 > bounds.x1
          && item.bounds.y1 < bounds.y2
          && item.bounds.y2 > bounds.y1;
+   }
+
+   public uint get_items_length () {
+      return items.get_n_items ();
+   }
+
+   public void remove_item (Items.CanvasItem item) {
+      items.remove_item.begin (item);
+      item.artboard = null;
+   }
+
+   public void delete () {
+      foreach (Items.CanvasItem item in items) {
+         items.remove_item.begin (item);
+         item.remove ();
+      }
+
+      background.remove ();
+      // Reassign the Canvas as parent to the label in order to remove it.
+      label.parent = parent;
+      label.remove ();
+
+      remove ();
    }
 }

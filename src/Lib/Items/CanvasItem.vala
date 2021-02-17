@@ -57,6 +57,7 @@ public interface Akira.Lib.Items.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasIt
     public void init_position (Items.CanvasItem item, double x, double y) {
         if (item.artboard != null) {
             item.canvas.convert_to_item_space (item.artboard, ref x, ref y);
+            item.artboard.items.add_item.begin (item, item.is_loaded);
         }
 
         item.translate (x, y);
@@ -133,6 +134,18 @@ public interface Akira.Lib.Items.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasIt
     }
 
     public void delete () {
+        // If we're deleting an Artboard, deal with it inside its class.
+        if (this is CanvasArtboard) {
+            ((CanvasArtboard) this).delete ();
+            return;
+        }
+
+        // Remove the item from the artboard before deleting it
+        // if it belongs to one.
+        if (artboard != null) {
+            artboard.remove_item (this);
+        }
+
         remove ();
     }
 }
