@@ -49,7 +49,16 @@ public class Akira.Lib.Managers.HoverManager : Object {
     public void add_hover_effect (double event_x, double event_y) {
         var target = canvas.get_item_at (event_x, event_y, true);
 
-        if (target == null) {
+        // Remove the hover effect is no item is hovered, or the item is the
+        // white background of the CanvasArtboard, which is a GooCanvasRect item.
+        if (
+            target == null ||
+            (
+                target is Goo.CanvasRect &&
+                !(target is Items.CanvasItem) &&
+                !(target is Selection.Nob)
+            )
+        ) {
             current_hover_item = null;
             remove_hover_effect ();
 
@@ -64,7 +73,11 @@ public class Akira.Lib.Managers.HoverManager : Object {
         }
 
         // If we're hovering over the Artboard's label, change the target to the Artboard.
-        if (target is Goo.CanvasText && target.parent is Items.CanvasArtboard) {
+        if (
+            target is Goo.CanvasText &&
+            target.parent is Items.CanvasArtboard &&
+            !(target is Items.CanvasItem)
+        ) {
             target = target.parent as Items.CanvasItem;
         }
 

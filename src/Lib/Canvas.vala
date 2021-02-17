@@ -217,7 +217,18 @@ public class Akira.Lib.Canvas : Goo.Canvas {
             case EditMode.MODE_SELECTION:
                 var clicked_item = get_item_at (event.x, event.y, true);
 
-                if (clicked_item == null) {
+                // Deselect if no item was clicked, or a non selected artboard was clicked.
+                // We do this to allow users to clear the selection when clicking on the
+                // empty artboard space, which is a white GooCanvasRect item.
+                if (
+                    clicked_item == null ||
+                    (
+                        clicked_item is Goo.CanvasRect &&
+                        !(clicked_item is Items.CanvasItem) &&
+                        !(clicked_item is Selection.Nob) &&
+                        !((Items.CanvasItem) clicked_item.parent).layer.selected
+                    )
+                ) {
                     selected_bound_manager.reset_selection ();
                     // TODO: allow for multi select with click & drag on canvas
                     // Workaround: when no item is clicked, there's no point in keeping holding active
@@ -236,7 +247,11 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 nob_manager.selected_nob = clicked_nob_name;
 
                 // If we're clicking on the Artboard's label, change the target to the Artboard.
-                if (clicked_item is Goo.CanvasText && clicked_item.parent is Items.CanvasArtboard) {
+                if (
+                    clicked_item is Goo.CanvasText &&
+                    clicked_item.parent is Items.CanvasArtboard &&
+                    !(clicked_item is Items.CanvasItem)
+                ) {
                     clicked_item = clicked_item.parent as Items.CanvasItem;
                 }
 
