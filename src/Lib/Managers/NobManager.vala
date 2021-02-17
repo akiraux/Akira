@@ -178,6 +178,13 @@ public class Akira.Lib.Managers.NobManager : Object {
             select_effect.set ("parent", root);
         }
 
+        // If only one item is selected and it's inside an artboard,
+        // we need to convert its coordinates from the artboard space.
+        var item = selected_items.nth_data (0);
+        if (selected_items.length () == 1 && item.artboard != null) {
+            item.canvas.convert_from_item_space (item.artboard, ref matrix.x0, ref matrix.y0);
+        }
+
         select_effect.set_transform (matrix);
         select_effect.set ("width", width);
         select_effect.set ("height", height);
@@ -222,6 +229,13 @@ public class Akira.Lib.Managers.NobManager : Object {
         bool print_middle_height_nobs = height > nob_size * 3;
 
         var nob_offset = nob_size / 2;
+
+        // If only one item is selected and it's inside an artboard,
+        // we need to convert its coordinates from the artboard space.
+        var item = selected_items.nth_data (0);
+        if (selected_items.length () == 1 && item.artboard != null) {
+            item.canvas.convert_from_item_space (item.artboard, ref matrix.x0, ref matrix.y0);
+        }
 
         // TOP LEFT nob
         nobs[Nob.TOP_LEFT].set_transform (matrix);

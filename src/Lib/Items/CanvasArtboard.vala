@@ -31,7 +31,7 @@ public class Akira.Lib.Items.CanvasArtboard : Goo.CanvasGroup, Akira.Lib.Items.C
 
    public bool is_loaded { get; set; }
 
-   // Override the list type from he CanvasGroup.
+   // Override the list type from the CanvasGroup.
    public new Akira.Models.ListModel<Lib.Items.CanvasItem> items;
 
    // Private attributes of the Artboard.

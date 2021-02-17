@@ -55,6 +55,10 @@ public interface Akira.Lib.Items.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasIt
      * the generation of the item's Cairo.Matrix which is used across the app.
      */
     public void init_position (Items.CanvasItem item, double x, double y) {
+        if (item.artboard != null) {
+            item.canvas.convert_to_item_space (item.artboard, ref x, ref y);
+        }
+
         item.translate (x, y);
     }
 

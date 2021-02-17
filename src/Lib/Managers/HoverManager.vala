@@ -118,6 +118,13 @@ public class Akira.Lib.Managers.HoverManager : Object {
 
         Cairo.Matrix matrix;
         item.get_transform (out matrix);
+
+        // If the item is inside an artboard, we need to convert
+        // its coordinates from the artboard space.
+        if (item.artboard != null) {
+            item.canvas.convert_from_item_space (item.artboard, ref matrix.x0, ref matrix.y0);
+        }
+
         hover_effect.set_transform (matrix);
 
         hover_effect.set ("parent", canvas.get_root_item ());

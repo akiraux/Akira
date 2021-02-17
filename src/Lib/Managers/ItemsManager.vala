@@ -103,6 +103,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         if (artboard == null) {
             foreach (Items.CanvasArtboard _artboard in artboards) {
                 if (_artboard.is_inside (x, y)) {
+                    warning ("inside artboard");
                     artboard = _artboard;
                     break;
                 }
