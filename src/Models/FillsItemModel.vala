@@ -21,54 +21,48 @@
 */
 
 public class Akira.Models.FillsItemModel : Models.BaseModel {
-    // public string color {
-    //     owned get {
-    //         return item.color.to_string ();
-    //     }
-    //     set {
-    //         var new_rgba = Gdk.RGBA ();
-    //         new_rgba.parse (value);
-    //         item.color = new_rgba;
-    //     }
-    // }
+    public string color {
+        owned get {
+            return fill.color.to_string ();
+        }
+        set {
+            var new_rgba = Gdk.RGBA ();
+            new_rgba.parse (value);
+            fill.color = new_rgba;
+            fill.reload ();
+        }
+    }
 
-    // public int alpha {
-    //     get {
-    //         return item.fill_alpha;
-    //     }
-    //     set {
-    //         item.fill_alpha = value;
-    //     }
-    // }
+    public int alpha {
+        get {
+            return fill.alpha;
+        }
+        set {
+            fill.alpha = value;
+            fill.reload ();
+        }
+    }
 
-    // public bool hidden {
-    //     get {
-    //         return item.hidden_fill;
-    //     }
-    //     set {
-    //         item.hidden_fill = value;
-    //     }
-    // }
+    public bool hidden {
+        get {
+            return fill.hidden;
+        }
+        set {
+            fill.hidden = value;
+            fill.reload ();
+        }
+    }
 
     public Akira.Utils.BlendingMode blending_mode;
 
-    public FillsItemModel (
-        Lib.Items.CanvasItem item,
-        Akira.Models.ListModel list_model
-    ) {
-        Object (
-            item: item,
-            list_model: list_model
-        );
-    }
-
-    construct {
-        // item.add_fill_color ();
+    public FillsItemModel (Lib.Components.Fill _fill, ListModel _model) {
+        fill = _fill;
+        model = _model;
         blending_mode = Akira.Utils.BlendingMode.NORMAL;
     }
 
-    // public string to_string () {
-    //     return "Color: %s\nAlpha: %f\nHidden: %s\nBlendingMode: %s".printf (
-    //         color, alpha, (hidden ? "1" : "0"), blending_mode.to_string ());
-    // }
+    public string to_string () {
+        return "Color: %s\nAlpha: %f\nHidden: %s\nBlendingMode: %s".printf (
+            color, alpha, (hidden ? "1" : "0"), blending_mode.to_string ());
+    }
 }

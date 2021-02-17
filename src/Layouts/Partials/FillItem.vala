@@ -28,7 +28,7 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
     private Gtk.Button eyedropper_button;
     private Gtk.Button hidden_button;
     private Gtk.Button delete_button;
-    // private Gtk.Image hidden_button_icon;
+    private Gtk.Image hidden_button_icon;
     private Gtk.MenuButton selected_color;
     public Akira.Partials.InputField opacity_container;
     public Akira.Partials.ColorField color_container;
@@ -44,31 +44,31 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
     // If the color or alpha are manually set from the ColorPicker.
     // If true, the ColorChooserWidget doesn't need to be updated.
     private bool color_set_manually = false;
-    // private string color {
-    //     owned get {
-    //         return model.color;
-    //     } set {
-    //         model.color = value;
-    //     }
-    // }
+    private string color {
+        owned get {
+            return model.color;
+        } set {
+            model.color = value;
+        }
+    }
 
-    // private int alpha {
-    //     owned get {
-    //         return model.alpha;
-    //     } set {
-    //         model.alpha = value;
-    //     }
-    // }
+    private int alpha {
+        owned get {
+            return model.alpha;
+        } set {
+            model.alpha = value;
+        }
+    }
 
-    // private bool hidden {
-    //     owned get {
-    //         return model.hidden;
-    //     } set {
-    //         model.hidden = value;
-    //         set_hidden_button ();
-    //         toggle_ui_visibility ();
-    //     }
-    // }
+    private bool hidden {
+        owned get {
+            return model.hidden;
+        } set {
+            model.hidden = value;
+            set_hidden_button ();
+            toggle_ui_visibility ();
+        }
+    }
 
     public FillItem (Akira.Window window, Akira.Models.FillsItemModel model) {
         Object (
@@ -89,9 +89,9 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
     }
 
     private void update_view () {
-        // hidden = model.hidden;
-        // color = model.color;
-        // old_color = color;
+        hidden = model.hidden;
+        color = model.color;
+        old_color = color;
     }
 
     private void create_ui () {
@@ -120,7 +120,7 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         picker_container.add (selected_color);
 
         color_container = new Akira.Partials.ColorField (window);
-        // color_container.text = Utils.Color.rgba_to_hex (color);
+        color_container.text = Utils.Color.rgba_to_hex (color);
 
         color_container.bind_property (
             "text", model, "color",
@@ -151,7 +151,7 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         opacity_container = new Akira.Partials.InputField (
             Akira.Partials.InputField.Unit.PERCENTAGE, 7, true, true);
         opacity_container.entry.sensitive = true;
-        // opacity_container.entry.value = Math.round ((double) alpha / 255 * 100);
+        opacity_container.entry.value = Math.round ((double) alpha / 255 * 100);
 
         opacity_container.entry.bind_property (
             "value", model, "alpha",
@@ -236,47 +236,46 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
     }
 
     private void on_model_changed () {
-        model.item.fills.reload ();
         set_button_color ();
         set_color_chooser_color ();
     }
 
     private void on_color_changed () {
         color_set_manually = true;
-        // color = color_chooser_widget.rgba.to_string ();
-        // alpha = ((int)(color_chooser_widget.rgba.alpha * 255));
+        color = color_chooser_widget.rgba.to_string ();
+        alpha = ((int)(color_chooser_widget.rgba.alpha * 255));
     }
 
     private void on_delete_item () {
-        model.list_model<Akira.Models.FillsItemModel>.remove_item.begin (model);
-        model.item.fills.reload ();
-        window.event_bus.fill_deleted ();
+        model.model<Akira.Models.FillsItemModel>.remove_item.begin (model);
+        // Actually remove the Fill component only if the user requests it.
+        model.fill.remove ();
     }
 
-    // private void set_hidden_button () {
-    //     if (hidden_button_icon != null) {
-    //         hidden_button.remove (hidden_button_icon);
-    //     }
+    private void set_hidden_button () {
+        if (hidden_button_icon != null) {
+            hidden_button.remove (hidden_button_icon);
+        }
 
-    //     hidden_button_icon = new Gtk.Image.from_icon_name (
-    //         "layer-%s-symbolic".printf (hidden ? "hidden" : "visible"),
-    //         Gtk.IconSize.SMALL_TOOLBAR);
+        hidden_button_icon = new Gtk.Image.from_icon_name (
+            "layer-%s-symbolic".printf (hidden ? "hidden" : "visible"),
+            Gtk.IconSize.SMALL_TOOLBAR);
 
-    //     hidden_button.add (hidden_button_icon);
-    //     hidden_button_icon.show_all ();
-    // }
+        hidden_button.add (hidden_button_icon);
+        hidden_button_icon.show_all ();
+    }
 
     private void toggle_visibility () {
-        // hidden = !hidden;
+        hidden = !hidden;
         toggle_ui_visibility ();
     }
 
     private void toggle_ui_visibility () {
-        // if (hidden) {
-        //     get_style_context ().add_class ("disabled");
-        //     hidden_button.set_tooltip_text (_("Show fill color"));
-        //     return;
-        // }
+        if (hidden) {
+            get_style_context ().add_class ("disabled");
+            hidden_button.set_tooltip_text (_("Show fill color"));
+            return;
+        }
 
         hidden_button.set_tooltip_text (_("Hide fill color"));
         get_style_context ().remove_class ("disabled");
@@ -309,8 +308,8 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         }
 
         var new_rgba = Gdk.RGBA ();
-        // new_rgba.parse (color);
-        // new_rgba.alpha = (double) alpha / 255;
+        new_rgba.parse (color);
+        new_rgba.alpha = (double) alpha / 255;
 
         color_chooser_widget.set_rgba (new_rgba);
     }

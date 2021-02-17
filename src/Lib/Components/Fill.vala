@@ -23,6 +23,7 @@
  * Fill component to keep track of a single filling, which includes different attributes.
  */
 public class Akira.Lib.Components.Fill : Component {
+    public unowned Fills fills { get; set; }
     // Since items can have multiple filling colors, we need to keep track of each
     // with a unique identifier in order to properly update them.
     public int id { get; set; }
@@ -34,7 +35,8 @@ public class Akira.Lib.Components.Fill : Component {
     public int alpha { get; set; }
     public bool hidden { get; set; }
 
-    public Fill (Items.CanvasItem _item, Gdk.RGBA init_color, int fill_id) {
+    public Fill (Fills _fills, Items.CanvasItem _item, Gdk.RGBA init_color, int fill_id) {
+        fills = _fills;
         item = _item;
         id = fill_id;
         color = init_color;
@@ -47,7 +49,7 @@ public class Akira.Lib.Components.Fill : Component {
      * Apply the properly converted fill color to the item.
      */
     private void set_fill () {
-        // Make the item transparent if the color is set by hidden.
+        // Make the item transparent if the color is set to hidden.
         if (hidden) {
             if (item is Items.CanvasArtboard) {
                 ((Items.CanvasArtboard) item).background.set ("fill-color-rgba", null);
@@ -97,5 +99,9 @@ public class Akira.Lib.Components.Fill : Component {
         color.parse (hex);
 
         set_fill ();
+    }
+
+    public void remove () {
+        fills.remove_fill (this);
     }
 }

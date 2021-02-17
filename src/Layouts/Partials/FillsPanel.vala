@@ -85,7 +85,6 @@ public class Akira.Layouts.Partials.FillsPanel : Gtk.Grid {
         attach (title_cont, 0, 0, 1, 1);
         attach (fills_list_container, 0, 1, 1, 1);
         show_all ();
-        add_btn.hide ();
 
         create_event_bindings ();
     }
@@ -94,30 +93,19 @@ public class Akira.Layouts.Partials.FillsPanel : Gtk.Grid {
         toggled = false;
         window.event_bus.selected_items_changed.connect (on_selected_items_changed);
 
-        window.event_bus.fill_deleted.connect (() => {
-            add_btn.show ();
-            window.main_window.left_sidebar.queue_resize ();
-        });
-
         add_btn.clicked.connect (() => {
-            var model_item = create_model ();
+            var fill_color = Gdk.RGBA ();
+            fill_color.parse (settings.fill_color);
+            Lib.Components.Fill fill = selected_item.fills.add_fill_color (fill_color);
+
+            var model_item = create_model (fill);
             list_model.add_item.begin (model_item);
             selected_item.fills.reload ();
-            add_btn.hide ();
-            window.main_window.left_sidebar.queue_resize ();
         });
 
         // Listen to the model changes when adding/removing items.
         list_model.items_changed.connect ((position, removed, added) => {
-            if (selected_item != null) {
-                // If an item is still selected, update the has_fill property
-                // to TRUE or FALSE based on the model changes.
-
-                // This will need to be updated in the future once we're dealing
-                // with multiple fill colors, updating to FALSE only if all
-                // the fills have been deleted.
-                // selected_item.has_fill = (added == 1);
-            }
+            window.main_window.left_sidebar.queue_resize ();
         });
     }
 
@@ -125,7 +113,6 @@ public class Akira.Layouts.Partials.FillsPanel : Gtk.Grid {
         if (selected_items.length () == 0) {
             selected_item = null;
             list_model.clear.begin ();
-            add_btn.hide ();
             toggled = false;
             return;
         }
@@ -134,22 +121,19 @@ public class Akira.Layouts.Partials.FillsPanel : Gtk.Grid {
             toggled = true;
             selected_item = selected_items.nth_data (0);
 
-            if (selected_item.fills != null) {
+            if (selected_item.fills == null) {
                 toggled = false;
                 return;
             }
 
-            if (selected_item.fills.count () == 0) {
-                add_btn.show ();
-                return;
+            foreach (Lib.Components.Fill fill in selected_item.fills.fills) {
+                var model_item = create_model (fill);
+                list_model.add_item.begin (model_item);
             }
-
-            var model_item = create_model ();
-            list_model.add_item.begin (model_item);
         }
     }
 
-    private Akira.Models.FillsItemModel create_model () {
-        return new Akira.Models.FillsItemModel (selected_item, list_model);
+    private Akira.Models.FillsItemModel create_model (Lib.Components.Fill fill) {
+        return new Akira.Models.FillsItemModel (fill, list_model);
     }
 }

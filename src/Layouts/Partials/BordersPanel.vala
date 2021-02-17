@@ -99,11 +99,11 @@ public class Akira.Layouts.Partials.BordersPanel : Gtk.Grid {
         });
 
         add_btn.clicked.connect (() => {
-            var model_item = create_model ();
-            list_model.add_item.begin (model_item);
-            selected_item.borders.reload ();
-            add_btn.hide ();
-            window.main_window.left_sidebar.queue_resize ();
+            // var model_item = create_model ();
+            // list_model.add_item.begin (model_item);
+            // selected_item.borders.reload ();
+            // add_btn.hide ();
+            // window.main_window.left_sidebar.queue_resize ();
         });
 
         // Listen to the model changes when adding/removing items.
@@ -143,12 +143,12 @@ public class Akira.Layouts.Partials.BordersPanel : Gtk.Grid {
                 return;
             }
 
-            var model_item = create_model ();
-            list_model.add_item.begin (model_item);
+            // var model_item = create_model ();
+            // list_model.add_item.begin (model_item);
         }
     }
 
-    private Akira.Models.BordersItemModel create_model () {
-        return new Akira.Models.BordersItemModel (selected_item, list_model);
-    }
+    // private Akira.Models.BordersItemModel create_model () {
+    //     return new Akira.Models.BordersItemModel (selected_item, list_model);
+    // }
 }

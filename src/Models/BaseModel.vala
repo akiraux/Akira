@@ -19,6 +19,6 @@
 */
 
 public abstract class Akira.Models.BaseModel : GLib.Object {
-    public Lib.Items.CanvasItem item { get; construct; }
-    public Akira.Models.ListModel<Akira.Models.BaseModel> list_model { get; set; }
+    public Lib.Components.Fill fill { get; set; }
+    public Akira.Models.ListModel<Akira.Models.BaseModel> model { get; set; }
 }

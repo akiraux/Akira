@@ -58,14 +58,9 @@ public class Akira.Models.BordersItemModel : Models.BaseModel {
     //     }
     // }
 
-    public BordersItemModel (
-        Lib.Items.CanvasItem item,
-        Akira.Models.ListModel<Akira.Models.BordersItemModel> list_model
-    ) {
-        Object (
-            item: item,
-            list_model: list_model
-        );
+    public BordersItemModel (Lib.Components.Fill _fill, ListModel _model) {
+        fill = _fill;
+        model = _model;
     }
 
     // public string to_string () {

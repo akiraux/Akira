@@ -37,11 +37,20 @@ public class Akira.Lib.Components.Fills : Component {
         add_fill_color (color);
     }
 
-    public void add_fill_color (Gdk.RGBA color) {
-        fills.add (new Fill (item, color, id));
+    /**
+     * Create a new fill color component.
+     *
+     * @param {Gdk.RGBA} color - The initial color of the fill.
+     * @return Fill - The newly created fill component.
+     */
+    public Fill add_fill_color (Gdk.RGBA color) {
+        var new_fill = new Fill (this, item, color, id);
+        fills.add (new_fill);
 
         // Increase the ID to keep an incremental unique identifier.
         id++;
+
+        return new_fill;
     }
 
     public int count () {
@@ -49,8 +58,24 @@ public class Akira.Lib.Components.Fills : Component {
     }
 
     public void reload () {
+        // If we don't have any fills associated with this item, remove the background color.
+        if (count () == 0) {
+            if (item is Items.CanvasArtboard) {
+                ((Items.CanvasArtboard) item).background.set ("fill-color-rgba", null);
+            } else {
+                item.set ("fill-color-rgba", null);
+            }
+            return;
+        }
+
+        // Loop through all the configured fill and reload the color.
         foreach (Fill fill in fills) {
             fill.reload ();
         }
+    }
+
+    public void remove_fill (Fill fill) {
+        fills.remove (fill);
+        reload ();
     }
 }
