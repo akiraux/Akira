@@ -188,9 +188,6 @@ public class Akira.StateManagers.CoordinatesManager : Object {
             item.transform.x += inc_x;
             item.transform.y += inc_y;
         }
-
-        // Notify the rest of the UI that a value of the select items has changed.
-        window.event_bus.item_value_changed ();
     }
 
     /**

@@ -118,9 +118,6 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
 
         // Notify the X & Y values in the state manager.
         canvas.window.event_bus.reset_state_coords (selected_item);
-
-        // Let the UI know that a redraw is necessary.
-        update_selected_items ();
     }
 
     public void add_item_to_selection (Items.CanvasItem item) {

@@ -35,6 +35,7 @@ public class Akira.Lib.Components.Size : Component {
         }
         set {
             item.set ("width", value);
+            ((Lib.Canvas) item.canvas).window.event_bus.item_value_changed ();
         }
     }
 
@@ -47,6 +48,7 @@ public class Akira.Lib.Components.Size : Component {
         }
         set {
             item.set ("height", value);
+            ((Lib.Canvas) item.canvas).window.event_bus.item_value_changed ();
         }
     }
 

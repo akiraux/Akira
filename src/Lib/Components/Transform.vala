@@ -37,6 +37,7 @@ public class Akira.Lib.Components.Transform : Component {
         }
         set {
             _x = value;
+            ((Lib.Canvas) item.canvas).window.event_bus.item_value_changed ();
         }
     }
 
@@ -54,6 +55,7 @@ public class Akira.Lib.Components.Transform : Component {
         }
         set {
             _y = value;
+            ((Lib.Canvas) item.canvas).window.event_bus.item_value_changed ();
         }
     }
 

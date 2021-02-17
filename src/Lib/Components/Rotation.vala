@@ -38,9 +38,11 @@ public class Akira.Lib.Components.Rotation : Component {
             var center_y = item.size.height / 2;
             var new_rotation = value - _rotation;
 
-            item.rotate (value, center_x, center_y);
+            item.rotate (new_rotation, center_x, center_y);
 
-            _rotation = new_rotation;
+            _rotation += new_rotation;
+
+            ((Lib.Canvas) item.canvas).window.event_bus.item_value_changed ();
         }
     }
 

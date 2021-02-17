@@ -42,8 +42,8 @@ public class Akira.Utils.AffineTransform : Object {
         ref double initial_event_y
     ) {
         // Calculate the delta between the initial point and new mouse location.
-        var delta_x = event_x - initial_event_x;
-        var delta_y = event_y - initial_event_y;
+        var delta_x = fix_size (event_x - initial_event_x);
+        var delta_y = fix_size (event_y - initial_event_y);
 
         Cairo.Matrix matrix;
         item.get_transform (out matrix);
@@ -459,9 +459,6 @@ public class Akira.Utils.AffineTransform : Object {
     }
 
     public static void set_size (Lib.Items.CanvasItem item, double x, double y) {
-        // double width, height;
-        // item.get ("width", out width, "height", out height);
-
         double new_width = fix_size (item.size.width + x);
         double new_height = fix_size (item.size.height + y);
 
@@ -474,15 +471,6 @@ public class Akira.Utils.AffineTransform : Object {
             item.size.height = new_height;
         }
     }
-
-    // public static void set_rotation (CanvasItem item, double rotation) {
-    //     var center_x = item.size.width / 2;
-    //     var center_y = item.size.height / 2;
-    //     var actual_rotation = rotation - item.rotation.rotation;
-
-    //     item.rotate (actual_rotation, center_x, center_y);
-    //     item.rotation.rotation += actual_rotation;
-    // }
 
     public static void flip_item (CanvasItem item, double sx, double sy) {
         var center_x = item.size.width / 2;
