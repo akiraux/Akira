@@ -278,28 +278,13 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         );
     }
 
-    public int get_item_position (Lib.Items.CanvasItem item) {
-        if (item.artboard != null) {
-            return -1;
-        }
-
-        return free_items.index (item);
-    }
-
-    public Lib.Items.CanvasItem get_item_at_z_index (uint z_index) {
-        var item_position = free_items.get_n_items () - 1 - z_index;
-        var item_model = free_items.get_item (item_position) as Akira.Lib.Items.CanvasItem;
-
-        return item_model;
-    }
-
     public int get_item_z_index (Items.CanvasItem item) {
         if (item.artboard != null) {
             var items_count = (int) item.artboard.items.get_n_items ();
             return items_count - 1 - item.artboard.items.index (item);
         }
 
-        return get_free_items_count () - 1 - free_items.index (item);
+        return (int) free_items.get_n_items () - 1 - free_items.index (item);
     }
 
     public int get_item_top_position (Items.CanvasItem item) {
@@ -307,11 +292,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             return (int) item.artboard.items.get_n_items () - 1;
         }
 
-        return get_free_items_count () - 1;
-    }
-
-    public int get_free_items_count () {
-        return (int) free_items.get_n_items ();
+        return (int) free_items.get_n_items () - 1;
     }
 
     public void set_item_to_insert (string insert_type) {
@@ -342,7 +323,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         // z-index is the exact opposite of items placement
         // inside the free_items list
         // last in is the topmost element
-        var free_items_length = get_free_items_count ();
+        var free_items_length = (int) free_items.get_n_items ();
 
         var source = free_items_length - 1 - source_z_index;
         var target = free_items_length - 1 - target_z_index;

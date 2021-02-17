@@ -412,7 +412,6 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 
         // Interrupt if the item was dropped in the same position.
         if (source - 1 == target) {
-            debug ("same position");
             return;
         }
 
@@ -425,6 +424,10 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 
         debug ("%i - %i", source, target);
 
+        // If we're on the same artboard, only swap the items position.
+
+        // If the artboard changed, we need to remove the item and add it to the new artboard.
+
         // Remove item at source position
         var item_to_swap = items_source.remove_at (source);
 
@@ -436,13 +439,12 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
         // Insert item at target position
         items_source.insert_at (target, item_to_swap);
 
-        if (model.artboard != null) {
-            model.artboard.changed (true);
-        }
-
-        // If the item is a free item, we need to add it to the Canvas root element.
-        if (layer.model.artboard == null) {
+        if (layer.model.artboard != null) {
+            warning ("artboard");
+        } else {
+            // If the item is a free item, we need to add it to the Canvas root element.
             var root = window.main_window.main_canvas.canvas.get_root_item ();
+
             // Fetch the new correct position.
             target = items_count - 1 - items_source.index (item_to_swap);
             root.add_child (item_to_swap, target);

@@ -196,12 +196,13 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
             items_count = (int) selected_item.artboard.items.get_n_items ();
             pos_selected = items_count - 1 - selected_item.artboard.items.index (selected_item);
         } else {
-            items_count = window.items_manager.get_free_items_count ();
-            pos_selected = items_count - 1 - window.items_manager.get_item_position (selected_item);
+            items_count = (int) window.items_manager.free_items.get_n_items ();
+            pos_selected = items_count - 1 - window.items_manager.free_items.index (selected_item);
         }
 
         // Interrupt if item position doesn't exist.
         if (pos_selected == -1) {
+            warning ("item position doesn't exist");
             return;
         }
 
@@ -225,39 +226,34 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
             }
         }
 
+        // Interrupt if the target position is invalid.
         if (target_position == -1) {
-            // Invalid position, return
+            warning ("Target position invalid");
             return;
         }
 
         Items.CanvasItem target_item = null;
 
-        // z-index is the exact opposite of items placement
-        // inside the free_items list
-        // last in is the topmost element
+        // z-index is the exact opposite of items placement inside the items list model
+        // as the last item is actually the topmost element.
         var source = items_count - 1 - pos_selected;
         var target = items_count - 1 - target_position;
 
         if (selected_item.artboard != null) {
+            target_item = selected_item.artboard.items.get_item (target) as Lib.Items.CanvasItem;
             selected_item.artboard.items.swap_items (source, target);
-
-            selected_item.artboard.changed (true);
-            canvas.window.event_bus.z_selected_changed ();
-
-            // There is no need to raise or lower the selection
-            // since the z stacking is done inside the paint method
-            // and it is calculated based on the artboard's children list index
-            return;
+        } else {
+            target_item = window.items_manager.free_items.get_item (target) as Lib.Items.CanvasItem;
+            window.items_manager.free_items.swap_items (source, target);
         }
-
-        target_item = window.items_manager.get_item_at_z_index (target_position);
-        window.items_manager.free_items.swap_items (source, target);
 
         if (raise) {
             selected_item.raise (target_item);
         } else {
             selected_item.lower (target_item);
         }
+
+        warning ("here");
 
         canvas.window.event_bus.z_selected_changed ();
     }
