@@ -157,6 +157,10 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         return new_item;
     }
 
+    /**
+     * Helper method to add an item to the canvas, used when dragging an item
+     * outside an artboard where a reset of the parent root is necessary.
+     */
     public void add_item_to_canvas (Lib.Items.CanvasItem item) {
         item.set_parent (root);
         item.parent.add_child (item, -1);
@@ -164,6 +168,10 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         window.event_bus.file_edited ();
     }
 
+    /**
+     * Helper method to add an item to an artboard, used when dragging an item
+     * from the canvas or another artboard where a reset of the parent root is necessary.
+     */
     public void add_item_to_artboard (Lib.Items.CanvasItem item, Lib.Items.CanvasArtboard artboard) {
         item.set_parent (artboard);
         item.artboard = artboard;
@@ -606,7 +614,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
     public async void change_artboard (Items.CanvasItem item, Items.CanvasArtboard? new_artboard) {
         // Interrupt if the item was moved within its original artboard.
         if (item.artboard == new_artboard) {
-            warning ("Same parent");
+            debug ("Same parent");
             return;
         }
 
@@ -670,23 +678,28 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         // If the item was moved from inside an Artboard to another Artboard.
         if (item.artboard != null && new_artboard != null) {
             debug ("Artboard => Artboard");
+
+            // Passing from an artboard to another we need to first convert the coordinates
+            // from the old artboard to the global canvas, and then convert them again
+            // to the new artboard.
+            item.canvas.convert_from_item_space (item.artboard, ref matrix.x0, ref matrix.y0);
+            item.canvas.convert_to_item_space (new_artboard, ref matrix.x0, ref matrix.y0);
+
             // Remove the item from the Artboard.
-            item.artboard.remove_child (item.artboard.find_child (item));
+            item.artboard.remove_item (item);
+
+            // Remove the item from the selection and redraw the layers panel.
             window.event_bus.item_deleted (item);
 
             // Attach the item to the Artboard.
-            item.artboard = new_artboard;
+            add_item_to_artboard (item, new_artboard);
 
-            // Insert the item back into the Artboard, add the Layer,
-            // reset its position, and add it back to the selection.
-            // item.position_item (x, y);
-            // item.connect_to_artboard ();
-            item.artboard.add_child (item, -1);
+            // Apply the updated coordinates.
+            item.set_transform (matrix);
 
             // Trigger the canvas repaint after the item was added back.
             window.event_bus.item_inserted ();
             window.event_bus.request_add_item_to_selection (item);
-            window.event_bus.file_edited ();
 
             return;
         }
