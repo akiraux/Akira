@@ -137,7 +137,11 @@ public class Akira.Lib.Items.CanvasArtboard : Goo.CanvasGroup, Akira.Lib.Items.C
    }
 
    public void remove_item (Items.CanvasItem item) {
+      // Remove the child from the GooCanvasItem parent.
+      remove_child (find_child (item));
+      // Remove the item from the ListModel.
       items.remove_item.begin (item);
+      // Unset the artboard attribute.
       item.artboard = null;
    }
 

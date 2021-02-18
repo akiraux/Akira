@@ -253,8 +253,6 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
             selected_item.lower (target_item);
         }
 
-        warning ("here");
-
         canvas.window.event_bus.z_selected_changed ();
     }
 

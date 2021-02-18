@@ -151,14 +151,24 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             }
         }
 
-        window.event_bus.item_inserted (new_item);
+        window.event_bus.item_inserted ();
         window.event_bus.file_edited ();
 
         return new_item;
     }
 
-    public void add_item (Akira.Lib.Items.CanvasItem item) {
+    public void add_item_to_canvas (Lib.Items.CanvasItem item) {
+        item.set_parent (root);
+        item.parent.add_child (item, -1);
         free_items.add_item.begin (item);
+        window.event_bus.file_edited ();
+    }
+
+    public void add_item_to_artboard (Lib.Items.CanvasItem item, Lib.Items.CanvasArtboard artboard) {
+        item.set_parent (artboard);
+        item.artboard = artboard;
+        item.parent.add_child (item, -1);
+        item.check_add_to_artboard (item);
         window.event_bus.file_edited ();
     }
 
@@ -603,34 +613,28 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         // Save the coordinates before removing the item.
         Cairo.Matrix matrix;
         item.get_transform (out matrix);
-        // var x = item.transform.x;
-        // var y = item.transform.y;
 
         // If the item was moved from inside an Artboard to the empty Canvas.
         if (item.artboard != null && new_artboard == null) {
-            warning ("Artboard => Free Item");
+            debug ("Artboard => Free Item");
 
-            // Apply the matrix transform before removing the item from the artboard.
-            item.canvas.convert_to_item_space (item, ref matrix.x0, ref matrix.y0);
-            // item.set_transform (item.get_real_transform ());
+            // Convert the matrix transform before removing the item from the artboard.
+            item.canvas.convert_from_item_space (item.artboard, ref matrix.x0, ref matrix.y0);
 
             // Remove the item from the Artboard.
-            item.artboard.remove_child (item.artboard.find_child (item));
+            item.artboard.remove_item (item);
+
+            // Remove the item from the selection and redraw the layers panel.
             window.event_bus.item_deleted (item);
 
             // Attach the item to the Canvas.
-            item.set_parent (root);
+            add_item_to_canvas (item);
 
-            // Insert the item back into the Canvas, add the Layer,
-            // reset its position, and add it back to the selection.
-            add_item (item);
-
+            // Apply the updated coordinates.
             item.set_transform (matrix);
 
-            // Trigger the canvas repaint after the item was added back.
-            window.event_bus.item_inserted (item);
+            window.event_bus.item_inserted ();
             window.event_bus.request_add_item_to_selection (item);
-            window.event_bus.file_edited ();
 
             return;
         }
@@ -639,26 +643,26 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         if (item.artboard == null && new_artboard != null) {
             debug ("Free Item => Artboard");
 
-            // Apply the matrix transform before removing the item from the artboard.
-            // item.set_transform (item.get_real_transform ());
+            // Convert the matrix transform to the new artboard.
+            item.canvas.convert_to_item_space (new_artboard, ref matrix.x0, ref matrix.y0);
 
-            // Remove the item from the free items.
-            free_items.remove_item.begin (item);
+            // Remove the child from the GooCanvasItem parent.
             item.parent.remove_child (item.parent.find_child (item));
+
+            // Remove the item from the free items list.
+            free_items.remove_item.begin (item);
+
+            // Remove the item from the selection and redraw the layers panel.
             window.event_bus.item_deleted (item);
 
             // Attach the item to the Artboard.
-            item.artboard = new_artboard;
+            add_item_to_artboard (item, new_artboard);
 
-            // Insert the item back into the Artboard, add the Layer,
-            // reset its position, and add it back to the selection.
-            // item.position_item (x, y);
-            // item.connect_to_artboard ();
+            // Apply the updated coordinates.
+            item.set_transform (matrix);
 
-            // Trigger the canvas repaint after the item was added back.
-            window.event_bus.item_inserted (item);
+            window.event_bus.item_inserted ();
             window.event_bus.request_add_item_to_selection (item);
-            window.event_bus.file_edited ();
 
             return;
         }
@@ -680,7 +684,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             item.artboard.add_child (item, -1);
 
             // Trigger the canvas repaint after the item was added back.
-            window.event_bus.item_inserted (item);
+            window.event_bus.item_inserted ();
             window.event_bus.request_add_item_to_selection (item);
             window.event_bus.file_edited ();
 

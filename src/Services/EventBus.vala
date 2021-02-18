@@ -34,7 +34,7 @@ public class Akira.Services.EventBus : Object {
     // Canvas signals.
     public signal void coordinate_change (double x, double y);
     public signal void insert_item (string type);
-    public signal void item_inserted (Lib.Items.CanvasItem item);
+    public signal void item_inserted ();
     public signal void move_item_from_canvas (Gdk.EventKey event);
     public signal void request_change_cursor (Gdk.CursorType? cursor_type);
     public signal void request_change_mode (Lib.Canvas.EditMode mode);
