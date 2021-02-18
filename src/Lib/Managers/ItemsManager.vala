@@ -570,7 +570,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             }
 
             // Interrupt if the item is already inside an artboard and was only moved within it.
-            if (item.artboard != null && item.artboard.dropped_inside (item)) {
+            if (item.artboard != null && !item.artboard.is_outside (item)) {
                 continue;
             }
 
@@ -578,7 +578,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
 
             foreach (Items.CanvasArtboard artboard in artboards) {
                 // Interrupt the loop if we find an artboard that matches the dropped coordinate.
-                if (artboard.dropped_inside (item)) {
+                if (!artboard.is_outside (item)) {
                     new_artboard = artboard;
                     break;
                 }

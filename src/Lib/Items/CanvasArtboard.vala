@@ -112,20 +112,24 @@ public class Akira.Lib.Items.CanvasArtboard : Goo.CanvasGroup, Akira.Lib.Items.C
     * Helper method to determine if a click event happened inside an artboard.
     */
    public bool is_inside (double x, double y) {
-      return x <= bounds.x2
-          && x >= bounds.x1
-          && y >= bounds.y1
-          && y <= bounds.y2;
+      return x <= background.bounds.x2
+          && x >= background.bounds.x1
+          && y >= background.bounds.y1
+          && y <= background.bounds.y2;
   }
 
-  /**
-   * Helper method to determine if an item was moved inside an artboard.
-   */
-  public bool dropped_inside (Items.CanvasItem item) {
-      return item.bounds.x1 > bounds.x1
-         && item.bounds.x2 < bounds.x2
-         && item.bounds.y1 > bounds.y1
-         && item.bounds.y2 < bounds.y2;
+   /**
+    * Detect if an item was moved outside the artboard's sizing limits.
+    * We use the background bounds because the artboard bounds grow based
+    * on the location of the child items. So if an item is outside the
+    * artboard's background, the artboard bounds will reflect the new group bounds.
+    */
+   public bool is_outside (Items.CanvasItem item) {
+      return item.bounds.x1 > background.bounds.x2 ||
+             item.bounds.y1 > background.bounds.y2 ||
+             item.bounds.x2 < background.bounds.x1 ||
+             item.bounds.y2 < background.bounds.y1;
+
    }
 
    public uint get_items_length () {
