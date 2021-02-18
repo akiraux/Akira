@@ -122,10 +122,10 @@ public class Akira.Lib.Items.CanvasArtboard : Goo.CanvasGroup, Akira.Lib.Items.C
    * Helper method to determine if an item was moved inside an artboard.
    */
   public bool dropped_inside (Items.CanvasItem item) {
-      return item.bounds.x1 < bounds.x2
-         && item.bounds.x2 > bounds.x1
-         && item.bounds.y1 < bounds.y2
-         && item.bounds.y2 > bounds.y1;
+      return item.bounds.x1 > bounds.x1
+         && item.bounds.x2 < bounds.x2
+         && item.bounds.y1 > bounds.y1
+         && item.bounds.y2 < bounds.y2;
    }
 
    public uint get_items_length () {

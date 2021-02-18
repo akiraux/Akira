@@ -596,19 +596,22 @@ public class Akira.Lib.Managers.ItemsManager : Object {
     public async void change_artboard (Items.CanvasItem item, Items.CanvasArtboard? new_artboard) {
         // Interrupt if the item was moved within its original artboard.
         if (item.artboard == new_artboard) {
-            debug ("Same parent");
+            warning ("Same parent");
             return;
         }
 
         // Save the coordinates before removing the item.
-        // var x = item.bounds.x1;
-        // var y = item.bounds.y1;
+        Cairo.Matrix matrix;
+        item.get_transform (out matrix);
+        // var x = item.transform.x;
+        // var y = item.transform.y;
 
         // If the item was moved from inside an Artboard to the empty Canvas.
         if (item.artboard != null && new_artboard == null) {
-            debug ("Artboard => Free Item");
+            warning ("Artboard => Free Item");
 
             // Apply the matrix transform before removing the item from the artboard.
+            item.canvas.convert_to_item_space (item, ref matrix.x0, ref matrix.y0);
             // item.set_transform (item.get_real_transform ());
 
             // Remove the item from the Artboard.
@@ -621,7 +624,8 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             // Insert the item back into the Canvas, add the Layer,
             // reset its position, and add it back to the selection.
             add_item (item);
-            // item.position_item (x, y);
+
+            item.set_transform (matrix);
 
             // Trigger the canvas repaint after the item was added back.
             window.event_bus.item_inserted (item);
