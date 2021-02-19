@@ -33,6 +33,13 @@ public class Akira.Lib.Components.Transform : Component {
                 item.canvas.convert_to_item_space (item.artboard, ref item_x, ref temp_y);
             }
 
+            // If the item is an artboard we need to get the bounds of the background since
+            // the artboard group will have its bounds changing based on the location of the
+            // child items.
+            if (item is Items.CanvasArtboard) {
+                item_x = ((Items.CanvasArtboard) item).background.bounds.x1;
+            }
+
             return item_x;
         }
         set {
@@ -49,6 +56,13 @@ public class Akira.Lib.Components.Transform : Component {
             if (item.artboard != null) {
                 double temp_x = 0.0;
                 item.canvas.convert_to_item_space (item.artboard, ref temp_x, ref item_y);
+            }
+
+            // If the item is an artboard we need to get the bounds of the background since
+            // the artboard group will have its bounds changing based on the location of the
+            // child items.
+            if (item is Items.CanvasArtboard) {
+                item_y = ((Items.CanvasArtboard) item).background.bounds.y1;
             }
 
             return item_y;
