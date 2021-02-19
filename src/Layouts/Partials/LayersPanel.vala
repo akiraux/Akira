@@ -193,11 +193,12 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.Grid {
                 return;
             }
 
-            // Remove item at source position.
-            var artboard_to_swap = window.items_manager.artboards.remove_at (source);
+            // Swap the position inside the List Model.
+            window.items_manager.artboards.swap_items (source, items_count - 1);
 
-            // Insert item at target position.
-            window.items_manager.artboards.insert_at (items_count - 1, artboard_to_swap);
+            // Swap the position in the CanvasItem stack.
+            artboard.model.parent.move_child (pos_source, 0);
+
             window.event_bus.z_selected_changed ();
 
             return;

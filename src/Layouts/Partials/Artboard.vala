@@ -385,11 +385,12 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
                 target++;
             }
 
-            // Remove item at source position.
-            var artboard_to_swap = window.items_manager.artboards.remove_at (source);
+            // Swap the position inside the List Model.
+            window.items_manager.artboards.swap_items (source, target);
 
-            // Insert item at target position.
-            window.items_manager.artboards.insert_at (target, artboard_to_swap);
+            // Swap the position in the CanvasItem stack.
+            artboard.model.parent.move_child (pos_source, pos_target);
+
             window.event_bus.z_selected_changed ();
 
             return;

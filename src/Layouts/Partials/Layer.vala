@@ -387,6 +387,10 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
     ) {
         var layer = (Layer) ((Gtk.Widget[]) selection_data.get_data ())[0];
 
+        // Used to adjust the position of swappable items if the source item
+        // is dragged from the bottom up.
+        int position_adjustment = 0;
+
         // Change artboard if necessary.
         window.items_manager.change_artboard.begin (layer.model, model.artboard);
 
@@ -419,36 +423,20 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
         // means the layer was dragged from the bottom up, therefore we need to
         // increase the dropped target by 1 since we don't deal with location 0.
         if (source > target) {
+            position_adjustment--;
             target++;
         }
 
         debug ("%i - %i", source, target);
 
-        // If we're on the same artboard, only swap the items position.
+        // Swap the location of the items in the List Model.
+        items_source.swap_items (source, target);
 
-        // If the artboard changed, we need to remove the item and add it to the new artboard.
-
-        // Remove item at source position
-        var item_to_swap = items_source.remove_at (source);
-
-        // If the item is a free item, we need to remove it from the Canvas.
-        if (layer.model.artboard == null) {
-            item_to_swap.parent.remove_child (item_to_swap.parent.find_child (item_to_swap));
-        }
-
-        // Insert item at target position
-        items_source.insert_at (target, item_to_swap);
-
-        if (layer.model.artboard != null) {
-            warning ("artboard");
-        } else {
-            // If the item is a free item, we need to add it to the Canvas root element.
-            var root = window.main_window.main_canvas.canvas.get_root_item ();
-
-            // Fetch the new correct position.
-            target = items_count - 1 - items_source.index (item_to_swap);
-            root.add_child (item_to_swap, target);
-        }
+        // The actual items in the canvas might not match the items in the List Model
+        // due to Artboards labels, grids, and other pseudo elements. Therefore we need
+        // to get the real position of the child and swap them.
+        var root = layer.model.parent;
+        root.move_child (root.find_child (layer.model), root.find_child (model) + position_adjustment);
 
         window.event_bus.z_selected_changed ();
     }
