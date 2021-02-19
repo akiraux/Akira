@@ -437,7 +437,9 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
                 return false;
         }
 
-        return false;
+        // Always move the focus back to the canvas.
+        window.event_bus.set_focus_on_canvas ();
+        return true;
     }
 
     public void update_on_enter () {

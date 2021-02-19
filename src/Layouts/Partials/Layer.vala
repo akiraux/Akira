@@ -201,7 +201,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
         build_drag_and_drop ();
 
         handle.button_press_event.connect (on_click_event);
-        // handle.button_release_event.connect (on_release_event);
+        handle.button_release_event.connect (on_release_event);
 
         handle.enter_notify_event.connect (event => {
             get_style_context ().add_class ("hover");
@@ -549,7 +549,10 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
      * @param {Gdk.Event} event - The button click event.
      * @return {bool} True to stop propagation, False to let other events run.
      */
-    // public bool on_release_event (Gdk.Event event) {
+    public bool on_release_event (Gdk.Event event) {
+        // Always move the focus back to the canvas.
+        window.event_bus.set_focus_on_canvas ();
+        return true;
     //     if (event.type == Gdk.EventType.BUTTON_RELEASE) {
     //         if (entry.visible == true) {
     //             return false;
@@ -610,7 +613,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
     //     }
 
     //     return false;
-    // }
+    }
 
     //  private void unselect_groups (Gtk.ListBox container) {
     //      container.foreach (child => {
