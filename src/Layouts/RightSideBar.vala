@@ -154,7 +154,7 @@ public class Akira.Layouts.RightSideBar : Gtk.Grid {
         Gtk.SelectionData selection_data,
         uint target_type, uint time
     ) {
-        int items_count, pos_source, pos_target, source;
+        int items_count, pos_source, source;
 
         var type = Gtk.drag_dest_find_target (this, context, drop_targets);
 
@@ -164,7 +164,6 @@ public class Akira.Layouts.RightSideBar : Gtk.Grid {
             )[0];
 
             items_count = (int) window.items_manager.artboards.get_n_items ();
-            pos_target = items_count;
             pos_source = items_count - 1 - window.items_manager.artboards.index (artboard.model);
 
             // Interrupt if item position doesn't exist.
@@ -186,8 +185,11 @@ public class Akira.Layouts.RightSideBar : Gtk.Grid {
             // Swap the position inside the List Model.
             window.items_manager.artboards.swap_items (source, 0);
 
-            // Swap the position in the CanvasItem stack.
-            artboard.model.parent.move_child (pos_source, pos_target);
+            // The actual items in the canvas might not match the items in the List Model
+            // due to Artboards labels, grids, and other pseudo elements. Therefore we need
+            // to get the real position of the child and swap them.
+            var root = artboard.model.parent;
+            root.move_child (root.find_child (artboard.model), root.get_n_children ());
 
             window.event_bus.z_selected_changed ();
 

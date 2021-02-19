@@ -196,8 +196,11 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.Grid {
             // Swap the position inside the List Model.
             window.items_manager.artboards.swap_items (source, items_count - 1);
 
-            // Swap the position in the CanvasItem stack.
-            artboard.model.parent.move_child (pos_source, 0);
+            // The actual items in the canvas might not match the items in the List Model
+            // due to Artboards labels, grids, and other pseudo elements. Therefore we need
+            // to get the real position of the child and swap them.
+            var root = artboard.model.parent;
+            root.move_child (root.find_child (artboard.model), 0);
 
             window.event_bus.z_selected_changed ();
 
