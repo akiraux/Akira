@@ -62,6 +62,9 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     public double current_scale = 1.0;
     private Gdk.CursorType current_cursor = Gdk.CursorType.ARROW;
 
+    // Used to show the canvas bounds of selected items.
+    private Goo.CanvasRect ghost;
+
     public Canvas (Akira.Window window) {
         Object (window: window);
     }
@@ -420,15 +423,31 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     }
 
     /*
-     * Show or hide the ghost bounding box of the selected items
+     * Show or hide the ghost bounding box of the selected items.
      */
     private void toggle_item_ghost (bool show) {
         // If no items is selected we can't show anything.
-        // if (selected_bound_manager.selected_items.length () == 0) {
-        //     return;
-        // }
+        if (selected_bound_manager.selected_items.length () == 0) {
+            return;
+        }
 
-        // // Temporarily get the first item until multi select is implemented.
-        // var item = selected_bound_manager.selected_items.nth_data (0);
+        // Temporarily get the first item until multi select is implemented.
+        var item = selected_bound_manager.selected_items.nth_data (0);
+
+        if (show) {
+            ghost = new Goo.CanvasRect (
+                null,
+                item.bounds.x1, item.bounds.y1,
+                item.bounds.x2 - item.bounds.x1, item.bounds.y2 - item.bounds.y1,
+                "line-width", 1.0 / current_scale,
+                "stroke-color", "#41c9fd",
+                null
+            );
+            ghost.set ("parent", get_root_item ());
+            ghost.can_focus = false;
+            return;
+        }
+
+        ghost.remove ();
     }
 }
