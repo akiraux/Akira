@@ -165,7 +165,7 @@ public class Akira.StateManagers.CoordinatesManager : Object {
 
             // If the item is rotated, we need to calculate the delta between the
             // new coordinates and item's bounds coordinates.
-            if (item.rotation.rotation != 0) {
+            if (item.rotation != null && item.rotation.rotation != 0) {
                 double half_border = get_border (item.line_width);
                 double diff_x = item.bounds.x1 - half_border;
                 double diff_y = item.bounds.y1 - half_border;
