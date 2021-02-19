@@ -97,14 +97,12 @@ public class Akira.Lib.Items.CanvasArtboard : Goo.CanvasGroup, Akira.Lib.Items.C
          "font", "Open Sans 10",
          "ellipsize", Pango.EllipsizeMode.END,
          null);
+      label.translate (transform.x, transform.y);
       label.can_focus = false;
       // Change the parent to allow mouse pointer selection.
       label.parent = this;
 
-      this.transform.bind_property ("x", label, "x", BindingFlags.SYNC_CREATE);
-      this.transform.bind_property ("y", label, "y", BindingFlags.SYNC_CREATE);
       this.bind_property ("width", label, "width", BindingFlags.SYNC_CREATE);
-
       this.name.bind_property ("name", label, "text", BindingFlags.SYNC_CREATE);
    }
 

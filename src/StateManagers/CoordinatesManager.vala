@@ -165,6 +165,11 @@ public class Akira.StateManagers.CoordinatesManager : Object {
 
             item.set_transform (matrix);
 
+            // If the item is an Artboard, move the label with it.
+            if (item is Lib.Items.CanvasArtboard) {
+                ((Lib.Items.CanvasArtboard) item).label.translate (inc_x, inc_y);
+            }
+
             // Update the Transform component attributes.
             item.transform.x += inc_x;
             item.transform.y += inc_y;

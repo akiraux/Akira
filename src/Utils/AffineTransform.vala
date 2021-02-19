@@ -48,10 +48,16 @@ public class Akira.Utils.AffineTransform : Object {
         Cairo.Matrix matrix;
         item.get_transform (out matrix);
 
+        // Increment the cairo matrix coordinates so we can ignore the item's rotation.
         matrix.x0 += delta_x;
         matrix.y0 += delta_y;
 
         item.set_transform (matrix);
+
+        // If the item is an Artboard, move the label with it.
+        if (item is Lib.Items.CanvasArtboard) {
+            ((Lib.Items.CanvasArtboard) item).label.translate (delta_x, delta_y);
+        }
 
         initial_event_x = event_x;
         initial_event_y = event_y;
