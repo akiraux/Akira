@@ -153,51 +153,21 @@ public class Akira.StateManagers.CoordinatesManager : Object {
             }
 
             // Store the new coordinates in local variables so we can manipulate them.
-            double inc_x = x;
-            double inc_y = y;
+            double inc_x = x - item.transform.x;
+            double inc_y = y - item.transform.y;
 
-            // Convert the new coordinates to reflect the item's space on the canvas.
-            if (item.artboard != null) {
-                canvas.convert_to_item_space (item.artboard, ref inc_x, ref inc_y);
-            } else {
-                canvas.convert_to_item_space (item, ref inc_x, ref inc_y);
-            }
+            Cairo.Matrix matrix;
+            item.get_transform (out matrix);
 
-            // If the item is rotated, we need to calculate the delta between the
-            // new coordinates and item's bounds coordinates.
-            if (item.rotation != null && item.rotation.rotation != 0) {
-                double half_border = get_border (item.line_width);
-                double diff_x = item.bounds.x1 - half_border;
-                double diff_y = item.bounds.y1 - half_border;
+            // Increment the cairo matrix coordinates so we can ignore the item's rotation.
+            matrix.x0 += inc_x;
+            matrix.y0 += inc_y;
 
-                // Convert the bounds to the item space to get the proper delta between
-                // the bounds coordinates and the rotation X & Y coordinates.
-                if (item.artboard != null) {
-                    canvas.convert_to_item_space (item.artboard, ref diff_x, ref diff_y);
-                } else {
-                    canvas.convert_to_item_space (item, ref diff_x, ref diff_y);
-                }
-
-                inc_x -= diff_x;
-                inc_y -= diff_y;
-            }
-
-            // Move the item with the new coordinates.
-            item.translate (inc_x, inc_y);
+            item.set_transform (matrix);
 
             // Update the Transform component attributes.
             item.transform.x += inc_x;
             item.transform.y += inc_y;
         }
-    }
-
-    /**
-     * The item's bounds account also for the border width, but we shouldn't,
-     * so we need to account for half the border width since we're only dealing
-     * with a centered border. In the future, once borders can be inside or outside,
-     * we will need to update this condition.
-     */
-    private double get_border (double size) {
-        return size > 0 ? size / 2 : 0;
     }
 }
