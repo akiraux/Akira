@@ -90,10 +90,6 @@ public class Akira.Layouts.MainCanvas : Gtk.Grid {
 
         main_scroll.add (canvas);
 
-        // Center canvas at startup
-        // main_scroll.hadjustment.value = CANVAS_SIZE / 2;
-        // main_scroll.vadjustment.value = CANVAS_SIZE / 2;
-
         main_overlay.add (main_scroll);
         main_overlay.add_overlay (notification);
 

@@ -20,6 +20,9 @@
  * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
  */
 
+/**
+ * Converts an item into a JSON Object, converting all the child attributes to string.
+ */
 public class Akira.FileFormat.JsonObject : GLib.Object {
     public Lib.Items.CanvasItem? item { get; construct; }
 
@@ -84,16 +87,16 @@ public class Akira.FileFormat.JsonObject : GLib.Object {
             item.get_property (spec.get_name (), ref val);
             obj.set_int_member (spec.get_name (), val.get_int64 ());
             //  debug ("%s: %s", spec.get_name (), val.get_int64 ().to_string ());
-        } else if (type == typeof (Akira.Lib.Items.CanvasArtboard)) {
+        } else if (type == typeof (Lib.Items.CanvasArtboard)) {
             item.get_property (spec.get_name (), ref val);
             if (val.strdup_contents () != "NULL") {
-                obj.set_string_member (spec.get_name (), ((Akira.Lib.Items.CanvasArtboard) val).name.id);
+                obj.set_string_member (spec.get_name (), ((Lib.Items.CanvasArtboard) val).name.id);
             }
         } else if (type == typeof (Goo.CanvasItemVisibility)) {
             item.get_property (spec.get_name (), ref val);
             obj.set_int_member (spec.get_name (), val.get_enum ());
-        } else if (type == typeof (Akira.Lib.Managers.ImageManager)) {
-            var canvas_image = item as Akira.Lib.Items.CanvasImage;
+        } else if (type == typeof (Lib.Managers.ImageManager)) {
+            var canvas_image = item as Lib.Items.CanvasImage;
             obj.set_string_member ("image_id", canvas_image.manager.filename);
         } else {
             // Leave this comment for debug purpose.

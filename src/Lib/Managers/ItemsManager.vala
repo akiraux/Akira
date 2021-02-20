@@ -58,8 +58,8 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         var selected_bound_manager = window.main_window.main_canvas.canvas.selected_bound_manager;
 
         double start_x, start_y, scale, rotation;
-        start_x = Akira.Layouts.MainCanvas.CANVAS_SIZE / 2;
-        start_y = Akira.Layouts.MainCanvas.CANVAS_SIZE / 2;
+        start_x = 0;
+        start_y = 0;
 
         if (selected_bound_manager.selected_items.length () > 0) {
             var item = selected_bound_manager.selected_items.nth_data (0);
