@@ -228,7 +228,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
 
         // Interrupt if the target position is invalid.
         if (target_position == -1) {
-            warning ("Target position invalid");
+            debug ("Target position invalid");
             return;
         }
 

@@ -363,6 +363,7 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
     private void build_signals () {
         window.event_bus.file_edited.connect (on_file_edited);
         window.event_bus.file_saved.connect (on_file_saved);
+        window.event_bus.selected_items_list_changed.connect (on_selected_items_changed);
         window.event_bus.selected_items_changed.connect (on_selected_items_changed);
         window.event_bus.z_selected_changed.connect (update_button_sensitivity);
         window.event_bus.set_scale.connect (on_set_scale);
