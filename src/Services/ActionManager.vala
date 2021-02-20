@@ -464,36 +464,47 @@ public class Akira.Services.ActionManager : Object {
 
     private void action_pick_color () {
         weak Akira.Lib.Canvas canvas = window.main_window.main_canvas.canvas;
+
         // Interrupt if no item is selected.
         if (canvas.selected_bound_manager.selected_items.length () == 0) {
             return;
         }
-        foreach (var item in canvas.selected_bound_manager.selected_items) {
-            // Hide the ghost bound manager.
-            // item.bounds_manager.hide ();
-        }
+
+        // Hide the ghost bound manager.
+        canvas.toggle_item_ghost (false);
+
         bool is_holding_shift = false;
         var color_picker = new Akira.Utils.ColorPicker ();
         color_picker.show_all ();
+
         color_picker.key_pressed.connect (e => {
             is_holding_shift = e.keyval == Gdk.Key.Shift_L;
         });
+
         color_picker.key_released.connect (e => {
             is_holding_shift = e.keyval == Gdk.Key.Shift_L;
         });
+
         color_picker.cancelled.connect (() => {
             color_picker.close ();
         });
+
         color_picker.picked.connect (color => {
             foreach (var item in canvas.selected_bound_manager.selected_items) {
-                if (is_holding_shift) {
-                    // item.border_color_string = Utils.Color.rgba_to_hex_string (color);
-                    item.borders.reload ();
-                } else {
-                    // item.color_string = Utils.Color.rgba_to_hex_string (color);
-                    item.fills.reload ();
+                // Ignore the item if it doesn't have a fills or border component
+                // based on the shift key pressed by the user.
+                if ((item.fills == null && !is_holding_shift) || (item.borders == null && is_holding_shift)) {
+                    continue;
                 }
+
+                if (is_holding_shift) {
+                    item.borders.update_color_from_action (color);
+                    continue;
+                }
+
+                item.fills.update_color_from_action (color);
             }
+
             color_picker.close ();
         });
     }

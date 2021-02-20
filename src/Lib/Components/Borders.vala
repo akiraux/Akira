@@ -75,4 +75,20 @@ public class Akira.Lib.Components.Borders : Component {
         borders.remove (border);
         reload ();
     }
+
+    /**
+     * Helper method to allow the global shortcut action to update the border color.
+     */
+    public void update_color_from_action (Gdk.RGBA color) {
+        // If no border color is available, create a new one.
+        if (count () == 0) {
+            add_border_color (color, 1);
+            return;
+        }
+
+        // Get the first border color since the user is using the global color picker.
+        Border first = borders.get (0);
+        first.color = color;
+        reload ();
+    }
 }

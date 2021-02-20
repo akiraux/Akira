@@ -78,4 +78,20 @@ public class Akira.Lib.Components.Fills : Component {
         fills.remove (fill);
         reload ();
     }
+
+    /**
+     * Helper method to allow the global shortcut action to update the fill color.
+     */
+     public void update_color_from_action (Gdk.RGBA color) {
+        // If no fill color is available, create a new one.
+        if (count () == 0) {
+            add_fill_color (color);
+            return;
+        }
+
+        // Get the first fill color since the user is using the global color picker.
+        Fill first = fills.get (0);
+        first.color = color;
+        reload ();
+    }
 }

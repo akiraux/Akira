@@ -425,7 +425,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     /*
      * Show or hide the ghost bounding box of the selected items.
      */
-    private void toggle_item_ghost (bool show) {
+    public void toggle_item_ghost (bool show) {
         // If no items is selected we can't show anything.
         if (selected_bound_manager.selected_items.length () == 0) {
             return;
