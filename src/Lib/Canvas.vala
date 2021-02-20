@@ -448,6 +448,8 @@ public class Akira.Lib.Canvas : Goo.Canvas {
             return;
         }
 
-        ghost.remove ();
+        if (ghost != null) {
+            ghost.remove ();
+        }
     }
 }
