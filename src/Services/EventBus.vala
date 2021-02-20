@@ -61,6 +61,7 @@ public class Akira.Services.EventBus : Object {
     public signal void request_add_item_to_selection (Lib.Items.CanvasItem item);
     public signal void request_delete_item (Lib.Items.CanvasItem item);
     public signal void selected_items_changed (List<Lib.Items.CanvasItem> selected_items);
+    public signal void selected_items_list_changed (List<Lib.Items.CanvasItem> selected_items);
     public signal void z_selected_changed ();
     public signal void detect_artboard_change ();
 

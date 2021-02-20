@@ -217,7 +217,7 @@ public class Akira.Layouts.Partials.BorderRadiusPanel : Gtk.Grid {
 
     private void bind_signals () {
         toggled = false;
-        window.event_bus.selected_items_changed.connect (on_selected_items_changed);
+        window.event_bus.selected_items_list_changed.connect (on_selected_items_list_changed);
         options_button.toggled.connect (() => {
             options_revealer.reveal_child = !options_revealer.child_revealed;
             window.event_bus.request_widget_redraw ();
@@ -233,8 +233,10 @@ public class Akira.Layouts.Partials.BorderRadiusPanel : Gtk.Grid {
         //  border_radius_bottom_left_entry.entry.changed.connect (on_radius_change);
     }
 
-    private void on_selected_items_changed (List<Lib.Items.CanvasItem> selected_items) {
-        if (selected_items.length () == 0) {
+    private void on_selected_items_list_changed (List<Lib.Items.CanvasItem> selected_items) {
+        // Interrupt if we don't have an item selected or if more than 1 is selected
+        // since we can't handle the border radius of multiple items at once.
+        if (selected_items.length () == 0 || selected_items.length () > 1) {
             selected_item = null;
             toggled = false;
             return;

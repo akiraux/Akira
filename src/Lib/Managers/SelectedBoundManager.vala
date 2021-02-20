@@ -31,7 +31,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         }
         set {
             _selected_items = value;
-            update_selected_items ();
+            canvas.window.event_bus.selected_items_list_changed (value);
         }
     }
 

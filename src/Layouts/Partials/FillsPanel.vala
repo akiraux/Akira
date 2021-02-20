@@ -91,7 +91,7 @@ public class Akira.Layouts.Partials.FillsPanel : Gtk.Grid {
 
     private void create_event_bindings () {
         toggled = false;
-        window.event_bus.selected_items_changed.connect (on_selected_items_changed);
+        window.event_bus.selected_items_list_changed.connect (on_selected_items_list_changed);
 
         add_btn.clicked.connect (() => {
             var fill_color = Gdk.RGBA ();
@@ -109,7 +109,7 @@ public class Akira.Layouts.Partials.FillsPanel : Gtk.Grid {
         });
     }
 
-    private void on_selected_items_changed (List<Lib.Items.CanvasItem> selected_items) {
+    private void on_selected_items_list_changed (List<Lib.Items.CanvasItem> selected_items) {
         if (selected_items.length () == 0) {
             selected_item = null;
             list_model.clear.begin ();
@@ -117,20 +117,28 @@ public class Akira.Layouts.Partials.FillsPanel : Gtk.Grid {
             return;
         }
 
-        if (selected_item == null || selected_item != selected_items.nth_data (0)) {
-            toggled = true;
-            selected_item = selected_items.nth_data (0);
+        // Always clear the list model when a selection changes.
+        list_model.clear.begin ();
 
-            if (selected_item.fills == null) {
-                toggled = false;
-                return;
+        bool show = false;
+        foreach (Lib.Items.CanvasItem item in selected_items) {
+            // Skip items that don't have a fill item since there will be nothing to show.
+            if (item.fills == null) {
+                continue;
             }
 
-            foreach (Lib.Components.Fill fill in selected_item.fills.fills) {
+            // At least an item has the fills component, so we can show the
+            show = true;
+
+            // Loops through all the available fills and add them tot he list model.
+            // TODO: handle duplicate identical colors.
+            foreach (Lib.Components.Fill fill in item.fills.fills) {
                 var model_item = create_model (fill);
                 list_model.add_item.begin (model_item);
             }
         }
+
+        toggled = show;
     }
 
     private Akira.Models.FillsItemModel create_model (Lib.Components.Fill fill) {

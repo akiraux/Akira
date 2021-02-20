@@ -90,7 +90,7 @@ public class Akira.Layouts.Partials.BordersPanel : Gtk.Grid {
 
     private void create_event_bindings () {
         toggled = false;
-        window.event_bus.selected_items_changed.connect (on_selected_items_changed);
+        window.event_bus.selected_items_list_changed.connect (on_selected_items_list_changed);
 
         add_btn.clicked.connect (() => {
             var border_color = Gdk.RGBA ();
@@ -109,7 +109,7 @@ public class Akira.Layouts.Partials.BordersPanel : Gtk.Grid {
         });
     }
 
-    private void on_selected_items_changed (List<Lib.Items.CanvasItem> selected_items) {
+    private void on_selected_items_list_changed (List<Lib.Items.CanvasItem> selected_items) {
         if (selected_items.length () == 0) {
             selected_item = null;
             list_model.clear.begin ();
@@ -117,20 +117,28 @@ public class Akira.Layouts.Partials.BordersPanel : Gtk.Grid {
             return;
         }
 
-        if (selected_item == null || selected_item != selected_items.nth_data (0)) {
-            toggled = true;
-            selected_item = selected_items.nth_data (0);
+        // Always clear the list model when a selection changes.
+        list_model.clear.begin ();
 
-            if (selected_item.borders == null) {
-                toggled = false;
-                return;
+        bool show = false;
+        foreach (Lib.Items.CanvasItem item in selected_items) {
+            // Skip items that don't have a border item since there will be nothing to show.
+            if (item.borders == null) {
+                continue;
             }
 
-            foreach (Lib.Components.Border border in selected_item.borders.borders) {
+            // At least an item has the borders component, so we can show the
+            show = true;
+
+            // Loops through all the available borders and add them tot he list model.
+            // TODO: handle duplicate identical colors.
+            foreach (Lib.Components.Border border in item.borders.borders) {
                 var model_item = create_model (border);
                 list_model.add_item.begin (model_item);
             }
         }
+
+        toggled = show;
     }
 
     private Akira.Models.BordersItemModel create_model (Lib.Components.Border border) {

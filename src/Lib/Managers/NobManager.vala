@@ -74,6 +74,7 @@ public class Akira.Lib.Managers.NobManager : Object {
     construct {
         root = canvas.get_root_item ();
 
+        canvas.window.event_bus.selected_items_list_changed.connect (on_add_select_effect);
         canvas.window.event_bus.selected_items_changed.connect (on_add_select_effect);
         canvas.window.event_bus.zoom.connect (on_canvas_zoom);
         canvas.window.event_bus.hide_select_effect.connect (on_hide_select_effect);

@@ -506,6 +506,10 @@ public class Akira.Services.ActionManager : Object {
             }
 
             color_picker.close ();
+
+            // Force a UI reload of the fills and borders panel since some items
+            // had their properties changed.
+            canvas.window.event_bus.selected_items_list_changed (canvas.selected_bound_manager.selected_items);
         });
     }
 
