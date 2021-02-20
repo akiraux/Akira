@@ -32,8 +32,14 @@ public class Akira.Lib.Components.Opacity : Component {
         opacity = 100.0;
 
         this.notify["opacity"].connect (() => {
-            item.fills.reload ();
-            item.borders.reload ();
+            // Reload the item's colors only if it uses those components.
+            if (item.fills != null) {
+                item.fills.reload ();
+            }
+
+            if (item.borders != null) {
+                item.borders.reload ();
+            }
         });
     }
 }
