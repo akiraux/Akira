@@ -29,7 +29,7 @@ public class Akira.Lib.Managers.HoverManager : Object {
     private double initial_event_y;
     private Goo.CanvasItem hover_effect;
     private Lib.Managers.NobManager.Nob current_hovering_nob;
-    private Lib.Models.CanvasItem current_hover_item;
+    private Lib.Items.CanvasItem current_hover_item;
 
     public HoverManager (Akira.Lib.Canvas canvas) {
         Object (
@@ -49,7 +49,16 @@ public class Akira.Lib.Managers.HoverManager : Object {
     public void add_hover_effect (double event_x, double event_y) {
         var target = canvas.get_item_at (event_x, event_y, true);
 
-        if (target == null) {
+        // Remove the hover effect is no item is hovered, or the item is the
+        // white background of the CanvasArtboard, which is a GooCanvasRect item.
+        if (
+            target == null ||
+            (
+                target is Goo.CanvasRect &&
+                !(target is Items.CanvasItem) &&
+                !(target is Selection.Nob)
+            )
+        ) {
             current_hover_item = null;
             remove_hover_effect ();
 
@@ -63,31 +72,40 @@ public class Akira.Lib.Managers.HoverManager : Object {
             return;
         }
 
-        if (!(target is Models.CanvasItem)) {
+        // If we're hovering over the Artboard's label, change the target to the Artboard.
+        if (
+            target is Goo.CanvasText &&
+            target.parent is Items.CanvasArtboard &&
+            !(target is Items.CanvasItem)
+        ) {
+            target = target.parent as Items.CanvasItem;
+        }
+
+        if (!(target is Items.CanvasItem)) {
             return;
         }
 
-        var item = target as Models.CanvasItem;
+        var item = target as Items.CanvasItem;
 
-        if (current_hover_item != null && item.id == current_hover_item.id) {
-            // We already have the hover effect rendered correctly
+        if (current_hover_item != null && item.name.id == current_hover_item.name.id) {
+            // We already have the hover effect rendered correctly.
             return;
         }
 
-        // We need to recreate it
+        // We need to recreate it.
         remove_hover_effect ();
         current_hover_item = item;
 
         create_hover_effect (item);
 
-        if (!item.selected && !item.locked) {
+        if (!item.layer.selected && !item.layer.locked) {
             canvas.window.event_bus.hover_over_item (item);
         }
 
         set_cursor_for_nob (Managers.NobManager.Nob.NONE);
     }
 
-    private void on_layer_hovered (Models.CanvasItem? item) {
+    private void on_layer_hovered (Items.CanvasItem? item) {
         if (item == null) {
             remove_hover_effect ();
             return;
@@ -97,25 +115,30 @@ public class Akira.Lib.Managers.HoverManager : Object {
         create_hover_effect (item);
     }
 
-    private void create_hover_effect (Models.CanvasItem? item) {
-        if (item.locked || item.selected) {
+    private void create_hover_effect (Items.CanvasItem item) {
+        if (item.layer.locked || item.layer.selected) {
             return;
         }
-
-        double width = item.get_coords ("width");
-        double height = item.get_coords ("height");
 
         hover_effect = new Goo.CanvasRect (
             null,
             0, 0,
-            width, height,
+            item.size.width, item.size.height,
             "line-width", LINE_WIDTH / canvas.current_scale,
             "stroke-color", STROKE_COLOR,
             null
         );
 
-        var transform = item.get_real_transform ();
-        hover_effect.set_transform (transform);
+        Cairo.Matrix matrix;
+        item.get_transform (out matrix);
+
+        // If the item is inside an artboard, we need to convert
+        // its coordinates from the artboard space.
+        if (item.artboard != null) {
+            item.canvas.convert_from_item_space (item.artboard, ref matrix.x0, ref matrix.y0);
+        }
+
+        hover_effect.set_transform (matrix);
 
         hover_effect.set ("parent", canvas.get_root_item ());
         hover_effect.can_focus = false;

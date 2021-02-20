@@ -24,14 +24,14 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
     public weak Akira.Lib.Canvas canvas { get; construct; }
     public weak Akira.Window window { get; construct; }
 
-    private unowned List<Models.CanvasItem> _selected_items;
-    public unowned List<Models.CanvasItem> selected_items {
+    private unowned List<Items.CanvasItem> _selected_items;
+    public unowned List<Items.CanvasItem> selected_items {
         get {
             return _selected_items;
         }
         set {
             _selected_items = value;
-            update_selected_items ();
+            canvas.window.event_bus.selected_items_list_changed (value);
         }
     }
 
@@ -72,8 +72,8 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
             delta_x_accumulator = 0.0;
             delta_y_accumulator = 0.0;
 
-            initial_width = selected_item.get_coords ("width");
-            initial_height = selected_item.get_coords ("height");
+            initial_width = selected_item.size.width;
+            initial_height = selected_item.size.height;
 
             return;
         }
@@ -83,7 +83,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
     }
 
     public void transform_bound (double event_x, double event_y, Managers.NobManager.Nob selected_nob) {
-        Models.CanvasItem selected_item = selected_items.nth_data (0);
+        Items.CanvasItem selected_item = selected_items.nth_data (0);
 
         if (selected_item == null) {
             return;
@@ -118,12 +118,9 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
 
         // Notify the X & Y values in the state manager.
         canvas.window.event_bus.reset_state_coords (selected_item);
-
-        // Let the UI know that a redraw is necessary.
-        canvas.window.event_bus.item_value_changed ();
     }
 
-    public void add_item_to_selection (Models.CanvasItem item) {
+    public void add_item_to_selection (Items.CanvasItem item) {
         // Don't clear and reselect the same element if it's already selected.
         if (selected_items.index (item) != -1) {
             return;
@@ -133,12 +130,12 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         // TODO: allow for multi selection with shift pressed
         reset_selection ();
 
-        if (item.locked) {
+        if (item.layer.locked) {
             return;
         }
 
-        item.selected = true;
-        item.update_size_ratio ();
+        item.layer.selected = true;
+        item.size.update_ratio ();
 
         // Initialize the state manager coordinates before adding the item to the selection.
         canvas.window.event_bus.init_state_coords (item);
@@ -160,7 +157,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         }
 
         // By emptying the selected_items list, the select_effect gets dropped
-        selected_items = new List<Models.CanvasItem> ();
+        selected_items = new List<Items.CanvasItem> ();
     }
 
     public void reset_selection () {
@@ -169,10 +166,10 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         }
 
         foreach (var item in selected_items) {
-            item.selected = false;
+            item.layer.selected = false;
         }
 
-        selected_items = new List<Models.CanvasItem> ();
+        selected_items = new List<Items.CanvasItem> ();
     }
 
     private void update_selected_items () {
@@ -184,10 +181,10 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
             return;
         }
 
-        Models.CanvasItem selected_item = selected_items.nth_data (0);
+        Items.CanvasItem selected_item = selected_items.nth_data (0);
 
         // Cannot move artboard z-index wise
-        if (selected_item is Models.CanvasArtboard) {
+        if (selected_item is Items.CanvasArtboard) {
             return;
         }
 
@@ -199,12 +196,13 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
             items_count = (int) selected_item.artboard.items.get_n_items ();
             pos_selected = items_count - 1 - selected_item.artboard.items.index (selected_item);
         } else {
-            items_count = window.items_manager.get_free_items_count ();
-            pos_selected = items_count - 1 - window.items_manager.get_item_position (selected_item);
+            items_count = (int) window.items_manager.free_items.get_n_items ();
+            pos_selected = items_count - 1 - window.items_manager.free_items.index (selected_item);
         }
 
         // Interrupt if item position doesn't exist.
         if (pos_selected == -1) {
+            warning ("item position doesn't exist");
             return;
         }
 
@@ -228,33 +226,26 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
             }
         }
 
+        // Interrupt if the target position is invalid.
         if (target_position == -1) {
-            // Invalid position, return
+            debug ("Target position invalid");
             return;
         }
 
-        Models.CanvasItem target_item = null;
+        Items.CanvasItem target_item = null;
 
-        // z-index is the exact opposite of items placement
-        // inside the free_items list
-        // last in is the topmost element
+        // z-index is the exact opposite of items placement inside the items list model
+        // as the last item is actually the topmost element.
         var source = items_count - 1 - pos_selected;
         var target = items_count - 1 - target_position;
 
         if (selected_item.artboard != null) {
+            target_item = selected_item.artboard.items.get_item (target) as Lib.Items.CanvasItem;
             selected_item.artboard.items.swap_items (source, target);
-
-            selected_item.artboard.changed (true);
-            canvas.window.event_bus.z_selected_changed ();
-
-            // There is no need to raise or lower the selection
-            // since the z stacking is done inside the paint method
-            // and it is calculated based on the artboard's children list index
-            return;
+        } else {
+            target_item = window.items_manager.free_items.get_item (target) as Lib.Items.CanvasItem;
+            window.items_manager.free_items.swap_items (source, target);
         }
-
-        target_item = window.items_manager.get_item_at_z_index (target_position);
-        window.items_manager.free_items.swap_items (source, target);
 
         if (raise) {
             selected_item.raise (target_item);
@@ -266,21 +257,24 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
     }
 
     private void on_flip_item (bool vertical) {
-        if (selected_items.length () == 0 || selected_items.nth_data (0) is Lib.Models.CanvasArtboard) {
+        if (selected_items.length () == 0) {
             return;
         }
 
-        selected_items.foreach ((item) => {
-            if (vertical) {
-                item.flipped_v = !item.flipped_v;
-                Utils.AffineTransform.flip_item (item, 1, -1);
-                update_selected_items ();
-                return;
+        // Loop through all the currently selected items.
+        foreach (Items.CanvasItem item in selected_items) {
+            // Skip if the item is an Artboard.
+            if (item is Items.CanvasArtboard) {
+                continue;
             }
-            item.flipped_h = !item.flipped_h;
-            Utils.AffineTransform.flip_item (item, -1, 1);
-            update_selected_items ();
-        });
+
+            if (vertical) {
+                item.flipped.vertical = !item.flipped.vertical;
+                continue;
+            }
+
+            item.flipped.horizontal = !item.flipped.horizontal;
+        }
     }
 
     private void on_move_item_from_canvas (Gdk.EventKey event) {
@@ -309,7 +303,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         window.event_bus.update_state_coords (x, y);
     }
 
-    private void remove_item_from_selection (Lib.Models.CanvasItem item) {
+    private void remove_item_from_selection (Lib.Items.CanvasItem item) {
         if (selected_items.index (item) > -1) {
             selected_items.remove (item);
         }

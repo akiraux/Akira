@@ -61,9 +61,9 @@ public class Akira.Layouts.Partials.BorderItem : Gtk.Grid {
 
     private int border_size {
         owned get {
-            return model.border_size;
+            return model.size;
         } set {
-            model.border_size = value;
+            model.size = value;
         }
     }
 
@@ -162,7 +162,7 @@ public class Akira.Layouts.Partials.BorderItem : Gtk.Grid {
         tickness_container.entry.value = border_size;
 
         tickness_container.entry.bind_property (
-            "value", model, "border_size", BindingFlags.BIDIRECTIONAL);
+            "value", model, "size", BindingFlags.BIDIRECTIONAL);
 
         color_chooser.attach (picker_container, 0, 0, 1, 1);
         color_chooser.attach (color_container, 1, 0, 1, 1);
@@ -234,7 +234,6 @@ public class Akira.Layouts.Partials.BorderItem : Gtk.Grid {
     }
 
     private void on_model_changed () {
-        model.item.reset_colors ();
         set_button_color ();
         set_color_chooser_color ();
     }
@@ -246,9 +245,9 @@ public class Akira.Layouts.Partials.BorderItem : Gtk.Grid {
     }
 
     private void on_delete_item () {
-        model.list_model.remove_item.begin (model);
-        model.item.reset_colors ();
-        window.event_bus.border_deleted ();
+        model.model.remove_item.begin (model);
+        // Actually remove the Border component only if the user requests it.
+        model.border.remove ();
     }
 
     private void set_hidden_button () {

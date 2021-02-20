@@ -34,7 +34,7 @@ public class Akira.Services.EventBus : Object {
     // Canvas signals.
     public signal void coordinate_change (double x, double y);
     public signal void insert_item (string type);
-    public signal void item_inserted (Lib.Models.CanvasItem item);
+    public signal void item_inserted ();
     public signal void move_item_from_canvas (Gdk.EventKey event);
     public signal void request_change_cursor (Gdk.CursorType? cursor_type);
     public signal void request_change_mode (Lib.Canvas.EditMode mode);
@@ -50,27 +50,26 @@ public class Akira.Services.EventBus : Object {
 
     // Options panel signals.
     public signal void align_items (string align_action);
-    public signal void border_deleted ();
-    public signal void fill_deleted ();
-    public signal void init_state_coords (Lib.Models.CanvasItem item);
-    public signal void reset_state_coords (Lib.Models.CanvasItem item);
+    public signal void init_state_coords (Lib.Items.CanvasItem item);
+    public signal void reset_state_coords (Lib.Items.CanvasItem item);
     public signal void update_state_coords (double moved_x, double moved_y);
     public signal void item_value_changed ();
 
     // Item signals.
     public signal void change_z_selected (bool raise, bool total);
     public signal void flip_item (bool vertical = false);
-    public signal void request_add_item_to_selection (Lib.Models.CanvasItem item);
-    public signal void request_delete_item (Lib.Models.CanvasItem item);
-    public signal void selected_items_changed (List<Lib.Models.CanvasItem> selected_items);
+    public signal void request_add_item_to_selection (Lib.Items.CanvasItem item);
+    public signal void request_delete_item (Lib.Items.CanvasItem item);
+    public signal void selected_items_changed (List<Lib.Items.CanvasItem> selected_items);
+    public signal void selected_items_list_changed (List<Lib.Items.CanvasItem> selected_items);
     public signal void z_selected_changed ();
     public signal void detect_artboard_change ();
 
     // Layers panel signals.
-    public signal void hover_over_item (Lib.Models.CanvasItem? item);
-    public signal void hover_over_layer (Lib.Models.CanvasItem? item);
-    public signal void item_deleted (Lib.Models.CanvasItem item);
-    public signal void item_locked (Lib.Models.CanvasItem item);
+    public signal void hover_over_item (Lib.Items.CanvasItem? item);
+    public signal void hover_over_layer (Lib.Items.CanvasItem? item);
+    public signal void item_deleted (Lib.Items.CanvasItem item);
+    public signal void item_locked (Lib.Items.CanvasItem item);
 
     // Others.
     public signal void disconnect_typing_accel ();

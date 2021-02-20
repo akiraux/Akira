@@ -62,6 +62,9 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     public double current_scale = 1.0;
     private Gdk.CursorType current_cursor = Gdk.CursorType.ARROW;
 
+    // Used to show the canvas bounds of selected items.
+    private Goo.CanvasRect ghost;
+
     public Canvas (Akira.Window window) {
         Object (window: window);
     }
@@ -217,7 +220,18 @@ public class Akira.Lib.Canvas : Goo.Canvas {
             case EditMode.MODE_SELECTION:
                 var clicked_item = get_item_at (event.x, event.y, true);
 
-                if (clicked_item == null) {
+                // Deselect if no item was clicked, or a non selected artboard was clicked.
+                // We do this to allow users to clear the selection when clicking on the
+                // empty artboard space, which is a white GooCanvasRect item.
+                if (
+                    clicked_item == null ||
+                    (
+                        clicked_item is Goo.CanvasRect &&
+                        !(clicked_item is Items.CanvasItem) &&
+                        !(clicked_item is Selection.Nob) &&
+                        !((Items.CanvasItem) clicked_item.parent).layer.selected
+                    )
+                ) {
                     selected_bound_manager.reset_selection ();
                     // TODO: allow for multi select with click & drag on canvas
                     // Workaround: when no item is clicked, there's no point in keeping holding active
@@ -235,10 +249,19 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
                 nob_manager.selected_nob = clicked_nob_name;
 
-                if (clicked_item is Models.CanvasItem) {
-                    Models.CanvasItem item = clicked_item as Models.CanvasItem;
+                // If we're clicking on the Artboard's label, change the target to the Artboard.
+                if (
+                    clicked_item is Goo.CanvasText &&
+                    clicked_item.parent is Items.CanvasArtboard &&
+                    !(clicked_item is Items.CanvasItem)
+                ) {
+                    clicked_item = clicked_item.parent as Items.CanvasItem;
+                }
 
-                    if (item.locked) {
+                if (clicked_item is Items.CanvasItem) {
+                    Items.CanvasItem item = clicked_item as Items.CanvasItem;
+
+                    if (item.layer.locked) {
                         selected_bound_manager.reset_selection ();
                         holding = false;
                         return true;
@@ -400,9 +423,9 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     }
 
     /*
-     * Show or hide the ghost bounding box of the selected items
+     * Show or hide the ghost bounding box of the selected items.
      */
-    private void toggle_item_ghost (bool show) {
+    public void toggle_item_ghost (bool show) {
         // If no items is selected we can't show anything.
         if (selected_bound_manager.selected_items.length () == 0) {
             return;
@@ -411,11 +434,22 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         // Temporarily get the first item until multi select is implemented.
         var item = selected_bound_manager.selected_items.nth_data (0);
 
-        if (!show) {
-            item.bounds_manager.hide ();
+        if (show) {
+            ghost = new Goo.CanvasRect (
+                null,
+                item.bounds.x1, item.bounds.y1,
+                item.bounds.x2 - item.bounds.x1, item.bounds.y2 - item.bounds.y1,
+                "line-width", 1.0 / current_scale,
+                "stroke-color", "#41c9fd",
+                null
+            );
+            ghost.set ("parent", get_root_item ());
+            ghost.can_focus = false;
             return;
         }
 
-        item.bounds_manager.show ();
+        if (ghost != null) {
+            ghost.remove ();
+        }
     }
 }

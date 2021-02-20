@@ -22,58 +22,53 @@
 public class Akira.Models.BordersItemModel : Models.BaseModel {
     public string color {
         owned get {
-            return item.border_color.to_string ();
+            return border.color.to_string ();
         }
         set {
             var new_rgba = Gdk.RGBA ();
             new_rgba.parse (value);
-            item.border_color = new_rgba;
+            border.color = new_rgba;
+            border.reload ();
         }
     }
 
     public int alpha {
         get {
-            return item.stroke_alpha;
+            return border.alpha;
         }
         set {
-            item.stroke_alpha = value;
+            border.alpha = value;
+            border.reload ();
         }
     }
 
-    public int border_size {
+    public int size {
         get {
-            return item.border_size;
+            return border.size;
         }
         set {
-            item.border_size = value;
+            border.size = value;
+            border.reload ();
         }
     }
 
     public bool hidden {
         get {
-            return item.hidden_border;
+            return border.hidden;
         }
         set {
-            item.hidden_border = value;
+            border.hidden = value;
+            border.reload ();
         }
     }
 
-    public BordersItemModel (
-        Lib.Models.CanvasItem item,
-        Akira.Models.ListModel<Akira.Models.BordersItemModel> list_model
-    ) {
-        Object (
-            item: item,
-            list_model: list_model
-        );
-    }
-
-    construct {
-        item.has_border = true;
+    public BordersItemModel (Lib.Components.Border _border, ListModel _model) {
+        border = _border;
+        model = _model;
     }
 
     public string to_string () {
         return "Color: %s\nAlpha: %f\nSize: %i\nHidden: %s".printf (
-            color, alpha, border_size, (hidden ? "1" : "0"));
+            color, alpha, size, (hidden ? "1" : "0"));
     }
 }

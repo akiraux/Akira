@@ -78,19 +78,10 @@ public class Akira.StateManagers.CoordinatesManager : Object {
     /**
      * Initialize the manager coordinates with the newly created or selected item.
      */
-    private void on_init_state_coords (Lib.Models.CanvasItem item) {
-        // Get the half border size.
-        double half_border = get_border (item.border_size);
-
-        // Get the item X & Y coordinates bounds in order to account for the item's rotation.
-        double item_x = item.bounds.x1 + half_border;
-        double item_y = item.bounds.y1 + half_border;
-
-        // Update the coordinates if the item is inside an Artboard.
-        if (item.artboard != null) {
-            item_x = item.relative_x;
-            item_y = item.relative_y;
-        }
+    private void on_init_state_coords (Lib.Items.CanvasItem item) {
+        // Get the item X & Y coordinates.
+        double item_x = item.transform.x;
+        double item_y = item.transform.y;
 
         // Interrupt if no value has changed.
         if (item_x == x && item_y == y) {
@@ -119,20 +110,12 @@ public class Akira.StateManagers.CoordinatesManager : Object {
      * therefore we set the d_update to false to prevent updating  the selected
      * items Cairo transform.
      */
-    private void on_reset_state_coords (Lib.Models.CanvasItem item) {
+    private void on_reset_state_coords (Lib.Items.CanvasItem item) {
         do_update = false;
 
-        // Get the half border size.
-        double half_border = get_border (item.border_size);
-
-        // Get the item X & Y coordinates bounds in order to account for the item's rotation.
-        double item_x = item.bounds.x1 + half_border;
-        double item_y = item.bounds.y1 + half_border;
-
-        if (item.artboard != null) {
-            item_x = item.relative_x;
-            item_y = item.relative_y;
-        }
+        // Get the item X & Y coordinates.
+        double item_x = item.transform.x;
+        double item_y = item.transform.y;
 
         // Interrupt if no value has changed.
         if (item_x == x && item_y == y) {
@@ -142,6 +125,11 @@ public class Akira.StateManagers.CoordinatesManager : Object {
 
         x = item_x;
         y = item_y;
+
+        // Set the same values we just fetched to the Transform attributes
+        // in order to trigger the redraw of all the elements using them.
+        item.transform.x = item_x;
+        item.transform.y = item_y;
 
         do_update = true;
 
@@ -159,59 +147,32 @@ public class Akira.StateManagers.CoordinatesManager : Object {
         // Loop through all the selected items to update their position. This is temporary
         // since we currently support only 1 selected item per time. In the future, we will need
         // to account for multiple items and their relative position between each other.
-        foreach (Lib.Models.CanvasItem item in canvas.selected_bound_manager.selected_items) {
+        foreach (Lib.Items.CanvasItem item in canvas.selected_bound_manager.selected_items) {
             if (!do_update) {
                 continue;
             }
 
-            // Update the relative coordinates for items inside the canvas.
-            // This will need to be removed after we rebuild the artboards.
-            if (item.artboard != null) {
-                item.relative_x = x;
-                item.relative_y = y;
-                continue;
-            }
-
             // Store the new coordinates in local variables so we can manipulate them.
-            double inc_x = x;
-            double inc_y = y;
+            double inc_x = x - item.transform.x;
+            double inc_y = y - item.transform.y;
 
-            // Convert the new coordinates to reflect the item's space on the canvas.
-            canvas.convert_to_item_space (item, ref inc_x, ref inc_y);
+            Cairo.Matrix matrix;
+            item.get_transform (out matrix);
 
-            // If the item is rotated, we need to calculate the delta between the
-            // new coordinates and item's bounds coordinates.
-            if (item.rotation != 0) {
-                double half_border = get_border (item.border_size);
-                double diff_x = item.bounds.x1 - half_border;
-                double diff_y = item.bounds.y1 - half_border;
+            // Increment the cairo matrix coordinates so we can ignore the item's rotation.
+            matrix.x0 += inc_x;
+            matrix.y0 += inc_y;
 
-                // Convert the bounds to the item space to get the proper delta between
-                // the bounds coordinates and the rotation X & Y coordinates.
-                canvas.convert_to_item_space (item, ref diff_x, ref diff_y);
+            item.set_transform (matrix);
 
-                inc_x -= diff_x;
-                inc_y -= diff_y;
+            // If the item is an Artboard, move the label with it.
+            if (item is Lib.Items.CanvasArtboard) {
+                ((Lib.Items.CanvasArtboard) item).label.translate (inc_x, inc_y);
             }
 
-            // Move the item with the new coordinates.
-            item.translate (inc_x, inc_y);
-
-            //  // Update the bounds of the ghost item.
-            item.bounds_manager.update ();
+            // Update the Transform component attributes.
+            item.transform.x += inc_x;
+            item.transform.y += inc_y;
         }
-
-        // Notify the rest of the UI that a value of the select items has changed.
-        window.event_bus.item_value_changed ();
-    }
-
-    /**
-     * The item's bounds account also for the border width, but we shouldn't,
-     * so we need to account for half the border width since we're only dealing
-     * with a centered border. In the future, once borders can be inside or outside,
-     * we will need to update this condition.
-     */
-    private double get_border (double size) {
-        return size > 0 ? size / 2 : 0;
     }
 }

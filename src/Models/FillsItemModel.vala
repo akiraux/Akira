@@ -23,47 +23,41 @@
 public class Akira.Models.FillsItemModel : Models.BaseModel {
     public string color {
         owned get {
-            return item.color.to_string ();
+            return fill.color.to_string ();
         }
         set {
             var new_rgba = Gdk.RGBA ();
             new_rgba.parse (value);
-            item.color = new_rgba;
+            fill.color = new_rgba;
+            fill.reload ();
         }
     }
 
     public int alpha {
         get {
-            return item.fill_alpha;
+            return fill.alpha;
         }
         set {
-            item.fill_alpha = value;
+            fill.alpha = value;
+            fill.reload ();
         }
     }
 
     public bool hidden {
         get {
-            return item.hidden_fill;
+            return fill.hidden;
         }
         set {
-            item.hidden_fill = value;
+            fill.hidden = value;
+            fill.reload ();
         }
     }
 
     public Akira.Utils.BlendingMode blending_mode;
 
-    public FillsItemModel (
-        Lib.Models.CanvasItem item,
-        Akira.Models.ListModel list_model
-    ) {
-        Object (
-            item: item,
-            list_model: list_model
-        );
-    }
-
-    construct {
-        item.has_fill = true;
+    public FillsItemModel (Lib.Components.Fill _fill, ListModel _model) {
+        fill = _fill;
+        model = _model;
         blending_mode = Akira.Utils.BlendingMode.NORMAL;
     }
 

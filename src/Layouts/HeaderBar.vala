@@ -22,7 +22,7 @@
 public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
     public weak Akira.Window window { get; construct; }
 
-    private Lib.Models.CanvasItem selected_item;
+    private Lib.Items.CanvasItem selected_item;
 
     public Akira.Partials.HeaderBarButton new_document;
     public Akira.Partials.HeaderBarButton save_file;
@@ -363,6 +363,7 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
     private void build_signals () {
         window.event_bus.file_edited.connect (on_file_edited);
         window.event_bus.file_saved.connect (on_file_saved);
+        window.event_bus.selected_items_list_changed.connect (on_selected_items_changed);
         window.event_bus.selected_items_changed.connect (on_selected_items_changed);
         window.event_bus.z_selected_changed.connect (update_button_sensitivity);
         window.event_bus.set_scale.connect (on_set_scale);
@@ -501,7 +502,7 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
         title = file_name.has_suffix (".akira") ? file_name.replace (".akira", "") : file_name;
     }
 
-    private void on_selected_items_changed (List<Lib.Models.CanvasItem> selected_items) {
+    private void on_selected_items_changed (List<Lib.Items.CanvasItem> selected_items) {
         if (selected_items.length () == 0) {
             selected_item = null;
             update_button_sensitivity ();
@@ -515,7 +516,7 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
     }
 
     private void update_button_sensitivity () {
-        var z_buttons_sensitive = selected_item != null && !(selected_item is Lib.Models.CanvasArtboard);
+        var z_buttons_sensitive = selected_item != null && !(selected_item is Lib.Items.CanvasArtboard);
 
         move_up.sensitive = z_buttons_sensitive;
         move_down.sensitive = z_buttons_sensitive;
