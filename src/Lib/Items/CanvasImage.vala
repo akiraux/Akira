@@ -82,17 +82,21 @@ public class Akira.Lib.Items.CanvasImage : Goo.CanvasImage, Akira.Lib.Items.Canv
     }
 
     private void init_pixbuf () {
-        // Save the unedited pixbuf to enable resampling and restoring.
+        // Load the pixbuf at full resolution to properly define the size ratio of the item.
         manager.get_pixbuf.begin (-1, -1, (obj, res) => {
             try {
                 original_pixbuf = manager.get_pixbuf.end (res);
                 pixbuf = original_pixbuf;
-                width = size.width = original_pixbuf.get_width ();
-                height = size.height = original_pixbuf.get_height ();
 
+                // Define the item's size based on the images size.
+                size.width = original_pixbuf.width;
+                size.height = original_pixbuf.height;
                 // Imported images should have their size ratio locked by default.
                 size.locked = true;
-                size.ratio = width / height;
+
+                // Reset the size to the 1px initial value after the size ratio was properly defined
+                // in order to allow the user to decide the initial image size.
+                size.width = 1;
             } catch (Error e) {
                 warning (e.message);
                 ((Lib.Canvas) canvas).window.event_bus.canvas_notification (e.message);

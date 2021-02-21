@@ -35,6 +35,9 @@ public class Akira.Lib.Managers.ItemsManager : Object {
     // Keep track of the expensive Artboard change method.
     private bool is_changing = false;
 
+    // Keep track of newly imported images before creation.
+    private Lib.Managers.ImageManager? image_manager;
+
     public ItemsManager (Akira.Window window) {
         Object (
             window: window
@@ -55,31 +58,8 @@ public class Akira.Lib.Managers.ItemsManager : Object {
     }
 
     public void insert_image (Lib.Managers.ImageManager manager) {
-        var selected_bound_manager = window.main_window.main_canvas.canvas.selected_bound_manager;
-
-        double start_x, start_y, scale, rotation;
-        start_x = 0;
-        start_y = 0;
-
-        if (selected_bound_manager.selected_items.length () > 0) {
-            var item = selected_bound_manager.selected_items.nth_data (0);
-
-            if (item.artboard == null) {
-                item.get_simple_transform (
-                    out start_x, out start_y, out scale, out rotation
-                );
-            } else {
-                item.artboard.get_simple_transform (
-                    out start_x, out start_y, out scale, out rotation
-                );
-            }
-        }
-
-        set_item_to_insert ("image");
-        var new_item = insert_item (start_x, start_y, manager);
-
-        selected_bound_manager.set_initial_coordinates (start_x, start_y);
-        selected_bound_manager.add_item_to_selection (new_item);
+        image_manager = manager;
+        window.event_bus.insert_item ("image");
     }
 
     public Items.CanvasItem? insert_item (
@@ -127,7 +107,15 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         }
 
         if (item_type == typeof (Items.CanvasImage)) {
+            // If we don't have a manager passed to this method but a general image manager
+            // is available in the class, it means the user is importing a new image.
+            if (manager == null && image_manager != null) {
+                manager = image_manager;
+            }
             new_item = add_image (x, y, manager, root, artboard, loaded);
+
+            // Empty the image manager since we used it.
+            image_manager = null;
         }
 
         if (new_item == null) {
@@ -420,7 +408,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
                         filename
                     )
                 );
-                var manager = new Akira.Lib.Managers.ImageManager.from_archive (file, filename);
+                var manager = new Lib.Managers.ImageManager.from_archive (file, filename);
                 item = insert_item (pos_x, pos_y, manager, true, artboard);
                 break;
         }
