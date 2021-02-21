@@ -103,6 +103,7 @@ public class Akira.Lib.Items.CanvasArtboard : Goo.CanvasGroup, Akira.Lib.Items.C
       label.parent = this;
 
       this.bind_property ("width", label, "width", BindingFlags.SYNC_CREATE);
+      this.bind_property ("visibility", label, "visibility", BindingFlags.SYNC_CREATE);
       this.name.bind_property ("name", label, "text", BindingFlags.SYNC_CREATE);
    }
 
