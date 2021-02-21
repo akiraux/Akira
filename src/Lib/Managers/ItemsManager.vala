@@ -544,6 +544,15 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             item.borders.reload ();
         }
 
+        // Restore image size.
+        if (item is Items.CanvasImage) {
+            ((Items.CanvasImage) item).resize_pixbuf (
+                (int) item.size.width,
+                (int) item.size.height,
+                true
+            );
+        }
+
         // Since free items are loaded upside down, always raise to the top position
         // the newly added free item.
         if (artboard == null & !(item is Items.CanvasArtboard)) {
