@@ -37,24 +37,29 @@ public class Akira.FileFormat.JsonObject : GLib.Object {
 
         // Set a string of the type so we're not tied to the namespace and location.
         if (item is Lib.Items.CanvasArtboard) {
-            object.set_string_member ("type", "CanvasArtboard");
+            object.set_string_member ("type", "artboard");
         }
 
         if (item is Lib.Items.CanvasRect) {
-            object.set_string_member ("type", "CanvasRect");
+            object.set_string_member ("type", "rectangle");
         }
 
         if (item is Lib.Items.CanvasEllipse) {
-            object.set_string_member ("type", "CanvasEllipse");
+            object.set_string_member ("type", "ellipse");
         }
 
         if (item is Lib.Items.CanvasImage) {
-            object.set_string_member ("type", "CanvasImage");
+            object.set_string_member ("type", "image");
             object.set_string_member ("image_id", ((Lib.Items.CanvasImage) item).manager.filename);
         }
 
         if (item is Lib.Items.CanvasText) {
-            object.set_string_member ("type", "CanvasText");
+            object.set_string_member ("type", "text");
+        }
+
+        // Save the artboard ID if the item belongs to one.
+        if (item.artboard != null) {
+            object.set_string_member ("artboard", item.artboard.name.id);
         }
 
         write_matrix ();
