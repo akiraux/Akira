@@ -425,7 +425,13 @@ public class Akira.Lib.Managers.ItemsManager : Object {
                 break;
         }
 
+        var selected_bound_manager = window.main_window.main_canvas.canvas.selected_bound_manager;
+        selected_bound_manager.set_initial_coordinates (pos_x, pos_y);
+        selected_bound_manager.add_item_to_selection (item);
+
         restore_attributes (item, artboard, components);
+
+        selected_bound_manager.reset_selection ();
     }
 
     /*
@@ -443,89 +449,90 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             item.name.icon = name.get_string_member ("icon");
         }
 
-        // Restore transform values.
-        if (components.has_member ("Transform")) {
-            var transform = components.get_member ("Transform").get_object ();
-            item.transform.x = transform.get_double_member ("x");
-            item.transform.y = transform.get_double_member ("y");
+        // Restore opacity.
+        if (components.has_member ("Opacity")) {
+            var opacity = components.get_member ("Opacity").get_object ();
+            item.opacity.opacity = opacity.get_double_member ("opacity");
+        }
+
+        // Restore rotation.
+        if (components.has_member ("Rotation")) {
+            var rotation = components.get_member ("Rotation").get_object ();
+            item.rotation.rotation = rotation.get_double_member ("rotation");
+        }
+
+        // Restore size.
+        if (components.has_member ("Size")) {
+            var size = components.get_member ("Size").get_object ();
+            item.size.locked = size.get_boolean_member ("locked");
+            item.size.ratio = size.get_double_member ("ratio");
+            item.size.width = size.get_double_member ("width");
+            item.size.height = size.get_double_member ("height");
+        }
+
+        // Restore flipped.
+        if (components.has_member ("Flipped")) {
+            var flipped = components.get_member ("Flipped").get_object ();
+            item.flipped.horizontal = flipped.get_boolean_member ("horizontal");
+            item.flipped.vertical = flipped.get_boolean_member ("vertical");
         }
 
         // Restore border radius.
-        // if (item is Items.CanvasRect) {
-        //     item.set ("border-radius-uniform", obj.get_boolean_member ("border-radius-uniform"));
-        //     item.set ("border-radius-autoscale", obj.get_boolean_member ("border-radius-autoscale"));
-        //     item.set ("radius-x", obj.get_double_member ("radius-x"));
-        //     item.set ("radius-y", obj.get_double_member ("radius-y"));
-        //     item.set ("global-radius", obj.get_double_member ("global-radius"));
-        // }
+        if (components.has_member ("BorderRadius")) {
+            var border_radius = components.get_member ("BorderRadius").get_object ();
+            item.border_radius.x = border_radius.get_double_member ("x");
+            item.border_radius.y = border_radius.get_double_member ("y");
+            item.border_radius.uniform = border_radius.get_boolean_member ("uniform");
+            item.border_radius.autoscale = border_radius.get_boolean_member ("autoscale");
+        }
 
-        // // Restore image size.
-        // if (item is Items.CanvasImage) {
-        //     ((Items.CanvasImage) item).resize_pixbuf (
-        //         (int) obj.get_double_member ("width"),
-        //         (int) obj.get_double_member ("height"),
-        //         true
-        //     );
-        // }
+        // Restore layer.
+        if (components.has_member ("Layer")) {
+            var layer = components.get_member ("Layer").get_object ();
+            item.layer.selected = layer.get_boolean_member ("selected");
+            item.layer.locked = layer.get_boolean_member ("locked");
+        }
 
-        // // Restore layer options.
-        // item.layer.locked = obj.get_boolean_member ("locked");
-        // item.visibility =
-        //     obj.get_int_member ("visibility") == 2
-        //         ? Goo.CanvasItemVisibility.VISIBLE
-        //         : Goo.CanvasItemVisibility.INVISIBLE;
+        // Restore fills.
+        if (components.has_member ("Fills")) {
+            // Delete all pre-existing fills to be sure we're starting with a clean slate.
+            foreach (Lib.Components.Fill fill in item.fills.fills) {
+                item.fills.fills.remove (fill);
+            }
 
-        // Restore the fill attributes.
-        // item.has_fill = obj.get_boolean_member ("has-fill");
-        // item.hidden_fill = obj.get_boolean_member ("hidden-fill");
-        // item.fill_alpha = (int) obj.get_int_member ("fill-alpha");
-        // If an item doesn't have any fill color, set a default white in case
-        // this is an artboard and it needs to be rendered.
-        // item.color_string =
-        //     obj.get_string_member ("color-string") != null
-        //     ? obj.get_string_member ("color-string")
-        //     : "#ffffff";
+            var fills = components.get_member ("Fills").get_object ();
+            fills.foreach_member ((i, name, node) => {
+                var obj = node.get_object ();
+                var fill = item.fills.add_fill_color (Utils.Color.hex_to_rgba (obj.get_string_member ("hex")));
+                fill.hex = obj.get_string_member ("hex");
+                fill.alpha = (int) obj.get_int_member ("alpha");
+                fill.hidden = obj.get_boolean_member ("hidden");
+            });
 
-        // Restore the border attributes.
-        // item.has_border = obj.get_boolean_member ("has-border");
-        // item.hidden_border = obj.get_boolean_member ("hidden-border");
-        // item.border_size = (int) obj.get_int_member ("border-size");
-        // item.stroke_alpha = (int) obj.get_int_member ("stroke-alpha");
-        // item.border_color_string = obj.get_string_member ("border-color-string");
+            item.fills.reload ();
+        }
 
-        // item.load_colors ();
+        // Restore borders.
+        if (components.has_member ("Borders")) {
+            // Delete all pre-existing borders to be sure we're starting with a clean slate.
+            foreach (Lib.Components.Border border in item.borders.borders) {
+                item.borders.borders.remove (border);
+            }
 
-        // Trigger the simple_update () method for artboards.
-        // if (item is Items.CanvasArtboard) {
-        //     ((Items.CanvasArtboard) item).trigger_change ();
-        // }
+            var borders = components.get_member ("Borders").get_object ();
+            borders.foreach_member ((i, name, node) => {
+                var obj = node.get_object ();
+                var border = item.borders.add_border_color (
+                    Utils.Color.hex_to_rgba (obj.get_string_member ("hex")),
+                    (int) obj.get_int_member ("size")
+                );
+                border.hex = obj.get_string_member ("hex");
+                border.alpha = (int) obj.get_int_member ("alpha");
+                border.hidden = obj.get_boolean_member ("hidden");
+            });
 
-        // item.set ("relative-x", obj.get_double_member ("relative-x"));
-        // item.set ("relative-y", obj.get_double_member ("relative-y"));
-
-        // Cairo.Matrix matrix;
-        // item.get_transform (out matrix);
-        // var transform = obj.get_member ("transform").get_object ();
-
-        // // Apply the Cairo Matrix to properly update position and rotation.
-        // var new_matrix = Cairo.Matrix (
-        //     transform.get_double_member ("xx"),
-        //     transform.get_double_member ("yx"),
-        //     transform.get_double_member ("xy"),
-        //     transform.get_double_member ("yy"),
-        //     transform.get_double_member ("x0"),
-        //     transform.get_double_member ("y0")
-        // );
-        // item.set_transform (new_matrix);
-
-        // // If the item is an Artboard, we need to restore bounding coordinates otherwise
-        // // new child items won't be properly restored into it.
-        // if (item is Items.CanvasArtboard) {
-        //     item.bounds.x1 = transform.get_double_member ("x0");
-        //     item.bounds.y1 = transform.get_double_member ("y0");
-        //     item.bounds.x2 = transform.get_double_member ("x0") + obj.get_double_member ("width");
-        //     item.bounds.y2 = transform.get_double_member ("y0") + obj.get_double_member ("height");
-        // }
+            item.borders.reload ();
+        }
 
         // Since free items are loaded upside down, always raise to the top position
         // the newly added free item.

@@ -183,10 +183,10 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         attach (group_title (_("Opacity")), 0, 9, 3);
         attach (opacity_grid, 0, 10, 3);
 
-        window.event_bus.selected_items_changed.connect (on_selected_items_changed);
+        window.event_bus.selected_items_list_changed.connect (on_selected_items_list_changed);
     }
 
-    private void on_selected_items_changed (List<Lib.Items.CanvasItem> selected_items) {
+    private void on_selected_items_list_changed (List<Lib.Items.CanvasItem> selected_items) {
         if (selected_items.length () == 0) {
             selected_item = null;
             return;
