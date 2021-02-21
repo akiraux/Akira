@@ -26,7 +26,7 @@ public class Akira.Layouts.Partials.BordersPanel : Gtk.Grid {
     public Gtk.ListBox borders_list_container;
     public Akira.Models.ListModel<Akira.Models.BordersItemModel> list_model;
     public Gtk.Grid title_cont;
-    private Lib.Items.CanvasItem selected_item;
+    private unowned List<Lib.Items.CanvasItem>? items;
 
     public bool toggled {
         get {
@@ -95,12 +95,13 @@ public class Akira.Layouts.Partials.BordersPanel : Gtk.Grid {
         add_btn.clicked.connect (() => {
             var border_color = Gdk.RGBA ();
             border_color.parse (settings.border_color);
-            Lib.Components.Border border =
-                selected_item.borders.add_border_color (border_color, (int) settings.border_size);
 
-            var model_item = create_model (border);
-            list_model.add_item.begin (model_item);
-            selected_item.borders.reload ();
+            foreach (Lib.Items.CanvasItem item in items) {
+                Lib.Components.Border border = item.borders.add_border_color (border_color, (int) settings.border_size);
+                var model_item = create_model (border);
+                list_model.add_item.begin (model_item);
+                item.borders.reload ();
+            }
         });
 
         // Listen to the model changes when adding/removing items.
@@ -111,11 +112,13 @@ public class Akira.Layouts.Partials.BordersPanel : Gtk.Grid {
 
     private void on_selected_items_list_changed (List<Lib.Items.CanvasItem> selected_items) {
         if (selected_items.length () == 0) {
-            selected_item = null;
+            items = null;
             list_model.clear.begin ();
             toggled = false;
             return;
         }
+
+        items = selected_items;
 
         // Always clear the list model when a selection changes.
         list_model.clear.begin ();
