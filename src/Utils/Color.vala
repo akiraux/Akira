@@ -35,11 +35,11 @@ public class Akira.Utils.Color : Object {
         );
     }
 
-    public static string hex_to_rgba (string hex) {
+    public static Gdk.RGBA hex_to_rgba (string hex) {
         var rgba = Gdk.RGBA ();
         rgba.parse (hex);
 
-        return rgba.to_string ();
+        return rgba;
     }
 
     public static bool is_valid_hex (string hex) {
