@@ -27,7 +27,7 @@ public class Akira.Layouts.Partials.FillsPanel : Gtk.Grid {
     public Gtk.ListBox fills_list_container;
     public Akira.Models.ListModel<Akira.Models.FillsItemModel> list_model;
     public Gtk.Grid title_cont;
-    private Lib.Items.CanvasItem selected_item;
+    private unowned List<Lib.Items.CanvasItem>? items;
 
     public bool toggled {
         get {
@@ -96,11 +96,13 @@ public class Akira.Layouts.Partials.FillsPanel : Gtk.Grid {
         add_btn.clicked.connect (() => {
             var fill_color = Gdk.RGBA ();
             fill_color.parse (settings.fill_color);
-            Lib.Components.Fill fill = selected_item.fills.add_fill_color (fill_color);
 
-            var model_item = create_model (fill);
-            list_model.add_item.begin (model_item);
-            selected_item.fills.reload ();
+            foreach (Lib.Items.CanvasItem item in items) {
+                Lib.Components.Fill fill = item.fills.add_fill_color (fill_color);
+                var model_item = create_model (fill);
+                list_model.add_item.begin (model_item);
+                item.fills.reload ();
+            }
         });
 
         // Listen to the model changes when adding/removing items.
@@ -111,11 +113,13 @@ public class Akira.Layouts.Partials.FillsPanel : Gtk.Grid {
 
     private void on_selected_items_list_changed (List<Lib.Items.CanvasItem> selected_items) {
         if (selected_items.length () == 0) {
-            selected_item = null;
+            items = null;
             list_model.clear.begin ();
             toggled = false;
             return;
         }
+
+        items = selected_items;
 
         // Always clear the list model when a selection changes.
         list_model.clear.begin ();

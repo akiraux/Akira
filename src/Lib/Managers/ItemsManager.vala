@@ -58,8 +58,8 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         var selected_bound_manager = window.main_window.main_canvas.canvas.selected_bound_manager;
 
         double start_x, start_y, scale, rotation;
-        start_x = Akira.Layouts.MainCanvas.CANVAS_SIZE / 2;
-        start_y = Akira.Layouts.MainCanvas.CANVAS_SIZE / 2;
+        start_x = 0;
+        start_y = 0;
 
         if (selected_bound_manager.selected_items.length () > 0) {
             var item = selected_bound_manager.selected_items.nth_data (0);
@@ -372,18 +372,18 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         Items.CanvasItem? item = null;
         Items.CanvasArtboard? artboard = null;
 
-        var transform = obj.get_member ("transform").get_object ();
-        var pos_x = transform.get_double_member ("x0");
-        var pos_y = transform.get_double_member ("y0");
+        var components = obj.get_member ("Components").get_object ();
+        var transform = components.get_member ("Transform").get_object ();
+        var pos_x = transform.get_double_member ("x");
+        var pos_y = transform.get_double_member ("y");
 
         // If item is inside an artboard update the coordinates accordingly.
         if (obj.has_member ("artboard")) {
             foreach (var _artboard in artboards) {
                 if (_artboard.name.id == obj.get_string_member ("artboard")) {
-                    var matrix = Cairo.Matrix.identity ();
-                    _artboard.get_transform (out matrix);
-                    pos_x = matrix.x0 + obj.get_double_member ("relative-x");
-                    pos_y = matrix.y0 + obj.get_double_member ("relative-y");
+                    window.main_window.main_canvas.canvas.convert_from_item_space (
+                        _artboard, ref pos_x, ref pos_y
+                    );
                     artboard = _artboard;
                     break;
                 }
@@ -391,27 +391,27 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         }
 
         switch (obj.get_string_member ("type")) {
-            case "AkiraLibItemsCanvasRect":
+            case "rectangle":
                 item_type = typeof (Items.CanvasRect);
                 item = insert_item (pos_x, pos_y, null, true, artboard);
                 break;
 
-            case "AkiraLibItemsCanvasEllipse":
+            case "ellipse":
                 item_type = typeof (Items.CanvasEllipse);
                 item = insert_item (pos_x, pos_y, null, true, artboard);
                 break;
 
-            case "AkiraLibItemsCanvasText":
+            case "text":
                 item_type = typeof (Items.CanvasText);
                 item = insert_item (pos_x, pos_y, null, true, artboard);
                 break;
 
-            case "AkiraLibItemsCanvasArtboard":
+            case "artboard":
                 item_type = typeof (Items.CanvasArtboard);
                 item = insert_item (pos_x, pos_y, null, true, artboard);
                 break;
 
-            case "AkiraLibItemsCanvasImage":
+            case "image":
                 item_type = typeof (Items.CanvasImage);
                 var filename = obj.get_string_member ("image_id");
                 var file = File.new_for_path (
@@ -425,7 +425,24 @@ public class Akira.Lib.Managers.ItemsManager : Object {
                 break;
         }
 
-        restore_attributes (item, artboard, obj);
+        var selected_bound_manager = window.main_window.main_canvas.canvas.selected_bound_manager;
+        selected_bound_manager.add_item_to_selection (item);
+
+        restore_attributes (item, artboard, components);
+
+        // Restore the matrix transform to properly reset position and rotation.
+        var matrix = obj.get_member ("matrix").get_object ();
+        var new_matrix = Cairo.Matrix (
+            matrix.get_double_member ("xx"),
+            matrix.get_double_member ("yx"),
+            matrix.get_double_member ("xy"),
+            matrix.get_double_member ("yy"),
+            matrix.get_double_member ("x0"),
+            matrix.get_double_member ("y0")
+        );
+        item.set_transform (new_matrix);
+
+        selected_bound_manager.reset_selection ();
     }
 
     /*
@@ -434,98 +451,106 @@ public class Akira.Lib.Managers.ItemsManager : Object {
      * @param Items.CanvasItem item - The newly created item.
      * @param Json.Object obj - The json object containing the item's attributes.
      */
-    private void restore_attributes (Items.CanvasItem item, Items.CanvasArtboard? artboard, Json.Object obj) {
+    private void restore_attributes (Items.CanvasItem item, Items.CanvasArtboard? artboard, Json.Object components) {
         // Restore identifiers.
-        if (obj.get_string_member ("name") != null) {
-            item.name.name = obj.get_string_member ("name");
+        if (components.has_member ("Name")) {
+            var name = components.get_member ("Name").get_object ();
+            item.name.id = name.get_string_member ("id");
+            item.name.name = name.get_string_member ("name");
+            item.name.icon = name.get_string_member ("icon");
         }
-        item.name.id = obj.get_string_member ("id");
 
-        // Restore transform panel values.
-        item.set ("width", obj.get_double_member ("width"));
-        item.set ("height", obj.get_double_member ("height"));
-        item.set ("size-locked", obj.get_boolean_member ("size-locked"));
-        item.set ("size-ratio", obj.get_double_member ("size-ratio"));
-        item.set ("rotation", obj.get_double_member ("rotation"));
-        item.set ("flipped-h", obj.get_boolean_member ("flipped-h"));
-        item.set ("flipped-v", obj.get_boolean_member ("flipped-v"));
-        item.set ("opacity", obj.get_double_member ("opacity"));
+        // Restore opacity.
+        if (components.has_member ("Opacity")) {
+            var opacity = components.get_member ("Opacity").get_object ();
+            item.opacity.opacity = opacity.get_double_member ("opacity");
+        }
+
+        // Restore rotation.
+        if (components.has_member ("Rotation")) {
+            var rotation = components.get_member ("Rotation").get_object ();
+            item.rotation.rotation = rotation.get_double_member ("rotation");
+        }
+
+        // Restore size.
+        if (components.has_member ("Size")) {
+            var size = components.get_member ("Size").get_object ();
+            item.size.locked = size.get_boolean_member ("locked");
+            item.size.ratio = size.get_double_member ("ratio");
+            item.size.width = size.get_double_member ("width");
+            item.size.height = size.get_double_member ("height");
+        }
+
+        // Restore flipped.
+        if (components.has_member ("Flipped")) {
+            var flipped = components.get_member ("Flipped").get_object ();
+            item.flipped.horizontal = flipped.get_boolean_member ("horizontal");
+            item.flipped.vertical = flipped.get_boolean_member ("vertical");
+        }
 
         // Restore border radius.
-        if (item is Items.CanvasRect) {
-            item.set ("border-radius-uniform", obj.get_boolean_member ("border-radius-uniform"));
-            item.set ("border-radius-autoscale", obj.get_boolean_member ("border-radius-autoscale"));
-            item.set ("radius-x", obj.get_double_member ("radius-x"));
-            item.set ("radius-y", obj.get_double_member ("radius-y"));
-            item.set ("global-radius", obj.get_double_member ("global-radius"));
+        if (components.has_member ("BorderRadius")) {
+            var border_radius = components.get_member ("BorderRadius").get_object ();
+            item.border_radius.x = border_radius.get_double_member ("x");
+            item.border_radius.y = border_radius.get_double_member ("y");
+            item.border_radius.uniform = border_radius.get_boolean_member ("uniform");
+            item.border_radius.autoscale = border_radius.get_boolean_member ("autoscale");
+        }
+
+        // Restore layer.
+        if (components.has_member ("Layer")) {
+            var layer = components.get_member ("Layer").get_object ();
+            item.layer.locked = layer.get_boolean_member ("locked");
+        }
+
+        // Restore fills.
+        if (components.has_member ("Fills")) {
+            // Delete all pre-existing fills to be sure we're starting with a clean slate.
+            foreach (Lib.Components.Fill fill in item.fills.fills) {
+                item.fills.fills.remove (fill);
+            }
+
+            var fills = components.get_member ("Fills").get_object ();
+            fills.foreach_member ((i, name, node) => {
+                var obj = node.get_object ();
+                var fill = item.fills.add_fill_color (Utils.Color.hex_to_rgba (obj.get_string_member ("hex")));
+                fill.hex = obj.get_string_member ("hex");
+                fill.alpha = (int) obj.get_int_member ("alpha");
+                fill.hidden = obj.get_boolean_member ("hidden");
+            });
+
+            item.fills.reload ();
+        }
+
+        // Restore borders.
+        if (components.has_member ("Borders")) {
+            // Delete all pre-existing borders to be sure we're starting with a clean slate.
+            foreach (Lib.Components.Border border in item.borders.borders) {
+                item.borders.borders.remove (border);
+            }
+
+            var borders = components.get_member ("Borders").get_object ();
+            borders.foreach_member ((i, name, node) => {
+                var obj = node.get_object ();
+                var border = item.borders.add_border_color (
+                    Utils.Color.hex_to_rgba (obj.get_string_member ("hex")),
+                    (int) obj.get_int_member ("size")
+                );
+                border.hex = obj.get_string_member ("hex");
+                border.alpha = (int) obj.get_int_member ("alpha");
+                border.hidden = obj.get_boolean_member ("hidden");
+            });
+
+            item.borders.reload ();
         }
 
         // Restore image size.
         if (item is Items.CanvasImage) {
             ((Items.CanvasImage) item).resize_pixbuf (
-                (int) obj.get_double_member ("width"),
-                (int) obj.get_double_member ("height"),
+                (int) item.size.width,
+                (int) item.size.height,
                 true
             );
-        }
-
-        // Restore layer options.
-        item.layer.locked = obj.get_boolean_member ("locked");
-        item.visibility =
-            obj.get_int_member ("visibility") == 2
-                ? Goo.CanvasItemVisibility.VISIBLE
-                : Goo.CanvasItemVisibility.INVISIBLE;
-
-        // Restore the fill attributes.
-        // item.has_fill = obj.get_boolean_member ("has-fill");
-        // item.hidden_fill = obj.get_boolean_member ("hidden-fill");
-        // item.fill_alpha = (int) obj.get_int_member ("fill-alpha");
-        // If an item doesn't have any fill color, set a default white in case
-        // this is an artboard and it needs to be rendered.
-        // item.color_string =
-        //     obj.get_string_member ("color-string") != null
-        //     ? obj.get_string_member ("color-string")
-        //     : "#ffffff";
-
-        // Restore the border attributes.
-        // item.has_border = obj.get_boolean_member ("has-border");
-        // item.hidden_border = obj.get_boolean_member ("hidden-border");
-        // item.border_size = (int) obj.get_int_member ("border-size");
-        // item.stroke_alpha = (int) obj.get_int_member ("stroke-alpha");
-        // item.border_color_string = obj.get_string_member ("border-color-string");
-
-        // item.load_colors ();
-
-        // Trigger the simple_update () method for artboards.
-        // if (item is Items.CanvasArtboard) {
-        //     ((Items.CanvasArtboard) item).trigger_change ();
-        // }
-
-        item.set ("relative-x", obj.get_double_member ("relative-x"));
-        item.set ("relative-y", obj.get_double_member ("relative-y"));
-
-        Cairo.Matrix matrix;
-        item.get_transform (out matrix);
-        var transform = obj.get_member ("transform").get_object ();
-
-        // Apply the Cairo Matrix to properly update position and rotation.
-        var new_matrix = Cairo.Matrix (
-            transform.get_double_member ("xx"),
-            transform.get_double_member ("yx"),
-            transform.get_double_member ("xy"),
-            transform.get_double_member ("yy"),
-            transform.get_double_member ("x0"),
-            transform.get_double_member ("y0")
-        );
-        item.set_transform (new_matrix);
-
-        // If the item is an Artboard, we need to restore bounding coordinates otherwise
-        // new child items won't be properly restored into it.
-        if (item is Items.CanvasArtboard) {
-            item.bounds.x1 = transform.get_double_member ("x0");
-            item.bounds.y1 = transform.get_double_member ("y0");
-            item.bounds.x2 = transform.get_double_member ("x0") + obj.get_double_member ("width");
-            item.bounds.y2 = transform.get_double_member ("y0") + obj.get_double_member ("height");
         }
 
         // Since free items are loaded upside down, always raise to the top position

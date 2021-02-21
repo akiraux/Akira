@@ -434,12 +434,12 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 
             case Gdk.EventType.BUTTON_PRESS:
                 window.event_bus.request_add_item_to_selection (model);
-                return false;
+                // Always move the focus back to the canvas.
+                window.event_bus.set_focus_on_canvas ();
+                return true;
         }
 
-        // Always move the focus back to the canvas.
-        window.event_bus.set_focus_on_canvas ();
-        return true;
+        return false;
     }
 
     public void update_on_enter () {

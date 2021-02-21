@@ -136,7 +136,7 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
                 }
 
                 var new_color_rgba = Utils.Color.hex_to_rgba (color_container_hex);
-                model_value.set_string (new_color_rgba);
+                model_value.set_string (new_color_rgba.to_string ());
                 return true;
             },
             // model => this

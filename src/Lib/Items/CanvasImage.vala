@@ -87,8 +87,8 @@ public class Akira.Lib.Items.CanvasImage : Goo.CanvasImage, Akira.Lib.Items.Canv
             try {
                 original_pixbuf = manager.get_pixbuf.end (res);
                 pixbuf = original_pixbuf;
-                width = original_pixbuf.get_width ();
-                height = original_pixbuf.get_height ();
+                width = size.width = original_pixbuf.get_width ();
+                height = size.height = original_pixbuf.get_height ();
 
                 // Imported images should have their size ratio locked by default.
                 size.locked = true;
