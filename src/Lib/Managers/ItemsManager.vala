@@ -381,7 +381,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         if (obj.has_member ("artboard")) {
             foreach (var _artboard in artboards) {
                 if (_artboard.name.id == obj.get_string_member ("artboard")) {
-                    window.main_window.main_canvas.canvas.convert_to_item_space (
+                    window.main_window.main_canvas.canvas.convert_from_item_space (
                         _artboard, ref pos_x, ref pos_y
                     );
                     artboard = _artboard;
@@ -426,10 +426,21 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         }
 
         var selected_bound_manager = window.main_window.main_canvas.canvas.selected_bound_manager;
-        selected_bound_manager.set_initial_coordinates (pos_x, pos_y);
         selected_bound_manager.add_item_to_selection (item);
 
         restore_attributes (item, artboard, components);
+
+        // Restore the matrix transform to properly reset position and rotation.
+        var matrix = obj.get_member ("matrix").get_object ();
+        var new_matrix = Cairo.Matrix (
+            matrix.get_double_member ("xx"),
+            matrix.get_double_member ("yx"),
+            matrix.get_double_member ("xy"),
+            matrix.get_double_member ("yy"),
+            matrix.get_double_member ("x0"),
+            matrix.get_double_member ("y0")
+        );
+        item.set_transform (new_matrix);
 
         selected_bound_manager.reset_selection ();
     }
@@ -489,7 +500,6 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         // Restore layer.
         if (components.has_member ("Layer")) {
             var layer = components.get_member ("Layer").get_object ();
-            item.layer.selected = layer.get_boolean_member ("selected");
             item.layer.locked = layer.get_boolean_member ("locked");
         }
 

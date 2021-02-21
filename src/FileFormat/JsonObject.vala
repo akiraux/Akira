@@ -161,7 +161,6 @@ public class Akira.FileFormat.JsonObject : GLib.Object {
 
         if (item.layer != null) {
             var layer = new Json.Object ();
-            layer.set_boolean_member ("selected", item.layer.selected);
             layer.set_boolean_member ("locked", item.layer.locked);
 
             components.set_object_member ("Layer", layer);
