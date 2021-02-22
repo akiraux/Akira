@@ -23,6 +23,9 @@
  * Size component to keep track of the item's size ratio attributes.
  */
 public class Akira.Lib.Components.Size : Component {
+    // Keep track of the size changed internally based on the size ratio.
+    private bool ratio_resized = false;
+
     public bool locked { get; set; }
     public double ratio { get; set; }
 
@@ -35,6 +38,13 @@ public class Akira.Lib.Components.Size : Component {
         }
         set {
             item.set ("width", value);
+
+            if (locked && !ratio_resized) {
+                ratio_resized = true;
+                height = Utils.AffineTransform.fix_size (value / ratio);
+                ratio_resized = false;
+            }
+
             ((Lib.Canvas) item.canvas).window.event_bus.item_value_changed ();
         }
     }
@@ -48,6 +58,13 @@ public class Akira.Lib.Components.Size : Component {
         }
         set {
             item.set ("height", value);
+
+            if (locked && !ratio_resized) {
+                ratio_resized = true;
+                width = Utils.AffineTransform.fix_size (value * ratio);
+                ratio_resized = false;
+            }
+
             ((Lib.Canvas) item.canvas).window.event_bus.item_value_changed ();
         }
     }

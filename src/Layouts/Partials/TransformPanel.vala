@@ -256,9 +256,6 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
             (binding, srcval, ref targetval) => {
                 double src = (double) srcval;
                 targetval.set_double (src);
-                if (selected_item.size.locked) {
-                    height.value = Utils.AffineTransform.fix_size (src / selected_item.size.ratio);
-                }
                 return true;
             });
 
@@ -268,9 +265,6 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
             (binding, srcval, ref targetval) => {
                 double src = (double) srcval;
                 targetval.set_double (src);
-                if (selected_item.size.locked) {
-                    width.value = Utils.AffineTransform.fix_size (src * selected_item.size.ratio);
-                }
                 return true;
             });
 
