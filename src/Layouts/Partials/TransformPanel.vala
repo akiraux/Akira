@@ -253,18 +253,38 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         width_bind = selected_item.size.bind_property (
             "width", width, "value",
             BindingFlags.SYNC_CREATE | BindingFlags.BIDIRECTIONAL,
+            // size component => input field.
             (binding, srcval, ref targetval) => {
                 double src = (double) srcval;
                 targetval.set_double (src);
+                return true;
+            },
+            // input field => size component.
+            (binding, srcval, ref targetval) => {
+                double src = (double) srcval;
+                targetval.set_double (src);
+                // Check if an image is currently selected and needs a recalculation
+                // of the Pixbuf quality if it was resized from the Transform Panel.
+                window.event_bus.detect_image_size_change ();
                 return true;
             });
 
         height_bind = selected_item.size.bind_property (
             "height", height, "value",
             BindingFlags.SYNC_CREATE | BindingFlags.BIDIRECTIONAL,
+            // size component => input field.
             (binding, srcval, ref targetval) => {
                 double src = (double) srcval;
                 targetval.set_double (src);
+                return true;
+            },
+            // input field => size component.
+            (binding, srcval, ref targetval) => {
+                double src = (double) srcval;
+                targetval.set_double (src);
+                // Check if an image is currently selected and needs a recalculation
+                // of the Pixbuf quality if it was resized from the Transform Panel.
+                window.event_bus.detect_image_size_change ();
                 return true;
             });
 
