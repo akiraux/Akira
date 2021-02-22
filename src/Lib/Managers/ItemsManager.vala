@@ -36,7 +36,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
     private bool is_changing = false;
 
     // Keep track of newly imported images before creation.
-    private Lib.Managers.ImageManager? image_manager;
+    public Lib.Managers.ImageManager? image_manager;
 
     public ItemsManager (Akira.Window window) {
         Object (

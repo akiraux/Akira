@@ -135,6 +135,8 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 edit_mode = EditMode.MODE_SELECTION;
                 // Clear the selected export area to be sure to not leave anything behind.
                 export_manager.clear ();
+                // Clear the image manager in case the user was adding an image.
+                window.items_manager.image_manager = null;
                 break;
 
             case Gdk.Key.space:
