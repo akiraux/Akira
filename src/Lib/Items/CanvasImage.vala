@@ -119,11 +119,11 @@ public class Akira.Lib.Items.CanvasImage : Goo.CanvasImage, Akira.Lib.Items.Canv
         }
 
         // Interrupt if the size of the image didn't change.
-        if (width == manager.pixbuf.get_width () && height == manager.pixbuf.get_height ()) {
+        if (size.width == manager.pixbuf.get_width () && size.height == manager.pixbuf.get_height ()) {
             return;
         }
 
-        resize_pixbuf ((int) width, (int) height);
+        resize_pixbuf ((int) size.width, (int) size.height);
     }
 
     /**

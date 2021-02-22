@@ -24,7 +24,7 @@
  */
 public class Akira.Lib.Components.Size : Component {
     // Keep track of the size changed internally based on the size ratio.
-    private bool ratio_resized = false;
+    private bool auto_resize = false;
 
     public bool locked { get; set; }
     public double ratio { get; set; }
@@ -39,13 +39,22 @@ public class Akira.Lib.Components.Size : Component {
         set {
             item.set ("width", value);
 
-            if (locked && !ratio_resized) {
-                ratio_resized = true;
+            if (locked && !auto_resize) {
+                auto_resize = true;
                 height = Utils.AffineTransform.fix_size (value / ratio);
-                ratio_resized = false;
+                auto_resize = false;
             }
 
-            ((Lib.Canvas) item.canvas).window.event_bus.item_value_changed ();
+            if (!auto_resize) {
+                Lib.Canvas canvas = item.canvas as Lib.Canvas;
+                canvas.window.event_bus.item_value_changed ();
+
+                // If the value wasn't changed automatically by the auto resize,
+                // and the image is selected and not loaded, recalculate the pixbuf quality.
+                if (item is Items.CanvasImage && item.layer.selected && !canvas.holding && !item.is_loaded) {
+                    canvas.window.event_bus.detect_image_size_change ();
+                }
+            }
         }
     }
 
@@ -59,13 +68,22 @@ public class Akira.Lib.Components.Size : Component {
         set {
             item.set ("height", value);
 
-            if (locked && !ratio_resized) {
-                ratio_resized = true;
+            if (locked && !auto_resize) {
+                auto_resize = true;
                 width = Utils.AffineTransform.fix_size (value * ratio);
-                ratio_resized = false;
+                auto_resize = false;
             }
 
-            ((Lib.Canvas) item.canvas).window.event_bus.item_value_changed ();
+            if (!auto_resize) {
+                Lib.Canvas canvas = item.canvas as Lib.Canvas;
+                canvas.window.event_bus.item_value_changed ();
+
+                // If the value wasn't changed automatically by the auto resize,
+                // and the image is selected and not loaded, recalculate the pixbuf quality.
+                if (item is Items.CanvasImage && item.layer.selected && !canvas.holding && !item.is_loaded) {
+                    canvas.window.event_bus.detect_image_size_change ();
+                }
+            }
         }
     }
 

@@ -58,7 +58,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     private Managers.HoverManager hover_manager;
 
     public bool ctrl_is_pressed = false;
-    private bool holding;
+    public bool holding;
     public double current_scale = 1.0;
     private Gdk.CursorType current_cursor = Gdk.CursorType.ARROW;
 

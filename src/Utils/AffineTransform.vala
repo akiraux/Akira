@@ -120,7 +120,7 @@ public class Akira.Utils.AffineTransform : Object {
                     ref inc_width
                 );
 
-                if (canvas.ctrl_is_pressed) {
+                if (canvas.ctrl_is_pressed || item.size.locked) {
                     inc_width = inc_height * item.size.ratio;
                     inc_x = -inc_width;
                     inc_y = -inc_height;
@@ -140,7 +140,7 @@ public class Akira.Utils.AffineTransform : Object {
                     ref inc_height
                 );
 
-                if (canvas.ctrl_is_pressed) {
+                if (canvas.ctrl_is_pressed || item.size.locked) {
                     inc_width = inc_height * item.size.ratio;
                     inc_x = - (inc_width / 2);
                 }
@@ -162,7 +162,7 @@ public class Akira.Utils.AffineTransform : Object {
 
                 fix_width (ref delta_x, ref event_x, ref item_x, ref item_width, ref inc_width);
 
-                if (canvas.ctrl_is_pressed) {
+                if (canvas.ctrl_is_pressed || item.size.locked) {
                     inc_height = inc_width / item.size.ratio;
                     inc_y = -inc_height;
                 }
@@ -173,7 +173,7 @@ public class Akira.Utils.AffineTransform : Object {
 
                 fix_width (ref delta_x, ref event_x, ref item_x, ref item_width, ref inc_width);
 
-                if (canvas.ctrl_is_pressed) {
+                if (canvas.ctrl_is_pressed || item.size.locked) {
                     inc_height = inc_width / item.size.ratio;
                     inc_y = - (inc_height / 2);
                 }
@@ -187,7 +187,7 @@ public class Akira.Utils.AffineTransform : Object {
 
                 fix_height (ref delta_y, ref event_y, ref item_y, ref item_height, ref inc_height);
 
-                if (canvas.ctrl_is_pressed) {
+                if (canvas.ctrl_is_pressed || item.size.locked) {
                     inc_height = inc_width / item.size.ratio;
                     if (item.size.ratio == 1 && item_width != item_height) {
                         inc_height = item_width - item_height;
@@ -200,7 +200,7 @@ public class Akira.Utils.AffineTransform : Object {
 
                 fix_height (ref delta_y, ref event_y, ref item_y, ref item_height, ref inc_height);
 
-                if (canvas.ctrl_is_pressed) {
+                if (canvas.ctrl_is_pressed || item.size.locked) {
                     inc_width = inc_height * item.size.ratio;
                     inc_x = - (inc_width / 2);
                 }
@@ -222,7 +222,7 @@ public class Akira.Utils.AffineTransform : Object {
 
                 fix_height (ref delta_y, ref event_y, ref item_y, ref item_height, ref inc_height);
 
-                if (canvas.ctrl_is_pressed) {
+                if (canvas.ctrl_is_pressed || item.size.locked) {
                     inc_width = inc_height * item.size.ratio;
                     inc_x = -inc_width;
                 }
@@ -241,7 +241,7 @@ public class Akira.Utils.AffineTransform : Object {
                     ref inc_width
                 );
 
-                if (canvas.ctrl_is_pressed) {
+                if (canvas.ctrl_is_pressed || item.size.locked) {
                     inc_height = inc_width * item.size.ratio;
                     inc_y = - (inc_height / 2);
                 }
