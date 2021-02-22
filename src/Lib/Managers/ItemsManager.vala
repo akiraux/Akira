@@ -577,15 +577,6 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         // moved to force the natural redraw of the canvas.
         var items = window.main_window.main_canvas.canvas.selected_bound_manager.selected_items.copy ();
 
-        // If we have images in the canvas, check if they're part of the selection to recalculate the size.
-        if (images.get_n_items () > 0) {
-            foreach (var image in images) {
-                if (items.find (image) != null) {
-                    image.check_resize_pixbuf ();
-                }
-            }
-        }
-
         // Update the size ratio to always be faithful to the updated size.
         foreach (var item in items) {
             if (item is Items.CanvasArtboard) {

@@ -79,6 +79,8 @@ public class Akira.Lib.Items.CanvasImage : Goo.CanvasImage, Akira.Lib.Items.Canv
         components.add (new Layer ());
 
         check_add_to_artboard (this);
+
+        ((Lib.Canvas) canvas).window.event_bus.detect_image_size_change.connect (check_resize_pixbuf);
     }
 
     private void init_pixbuf () {
@@ -92,6 +94,8 @@ public class Akira.Lib.Items.CanvasImage : Goo.CanvasImage, Akira.Lib.Items.Canv
                 size.width = original_pixbuf.width;
                 size.height = original_pixbuf.height;
                 // Imported images should have their size ratio locked by default.
+                // Change the locked attribute after the size has been defined to let
+                // the Size component properly calculate the correct size ratio.
                 size.locked = true;
 
                 // Reset the size to the 1px initial value after the size ratio was properly defined
@@ -105,9 +109,15 @@ public class Akira.Lib.Items.CanvasImage : Goo.CanvasImage, Akira.Lib.Items.Canv
     }
 
     /**
-     * Trigger the pixbuf resampling only if the image size changed.
+     * Trigger the pixbuf resampling.
      */
-     public void check_resize_pixbuf () {
+    public void check_resize_pixbuf () {
+        // Interrupt if this image isn't part of the selection.
+        if (!layer.selected) {
+            return;
+        }
+
+        // Interrupt if the size of the image didn't change.
         if (width == manager.pixbuf.get_width () && height == manager.pixbuf.get_height ()) {
             return;
         }

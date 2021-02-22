@@ -311,6 +311,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
             case EditMode.MODE_SELECTION:
                 window.event_bus.detect_artboard_change ();
+                window.event_bus.detect_image_size_change ();
                 break;
 
             default:
