@@ -79,20 +79,29 @@ public class Akira.Lib.Items.CanvasImage : Goo.CanvasImage, Akira.Lib.Items.Canv
         components.add (new Layer ());
 
         check_add_to_artboard (this);
+
+        ((Lib.Canvas) canvas).window.event_bus.detect_image_size_change.connect (check_resize_pixbuf);
     }
 
     private void init_pixbuf () {
-        // Save the unedited pixbuf to enable resampling and restoring.
+        // Load the pixbuf at full resolution to properly define the size ratio of the item.
         manager.get_pixbuf.begin (-1, -1, (obj, res) => {
             try {
                 original_pixbuf = manager.get_pixbuf.end (res);
                 pixbuf = original_pixbuf;
-                width = size.width = original_pixbuf.get_width ();
-                height = size.height = original_pixbuf.get_height ();
 
+                // Define the item's size based on the images size.
+                size.width = original_pixbuf.width;
+                size.height = original_pixbuf.height;
                 // Imported images should have their size ratio locked by default.
+                // Change the locked attribute after the size has been defined to let
+                // the Size component properly calculate the correct size ratio.
                 size.locked = true;
-                size.ratio = width / height;
+
+                // Reset the size to a 2px initial value after the size ratio was properly defined
+                // in order to allow the user to decide the initial image size. We use 2px in order
+                // to avoid issues when dividing by the ratio in case of narrow images.
+                size.width = 2;
             } catch (Error e) {
                 warning (e.message);
                 ((Lib.Canvas) canvas).window.event_bus.canvas_notification (e.message);
@@ -101,14 +110,20 @@ public class Akira.Lib.Items.CanvasImage : Goo.CanvasImage, Akira.Lib.Items.Canv
     }
 
     /**
-     * Trigger the pixbuf resampling only if the image size changed.
+     * Trigger the pixbuf resampling.
      */
-     public void check_resize_pixbuf () {
-        if (width == manager.pixbuf.get_width () && height == manager.pixbuf.get_height ()) {
+    public void check_resize_pixbuf () {
+        // Interrupt if this image isn't part of the selection.
+        if (!layer.selected) {
             return;
         }
 
-        resize_pixbuf ((int) width, (int) height);
+        // Interrupt if the size of the image didn't change.
+        if (size.width == manager.pixbuf.get_width () && size.height == manager.pixbuf.get_height ()) {
+            return;
+        }
+
+        resize_pixbuf ((int) size.width, (int) size.height);
     }
 
     /**

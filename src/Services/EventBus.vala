@@ -64,6 +64,7 @@ public class Akira.Services.EventBus : Object {
     public signal void selected_items_list_changed (List<Lib.Items.CanvasItem> selected_items);
     public signal void z_selected_changed ();
     public signal void detect_artboard_change ();
+    public signal void detect_image_size_change ();
 
     // Layers panel signals.
     public signal void hover_over_item (Lib.Items.CanvasItem? item);
@@ -80,8 +81,4 @@ public class Akira.Services.EventBus : Object {
     public signal void preview_completed ();
     public signal void exporting (string message);
     public signal void export_completed ();
-
-    public void test (string caller_id) {
-        debug (@"Test from EventBus called by $(caller_id)");
-    }
 }

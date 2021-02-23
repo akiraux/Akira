@@ -35,6 +35,10 @@ public class Akira.FileFormat.JsonLoader : Object {
     }
 
     public void load_content () {
+        // Se the canvas to simulate a click + holding state to avoid triggering
+        // redrawing methods connected to that state.
+        window.main_window.main_canvas.canvas.holding = true;
+
         // Load saved Artboards.
         if (obj.get_member ("artboards") != null) {
             Json.Array artboards = obj.get_member ("artboards").get_array ();
@@ -54,6 +58,9 @@ public class Akira.FileFormat.JsonLoader : Object {
         window.event_bus.set_scale (obj.get_double_member ("scale"));
         window.main_window.main_canvas.main_scroll.hadjustment.value = obj.get_double_member ("hadjustment");
         window.main_window.main_canvas.main_scroll.vadjustment.value = obj.get_double_member ("vadjustment");
+
+        // Reset the holding state at the end of it.
+        window.main_window.main_canvas.canvas.holding = false;
     }
 
     private void load_item (Json.Object obj, string type) {

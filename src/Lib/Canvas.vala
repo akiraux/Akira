@@ -58,7 +58,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     private Managers.HoverManager hover_manager;
 
     public bool ctrl_is_pressed = false;
-    private bool holding;
+    public bool holding;
     public double current_scale = 1.0;
     private Gdk.CursorType current_cursor = Gdk.CursorType.ARROW;
 
@@ -135,6 +135,8 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 edit_mode = EditMode.MODE_SELECTION;
                 // Clear the selected export area to be sure to not leave anything behind.
                 export_manager.clear ();
+                // Clear the image manager in case the user was adding an image.
+                window.items_manager.image_manager = null;
                 break;
 
             case Gdk.Key.space:
@@ -311,6 +313,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
             case EditMode.MODE_SELECTION:
                 window.event_bus.detect_artboard_change ();
+                window.event_bus.detect_image_size_change ();
                 break;
 
             default:

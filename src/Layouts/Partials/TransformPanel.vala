@@ -252,27 +252,11 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
 
         width_bind = selected_item.size.bind_property (
             "width", width, "value",
-            BindingFlags.SYNC_CREATE | BindingFlags.BIDIRECTIONAL,
-            (binding, srcval, ref targetval) => {
-                double src = (double) srcval;
-                targetval.set_double (src);
-                if (selected_item.size.locked) {
-                    height.value = Utils.AffineTransform.fix_size (src / selected_item.size.ratio);
-                }
-                return true;
-            });
+            BindingFlags.SYNC_CREATE | BindingFlags.BIDIRECTIONAL);
 
         height_bind = selected_item.size.bind_property (
             "height", height, "value",
-            BindingFlags.SYNC_CREATE | BindingFlags.BIDIRECTIONAL,
-            (binding, srcval, ref targetval) => {
-                double src = (double) srcval;
-                targetval.set_double (src);
-                if (selected_item.size.locked) {
-                    width.value = Utils.AffineTransform.fix_size (src * selected_item.size.ratio);
-                }
-                return true;
-            });
+            BindingFlags.SYNC_CREATE | BindingFlags.BIDIRECTIONAL);
 
         // Some items like Artboards don't implement every component.
         if (selected_item.rotation != null) {
