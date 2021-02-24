@@ -43,7 +43,7 @@ public class Akira.Layouts.MainCanvas : Gtk.Grid {
         get_style_context ().add_class ("main-canvas");
 
         main_overlay = new Gtk.Overlay ();
-        notification = new Granite.Widgets.Toast (_("Button was pressed!"));
+        notification = new Granite.Widgets.Toast (_(""));
 
         main_scroll = new Gtk.ScrolledWindow (null, null);
         main_scroll.expand = true;

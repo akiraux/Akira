@@ -15,6 +15,9 @@
 
     <file alias="stylesheet.css" compressed="true">css/stylesheet.css</file>
 
+    <file alias="document-layout.svg">icons/hicolor/document-layout.svg</file>
+    <file alias="document-layout-symbolic.svg">icons/symbolic/document-layout-symbolic.svg</file>
+
     <file alias="layer-visible-symbolic.svg">icons/symbolic/layer-visible-symbolic.svg</file>
     <file alias="layer-hidden-symbolic.svg">icons/symbolic/layer-hidden-symbolic.svg</file>
 
