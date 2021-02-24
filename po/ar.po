@@ -700,7 +700,7 @@ msgstr "هل أنت متأكد انك تريد الخروج؟"
 
 #: Window.vala:122
 msgid "All unsaved data will be lost and impossible to recover."
-msgstr "كل البيانت التي لم يتم حفظها ستفقد ويستحيل استعادتها."
+msgstr "كل البيانات التي لم يتم حفظها ستفقد ويستحيل استعادتها."
 
 #: Window.vala:124
 msgid "Quit without saving!"

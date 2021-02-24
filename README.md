@@ -55,13 +55,13 @@ You can install Akira by compiling it from the source
  - `libxml-2.0`
  - `gtksourceview-3.0`
  - `libjson-glib-1.0`
- - `goocanvas-2.0`
+ - `goocanvas-3.0`
  - `libarchive`
  - `gettext`
  - `cairo`
  - `meson`
 
-> _**Note:** For non-elementary distros, (such as Arch, Debian etc) you are required to install "vala" as additional dependency._
+> _**Note:** For non-elementary distros, (such as Arch, Debian etc) you are required to install "vala", "elementary-theme" and "elementary-icon-theme" as additional dependencies._
 
 ### Compile &amp; Run
 

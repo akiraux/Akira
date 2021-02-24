@@ -26,7 +26,7 @@ public class Akira.Layouts.Partials.BordersPanel : Gtk.Grid {
     public Gtk.ListBox borders_list_container;
     public Akira.Models.ListModel<Akira.Models.BordersItemModel> list_model;
     public Gtk.Grid title_cont;
-    private Lib.Models.CanvasItem selected_item;
+    private unowned List<Lib.Items.CanvasItem>? items;
 
     public bool toggled {
         get {
@@ -84,71 +84,67 @@ public class Akira.Layouts.Partials.BordersPanel : Gtk.Grid {
         attach (title_cont, 0, 0, 1, 1);
         attach (borders_list_container, 0, 1, 1, 1);
         show_all ();
-        add_btn.hide ();
 
         create_event_bindings ();
     }
 
     private void create_event_bindings () {
         toggled = false;
-        window.event_bus.selected_items_changed.connect (on_selected_items_changed);
-
-        window.event_bus.border_deleted.connect (() => {
-            add_btn.show ();
-            window.main_window.left_sidebar.queue_resize ();
-        });
+        window.event_bus.selected_items_list_changed.connect (on_selected_items_list_changed);
 
         add_btn.clicked.connect (() => {
-            var model_item = create_model ();
-            list_model.add_item.begin (model_item);
-            selected_item.reset_colors ();
-            add_btn.hide ();
-            window.main_window.left_sidebar.queue_resize ();
+            var border_color = Gdk.RGBA ();
+            border_color.parse (settings.border_color);
+
+            foreach (Lib.Items.CanvasItem item in items) {
+                Lib.Components.Border border = item.borders.add_border_color (border_color, (int) settings.border_size);
+                var model_item = create_model (border);
+                list_model.add_item.begin (model_item);
+                item.borders.reload ();
+            }
         });
 
         // Listen to the model changes when adding/removing items.
         list_model.items_changed.connect ((position, removed, added) => {
-            if (selected_item != null) {
-                // If an item is still selected, update the has_border property
-                // to TRUE or FALSE based on the model changes.
-
-                // This will need to be updated in the future once we're dealing
-                // with multiple border colors, updating to FALSE only if all
-                // the borders have been deleted.
-                selected_item.has_border = (added == 1);
-            }
+            window.main_window.left_sidebar.queue_resize ();
         });
     }
 
-    private void on_selected_items_changed (List<Lib.Models.CanvasItem> selected_items) {
+    private void on_selected_items_list_changed (List<Lib.Items.CanvasItem> selected_items) {
         if (selected_items.length () == 0) {
-            selected_item = null;
+            items = null;
             list_model.clear.begin ();
-            add_btn.hide ();
             toggled = false;
             return;
         }
 
-        if (selected_item == null || selected_item != selected_items.nth_data (0)) {
-            toggled = true;
-            selected_item = selected_items.nth_data (0);
+        items = selected_items;
 
-            if (!selected_item.show_border_panel) {
-                toggled = false;
-                return;
+        // Always clear the list model when a selection changes.
+        list_model.clear.begin ();
+
+        bool show = false;
+        foreach (Lib.Items.CanvasItem item in selected_items) {
+            // Skip items that don't have a border item since there will be nothing to show.
+            if (item.borders == null) {
+                continue;
             }
 
-            if (!selected_item.has_border) {
-                add_btn.show ();
-                return;
-            }
+            // At least an item has the borders component, so we can show the
+            show = true;
 
-            var model_item = create_model ();
-            list_model.add_item.begin (model_item);
+            // Loops through all the available borders and add them tot he list model.
+            // TODO: handle duplicate identical colors.
+            foreach (Lib.Components.Border border in item.borders.borders) {
+                var model_item = create_model (border);
+                list_model.add_item.begin (model_item);
+            }
         }
+
+        toggled = show;
     }
 
-    private Akira.Models.BordersItemModel create_model () {
-        return new Akira.Models.BordersItemModel (selected_item, list_model);
+    private Akira.Models.BordersItemModel create_model (Lib.Components.Border border) {
+        return new Akira.Models.BordersItemModel (border, list_model);
     }
 }

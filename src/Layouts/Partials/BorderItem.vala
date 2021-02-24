@@ -61,9 +61,9 @@ public class Akira.Layouts.Partials.BorderItem : Gtk.Grid {
 
     private int border_size {
         owned get {
-            return model.border_size;
+            return model.size;
         } set {
-            model.border_size = value;
+            model.size = value;
         }
     }
 
@@ -143,7 +143,7 @@ public class Akira.Layouts.Partials.BorderItem : Gtk.Grid {
                 }
 
                 var new_color_rgba = Utils.Color.hex_to_rgba (color_container_hex);
-                model_value.set_string (new_color_rgba);
+                model_value.set_string (new_color_rgba.to_string ());
                 return true;
             },
             // model => this
@@ -157,12 +157,12 @@ public class Akira.Layouts.Partials.BorderItem : Gtk.Grid {
 
         tickness_container = new Akira.Partials.InputField (
             Akira.Partials.InputField.Unit.PIXEL, 7, true, true);
-        tickness_container.set_range (0, Akira.Layouts.MainCanvas.CANVAS_SIZE);
+        tickness_container.set_range (0, Akira.Layouts.MainCanvas.CANVAS_SIZE / 2);
         tickness_container.entry.sensitive = true;
         tickness_container.entry.value = border_size;
 
         tickness_container.entry.bind_property (
-            "value", model, "border_size", BindingFlags.BIDIRECTIONAL);
+            "value", model, "size", BindingFlags.BIDIRECTIONAL);
 
         color_chooser.attach (picker_container, 0, 0, 1, 1);
         color_chooser.attach (color_container, 1, 0, 1, 1);
@@ -234,7 +234,6 @@ public class Akira.Layouts.Partials.BorderItem : Gtk.Grid {
     }
 
     private void on_model_changed () {
-        model.item.reset_colors ();
         set_button_color ();
         set_color_chooser_color ();
     }
@@ -246,9 +245,9 @@ public class Akira.Layouts.Partials.BorderItem : Gtk.Grid {
     }
 
     private void on_delete_item () {
-        model.list_model.remove_item.begin (model);
-        model.item.reset_colors ();
-        window.event_bus.border_deleted ();
+        model.model.remove_item.begin (model);
+        // Actually remove the Border component only if the user requests it.
+        model.border.remove ();
     }
 
     private void set_hidden_button () {

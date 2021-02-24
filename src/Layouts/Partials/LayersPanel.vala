@@ -70,13 +70,11 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.Grid {
         artboards_list.selection_mode = Gtk.SelectionMode.SINGLE;
 
         items_list.bind_model (window.items_manager.free_items, item => {
-            var item_model = item as Lib.Models.CanvasItem;
-            return new Akira.Layouts.Partials.Layer (window, item_model, items_list);
+            return new Layouts.Partials.Layer (window, ((Lib.Items.CanvasItem) item), items_list);
         });
 
         artboards_list.bind_model (window.items_manager.artboards, item => {
-            var artboard_model = item as Akira.Lib.Models.CanvasArtboard;
-            return new Akira.Layouts.Partials.Artboard (window, artboard_model);
+            return new Layouts.Partials.Artboard (window, ((Lib.Items.CanvasArtboard) item));
         });
 
         get_style_context ().add_class ("layers-panel");
@@ -195,11 +193,15 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.Grid {
                 return;
             }
 
-            // Remove item at source position.
-            var artboard_to_swap = window.items_manager.artboards.remove_at (source);
+            // Swap the position inside the List Model.
+            window.items_manager.artboards.swap_items (source, items_count - 1);
 
-            // Insert item at target position.
-            window.items_manager.artboards.insert_at (items_count - 1, artboard_to_swap);
+            // The actual items in the canvas might not match the items in the List Model
+            // due to Artboards labels, grids, and other pseudo elements. Therefore we need
+            // to get the real position of the child and swap them.
+            var root = artboard.model.parent;
+            root.move_child (root.find_child (artboard.model), 0);
+
             window.event_bus.z_selected_changed ();
 
             return;
@@ -209,7 +211,7 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.Grid {
         var layer_artboard = layer.model.artboard;
 
         // Change artboard if necessary.
-        window.items_manager.change_artboard (layer.model, null);
+        window.items_manager.change_artboard.begin (layer.model, null);
 
         // If the moved layer had an artboard, no need to do anything else.
         if (layer_artboard != null) {

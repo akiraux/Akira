@@ -1,18 +1,18 @@
 .option-panel {
-    padding: 6px 10px;
     background-color: alpha (@base_color, 0.7);
     border-top: 1px solid shade (@bg_color, 0.7);
     border-bottom: 1px solid shade (@bg_color, 0.7);
 }
 
 .option-panel label {
+    padding: 9px;
     font-size: 9pt;
     font-weight: bold;
     color: @fg_color;
 }
 
 .option-panel button {
-    padding: 4px;
+    margin-right: 6px;
     border-radius: 50%;
 }
 

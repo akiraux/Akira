@@ -136,7 +136,7 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
                 }
 
                 var new_color_rgba = Utils.Color.hex_to_rgba (color_container_hex);
-                model_value.set_string (new_color_rgba);
+                model_value.set_string (new_color_rgba.to_string ());
                 return true;
             },
             // model => this
@@ -236,7 +236,6 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
     }
 
     private void on_model_changed () {
-        model.item.reset_colors ();
         set_button_color ();
         set_color_chooser_color ();
     }
@@ -248,9 +247,9 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
     }
 
     private void on_delete_item () {
-        model.list_model<Akira.Models.FillsItemModel>.remove_item.begin (model);
-        model.item.reset_colors ();
-        window.event_bus.fill_deleted ();
+        model.model.remove_item.begin (model);
+        // Actually remove the Fill component only if the user requests it.
+        model.fill.remove ();
     }
 
     private void set_hidden_button () {

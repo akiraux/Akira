@@ -49,7 +49,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
     public Gtk.Revealer revealer;
     public Gtk.ListBox container;
 
-    public Akira.Lib.Models.CanvasArtboard model { get; construct; }
+    public Akira.Lib.Items.CanvasArtboard model { get; construct; }
 
     // Drag and Drop properties.
     private Gtk.Revealer motion_revealer;
@@ -60,7 +60,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
         get { return _editing; } set { _editing = value; }
     }
 
-    public Artboard (Akira.Window window, Akira.Lib.Models.CanvasArtboard model) {
+    public Artboard (Akira.Window window, Akira.Lib.Items.CanvasArtboard model) {
         Object (
             window: window,
             model: model
@@ -78,7 +78,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
         label.hexpand = true;
         label.set_ellipsize (Pango.EllipsizeMode.END);
 
-        model.bind_property ("name", label, "label",
+        model.name.bind_property ("name", label, "label",
             BindingFlags.SYNC_CREATE | BindingFlags.BIDIRECTIONAL);
 
         entry = new Gtk.Entry ();
@@ -89,7 +89,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
         entry.no_show_all = true;
         // NOTE: We can't bind the entry to the model.name otherwise we won't be
         // able to handle the ESC key to restore the previous entry.
-        entry.text = model.name;
+        entry.text = model.name.name;
 
         entry.activate.connect (update_on_enter);
         entry.key_release_event.connect (update_on_escape);
@@ -212,13 +212,13 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
             }
         });
 
-        model.notify["selected"].connect (() => {
-            if (model.selected) {
+        model.layer.notify["selected"].connect (() => {
+            if (model.layer.selected) {
               activate ();
               return;
             }
 
-            (parent as Gtk.ListBox).unselect_row (this);
+            ((Gtk.ListBox) parent).unselect_row (this);
         });
 
         handle.enter_notify_event.connect (event => {
@@ -234,10 +234,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
         });
 
         container.bind_model (model.items, item => {
-            // TODO: Differentiate between layer and artboard
-            // based upon item "type" of some sort
-            var item_model = item as Akira.Lib.Models.CanvasItem;
-            return new Akira.Layouts.Partials.Layer (window, item_model, container);
+            return new Layouts.Partials.Layer (window, ((Lib.Items.CanvasItem) item), container);
         });
 
         lock_actions ();
@@ -246,7 +243,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
         window.event_bus.hover_over_item.connect (on_hover_over_item);
     }
 
-    private void on_hover_over_item (Lib.Models.CanvasItem? item) {
+    private void on_hover_over_item (Lib.Items.CanvasItem? item) {
         if (item == model) {
             get_style_context ().add_class ("hovered");
             return;
@@ -354,6 +351,9 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
         int items_count, pos_source, pos_target, source, target;
 
         var type = Gtk.drag_dest_find_target (this, context, drop_targets);
+        // Used to adjust the position of swappable items if the source item
+        // is dragged from the bottom up.
+        int position_adjustment = 0;
 
         if (type == Gdk.Atom.intern_static_string ("ARTBOARD")) {
             var artboard = (Layouts.Partials.Artboard) (
@@ -385,14 +385,19 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
             // means the layer was dragged from the bottom up, therefore we need to
             // increase the dropped target by 1 since we don't deal with location 0.
             if (source > target) {
+                position_adjustment--;
                 target++;
             }
 
-            // Remove item at source position.
-            var artboard_to_swap = window.items_manager.artboards.remove_at (source);
+            // Swap the position inside the List Model.
+            window.items_manager.artboards.swap_items (source, target);
 
-            // Insert item at target position.
-            window.items_manager.artboards.insert_at (target, artboard_to_swap);
+            // The actual items in the canvas might not match the items in the List Model
+            // due to Artboards labels, grids, and other pseudo elements. Therefore we need
+            // to get the real position of the child and swap them.
+            var root = artboard.model.parent;
+            root.move_child (root.find_child (artboard.model), root.find_child (model) + position_adjustment);
+
             window.event_bus.z_selected_changed ();
 
             return;
@@ -401,7 +406,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
         var layer = (Layer) ((Gtk.Widget[]) selection_data.get_data ())[0];
 
         // Change artboard if necessary.
-        window.items_manager.change_artboard (layer.model, model);
+        window.items_manager.change_artboard.begin (layer.model, model);
 
         // Use the existing action to push an item all the way to the top.
         window.event_bus.change_z_selected (true, true);
@@ -429,7 +434,9 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 
             case Gdk.EventType.BUTTON_PRESS:
                 window.event_bus.request_add_item_to_selection (model);
-                return false;
+                // Always move the focus back to the canvas.
+                window.event_bus.set_focus_on_canvas ();
+                return true;
         }
 
         return false;
@@ -479,7 +486,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
     }
 
     private void lock_actions () {
-        button_locked.bind_property ("active", model, "locked",
+        button_locked.bind_property ("active", model.layer, "locked",
             BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE);
 
         button_locked.toggled.connect (() => {
@@ -500,7 +507,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 
             if (active) {
                 window.event_bus.item_locked (model);
-                (parent as Gtk.ListBox).unselect_row (this);
+                ((Gtk.ListBox) parent).unselect_row (this);
             }
 
             window.event_bus.set_focus_on_canvas ();

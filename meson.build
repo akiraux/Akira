@@ -6,13 +6,9 @@ akira_datadir = join_paths(akira_prefix, get_option('datadir'))
 akira_pkgdatadir = join_paths(akira_datadir, meson.project_name())
 install_tests = get_option('install-tests')
 
-vala_version = meson.get_compiler('vala').version()
-if vala_version.version_compare('<=0.43.90')
-    add_project_arguments(
-        ['--vapidir', join_paths(meson.current_source_dir(), 'vapi')],
-        language: 'vala'
-    )
-endif
+source_root = meson.current_source_dir()
+vapi_dir = join_paths(source_root, 'vapi')
+add_project_arguments('--vapidir=' + vapi_dir, language: 'vala')
 
 # Include the translations module
 i18n = import('i18n')
@@ -22,7 +18,7 @@ granite_dependency = dependency('granite', version: '>= 5.3.0')
 gee_dependency = dependency('gee-0.8')
 libxml_dependency = dependency('libxml-2.0')
 cairo_dependency = dependency('cairo', version: '>=1.14')
-goocanvas_dependency = dependency('goocanvas-2.0')
+goocanvas_dependency = dependency('goocanvas-3.0')
 libarchive_dependency = dependency('libarchive')
 json_glib_dependency = dependency('json-glib-1.0')
 

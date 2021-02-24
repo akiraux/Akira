@@ -79,22 +79,37 @@ sources = files(
 
     'Lib/Canvas.vala',
 
+    'Lib/Components/Component.vala',
+    'Lib/Components/Border.vala',
+    'Lib/Components/Borders.vala',
+    'Lib/Components/BorderRadius.vala',
+    'Lib/Components/Fill.vala',
+    'Lib/Components/Fills.vala',
+    'Lib/Components/Flipped.vala',
+    'Lib/Components/Layer.vala',
+    'Lib/Components/Name.vala',
+    'Lib/Components/Opacity.vala',
+    'Lib/Components/Rotation.vala',
+    'Lib/Components/Size.vala',
+    'Lib/Components/Transform.vala',
+
+    'Lib/Items/CanvasArtboard.vala',
+    'Lib/Items/CanvasEllipse.vala',
+    'Lib/Items/CanvasImage.vala',
+    'Lib/Items/CanvasItem.vala',
+    'Lib/Items/CanvasRect.vala',
+    'Lib/Items/CanvasText.vala',
+
     'Lib/Managers/ExportManager.vala',
-    'Lib/Managers/GhostBoundsManager.vala',
     'Lib/Managers/HoverManager.vala',
     'Lib/Managers/ImageManager.vala',
     'Lib/Managers/ItemsManager.vala',
     'Lib/Managers/NobManager.vala',
     'Lib/Managers/SelectedBoundManager.vala',
 
-    'Lib/Models/CanvasItem.vala',
-    'Lib/Models/CanvasRect.vala',
-    'Lib/Models/CanvasEllipse.vala',
-    'Lib/Models/CanvasText.vala',
-    'Lib/Models/CanvasImage.vala',
-    'Lib/Models/CanvasArtboard.vala',
-
     'Lib/Selection/Nob.vala',
+
+    'StateManagers/CoordinatesManager.vala',
 )
 
 deps = [

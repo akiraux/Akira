@@ -47,7 +47,7 @@ public class Akira.Application : Gtk.Application {
 
             // If the current window is empty, load the file in this one.
             var current_window = active_window as Akira.Window;
-            if (current_window.akira_file == null && !current_window.edited) {
+            if (current_window != null && current_window.akira_file == null && !current_window.edited) {
                 current_window.open_file (file);
                 current_window.event_bus.file_saved (file.get_basename ());
                 continue;

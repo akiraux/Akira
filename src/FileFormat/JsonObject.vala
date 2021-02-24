@@ -20,33 +20,50 @@
  * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
  */
 
+/**
+ * Converts an item into a JSON Object, converting all the child attributes to string.
+ */
 public class Akira.FileFormat.JsonObject : GLib.Object {
-    public Lib.Models.CanvasItem? item { get; construct; }
+    public weak Lib.Items.CanvasItem? item;
 
     private Json.Object object;
-    private Json.Object transform;
     private ObjectClass obj_class;
 
-    public JsonObject (Lib.Models.CanvasItem? item) {
-        Object (item: item);
-    }
+    public JsonObject (Lib.Items.CanvasItem? _item) {
+        item = _item;
 
-    construct {
         object = new Json.Object ();
         obj_class = (ObjectClass) item.get_type ().class_ref ();
 
-        object.set_string_member ("type", item.get_type ().name ());
-
-        foreach (ParamSpec spec in obj_class.list_properties ()) {
-            if (!(ParamFlags.READABLE in spec.flags)) {
-                continue;
-            }
-            write_key (spec, object);
+        // Set a string of the type so we're not tied to the namespace and location.
+        if (item is Lib.Items.CanvasArtboard) {
+            object.set_string_member ("type", "artboard");
         }
 
-        transform = new Json.Object ();
+        if (item is Lib.Items.CanvasRect) {
+            object.set_string_member ("type", "rectangle");
+        }
 
-        write_transform ();
+        if (item is Lib.Items.CanvasEllipse) {
+            object.set_string_member ("type", "ellipse");
+        }
+
+        if (item is Lib.Items.CanvasImage) {
+            object.set_string_member ("type", "image");
+            object.set_string_member ("image_id", ((Lib.Items.CanvasImage) item).manager.filename);
+        }
+
+        if (item is Lib.Items.CanvasText) {
+            object.set_string_member ("type", "text");
+        }
+
+        // Save the artboard ID if the item belongs to one.
+        if (item.artboard != null) {
+            object.set_string_member ("artboard", item.artboard.name.id);
+        }
+
+        write_matrix ();
+        write_components ();
     }
 
     public Json.Node get_node () {
@@ -56,62 +73,135 @@ public class Akira.FileFormat.JsonObject : GLib.Object {
         return node;
     }
 
-    private void write_key (ParamSpec spec, Json.Object obj) {
-        var type = spec.value_type;
-        var val = Value (type);
+    private void write_matrix () {
+        var identity = Cairo.Matrix.identity ();
+        item.get_transform (out identity);
 
-        if (type == typeof (int)) {
-            item.get_property (spec.get_name (), ref val);
-            obj.set_int_member (spec.get_name (), val.get_int ());
-            //  debug ("%s: %i", spec.get_name (), val.get_int ());
-        } else if (type == typeof (uint)) {
-            item.get_property (spec.get_name (), ref val);
-            obj.set_int_member (spec.get_name (), val.get_uint ());
-            //  debug ("%s: %s", spec.get_name (), val.get_uint ().to_string ());
-        } else if (type == typeof (double)) {
-            item.get_property (spec.get_name (), ref val);
-            obj.set_double_member (spec.get_name (), val.get_double ());
-            //  debug ("%s: %f", spec.get_name (), val.get_double ());
-        } else if (type == typeof (string)) {
-            item.get_property (spec.get_name (), ref val);
-            obj.set_string_member (spec.get_name (), val.get_string ());
-            //  debug ("%s: %s", spec.get_name (), val.get_string ());
-        } else if (type == typeof (bool)) {
-            item.get_property (spec.get_name (), ref val);
-            obj.set_boolean_member (spec.get_name (), val.get_boolean ());
-            //  debug ("%s: %s", spec.get_name (), val.get_boolean ().to_string ());
-        } else if (type == typeof (int64)) {
-            item.get_property (spec.get_name (), ref val);
-            obj.set_int_member (spec.get_name (), val.get_int64 ());
-            //  debug ("%s: %s", spec.get_name (), val.get_int64 ().to_string ());
-        } else if (type == typeof (Akira.Lib.Models.CanvasArtboard)) {
-            item.get_property (spec.get_name (), ref val);
-            if (val.strdup_contents () != "NULL") {
-                obj.set_string_member (spec.get_name (), (val as Akira.Lib.Models.CanvasArtboard).id);
-            }
-        } else if (type == typeof (Goo.CanvasItemVisibility)) {
-            item.get_property (spec.get_name (), ref val);
-            obj.set_int_member (spec.get_name (), val.get_enum ());
-        } else if (type == typeof (Akira.Lib.Managers.ImageManager)) {
-            var canvas_image = item as Akira.Lib.Models.CanvasImage;
-            obj.set_string_member ("image_id", canvas_image.manager.filename);
-        } else {
-            // Leave this comment for debug purpose.
-            // warning ("Property type %s not yet supported: %s\n", type.name (), spec.get_name ());
-        }
+        var matrix = new Json.Object ();
+        matrix.set_double_member ("xx", identity.xx);
+        matrix.set_double_member ("yx", identity.yx);
+        matrix.set_double_member ("xy", identity.xy);
+        matrix.set_double_member ("yy", identity.yy);
+        matrix.set_double_member ("x0", identity.x0);
+        matrix.set_double_member ("y0", identity.y0);
+
+        object.set_object_member ("matrix", matrix);
     }
 
-    private void write_transform () {
-        var matrix = Cairo.Matrix.identity ();
-        item.get_transform (out matrix);
+    /**
+     * Write all the Components used by the item.
+     */
+    private void write_components () {
+        // Interrupt if this is not a CanvasItem.
+        if (!(item is Lib.Items.CanvasItem)) {
+            return;
+        }
 
-        transform.set_double_member ("xx", matrix.xx);
-        transform.set_double_member ("yx", matrix.yx);
-        transform.set_double_member ("xy", matrix.xy);
-        transform.set_double_member ("yy", matrix.yy);
-        transform.set_double_member ("x0", matrix.x0);
-        transform.set_double_member ("y0", matrix.y0);
+        // Create the components object.
+        var components = new Json.Object ();
 
-        object.set_object_member ("transform", transform);
+        if (item.name != null) {
+            var name = new Json.Object ();
+            name.set_string_member ("name", item.name.name);
+            name.set_string_member ("id", item.name.id);
+            name.set_string_member ("icon", item.name.icon);
+
+            components.set_object_member ("Name", name);
+        }
+
+        if (item.transform != null) {
+            var transform = new Json.Object ();
+            transform.set_double_member ("x", item.transform.x);
+            transform.set_double_member ("y", item.transform.y);
+
+            components.set_object_member ("Transform", transform);
+        }
+
+        if (item.opacity != null) {
+            var opacity = new Json.Object ();
+            opacity.set_double_member ("opacity", item.opacity.opacity);
+
+            components.set_object_member ("Opacity", opacity);
+        }
+
+        if (item.rotation != null) {
+            var rotation = new Json.Object ();
+            rotation.set_double_member ("rotation", item.rotation.rotation);
+
+            components.set_object_member ("Rotation", rotation);
+        }
+
+        if (item.size != null) {
+            var size = new Json.Object ();
+            size.set_boolean_member ("locked", item.size.locked);
+            size.set_double_member ("ratio", item.size.ratio);
+            size.set_double_member ("width", item.size.width);
+            size.set_double_member ("height", item.size.height);
+
+            components.set_object_member ("Size", size);
+        }
+
+        if (item.flipped != null) {
+            var flipped = new Json.Object ();
+            flipped.set_boolean_member ("horizontal", item.flipped.horizontal);
+            flipped.set_boolean_member ("vertical", item.flipped.vertical);
+
+            components.set_object_member ("Flipped", flipped);
+        }
+
+        if (item.border_radius != null) {
+            var border_radius = new Json.Object ();
+            border_radius.set_double_member ("x", item.border_radius.x);
+            border_radius.set_double_member ("y", item.border_radius.y);
+            border_radius.set_boolean_member ("uniform", item.border_radius.uniform);
+            border_radius.set_boolean_member ("autoscale", item.border_radius.autoscale);
+
+            components.set_object_member ("BorderRadius", border_radius);
+        }
+
+        if (item.layer != null) {
+            var layer = new Json.Object ();
+            layer.set_boolean_member ("locked", item.layer.locked);
+
+            components.set_object_member ("Layer", layer);
+        }
+
+        if (item.fills != null) {
+            var fills = new Json.Object ();
+
+            foreach (Lib.Components.Fill fill in item.fills.fills) {
+                var obj = new Json.Object ();
+                obj.set_int_member ("id", fill.id);
+                obj.set_string_member ("color", Utils.Color.hex_to_rgba (fill.hex).to_string ());
+                obj.set_string_member ("hex", fill.hex);
+                obj.set_int_member ("alpha", fill.alpha);
+                obj.set_boolean_member ("hidden", fill.hidden);
+
+                fills.set_object_member ("Fill-" + fill.id.to_string (), obj);
+            }
+
+            components.set_object_member ("Fills", fills);
+        }
+
+        if (item.borders != null) {
+            var borders = new Json.Object ();
+
+            foreach (Lib.Components.Border border in item.borders.borders) {
+                var obj = new Json.Object ();
+                obj.set_int_member ("id", border.id);
+                obj.set_int_member ("color", Utils.Color.rgba_to_uint (border.color));
+                obj.set_string_member ("hex", border.hex);
+                obj.set_int_member ("size", border.size);
+                obj.set_int_member ("alpha", border.alpha);
+                obj.set_boolean_member ("hidden", border.hidden);
+
+                borders.set_object_member ("Border-" + border.id.to_string (), obj);
+            }
+
+            components.set_object_member ("Borders", borders);
+        }
+
+        // Save all the components in the main object.
+        object.set_object_member ("Components", components);
     }
 }

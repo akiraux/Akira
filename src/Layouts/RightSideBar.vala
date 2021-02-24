@@ -182,11 +182,15 @@ public class Akira.Layouts.RightSideBar : Gtk.Grid {
                 return;
             }
 
-            // Remove item at source position.
-            var artboard_to_swap = window.items_manager.artboards.remove_at (source);
+            // Swap the position inside the List Model.
+            window.items_manager.artboards.swap_items (source, 0);
 
-            // Insert item at target position.
-            window.items_manager.artboards.insert_at (0, artboard_to_swap);
+            // The actual items in the canvas might not match the items in the List Model
+            // due to Artboards labels, grids, and other pseudo elements. Therefore we need
+            // to get the real position of the child and swap them.
+            var root = artboard.model.parent;
+            root.move_child (root.find_child (artboard.model), root.get_n_children ());
+
             window.event_bus.z_selected_changed ();
 
             return;
@@ -196,7 +200,7 @@ public class Akira.Layouts.RightSideBar : Gtk.Grid {
         var layer_artboard = layer.model.artboard;
 
         // Change artboard if necessary.
-        window.items_manager.change_artboard (layer.model, null);
+        window.items_manager.change_artboard.begin (layer.model, null);
 
         // If the moved layer had an artboard, no need to do anything else.
         if (layer_artboard != null) {

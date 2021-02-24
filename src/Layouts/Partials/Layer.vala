@@ -25,7 +25,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
     // public Akira.Layouts.Partials.Artboard? artboard { get; construct set; }
     public Akira.Layouts.Partials.Layer? layer_group { get; construct set; }
     public string icon_name { get; construct; }
-    public Akira.Lib.Models.CanvasItem model { get; construct; }
+    public Akira.Lib.Items.CanvasItem model { get; construct; }
 
     private bool scroll_up = false;
     private bool scrolling = false;
@@ -76,7 +76,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 
     public Layer (
         Akira.Window window,
-        Akira.Lib.Models.CanvasItem model,
+        Akira.Lib.Items.CanvasItem model,
         Gtk.ListBox? list = null
     ) {
         Object (
@@ -84,7 +84,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
             model: model
         );
 
-        if (model.selected && list != null) {
+        if (model.layer.selected && list != null) {
             list.select_row (this);
         }
     }
@@ -99,7 +99,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
         label.expand = true;
         label.set_ellipsize (Pango.EllipsizeMode.END);
 
-        model.bind_property ("name", label, "label",
+        model.name.bind_property ("name", label, "label",
             BindingFlags.SYNC_CREATE | BindingFlags.BIDIRECTIONAL);
 
         entry = new Gtk.Entry ();
@@ -110,14 +110,14 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
         entry.no_show_all = true;
         // NOTE: We can't bind the entry to the model.name otherwise we won't be
         // able to handle the ESC key to restore the previous entry.
-        entry.text = model.name;
+        entry.text = model.name.name;
 
         entry.activate.connect (update_on_enter);
         entry.key_release_event.connect (update_on_escape);
         entry.focus_in_event.connect (handle_focus_in);
         entry.focus_out_event.connect (update_on_leave);
 
-        icon = new Gtk.Image.from_icon_name (model.layer_icon, Gtk.IconSize.MENU);
+        icon = new Gtk.Image.from_icon_name (model.name.icon, Gtk.IconSize.MENU);
         icon.margin_start = icon_name != "folder-symbolic" ? 16 : 0;
         icon.margin_end = 10;
         icon.vexpand = true;
@@ -201,7 +201,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
         build_drag_and_drop ();
 
         handle.button_press_event.connect (on_click_event);
-        // handle.button_release_event.connect (on_release_event);
+        handle.button_release_event.connect (on_release_event);
 
         handle.enter_notify_event.connect (event => {
             get_style_context ().add_class ("hover");
@@ -215,14 +215,14 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
             return false;
         });
 
-        model.notify["selected"].connect (() => {
-            if (model.selected) {
+        model.layer.notify["selected"].connect (() => {
+            if (model.layer.selected) {
                 get_style_context ().remove_class ("hovered");
                 activate ();
                 return;
             }
 
-            (parent as Gtk.ListBox).unselect_row (this);
+            ((Gtk.ListBox) parent).unselect_row (this);
         });
 
         lock_actions ();
@@ -232,7 +232,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
         window.event_bus.hover_over_item.connect (on_hover_over_item);
     }
 
-    private void on_hover_over_item (Lib.Models.CanvasItem? item) {
+    private void on_hover_over_item (Lib.Items.CanvasItem? item) {
         if (item == model) {
             get_style_context ().add_class ("hovered");
             return;
@@ -387,8 +387,12 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
     ) {
         var layer = (Layer) ((Gtk.Widget[]) selection_data.get_data ())[0];
 
+        // Used to adjust the position of swappable items if the source item
+        // is dragged from the bottom up.
+        int position_adjustment = 0;
+
         // Change artboard if necessary.
-        window.items_manager.change_artboard (layer.model, model.artboard);
+        window.items_manager.change_artboard.begin (layer.model, model.artboard);
 
         // Store the source of our items.
         var items_source = model.artboard == null
@@ -412,7 +416,6 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 
         // Interrupt if the item was dropped in the same position.
         if (source - 1 == target) {
-            debug ("same position");
             return;
         }
 
@@ -420,33 +423,20 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
         // means the layer was dragged from the bottom up, therefore we need to
         // increase the dropped target by 1 since we don't deal with location 0.
         if (source > target) {
+            position_adjustment--;
             target++;
         }
 
         debug ("%i - %i", source, target);
 
-        // Remove item at source position
-        var item_to_swap = items_source.remove_at (source);
+        // Swap the location of the items in the List Model.
+        items_source.swap_items (source, target);
 
-        // If the item is a free item, we need to remove it from the Canvas.
-        if (layer.model.artboard == null) {
-            item_to_swap.parent.remove_child (item_to_swap.parent.find_child (item_to_swap));
-        }
-
-        // Insert item at target position
-        items_source.insert_at (target, item_to_swap);
-
-        if (model.artboard != null) {
-            model.artboard.changed (true);
-        }
-
-        // If the item is a free item, we need to add it to the Canvas root element.
-        if (layer.model.artboard == null) {
-            var root = window.main_window.main_canvas.canvas.get_root_item ();
-            // Fetch the new correct position.
-            target = items_count - 1 - items_source.index (item_to_swap);
-            root.add_child (item_to_swap, target);
-        }
+        // The actual items in the canvas might not match the items in the List Model
+        // due to Artboards labels, grids, and other pseudo elements. Therefore we need
+        // to get the real position of the child and swap them.
+        var root = layer.model.parent;
+        root.move_child (root.find_child (layer.model), root.find_child (model) + position_adjustment);
 
         window.event_bus.z_selected_changed ();
     }
@@ -466,7 +456,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 
     private bool on_drag_motion (Gdk.DragContext context, int x, int y, uint time) {
         int row_index = get_index ();
-        var row = (Akira.Layouts.Partials.Layer) (parent as Gtk.ListBox).get_row_at_index (row_index);
+        var row = (Akira.Layouts.Partials.Layer) ((Gtk.ListBox) parent).get_row_at_index (row_index);
 
         if (!dragged) {
             motion_revealer.reveal_child = true;
@@ -507,7 +497,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
      * @return {bool} True to stop propagation, False to let other events run.
      */
     public bool on_click_event (Gdk.Event event) {
-        if (model.locked) {
+        if (model.layer.locked) {
             return true;
         }
 
@@ -543,7 +533,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 
                 // We need this in case the user clicks on the layer right after being unlocked.
                 if (!is_selected ()) {
-                    (parent as Gtk.ListBox).select_row (this);
+                    ((Gtk.ListBox) parent).select_row (this);
                 }
 
                 // We're returning false to not interrupt the natural bubbling of the click event.
@@ -559,7 +549,10 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
      * @param {Gdk.Event} event - The button click event.
      * @return {bool} True to stop propagation, False to let other events run.
      */
-    // public bool on_release_event (Gdk.Event event) {
+    public bool on_release_event (Gdk.Event event) {
+        // Always move the focus back to the canvas.
+        window.event_bus.set_focus_on_canvas ();
+        return true;
     //     if (event.type == Gdk.EventType.BUTTON_RELEASE) {
     //         if (entry.visible == true) {
     //             return false;
@@ -620,20 +613,20 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
     //     }
 
     //     return false;
-    // }
-
-    private void unselect_groups (Gtk.ListBox container) {
-        container.foreach (child => {
-            if (child is Akira.Layouts.Partials.Layer) {
-                Akira.Layouts.Partials.Layer layer = (Akira.Layouts.Partials.Layer) child;
-
-                if (layer.grouped) {
-                    layer.container.unselect_all ();
-                    unselect_groups (layer.container);
-                }
-            }
-        });
     }
+
+    //  private void unselect_groups (Gtk.ListBox container) {
+    //      container.foreach (child => {
+    //          if (child is Akira.Layouts.Partials.Layer) {
+    //              Akira.Layouts.Partials.Layer layer = (Akira.Layouts.Partials.Layer) child;
+
+    //              if (layer.grouped) {
+    //                  layer.container.unselect_all ();
+    //                  unselect_groups (layer.container);
+    //              }
+    //          }
+    //      });
+    //  }
 
     public void update_on_enter () {
         update_label ();
@@ -679,7 +672,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
     }
 
     private void lock_actions () {
-        button_locked.bind_property ("active", model, "locked",
+        button_locked.bind_property ("active", model.layer, "locked",
             BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE);
 
         button_locked.toggled.connect (() => {
@@ -700,7 +693,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 
             if (active) {
                 window.event_bus.item_locked (model);
-                (parent as Gtk.ListBox).unselect_row (this);
+                ((Gtk.ListBox) parent).unselect_row (this);
             }
 
             window.event_bus.set_focus_on_canvas ();

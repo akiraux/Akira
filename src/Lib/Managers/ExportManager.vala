@@ -131,9 +131,10 @@ public class Akira.Lib.Managers.ExportManager : Object {
             }
         }
 
-        Utils.AffineTransform.set_size (area, new_width, new_height);
+        area.set ("width", new_width + area.width);
+        area.set ("height", new_height + area.height);
 
-        // Update the initial coordiante to keep getting the correct delta.
+        // Update the initial coordinates to keep getting the correct delta.
         initial_x = x;
         initial_y = y;
     }
@@ -321,20 +322,20 @@ public class Akira.Lib.Managers.ExportManager : Object {
             }
 
             // If the item is an artboard, account for the label's height.
-            if (item is Akira.Lib.Models.CanvasArtboard) {
-                var artboard = item as Akira.Lib.Models.CanvasArtboard;
-                label_height = artboard.get_label_height ();
-                name = artboard.name != null ? artboard.name : name;
+            if (item is Akira.Lib.Items.CanvasArtboard) {
+                var artboard = item as Akira.Lib.Items.CanvasArtboard;
+                // label_height = artboard.get_label_height ();
+                name = artboard.name.name;
             }
 
             // Hide the ghost item.
-            item.bounds_manager.hide ();
+            // item.bounds_manager.hide ();
 
             // Account for items inside or outside artboards.
-            double x1 = item.bounds_manager.x1;
-            double x2 = item.bounds_manager.x2;
-            double y1 = item.bounds_manager.y1;
-            double y2 = item.bounds_manager.y2;
+            double x1 = item.bounds.x1;
+            double x2 = item.bounds.x2;
+            double y1 = item.bounds.y1;
+            double y2 = item.bounds.y2;
 
             // Create the rendered image with Cairo.
             surface = new Cairo.ImageSurface (
@@ -387,25 +388,25 @@ public class Akira.Lib.Managers.ExportManager : Object {
         }
     }
 
-    public Gdk.Pixbuf rescale_image (Gdk.Pixbuf pixbuf, Lib.Models.CanvasItem? item = null) {
+    public Gdk.Pixbuf rescale_image (Gdk.Pixbuf pixbuf, Lib.Items.CanvasItem? item = null) {
         Gdk.Pixbuf scaled_image;
         var label_height = 0.0;
 
         // If the item is an artboard, account for the label's height.
-        if (item != null && item is Lib.Models.CanvasArtboard) {
-            var artboard = item as Lib.Models.CanvasArtboard;
-            label_height = artboard.get_label_height ();
-        }
+        // if (item != null && item is Lib.Items.CanvasArtboard) {
+            // var artboard = item as Lib.Items.CanvasArtboard;
+            // label_height = artboard.get_label_height ();
+        // }
 
         double width, height;
 
         // If the item is null it mean we're dealing with a custom area and we
         // don't have the bounds manager.
         if (item != null) {
-            double x1 = item.bounds_manager.x1;
-            double x2 = item.bounds_manager.x2;
-            double y1 = item.bounds_manager.y1;
-            double y2 = item.bounds_manager.y2;
+            double x1 = item.bounds.x1;
+            double x2 = item.bounds.x2;
+            double y1 = item.bounds.y1;
+            double y2 = item.bounds.y2;
 
             width = x2 - x1;
             height = y2 - y1 - label_height;

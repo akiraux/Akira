@@ -27,7 +27,7 @@ public class Akira.Layouts.Partials.FillsPanel : Gtk.Grid {
     public Gtk.ListBox fills_list_container;
     public Akira.Models.ListModel<Akira.Models.FillsItemModel> list_model;
     public Gtk.Grid title_cont;
-    private Lib.Models.CanvasItem selected_item;
+    private unowned List<Lib.Items.CanvasItem>? items;
 
     public bool toggled {
         get {
@@ -85,71 +85,67 @@ public class Akira.Layouts.Partials.FillsPanel : Gtk.Grid {
         attach (title_cont, 0, 0, 1, 1);
         attach (fills_list_container, 0, 1, 1, 1);
         show_all ();
-        add_btn.hide ();
 
         create_event_bindings ();
     }
 
     private void create_event_bindings () {
         toggled = false;
-        window.event_bus.selected_items_changed.connect (on_selected_items_changed);
-
-        window.event_bus.fill_deleted.connect (() => {
-            add_btn.show ();
-            window.main_window.left_sidebar.queue_resize ();
-        });
+        window.event_bus.selected_items_list_changed.connect (on_selected_items_list_changed);
 
         add_btn.clicked.connect (() => {
-            var model_item = create_model ();
-            list_model.add_item.begin (model_item);
-            selected_item.reset_colors ();
-            add_btn.hide ();
-            window.main_window.left_sidebar.queue_resize ();
+            var fill_color = Gdk.RGBA ();
+            fill_color.parse (settings.fill_color);
+
+            foreach (Lib.Items.CanvasItem item in items) {
+                Lib.Components.Fill fill = item.fills.add_fill_color (fill_color);
+                var model_item = create_model (fill);
+                list_model.add_item.begin (model_item);
+                item.fills.reload ();
+            }
         });
 
         // Listen to the model changes when adding/removing items.
         list_model.items_changed.connect ((position, removed, added) => {
-            if (selected_item != null) {
-                // If an item is still selected, update the has_fill property
-                // to TRUE or FALSE based on the model changes.
-
-                // This will need to be updated in the future once we're dealing
-                // with multiple fill colors, updating to FALSE only if all
-                // the fills have been deleted.
-                selected_item.has_fill = (added == 1);
-            }
+            window.main_window.left_sidebar.queue_resize ();
         });
     }
 
-    private void on_selected_items_changed (List<Lib.Models.CanvasItem> selected_items) {
+    private void on_selected_items_list_changed (List<Lib.Items.CanvasItem> selected_items) {
         if (selected_items.length () == 0) {
-            selected_item = null;
+            items = null;
             list_model.clear.begin ();
-            add_btn.hide ();
             toggled = false;
             return;
         }
 
-        if (selected_item == null || selected_item != selected_items.nth_data (0)) {
-            toggled = true;
-            selected_item = selected_items.nth_data (0);
+        items = selected_items;
 
-            if (!selected_item.show_fill_panel) {
-                toggled = false;
-                return;
+        // Always clear the list model when a selection changes.
+        list_model.clear.begin ();
+
+        bool show = false;
+        foreach (Lib.Items.CanvasItem item in selected_items) {
+            // Skip items that don't have a fill item since there will be nothing to show.
+            if (item.fills == null) {
+                continue;
             }
 
-            if (!selected_item.has_fill) {
-                add_btn.show ();
-                return;
-            }
+            // At least an item has the fills component, so we can show the
+            show = true;
 
-            var model_item = create_model ();
-            list_model.add_item.begin (model_item);
+            // Loops through all the available fills and add them tot he list model.
+            // TODO: handle duplicate identical colors.
+            foreach (Lib.Components.Fill fill in item.fills.fills) {
+                var model_item = create_model (fill);
+                list_model.add_item.begin (model_item);
+            }
         }
+
+        toggled = show;
     }
 
-    private Akira.Models.FillsItemModel create_model () {
-        return new Akira.Models.FillsItemModel (selected_item, list_model);
+    private Akira.Models.FillsItemModel create_model (Lib.Components.Fill fill) {
+        return new Akira.Models.FillsItemModel (fill, list_model);
     }
 }
