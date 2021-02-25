@@ -102,6 +102,8 @@ public class Akira.Layouts.RightSideBar : Gtk.Grid {
         pages_scroll.add (pages_panel);
 
         attach (pane, 0 , 0 , 1, 1);
+
+        window.event_bus.toggle_presentation_mode.connect (toggle);
     }
 
     private Gtk.Grid build_search_bar () {
@@ -229,7 +231,7 @@ public class Akira.Layouts.RightSideBar : Gtk.Grid {
         return false;
     }
 
-    public void toggle () {
+    private void toggle () {
         toggled = !toggled;
     }
 }

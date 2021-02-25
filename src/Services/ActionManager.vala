@@ -191,9 +191,7 @@ public class Akira.Services.ActionManager : Object {
     }
 
     private void action_presentation () {
-        window.headerbar.toggle ();
-        window.main_window.left_sidebar.toggle ();
-        window.main_window.right_sidebar.toggle ();
+        window.event_bus.toggle_presentation_mode ();
     }
 
     private void action_new_window () {
@@ -454,6 +452,11 @@ public class Akira.Services.ActionManager : Object {
 
     private void action_escape () {
         window.event_bus.request_escape ();
+        // If the layout is hidden, allow users to easily get out of presentation mode
+        // when they press Escape.
+        if (!window.headerbar.toggled) {
+            action_presentation ();
+        }
     }
 
     private void action_shortcuts () {

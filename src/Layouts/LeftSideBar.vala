@@ -43,6 +43,7 @@ public class Akira.Layouts.LeftSideBar : Gtk.Grid {
     }
 
     construct {
+        window.event_bus.toggle_presentation_mode.connect (toggle);
         window.event_bus.request_widget_redraw.connect (on_widget_redraw_request);
 
         get_style_context ().add_class ("sidebar-l");
@@ -70,7 +71,7 @@ public class Akira.Layouts.LeftSideBar : Gtk.Grid {
         show_all ();
     }
 
-    public void toggle () {
+    private void toggle () {
         toggled = !toggled;
     }
 

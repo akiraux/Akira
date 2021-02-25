@@ -39,7 +39,6 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
     public Akira.Partials.HeaderBarButton move_top;
     public Akira.Partials.HeaderBarButton move_bottom;
     public Akira.Partials.HeaderBarButton preferences;
-    public Akira.Partials.MenuButton export;
     public Akira.Partials.HeaderBarButton layout;
     public Akira.Partials.HeaderBarButton path_difference;
     public Akira.Partials.HeaderBarButton path_exclusion;
@@ -109,10 +108,15 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
             + Akira.Services.ActionManager.ACTION_PREFERENCES;
         preferences.sensitive = true;
 
-        export = new Akira.Partials.MenuButton ("document-export", _("Export"), null);
+        var export = new Akira.Partials.MenuButton ("document-export", _("Export"), null);
         var export_popover = build_export_popover ();
         export.button.popover = export_popover;
         export.sensitive = true;
+
+        var layout = new Akira.Partials.MenuButton ("document-layout", _("Layout"), null);
+        var layout_popover = build_layout_popover ();
+        layout.button.popover = layout_popover;
+        layout.sensitive = true;
 
         path_difference = new Akira.Partials.HeaderBarButton (window, "path-difference",
             _("Difference"), null, "multiple");
@@ -138,6 +142,7 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
         pack_start (new Gtk.Separator (Gtk.Orientation.VERTICAL));
 
         pack_end (preferences);
+        pack_end (layout);
         pack_end (export);
         pack_end (new Gtk.Separator (Gtk.Orientation.VERTICAL));
         pack_end (path_difference);
@@ -360,7 +365,31 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
         return popover;
     }
 
+    private Gtk.PopoverMenu build_layout_popover () {
+        var grid = new Gtk.Grid ();
+        grid.margin_top = 6;
+        grid.margin_bottom = 3;
+        grid.orientation = Gtk.Orientation.VERTICAL;
+        grid.width_request = 240;
+        grid.name = "main";
+
+        var presentation_mode = create_model_button (
+            _("Presentation Mode"),
+            null,
+            Akira.Services.ActionManager.ACTION_PREFIX
+            + Akira.Services.ActionManager.ACTION_PRESENTATION);
+
+        grid.add (presentation_mode);
+        grid.show_all ();
+
+        var popover = new Gtk.PopoverMenu ();
+        popover.add (grid);
+
+        return popover;
+    }
+
     private void build_signals () {
+        window.event_bus.toggle_presentation_mode.connect (toggle);
         window.event_bus.file_edited.connect (on_file_edited);
         window.event_bus.file_saved.connect (on_file_saved);
         window.event_bus.selected_items_list_changed.connect (on_selected_items_changed);
@@ -374,8 +403,11 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
         zoom.zoom_default_button.label = "%.0f%%".printf (scale * 100);
     }
 
-    public void toggle () {
+    private void toggle () {
         toggled = !toggled;
+        if (!toggled) {
+            window.event_bus.canvas_notification (_("Presentation Mode enabled."));
+        }
     }
 
     /**
