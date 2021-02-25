@@ -708,4 +708,13 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             return;
         }
     }
+
+    /**
+     * Helper method to get the count of all the created items in the canvas.
+     * This count excludes pseudo items like the select effect, hover effect,
+     * or grids items.
+     */
+    public int get_items_count () {
+        return (int) free_items.get_n_items () + (int) artboards.get_n_items ();
+    }
 }
