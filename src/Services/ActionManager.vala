@@ -40,8 +40,7 @@ public class Akira.Services.ActionManager : Object {
     public const string ACTION_LOAD_FIRST = "action_load_first";
     public const string ACTION_LOAD_SECOND = "action_load_second";
     public const string ACTION_LOAD_THIRD = "action_load_third";
-    public const string ACTION_SHOW_PIXEL_GRID = "action-show-pixel-grid";
-    public const string ACTION_SHOW_UI_GRID = "action-show-ui-grid";
+    public const string ACTION_TOGGLE_PIXEL_GRID = "action-show-pixel-grid";
     public const string ACTION_PRESENTATION = "action_presentation";
     public const string ACTION_PREFERENCES = "action_preferences";
     public const string ACTION_EXPORT_SELECTION = "action_export_selection";
@@ -79,8 +78,7 @@ public class Akira.Services.ActionManager : Object {
         { ACTION_LOAD_FIRST, action_load_first },
         { ACTION_LOAD_SECOND, action_load_second },
         { ACTION_LOAD_THIRD, action_load_third },
-        { ACTION_SHOW_PIXEL_GRID, action_show_pixel_grid },
-        { ACTION_SHOW_UI_GRID, action_show_ui_grid },
+        { ACTION_TOGGLE_PIXEL_GRID, action_toggle_pixel_grid },
         { ACTION_PRESENTATION, action_presentation },
         { ACTION_PREFERENCES, action_preferences },
         { ACTION_EXPORT_SELECTION, action_export_selection },
@@ -123,8 +121,7 @@ public class Akira.Services.ActionManager : Object {
         action_accelerators.set (ACTION_LOAD_FIRST, "<Control><Alt>1");
         action_accelerators.set (ACTION_LOAD_SECOND, "<Control><Alt>2");
         action_accelerators.set (ACTION_LOAD_THIRD, "<Control><Alt>3");
-        action_accelerators.set (ACTION_SHOW_PIXEL_GRID, "<Control><Shift>p");
-        action_accelerators.set (ACTION_SHOW_UI_GRID, "<Control><Shift>g");
+        action_accelerators.set (ACTION_TOGGLE_PIXEL_GRID, "<Shift>Tab");
         action_accelerators.set (ACTION_PRESENTATION, "<Control>period");
         action_accelerators.set (ACTION_PREFERENCES, "<Control>comma");
         action_accelerators.set (ACTION_EXPORT_SELECTION, "<Control><Alt>e");
@@ -267,12 +264,8 @@ public class Akira.Services.ActionManager : Object {
         window.app.open (files, "");
     }
 
-    private void action_show_pixel_grid () {
-        warning ("show pixel grid");
-    }
-
-    private void action_show_ui_grid () {
-        warning ("show UI grid");
+    private void action_toggle_pixel_grid () {
+        window.event_bus.toggle_pixel_grid ();
     }
 
     private void action_preferences () {

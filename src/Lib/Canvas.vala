@@ -84,6 +84,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         nob_manager = new Managers.NobManager (this);
         hover_manager = new Managers.HoverManager (this);
 
+        window.event_bus.toggle_pixel_grid.connect (on_toggle_pixel_grid);
         window.event_bus.update_scale.connect (on_update_scale);
         window.event_bus.set_scale.connect (on_set_scale);
         window.event_bus.request_change_cursor.connect (on_request_change_cursor);
@@ -454,5 +455,17 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         if (ghost != null) {
             ghost.remove ();
         }
+    }
+
+    private void on_toggle_pixel_grid () {
+        // Show or hide the pixel grid based on its state.
+
+        // Create the pixel grid if it doesn't exist.
+
+        // Add the grid to the canvas.
+
+        // Make sure it can't be selected.
+
+        // Make sure newly created items won't be on top.
     }
 }

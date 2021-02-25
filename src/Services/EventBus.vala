@@ -48,6 +48,7 @@ public class Akira.Services.EventBus : Object {
     public signal void canvas_notification (string message);
     public signal void hide_select_effect ();
     public signal void show_select_effect ();
+    public signal void toggle_pixel_grid ();
 
     // Options panel signals.
     public signal void align_items (string align_action);
