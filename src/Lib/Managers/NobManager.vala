@@ -177,6 +177,7 @@ public class Akira.Lib.Managers.NobManager : Object {
                 null
             );
             select_effect.set ("parent", root);
+            select_effect.pointer_events = Goo.CanvasPointerEvents.NONE;
         }
 
         // If only one item is selected and it's inside an artboard,
