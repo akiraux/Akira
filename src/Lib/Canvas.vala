@@ -27,7 +27,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
     private const int MIN_SIZE = 1;
     private const int MIN_POS = 10;
-    private const int GRID_THRESHOLD = 8;
+    private const int GRID_THRESHOLD = 7;
 
     public signal void canvas_moved (double delta_x, double delta_y);
     public signal void canvas_scroll_set_origin (double origin_x, double origin_y);
@@ -110,7 +110,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
             1, 1, 0, 0);
 
         var grid_rgba = Gdk.RGBA ();
-        grid_rgba.parse ("#999999");
+        grid_rgba.parse ("#888888");
 
         pixel_grid.horz_grid_line_width = pixel_grid.vert_grid_line_width = 0.02;
         pixel_grid.horz_grid_line_color_gdk_rgba = pixel_grid.vert_grid_line_color_gdk_rgba = grid_rgba;
@@ -245,6 +245,11 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 selected_bound_manager.set_initial_coordinates (event.x, event.y);
 
                 nob_manager.selected_nob = Managers.NobManager.Nob.BOTTOM_RIGHT;
+
+                // Update the pixel grid if it's visible in order to move it to the foreground.
+                if (is_grid_visible) {
+                    update_pixel_grid ();
+                }
                 break;
 
             case EditMode.MODE_SELECTION:
@@ -508,18 +513,22 @@ public class Akira.Lib.Canvas : Goo.Canvas {
      */
     private void on_toggle_pixel_grid () {
         if (!is_grid_visible) {
-            // Show the grid only if we're zoomed in enough.
-            if (current_scale >= GRID_THRESHOLD) {
-                pixel_grid.visibility = Goo.CanvasItemVisibility.VISIBLE;
-                // Always move the grid to the top of the stack.
-                var root = get_root_item ();
-                root.move_child (root.find_child (pixel_grid), window.items_manager.get_items_count ());
-            }
+            update_pixel_grid ();
             is_grid_visible = true;
             return;
         }
 
         pixel_grid.visibility = Goo.CanvasItemVisibility.HIDDEN;
         is_grid_visible = false;
+    }
+
+    private void update_pixel_grid () {
+        // Show the grid only if we're zoomed in enough.
+        if (current_scale >= GRID_THRESHOLD) {
+            pixel_grid.visibility = Goo.CanvasItemVisibility.VISIBLE;
+            // Always move the grid to the top of the stack.
+            var root = get_root_item ();
+            root.move_child (root.find_child (pixel_grid), window.items_manager.get_items_count ());
+        }
     }
 }
