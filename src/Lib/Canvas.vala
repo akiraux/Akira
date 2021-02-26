@@ -500,6 +500,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
             );
             ghost.set ("parent", get_root_item ());
             ghost.can_focus = false;
+            ghost.pointer_events = Goo.CanvasPointerEvents.NONE;
             return;
         }
 

@@ -142,6 +142,7 @@ public class Akira.Lib.Managers.HoverManager : Object {
 
         hover_effect.set ("parent", canvas.get_root_item ());
         hover_effect.can_focus = false;
+        hover_effect.pointer_events = Goo.CanvasPointerEvents.NONE;
     }
 
     public void remove_hover_effect () {

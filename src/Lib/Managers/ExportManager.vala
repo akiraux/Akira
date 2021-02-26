@@ -78,6 +78,7 @@ public class Akira.Lib.Managers.ExportManager : Object {
 
         area.set ("parent", canvas.get_root_item ());
         area.can_focus = false;
+        area.pointer_events = Goo.CanvasPointerEvents.NONE;
 
         return area;
     }

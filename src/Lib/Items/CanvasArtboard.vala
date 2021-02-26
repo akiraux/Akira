@@ -84,6 +84,9 @@ public class Akira.Lib.Items.CanvasArtboard : Goo.CanvasGroup, Akira.Lib.Items.C
       background = new Goo.CanvasRect (this, 0, 0, 1, 1, "line-width", 0.0, null);
       background.translate (0, 0);
       background.can_focus = false;
+      // Even if this item doesn't receive any pointer events we can't set NONE
+      // since users should be able to click on the artboard's background to drag
+      // the artboard around when the artboard is selected.
 
       this.bind_property ("width", background, "width", BindingFlags.SYNC_CREATE);
       this.bind_property ("height", background, "height", BindingFlags.SYNC_CREATE);
