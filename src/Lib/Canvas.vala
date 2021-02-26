@@ -27,6 +27,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
     private const int MIN_SIZE = 1;
     private const int MIN_POS = 10;
+    private const int GRID_THRESHOLD = 7;
 
     public signal void canvas_moved (double delta_x, double delta_y);
     public signal void canvas_scroll_set_origin (double origin_x, double origin_y);
@@ -65,6 +66,10 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     // Used to show the canvas bounds of selected items.
     private Goo.CanvasRect ghost;
 
+    // Used to show a pixel grid on the whole canvas.
+    private Goo.CanvasGrid pixel_grid;
+    private bool is_grid_visible;
+
     public Canvas (Akira.Window window) {
         Object (window: window);
     }
@@ -84,6 +89,9 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         nob_manager = new Managers.NobManager (this);
         hover_manager = new Managers.HoverManager (this);
 
+        create_pixel_grid ();
+
+        window.event_bus.toggle_pixel_grid.connect (on_toggle_pixel_grid);
         window.event_bus.update_scale.connect (on_update_scale);
         window.event_bus.set_scale.connect (on_set_scale);
         window.event_bus.request_change_cursor.connect (on_request_change_cursor);
@@ -91,6 +99,26 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         window.event_bus.set_focus_on_canvas.connect (on_set_focus_on_canvas);
         window.event_bus.request_escape.connect (on_set_focus_on_canvas);
         window.event_bus.insert_item.connect (on_insert_item);
+    }
+
+    private void create_pixel_grid () {
+        pixel_grid = new Goo.CanvasGrid (
+            null,
+            0, 0,
+            Layouts.MainCanvas.CANVAS_SIZE,
+            Layouts.MainCanvas.CANVAS_SIZE,
+            1, 1, 0, 0);
+
+        var grid_rgba = Gdk.RGBA ();
+        grid_rgba.parse ("#888888");
+
+        pixel_grid.horz_grid_line_width = pixel_grid.vert_grid_line_width = 0.02;
+        pixel_grid.horz_grid_line_color_gdk_rgba = pixel_grid.vert_grid_line_color_gdk_rgba = grid_rgba;
+        pixel_grid.visibility = Goo.CanvasItemVisibility.HIDDEN;
+        pixel_grid.set ("parent", get_root_item ());
+        pixel_grid.can_focus = false;
+        pixel_grid.pointer_events = Goo.CanvasPointerEvents.NONE;
+        is_grid_visible = false;
     }
 
     public void set_cursor_by_edit_mode () {
@@ -217,6 +245,11 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 selected_bound_manager.set_initial_coordinates (event.x, event.y);
 
                 nob_manager.selected_nob = Managers.NobManager.Nob.BOTTOM_RIGHT;
+
+                // Update the pixel grid if it's visible in order to move it to the foreground.
+                if (is_grid_visible) {
+                    update_pixel_grid ();
+                }
                 break;
 
             case EditMode.MODE_SELECTION:
@@ -401,6 +434,25 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         current_scale = scale;
         set_scale (scale);
         window.event_bus.zoom ();
+
+        // Check if the user requested the pixel grid and if is not already visible.
+        if (
+            !is_grid_visible ||
+            pixel_grid.visibility == Goo.CanvasItemVisibility.VISIBLE
+        ) {
+            return;
+        }
+
+        // If the pixel grid is visible, hide it based on the canvas scale
+        // in order to avoid a visually jarring canvas.
+        if (current_scale < GRID_THRESHOLD) {
+            pixel_grid.visibility = Goo.CanvasItemVisibility.HIDDEN;
+        } else {
+            pixel_grid.visibility = Goo.CanvasItemVisibility.VISIBLE;
+            // Always move the grid to the top of the stack.
+            var root = get_root_item ();
+            root.move_child (root.find_child (pixel_grid), window.items_manager.get_items_count ());
+        }
     }
 
     private void on_request_change_cursor (Gdk.CursorType? cursor_type) {
@@ -454,6 +506,30 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
         if (ghost != null) {
             ghost.remove ();
+        }
+    }
+
+    /**
+     * Show or hide the pixel grid based on its state.
+     */
+    private void on_toggle_pixel_grid () {
+        if (!is_grid_visible) {
+            update_pixel_grid ();
+            is_grid_visible = true;
+            return;
+        }
+
+        pixel_grid.visibility = Goo.CanvasItemVisibility.HIDDEN;
+        is_grid_visible = false;
+    }
+
+    private void update_pixel_grid () {
+        // Show the grid only if we're zoomed in enough.
+        if (current_scale >= GRID_THRESHOLD) {
+            pixel_grid.visibility = Goo.CanvasItemVisibility.VISIBLE;
+            // Always move the grid to the top of the stack.
+            var root = get_root_item ();
+            root.move_child (root.find_child (pixel_grid), window.items_manager.get_items_count ());
         }
     }
 }

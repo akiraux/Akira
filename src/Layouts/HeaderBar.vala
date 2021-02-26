@@ -39,7 +39,6 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
     public Akira.Partials.HeaderBarButton move_top;
     public Akira.Partials.HeaderBarButton move_bottom;
     public Akira.Partials.HeaderBarButton preferences;
-    public Akira.Partials.HeaderBarButton layout;
     public Akira.Partials.HeaderBarButton path_difference;
     public Akira.Partials.HeaderBarButton path_exclusion;
     public Akira.Partials.HeaderBarButton path_intersect;
@@ -373,12 +372,19 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
         grid.width_request = 240;
         grid.name = "main";
 
+        var pixel_grid = create_model_button (
+            _("Toggle Pixel Grid"),
+            null,
+            Akira.Services.ActionManager.ACTION_PREFIX
+            + Akira.Services.ActionManager.ACTION_TOGGLE_PIXEL_GRID);
+
         var presentation_mode = create_model_button (
             _("Presentation Mode"),
             null,
             Akira.Services.ActionManager.ACTION_PREFIX
             + Akira.Services.ActionManager.ACTION_PRESENTATION);
 
+        grid.add (pixel_grid);
         grid.add (presentation_mode);
         grid.show_all ();
 
