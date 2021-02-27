@@ -26,6 +26,7 @@ public class Akira.Dialogs.SettingsDialog : Gtk.Dialog {
     private Gtk.Switch label_switch;
     private Gtk.Switch symbolic_switch;
     private Gtk.Switch border_switch;
+    private Gtk.ColorButton grid_color;
     private Gtk.ColorButton fill_color;
     private Gtk.ColorButton border_color;
     private Gtk.SpinButton border_size;
@@ -49,6 +50,7 @@ public class Akira.Dialogs.SettingsDialog : Gtk.Dialog {
         stack.margin_top = 15;
         stack.add_titled (get_general_box (), "general", _("General"));
         stack.add_titled (get_interface_box (), "interface", _("Interface"));
+        stack.add_titled (get_canvas_box (), "canvas", _("Canvas"));
         stack.add_titled (get_shapes_box (), "shapes", _("Shapes"));
         stack.add_titled (get_about_box (), "about", _("About"));
 
@@ -115,6 +117,47 @@ public class Akira.Dialogs.SettingsDialog : Gtk.Dialog {
         return grid;
     }
 
+    private Gtk.Widget get_canvas_box () {
+        var grid = new Gtk.Grid ();
+        grid.row_spacing = 6;
+        grid.column_spacing = 12;
+        grid.column_homogeneous = true;
+
+        var grid_rgba = Gdk.RGBA ();
+        grid_rgba.parse (settings.grid_color);
+
+        grid.attach (new SettingsHeader (_("Pixel Grid")), 0, 0, 2, 1);
+
+        var description = new Gtk.Label (_("Define the default color for the Canvas pixel grid."));
+        description.halign = Gtk.Align.START;
+        description.margin_bottom = 10;
+        grid.attach (description, 0, 1, 2, 1);
+
+        grid.attach (new SettingsLabel (_("Pixel Grid Color:")), 0, 2, 1, 1);
+        grid_color = new Gtk.ColorButton.with_rgba (grid_rgba);
+        grid_color.halign = Gtk.Align.START;
+        grid.attach (grid_color, 1, 2, 1, 1);
+
+        grid_color.color_set.connect (() => {
+            var rgba = grid_color.get_rgba ();
+
+            // Gdk.RGBA uses rgb() if alpha is 1.
+            string rgba_str = "rgba(%d,%d,%d,%d)".printf (
+                (int) (rgba.red * 255),
+                (int) (rgba.green * 255),
+                (int) (rgba.blue * 255),
+                (int) (rgba.alpha)
+            );
+
+            debug ("pixel grid color: %s", rgba_str);
+
+            settings.grid_color = rgba_str;
+            window.event_bus.update_pixel_grid ();
+        });
+
+        return grid;
+    }
+
     private Gtk.Widget get_shapes_box () {
         var grid = new Gtk.Grid ();
         grid.row_spacing = 6;
@@ -141,8 +184,8 @@ public class Akira.Dialogs.SettingsDialog : Gtk.Dialog {
         fill_color.color_set.connect (() => {
             var rgba = fill_color.get_rgba ();
 
-            //Gdk.RGBA uses rgb() if alpha is 1.
-            string rgba_str = "rgba(%d,%d,%d,%d)" .printf (
+            // Gdk.RGBA uses rgb() if alpha is 1.
+            string rgba_str = "rgba(%d,%d,%d,%d)".printf (
                 (int) (rgba.red * 255),
                 (int) (rgba.green * 255),
                 (int) (rgba.blue * 255),
@@ -165,7 +208,7 @@ public class Akira.Dialogs.SettingsDialog : Gtk.Dialog {
         border_color.color_set.connect (() => {
             var rgba = border_color.get_rgba ();
 
-            //Gdk.RGBA uses rgb() if alpha is 1.
+            // Gdk.RGBA uses rgb() if alpha is 1.
             string rgba_str = "rgba(%d,%d,%d,%d)".printf (
                 (int) (rgba.red * 255),
                 (int) (rgba.green * 255),

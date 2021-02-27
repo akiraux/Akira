@@ -66,6 +66,12 @@
             <description>Allow user to choose between default and inverted panels order.</description>
         </key>
 
+        <key name="grid-color" type="s">
+            <default>'#888888'</default>
+            <summary>Default Grid Color.</summary>
+            <description>The default color of the pixel grid.</description>
+        </key>
+
         <key name="fill-color" type="s">
             <default>'#CCCCCC'</default>
             <summary>Default Shape Color.</summary>
