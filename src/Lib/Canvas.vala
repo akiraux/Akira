@@ -27,7 +27,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
     private const int MIN_SIZE = 1;
     private const int MIN_POS = 10;
-    private const int GRID_THRESHOLD = 7;
+    private const int GRID_THRESHOLD = 3;
 
     public signal void canvas_moved (double delta_x, double delta_y);
     public signal void canvas_scroll_set_origin (double origin_x, double origin_y);
@@ -92,6 +92,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         create_pixel_grid ();
 
         window.event_bus.toggle_pixel_grid.connect (on_toggle_pixel_grid);
+        window.event_bus.update_pixel_grid.connect (on_update_pixel_grid);
         window.event_bus.update_scale.connect (on_update_scale);
         window.event_bus.set_scale.connect (on_set_scale);
         window.event_bus.request_change_cursor.connect (on_request_change_cursor);
@@ -110,7 +111,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
             1, 1, 0, 0);
 
         var grid_rgba = Gdk.RGBA ();
-        grid_rgba.parse ("#888888");
+        grid_rgba.parse (settings.grid_color);
 
         pixel_grid.horz_grid_line_width = pixel_grid.vert_grid_line_width = 0.02;
         pixel_grid.horz_grid_line_color_gdk_rgba = pixel_grid.vert_grid_line_color_gdk_rgba = grid_rgba;
@@ -119,6 +120,16 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         pixel_grid.can_focus = false;
         pixel_grid.pointer_events = Goo.CanvasPointerEvents.NONE;
         is_grid_visible = false;
+    }
+
+    /**
+     * Trigger the update of the pixel grid after the settings color have been changed.
+     */
+    private void on_update_pixel_grid () {
+        var grid_rgba = Gdk.RGBA ();
+        grid_rgba.parse (settings.grid_color);
+
+        pixel_grid.horz_grid_line_color_gdk_rgba = pixel_grid.vert_grid_line_color_gdk_rgba = grid_rgba;
     }
 
     public void set_cursor_by_edit_mode () {
@@ -436,10 +447,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         window.event_bus.zoom ();
 
         // Check if the user requested the pixel grid and if is not already visible.
-        if (
-            !is_grid_visible ||
-            pixel_grid.visibility == Goo.CanvasItemVisibility.VISIBLE
-        ) {
+        if (!is_grid_visible) {
             return;
         }
 

@@ -64,12 +64,18 @@ public class Akira.Services.Settings : GLib.Settings {
         get { return get_boolean ("use-symbolic"); }
         set { set_boolean ("use-symbolic", value); }
     }
+
+    // Default canvas settings.
+    public string grid_color {
+        owned get { return get_string ("grid-color"); }
+        set { set_string ("grid-color", value); }
+    }
+
+    // Default shape settings.
     public string fill_color {
         owned get { return get_string ("fill-color"); }
         set { set_string ("fill-color", value); }
     }
-
-    // Default shape settings.
     public bool set_border {
         get { return get_boolean ("set-border"); }
         set { set_boolean ("set-border", value); }
