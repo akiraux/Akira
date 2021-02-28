@@ -27,10 +27,14 @@ public class Akira.Lib.Managers.SnapManager : Object {
 
     public weak Akira.Lib.Canvas canvas { get; construct; }
 
+
     private Goo.CanvasItem root;
     //private Goo.CanvasRect? select_effect;
     //private Goo.CanvasItemSimple[] nobs = new Goo.CanvasItemSimple[9];
     //private Goo.CanvasBounds select_bb;
+
+    private Gee.HashMap<int, Gee.HashSet<int>> vertical_snaps;
+    private Gee.HashMap<int, Gee.HashSet<int>> horizontal_snaps;
 
     // If the effect needs to be created or it's only a value update.
     private bool create { get; set; default = true; }
@@ -43,6 +47,8 @@ public class Akira.Lib.Managers.SnapManager : Object {
 
     construct {
         root = canvas.get_root_item ();
+        vertical_snaps = new Gee.HashMap<int, Gee.HashSet<int>>();
+        horizontal_snaps = new Gee.HashMap<int, Gee.HashSet<int>>();
     }
 
     public void generate_snap_grid (List<Items.CanvasItem> selection) {
@@ -52,8 +58,8 @@ public class Akira.Lib.Managers.SnapManager : Object {
         Goo.CanvasBounds vertical_filter = {0, 0, 0, 0};
         Goo.CanvasBounds horizontal_filter = {0, 0, 0, 0};
 
-        Gee.HashMap<int, List<int>>  vertical_snaps = null;
-        Gee.HashMap<int, List<int>>  horizontal_snaps = null;
+        vertical_snaps.clear();
+        horizontal_snaps.clear();
 
         foreach (var item in selection)
         {
@@ -74,15 +80,63 @@ public class Akira.Lib.Managers.SnapManager : Object {
         foreach (var vfi in vertical_candidates) {
           var candidate_item = vfi as Items.CanvasItem;
           if (candidate_item != null && selection.find(candidate_item) == null) {
-
+            populate_horizontal_snaps(candidate_item, ref vertical_snaps);
           }
         }
+
+        debug("vs: %d",vertical_snaps.size);
 
         foreach (var hfi in horizontal_candidates) {
           var candidate_item = hfi as Items.CanvasItem;
           if (candidate_item != null && selection.find(candidate_item) == null) {
-            debug("   :(");
+            populate_vertical_snaps(candidate_item, ref horizontal_snaps);
           }
         }
+        debug("hs: %d",horizontal_snaps.size);
+    }
+
+    private void add_to_map(int pos, int n1, int n2, int n3, ref Gee.HashMap<int, Gee.HashSet<int>> map)
+    {
+        if (map.has_key(pos)) {
+            var k = map.get(pos);
+            k.add(n1);
+            k.add(n2);
+            k.add(n3);
+        }
+        else {
+            var v = new Gee.HashSet<int>();
+            v.add(n1);
+            v.add(n2);
+            v.add(n3);
+            map.set(pos, v);
+        }
+    }
+
+    private void populate_horizontal_snaps(Items.CanvasItem item, ref Gee.HashMap<int, Gee.HashSet<int>> map)
+    {
+        int x_1 = (int)item.bounds.x1;
+        int x_2 = (int)item.bounds.x1;
+        int y_1 = (int)item.bounds.x1;
+        int y_2 = (int)item.bounds.x1;
+        int center_x = (int)((item.bounds.x2 - item.bounds.x1) / 2.0 + item.bounds.x1);
+        int center_y = (int)((item.bounds.y2 - item.bounds.y1) / 2.0 + item.bounds.y1);
+
+        add_to_map(x_1, y_1, y_2, center_y, ref map);
+        add_to_map(x_2, y_1, y_2, center_y, ref map);
+        add_to_map(center_x, center_y, center_y, center_y, ref map);
+    }
+
+    private void populate_vertical_snaps(Items.CanvasItem item, ref Gee.HashMap<int, Gee.HashSet<int>> map)
+    {
+        int x_1 = (int)item.bounds.x1;
+        int x_2 = (int)item.bounds.x1;
+        int y_1 = (int)item.bounds.x1;
+        int y_2 = (int)item.bounds.x1;
+        int center_x = (int)((item.bounds.x2 - item.bounds.x1) / 2.0 + item.bounds.x1);
+        int center_y = (int)((item.bounds.y2 - item.bounds.y1) / 2.0 + item.bounds.y1);
+
+        add_to_map(y_1, x_1, x_2, center_x, ref map);
+        add_to_map(y_2, x_1, x_2, center_x, ref map);
+        add_to_map(center_y, center_x, center_x, center_x, ref map);
     }
 }
