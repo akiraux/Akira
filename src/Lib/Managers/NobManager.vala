@@ -23,6 +23,7 @@
 public class Akira.Lib.Managers.NobManager : Object {
     private const string STROKE_COLOR = "#666";
     private const double LINE_WIDTH = 1.0;
+    private const double LINE_HEIGHT = 40.0;
 
     /*
     Grabber Pos:   8
@@ -52,6 +53,7 @@ public class Akira.Lib.Managers.NobManager : Object {
     private Goo.CanvasItem root;
     private Goo.CanvasRect? select_effect;
     private Goo.CanvasItemSimple[] nobs = new Goo.CanvasItemSimple[9];
+    private Goo.CanvasPolyline? rotation_line;
     private Goo.CanvasBounds select_bb;
     private double top;
     private double left;
@@ -144,6 +146,8 @@ public class Akira.Lib.Managers.NobManager : Object {
             return;
         }
 
+        rotation_line.remove ();
+        rotation_line = null;
         select_effect.remove ();
         select_effect = null;
 
@@ -178,6 +182,15 @@ public class Akira.Lib.Managers.NobManager : Object {
             );
             select_effect.set ("parent", root);
             select_effect.pointer_events = Goo.CanvasPointerEvents.NONE;
+
+            // Create the line to visually connect the rotation nob to the item.
+            rotation_line = new Goo.CanvasPolyline.line (
+                null, 0, 0, 0, LINE_HEIGHT,
+                "line-width", LINE_WIDTH / canvas.current_scale,
+                "stroke-color", STROKE_COLOR,
+                null);
+            rotation_line.set ("parent", root);
+            rotation_line.pointer_events = Goo.CanvasPointerEvents.NONE;
         }
 
         // If only one item is selected and it's inside an artboard,
@@ -214,7 +227,7 @@ public class Akira.Lib.Managers.NobManager : Object {
         }
 
         if (create) {
-            // debug ("create nobs");
+            // Create all the nobs.
             for (int i = 0; i < 9; i++) {
                 nobs[i] = new Selection.Nob (root, (Managers.NobManager.Nob) i);
                 // If an artboard is part of the current selection, hide the rotation nob.
@@ -335,15 +348,15 @@ public class Akira.Lib.Managers.NobManager : Object {
         nobs[Nob.LEFT_CENTER].raise (select_effect);
 
         // ROTATE nob
-        double distance = 40;
-        if (canvas.current_scale > 1) {
-            distance -= (distance * canvas.current_scale) * 0.05;
-        } else if (canvas.current_scale < 1) {
-            distance += (distance / canvas.current_scale) / 4;
-        }
-
         nobs[Nob.ROTATE].set_transform (matrix);
-        nobs[Nob.ROTATE].translate ((width / 2) - nob_offset, nob_offset - distance);
+        nobs[Nob.ROTATE].translate ((width / 2) - nob_offset, - LINE_HEIGHT / canvas.current_scale);
+
+        // Rotation line linked to the ROTATE nob.
+        rotation_line.set_transform (matrix);
+        rotation_line.translate ((width / 2), - LINE_HEIGHT / canvas.current_scale);
+        rotation_line.set ("line-width", LINE_WIDTH / canvas.current_scale);
+        rotation_line.set ("height", LINE_HEIGHT / canvas.current_scale);
+
         nobs[Nob.ROTATE].raise (select_effect);
     }
 
@@ -380,6 +393,7 @@ public class Akira.Lib.Managers.NobManager : Object {
             nobs[i].set ("visibility", Goo.CanvasItemVisibility.HIDDEN);
         }
         select_effect.set ("visibility", Goo.CanvasItemVisibility.HIDDEN);
+        rotation_line.set ("visibility", Goo.CanvasItemVisibility.HIDDEN);
     }
 
     private async void on_show_select_effect () {
@@ -391,5 +405,6 @@ public class Akira.Lib.Managers.NobManager : Object {
             nobs[i].set ("visibility", Goo.CanvasItemVisibility.VISIBLE);
         }
         select_effect.set ("visibility", Goo.CanvasItemVisibility.VISIBLE);
+        rotation_line.set ("visibility", Goo.CanvasItemVisibility.VISIBLE);
     }
 }
