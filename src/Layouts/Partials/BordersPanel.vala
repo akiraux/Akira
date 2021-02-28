@@ -25,7 +25,6 @@ public class Akira.Layouts.Partials.BordersPanel : Gtk.Grid {
     public Gtk.Button add_btn;
     public Gtk.ListBox borders_list_container;
     public Akira.Models.ListModel<Akira.Models.BordersItemModel> list_model;
-    public Gtk.Grid title_cont;
     private unowned List<Lib.Items.CanvasItem>? items;
 
     public bool toggled {
@@ -45,7 +44,7 @@ public class Akira.Layouts.Partials.BordersPanel : Gtk.Grid {
     }
 
     construct {
-        title_cont = new Gtk.Grid ();
+        var title_cont = new Gtk.Grid ();
         title_cont.orientation = Gtk.Orientation.HORIZONTAL;
         title_cont.hexpand = true;
         title_cont.get_style_context ().add_class ("option-panel");

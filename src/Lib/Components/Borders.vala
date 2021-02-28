@@ -34,7 +34,12 @@ public class Akira.Lib.Components.Borders : Component {
         item = _item;
         borders = new Gee.ArrayList<Border> ();
 
-        add_border_color (init_color, init_size);
+        // Only add the initial border if the user configured it in the Settings.
+        if (settings.set_border) {
+            add_border_color (init_color, init_size);
+        } else {
+            reload ();
+        }
     }
 
     /**
