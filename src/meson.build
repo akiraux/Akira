@@ -106,6 +106,7 @@ sources = files(
     'Lib/Managers/ItemsManager.vala',
     'Lib/Managers/NobManager.vala',
     'Lib/Managers/SelectedBoundManager.vala',
+    'Lib/Managers/SnapManager.vala',
 
     'Lib/Selection/Nob.vala',
 

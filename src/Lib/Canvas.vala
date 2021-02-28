@@ -55,6 +55,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     public Managers.ExportManager export_manager;
     public Managers.SelectedBoundManager selected_bound_manager;
     private Managers.NobManager nob_manager;
+    private Managers.SnapManager snap_manager;
     private Managers.HoverManager hover_manager;
 
     public bool ctrl_is_pressed = false;
@@ -82,6 +83,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         export_manager = new Managers.ExportManager (this);
         selected_bound_manager = new Managers.SelectedBoundManager (this);
         nob_manager = new Managers.NobManager (this);
+        snap_manager = new Managers.SnapManager (this);
         hover_manager = new Managers.HoverManager (this);
 
         window.event_bus.update_scale.connect (on_update_scale);
@@ -345,6 +347,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
             case EditMode.MODE_INSERT:
             case EditMode.MODE_SELECTION:
                 var selected_nob = nob_manager.selected_nob;
+                snap_manager.generate_snap_grid(selected_bound_manager.selected_items);
                 selected_bound_manager.transform_bound (event.x, event.y, selected_nob);
                 break;
 
