@@ -29,7 +29,7 @@ public class Akira.Models.FillsItemModel : Models.BaseModel {
             var new_rgba = Gdk.RGBA ();
             new_rgba.parse (value);
             fill.color = new_rgba;
-            fill.reload ();
+            fill.fills.reload ();
         }
     }
 
@@ -39,7 +39,7 @@ public class Akira.Models.FillsItemModel : Models.BaseModel {
         }
         set {
             fill.alpha = value;
-            fill.reload ();
+            fill.fills.reload ();
         }
     }
 
@@ -49,7 +49,7 @@ public class Akira.Models.FillsItemModel : Models.BaseModel {
         }
         set {
             fill.hidden = value;
-            fill.reload ();
+            fill.fills.reload ();
         }
     }
 

@@ -57,6 +57,9 @@ public class Akira.Lib.Components.Fills : Component {
         return fills.size;
     }
 
+    /**
+     * Loop through all the fill colors and create a final blend.
+     */
     public void reload () {
         // If we don't have any fill associated with this item, remove the background color.
         if (count () == 0) {
@@ -68,9 +71,72 @@ public class Akira.Lib.Components.Fills : Component {
             return;
         }
 
-        // Loop through all the configured fill and reload the color.
+        bool has_colors = false;
+        double alpha = 0;
+        double red = 0;
+        double blue = 0;
+        double green = 0;
+
+        // alpha = 0.25 + 0.85 * (1 - 0.25) = 0.8875
+        // red   = (57 * 0.25 + 255 * 0.85 * (1 - 0.25)) / 0.8875 = 199.2
+        // green = (40 * 0.25 + 255 * 0.85 * (1 - 0.25)) / 0.8875 = 194.4
+        // blue  = (28 * 0.25 + 255 * 0.85 * (1 - 0.25)) / 0.8875 = 191.1
+
+        // Loop through all the configured fill.
         foreach (Fill fill in fills) {
-            fill.reload ();
+            // Skip if the fill is hidden.
+            if (fill.hidden) {
+                continue;
+            }
+
+            // warning ("%f, %f, %f, %f", fill.color.red, fill.color.green, fill.color.blue, fill.color.alpha);
+
+            // alpha += ((double) fill.alpha) / 255;
+            // red += ((double) fill.color.red) * fill.color.alpha;
+            // green += ((double) fill.color.green) * fill.color.alpha;
+            // blue += ((double) fill.color.blue) * fill.color.alpha;
+            alpha += fill.color.alpha;
+            red += fill.color.red * fill.color.alpha;
+            green += fill.color.green * fill.color.alpha;
+            blue += fill.color.blue * fill.color.alpha;
+
+            has_colors = true;
+        }
+
+        // Calculate the mixed RGBA only if all the values are valid.
+        if (has_colors) {
+            // Keep in consideration the global opacity to properly update the fill color.
+            // double final_alpha = alpha * (1 - 0.25);
+
+            // var rgba_fill = Gdk.RGBA ();
+            // rgba_fill.red = (red * (1 - 0.25)) / final_alpha;
+            // rgba_fill.green = (green * (1 - 0.25)) / final_alpha;
+            // rgba_fill.blue = (blue * (1 - 0.25)) / final_alpha;
+            // rgba_fill.alpha = final_alpha;
+            double final_alpha = alpha / count ();
+
+            var rgba_fill = Gdk.RGBA ();
+            rgba_fill.red = red / final_alpha;
+            rgba_fill.green = green / final_alpha;
+            rgba_fill.blue = blue / final_alpha;
+            rgba_fill.alpha = final_alpha * item.opacity.opacity / 100;
+
+            warning ("%f, %f, %f, %f", rgba_fill.red, rgba_fill.green, rgba_fill.blue, rgba_fill.alpha);
+
+            uint fill_color_rgba = Utils.Color.rgba_to_uint (rgba_fill);
+
+            if (item is Items.CanvasArtboard) {
+                ((Items.CanvasArtboard) item).background.set ("fill-color-rgba", fill_color_rgba);
+            } else {
+                item.set ("fill-color-rgba", fill_color_rgba);
+            }
+        } else {
+            warning ("HERE");
+            if (item is Items.CanvasArtboard) {
+                ((Items.CanvasArtboard) item).background.set ("fill-color-rgba", null);
+            } else {
+                item.set ("fill-color-rgba", null);
+            }
         }
     }
 

@@ -41,64 +41,6 @@ public class Akira.Lib.Components.Fill : Component {
         id = fill_id;
         color = init_color;
         alpha = 255;
-
-        set_fill ();
-    }
-
-    /**
-     * Apply the properly converted fill color to the item.
-     */
-    private void set_fill () {
-        // Make the item transparent if the color is set to hidden.
-        if (hidden) {
-            if (item is Items.CanvasArtboard) {
-                ((Items.CanvasArtboard) item).background.set ("fill-color-rgba", null);
-            } else {
-                item.set ("fill-color-rgba", null);
-            }
-            hex = "";
-            return;
-        }
-
-        // Store the color in a new RGBA variable so we can manipulate it.
-        var rgba_fill = Gdk.RGBA ();
-        rgba_fill = color;
-
-        // Keep in consideration the global opacity to properly update the fill color.
-        rgba_fill.alpha = ((double) alpha) / 255 * item.opacity.opacity / 100;
-        hex = Utils.Color.rgba_to_hex (rgba_fill.to_string ());
-        uint fill_color_rgba = Utils.Color.rgba_to_uint (rgba_fill);
-
-        // Temporarily set the item color here. This will be moved to the Fills component
-        // once we enable multiple fillings.
-        if (item is Items.CanvasArtboard) {
-            ((Items.CanvasArtboard) item).background.set ("fill-color-rgba", fill_color_rgba);
-        } else {
-            item.set ("fill-color-rgba", fill_color_rgba);
-        }
-    }
-
-    /**
-     * Helper method used by the Fills component to force a reset of of the applied colors.
-     * This will most likely be removed once we start supporting multiple fillings.
-     */
-    public void reload () {
-        set_fill ();
-    }
-
-    /**
-     * Get the new hexadecimal string defined by the user and update the fill color.
-     */
-    public void set_fill_hex (string new_hex) {
-        // Interrupt if the value didn't change.
-        if (new_hex == hex) {
-            return;
-        }
-
-        hex = new_hex;
-        color.parse (hex);
-
-        set_fill ();
     }
 
     public void remove () {
