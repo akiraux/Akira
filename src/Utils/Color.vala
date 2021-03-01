@@ -69,4 +69,44 @@ public class Akira.Utils.Color : Object {
 
         return uint_rgba;
     }
+
+    public static Gdk.RGBA blend_colors (Gdk.RGBA base_color, Gdk.RGBA added_color) {
+        // If the newly added color alpha is 0 we don't need to do any color mixing
+        // as the added color won't alter the base color.
+        if (added_color.alpha == 0.0) {
+            warning ("added alpha 0");
+            return base_color;
+        }
+
+        // If the newly added color alpha is 1 we don't need to do any color mixing,
+        // as the added color will completely cover the base color.
+        if (added_color.alpha == 1.0) {
+            return added_color;
+        }
+
+        double alpha = base_color.alpha + added_color.alpha * (1 - base_color.alpha);
+        double red = Math.round (
+            ((base_color.red * base_color.alpha) +
+            (added_color.red * added_color.alpha) *
+            (1 - base_color.alpha)) / alpha
+        );
+        double green = Math.round (
+            ((base_color.green * base_color.alpha) +
+            (added_color.green * added_color.alpha) *
+            (1 - base_color.alpha)) / alpha
+        );
+        double blue = Math.round (
+            ((base_color.blue * base_color.alpha) +
+            (added_color.blue * added_color.alpha) *
+            (1 - base_color.alpha)) / alpha
+        );
+
+        var rgba = Gdk.RGBA ();
+        rgba.alpha = alpha;
+        rgba.red = red;
+        rgba.green = green;
+        rgba.blue = blue;
+
+        return rgba;
+    }
 }

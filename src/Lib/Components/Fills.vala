@@ -72,56 +72,29 @@ public class Akira.Lib.Components.Fills : Component {
         }
 
         bool has_colors = false;
-        double alpha = 0;
-        double red = 0;
-        double blue = 0;
-        double green = 0;
+        // Store the first available color
+        var rgba_fill = fills[0].color;
 
-        // alpha = 0.25 + 0.85 * (1 - 0.25) = 0.8875
-        // red   = (57 * 0.25 + 255 * 0.85 * (1 - 0.25)) / 0.8875 = 199.2
-        // green = (40 * 0.25 + 255 * 0.85 * (1 - 0.25)) / 0.8875 = 194.4
-        // blue  = (28 * 0.25 + 255 * 0.85 * (1 - 0.25)) / 0.8875 = 191.1
+        if (count () > 1) {
+            // Loop through all the configured fills.
+            foreach (Fill fill in fills) {
+                // Skip if the fill is hidden as we don't need to blend colors.
+                if (fill.hidden) {
+                    continue;
+                }
 
-        // Loop through all the configured fill.
-        foreach (Fill fill in fills) {
-            // Skip if the fill is hidden.
-            if (fill.hidden) {
-                continue;
+                // Set the new blended color.
+                rgba_fill = Utils.Color.blend_colors (rgba_fill, fill.color);
+                has_colors = true;
             }
-
-            // warning ("%f, %f, %f, %f", fill.color.red, fill.color.green, fill.color.blue, fill.color.alpha);
-
-            // alpha += ((double) fill.alpha) / 255;
-            // red += ((double) fill.color.red) * fill.color.alpha;
-            // green += ((double) fill.color.green) * fill.color.alpha;
-            // blue += ((double) fill.color.blue) * fill.color.alpha;
-            alpha += fill.color.alpha;
-            red += fill.color.red * fill.color.alpha;
-            green += fill.color.green * fill.color.alpha;
-            blue += fill.color.blue * fill.color.alpha;
-
-            has_colors = true;
+        } else {
+            has_colors = !fills[0].hidden;
         }
 
         // Calculate the mixed RGBA only if all the values are valid.
         if (has_colors) {
             // Keep in consideration the global opacity to properly update the fill color.
-            // double final_alpha = alpha * (1 - 0.25);
-
-            // var rgba_fill = Gdk.RGBA ();
-            // rgba_fill.red = (red * (1 - 0.25)) / final_alpha;
-            // rgba_fill.green = (green * (1 - 0.25)) / final_alpha;
-            // rgba_fill.blue = (blue * (1 - 0.25)) / final_alpha;
-            // rgba_fill.alpha = final_alpha;
-            double final_alpha = alpha / count ();
-
-            var rgba_fill = Gdk.RGBA ();
-            rgba_fill.red = red / final_alpha;
-            rgba_fill.green = green / final_alpha;
-            rgba_fill.blue = blue / final_alpha;
-            rgba_fill.alpha = final_alpha * item.opacity.opacity / 100;
-
-            warning ("%f, %f, %f, %f", rgba_fill.red, rgba_fill.green, rgba_fill.blue, rgba_fill.alpha);
+            rgba_fill.alpha = rgba_fill.alpha * item.opacity.opacity / 100;
 
             uint fill_color_rgba = Utils.Color.rgba_to_uint (rgba_fill);
 
