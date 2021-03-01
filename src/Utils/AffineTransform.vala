@@ -36,14 +36,15 @@ public class Akira.Utils.AffineTransform : Object {
      */
     public static void move_from_event (
         CanvasItem item,
+        SnapManager.SnapMatchData data,
         double event_x,
         double event_y,
         ref double initial_event_x,
         ref double initial_event_y
     ) {
         // Calculate the delta between the initial point and new mouse location.
-        var delta_x = fix_size (event_x - initial_event_x);
-        var delta_y = fix_size (event_y - initial_event_y);
+        var delta_x = fix_size (event_x - initial_event_x + data.horizontal_data.snap_offset());
+        var delta_y = fix_size (event_y - initial_event_y + data.vertical_data.snap_offset());
 
         Cairo.Matrix matrix;
         item.get_transform (out matrix);

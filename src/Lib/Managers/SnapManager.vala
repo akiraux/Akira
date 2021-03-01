@@ -20,30 +20,49 @@
 */
 
 public class Akira.Lib.Managers.SnapManager : Object {
-    private const string DEBUG_COLOR = "#444";
-    private const string MATCH_COLOR = "#f00";
-    private const double LINE_WIDTH = 1.0;
-    private const double SENSITIVITY = 10.0;
+    private const double SENSITIVITY = 4.0;
 
     public weak Akira.Lib.Canvas canvas { get; construct; }
 
 
     private Goo.CanvasItem root;
-    //private Goo.CanvasRect? select_effect;
-    //private Goo.CanvasItemSimple[] nobs = new Goo.CanvasItemSimple[9];
-    //private Goo.CanvasBounds select_bb;
 
+    // active snaps
+    private Gee.HashMap<int, Gee.HashSet<int>> active_vertical_snaps;
+    private Gee.HashMap<int, Gee.HashSet<int>> active_horizontal_snaps;
+
+    // snap grid
     public Gee.HashMap<int, Gee.HashSet<int>> vertical_snaps;
     public Gee.HashMap<int, Gee.HashSet<int>> horizontal_snaps;
 
-    // matchdata
-    public int v_reference_position;
-    public int v_fuzzy_match;
-    public Gee.HashSet<int> v_exact_matches;
+    public struct SnapMatch {
+        public bool wants_snap() {
+            return snap_position_found || exact_matches.size > 0;
+        }
 
-    public int h_reference_position;
-    public int h_fuzzy_match;
-    public Gee.HashSet<int> h_exact_matches;
+        public int snap_offset() {
+            if (wants_snap()) {
+                return snap_position - reference_position;
+            }
+            return 0;
+        }
+
+        public bool snap_position_found;
+        public int snap_position;
+        public int reference_position;
+        public Gee.HashSet<int> exact_matches;
+    }
+
+    public struct SnapMatchData {
+        public bool wants_snap() {
+            return horizontal_data.wants_snap() || vertical_data.wants_snap();
+        }
+        SnapMatch horizontal_data;
+        SnapMatch vertical_data;
+    }
+
+    // matchdata
+    public SnapMatchData snap_match_data;
 
     // If the effect needs to be created or it's only a value update.
     private bool create { get; set; default = true; }
@@ -56,15 +75,41 @@ public class Akira.Lib.Managers.SnapManager : Object {
 
     construct {
         root = canvas.get_root_item ();
+        active_vertical_snaps = new Gee.HashMap<int, Gee.HashSet<int>>();
+        active_horizontal_snaps = new Gee.HashMap<int, Gee.HashSet<int>>();
         vertical_snaps = new Gee.HashMap<int, Gee.HashSet<int>>();
         horizontal_snaps = new Gee.HashMap<int, Gee.HashSet<int>>();
-        v_reference_position = -1;
-        v_fuzzy_match = -1;
-        v_exact_matches = new Gee.HashSet<int>();
-        h_reference_position = -1;
-        h_fuzzy_match = -1;
-        h_exact_matches = new Gee.HashSet<int>();
+        snap_match_data.horizontal_data.reference_position = -1;
+        snap_match_data.horizontal_data.snap_position = -1;
+        snap_match_data.horizontal_data.snap_position_found = false;
+        snap_match_data.horizontal_data.exact_matches = new Gee.HashSet<int>();
+        snap_match_data.vertical_data.reference_position = -1;
+        snap_match_data.vertical_data.snap_position = -1;
+        snap_match_data.vertical_data.snap_position_found = false;
+        snap_match_data.vertical_data.exact_matches = new Gee.HashSet<int>();
     }
+
+    public void reset()
+    {
+        active_vertical_snaps.clear();
+        active_horizontal_snaps.clear();
+        vertical_snaps.clear();
+        horizontal_snaps.clear();
+        resetMatches();
+    }
+
+    public void resetMatches()
+    {
+        snap_match_data.horizontal_data.reference_position = -1;
+        snap_match_data.horizontal_data.snap_position = -1;
+        snap_match_data.horizontal_data.snap_position_found = false;
+        snap_match_data.horizontal_data.exact_matches.clear();
+        snap_match_data.vertical_data.reference_position = -1;
+        snap_match_data.vertical_data.snap_position = -1;
+        snap_match_data.vertical_data.snap_position_found = false;
+        snap_match_data.vertical_data.exact_matches.clear();
+    }
+
 
     public void generate_snap_grid (List<Items.CanvasItem> selection) {
         List<weak Goo.CanvasItem> vertical_candidates = null;
@@ -107,14 +152,10 @@ public class Akira.Lib.Managers.SnapManager : Object {
         }
     }
 
-    public Gee.HashMap<int, Gee.HashSet<int>> matches(List<Items.CanvasItem> selection)
+    public void generate_snap_matches(List<Items.CanvasItem> selection)
     {
-        v_fuzzy_match = -1;
-        v_exact_matches.clear();
-        h_fuzzy_match = -1;
-        h_exact_matches.clear();
-
-        var matches = new Gee.HashMap<int, Gee.HashSet<int>>();
+        generate_snap_grid(selection);
+        resetMatches();
 
         var v_sel_snaps = new Gee.HashMap<int, Gee.HashSet<int>>();
         var h_sel_snaps = new Gee.HashMap<int, Gee.HashSet<int>>();
@@ -135,14 +176,16 @@ public class Akira.Lib.Managers.SnapManager : Object {
 
                 if (diff < SENSITIVITY) {
                     if (diff == 0) {
-                        v_fuzzy_match = -1;
-                        v_exact_matches.add(cand.key);
-                        v_reference_position = sel_snap.key;
+                        snap_match_data.vertical_data.snap_position_found = true;
+                        snap_match_data.vertical_data.snap_position = sel_snap.key;
+                        snap_match_data.vertical_data.reference_position = sel_snap.key;
+                        snap_match_data.vertical_data.exact_matches.add(cand.key);
                         tmpdiff = diff;
                     }
                     else if (diff < tmpdiff) {
-                        v_fuzzy_match = cand.key;
-                        v_reference_position = sel_snap.key;
+                        snap_match_data.vertical_data.snap_position_found = true;
+                        snap_match_data.vertical_data.snap_position = cand.key;
+                        snap_match_data.vertical_data.reference_position = sel_snap.key;
                         tmpdiff = diff;
                     }
                 }
@@ -157,22 +200,22 @@ public class Akira.Lib.Managers.SnapManager : Object {
 
                 if (diff < SENSITIVITY) {
                     if (diff == 0) {
-                        h_fuzzy_match = -1;
-                        h_exact_matches.add(cand.key);
-                        h_reference_position = sel_snap.key;
+                        snap_match_data.horizontal_data.snap_position_found = true;
+                        snap_match_data.horizontal_data.snap_position = sel_snap.key;
+                        snap_match_data.horizontal_data.reference_position = sel_snap.key;
+                        snap_match_data.horizontal_data.exact_matches.add(cand.key);
                         tmpdiff = diff;
                     }
                     else if (diff < tmpdiff) {
-                        h_fuzzy_match = cand.key;
-                        h_reference_position = sel_snap.key;
+                        snap_match_data.horizontal_data.snap_position_found = true;
+                        snap_match_data.horizontal_data.snap_position = cand.key;
+                        snap_match_data.horizontal_data.reference_position = sel_snap.key;
                         tmpdiff = diff;
                     }
                 }
                 tmpdiff = diff;
             }
         }
-
-        return matches;
     }
 
     private void add_to_map(int pos, int n1, int n2, int n3, ref Gee.HashMap<int, Gee.HashSet<int>> map)

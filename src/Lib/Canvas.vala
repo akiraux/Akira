@@ -314,6 +314,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 break;
 
             case EditMode.MODE_SELECTION:
+                snap_manager.reset();
                 window.event_bus.detect_artboard_change ();
                 window.event_bus.detect_image_size_change ();
                 break;
@@ -347,9 +348,13 @@ public class Akira.Lib.Canvas : Goo.Canvas {
             case EditMode.MODE_INSERT:
             case EditMode.MODE_SELECTION:
                 var selected_nob = nob_manager.selected_nob;
-                snap_manager.generate_snap_grid(selected_bound_manager.selected_items);
-                snap_manager.matches(selected_bound_manager.selected_items);
-                selected_bound_manager.transform_bound (event.x, event.y, selected_nob);
+                snap_manager.generate_snap_matches(selected_bound_manager.selected_items);
+                selected_bound_manager.transform_bound (event.x, event.y, selected_nob, snap_manager.snap_match_data);
+
+                if (snap_manager.snap_match_data.wants_snap()) {
+                    // if snapping occured, we need to update the grid before painting
+                    snap_manager.generate_snap_grid(selected_bound_manager.selected_items);
+                }
                 break;
 
             case EditMode.MODE_PANNING:

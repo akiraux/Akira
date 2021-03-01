@@ -82,7 +82,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         initial_height = select_bb.y2 - select_bb.y1;
     }
 
-    public void transform_bound (double event_x, double event_y, Managers.NobManager.Nob selected_nob) {
+    public void transform_bound (double event_x, double event_y, Managers.NobManager.Nob selected_nob, Managers.SnapManager.SnapMatchData snap_data) {
         Items.CanvasItem selected_item = selected_items.nth_data (0);
 
         if (selected_item == null) {
@@ -91,8 +91,8 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
 
         switch (selected_nob) {
             case Managers.NobManager.Nob.NONE:
-                Utils.AffineTransform.move_from_event (
-                    selected_item, event_x, event_y,
+              Utils.AffineTransform.move_from_event (
+                    selected_item, snap_data, event_x, event_y,
                     ref initial_event_x, ref initial_event_y
                 );
                 break;
