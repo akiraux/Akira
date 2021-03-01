@@ -23,7 +23,7 @@ public class Akira.Lib.Managers.SnapManager : Object {
     private const string DEBUG_COLOR = "#444";
     private const string MATCH_COLOR = "#f00";
     private const double LINE_WIDTH = 1.0;
-    private const double SENSITIVITY = 4.0;
+    private const double SENSITIVITY = 10.0;
 
     public weak Akira.Lib.Canvas canvas { get; construct; }
 
@@ -33,8 +33,17 @@ public class Akira.Lib.Managers.SnapManager : Object {
     //private Goo.CanvasItemSimple[] nobs = new Goo.CanvasItemSimple[9];
     //private Goo.CanvasBounds select_bb;
 
-    private Gee.HashMap<int, Gee.HashSet<int>> vertical_snaps;
-    private Gee.HashMap<int, Gee.HashSet<int>> horizontal_snaps;
+    public Gee.HashMap<int, Gee.HashSet<int>> vertical_snaps;
+    public Gee.HashMap<int, Gee.HashSet<int>> horizontal_snaps;
+
+    // matchdata
+    public int v_reference_position;
+    public int v_fuzzy_match;
+    public Gee.HashSet<int> v_exact_matches;
+
+    public int h_reference_position;
+    public int h_fuzzy_match;
+    public Gee.HashSet<int> h_exact_matches;
 
     // If the effect needs to be created or it's only a value update.
     private bool create { get; set; default = true; }
@@ -49,6 +58,12 @@ public class Akira.Lib.Managers.SnapManager : Object {
         root = canvas.get_root_item ();
         vertical_snaps = new Gee.HashMap<int, Gee.HashSet<int>>();
         horizontal_snaps = new Gee.HashMap<int, Gee.HashSet<int>>();
+        v_reference_position = -1;
+        v_fuzzy_match = -1;
+        v_exact_matches = new Gee.HashSet<int>();
+        h_reference_position = -1;
+        h_fuzzy_match = -1;
+        h_exact_matches = new Gee.HashSet<int>();
     }
 
     public void generate_snap_grid (List<Items.CanvasItem> selection) {
@@ -63,15 +78,15 @@ public class Akira.Lib.Managers.SnapManager : Object {
 
         foreach (var item in selection)
         {
-          horizontal_filter.x1 = item.bounds.x1;
-          horizontal_filter.x2 = item.bounds.x2;
+          horizontal_filter.x1 = item.bounds.x1 - SENSITIVITY;
+          horizontal_filter.x2 = item.bounds.x2 + SENSITIVITY;
           horizontal_filter.y1 = canvas.y1;
           horizontal_filter.y2 = canvas.y2;
 
           vertical_filter.x1 = canvas.x1;
           vertical_filter.x2 = canvas.x2;
-          vertical_filter.y1 = item.bounds.y1;
-          vertical_filter.y2 = item.bounds.y2;
+          vertical_filter.y1 = item.bounds.y1 - SENSITIVITY;
+          vertical_filter.y2 = item.bounds.y2 + SENSITIVITY;
 
           vertical_candidates.concat(canvas.get_items_in_area(vertical_filter, true, true, false));
           horizontal_candidates.concat(canvas.get_items_in_area(horizontal_filter, true, true, false));
@@ -80,19 +95,84 @@ public class Akira.Lib.Managers.SnapManager : Object {
         foreach (var vfi in vertical_candidates) {
           var candidate_item = vfi as Items.CanvasItem;
           if (candidate_item != null && selection.find(candidate_item) == null) {
-            populate_horizontal_snaps(candidate_item, ref vertical_snaps);
+            populate_vertical_snaps(candidate_item, ref vertical_snaps);
           }
         }
-
-        debug("vs: %d",vertical_snaps.size);
 
         foreach (var hfi in horizontal_candidates) {
           var candidate_item = hfi as Items.CanvasItem;
           if (candidate_item != null && selection.find(candidate_item) == null) {
-            populate_vertical_snaps(candidate_item, ref horizontal_snaps);
+            populate_horizontal_snaps(candidate_item, ref horizontal_snaps);
           }
         }
-        debug("hs: %d",horizontal_snaps.size);
+    }
+
+    public Gee.HashMap<int, Gee.HashSet<int>> matches(List<Items.CanvasItem> selection)
+    {
+        v_fuzzy_match = -1;
+        v_exact_matches.clear();
+        h_fuzzy_match = -1;
+        h_exact_matches.clear();
+
+        var matches = new Gee.HashMap<int, Gee.HashSet<int>>();
+
+        var v_sel_snaps = new Gee.HashMap<int, Gee.HashSet<int>>();
+        var h_sel_snaps = new Gee.HashMap<int, Gee.HashSet<int>>();
+
+        foreach (var item in selection)
+        {
+            populate_horizontal_snaps(item, ref h_sel_snaps);
+            populate_vertical_snaps(item, ref v_sel_snaps);
+        }
+
+        int diff = (int) SENSITIVITY + 1;
+        int tmpdiff = (int) SENSITIVITY + 1;
+
+        foreach (var sel_snap in v_sel_snaps) {
+            foreach (var cand in vertical_snaps) {
+                diff = (int)(cand.key - sel_snap.key);
+                diff = diff.abs();
+
+                if (diff < SENSITIVITY) {
+                    if (diff == 0) {
+                        v_fuzzy_match = -1;
+                        v_exact_matches.add(cand.key);
+                        v_reference_position = sel_snap.key;
+                        tmpdiff = diff;
+                    }
+                    else if (diff < tmpdiff) {
+                        v_fuzzy_match = cand.key;
+                        v_reference_position = sel_snap.key;
+                        tmpdiff = diff;
+                    }
+                }
+            }
+        }
+
+        tmpdiff = (int) SENSITIVITY + 1;
+        foreach (var sel_snap in h_sel_snaps) {
+            foreach (var cand in horizontal_snaps) {
+                diff = (int)(cand.key - sel_snap.key);
+                diff = diff.abs();
+
+                if (diff < SENSITIVITY) {
+                    if (diff == 0) {
+                        h_fuzzy_match = -1;
+                        h_exact_matches.add(cand.key);
+                        h_reference_position = sel_snap.key;
+                        tmpdiff = diff;
+                    }
+                    else if (diff < tmpdiff) {
+                        h_fuzzy_match = cand.key;
+                        h_reference_position = sel_snap.key;
+                        tmpdiff = diff;
+                    }
+                }
+                tmpdiff = diff;
+            }
+        }
+
+        return matches;
     }
 
     private void add_to_map(int pos, int n1, int n2, int n3, ref Gee.HashMap<int, Gee.HashSet<int>> map)
@@ -115,9 +195,9 @@ public class Akira.Lib.Managers.SnapManager : Object {
     private void populate_horizontal_snaps(Items.CanvasItem item, ref Gee.HashMap<int, Gee.HashSet<int>> map)
     {
         int x_1 = (int)item.bounds.x1;
-        int x_2 = (int)item.bounds.x1;
-        int y_1 = (int)item.bounds.x1;
-        int y_2 = (int)item.bounds.x1;
+        int x_2 = (int)item.bounds.x2;
+        int y_1 = (int)item.bounds.y1;
+        int y_2 = (int)item.bounds.y2;
         int center_x = (int)((item.bounds.x2 - item.bounds.x1) / 2.0 + item.bounds.x1);
         int center_y = (int)((item.bounds.y2 - item.bounds.y1) / 2.0 + item.bounds.y1);
 
@@ -129,9 +209,9 @@ public class Akira.Lib.Managers.SnapManager : Object {
     private void populate_vertical_snaps(Items.CanvasItem item, ref Gee.HashMap<int, Gee.HashSet<int>> map)
     {
         int x_1 = (int)item.bounds.x1;
-        int x_2 = (int)item.bounds.x1;
-        int y_1 = (int)item.bounds.x1;
-        int y_2 = (int)item.bounds.x1;
+        int x_2 = (int)item.bounds.x2;
+        int y_1 = (int)item.bounds.y1;
+        int y_2 = (int)item.bounds.y2;
         int center_x = (int)((item.bounds.x2 - item.bounds.x1) / 2.0 + item.bounds.x1);
         int center_y = (int)((item.bounds.y2 - item.bounds.y1) / 2.0 + item.bounds.y1);
 

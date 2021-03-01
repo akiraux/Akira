@@ -348,6 +348,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
             case EditMode.MODE_SELECTION:
                 var selected_nob = nob_manager.selected_nob;
                 snap_manager.generate_snap_grid(selected_bound_manager.selected_items);
+                snap_manager.matches(selected_bound_manager.selected_items);
                 selected_bound_manager.transform_bound (event.x, event.y, selected_nob);
                 break;
 
