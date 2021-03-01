@@ -20,16 +20,18 @@
 */
 
 public class Akira.Lib.Managers.SnapManager : Object {
+    private const string STROKE_COLOR = "#ff0000";
+    private const double LINE_WIDTH = 2.0;
+    private const double DOT_RADIUS = 3.0;
     private const double SENSITIVITY = 4.0;
 
     public weak Akira.Lib.Canvas canvas { get; construct; }
 
 
     private Goo.CanvasItem root;
-
-    // active snaps
-    private Gee.HashMap<int, Gee.HashSet<int>> active_vertical_snaps;
-    private Gee.HashMap<int, Gee.HashSet<int>> active_horizontal_snaps;
+    private Gee.ArrayList<Goo.CanvasItemSimple> vertical_decorator_lines;
+    private Gee.ArrayList<Goo.CanvasItemSimple> horizontal_decorator_lines;
+    private Gee.ArrayList<Goo.CanvasItemSimple> decorator_dots;
 
     // snap grid
     public Gee.HashMap<int, Gee.HashSet<int>> vertical_snaps;
@@ -74,9 +76,6 @@ public class Akira.Lib.Managers.SnapManager : Object {
     }
 
     construct {
-        root = canvas.get_root_item ();
-        active_vertical_snaps = new Gee.HashMap<int, Gee.HashSet<int>>();
-        active_horizontal_snaps = new Gee.HashMap<int, Gee.HashSet<int>>();
         vertical_snaps = new Gee.HashMap<int, Gee.HashSet<int>>();
         horizontal_snaps = new Gee.HashMap<int, Gee.HashSet<int>>();
         snap_match_data.horizontal_data.reference_position = -1;
@@ -87,18 +86,21 @@ public class Akira.Lib.Managers.SnapManager : Object {
         snap_match_data.vertical_data.snap_position = -1;
         snap_match_data.vertical_data.snap_position_found = false;
         snap_match_data.vertical_data.exact_matches = new Gee.HashSet<int>();
+
+        vertical_decorator_lines = new Gee.ArrayList<Goo.CanvasItemSimple> ();
+        horizontal_decorator_lines = new Gee.ArrayList<Goo.CanvasItemSimple> ();
+        decorator_dots = new Gee.ArrayList<Goo.CanvasItemSimple> ();
     }
 
     public void reset()
     {
-        active_vertical_snaps.clear();
-        active_horizontal_snaps.clear();
         vertical_snaps.clear();
         horizontal_snaps.clear();
-        resetMatches();
+        reset_matches();
+        reset_decorators();
     }
 
-    public void resetMatches()
+    public void reset_matches()
     {
         snap_match_data.horizontal_data.reference_position = -1;
         snap_match_data.horizontal_data.snap_position = -1;
@@ -110,6 +112,18 @@ public class Akira.Lib.Managers.SnapManager : Object {
         snap_match_data.vertical_data.exact_matches.clear();
     }
 
+    public void reset_decorators()
+    {
+        foreach (var decorator in vertical_decorator_lines) {
+            decorator.set("visibility", Goo.CanvasItemVisibility.HIDDEN);
+        }
+        foreach (var decorator in horizontal_decorator_lines) {
+            decorator.set("visibility", Goo.CanvasItemVisibility.HIDDEN);
+        }
+        foreach (var decorator in decorator_dots) {
+            decorator.set("visibility", Goo.CanvasItemVisibility.HIDDEN);
+        }
+    }
 
     public void generate_snap_grid (List<Items.CanvasItem> selection) {
         List<weak Goo.CanvasItem> vertical_candidates = null;
@@ -155,7 +169,7 @@ public class Akira.Lib.Managers.SnapManager : Object {
     public void generate_snap_matches(List<Items.CanvasItem> selection)
     {
         generate_snap_grid(selection);
-        resetMatches();
+        reset_matches();
 
         var v_sel_snaps = new Gee.HashMap<int, Gee.HashSet<int>>();
         var h_sel_snaps = new Gee.HashMap<int, Gee.HashSet<int>>();
@@ -218,6 +232,38 @@ public class Akira.Lib.Managers.SnapManager : Object {
         }
     }
 
+    public void populate_decorators()
+    {
+        if (root == null) {
+            root = canvas.get_root_item ();
+        }
+
+        reset_decorators();
+
+       if (snap_match_data.vertical_data.wants_snap()) {
+            if (snap_match_data.vertical_data.exact_matches.size == 0) {
+                add_vertical_decorator_line(snap_match_data.vertical_data.snap_position);
+            }
+            else {
+                foreach (var snap_position in snap_match_data.vertical_data.exact_matches) {
+                    add_vertical_decorator_line(snap_position);
+                }
+            }
+       }
+
+       if (snap_match_data.horizontal_data.wants_snap()) {
+            if (snap_match_data.horizontal_data.exact_matches.size == 0) {
+                add_horizontal_decorator_line(snap_match_data.horizontal_data.snap_position);
+            }
+            else {
+                foreach (var snap_position in snap_match_data.horizontal_data.exact_matches) {
+                    add_horizontal_decorator_line(snap_position);
+                }
+            }
+       }
+
+    }
+
     private void add_to_map(int pos, int n1, int n2, int n3, ref Gee.HashMap<int, Gee.HashSet<int>> map)
     {
         if (map.has_key(pos)) {
@@ -262,4 +308,112 @@ public class Akira.Lib.Managers.SnapManager : Object {
         add_to_map(y_2, x_1, x_2, center_x, ref map);
         add_to_map(center_y, center_x, center_x, center_x, ref map);
     }
+
+    private void add_vertical_decorator_line(int pos) {
+        var snap_value = vertical_snaps.get(pos);
+        if (snap_value != null) {
+
+            // add dots
+            foreach (var normal in snap_value) {
+                add_decorator_dot(normal, pos);
+            }
+
+            // add lines (reuse if possible
+            foreach (var line in vertical_decorator_lines) {
+                if (line.visibility == Goo.CanvasItemVisibility.HIDDEN) {
+                    line.set("visibility", Goo.CanvasItemVisibility.VISIBLE);
+                    line.set("y", (double)pos);
+                    line.set("line-width", LINE_WIDTH / canvas.current_scale);
+                    line.raise(null);
+                    return;
+                }
+            }
+
+            var tmp = new Goo.CanvasPolyline.line(
+                null,
+                canvas.x1, pos,
+                canvas.x2, pos,
+                "line-width", LINE_WIDTH / canvas.current_scale,
+                "stroke-color", STROKE_COLOR,
+                null
+            );
+
+            tmp.can_focus = false;
+            tmp.pointer_events = Goo.CanvasPointerEvents.NONE;
+
+            tmp.set("parent", root);
+            tmp.raise(null);
+            vertical_decorator_lines.add(tmp);
+        }
+    }
+
+    private void add_horizontal_decorator_line(int pos) {
+        var snap_value = horizontal_snaps.get(pos);
+        if (snap_value != null) {
+
+            // add dots
+            foreach (var normal in snap_value) {
+                add_decorator_dot(pos, normal);
+            }
+
+            // add lines (reuse if possible
+            foreach (var line in horizontal_decorator_lines) {
+                if (line.visibility == Goo.CanvasItemVisibility.HIDDEN) {
+                    line.set("visibility", Goo.CanvasItemVisibility.VISIBLE);
+                    line.set("x", (double)pos);
+                    line.set("line-width", LINE_WIDTH / canvas.current_scale);
+                    line.raise(null);
+                    return;
+                }
+            }
+
+            var tmp = new Goo.CanvasPolyline.line(
+                null,
+                pos, canvas.y1,
+                pos, canvas.y2,
+                "line-width", LINE_WIDTH / canvas.current_scale,
+                "stroke-color", STROKE_COLOR,
+                null
+            );
+
+            tmp.can_focus = false;
+            tmp.pointer_events = Goo.CanvasPointerEvents.NONE;
+
+            tmp.set("parent", root);
+            tmp.raise(null);
+            horizontal_decorator_lines.add(tmp);
+        }
+    }
+
+    private void add_decorator_dot(int x, int y) {
+        // add dot
+        foreach (var line in decorator_dots) {
+            if (line.visibility == Goo.CanvasItemVisibility.HIDDEN) {
+                line.set("visibility", Goo.CanvasItemVisibility.VISIBLE);
+                line.set("center_x", (double)x);
+                line.set("center_y", (double)y);
+                line.set("radius_x", DOT_RADIUS / canvas.current_scale);
+                line.set("radius_y", DOT_RADIUS / canvas.current_scale);
+                line.raise(null);
+                return;
+            }
+        }
+
+        var tmp = new Goo.CanvasEllipse(
+            null,
+            x, y,
+            DOT_RADIUS / canvas.current_scale, DOT_RADIUS / canvas.current_scale,
+            "line-width", 0.0,
+            "fill-color", STROKE_COLOR,
+            null
+        );
+
+        tmp.can_focus = false;
+        tmp.pointer_events = Goo.CanvasPointerEvents.NONE;
+
+        tmp.set("parent", root);
+        tmp.raise(null);
+        decorator_dots.add(tmp);
+    }
+
 }

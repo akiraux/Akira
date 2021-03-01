@@ -355,6 +355,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                     // if snapping occured, we need to update the grid before painting
                     snap_manager.generate_snap_grid(selected_bound_manager.selected_items);
                 }
+                snap_manager.populate_decorators();
                 break;
 
             case EditMode.MODE_PANNING:
