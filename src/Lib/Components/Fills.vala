@@ -104,7 +104,6 @@ public class Akira.Lib.Components.Fills : Component {
                 item.set ("fill-color-rgba", fill_color_rgba);
             }
         } else {
-            warning ("HERE");
             if (item is Items.CanvasArtboard) {
                 ((Items.CanvasArtboard) item).background.set ("fill-color-rgba", null);
             } else {
