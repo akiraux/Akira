@@ -111,6 +111,9 @@ public class Akira.Layouts.Partials.BorderItem : Gtk.Grid {
         color_popover = new Gtk.Popover (color_picker);
         color_popover.position = Gtk.PositionType.BOTTOM;
 
+        var selected_color_container = new Gtk.Grid ();
+        selected_color_container.get_style_context ().add_class ("bg-pattern");
+
         selected_color = new Gtk.MenuButton ();
         selected_color.remove (selected_color.get_child ());
         selected_color.vexpand = true;
@@ -120,11 +123,21 @@ public class Akira.Layouts.Partials.BorderItem : Gtk.Grid {
         selected_color.popover = color_popover;
         selected_color.set_tooltip_text (_("Choose border color"));
 
+        selected_color_container.add (selected_color);
+
+        eyedropper_button = new Gtk.Button ();
+        eyedropper_button.get_style_context ().add_class ("color-picker-button");
+        eyedropper_button.can_focus = false;
+        eyedropper_button.valign = Gtk.Align.CENTER;
+        eyedropper_button.set_tooltip_text (_("Pick color"));
+        eyedropper_button.add (new Gtk.Image.from_icon_name ("color-select-symbolic",
+            Gtk.IconSize.SMALL_TOOLBAR));
+
         var picker_container = new Gtk.Grid ();
         picker_container.margin_end = 10;
         picker_container.margin_top = picker_container.margin_bottom = 1;
-        picker_container.get_style_context ().add_class ("bg-pattern");
-        picker_container.add (selected_color);
+        picker_container.add (selected_color_container);
+        picker_container.add (eyedropper_button);
 
         color_container = new Akira.Partials.ColorField (window);
         color_container.text = Utils.Color.rgba_to_hex (color);
@@ -168,15 +181,6 @@ public class Akira.Layouts.Partials.BorderItem : Gtk.Grid {
         color_chooser.attach (color_container, 1, 0, 1, 1);
         color_chooser.attach (tickness_container, 2, 0, 1, 1);
 
-        eyedropper_button = new Gtk.Button ();
-        eyedropper_button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
-        eyedropper_button.get_style_context ().add_class ("button-rounded");
-        eyedropper_button.can_focus = false;
-        eyedropper_button.valign = Gtk.Align.CENTER;
-        eyedropper_button.set_tooltip_text (_("Pick color"));
-        eyedropper_button.add (new Gtk.Image.from_icon_name ("preferences-color-symbolic",
-            Gtk.IconSize.SMALL_TOOLBAR));
-
         hidden_button = new Gtk.Button ();
         hidden_button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
         hidden_button.get_style_context ().add_class ("button-rounded");
@@ -203,9 +207,8 @@ public class Akira.Layouts.Partials.BorderItem : Gtk.Grid {
         color_popover.add (color_picker);
 
         attach (color_chooser, 0, 0, 1, 1);
-        attach (eyedropper_button, 1, 0, 1, 1);
-        attach (hidden_button, 2, 0, 1, 1);
-        attach (delete_button, 3, 0, 1, 1);
+        attach (hidden_button, 1, 0, 1, 1);
+        attach (delete_button, 2, 0, 1, 1);
 
         set_color_chooser_color ();
         set_button_color ();
