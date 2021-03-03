@@ -43,10 +43,10 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
     private double initial_width;
     private double initial_height;
 
-    // drag move state
+    // Attributes to keep track of the mouse dragging coordinates
     private double initial_drag_press_x;
     private double initial_drag_press_y;
-    private bool   initial_drag_item_registered = false;
+    private bool initial_drag_registered = false;
     private double initial_drag_item_x;
     private double initial_drag_item_y;
 
@@ -75,7 +75,9 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
 
         initial_drag_press_x = event_x;
         initial_drag_press_y = event_y;
-        initial_drag_item_registered = false;
+        // We deregister any old drag, and the next will be registered on the
+        // first drag move_from_event call.
+        initial_drag_registered = false;
 
         if (selected_items.length () == 1) {
             var selected_item = selected_items.nth_data (0);
@@ -102,7 +104,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
 
         switch (selected_nob) {
             case Managers.NobManager.Nob.NONE:
-                move_from_event ( selected_item, event_x, event_y );
+                move_from_event (selected_item, event_x, event_y);
                 break;
 
             case Managers.NobManager.Nob.ROTATE:
@@ -324,17 +326,17 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
      */
     private void move_from_event (
         Lib.Items.CanvasItem item, double event_x, double event_y) {
-        if (!initial_drag_item_registered) {
-            initial_drag_item_registered = true;
-            initial_drag_item_x = item.bounds.x1;
-            initial_drag_item_y = item.bounds.y1;
+        if (!initial_drag_registered) {
+            initial_drag_registered = true;
+            initial_drag_item_x = item.transform.x;
+            initial_drag_item_y = item.transform.y;
         }
 
         // Keep reset and delta values for future adjustments.
 
         // Calculate values needed to reset to the original position
-        var reset_x = item.bounds.x1 - initial_drag_item_x;
-        var reset_y = item.bounds.y1 - initial_drag_item_y;
+        var reset_x = item.transform.x - initial_drag_item_x;
+        var reset_y = item.transform.y - initial_drag_item_y;
 
         // Calculate the change based on the event
         var delta_x = event_x - initial_drag_press_x;
@@ -359,7 +361,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
 
         // If the item is an Artboard, move the label with it.
         if (item is Lib.Items.CanvasArtboard) {
-            ((Lib.Items.CanvasArtboard) item).label.translate (first_move_x, first_move_x);
+            ((Lib.Items.CanvasArtboard) item).label.translate (first_move_x, first_move_y);
         }
     }
 }
