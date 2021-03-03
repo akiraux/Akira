@@ -314,7 +314,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 break;
 
             case EditMode.MODE_SELECTION:
-                snap_manager.reset();
+                snap_manager.reset ();
                 window.event_bus.detect_artboard_change ();
                 window.event_bus.detect_image_size_change ();
                 break;
@@ -349,7 +349,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
             case EditMode.MODE_SELECTION:
                 var selected_nob = nob_manager.selected_nob;
                 selected_bound_manager.transform_bound2 (event.x, event.y, selected_nob, snap_manager);
-                snap_manager.populate_decorators();
+                snap_manager.populate_decorators ();
                 break;
 
             case EditMode.MODE_PANNING:

@@ -51,9 +51,9 @@ public class Akira.Utils.AffineTransform : Object {
         bool snap_x = false;
         bool snap_y = false;
 
-        if (data.horizontal.wants_snap() && delta_x.abs() <= 4) {
+        if (data.horizontal.wants_snap () && delta_x.abs () <= 4) {
             if (data.horizontal.type == SnapManager.MatchType.FUZZY) {
-                delta_x = data.horizontal.snap_offset();
+                delta_x = data.horizontal.snap_offset ();
                 snap_x = true;
             }
             else {
@@ -62,9 +62,9 @@ public class Akira.Utils.AffineTransform : Object {
             }
         }
 
-        if (data.vertical.wants_snap() && delta_y.abs() <= 4) {
+        if (data.vertical.wants_snap () && delta_y.abs () <= 4) {
             if (data.vertical.type == SnapManager.MatchType.FUZZY) {
-                delta_y = data.vertical.snap_offset();
+                delta_y = data.vertical.snap_offset ();
                 snap_y = true;
             }
             else {
@@ -112,8 +112,8 @@ public class Akira.Utils.AffineTransform : Object {
         var delta_x = (event_x - initial_press_event_x);
         var delta_y = (event_y - initial_press_event_y);
 
-        item.translate(delta_x - reset_x, delta_y - reset_y);
-        snap_manager.generate_snap_matches(sel_manager.selected_items);
+        item.translate (delta_x - reset_x, delta_y - reset_y);
+        snap_manager.generate_snap_matches (sel_manager.selected_items);
 
         var hdata = snap_manager.snap_match_data.horizontal;
         var vdata = snap_manager.snap_match_data.vertical;
@@ -122,26 +122,27 @@ public class Akira.Utils.AffineTransform : Object {
         double snap_offset_x = 0;
         double snap_offset_y = 0;
 
-        if (hdata.wants_snap()) {
-            snap_offset_x = hdata.snap_offset();
+        if (hdata.wants_snap ()) {
+            snap_offset_x = hdata.snap_offset ();
             requires_snap = true;
         }
 
-        if (vdata.wants_snap()) {
-            snap_offset_y = vdata.snap_offset();
+        if (vdata.wants_snap ()) {
+            snap_offset_y = vdata.snap_offset ();
             requires_snap = true;
         }
 
         if (requires_snap) {
-            item.translate(snap_offset_x, snap_offset_y);
+            item.translate (snap_offset_x, snap_offset_y);
         }
 
         // If the item is an Artboard, move the label with it.
         if (item is Lib.Items.CanvasArtboard) {
-            ((Lib.Items.CanvasArtboard) item).label.translate (delta_x - reset_x + snap_offset_x, delta_y - reset_y + snap_offset_y);
+            ((Lib.Items.CanvasArtboard) item).label.translate (delta_x - reset_x + snap_offset_x,
+                                                               delta_y - reset_y + snap_offset_y);
         }
 
-        snap_manager.generate_snap_matches(sel_manager.selected_items);
+        snap_manager.generate_snap_matches (sel_manager.selected_items);
     }
 
     public static void scale_from_event (

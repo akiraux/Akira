@@ -45,7 +45,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
 
     private double initial_press_event_x;
     private double initial_press_event_y;
-    private bool   initial_object_populated;
+    private bool initial_object_populated;
     private double initial_object_x;
     private double initial_object_y;
 
@@ -93,7 +93,12 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         initial_height = select_bb.y2 - select_bb.y1;
     }
 
-    public void transform_bound (double event_x, double event_y, Managers.NobManager.Nob selected_nob, Managers.SnapManager.SnapMatchData snap_data) {
+    public void transform_bound (
+        double event_x,
+        double event_y,
+        Managers.NobManager.Nob selected_nob,
+        Managers.SnapManager.SnapMatchData snap_data
+    ) {
         Items.CanvasItem selected_item = selected_items.nth_data (0);
 
         if (selected_item == null) {
@@ -138,7 +143,12 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         canvas.window.event_bus.reset_state_coords (selected_item);
     }
 
-    public void transform_bound2 (double event_x, double event_y, Managers.NobManager.Nob selected_nob, Managers.SnapManager snap_manager) {
+    public void transform_bound2 (
+        double event_x,
+        double event_y,
+        Managers.NobManager.Nob selected_nob,
+        Managers.SnapManager snap_manager
+    ) {
         Items.CanvasItem selected_item = selected_items.nth_data (0);
 
         if (selected_item == null) {
@@ -155,7 +165,14 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         switch (selected_nob) {
             case Managers.NobManager.Nob.NONE:
               Utils.AffineTransform.move_from_event2 (
-                    selected_item, snap_manager, this, initial_press_event_x, initial_press_event_y, initial_object_x, initial_object_y, event_x, event_y
+                    selected_item, snap_manager,
+                    this,
+                    initial_press_event_x,
+                    initial_press_event_y,
+                    initial_object_x,
+                    initial_object_y,
+                    event_x,
+                    event_y
                 );
                 break;
 
