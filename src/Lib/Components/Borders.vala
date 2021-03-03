@@ -70,9 +70,41 @@ public class Akira.Lib.Components.Borders : Component {
             return;
         }
 
+        bool has_colors = false;
+        // Set an initial arbitrary color with full transparency.
+        var rgba_border = Gdk.RGBA ();
+        rgba_border.alpha = 0;
+        // Set an initial border size, we currently support one size
+        // even for multiple borders.
+        int size = 0;
+
         // Loop through all the configured borders and reload the color.
         foreach (Border border in borders) {
-            border.reload ();
+            // Skip if the border is hidden as we don't need to blend colors.
+            if (border.hidden) {
+                continue;
+            }
+
+            // Set the new blended color.
+            rgba_border = Utils.Color.blend_colors (rgba_border, border.color);
+            size = int.max (size, border.size);
+            has_colors = true;
+        }
+
+        // Apply the mixed RGBA value only if we had one.
+        if (has_colors) {
+            // Keep in consideration the global opacity to properly update the border color.
+            rgba_border.alpha = rgba_border.alpha * item.opacity.opacity / 100;
+
+            uint sroke_color_rgba = Utils.Color.rgba_to_uint (rgba_border);
+
+            item.set ("stroke-color-rgba", sroke_color_rgba);
+            // The "line-width" property expects a DOUBLE type, but we don't support subpixels
+            // so we always handle the border size as INT, therefore we need to type cast it here.
+            item.set ("line-width", (double) size);
+        } else {
+            item.set ("stroke-color-rgba", null);
+            item.set ("line-width", 0.0);
         }
     }
 

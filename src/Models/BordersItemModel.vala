@@ -28,7 +28,7 @@ public class Akira.Models.BordersItemModel : Models.BaseModel {
             var new_rgba = Gdk.RGBA ();
             new_rgba.parse (value);
             border.color = new_rgba;
-            border.reload ();
+            border.borders.reload ();
         }
     }
 
@@ -38,7 +38,7 @@ public class Akira.Models.BordersItemModel : Models.BaseModel {
         }
         set {
             border.alpha = value;
-            border.reload ();
+            border.borders.reload ();
         }
     }
 
@@ -48,7 +48,7 @@ public class Akira.Models.BordersItemModel : Models.BaseModel {
         }
         set {
             border.size = value;
-            border.reload ();
+            border.borders.reload ();
         }
     }
 
@@ -58,7 +58,7 @@ public class Akira.Models.BordersItemModel : Models.BaseModel {
         }
         set {
             border.hidden = value;
-            border.reload ();
+            border.borders.reload ();
         }
     }
 

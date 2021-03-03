@@ -88,7 +88,7 @@ public class Akira.Lib.Components.Fills : Component {
             has_colors = true;
         }
 
-        // Calculate the mixed RGBA only if all the values are valid.
+        // Apply the mixed RGBA value only if we had one.
         if (has_colors) {
             // Keep in consideration the global opacity to properly update the fill color.
             rgba_fill.alpha = rgba_fill.alpha * item.opacity.opacity / 100;
