@@ -80,9 +80,10 @@ public class Akira.Utils.Color : Object {
             return base_color;
         }
 
-        // If the newly added color alpha is 1 we don't need to do any color mixing,
-        // as the added color will completely cover the base color.
-        if (added_color.alpha == 1.0) {
+        // If the newly added color alpha is 1 or the base color alpha is 0
+        // we don't need to do any color mixing, as the added color will be
+        // the only one visible.
+        if (added_color.alpha == 1.0 || base_color.alpha == 0) {
             return added_color;
         }
 

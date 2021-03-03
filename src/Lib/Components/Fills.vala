@@ -72,23 +72,20 @@ public class Akira.Lib.Components.Fills : Component {
         }
 
         bool has_colors = false;
-        // Store the first available color
-        var rgba_fill = fills[0].color;
+        // Set an initial arbitrary color with full transparency.
+        var rgba_fill = Gdk.RGBA ();
+        rgba_fill.alpha = 0;
 
-        if (count () > 1) {
-            // Loop through all the configured fills.
-            foreach (Fill fill in fills) {
-                // Skip if the fill is hidden as we don't need to blend colors.
-                if (fill.hidden) {
-                    continue;
-                }
-
-                // Set the new blended color.
-                rgba_fill = Utils.Color.blend_colors (rgba_fill, fill.color);
-                has_colors = true;
+        // Loop through all the configured fills.
+        foreach (Fill fill in fills) {
+            // Skip if the fill is hidden as we don't need to blend colors.
+            if (fill.hidden) {
+                continue;
             }
-        } else {
-            has_colors = !fills[0].hidden;
+
+            // Set the new blended color.
+            rgba_fill = Utils.Color.blend_colors (rgba_fill, fill.color);
+            has_colors = true;
         }
 
         // Calculate the mixed RGBA only if all the values are valid.
