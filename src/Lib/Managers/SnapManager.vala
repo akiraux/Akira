@@ -21,46 +21,61 @@
 
 public class Akira.Lib.Managers.SnapManager : Object {
     private const string STROKE_COLOR = "#ff0000";
-    private const double LINE_WIDTH = 2.0;
+    private const double LINE_WIDTH = 1.0;
     private const double DOT_RADIUS = 3.0;
     private const double SENSITIVITY = 4.0;
 
     public weak Akira.Lib.Canvas canvas { get; construct; }
 
 
+    // Canvas items
     private Goo.CanvasItem root;
     private Gee.ArrayList<Goo.CanvasItemSimple> vertical_decorator_lines;
     private Gee.ArrayList<Goo.CanvasItemSimple> horizontal_decorator_lines;
     private Gee.ArrayList<Goo.CanvasItemSimple> decorator_dots;
 
-    // snap grid
-    public Gee.HashMap<int, Gee.HashSet<int>> vertical_snaps;
-    public Gee.HashMap<int, Gee.HashSet<int>> horizontal_snaps;
 
+    // Snap grid data
+    public struct SnapMeta {
+        public Gee.HashSet<int> normals;
+        public int polarity;
+    }
+
+    public Gee.HashMap<int, SnapMeta?> vertical_snaps;
+    public Gee.HashMap<int, SnapMeta?> horizontal_snaps;
+
+    // snap match data
+    public enum MatchType {
+        NONE=-1,
+        FUZZY,
+        EXACT,
+    }
     public struct SnapMatch {
         public bool wants_snap() {
-            return snap_position_found || exact_matches.size > 0;
+            return type != MatchType.NONE;
         }
 
         public int snap_offset() {
             if (wants_snap()) {
-                return snap_position - reference_position;
+                return snap_position + polarity_offset - reference_position;
             }
             return 0;
         }
 
-        public bool snap_position_found;
+        public MatchType type;
         public int snap_position;
+        public int polarity_offset;
         public int reference_position;
-        public Gee.HashSet<int> exact_matches;
+        public Gee.HashMap<int, int> exact_matches;
     }
 
     public struct SnapMatchData {
         public bool wants_snap() {
-            return horizontal_data.wants_snap() || vertical_data.wants_snap();
+            return horizontal.wants_snap() || vertical.wants_snap();
         }
-        SnapMatch horizontal_data;
-        SnapMatch vertical_data;
+
+        SnapMatch horizontal;
+        SnapMatch vertical;
     }
 
     // matchdata
@@ -76,16 +91,20 @@ public class Akira.Lib.Managers.SnapManager : Object {
     }
 
     construct {
-        vertical_snaps = new Gee.HashMap<int, Gee.HashSet<int>>();
-        horizontal_snaps = new Gee.HashMap<int, Gee.HashSet<int>>();
-        snap_match_data.horizontal_data.reference_position = -1;
-        snap_match_data.horizontal_data.snap_position = -1;
-        snap_match_data.horizontal_data.snap_position_found = false;
-        snap_match_data.horizontal_data.exact_matches = new Gee.HashSet<int>();
-        snap_match_data.vertical_data.reference_position = -1;
-        snap_match_data.vertical_data.snap_position = -1;
-        snap_match_data.vertical_data.snap_position_found = false;
-        snap_match_data.vertical_data.exact_matches = new Gee.HashSet<int>();
+        vertical_snaps = new Gee.HashMap<int, SnapMeta>();
+        horizontal_snaps = new Gee.HashMap<int, SnapMeta>();
+
+        snap_match_data.horizontal.type = MatchType.NONE;
+        snap_match_data.horizontal.reference_position = 0;
+        snap_match_data.horizontal.snap_position = 0;
+        snap_match_data.horizontal.polarity_offset = 0;
+        snap_match_data.horizontal.exact_matches = new Gee.HashMap<int, int>();
+
+        snap_match_data.vertical.type = MatchType.NONE;
+        snap_match_data.vertical.reference_position = 0;
+        snap_match_data.vertical.snap_position = 0;
+        snap_match_data.vertical.polarity_offset = 0;
+        snap_match_data.vertical.exact_matches = new Gee.HashMap<int, int>();
 
         vertical_decorator_lines = new Gee.ArrayList<Goo.CanvasItemSimple> ();
         horizontal_decorator_lines = new Gee.ArrayList<Goo.CanvasItemSimple> ();
@@ -102,14 +121,17 @@ public class Akira.Lib.Managers.SnapManager : Object {
 
     public void reset_matches()
     {
-        snap_match_data.horizontal_data.reference_position = -1;
-        snap_match_data.horizontal_data.snap_position = -1;
-        snap_match_data.horizontal_data.snap_position_found = false;
-        snap_match_data.horizontal_data.exact_matches.clear();
-        snap_match_data.vertical_data.reference_position = -1;
-        snap_match_data.vertical_data.snap_position = -1;
-        snap_match_data.vertical_data.snap_position_found = false;
-        snap_match_data.vertical_data.exact_matches.clear();
+        snap_match_data.horizontal.type = MatchType.NONE;
+        snap_match_data.horizontal.reference_position = 0;
+        snap_match_data.horizontal.snap_position = 0;
+        snap_match_data.horizontal.polarity_offset = 0;
+        snap_match_data.horizontal.exact_matches.clear();
+
+        snap_match_data.vertical.type = MatchType.NONE;
+        snap_match_data.vertical.reference_position = 0;
+        snap_match_data.vertical.snap_position = 0;
+        snap_match_data.vertical.polarity_offset = 0;
+        snap_match_data.vertical.exact_matches.clear();
     }
 
     public void reset_decorators()
@@ -171,8 +193,8 @@ public class Akira.Lib.Managers.SnapManager : Object {
         generate_snap_grid(selection);
         reset_matches();
 
-        var v_sel_snaps = new Gee.HashMap<int, Gee.HashSet<int>>();
-        var h_sel_snaps = new Gee.HashMap<int, Gee.HashSet<int>>();
+        var v_sel_snaps = new Gee.HashMap<int, SnapMeta?>();
+        var h_sel_snaps = new Gee.HashMap<int, SnapMeta?>();
 
         foreach (var item in selection)
         {
@@ -182,24 +204,36 @@ public class Akira.Lib.Managers.SnapManager : Object {
 
         int diff = (int) SENSITIVITY + 1;
         int tmpdiff = (int) SENSITIVITY + 1;
+        int polarity_offset = 0;
 
         foreach (var sel_snap in v_sel_snaps) {
             foreach (var cand in vertical_snaps) {
+                if ((sel_snap.value.polarity > 0) != (cand.value.polarity > 0)) {
+                    polarity_offset = 0;//(sel_snap.value.polarity > 0) ? -1 : 1;
+
+                }
+                else {
+                    polarity_offset= 0;
+                }
+
+
                 diff = (int)(cand.key - sel_snap.key);
                 diff = diff.abs();
 
                 if (diff < SENSITIVITY) {
-                    if (diff == 0) {
-                        snap_match_data.vertical_data.snap_position_found = true;
-                        snap_match_data.vertical_data.snap_position = sel_snap.key;
-                        snap_match_data.vertical_data.reference_position = sel_snap.key;
-                        snap_match_data.vertical_data.exact_matches.add(cand.key);
+                    if ((int)(cand.key + polarity_offset - sel_snap.key) == 0) {
+                        snap_match_data.vertical.type = MatchType.EXACT;
+                        snap_match_data.vertical.snap_position = sel_snap.key;
+                        snap_match_data.vertical.reference_position = sel_snap.key;
+                        snap_match_data.vertical.polarity_offset = polarity_offset;
+                        snap_match_data.vertical.exact_matches[cand.key] = polarity_offset;
                         tmpdiff = diff;
                     }
                     else if (diff < tmpdiff) {
-                        snap_match_data.vertical_data.snap_position_found = true;
-                        snap_match_data.vertical_data.snap_position = cand.key;
-                        snap_match_data.vertical_data.reference_position = sel_snap.key;
+                        snap_match_data.vertical.type = MatchType.FUZZY;
+                        snap_match_data.vertical.snap_position = cand.key;
+                        snap_match_data.vertical.reference_position = sel_snap.key;
+                        snap_match_data.vertical.polarity_offset = polarity_offset;
                         tmpdiff = diff;
                     }
                 }
@@ -209,21 +243,31 @@ public class Akira.Lib.Managers.SnapManager : Object {
         tmpdiff = (int) SENSITIVITY + 1;
         foreach (var sel_snap in h_sel_snaps) {
             foreach (var cand in horizontal_snaps) {
+                if ((sel_snap.value.polarity > 0) != (cand.value.polarity > 0)) {
+                    polarity_offset = 0;//(sel_snap.value.polarity > 0) ? -1 : 1;
+
+                }
+                else {
+                    polarity_offset= 0;
+                }
+
                 diff = (int)(cand.key - sel_snap.key);
                 diff = diff.abs();
 
                 if (diff < SENSITIVITY) {
-                    if (diff == 0) {
-                        snap_match_data.horizontal_data.snap_position_found = true;
-                        snap_match_data.horizontal_data.snap_position = sel_snap.key;
-                        snap_match_data.horizontal_data.reference_position = sel_snap.key;
-                        snap_match_data.horizontal_data.exact_matches.add(cand.key);
+                    if ((int)(cand.key + polarity_offset - sel_snap.key) == 0) {
+                        snap_match_data.horizontal.type = MatchType.EXACT;
+                        snap_match_data.horizontal.snap_position = cand.key;
+                        snap_match_data.horizontal.reference_position = sel_snap.key;
+                        snap_match_data.horizontal.polarity_offset = polarity_offset;
+                        snap_match_data.horizontal.exact_matches[cand.key] = polarity_offset;
                         tmpdiff = diff;
                     }
                     else if (diff < tmpdiff) {
-                        snap_match_data.horizontal_data.snap_position_found = true;
-                        snap_match_data.horizontal_data.snap_position = cand.key;
-                        snap_match_data.horizontal_data.reference_position = sel_snap.key;
+                        snap_match_data.horizontal.type = MatchType.FUZZY;
+                        snap_match_data.horizontal.snap_position = cand.key;
+                        snap_match_data.horizontal.reference_position = sel_snap.key;
+                        snap_match_data.horizontal.polarity_offset = polarity_offset;
                         tmpdiff = diff;
                     }
                 }
@@ -240,48 +284,52 @@ public class Akira.Lib.Managers.SnapManager : Object {
 
         reset_decorators();
 
-       if (snap_match_data.vertical_data.wants_snap()) {
-            if (snap_match_data.vertical_data.exact_matches.size == 0) {
-                add_vertical_decorator_line(snap_match_data.vertical_data.snap_position);
+       if (snap_match_data.vertical.wants_snap()) {
+            if (snap_match_data.vertical.exact_matches.size == 0) {
+                //add_vertical_decorator_line(snap_match_data.vertical.snap_position, snap_match_data.vertical.polarity_offset);
             }
             else {
-                foreach (var snap_position in snap_match_data.vertical_data.exact_matches) {
-                    add_vertical_decorator_line(snap_position);
+                foreach (var snap_position in snap_match_data.vertical.exact_matches) {
+                    add_vertical_decorator_line(snap_position.key, snap_position.value);
                 }
             }
        }
 
-       if (snap_match_data.horizontal_data.wants_snap()) {
-            if (snap_match_data.horizontal_data.exact_matches.size == 0) {
-                add_horizontal_decorator_line(snap_match_data.horizontal_data.snap_position);
+       if (snap_match_data.horizontal.wants_snap()) {
+            if (snap_match_data.horizontal.exact_matches.size == 0) {
+                //add_horizontal_decorator_line(snap_match_data.horizontal.snap_position, snap_match_data.horizontal.polarity_offset);
             }
             else {
-                foreach (var snap_position in snap_match_data.horizontal_data.exact_matches) {
-                    add_horizontal_decorator_line(snap_position);
+                foreach (var snap_position in snap_match_data.horizontal.exact_matches) {
+                    add_horizontal_decorator_line(snap_position.key, snap_position.value);
                 }
             }
        }
 
     }
 
-    private void add_to_map(int pos, int n1, int n2, int n3, ref Gee.HashMap<int, Gee.HashSet<int>> map)
+    private void add_to_map(int pos, int n1, int n2, int n3, int polarity, ref Gee.HashMap<int, SnapMeta?> map)
     {
         if (map.has_key(pos)) {
-            var k = map.get(pos);
-            k.add(n1);
-            k.add(n2);
-            k.add(n3);
+            SnapMeta? k = map.get(pos);
+            k.normals.add(n1);
+            k.normals.add(n2);
+            k.normals.add(n3);
+            // #TOFIX - this isn't accumulating
+            k.polarity += polarity;
         }
         else {
-            var v = new Gee.HashSet<int>();
-            v.add(n1);
-            v.add(n2);
-            v.add(n3);
+            var v = SnapMeta();
+            v.normals = new Gee.HashSet<int>();
+            v.normals.add(n1);
+            v.normals.add(n2);
+            v.normals.add(n3);
+            v.polarity = polarity;
             map.set(pos, v);
         }
     }
 
-    private void populate_horizontal_snaps(Items.CanvasItem item, ref Gee.HashMap<int, Gee.HashSet<int>> map)
+    private void populate_horizontal_snaps(Items.CanvasItem item, ref Gee.HashMap<int, SnapMeta?> map)
     {
         int x_1 = (int)item.bounds.x1;
         int x_2 = (int)item.bounds.x2;
@@ -290,12 +338,12 @@ public class Akira.Lib.Managers.SnapManager : Object {
         int center_x = (int)((item.bounds.x2 - item.bounds.x1) / 2.0 + item.bounds.x1);
         int center_y = (int)((item.bounds.y2 - item.bounds.y1) / 2.0 + item.bounds.y1);
 
-        add_to_map(x_1, y_1, y_2, center_y, ref map);
-        add_to_map(x_2, y_1, y_2, center_y, ref map);
-        add_to_map(center_x, center_y, center_y, center_y, ref map);
+        add_to_map(x_1, y_1, y_2, center_y, -1, ref map);
+        add_to_map(x_2, y_1, y_2, center_y, 1, ref map);
+        add_to_map(center_x, center_y, center_y, center_y, 0, ref map);
     }
 
-    private void populate_vertical_snaps(Items.CanvasItem item, ref Gee.HashMap<int, Gee.HashSet<int>> map)
+    private void populate_vertical_snaps(Items.CanvasItem item, ref Gee.HashMap<int, SnapMeta?> map)
     {
         int x_1 = (int)item.bounds.x1;
         int x_2 = (int)item.bounds.x2;
@@ -304,25 +352,25 @@ public class Akira.Lib.Managers.SnapManager : Object {
         int center_x = (int)((item.bounds.x2 - item.bounds.x1) / 2.0 + item.bounds.x1);
         int center_y = (int)((item.bounds.y2 - item.bounds.y1) / 2.0 + item.bounds.y1);
 
-        add_to_map(y_1, x_1, x_2, center_x, ref map);
-        add_to_map(y_2, x_1, x_2, center_x, ref map);
-        add_to_map(center_y, center_x, center_x, center_x, ref map);
+        add_to_map(y_1, x_1, x_2, center_x, -1,  ref map);
+        add_to_map(y_2, x_1, x_2, center_x, 1, ref map);
+        add_to_map(center_y, center_x, center_x, center_x, 0, ref map);
     }
 
-    private void add_vertical_decorator_line(int pos) {
+    private void add_vertical_decorator_line(int pos, int polarity_offset) {
         var snap_value = vertical_snaps.get(pos);
         if (snap_value != null) {
 
             // add dots
-            foreach (var normal in snap_value) {
-                add_decorator_dot(normal, pos);
+            foreach (var normal in snap_value.normals) {
+                add_decorator_dot(normal, pos + polarity_offset);
             }
 
             // add lines (reuse if possible
             foreach (var line in vertical_decorator_lines) {
                 if (line.visibility == Goo.CanvasItemVisibility.HIDDEN) {
                     line.set("visibility", Goo.CanvasItemVisibility.VISIBLE);
-                    line.set("y", (double)pos);
+                    line.set("y", (double)pos + polarity_offset);
                     line.set("line-width", LINE_WIDTH / canvas.current_scale);
                     line.raise(null);
                     return;
@@ -331,8 +379,8 @@ public class Akira.Lib.Managers.SnapManager : Object {
 
             var tmp = new Goo.CanvasPolyline.line(
                 null,
-                canvas.x1, pos,
-                canvas.x2, pos,
+                canvas.x1, pos + polarity_offset,
+                canvas.x2, pos + polarity_offset,
                 "line-width", LINE_WIDTH / canvas.current_scale,
                 "stroke-color", STROKE_COLOR,
                 null
@@ -347,20 +395,20 @@ public class Akira.Lib.Managers.SnapManager : Object {
         }
     }
 
-    private void add_horizontal_decorator_line(int pos) {
+    private void add_horizontal_decorator_line(int pos, int polarity_offset) {
         var snap_value = horizontal_snaps.get(pos);
         if (snap_value != null) {
 
             // add dots
-            foreach (var normal in snap_value) {
-                add_decorator_dot(pos, normal);
+            foreach (var normal in snap_value.normals) {
+                add_decorator_dot(pos + polarity_offset, normal);
             }
 
             // add lines (reuse if possible
             foreach (var line in horizontal_decorator_lines) {
                 if (line.visibility == Goo.CanvasItemVisibility.HIDDEN) {
                     line.set("visibility", Goo.CanvasItemVisibility.VISIBLE);
-                    line.set("x", (double)pos);
+                    line.set("x", (double)pos + polarity_offset);
                     line.set("line-width", LINE_WIDTH / canvas.current_scale);
                     line.raise(null);
                     return;
@@ -369,8 +417,8 @@ public class Akira.Lib.Managers.SnapManager : Object {
 
             var tmp = new Goo.CanvasPolyline.line(
                 null,
-                pos, canvas.y1,
-                pos, canvas.y2,
+                pos + polarity_offset, canvas.y1,
+                pos + polarity_offset, canvas.y2,
                 "line-width", LINE_WIDTH / canvas.current_scale,
                 "stroke-color", STROKE_COLOR,
                 null

@@ -37,14 +37,42 @@ public class Akira.Utils.AffineTransform : Object {
     public static void move_from_event (
         CanvasItem item,
         SnapManager.SnapMatchData data,
+        double initial_press_event_x,
+        double initial_press_event_y,
         double event_x,
         double event_y,
         ref double initial_event_x,
         ref double initial_event_y
     ) {
         // Calculate the delta between the initial point and new mouse location.
-        var delta_x = fix_size (event_x - initial_event_x + data.horizontal_data.snap_offset());
-        var delta_y = fix_size (event_y - initial_event_y + data.vertical_data.snap_offset());
+        var delta_x = fix_size (event_x - initial_event_x);
+        var delta_y = fix_size (event_y - initial_event_y);
+
+        bool snap_x = false;
+        bool snap_y = false;
+
+        if (data.horizontal.wants_snap() && delta_x.abs() <= 4) {
+            if (data.horizontal.type == SnapManager.MatchType.FUZZY) {
+                delta_x = data.horizontal.snap_offset();
+                snap_x = true;
+            }
+            else {
+                delta_x = 0;
+                snap_x = true;
+            }
+        }
+
+        if (data.vertical.wants_snap() && delta_y.abs() <= 4) {
+            if (data.vertical.type == SnapManager.MatchType.FUZZY) {
+                delta_y = data.vertical.snap_offset();
+                snap_y = true;
+            }
+            else {
+                delta_y = 0;
+                snap_y = true;
+            }
+        }
+
 
         Cairo.Matrix matrix;
         item.get_transform (out matrix);
@@ -60,8 +88,12 @@ public class Akira.Utils.AffineTransform : Object {
             ((Lib.Items.CanvasArtboard) item).label.translate (delta_x, delta_y);
         }
 
-        initial_event_x = event_x;
-        initial_event_y = event_y;
+        if (!snap_x) {
+            initial_event_x = event_x;
+        }
+        if (!snap_y) {
+            initial_event_y = event_y;
+        }
     }
 
     public static void scale_from_event (

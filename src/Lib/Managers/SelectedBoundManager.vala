@@ -36,6 +36,8 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
     }
 
     private Goo.CanvasBounds select_bb;
+    private double initial_press_event_x;
+    private double initial_press_event_y;
     private double initial_event_x;
     private double initial_event_y;
     private double delta_x_accumulator;
@@ -63,6 +65,8 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
     }
 
     public void set_initial_coordinates (double event_x, double event_y) {
+        initial_press_event_x = event_x;
+        initial_press_event_y = event_y;
         initial_event_x = event_x;
         initial_event_y = event_y;
 
@@ -92,7 +96,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         switch (selected_nob) {
             case Managers.NobManager.Nob.NONE:
               Utils.AffineTransform.move_from_event (
-                    selected_item, snap_data, event_x, event_y,
+                    selected_item, snap_data, initial_press_event_x, initial_press_event_y, event_x, event_y,
                     ref initial_event_x, ref initial_event_y
                 );
                 break;
