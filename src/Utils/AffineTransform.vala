@@ -96,6 +96,54 @@ public class Akira.Utils.AffineTransform : Object {
         }
     }
 
+    public static void move_from_event2 (
+        CanvasItem item,
+        SnapManager snap_manager,
+        SelectedBoundManager sel_manager,
+        double initial_press_event_x,
+        double initial_press_event_y,
+        double object_start_x,
+        double object_start_y,
+        double event_x,
+        double event_y
+    ) {
+        var reset_x = item.bounds.x1 - object_start_x;
+        var reset_y = item.bounds.y1 - object_start_y;
+        var delta_x = (event_x - initial_press_event_x);
+        var delta_y = (event_y - initial_press_event_y);
+
+        item.translate(delta_x - reset_x, delta_y - reset_y);
+        snap_manager.generate_snap_matches(sel_manager.selected_items);
+
+        var hdata = snap_manager.snap_match_data.horizontal;
+        var vdata = snap_manager.snap_match_data.vertical;
+
+        bool requires_snap = false;
+        double snap_offset_x = 0;
+        double snap_offset_y = 0;
+
+        if (hdata.wants_snap()) {
+            snap_offset_x = hdata.snap_offset();
+            requires_snap = true;
+        }
+
+        if (vdata.wants_snap()) {
+            snap_offset_y = vdata.snap_offset();
+            requires_snap = true;
+        }
+
+        if (requires_snap) {
+            item.translate(snap_offset_x, snap_offset_y);
+        }
+
+        // If the item is an Artboard, move the label with it.
+        if (item is Lib.Items.CanvasArtboard) {
+            ((Lib.Items.CanvasArtboard) item).label.translate (delta_x - reset_x + snap_offset_x, delta_y - reset_y + snap_offset_y);
+        }
+
+        snap_manager.generate_snap_matches(sel_manager.selected_items);
+    }
+
     public static void scale_from_event (
         CanvasItem item,
         NobManager.Nob nob,

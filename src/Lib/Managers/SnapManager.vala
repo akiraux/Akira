@@ -23,7 +23,7 @@ public class Akira.Lib.Managers.SnapManager : Object {
     private const string STROKE_COLOR = "#ff0000";
     private const double LINE_WIDTH = 1.0;
     private const double DOT_RADIUS = 3.0;
-    private const double SENSITIVITY = 4.0;
+    private const double SENSITIVITY = 5.0;
 
     public weak Akira.Lib.Canvas canvas { get; construct; }
 
@@ -209,7 +209,7 @@ public class Akira.Lib.Managers.SnapManager : Object {
         foreach (var sel_snap in v_sel_snaps) {
             foreach (var cand in vertical_snaps) {
                 if ((sel_snap.value.polarity > 0) != (cand.value.polarity > 0)) {
-                    polarity_offset = 0;//(sel_snap.value.polarity > 0) ? -1 : 1;
+                    polarity_offset = 0; //(sel_snap.value.polarity > 0) ? -1 : 1;
 
                 }
                 else {
@@ -244,7 +244,7 @@ public class Akira.Lib.Managers.SnapManager : Object {
         foreach (var sel_snap in h_sel_snaps) {
             foreach (var cand in horizontal_snaps) {
                 if ((sel_snap.value.polarity > 0) != (cand.value.polarity > 0)) {
-                    polarity_offset = 0;//(sel_snap.value.polarity > 0) ? -1 : 1;
+                    polarity_offset = 0; //(sel_snap.value.polarity > 0) ? -1 : 1;
 
                 }
                 else {
@@ -285,24 +285,14 @@ public class Akira.Lib.Managers.SnapManager : Object {
         reset_decorators();
 
        if (snap_match_data.vertical.wants_snap()) {
-            if (snap_match_data.vertical.exact_matches.size == 0) {
-                //add_vertical_decorator_line(snap_match_data.vertical.snap_position, snap_match_data.vertical.polarity_offset);
-            }
-            else {
-                foreach (var snap_position in snap_match_data.vertical.exact_matches) {
-                    add_vertical_decorator_line(snap_position.key, snap_position.value);
-                }
+            foreach (var snap_position in snap_match_data.vertical.exact_matches) {
+                add_vertical_decorator_line(snap_position.key, snap_position.value);
             }
        }
 
        if (snap_match_data.horizontal.wants_snap()) {
-            if (snap_match_data.horizontal.exact_matches.size == 0) {
-                //add_horizontal_decorator_line(snap_match_data.horizontal.snap_position, snap_match_data.horizontal.polarity_offset);
-            }
-            else {
-                foreach (var snap_position in snap_match_data.horizontal.exact_matches) {
-                    add_horizontal_decorator_line(snap_position.key, snap_position.value);
-                }
+            foreach (var snap_position in snap_match_data.horizontal.exact_matches) {
+                add_horizontal_decorator_line(snap_position.key, snap_position.value);
             }
        }
 

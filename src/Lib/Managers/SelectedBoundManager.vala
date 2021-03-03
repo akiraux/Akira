@@ -36,14 +36,19 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
     }
 
     private Goo.CanvasBounds select_bb;
-    private double initial_press_event_x;
-    private double initial_press_event_y;
     private double initial_event_x;
     private double initial_event_y;
     private double delta_x_accumulator;
     private double delta_y_accumulator;
     private double initial_width;
     private double initial_height;
+
+    private double initial_press_event_x;
+    private double initial_press_event_y;
+    private bool   initial_object_populated;
+    private double initial_object_x;
+    private double initial_object_y;
+
 
     public SelectedBoundManager (Akira.Lib.Canvas canvas) {
         Object (
@@ -62,9 +67,11 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
 
     construct {
         reset_selection ();
+        initial_object_populated = false;
     }
 
     public void set_initial_coordinates (double event_x, double event_y) {
+        initial_object_populated = false;
         initial_press_event_x = event_x;
         initial_press_event_y = event_y;
         initial_event_x = event_x;
@@ -92,6 +99,13 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         if (selected_item == null) {
             return;
         }
+
+        if (!initial_object_populated) {
+            initial_object_populated = true;
+            initial_object_x = selected_item.bounds.x1;
+            initial_object_y = selected_item.bounds.y1;
+        }
+
 
         switch (selected_nob) {
             case Managers.NobManager.Nob.NONE:
@@ -123,6 +137,51 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         // Notify the X & Y values in the state manager.
         canvas.window.event_bus.reset_state_coords (selected_item);
     }
+
+    public void transform_bound2 (double event_x, double event_y, Managers.NobManager.Nob selected_nob, Managers.SnapManager snap_manager) {
+        Items.CanvasItem selected_item = selected_items.nth_data (0);
+
+        if (selected_item == null) {
+            return;
+        }
+
+        if (!initial_object_populated) {
+            initial_object_populated = true;
+            initial_object_x = selected_item.bounds.x1;
+            initial_object_y = selected_item.bounds.y1;
+        }
+
+
+        switch (selected_nob) {
+            case Managers.NobManager.Nob.NONE:
+              Utils.AffineTransform.move_from_event2 (
+                    selected_item, snap_manager, this, initial_press_event_x, initial_press_event_y, initial_object_x, initial_object_y, event_x, event_y
+                );
+                break;
+
+            case Managers.NobManager.Nob.ROTATE:
+                Utils.AffineTransform.rotate_from_event (
+                    selected_item, event_x, event_y,
+                    ref initial_event_x, ref initial_event_y
+                );
+                break;
+
+            default:
+                Utils.AffineTransform.scale_from_event (
+                    selected_item,
+                    selected_nob,
+                    event_x, event_y,
+                    ref initial_event_x, ref initial_event_y,
+                    ref delta_x_accumulator, ref delta_y_accumulator,
+                    initial_width, initial_height
+                );
+                break;
+        }
+
+        // Notify the X & Y values in the state manager.
+        canvas.window.event_bus.reset_state_coords (selected_item);
+    }
+
 
     public void add_item_to_selection (Items.CanvasItem item) {
         // Don't clear and reselect the same element if it's already selected.
