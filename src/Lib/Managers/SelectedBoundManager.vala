@@ -344,8 +344,8 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
 
         // Keep reset and delta values for future adjustments. fix_size should
         // be called right before a transform.
-        var first_move_x = Utils.AffineTransform.fix_size(delta_x - reset_x);
-        var first_move_y = Utils.AffineTransform.fix_size(delta_y - reset_y);
+        var first_move_x = Utils.AffineTransform.fix_size (delta_x - reset_x);
+        var first_move_y = Utils.AffineTransform.fix_size (delta_y - reset_y);
 
         Cairo.Matrix matrix;
         item.get_transform (out matrix);
