@@ -99,7 +99,6 @@ public class Akira.Layouts.Partials.BordersPanel : Gtk.Grid {
                 Lib.Components.Border border = item.borders.add_border_color (border_color, (int) settings.border_size);
                 var model_item = create_model (border);
                 list_model.add_item.begin (model_item);
-                item.borders.reload ();
             }
         });
 

@@ -40,7 +40,18 @@ public class Akira.Lib.Components.Fill : Component {
         item = _item;
         id = fill_id;
         color = init_color;
+        hex = color.to_string ();
         alpha = 255;
+
+        // Listen for changed to the fill attributes to properly trigger the color generation.
+        this.notify["color"].connect (() => {
+            hex = Utils.Color.rgba_to_hex (color.to_string ());
+            fills.reload ();
+        });
+
+        this.notify["hidden"].connect (() => {
+            fills.reload ();
+        });
     }
 
     public void remove () {

@@ -100,7 +100,6 @@ public class Akira.Layouts.Partials.FillsPanel : Gtk.Grid {
                 Lib.Components.Fill fill = item.fills.add_fill_color (fill_color);
                 var model_item = create_model (fill);
                 list_model.add_item.begin (model_item);
-                item.fills.reload ();
             }
         });
 

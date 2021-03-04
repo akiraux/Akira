@@ -55,6 +55,9 @@ public class Akira.Lib.Components.Borders : Component {
         // Increase the ID to keep an incremental unique identifier.
         id++;
 
+        // Trigger the generation of the border color.
+        reload ();
+
         return new_border;
     }
 
@@ -96,9 +99,9 @@ public class Akira.Lib.Components.Borders : Component {
             // Keep in consideration the global opacity to properly update the border color.
             rgba_border.alpha = rgba_border.alpha * item.opacity.opacity / 100;
 
-            uint sroke_color_rgba = Utils.Color.rgba_to_uint (rgba_border);
+            uint stroke_color_rgba = Utils.Color.rgba_to_uint (rgba_border);
 
-            item.set ("stroke-color-rgba", sroke_color_rgba);
+            item.set ("stroke-color-rgba", stroke_color_rgba);
             // The "line-width" property expects a DOUBLE type, but we don't support subpixels
             // so we always handle the border size as INT, therefore we need to type cast it here.
             item.set ("line-width", (double) size);

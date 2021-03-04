@@ -50,6 +50,9 @@ public class Akira.Lib.Components.Fills : Component {
         // Increase the ID to keep an incremental unique identifier.
         id++;
 
+        // Trigger the generation of the fill color.
+        reload ();
+
         return new_fill;
     }
 

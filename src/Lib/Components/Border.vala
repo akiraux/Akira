@@ -43,6 +43,20 @@ public class Akira.Lib.Components.Border : Component {
         color = init_color;
         size = init_size;
         alpha = 255;
+
+        // Listen for changed to the border attributes to properly trigger the color generation.
+        this.notify["color"].connect (() => {
+            hex = Utils.Color.rgba_to_hex (color.to_string ());
+            borders.reload ();
+        });
+
+        this.notify["size"].connect (() => {
+            borders.reload ();
+        });
+
+        this.notify["hidden"].connect (() => {
+            borders.reload ();
+        });
     }
 
     public void remove () {
