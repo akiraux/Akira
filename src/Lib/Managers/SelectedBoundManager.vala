@@ -43,6 +43,13 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
     private double initial_width;
     private double initial_height;
 
+    // Attributes to keep track of the mouse dragging coordinates
+    private double initial_drag_press_x;
+    private double initial_drag_press_y;
+    private bool initial_drag_registered = false;
+    private double initial_drag_item_x;
+    private double initial_drag_item_y;
+
     public SelectedBoundManager (Akira.Lib.Canvas canvas) {
         Object (
             canvas: canvas,
@@ -65,6 +72,12 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
     public void set_initial_coordinates (double event_x, double event_y) {
         initial_event_x = event_x;
         initial_event_y = event_y;
+
+        initial_drag_press_x = event_x;
+        initial_drag_press_y = event_y;
+        // We deregister any old drag, and the next will be registered on the
+        // first drag move_from_event call.
+        initial_drag_registered = false;
 
         if (selected_items.length () == 1) {
             var selected_item = selected_items.nth_data (0);
@@ -91,10 +104,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
 
         switch (selected_nob) {
             case Managers.NobManager.Nob.NONE:
-                Utils.AffineTransform.move_from_event (
-                    selected_item, event_x, event_y,
-                    ref initial_event_x, ref initial_event_y
-                );
+                move_from_event (selected_item, event_x, event_y);
                 break;
 
             case Managers.NobManager.Nob.ROTATE:
@@ -309,5 +319,49 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         }
 
         canvas.window.event_bus.set_focus_on_canvas ();
+    }
+
+    /**
+     * Move the item based on the mouse click and drag event.
+     */
+    private void move_from_event (
+        Lib.Items.CanvasItem item, double event_x, double event_y) {
+        if (!initial_drag_registered) {
+            initial_drag_registered = true;
+            initial_drag_item_x = item.transform.x;
+            initial_drag_item_y = item.transform.y;
+        }
+
+        // Keep reset and delta values for future adjustments.
+
+        // Calculate values needed to reset to the original position
+        var reset_x = item.transform.x - initial_drag_item_x;
+        var reset_y = item.transform.y - initial_drag_item_y;
+
+        // Calculate the change based on the event
+        var delta_x = event_x - initial_drag_press_x;
+        var delta_y = event_y - initial_drag_press_y;
+
+        // Keep reset and delta values for future adjustments. fix_size should
+        // be called right before a transform.
+        var first_move_x = Utils.AffineTransform.fix_size (delta_x - reset_x);
+        var first_move_y = Utils.AffineTransform.fix_size (delta_y - reset_y);
+
+        Cairo.Matrix matrix;
+        item.get_transform (out matrix);
+
+        // Increment the cairo matrix coordinates so we can ignore the item's rotation.
+        matrix.x0 += first_move_x;
+        matrix.y0 += first_move_y;
+
+        item.set_transform (matrix);
+
+        // Any adjustments like snapping would be computed here, and the item would
+        // then be translated again.
+
+        // If the item is an Artboard, move the label with it.
+        if (item is Lib.Items.CanvasArtboard) {
+            ((Lib.Items.CanvasArtboard) item).label.translate (first_move_x, first_move_y);
+        }
     }
 }

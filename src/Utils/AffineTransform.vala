@@ -31,38 +31,6 @@ public class Akira.Utils.AffineTransform : Object {
     private static double temp_rotation = 0.0;
     private static double prev_rotation_difference = 0.0;
 
-    /**
-     * Move the item based on the mouse click and drag event.
-     */
-    public static void move_from_event (
-        CanvasItem item,
-        double event_x,
-        double event_y,
-        ref double initial_event_x,
-        ref double initial_event_y
-    ) {
-        // Calculate the delta between the initial point and new mouse location.
-        var delta_x = fix_size (event_x - initial_event_x);
-        var delta_y = fix_size (event_y - initial_event_y);
-
-        Cairo.Matrix matrix;
-        item.get_transform (out matrix);
-
-        // Increment the cairo matrix coordinates so we can ignore the item's rotation.
-        matrix.x0 += delta_x;
-        matrix.y0 += delta_y;
-
-        item.set_transform (matrix);
-
-        // If the item is an Artboard, move the label with it.
-        if (item is Lib.Items.CanvasArtboard) {
-            ((Lib.Items.CanvasArtboard) item).label.translate (delta_x, delta_y);
-        }
-
-        initial_event_x = event_x;
-        initial_event_y = event_y;
-    }
-
     public static void scale_from_event (
         CanvasItem item,
         NobManager.Nob nob,
