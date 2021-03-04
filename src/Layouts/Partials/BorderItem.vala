@@ -142,28 +142,27 @@ public class Akira.Layouts.Partials.BorderItem : Gtk.Grid {
         color_container = new Akira.Partials.ColorField (window);
         color_container.text = Utils.Color.rgba_to_hex (color);
 
-        color_container.bind_property (
-            "text", model, "color",
+        model.bind_property (
+            "color", color_container, "text",
             BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE,
-            // this => model
-            (binding, color_container_value, ref model_value) => {
-                color_set_manually = false;
-                var color_container_hex = color_container_value.dup_string ();
-
-                if (!Utils.Color.is_valid_hex (color_container_hex)) {
-                    model_value.set_string (Utils.Color.rgba_to_hex (old_color));
-                    return false;
-                }
-
-                var new_color_rgba = Utils.Color.hex_to_rgba (color_container_hex);
-                model_value.set_string (new_color_rgba.to_string ());
-                return true;
-            },
             // model => this
             (binding, model_value, ref color_container_value) => {
                 var model_rgba = model_value.dup_string ();
                 old_color = model_rgba;
                 color_container_value.set_string (Utils.Color.rgba_to_hex (model_rgba));
+                return true;
+            },
+            // this => model
+            (binding, color_container_value, ref model_value) => {
+                color_set_manually = false;
+                var color_container_hex = color_container_value.dup_string ();
+                if (!Utils.Color.is_valid_hex (color_container_hex)) {
+                    model_value.set_string (Utils.Color.rgba_to_hex (old_color));
+                    return false;
+                }
+                var new_color_rgba = Utils.Color.hex_to_rgba (color_container_hex);
+                new_color_rgba.alpha = alpha / 100;
+                model_value.set_string (new_color_rgba.to_string ());
                 return true;
             }
         );
