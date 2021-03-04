@@ -237,6 +237,10 @@ public class Akira.Lib.Managers.NobManager : Object {
             }
         }
 
+        if (is_artboard) {
+            rotation_line.set ("visibility", Goo.CanvasItemVisibility.HIDDEN);
+        }
+
         canvas.window.event_bus.update_nob_size ();
         nob_size = Selection.Nob.NOB_SIZE / canvas.current_scale;
 
@@ -405,6 +409,9 @@ public class Akira.Lib.Managers.NobManager : Object {
             nobs[i].set ("visibility", Goo.CanvasItemVisibility.VISIBLE);
         }
         select_effect.set ("visibility", Goo.CanvasItemVisibility.VISIBLE);
-        rotation_line.set ("visibility", Goo.CanvasItemVisibility.VISIBLE);
+
+        if (!is_artboard) {
+            rotation_line.set ("visibility", Goo.CanvasItemVisibility.VISIBLE);
+        }
     }
 }
