@@ -19,21 +19,10 @@
 * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
 */
 
-// This manager handles snap generation. It uses a list of selected items, and a list of candidate items to determine
-// whether snaps in the vertical and horizontal directions are suggested.
-//
-// Selected items may be a collection of items being dragged.
-//
-// Candidate items may be all items in the canvas, or items within an artboard.
-//
-// Matching is done in the vertical and horizontal directiosn independently
-
-
 public class Akira.Lib.Managers.SnapManager : Object {
     private const string STROKE_COLOR = "#ff0000";
     private const double LINE_WIDTH = 0.5;
     private const double DOT_RADIUS = 2.0;
-    private const double SENSITIVITY = 5.0;
 
     public weak Akira.Lib.Canvas canvas { get; construct; }
 
@@ -43,6 +32,8 @@ public class Akira.Lib.Managers.SnapManager : Object {
     private Gee.ArrayList<Goo.CanvasItemSimple> v_decorator_lines;
     private Gee.ArrayList<Goo.CanvasItemSimple> h_decorator_lines;
     private Gee.ArrayList<Goo.CanvasItemSimple> decorator_dots;
+
+    private bool any_decorators_visible = false;
 
     public SnapManager (Akira.Lib.Canvas canvas) {
         Object (
@@ -56,6 +47,10 @@ public class Akira.Lib.Managers.SnapManager : Object {
         decorator_dots = new Gee.ArrayList<Goo.CanvasItemSimple> ();
     }
 
+    public bool is_active () {
+        return any_decorators_visible;
+    }
+
     public void reset_decorators () {
         foreach (var decorator in v_decorator_lines) {
             decorator.set ("visibility", Goo.CanvasItemVisibility.HIDDEN);
@@ -66,30 +61,35 @@ public class Akira.Lib.Managers.SnapManager : Object {
         foreach (var decorator in decorator_dots) {
             decorator.set ("visibility", Goo.CanvasItemVisibility.HIDDEN);
         }
+
+        any_decorators_visible = false;
     }
 
-    public void populate_decorators (Utils.Snapping.SnapMatchData data, Utils.Snapping.SnapGrid grid) {
+    public void populate_decorators_from_data (Utils.Snapping.SnapMatchData data, Utils.Snapping.SnapGrid grid) {
         if (root == null) {
             root = canvas.get_root_item ();
         }
 
-            reset_decorators ();
+        reset_decorators ();
 
         if (data.v_data.snap_found ()) {
             foreach (var snap_position in data.v_data.exact_matches) {
+                any_decorators_visible = true;
                 add_vertical_decorator_line (snap_position.key, snap_position.value, grid);
             }
         }
 
         if (data.h_data.snap_found ()) {
             foreach (var snap_position in data.h_data.exact_matches) {
+                any_decorators_visible = true;
                 add_horizontal_decorator_line (snap_position.key, snap_position.value, grid);
             }
         }
-
     }
 
     private void add_vertical_decorator_line (int pos, int polarity_offset, Utils.Snapping.SnapGrid grid) {
+
+        double lw = double.max (0.5, LINE_WIDTH / canvas.current_scale);
         var snap_value = grid.v_snaps.get (pos);
         if (snap_value != null) {
 
@@ -103,7 +103,7 @@ public class Akira.Lib.Managers.SnapManager : Object {
                 if (line.visibility == Goo.CanvasItemVisibility.HIDDEN) {
                     line.set ("visibility", Goo.CanvasItemVisibility.VISIBLE);
                     line.set ("y", (double)pos + polarity_offset);
-                    line.set ("line-width", LINE_WIDTH / canvas.current_scale);
+                    line.set ("line-width", lw);
                     line.raise (null);
                     return;
                 }
@@ -113,7 +113,7 @@ public class Akira.Lib.Managers.SnapManager : Object {
                 null,
                 canvas.x1, pos + polarity_offset,
                 canvas.x2, pos + polarity_offset,
-                "line-width", LINE_WIDTH / canvas.current_scale,
+                "line-width", lw,
                 "stroke-color", STROKE_COLOR,
                 null
             );
@@ -128,9 +128,10 @@ public class Akira.Lib.Managers.SnapManager : Object {
     }
 
     private void add_horizontal_decorator_line (int pos, int polarity_offset, Utils.Snapping.SnapGrid grid) {
+
+        double lw = double.max (0.5, LINE_WIDTH / canvas.current_scale);
         var snap_value = grid.h_snaps.get (pos);
         if (snap_value != null) {
-
             // add dots
             foreach (var normal in snap_value.normals) {
                 add_decorator_dot (pos + polarity_offset, normal);
@@ -141,7 +142,7 @@ public class Akira.Lib.Managers.SnapManager : Object {
                 if (line.visibility == Goo.CanvasItemVisibility.HIDDEN) {
                     line.set ("visibility", Goo.CanvasItemVisibility.VISIBLE);
                     line.set ("x", (double)pos + polarity_offset);
-                    line.set ("line-width", LINE_WIDTH / canvas.current_scale);
+                    line.set ("line-width", lw);
                     line.raise (null);
                     return;
                 }
@@ -151,7 +152,7 @@ public class Akira.Lib.Managers.SnapManager : Object {
                 null,
                 pos + polarity_offset, canvas.y1,
                 pos + polarity_offset, canvas.y2,
-                "line-width", LINE_WIDTH / canvas.current_scale,
+                "line-width", lw,
                 "stroke-color", STROKE_COLOR,
                 null
             );
@@ -166,14 +167,16 @@ public class Akira.Lib.Managers.SnapManager : Object {
     }
 
     private void add_decorator_dot (int x, int y) {
+        double dot_radius = double.max (1, DOT_RADIUS / canvas.current_scale);
+
         // add dot
         foreach (var line in decorator_dots) {
             if (line.visibility == Goo.CanvasItemVisibility.HIDDEN) {
                 line.set ("visibility", Goo.CanvasItemVisibility.VISIBLE);
                 line.set ("center_x", (double)x);
                 line.set ("center_y", (double)y);
-                line.set ("radius_x", DOT_RADIUS / canvas.current_scale);
-                line.set ("radius_y", DOT_RADIUS / canvas.current_scale);
+                line.set ("radius_x", dot_radius);
+                line.set ("radius_y", dot_radius);
                 line.raise (null);
                 return;
             }
@@ -182,7 +185,7 @@ public class Akira.Lib.Managers.SnapManager : Object {
         var tmp = new Goo.CanvasEllipse (
             null,
             x, y,
-            DOT_RADIUS / canvas.current_scale, DOT_RADIUS / canvas.current_scale,
+            dot_radius, dot_radius,
             "line-width", 0.0,
             "fill-color", STROKE_COLOR,
             null
@@ -195,5 +198,4 @@ public class Akira.Lib.Managers.SnapManager : Object {
         tmp.raise (null);
         decorator_dots.add (tmp);
     }
-
 }

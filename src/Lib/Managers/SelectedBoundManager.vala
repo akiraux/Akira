@@ -35,6 +35,8 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         }
     }
 
+    private Managers.SnapManager snap_manager;
+
     private Goo.CanvasBounds select_bb;
     private double initial_event_x;
     private double initial_event_y;
@@ -63,9 +65,11 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         canvas.window.event_bus.item_deleted.connect (remove_item_from_selection);
         canvas.window.event_bus.request_add_item_to_selection.connect (add_item_to_selection);
         canvas.window.event_bus.item_locked.connect (remove_item_from_selection);
+        canvas.window.event_bus.zoom.connect (on_canvas_zoom);
     }
 
     construct {
+        snap_manager = new Managers.SnapManager (canvas);
         reset_selection ();
     }
 
@@ -95,7 +99,11 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         initial_height = select_bb.y2 - select_bb.y1;
     }
 
-    public void transform_bound (double event_x, double event_y, Managers.NobManager.Nob selected_nob) {
+    public void transform_bound (
+        double event_x,
+        double event_y,
+        Managers.NobManager.Nob selected_nob
+    ) {
         Items.CanvasItem selected_item = selected_items.nth_data (0);
 
         if (selected_item == null) {
@@ -180,6 +188,10 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         }
 
         selected_items = new List<Items.CanvasItem> ();
+    }
+
+    public void alert_held_button_release () {
+        snap_manager.reset_decorators ();
     }
 
     private void update_selected_items () {
@@ -325,7 +337,11 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
      * Move the item based on the mouse click and drag event.
      */
     private void move_from_event (
-        Lib.Items.CanvasItem item, double event_x, double event_y) {
+        Lib.Items.CanvasItem item,
+        double event_x,
+        double event_y
+        ) {
+
         if (!initial_drag_registered) {
             initial_drag_registered = true;
             initial_drag_item_x = item.transform.x;
@@ -353,15 +369,51 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         // Increment the cairo matrix coordinates so we can ignore the item's rotation.
         matrix.x0 += first_move_x;
         matrix.y0 += first_move_y;
-
         item.set_transform (matrix);
 
-        // Any adjustments like snapping would be computed here, and the item would
-        // then be translated again.
+        // Make adjustment basted on snaps
+        // Double the sensitivity to allow for reuse of grid after snap
+        var sensitivity = (int) Utils.Snapping.adjusted_sensitivity (canvas.current_scale);
+        var snap_grid = Utils.Snapping.snap_grid_from_canvas (canvas, selected_items, sensitivity);
+
+        if (!snap_grid.is_empty ()) {
+            int snap_offset_x = 0;
+            int snap_offset_y = 0;
+            var matches = Utils.Snapping.generate_snap_matches (snap_grid, selected_items, sensitivity);
+
+            if (matches.h_data.snap_found ()) {
+                snap_offset_x = matches.h_data.snap_offset ();
+                first_move_x += snap_offset_x;
+                matrix.x0 += snap_offset_x;
+            }
+
+            if (matches.v_data.snap_found ()) {
+                snap_offset_y = matches.v_data.snap_offset ();
+                first_move_y += snap_offset_y;
+                matrix.y0 += snap_offset_y;
+            }
+
+            item.set_transform (matrix);
+            update_grid_decorators (true);
+        }
+
 
         // If the item is an Artboard, move the label with it.
         if (item is Lib.Items.CanvasArtboard) {
             ((Lib.Items.CanvasArtboard) item).label.translate (first_move_x, first_move_y);
+        }
+    }
+
+    private void on_canvas_zoom () {
+        update_grid_decorators (false);
+    }
+
+    private void update_grid_decorators (bool force) {
+        if (force || snap_manager.is_active ()) {
+            var sensitivity = (int) Utils.Snapping.adjusted_sensitivity (canvas.current_scale);
+            var snap_grid = Utils.Snapping.snap_grid_from_canvas (canvas, selected_items, sensitivity);
+            var matches = Utils.Snapping.generate_snap_matches (snap_grid, selected_items, sensitivity);
+            snap_manager.populate_decorators_from_data (matches, snap_grid);
         }
     }
 }

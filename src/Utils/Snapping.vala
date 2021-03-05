@@ -20,13 +20,11 @@
 */
 
 public class Akira.Utils.Snapping : Object {
-    private const string STROKE_COLOR = "#ff0000";
-    private const double LINE_WIDTH = 0.5;
-    private const double DOT_RADIUS = 2.0;
+    private const double SENSITIVITY = 4.0;
 
     // Metadata used in the cosmetic aspects of snap lines and dots
     public class SnapMeta {
-        public void add_polarity(int to_add) {
+        public void add_polarity (int to_add) {
             polarity += to_add;
         }
         public Gee.HashSet<int> normals;
@@ -35,6 +33,10 @@ public class Akira.Utils.Snapping : Object {
 
     // Grid snaps found for a given selection and set of candidates
     public struct SnapGrid {
+        public bool is_empty () {
+            return (v_snaps.size == 0 && h_snaps.size == 0);
+        }
+
         public Gee.HashMap<int, SnapMeta> v_snaps;
         public Gee.HashMap<int, SnapMeta> h_snaps;
     }
@@ -79,6 +81,12 @@ public class Akira.Utils.Snapping : Object {
         SnapMatch v_data;
     }
 
+    public static double adjusted_sensitivity (double canvas_scale) {
+        // Limit the sensitivity. This seems like a sensible default for now
+        return double.max (SENSITIVITY / 2.0, SENSITIVITY / canvas_scale);
+    }
+
+
     public static SnapGrid snap_grid_from_canvas (
         Goo.Canvas canvas,
         List<Lib.Items.CanvasItem> selection,
@@ -105,7 +113,7 @@ public class Akira.Utils.Snapping : Object {
           horizontal_candidates.concat (canvas.get_items_in_area (horizontal_filter, true, true, false));
         }
 
-        return snap_grid_from_candidates(vertical_candidates, horizontal_candidates, selection, sensitivity);
+        return snap_grid_from_candidates (vertical_candidates, horizontal_candidates, selection);
     }
 
     public static SnapMatchData generate_snap_matches (
@@ -113,7 +121,7 @@ public class Akira.Utils.Snapping : Object {
         List<Lib.Items.CanvasItem> selection,
         int sensitivity
     ) {
-        var matches = defaultMatchData();
+        var matches = default_match_data ();
 
         var v_sel_snaps = new Gee.HashMap<int, SnapMeta> ();
         var h_sel_snaps = new Gee.HashMap<int, SnapMeta> ();
@@ -123,13 +131,13 @@ public class Akira.Utils.Snapping : Object {
             populate_vertical_snaps (item, ref v_sel_snaps);
         }
 
-        populate_snap_matches_from_list(h_sel_snaps, grid.h_snaps, ref matches.h_data, sensitivity);
-        populate_snap_matches_from_list(v_sel_snaps, grid.v_snaps, ref matches.v_data, sensitivity);
+        populate_snap_matches_from_list (h_sel_snaps, grid.h_snaps, ref matches.h_data, sensitivity);
+        populate_snap_matches_from_list (v_sel_snaps, grid.v_snaps, ref matches.v_data, sensitivity);
 
         return matches;
     }
 
-    private static void populate_snap_matches_from_list(
+    private static void populate_snap_matches_from_list (
         Gee.HashMap<int, SnapMeta> target_snap_list,
         Gee.HashMap<int, SnapMeta> grid_snap_list,
         ref SnapMatch matches,
@@ -172,12 +180,11 @@ public class Akira.Utils.Snapping : Object {
     private static SnapGrid snap_grid_from_candidates (
     List<weak Goo.CanvasItem> v_candidates,
     List<weak Goo.CanvasItem> h_candidates,
-    List<Lib.Items.CanvasItem> selection,
-    int sensitivity
+    List<Lib.Items.CanvasItem> selection
     ) {
-        var grid = SnapGrid();
-        grid.v_snaps = new Gee.HashMap<int, SnapMeta>();
-        grid.h_snaps = new Gee.HashMap<int, SnapMeta>();
+        var grid = SnapGrid ();
+        grid.v_snaps = new Gee.HashMap<int, SnapMeta> ();
+        grid.h_snaps = new Gee.HashMap<int, SnapMeta> ();
 
         foreach (var cand in v_candidates) {
           var candidate_item = cand as Lib.Items.CanvasItem;
@@ -248,8 +255,8 @@ public class Akira.Utils.Snapping : Object {
         }
     }
 
-    private static SnapMatchData defaultMatchData() {
-        var matches = SnapMatchData();
+    private static SnapMatchData default_match_data () {
+        var matches = SnapMatchData ();
         matches.v_data.type = MatchType.NONE;
         matches.v_data.snap_position = 0;
         matches.v_data.polarity_offset = 0;
