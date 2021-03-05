@@ -19,6 +19,7 @@
 * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
 */
 
+/// Utility providing snap functionality between objects.
 public class Akira.Utils.Snapping : Object {
     private const double SENSITIVITY = 4.0;
 
@@ -81,12 +82,13 @@ public class Akira.Utils.Snapping : Object {
         SnapMatch v_data;
     }
 
+    /// Returns a sensitivity adjusted to the given canvas scale
     public static double adjusted_sensitivity (double canvas_scale) {
         // Limit the sensitivity. This seems like a sensible default for now
         return double.max (SENSITIVITY / 2.0, SENSITIVITY / canvas_scale);
     }
 
-
+    // Generates a snap grid from a canvas.
     public static SnapGrid snap_grid_from_canvas (
         Goo.Canvas canvas,
         List<Lib.Items.CanvasItem> selection,
@@ -116,6 +118,7 @@ public class Akira.Utils.Snapping : Object {
         return snap_grid_from_candidates (vertical_candidates, horizontal_candidates, selection);
     }
 
+    // Calculate snaps inside a grid that match the selection input
     public static SnapMatchData generate_snap_matches (
         SnapGrid grid,
         List<Lib.Items.CanvasItem> selection,
@@ -137,6 +140,7 @@ public class Akira.Utils.Snapping : Object {
         return matches;
     }
 
+    // Matches in one direction (vertical / horizontal)
     private static void populate_snap_matches_from_list (
         Gee.HashMap<int, SnapMeta> target_snap_list,
         Gee.HashMap<int, SnapMeta> grid_snap_list,
@@ -203,6 +207,7 @@ public class Akira.Utils.Snapping : Object {
         return grid;
     }
 
+    /// Populates the horizontal snaps of an item
     private static void populate_horizontal_snaps (Lib.Items.CanvasItem item, ref Gee.HashMap<int, SnapMeta> map) {
         int x_1 = (int)item.bounds.x1;
         int x_2 = (int)item.bounds.x2;
@@ -216,6 +221,7 @@ public class Akira.Utils.Snapping : Object {
         add_to_map (center_x, center_y, center_y, center_y, 0, ref map);
     }
 
+    /// Populates the vertical snaps of an item
     private static void populate_vertical_snaps (Lib.Items.CanvasItem item, ref Gee.HashMap<int, SnapMeta> map) {
         int x_1 = (int)item.bounds.x1;
         int x_2 = (int)item.bounds.x2;
@@ -229,6 +235,7 @@ public class Akira.Utils.Snapping : Object {
         add_to_map (center_y, center_x, center_x, center_x, 0, ref map);
     }
 
+    /// Simple method to add information to a snap list
     private static void add_to_map (
         int pos,
         int n1,
@@ -255,6 +262,7 @@ public class Akira.Utils.Snapping : Object {
         }
     }
 
+    // Generate a default match data
     private static SnapMatchData default_match_data () {
         var matches = SnapMatchData ();
         matches.v_data.type = MatchType.NONE;

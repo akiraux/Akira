@@ -19,6 +19,7 @@
 * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
 */
 
+// Manages Goo.CanvasItem decorators used to display snap lines and dots
 public class Akira.Lib.Managers.SnapManager : Object {
     private const string STROKE_COLOR = "#ff0000";
     private const double LINE_WIDTH = 0.5;
@@ -47,10 +48,12 @@ public class Akira.Lib.Managers.SnapManager : Object {
         decorator_dots = new Gee.ArrayList<Goo.CanvasItemSimple> ();
     }
 
+    // Returns true if the manager has active decorators
     public bool is_active () {
         return any_decorators_visible;
     }
 
+    // Makes all decorators invisible, and ready to be reused
     public void reset_decorators () {
         foreach (var decorator in v_decorator_lines) {
             decorator.set ("visibility", Goo.CanvasItemVisibility.HIDDEN);
@@ -65,6 +68,8 @@ public class Akira.Lib.Managers.SnapManager : Object {
         any_decorators_visible = false;
     }
 
+    // Populates decorators (if applicable) based on match data and the snap grid
+    // Reuses decorator Goo.CanvasItems if possible, otherwise constructs new ones
     public void populate_decorators_from_data (Utils.Snapping.SnapMatchData data, Utils.Snapping.SnapGrid grid) {
         if (root == null) {
             root = canvas.get_root_item ();
