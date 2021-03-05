@@ -38,6 +38,7 @@ public class Akira.Lib.Managers.HoverManager : Object {
     }
 
     construct {
+        canvas.window.event_bus.zoom.connect (on_canvas_zoom);
         canvas.window.event_bus.hover_over_layer.connect (on_layer_hovered);
     }
 
@@ -196,5 +197,15 @@ public class Akira.Lib.Managers.HoverManager : Object {
             canvas.window.event_bus.request_change_cursor (selected_cursor);
             current_hovering_nob = grabbed_id;
         }
+    }
+
+    private void on_canvas_zoom () {
+        // Interrupt if we don't have any hover effect currently visible.
+        if (hover_effect == null) {
+            return;
+        }
+
+        // Update the line width of the hover effect based on the canvas scale.
+        hover_effect.set ("line-width", LINE_WIDTH / canvas.current_scale);
     }
 }
