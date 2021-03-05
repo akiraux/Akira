@@ -90,13 +90,12 @@ public class Akira.Utils.Color : Object {
         // Simple blend using Alpha channels. In the future we will support
         // different blending modes.
         double alpha = 1 - (1 - added_color.alpha) * (1 - base_color.alpha);
+        double ar1 = added_color.alpha / alpha;
+        double ar2 = (1 - added_color.alpha) / alpha;
 
-        double red = added_color.red * added_color.alpha /
-            alpha + base_color.red * base_color.alpha * (1 - added_color.alpha) / alpha;
-        double green = added_color.green * added_color.alpha /
-            alpha + base_color.green * base_color.alpha * (1 - added_color.alpha) / alpha;
-        double blue = added_color.blue * added_color.alpha /
-            alpha + base_color.blue * base_color.alpha * (1 - added_color.alpha) / alpha;
+        double red = added_color.red * ar1 + base_color.red * base_color.alpha * ar2;
+        double green = added_color.green * ar1 + base_color.green * base_color.alpha * ar2;
+        double blue = added_color.blue * ar1 + base_color.blue * base_color.alpha * ar2;
 
         var rgba = Gdk.RGBA ();
         rgba.alpha = alpha;
