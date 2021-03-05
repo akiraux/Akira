@@ -50,6 +50,9 @@ public class Akira.Lib.Components.Fills : Component {
         // Increase the ID to keep an incremental unique identifier.
         id++;
 
+        // Trigger the generation of the fill color.
+        reload ();
+
         return new_fill;
     }
 
@@ -57,6 +60,9 @@ public class Akira.Lib.Components.Fills : Component {
         return fills.size;
     }
 
+    /**
+     * Loop through all the fill colors and create a final blend.
+     */
     public void reload () {
         // If we don't have any fill associated with this item, remove the background color.
         if (count () == 0) {
@@ -68,9 +74,41 @@ public class Akira.Lib.Components.Fills : Component {
             return;
         }
 
-        // Loop through all the configured fill and reload the color.
+        bool has_colors = false;
+        // Set an initial arbitrary color with full transparency.
+        var rgba_fill = Gdk.RGBA ();
+        rgba_fill.alpha = 0;
+
+        // Loop through all the configured fills.
         foreach (Fill fill in fills) {
-            fill.reload ();
+            // Skip if the fill is hidden as we don't need to blend colors.
+            if (fill.hidden) {
+                continue;
+            }
+
+            // Set the new blended color.
+            rgba_fill = Utils.Color.blend_colors (rgba_fill, fill.color);
+            has_colors = true;
+        }
+
+        // Apply the mixed RGBA value only if we had one.
+        if (has_colors) {
+            // Keep in consideration the global opacity to properly update the fill color.
+            rgba_fill.alpha = rgba_fill.alpha * item.opacity.opacity / 100;
+
+            uint fill_color_rgba = Utils.Color.rgba_to_uint (rgba_fill);
+
+            if (item is Items.CanvasArtboard) {
+                ((Items.CanvasArtboard) item).background.set ("fill-color-rgba", fill_color_rgba);
+            } else {
+                item.set ("fill-color-rgba", fill_color_rgba);
+            }
+        } else {
+            if (item is Items.CanvasArtboard) {
+                ((Items.CanvasArtboard) item).background.set ("fill-color-rgba", null);
+            } else {
+                item.set ("fill-color-rgba", null);
+            }
         }
     }
 

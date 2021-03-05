@@ -44,58 +44,19 @@ public class Akira.Lib.Components.Border : Component {
         size = init_size;
         alpha = 255;
 
-        set_border ();
-    }
+        // Listen for changed to the border attributes to properly trigger the color generation.
+        this.notify["color"].connect (() => {
+            hex = Utils.Color.rgba_to_hex (color.to_string ());
+            borders.reload ();
+        });
 
-    /**
-     * Apply the properly converted border color to the item.
-     */
-    private void set_border () {
-        // Make the item transparent if the color is set by hidden.
-        if (hidden) {
-            item.set ("stroke-color-rgba", null);
-            item.set ("line-width", 0.0);
-            hex = "";
-            return;
-        }
+        this.notify["size"].connect (() => {
+            borders.reload ();
+        });
 
-        // Store the color in a new RGBA variable so we can manipulate it.
-        var rgba_fill = Gdk.RGBA ();
-        rgba_fill = color;
-
-        // Keep in consideration the global opacity to properly update the border color.
-        rgba_fill.alpha = ((double) alpha) / 255 * item.opacity.opacity / 100;
-        hex = Utils.Color.rgba_to_hex (rgba_fill.to_string ());
-
-        // Temporarily set the item color here. This will be moved to the Borders component
-        // once we enable multiple borders.
-        item.set ("stroke-color-rgba", Utils.Color.rgba_to_uint (rgba_fill));
-        // The "line-width" property expects a DOUBLE type, but we don't support subpixels
-        // so we always handle the border size as INT, therefore we need to type cast it here.
-        item.set ("line-width", (double) size);
-    }
-
-    /**
-     * Helper method used by the Borders component to force a reset of of the applied colors.
-     * This will most likely be removed once we start supporting multiple borders.
-     */
-    public void reload () {
-        set_border ();
-    }
-
-    /**
-     * Get the new hexadecimal string defined by the user and update the border color.
-     */
-    public void set_border_hex (string new_hex) {
-        // Interrupt if the value didn't change.
-        if (new_hex == hex) {
-            return;
-        }
-
-        hex = new_hex;
-        color.parse (hex);
-
-        set_border ();
+        this.notify["hidden"].connect (() => {
+            borders.reload ();
+        });
     }
 
     public void remove () {

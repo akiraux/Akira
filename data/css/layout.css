@@ -65,6 +65,11 @@
     padding-right: 3px;
 }
 
+.color-picker-button {
+    border-radius: 0 3px 3px 0;
+    border-left: none;
+}
+
 .group-title {
     font-size: 9pt;
     font-weight: 600;
