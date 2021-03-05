@@ -85,7 +85,12 @@ public class Akira.Utils.Snapping : Object {
     /// Returns a sensitivity adjusted to the given canvas scale
     public static double adjusted_sensitivity (double canvas_scale) {
         // Limit the sensitivity. This seems like a sensible default for now
-        return double.max (SENSITIVITY / 2.0, SENSITIVITY / canvas_scale);
+        if (canvas_scale > SENSITIVITY) {
+            return 1.0;
+        }
+
+        // beyond 0.002, the snapping breaks down. Arguably, it does before.
+        return SENSITIVITY / double.max(0.002, canvas_scale);
     }
 
     // Generates a snap grid from a canvas.
@@ -147,26 +152,36 @@ public class Akira.Utils.Snapping : Object {
         ref SnapMatch matches,
         int sensitivity
     ) {
+
+        var sorted_target_snaps = new Gee.TreeMap<int, SnapMeta>();
+        var sorted_grid_snaps = new Gee.TreeMap<int, SnapMeta>();
+
+        sorted_target_snaps.set_all (target_snap_list);
+        sorted_grid_snaps.set_all (grid_snap_list);
+
         int diff = 0;
         int polarity_offset = 0;
         var tmpdiff = sensitivity;
-        foreach (var target_snap in target_snap_list) {
-            foreach (var cand in grid_snap_list) {
-                polarity_offset = 0;
+        foreach (var target_snap in sorted_target_snaps) {
+            foreach (var cand in sorted_grid_snaps) {
+
+               polarity_offset = 0;
 
                 diff = (int)(cand.key - target_snap.key);
                 diff = diff.abs ();
 
-                if (diff < sensitivity) {
+
+               if (diff < sensitivity) {
                     if ((int)(cand.key + polarity_offset - target_snap.key) == 0) {
-                        matches.type = MatchType.EXACT;
+
+                       matches.type = MatchType.EXACT;
                         matches.snap_position = cand.key;
                         matches.reference_position = target_snap.key;
                         matches.polarity_offset = polarity_offset;
                         matches.exact_matches[cand.key] = polarity_offset;
                         tmpdiff = diff;
                     }
-                    else if (diff < tmpdiff) {
+                  else if (diff < tmpdiff) {
                         matches.type = MatchType.FUZZY;
                         matches.snap_position = cand.key;
                         matches.reference_position = target_snap.key;
@@ -177,7 +192,6 @@ public class Akira.Utils.Snapping : Object {
                 tmpdiff = diff;
             }
         }
-
     }
 
 
@@ -213,8 +227,8 @@ public class Akira.Utils.Snapping : Object {
         int x_2 = (int)item.bounds.x2;
         int y_1 = (int)item.bounds.y1;
         int y_2 = (int)item.bounds.y2;
-        int center_x = (int)((item.bounds.x2 - item.bounds.x1) / 2.0 + item.bounds.x1);
-        int center_y = (int)((item.bounds.y2 - item.bounds.y1) / 2.0 + item.bounds.y1);
+        int center_x = (int)(Math.ceil((item.bounds.x2 - item.bounds.x1) / 2.0) + item.bounds.x1);
+        int center_y = (int)(Math.ceil((item.bounds.y2 - item.bounds.y1) / 2.0) + item.bounds.y1);
 
         add_to_map (x_1, y_1, y_2, center_y, -1, ref map);
         add_to_map (x_2, y_1, y_2, center_y, 1, ref map);
@@ -227,8 +241,8 @@ public class Akira.Utils.Snapping : Object {
         int x_2 = (int)item.bounds.x2;
         int y_1 = (int)item.bounds.y1;
         int y_2 = (int)item.bounds.y2;
-        int center_x = (int)((item.bounds.x2 - item.bounds.x1) / 2.0 + item.bounds.x1);
-        int center_y = (int)((item.bounds.y2 - item.bounds.y1) / 2.0 + item.bounds.y1);
+        int center_x = (int)(Math.ceil((item.bounds.x2 - item.bounds.x1) / 2.0) + item.bounds.x1);
+        int center_y = (int)(Math.ceil((item.bounds.y2 - item.bounds.y1) / 2.0) + item.bounds.y1);
 
         add_to_map (y_1, x_1, x_2, center_x, -1, ref map);
         add_to_map (y_2, x_1, x_2, center_x, 1, ref map);

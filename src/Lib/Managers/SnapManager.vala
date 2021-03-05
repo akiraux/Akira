@@ -94,20 +94,23 @@ public class Akira.Lib.Managers.SnapManager : Object {
 
     private void add_vertical_decorator_line (int pos, int polarity_offset, Utils.Snapping.SnapGrid grid) {
 
-        double lw = double.max (0.5, LINE_WIDTH / canvas.current_scale);
+        double lw = LINE_WIDTH / canvas.current_scale;
         var snap_value = grid.v_snaps.get (pos);
         if (snap_value != null) {
 
+            // To actually show decorators in their exact position, we offset by 0.5
+            double actual_pos = (double)(pos + polarity_offset);
+
             // add dots
             foreach (var normal in snap_value.normals) {
-                add_decorator_dot (normal, pos + polarity_offset);
+                add_decorator_dot (normal, actual_pos);
             }
 
             // add lines (reuse if possible
             foreach (var line in v_decorator_lines) {
                 if (line.visibility == Goo.CanvasItemVisibility.HIDDEN) {
                     line.set ("visibility", Goo.CanvasItemVisibility.VISIBLE);
-                    line.set ("y", (double)pos + polarity_offset);
+                    line.set ("y", actual_pos);
                     line.set ("line-width", lw);
                     line.raise (null);
                     return;
@@ -116,8 +119,8 @@ public class Akira.Lib.Managers.SnapManager : Object {
 
             var tmp = new Goo.CanvasPolyline.line (
                 null,
-                canvas.x1, pos + polarity_offset,
-                canvas.x2, pos + polarity_offset,
+                canvas.x1, actual_pos,
+                canvas.x2, actual_pos,
                 "line-width", lw,
                 "stroke-color", STROKE_COLOR,
                 null
@@ -134,19 +137,21 @@ public class Akira.Lib.Managers.SnapManager : Object {
 
     private void add_horizontal_decorator_line (int pos, int polarity_offset, Utils.Snapping.SnapGrid grid) {
 
-        double lw = double.max (0.5, LINE_WIDTH / canvas.current_scale);
+        double lw = LINE_WIDTH / canvas.current_scale;
         var snap_value = grid.h_snaps.get (pos);
         if (snap_value != null) {
+            double actual_pos = (double)(pos + polarity_offset);
+
             // add dots
             foreach (var normal in snap_value.normals) {
-                add_decorator_dot (pos + polarity_offset, normal);
+                add_decorator_dot (actual_pos, normal);
             }
 
             // add lines (reuse if possible
             foreach (var line in h_decorator_lines) {
                 if (line.visibility == Goo.CanvasItemVisibility.HIDDEN) {
                     line.set ("visibility", Goo.CanvasItemVisibility.VISIBLE);
-                    line.set ("x", (double)pos + polarity_offset);
+                    line.set ("x", actual_pos);
                     line.set ("line-width", lw);
                     line.raise (null);
                     return;
@@ -155,8 +160,8 @@ public class Akira.Lib.Managers.SnapManager : Object {
 
             var tmp = new Goo.CanvasPolyline.line (
                 null,
-                pos + polarity_offset, canvas.y1,
-                pos + polarity_offset, canvas.y2,
+                actual_pos, canvas.y1,
+                actual_pos, canvas.y2,
                 "line-width", lw,
                 "stroke-color", STROKE_COLOR,
                 null
@@ -171,15 +176,15 @@ public class Akira.Lib.Managers.SnapManager : Object {
         }
     }
 
-    private void add_decorator_dot (int x, int y) {
-        double dot_radius = double.max (1, DOT_RADIUS / canvas.current_scale);
+    private void add_decorator_dot (double x, double y) {
+        double dot_radius = DOT_RADIUS / canvas.current_scale;
 
         // add dot
         foreach (var line in decorator_dots) {
             if (line.visibility == Goo.CanvasItemVisibility.HIDDEN) {
                 line.set ("visibility", Goo.CanvasItemVisibility.VISIBLE);
-                line.set ("center_x", (double)x);
-                line.set ("center_y", (double)y);
+                line.set ("center_x", x);
+                line.set ("center_y", y);
                 line.set ("radius_x", dot_radius);
                 line.set ("radius_y", dot_radius);
                 line.raise (null);
