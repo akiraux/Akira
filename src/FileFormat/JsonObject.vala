@@ -1,5 +1,5 @@
-/*
- * Copyright (c) 2019-2020 Alecaddd (https://alecaddd.com)
+/**
+ * Copyright (c) 2019-2021 Alecaddd (https://alecaddd.com)
  *
  * This file is part of Akira.
  *
@@ -172,8 +172,7 @@ public class Akira.FileFormat.JsonObject : GLib.Object {
             foreach (Lib.Components.Fill fill in item.fills.fills) {
                 var obj = new Json.Object ();
                 obj.set_int_member ("id", fill.id);
-                obj.set_string_member ("color", Utils.Color.hex_to_rgba (fill.hex).to_string ());
-                obj.set_string_member ("hex", fill.hex);
+                obj.set_string_member ("color", fill.color.to_string ());
                 obj.set_int_member ("alpha", fill.alpha);
                 obj.set_boolean_member ("hidden", fill.hidden);
 
@@ -189,8 +188,7 @@ public class Akira.FileFormat.JsonObject : GLib.Object {
             foreach (Lib.Components.Border border in item.borders.borders) {
                 var obj = new Json.Object ();
                 obj.set_int_member ("id", border.id);
-                obj.set_int_member ("color", Utils.Color.rgba_to_uint (border.color));
-                obj.set_string_member ("hex", border.hex);
+                obj.set_string_member ("color", border.color.to_string ());
                 obj.set_int_member ("size", border.size);
                 obj.set_int_member ("alpha", border.alpha);
                 obj.set_boolean_member ("hidden", border.hidden);

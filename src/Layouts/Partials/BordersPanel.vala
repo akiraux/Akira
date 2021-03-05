@@ -1,23 +1,23 @@
-/*
-* Copyright (c) 2019 Alecaddd (https://alecaddd.com)
-*
-* This file is part of Akira.
-*
-* Akira is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
+/**
+ * Copyright (c) 2019-2021 Alecaddd (https://alecaddd.com)
+ *
+ * This file is part of Akira.
+ *
+ * Akira is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
 
-* Akira is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-* GNU General Public License for more details.
+ * Akira is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
 
-* You should have received a copy of the GNU General Public License
-* along with Akira. If not, see <https://www.gnu.org/licenses/>.
-*
-* Authored by: Alessandro "alecaddd" Castellani <castellani.ale@gmail.com>
-*/
+ * You should have received a copy of the GNU General Public License
+ * along with Akira. If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Authored by: Alessandro "alecaddd" Castellani <castellani.ale@gmail.com>
+ */
 
 public class Akira.Layouts.Partials.BordersPanel : Gtk.Grid {
     public weak Akira.Window window { get; construct; }
@@ -25,7 +25,6 @@ public class Akira.Layouts.Partials.BordersPanel : Gtk.Grid {
     public Gtk.Button add_btn;
     public Gtk.ListBox borders_list_container;
     public Akira.Models.ListModel<Akira.Models.BordersItemModel> list_model;
-    public Gtk.Grid title_cont;
     private unowned List<Lib.Items.CanvasItem>? items;
 
     public bool toggled {
@@ -45,7 +44,7 @@ public class Akira.Layouts.Partials.BordersPanel : Gtk.Grid {
     }
 
     construct {
-        title_cont = new Gtk.Grid ();
+        var title_cont = new Gtk.Grid ();
         title_cont.orientation = Gtk.Orientation.HORIZONTAL;
         title_cont.hexpand = true;
         title_cont.get_style_context ().add_class ("option-panel");
@@ -100,7 +99,6 @@ public class Akira.Layouts.Partials.BordersPanel : Gtk.Grid {
                 Lib.Components.Border border = item.borders.add_border_color (border_color, (int) settings.border_size);
                 var model_item = create_model (border);
                 list_model.add_item.begin (model_item);
-                item.borders.reload ();
             }
         });
 

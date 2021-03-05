@@ -1,5 +1,5 @@
-/*
- * Copyright (c) 2019-2020 Alecaddd (http://alecaddd.com)
+/**
+ * Copyright (c) 2019-2021 Alecaddd (https://alecaddd.com)
  *
  * This file is part of Akira.
  *
@@ -501,8 +501,9 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             var fills = components.get_member ("Fills").get_object ();
             fills.foreach_member ((i, name, node) => {
                 var obj = node.get_object ();
-                var fill = item.fills.add_fill_color (Utils.Color.hex_to_rgba (obj.get_string_member ("hex")));
-                fill.hex = obj.get_string_member ("hex");
+                var color = Gdk.RGBA ();
+                color.parse (obj.get_string_member ("color"));
+                var fill = item.fills.add_fill_color (color);
                 fill.alpha = (int) obj.get_int_member ("alpha");
                 fill.hidden = obj.get_boolean_member ("hidden");
             });
@@ -520,11 +521,9 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             var borders = components.get_member ("Borders").get_object ();
             borders.foreach_member ((i, name, node) => {
                 var obj = node.get_object ();
-                var border = item.borders.add_border_color (
-                    Utils.Color.hex_to_rgba (obj.get_string_member ("hex")),
-                    (int) obj.get_int_member ("size")
-                );
-                border.hex = obj.get_string_member ("hex");
+                var color = Gdk.RGBA ();
+                color.parse (obj.get_string_member ("color"));
+                var border = item.borders.add_border_color (color, (int) obj.get_int_member ("size"));
                 border.alpha = (int) obj.get_int_member ("alpha");
                 border.hidden = obj.get_boolean_member ("hidden");
             });
