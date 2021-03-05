@@ -507,6 +507,8 @@ public class Akira.Lib.Managers.ItemsManager : Object {
                 fill.alpha = (int) obj.get_int_member ("alpha");
                 fill.hidden = obj.get_boolean_member ("hidden");
             });
+
+            item.fills.reload ();
         }
 
         // Restore borders.
@@ -525,6 +527,8 @@ public class Akira.Lib.Managers.ItemsManager : Object {
                 border.alpha = (int) obj.get_int_member ("alpha");
                 border.hidden = obj.get_boolean_member ("hidden");
             });
+
+            item.borders.reload ();
         }
 
         // Restore image size.
