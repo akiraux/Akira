@@ -36,7 +36,6 @@ public class Akira.Utils.AffineTransform : Object {
      */
     public static void move_from_event (
         CanvasItem item,
-        SnapManager.SnapMatchData data,
         double initial_press_event_x,
         double initial_press_event_y,
         double event_x,
@@ -50,6 +49,8 @@ public class Akira.Utils.AffineTransform : Object {
 
         bool snap_x = false;
         bool snap_y = false;
+
+        /*
 
         if (data.horizontal.wants_snap () && delta_x.abs () <= 4) {
             if (data.horizontal.type == SnapManager.MatchType.FUZZY) {
@@ -94,6 +95,7 @@ public class Akira.Utils.AffineTransform : Object {
         if (!snap_y) {
             initial_event_y = event_y;
         }
+        */
     }
 
     public static void move_from_event2 (
@@ -115,19 +117,19 @@ public class Akira.Utils.AffineTransform : Object {
         item.translate (delta_x - reset_x, delta_y - reset_y);
         snap_manager.generate_snap_matches (sel_manager.selected_items);
 
-        var hdata = snap_manager.snap_match_data.horizontal;
-        var vdata = snap_manager.snap_match_data.vertical;
+        var hdata = snap_manager.snap_match_data.h_data;
+        var vdata = snap_manager.snap_match_data.v_data;
 
         bool requires_snap = false;
         double snap_offset_x = 0;
         double snap_offset_y = 0;
 
-        if (hdata.wants_snap ()) {
+        if (hdata.snap_found ()) {
             snap_offset_x = hdata.snap_offset ();
             requires_snap = true;
         }
 
-        if (vdata.wants_snap ()) {
+        if (vdata.snap_found ()) {
             snap_offset_y = vdata.snap_offset ();
             requires_snap = true;
         }

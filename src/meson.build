@@ -36,6 +36,7 @@ sources = files(
     'Utils/Color.vala',
     'Utils/Image.vala',
     'Utils/ColorPicker.vala',
+    'Utils/Snapping.vala',
 
     'Layouts/HeaderBar.vala',
     'Layouts/LeftSideBar.vala',

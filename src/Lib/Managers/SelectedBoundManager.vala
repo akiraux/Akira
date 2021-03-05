@@ -97,56 +97,6 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         double event_x,
         double event_y,
         Managers.NobManager.Nob selected_nob,
-        Managers.SnapManager.SnapMatchData snap_data
-    ) {
-        Items.CanvasItem selected_item = selected_items.nth_data (0);
-
-        if (selected_item == null) {
-            return;
-        }
-
-        if (!initial_object_populated) {
-            initial_object_populated = true;
-            initial_object_x = selected_item.bounds.x1;
-            initial_object_y = selected_item.bounds.y1;
-        }
-
-
-        switch (selected_nob) {
-            case Managers.NobManager.Nob.NONE:
-              Utils.AffineTransform.move_from_event (
-                    selected_item, snap_data, initial_press_event_x, initial_press_event_y, event_x, event_y,
-                    ref initial_event_x, ref initial_event_y
-                );
-                break;
-
-            case Managers.NobManager.Nob.ROTATE:
-                Utils.AffineTransform.rotate_from_event (
-                    selected_item, event_x, event_y,
-                    ref initial_event_x, ref initial_event_y
-                );
-                break;
-
-            default:
-                Utils.AffineTransform.scale_from_event (
-                    selected_item,
-                    selected_nob,
-                    event_x, event_y,
-                    ref initial_event_x, ref initial_event_y,
-                    ref delta_x_accumulator, ref delta_y_accumulator,
-                    initial_width, initial_height
-                );
-                break;
-        }
-
-        // Notify the X & Y values in the state manager.
-        canvas.window.event_bus.reset_state_coords (selected_item);
-    }
-
-    public void transform_bound2 (
-        double event_x,
-        double event_y,
-        Managers.NobManager.Nob selected_nob,
         Managers.SnapManager snap_manager
     ) {
         Items.CanvasItem selected_item = selected_items.nth_data (0);
@@ -389,5 +339,4 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         }
 
         canvas.window.event_bus.set_focus_on_canvas ();
-    }
-}
+    }}
