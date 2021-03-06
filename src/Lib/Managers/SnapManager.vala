@@ -48,12 +48,16 @@ public class Akira.Lib.Managers.SnapManager : Object {
         decorator_dots = new Gee.ArrayList<Goo.CanvasItemSimple> ();
     }
 
-    // Returns true if the manager has active decorators
+    /**
+     * Returns true if the manager has active decorators
+     */
     public bool is_active () {
         return any_decorators_visible;
     }
 
-    // Makes all decorators invisible, and ready to be reused
+    /**
+     * Makes all decorators invisible, and ready to be reused
+     */
     public void reset_decorators () {
         foreach (var decorator in v_decorator_lines) {
             decorator.set ("visibility", Goo.CanvasItemVisibility.HIDDEN);
@@ -68,8 +72,10 @@ public class Akira.Lib.Managers.SnapManager : Object {
         any_decorators_visible = false;
     }
 
-    // Populates decorators (if applicable) based on match data and the snap grid
-    // Reuses decorator Goo.CanvasItems if possible, otherwise constructs new ones
+    /**
+     * Populates decorators (if applicable) based on match data and the snap grid
+     * Reuses decorator Goo.CanvasItems if possible, otherwise constructs new ones
+     */
     public void populate_decorators_from_data (Utils.Snapping.SnapMatchData data, Utils.Snapping.SnapGrid grid) {
         if (root == null) {
             root = canvas.get_root_item ();
@@ -99,7 +105,7 @@ public class Akira.Lib.Managers.SnapManager : Object {
         if (snap_value != null) {
 
             // To actually show decorators in their exact position, we offset by 0.5
-            double actual_pos = (double)(pos + polarity_offset);
+            double actual_pos = (double) (pos + polarity_offset);
 
             // add dots
             foreach (var normal in snap_value.normals) {
@@ -140,7 +146,7 @@ public class Akira.Lib.Managers.SnapManager : Object {
         double lw = LINE_WIDTH / canvas.current_scale;
         var snap_value = grid.h_snaps.get (pos);
         if (snap_value != null) {
-            double actual_pos = (double)(pos + polarity_offset);
+            double actual_pos = (double) (pos + polarity_offset);
 
             // add dots
             foreach (var normal in snap_value.normals) {

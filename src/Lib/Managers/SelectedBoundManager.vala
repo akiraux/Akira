@@ -336,12 +336,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
     /**
      * Move the item based on the mouse click and drag event.
      */
-    private void move_from_event (
-        Lib.Items.CanvasItem item,
-        double event_x,
-        double event_y
-        ) {
-
+    private void move_from_event ( Lib.Items.CanvasItem item, double event_x, double event_y ) {
         if (!initial_drag_registered) {
             initial_drag_registered = true;
             initial_drag_item_x = item.transform.x;
@@ -350,15 +345,15 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
 
         // Keep reset and delta values for future adjustments.
 
-        // Calculate values needed to reset to the original position
+        // Calculate values needed to reset to the original position.
         var reset_x = item.transform.x - initial_drag_item_x;
         var reset_y = item.transform.y - initial_drag_item_y;
 
-        // Calculate the change based on the event
+        // Calculate the change based on the event.
         var delta_x = event_x - initial_drag_press_x;
         var delta_y = event_y - initial_drag_press_y;
 
-        // Keep reset and delta values for future adjustments. fix_size should
+        // Keep reset and delta values for future adjustments. fix_size should.
         // be called right before a transform.
         var first_move_x = Utils.AffineTransform.fix_size (delta_x - reset_x);
         var first_move_y = Utils.AffineTransform.fix_size (delta_y - reset_y);
@@ -371,9 +366,9 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         matrix.y0 += first_move_y;
         item.set_transform (matrix);
 
-        // Make adjustment basted on snaps
-        // Double the sensitivity to allow for reuse of grid after snap
-        var sensitivity = (int) Utils.Snapping.adjusted_sensitivity (canvas.current_scale);
+        // Make adjustment basted on snaps.
+        // Double the sensitivity to allow for reuse of grid after snap.
+        var sensitivity = Utils.Snapping.adjusted_sensitivity (canvas.current_scale);
         var snap_grid = Utils.Snapping.snap_grid_from_canvas (canvas, selected_items, sensitivity);
 
         if (!snap_grid.is_empty ()) {
@@ -410,7 +405,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
 
     private void update_grid_decorators (bool force) {
         if (force || snap_manager.is_active ()) {
-            var sensitivity = (int) Utils.Snapping.adjusted_sensitivity (canvas.current_scale);
+            var sensitivity = Utils.Snapping.adjusted_sensitivity (canvas.current_scale);
             var snap_grid = Utils.Snapping.snap_grid_from_canvas (canvas, selected_items, sensitivity);
             var matches = Utils.Snapping.generate_snap_matches (snap_grid, selected_items, sensitivity);
             snap_manager.populate_decorators_from_data (matches, snap_grid);
