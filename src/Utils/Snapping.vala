@@ -242,13 +242,13 @@ public class Akira.Utils.Snapping : Object {
     /*
      * Populates the horizontal snaps of an item.
      */
-    private static void populate_horizontal_snaps (lib.items.canvasitem item, ref gee.hashmap<int, snapmeta> map) {
+    private static void populate_horizontal_snaps (Lib.Items.CanvasItem item, ref Gee.HashMap<int, SnapMeta> map) {
         int x_1 = (int) item.bounds.x1;
         int x_2 = (int) item.bounds.x2;
         int y_1 = (int) item.bounds.y1;
         int y_2 = (int) item.bounds.y2;
-        int center_x = (int) (math.ceil ((item.bounds.x2 - item.bounds.x1) / 2.0) + item.bounds.x1);
-        int center_y = (int) (math.ceil ((item.bounds.y2 - item.bounds.y1) / 2.0) + item.bounds.y1);
+        int center_x = (int) (Math.ceil ((item.bounds.x2 - item.bounds.x1) / 2.0) + item.bounds.x1);
+        int center_y = (int) (Math.ceil ((item.bounds.y2 - item.bounds.y1) / 2.0) + item.bounds.y1);
 
         add_to_map (x_1, y_1, y_2, center_y, -1, ref map);
         add_to_map (x_2, y_1, y_2, center_y, 1, ref map);
