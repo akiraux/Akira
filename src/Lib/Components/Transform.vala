@@ -48,14 +48,24 @@ public class Akira.Lib.Components.Transform : Component {
         }
     }
 
+    public double x1 {
+        get {
+            double item_x1 = item.bounds.x1 + get_border ();
+
+            // If the item is an artboard we need to get the bounds of the background since
+            // the artboard group will have its bounds changing based on the location of the
+            // child items.
+            if (item is Items.CanvasArtboard) {
+                item_x1 = ((Items.CanvasArtboard) item).background.bounds.x1;
+            }
+
+            return item_x1;
+        }
+    }
+
     public double x2 {
         get {
             double item_x2 = item.bounds.x2 - get_border ();
-
-            if (item.artboard != null) {
-                double temp_y = 0.0;
-                item.canvas.convert_to_item_space (item.artboard, ref item_x2, ref temp_y);
-            }
 
             // If the item is an artboard we need to get the bounds of the background since
             // the artboard group will have its bounds changing based on the location of the
@@ -93,14 +103,24 @@ public class Akira.Lib.Components.Transform : Component {
         }
     }
 
+    public double y1 {
+        get {
+            double item_y1 = item.bounds.y1 + get_border ();
+
+            // If the item is an artboard we need to get the bounds of the background since
+            // the artboard group will have its bounds changing based on the location of the
+            // child items.
+            if (item is Items.CanvasArtboard) {
+                item_y1 = ((Items.CanvasArtboard) item).background.bounds.y1;
+            }
+
+            return item_y1;
+        }
+    }
+
     public double y2 {
         get {
             double item_y2 = item.bounds.y2 - get_border ();
-
-            if (item.artboard != null) {
-                double temp_x = 0.0;
-                item.canvas.convert_to_item_space (item.artboard, ref temp_x, ref item_y2);
-            }
 
             // If the item is an artboard we need to get the bounds of the background since
             // the artboard group will have its bounds changing based on the location of the
