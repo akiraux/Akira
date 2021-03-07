@@ -123,18 +123,18 @@ public class Akira.Utils.Snapping : Object {
         Goo.CanvasBounds horizontal_filter = {0, 0, 0, 0};
 
         foreach (var item in selection) {
-          horizontal_filter.x1 = item.bounds.x1 - sensitivity;
-          horizontal_filter.x2 = item.bounds.x2 + sensitivity;
-          horizontal_filter.y1 = canvas.y1;
-          horizontal_filter.y2 = canvas.y2;
+            horizontal_filter.x1 = item.bounds.x1 - sensitivity;
+            horizontal_filter.x2 = item.bounds.x2 + sensitivity;
+            horizontal_filter.y1 = canvas.y1;
+            horizontal_filter.y2 = canvas.y2;
 
-          vertical_filter.x1 = canvas.x1;
-          vertical_filter.x2 = canvas.x2;
-          vertical_filter.y1 = item.bounds.y1 - sensitivity;
-          vertical_filter.y2 = item.bounds.y2 + sensitivity;
+            vertical_filter.x1 = canvas.x1;
+            vertical_filter.x2 = canvas.x2;
+            vertical_filter.y1 = item.bounds.y1 - sensitivity;
+            vertical_filter.y2 = item.bounds.y2 + sensitivity;
 
-          vertical_candidates.concat (canvas.get_items_in_area (vertical_filter, true, true, false));
-          horizontal_candidates.concat (canvas.get_items_in_area (horizontal_filter, true, true, false));
+            vertical_candidates.concat (canvas.get_items_in_area (vertical_filter, true, true, false));
+            horizontal_candidates.concat (canvas.get_items_in_area (horizontal_filter, true, true, false));
         }
 
         return snap_grid_from_candidates (vertical_candidates, horizontal_candidates, selection);
