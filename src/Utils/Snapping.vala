@@ -1,29 +1,31 @@
-/*
-* Copyright (c) 2019 Alecaddd (http://alecaddd.com)
-*
-* This file is part of Akira.
-*
-* Akira is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
+/**
+ * Copyright (c) 2021 Alecaddd (http://alecaddd.com)
+ *
+ * This file is part of Akira.
+ *
+ * Akira is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
 
-* Akira is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
+ * Akira is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
 
-* You should have received a copy of the GNU General Public License
-* along with Akira.  If not, see <https://www.gnu.org/licenses/>.
-*
-* Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
-*/
+ * You should have received a copy of the GNU General Public License
+ * along with Akira. If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
+ */
 
-/// Utility providing snap functionality between objects.
+/**
+ * Utility providing snap functionality between objects.
+ */
 public class Akira.Utils.Snapping : Object {
     private const double SENSITIVITY = 4.0;
 
-    /*
+    /**
      * Metadata used in the cosmetic aspects of snap lines and dots.
      */
     public class SnapMeta {
@@ -31,7 +33,7 @@ public class Akira.Utils.Snapping : Object {
         public int polarity;
     }
 
-    /*
+    /**
      * Grid snaps found for a given selection and set of candidates.
      */
     public struct SnapGrid {
@@ -43,28 +45,28 @@ public class Akira.Utils.Snapping : Object {
         public Gee.HashMap<int, SnapMeta> h_snaps;
     }
 
-    /*
+    /**
      * Type of match that was found for a snap.
      */
     public enum MatchType {
-        NONE=-1,    //< No match was found.
+        NONE = -1,  //< No match was found.
         FUZZY,      //< A match was found, but requires an offset.
         EXACT,      //< An exact match was found, no offset is necessary.
     }
 
-    /*
+    /**
      * Information used to define a match for a given selection.
      * An instance of this class corresponds to a single direction (vertical or horizontal).
      */
     public struct SnapMatch {
-        /*
+        /**
          * Returns true if a match was found
          */
         public bool snap_found () {
             return type != MatchType.NONE;
         }
 
-        /*
+        /**
          * Returns the offset necessary to bring the reference position to the selected items.
          */
         public int snap_offset () {
@@ -81,7 +83,7 @@ public class Akira.Utils.Snapping : Object {
         public Gee.HashMap<int, int> exact_matches; //< map of exact matches and their polarities.
     }
 
-    /*
+    /**
      * Couple of MatchData used for convenience.
      */
     public struct SnapMatchData {
@@ -93,7 +95,7 @@ public class Akira.Utils.Snapping : Object {
         SnapMatch v_data;
     }
 
-    /*
+    /**
      * Returns a sensitivity adjusted to the given canvas scale.
      */
     public static int adjusted_sensitivity (double canvas_scale) {
@@ -102,11 +104,11 @@ public class Akira.Utils.Snapping : Object {
             return 1;
         }
 
-        // beyond 0.002, the snapping breaks down. Arguably, it does before.
+        // Beyond 0.002, the snapping breaks down. Arguably, it does before.
         return (int) (SENSITIVITY / double.max (0.002, canvas_scale));
     }
 
-    /*
+    /**
      * Generates a snap grid from a canvas.
      */
     public static SnapGrid snap_grid_from_canvas (
@@ -138,7 +140,7 @@ public class Akira.Utils.Snapping : Object {
         return snap_grid_from_candidates (vertical_candidates, horizontal_candidates, selection);
     }
 
-    /*
+    /**
      * Calculate snaps inside a grid that match the selection input.
      */
     public static SnapMatchData generate_snap_matches (
@@ -162,7 +164,7 @@ public class Akira.Utils.Snapping : Object {
         return matches;
     }
 
-    /*
+    /**
      * Matches in one direction (vertical / horizontal).
      */
     private static void populate_snap_matches_from_list (
@@ -182,31 +184,25 @@ public class Akira.Utils.Snapping : Object {
         var tmpdiff = sensitivity;
         foreach (var target_snap in sorted_target_snaps) {
             foreach (var cand in sorted_grid_snaps) {
-
-               polarity_offset = 0;
-
+                polarity_offset = 0;
                 diff = (int) (cand.key - target_snap.key);
                 diff = diff.abs ();
 
-
                if (diff < sensitivity) {
                     if ((int) (cand.key + polarity_offset - target_snap.key) == 0) {
-
-                       matches.type = MatchType.EXACT;
+                        matches.type = MatchType.EXACT;
                         matches.snap_position = cand.key;
                         matches.reference_position = target_snap.key;
                         matches.polarity_offset = polarity_offset;
                         matches.exact_matches[cand.key] = polarity_offset;
-                        tmpdiff = diff;
-                    }
-                  else if (diff < tmpdiff) {
+                    } else if (diff < tmpdiff) {
                         matches.type = MatchType.FUZZY;
                         matches.snap_position = cand.key;
                         matches.reference_position = target_snap.key;
                         matches.polarity_offset = polarity_offset;
-                        tmpdiff = diff;
                     }
                 }
+
                 tmpdiff = diff;
             }
         }
@@ -239,7 +235,7 @@ public class Akira.Utils.Snapping : Object {
         return grid;
     }
 
-    /*
+    /**
      * Populates the horizontal snaps of an item.
      */
     private static void populate_horizontal_snaps (Lib.Items.CanvasItem item, ref Gee.HashMap<int, SnapMeta> map) {
@@ -255,7 +251,7 @@ public class Akira.Utils.Snapping : Object {
         add_to_map (center_x, center_y, center_y, center_y, 0, ref map);
     }
 
-    /*
+    /**
      * Populates the vertical snaps of an item.
      */
     private static void populate_vertical_snaps (Lib.Items.CanvasItem item, ref Gee.HashMap<int, SnapMeta> map) {
@@ -271,7 +267,7 @@ public class Akira.Utils.Snapping : Object {
         add_to_map (center_y, center_x, center_x, center_x, 0, ref map);
     }
 
-    /*
+    /**
      * Simple method to add information to a snap list.
      */
     private static void add_to_map (
@@ -300,7 +296,7 @@ public class Akira.Utils.Snapping : Object {
         map.set (pos, v);
     }
 
-    /*
+    /**
      * Generate a default match data.
      */
     private static SnapMatchData default_match_data () {
@@ -316,7 +312,7 @@ public class Akira.Utils.Snapping : Object {
         matches.h_data.polarity_offset = 0;
         matches.h_data.reference_position = 0;
         matches.h_data.exact_matches = new Gee.HashMap<int, int> ();
+
         return matches;
     }
-
 }
