@@ -1,24 +1,24 @@
-/*
-* Copyright (c) 2019-2020 Alecaddd (https://alecaddd.com)
-*
-* This file is part of Akira.
-*
-* Akira is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
+/**
+ * Copyright (c) 2019-2021 Alecaddd (https://alecaddd.com)
+ *
+ * This file is part of Akira.
+ *
+ * Akira is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
 
-* Akira is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-* GNU General Public License for more details.
+ * Akira is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
 
-* You should have received a copy of the GNU General Public License
-* along with Akira. If not, see <https://www.gnu.org/licenses/>.
-*
-* Authored by: Giacomo Alberini <giacomoalbe@gmail.com>
-* Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
-*/
+ * You should have received a copy of the GNU General Public License
+ * along with Akira. If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Authored by: Giacomo Alberini <giacomoalbe@gmail.com>
+ * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
+ */
 
 public class Akira.Lib.Managers.SelectedBoundManager : Object {
     public weak Akira.Lib.Canvas canvas { get; construct; }
@@ -35,6 +35,8 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         }
     }
 
+    private Managers.SnapManager snap_manager;
+
     private Goo.CanvasBounds select_bb;
     private double initial_event_x;
     private double initial_event_y;
@@ -43,7 +45,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
     private double initial_width;
     private double initial_height;
 
-    // Attributes to keep track of the mouse dragging coordinates
+    // Attributes to keep track of the mouse dragging coordinates.
     private double initial_drag_press_x;
     private double initial_drag_press_y;
     private bool initial_drag_registered = false;
@@ -63,9 +65,11 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         canvas.window.event_bus.item_deleted.connect (remove_item_from_selection);
         canvas.window.event_bus.request_add_item_to_selection.connect (add_item_to_selection);
         canvas.window.event_bus.item_locked.connect (remove_item_from_selection);
+        canvas.window.event_bus.zoom.connect (on_canvas_zoom);
     }
 
     construct {
+        snap_manager = new Managers.SnapManager (canvas);
         reset_selection ();
     }
 
@@ -95,7 +99,11 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         initial_height = select_bb.y2 - select_bb.y1;
     }
 
-    public void transform_bound (double event_x, double event_y, Managers.NobManager.Nob selected_nob) {
+    public void transform_bound (
+        double event_x,
+        double event_y,
+        Managers.NobManager.Nob selected_nob
+    ) {
         Items.CanvasItem selected_item = selected_items.nth_data (0);
 
         if (selected_item == null) {
@@ -180,6 +188,10 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         }
 
         selected_items = new List<Items.CanvasItem> ();
+    }
+
+    public void alert_held_button_release () {
+        snap_manager.reset_decorators ();
     }
 
     private void update_selected_items () {
@@ -324,8 +336,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
     /**
      * Move the item based on the mouse click and drag event.
      */
-    private void move_from_event (
-        Lib.Items.CanvasItem item, double event_x, double event_y) {
+    private void move_from_event ( Lib.Items.CanvasItem item, double event_x, double event_y ) {
         if (!initial_drag_registered) {
             initial_drag_registered = true;
             initial_drag_item_x = item.transform.x;
@@ -334,15 +345,15 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
 
         // Keep reset and delta values for future adjustments.
 
-        // Calculate values needed to reset to the original position
+        // Calculate values needed to reset to the original position.
         var reset_x = item.transform.x - initial_drag_item_x;
         var reset_y = item.transform.y - initial_drag_item_y;
 
-        // Calculate the change based on the event
+        // Calculate the change based on the event.
         var delta_x = event_x - initial_drag_press_x;
         var delta_y = event_y - initial_drag_press_y;
 
-        // Keep reset and delta values for future adjustments. fix_size should
+        // Keep reset and delta values for future adjustments. fix_size should.
         // be called right before a transform.
         var first_move_x = Utils.AffineTransform.fix_size (delta_x - reset_x);
         var first_move_y = Utils.AffineTransform.fix_size (delta_y - reset_y);
@@ -353,15 +364,51 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         // Increment the cairo matrix coordinates so we can ignore the item's rotation.
         matrix.x0 += first_move_x;
         matrix.y0 += first_move_y;
-
         item.set_transform (matrix);
 
-        // Any adjustments like snapping would be computed here, and the item would
-        // then be translated again.
+        // Make adjustment basted on snaps.
+        // Double the sensitivity to allow for reuse of grid after snap.
+        var sensitivity = Utils.Snapping.adjusted_sensitivity (canvas.current_scale);
+        var snap_grid = Utils.Snapping.snap_grid_from_canvas (canvas, selected_items, sensitivity);
+
+        if (!snap_grid.is_empty ()) {
+            int snap_offset_x = 0;
+            int snap_offset_y = 0;
+            var matches = Utils.Snapping.generate_snap_matches (snap_grid, selected_items, sensitivity);
+
+            if (matches.h_data.snap_found ()) {
+                snap_offset_x = matches.h_data.snap_offset ();
+                first_move_x += snap_offset_x;
+                matrix.x0 += snap_offset_x;
+            }
+
+            if (matches.v_data.snap_found ()) {
+                snap_offset_y = matches.v_data.snap_offset ();
+                first_move_y += snap_offset_y;
+                matrix.y0 += snap_offset_y;
+            }
+
+            item.set_transform (matrix);
+            update_grid_decorators (true);
+        }
+
 
         // If the item is an Artboard, move the label with it.
         if (item is Lib.Items.CanvasArtboard) {
             ((Lib.Items.CanvasArtboard) item).label.translate (first_move_x, first_move_y);
+        }
+    }
+
+    private void on_canvas_zoom () {
+        update_grid_decorators (false);
+    }
+
+    private void update_grid_decorators (bool force) {
+        if (force || snap_manager.is_active ()) {
+            var sensitivity = Utils.Snapping.adjusted_sensitivity (canvas.current_scale);
+            var snap_grid = Utils.Snapping.snap_grid_from_canvas (canvas, selected_items, sensitivity);
+            var matches = Utils.Snapping.generate_snap_matches (snap_grid, selected_items, sensitivity);
+            snap_manager.populate_decorators_from_data (matches, snap_grid);
         }
     }
 }

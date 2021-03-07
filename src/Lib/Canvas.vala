@@ -341,6 +341,10 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
         holding = false;
 
+        // This is a temporary approach to end operations. In the future we may want to have more specific
+        // methods.
+        selected_bound_manager.alert_held_button_release ();
+
         if (event.button == Gdk.BUTTON_MIDDLE) {
             edit_mode = EditMode.MODE_SELECTION;
         }

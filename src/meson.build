@@ -36,6 +36,7 @@ sources = files(
     'Utils/Color.vala',
     'Utils/Image.vala',
     'Utils/ColorPicker.vala',
+    'Utils/Snapping.vala',
 
     'Layouts/HeaderBar.vala',
     'Layouts/LeftSideBar.vala',
@@ -106,6 +107,7 @@ sources = files(
     'Lib/Managers/ItemsManager.vala',
     'Lib/Managers/NobManager.vala',
     'Lib/Managers/SelectedBoundManager.vala',
+    'Lib/Managers/SnapManager.vala',
 
     'Lib/Selection/Nob.vala',
 
