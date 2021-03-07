@@ -226,6 +226,11 @@ public class Akira.Utils.AffineTransform : Object {
         item.translate (inc_x, inc_y);
         // Update the item size.
         set_size (item, inc_width, inc_height);
+
+        // If the item is an Artboard, move the label with it.
+        if (item is Lib.Items.CanvasArtboard) {
+            ((Lib.Items.CanvasArtboard) item).label.translate (inc_x, inc_y);
+        }
     }
 
     // Width size constraints.
