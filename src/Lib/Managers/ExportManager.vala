@@ -406,6 +406,7 @@ public class Akira.Lib.Managers.ExportManager : Object {
         // If the item is null it means we're dealing with a custom area and we
         // don't have the bounds manager.
         if (item != null) {
+            // Use the item's bounds to include the border.
             double x1 = item.bounds.x1;
             double x2 = item.bounds.x2;
             double y1 = item.bounds.y1;
