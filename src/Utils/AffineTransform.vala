@@ -27,9 +27,339 @@ public class Akira.Utils.AffineTransform : Object {
     private const int MIN_SIZE = 1;
     private const int MIN_POS = 10;
     private const double ROTATION_FIXED_STEP = 15.0;
+    private const bool ALLOW_SCALE_OVERFLOW = false;
 
     private static double temp_rotation = 0.0;
     private static double prev_rotation_difference = 0.0;
+
+    /*
+     * Calculate adjustments necessary for a nob resize operation. All inputs
+     * should have already been transformed to the correct space
+     */
+    public static void calculate_size_adjustments (
+        CanvasItem item,
+        NobManager.Nob nob,
+        double delta_x,
+        double delta_y,
+        double size_ratio,
+        Cairo.Matrix transform,
+        ref double inc_x,
+        ref double inc_y,
+        ref double inc_width,
+        ref double inc_height,
+        ref bool   h_flip,
+        ref bool   v_flip
+    ) {
+        var canvas = (Lib.Canvas) item.canvas;
+
+        double local_x_adj = 0.0;
+        double local_y_adj = 0.0;
+        double perm_x_adj = 0.0;
+        double perm_y_adj = 0.0;
+        double perm_w_adj = 0;
+        double perm_h_adj = 0;
+        double item_width = item.size.width;
+        double item_height = item.size.height;
+
+        nob = correct_nob (
+            nob,
+            item_width,
+            item_height,
+            ref h_flip,
+            ref v_flip,
+            ref delta_x,
+            ref delta_y,
+            ref perm_x_adj,
+            ref perm_y_adj,
+            ref perm_w_adj,
+            ref perm_h_adj
+        );
+
+        item_width += perm_w_adj;
+        item_height += perm_h_adj;
+
+        bool pure_v = (nob == NobManager.Nob.TOP_CENTER || nob == NobManager.Nob.BOTTOM_CENTER);
+        bool pure_h = (nob == NobManager.Nob.RIGHT_CENTER || nob == NobManager.Nob.LEFT_CENTER);
+
+        // handle vertical adjustment
+        if (NobManager.is_top_nob (nob)) {
+            inc_height = -delta_y;
+            local_y_adj = delta_y;
+        }
+        else if (NobManager.is_bot_nob (nob)) {
+            inc_height += delta_y;
+        }
+
+        // handle horizontal adjustment
+        if (NobManager.is_left_nob (nob)) {
+            inc_width -= delta_x;
+            local_x_adj = delta_x;
+        }
+        else if (NobManager.is_right_nob (nob)) {
+            inc_width = delta_x;
+        }
+
+
+        if (canvas.ctrl_is_pressed || item.size.locked) {
+            if (pure_v || (!pure_h && (item_width + inc_width) / (item_height + inc_height) < size_ratio)) {
+                if (NobManager.is_top_nob (nob)) {
+                    inc_width = (inc_height + perm_h_adj) * size_ratio - perm_w_adj;
+                    if (nob == NobManager.Nob.TOP_LEFT) {
+                        local_x_adj = -inc_width;
+                    }
+                    else if (nob == NobManager.Nob.TOP_CENTER) {
+                        local_x_adj = -(inc_width / 2.0);
+                    }
+                }
+                else {
+                    inc_width = (inc_height + perm_h_adj) * size_ratio - perm_w_adj;
+                    if (nob == NobManager.Nob.BOTTOM_LEFT) {
+                        local_x_adj = -inc_width;
+                    }
+                    else if (nob == NobManager.Nob.BOTTOM_CENTER) {
+                        local_x_adj = -(inc_width / 2.0);
+                    }
+                }
+            }
+            else if (!pure_v) {
+                if (NobManager.is_left_nob (nob)) {
+                    inc_height = (inc_width + perm_w_adj) / size_ratio - perm_h_adj;
+                    if (nob == NobManager.Nob.TOP_LEFT) {
+                        local_y_adj = -inc_height;
+                    }
+                    else if (nob == NobManager.Nob.LEFT_CENTER) {
+                        local_y_adj = -(inc_height / 2.0);
+                    }
+                }
+                else if (NobManager.is_right_nob (nob)) {
+                    inc_height = (inc_width + perm_w_adj) / size_ratio - perm_h_adj;
+                    if (nob == NobManager.Nob.TOP_RIGHT) {
+                        local_y_adj = -inc_height;
+                    }
+                    else if (nob == NobManager.Nob.RIGHT_CENTER) {
+                        local_y_adj = -(inc_height / 2.0);
+                    }
+                }
+            }
+        }
+
+        apply_transform_to_adjustment (
+            transform,
+            local_x_adj + perm_x_adj,
+            local_y_adj - perm_y_adj,
+            ref inc_x,
+            ref inc_y
+        );
+
+        inc_width += perm_w_adj;
+        inc_height += perm_h_adj;
+    }
+
+    /*
+     * Corrects which nob should be used for scaling depending on delta change of the drag.
+     * The nob will be flipped in the vertical and horizontal directions if needed, and
+     * the necessary adjustments to delta_x, delta_y and other adjustments will be populated.
+     *
+     * h_flip will be true if a horizontal flip is required.
+     * v_flip will be true if a vertical flip is required.
+     * delta_x and delta_y are the delta positions from the start of the drag to the current position.
+     * perm_{x,y}_adj are permanent translation adjustments required on the bounding box.
+     * perm_{h,w}_adj are permanent scaling adjustments required on the bounding box.
+     * both _adj adjustments are in the items' local coordinates.
+     */
+    private static NobManager.Nob correct_nob (
+        NobManager.Nob nob,
+        double item_width,
+        double item_height,
+        ref bool   h_flip,
+        ref bool   v_flip,
+        ref double delta_x,
+        ref double delta_y,
+        ref double perm_x_adj,
+        ref double perm_y_adj,
+        ref double perm_w_adj,
+        ref double perm_h_adj
+    ) {
+        if (NobManager.is_top_nob (nob)) {
+            if (item_height - delta_y == 0) {
+                delta_y -= 1;
+            }
+            else if (item_height - delta_y < 0) {
+                v_flip = true;
+                delta_y -= item_height;
+                perm_y_adj = -item_height;
+                perm_h_adj = -item_height;
+
+                if (nob == NobManager.Nob.TOP_LEFT) {
+                    nob = NobManager.Nob.BOTTOM_LEFT;
+                }
+                else if (nob == NobManager.Nob.TOP_CENTER) {
+                    // nothing more to do;
+                    nob = NobManager.Nob.BOTTOM_CENTER;
+                    return nob;
+                }
+                else if (nob == NobManager.Nob.TOP_RIGHT) {
+                    nob = NobManager.Nob.BOTTOM_RIGHT;
+                }
+            }
+        }
+        else if (NobManager.is_bot_nob (nob)) {
+            if (item_height + delta_y == 0) {
+                delta_y += 1;
+            }
+            else if (item_height + delta_y < 0) {
+                v_flip = true;
+                delta_y += item_height;
+                perm_h_adj = -item_height;
+                if (nob == NobManager.Nob.BOTTOM_LEFT) {
+                    nob = NobManager.Nob.TOP_LEFT;
+                }
+                else if (nob == NobManager.Nob.BOTTOM_CENTER) {
+                    nob = NobManager.Nob.TOP_CENTER;
+                    // nothing more to do;
+                    return nob;
+                }
+                else if (nob == NobManager.Nob.BOTTOM_RIGHT) {
+                    nob = NobManager.Nob.TOP_RIGHT;
+                }
+            }
+        }
+
+        if (NobManager.is_left_nob (nob)) {
+            if (item_width - delta_x == 0) {
+                delta_x -= 1;
+            }
+            else if (item_width - delta_x < 0) {
+                h_flip = true;
+                delta_x -= item_width;
+                perm_x_adj = item_width;
+                perm_w_adj = -item_width;
+
+                if (nob == NobManager.Nob.TOP_LEFT) {
+                    nob = NobManager.Nob.TOP_RIGHT;
+                }
+                else if (nob == NobManager.Nob.LEFT_CENTER) {
+                    nob = NobManager.Nob.RIGHT_CENTER;
+                }
+                else if (nob == NobManager.Nob.BOTTOM_LEFT) {
+                    nob = NobManager.Nob.BOTTOM_RIGHT;
+                }
+            }
+        }
+        else if (NobManager.is_right_nob (nob)) {
+            if (item_width + delta_x == 0) {
+                delta_x += 1;
+            }
+            else if (item_width + delta_x < 0) {
+                h_flip = true;
+                delta_x += item_width;
+                perm_w_adj = -item_width;
+
+                if (nob == NobManager.Nob.TOP_RIGHT) {
+                    nob = NobManager.Nob.TOP_LEFT;
+                }
+                else if (nob == NobManager.Nob.RIGHT_CENTER) {
+                    nob = NobManager.Nob.LEFT_CENTER;
+                }
+                else if (nob == NobManager.Nob.BOTTOM_RIGHT) {
+                    nob = NobManager.Nob.BOTTOM_LEFT;
+                }
+            }
+        }
+
+        return nob;
+    }
+
+    /*
+     * Apply transform to an translation adjustment, and adjust the increment with it.
+     */
+    private static void apply_transform_to_adjustment (
+        Cairo.Matrix transform,
+        double adj_x,
+        double adj_y,
+        ref double inc_x,
+        ref double inc_y
+    ) {
+        transform.transform_distance(ref adj_x, ref adj_y);
+        inc_x += adj_x;
+        inc_y += adj_y;
+    }
+
+    /*
+     * Apply adjustment needed for right nobs.
+     * inc_width is the adjustment that needs to be made to the width of the bounding box.
+     * local_x_adj is the required translation (in the bounding box local coordinates)
+     */
+    private static void apply_right_nob_adjust (
+        double delta_x,
+        double item_width,
+        ref double inc_width,
+        ref double local_x_adj
+    ) {
+
+        if (item_width + inc_width < 0) {
+            // flipped adjustment
+            if (ALLOW_SCALE_OVERFLOW) {
+                local_x_adj = (item_width + inc_width);
+                inc_width = -local_x_adj - item_width;
+                return;
+            }
+
+            inc_width = 1 - item_width;
+        }
+    }
+
+    /*
+     * Apply adjustment needed for left nobs.
+     * inc_width is the adjustment that needs to be made to the width of the bounding box.
+     * local_x_adj is the required translation (in the bounding box local coordinates)
+     */
+    private static void apply_left_nob_adjust (
+        double delta_x,
+        double item_width,
+        ref double inc_width,
+        ref double local_x_adj
+    ) {
+
+        if (item_width + inc_width >= 0) {
+            // normal adjustment
+        }
+        else {
+            // flipped adjustment
+            if (ALLOW_SCALE_OVERFLOW) {
+                inc_width = -(2 * item_width + inc_width);
+                local_x_adj = item_width;
+                return;
+            }
+
+            local_x_adj = item_width - 1;
+            inc_width = 1 - item_width;
+        }
+    }
+
+    /*
+     * Apply adjustment needed for bottom nobs.
+     * inc_height is the adjustment that needs to be made to the height of the bounding box.
+     * local_y_adj is the required translation (in the bounding box local coordinates)
+     */
+    private static void apply_bottom_nob_adjust (
+        double delta_y,
+        double item_height,
+        ref double inc_height,
+        ref double local_y_adj
+    ) {
+
+        if (item_height + inc_height < 0) {
+            // flipped adjustment
+            if (ALLOW_SCALE_OVERFLOW) {
+                local_y_adj =  inc_height + item_height;
+                inc_height =  -(item_height + local_y_adj);
+                return;
+            }
+
+            inc_height = 1 - item_height;
+        }
+    }
 
     public static void scale_from_event (
         CanvasItem item,
@@ -233,8 +563,10 @@ public class Akira.Utils.AffineTransform : Object {
         }
     }
 
+
+
     // Width size constraints.
-    private static void fix_width (
+    public static void fix_width (
         ref double delta_x,
         ref double event_x,
         ref double item_x,
@@ -257,7 +589,7 @@ public class Akira.Utils.AffineTransform : Object {
     }
 
     // Width size constraints and origin point.
-    private static void fix_width_origin (
+    public static void fix_width_origin (
         ref double delta_x,
         ref double event_x,
         ref double item_x,
@@ -284,7 +616,7 @@ public class Akira.Utils.AffineTransform : Object {
     }
 
     // Height size constraints.
-    private static void fix_height (
+    public static void fix_height (
         ref double delta_y,
         ref double event_y,
         ref double item_y,
@@ -307,7 +639,7 @@ public class Akira.Utils.AffineTransform : Object {
     }
 
     // Height size constraints and origin point.
-    private static void fix_height_origin (
+    public static void fix_height_origin (
         ref double delta_y,
         ref double event_y,
         ref double item_y,
