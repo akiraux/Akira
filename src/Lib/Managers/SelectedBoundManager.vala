@@ -369,7 +369,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         // Make adjustment basted on snaps.
         // Double the sensitivity to allow for reuse of grid after snap.
         var sensitivity = Utils.Snapping.adjusted_sensitivity (canvas.current_scale);
-        var snap_grid = Utils.Snapping.snap_grid_from_canvas (canvas, selected_items, sensitivity);
+        var snap_grid = Utils.Snapping.generate_best_snap_grid (canvas, selected_items, sensitivity);
 
         if (!snap_grid.is_empty ()) {
             int snap_offset_x = 0;
@@ -406,7 +406,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
     private void update_grid_decorators (bool force) {
         if (force || snap_manager.is_active ()) {
             var sensitivity = Utils.Snapping.adjusted_sensitivity (canvas.current_scale);
-            var snap_grid = Utils.Snapping.snap_grid_from_canvas (canvas, selected_items, sensitivity);
+            var snap_grid = Utils.Snapping.generate_best_snap_grid (canvas, selected_items, sensitivity);
             var matches = Utils.Snapping.generate_snap_matches (snap_grid, selected_items, sensitivity);
             snap_manager.populate_decorators_from_data (matches, snap_grid);
         }

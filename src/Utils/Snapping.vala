@@ -109,6 +109,34 @@ public class Akira.Utils.Snapping : Object {
     }
 
     /**
+     * Generates the best snap grid from selection.
+     */
+    public static SnapGrid generate_best_snap_grid (
+        Goo.Canvas canvas,
+        List<Lib.Items.CanvasItem> selection,
+        int sensitivity
+    ) {
+        Lib.Items.CanvasArtboard artboard = null;
+        bool all_in_same_artboard = false;
+
+        foreach (var sel in selection) {
+            if (artboard != null && artboard != sel.artboard) {
+                all_in_same_artboard = false;
+                break;
+            }
+
+            artboard = sel.artboard;
+            all_in_same_artboard = artboard != null;
+        }
+
+        if (artboard != null && all_in_same_artboard) {
+            return snap_grid_from_artboard (canvas, artboard, selection, sensitivity);
+        }
+
+        return snap_grid_from_canvas (canvas, selection, sensitivity);
+    }
+
+    /**
      * Generates a snap grid from a canvas.
      */
     public static SnapGrid snap_grid_from_canvas (
@@ -137,7 +165,27 @@ public class Akira.Utils.Snapping : Object {
           horizontal_candidates.concat (canvas.get_items_in_area (horizontal_filter, true, true, false));
         }
 
-        return snap_grid_from_candidates (vertical_candidates, horizontal_candidates, selection);
+        return snap_grid_from_canvas_candidates (vertical_candidates, horizontal_candidates, selection, false);
+    }
+
+    /**
+     * Generates a snap grid from an artboard.
+     */
+    public static SnapGrid snap_grid_from_artboard (
+        Goo.Canvas canvas,
+        Lib.Items.CanvasArtboard artboard,
+        List<Lib.Items.CanvasItem> selection,
+        int sensitivity
+    ) {
+        List<weak Goo.CanvasItem> candidates = null;
+
+        foreach (var item in selection) {
+          candidates.concat (canvas.get_items_in_area (artboard.background.bounds, true, true, false));
+        }
+
+        candidates.append (artboard);
+
+        return snap_grid_from_artboard_candidates (candidates, selection, artboard);
     }
 
     /**
@@ -209,10 +257,11 @@ public class Akira.Utils.Snapping : Object {
     }
 
 
-    private static SnapGrid snap_grid_from_candidates (
+    private static SnapGrid snap_grid_from_canvas_candidates (
         List<weak Goo.CanvasItem> v_candidates,
         List<weak Goo.CanvasItem> h_candidates,
-        List<Lib.Items.CanvasItem> selection
+        List<Lib.Items.CanvasItem> selection,
+        bool include_artboard_contents
     ) {
         var grid = SnapGrid ();
         grid.v_snaps = new Gee.HashMap<int, SnapMeta> ();
@@ -220,14 +269,45 @@ public class Akira.Utils.Snapping : Object {
 
         foreach (var cand in v_candidates) {
             var candidate_item = cand as Lib.Items.CanvasItem;
-            if (candidate_item != null && selection.find (candidate_item) == null) {
+            if (candidate_item != null
+                    && (include_artboard_contents || candidate_item.artboard == null)
+                    && selection.find (candidate_item) == null) {
                 populate_vertical_snaps (candidate_item, ref grid.v_snaps);
             }
         }
 
         foreach (var cand in h_candidates) {
             var candidate_item = cand as Lib.Items.CanvasItem;
-            if (candidate_item != null && selection.find (candidate_item) == null) {
+            if (candidate_item != null
+                    && (include_artboard_contents || candidate_item.artboard == null)
+                    && selection.find (candidate_item) == null ) {
+                populate_horizontal_snaps (candidate_item, ref grid.h_snaps);
+            }
+        }
+
+        return grid;
+    }
+
+    private static SnapGrid snap_grid_from_artboard_candidates (
+        List<weak Goo.CanvasItem> candidates,
+        List<Lib.Items.CanvasItem> selection,
+        Lib.Items.CanvasArtboard? artboard
+    ) {
+        var grid = SnapGrid ();
+        grid.v_snaps = new Gee.HashMap<int, SnapMeta> ();
+        grid.h_snaps = new Gee.HashMap<int, SnapMeta> ();
+
+        foreach (var cand in candidates) {
+            if (cand == artboard) {
+                populate_vertical_snaps (cand as Lib.Items.CanvasArtboard, ref grid.v_snaps);
+                populate_horizontal_snaps (cand as Lib.Items.CanvasArtboard, ref grid.h_snaps);
+            }
+
+            var candidate_item = cand as Lib.Items.CanvasItem;
+            if (candidate_item != null
+                    && candidate_item.artboard == artboard
+                    && selection.find (candidate_item) == null) {
+                populate_vertical_snaps (candidate_item, ref grid.v_snaps);
                 populate_horizontal_snaps (candidate_item, ref grid.h_snaps);
             }
         }
@@ -239,15 +319,24 @@ public class Akira.Utils.Snapping : Object {
      * Populates the horizontal snaps of an item.
      */
     private static void populate_horizontal_snaps (Lib.Items.CanvasItem item, ref Gee.HashMap<int, SnapMeta> map) {
-        int x_1 = (int) item.bounds.x1;
-        int x_2 = (int) item.bounds.x2;
-        int y_1 = (int) item.bounds.y1;
-        int y_2 = (int) item.bounds.y2;
-        int center_x = (int) (Math.ceil ((item.bounds.x2 - item.bounds.x1) / 2.0) + item.bounds.x1);
-        int center_y = (int) (Math.ceil ((item.bounds.y2 - item.bounds.y1) / 2.0) + item.bounds.y1);
+        double x_1 = item.bounds.x1;
+        double x_2 = item.bounds.x2;
+        double y_1 = item.bounds.y1;
+        double y_2 = item.bounds.y2;
 
-        add_to_map (x_1, y_1, y_2, center_y, -1, ref map);
-        add_to_map (x_2, y_1, y_2, center_y, 1, ref map);
+        if (item is Lib.Items.CanvasArtboard) {
+            var bg = ((Lib.Items.CanvasArtboard) item).background;
+            x_1 = bg.bounds.x1;
+            x_2 = bg.bounds.x2;
+            y_1 = bg.bounds.y1;
+            y_2 = bg.bounds.y2;
+        }
+
+        int center_x = (int) (Math.ceil ((x_2 - x_1) / 2.0) + x_1);
+        int center_y = (int) (Math.ceil ((y_2 - y_1) / 2.0) + y_1);
+
+        add_to_map ((int) x_1, (int) y_1, (int) y_2, center_y, -1, ref map);
+        add_to_map ((int) x_2, (int) y_1, (int) y_2, center_y, 1, ref map);
         add_to_map (center_x, center_y, center_y, center_y, 0, ref map);
     }
 
@@ -255,15 +344,24 @@ public class Akira.Utils.Snapping : Object {
      * Populates the vertical snaps of an item.
      */
     private static void populate_vertical_snaps (Lib.Items.CanvasItem item, ref Gee.HashMap<int, SnapMeta> map) {
-        int x_1 = (int) item.bounds.x1;
-        int x_2 = (int) item.bounds.x2;
-        int y_1 = (int) item.bounds.y1;
-        int y_2 = (int) item.bounds.y2;
-        int center_x = (int) (Math.ceil ((item.bounds.x2 - item.bounds.x1) / 2.0) + item.bounds.x1);
-        int center_y = (int) (Math.ceil ((item.bounds.y2 - item.bounds.y1) / 2.0) + item.bounds.y1);
+        double x_1 = item.bounds.x1;
+        double x_2 = item.bounds.x2;
+        double y_1 = item.bounds.y1;
+        double y_2 = item.bounds.y2;
 
-        add_to_map (y_1, x_1, x_2, center_x, -1, ref map);
-        add_to_map (y_2, x_1, x_2, center_x, 1, ref map);
+        if (item is Lib.Items.CanvasArtboard) {
+            var bg = ((Lib.Items.CanvasArtboard) item).background;
+            x_1 = bg.bounds.x1;
+            x_2 = bg.bounds.x2;
+            y_1 = bg.bounds.y1;
+            y_2 = bg.bounds.y2;
+        }
+
+        int center_x = (int) (Math.ceil ((x_2 - x_1) / 2.0) + x_1);
+        int center_y = (int) (Math.ceil ((y_2 - y_1) / 2.0) + y_1);
+
+        add_to_map ((int) y_1, (int) x_1, (int) x_2, center_x, -1, ref map);
+        add_to_map ((int) y_2, (int) x_1, (int) x_2, center_x, 1, ref map);
         add_to_map (center_y, center_x, center_x, center_x, 0, ref map);
     }
 
