@@ -269,18 +269,22 @@ public class Akira.Utils.Snapping : Object {
 
         foreach (var cand in v_candidates) {
             var candidate_item = cand as Lib.Items.CanvasItem;
-            if (candidate_item != null
-                    && (include_artboard_contents || candidate_item.artboard == null)
-                    && selection.find (candidate_item) == null) {
+            if (
+                candidate_item != null &&
+                (include_artboard_contents || candidate_item.artboard == null) &&
+                selection.find (candidate_item) == null
+            ) {
                 populate_vertical_snaps (candidate_item, ref grid.v_snaps);
             }
         }
 
         foreach (var cand in h_candidates) {
             var candidate_item = cand as Lib.Items.CanvasItem;
-            if (candidate_item != null
-                    && (include_artboard_contents || candidate_item.artboard == null)
-                    && selection.find (candidate_item) == null ) {
+            if (
+                candidate_item != null &&
+                (include_artboard_contents || candidate_item.artboard == null) &&
+                selection.find (candidate_item) == null
+            ) {
                 populate_horizontal_snaps (candidate_item, ref grid.h_snaps);
             }
         }
@@ -304,9 +308,11 @@ public class Akira.Utils.Snapping : Object {
             }
 
             var candidate_item = cand as Lib.Items.CanvasItem;
-            if (candidate_item != null
-                    && candidate_item.artboard == artboard
-                    && selection.find (candidate_item) == null) {
+            if (
+                candidate_item != null &&
+                candidate_item.artboard == artboard &&
+                selection.find (candidate_item) == null
+            ) {
                 populate_vertical_snaps (candidate_item, ref grid.v_snaps);
                 populate_horizontal_snaps (candidate_item, ref grid.h_snaps);
             }
