@@ -161,8 +161,8 @@ public class Akira.Utils.Snapping : Object {
             vertical_filter.y1 = item.transform.y1 - sensitivity;
             vertical_filter.y2 = item.transform.y2 + sensitivity;
 
-            vertical_candidates.concat (canvas.get_items_in_area (vertical_filter, true, true, false));
-            horizontal_candidates.concat (canvas.get_items_in_area (horizontal_filter, true, true, false));
+            vertical_candidates.concat (canvas.get_items_in_area (vertical_filter, true, true, true));
+            horizontal_candidates.concat (canvas.get_items_in_area (horizontal_filter, true, true, true));
         }
 
         return snap_grid_from_canvas_candidates (vertical_candidates, horizontal_candidates, selection, false);
@@ -180,10 +180,8 @@ public class Akira.Utils.Snapping : Object {
         List<weak Goo.CanvasItem> candidates = null;
 
         foreach (var item in selection) {
-          candidates.concat (canvas.get_items_in_area (artboard.background.bounds, true, true, false));
+          candidates.concat (canvas.get_items_in_area (artboard.background.bounds, true, true, true));
         }
-
-        candidates.append (artboard);
 
         return snap_grid_from_artboard_candidates (candidates, selection, artboard);
     }
