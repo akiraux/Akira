@@ -106,10 +106,10 @@ public class Akira.Lib.Managers.NobManager : Object {
         double bb_left = 1e6, bb_top = 1e6, bb_right = 0, bb_bottom = 0;
 
         foreach (var item in selected_items) {
-            bb_left = double.min (bb_left, item.bounds.x1);
-            bb_top = double.min (bb_top, item.bounds.y1);
-            bb_right = double.max (bb_right, item.bounds.x2);
-            bb_bottom = double.max (bb_bottom, item.bounds.y2);
+            bb_left = double.min (bb_left, item.transform.x1);
+            bb_top = double.min (bb_top, item.transform.y1);
+            bb_right = double.max (bb_right, item.transform.x2);
+            bb_bottom = double.max (bb_bottom, item.transform.y2);
         }
 
         select_bb = Goo.CanvasBounds () {

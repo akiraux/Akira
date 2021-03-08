@@ -121,7 +121,6 @@ public class Akira.Services.ActionManager : Object {
         action_accelerators.set (ACTION_LOAD_FIRST, "<Control><Alt>1");
         action_accelerators.set (ACTION_LOAD_SECOND, "<Control><Alt>2");
         action_accelerators.set (ACTION_LOAD_THIRD, "<Control><Alt>3");
-        action_accelerators.set (ACTION_TOGGLE_PIXEL_GRID, "<Shift>Tab");
         action_accelerators.set (ACTION_PRESENTATION, "<Control>period");
         action_accelerators.set (ACTION_PREFERENCES, "<Control>comma");
         action_accelerators.set (ACTION_EXPORT_SELECTION, "<Control><Alt>e");
@@ -149,6 +148,7 @@ public class Akira.Services.ActionManager : Object {
         typing_accelerators.set (ACTION_IMAGE_TOOL, "i");
         typing_accelerators.set (ACTION_DELETE, "Delete");
         typing_accelerators.set (ACTION_DELETE, "BackSpace");
+        typing_accelerators.set (ACTION_TOGGLE_PIXEL_GRID, "<Shift>Tab");
     }
 
     construct {

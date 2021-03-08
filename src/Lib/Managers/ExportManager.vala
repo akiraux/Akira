@@ -310,7 +310,6 @@ public class Akira.Lib.Managers.ExportManager : Object {
 
         // Loop through all the currently selected elements.
         for (var i = 0; i < canvas.selected_bound_manager.selected_items.length (); i++) {
-            var label_height = 0.0;
             var item = canvas.selected_bound_manager.selected_items.nth_data (i);
             var name = _("Untitled %i").printf (i);
 
@@ -325,24 +324,33 @@ public class Akira.Lib.Managers.ExportManager : Object {
             // If the item is an artboard, account for the label's height.
             if (item is Akira.Lib.Items.CanvasArtboard) {
                 var artboard = item as Akira.Lib.Items.CanvasArtboard;
-                // label_height = artboard.get_label_height ();
                 name = artboard.name.name;
             }
 
             // Hide the ghost item.
-            // item.bounds_manager.hide ();
+            ((Lib.Canvas) item.canvas).toggle_item_ghost (false);
 
-            // Account for items inside or outside artboards.
+            // Always use the item's bounds so we can include borders.
             double x1 = item.bounds.x1;
             double x2 = item.bounds.x2;
             double y1 = item.bounds.y1;
             double y2 = item.bounds.y2;
 
+            // If the item is an artboard, use the bounds of the background item
+            // since the CanvasGroup bounds will grow based on the position of its children.
+            if (item is Items.CanvasArtboard) {
+                var item_artboard = item as Items.CanvasArtboard;
+                x1 = item_artboard.background.bounds.x1;
+                x2 = item_artboard.background.bounds.x2;
+                y1 = item_artboard.background.bounds.y1;
+                y2 = item_artboard.background.bounds.y2;
+            }
+
             // Create the rendered image with Cairo.
             surface = new Cairo.ImageSurface (
                 format,
                 (int) Math.round (x2 - x1),
-                (int) Math.round (y2 - y1 - label_height)
+                (int) Math.round (y2 - y1)
             );
             context = new Cairo.Context (surface);
 
@@ -352,12 +360,13 @@ public class Akira.Lib.Managers.ExportManager : Object {
                 context.rectangle (
                     0, 0,
                     (int) Math.round (x2 - x1),
-                    (int) Math.round (y2 - y1 - label_height));
+                    (int) Math.round (y2 - y1)
+                );
                 context.fill ();
             }
 
             // Move to the currently selected item.
-            context.translate (-x1, -y1 - label_height);
+            context.translate (-x1, -y1);
 
             // Render the selected item.
             canvas.render (context, null, canvas.current_scale);
@@ -391,26 +400,30 @@ public class Akira.Lib.Managers.ExportManager : Object {
 
     public Gdk.Pixbuf rescale_image (Gdk.Pixbuf pixbuf, Lib.Items.CanvasItem? item = null) {
         Gdk.Pixbuf scaled_image;
-        var label_height = 0.0;
-
-        // If the item is an artboard, account for the label's height.
-        // if (item != null && item is Lib.Items.CanvasArtboard) {
-            // var artboard = item as Lib.Items.CanvasArtboard;
-            // label_height = artboard.get_label_height ();
-        // }
 
         double width, height;
 
-        // If the item is null it mean we're dealing with a custom area and we
+        // If the item is null it means we're dealing with a custom area and we
         // don't have the bounds manager.
         if (item != null) {
+            // Use the item's bounds to include the border.
             double x1 = item.bounds.x1;
             double x2 = item.bounds.x2;
             double y1 = item.bounds.y1;
             double y2 = item.bounds.y2;
 
+            // If the item is an artboard, use the bounds of the background item
+            // since the CanvasGroup bounds will grow based on the position of its children.
+            if (item is Items.CanvasArtboard) {
+                var item_artboard = item as Items.CanvasArtboard;
+                x1 = item_artboard.background.bounds.x1;
+                x2 = item_artboard.background.bounds.x2;
+                y1 = item_artboard.background.bounds.y1;
+                y2 = item_artboard.background.bounds.y2;
+            }
+
             width = x2 - x1;
-            height = y2 - y1 - label_height;
+            height = y2 - y1;
         } else {
             width = area.width;
             height = area.height;

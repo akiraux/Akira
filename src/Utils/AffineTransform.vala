@@ -54,8 +54,8 @@ public class Akira.Utils.AffineTransform : Object {
 
         double item_width = item.size.width;
         double item_height = item.size.height;
-        double item_x = item.bounds.x1;
-        double item_y = item.bounds.y1;
+        double item_x = item.transform.x1;
+        double item_y = item.transform.y1;
         canvas.convert_to_item_space (item, ref item_x, ref item_y);
 
         double inc_width = 0;
@@ -226,6 +226,11 @@ public class Akira.Utils.AffineTransform : Object {
         item.translate (inc_x, inc_y);
         // Update the item size.
         set_size (item, inc_width, inc_height);
+
+        // If the item is an Artboard, move the label with it.
+        if (item is Lib.Items.CanvasArtboard) {
+            ((Lib.Items.CanvasArtboard) item).label.translate (inc_x, inc_y);
+        }
     }
 
     // Width size constraints.
@@ -343,8 +348,8 @@ public class Akira.Utils.AffineTransform : Object {
             canvas.convert_to_item_space (item.artboard, ref x, ref y);
             canvas.convert_to_item_space (item.artboard, ref initial_x, ref initial_y);
 
-            diff_x = item.bounds.x1 - item.artboard.bounds.x1;
-            diff_y = item.bounds.y1 - item.artboard.bounds.y1;
+            diff_x = item.transform.x1 - item.artboard.transform.x1;
+            diff_y = item.transform.y1 - item.artboard.transform.y1;
 
             x -= diff_x;
             y -= diff_y;
