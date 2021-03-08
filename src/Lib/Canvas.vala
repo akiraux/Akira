@@ -504,8 +504,8 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         if (show) {
             ghost = new Goo.CanvasRect (
                 null,
-                item.bounds.x1, item.bounds.y1,
-                item.bounds.x2 - item.bounds.x1, item.bounds.y2 - item.bounds.y1,
+                item.transform.x1, item.transform.y1,
+                item.transform.x2 - item.transform.x1, item.transform.y2 - item.transform.y1,
                 "line-width", 1.0 / current_scale,
                 "stroke-color", "#41c9fd",
                 null
