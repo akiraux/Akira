@@ -109,6 +109,34 @@ public class Akira.Utils.Snapping : Object {
     }
 
     /**
+     * Generates the best snap grid from selection.
+     */
+    public static SnapGrid generate_best_snap_grid (
+        Goo.Canvas canvas,
+        List<Lib.Items.CanvasItem> selection,
+        int sensitivity
+    ) {
+        Lib.Items.CanvasArtboard artboard = null;
+        bool all_in_same_artboard = false;
+
+        foreach (var sel in selection) {
+            if (artboard != null && artboard != sel.artboard) {
+                all_in_same_artboard = false;
+                break;
+            }
+
+            artboard = sel.artboard;
+            all_in_same_artboard = artboard != null;
+        }
+
+        if (artboard != null && all_in_same_artboard) {
+            return snap_grid_from_artboard (canvas, artboard, selection, sensitivity);
+        }
+
+        return snap_grid_from_canvas (canvas, selection, sensitivity);
+    }
+
+    /**
      * Generates a snap grid from a canvas.
      */
     public static SnapGrid snap_grid_from_canvas (
@@ -137,7 +165,27 @@ public class Akira.Utils.Snapping : Object {
             horizontal_candidates.concat (canvas.get_items_in_area (horizontal_filter, true, true, false));
         }
 
-        return snap_grid_from_candidates (vertical_candidates, horizontal_candidates, selection);
+        return snap_grid_from_canvas_candidates (vertical_candidates, horizontal_candidates, selection, false);
+    }
+
+    /**
+     * Generates a snap grid from an artboard.
+     */
+    public static SnapGrid snap_grid_from_artboard (
+        Goo.Canvas canvas,
+        Lib.Items.CanvasArtboard artboard,
+        List<Lib.Items.CanvasItem> selection,
+        int sensitivity
+    ) {
+        List<weak Goo.CanvasItem> candidates = null;
+
+        foreach (var item in selection) {
+          candidates.concat (canvas.get_items_in_area (artboard.background.bounds, true, true, false));
+        }
+
+        candidates.append (artboard);
+
+        return snap_grid_from_artboard_candidates (candidates, selection, artboard);
     }
 
     /**
@@ -209,10 +257,11 @@ public class Akira.Utils.Snapping : Object {
     }
 
 
-    private static SnapGrid snap_grid_from_candidates (
+    private static SnapGrid snap_grid_from_canvas_candidates (
         List<weak Goo.CanvasItem> v_candidates,
         List<weak Goo.CanvasItem> h_candidates,
-        List<Lib.Items.CanvasItem> selection
+        List<Lib.Items.CanvasItem> selection,
+        bool include_artboard_contents
     ) {
         var grid = SnapGrid ();
         grid.v_snaps = new Gee.HashMap<int, SnapMeta> ();
@@ -220,14 +269,51 @@ public class Akira.Utils.Snapping : Object {
 
         foreach (var cand in v_candidates) {
             var candidate_item = cand as Lib.Items.CanvasItem;
-            if (candidate_item != null && selection.find (candidate_item) == null) {
+            if (
+                candidate_item != null &&
+                (include_artboard_contents || candidate_item.artboard == null) &&
+                selection.find (candidate_item) == null
+            ) {
                 populate_vertical_snaps (candidate_item, ref grid.v_snaps);
             }
         }
 
         foreach (var cand in h_candidates) {
             var candidate_item = cand as Lib.Items.CanvasItem;
-            if (candidate_item != null && selection.find (candidate_item) == null) {
+            if (
+                candidate_item != null &&
+                (include_artboard_contents || candidate_item.artboard == null) &&
+                selection.find (candidate_item) == null
+            ) {
+                populate_horizontal_snaps (candidate_item, ref grid.h_snaps);
+            }
+        }
+
+        return grid;
+    }
+
+    private static SnapGrid snap_grid_from_artboard_candidates (
+        List<weak Goo.CanvasItem> candidates,
+        List<Lib.Items.CanvasItem> selection,
+        Lib.Items.CanvasArtboard? artboard
+    ) {
+        var grid = SnapGrid ();
+        grid.v_snaps = new Gee.HashMap<int, SnapMeta> ();
+        grid.h_snaps = new Gee.HashMap<int, SnapMeta> ();
+
+        foreach (var cand in candidates) {
+            if (cand == artboard) {
+                populate_vertical_snaps (cand as Lib.Items.CanvasArtboard, ref grid.v_snaps);
+                populate_horizontal_snaps (cand as Lib.Items.CanvasArtboard, ref grid.h_snaps);
+            }
+
+            var candidate_item = cand as Lib.Items.CanvasItem;
+            if (
+                candidate_item != null &&
+                candidate_item.artboard == artboard &&
+                selection.find (candidate_item) == null
+            ) {
+                populate_vertical_snaps (candidate_item, ref grid.v_snaps);
                 populate_horizontal_snaps (candidate_item, ref grid.h_snaps);
             }
         }
