@@ -29,8 +29,6 @@ public class Akira.Lib.Items.CanvasEllipse : Goo.CanvasEllipse, Akira.Lib.Items.
 
     public Items.CanvasArtboard? artboard { get; set; }
 
-    public bool is_loaded { get; set; }
-
     public CanvasEllipse (
         double _x,
         double _y,
@@ -38,8 +36,7 @@ public class Akira.Lib.Items.CanvasEllipse : Goo.CanvasEllipse, Akira.Lib.Items.
         Gdk.RGBA border_color,
         Gdk.RGBA fill_color,
         Goo.CanvasItem? _parent,
-        Items.CanvasArtboard? _artboard,
-        bool _loaded
+        Items.CanvasArtboard? _artboard
     ) {
         parent = _artboard != null ? _artboard : _parent;
         artboard = _artboard;
@@ -50,9 +47,6 @@ public class Akira.Lib.Items.CanvasEllipse : Goo.CanvasEllipse, Akira.Lib.Items.
         // The CanvasEllipse needs a starting radius at least half of the initial width.
         radius_x = radius_y = 0.5;
         init_position (this, _x, _y);
-
-        // Add extra attributes.
-        is_loaded = _is_loaded;
 
         // Add the newly created item to the Canvas or Artboard.
         parent.add_child (this, -1);

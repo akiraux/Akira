@@ -42,7 +42,10 @@ public class Akira.FileFormat.JsonLoader : Object {
         // Load saved Artboards.
         if (obj.get_member ("artboards") != null) {
             Json.Array artboards = obj.get_member ("artboards").get_array ();
-            foreach (unowned Json.Node node in artboards.get_elements ()) {
+            var artboards_list = artboards.get_elements ();
+            artboards_list.reverse ();
+
+            foreach (unowned Json.Node node in artboards_list) {
                 load_item (node.get_object (), "artboard");
             }
         }
@@ -50,7 +53,10 @@ public class Akira.FileFormat.JsonLoader : Object {
         // Load saved Items.
         if (obj.get_member ("items") != null) {
             Json.Array items = obj.get_member ("items").get_array ();
-            foreach (unowned Json.Node node in items.get_elements ()) {
+            var items_list = items.get_elements ();
+            items_list.reverse ();
+
+            foreach (unowned Json.Node node in items_list) {
                 load_item (node.get_object (), "item");
             }
         }

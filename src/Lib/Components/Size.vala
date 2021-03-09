@@ -50,8 +50,8 @@ public class Akira.Lib.Components.Size : Component {
                 canvas.window.event_bus.item_value_changed ();
 
                 // If the value wasn't changed automatically by the auto resize,
-                // and the image is selected and not loaded, recalculate the pixbuf quality.
-                if (item is Items.CanvasImage && item.layer.selected && !canvas.holding && !item.is_loaded) {
+                // and the image is selected, recalculate the pixbuf quality.
+                if (item is Items.CanvasImage && item.layer.selected && !canvas.holding) {
                     canvas.window.event_bus.detect_image_size_change ();
                 }
             }
@@ -79,8 +79,8 @@ public class Akira.Lib.Components.Size : Component {
                 canvas.window.event_bus.item_value_changed ();
 
                 // If the value wasn't changed automatically by the auto resize,
-                // and the image is selected and not loaded, recalculate the pixbuf quality.
-                if (item is Items.CanvasImage && item.layer.selected && !canvas.holding && !item.is_loaded) {
+                // and the image is selected, recalculate the pixbuf quality.
+                if (item is Items.CanvasImage && item.layer.selected && !canvas.holding) {
                     canvas.window.event_bus.detect_image_size_change ();
                 }
             }

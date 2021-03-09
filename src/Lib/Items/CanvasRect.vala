@@ -29,8 +29,6 @@ public class Akira.Lib.Items.CanvasRect : Goo.CanvasRect, Akira.Lib.Items.Canvas
 
     public Items.CanvasArtboard? artboard { get; set; }
 
-    public bool is_loaded { get; set; }
-
     public CanvasRect (
         double _x,
         double _y,
@@ -38,8 +36,7 @@ public class Akira.Lib.Items.CanvasRect : Goo.CanvasRect, Akira.Lib.Items.Canvas
         Gdk.RGBA border_color,
         Gdk.RGBA fill_color,
         Goo.CanvasItem? _parent,
-        Items.CanvasArtboard? _artboard,
-        bool _is_loaded
+        Items.CanvasArtboard? _artboard
     ) {
         parent = _artboard != null ? _artboard : _parent;
         artboard = _artboard;
@@ -49,9 +46,6 @@ public class Akira.Lib.Items.CanvasRect : Goo.CanvasRect, Akira.Lib.Items.Canvas
         width = height = 1;
         radius_x = radius_y = 0.0;
         init_position (this, _x, _y);
-
-        // Add extra attributes.
-        is_loaded = _is_loaded;
 
         // Add the newly created item to the Canvas or Artboard.
         parent.add_child (this, -1);

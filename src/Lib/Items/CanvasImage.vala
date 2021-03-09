@@ -29,8 +29,6 @@ public class Akira.Lib.Items.CanvasImage : Goo.CanvasImage, Akira.Lib.Items.Canv
 
     public Items.CanvasArtboard? artboard { get; set; }
 
-    public bool is_loaded { get; set; }
-
     // CanvasImage unique attributes.
     public Lib.Managers.ImageManager manager { get; set; }
     private Gdk.Pixbuf original_pixbuf;
@@ -40,8 +38,7 @@ public class Akira.Lib.Items.CanvasImage : Goo.CanvasImage, Akira.Lib.Items.Canv
         double _y,
         Lib.Managers.ImageManager _manager,
         Goo.CanvasItem? _parent,
-        Items.CanvasArtboard? _artboard,
-        bool _loaded = false
+        Items.CanvasArtboard? _artboard
     ) {
         parent = _artboard != null ? _artboard : _parent;
         artboard = _artboard;
@@ -54,9 +51,6 @@ public class Akira.Lib.Items.CanvasImage : Goo.CanvasImage, Akira.Lib.Items.Canv
         width = height = 1;
         scale_to_fit = true;
         init_position (this, _x, _y);
-
-        // Add extra attributes.
-        is_loaded = _is_loaded;
 
         // Add the newly created item to the Canvas or Artboard.
         parent.add_child (this, -1);
