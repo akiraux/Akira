@@ -163,15 +163,19 @@ public class Akira.Dialogs.SettingsDialog : Gtk.Dialog {
 
         grid.attach (new SettingsHeader (_("Snapping Guides")), 0, 3, 2, 1);
 
-        var snaps_description = new Gtk.Label (_("Define the default color for the Snapping Guides."));
+        var snaps_description = new Gtk.Label (_("Define the default options for the Snapping Guides."));
         snaps_description.halign = Gtk.Align.START;
         snaps_description.margin_bottom = 10;
         grid.attach (snaps_description, 0, 4, 2, 1);
 
-        grid.attach (new SettingsLabel (_("Snapping Guides Color:")), 0, 5, 1, 1);
+        grid.attach (new SettingsLabel (_("Enable Snapping Guides:")), 0, 5, 1, 1);
+        var snaps_switch = new SettingsSwitch ("enable-snaps");
+        grid.attach (snaps_switch, 1, 5, 1, 1);
+
+        grid.attach (new SettingsLabel (_("Snapping Guides Color:")), 0, 6, 1, 1);
         snaps_color = new Gtk.ColorButton.with_rgba (snaps_rgba);
         snaps_color.halign = Gtk.Align.START;
-        grid.attach (snaps_color, 1, 5, 1, 1);
+        grid.attach (snaps_color, 1, 6, 1, 1);
 
         snaps_color.color_set.connect (() => {
             var rgba = snaps_color.get_rgba ();
@@ -189,6 +193,8 @@ public class Akira.Dialogs.SettingsDialog : Gtk.Dialog {
             settings.snaps_color = rgba_str;
             window.event_bus.update_snaps_color ();
         });
+
+        snaps_switch.bind_property ("active", snaps_color, "sensitive", BindingFlags.SYNC_CREATE);
 
         return grid;
     }
