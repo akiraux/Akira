@@ -72,6 +72,12 @@
             <description>The default color of the pixel grid.</description>
         </key>
 
+        <key name="snaps-color" type="s">
+            <default>'#ff0000'</default>
+            <summary>Default Snaps Color.</summary>
+            <description>The default color of the snapping guides.</description>
+        </key>
+
         <key name="fill-color" type="s">
             <default>'#CCCCCC'</default>
             <summary>Default Shape Color.</summary>

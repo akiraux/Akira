@@ -23,7 +23,6 @@
  * Manages Goo.CanvasItem decorators used to display snap lines and dots.
  */
 public class Akira.Lib.Managers.SnapManager : Object {
-    private const string STROKE_COLOR = "#ff0000";
     private const double LINE_WIDTH = 0.5;
     private const double DOT_RADIUS = 2.0;
 
@@ -47,6 +46,8 @@ public class Akira.Lib.Managers.SnapManager : Object {
         v_decorator_lines = new Gee.ArrayList<Goo.CanvasItemSimple> ();
         h_decorator_lines = new Gee.ArrayList<Goo.CanvasItemSimple> ();
         decorator_dots = new Gee.ArrayList<Goo.CanvasItemSimple> ();
+
+        canvas.window.event_bus.update_snaps_color.connect (on_update_snaps_color);
     }
 
     /**
@@ -127,7 +128,7 @@ public class Akira.Lib.Managers.SnapManager : Object {
                 canvas.x1, actual_pos,
                 canvas.x2, actual_pos,
                 "line-width", lw,
-                "stroke-color", STROKE_COLOR,
+                "stroke-color", settings.snaps_color,
                 null
             );
 
@@ -167,7 +168,7 @@ public class Akira.Lib.Managers.SnapManager : Object {
                 actual_pos, canvas.y1,
                 actual_pos, canvas.y2,
                 "line-width", lw,
-                "stroke-color", STROKE_COLOR,
+                "stroke-color", settings.snaps_color,
                 null
             );
 
@@ -201,7 +202,7 @@ public class Akira.Lib.Managers.SnapManager : Object {
             x, y,
             dot_radius, dot_radius,
             "line-width", 0.0,
-            "fill-color", STROKE_COLOR,
+            "fill-color", settings.snaps_color,
             null
         );
 
@@ -211,5 +212,25 @@ public class Akira.Lib.Managers.SnapManager : Object {
         tmp.set ("parent", root);
         tmp.raise (null);
         decorator_dots.add (tmp);
+    }
+
+    /**
+     * Loop through all the existing guides and update the color.
+     */
+    private void on_update_snaps_color () {
+        // Points.
+        foreach (var dot in decorator_dots) {
+            dot.set ("fill-color", settings.snaps_color);
+        }
+
+        // Horizontal lines.
+        foreach (var line in h_decorator_lines) {
+            line.set ("stroke-color", settings.snaps_color);
+        }
+
+        // Vertical lines.
+        foreach (var line in v_decorator_lines) {
+            line.set ("stroke-color", settings.snaps_color);
+        }
     }
 }
