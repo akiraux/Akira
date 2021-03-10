@@ -29,8 +29,6 @@ public class Akira.Lib.Items.CanvasArtboard : Goo.CanvasGroup, Akira.Lib.Items.C
 
    public Items.CanvasArtboard? artboard { get; set; }
 
-   public bool is_loaded { get; set; }
-
    // Override the list type from the CanvasGroup.
    public new Akira.Models.ListModel<Lib.Items.CanvasItem> items;
 
@@ -50,9 +48,6 @@ public class Akira.Lib.Items.CanvasArtboard : Goo.CanvasGroup, Akira.Lib.Items.C
       init_position (this, _x, _y);
 
       create_background ();
-
-      // Add extra attributes.
-      is_loaded = _is_loaded;
 
       // Add the newly created item to the Canvas.
       parent.add_child (this, -1);

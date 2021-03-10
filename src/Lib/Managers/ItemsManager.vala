@@ -66,7 +66,6 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         double x,
         double y,
         Lib.Managers.ImageManager? manager = null,
-        bool loaded = false,
         Items.CanvasArtboard? artboard = null
     ) {
         update_default_values ();
@@ -95,15 +94,15 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         }
 
         if (item_type == typeof (Items.CanvasRect)) {
-            new_item = add_rect (x, y, root, artboard, loaded);
+            new_item = add_rect (x, y, root, artboard);
         }
 
         if (item_type == typeof (Items.CanvasEllipse)) {
-            new_item = add_ellipse (x, y, root, artboard, loaded);
+            new_item = add_ellipse (x, y, root, artboard);
         }
 
         if (item_type == typeof (Items.CanvasText)) {
-            new_item = add_text (x, y, root, artboard, loaded);
+            new_item = add_text (x, y, root, artboard);
         }
 
         if (item_type == typeof (Items.CanvasImage)) {
@@ -112,7 +111,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             if (manager == null && image_manager != null) {
                 manager = image_manager;
             }
-            new_item = add_image (x, y, manager, root, artboard, loaded);
+            new_item = add_image (x, y, manager, root, artboard);
 
             // Empty the image manager since we used it.
             image_manager = null;
@@ -127,7 +126,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         } else {
             // Add it to "free items" if it doesn't belong to an artboard.
             if (new_item.artboard == null) {
-                free_items.add_item.begin ((Items.CanvasItem) new_item, loaded);
+                free_items.add_item.begin ((Items.CanvasItem) new_item);
             }
 
             // We need to additionally store images in a dedicated list in order
@@ -135,7 +134,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             // If we don't curate this dedicated list, it would be a nightamer to
             // loop through all the free items and artboard items to check for images.
             if (new_item is Items.CanvasImage) {
-                images.add_item.begin ((new_item as Akira.Lib.Items.CanvasImage), loaded);
+                images.add_item.begin ((new_item as Akira.Lib.Items.CanvasImage));
             }
         }
 
@@ -211,8 +210,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         double x,
         double y,
         Goo.CanvasItem parent,
-        Items.CanvasArtboard? artboard,
-        bool loaded
+        Items.CanvasArtboard? artboard
     ) {
         return new Items.CanvasRect (
             Utils.AffineTransform.fix_size (x),
@@ -221,8 +219,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             border_color,
             fill_color,
             parent,
-            artboard,
-            loaded
+            artboard
         );
     }
 
@@ -230,8 +227,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         double x,
         double y,
         Goo.CanvasItem parent,
-        Items.CanvasArtboard? artboard,
-        bool loaded
+        Items.CanvasArtboard? artboard
     ) {
         return new Items.CanvasEllipse (
             Utils.AffineTransform.fix_size (x),
@@ -240,8 +236,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             border_color,
             fill_color,
             parent,
-            artboard,
-            loaded
+            artboard
         );
     }
 
@@ -249,8 +244,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         double x,
         double y,
         Goo.CanvasItem parent,
-        Items.CanvasArtboard? artboard,
-        bool loaded
+        Items.CanvasArtboard? artboard
     ) {
         return new Items.CanvasText (
             "Akira is awesome :)",
@@ -261,8 +255,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             Goo.CanvasAnchorType.NW,
             "Open Sans 18",
             parent,
-            artboard,
-            loaded
+            artboard
         );
     }
 
@@ -271,16 +264,14 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         double y,
         Lib.Managers.ImageManager manager,
         Goo.CanvasItem parent,
-        Items.CanvasArtboard? artboard,
-        bool loaded
+        Items.CanvasArtboard? artboard
     ) {
         return new Items.CanvasImage (
             Utils.AffineTransform.fix_size (x),
             Utils.AffineTransform.fix_size (y),
             manager,
             parent,
-            artboard,
-            loaded
+            artboard
         );
     }
 
@@ -381,22 +372,22 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         switch (obj.get_string_member ("type")) {
             case "rectangle":
                 item_type = typeof (Items.CanvasRect);
-                item = insert_item (pos_x, pos_y, null, true, artboard);
+                item = insert_item (pos_x, pos_y, null, artboard);
                 break;
 
             case "ellipse":
                 item_type = typeof (Items.CanvasEllipse);
-                item = insert_item (pos_x, pos_y, null, true, artboard);
+                item = insert_item (pos_x, pos_y, null, artboard);
                 break;
 
             case "text":
                 item_type = typeof (Items.CanvasText);
-                item = insert_item (pos_x, pos_y, null, true, artboard);
+                item = insert_item (pos_x, pos_y, null, artboard);
                 break;
 
             case "artboard":
                 item_type = typeof (Items.CanvasArtboard);
-                item = insert_item (pos_x, pos_y, null, true, artboard);
+                item = insert_item (pos_x, pos_y, null, artboard);
                 break;
 
             case "image":
@@ -409,7 +400,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
                     )
                 );
                 var manager = new Lib.Managers.ImageManager.from_archive (file, filename);
-                item = insert_item (pos_x, pos_y, manager, true, artboard);
+                item = insert_item (pos_x, pos_y, manager, artboard);
                 break;
         }
 
@@ -539,15 +530,6 @@ public class Akira.Lib.Managers.ItemsManager : Object {
                 true
             );
         }
-
-        // Since free items are loaded upside down, always raise to the top position
-        // the newly added free item.
-        if (artboard == null & !(item is Items.CanvasArtboard)) {
-            item.lower (null);
-        }
-
-        // Reset the loaded attribute to prevent sorting issues inside artboards.
-        item.is_loaded = false;
     }
 
     /**

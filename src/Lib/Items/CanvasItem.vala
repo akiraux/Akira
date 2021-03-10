@@ -33,9 +33,6 @@ public interface Akira.Lib.Items.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasIt
     // Keep track of the parent artboard if the item belongs to one.
     public abstract Items.CanvasArtboard? artboard { get; set; }
 
-    // Check if an item was created or it was loaded for ordering purpose.
-    public abstract bool is_loaded { get; set; }
-
     /**
      * Find the component attached to the item by its GLib.Type.
      */
@@ -70,7 +67,7 @@ public interface Akira.Lib.Items.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasIt
      */
     public void check_add_to_artboard (Items.CanvasItem item) {
         if (item.artboard != null) {
-            item.artboard.items.add_item.begin (item, item.is_loaded);
+            item.artboard.items.add_item.begin (item);
         }
     }
 

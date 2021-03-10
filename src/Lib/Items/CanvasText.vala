@@ -29,8 +29,6 @@ public class Akira.Lib.Items.CanvasText : Goo.CanvasText, Akira.Lib.Items.Canvas
 
     public Items.CanvasArtboard? artboard { get; set; }
 
-    public bool is_loaded { get; set; }
-
     public CanvasText (
         string _text,
         double _x,
@@ -40,8 +38,7 @@ public class Akira.Lib.Items.CanvasText : Goo.CanvasText, Akira.Lib.Items.Canvas
         Goo.CanvasAnchorType _anchor = Goo.CanvasAnchorType.NW,
         string _font = "Open Sans 16",
         Goo.CanvasItem? _parent,
-        Items.CanvasArtboard? _artboard,
-        bool _loaded = false
+        Items.CanvasArtboard? _artboard
     ) {
         parent = _artboard != null ? _artboard : _parent;
         artboard = _artboard;
@@ -53,9 +50,6 @@ public class Akira.Lib.Items.CanvasText : Goo.CanvasText, Akira.Lib.Items.Canvas
         anchor = _anchor;
         font = _font;
         init_position (this, _x, _y);
-
-        // Add extra attributes.
-        is_loaded = _is_loaded;
 
         // Add the newly created item to the Canvas or Artboard.
         parent.add_child (this, -1);
