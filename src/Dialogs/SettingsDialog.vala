@@ -27,6 +27,7 @@ public class Akira.Dialogs.SettingsDialog : Gtk.Dialog {
     private Gtk.Switch symbolic_switch;
     private Gtk.Switch border_switch;
     private Gtk.ColorButton grid_color;
+    private Gtk.ColorButton snaps_color;
     private Gtk.ColorButton fill_color;
     private Gtk.ColorButton border_color;
     private Gtk.SpinButton border_size;
@@ -123,6 +124,7 @@ public class Akira.Dialogs.SettingsDialog : Gtk.Dialog {
         grid.column_spacing = 12;
         grid.column_homogeneous = true;
 
+        // Pixel grid.
         var grid_rgba = Gdk.RGBA ();
         grid_rgba.parse (settings.grid_color);
 
@@ -153,6 +155,39 @@ public class Akira.Dialogs.SettingsDialog : Gtk.Dialog {
 
             settings.grid_color = rgba_str;
             window.event_bus.update_pixel_grid ();
+        });
+
+        // Snapping guides.
+        var snaps_rgba = Gdk.RGBA ();
+        snaps_rgba.parse (settings.snaps_color);
+
+        grid.attach (new SettingsHeader (_("Snapping Guides")), 0, 3, 2, 1);
+
+        var snaps_description = new Gtk.Label (_("Define the default color for the Snapping Guides."));
+        snaps_description.halign = Gtk.Align.START;
+        snaps_description.margin_bottom = 10;
+        grid.attach (snaps_description, 0, 4, 2, 1);
+
+        grid.attach (new SettingsLabel (_("Snapping Guides Color:")), 0, 5, 1, 1);
+        snaps_color = new Gtk.ColorButton.with_rgba (snaps_rgba);
+        snaps_color.halign = Gtk.Align.START;
+        grid.attach (snaps_color, 1, 5, 1, 1);
+
+        snaps_color.color_set.connect (() => {
+            var rgba = snaps_color.get_rgba ();
+
+            // Gdk.RGBA uses rgb() if alpha is 1.
+            string rgba_str = "rgba(%d,%d,%d,%d)".printf (
+                (int) (rgba.red * 255),
+                (int) (rgba.green * 255),
+                (int) (rgba.blue * 255),
+                (int) (rgba.alpha)
+            );
+
+            debug ("pixel snaps color: %s", rgba_str);
+
+            settings.snaps_color = rgba_str;
+            window.event_bus.update_snaps_color ();
         });
 
         return grid;
