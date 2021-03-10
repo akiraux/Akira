@@ -366,36 +366,46 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         matrix.y0 += first_move_y;
         item.set_transform (matrix);
 
+        // If the item is an Artboard, move the label with it.
+        if (item is Lib.Items.CanvasArtboard) {
+            ((Lib.Items.CanvasArtboard) item).label.translate (first_move_x, first_move_y);
+        }
+
+        // Interrupt if the user disabled the snapping.
+        if (!settings.enable_snaps) {
+            return;
+        }
+
         // Make adjustment basted on snaps.
         // Double the sensitivity to allow for reuse of grid after snap.
         var sensitivity = Utils.Snapping.adjusted_sensitivity (canvas.current_scale);
         var snap_grid = Utils.Snapping.generate_best_snap_grid (canvas, selected_items, sensitivity);
 
-        if (!snap_grid.is_empty ()) {
-            int snap_offset_x = 0;
-            int snap_offset_y = 0;
-            var matches = Utils.Snapping.generate_snap_matches (snap_grid, selected_items, sensitivity);
-
-            if (matches.h_data.snap_found ()) {
-                snap_offset_x = matches.h_data.snap_offset ();
-                first_move_x += snap_offset_x;
-                matrix.x0 += snap_offset_x;
-            }
-
-            if (matches.v_data.snap_found ()) {
-                snap_offset_y = matches.v_data.snap_offset ();
-                first_move_y += snap_offset_y;
-                matrix.y0 += snap_offset_y;
-            }
-
-            item.set_transform (matrix);
-            update_grid_decorators (true);
+        // Interrupt if we don't have any snap to use.
+        if (snap_grid.is_empty ()) {
+            return;
         }
 
+        int snap_offset_x = 0;
+        int snap_offset_y = 0;
+        var matches = Utils.Snapping.generate_snap_matches (snap_grid, selected_items, sensitivity);
+
+        if (matches.h_data.snap_found ()) {
+            snap_offset_x = matches.h_data.snap_offset ();
+            matrix.x0 += snap_offset_x;
+        }
+
+        if (matches.v_data.snap_found ()) {
+            snap_offset_y = matches.v_data.snap_offset ();
+            matrix.y0 += snap_offset_y;
+        }
+
+        item.set_transform (matrix);
+        update_grid_decorators (true);
 
         // If the item is an Artboard, move the label with it.
         if (item is Lib.Items.CanvasArtboard) {
-            ((Lib.Items.CanvasArtboard) item).label.translate (first_move_x, first_move_y);
+            ((Lib.Items.CanvasArtboard) item).label.translate (snap_offset_x, snap_offset_y);
         }
     }
 

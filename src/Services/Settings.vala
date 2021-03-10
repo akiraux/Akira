@@ -70,6 +70,10 @@ public class Akira.Services.Settings : GLib.Settings {
         owned get { return get_string ("grid-color"); }
         set { set_string ("grid-color", value); }
     }
+    public bool enable_snaps {
+        get { return get_boolean ("enable-snaps"); }
+        set { set_boolean ("enable-snaps", value); }
+    }
     public string snaps_color {
         owned get { return get_string ("snaps-color"); }
         set { set_string ("snaps-color", value); }
