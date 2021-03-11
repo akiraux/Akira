@@ -388,6 +388,8 @@ public class Akira.Lib.Managers.NobManager : Object {
             return;
         }
 
+        matrix.y0 = top;
+        matrix.x0 = left;
         _width = width;
         _height = height;
     }

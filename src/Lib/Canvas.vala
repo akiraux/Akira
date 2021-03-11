@@ -315,8 +315,8 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                     // If the item is selected and the shift key is pressed,
                     // remove the item from the selection.
                     if (selected_bound_manager.contains_item (item) && is_shift) {
-                       selected_bound_manager.remove_item_from_selection (item);
-                       return true;
+                        selected_bound_manager.remove_item_from_selection (item);
+                        return true;
                     }
 
                     // Check if the clicked item is currently locked.
@@ -327,6 +327,10 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                         }
 
                         return true;
+                    }
+
+                    if (!selected_bound_manager.contains_item (item) && !is_shift) {
+                        selected_bound_manager.reset_selection ();
                     }
 
                     // Item has been selected.

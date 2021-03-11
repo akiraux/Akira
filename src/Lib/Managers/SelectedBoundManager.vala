@@ -148,10 +148,6 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
             return;
         }
 
-        // Just 1 selected element at the same time
-        // TODO: allow for multi selection with shift pressed
-        reset_selection ();
-
         if (item.layer.locked) {
             return;
         }
@@ -178,7 +174,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
             canvas.window.event_bus.request_delete_item (item);
         }
 
-        // By emptying the selected_items list, the select_effect gets dropped
+        // By emptying the selected_items list, the select_effect gets dropped.
         selected_items = new List<Items.CanvasItem> ();
     }
 
@@ -209,7 +205,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
 
         Items.CanvasItem selected_item = selected_items.nth_data (0);
 
-        // Cannot move artboard z-index wise
+        // Cannot move artboard z-index wise.
         if (selected_item is Items.CanvasArtboard) {
             return;
         }
@@ -218,7 +214,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         int pos_selected = -1;
 
         if (selected_item.artboard != null) {
-            // Inside an artboard
+            // Inside an artboard.
             items_count = (int) selected_item.artboard.items.get_n_items ();
             pos_selected = items_count - 1 - selected_item.artboard.items.index (selected_item);
         } else {
