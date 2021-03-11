@@ -29,7 +29,7 @@ public class Akira.Partials.ButtonImage: Gtk.Image {
         size = icon_size;
         margin = 0;
 
-        settings.changed["use-symbolic"].connect ( () => {
+        settings.changed["use-symbolic"].connect (() => {
             update_image ();
         });
 

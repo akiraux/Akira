@@ -266,7 +266,10 @@ public class Akira.Lib.Canvas : Goo.Canvas {
             case EditMode.MODE_SELECTION:
                 var clicked_item = get_item_at (event.x, event.y, true);
 
-                // Deselect if no item was clicked, or a non selected artboard was clicked.
+                // Check if the user is holding down the shift key.
+                bool is_shift = (event.state & Gdk.ModifierType.SHIFT_MASK) > 0;
+
+                // Check if no item was clicked, or a non selected artboard was clicked.
                 // We do this to allow users to clear the selection when clicking on the
                 // empty artboard space, which is a white GooCanvasRect item.
                 if (
@@ -278,10 +281,11 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                         !((Items.CanvasItem) clicked_item.parent).layer.selected
                     )
                 ) {
-                    selected_bound_manager.reset_selection ();
-                    // TODO: allow for multi select with click & drag on canvas
-                    // Workaround: when no item is clicked, there's no point in keeping holding active
-                    holding = false;
+                    // Reset the selection if the shift key is not pressed.
+                    if (!is_shift) {
+                        selected_bound_manager.reset_selection ();
+                    }
+
                     return true;
                 }
 
@@ -304,12 +308,24 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                     clicked_item = clicked_item.parent as Items.CanvasItem;
                 }
 
+                // The clicked item is a valid CanvasItem.
                 if (clicked_item is Items.CanvasItem) {
                     Items.CanvasItem item = clicked_item as Items.CanvasItem;
 
+                    // If the item is selected and the shift key is pressed,
+                    // remove the item from the selection.
+                    if (selected_bound_manager.contains_item (item) && is_shift) {
+                       selected_bound_manager.remove_item_from_selection (item);
+                       return true;
+                    }
+
+                    // Check if the clicked item is currently locked.
                     if (item.layer.locked) {
-                        selected_bound_manager.reset_selection ();
-                        holding = false;
+                        // If the shift key is not pressed, reset the selection.
+                        if (!is_shift) {
+                            selected_bound_manager.reset_selection ();
+                        }
+
                         return true;
                     }
 
@@ -341,8 +357,8 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
         holding = false;
 
-        // This is a temporary approach to end operations. In the future we may want to have more specific
-        // methods.
+        // This is a temporary approach to end operations. In the future
+        // we may want to have more specific methods.
         selected_bound_manager.alert_held_button_release ();
 
         if (event.button == Gdk.BUTTON_MIDDLE) {

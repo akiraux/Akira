@@ -138,9 +138,13 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         canvas.window.event_bus.reset_state_coords (selected_item);
     }
 
+    public bool contains_item (Items.CanvasItem item) {
+        return selected_items.index (item) != -1;
+    }
+
     public void add_item_to_selection (Items.CanvasItem item) {
-        // Don't clear and reselect the same element if it's already selected.
-        if (selected_items.index (item) != -1) {
+        // Interrupt if the item is already selected.
+        if (contains_item (item)) {
             return;
         }
 
@@ -325,8 +329,8 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         window.event_bus.update_state_coords (x, y);
     }
 
-    private void remove_item_from_selection (Lib.Items.CanvasItem item) {
-        if (selected_items.index (item) > -1) {
+    public void remove_item_from_selection (Items.CanvasItem item) {
+        if (contains_item (item)) {
             selected_items.remove (item);
         }
 
@@ -336,7 +340,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
     /**
      * Move the item based on the mouse click and drag event.
      */
-    private void move_from_event ( Lib.Items.CanvasItem item, double event_x, double event_y ) {
+    private void move_from_event (Items.CanvasItem item, double event_x, double event_y) {
         if (!initial_drag_registered) {
             initial_drag_registered = true;
             initial_drag_item_x = item.transform.x;
