@@ -445,12 +445,13 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         var delta_x = rel_event_x - rel_press_x;
         var delta_y = rel_event_y - rel_press_y;
 
-        double item_width = item.size.width;
-        double item_height = item.size.height;
         double item_x = item.bounds.x1;
         double item_y = item.bounds.y1;
         canvas.convert_to_item_space (item, ref item_x, ref item_y);
 
+        bool ratio_locked = canvas.ctrl_is_pressed || item.size.locked;
+
+        // these values will be populated
         double inc_width = 0;
         double inc_height = 0;
         double inc_x = 0;
@@ -458,21 +459,15 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         bool h_flip = false;
         bool v_flip = false;
 
-        item.set_transform(initial_item_transform);
-        item.size.width = initial_width;
-        item.size.height = initial_height;
-
-        Cairo.Matrix new_item_transform = initial_item_transform;
-
-
-
-        Utils.AffineTransform.calculate_size_adjustments(
-            item,
+        Utils.AffineTransform.calculate_size_adjustments (
             selected_nob,
+            initial_width,
+            initial_height,
             delta_x,
             delta_y,
             initial_width / initial_height,
-            new_item_transform,
+            ratio_locked,
+            initial_item_transform,
             ref inc_x,
             ref inc_y,
             ref inc_width,
@@ -481,10 +476,16 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
             ref v_flip
         );
 
-        Utils.AffineTransform.set_size (item, inc_width, inc_height);
-        new_item_transform.x0 += inc_x;
-        new_item_transform.y0 += inc_y;
-        item.set_transform(new_item_transform);
+        var reset_width = item.size.width - initial_width;
+        var reset_height = item.size.height - initial_height;
 
+
+        Cairo.Matrix new_transform;
+        item.get_transform (out new_transform);
+        new_transform.x0 = initial_item_transform.x0 + inc_x;
+        new_transform.y0 = initial_item_transform.y0 + inc_y;
+        item.set_transform (new_transform);
+
+        Utils.AffineTransform.set_size (item, inc_width - reset_width, inc_height - reset_height);
     }
 }

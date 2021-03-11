@@ -37,29 +37,27 @@ public class Akira.Utils.AffineTransform : Object {
      * should have already been transformed to the correct space
      */
     public static void calculate_size_adjustments (
-        CanvasItem item,
         NobManager.Nob nob,
+        double item_width,
+        double item_height,
         double delta_x,
         double delta_y,
         double size_ratio,
+        bool ratio_locked,
         Cairo.Matrix transform,
         ref double inc_x,
         ref double inc_y,
         ref double inc_width,
         ref double inc_height,
-        ref bool   h_flip,
-        ref bool   v_flip
+        ref bool h_flip,
+        ref bool v_flip
     ) {
-        var canvas = (Lib.Canvas) item.canvas;
-
         double local_x_adj = 0.0;
         double local_y_adj = 0.0;
         double perm_x_adj = 0.0;
         double perm_y_adj = 0.0;
         double perm_w_adj = 0;
         double perm_h_adj = 0;
-        double item_width = item.size.width;
-        double item_height = item.size.height;
 
         nob = correct_nob (
             nob,
@@ -100,7 +98,7 @@ public class Akira.Utils.AffineTransform : Object {
         }
 
 
-        if (canvas.ctrl_is_pressed || item.size.locked) {
+        if (ratio_locked) {
             if (pure_v || (!pure_h && (item_width + inc_width) / (item_height + inc_height) < size_ratio)) {
                 if (NobManager.is_top_nob (nob)) {
                     inc_width = (inc_height + perm_h_adj) * size_ratio - perm_w_adj;
@@ -108,7 +106,7 @@ public class Akira.Utils.AffineTransform : Object {
                         local_x_adj = -inc_width;
                     }
                     else if (nob == NobManager.Nob.TOP_CENTER) {
-                        local_x_adj = -(inc_width / 2.0);
+                        local_x_adj = - (inc_width / 2.0);
                     }
                 }
                 else {
@@ -117,7 +115,7 @@ public class Akira.Utils.AffineTransform : Object {
                         local_x_adj = -inc_width;
                     }
                     else if (nob == NobManager.Nob.BOTTOM_CENTER) {
-                        local_x_adj = -(inc_width / 2.0);
+                        local_x_adj = - (inc_width / 2.0);
                     }
                 }
             }
@@ -128,7 +126,7 @@ public class Akira.Utils.AffineTransform : Object {
                         local_y_adj = -inc_height;
                     }
                     else if (nob == NobManager.Nob.LEFT_CENTER) {
-                        local_y_adj = -(inc_height / 2.0);
+                        local_y_adj = - (inc_height / 2.0);
                     }
                 }
                 else if (NobManager.is_right_nob (nob)) {
@@ -137,7 +135,7 @@ public class Akira.Utils.AffineTransform : Object {
                         local_y_adj = -inc_height;
                     }
                     else if (nob == NobManager.Nob.RIGHT_CENTER) {
-                        local_y_adj = -(inc_height / 2.0);
+                        local_y_adj = - (inc_height / 2.0);
                     }
                 }
             }
@@ -171,8 +169,8 @@ public class Akira.Utils.AffineTransform : Object {
         NobManager.Nob nob,
         double item_width,
         double item_height,
-        ref bool   h_flip,
-        ref bool   v_flip,
+        ref bool h_flip,
+        ref bool v_flip,
         ref double delta_x,
         ref double delta_y,
         ref double perm_x_adj,
@@ -280,85 +278,9 @@ public class Akira.Utils.AffineTransform : Object {
         ref double inc_x,
         ref double inc_y
     ) {
-        transform.transform_distance(ref adj_x, ref adj_y);
+        transform.transform_distance (ref adj_x, ref adj_y);
         inc_x += adj_x;
         inc_y += adj_y;
-    }
-
-    /*
-     * Apply adjustment needed for right nobs.
-     * inc_width is the adjustment that needs to be made to the width of the bounding box.
-     * local_x_adj is the required translation (in the bounding box local coordinates)
-     */
-    private static void apply_right_nob_adjust (
-        double delta_x,
-        double item_width,
-        ref double inc_width,
-        ref double local_x_adj
-    ) {
-
-        if (item_width + inc_width < 0) {
-            // flipped adjustment
-            if (ALLOW_SCALE_OVERFLOW) {
-                local_x_adj = (item_width + inc_width);
-                inc_width = -local_x_adj - item_width;
-                return;
-            }
-
-            inc_width = 1 - item_width;
-        }
-    }
-
-    /*
-     * Apply adjustment needed for left nobs.
-     * inc_width is the adjustment that needs to be made to the width of the bounding box.
-     * local_x_adj is the required translation (in the bounding box local coordinates)
-     */
-    private static void apply_left_nob_adjust (
-        double delta_x,
-        double item_width,
-        ref double inc_width,
-        ref double local_x_adj
-    ) {
-
-        if (item_width + inc_width >= 0) {
-            // normal adjustment
-        }
-        else {
-            // flipped adjustment
-            if (ALLOW_SCALE_OVERFLOW) {
-                inc_width = -(2 * item_width + inc_width);
-                local_x_adj = item_width;
-                return;
-            }
-
-            local_x_adj = item_width - 1;
-            inc_width = 1 - item_width;
-        }
-    }
-
-    /*
-     * Apply adjustment needed for bottom nobs.
-     * inc_height is the adjustment that needs to be made to the height of the bounding box.
-     * local_y_adj is the required translation (in the bounding box local coordinates)
-     */
-    private static void apply_bottom_nob_adjust (
-        double delta_y,
-        double item_height,
-        ref double inc_height,
-        ref double local_y_adj
-    ) {
-
-        if (item_height + inc_height < 0) {
-            // flipped adjustment
-            if (ALLOW_SCALE_OVERFLOW) {
-                local_y_adj =  inc_height + item_height;
-                inc_height =  -(item_height + local_y_adj);
-                return;
-            }
-
-            inc_height = 1 - item_height;
-        }
     }
 
     public static void scale_from_event (
