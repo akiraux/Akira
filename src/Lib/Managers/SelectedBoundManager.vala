@@ -47,9 +47,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
     // Attributes to keep track of the mouse dragging coordinates.
     private double initial_drag_press_x;
     private double initial_drag_press_y;
-    private bool initial_drag_registered = false;
-    private double initial_drag_item_x;
-    private double initial_drag_item_y;
+    private Gee.HashMap<string, GLib.Array<double?>> initial_drag_coords;
 
     public SelectedBoundManager (Akira.Lib.Canvas canvas) {
         Object (
@@ -69,6 +67,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
 
     construct {
         snap_manager = new Managers.SnapManager (canvas);
+        initial_drag_coords = new Gee.HashMap<string, GLib.Array<double?>> ();
         reset_selection ();
     }
 
@@ -78,9 +77,10 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
 
         initial_drag_press_x = event_x;
         initial_drag_press_y = event_y;
+
         // We deregister any old drag, and the next will be registered on the
         // first drag move_from_event call.
-        initial_drag_registered = false;
+        initial_drag_coords.clear ();
 
         delta_x_accumulator = 0.0;
         delta_y_accumulator = 0.0;
@@ -104,12 +104,6 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
 
         switch (selected_nob) {
             case Managers.NobManager.Nob.NONE:
-                if (!initial_drag_registered) {
-                    initial_drag_registered = true;
-                    initial_drag_item_x = canvas.nob_manager.left;
-                    initial_drag_item_y = canvas.nob_manager.top;
-                }
-
                 foreach (var item in selected_items) {
                     move_from_event (item, event_x, event_y);
                 }
@@ -337,8 +331,21 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
      * Move the item based on the mouse click and drag event.
      */
     private void move_from_event (Items.CanvasItem item, double event_x, double event_y) {
-        // Keep reset and delta values for future adjustments.
+        // If it's the first time we're moving this item, collect the original coordinates.
+        if (!initial_drag_coords.has_key (item.name.id)) {
+            Array<double?> coords = new Array<double?> ();
+            coords.append_val (item.transform.x1);
+            coords.append_val (item.transform.y1);
 
+            initial_drag_coords.set (item.name.id, coords);
+        }
+
+        // Fetch the initial dragging coordinates.
+        var initial_coords = initial_drag_coords.get (item.name.id);
+        var initial_drag_item_x = initial_coords.index (0);
+        var initial_drag_item_y = initial_coords.index (1);
+
+        // Keep reset and delta values for future adjustments.
         // Calculate values needed to reset to the original position.
         var reset_x = item.transform.x - initial_drag_item_x;
         var reset_y = item.transform.y - initial_drag_item_y;
