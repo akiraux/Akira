@@ -54,11 +54,10 @@ public class Akira.Lib.Managers.NobManager : Object {
     private Goo.CanvasRect? select_effect;
     private Goo.CanvasItemSimple[] nobs = new Goo.CanvasItemSimple[9];
     private Goo.CanvasPolyline? rotation_line;
-    private Goo.CanvasBounds select_bb;
-    private double top;
-    private double left;
-    private double width;
-    private double height;
+    public double top;
+    public double left;
+    public double width;
+    public double height;
     private double nob_size;
 
     // Tracks if an artboard is part of the current selection.
@@ -105,24 +104,25 @@ public class Akira.Lib.Managers.NobManager : Object {
         // Bounding box edges
         double bb_left = 1e6, bb_top = 1e6, bb_right = 0, bb_bottom = 0;
 
-        foreach (var item in selected_items) {
-            bb_left = double.min (bb_left, item.transform.x1);
-            bb_top = double.min (bb_top, item.transform.y1);
-            bb_right = double.max (bb_right, item.transform.x2);
-            bb_bottom = double.max (bb_bottom, item.transform.y2);
+        if (selected_items.length () == 1) {
+            var item = selected_items.nth_data (0);
+            bb_left = item.transform.x1;
+            bb_top = item.transform.y1;
+            bb_right = item.transform.x2;
+            bb_bottom = item.transform.y2;
+        } else {
+            foreach (var item in selected_items) {
+                bb_left = double.min (bb_left, item.transform.x1);
+                bb_top = double.min (bb_top, item.transform.y1);
+                bb_right = double.max (bb_right, item.transform.x2);
+                bb_bottom = double.max (bb_bottom, item.transform.y2);
+            }
         }
 
-        select_bb = Goo.CanvasBounds () {
-            x1 = bb_left,
-            y1 = bb_top,
-            x2 = bb_right,
-            y2 = bb_bottom
-        };
-
-        top = select_bb.y1;
-        left = select_bb.x1;
-        width = select_bb.x2 - select_bb.x1;
-        height = select_bb.y2 - select_bb.y1;
+        top = bb_top;
+        left = bb_left;
+        width = bb_right - bb_left;
+        height = bb_bottom - bb_top;
     }
 
     private void on_add_select_effect (List<Items.CanvasItem> selected_items) {
@@ -131,10 +131,7 @@ public class Akira.Lib.Managers.NobManager : Object {
             return;
         }
 
-        if (selected_items.length () > 1) {
-            update_select_bb_coords (selected_items);
-        }
-
+        update_select_bb_coords (selected_items);
         update_select_effect (selected_items);
         update_nob_position (selected_items);
         // We don't need to recreate those objects after this.

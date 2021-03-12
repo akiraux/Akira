@@ -55,7 +55,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
     public Managers.ExportManager export_manager;
     public Managers.SelectedBoundManager selected_bound_manager;
-    private Managers.NobManager nob_manager;
+    public Managers.NobManager nob_manager;
     private Managers.HoverManager hover_manager;
 
     // HashMap to keep track of the event coordinates on button press.
