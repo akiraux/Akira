@@ -142,10 +142,6 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
             return;
         }
 
-        if (item.layer.locked) {
-            return;
-        }
-
         item.layer.selected = true;
         item.size.update_ratio ();
 

@@ -336,16 +336,6 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                         return true;
                     }
 
-                    // Check if the clicked item is currently locked.
-                    if (item.layer.locked) {
-                        // If the shift key is not pressed, reset the selection.
-                        if (!shift_is_pressed) {
-                            selected_bound_manager.reset_selection ();
-                        }
-
-                        return true;
-                    }
-
                     if (!selected_bound_manager.contains_item (item) && !shift_is_pressed) {
                         selected_bound_manager.reset_selection ();
                     }

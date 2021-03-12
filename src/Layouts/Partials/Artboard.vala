@@ -495,20 +495,24 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 
             if (active) {
                 button_locked.get_style_context ().add_class ("show");
+                // Disable any pointer events for a locked item.
+                model.pointer_events = Goo.CanvasPointerEvents.NONE;
+
+                // Let the UI know that this item was locked.
+                window.event_bus.item_locked (model);
+                ((Gtk.ListBox) parent).unselect_row (this);
+                model.layer.selected = false;
             } else {
                 button_locked.get_style_context ().remove_class ("show");
+                // Re-enable pointer events.
+                model.pointer_events = Goo.CanvasPointerEvents.ALL;
             }
 
             icon_unlocked.visible = active;
-            icon_unlocked.no_show_all = ! active;
+            icon_unlocked.no_show_all = !active;
 
-            icon_locked.visible = ! active;
+            icon_locked.visible = !active;
             icon_locked.no_show_all = active;
-
-            if (active) {
-                window.event_bus.item_locked (model);
-                ((Gtk.ListBox) parent).unselect_row (this);
-            }
 
             window.event_bus.set_focus_on_canvas ();
             window.event_bus.file_edited ();
