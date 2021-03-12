@@ -58,7 +58,11 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     private Managers.NobManager nob_manager;
     private Managers.HoverManager hover_manager;
 
+    // HashMap to keep track of the event coordinates on button press.
+    private Gee.HashMap<string, int> event_coords;
+
     public bool ctrl_is_pressed = false;
+    public bool shift_is_pressed = false;
     public bool holding;
     public double current_scale = 1.0;
     private Gdk.CursorType current_cursor = Gdk.CursorType.ARROW;
@@ -83,6 +87,8 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         events |= Gdk.EventMask.SMOOTH_SCROLL_MASK;
         events |= Gdk.EventMask.TOUCHPAD_GESTURE_MASK;
         events |= Gdk.EventMask.TOUCH_MASK;
+
+        event_coords = new Gee.HashMap<string, int> ();
 
         export_manager = new Managers.ExportManager (this);
         selected_bound_manager = new Managers.SelectedBoundManager (this);
@@ -190,6 +196,11 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 toggle_item_ghost (false);
                 break;
 
+            case Gdk.Key.Shift_L:
+            case Gdk.Key.Shift_R:
+                shift_is_pressed = true;
+                break;
+
             case Gdk.Key.Alt_L:
             case Gdk.Key.Alt_R:
                 // Show the ghost item only if the CTRL button is not pressed.
@@ -221,6 +232,11 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 ctrl_is_pressed = false;
                 break;
 
+            case Gdk.Key.Shift_L:
+            case Gdk.Key.Shift_R:
+                shift_is_pressed = false;
+                break;
+
             case Gdk.Key.Alt_L:
             case Gdk.Key.Alt_R:
                 toggle_item_ghost (false);
@@ -245,6 +261,10 @@ public class Akira.Lib.Canvas : Goo.Canvas {
             canvas_scroll_set_origin (event.x, event.y);
         }
 
+        // Save the button clicked coordinates for future reference.
+        event_coords.set ("x", (int) event.x);
+        event_coords.set ("y", (int) event.y);
+
         switch (edit_mode) {
             case EditMode.MODE_INSERT:
                 selected_bound_manager.reset_selection ();
@@ -266,9 +286,6 @@ public class Akira.Lib.Canvas : Goo.Canvas {
             case EditMode.MODE_SELECTION:
                 var clicked_item = get_item_at (event.x, event.y, true);
 
-                // Check if the user is holding down the shift key.
-                bool is_shift = (event.state & Gdk.ModifierType.SHIFT_MASK) > 0;
-
                 // Check if no item was clicked, or a non selected artboard was clicked.
                 // We do this to allow users to clear the selection when clicking on the
                 // empty artboard space, which is a white GooCanvasRect item.
@@ -282,7 +299,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                     )
                 ) {
                     // Reset the selection if the shift key is not pressed.
-                    if (!is_shift) {
+                    if (!shift_is_pressed) {
                         selected_bound_manager.reset_selection ();
                     }
 
@@ -310,11 +327,11 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
                 // The clicked item is a valid CanvasItem.
                 if (clicked_item is Items.CanvasItem) {
-                    Items.CanvasItem item = clicked_item as Items.CanvasItem;
+                    var item = clicked_item as Items.CanvasItem;
 
                     // If the item is selected and the shift key is pressed,
                     // remove the item from the selection.
-                    if (selected_bound_manager.contains_item (item) && is_shift) {
+                    if (selected_bound_manager.contains_item (item) && shift_is_pressed) {
                         selected_bound_manager.remove_item_from_selection (item);
                         return true;
                     }
@@ -322,14 +339,14 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                     // Check if the clicked item is currently locked.
                     if (item.layer.locked) {
                         // If the shift key is not pressed, reset the selection.
-                        if (!is_shift) {
+                        if (!shift_is_pressed) {
                             selected_bound_manager.reset_selection ();
                         }
 
                         return true;
                     }
 
-                    if (!selected_bound_manager.contains_item (item) && !is_shift) {
+                    if (!selected_bound_manager.contains_item (item) && !shift_is_pressed) {
                         selected_bound_manager.reset_selection ();
                     }
 
@@ -355,10 +372,6 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     }
 
     public override bool button_release_event (Gdk.EventButton event) {
-        if (!holding) {
-            return true;
-        }
-
         holding = false;
 
         // This is a temporary approach to end operations. In the future
@@ -380,8 +393,66 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 break;
 
             case EditMode.MODE_SELECTION:
-                window.event_bus.detect_artboard_change ();
-                window.event_bus.detect_image_size_change ();
+                // Interrupt if no movement was registered.
+                if (event_coords.size == 0) {
+                    event_coords.clear ();
+                    return true;
+                }
+
+                event.x = (int) Math.round (event.x / current_scale);
+                event.y = (int) Math.round (event.y / current_scale);
+
+                // Interrupt if the original button press even is different from the
+                // current button release event, meaning the user moved stuff around
+                // and we don't need to check for the removal of any clicked item.
+                if (event_coords.get ("x") != event.x || event_coords.get ("y") != event.y) {
+                    // Run these conditions only if a click and drag actually happened.
+                    window.event_bus.detect_artboard_change ();
+                    window.event_bus.detect_image_size_change ();
+                    event_coords.clear ();
+                    return true;
+                }
+
+                // Clear the event coordinates.
+                event_coords.clear ();
+
+                // Interrupt if only one item is currently present in the selection list.
+                if (selected_bound_manager.selected_items.length () == 1) {
+                    return true;
+                }
+
+                var clicked_item = get_item_at (event.x, event.y, true);
+
+                // Interrupt if no item was clicked, or the user selected a Nob.
+                if (clicked_item == null || clicked_item is Selection.Nob) {
+                    return true;
+                }
+
+                // If we're clicking on the Artboard's label, change the target to the Artboard.
+                if (
+                    clicked_item is Goo.CanvasText &&
+                    clicked_item.parent is Items.CanvasArtboard &&
+                    !(clicked_item is Items.CanvasItem)
+                ) {
+                    clicked_item = clicked_item.parent as Items.CanvasItem;
+                }
+
+                // Interrupt if we didn't click on a valid item.
+                if (!(clicked_item is Items.CanvasItem)) {
+                    return true;
+                }
+
+                var item = clicked_item as Items.CanvasItem;
+
+                // If the item is part of the selection, the user didn't move
+                // the items around, and the shift key wasn't clicked, we can
+                // safely remove all the items from the selection and add the
+                // currently clicked item.
+                if (selected_bound_manager.contains_item (item) && !shift_is_pressed) {
+                    selected_bound_manager.reset_selection ();
+                    selected_bound_manager.add_item_to_selection (item);
+                }
+
                 break;
 
             default:
