@@ -47,7 +47,9 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
     // Attributes to keep track of the mouse dragging coordinates.
     private double initial_drag_press_x;
     private double initial_drag_press_y;
-    private Gee.HashMap<string, GLib.Array<double?>> initial_drag_coords;
+    private double initial_drag_selection_x;
+    private double initial_drag_selection_y;
+    private bool initial_drag_selection_registered = false;
 
     public SelectedBoundManager (Akira.Lib.Canvas canvas) {
         Object (
@@ -67,7 +69,6 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
 
     construct {
         snap_manager = new Managers.SnapManager (canvas);
-        initial_drag_coords = new Gee.HashMap<string, GLib.Array<double?>> ();
         reset_selection ();
     }
 
@@ -80,7 +81,9 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
 
         // We deregister any old drag, and the next will be registered on the
         // first drag move_from_event call.
-        initial_drag_coords.clear ();
+        initial_drag_selection_registered = false;
+        initial_drag_selection_x = 0.0;
+        initial_drag_selection_y = 0.0;
 
         delta_x_accumulator = 0.0;
         delta_y_accumulator = 0.0;
@@ -104,9 +107,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
 
         switch (selected_nob) {
             case Managers.NobManager.Nob.NONE:
-                foreach (var item in selected_items) {
-                    move_from_event (item, event_x, event_y);
-                }
+                move_from_event (event_x, event_y);
                 break;
 
             case Managers.NobManager.Nob.ROTATE:
@@ -326,25 +327,18 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
     /**
      * Move the item based on the mouse click and drag event.
      */
-    private void move_from_event (Items.CanvasItem item, double event_x, double event_y) {
+    private void move_from_event (double event_x, double event_y) {
         // If it's the first time we're moving this item, collect the original coordinates.
-        if (!initial_drag_coords.has_key (item.name.id)) {
-            Array<double?> coords = new Array<double?> ();
-            coords.append_val (item.transform.x1);
-            coords.append_val (item.transform.y1);
-
-            initial_drag_coords.set (item.name.id, coords);
+        if (!initial_drag_selection_registered) {
+            initial_drag_selection_x = selected_items.data.transform.x1;
+            initial_drag_selection_y = selected_items.data.transform.y1;
+            initial_drag_selection_registered = true;
         }
-
-        // Fetch the initial dragging coordinates.
-        var initial_coords = initial_drag_coords.get (item.name.id);
-        var initial_drag_item_x = initial_coords.index (0);
-        var initial_drag_item_y = initial_coords.index (1);
 
         // Keep reset and delta values for future adjustments.
         // Calculate values needed to reset to the original position.
-        var reset_x = item.transform.x - initial_drag_item_x;
-        var reset_y = item.transform.y - initial_drag_item_y;
+        var reset_x = selected_items.data.transform.x - initial_drag_selection_x;
+        var reset_y = selected_items.data.transform.y - initial_drag_selection_y;
 
         // Calculate the change based on the event.
         var delta_x = event_x - initial_drag_press_x;
@@ -355,17 +349,20 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         var first_move_x = Utils.AffineTransform.fix_size (delta_x - reset_x);
         var first_move_y = Utils.AffineTransform.fix_size (delta_y - reset_y);
 
-        Cairo.Matrix matrix;
-        item.get_transform (out matrix);
+        // Loop through all the currently selected items to move them.
+        foreach (var item in selected_items) {
+            Cairo.Matrix matrix;
+            item.get_transform (out matrix);
 
-        // Increment the cairo matrix coordinates so we can ignore the item's rotation.
-        matrix.x0 += first_move_x;
-        matrix.y0 += first_move_y;
-        item.set_transform (matrix);
+            // Increment the cairo matrix coordinates so we can ignore the item's rotation.
+            matrix.x0 += first_move_x;
+            matrix.y0 += first_move_y;
+            item.set_transform (matrix);
 
-        // If the item is an Artboard, move the label with it.
-        if (item is Lib.Items.CanvasArtboard) {
-            ((Lib.Items.CanvasArtboard) item).label.translate (first_move_x, first_move_y);
+            // If the item is an Artboard, move the label with it.
+            if (item is Lib.Items.CanvasArtboard) {
+                ((Lib.Items.CanvasArtboard) item).label.translate (first_move_x, first_move_y);
+            }
         }
 
         // Interrupt if the user disabled the snapping.
@@ -385,25 +382,39 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
 
         int snap_offset_x = 0;
         int snap_offset_y = 0;
+
         var matches = Utils.Snapping.generate_snap_matches (snap_grid, selected_items, sensitivity);
 
         if (matches.h_data.snap_found ()) {
             snap_offset_x = matches.h_data.snap_offset ();
-            matrix.x0 += snap_offset_x;
         }
 
         if (matches.v_data.snap_found ()) {
             snap_offset_y = matches.v_data.snap_offset ();
+        }
+
+        // Interrupt if no variation in the current position of the items is necessary.
+        if (snap_offset_x == 0 && snap_offset_y == 0) {
+            return;
+        }
+
+        // Loop again through all the selected items to apply the snap offset.
+        foreach (var item in selected_items) {
+            Cairo.Matrix matrix;
+            item.get_transform (out matrix);
+
+            matrix.x0 += snap_offset_x;
             matrix.y0 += snap_offset_y;
+
+            item.set_transform (matrix);
+
+            // If the item is an Artboard, move the label with it.
+            if (item is Lib.Items.CanvasArtboard) {
+                ((Lib.Items.CanvasArtboard) item).label.translate (snap_offset_x, snap_offset_y);
+            }
         }
 
-        item.set_transform (matrix);
         update_grid_decorators (true);
-
-        // If the item is an Artboard, move the label with it.
-        if (item is Lib.Items.CanvasArtboard) {
-            ((Lib.Items.CanvasArtboard) item).label.translate (snap_offset_x, snap_offset_y);
-        }
     }
 
     private void on_canvas_zoom () {
