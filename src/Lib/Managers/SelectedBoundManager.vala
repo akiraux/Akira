@@ -63,6 +63,8 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         canvas.window.event_bus.move_item_from_canvas.connect (on_move_item_from_canvas);
         canvas.window.event_bus.item_deleted.connect (remove_item_from_selection);
         canvas.window.event_bus.request_add_item_to_selection.connect (add_item_to_selection);
+        canvas.window.event_bus.request_remove_item_from_selection.connect (remove_item_from_selection);
+        canvas.window.event_bus.request_reset_selection.connect (reset_selection);
         canvas.window.event_bus.item_locked.connect (remove_item_from_selection);
         canvas.window.event_bus.zoom.connect (on_canvas_zoom);
     }
@@ -329,6 +331,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
     public void remove_item_from_selection (Items.CanvasItem item) {
         if (contains_item (item)) {
             selected_items.remove (item);
+            item.layer.selected = false;
         }
 
         canvas.window.event_bus.set_focus_on_canvas ();

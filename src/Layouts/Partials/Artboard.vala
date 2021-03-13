@@ -108,7 +108,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
         container = new Gtk.ListBox ();
         container.get_style_context ().add_class ("artboard-container");
         container.activate_on_single_click = false;
-        container.selection_mode = Gtk.SelectionMode.SINGLE;
+        container.selection_mode = Gtk.SelectionMode.MULTIPLE;
 
         // Block all the events from bubbling up and triggering the Artboard's events.
         container.event.connect (() => {
@@ -138,7 +138,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
         handle = new Gtk.EventBox ();
         handle.hexpand = true;
         handle.add (label_grid);
-        handle.event.connect (on_handle_event);
+        handle.button_press_event.connect (on_click_event);
 
         button_locked = new Gtk.ToggleButton ();
         button_locked.tooltip_text = _("Lock Layer");
@@ -414,7 +414,13 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
         model.changed (true);
     }
 
-    private bool on_handle_event (Gdk.Event event) {
+    private bool on_click_event (Gdk.EventButton event) {
+        if (model.layer.locked) {
+            return true;
+        }
+
+        bool is_control = (event.state & Gdk.ModifierType.CONTROL_MASK) > 0;
+
         switch (event.type) {
             case Gdk.EventType.@2BUTTON_PRESS:
                 entry.text = label.label;
@@ -422,6 +428,11 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
                 entry.no_show_all = false;
                 label.visible = false;
                 label.no_show_all = true;
+
+                button_locked.visible = false;
+                button_locked.no_show_all = true;
+                button_hidden.visible = false;
+                button_hidden.no_show_all = true;
 
                 editing = true;
 
@@ -433,9 +444,33 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
                 return true;
 
             case Gdk.EventType.BUTTON_PRESS:
+                // If the CTRL key is not held, deselect all layers.
+                if (!is_control) {
+                    ((Gtk.ListBox) parent).unselect_all ();
+                    window.event_bus.request_reset_selection ();
+                }
+
+                // Selected layers can't show hover a effect.
+                get_style_context ().remove_class ("hovered");
+
+                // If the CTRL key is held and the layer is already selected,
+                // remove it from the selection array.
+                if (is_control && is_selected ()) {
+                    ((Gtk.ListBox) parent).unselect_row (this);
+                    window.event_bus.request_remove_item_from_selection (model);
+                    model.layer.selected = false;
+                    return true;
+                }
+
                 window.event_bus.request_add_item_to_selection (model);
-                // Always move the focus back to the canvas.
-                window.event_bus.set_focus_on_canvas ();
+                window.event_bus.hover_over_layer (null);
+
+                // We need this in case the user clicks on the layer right after being unlocked.
+                if (!is_selected ()) {
+                    ((Gtk.ListBox) parent).select_row (this);
+                }
+
+                // We're returning false to not interrupt the natural bubbling of the click event.
                 return true;
         }
 
@@ -467,6 +502,11 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
         entry.no_show_all = true;
         label.visible = true;
         label.no_show_all = false;
+
+        button_locked.visible = true;
+        button_locked.no_show_all = false;
+        button_hidden.visible = true;
+        button_hidden.no_show_all = false;
 
         editing = false;
 

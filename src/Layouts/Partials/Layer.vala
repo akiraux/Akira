@@ -496,10 +496,12 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
      * @param {Gdk.Event} event - The button click event.
      * @return {bool} True to stop propagation, False to let other events run.
      */
-    public bool on_click_event (Gdk.Event event) {
+    public bool on_click_event (Gdk.EventButton event) {
         if (model.layer.locked) {
             return true;
         }
+
+        bool is_control = (event.state & Gdk.ModifierType.CONTROL_MASK) > 0;
 
         switch (event.type) {
             case Gdk.EventType.@2BUTTON_PRESS:
@@ -524,9 +526,23 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
                 return true;
 
             case Gdk.EventType.BUTTON_PRESS:
-                // Selected layers can't show hover effect.
-                // We need to reflect the status of the canvas item.
+                // If the CTRL key is not held, deselect all layers.
+                if (!is_control) {
+                    ((Gtk.ListBox) parent).unselect_all ();
+                    window.event_bus.request_reset_selection ();
+                }
+
+                // Selected layers can't show hover a effect.
                 get_style_context ().remove_class ("hovered");
+
+                // If the CTRL key is held and the layer is already selected,
+                // remove it from the selection array.
+                if (is_control && is_selected ()) {
+                    ((Gtk.ListBox) parent).unselect_row (this);
+                    window.event_bus.request_remove_item_from_selection (model);
+                    model.layer.selected = false;
+                    return true;
+                }
 
                 window.event_bus.request_add_item_to_selection (model);
                 window.event_bus.hover_over_layer (null);

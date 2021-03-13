@@ -64,10 +64,10 @@ public class Akira.Layouts.Partials.LayersPanel : Gtk.Grid {
         artboards_list = new Gtk.ListBox ();
 
         items_list.activate_on_single_click = false;
-        items_list.selection_mode = Gtk.SelectionMode.SINGLE;
+        items_list.selection_mode = Gtk.SelectionMode.MULTIPLE;
 
         artboards_list.activate_on_single_click = false;
-        artboards_list.selection_mode = Gtk.SelectionMode.SINGLE;
+        artboards_list.selection_mode = Gtk.SelectionMode.MULTIPLE;
 
         items_list.bind_model (window.items_manager.free_items, item => {
             return new Layouts.Partials.Layer (window, ((Lib.Items.CanvasItem) item), items_list);
