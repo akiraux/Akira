@@ -25,18 +25,18 @@
 public class Akira.Lib.Components.Coordinates : Component {
     public double x {
         get {
+            // If the item is an artboard we need to get the bounds of the background since
+            // the artboard group will have its bounds changing based on the location of the
+            // child items.
+            if (item is Items.CanvasArtboard) {
+                return ((Items.CanvasArtboard) item).background.bounds.x1;
+            }
+
             double item_x = item.bounds.x1 + get_border ();
 
             if (item.artboard != null) {
                 double temp_y = 0.0;
                 item.canvas.convert_to_item_space (item.artboard, ref item_x, ref temp_y);
-            }
-
-            // If the item is an artboard we need to get the bounds of the background since
-            // the artboard group will have its bounds changing based on the location of the
-            // child items.
-            if (item is Items.CanvasArtboard) {
-                item_x = ((Items.CanvasArtboard) item).background.bounds.x1;
             }
 
             return item_x;
@@ -45,48 +45,44 @@ public class Akira.Lib.Components.Coordinates : Component {
 
     public double x1 {
         get {
-            double item_x1 = item.bounds.x1 + get_border ();
-
             // If the item is an artboard we need to get the bounds of the background since
             // the artboard group will have its bounds changing based on the location of the
             // child items.
             if (item is Items.CanvasArtboard) {
-                item_x1 = ((Items.CanvasArtboard) item).background.bounds.x1;
+                return ((Items.CanvasArtboard) item).background.bounds.x1;
             }
 
-            return item_x1;
+            return item.bounds.x1 + get_border ();
         }
     }
 
     public double x2 {
         get {
-            double item_x2 = item.bounds.x2 - get_border ();
-
             // If the item is an artboard we need to get the bounds of the background since
             // the artboard group will have its bounds changing based on the location of the
             // child items.
             if (item is Items.CanvasArtboard) {
-                item_x2 = ((Items.CanvasArtboard) item).background.bounds.x2;
+                return ((Items.CanvasArtboard) item).background.bounds.x2;
             }
 
-            return item_x2;
+            return item.bounds.x2 - get_border ();
         }
     }
 
     public double y {
         get {
+            // If the item is an artboard we need to get the bounds of the background since
+            // the artboard group will have its bounds changing based on the location of the
+            // child items.
+            if (item is Items.CanvasArtboard) {
+                return ((Items.CanvasArtboard) item).background.bounds.y1;
+            }
+
             double item_y = item.bounds.y1 + get_border ();
 
             if (item.artboard != null) {
                 double temp_x = 0.0;
                 item.canvas.convert_to_item_space (item.artboard, ref temp_x, ref item_y);
-            }
-
-            // If the item is an artboard we need to get the bounds of the background since
-            // the artboard group will have its bounds changing based on the location of the
-            // child items.
-            if (item is Items.CanvasArtboard) {
-                item_y = ((Items.CanvasArtboard) item).background.bounds.y1;
             }
 
             return item_y;
@@ -95,31 +91,27 @@ public class Akira.Lib.Components.Coordinates : Component {
 
     public double y1 {
         get {
-            double item_y1 = item.bounds.y1 + get_border ();
-
             // If the item is an artboard we need to get the bounds of the background since
             // the artboard group will have its bounds changing based on the location of the
             // child items.
             if (item is Items.CanvasArtboard) {
-                item_y1 = ((Items.CanvasArtboard) item).background.bounds.y1;
+                return ((Items.CanvasArtboard) item).background.bounds.y1;
             }
 
-            return item_y1;
+            return item.bounds.y1 + get_border ();
         }
     }
 
     public double y2 {
         get {
-            double item_y2 = item.bounds.y2 - get_border ();
-
             // If the item is an artboard we need to get the bounds of the background since
             // the artboard group will have its bounds changing based on the location of the
             // child items.
             if (item is Items.CanvasArtboard) {
-                item_y2 = ((Items.CanvasArtboard) item).background.bounds.y2;
+                return ((Items.CanvasArtboard) item).background.bounds.y2;
             }
 
-            return item_y2;
+            return item.bounds.y2 - get_border ();
         }
     }
 
