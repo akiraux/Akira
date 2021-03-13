@@ -23,7 +23,6 @@
  * Coordinates component to keep track of the item's initial coordinates.
  */
 public class Akira.Lib.Components.Coordinates : Component {
-    private double _x;
     public double x {
         get {
             double item_x = item.bounds.x1 + get_border ();
@@ -41,10 +40,6 @@ public class Akira.Lib.Components.Coordinates : Component {
             }
 
             return item_x;
-        }
-        set {
-            _x = value;
-            ((Lib.Canvas) item.canvas).window.event_bus.item_value_changed ();
         }
     }
 
@@ -78,7 +73,6 @@ public class Akira.Lib.Components.Coordinates : Component {
         }
     }
 
-    private double _y;
     public double y {
         get {
             double item_y = item.bounds.y1 + get_border ();
@@ -96,10 +90,6 @@ public class Akira.Lib.Components.Coordinates : Component {
             }
 
             return item_y;
-        }
-        set {
-            _y = value;
-            ((Lib.Canvas) item.canvas).window.event_bus.item_value_changed ();
         }
     }
 
