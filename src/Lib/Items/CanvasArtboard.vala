@@ -29,10 +29,10 @@ public class Akira.Lib.Items.CanvasArtboard : Goo.CanvasGroup, Akira.Lib.Items.C
 
    public Items.CanvasArtboard? artboard { get; set; }
 
-   // Override the list type from the CanvasGroup.
+   // Override the list type of the Goo.CanvasAnimateTypeCanvasGroup.
    public new Akira.Models.ListModel<Lib.Items.CanvasItem> items;
 
-   // Private attributes of the Artboard.
+   // Unique attributes of the Artboard.
    public Goo.CanvasRect background;
    public Goo.CanvasText label;
 
@@ -47,8 +47,6 @@ public class Akira.Lib.Items.CanvasArtboard : Goo.CanvasGroup, Akira.Lib.Items.C
       width = height = 1;
       init_position (this, _x, _y);
 
-      create_background ();
-
       // Add the newly created item to the Canvas.
       parent.add_child (this, -1);
 
@@ -61,12 +59,16 @@ public class Akira.Lib.Items.CanvasArtboard : Goo.CanvasGroup, Akira.Lib.Items.C
       components.add (new Name (this));
       components.add (new Transform (this));
       components.add (new Opacity (this));
+      components.add (new Size (this));
+
+      // Create the background element before adding the Fills component.
+      create_background ();
+
       // Artboards have fills that can be edited, but they always start
       // with a full white background.
       var fill_color = Gdk.RGBA ();
       fill_color.parse ("#fff");
       components.add (new Fills (this, fill_color));
-      components.add (new Size (this));
       components.add (new Layer ());
 
       // Init the items list.
@@ -83,8 +85,8 @@ public class Akira.Lib.Items.CanvasArtboard : Goo.CanvasGroup, Akira.Lib.Items.C
       // since users should be able to click on the artboard's background to drag
       // the artboard around when the artboard is selected.
 
-      this.bind_property ("width", background, "width", BindingFlags.SYNC_CREATE);
-      this.bind_property ("height", background, "height", BindingFlags.SYNC_CREATE);
+      this.size.bind_property ("width", background, "width", BindingFlags.SYNC_CREATE);
+      this.size.bind_property ("height", background, "height", BindingFlags.SYNC_CREATE);
    }
 
    private void create_label () {
@@ -95,14 +97,15 @@ public class Akira.Lib.Items.CanvasArtboard : Goo.CanvasGroup, Akira.Lib.Items.C
          "font", "Open Sans 10",
          "ellipsize", Pango.EllipsizeMode.END,
          null);
-      label.translate (transform.x, transform.y);
       label.can_focus = false;
       // Change the parent to allow mouse pointer selection.
       label.parent = this;
 
-      this.bind_property ("width", label, "width", BindingFlags.SYNC_CREATE);
       this.bind_property ("visibility", label, "visibility", BindingFlags.SYNC_CREATE);
       this.name.bind_property ("name", label, "text", BindingFlags.SYNC_CREATE);
+      this.size.bind_property ("width", label, "width", BindingFlags.SYNC_CREATE);
+      this.transform.bind_property ("x", label, "x", BindingFlags.SYNC_CREATE);
+      this.transform.bind_property ("y", label, "y", BindingFlags.SYNC_CREATE);
    }
 
    /**

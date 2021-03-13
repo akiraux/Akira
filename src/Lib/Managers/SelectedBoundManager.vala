@@ -358,11 +358,6 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
             matrix.x0 += first_move_x;
             matrix.y0 += first_move_y;
             item.set_transform (matrix);
-
-            // If the item is an Artboard, move the label with it.
-            if (item is Lib.Items.CanvasArtboard) {
-                ((Lib.Items.CanvasArtboard) item).label.translate (first_move_x, first_move_y);
-            }
         }
 
         // Interrupt if the user disabled the snapping.
@@ -407,11 +402,6 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
             matrix.y0 += snap_offset_y;
 
             item.set_transform (matrix);
-
-            // If the item is an Artboard, move the label with it.
-            if (item is Lib.Items.CanvasArtboard) {
-                ((Lib.Items.CanvasArtboard) item).label.translate (snap_offset_x, snap_offset_y);
-            }
         }
 
         update_grid_decorators (true);
