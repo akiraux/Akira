@@ -111,8 +111,8 @@ public class Akira.FileFormat.JsonObject : GLib.Object {
 
         if (item.transform != null) {
             var transform = new Json.Object ();
-            transform.set_double_member ("x", item.transform.x);
-            transform.set_double_member ("y", item.transform.y);
+            transform.set_double_member ("x", item.coordinates.x);
+            transform.set_double_member ("y", item.coordinates.y);
 
             components.set_object_member ("Transform", transform);
         }

@@ -57,7 +57,7 @@ public class Akira.Lib.Items.CanvasArtboard : Goo.CanvasGroup, Akira.Lib.Items.C
       // Add all the components that this item uses.
       components = new Gee.ArrayList<Component> ();
       components.add (new Name (this));
-      components.add (new Transform (this));
+      components.add (new Coordinates (this));
       components.add (new Opacity (this));
       components.add (new Size (this));
 
@@ -104,8 +104,6 @@ public class Akira.Lib.Items.CanvasArtboard : Goo.CanvasGroup, Akira.Lib.Items.C
       this.bind_property ("visibility", label, "visibility", BindingFlags.SYNC_CREATE);
       this.name.bind_property ("name", label, "text", BindingFlags.SYNC_CREATE);
       this.size.bind_property ("width", label, "width", BindingFlags.SYNC_CREATE);
-      this.transform.bind_property ("x", label, "x", BindingFlags.SYNC_CREATE);
-      this.transform.bind_property ("y", label, "y", BindingFlags.SYNC_CREATE);
    }
 
    /**
@@ -125,10 +123,10 @@ public class Akira.Lib.Items.CanvasArtboard : Goo.CanvasGroup, Akira.Lib.Items.C
     * artboard's background, the artboard bounds will reflect the new group bounds.
     */
    public bool is_outside (Items.CanvasItem item) {
-      return item.bounds.x1 > background.bounds.x2 ||
-             item.bounds.y1 > background.bounds.y2 ||
-             item.bounds.x2 < background.bounds.x1 ||
-             item.bounds.y2 < background.bounds.y1;
+      return item.coordinates.x1 > background.bounds.x2 ||
+             item.coordinates.y1 > background.bounds.y2 ||
+             item.coordinates.x2 < background.bounds.x1 ||
+             item.coordinates.y2 < background.bounds.y1;
 
    }
 

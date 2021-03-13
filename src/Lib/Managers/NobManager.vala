@@ -106,16 +106,16 @@ public class Akira.Lib.Managers.NobManager : Object {
 
         if (selected_items.length () == 1) {
             var item = selected_items.nth_data (0);
-            bb_left = item.transform.x1;
-            bb_top = item.transform.y1;
-            bb_right = item.transform.x2;
-            bb_bottom = item.transform.y2;
+            bb_left = item.coordinates.x1;
+            bb_top = item.coordinates.y1;
+            bb_right = item.coordinates.x2;
+            bb_bottom = item.coordinates.y2;
         } else {
             foreach (var item in selected_items) {
-                bb_left = double.min (bb_left, item.transform.x1);
-                bb_top = double.min (bb_top, item.transform.y1);
-                bb_right = double.max (bb_right, item.transform.x2);
-                bb_bottom = double.max (bb_bottom, item.transform.y2);
+                bb_left = double.min (bb_left, item.coordinates.x1);
+                bb_top = double.min (bb_top, item.coordinates.y1);
+                bb_right = double.max (bb_right, item.coordinates.x2);
+                bb_bottom = double.max (bb_bottom, item.coordinates.y2);
             }
         }
 

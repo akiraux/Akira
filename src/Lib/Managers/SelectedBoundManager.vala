@@ -187,6 +187,16 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
 
     private void update_selected_items () {
         canvas.window.event_bus.selected_items_changed (selected_items);
+
+        foreach (var item in selected_items) {
+            if (!(item is Items.CanvasArtboard)) {
+                continue;
+            }
+
+            Cairo.Matrix matrix;
+            item.get_transform (out matrix);
+            ((Items.CanvasArtboard) item).label.set_transform (matrix);
+        }
     }
 
     private void change_z_selected (bool raise, bool total) {
@@ -330,15 +340,15 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
     private void move_from_event (double event_x, double event_y) {
         // If it's the first time we're moving this item, collect the original coordinates.
         if (!initial_drag_selection_registered) {
-            initial_drag_selection_x = selected_items.data.transform.x1;
-            initial_drag_selection_y = selected_items.data.transform.y1;
+            initial_drag_selection_x = selected_items.data.coordinates.x;
+            initial_drag_selection_y = selected_items.data.coordinates.y;
             initial_drag_selection_registered = true;
         }
 
         // Keep reset and delta values for future adjustments.
         // Calculate values needed to reset to the original position.
-        var reset_x = selected_items.data.transform.x - initial_drag_selection_x;
-        var reset_y = selected_items.data.transform.y - initial_drag_selection_y;
+        var reset_x = selected_items.data.coordinates.x - initial_drag_selection_x;
+        var reset_y = selected_items.data.coordinates.y - initial_drag_selection_y;
 
         // Calculate the change based on the event.
         var delta_x = event_x - initial_drag_press_x;
@@ -351,6 +361,12 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
 
         // Loop through all the currently selected items to move them.
         foreach (var item in selected_items) {
+            // Skip this item if it belongs to an artboard and the artboard
+            // is part of the current selection.
+            if (item.artboard != null && contains_item (item.artboard)) {
+                continue;
+            }
+
             Cairo.Matrix matrix;
             item.get_transform (out matrix);
 
@@ -395,6 +411,12 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
 
         // Loop again through all the selected items to apply the snap offset.
         foreach (var item in selected_items) {
+            // Skip this item if it belongs to an artboard and the artboard
+            // is part of the current selection.
+            if (item.artboard != null && contains_item (item.artboard)) {
+                continue;
+            }
+
             Cairo.Matrix matrix;
             item.get_transform (out matrix);
 

@@ -54,8 +54,8 @@ public class Akira.Utils.AffineTransform : Object {
 
         double item_width = item.size.width;
         double item_height = item.size.height;
-        double item_x = item.transform.x1;
-        double item_y = item.transform.y1;
+        double item_x = item.coordinates.x1;
+        double item_y = item.coordinates.y1;
         canvas.convert_to_item_space (item, ref item_x, ref item_y);
 
         double inc_width = 0;
@@ -343,8 +343,8 @@ public class Akira.Utils.AffineTransform : Object {
             canvas.convert_to_item_space (item.artboard, ref x, ref y);
             canvas.convert_to_item_space (item.artboard, ref initial_x, ref initial_y);
 
-            diff_x = item.transform.x1 - item.artboard.transform.x1;
-            diff_y = item.transform.y1 - item.artboard.transform.y1;
+            diff_x = item.coordinates.x1 - item.artboard.coordinates.x1;
+            diff_y = item.coordinates.y1 - item.artboard.coordinates.y1;
 
             x -= diff_x;
             y -= diff_y;
