@@ -197,6 +197,11 @@ public class Akira.Dialogs.SettingsDialog : Gtk.Dialog {
         grid.attach (new SettingsLabel (_("Snapping Sensitivity Threshold:")), 0, 7, 1, 1);
         var snaps_sensitivity = new Gtk.SpinButton.with_range (0, 9999, 1);
         snaps_sensitivity.halign = Gtk.Align.START;
+        snaps_sensitivity.width_chars = 6;
+        snaps_sensitivity.get_style_context ().add_class ("input-icon-right");
+        snaps_sensitivity.secondary_icon_name = "input-pixel-symbolic";
+        snaps_sensitivity.secondary_icon_sensitive = false;
+        snaps_sensitivity.secondary_icon_activatable = false;
         grid.attach (snaps_sensitivity, 1, 7, 1, 1);
 
         settings.bind ("snaps-sensitivity", snaps_sensitivity, "value", SettingsBindFlags.DEFAULT);
@@ -273,6 +278,11 @@ public class Akira.Dialogs.SettingsDialog : Gtk.Dialog {
         grid.attach (new SettingsLabel (_("Border Width:")), 0, 5, 1, 1);
         border_size = new Gtk.SpinButton.with_range (1, 9999, 1);
         border_size.halign = Gtk.Align.START;
+        border_size.width_chars = 6;
+        border_size.get_style_context ().add_class ("input-icon-right");
+        border_size.secondary_icon_name = "input-pixel-symbolic";
+        border_size.secondary_icon_sensitive = false;
+        border_size.secondary_icon_activatable = false;
         grid.attach (border_size, 1, 5, 1, 1);
 
         settings.bind ("border-size", border_size, "value", SettingsBindFlags.DEFAULT);
