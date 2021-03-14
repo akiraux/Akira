@@ -194,7 +194,15 @@ public class Akira.Dialogs.SettingsDialog : Gtk.Dialog {
             window.event_bus.update_snaps_color ();
         });
 
+        grid.attach (new SettingsLabel (_("Snapping Sensitivity Threshold:")), 0, 7, 1, 1);
+        var snaps_sensitivity = new Gtk.SpinButton.with_range (0, 9999, 1);
+        snaps_sensitivity.halign = Gtk.Align.START;
+        grid.attach (snaps_sensitivity, 1, 7, 1, 1);
+
+        settings.bind ("snaps-sensitivity", snaps_sensitivity, "value", SettingsBindFlags.DEFAULT);
+
         snaps_switch.bind_property ("active", snaps_color, "sensitive", BindingFlags.SYNC_CREATE);
+        snaps_switch.bind_property ("active", snaps_sensitivity, "sensitive", BindingFlags.SYNC_CREATE);
 
         return grid;
     }

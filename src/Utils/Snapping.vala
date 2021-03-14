@@ -23,8 +23,6 @@
  * Utility providing snap functionality between objects.
  */
 public class Akira.Utils.Snapping : Object {
-    private const double SENSITIVITY = 4.0;
-
     /**
      * Metadata used in the cosmetic aspects of snap lines and dots.
      */
@@ -100,12 +98,12 @@ public class Akira.Utils.Snapping : Object {
      */
     public static int adjusted_sensitivity (double canvas_scale) {
         // Limit the sensitivity. This seems like a sensible default for now.
-        if (canvas_scale > SENSITIVITY) {
+        if (canvas_scale > settings.snaps_sensitivity) {
             return 1;
         }
 
         // Beyond 0.002, the snapping breaks down. Arguably, it does before.
-        return (int) (SENSITIVITY / double.max (0.002, canvas_scale));
+        return (int) (settings.snaps_sensitivity / double.max (0.002, canvas_scale));
     }
 
     /**
