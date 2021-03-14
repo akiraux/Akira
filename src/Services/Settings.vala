@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2019-2020 Alecaddd (https://alecaddd.com)
+* Copyright (c) 2019-2021 Alecaddd (https://alecaddd.com)
 *
 * This file is part of Akira.
 *
@@ -77,6 +77,10 @@ public class Akira.Services.Settings : GLib.Settings {
     public string snaps_color {
         owned get { return get_string ("snaps-color"); }
         set { set_string ("snaps-color", value); }
+    }
+    public int snaps_sensitivity {
+        get { return get_int ("snaps-sensitivity"); }
+        set { set_int ("snaps-sensitivity", value); }
     }
 
     // Default shape settings.

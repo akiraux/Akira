@@ -393,8 +393,9 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
             item.set_transform (matrix);
         }
 
-        // Interrupt if the user disabled the snapping.
-        if (!settings.enable_snaps) {
+        // Interrupt if the user disabled the snapping or we don't have any
+        // adjacent item to snap to.
+        if (!settings.enable_snaps || window.items_manager.get_items_count () == 1) {
             return;
         }
 

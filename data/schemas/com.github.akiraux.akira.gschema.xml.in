@@ -84,6 +84,12 @@
             <description>The default color of the snapping guides.</description>
         </key>
 
+        <key name="snaps-sensitivity" type="i">
+            <default>4</default>
+            <summary>Default Snaps Sensitivity.</summary>
+            <description>The default sensitivity of the snapping threshold.</description>
+        </key>
+
         <key name="fill-color" type="s">
             <default>'#CCCCCC'</default>
             <summary>Default Shape Color.</summary>
