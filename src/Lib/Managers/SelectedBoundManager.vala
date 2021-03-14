@@ -145,6 +145,12 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
             return;
         }
 
+        // Don't add an item to the selection if it's part of an artboard
+        // that is already selected.
+        if (item.artboard != null && contains_item (item.artboard)) {
+            return;
+        }
+
         item.layer.selected = true;
         item.size.update_ratio ();
 
@@ -153,7 +159,24 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
 
         selected_items.append (item);
 
+        // If the item is an artboard, remove all its children from the selection,
+        // in order to avoid strange translation outcomes.
+        if (item is Items.CanvasArtboard) {
+            foreach (var child in ((Items.CanvasArtboard) item).items) {
+                remove_item_from_selection (child);
+            }
+        }
+
         // Move focus back to the canvas.
+        canvas.window.event_bus.set_focus_on_canvas ();
+    }
+
+    public void remove_item_from_selection (Items.CanvasItem item) {
+        if (contains_item (item)) {
+            selected_items.remove (item);
+            item.layer.selected = false;
+        }
+
         canvas.window.event_bus.set_focus_on_canvas ();
     }
 
@@ -326,15 +349,6 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         }
 
         window.event_bus.update_state_coords (x, y);
-    }
-
-    public void remove_item_from_selection (Items.CanvasItem item) {
-        if (contains_item (item)) {
-            selected_items.remove (item);
-            item.layer.selected = false;
-        }
-
-        canvas.window.event_bus.set_focus_on_canvas ();
     }
 
     /**
