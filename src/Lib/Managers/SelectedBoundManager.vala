@@ -336,7 +336,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
     /**
      * Move the item based on the mouse click and drag event.
      */
-    private void move_from_event ( Lib.Items.CanvasItem item, double event_x, double event_y ) {
+    private void move_from_event (Lib.Items.CanvasItem item, double event_x, double event_y) {
         if (!initial_drag_registered) {
             initial_drag_registered = true;
             initial_drag_item_x = item.transform.x;
@@ -371,8 +371,9 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
             ((Lib.Items.CanvasArtboard) item).label.translate (first_move_x, first_move_y);
         }
 
-        // Interrupt if the user disabled the snapping.
-        if (!settings.enable_snaps) {
+        // Interrupt if the user disabled the snapping or we don't have any
+        // adjacent item to snap to.
+        if (!settings.enable_snaps || window.items_manager.get_items_count () == 1) {
             return;
         }
 
