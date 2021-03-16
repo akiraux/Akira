@@ -124,7 +124,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
                 break;
 
             default:
-                scale_from_event ( selected_item, selected_nob, event_x, event_y );
+                scale_from_event (selected_item, selected_nob, event_x, event_y);
                 break;
         }
 
@@ -445,8 +445,8 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         var delta_x = rel_event_x - rel_press_x;
         var delta_y = rel_event_y - rel_press_y;
 
-        double item_x = item.bounds.x1;
-        double item_y = item.bounds.y1;
+        double item_x = item.transform.x1;
+        double item_y = item.transform.y1;
         canvas.convert_to_item_space (item, ref item_x, ref item_y);
 
         bool ratio_locked = canvas.ctrl_is_pressed || item.size.locked;
@@ -456,8 +456,6 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         double inc_height = 0;
         double inc_x = 0;
         double inc_y = 0;
-        bool h_flip = false;
-        bool v_flip = false;
 
         Utils.AffineTransform.calculate_size_adjustments (
             selected_nob,
@@ -471,20 +469,17 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
             ref inc_x,
             ref inc_y,
             ref inc_width,
-            ref inc_height,
-            ref h_flip,
-            ref v_flip
+            ref inc_height
         );
 
         var reset_width = item.size.width - initial_width;
         var reset_height = item.size.height - initial_height;
 
-
-        Cairo.Matrix new_transform;
-        item.get_transform (out new_transform);
-        new_transform.x0 = initial_item_transform.x0 + inc_x;
-        new_transform.y0 = initial_item_transform.y0 + inc_y;
-        item.set_transform (new_transform);
+        Cairo.Matrix new_matrix;
+        item.get_transform (out new_matrix);
+        new_matrix.x0 = initial_item_transform.x0 + inc_x;
+        new_matrix.y0 = initial_item_transform.y0 + inc_y;
+        item.set_transform (new_matrix);
 
         Utils.AffineTransform.set_size (item, inc_width - reset_width, inc_height - reset_height);
     }

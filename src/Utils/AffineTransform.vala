@@ -48,9 +48,7 @@ public class Akira.Utils.AffineTransform : Object {
         ref double inc_x,
         ref double inc_y,
         ref double inc_width,
-        ref double inc_height,
-        ref bool h_flip,
-        ref bool v_flip
+        ref double inc_height
     ) {
         double local_x_adj = 0.0;
         double local_y_adj = 0.0;
@@ -63,8 +61,6 @@ public class Akira.Utils.AffineTransform : Object {
             nob,
             item_width,
             item_height,
-            ref h_flip,
-            ref v_flip,
             ref delta_x,
             ref delta_y,
             ref perm_x_adj,
@@ -83,8 +79,7 @@ public class Akira.Utils.AffineTransform : Object {
         if (NobManager.is_top_nob (nob)) {
             inc_height = -delta_y;
             local_y_adj = delta_y;
-        }
-        else if (NobManager.is_bot_nob (nob)) {
+        } else if (NobManager.is_bot_nob (nob)) {
             inc_height += delta_y;
         }
 
@@ -92,8 +87,7 @@ public class Akira.Utils.AffineTransform : Object {
         if (NobManager.is_left_nob (nob)) {
             inc_width -= delta_x;
             local_x_adj = delta_x;
-        }
-        else if (NobManager.is_right_nob (nob)) {
+        } else if (NobManager.is_right_nob (nob)) {
             inc_width = delta_x;
         }
 
@@ -104,8 +98,7 @@ public class Akira.Utils.AffineTransform : Object {
                     inc_width = (inc_height + perm_h_adj) * size_ratio - perm_w_adj;
                     if (nob == NobManager.Nob.TOP_LEFT) {
                         local_x_adj = -inc_width;
-                    }
-                    else if (nob == NobManager.Nob.TOP_CENTER) {
+                    } else if (nob == NobManager.Nob.TOP_CENTER) {
                         local_x_adj = - (inc_width / 2.0);
                     }
                 }
@@ -113,8 +106,7 @@ public class Akira.Utils.AffineTransform : Object {
                     inc_width = (inc_height + perm_h_adj) * size_ratio - perm_w_adj;
                     if (nob == NobManager.Nob.BOTTOM_LEFT) {
                         local_x_adj = -inc_width;
-                    }
-                    else if (nob == NobManager.Nob.BOTTOM_CENTER) {
+                    } else if (nob == NobManager.Nob.BOTTOM_CENTER) {
                         local_x_adj = - (inc_width / 2.0);
                     }
                 }
@@ -124,8 +116,7 @@ public class Akira.Utils.AffineTransform : Object {
                     inc_height = (inc_width + perm_w_adj) / size_ratio - perm_h_adj;
                     if (nob == NobManager.Nob.TOP_LEFT) {
                         local_y_adj = -inc_height;
-                    }
-                    else if (nob == NobManager.Nob.LEFT_CENTER) {
+                    } else if (nob == NobManager.Nob.LEFT_CENTER) {
                         local_y_adj = - (inc_height / 2.0);
                     }
                 }
@@ -133,8 +124,7 @@ public class Akira.Utils.AffineTransform : Object {
                     inc_height = (inc_width + perm_w_adj) / size_ratio - perm_h_adj;
                     if (nob == NobManager.Nob.TOP_RIGHT) {
                         local_y_adj = -inc_height;
-                    }
-                    else if (nob == NobManager.Nob.RIGHT_CENTER) {
+                    } else if (nob == NobManager.Nob.RIGHT_CENTER) {
                         local_y_adj = - (inc_height / 2.0);
                     }
                 }
@@ -169,8 +159,6 @@ public class Akira.Utils.AffineTransform : Object {
         NobManager.Nob nob,
         double item_width,
         double item_height,
-        ref bool h_flip,
-        ref bool v_flip,
         ref double delta_x,
         ref double delta_y,
         ref double perm_x_adj,
@@ -183,7 +171,6 @@ public class Akira.Utils.AffineTransform : Object {
                 delta_y -= 1;
             }
             else if (item_height - delta_y < 0) {
-                v_flip = true;
                 delta_y -= item_height;
                 perm_y_adj = -item_height;
                 perm_h_adj = -item_height;
@@ -206,7 +193,6 @@ public class Akira.Utils.AffineTransform : Object {
                 delta_y += 1;
             }
             else if (item_height + delta_y < 0) {
-                v_flip = true;
                 delta_y += item_height;
                 perm_h_adj = -item_height;
                 if (nob == NobManager.Nob.BOTTOM_LEFT) {
@@ -228,7 +214,6 @@ public class Akira.Utils.AffineTransform : Object {
                 delta_x -= 1;
             }
             else if (item_width - delta_x < 0) {
-                h_flip = true;
                 delta_x -= item_width;
                 perm_x_adj = item_width;
                 perm_w_adj = -item_width;
@@ -249,7 +234,6 @@ public class Akira.Utils.AffineTransform : Object {
                 delta_x += 1;
             }
             else if (item_width + delta_x < 0) {
-                h_flip = true;
                 delta_x += item_width;
                 perm_w_adj = -item_width;
 
