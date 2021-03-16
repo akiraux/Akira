@@ -53,6 +53,10 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
     private double initial_drag_item_y;
     private Cairo.Matrix initial_item_transform;
 
+    // Adjustment applied to scaling to snap it to the pixel grid
+    private double scale_item_x_adj;
+    private double scale_item_y_adj;
+
     public SelectedBoundManager (Akira.Lib.Canvas canvas) {
         Object (
             canvas: canvas,
@@ -424,10 +428,25 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         double event_y
     ) {
         if (!initial_drag_registered) {
+            item.get_transform (out initial_item_transform);
             initial_drag_registered = true;
             initial_drag_item_x = item.transform.x;
             initial_drag_item_y = item.transform.y;
-            item.get_transform (out initial_item_transform);
+            scale_item_x_adj = 0;
+            scale_item_y_adj = 0;
+
+            // If rotation is multiple of pi / 2 (90), then snap to pixel grid before scale
+            var dummy_x = 1.0;
+            var dummy_y = 1.0;
+            initial_item_transform.transform_distance (ref dummy_x, ref dummy_y);
+            if (Utils.AffineTransform.epsilon_equals_d (1.0, GLib.Math.fabs (dummy_x), double.EPSILON * 10)
+                && Utils.AffineTransform.epsilon_equals_d (1.0, GLib.Math.fabs (dummy_y), double.EPSILON * 10)) {
+                scale_item_x_adj = Utils.AffineTransform.fix_size (initial_drag_item_x) - initial_drag_item_x;
+                scale_item_y_adj = Utils.AffineTransform.fix_size (initial_drag_item_y) - initial_drag_item_y;
+                initial_width = Utils.AffineTransform.fix_size (initial_width);
+                initial_height = Utils.AffineTransform.fix_size (initial_height);
+            }
+
         }
 
         double rel_event_x = event_x;
@@ -477,10 +496,10 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
 
         Cairo.Matrix new_matrix;
         item.get_transform (out new_matrix);
-        new_matrix.x0 = initial_item_transform.x0 + inc_x;
-        new_matrix.y0 = initial_item_transform.y0 + inc_y;
+        new_matrix.x0 = initial_item_transform.x0 + inc_x + scale_item_x_adj;
+        new_matrix.y0 = initial_item_transform.y0 + inc_y + scale_item_y_adj;
         item.set_transform (new_matrix);
 
-        Utils.AffineTransform.set_size (item, inc_width - reset_width, inc_height - reset_height);
+        Utils.AffineTransform.adjust_size (item, inc_width - reset_width, inc_height - reset_height);
     }
 }
