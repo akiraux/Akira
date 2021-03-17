@@ -430,8 +430,10 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         if (!initial_drag_registered) {
             item.get_transform (out initial_item_transform);
             initial_drag_registered = true;
-            initial_drag_item_x = item.transform.x;
-            initial_drag_item_y = item.transform.y;
+            initial_drag_item_x = item.bounds.x1;
+            initial_drag_item_y = item.bounds.y1;
+            debug ("%f", initial_drag_item_x);
+            debug ("%f", initial_drag_item_y);
             scale_item_x_adj = 0;
             scale_item_y_adj = 0;
 
