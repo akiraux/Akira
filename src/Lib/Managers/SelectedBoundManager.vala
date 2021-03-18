@@ -439,8 +439,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
             var dummy_x = 1.0;
             var dummy_y = 1.0;
             initial_item_transform.transform_distance (ref dummy_x, ref dummy_y);
-            if (Utils.AffineTransform.epsilon_equals_d (1.0, GLib.Math.fabs (dummy_x), double.EPSILON * 10)
-                && Utils.AffineTransform.epsilon_equals_d (1.0, GLib.Math.fabs (dummy_y), double.EPSILON * 10)) {
+            if (item.rotation != null && GLib.Math.fmod (item.rotation.rotation, 90) == 0) {
                 scale_item_x_adj = Utils.AffineTransform.fix_size (initial_drag_item_x) - initial_drag_item_x;
                 scale_item_y_adj = Utils.AffineTransform.fix_size (initial_drag_item_y) - initial_drag_item_y;
                 initial_width = Utils.AffineTransform.fix_size (initial_width);
