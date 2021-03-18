@@ -51,7 +51,6 @@ public class Akira.Lib.Components.Transform : Component {
     public double x1 {
         get {
             double item_x1 = item.bounds.x1 + get_border ();
-
             // If the item is an artboard we need to get the bounds of the background since
             // the artboard group will have its bounds changing based on the location of the
             // child items.

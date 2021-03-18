@@ -94,43 +94,19 @@ public class Akira.Utils.AffineTransform : Object {
 
         if (ratio_locked) {
             if (pure_v || (!pure_h && (item_width + inc_width) / (item_height + inc_height) < size_ratio)) {
-                if (NobManager.is_top_nob (nob)) {
-                    inc_width = (inc_height + perm_h_adj) * size_ratio - perm_w_adj;
-                    inc_width = fix_size (inc_width / 2.0) * 2.0;
-                    if (nob == NobManager.Nob.TOP_LEFT) {
-                        local_x_adj = -inc_width;
-                    } else if (nob == NobManager.Nob.TOP_CENTER) {
-                        local_x_adj = - (inc_width / 2.0);
-                    }
-                }
-                else {
-                    inc_width = (inc_height + perm_h_adj) * size_ratio - perm_w_adj;
-                    inc_width = fix_size (inc_width / 2.0) * 2.0;
-                    if (nob == NobManager.Nob.BOTTOM_LEFT) {
-                        local_x_adj = -inc_width;
-                    } else if (nob == NobManager.Nob.BOTTOM_CENTER) {
-                        local_x_adj = - (inc_width / 2.0);
-                    }
+                inc_width = fix_size ((inc_height + perm_h_adj) * size_ratio - perm_w_adj);
+                if (nob == NobManager.Nob.TOP_LEFT || nob == NobManager.Nob.BOTTOM_LEFT) {
+                    local_x_adj = -inc_width;
+                } else if (nob == NobManager.Nob.TOP_CENTER || nob == NobManager.Nob.BOTTOM_CENTER) {
+                    local_x_adj = - fix_size (inc_width / 2.0);
                 }
             }
             else if (!pure_v) {
-                if (NobManager.is_left_nob (nob)) {
-                    inc_height = (inc_width + perm_w_adj) / size_ratio - perm_h_adj;
-                    inc_height = fix_size (inc_height / 2.0) * 2.0;
-                    if (nob == NobManager.Nob.TOP_LEFT) {
+                inc_height = fix_size ((inc_width + perm_w_adj) / size_ratio - perm_h_adj);
+                if (nob == NobManager.Nob.TOP_LEFT || nob == NobManager.Nob.TOP_RIGHT) {
                         local_y_adj = -inc_height;
-                    } else if (nob == NobManager.Nob.LEFT_CENTER) {
-                        local_y_adj = - (inc_height / 2.0);
-                    }
-                }
-                else if (NobManager.is_right_nob (nob)) {
-                    inc_height = (inc_width + perm_w_adj) / size_ratio - perm_h_adj;
-                    inc_height = fix_size (inc_height / 2.0) * 2.0;
-                    if (nob == NobManager.Nob.TOP_RIGHT) {
-                        local_y_adj = -inc_height;
-                    } else if (nob == NobManager.Nob.RIGHT_CENTER) {
-                        local_y_adj = - (inc_height / 2.0);
-                    }
+                } else if (nob == NobManager.Nob.LEFT_CENTER || nob == NobManager.Nob.RIGHT_CENTER) {
+                        local_y_adj = - fix_size (inc_height / 2.0);
                 }
             }
         }
@@ -146,6 +122,7 @@ public class Akira.Utils.AffineTransform : Object {
         inc_width += perm_w_adj;
         inc_height += perm_h_adj;
     }
+
 
     /*
      * Corrects which nob should be used for scaling depending on delta change of the drag.
