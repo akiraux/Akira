@@ -374,10 +374,4 @@ public class Akira.Utils.AffineTransform : Object {
         return deg * Math.PI / 180.0;
     }
 
-    /*
-     * Returns true if the two values have a difference smaller than the epsilon
-     */
-    public static bool epsilon_equals_d (double a, double b, double eps = double.EPSILON) {
-        return (a - b) < eps;
-    }
 }
