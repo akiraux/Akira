@@ -261,6 +261,10 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 if (is_grid_visible) {
                     update_pixel_grid ();
                 }
+
+                // Synchronous update to make sure item is initialized before any other event.
+                update ();
+
                 break;
 
             case EditMode.MODE_SELECTION:

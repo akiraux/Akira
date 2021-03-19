@@ -51,6 +51,11 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
     private bool initial_drag_registered = false;
     private double initial_drag_item_x;
     private double initial_drag_item_y;
+    private Cairo.Matrix initial_item_transform;
+
+    // Adjustment applied to scaling to snap it to the pixel grid.
+    private double scale_item_x_adj;
+    private double scale_item_y_adj;
 
     public SelectedBoundManager (Akira.Lib.Canvas canvas) {
         Object (
@@ -123,14 +128,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
                 break;
 
             default:
-                Utils.AffineTransform.scale_from_event (
-                    selected_item,
-                    selected_nob,
-                    event_x, event_y,
-                    ref initial_event_x, ref initial_event_y,
-                    ref delta_x_accumulator, ref delta_y_accumulator,
-                    initial_width, initial_height
-                );
+                scale_from_event (selected_item, selected_nob, event_x, event_y);
                 break;
         }
 
@@ -421,5 +419,82 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
             var matches = Utils.Snapping.generate_snap_matches (snap_grid, selected_items, sensitivity);
             snap_manager.populate_decorators_from_data (matches, snap_grid);
         }
+    }
+
+    private void scale_from_event (
+        Lib.Items.CanvasItem item,
+        Managers.NobManager.Nob selected_nob,
+        double event_x,
+        double event_y
+    ) {
+        if (!initial_drag_registered) {
+            item.get_transform (out initial_item_transform);
+            initial_drag_registered = true;
+            initial_drag_item_x = item.transform.x1;
+            initial_drag_item_y = item.transform.y1;
+            scale_item_x_adj = 0;
+            scale_item_y_adj = 0;
+
+            // If rotation is multiple of pi / 2 (90), then snap to pixel grid before scale.
+            if (item.rotation != null && GLib.Math.fmod (item.rotation.rotation, 90) == 0) {
+                scale_item_x_adj = Utils.AffineTransform.fix_size (initial_drag_item_x) - initial_drag_item_x;
+                scale_item_y_adj = Utils.AffineTransform.fix_size (initial_drag_item_y) - initial_drag_item_y;
+                initial_width = Utils.AffineTransform.fix_size (initial_width);
+                initial_height = Utils.AffineTransform.fix_size (initial_height);
+            }
+        }
+
+        double rel_event_x = event_x;
+        double rel_event_y = event_y;
+        double rel_press_x = initial_drag_press_x;
+        double rel_press_y = initial_drag_press_y;
+
+        var canvas = (Lib.Canvas) item.canvas;
+        // Convert the coordinates from the canvas to the item so we know the real
+        // values even if the item is rotated.
+        canvas.convert_to_item_space (item, ref rel_event_x, ref rel_event_y);
+        canvas.convert_to_item_space (item, ref rel_press_x, ref rel_press_y);
+
+        // Calculate the change based on the event.
+        var delta_x = rel_event_x - rel_press_x;
+        var delta_y = rel_event_y - rel_press_y;
+
+        double item_x = item.transform.x1;
+        double item_y = item.transform.y1;
+        canvas.convert_to_item_space (item, ref item_x, ref item_y);
+
+        bool ratio_locked = canvas.ctrl_is_pressed || item.size.locked;
+
+        // These values will be populated.
+        double inc_width = 0;
+        double inc_height = 0;
+        double inc_x = 0;
+        double inc_y = 0;
+
+        Utils.AffineTransform.calculate_size_adjustments (
+            selected_nob,
+            initial_width,
+            initial_height,
+            delta_x,
+            delta_y,
+            initial_width / initial_height,
+            ratio_locked,
+            initial_item_transform,
+            ref inc_x,
+            ref inc_y,
+            ref inc_width,
+            ref inc_height
+        );
+
+        var reset_width = item.size.width - initial_width;
+        var reset_height = item.size.height - initial_height;
+
+        Cairo.Matrix new_matrix;
+        item.get_transform (out new_matrix);
+        new_matrix.x0 = initial_item_transform.x0 + inc_x + scale_item_x_adj;
+        new_matrix.y0 = initial_item_transform.y0 + inc_y + scale_item_y_adj;
+        item.set_transform (new_matrix);
+
+        Utils.AffineTransform.adjust_size (item, inc_width - reset_width, inc_height - reset_height);
     }
 }
