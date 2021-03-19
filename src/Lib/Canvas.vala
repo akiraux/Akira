@@ -262,7 +262,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                     update_pixel_grid ();
                 }
 
-                /// Synchronous update to make sure item is initialized before any other event.
+                // Synchronous update to make sure item is initialized before any other event.
                 update ();
 
                 break;

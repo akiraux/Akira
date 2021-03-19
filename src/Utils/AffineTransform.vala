@@ -1,24 +1,24 @@
-/*
-* Copyright (c) 2020 Alecaddd (https://alecaddd.com)
-*
-* This file is part of Akira.
-*
-* Akira is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
+/**
+ * Copyright (c) 2021 Alecaddd (https://alecaddd.com)
+ *
+ * This file is part of Akira.
+ *
+ * Akira is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
 
-* Akira is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-* GNU General Public License for more details.
+ * Akira is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
 
-* You should have received a copy of the GNU General Public License
-* along with Akira. If not, see <https://www.gnu.org/licenses/>.
-*
-* Authored by: Giacomo "giacomoalbe" Alberini <giacomoalbe@gmail.com>
-* Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
-*/
+ * You should have received a copy of the GNU General Public License
+ * along with Akira. If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Authored by: Giacomo "giacomoalbe" Alberini <giacomoalbe@gmail.com>
+ * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
+ */
 
 using Akira.Lib.Items;
 using Akira.Lib.Managers;
@@ -32,9 +32,9 @@ public class Akira.Utils.AffineTransform : Object {
     private static double temp_rotation = 0.0;
     private static double prev_rotation_difference = 0.0;
 
-    /*
+    /**
      * Calculate adjustments necessary for a nob resize operation. All inputs
-     * should have already been transformed to the correct space
+     * should have already been transformed to the correct space.
      */
     public static void calculate_size_adjustments (
         NobManager.Nob nob,
@@ -75,7 +75,7 @@ public class Akira.Utils.AffineTransform : Object {
         bool pure_v = (nob == NobManager.Nob.TOP_CENTER || nob == NobManager.Nob.BOTTOM_CENTER);
         bool pure_h = (nob == NobManager.Nob.RIGHT_CENTER || nob == NobManager.Nob.LEFT_CENTER);
 
-        // handle vertical adjustment
+        // Handle vertical adjustment.
         if (NobManager.is_top_nob (nob)) {
             inc_height = fix_size (-delta_y);
             local_y_adj = -inc_height;
@@ -83,14 +83,13 @@ public class Akira.Utils.AffineTransform : Object {
             inc_height = fix_size (inc_height + delta_y);
         }
 
-        // handle horizontal adjustment
+        // Handle horizontal adjustment.
         if (NobManager.is_left_nob (nob)) {
             inc_width = fix_size (inc_width - delta_x);
             local_x_adj = -inc_width;
         } else if (NobManager.is_right_nob (nob)) {
             inc_width = fix_size (delta_x);
         }
-
 
         if (ratio_locked) {
             if (pure_v || (!pure_h && (item_width + inc_width) / (item_height + inc_height) < size_ratio)) {
@@ -100,8 +99,7 @@ public class Akira.Utils.AffineTransform : Object {
                 } else if (nob == NobManager.Nob.TOP_CENTER || nob == NobManager.Nob.BOTTOM_CENTER) {
                     local_x_adj = - fix_size (inc_width / 2.0);
                 }
-            }
-            else if (!pure_v) {
+            } else if (!pure_v) {
                 inc_height = fix_size ((inc_width + perm_w_adj) / size_ratio - perm_h_adj);
                 if (nob == NobManager.Nob.TOP_LEFT || nob == NobManager.Nob.TOP_RIGHT) {
                         local_y_adj = -inc_height;
@@ -123,8 +121,7 @@ public class Akira.Utils.AffineTransform : Object {
         inc_height += perm_h_adj;
     }
 
-
-    /*
+    /**
      * Corrects which nob should be used for scaling depending on delta change of the drag.
      * The nob will be flipped in the vertical and horizontal directions if needed, and
      * the necessary adjustments to delta_x, delta_y and other adjustments will be populated.
@@ -150,41 +147,32 @@ public class Akira.Utils.AffineTransform : Object {
         if (NobManager.is_top_nob (nob)) {
             if (fix_size (item_height - delta_y) == 0) {
                 delta_y -= 1;
-            }
-            else if (item_height - delta_y < 0) {
+            } else if (item_height - delta_y < 0) {
                 delta_y -= item_height;
                 perm_y_adj = -item_height;
                 perm_h_adj = -item_height;
 
                 if (nob == NobManager.Nob.TOP_LEFT) {
                     nob = NobManager.Nob.BOTTOM_LEFT;
-                }
-                else if (nob == NobManager.Nob.TOP_CENTER) {
-                    // nothing more to do;
-                    nob = NobManager.Nob.BOTTOM_CENTER;
-                    return nob;
-                }
-                else if (nob == NobManager.Nob.TOP_RIGHT) {
+                } else if (nob == NobManager.Nob.TOP_CENTER) {
+                    // Nothing more to do.
+                    return NobManager.Nob.BOTTOM_CENTER;
+                } else if (nob == NobManager.Nob.TOP_RIGHT) {
                     nob = NobManager.Nob.BOTTOM_RIGHT;
                 }
             }
-        }
-        else if (NobManager.is_bot_nob (nob)) {
+        } else if (NobManager.is_bot_nob (nob)) {
             if (fix_size (item_height + delta_y) == 0) {
                 delta_y += 1;
-            }
-            else if (item_height + delta_y < 0) {
+            } else if (item_height + delta_y < 0) {
                 delta_y += item_height;
                 perm_h_adj = -item_height;
                 if (nob == NobManager.Nob.BOTTOM_LEFT) {
                     nob = NobManager.Nob.TOP_LEFT;
-                }
-                else if (nob == NobManager.Nob.BOTTOM_CENTER) {
-                    nob = NobManager.Nob.TOP_CENTER;
-                    // nothing more to do;
-                    return nob;
-                }
-                else if (nob == NobManager.Nob.BOTTOM_RIGHT) {
+                } else if (nob == NobManager.Nob.BOTTOM_CENTER) {
+                    // Nothing more to do.
+                    return NobManager.Nob.TOP_CENTER;
+                } else if (nob == NobManager.Nob.BOTTOM_RIGHT) {
                     nob = NobManager.Nob.TOP_RIGHT;
                 }
             }
@@ -193,38 +181,31 @@ public class Akira.Utils.AffineTransform : Object {
         if (NobManager.is_left_nob (nob)) {
             if (fix_size (item_width - delta_x) == 0) {
                 delta_x -= 1;
-            }
-            else if (item_width - delta_x < 0) {
+            } else if (item_width - delta_x < 0) {
                 delta_x -= item_width;
                 perm_x_adj = item_width;
                 perm_w_adj = -item_width;
 
                 if (nob == NobManager.Nob.TOP_LEFT) {
                     nob = NobManager.Nob.TOP_RIGHT;
-                }
-                else if (nob == NobManager.Nob.LEFT_CENTER) {
+                } else if (nob == NobManager.Nob.LEFT_CENTER) {
                     nob = NobManager.Nob.RIGHT_CENTER;
-                }
-                else if (nob == NobManager.Nob.BOTTOM_LEFT) {
+                } else if (nob == NobManager.Nob.BOTTOM_LEFT) {
                     nob = NobManager.Nob.BOTTOM_RIGHT;
                 }
             }
-        }
-        else if (NobManager.is_right_nob (nob)) {
+        } else if (NobManager.is_right_nob (nob)) {
             if (fix_size (item_width + delta_x) == 0) {
                 delta_x += 1;
-            }
-            else if (item_width + delta_x < 0) {
+            } else if (item_width + delta_x < 0) {
                 delta_x += item_width;
                 perm_w_adj = -item_width;
 
                 if (nob == NobManager.Nob.TOP_RIGHT) {
                     nob = NobManager.Nob.TOP_LEFT;
-                }
-                else if (nob == NobManager.Nob.RIGHT_CENTER) {
+                } else if (nob == NobManager.Nob.RIGHT_CENTER) {
                     nob = NobManager.Nob.LEFT_CENTER;
-                }
-                else if (nob == NobManager.Nob.BOTTOM_RIGHT) {
+                } else if (nob == NobManager.Nob.BOTTOM_RIGHT) {
                     nob = NobManager.Nob.BOTTOM_LEFT;
                 }
             }
@@ -233,7 +214,7 @@ public class Akira.Utils.AffineTransform : Object {
         return nob;
     }
 
-    /*
+    /**
      * Apply transform to an translation adjustment, and adjust the increment with it.
      */
     private static void apply_transform_to_adjustment (
@@ -373,5 +354,4 @@ public class Akira.Utils.AffineTransform : Object {
     public static double deg_to_rad (double deg) {
         return deg * Math.PI / 180.0;
     }
-
 }

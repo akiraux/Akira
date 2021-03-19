@@ -53,7 +53,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
     private double initial_drag_item_y;
     private Cairo.Matrix initial_item_transform;
 
-    // Adjustment applied to scaling to snap it to the pixel grid
+    // Adjustment applied to scaling to snap it to the pixel grid.
     private double scale_item_x_adj;
     private double scale_item_y_adj;
 
@@ -435,17 +435,13 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
             scale_item_x_adj = 0;
             scale_item_y_adj = 0;
 
-            // If rotation is multiple of pi / 2 (90), then snap to pixel grid before scale
-            var dummy_x = 1.0;
-            var dummy_y = 1.0;
-            initial_item_transform.transform_distance (ref dummy_x, ref dummy_y);
+            // If rotation is multiple of pi / 2 (90), then snap to pixel grid before scale.
             if (item.rotation != null && GLib.Math.fmod (item.rotation.rotation, 90) == 0) {
                 scale_item_x_adj = Utils.AffineTransform.fix_size (initial_drag_item_x) - initial_drag_item_x;
                 scale_item_y_adj = Utils.AffineTransform.fix_size (initial_drag_item_y) - initial_drag_item_y;
                 initial_width = Utils.AffineTransform.fix_size (initial_width);
                 initial_height = Utils.AffineTransform.fix_size (initial_height);
             }
-
         }
 
         double rel_event_x = event_x;
@@ -469,7 +465,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
 
         bool ratio_locked = canvas.ctrl_is_pressed || item.size.locked;
 
-        // these values will be populated
+        // These values will be populated.
         double inc_width = 0;
         double inc_height = 0;
         double inc_x = 0;
