@@ -100,6 +100,22 @@ public class Akira.Lib.Managers.NobManager : Object {
         return (Nob) grabbed_id;
     }
 
+    public static bool is_top_nob (Nob nob) {
+        return nob == 0 || nob == 1 || nob == 2;
+    }
+
+    public static bool is_bot_nob (Nob nob) {
+        return nob == 6 || nob == 5 || nob == 4;
+    }
+
+    public static bool is_left_nob (Nob nob) {
+        return nob == 0 || nob == 7 || nob == 6;
+    }
+
+    public static bool is_right_nob (Nob nob) {
+        return nob == 2 || nob == 3 || nob == 4;
+    }
+
     private void update_select_bb_coords (List<Items.CanvasItem> selected_items) {
         // Bounding box edges
         double bb_left = 1e6, bb_top = 1e6, bb_right = 0, bb_bottom = 0;
