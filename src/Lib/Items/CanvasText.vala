@@ -61,7 +61,7 @@ public class Akira.Lib.Items.CanvasText : Goo.CanvasText, Akira.Lib.Items.Canvas
         // Add all the components that this item uses.
         components = new Gee.ArrayList<Component> ();
         components.add (new Name (this));
-        components.add (new Transform (this));
+        components.add (new Coordinates (this));
         components.add (new Opacity (this));
         components.add (new Rotation (this));
         components.add (new Size (this));
