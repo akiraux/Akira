@@ -29,10 +29,10 @@ public class Akira.Lib.Items.CanvasArtboard : Goo.CanvasGroup, Akira.Lib.Items.C
 
    public Items.CanvasArtboard? artboard { get; set; }
 
-   // Override the list type from the CanvasGroup.
+   // Override the list type of the Goo.CanvasGroup.
    public new Akira.Models.ListModel<Lib.Items.CanvasItem> items;
 
-   // Private attributes of the Artboard.
+   // Unique attributes of the Artboard.
    public Goo.CanvasRect background;
    public Goo.CanvasText label;
 
@@ -122,11 +122,10 @@ public class Akira.Lib.Items.CanvasArtboard : Goo.CanvasGroup, Akira.Lib.Items.C
     * artboard's background, the artboard bounds will reflect the new group bounds.
     */
    public bool is_outside (Items.CanvasItem item) {
-      return item.bounds.x1 > background.bounds.x2 ||
-             item.bounds.y1 > background.bounds.y2 ||
-             item.bounds.x2 < background.bounds.x1 ||
-             item.bounds.y2 < background.bounds.y1;
-
+      return item.coordinates.x1 > background.bounds.x2 ||
+             item.coordinates.y1 > background.bounds.y2 ||
+             item.coordinates.x2 < background.bounds.x1 ||
+             item.coordinates.y2 < background.bounds.y1;
    }
 
    public uint get_items_length () {

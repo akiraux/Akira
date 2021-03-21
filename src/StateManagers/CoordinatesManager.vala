@@ -126,13 +126,9 @@ public class Akira.StateManagers.CoordinatesManager : Object {
         x = item_x;
         y = item_y;
 
-        // Set the same values we just fetched to the Transform attributes
-        // in order to trigger the redraw of all the elements using them.
-        item.coordinates.x = item_x;
-        item.coordinates.y = item_y;
-
         do_update = true;
 
+        window.event_bus.item_value_changed ();
         window.event_bus.file_edited ();
     }
 
@@ -170,9 +166,7 @@ public class Akira.StateManagers.CoordinatesManager : Object {
                 ((Lib.Items.CanvasArtboard) item).label.translate (inc_x, inc_y);
             }
 
-            // Update the Transform component attributes.
-            item.coordinates.x += inc_x;
-            item.coordinates.y += inc_y;
+            window.event_bus.item_value_changed ();
         }
     }
 }
