@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2021 Alecaddd (https://alecaddd.com)
+ * Copyright (c) 2020-2021 Alecaddd (https://alecaddd.com)
  *
  * This file is part of Akira.
  *
@@ -69,12 +69,6 @@ public class Akira.Utils.AffineTransform : Object {
             ref perm_h_adj
         );
 
-        item_width += perm_w_adj;
-        item_height += perm_h_adj;
-
-        bool pure_v = (nob == NobManager.Nob.TOP_CENTER || nob == NobManager.Nob.BOTTOM_CENTER);
-        bool pure_h = (nob == NobManager.Nob.RIGHT_CENTER || nob == NobManager.Nob.LEFT_CENTER);
-
         // Handle vertical adjustment.
         if (NobManager.is_top_nob (nob)) {
             inc_height = fix_size (-delta_y);
@@ -92,19 +86,25 @@ public class Akira.Utils.AffineTransform : Object {
         }
 
         if (ratio_locked) {
+            item_width += perm_w_adj;
+            item_height += perm_h_adj;
+
+            bool pure_v = (nob == NobManager.Nob.TOP_CENTER || nob == NobManager.Nob.BOTTOM_CENTER);
+            bool pure_h = (nob == NobManager.Nob.RIGHT_CENTER || nob == NobManager.Nob.LEFT_CENTER);
+
             if (pure_v || (!pure_h && (item_width + inc_width) / (item_height + inc_height) < size_ratio)) {
                 inc_width = fix_size ((inc_height + perm_h_adj) * size_ratio - perm_w_adj);
                 if (nob == NobManager.Nob.TOP_LEFT || nob == NobManager.Nob.BOTTOM_LEFT) {
                     local_x_adj = -inc_width;
-                } else if (nob == NobManager.Nob.TOP_CENTER || nob == NobManager.Nob.BOTTOM_CENTER) {
+                } else if (pure_v) {
                     local_x_adj = - fix_size (inc_width / 2.0);
                 }
             } else if (!pure_v) {
                 inc_height = fix_size ((inc_width + perm_w_adj) / size_ratio - perm_h_adj);
                 if (nob == NobManager.Nob.TOP_LEFT || nob == NobManager.Nob.TOP_RIGHT) {
-                        local_y_adj = -inc_height;
-                } else if (nob == NobManager.Nob.LEFT_CENTER || nob == NobManager.Nob.RIGHT_CENTER) {
-                        local_y_adj = - fix_size (inc_height / 2.0);
+                    local_y_adj = -inc_height;
+                } else if (pure_h) {
+                    local_y_adj = - fix_size (inc_height / 2.0);
                 }
             }
         }
@@ -122,7 +122,7 @@ public class Akira.Utils.AffineTransform : Object {
     }
 
     /**
-     * Corrects which nob should be used for scaling depending on delta change of the drag.
+     * Corrects which nob should be used for scaling depending on the delta change of the drag.
      * The nob will be flipped in the vertical and horizontal directions if needed, and
      * the necessary adjustments to delta_x, delta_y and other adjustments will be populated.
      *
@@ -215,7 +215,7 @@ public class Akira.Utils.AffineTransform : Object {
     }
 
     /**
-     * Apply transform to an translation adjustment, and adjust the increment with it.
+     * Apply transform to a translation adjustment, and adjust the increment with it.
      */
     private static void apply_transform_to_adjustment (
         Cairo.Matrix transform,
