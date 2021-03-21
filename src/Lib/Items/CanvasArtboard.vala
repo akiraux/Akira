@@ -59,7 +59,7 @@ public class Akira.Lib.Items.CanvasArtboard : Goo.CanvasGroup, Akira.Lib.Items.C
       // Add all the components that this item uses.
       components = new Gee.ArrayList<Component> ();
       components.add (new Name (this));
-      components.add (new Transform (this));
+      components.add (new Coordinates (this));
       components.add (new Opacity (this));
       // Artboards have fills that can be edited, but they always start
       // with a full white background.
@@ -95,7 +95,7 @@ public class Akira.Lib.Items.CanvasArtboard : Goo.CanvasGroup, Akira.Lib.Items.C
          "font", "Open Sans 10",
          "ellipsize", Pango.EllipsizeMode.END,
          null);
-      label.translate (transform.x, transform.y);
+      label.translate (coordinates.x, coordinates.y);
       label.can_focus = false;
       // Change the parent to allow mouse pointer selection.
       label.parent = this;

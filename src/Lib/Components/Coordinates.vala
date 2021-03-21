@@ -20,9 +20,9 @@
  */
 
 /**
- * Transform component to keep track of the item's initial coordinates.
+ * Coordinates component to keep track of the item's initial coordinates.
  */
-public class Akira.Lib.Components.Transform : Component {
+public class Akira.Lib.Components.Coordinates : Component {
     private double _x;
     public double x {
         get {
@@ -133,7 +133,7 @@ public class Akira.Lib.Components.Transform : Component {
         }
     }
 
-    public Transform (Items.CanvasItem _item) {
+    public Coordinates (Items.CanvasItem _item) {
         item = _item;
     }
 

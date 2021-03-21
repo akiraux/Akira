@@ -352,9 +352,9 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         Items.CanvasArtboard? artboard = null;
 
         var components = obj.get_member ("Components").get_object ();
-        var transform = components.get_member ("Transform").get_object ();
-        var pos_x = transform.get_double_member ("x");
-        var pos_y = transform.get_double_member ("y");
+        var coordinates = components.get_member ("Coordinates").get_object ();
+        var pos_x = coordinates.get_double_member ("x");
+        var pos_y = coordinates.get_double_member ("y");
 
         // If item is inside an artboard update the coordinates accordingly.
         if (obj.has_member ("artboard")) {

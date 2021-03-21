@@ -78,10 +78,10 @@ public interface Akira.Lib.Items.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasIt
         }
     }
 
-    public Components.Transform? transform {
+    public Components.Coordinates? coordinates {
         get {
-            Component? component = this.get_component (typeof (Components.Transform));
-            return (Components.Transform) component;
+            Component? component = this.get_component (typeof (Components.Coordinates));
+            return (Components.Coordinates) component;
         }
     }
 
