@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2021 Alecaddd (https://alecaddd.com)
+ * Copyright (c) 2020-2021 Alecaddd (https://alecaddd.com)
  *
  * This file is part of Akira.
  *
@@ -122,7 +122,7 @@ public class Akira.Utils.AffineTransform : Object {
     }
 
     /**
-     * Corrects which nob should be used for scaling depending on delta change of the drag.
+     * Corrects which nob should be used for scaling depending on the delta change of the drag.
      * The nob will be flipped in the vertical and horizontal directions if needed, and
      * the necessary adjustments to delta_x, delta_y and other adjustments will be populated.
      *
@@ -215,7 +215,7 @@ public class Akira.Utils.AffineTransform : Object {
     }
 
     /**
-     * Apply transform to an translation adjustment, and adjust the increment with it.
+     * Apply transform to a translation adjustment, and adjust the increment with it.
      */
     private static void apply_transform_to_adjustment (
         Cairo.Matrix transform,

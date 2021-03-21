@@ -435,7 +435,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
             scale_item_x_adj = 0;
             scale_item_y_adj = 0;
 
-            // If rotation is multiple of pi / 2 (90), then snap to pixel grid before scale.
+            // If rotation is multiple of 90, then snap to pixel grid before scale.
             if (item.rotation != null && GLib.Math.fmod (item.rotation.rotation, 90) == 0) {
                 scale_item_x_adj = Utils.AffineTransform.fix_size (initial_drag_item_x) - initial_drag_item_x;
                 scale_item_y_adj = Utils.AffineTransform.fix_size (initial_drag_item_y) - initial_drag_item_y;
