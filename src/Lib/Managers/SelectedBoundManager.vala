@@ -459,10 +459,6 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         var delta_x = rel_event_x - rel_press_x;
         var delta_y = rel_event_y - rel_press_y;
 
-        double item_x = item.transform.x1;
-        double item_y = item.transform.y1;
-        canvas.convert_to_item_space (item, ref item_x, ref item_y);
-
         bool ratio_locked = canvas.ctrl_is_pressed || item.size.locked;
 
         // These values will be populated.
