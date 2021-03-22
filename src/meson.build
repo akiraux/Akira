@@ -80,10 +80,11 @@ sources = files(
 
     'Lib/Canvas.vala',
 
-    'Lib/Components/Component.vala',
     'Lib/Components/Border.vala',
     'Lib/Components/Borders.vala',
     'Lib/Components/BorderRadius.vala',
+    'Lib/Components/Component.vala',
+    'Lib/Components/Coordinates.vala',
     'Lib/Components/Fill.vala',
     'Lib/Components/Fills.vala',
     'Lib/Components/Flipped.vala',
@@ -92,7 +93,6 @@ sources = files(
     'Lib/Components/Opacity.vala',
     'Lib/Components/Rotation.vala',
     'Lib/Components/Size.vala',
-    'Lib/Components/Transform.vala',
 
     'Lib/Items/CanvasArtboard.vala',
     'Lib/Items/CanvasEllipse.vala',

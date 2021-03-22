@@ -337,15 +337,15 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
     private void move_from_event (Lib.Items.CanvasItem item, double event_x, double event_y) {
         if (!initial_drag_registered) {
             initial_drag_registered = true;
-            initial_drag_item_x = item.transform.x;
-            initial_drag_item_y = item.transform.y;
+            initial_drag_item_x = item.coordinates.x;
+            initial_drag_item_y = item.coordinates.y;
         }
 
         // Keep reset and delta values for future adjustments.
 
         // Calculate values needed to reset to the original position.
-        var reset_x = item.transform.x - initial_drag_item_x;
-        var reset_y = item.transform.y - initial_drag_item_y;
+        var reset_x = item.coordinates.x - initial_drag_item_x;
+        var reset_y = item.coordinates.y - initial_drag_item_y;
 
         // Calculate the change based on the event.
         var delta_x = event_x - initial_drag_press_x;
@@ -430,8 +430,8 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         if (!initial_drag_registered) {
             item.get_transform (out initial_item_transform);
             initial_drag_registered = true;
-            initial_drag_item_x = item.transform.x1;
-            initial_drag_item_y = item.transform.y1;
+            initial_drag_item_x = item.coordinates.x1;
+            initial_drag_item_y = item.coordinates.y1;
             scale_item_x_adj = 0;
             scale_item_y_adj = 0;
 

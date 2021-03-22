@@ -80,8 +80,8 @@ public class Akira.StateManagers.CoordinatesManager : Object {
      */
     private void on_init_state_coords (Lib.Items.CanvasItem item) {
         // Get the item X & Y coordinates.
-        double item_x = item.transform.x;
-        double item_y = item.transform.y;
+        double item_x = item.coordinates.x;
+        double item_y = item.coordinates.y;
 
         // Interrupt if no value has changed.
         if (item_x == x && item_y == y) {
@@ -114,8 +114,8 @@ public class Akira.StateManagers.CoordinatesManager : Object {
         do_update = false;
 
         // Get the item X & Y coordinates.
-        double item_x = item.transform.x;
-        double item_y = item.transform.y;
+        double item_x = item.coordinates.x;
+        double item_y = item.coordinates.y;
 
         // Interrupt if no value has changed.
         if (item_x == x && item_y == y) {
@@ -126,13 +126,9 @@ public class Akira.StateManagers.CoordinatesManager : Object {
         x = item_x;
         y = item_y;
 
-        // Set the same values we just fetched to the Transform attributes
-        // in order to trigger the redraw of all the elements using them.
-        item.transform.x = item_x;
-        item.transform.y = item_y;
-
         do_update = true;
 
+        window.event_bus.item_value_changed ();
         window.event_bus.file_edited ();
     }
 
@@ -153,8 +149,8 @@ public class Akira.StateManagers.CoordinatesManager : Object {
             }
 
             // Store the new coordinates in local variables so we can manipulate them.
-            double inc_x = x - item.transform.x;
-            double inc_y = y - item.transform.y;
+            double inc_x = x - item.coordinates.x;
+            double inc_y = y - item.coordinates.y;
 
             Cairo.Matrix matrix;
             item.get_transform (out matrix);
@@ -170,9 +166,7 @@ public class Akira.StateManagers.CoordinatesManager : Object {
                 ((Lib.Items.CanvasArtboard) item).label.translate (inc_x, inc_y);
             }
 
-            // Update the Transform component attributes.
-            item.transform.x += inc_x;
-            item.transform.y += inc_y;
+            window.event_bus.item_value_changed ();
         }
     }
 }

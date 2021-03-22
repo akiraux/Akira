@@ -109,12 +109,12 @@ public class Akira.FileFormat.JsonObject : GLib.Object {
             components.set_object_member ("Name", name);
         }
 
-        if (item.transform != null) {
-            var transform = new Json.Object ();
-            transform.set_double_member ("x", item.transform.x);
-            transform.set_double_member ("y", item.transform.y);
+        if (item.coordinates != null) {
+            var coordinates = new Json.Object ();
+            coordinates.set_double_member ("x", item.coordinates.x);
+            coordinates.set_double_member ("y", item.coordinates.y);
 
-            components.set_object_member ("Transform", transform);
+            components.set_object_member ("Coordinates", coordinates);
         }
 
         if (item.opacity != null) {
