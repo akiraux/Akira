@@ -149,15 +149,15 @@ public class Akira.Utils.Snapping : Object {
         Goo.CanvasBounds horizontal_filter = {0, 0, 0, 0};
 
         foreach (var item in selection) {
-            horizontal_filter.x1 = item.transform.x1 - sensitivity;
-            horizontal_filter.x2 = item.transform.x2 + sensitivity;
+            horizontal_filter.x1 = item.coordinates.x1 - sensitivity;
+            horizontal_filter.x2 = item.coordinates.x2 + sensitivity;
             horizontal_filter.y1 = canvas.y1;
             horizontal_filter.y2 = canvas.y2;
 
             vertical_filter.x1 = canvas.x1;
             vertical_filter.x2 = canvas.x2;
-            vertical_filter.y1 = item.transform.y1 - sensitivity;
-            vertical_filter.y2 = item.transform.y2 + sensitivity;
+            vertical_filter.y1 = item.coordinates.y1 - sensitivity;
+            vertical_filter.y2 = item.coordinates.y2 + sensitivity;
 
             vertical_candidates.concat (canvas.get_items_in_area (vertical_filter, true, true, true));
             horizontal_candidates.concat (canvas.get_items_in_area (horizontal_filter, true, true, true));
@@ -321,12 +321,12 @@ public class Akira.Utils.Snapping : Object {
      * Populates the horizontal snaps of an item.
      */
     private static void populate_horizontal_snaps (Lib.Items.CanvasItem item, ref Gee.HashMap<int, SnapMeta> map) {
-        int x_1 = (int) item.transform.x1;
-        int x_2 = (int) item.transform.x2;
-        int y_1 = (int) item.transform.y1;
-        int y_2 = (int) item.transform.y2;
-        int center_x = (int) (Math.ceil ((item.transform.x2 - item.transform.x1) / 2.0) + item.transform.x1);
-        int center_y = (int) (Math.ceil ((item.transform.y2 - item.transform.y1) / 2.0) + item.transform.y1);
+        int x_1 = (int) item.coordinates.x1;
+        int x_2 = (int) item.coordinates.x2;
+        int y_1 = (int) item.coordinates.y1;
+        int y_2 = (int) item.coordinates.y2;
+        int center_x = (int) (Math.ceil ((item.coordinates.x2 - item.coordinates.x1) / 2.0) + item.coordinates.x1);
+        int center_y = (int) (Math.ceil ((item.coordinates.y2 - item.coordinates.y1) / 2.0) + item.coordinates.y1);
 
         add_to_map (x_1, y_1, y_2, center_y, -1, ref map);
         add_to_map (x_2, y_1, y_2, center_y, 1, ref map);
@@ -337,12 +337,12 @@ public class Akira.Utils.Snapping : Object {
      * Populates the vertical snaps of an item.
      */
     private static void populate_vertical_snaps (Lib.Items.CanvasItem item, ref Gee.HashMap<int, SnapMeta> map) {
-        int x_1 = (int) item.transform.x1;
-        int x_2 = (int) item.transform.x2;
-        int y_1 = (int) item.transform.y1;
-        int y_2 = (int) item.transform.y2;
-        int center_x = (int) (Math.ceil ((item.transform.x2 - item.transform.x1) / 2.0) + item.transform.x1);
-        int center_y = (int) (Math.ceil ((item.transform.y2 - item.transform.y1) / 2.0) + item.transform.y1);
+        int x_1 = (int) item.coordinates.x1;
+        int x_2 = (int) item.coordinates.x2;
+        int y_1 = (int) item.coordinates.y1;
+        int y_2 = (int) item.coordinates.y2;
+        int center_x = (int) (Math.ceil ((item.coordinates.x2 - item.coordinates.x1) / 2.0) + item.coordinates.x1);
+        int center_y = (int) (Math.ceil ((item.coordinates.y2 - item.coordinates.y1) / 2.0) + item.coordinates.y1);
 
         add_to_map (y_1, x_1, x_2, center_x, -1, ref map);
         add_to_map (y_2, x_1, x_2, center_x, 1, ref map);

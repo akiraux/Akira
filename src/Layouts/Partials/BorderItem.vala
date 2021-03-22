@@ -1,5 +1,5 @@
-/*
- * Copyright (c) 2019-2020 Alecaddd (https://alecaddd.com)
+/**
+ * Copyright (c) 2019-2021 Alecaddd (https://alecaddd.com)
  *
  * This file is part of Akira.
  *
@@ -28,13 +28,13 @@ public class Akira.Layouts.Partials.BorderItem : Gtk.Grid {
     private Gtk.Button hidden_button;
     private Gtk.Button delete_button;
     private Gtk.Image hidden_button_icon;
-    private Gtk.MenuButton selected_color;
+    private Gtk.Button selected_color;
     public Akira.Partials.InputField tickness_container;
     public Akira.Partials.ColorField color_container;
     private Gtk.Popover color_popover;
     private Gtk.Grid color_picker;
     private Akira.Utils.ColorPicker eyedropper;
-    private Gtk.ColorChooserWidget color_chooser_widget;
+    private Gtk.ColorChooserWidget? color_chooser_widget = null;
 
     public Akira.Models.BordersItemModel model { get; construct; }
 
@@ -108,22 +108,26 @@ public class Akira.Layouts.Partials.BorderItem : Gtk.Grid {
         color_chooser.hexpand = true;
         color_chooser.margin_end = 5;
 
-        color_popover = new Gtk.Popover (color_picker);
-        color_popover.position = Gtk.PositionType.BOTTOM;
-
         var selected_color_container = new Gtk.Grid ();
         selected_color_container.get_style_context ().add_class ("bg-pattern");
 
-        selected_color = new Gtk.MenuButton ();
-        selected_color.remove (selected_color.get_child ());
+        selected_color = new Gtk.Button ();
         selected_color.vexpand = true;
         selected_color.width_request = 40;
         selected_color.can_focus = false;
         selected_color.get_style_context ().add_class ("selected-color");
-        selected_color.popover = color_popover;
         selected_color.set_tooltip_text (_("Choose border color"));
 
+        color_popover = new Gtk.Popover (selected_color);
+        color_popover.position = Gtk.PositionType.BOTTOM;
+
+        selected_color.clicked.connect (() => {
+            init_color_chooser ();
+            color_popover.popup ();
+        });
+
         selected_color_container.add (selected_color);
+        set_button_color ();
 
         eyedropper_button = new Gtk.Button ();
         eyedropper_button.get_style_context ().add_class ("color-picker-button");
@@ -195,6 +199,16 @@ public class Akira.Layouts.Partials.BorderItem : Gtk.Grid {
         delete_button.add (new Gtk.Image.from_icon_name ("user-trash-symbolic",
             Gtk.IconSize.SMALL_TOOLBAR));
 
+        attach (color_chooser, 0, 0, 1, 1);
+        attach (hidden_button, 1, 0, 1, 1);
+        attach (delete_button, 2, 0, 1, 1);
+    }
+
+    private void init_color_chooser () {
+        if (color_chooser_widget != null) {
+            return;
+        }
+
         color_chooser_widget = new Gtk.ColorChooserWidget ();
         color_chooser_widget.hexpand = true;
         color_chooser_widget.show_editor = true;
@@ -205,20 +219,14 @@ public class Akira.Layouts.Partials.BorderItem : Gtk.Grid {
         color_picker.show_all ();
         color_popover.add (color_picker);
 
-        attach (color_chooser, 0, 0, 1, 1);
-        attach (hidden_button, 1, 0, 1, 1);
-        attach (delete_button, 2, 0, 1, 1);
-
         set_color_chooser_color ();
-        set_button_color ();
+        color_chooser_widget.notify["rgba"].connect (on_color_changed);
     }
 
     private void create_event_bindings () {
         eyedropper_button.clicked.connect (on_eyedropper_click);
         delete_button.clicked.connect (on_delete_item);
         hidden_button.clicked.connect (toggle_visibility);
-        model.notify.connect (on_model_changed);
-        color_chooser_widget.notify["rgba"].connect (on_color_changed);
     }
 
     private void on_eyedropper_click () {
@@ -226,6 +234,7 @@ public class Akira.Layouts.Partials.BorderItem : Gtk.Grid {
         eyedropper.show_all ();
 
         eyedropper.picked.connect ((picked_color) => {
+            init_color_chooser ();
             color_chooser_widget.set_rgba (picked_color);
             eyedropper.close ();
         });
@@ -235,15 +244,11 @@ public class Akira.Layouts.Partials.BorderItem : Gtk.Grid {
         });
     }
 
-    private void on_model_changed () {
-        set_button_color ();
-        set_color_chooser_color ();
-    }
-
     private void on_color_changed () {
         color_set_manually = true;
         color = color_chooser_widget.rgba.to_string ();
         alpha = ((int)(color_chooser_widget.rgba.alpha * 255));
+        set_button_color ();
     }
 
     private void on_delete_item () {
@@ -285,7 +290,11 @@ public class Akira.Layouts.Partials.BorderItem : Gtk.Grid {
         try {
             var provider = new Gtk.CssProvider ();
             var context = selected_color.get_style_context ();
-            var new_color = color_chooser_widget.rgba.to_string ();
+
+            var new_rgba = Gdk.RGBA ();
+            new_rgba.parse (color);
+            new_rgba.alpha = (double) alpha / 255;
+            var new_color = new_rgba.to_string ();
 
             var css = """.selected-color {
                     background-color: %s;
