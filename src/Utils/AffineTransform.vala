@@ -82,9 +82,9 @@ public class Akira.Utils.AffineTransform : Object {
             if (symmetric) {
                 inc_height *= 2;
             }
-
         } else if (NobManager.is_bot_nob (nob)) {
             inc_height = fix_size (inc_height + delta_y);
+
             if (symmetric) {
                 symmetry_offset_y = -delta_y;
                 local_y_adj = symmetry_offset_y;
@@ -131,9 +131,9 @@ public class Akira.Utils.AffineTransform : Object {
                 if (symmetric) {
                     local_y_adj = -fix_size (inc_height / 2.0);
                 } else if (nob == NobManager.Nob.TOP_LEFT || nob == NobManager.Nob.TOP_RIGHT) {
-                        local_y_adj = -inc_height;
+                    local_y_adj = -inc_height;
                 } else if (pure_h) {
-                        local_y_adj = - fix_size (inc_height / 2.0);
+                    local_y_adj = - fix_size (inc_height / 2.0);
                 }
             }
         }
@@ -197,8 +197,7 @@ public class Akira.Utils.AffineTransform : Object {
         } else if (NobManager.is_bot_nob (nob)) {
             if (fix_size (height_to_check + delta_y) == 0) {
                 delta_y += 1;
-            }
-            else if (height_to_check + delta_y < 0) {
+            } else if (height_to_check + delta_y < 0) {
                 delta_y += height_to_check;
                 perm_y_adj = - (item_height - height_to_check);
                 perm_h_adj = -item_height;
@@ -232,8 +231,7 @@ public class Akira.Utils.AffineTransform : Object {
         } else if (NobManager.is_right_nob (nob)) {
             if (fix_size (width_to_check + delta_x) == 0) {
                 delta_x += 1;
-            }
-            else if (width_to_check + delta_x < 0) {
+            } else if (width_to_check + delta_x < 0) {
                 delta_x += width_to_check;
                 perm_x_adj = (item_width - width_to_check);
                 perm_w_adj = -item_width;
