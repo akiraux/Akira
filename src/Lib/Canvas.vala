@@ -59,6 +59,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     private Managers.HoverManager hover_manager;
 
     public bool ctrl_is_pressed = false;
+    public bool shift_is_pressed = false;
     public bool holding;
     public double current_scale = 1.0;
     private Gdk.CursorType current_cursor = Gdk.CursorType.ARROW;
@@ -190,6 +191,11 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 toggle_item_ghost (false);
                 break;
 
+            case Gdk.Key.Shift_L:
+            case Gdk.Key.Shift_R:
+                shift_is_pressed = true;
+                break;
+
             case Gdk.Key.Alt_L:
             case Gdk.Key.Alt_R:
                 // Show the ghost item only if the CTRL button is not pressed.
@@ -219,6 +225,11 @@ public class Akira.Lib.Canvas : Goo.Canvas {
             case Gdk.Key.Control_L:
             case Gdk.Key.Control_R:
                 ctrl_is_pressed = false;
+                break;
+
+            case Gdk.Key.Shift_L:
+            case Gdk.Key.Shift_R:
+                shift_is_pressed = false;
                 break;
 
             case Gdk.Key.Alt_L:

@@ -44,6 +44,7 @@ public class Akira.Utils.AffineTransform : Object {
         double delta_y,
         double size_ratio,
         bool ratio_locked,
+        bool symmetric,
         Cairo.Matrix transform,
         ref double inc_x,
         ref double inc_y,
@@ -61,6 +62,7 @@ public class Akira.Utils.AffineTransform : Object {
             nob,
             item_width,
             item_height,
+            symmetric,
             ref delta_x,
             ref delta_y,
             ref perm_x_adj,
@@ -69,20 +71,43 @@ public class Akira.Utils.AffineTransform : Object {
             ref perm_h_adj
         );
 
+        double symmetry_offset_x = 0;
+        double symmetry_offset_y = 0;
+
         // Handle vertical adjustment.
         if (NobManager.is_top_nob (nob)) {
             inc_height = fix_size (-delta_y);
             local_y_adj = -inc_height;
+
+            if (symmetric) {
+                inc_height *= 2;
+            }
         } else if (NobManager.is_bot_nob (nob)) {
             inc_height = fix_size (inc_height + delta_y);
+
+            if (symmetric) {
+                symmetry_offset_y = -delta_y;
+                local_y_adj = symmetry_offset_y;
+                inc_height += delta_y;
+            }
         }
 
         // Handle horizontal adjustment.
         if (NobManager.is_left_nob (nob)) {
             inc_width = fix_size (inc_width - delta_x);
             local_x_adj = -inc_width;
+
+            if (symmetric) {
+                inc_width *= 2;
+            }
         } else if (NobManager.is_right_nob (nob)) {
             inc_width = fix_size (delta_x);
+
+            if (symmetric) {
+                symmetry_offset_x = -delta_x;
+                local_x_adj = symmetry_offset_x;
+                inc_width += delta_x;
+            }
         }
 
         if (ratio_locked) {
@@ -94,14 +119,18 @@ public class Akira.Utils.AffineTransform : Object {
 
             if (pure_v || (!pure_h && (item_width + inc_width) / (item_height + inc_height) < size_ratio)) {
                 inc_width = fix_size ((inc_height + perm_h_adj) * size_ratio - perm_w_adj);
-                if (nob == NobManager.Nob.TOP_LEFT || nob == NobManager.Nob.BOTTOM_LEFT) {
+                if (symmetric) {
+                    local_x_adj = -fix_size (inc_width / 2.0);
+                } else if (nob == NobManager.Nob.TOP_LEFT || nob == NobManager.Nob.BOTTOM_LEFT) {
                     local_x_adj = -inc_width;
                 } else if (pure_v) {
                     local_x_adj = - fix_size (inc_width / 2.0);
                 }
             } else if (!pure_v) {
                 inc_height = fix_size ((inc_width + perm_w_adj) / size_ratio - perm_h_adj);
-                if (nob == NobManager.Nob.TOP_LEFT || nob == NobManager.Nob.TOP_RIGHT) {
+                if (symmetric) {
+                    local_y_adj = -fix_size (inc_height / 2.0);
+                } else if (nob == NobManager.Nob.TOP_LEFT || nob == NobManager.Nob.TOP_RIGHT) {
                     local_y_adj = -inc_height;
                 } else if (pure_h) {
                     local_y_adj = - fix_size (inc_height / 2.0);
@@ -137,6 +166,7 @@ public class Akira.Utils.AffineTransform : Object {
         NobManager.Nob nob,
         double item_width,
         double item_height,
+        bool symmetric,
         ref double delta_x,
         ref double delta_y,
         ref double perm_x_adj,
@@ -144,12 +174,15 @@ public class Akira.Utils.AffineTransform : Object {
         ref double perm_w_adj,
         ref double perm_h_adj
     ) {
+        var height_to_check = symmetric ? item_height / 2.0 : item_height;
+        var width_to_check = symmetric ? item_width / 2.0 : item_width;
+
         if (NobManager.is_top_nob (nob)) {
-            if (fix_size (item_height - delta_y) == 0) {
+            if (fix_size (height_to_check - delta_y) == 0) {
                 delta_y -= 1;
-            } else if (item_height - delta_y < 0) {
-                delta_y -= item_height;
-                perm_y_adj = -item_height;
+            } else if (height_to_check - delta_y < 0) {
+                delta_y -= height_to_check;
+                perm_y_adj = -item_height + (item_height - height_to_check);
                 perm_h_adj = -item_height;
 
                 if (nob == NobManager.Nob.TOP_LEFT) {
@@ -162,10 +195,11 @@ public class Akira.Utils.AffineTransform : Object {
                 }
             }
         } else if (NobManager.is_bot_nob (nob)) {
-            if (fix_size (item_height + delta_y) == 0) {
+            if (fix_size (height_to_check + delta_y) == 0) {
                 delta_y += 1;
-            } else if (item_height + delta_y < 0) {
-                delta_y += item_height;
+            } else if (height_to_check + delta_y < 0) {
+                delta_y += height_to_check;
+                perm_y_adj = - (item_height - height_to_check);
                 perm_h_adj = -item_height;
                 if (nob == NobManager.Nob.BOTTOM_LEFT) {
                     nob = NobManager.Nob.TOP_LEFT;
@@ -179,11 +213,11 @@ public class Akira.Utils.AffineTransform : Object {
         }
 
         if (NobManager.is_left_nob (nob)) {
-            if (fix_size (item_width - delta_x) == 0) {
+            if (fix_size (width_to_check - delta_x) == 0) {
                 delta_x -= 1;
-            } else if (item_width - delta_x < 0) {
-                delta_x -= item_width;
-                perm_x_adj = item_width;
+            } else if (width_to_check - delta_x < 0) {
+                delta_x -= width_to_check;
+                perm_x_adj = item_width - (item_width - width_to_check);
                 perm_w_adj = -item_width;
 
                 if (nob == NobManager.Nob.TOP_LEFT) {
@@ -195,10 +229,11 @@ public class Akira.Utils.AffineTransform : Object {
                 }
             }
         } else if (NobManager.is_right_nob (nob)) {
-            if (fix_size (item_width + delta_x) == 0) {
+            if (fix_size (width_to_check + delta_x) == 0) {
                 delta_x += 1;
-            } else if (item_width + delta_x < 0) {
-                delta_x += item_width;
+            } else if (width_to_check + delta_x < 0) {
+                delta_x += width_to_check;
+                perm_x_adj = (item_width - width_to_check);
                 perm_w_adj = -item_width;
 
                 if (nob == NobManager.Nob.TOP_RIGHT) {

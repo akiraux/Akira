@@ -475,6 +475,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
             delta_y,
             initial_width / initial_height,
             ratio_locked,
+            canvas.shift_is_pressed,
             initial_item_transform,
             ref inc_x,
             ref inc_y,
