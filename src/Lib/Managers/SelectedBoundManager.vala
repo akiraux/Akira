@@ -194,6 +194,16 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
 
     private void update_selected_items () {
         canvas.window.event_bus.selected_items_changed (selected_items);
+
+        foreach (var item in selected_items) {
+            if (!(item is Items.CanvasArtboard)) {
+                continue;
+            }
+
+            Cairo.Matrix matrix;
+            item.get_transform (out matrix);
+            ((Items.CanvasArtboard) item).label.set_transform (matrix);
+        }
     }
 
     private void change_z_selected (bool raise, bool total) {
@@ -203,7 +213,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
 
         Items.CanvasItem selected_item = selected_items.nth_data (0);
 
-        // Cannot move artboard z-index wise
+        // Cannot move artboard z-index wise.
         if (selected_item is Items.CanvasArtboard) {
             return;
         }
@@ -212,7 +222,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         int pos_selected = -1;
 
         if (selected_item.artboard != null) {
-            // Inside an artboard
+            // Inside an artboard.
             items_count = (int) selected_item.artboard.items.get_n_items ();
             pos_selected = items_count - 1 - selected_item.artboard.items.index (selected_item);
         } else {
@@ -364,11 +374,6 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         matrix.y0 += first_move_y;
         item.set_transform (matrix);
 
-        // If the item is an Artboard, move the label with it.
-        if (item is Lib.Items.CanvasArtboard) {
-            ((Lib.Items.CanvasArtboard) item).label.translate (first_move_x, first_move_y);
-        }
-
         // Interrupt if the user disabled the snapping or we don't have any
         // adjacent item to snap to.
         if (!settings.enable_snaps || window.items_manager.get_items_count () == 1) {
@@ -401,11 +406,6 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
 
         item.set_transform (matrix);
         update_grid_decorators (true);
-
-        // If the item is an Artboard, move the label with it.
-        if (item is Lib.Items.CanvasArtboard) {
-            ((Lib.Items.CanvasArtboard) item).label.translate (snap_offset_x, snap_offset_y);
-        }
     }
 
     private void on_canvas_zoom () {

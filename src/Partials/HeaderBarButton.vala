@@ -48,15 +48,15 @@ public class Akira.Partials.HeaderBarButton : Gtk.Grid {
         valign = Gtk.Align.CENTER;
         sensitive = false;
 
-        udpate_label ();
+        update_label ();
         build_signals ();
 
         settings.changed["show-label"].connect ( () => {
-            udpate_label ();
+            update_label ();
         });
     }
 
-    private void udpate_label () {
+    private void update_label () {
         label_btn.visible = settings.show_label;
         label_btn.no_show_all = !settings.show_label;
     }
