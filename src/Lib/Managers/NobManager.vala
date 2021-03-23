@@ -150,6 +150,14 @@ public class Akira.Lib.Managers.NobManager : Object {
         if (items.length () == 1) {
             var item = items.first ().data;
             item.get_transform (out matrix);
+
+            Cairo.Matrix nob_matrix = matrix;
+            if (item.artboard != null) {
+                Cairo.Matrix artboard_matrix;
+                item.artboard.get_transform (out artboard_matrix);
+                nob_matrix.multiply (matrix, artboard_matrix);
+            }
+
             width = item.size.width;
             height = item.size.height;
 
@@ -157,9 +165,9 @@ public class Akira.Lib.Managers.NobManager : Object {
             width_offset_y = 0;
             height_offset_x = 0;
             height_offset_y = height;
-            matrix.transform_distance (ref width_offset_x, ref width_offset_y);
-            matrix.transform_distance (ref height_offset_x, ref height_offset_y);
-            matrix.transform_point (ref top_left_x, ref top_left_y);
+            nob_matrix.transform_distance (ref width_offset_x, ref width_offset_y);
+            nob_matrix.transform_distance (ref height_offset_x, ref height_offset_y);
+            nob_matrix.transform_point (ref top_left_x, ref top_left_y);
             return;
         }
         else {
@@ -381,7 +389,6 @@ public class Akira.Lib.Managers.NobManager : Object {
      */
     private void update_nob_position (List<Items.CanvasItem> selected_items) {
         is_artboard = false;
-
         foreach (var item in selected_items) {
             if (item is Items.CanvasArtboard) {
                 is_artboard = true;
@@ -413,14 +420,22 @@ public class Akira.Lib.Managers.NobManager : Object {
                 ref center_y
             );
 
-            if (!print_middle_width_nobs && (nob_name == Nob.RIGHT_CENTER || nob_name == Nob.LEFT_CENTER)) {
+            if (!print_middle_height_nobs && (nob_name == Nob.RIGHT_CENTER || nob_name == Nob.LEFT_CENTER)) {
                 set_visible = false;
-            } else if (!print_middle_height_nobs && (nob_name == Nob.TOP_CENTER || nob_name == Nob.BOTTOM_CENTER)) {
+            } else if (!print_middle_width_nobs && (nob_name == Nob.TOP_CENTER || nob_name == Nob.BOTTOM_CENTER)) {
                 set_visible = false;
             } else if (nob.handle_id == Nob.ROTATE) {
                 double line_offset_x = 0;
                 double line_offset_y = - (LINE_HEIGHT / canvas.current_scale);
                 bb_matrix.transform_distance (ref line_offset_x, ref line_offset_y);
+
+                // If only one item is selected and it's inside an artboard,
+                // we need to convert its coordinates from the artboard space.
+                Cairo.Matrix tmp_matrix = bb_matrix;
+                var item = selected_items.first ().data;
+                if (selected_items.length () == 1 && item.artboard != null) {
+                    item.canvas.convert_from_item_space (item.artboard, ref tmp_matrix.x0, ref tmp_matrix.y0);
+                }
 
                 center_x = top_left_x + width_offset_x / 2.0 + line_offset_x;
                 center_y = top_left_y + width_offset_y / 2.0 + line_offset_y;
@@ -428,14 +443,21 @@ public class Akira.Lib.Managers.NobManager : Object {
                 set_visible = !is_artboard;
 
                 if (set_visible) {
-                    rotation_line.set_transform (bb_matrix);
-                    rotation_line.translate ((bb_width / 2), - LINE_HEIGHT / canvas.current_scale);
+                    rotation_line.set_transform (tmp_matrix);
+                    rotation_line.translate (bb_width / 2.0, - LINE_HEIGHT / canvas.current_scale);
                     rotation_line.set ("line-width", LINE_WIDTH / canvas.current_scale);
                     rotation_line.set ("height", LINE_HEIGHT / canvas.current_scale);
                     rotation_line.set ("visibility", Goo.CanvasItemVisibility.VISIBLE);
+                    rotation_line.raise (select_effect);
+
                 } else {
                     rotation_line.set ("visibility", Goo.CanvasItemVisibility.HIDDEN);
                 }
+
+                // raise to the rotation_line, so the line is under the rotation nob
+                nob.update_state (bb_matrix, center_x, center_y, set_visible);
+                nob.raise (rotation_line);
+                return;
             }
 
             nob.update_state (bb_matrix, center_x, center_y, set_visible);

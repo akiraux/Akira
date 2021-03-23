@@ -26,7 +26,6 @@ public class Akira.Lib.Selection.Nob : Goo.CanvasRect {
     public Managers.NobManager.Nob handle_id;
 
     private double nob_size;
-    private double radius;
     public double center_x;
     public double center_y;
 
