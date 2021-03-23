@@ -27,6 +27,8 @@ public class Akira.Lib.Selection.Nob : Goo.CanvasRect {
 
     private double nob_size;
     private double radius;
+    public double center_x;
+    public double center_y;
 
     public Nob (Goo.CanvasItem? root, Managers.NobManager.Nob _handle_id) {
         Object (
@@ -34,32 +36,39 @@ public class Akira.Lib.Selection.Nob : Goo.CanvasRect {
         );
 
         handle_id = _handle_id;
-        set_rectangle ();
         can_focus = false;
 
-        ((Akira.Lib.Canvas) canvas).window.event_bus.update_nob_size.connect (update_size);
+        set_rectangle ();
     }
 
-    private void update_size () {
+    public void update_state (Cairo.Matrix matrix, double new_x, double new_y, bool visible) {
+        matrix.x0 = new_x;
+        matrix.y0 = new_y;
+        set_transform (matrix);
+        center_x = new_x;
+        center_y = new_y;
+
         var canvas = canvas as Akira.Lib.Canvas;
         line_width = LINE_WIDTH / canvas.current_scale;
         nob_size = NOB_SIZE / canvas.current_scale;
 
         set ("line-width", line_width);
+        set ("x", - nob_size / 2.0);
+        set ("y", - nob_size / 2.0);
         set ("height", nob_size);
         set ("width", nob_size);
+
+        this.set (
+            "visibility",
+            visible ? Goo.CanvasItemVisibility.VISIBLE: Goo.CanvasItemVisibility.HIDDEN
+        );
     }
 
     public void set_rectangle () {
         x = 0;
         y = 0;
 
-        update_size ();
-
-        radius = handle_id == 8 ? nob_size : 0;
-
-        set ("radius-x", radius);
-        set ("radius-y", radius);
+        update_state (Cairo.Matrix.identity(), 0, 0, false);
         set ("fill-color", "#fff");
         set ("stroke-color", "#41c9fd");
     }
