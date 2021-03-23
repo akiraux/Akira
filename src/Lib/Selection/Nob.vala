@@ -68,7 +68,7 @@ public class Akira.Lib.Selection.Nob : Goo.CanvasRect {
         x = 0;
         y = 0;
 
-        update_state (Cairo.Matrix.identity(), 0, 0, false);
+        update_state (Cairo.Matrix.identity (), 0, 0, false);
         set ("fill-color", "#fff");
         set ("stroke-color", "#41c9fd");
     }

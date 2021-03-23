@@ -88,19 +88,25 @@ public class Akira.Lib.Managers.NobManager : Object {
         canvas.window.event_bus.show_select_effect.connect (on_show_select_effect);
     }
 
-    public void update_selection_nobs (List<Items.CanvasItem> selected_items) {
-        on_add_select_effect (canvas.selected_bound_manager.selected_items);
-    }
-
+    /*
+     * Set which nob is selected by its Nob name.
+     */
     public void set_selected_by_name (Nob selected_nob) {
         this.selected_nob = selected_nob;
     }
 
+    /*
+     * Compares a target item to the current nobs to see if there is a match. Otherwise returns Nob.NONE.
+     */
     public Nob get_grabbed_id (Goo.CanvasItem? target) {
-        int grabbed_id = -1;
+        int grabbed_id = Nob.NONE;
 
-        for (int i = 0; i < 9; i++) {
-            if (target == nobs[i]) grabbed_id = i;
+        for (var i = 0; i < 9; ++i) {
+            var nob = nobs[i];
+            if (target == nob) {
+                grabbed_id = i;
+                break;
+            }
         }
 
         return (Nob) grabbed_id;
@@ -122,11 +128,10 @@ public class Akira.Lib.Managers.NobManager : Object {
         return nob == Nob.TOP_RIGHT || nob == Nob.RIGHT_CENTER || nob == Nob.BOTTOM_RIGHT;
     }
 
-    public static bool is_center_nob (Nob nob) {
-        return nob == Nob.TOP_CENTER || nob == Nob.RIGHT_CENTER || nob == Nob.BOTTOM_CENTER || nob == Nob.LEFT_CENTER;
-    }
-
-
+    /*
+     * Takes a set of items and populates information needed to determine the selection box and nob positions.
+     * If the number of items is one, the selection box may be rotated, otherwise it is never rotated.
+     */
     public static void populate_nob_bounds_from_items (
         List<Items.CanvasItem> items,
         ref Cairo.Matrix matrix,
@@ -185,6 +190,9 @@ public class Akira.Lib.Managers.NobManager : Object {
         height_offset_y = height;
     }
 
+    /*
+     * Calculates the position of a nob based on values calculated using `populate_nob_bounds_from_items`.
+     */
     private static void calculate_nob_position (
         Nob nob_name,
         double top_left_x,
@@ -237,6 +245,9 @@ public class Akira.Lib.Managers.NobManager : Object {
     }
 
 
+    /*
+     * Calculates the position of a nob based on a selection of items and the nob id
+     */
     public static void nob_position_from_items (
         List<Items.CanvasItem> items,
         Nob nob_name,
@@ -279,11 +290,16 @@ public class Akira.Lib.Managers.NobManager : Object {
          );
     }
 
-
+    /*
+     * What happens when the canvas is zoomed in.
+     */
     private void on_canvas_zoom () {
         on_add_select_effect (canvas.selected_bound_manager.selected_items);
     }
 
+    /*
+     * Adds selection effects if applicable to selected items, and repositions the selection and nobs.
+     */
     private void on_add_select_effect (List<Items.CanvasItem> selected_items) {
         if (selected_items.length () == 0) {
             remove_select_effect ();
@@ -309,6 +325,9 @@ public class Akira.Lib.Managers.NobManager : Object {
         update_nob_position (selected_items);
     }
 
+    /*
+     * Resets all selection and nob items.
+     */
     private void remove_select_effect (bool keep_selection = false) {
         if (select_effect == null) {
             return;
@@ -324,6 +343,9 @@ public class Akira.Lib.Managers.NobManager : Object {
         }
     }
 
+    /*
+     * Updates selection items, constructing them if necessary.
+     */
     private void update_select_effect (List<Items.CanvasItem> selected_items) {
         if (select_effect == null) {
             select_effect = new Goo.CanvasRect (
@@ -353,6 +375,10 @@ public class Akira.Lib.Managers.NobManager : Object {
         select_effect.set ("line-width", LINE_WIDTH / canvas.current_scale);
     }
 
+    /*
+     * Update the position of all nobs of selected items. It will show or hide them based on
+     * the properties of the selection.
+     */
     private void update_nob_position (List<Items.CanvasItem> selected_items) {
         is_artboard = false;
 
@@ -417,6 +443,9 @@ public class Akira.Lib.Managers.NobManager : Object {
         }
     }
 
+    /*
+     * Constructs all nobs and the rotation line if they haven't been constructed already
+     */
     private void populate_nobs () {
         if (!nobs_constructed) {
             root = canvas.get_root_item ();
@@ -441,6 +470,9 @@ public class Akira.Lib.Managers.NobManager : Object {
     }
 
 
+    /*
+     * Asynchronous call to hide selection and nobs.
+     */
     private async void on_hide_select_effect () {
         foreach (var nob in nobs) {
             nob.set ("visibility", Goo.CanvasItemVisibility.HIDDEN);
@@ -450,6 +482,9 @@ public class Akira.Lib.Managers.NobManager : Object {
         rotation_line.set ("visibility", Goo.CanvasItemVisibility.HIDDEN);
     }
 
+    /*
+     * Asynchronous call to show selection and nobs.
+     */
     private async void on_show_select_effect () {
         for (int i = 0; i < 9; i++) {
             // If an artboard is part of the current selection, don't show the rotation nob.
