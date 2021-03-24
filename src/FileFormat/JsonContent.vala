@@ -40,7 +40,20 @@ public class Akira.FileFormat.JsonContent : Object {
         canvas = window.main_window.main_canvas.canvas;
     }
 
-    public void save_content () {
+    public string finalize_content () {
+        builder.end_object ();
+
+        Json.Node root = builder.get_root ();
+        generator.set_root (root);
+
+        return generator.to_data (null);
+    }
+
+    public void inner_save_content() {
+        save_content(builder, canvas);
+    }
+
+    public static void save_content (Json.Builder builder, Akira.Lib.Canvas canvas) {
         // Save the current version of Akira.
         builder.set_member_name ("version");
         builder.add_string_value (Constants.VERSION);
@@ -49,22 +62,22 @@ public class Akira.FileFormat.JsonContent : Object {
         builder.set_member_name ("scale");
         builder.add_double_value (canvas.get_scale ());
         builder.set_member_name ("hadjustment");
-        builder.add_double_value (window.main_window.main_canvas.main_scroll.hadjustment.value);
+        builder.add_double_value (0);
         builder.set_member_name ("vadjustment");
-        builder.add_double_value (window.main_window.main_canvas.main_scroll.vadjustment.value);
+        builder.add_double_value (0);
 
         // Convert Artboards to JSON.
-        save_artboards ();
+        save_artboards (builder, canvas);
 
         // Convert Items to JSON.
-        save_items ();
+        save_items (builder, canvas);
     }
 
-    private void save_artboards () {
+    private static void save_artboards (Json.Builder builder, Akira.Lib.Canvas canvas) {
         builder.set_member_name ("artboards");
         builder.begin_array ();
 
-        foreach (var artboard in window.items_manager.artboards) {
+        foreach (var artboard in canvas.window.items_manager.artboards) {
             var item = new JsonObject (artboard);
             builder.begin_object ();
             builder.set_member_name ("artboard");
@@ -75,11 +88,11 @@ public class Akira.FileFormat.JsonContent : Object {
         builder.end_array ();
     }
 
-    private void save_items () {
+    private static void save_items (Json.Builder builder, Akira.Lib.Canvas canvas) {
         builder.set_member_name ("items");
         builder.begin_array ();
 
-        foreach (var _item in window.items_manager.free_items) {
+        foreach (var _item in canvas.window.items_manager.free_items) {
             var item = new JsonObject (_item);
             builder.begin_object ();
             builder.set_member_name ("item");
@@ -88,7 +101,7 @@ public class Akira.FileFormat.JsonContent : Object {
         }
 
         // Save all the items inside this Artboard.
-        foreach (var artboard in window.items_manager.artboards) {
+        foreach (var artboard in canvas.window.items_manager.artboards) {
             foreach (var _item in artboard.items) {
                 var child_item = new JsonObject (_item);
                 builder.begin_object ();
@@ -101,12 +114,19 @@ public class Akira.FileFormat.JsonContent : Object {
         builder.end_array ();
     }
 
-    public string finalize_content () {
-        builder.end_object ();
+    public static string serialize_canvas (Akira.Lib.Canvas canvas) {
+        var inner_generator = new Json.Generator ();
+        inner_generator.pretty = true;
+        var inner_builder = new Json.Builder ();
+        inner_builder.begin_object ();
 
-        Json.Node root = builder.get_root ();
-        generator.set_root (root);
+        save_content(inner_builder, canvas);
 
-        return generator.to_data (null);
+        inner_builder.end_object ();
+
+        Json.Node root = inner_builder.get_root ();
+        inner_generator.set_root (root);
+
+        return inner_generator.to_data (null);
     }
 }

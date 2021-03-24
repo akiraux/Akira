@@ -59,7 +59,7 @@ public class Akira.FileFormat.AkiraFile : Akira.FileFormat.ZipArchiveHandler {
             save_images.begin ();
             var content = new FileFormat.JsonContent (window);
 
-            content.save_content ();
+            content.inner_save_content ();
             var json = content.finalize_content ();
             write_content_to_file (content_file, json);
 

@@ -53,6 +53,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         MODE_PANNING,
     }
 
+    public Managers.UndoManager undo_manager;
     public Managers.ExportManager export_manager;
     public Managers.SelectedBoundManager selected_bound_manager;
     private Managers.NobManager nob_manager;
@@ -85,6 +86,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         events |= Gdk.EventMask.TOUCHPAD_GESTURE_MASK;
         events |= Gdk.EventMask.TOUCH_MASK;
 
+        undo_manager = new Managers.UndoManager ();
         export_manager = new Managers.ExportManager (this);
         selected_bound_manager = new Managers.SelectedBoundManager (this);
         nob_manager = new Managers.NobManager (this);
@@ -258,6 +260,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
         switch (edit_mode) {
             case EditMode.MODE_INSERT:
+                undo_manager.add_undo(this);
                 selected_bound_manager.reset_selection ();
 
                 var new_item = window.items_manager.insert_item (event.x, event.y);
@@ -375,6 +378,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 break;
 
             case EditMode.MODE_SELECTION:
+                undo_manager.add_undo(this);
                 window.event_bus.detect_artboard_change ();
                 window.event_bus.detect_image_size_change ();
                 break;
@@ -424,6 +428,8 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
     public void on_insert_item () {
         edit_mode = EditMode.MODE_INSERT;
+
+        debug("add item");
     }
 
     public void on_set_focus_on_canvas () {

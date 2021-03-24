@@ -66,6 +66,8 @@ public class Akira.Services.ActionManager : Object {
     public const string ACTION_ESCAPE = "action_escape";
     public const string ACTION_SHORTCUTS = "action_shortcuts";
     public const string ACTION_PICK_COLOR = "action_pick_color";
+    public const string ACTION_UNDO = "action_undo";
+    public const string ACTION_REDO = "action_redo";
 
     public static Gee.MultiMap<string, string> action_accelerators = new Gee.HashMultiMap<string, string> ();
     public static Gee.MultiMap<string, string> typing_accelerators = new Gee.HashMultiMap<string, string> ();
@@ -104,6 +106,8 @@ public class Akira.Services.ActionManager : Object {
         { ACTION_ESCAPE, action_escape },
         { ACTION_SHORTCUTS, action_shortcuts },
         { ACTION_PICK_COLOR, action_pick_color },
+        { ACTION_UNDO, do_undo },
+        { ACTION_REDO, do_redo },
     };
 
     public ActionManager (Akira.Application akira_app, Akira.Window window) {
@@ -149,6 +153,9 @@ public class Akira.Services.ActionManager : Object {
         typing_accelerators.set (ACTION_DELETE, "Delete");
         typing_accelerators.set (ACTION_DELETE, "BackSpace");
         typing_accelerators.set (ACTION_TOGGLE_PIXEL_GRID, "<Shift>Tab");
+
+        typing_accelerators.set (ACTION_UNDO, "<Control>z");
+        typing_accelerators.set (ACTION_REDO, "<Control><Shift>z");
     }
 
     construct {
@@ -507,6 +514,16 @@ public class Akira.Services.ActionManager : Object {
             // had their properties changed.
             canvas.window.event_bus.selected_items_list_changed (canvas.selected_bound_manager.selected_items);
         });
+    }
+
+    private void do_undo () {
+        weak Akira.Lib.Canvas canvas = window.main_window.main_canvas.canvas;
+        canvas.undo_manager.apply_undo(canvas);
+    }
+
+    private void do_redo () {
+        weak Akira.Lib.Canvas canvas = window.main_window.main_canvas.canvas;
+        canvas.undo_manager.apply_redo(canvas);
     }
 
     public static void action_from_group (string action_name, ActionGroup? action_group) {
