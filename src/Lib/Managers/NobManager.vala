@@ -1,24 +1,24 @@
-/*
-* Copyright (c) 2019 Alecaddd (https://alecaddd.com)
-*
-* This file is part of Akira.
-*
-* Akira is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
+/**
+ * Copyright (c) 2019-2021 Alecaddd (https://alecaddd.com)
+ *
+ * This file is part of Akira.
+ *
+ * Akira is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
 
-* Akira is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-* GNU General Public License for more details.
+ * Akira is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
 
-* You should have received a copy of the GNU General Public License
-* along with Akira. If not, see <https://www.gnu.org/licenses/>.
-*
-* Authored by: Giacomo Alberini <giacomoalbe@gmail.com>
-* Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
-*/
+ * You should have received a copy of the GNU General Public License
+ * along with Akira. If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Authored by: Giacomo Alberini <giacomoalbe@gmail.com>
+ * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
+ */
 
 public class Akira.Lib.Managers.NobManager : Object {
     private const string STROKE_COLOR = "#666";
@@ -26,12 +26,14 @@ public class Akira.Lib.Managers.NobManager : Object {
     private const double LINE_HEIGHT = 40.0;
 
     /*
-    Grabber Pos:   8
+    Grabber Pos:
+      8
+      |
     0 1 2
     7   3
     6 5 4
 
-    // -1 if no nub is grabbed
+    // -1 if no nob is grabbed.
     */
     public enum Nob {
         NONE=-1,
@@ -55,7 +57,7 @@ public class Akira.Lib.Managers.NobManager : Object {
     private Goo.CanvasItemSimple[] nobs = new Goo.CanvasItemSimple[9];
     private Goo.CanvasPolyline? rotation_line;
 
-    // values in canvas coordinates
+    // Values in canvas coordinates.
     private double top_left_x;
     private double top_left_y;
     private double width_offset_x;
@@ -88,22 +90,22 @@ public class Akira.Lib.Managers.NobManager : Object {
         canvas.window.event_bus.show_select_effect.connect (on_show_select_effect);
     }
 
-    /*
+    /**
      * Set which nob is selected by its Nob name.
      */
     public void set_selected_by_name (Nob selected_nob) {
         this.selected_nob = selected_nob;
     }
 
-    /*
-     * Compares a target item to the current nobs to see if there is a match. Otherwise returns Nob.NONE.
+    /**
+     * Compares a target item to the current nobs to see if there is a match.
+     * Otherwise returns Nob.NONE.
      */
     public Nob get_grabbed_id (Goo.CanvasItem? target) {
         int grabbed_id = Nob.NONE;
 
         for (var i = 0; i < 9; ++i) {
-            var nob = nobs[i];
-            if (target == nob) {
+            if (target == nobs[i]) {
                 grabbed_id = i;
                 break;
             }
@@ -128,9 +130,10 @@ public class Akira.Lib.Managers.NobManager : Object {
         return nob == Nob.TOP_RIGHT || nob == Nob.RIGHT_CENTER || nob == Nob.BOTTOM_RIGHT;
     }
 
-    /*
-     * Takes a set of items and populates information needed to determine the selection box and nob positions.
-     * If the number of items is one, the selection box may be rotated, otherwise it is never rotated.
+    /**
+     * Takes a set of items and populates information needed to determine
+     * the selection box and nob positions. If the number of items is one,
+     * the selection box may be rotated, otherwise it is never rotated.
      */
     public static void populate_nob_bounds_from_items (
         List<Items.CanvasItem> items,
@@ -147,6 +150,7 @@ public class Akira.Lib.Managers.NobManager : Object {
         top_left_x = 0;
         top_left_y = 0;
 
+        // Check if we only have one item currently selected.
         if (items.length () == 1) {
             var item = items.first ().data;
             item.get_transform (out matrix);
@@ -170,9 +174,8 @@ public class Akira.Lib.Managers.NobManager : Object {
             nob_matrix.transform_point (ref top_left_x, ref top_left_y);
             return;
         }
-        else {
-            matrix = Cairo.Matrix.identity ();
-        }
+
+        matrix = Cairo.Matrix.identity ();
 
         bool first = true;
         double x1 = 0;
@@ -198,8 +201,9 @@ public class Akira.Lib.Managers.NobManager : Object {
         height_offset_y = height;
     }
 
-    /*
-     * Calculates the position of a nob based on values calculated using `populate_nob_bounds_from_items`.
+    /**
+     * Calculates the position of a nob based on values
+     * calculated using `populate_nob_bounds_from_items`.
      */
     private static void calculate_nob_position (
         Nob nob_name,
@@ -213,48 +217,46 @@ public class Akira.Lib.Managers.NobManager : Object {
         ref double pos_y
     ) {
         switch (nob_name) {
-        case Nob.NONE:
-            break;
-        case Nob.TOP_LEFT:
-            pos_x = top_left_x;
-            pos_y = top_left_y;
-            break;
-        case Nob.TOP_CENTER:
-            pos_x = top_left_x + width_offset_x / 2.0;
-            pos_y = top_left_y + width_offset_y / 2.0;
-            break;
-        case Nob.TOP_RIGHT:
-            pos_x = top_left_x + width_offset_x;
-            pos_y = top_left_y + width_offset_y;
-            break;
-        case Nob.RIGHT_CENTER:
-            pos_x = top_left_x + width_offset_x + height_offset_x / 2.0;
-            pos_y = top_left_y + width_offset_y + height_offset_y / 2.0;
-            break;
-        case Nob.BOTTOM_RIGHT:
-            pos_x = top_left_x + width_offset_x + height_offset_x;
-            pos_y = top_left_y + width_offset_y + height_offset_y;
-            break;
-        case Nob.BOTTOM_CENTER:
-            pos_x = top_left_x + width_offset_x / 2.0 + height_offset_x;
-            pos_y = top_left_y + width_offset_y / 2.0 + height_offset_y;
-            break;
-        case Nob.BOTTOM_LEFT:
-            pos_x = top_left_x + height_offset_x;
-            pos_y = top_left_y + height_offset_y;
-            break;
-        case Nob.LEFT_CENTER:
-            pos_x = top_left_x + height_offset_x / 2.0;
-            pos_y = top_left_y + height_offset_y / 2.0;
-            break;
-        default:
-            break;
+            case Nob.TOP_LEFT:
+                pos_x = top_left_x;
+                pos_y = top_left_y;
+                break;
+            case Nob.TOP_CENTER:
+                pos_x = top_left_x + width_offset_x / 2.0;
+                pos_y = top_left_y + width_offset_y / 2.0;
+                break;
+            case Nob.TOP_RIGHT:
+                pos_x = top_left_x + width_offset_x;
+                pos_y = top_left_y + width_offset_y;
+                break;
+            case Nob.RIGHT_CENTER:
+                pos_x = top_left_x + width_offset_x + height_offset_x / 2.0;
+                pos_y = top_left_y + width_offset_y + height_offset_y / 2.0;
+                break;
+            case Nob.BOTTOM_RIGHT:
+                pos_x = top_left_x + width_offset_x + height_offset_x;
+                pos_y = top_left_y + width_offset_y + height_offset_y;
+                break;
+            case Nob.BOTTOM_CENTER:
+                pos_x = top_left_x + width_offset_x / 2.0 + height_offset_x;
+                pos_y = top_left_y + width_offset_y / 2.0 + height_offset_y;
+                break;
+            case Nob.BOTTOM_LEFT:
+                pos_x = top_left_x + height_offset_x;
+                pos_y = top_left_y + height_offset_y;
+                break;
+            case Nob.LEFT_CENTER:
+                pos_x = top_left_x + height_offset_x / 2.0;
+                pos_y = top_left_y + height_offset_y / 2.0;
+                break;
+            case Nob.NONE:
+            default:
+                break;
         }
     }
 
-
-    /*
-     * Calculates the position of a nob based on a selection of items and the nob id
+    /**
+     * Calculates the position of a nob based on a selection of items and the nob id.
      */
     public static void nob_position_from_items (
         List<Items.CanvasItem> items,
@@ -298,15 +300,16 @@ public class Akira.Lib.Managers.NobManager : Object {
          );
     }
 
-    /*
+    /**
      * What happens when the canvas is zoomed in.
      */
     private void on_canvas_zoom () {
         on_add_select_effect (canvas.selected_bound_manager.selected_items);
     }
 
-    /*
-     * Adds selection effects if applicable to selected items, and repositions the selection and nobs.
+    /**
+     * Adds selection effects if applicable to selected items,
+     * and repositions the selection and nobs.
      */
     private void on_add_select_effect (List<Items.CanvasItem> selected_items) {
         if (selected_items.length () == 0) {
@@ -333,7 +336,7 @@ public class Akira.Lib.Managers.NobManager : Object {
         update_nob_position (selected_items);
     }
 
-    /*
+    /**
      * Resets all selection and nob items.
      */
     private void remove_select_effect (bool keep_selection = false) {
@@ -351,7 +354,7 @@ public class Akira.Lib.Managers.NobManager : Object {
         }
     }
 
-    /*
+    /**
      * Updates selection items, constructing them if necessary.
      */
     private void update_select_effect (List<Items.CanvasItem> selected_items) {
@@ -383,7 +386,7 @@ public class Akira.Lib.Managers.NobManager : Object {
         select_effect.set ("line-width", LINE_WIDTH / canvas.current_scale);
     }
 
-    /*
+    /**
      * Update the position of all nobs of selected items. It will show or hide them based on
      * the properties of the selection.
      */
@@ -449,12 +452,11 @@ public class Akira.Lib.Managers.NobManager : Object {
                     rotation_line.set ("height", LINE_HEIGHT / canvas.current_scale);
                     rotation_line.set ("visibility", Goo.CanvasItemVisibility.VISIBLE);
                     rotation_line.raise (select_effect);
-
                 } else {
                     rotation_line.set ("visibility", Goo.CanvasItemVisibility.HIDDEN);
                 }
 
-                // raise to the rotation_line, so the line is under the rotation nob
+                // Raise to the rotation_line, so the line is under the rotation nob.
                 nob.update_state (bb_matrix, center_x, center_y, set_visible);
                 nob.raise (rotation_line);
                 return;
@@ -465,34 +467,36 @@ public class Akira.Lib.Managers.NobManager : Object {
         }
     }
 
-    /*
-     * Constructs all nobs and the rotation line if they haven't been constructed already
+    /**
+     * Constructs all nobs and the rotation line if they haven't been constructed already.
      */
     private void populate_nobs () {
-        if (!nobs_constructed) {
-            root = canvas.get_root_item ();
-
-            for (int i = 0; i < 9; i++) {
-                var nob = new Selection.Nob (root, (Managers.NobManager.Nob) i);
-                nob.set ("visibility", Goo.CanvasItemVisibility.HIDDEN);
-                nobs[i] = nob;
-            }
-
-            // Create the line to visually connect the rotation nob to the item.
-            rotation_line = new Goo.CanvasPolyline.line (
-                null, 0, 0, 0, LINE_HEIGHT,
-                "line-width", LINE_WIDTH / canvas.current_scale,
-                "stroke-color", STROKE_COLOR,
-                null);
-            rotation_line.set ("parent", root);
-            rotation_line.pointer_events = Goo.CanvasPointerEvents.NONE;
-
-            nobs_constructed = true;
+        if (nobs_constructed) {
+            return;
         }
+
+        root = canvas.get_root_item ();
+
+        for (int i = 0; i < 9; i++) {
+            var nob = new Selection.Nob (root, (Managers.NobManager.Nob) i);
+            nob.set ("visibility", Goo.CanvasItemVisibility.HIDDEN);
+            nobs[i] = nob;
+        }
+
+        // Create the line to visually connect the rotation nob to the item.
+        rotation_line = new Goo.CanvasPolyline.line (
+            null, 0, 0, 0, LINE_HEIGHT,
+            "line-width", LINE_WIDTH / canvas.current_scale,
+            "stroke-color", STROKE_COLOR,
+            null);
+        rotation_line.set ("parent", root);
+        rotation_line.pointer_events = Goo.CanvasPointerEvents.NONE;
+
+        nobs_constructed = true;
     }
 
 
-    /*
+    /**
      * Asynchronous call to hide selection and nobs.
      */
     private async void on_hide_select_effect () {
@@ -504,7 +508,7 @@ public class Akira.Lib.Managers.NobManager : Object {
         rotation_line.set ("visibility", Goo.CanvasItemVisibility.HIDDEN);
     }
 
-    /*
+    /**
      * Asynchronous call to show selection and nobs.
      */
     private async void on_show_select_effect () {

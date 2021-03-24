@@ -68,6 +68,12 @@ public class Akira.Lib.Selection.Nob : Goo.CanvasRect {
         y = 0;
 
         update_state (Cairo.Matrix.identity (), 0, 0, false);
+
+        if (handle_id == Managers.NobManager.Nob.ROTATE) {
+            set ("radius-x", nob_size);
+            set ("radius-y", nob_size);
+        }
+
         set ("fill-color", "#fff");
         set ("stroke-color", "#41c9fd");
     }
