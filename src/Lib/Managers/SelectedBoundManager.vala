@@ -146,10 +146,6 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         // TODO: allow for multi selection with shift pressed
         reset_selection ();
 
-        if (item.layer.locked) {
-            return;
-        }
-
         item.layer.selected = true;
         item.size.update_ratio ();
 

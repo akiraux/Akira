@@ -201,9 +201,12 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
         build_drag_and_drop ();
 
         handle.button_press_event.connect (on_click_event);
-        handle.button_release_event.connect (on_release_event);
 
         handle.enter_notify_event.connect (event => {
+            if (model.layer.locked) {
+                return true;
+            }
+
             get_style_context ().add_class ("hover");
             window.event_bus.hover_over_layer (model);
             return false;
@@ -496,7 +499,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
      * @param {Gdk.Event} event - The button click event.
      * @return {bool} True to stop propagation, False to let other events run.
      */
-    public bool on_click_event (Gdk.Event event) {
+    public bool on_click_event (Gdk.EventButton event) {
         if (model.layer.locked) {
             return true;
         }
@@ -542,91 +545,6 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 
         return false;
     }
-
-    /**
-     * Handle the release event for the EventBox to manage multi select.
-     *
-     * @param {Gdk.Event} event - The button click event.
-     * @return {bool} True to stop propagation, False to let other events run.
-     */
-    public bool on_release_event (Gdk.Event event) {
-        // Always move the focus back to the canvas.
-        window.event_bus.set_focus_on_canvas ();
-        return true;
-    //     if (event.type == Gdk.EventType.BUTTON_RELEASE) {
-    //         if (entry.visible == true) {
-    //             return false;
-    //         }
-
-    //         Gdk.ModifierType state;
-    //         event.get_state (out state);
-
-    //         if (state.to_string () == "GDK_CONTROL_MASK") {
-    //             artboard.container.selection_mode = Gtk.SelectionMode.MULTIPLE;
-
-    //             if (layer_group != null) {
-    //                 layer_group.container.selection_mode = Gtk.SelectionMode.MULTIPLE;
-
-    //                 if (!layer_group.is_selected ()) {
-    //                     Timeout.add (1, () => {
-    //                         artboard.container.unselect_row (layer_group);
-    //                         return false;
-    //                     });
-    //                 }
-    //             }
-
-    //             if (is_selected ()) {
-    //                 Timeout.add (1, () => {
-    //                     artboard.container.unselect_row (this);
-    //                     return false;
-    //                 });
-    //             }
-
-    //             return true;
-    //         }
-
-    //         if (artboard != null) {
-    //             artboard.container.selection_mode = Gtk.SelectionMode.SINGLE;
-    //         }
-
-    //         window.main_window.right_sidebar.layers_panel.foreach (child => {
-    //             if (child is Akira.Layouts.Partials.Artboard) {
-    //                 Akira.Layouts.Partials.Artboard artboard = (Akira.Layouts.Partials.Artboard) child;
-
-    //                 window.main_window.right_sidebar.layers_panel.unselect_row (artboard);
-    //                 artboard.container.unselect_all ();
-
-    //                 unselect_groups (artboard.container);
-    //             }
-    //         });
-
-    //         if (layer_group != null) {
-    //             artboard.container.selection_mode = Gtk.SelectionMode.NONE;
-    //             artboard.container.unselect_row (layer_group);
-    //         }
-
-    //         if (artboard != null) {
-    //             window.main_window.right_sidebar.layers_panel.unselect_row (artboard);
-    //         }
-
-    //         return true;
-    //     }
-
-    //     return false;
-    }
-
-    //  private void unselect_groups (Gtk.ListBox container) {
-    //      container.foreach (child => {
-    //          if (child is Akira.Layouts.Partials.Layer) {
-    //              Akira.Layouts.Partials.Layer layer = (Akira.Layouts.Partials.Layer) child;
-
-    //              if (layer.grouped) {
-    //                  layer.container.unselect_all ();
-    //                  unselect_groups (layer.container);
-    //              }
-    //          }
-    //      });
-    //  }
 
     public void update_on_enter () {
         update_label ();
@@ -681,20 +599,24 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
 
             if (active) {
                 button_locked.get_style_context ().add_class ("show");
+                // Disable any pointer events for a locked item.
+                model.pointer_events = Goo.CanvasPointerEvents.NONE;
+
+                // Let the UI know that this item was locked.
+                window.event_bus.item_locked (model);
+                ((Gtk.ListBox) parent).unselect_row (this);
+                model.layer.selected = false;
             } else {
                 button_locked.get_style_context ().remove_class ("show");
+                // Re-enable pointer events.
+                model.pointer_events = Goo.CanvasPointerEvents.ALL;
             }
 
             icon_unlocked.visible = active;
-            icon_unlocked.no_show_all = ! active;
+            icon_unlocked.no_show_all = !active;
 
-            icon_locked.visible = ! active;
+            icon_locked.visible = !active;
             icon_locked.no_show_all = active;
-
-            if (active) {
-                window.event_bus.item_locked (model);
-                ((Gtk.ListBox) parent).unselect_row (this);
-            }
 
             window.event_bus.set_focus_on_canvas ();
             window.event_bus.file_edited ();

@@ -320,13 +320,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 }
 
                 if (clicked_item is Items.CanvasItem) {
-                    Items.CanvasItem item = clicked_item as Items.CanvasItem;
-
-                    if (item.layer.locked) {
-                        selected_bound_manager.reset_selection ();
-                        holding = false;
-                        return true;
-                    }
+                    var item = clicked_item as Items.CanvasItem;
 
                     // Item has been selected.
                     selected_bound_manager.add_item_to_selection (item);
