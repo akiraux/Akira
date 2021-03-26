@@ -138,7 +138,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
         handle = new Gtk.EventBox ();
         handle.hexpand = true;
         handle.add (label_grid);
-        handle.event.connect (on_handle_event);
+        handle.button_press_event.connect (on_click_event);
 
         button_locked = new Gtk.ToggleButton ();
         button_locked.tooltip_text = _("Lock Layer");
@@ -222,6 +222,10 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
         });
 
         handle.enter_notify_event.connect (event => {
+            if (model.layer.locked) {
+                return true;
+            }
+
             get_style_context ().add_class ("hover");
             window.event_bus.hover_over_layer (model);
             return false;
@@ -414,7 +418,11 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
         model.changed (true);
     }
 
-    private bool on_handle_event (Gdk.Event event) {
+    private bool on_click_event (Gdk.EventButton event) {
+        if (model.layer.locked) {
+            return true;
+        }
+
         switch (event.type) {
             case Gdk.EventType.@2BUTTON_PRESS:
                 entry.text = label.label;
@@ -422,6 +430,11 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
                 entry.no_show_all = false;
                 label.visible = false;
                 label.no_show_all = true;
+
+                button_locked.visible = false;
+                button_locked.no_show_all = true;
+                button_hidden.visible = false;
+                button_hidden.no_show_all = true;
 
                 editing = true;
 
@@ -434,8 +447,14 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 
             case Gdk.EventType.BUTTON_PRESS:
                 window.event_bus.request_add_item_to_selection (model);
+
+                // Selected layers can't show hover a effect.
+                get_style_context ().remove_class ("hovered");
+
                 // Always move the focus back to the canvas.
                 window.event_bus.set_focus_on_canvas ();
+                window.event_bus.hover_over_layer (null);
+
                 return true;
         }
 
@@ -495,20 +514,24 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
 
             if (active) {
                 button_locked.get_style_context ().add_class ("show");
+                // Disable any pointer events for a locked item.
+                model.pointer_events = Goo.CanvasPointerEvents.NONE;
+
+                // Let the UI know that this item was locked.
+                window.event_bus.item_locked (model);
+                ((Gtk.ListBox) parent).unselect_row (this);
+                model.layer.selected = false;
             } else {
                 button_locked.get_style_context ().remove_class ("show");
+                // Re-enable pointer events.
+                model.pointer_events = Goo.CanvasPointerEvents.ALL;
             }
 
             icon_unlocked.visible = active;
-            icon_unlocked.no_show_all = ! active;
+            icon_unlocked.no_show_all = !active;
 
-            icon_locked.visible = ! active;
+            icon_locked.visible = !active;
             icon_locked.no_show_all = active;
-
-            if (active) {
-                window.event_bus.item_locked (model);
-                ((Gtk.ListBox) parent).unselect_row (this);
-            }
 
             window.event_bus.set_focus_on_canvas ();
             window.event_bus.file_edited ();
