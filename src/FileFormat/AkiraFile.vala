@@ -44,7 +44,8 @@ public class Akira.FileFormat.AkiraFile : Akira.FileFormat.ZipArchiveHandler {
             open_archive ();
 
             var content_json = get_content_as_json (content_file);
-            new FileFormat.JsonLoader (window, content_json);
+
+            FileFormat.JsonDeserializer.json_object_to_world (content_json, window);
 
             update_recent_list.begin ();
 
@@ -57,11 +58,9 @@ public class Akira.FileFormat.AkiraFile : Akira.FileFormat.ZipArchiveHandler {
     public void save_file () {
         try {
             save_images.begin ();
-            var content = new FileFormat.JsonContent (window);
 
-            content.save_content ();
-            var json = content.finalize_content ();
-            write_content_to_file (content_file, json);
+            var world_json = FileFormat.JsonSerializer.world_to_json_node (window);
+            write_content_to_file (content_file, FileFormat.JsonSerializer.json_to_string (world_json, true));
 
             write_to_archive ();
             update_recent_list.begin ();

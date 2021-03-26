@@ -23,18 +23,27 @@
 /**
  * Converts an item into a JSON Object, converting all the child attributes to string.
  */
-public class Akira.FileFormat.JsonObject : GLib.Object {
-    public weak Lib.Items.CanvasItem? item;
+public class Akira.FileFormat.JsonItemSerializer {
 
-    private Json.Object object;
-    private ObjectClass obj_class;
+    /*
+     * Serialize an item and return its corresponding Json.Node.
+     */
+    public static Json.Node serialize_item (Lib.Items.CanvasItem item) {
+        var object = new Json.Object ();
 
-    public JsonObject (Lib.Items.CanvasItem? _item) {
-        item = _item;
+        serialize_type_specifics (item, ref object);
+        serialize_matrix (item, ref object);
+        serialize_components (item, ref object);
 
-        object = new Json.Object ();
-        obj_class = (ObjectClass) item.get_type ().class_ref ();
+        var node = new Json.Node.alloc ();
+        node.set_object (object);
+        return node;
+    }
 
+    /*
+     * Serialize type specifics of an item.
+     */
+    private static void serialize_type_specifics (Lib.Items.CanvasItem item, ref Json.Object object) {
         // Set a string of the type so we're not tied to the namespace and location.
         if (item is Lib.Items.CanvasArtboard) {
             object.set_string_member ("type", "artboard");
@@ -61,19 +70,12 @@ public class Akira.FileFormat.JsonObject : GLib.Object {
         if (item.artboard != null) {
             object.set_string_member ("artboard", item.artboard.name.id);
         }
-
-        write_matrix ();
-        write_components ();
     }
 
-    public Json.Node get_node () {
-        var node = new Json.Node.alloc ();
-        node.set_object (object);
-
-        return node;
-    }
-
-    private void write_matrix () {
+    /*
+     * Serialize item transform matrix.
+     */
+    private static void serialize_matrix (Lib.Items.CanvasItem item, ref Json.Object object) {
         var identity = Cairo.Matrix.identity ();
         item.get_transform (out identity);
 
@@ -89,9 +91,9 @@ public class Akira.FileFormat.JsonObject : GLib.Object {
     }
 
     /**
-     * Write all the Components used by the item.
+     * Serialize all the Components used by the item.
      */
-    private void write_components () {
+    private static void serialize_components (Lib.Items.CanvasItem item, ref Json.Object object) {
         // Interrupt if this is not a CanvasItem.
         if (!(item is Lib.Items.CanvasItem)) {
             return;
