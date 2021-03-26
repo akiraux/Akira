@@ -404,7 +404,6 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 var selected_nob = nob_manager.selected_nob;
                 selected_bound_manager.transform_bound (event.x, event.y, selected_nob);
                 break;
-
             case EditMode.MODE_PANNING:
                 canvas_moved (event.x, event.y);
                 break;
