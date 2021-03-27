@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Alecaddd (https://alecaddd.com)
+ * Copyright (c) 2020-2021 Alecaddd (https://alecaddd.com)
  *
  * This file is part of Akira.
  *
@@ -19,22 +19,22 @@
  * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
  */
 
-public class Akira.FileFormat.JsonLoader : Object {
-    public weak Akira.Window window { get; construct; }
-    public Json.Object obj { get; construct; }
-
-    public JsonLoader (Akira.Window window, Json.Object obj) {
-        Object (
-            window: window,
-            obj: obj
-        );
+public class Akira.FileFormat.JsonDeserializer {
+    /*
+     * Deserialize a Json.Node and apply it to the current world state.
+     * This deserializes a node, which is symmetric with the output of JsonSerializer.
+     */
+    public static void json_node_to_world (Json.Node node, Akira.Window window, bool items_only = false) {
+        var obj = node.get_object ();
+        if (obj != null) {
+            json_object_to_world (obj, window, items_only);
+        }
     }
 
-    construct {
-        load_content ();
-    }
-
-    public void load_content () {
+    /*
+     * Deserialize a Json.Node and apply it to the current world state.
+     */
+    public static void json_object_to_world (Json.Object obj, Akira.Window window, bool items_only = false) {
         // Se the canvas to simulate a click + holding state to avoid triggering
         // redrawing methods connected to that state.
         window.main_window.main_canvas.canvas.holding = true;
@@ -46,7 +46,7 @@ public class Akira.FileFormat.JsonLoader : Object {
             artboards_list.reverse ();
 
             foreach (unowned Json.Node node in artboards_list) {
-                load_item (node.get_object (), "artboard");
+                load_item (window, node.get_object (), "artboard");
             }
         }
 
@@ -57,22 +57,33 @@ public class Akira.FileFormat.JsonLoader : Object {
             items_list.reverse ();
 
             foreach (unowned Json.Node node in items_list) {
-                load_item (node.get_object (), "item");
+                load_item (window, node.get_object (), "item");
             }
         }
 
-        window.event_bus.set_scale (obj.get_double_member ("scale"));
-        window.main_window.main_canvas.main_scroll.hadjustment.value = obj.get_double_member ("hadjustment");
-        window.main_window.main_canvas.main_scroll.vadjustment.value = obj.get_double_member ("vadjustment");
+        if (!items_only) {
+            load_window_states (window, obj);
+        }
 
         // Reset the holding state at the end of it.
         window.main_window.main_canvas.canvas.holding = false;
     }
 
-    private void load_item (Json.Object obj, string type) {
+    /*
+     * Deserialize window states and apply them to the window.
+     */
+    private static void load_window_states (Akira.Window window, Json.Object obj) {
+        window.event_bus.set_scale (obj.get_double_member ("scale"));
+        window.main_window.main_canvas.main_scroll.hadjustment.value = obj.get_double_member ("hadjustment");
+        window.main_window.main_canvas.main_scroll.vadjustment.value = obj.get_double_member ("vadjustment");
+    }
+
+    /*
+     * Deserialize item states and apply them to the window.
+     */
+    private static void load_item (Akira.Window window, Json.Object obj, string type) {
         var item = obj.get_member (type).get_object ();
         if (item != null) {
-            //  debug ("loading %s", type);
             window.items_manager.load_item (item);
         }
     }
