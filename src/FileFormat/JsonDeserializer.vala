@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Alecaddd (https://alecaddd.com)
+ * Copyright (c) 2020-2021 Alecaddd (https://alecaddd.com)
  *
  * This file is part of Akira.
  *
@@ -20,7 +20,6 @@
  */
 
 public class Akira.FileFormat.JsonDeserializer {
-
     /*
      * Deserialize a Json.Node and apply it to the current world state.
      * This deserializes a node, which is symmetric with the output of JsonSerializer.
@@ -28,7 +27,7 @@ public class Akira.FileFormat.JsonDeserializer {
     public static void json_node_to_world (Json.Node node, Akira.Window window, bool items_only = false) {
         var obj = node.get_object ();
         if (obj != null) {
-            json_object_to_world(obj, window, items_only);
+            json_object_to_world (obj, window, items_only);
         }
     }
 
