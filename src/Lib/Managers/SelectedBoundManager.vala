@@ -133,7 +133,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         }
 
         // Notify the X & Y values in the state manager.
-        canvas.window.event_bus.reset_state_coords (selected_item);
+        canvas.window.event_bus.reset_state_coords ();
     }
 
     public void add_item_to_selection (Items.CanvasItem item) {
@@ -149,10 +149,9 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         item.layer.selected = true;
         item.size.update_ratio ();
 
-        // Initialize the state manager coordinates before adding the item to the selection.
-        canvas.window.event_bus.init_state_coords (item);
-
         selected_items.append (item);
+        // Initialize the state manager coordinates.
+        canvas.window.event_bus.init_state_coords ();
 
         // Move focus back to the canvas.
         canvas.window.event_bus.set_focus_on_canvas ();

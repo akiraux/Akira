@@ -55,7 +55,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
     public Managers.ExportManager export_manager;
     public Managers.SelectedBoundManager selected_bound_manager;
-    private Managers.NobManager nob_manager;
+    public Managers.NobManager nob_manager;
     private Managers.HoverManager hover_manager;
 
     public bool ctrl_is_pressed = false;
@@ -394,7 +394,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         }
 
         if (!holding) {
-            // Only motion_hover_effect
+            // Only motion_hover_effect.
             return false;
         }
 

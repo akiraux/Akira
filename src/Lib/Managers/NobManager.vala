@@ -66,7 +66,13 @@ public class Akira.Lib.Managers.NobManager : Object {
     private double height_offset_y;
     private double bb_width;
     private double bb_height;
-    Cairo.Matrix bb_matrix;
+    private Cairo.Matrix bb_matrix;
+
+    // Values for the Transform Panel fields.
+    public double selected_x;
+    public double selected_y;
+    public double selected_width;
+    public double selected_height;
 
     // Tracks if an artboard is part of the current selection.
     private bool is_artboard;
@@ -145,7 +151,9 @@ public class Akira.Lib.Managers.NobManager : Object {
         ref double height_offset_x,
         ref double height_offset_y,
         ref double width,
-        ref double height
+        ref double height,
+        ref double selected_x,
+        ref double selected_y
     ) {
         top_left_x = 0;
         top_left_y = 0;
@@ -154,6 +162,11 @@ public class Akira.Lib.Managers.NobManager : Object {
         if (items.length () == 1) {
             var item = items.first ().data;
             item.get_transform (out matrix);
+
+            // Set the coordinates for the transform panel.
+            // Use x and y coordinates to account for the item being inside artboard.
+            selected_x = item.coordinates.x;
+            selected_y = item.coordinates.y;
 
             Cairo.Matrix nob_matrix = matrix;
             if (item.artboard != null) {
@@ -178,17 +191,27 @@ public class Akira.Lib.Managers.NobManager : Object {
         matrix = Cairo.Matrix.identity ();
 
         bool first = true;
+        double x = 0;
+        double y = 0;
         double x1 = 0;
         double y1 = 0;
         double x2 = 0;
         double y2 = 0;
         foreach (var item in items) {
+            // Store the coordinates accounting for items inside artboards.
+            x = first ? item.coordinates.x : double.min (x, item.coordinates.x);
+            y = first ? item.coordinates.y : double.min (y, item.coordinates.y);
+
             x1 = first ? item.coordinates.x1 : double.min (x1, item.coordinates.x1);
             x2 = double.max (x2, item.coordinates.x2);
             y1 = first ? item.coordinates.y1 : double.min (y1, item.coordinates.y1);
             y2 = double.max (y2, item.coordinates.y2);
             first = false;
         }
+
+        // Set the coordinates for the transform panel.
+        selected_x = x;
+        selected_y = y;
 
         width = x2 - x1;
         height = y2 - y1;
@@ -258,47 +281,47 @@ public class Akira.Lib.Managers.NobManager : Object {
     /**
      * Calculates the position of a nob based on a selection of items and the nob id.
      */
-    public static void nob_position_from_items (
-        List<Items.CanvasItem> items,
-        Nob nob_name,
-        ref double pos_x,
-        ref double pos_y
-    ) {
-        Cairo.Matrix dummy_matrix = Cairo.Matrix.identity ();
-        double dummy_top_left_x = 0;
-        double dummy_top_left_y = 0;
-        double dummy_width_offset_x = 0;
-        double dummy_width_offset_y = 0;
-        double dummy_height_offset_x = 0;
-        double dummy_height_offset_y = 0;
-        double dummy_width = 0;
-        double dummy_height = 0;
+    // public static void nob_position_from_items (
+    //     List<Items.CanvasItem> items,
+    //     Nob nob_name,
+    //     ref double pos_x,
+    //     ref double pos_y
+    // ) {
+    //     Cairo.Matrix dummy_matrix = Cairo.Matrix.identity ();
+    //     double dummy_top_left_x = 0;
+    //     double dummy_top_left_y = 0;
+    //     double dummy_width_offset_x = 0;
+    //     double dummy_width_offset_y = 0;
+    //     double dummy_height_offset_x = 0;
+    //     double dummy_height_offset_y = 0;
+    //     double dummy_width = 0;
+    //     double dummy_height = 0;
 
-        populate_nob_bounds_from_items (
-            items,
-            ref dummy_matrix,
-            ref dummy_top_left_x,
-            ref dummy_top_left_y,
-            ref dummy_width_offset_x,
-            ref dummy_width_offset_y,
-            ref dummy_height_offset_x,
-            ref dummy_height_offset_y,
-            ref dummy_width,
-            ref dummy_height
-        );
+    //     populate_nob_bounds_from_items (
+    //         items,
+    //         ref dummy_matrix,
+    //         ref dummy_top_left_x,
+    //         ref dummy_top_left_y,
+    //         ref dummy_width_offset_x,
+    //         ref dummy_width_offset_y,
+    //         ref dummy_height_offset_x,
+    //         ref dummy_height_offset_y,
+    //         ref dummy_width,
+    //         ref dummy_height
+    //     );
 
-        calculate_nob_position (
-            nob_name,
-            dummy_top_left_x,
-            dummy_top_left_y,
-            dummy_width_offset_x,
-            dummy_width_offset_y,
-            dummy_height_offset_x,
-            dummy_height_offset_y,
-            ref pos_x,
-            ref pos_y
-         );
-    }
+    //     calculate_nob_position (
+    //         nob_name,
+    //         dummy_top_left_x,
+    //         dummy_top_left_y,
+    //         dummy_width_offset_x,
+    //         dummy_width_offset_y,
+    //         dummy_height_offset_x,
+    //         dummy_height_offset_y,
+    //         ref pos_x,
+    //         ref pos_y
+    //      );
+    // }
 
     /**
      * What happens when the canvas is zoomed in.
@@ -329,7 +352,9 @@ public class Akira.Lib.Managers.NobManager : Object {
             ref height_offset_x,
             ref height_offset_y,
             ref bb_width,
-            ref bb_height
+            ref bb_height,
+            ref selected_x,
+            ref selected_y
         );
 
         update_select_effect (selected_items);

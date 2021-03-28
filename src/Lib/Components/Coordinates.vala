@@ -23,6 +23,7 @@
  * Coordinates component to keep track of the item's initial coordinates.
  */
 public class Akira.Lib.Components.Coordinates : Component {
+    // Returns the bounds.x1 value updated if the item is inside an artboard.
     public double x {
         get {
             // If the item is an artboard we need to get the bounds of the background since
@@ -43,6 +44,7 @@ public class Akira.Lib.Components.Coordinates : Component {
         }
     }
 
+    // Returns the global bounds.x1 value.
     public double x1 {
         get {
             // If the item is an artboard we need to get the bounds of the background since
@@ -56,6 +58,7 @@ public class Akira.Lib.Components.Coordinates : Component {
         }
     }
 
+    // Returns the global bounds.x2 value.
     public double x2 {
         get {
             // If the item is an artboard we need to get the bounds of the background since
@@ -69,6 +72,7 @@ public class Akira.Lib.Components.Coordinates : Component {
         }
     }
 
+    // Returns the bounds.y1 value updated if the item is inside an artboard.
     public double y {
         get {
             // If the item is an artboard we need to get the bounds of the background since
@@ -89,6 +93,7 @@ public class Akira.Lib.Components.Coordinates : Component {
         }
     }
 
+    // Returns the global bounds.y1 value.
     public double y1 {
         get {
             // If the item is an artboard we need to get the bounds of the background since
@@ -102,6 +107,7 @@ public class Akira.Lib.Components.Coordinates : Component {
         }
     }
 
+    // Returns the global bounds.y2 value.
     public double y2 {
         get {
             // If the item is an artboard we need to get the bounds of the background since
