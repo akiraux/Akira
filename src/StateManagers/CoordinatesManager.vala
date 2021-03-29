@@ -30,7 +30,7 @@ public class Akira.StateManagers.CoordinatesManager : Object {
 
     // These attributes represent only the primary X & Y coordinates of the selected shapes.
     // These are not the origin points of each selected shape, but only the TOP-LEFT values
-    // of the selection bounding box.
+    // of the bounding box selection.
     private double? _x = null;
     public double x {
         get {
@@ -42,7 +42,7 @@ public class Akira.StateManagers.CoordinatesManager : Object {
             }
 
             _x = Utils.AffineTransform.fix_size (value);
-            update_items_coordinates ();
+            update_items_x ();
         }
     }
 
@@ -57,7 +57,7 @@ public class Akira.StateManagers.CoordinatesManager : Object {
             }
 
             _y = Utils.AffineTransform.fix_size (value);
-            update_items_coordinates ();
+            update_items_y ();
         }
     }
 
@@ -110,7 +110,7 @@ public class Akira.StateManagers.CoordinatesManager : Object {
     /*
      * Reset the coordinates to get the newly updated coordinates from the selected items.
      * This method is called when items are moved from the canvas, so we only need to update
-     * the X and Y values for the Transform Panel without triggering the update_items_coordinates().
+     * the X and Y values for the Transform Panel without triggering the update_items_*().
      */
     private void on_reset_state_coords () {
         on_init_state_coords ();
@@ -120,24 +120,41 @@ public class Akira.StateManagers.CoordinatesManager : Object {
     }
 
     /*
-     * Get the newly updated coordinates and update the position of all selected items.
+     * Update the position of all selected items.
      */
-    private void update_items_coordinates () {
-        if (_x == null || _y == null || !do_update) {
+     private void update_items_x () {
+        if (_x == null || !do_update) {
             return;
         }
 
-        // Loop through all the selected items to update their position. This is temporary
-        // since we currently support only 1 selected item per time. In the future, we will need
-        // to account for multiple items and their relative position between each other.
+        // Loop through all the selected items to update their position.
         foreach (Lib.Items.CanvasItem item in canvas.selected_bound_manager.selected_items) {
             Cairo.Matrix matrix;
             item.get_transform (out matrix);
 
             // Increment the cairo matrix coordinates so we can ignore the item's rotation.
             matrix.x0 += Utils.AffineTransform.fix_size (x - item.coordinates.x);
-            matrix.y0 += Utils.AffineTransform.fix_size (y - item.coordinates.y);
+            item.set_transform (matrix);
 
+            window.event_bus.item_value_changed ();
+        }
+    }
+
+    /*
+     * Update the position of all selected items.
+     */
+    private void update_items_y () {
+        if (_y == null || !do_update) {
+            return;
+        }
+
+        // Loop through all the selected items to update their position.
+        foreach (Lib.Items.CanvasItem item in canvas.selected_bound_manager.selected_items) {
+            Cairo.Matrix matrix;
+            item.get_transform (out matrix);
+
+            // Increment the cairo matrix coordinates so we can ignore the item's rotation.
+            matrix.y0 += Utils.AffineTransform.fix_size (y - item.coordinates.y);
             item.set_transform (matrix);
 
             window.event_bus.item_value_changed ();

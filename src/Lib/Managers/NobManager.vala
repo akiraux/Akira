@@ -153,7 +153,9 @@ public class Akira.Lib.Managers.NobManager : Object {
         ref double width,
         ref double height,
         ref double selected_x,
-        ref double selected_y
+        ref double selected_y,
+        ref double selected_width,
+        ref double selected_height
     ) {
         top_left_x = 0;
         top_left_y = 0;
@@ -175,8 +177,8 @@ public class Akira.Lib.Managers.NobManager : Object {
                 nob_matrix.multiply (matrix, artboard_matrix);
             }
 
-            width = item.size.width;
-            height = item.size.height;
+            width = selected_width = item.size.width;
+            height = selected_height = item.size.height;
 
             width_offset_x = width;
             width_offset_y = 0;
@@ -354,7 +356,9 @@ public class Akira.Lib.Managers.NobManager : Object {
             ref bb_width,
             ref bb_height,
             ref selected_x,
-            ref selected_y
+            ref selected_y,
+            ref selected_width,
+            ref selected_height
         );
 
         update_select_effect (selected_items);
