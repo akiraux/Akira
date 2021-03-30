@@ -339,7 +339,12 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
     /**
      * Move the item based on the mouse click and drag event.
      */
-    private void move_from_event (Lib.Items.CanvasItem item, double event_x, double event_y) {
+    public void move_from_event (
+        Lib.Items.CanvasItem item,
+        double event_x,
+        double event_y,
+        bool ignore_offset = false
+    ) {
         if (!initial_drag_registered) {
             initial_drag_registered = true;
             initial_drag_item_x = item.coordinates.x;
@@ -356,8 +361,8 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         var delta_x = event_x - initial_drag_press_x;
         var delta_y = event_y - initial_drag_press_y;
 
-        // Keep reset and delta values for future adjustments. fix_size should.
-        // be called right before a transform.
+        // Keep reset and delta values for future adjustments.
+        // fix_size should be called right before a transform.
         var first_move_x = Utils.AffineTransform.fix_size (delta_x - reset_x);
         var first_move_y = Utils.AffineTransform.fix_size (delta_y - reset_y);
 
@@ -388,6 +393,14 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         int snap_offset_x = 0;
         int snap_offset_y = 0;
         var matches = Utils.Snapping.generate_snap_matches (snap_grid, selected_items, sensitivity);
+
+        // Don't force the offset translation on items. This is mostly
+        // used when moving items from the Transform Panel where we want to show
+        // the snapping guides but ignore the magnetic effect.
+        if (ignore_offset) {
+            update_grid_decorators (true);
+            return;
+        }
 
         if (matches.h_data.snap_found ()) {
             snap_offset_x = matches.h_data.snap_offset ();

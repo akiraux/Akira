@@ -89,8 +89,8 @@ public class Akira.StateManagers.SizeManager : Object {
         do_update = false;
 
         // Get the item WIDTH & HEIGHT.
-        width = canvas.nob_manager.selected_width;
-        height = canvas.nob_manager.selected_height;
+        width = canvas.nob_manager.bb_width;
+        height = canvas.nob_manager.bb_height;
 
         do_update = true;
     }
@@ -125,7 +125,7 @@ public class Akira.StateManagers.SizeManager : Object {
         }
 
         // Get the correct modified amount in order to resize all the selected items equally.
-        var delta_w = width - canvas.nob_manager.selected_width;
+        var delta_w = width - canvas.nob_manager.bb_width;
 
         // Loop through all the selected items to update their width.
         foreach (Lib.Items.CanvasItem item in canvas.selected_bound_manager.selected_items) {
@@ -142,7 +142,7 @@ public class Akira.StateManagers.SizeManager : Object {
         }
 
         // Get the correct modified amount in order to resize all the selected items equally.
-        var delta_h = height - canvas.nob_manager.selected_height;
+        var delta_h = height - canvas.nob_manager.bb_height;
 
         // Loop through all the selected items to update their height.
         foreach (Lib.Items.CanvasItem item in canvas.selected_bound_manager.selected_items) {

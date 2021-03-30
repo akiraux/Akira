@@ -64,15 +64,15 @@ public class Akira.Lib.Managers.NobManager : Object {
     private double width_offset_y;
     private double height_offset_x;
     private double height_offset_y;
-    private double bb_width;
-    private double bb_height;
+    // bb_width and bb_height are also used by the SizeManager to represent
+    // the width and height of selected items in the Transform Panel.
+    public double bb_width;
+    public double bb_height;
     private Cairo.Matrix bb_matrix;
 
     // Values for the Transform Panel fields.
-    public double selected_x;
-    public double selected_y;
-    public double selected_width;
-    public double selected_height;
+    private double selected_x;
+    private double selected_y;
 
     // Tracks if an artboard is part of the current selection.
     private bool is_artboard;
@@ -153,9 +153,7 @@ public class Akira.Lib.Managers.NobManager : Object {
         ref double width,
         ref double height,
         ref double selected_x,
-        ref double selected_y,
-        ref double selected_width,
-        ref double selected_height
+        ref double selected_y
     ) {
         top_left_x = 0;
         top_left_y = 0;
@@ -177,8 +175,8 @@ public class Akira.Lib.Managers.NobManager : Object {
                 nob_matrix.multiply (matrix, artboard_matrix);
             }
 
-            width = selected_width = item.size.width;
-            height = selected_height = item.size.height;
+            width = item.size.width;
+            height = item.size.height;
 
             width_offset_x = width;
             width_offset_y = 0;
@@ -215,8 +213,8 @@ public class Akira.Lib.Managers.NobManager : Object {
         selected_x = x;
         selected_y = y;
 
-        width = selected_width = x2 - x1;
-        height = selected_height = y2 - y1;
+        width = x2 - x1;
+        height = y2 - y1;
 
         top_left_x = x1;
         top_left_y = y1;
@@ -300,8 +298,6 @@ public class Akira.Lib.Managers.NobManager : Object {
         double dummy_height = 0;
         double dummy_selected_x = 0;
         double dummy_selected_y = 0;
-        double dummy_selected_width = 0;
-        double dummy_selected_height = 0;
 
         populate_nob_bounds_from_items (
             items,
@@ -315,9 +311,7 @@ public class Akira.Lib.Managers.NobManager : Object {
             ref dummy_width,
             ref dummy_height,
             ref dummy_selected_x,
-            ref dummy_selected_y,
-            ref dummy_selected_width,
-            ref dummy_selected_height
+            ref dummy_selected_y
         );
 
         calculate_nob_position (
@@ -364,9 +358,7 @@ public class Akira.Lib.Managers.NobManager : Object {
             ref bb_width,
             ref bb_height,
             ref selected_x,
-            ref selected_y,
-            ref selected_width,
-            ref selected_height
+            ref selected_y
         );
 
         update_select_effect (selected_items);

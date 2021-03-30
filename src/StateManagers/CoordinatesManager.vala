@@ -28,6 +28,9 @@ public class Akira.StateManagers.CoordinatesManager : Object {
     public weak Akira.Window window { get; construct; }
     private weak Akira.Lib.Canvas canvas;
 
+    private double selected_x;
+    private double selected_y;
+
     // These attributes represent only the primary X & Y coordinates of the selected shapes.
     // These are not the origin points of each selected shape, but only the TOP-LEFT values
     // of the bounding box selection.
@@ -42,7 +45,7 @@ public class Akira.StateManagers.CoordinatesManager : Object {
             }
 
             _x = Utils.AffineTransform.fix_size (value);
-            update_items_x ();
+            move_from_panel ();
         }
     }
 
@@ -57,7 +60,7 @@ public class Akira.StateManagers.CoordinatesManager : Object {
             }
 
             _y = Utils.AffineTransform.fix_size (value);
-            update_items_y ();
+            move_from_panel ();
         }
     }
 
@@ -80,6 +83,37 @@ public class Akira.StateManagers.CoordinatesManager : Object {
         window.event_bus.update_state_coords.connect (on_update_state_coords);
     }
 
+    private void get_coordinates_from_items () {
+        var dummy_matrix = Cairo.Matrix.identity ();
+        double dummy_top_left_x = 0;
+        double dummy_top_left_y = 0;
+        double dummy_width_offset_x = 0;
+        double dummy_width_offset_y = 0;
+        double dummy_height_offset_x = 0;
+        double dummy_height_offset_y = 0;
+        double dummy_width = 0;
+        double dummy_height = 0;
+
+        // Reset the selected coordinates to always get correct values.
+        selected_x = 0;
+        selected_y = 0;
+
+        Lib.Managers.NobManager.populate_nob_bounds_from_items (
+            canvas.selected_bound_manager.selected_items,
+            ref dummy_matrix,
+            ref dummy_top_left_x,
+            ref dummy_top_left_y,
+            ref dummy_width_offset_x,
+            ref dummy_width_offset_y,
+            ref dummy_height_offset_x,
+            ref dummy_height_offset_y,
+            ref dummy_width,
+            ref dummy_height,
+            ref selected_x,
+            ref selected_y
+        );
+    }
+
     /**
      * Initialize the manager coordinates with the selected items coordinates.
      * The coordinates change comes from a canvas action that already moved the items,
@@ -90,8 +124,10 @@ public class Akira.StateManagers.CoordinatesManager : Object {
         do_update = false;
 
         // Get the item X & Y coordinates.
-        x = canvas.nob_manager.selected_x;
-        y = canvas.nob_manager.selected_y;
+        get_coordinates_from_items ();
+
+        x = selected_x;
+        y = selected_y;
 
         do_update = true;
     }
@@ -122,52 +158,21 @@ public class Akira.StateManagers.CoordinatesManager : Object {
     /**
      * Update the position of all selected items.
      */
-     private void update_items_x () {
-        if (_x == null || !do_update) {
+     private void move_from_panel () {
+        if (_x == null || _y == null || !do_update) {
             return;
         }
 
-        // Get the correct moved amount in order to translate all the selected items equally.
-        var delta_x = x - canvas.nob_manager.selected_x;
+        // Get the current item X & Y coordinates before translating.
+        get_coordinates_from_items ();
+        // Reset the SelectedBoundManager initial coordinates.
+        canvas.selected_bound_manager.set_initial_coordinates (selected_x, selected_y);
 
         // Loop through all the selected items to update their position.
         foreach (Lib.Items.CanvasItem item in canvas.selected_bound_manager.selected_items) {
-            Cairo.Matrix matrix;
-            item.get_transform (out matrix);
-
-            // Increment the cairo matrix coordinates so we can ignore the item's rotation.
-            matrix.x0 += Utils.AffineTransform.fix_size (delta_x);
-            item.set_transform (matrix);
-
-            // GooCanvasItem issue! This is necessary to properly update the CanvasBounds.
-            item.ensure_updated ();
-        }
-
-        window.event_bus.item_value_changed ();
-    }
-
-    /**
-     * Update the position of all selected items.
-     */
-    private void update_items_y () {
-        if (_y == null || !do_update) {
-            return;
-        }
-
-        // Get the correct moved amount in order to translate all the selected items equally.
-        var delta_y = y - canvas.nob_manager.selected_y;
-
-        // Loop through all the selected items to update their position.
-        foreach (Lib.Items.CanvasItem item in canvas.selected_bound_manager.selected_items) {
-            Cairo.Matrix matrix;
-            item.get_transform (out matrix);
-
-            // Increment the cairo matrix coordinates so we can ignore the item's rotation.
-            matrix.y0 += Utils.AffineTransform.fix_size (delta_y);
-            item.set_transform (matrix);
-
-            // GooCanvasItem issue! This is necessary to properly update the CanvasBounds.
-            item.ensure_updated ();
+            // Set the ignore_offset attribute to true to avoid the forced
+            // respositioning of the item (magnetic offset snapping).
+            canvas.selected_bound_manager.move_from_event (item, x, y, true);
         }
 
         window.event_bus.item_value_changed ();

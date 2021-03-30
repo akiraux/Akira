@@ -344,15 +344,15 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     }
 
     public override bool button_release_event (Gdk.EventButton event) {
+        // This is a temporary approach to end operations.
+        // In the future we may want to have more specific method.
+        selected_bound_manager.alert_held_button_release ();
+
         if (!holding) {
             return true;
         }
 
         holding = false;
-
-        // This is a temporary approach to end operations. In the future we may want to have more specific
-        // methods.
-        selected_bound_manager.alert_held_button_release ();
 
         if (event.button == Gdk.BUTTON_MIDDLE) {
             edit_mode = EditMode.MODE_SELECTION;
