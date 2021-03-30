@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (c) 2019-2021 Alecaddd (https://alecaddd.com)
  *
  * This file is part of Akira.
@@ -19,7 +19,7 @@
  * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
  */
 
- /*
+ /**
   * State manager handling the currently selected objects coordinates.
   * This is used to guarantee correct values in the Transform Panel no matter
   * if one or multiple items are selected.
@@ -80,7 +80,7 @@ public class Akira.StateManagers.CoordinatesManager : Object {
         window.event_bus.update_state_coords.connect (on_update_state_coords);
     }
 
-    /*
+    /**
      * Initialize the manager coordinates with the selected items coordinates.
      * The coordinates change comes from a canvas action that already moved the items,
      * therefore we set the do_update to false to prevent updating the selected
@@ -96,7 +96,7 @@ public class Akira.StateManagers.CoordinatesManager : Object {
         do_update = true;
     }
 
-    /*
+    /**
      * Update the coordinates to trigger the shapes transformation.
      * This action comes from an arrow keypress event from the Canvas.
      */
@@ -107,7 +107,7 @@ public class Akira.StateManagers.CoordinatesManager : Object {
         window.event_bus.file_edited ();
     }
 
-    /*
+    /**
      * Reset the coordinates to get the newly updated coordinates from the selected items.
      * This method is called when items are moved from the canvas, so we only need to update
      * the X and Y values for the Transform Panel without triggering the update_items_*().
@@ -119,7 +119,7 @@ public class Akira.StateManagers.CoordinatesManager : Object {
         window.event_bus.file_edited ();
     }
 
-    /*
+    /**
      * Update the position of all selected items.
      */
      private void update_items_x () {
@@ -146,7 +146,7 @@ public class Akira.StateManagers.CoordinatesManager : Object {
         window.event_bus.item_value_changed ();
     }
 
-    /*
+    /**
      * Update the position of all selected items.
      */
     private void update_items_y () {
