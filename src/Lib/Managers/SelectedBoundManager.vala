@@ -429,7 +429,7 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         }
     }
 
-    private void scale_from_event (
+    public void scale_from_event (
         Lib.Items.CanvasItem item,
         Managers.NobManager.Nob selected_nob,
         double event_x,

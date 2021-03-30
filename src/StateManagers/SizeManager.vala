@@ -28,6 +28,11 @@ public class Akira.StateManagers.SizeManager : Object {
     public weak Akira.Window window { get; construct; }
     private weak Akira.Lib.Canvas canvas;
 
+    // Store the initial size of the item before the values are edited by
+    // the user interacting with the Transform Panel fields.
+    private double initial_width;
+    private double initial_height;
+
     // Allow or deny updating the items size.
     private bool do_update = true;
 
@@ -45,7 +50,7 @@ public class Akira.StateManagers.SizeManager : Object {
             }
 
             _width = Utils.AffineTransform.fix_size (value);
-            update_items_width ();
+            scale_from_panel ();
         }
     }
 
@@ -60,7 +65,7 @@ public class Akira.StateManagers.SizeManager : Object {
             }
 
             _height = Utils.AffineTransform.fix_size (value);
-            update_items_height ();
+            scale_from_panel ();
         }
     }
 
@@ -79,6 +84,37 @@ public class Akira.StateManagers.SizeManager : Object {
         window.event_bus.reset_state_coords.connect (on_reset_state_coords);
     }
 
+    private void get_size_from_items () {
+        var dummy_matrix = Cairo.Matrix.identity ();
+        double dummy_top_left_x = 0;
+        double dummy_top_left_y = 0;
+        double dummy_width_offset_x = 0;
+        double dummy_width_offset_y = 0;
+        double dummy_height_offset_x = 0;
+        double dummy_height_offset_y = 0;
+        double dummy_x = 0;
+        double dummy_y = 0;
+
+        // Reset the selected coordinates to always get correct values.
+        initial_width = 0;
+        initial_height = 0;
+
+        Lib.Managers.NobManager.populate_nob_bounds_from_items (
+            canvas.selected_bound_manager.selected_items,
+            ref dummy_matrix,
+            ref dummy_top_left_x,
+            ref dummy_top_left_y,
+            ref dummy_width_offset_x,
+            ref dummy_width_offset_y,
+            ref dummy_height_offset_x,
+            ref dummy_height_offset_y,
+            ref initial_width,
+            ref initial_height,
+            ref dummy_x,
+            ref dummy_y
+        );
+    }
+
     /**
      * Initialize the manager sizes with the selected items sizes.
      * The sizes change comes from a canvas action that already moved the items,
@@ -88,9 +124,11 @@ public class Akira.StateManagers.SizeManager : Object {
      private void on_init_state_coords () {
         do_update = false;
 
-        // Get the item WIDTH & HEIGHT.
-        width = canvas.nob_manager.bb_width;
-        height = canvas.nob_manager.bb_height;
+        // Get the items WIDTH & HEIGHT.
+        get_size_from_items ();
+
+        width = initial_width;
+        height = initial_height;
 
         do_update = true;
     }
@@ -108,45 +146,26 @@ public class Akira.StateManagers.SizeManager : Object {
     }
 
     /**
-     * =========== INFO ===========
-     * We don't update width and height in the same method for 2 reasons:
-     * 1. It's impossible for the user to update both values when interacting with
-     *    the Transform panel as only once field cna be edited at the time.
-     * 2. We need to let the Size component handle the locked ratio independently
-     *    as the locked size will be properly updated when one of the values changes.
+     * Update the size of all selected items.
      */
-
-    /**
-     * Update the width of all selected items.
-     */
-     private void update_items_width () {
-        if (_width == null || !do_update) {
+     private void scale_from_panel () {
+        if (_width == null || _height == null || !do_update) {
             return;
         }
 
-        // Get the correct modified amount in order to resize all the selected items equally.
-        var delta_w = width - canvas.nob_manager.bb_width;
+        // Get the current item WIDTH & HEIGHT before translating.
+        get_size_from_items ();
+        // Reset the SelectedBoundManager initial coordinates.
+        canvas.selected_bound_manager.set_initial_coordinates (initial_width, initial_height);
+
+        // Simulate the proper Nob selection based on the resized value.
+        var nob = width != initial_width ?
+            Lib.Managers.NobManager.Nob.RIGHT_CENTER :
+            Lib.Managers.NobManager.Nob.BOTTOM_CENTER;
 
         // Loop through all the selected items to update their width.
         foreach (Lib.Items.CanvasItem item in canvas.selected_bound_manager.selected_items) {
-            item.size.width += delta_w;
-        }
-    }
-
-    /**
-     * Update the height of all selected items.
-     */
-     private void update_items_height () {
-        if (_height == null || !do_update) {
-            return;
-        }
-
-        // Get the correct modified amount in order to resize all the selected items equally.
-        var delta_h = height - canvas.nob_manager.bb_height;
-
-        // Loop through all the selected items to update their height.
-        foreach (Lib.Items.CanvasItem item in canvas.selected_bound_manager.selected_items) {
-            item.size.height += delta_h;
+            canvas.selected_bound_manager.scale_from_event (item, nob, width, height);
         }
     }
 }

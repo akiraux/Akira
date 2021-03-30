@@ -66,8 +66,8 @@ public class Akira.Lib.Managers.NobManager : Object {
     private double height_offset_y;
     // bb_width and bb_height are also used by the SizeManager to represent
     // the width and height of selected items in the Transform Panel.
-    public double bb_width;
-    public double bb_height;
+    private double bb_width;
+    private double bb_height;
     private Cairo.Matrix bb_matrix;
 
     // Values for the Transform Panel fields.

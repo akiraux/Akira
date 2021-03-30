@@ -28,8 +28,10 @@ public class Akira.StateManagers.CoordinatesManager : Object {
     public weak Akira.Window window { get; construct; }
     private weak Akira.Lib.Canvas canvas;
 
-    private double selected_x;
-    private double selected_y;
+    // Store the initial coordinates of the item before the values are edited by
+    // the user interacting with the Transform Panel fields.
+    private double initial_x;
+    private double initial_y;
 
     // These attributes represent only the primary X & Y coordinates of the selected shapes.
     // These are not the origin points of each selected shape, but only the TOP-LEFT values
@@ -95,8 +97,8 @@ public class Akira.StateManagers.CoordinatesManager : Object {
         double dummy_height = 0;
 
         // Reset the selected coordinates to always get correct values.
-        selected_x = 0;
-        selected_y = 0;
+        initial_x = 0;
+        initial_y = 0;
 
         Lib.Managers.NobManager.populate_nob_bounds_from_items (
             canvas.selected_bound_manager.selected_items,
@@ -109,8 +111,8 @@ public class Akira.StateManagers.CoordinatesManager : Object {
             ref dummy_height_offset_y,
             ref dummy_width,
             ref dummy_height,
-            ref selected_x,
-            ref selected_y
+            ref initial_x,
+            ref initial_y
         );
     }
 
@@ -123,11 +125,11 @@ public class Akira.StateManagers.CoordinatesManager : Object {
     private void on_init_state_coords () {
         do_update = false;
 
-        // Get the item X & Y coordinates.
+        // Get the items X & Y coordinates.
         get_coordinates_from_items ();
 
-        x = selected_x;
-        y = selected_y;
+        x = initial_x;
+        y = initial_y;
 
         do_update = true;
     }
@@ -166,7 +168,7 @@ public class Akira.StateManagers.CoordinatesManager : Object {
         // Get the current item X & Y coordinates before translating.
         get_coordinates_from_items ();
         // Reset the SelectedBoundManager initial coordinates.
-        canvas.selected_bound_manager.set_initial_coordinates (selected_x, selected_y);
+        canvas.selected_bound_manager.set_initial_coordinates (initial_x, initial_y);
 
         // Loop through all the selected items to update their position.
         foreach (Lib.Items.CanvasItem item in canvas.selected_bound_manager.selected_items) {
