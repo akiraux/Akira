@@ -215,8 +215,8 @@ public class Akira.Lib.Managers.NobManager : Object {
         selected_x = x;
         selected_y = y;
 
-        width = x2 - x1;
-        height = y2 - y1;
+        width = selected_width = x2 - x1;
+        height = selected_height = y2 - y1;
 
         top_left_x = x1;
         top_left_y = y1;
@@ -283,47 +283,55 @@ public class Akira.Lib.Managers.NobManager : Object {
     /**
      * Calculates the position of a nob based on a selection of items and the nob id.
      */
-    // public static void nob_position_from_items (
-    //     List<Items.CanvasItem> items,
-    //     Nob nob_name,
-    //     ref double pos_x,
-    //     ref double pos_y
-    // ) {
-    //     Cairo.Matrix dummy_matrix = Cairo.Matrix.identity ();
-    //     double dummy_top_left_x = 0;
-    //     double dummy_top_left_y = 0;
-    //     double dummy_width_offset_x = 0;
-    //     double dummy_width_offset_y = 0;
-    //     double dummy_height_offset_x = 0;
-    //     double dummy_height_offset_y = 0;
-    //     double dummy_width = 0;
-    //     double dummy_height = 0;
+    public static void nob_position_from_items (
+        List<Items.CanvasItem> items,
+        Nob nob_name,
+        ref double pos_x,
+        ref double pos_y
+    ) {
+        Cairo.Matrix dummy_matrix = Cairo.Matrix.identity ();
+        double dummy_top_left_x = 0;
+        double dummy_top_left_y = 0;
+        double dummy_width_offset_x = 0;
+        double dummy_width_offset_y = 0;
+        double dummy_height_offset_x = 0;
+        double dummy_height_offset_y = 0;
+        double dummy_width = 0;
+        double dummy_height = 0;
+        double dummy_selected_x = 0;
+        double dummy_selected_y = 0;
+        double dummy_selected_width = 0;
+        double dummy_selected_height = 0;
 
-    //     populate_nob_bounds_from_items (
-    //         items,
-    //         ref dummy_matrix,
-    //         ref dummy_top_left_x,
-    //         ref dummy_top_left_y,
-    //         ref dummy_width_offset_x,
-    //         ref dummy_width_offset_y,
-    //         ref dummy_height_offset_x,
-    //         ref dummy_height_offset_y,
-    //         ref dummy_width,
-    //         ref dummy_height
-    //     );
+        populate_nob_bounds_from_items (
+            items,
+            ref dummy_matrix,
+            ref dummy_top_left_x,
+            ref dummy_top_left_y,
+            ref dummy_width_offset_x,
+            ref dummy_width_offset_y,
+            ref dummy_height_offset_x,
+            ref dummy_height_offset_y,
+            ref dummy_width,
+            ref dummy_height,
+            ref dummy_selected_x,
+            ref dummy_selected_y,
+            ref dummy_selected_width,
+            ref dummy_selected_height
+        );
 
-    //     calculate_nob_position (
-    //         nob_name,
-    //         dummy_top_left_x,
-    //         dummy_top_left_y,
-    //         dummy_width_offset_x,
-    //         dummy_width_offset_y,
-    //         dummy_height_offset_x,
-    //         dummy_height_offset_y,
-    //         ref pos_x,
-    //         ref pos_y
-    //      );
-    // }
+        calculate_nob_position (
+            nob_name,
+            dummy_top_left_x,
+            dummy_top_left_y,
+            dummy_width_offset_x,
+            dummy_width_offset_y,
+            dummy_height_offset_x,
+            dummy_height_offset_y,
+            ref pos_x,
+            ref pos_y
+         );
+    }
 
     /**
      * What happens when the canvas is zoomed in.

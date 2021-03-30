@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (c) 2021 Alecaddd (https://alecaddd.com)
  *
  * This file is part of Akira.
@@ -19,7 +19,7 @@
  * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
  */
 
- /*
+ /**
   * State manager handling the currently selected objects sizings.
   * This is used to guarantee correct values in the Transform Panel no matter
   * if one or multiple items are selected.
@@ -79,7 +79,7 @@ public class Akira.StateManagers.SizeManager : Object {
         window.event_bus.reset_state_coords.connect (on_reset_state_coords);
     }
 
-    /*
+    /**
      * Initialize the manager sizes with the selected items sizes.
      * The sizes change comes from a canvas action that already moved the items,
      * therefore we set the do_update to false to prevent updating the selected
@@ -95,7 +95,7 @@ public class Akira.StateManagers.SizeManager : Object {
         do_update = true;
     }
 
-    /*
+    /**
      * Reset the sizes to get the newly updated sizes from the selected items.
      * This method is called when items are resized from the canvas, so we only need to update
      * the WIDTH & HEIGHT values for the Transform Panel without triggering the update_items_size().
@@ -107,7 +107,7 @@ public class Akira.StateManagers.SizeManager : Object {
         window.event_bus.file_edited ();
     }
 
-    /*
+    /**
      * =========== INFO ===========
      * We don't update width and height in the same method for 2 reasons:
      * 1. It's impossible for the user to update both values when interacting with
@@ -116,7 +116,7 @@ public class Akira.StateManagers.SizeManager : Object {
      *    as the locked size will be properly updated when one of the values changes.
      */
 
-    /*
+    /**
      * Update the width of all selected items.
      */
      private void update_items_width () {
@@ -124,14 +124,16 @@ public class Akira.StateManagers.SizeManager : Object {
             return;
         }
 
+        // Get the correct modified amount in order to resize all the selected items equally.
+        var delta_w = width - canvas.nob_manager.selected_width;
+
         // Loop through all the selected items to update their width.
         foreach (Lib.Items.CanvasItem item in canvas.selected_bound_manager.selected_items) {
-            var delta_w = width - item.size.width;
             item.size.width += delta_w;
         }
     }
 
-    /*
+    /**
      * Update the height of all selected items.
      */
      private void update_items_height () {
@@ -139,9 +141,11 @@ public class Akira.StateManagers.SizeManager : Object {
             return;
         }
 
+        // Get the correct modified amount in order to resize all the selected items equally.
+        var delta_h = height - canvas.nob_manager.selected_height;
+
         // Loop through all the selected items to update their height.
         foreach (Lib.Items.CanvasItem item in canvas.selected_bound_manager.selected_items) {
-            var delta_h = height - item.size.height;
             item.size.height += delta_h;
         }
     }

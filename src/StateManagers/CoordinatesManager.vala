@@ -127,17 +127,23 @@ public class Akira.StateManagers.CoordinatesManager : Object {
             return;
         }
 
+        // Get the correct moved amount in order to translate all the selected items equally.
+        var delta_x = x - canvas.nob_manager.selected_x;
+
         // Loop through all the selected items to update their position.
         foreach (Lib.Items.CanvasItem item in canvas.selected_bound_manager.selected_items) {
             Cairo.Matrix matrix;
             item.get_transform (out matrix);
 
             // Increment the cairo matrix coordinates so we can ignore the item's rotation.
-            matrix.x0 += Utils.AffineTransform.fix_size (x - item.coordinates.x);
+            matrix.x0 += Utils.AffineTransform.fix_size (delta_x);
             item.set_transform (matrix);
 
-            window.event_bus.item_value_changed ();
+            // GooCanvasItem issue! This is necessary to properly update the CanvasBounds.
+            item.ensure_updated ();
         }
+
+        window.event_bus.item_value_changed ();
     }
 
     /*
@@ -148,16 +154,22 @@ public class Akira.StateManagers.CoordinatesManager : Object {
             return;
         }
 
+        // Get the correct moved amount in order to translate all the selected items equally.
+        var delta_y = y - canvas.nob_manager.selected_y;
+
         // Loop through all the selected items to update their position.
         foreach (Lib.Items.CanvasItem item in canvas.selected_bound_manager.selected_items) {
             Cairo.Matrix matrix;
             item.get_transform (out matrix);
 
             // Increment the cairo matrix coordinates so we can ignore the item's rotation.
-            matrix.y0 += Utils.AffineTransform.fix_size (y - item.coordinates.y);
+            matrix.y0 += Utils.AffineTransform.fix_size (delta_y);
             item.set_transform (matrix);
 
-            window.event_bus.item_value_changed ();
+            // GooCanvasItem issue! This is necessary to properly update the CanvasBounds.
+            item.ensure_updated ();
         }
+
+        window.event_bus.item_value_changed ();
     }
 }
