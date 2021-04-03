@@ -153,19 +153,16 @@ public class Akira.StateManagers.SizeManager : Object {
             return;
         }
 
-        // Get the current item WIDTH & HEIGHT before translating.
-        get_size_from_items ();
-        // Reset the SelectedBoundManager initial coordinates.
-        canvas.selected_bound_manager.set_initial_coordinates (initial_width, initial_height);
-
-        // Simulate the proper Nob selection based on the resized value.
-        var nob = width != initial_width ?
-            Lib.Managers.NobManager.Nob.RIGHT_CENTER :
-            Lib.Managers.NobManager.Nob.BOTTOM_CENTER;
-
-        // Loop through all the selected items to update their width.
+        // Loop through all the selected items to update their size.
         foreach (Lib.Items.CanvasItem item in canvas.selected_bound_manager.selected_items) {
-            canvas.selected_bound_manager.scale_from_event (item, nob, width, height);
+            // TODO: We're temporarily applying the exact same size to all selected items.
+            // This will change once we implement the multi select and the ability to resize
+            // and translate multiple items relative to their position.
+            var delta_h = height - item.size.height;
+            var delta_w = width - item.size.width;
+
+            item.size.width += delta_w;
+            item.size.height += delta_h;
         }
     }
 }
