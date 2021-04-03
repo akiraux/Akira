@@ -40,6 +40,17 @@
          ]
       },
       {
+        "name": "stylesheet",
+        "buildsystem": "meson",
+        "sources": [
+          {
+            "type": "git",
+            "url": "https://github.com/elementary/stylesheet",
+            "commit": "3047efbfabe723e0b0f2b8ee3d53bed528be4b14"
+          }
+        ]
+      },
+      {
          "name": "akira",
          "buildsystem": "meson",
          "config-opts": [
