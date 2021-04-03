@@ -56,8 +56,10 @@ jobs:
       options: --privileged
     steps:
       - uses: actions/checkout@v2
-      - uses: bilelmoussaoui/flatpak-github-actions@v2
+      - uses: bilelmoussaoui/flatpak-github-actions@master
         with:
           bundle: "akira-dev.flatpak"
           manifest-path: "build-aux/flatpak/com.github.akiraux.akira.json"
+          run-tests: "true"
+          cache-key: flatpak-builder-${{ github.sha }}
           run-tests: "true"
