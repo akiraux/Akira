@@ -60,6 +60,5 @@ jobs:
         with:
           bundle: "akira-dev.flatpak"
           manifest-path: "build-aux/flatpak/com.github.akiraux.akira.json"
-          run-tests: "true"
           cache-key: flatpak-builder-${{ github.sha }}
           run-tests: "true"
