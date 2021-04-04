@@ -250,11 +250,11 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
             "locked", lock_changes, "active",
             BindingFlags.SYNC_CREATE | BindingFlags.BIDIRECTIONAL);
 
-        width_bind = selected_item.size.bind_property (
+        width_bind = window.size_manager.bind_property (
             "width", width, "value",
             BindingFlags.SYNC_CREATE | BindingFlags.BIDIRECTIONAL);
 
-        height_bind = selected_item.size.bind_property (
+        height_bind = window.size_manager.bind_property (
             "height", height, "value",
             BindingFlags.SYNC_CREATE | BindingFlags.BIDIRECTIONAL);
 
