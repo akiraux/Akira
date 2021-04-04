@@ -13,3 +13,14 @@
 .export-titlebar {
     padding: 0;
 }
+
+/* Temporary elementary OS 6 stylesheet fixes */
+button.flat:disabled {
+    background-color: transparent;
+    box-shadow: none;
+    border: none;
+}
+
+popover.menu stack {
+    padding: 6px 10px;
+}
