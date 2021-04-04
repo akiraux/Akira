@@ -13,6 +13,7 @@ add_project_arguments('--vapidir=' + vapi_dir, language: 'vala')
 # Include the translations module
 i18n = import('i18n')
 # Dependencies
+sass = find_program('sassc')
 gtk_dependency = dependency('gtk+-3.0')
 granite_dependency = dependency('granite', version: '>= 5.3.0')
 gee_dependency = dependency('gee-0.8')
