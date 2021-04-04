@@ -1,31 +1,41 @@
-/*
-* Copyright (c) 2019-2021 Alecaddd (https://alecaddd.com)
-*
-* This file is part of Akira.
-*
-* Akira is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
+/**
+ * Copyright (c) 2019-2021 Alecaddd (https://alecaddd.com)
+ *
+ * This file is part of Akira.
+ *
+ * Akira is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
 
-* Akira is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-* GNU General Public License for more details.
+ * Akira is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
 
-* You should have received a copy of the GNU General Public License
-* along with Akira. If not, see <https://www.gnu.org/licenses/>.
-*
-* Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
-*/
+ * You should have received a copy of the GNU General Public License
+ * along with Akira. If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
+ */
 
+ /**
+  * State manager handling the currently selected objects coordinates.
+  * This is used to guarantee correct values in the Transform Panel no matter
+  * if one or multiple items are selected.
+  */
 public class Akira.StateManagers.CoordinatesManager : Object {
     public weak Akira.Window window { get; construct; }
     private weak Akira.Lib.Canvas canvas;
 
+    // Store the initial coordinates of the item before the values are edited by
+    // the user interacting with the Transform Panel fields.
+    private double initial_x;
+    private double initial_y;
+
     // These attributes represent only the primary X & Y coordinates of the selected shapes.
     // These are not the origin points of each selected shape, but only the TOP-LEFT values
-    // of the selection bounding box.
+    // of the bounding box selection.
     private double? _x = null;
     public double x {
         get {
@@ -37,7 +47,7 @@ public class Akira.StateManagers.CoordinatesManager : Object {
             }
 
             _x = Utils.AffineTransform.fix_size (value);
-            update_items_coordinates ();
+            move_from_panel ();
         }
     }
 
@@ -52,7 +62,7 @@ public class Akira.StateManagers.CoordinatesManager : Object {
             }
 
             _y = Utils.AffineTransform.fix_size (value);
-            update_items_coordinates ();
+            move_from_panel ();
         }
     }
 
@@ -75,27 +85,58 @@ public class Akira.StateManagers.CoordinatesManager : Object {
         window.event_bus.update_state_coords.connect (on_update_state_coords);
     }
 
+    private void get_coordinates_from_items () {
+        var dummy_matrix = Cairo.Matrix.identity ();
+        double dummy_top_left_x = 0;
+        double dummy_top_left_y = 0;
+        double dummy_width_offset_x = 0;
+        double dummy_width_offset_y = 0;
+        double dummy_height_offset_x = 0;
+        double dummy_height_offset_y = 0;
+        double dummy_width = 0;
+        double dummy_height = 0;
+
+        // Reset the selected coordinates to always get correct values.
+        initial_x = 0;
+        initial_y = 0;
+
+        Lib.Managers.NobManager.populate_nob_bounds_from_items (
+            canvas.selected_bound_manager.selected_items,
+            ref dummy_matrix,
+            ref dummy_top_left_x,
+            ref dummy_top_left_y,
+            ref dummy_width_offset_x,
+            ref dummy_width_offset_y,
+            ref dummy_height_offset_x,
+            ref dummy_height_offset_y,
+            ref dummy_width,
+            ref dummy_height,
+            ref initial_x,
+            ref initial_y
+        );
+    }
+
     /**
-     * Initialize the manager coordinates with the newly created or selected item.
+     * Initialize the manager coordinates with the selected items coordinates.
+     * The coordinates change comes from a canvas action that already moved the items,
+     * therefore we set the do_update to false to prevent updating the selected
+     * items' Cairo Matrix.
      */
-    private void on_init_state_coords (Lib.Items.CanvasItem item) {
-        // Get the item X & Y coordinates.
-        double item_x = item.coordinates.x;
-        double item_y = item.coordinates.y;
+    private void on_init_state_coords () {
+        do_update = false;
 
-        // Interrupt if no value has changed.
-        if (item_x == x && item_y == y) {
-            return;
-        }
+        // Get the items X & Y coordinates.
+        get_coordinates_from_items ();
 
-        // Update the private attributes and not the public as we don't want to trigger the
-        // update_items_coordinates () when a new item is created.
-        _x = item_x;
-        _y = item_y;
+        x = initial_x;
+        y = initial_y;
+
+        do_update = true;
     }
 
     /**
      * Update the coordinates to trigger the shapes transformation.
+     * This action comes from an arrow keypress event from the Canvas.
      */
     private void on_update_state_coords (double moved_x, double moved_y) {
         x += moved_x;
@@ -105,63 +146,37 @@ public class Akira.StateManagers.CoordinatesManager : Object {
     }
 
     /**
-     * Reset the coordinates to get the newly updated coordinates from the item.
-     * The coordinates change came from a canvas action that already moved the items
-     * therefore we set the d_update to false to prevent updating  the selected
-     * items Cairo transform.
+     * Reset the coordinates to get the newly updated coordinates from the selected items.
+     * This method is called when items are moved from the canvas, so we only need to update
+     * the X and Y values for the Transform Panel without triggering the update_items_*().
      */
-    private void on_reset_state_coords (Lib.Items.CanvasItem item) {
-        do_update = false;
-
-        // Get the item X & Y coordinates.
-        double item_x = item.coordinates.x;
-        double item_y = item.coordinates.y;
-
-        // Interrupt if no value has changed.
-        if (item_x == x && item_y == y) {
-            do_update = true;
-            return;
-        }
-
-        x = item_x;
-        y = item_y;
-
-        do_update = true;
+    private void on_reset_state_coords () {
+        on_init_state_coords ();
 
         window.event_bus.item_value_changed ();
         window.event_bus.file_edited ();
     }
 
     /**
-     * Get the newly updated coordinates update the position of all the selected items.
+     * Update the position of all selected items.
      */
-    private void update_items_coordinates () {
-        if (_x == null || _y == null) {
+     private void move_from_panel () {
+        if (_x == null || _y == null || !do_update) {
             return;
         }
 
-        // Loop through all the selected items to update their position. This is temporary
-        // since we currently support only 1 selected item per time. In the future, we will need
-        // to account for multiple items and their relative position between each other.
+        // Get the current item X & Y coordinates before translating.
+        get_coordinates_from_items ();
+        // Reset the SelectedBoundManager initial coordinates.
+        canvas.selected_bound_manager.set_initial_coordinates (initial_x, initial_y);
+
+        // Loop through all the selected items to update their position.
         foreach (Lib.Items.CanvasItem item in canvas.selected_bound_manager.selected_items) {
-            if (!do_update) {
-                continue;
-            }
-
-            // Store the new coordinates in local variables so we can manipulate them.
-            double inc_x = x - item.coordinates.x;
-            double inc_y = y - item.coordinates.y;
-
-            Cairo.Matrix matrix;
-            item.get_transform (out matrix);
-
-            // Increment the cairo matrix coordinates so we can ignore the item's rotation.
-            matrix.x0 += inc_x;
-            matrix.y0 += inc_y;
-
-            item.set_transform (matrix);
-
-            window.event_bus.item_value_changed ();
+            // Set the ignore_offset attribute to true to avoid the forced
+            // respositioning of the item (magnetic offset snapping).
+            canvas.selected_bound_manager.move_from_event (item, x, y, true);
         }
+
+        window.event_bus.item_value_changed ();
     }
 }

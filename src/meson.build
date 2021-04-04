@@ -112,6 +112,7 @@ sources = files(
     'Lib/Selection/Nob.vala',
 
     'StateManagers/CoordinatesManager.vala',
+    'StateManagers/SizeManager.vala',
 )
 
 deps = [

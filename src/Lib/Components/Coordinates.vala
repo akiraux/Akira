@@ -23,6 +23,7 @@
  * Coordinates component to keep track of the item's initial coordinates.
  */
 public class Akira.Lib.Components.Coordinates : Component {
+    // LEFT item position, converted to artboard's coordinates if the item is inside an artboard.
     public double x {
         get {
             // If the item is an artboard we need to get the bounds of the background since
@@ -43,6 +44,7 @@ public class Akira.Lib.Components.Coordinates : Component {
         }
     }
 
+    // Global LEFT item position relative to the Canvas, ignoring potential parent's artboard.
     public double x1 {
         get {
             // If the item is an artboard we need to get the bounds of the background since
@@ -56,6 +58,8 @@ public class Akira.Lib.Components.Coordinates : Component {
         }
     }
 
+    // Global RIGHT (LEFT + WIDTH) item position relative to the Canvas,
+    // ignoring potential parent's artboard.
     public double x2 {
         get {
             // If the item is an artboard we need to get the bounds of the background since
@@ -69,6 +73,7 @@ public class Akira.Lib.Components.Coordinates : Component {
         }
     }
 
+    // TOP item position, converted to artboard's coordinates if the item is inside an artboard.
     public double y {
         get {
             // If the item is an artboard we need to get the bounds of the background since
@@ -89,6 +94,7 @@ public class Akira.Lib.Components.Coordinates : Component {
         }
     }
 
+    // Global TOP item position relative to the Canvas, ignoring potential parent's artboard.
     public double y1 {
         get {
             // If the item is an artboard we need to get the bounds of the background since
@@ -102,6 +108,8 @@ public class Akira.Lib.Components.Coordinates : Component {
         }
     }
 
+    // Global BOTTOM (TOP + HEIGHT) item position relative to the Canvas,
+    // ignoring potential parent's artboard.
     public double y2 {
         get {
             // If the item is an artboard we need to get the bounds of the background since
