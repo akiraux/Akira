@@ -238,11 +238,11 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
     private void enable () {
         canvas = selected_item.canvas as Akira.Lib.Canvas;
 
-        x_bind = window.coords_manager.bind_property (
+        x_bind = window.coords_middleware.bind_property (
             "x", x, "value", BindingFlags.SYNC_CREATE | BindingFlags.BIDIRECTIONAL
         );
 
-        y_bind = window.coords_manager.bind_property (
+        y_bind = window.coords_middleware.bind_property (
             "y", y, "value", BindingFlags.SYNC_CREATE | BindingFlags.BIDIRECTIONAL
         );
 
@@ -250,11 +250,11 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
             "locked", lock_changes, "active",
             BindingFlags.SYNC_CREATE | BindingFlags.BIDIRECTIONAL);
 
-        width_bind = window.size_manager.bind_property (
+        width_bind = window.size_middleware.bind_property (
             "width", width, "value",
             BindingFlags.SYNC_CREATE | BindingFlags.BIDIRECTIONAL);
 
-        height_bind = window.size_manager.bind_property (
+        height_bind = window.size_middleware.bind_property (
             "height", height, "value",
             BindingFlags.SYNC_CREATE | BindingFlags.BIDIRECTIONAL);
 

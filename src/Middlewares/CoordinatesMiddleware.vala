@@ -19,12 +19,13 @@
  * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
  */
 
- /**
-  * State manager handling the currently selected objects coordinates.
-  * This is used to guarantee correct values in the Transform Panel no matter
-  * if one or multiple items are selected.
-  */
-public class Akira.StateManagers.CoordinatesManager : Object {
+/**
+ * Middleware handling the currently selected objects coordinates with the Transform Panel.
+ * This is used to guarantee correct values in the Transform Panel no matter if one or
+ * multiple items are selected, and to always return the true items' coordinates which
+ * are held by the GooCanvasItem.
+ */
+public class Akira.StateManagers.CoordinatesMiddleware : Object {
     public weak Akira.Window window { get; construct; }
     private weak Akira.Lib.Canvas canvas;
 
@@ -69,7 +70,7 @@ public class Akira.StateManagers.CoordinatesManager : Object {
     // Allow or deny updating the items position.
     private bool do_update = true;
 
-    public CoordinatesManager (Akira.Window window) {
+    public CoordinatesMiddleware (Akira.Window window) {
         Object (
             window: window
         );

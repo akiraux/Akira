@@ -19,12 +19,13 @@
  * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
  */
 
- /**
-  * State manager handling the currently selected objects sizings.
-  * This is used to guarantee correct values in the Transform Panel no matter
-  * if one or multiple items are selected.
-  */
-public class Akira.StateManagers.SizeManager : Object {
+/**
+ * Middleware handling the currently selected objects sizes with the Transform Panel.
+ * This is used to guarantee correct values in the Transform Panel no matter if one or
+ * multiple items are selected, and to always return the true items' sizes which
+ * are held by the GooCanvasItem.
+ */
+public class Akira.StateManagers.SizeMiddleware : Object {
     public weak Akira.Window window { get; construct; }
     private weak Akira.Lib.Canvas canvas;
 
@@ -69,7 +70,7 @@ public class Akira.StateManagers.SizeManager : Object {
         }
     }
 
-    public SizeManager (Akira.Window window) {
+    public SizeMiddleware (Akira.Window window) {
         Object (
             window: window
         );
