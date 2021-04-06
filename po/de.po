@@ -66,15 +66,15 @@ msgstr ""
 
 #: Dialogs/ReleaseDialog.vala:100 Dialogs/SettingsDialog.vala:249
 msgid "Make a Donation"
-msgstr "Spende für das Projekt"
+msgstr "Für das Projekt Spenden"
 
 #: Dialogs/ReleaseDialog.vala:109 Dialogs/SettingsDialog.vala:258
 msgid "Suggest Translations"
-msgstr "Schlage eine Übersetzungen vor"
+msgstr "Übersetzungen vorschlagen"
 
 #: Dialogs/ReleaseDialog.vala:118 Dialogs/SettingsDialog.vala:267
 msgid "Report a Problem"
-msgstr "Melde einen Fehler"
+msgstr "Fehler melden"
 
 #: Dialogs/SettingsDialog.vala:40
 msgid "Preferences"
