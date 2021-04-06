@@ -83,7 +83,7 @@ msgstr "Einstellungen"
 #: Dialogs/SettingsDialog.vala:50 Dialogs/SettingsDialog.vala:73
 #: Dialogs/ShortcutsDialog.vala:45
 msgid "General"
-msgstr "Generell"
+msgstr "Allgemein"
 
 #: Dialogs/SettingsDialog.vala:51 Dialogs/SettingsDialog.vala:86
 msgid "Interface"
@@ -299,7 +299,7 @@ msgstr "Öffnen"
 
 #: Layouts/HeaderBar.vala:69 Lib/Managers/ExportManager.vala:296
 msgid "Untitled"
-msgstr "Ungespeichert"
+msgstr "Nicht gespeichert"
 
 #: Layouts/HeaderBar.vala:71
 msgid "Menu"
@@ -433,7 +433,7 @@ msgstr "Knopf wurde gedrückt!"
 
 #: Layouts/MainCanvas.vala:160
 msgid "Export completed!"
-msgstr "Export abgeschlossen."
+msgstr "Export abgeschlossen!"
 
 #: Layouts/Partials/AlignItemsPanel.vala:48
 #, fuzzy
@@ -505,7 +505,7 @@ msgstr "Ecken angleichen"
 
 #: Layouts/Partials/BordersPanel.vala:53
 msgid "Borders"
-msgstr "Rand"
+msgstr "Ränder"
 
 #: Layouts/Partials/FillsPanel.vala:54
 msgid "Fills"
