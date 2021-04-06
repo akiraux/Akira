@@ -16,7 +16,7 @@ msgstr ""
 
 #: Dialogs/ExportDialog.vala:151
 msgid "Export to:"
-msgstr "Exportieren nach:"
+msgstr "Exportiere nach:"
 
 #: Dialogs/ExportDialog.vala:157
 msgid "Select Folder"
@@ -66,7 +66,7 @@ msgstr ""
 
 #: Dialogs/ReleaseDialog.vala:100 Dialogs/SettingsDialog.vala:249
 msgid "Make a Donation"
-msgstr "Für das Projekt Spenden"
+msgstr "Für das Projekt spenden"
 
 #: Dialogs/ReleaseDialog.vala:109 Dialogs/SettingsDialog.vala:258
 msgid "Suggest Translations"
@@ -115,7 +115,7 @@ msgstr "Anwendungen neustarten um Änderungen zu übernehmen."
 
 #: Dialogs/SettingsDialog.vala:100
 msgid "ToolBar Style"
-msgstr "Werkzeugleisten Stil"
+msgstr "Werkzeugleistenstil"
 
 #: Dialogs/SettingsDialog.vala:102
 msgid "Show Button Labels:"
@@ -151,7 +151,7 @@ msgstr "Ränder Breite:"
 
 #: Dialogs/SettingsDialog.vala:209
 msgid "The Linux Design Tool"
-msgstr "Das Linux Design Werkzeug"
+msgstr "Das Linux Designwerkzeug"
 
 #: Dialogs/SettingsDialog.vala:226
 msgid "Thanks to our awesome supporters!"
@@ -203,7 +203,7 @@ msgstr "Auswahl exportieren:"
 
 #: Dialogs/ShortcutsDialog.vala:68
 msgid "Highlight area to export:"
-msgstr "Bereich zum Exportieren auswählen:"
+msgstr "Bereich zum exportieren auswählen:"
 
 #: Dialogs/ShortcutsDialog.vala:77
 msgid "Canvas"
@@ -407,11 +407,11 @@ msgstr "Bild"
 
 #: Layouts/HeaderBar.vala:330
 msgid "Export Current Selection"
-msgstr "Exportiere aktuelle Auswahl"
+msgstr "Aktuelle Auswahl exportieren"
 
 #: Layouts/HeaderBar.vala:336
 msgid "Export Artboards"
-msgstr "Exportiere aktuelles Zeichenbrett"
+msgstr "Aktuelles Zeichenbrett exportieren"
 
 #: Layouts/HeaderBar.vala:345
 msgid "Highlight Area to Export"
