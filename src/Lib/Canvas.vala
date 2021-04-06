@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2020 Alecaddd (https://alecaddd.com)
+ * Copyright (c) 2019-2021 Alecaddd (https://alecaddd.com)
  *
  * This file is part of Akira.
  *
@@ -24,14 +24,13 @@
 
 public class Akira.Lib.Canvas : Goo.Canvas {
     public weak Akira.Window window { get; construct; }
-
     private const int MIN_SIZE = 1;
     private const int MIN_POS = 10;
     private const int GRID_THRESHOLD = 3;
 
     public signal void canvas_moved (double delta_x, double delta_y);
     public signal void canvas_scroll_set_origin (double origin_x, double origin_y);
-
+    public Akira.Models.ListModel<Lib.Items.CanvasArtboard> artboards;
     private EditMode _edit_mode;
     public EditMode edit_mode {
         get {
@@ -73,6 +72,27 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
     public Canvas (Akira.Window window) {
         Object (window: window);
+        // Make The canvas the drop target
+        Gtk.drag_dest_set (this, Gtk.DestDefaults.ALL, targets, Gdk.DragAction.COPY);
+        this.drag_data_received.connect(this.on_drag_data_received);
+    }
+    // Making The canvas recive the dropped file
+    private const Gtk.TargetEntry[] targets = {{"text/uri-list",0,0}};
+    private void on_drag_data_received (Gdk.DragContext drag_context, int x, int y, 
+        Gtk.SelectionData data, uint info, uint time)
+    {
+    //loop through list of URIs
+    foreach(string uri in data.get_uris ()){
+        string file = uri.replace("file://","").replace("file:/","");
+        file = Uri.unescape_string (file);
+        var img_File = GLib.File.new_for_path(file);
+        var file_img_mangager = new Akira.Lib.Managers.ImageManager(img_File,GLib.Random.int_range(0,100));
+        //  var root = window.main_window.main_canvas.canvas.get_root_item();
+        //  var img_item = new Akira.Lib.Items.CanvasImage(x, y, file_img_mangager, root, null);
+        window.items_manager.insert_image(file_img_mangager);
+        window.items_manager.insert_item(x,y,file_img_mangager,artboards[0]);
+        }
+        Gtk.drag_finish (drag_context, true, false, time);
     }
 
     construct {
