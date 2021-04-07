@@ -108,7 +108,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     private const Gtk.TargetEntry[] targets = {{"text/uri-list",0,0}};
     private void on_drag_data_received (Gdk.DragContext drag_context, int x, int y, 
         Gtk.SelectionData data, uint info, uint time){
-        //loop through list of Files
+        // Loop through list of Files
         foreach(string uri in data.get_uris ()){
             string file = uri.replace("file://","").replace("file:/","");
             file = Uri.unescape_string (file);
@@ -120,7 +120,6 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 // Tell Items Manager that we want to insert an Image
                 window.items_manager.insert_image(file_img_mangager);
                 // Insert Image to Canvas
-                //window.items_manager.artboards[0]
                 window.items_manager.insert_item(x,y,file_img_mangager,null);
             }
         }

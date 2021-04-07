@@ -94,7 +94,7 @@ public class Akira.Lib.Items.CanvasImage : Goo.CanvasImage, Akira.Lib.Items.Canv
                 // Reset the size to a 2px initial value after the size ratio was properly defined
                 // in order to allow the user to decide the initial image size. We use 2px in order
                 // to avoid issues when dividing by the ratio in case of narrow images.
-                size.width = 2;
+                // size.width = 2;
             } catch (Error e) {
                 warning (e.message);
                 ((Lib.Canvas) canvas).window.event_bus.canvas_notification (e.message);
