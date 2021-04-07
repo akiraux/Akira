@@ -24,13 +24,13 @@
 
 public class Akira.Lib.Canvas : Goo.Canvas {
     public weak Akira.Window window { get; construct; }
+
     private const int MIN_SIZE = 1;
     private const int MIN_POS = 10;
     private const int GRID_THRESHOLD = 3;
 
     public signal void canvas_moved (double delta_x, double delta_y);
     public signal void canvas_scroll_set_origin (double origin_x, double origin_y);
-    public Akira.Models.ListModel<Lib.Items.CanvasArtboard> artboards;
     private EditMode _edit_mode;
     public EditMode edit_mode {
         get {
@@ -72,49 +72,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
     public Canvas (Akira.Window window) {
         Object (window: window);
-        // Make The canvas the drop target
-        Gtk.drag_dest_set (this, Gtk.DestDefaults.ALL, targets, Gdk.DragAction.COPY);
-        this.drag_data_received.connect(this.on_drag_data_received);
     }
-    // Making The canvas recive the dropped file
-    private const Gtk.TargetEntry[] targets = {{"text/uri-list",0,0}};
-    private void on_drag_data_received (Gdk.DragContext drag_context, int x, int y, 
-        Gtk.SelectionData data, uint info, uint time)
-    {
-    //loop through list of Files
-    const string[] ACCEPTED_TYPES = {
-        "jpeg",
-        "png",
-        "tiff",
-        "svg",
-        "xml",
-        "gif"
-    };
-    foreach(string uri in data.get_uris ()){
-        string file = uri.replace("file://","").replace("file:/","");
-        file = Uri.unescape_string (file);
-        // Creating a Glib.File using a file path
-        var img_File = GLib.File.new_for_path(file);
-        var file_img_mangager = new Akira.Lib.Managers.ImageManager(img_File,GLib.Random.int_range(0,100));
-        var root = window.main_window.main_canvas.canvas.get_root_item();
-        var img_extention = Utils.Image.get_extension(img_File);
-        // See if File is an Image File
-        foreach(string accepted_type in ACCEPTED_TYPES){
-            if(img_extention == accepted_type){
-                // Tell Items Manager that we want to insert an Image
-                window.items_manager.insert_image(file_img_mangager);
-                // Insert Image to Canvas
-                window.items_manager.insert_item(x,y,file_img_mangager,artboards[0]);
-                // Requesting Updates from the Root
-                this.request_update();
-                root.request_update();
-                break;
-            }
-        }
-    }
-        // Telling the Canvas to Stop the drag operation
-        Gtk.drag_finish (drag_context, true, false, time);
-}
 
     construct {
         events |= Gdk.EventMask.KEY_PRESS_MASK;
@@ -142,8 +100,33 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         window.event_bus.set_focus_on_canvas.connect (on_set_focus_on_canvas);
         window.event_bus.request_escape.connect (on_set_focus_on_canvas);
         window.event_bus.insert_item.connect (on_insert_item);
+        // Make The canvas the drop target
+        Gtk.drag_dest_set (this, Gtk.DestDefaults.ALL, targets, Gdk.DragAction.COPY);
+        drag_data_received.connect(this.on_drag_data_received);
     }
-
+    // Making The canvas recive the dropped file
+    private const Gtk.TargetEntry[] targets = {{"text/uri-list",0,0}};
+    private void on_drag_data_received (Gdk.DragContext drag_context, int x, int y, 
+        Gtk.SelectionData data, uint info, uint time){
+        //loop through list of Files
+        foreach(string uri in data.get_uris ()){
+            string file = uri.replace("file://","").replace("file:/","");
+            file = Uri.unescape_string (file);
+            // Creating a Glib.File using a file path
+            var img_File = GLib.File.new_for_path(file);
+            var file_img_mangager = new Akira.Lib.Managers.ImageManager(img_File,GLib.Random.int_range(0,100));
+            // See if File is an Image File
+            if(Akira.Utils.Image.is_valid_image (img_File)){
+                // Tell Items Manager that we want to insert an Image
+                window.items_manager.insert_image(file_img_mangager);
+                // Insert Image to Canvas
+                //window.items_manager.artboards[0]
+                window.items_manager.insert_item(x,y,file_img_mangager,null);
+            }
+        }
+        // Telling the Canvas to Stop the drag operation
+        Gtk.drag_finish (drag_context, true, false, time);
+    }
     private void create_pixel_grid () {
         pixel_grid = new Goo.CanvasGrid (
             null,
