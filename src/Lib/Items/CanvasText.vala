@@ -66,6 +66,7 @@ public class Akira.Lib.Items.CanvasText : Goo.CanvasText, Akira.Lib.Items.Canvas
         components.add (new Size (this));
         components.add (new Flipped (this));
         components.add (new Layer ());
+        
         check_add_to_artboard (this);
     }
 }
