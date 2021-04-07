@@ -82,6 +82,14 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         Gtk.SelectionData data, uint info, uint time)
     {
     //loop through list of Files
+    const string[] ACCEPTED_TYPES = {
+        "jpeg",
+        "png",
+        "tiff",
+        "svg",
+        "xml",
+        "gif"
+    };
     foreach(string uri in data.get_uris ()){
         string file = uri.replace("file://","").replace("file:/","");
         file = Uri.unescape_string (file);
@@ -89,17 +97,24 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         var img_File = GLib.File.new_for_path(file);
         var file_img_mangager = new Akira.Lib.Managers.ImageManager(img_File,GLib.Random.int_range(0,100));
         var root = window.main_window.main_canvas.canvas.get_root_item();
-        // Tell Items Manager that we want to insert an Image
-        window.items_manager.insert_image(file_img_mangager);
-        // Insert Image to Canvas
-        window.items_manager.insert_item(x,y,file_img_mangager,artboards[0]);
-        // Requesting Updates from the Root
-        this.request_update();
-        root.request_update();
+        var img_extention = Utils.Image.get_extension(img_File);
+        // See if File is an Image File
+        foreach(string accepted_type in ACCEPTED_TYPES){
+            if(img_extention == accepted_type){
+                // Tell Items Manager that we want to insert an Image
+                window.items_manager.insert_image(file_img_mangager);
+                // Insert Image to Canvas
+                window.items_manager.insert_item(x,y,file_img_mangager,artboards[0]);
+                // Requesting Updates from the Root
+                this.request_update();
+                root.request_update();
+                break;
+            }
         }
+    }
         // Telling the Canvas to Stop the drag operation
         Gtk.drag_finish (drag_context, true, false, time);
-    }
+}
 
     construct {
         events |= Gdk.EventMask.KEY_PRESS_MASK;
