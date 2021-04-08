@@ -109,12 +109,14 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     private void on_drag_data_received (Gdk.DragContext drag_context, int x, int y, 
         Gtk.SelectionData data, uint info, uint time){
         // Loop through list of Files
+        int current_index = 0;
         foreach(string uri in data.get_uris ()){
             string file = uri.replace("file://","").replace("file:/","");
             file = Uri.unescape_string (file);
             // Creating a Glib.File using a file path
             var img_File = GLib.File.new_for_path(file);
-            var file_img_mangager = new Akira.Lib.Managers.ImageManager(img_File,GLib.Random.int_range(0,100));
+            var file_img_mangager = new Akira.Lib.Managers.ImageManager(img_File,current_index);
+            current_index++;
             // See if File is an Image File
             if(Akira.Utils.Image.is_valid_image (img_File)){
                 // Tell Items Manager that we want to insert an Image
@@ -123,6 +125,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 window.items_manager.insert_item(x,y,file_img_mangager,null);
             }
         }
+        current_index=0;
         // Telling the Canvas to Stop the drag operation
         Gtk.drag_finish (drag_context, true, false, time);
     }
