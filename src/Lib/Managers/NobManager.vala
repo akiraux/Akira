@@ -64,7 +64,7 @@ public class Akira.Lib.Managers.NobManager : Object {
     private double width_offset_y;
     private double height_offset_x;
     private double height_offset_y;
-    // bb_width and bb_height are also used by the SizeManager to represent
+    // bb_width and bb_height are also used by the SizeMiddleware to represent
     // the width and height of selected items in the Transform Panel.
     private double bb_width;
     private double bb_height;
