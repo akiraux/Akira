@@ -57,7 +57,7 @@ public class Akira.Lib.Items.CanvasText : Goo.CanvasText, Akira.Lib.Items.Canvas
         // Force the generation of the item bounds on creation.
         Goo.CanvasBounds bounds;
         this.get_bounds (out bounds);
-        
+
         // Add all the components that this item uses.
         components = new Gee.ArrayList<Component> ();
         components.add (new Name (this));
