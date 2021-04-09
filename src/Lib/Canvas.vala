@@ -29,6 +29,10 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     private const int MIN_POS = 10;
     private const int GRID_THRESHOLD = 3;
 
+    private const Gtk.TargetEntry[] TARGETS = {
+        {"text/uri-list", 0, 0}
+    };
+
     public signal void canvas_moved (double delta_x, double delta_y);
     public signal void canvas_scroll_set_origin (double origin_x, double origin_y);
 
@@ -73,6 +77,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
     public Canvas (Akira.Window window) {
         Object (window: window);
+        Gtk.drag_dest_set (this, Gtk.DestDefaults.ALL, TARGETS, Gdk.DragAction.COPY);
     }
 
     construct {
@@ -101,6 +106,38 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         window.event_bus.set_focus_on_canvas.connect (on_set_focus_on_canvas);
         window.event_bus.request_escape.connect (on_set_focus_on_canvas);
         window.event_bus.insert_item.connect (on_insert_item);
+        drag_data_received.connect (on_drag_data_received);
+
+    }
+
+    // Make the Canvas Drag and Droppable
+    private void on_drag_data_received (Gdk.DragContext drag_context, int x, int y, Gtk.SelectionData data, uint info, uint time) {
+        //Loop Through The List of the dragged Files
+        int img_item_index = 0;
+        foreach (string link in data.get_uris ()) {
+            var file_link = link.replace ("file://", "").replace ("file:/", "");
+            file_link = Uri.unescape_string (file_link);
+            var image_file = File.new_for_path (file_link);
+            if (Akira.Utils.Image.is_valid_image (image_file)) {
+                var img_item_manager = new Lib.Managers.ImageManager (image_file, img_item_index);
+                window.items_manager.insert_image (img_item_manager);
+                var img_canvas_item = window.items_manager.insert_item (x, y, img_item_manager, null);
+                /*
+                 * We are creating a new Variable because when setting
+                 * img_canvas_item = (Akira.Lib.Items.CanvasImage)img_canvas_item;
+                 * when we do that it does not get converted
+                 * we want to convert it to a CanvasImage because the resize_pixbuf () function
+                */
+                Akira.Lib.Items.CanvasImage img_canvas_new_item = (Akira.Lib.Items.CanvasImage)img_canvas_item;
+                img_canvas_new_item.resize_pixbuf (-1, -1, true);
+            }
+            img_item_index++;
+        }
+        Gtk.drag_finish (drag_context, true, false, time);
+        // insert_image sets the cursor to CROSSHAIR till the user clicks on the canvas
+        // so we are setting it to ARROW which is the normal CursorType
+        current_cursor = Gdk.CursorType.ARROW;
+        set_cursor (current_cursor);
     }
 
     private void create_pixel_grid () {
