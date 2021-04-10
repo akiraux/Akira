@@ -77,7 +77,6 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
     public Canvas (Akira.Window window) {
         Object (window: window);
-        Gtk.drag_dest_set (this, Gtk.DestDefaults.ALL, TARGETS, Gdk.DragAction.COPY);
     }
 
     construct {
@@ -97,6 +96,8 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
         create_pixel_grid ();
 
+        Gtk.drag_dest_set (this, Gtk.DestDefaults.ALL, TARGETS, Gdk.DragAction.COPY);
+
         window.event_bus.toggle_pixel_grid.connect (on_toggle_pixel_grid);
         window.event_bus.update_pixel_grid.connect (on_update_pixel_grid);
         window.event_bus.update_scale.connect (on_update_scale);
@@ -107,7 +108,6 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         window.event_bus.request_escape.connect (on_set_focus_on_canvas);
         window.event_bus.insert_item.connect (on_insert_item);
         drag_data_received.connect (on_drag_data_received);
-
     }
 
     // Make the Canvas Drag and Droppable
@@ -120,24 +120,21 @@ public class Akira.Lib.Canvas : Goo.Canvas {
             var image_file = File.new_for_path (file_link);
             if (Akira.Utils.Image.is_valid_image (image_file)) {
                 var img_item_manager = new Lib.Managers.ImageManager (image_file, img_item_index);
-                window.items_manager.insert_image (img_item_manager);
+                window.event_bus.insert_item ("image");
                 var img_canvas_item = window.items_manager.insert_item (x, y, img_item_manager, null);
-                /*
-                 * We are creating a new Variable because when setting
-                 * img_canvas_item = (Akira.Lib.Items.CanvasImage)img_canvas_item;
-                 * when we do that it does not get converted
-                 * we want to convert it to a CanvasImage because the resize_pixbuf () function
-                */
-                Akira.Lib.Items.CanvasImage img_canvas_new_item = (Akira.Lib.Items.CanvasImage)img_canvas_item;
-                img_canvas_new_item.resize_pixbuf (-1, -1, true);
+                ((Akira.Lib.Items.CanvasImage)img_canvas_item).resize_pixbuf (-1, -1, true);
             }
             img_item_index++;
         }
         Gtk.drag_finish (drag_context, true, false, time);
-        // insert_image sets the cursor to CROSSHAIR till the user clicks on the canvas
-        // so we are setting it to ARROW which is the normal CursorType
-        current_cursor = Gdk.CursorType.ARROW;
-        set_cursor (current_cursor);
+        // Update the pixel grid if it's visible in order to move it to the foreground.
+        if (is_grid_visible) {
+            update_pixel_grid ();
+        }
+        // Synchronous update to make sure item is initialized before any other event.
+        update ();
+        // Reset the edit mode.
+        edit_mode = EditMode.MODE_SELECTION;
     }
 
     private void create_pixel_grid () {
