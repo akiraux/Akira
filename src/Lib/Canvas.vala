@@ -121,7 +121,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
             if (Akira.Utils.Image.is_valid_image (image_file)) {
                 var img_item_manager = new Lib.Managers.ImageManager (image_file, img_item_index);
                 window.event_bus.insert_item ("image");
-                var img_canvas_item = window.items_manager.insert_item (x, y, img_item_manager, null);
+                var img_canvas_item = window.items_manager.insert_item (x, y, img_item_manager);
                 ((Akira.Lib.Items.CanvasImage)img_canvas_item).resize_pixbuf (-1, -1, true);
             }
             img_item_index++;
