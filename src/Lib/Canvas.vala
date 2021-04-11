@@ -256,6 +256,33 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 window.event_bus.move_item_from_canvas (event);
                 window.event_bus.detect_artboard_change ();
                 break;
+                case Gdk.Key.D :
+                // Checking if Ctrl is pressed when D is pressed to do duplicate operation
+                if (ctrl_is_pressed) {
+                    // Loop through list of selected items
+                    unowned var list_selected_items = selected_bound_manager.selected_items;
+                    foreach (var selected_item in list_selected_items) {
+                        var new_item = window.items_manager.insert_item (selected_item.coordinates.x1, selected_item.coordinates.y1);
+                        // If the selected item is an Image the image manager will be set
+                        // else selected item will be null
+                        var selected_item_manager = ((Lib.Items.CanvasImage)selected_item).manager;
+                        // Creating a new Image Manager with different timestamp and id
+                        var img_manager = new Lib.Managers.ImageManager(selected_item_manager.file, list_selected_items.index (selected_item));
+                        // if the image manager is set this means that this is an Image so we will insert an Image
+                        if (selected_item_manager != null) {
+                            window.event_bus.insert_item ("image");
+                            new_item = window.items_manager.insert_item (selected_item.coordinates.x1, selected_item.coordinates.y1, img_manager);
+                            // Setting Image width does not change it unless we change it from resize_pixbuf
+                            ((Lib.Items.CanvasImage)new_item).resize_pixbuf ((int)selected_item.size.width, (int)selected_item.size.height, true);
+                        }
+                        new_item.size.width = selected_item.size.width;
+                        new_item.size.height = selected_item.size.height;
+                    }
+                    update_canvas ();
+                    // Reset the edit mode.
+                    edit_mode = EditMode.MODE_SELECTION;
+                }
+                break;
         }
 
         return true;
