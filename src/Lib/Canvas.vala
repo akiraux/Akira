@@ -29,6 +29,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     private const int MIN_POS = 10;
     private const int GRID_THRESHOLD = 3;
 
+    // List of accepted dragged targets.
     private const Gtk.TargetEntry[] TARGETS = {
         {"text/uri-list", 0, 0}
     };
@@ -96,7 +97,9 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
         create_pixel_grid ();
 
+        // Make the canvas a destination for drag actions.
         Gtk.drag_dest_set (this, Gtk.DestDefaults.ALL, TARGETS, Gdk.DragAction.COPY);
+        drag_data_received.connect (on_drag_data_received);
 
         window.event_bus.toggle_pixel_grid.connect (on_toggle_pixel_grid);
         window.event_bus.update_pixel_grid.connect (on_update_pixel_grid);
@@ -107,32 +110,42 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         window.event_bus.set_focus_on_canvas.connect (on_set_focus_on_canvas);
         window.event_bus.request_escape.connect (on_set_focus_on_canvas);
         window.event_bus.insert_item.connect (on_insert_item);
-        drag_data_received.connect (on_drag_data_received);
     }
 
-    // Make the Canvas Drag and Droppable
-    private void on_drag_data_received (Gdk.DragContext drag_context, int x, int y, Gtk.SelectionData data, uint info, uint time) {
-        //Loop Through The List of the dragged Files
-        int img_item_index = 0;
+    /**
+     * Handle the data received after a drag and drop action.
+     */
+    private void on_drag_data_received (
+        Gdk.DragContext drag_context,
+        int x,
+        int y,
+        Gtk.SelectionData data,
+        uint info,
+        uint time
+    ) {
+        // Loop through the list of the dragged files.
+        int index = 0;
         foreach (string link in data.get_uris ()) {
             var file_link = link.replace ("file://", "").replace ("file:/", "");
             file_link = Uri.unescape_string (file_link);
-            var image_file = File.new_for_path (file_link);
-            if (Akira.Utils.Image.is_valid_image (image_file)) {
-                var img_item_manager = new Lib.Managers.ImageManager (image_file, img_item_index);
-                window.event_bus.insert_item ("image");
-                var img_canvas_item = window.items_manager.insert_item (x, y, img_item_manager);
-                ((Akira.Lib.Items.CanvasImage)img_canvas_item).resize_pixbuf (-1, -1, true);
+            var image = File.new_for_path (file_link);
+            if (!Utils.Image.is_valid_image (image)) {
+                continue;
             }
-            img_item_index++;
+            // Create the image manager.
+            var manager = new Lib.Managers.ImageManager (image, index);
+            // Let the app know that we're adding image items.
+            window.event_bus.insert_item ("image");
+            // Create the item.
+            var item = window.items_manager.insert_item (x, y, manager);
+            // Force the resize of the item to its original size.
+            ((Lib.Items.CanvasImage)item).resize_pixbuf (-1, -1, true);
+            index++;
         }
+
         Gtk.drag_finish (drag_context, true, false, time);
-        // Update the pixel grid if it's visible in order to move it to the foreground.
-        if (is_grid_visible) {
-            update_pixel_grid ();
-        }
-        // Synchronous update to make sure item is initialized before any other event.
-        update ();
+
+        update_canvas ();
         // Reset the edit mode.
         edit_mode = EditMode.MODE_SELECTION;
     }
@@ -295,21 +308,12 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 selected_bound_manager.reset_selection ();
 
                 var new_item = window.items_manager.insert_item (event.x, event.y);
-
                 selected_bound_manager.add_item_to_selection (new_item);
-
                 selected_bound_manager.set_initial_coordinates (event.x, event.y);
 
                 nob_manager.selected_nob = Managers.NobManager.Nob.BOTTOM_RIGHT;
 
-                // Update the pixel grid if it's visible in order to move it to the foreground.
-                if (is_grid_visible) {
-                    update_pixel_grid ();
-                }
-
-                // Synchronous update to make sure item is initialized before any other event.
-                update ();
-
+                update_canvas ();
                 break;
 
             case EditMode.MODE_SELECTION:
@@ -338,7 +342,6 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
                 if (clicked_item is Selection.Nob) {
                     var selected_nob = clicked_item as Selection.Nob;
-
                     clicked_nob_name = nob_manager.get_grabbed_id (selected_nob);
                 }
 
@@ -452,6 +455,18 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
     public void on_insert_item () {
         edit_mode = EditMode.MODE_INSERT;
+    }
+
+    /**
+     * Perform a series of updates after an item is created.
+     */
+    public void update_canvas () {
+        // Update the pixel grid if it's visible in order to move it to the foreground.
+        if (is_grid_visible) {
+            update_pixel_grid ();
+        }
+        // Synchronous update to make sure item is initialized before any other event.
+        update ();
     }
 
     public void on_set_focus_on_canvas () {
