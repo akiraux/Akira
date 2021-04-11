@@ -105,6 +105,7 @@ sources = files(
     'Lib/Managers/HoverManager.vala',
     'Lib/Managers/ImageManager.vala',
     'Lib/Managers/ItemsManager.vala',
+    'Lib/Managers/ModeManager.vala',
     'Lib/Managers/NobManager.vala',
     'Lib/Managers/SelectedBoundManager.vala',
     'Lib/Managers/SnapManager.vala',
@@ -113,6 +114,10 @@ sources = files(
 
     'Middlewares/CoordinatesMiddleware.vala',
     'Middlewares/SizeMiddleware.vala',
+
+    'Lib/Modes/InteractionMode.vala',
+    'Lib/Modes/TransformMode.vala',
+    'Lib/Modes/ItemInsertMode.vala',
 )
 
 deps = [
