@@ -266,27 +266,27 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                         Items.CanvasItem new_item = null;
                         if (selected_item is Items.CanvasArtboard) {
                             window.event_bus.insert_item ("artboard");
-                            new_item = window.items_manager.insert_item (selected_item.coordinates.x, selected_item.coordinates.y);
+                            new_item = window.items_manager.insert_item (selected_item.coordinates.x1, selected_item.coordinates.y1, null, selected_item.artboard);
                             // Copy Artboard Children
                         }
                         else if (selected_item is Items.CanvasRect) {
                             window.event_bus.insert_item ("rectangle");
-                            new_item = window.items_manager.insert_item (selected_item.coordinates.x, selected_item.coordinates.y);
+                            new_item = window.items_manager.insert_item (selected_item.coordinates.x1, selected_item.coordinates.y1, null, selected_item.artboard);
                         }
                         else if (selected_item is Items.CanvasEllipse) {
                             window.event_bus.insert_item ("ellipse");
-                            new_item = window.items_manager.insert_item (selected_item.coordinates.x, selected_item.coordinates.y);
+                            new_item = window.items_manager.insert_item (selected_item.coordinates.x1, selected_item.coordinates.y1, null, selected_item.artboard);
                         }
                         else if (selected_item is Items.CanvasText) {
                             window.event_bus.insert_item ("text");
-                            new_item = window.items_manager.insert_item (selected_item.coordinates.x, selected_item.coordinates.y);
+                            new_item = window.items_manager.insert_item (selected_item.coordinates.x1, selected_item.coordinates.y1, null, selected_item.artboard);
                         }
                         else if (selected_item is Items.CanvasImage) {
                             window.event_bus.insert_item ("image");
                             var selected_image_manager = ((Lib.Items.CanvasImage)selected_item).manager;
                             // Creating a new Image Manager with different timestamp and id
                             var img_manager = new Lib.Managers.ImageManager(selected_image_manager.file, list_selected_items.index (selected_item));
-                            new_item = window.items_manager.insert_item (selected_item.coordinates.x1, selected_item.coordinates.y1, img_manager);
+                            new_item = window.items_manager.insert_item (selected_item.coordinates.x1, selected_item.coordinates.y1, img_manager,selected_item.artboard);
                             // Setting Image width does not change it unless we change it from resize_pixbuf
                             ((Lib.Items.CanvasImage)new_item).resize_pixbuf ((int)selected_item.size.width, (int)selected_item.size.height, true);
                         }
