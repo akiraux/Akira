@@ -141,6 +141,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
             // Force the resize of the item to its original size.
             ((Lib.Items.CanvasImage)item).resize_pixbuf (-1, -1, true);
             index++;
+            window.event_bus.canvas_notification ("Image Inserted");
         }
 
         Gtk.drag_finish (drag_context, true, false, time);
@@ -260,26 +261,64 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 // Checking if Ctrl is pressed when D is pressed to do duplicate operation
                 if (ctrl_is_pressed) {
                     // Loop through list of selected items
-                    unowned var list_selected_items = selected_bound_manager.selected_items;
+                    var list_selected_items = selected_bound_manager.selected_items.copy ();
                     foreach (var selected_item in list_selected_items) {
-                        var new_item = window.items_manager.insert_item (selected_item.coordinates.x1, selected_item.coordinates.y1);
-                        // If the selected item is an Image the image manager will be set
-                        // else selected item will be null
-                        var selected_item_manager = ((Lib.Items.CanvasImage)selected_item).manager;
-                        // Creating a new Image Manager with different timestamp and id
-                        var img_manager = new Lib.Managers.ImageManager(selected_item_manager.file, list_selected_items.index (selected_item));
-                        // if the image manager is set this means that this is an Image so we will insert an Image
-                        if (selected_item_manager != null) {
+                        Items.CanvasItem new_item = null;
+                        if (selected_item is Items.CanvasArtboard) {
+                            window.event_bus.insert_item ("artboard");
+                            new_item = window.items_manager.insert_item (selected_item.coordinates.x, selected_item.coordinates.y);
+                            // Copy Artboard Children
+                        }
+                        else if (selected_item is Items.CanvasRect) {
+                            window.event_bus.insert_item ("rectangle");
+                            new_item = window.items_manager.insert_item (selected_item.coordinates.x, selected_item.coordinates.y);
+                        }
+                        else if (selected_item is Items.CanvasEllipse) {
+                            window.event_bus.insert_item ("ellipse");
+                            new_item = window.items_manager.insert_item (selected_item.coordinates.x, selected_item.coordinates.y);
+                        }
+                        else if (selected_item is Items.CanvasText) {
+                            window.event_bus.insert_item ("text");
+                            new_item = window.items_manager.insert_item (selected_item.coordinates.x, selected_item.coordinates.y);
+                        }
+                        else if (selected_item is Items.CanvasImage) {
                             window.event_bus.insert_item ("image");
+                            var selected_image_manager = ((Lib.Items.CanvasImage)selected_item).manager;
+                            // Creating a new Image Manager with different timestamp and id
+                            var img_manager = new Lib.Managers.ImageManager(selected_image_manager.file, list_selected_items.index (selected_item));
                             new_item = window.items_manager.insert_item (selected_item.coordinates.x1, selected_item.coordinates.y1, img_manager);
                             // Setting Image width does not change it unless we change it from resize_pixbuf
                             ((Lib.Items.CanvasImage)new_item).resize_pixbuf ((int)selected_item.size.width, (int)selected_item.size.height, true);
                         }
+                        // Set Properties for duplicated item
                         new_item.size.width = selected_item.size.width;
                         new_item.size.height = selected_item.size.height;
+                        // The following properties does not exist for CanavsText so they break it
+                        if (selected_item is Items.CanvasText){continue;}
+                        new_item.opacity.opacity = selected_item.opacity.opacity;
+                        new_item.rotation.rotation = selected_item.rotation.rotation;
+                        new_item.flipped.horizontal = selected_item.flipped.horizontal;
+                        new_item.flipped.vertical = selected_item.flipped.vertical;
+                        // The following properties does not exist for CanavsImage so they break it
+                        if (selected_item is Items.CanvasImage){continue;}
+                        new_item.border_radius.x = selected_item.border_radius.x;
+                        new_item.border_radius.y = selected_item.border_radius.y;
+                        new_item.layer.selected = selected_item.layer.selected;
+                        new_item.layer.locked = selected_item.layer.locked;
+                        // Fills and borders needs to bee set in a diffrent way
+                        foreach (var fill in selected_item.fills.fills){
+                            new_item.fills.add_fill_color (fill.color);
+                        }
+                        foreach (var border in selected_item.borders.borders){
+                            new_item.borders.add_border_color (border.color, border.size);
+                        }
+                        // foreach loop adds the first item twice
+                        new_item.fills.fills[0].remove();
+                        new_item.borders.borders[0].remove();
+                        window.event_bus.canvas_notification ("'" + selected_item.name.name + "'" + " Duplicated");
                     }
-                    update_canvas ();
                     // Reset the edit mode.
+                    update_canvas ();
                     edit_mode = EditMode.MODE_SELECTION;
                 }
                 break;
