@@ -30,7 +30,6 @@ public class Akira.Lib.Modes.ItemInsertMode : Object, InteractionMode {
     public weak Akira.Lib.Canvas canvas { get; construct; }
     public weak Akira.Lib.Managers.ModeManager mode_manager { get; construct; }
 
-    private bool item_created = false;
     private bool resizing = false;
 
     public ItemInsertMode (Akira.Lib.Canvas canvas, Akira.Lib.Managers.ModeManager mode_manager) {

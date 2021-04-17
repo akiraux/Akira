@@ -74,7 +74,9 @@ public class Akira.Lib.Managers.ModeManager : Object {
      * Deregister the currently active mode.
      */
     public void deregister_active_mode () {
-        inner_deregister_active_mode (true);
+        if (active_mode != null) {
+            inner_deregister_active_mode (true);
+        }
     }
 
     /*
