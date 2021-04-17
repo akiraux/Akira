@@ -20,11 +20,20 @@
  */
 
 
+/*
+ * InteractionMode is an abstract definition. It abstracts a canvas interaction mode that can absorb mouse and key
+ * events, as well as having a well defined beginning and end. How these things are defined is up to a higher
+ * class such as the ModeManager.
+ *
+ * A canvas using these modes should have exactly one active at a time.
+ */
 public interface Akira.Lib.Modes.InteractionMode : Object {
     public enum ModeType {
         UNDEFINED = 0,
         RESIZE,
-        ITEM_INSERT
+        ITEM_INSERT,
+        EXPORT,
+        PAN
     }
 
     public abstract void mode_begin ();

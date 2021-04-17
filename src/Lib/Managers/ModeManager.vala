@@ -20,11 +20,19 @@
  */
 
 /**
- * Manages Goo.CanvasItem decorators used to display snap lines and dots.
+ * Manages InteractionMode's via registration. This class can be plugged into the event methods of a Canvas
+ * in order to allow these modes to affect items in the canvas as well as allowing them to absorb said
+ * events.
+ *
+ * Only one InteractionMode is guaranteed to exist at a time, and this manager will correctly alert the
+ * beginning and end of a registered mode.
+ *
+ * The exception to the above rule is pan_mode, which can be running on top of another mode in certain cases.
  */
 public class Akira.Lib.Managers.ModeManager : Object {
     public weak Akira.Lib.Canvas canvas { get; construct; }
 
+    private Akira.Lib.Modes.PanMode pan_mode;
     private Akira.Lib.Modes.InteractionMode active_mode;
 
     public ModeManager (Akira.Lib.Canvas canvas) {
@@ -46,6 +54,8 @@ public class Akira.Lib.Managers.ModeManager : Object {
     public void deregister_mode (Akira.Lib.Modes.InteractionMode.ModeType mode_type) {
         if (active_mode != null && active_mode.mode_type () == mode_type) {
             inner_deregister_active_mode (true);
+        } else if (pan_mode != null && pan_mode.mode_type () == mode_type) {
+            stop_panning_mode ();
         }
     }
 
@@ -53,57 +63,87 @@ public class Akira.Lib.Managers.ModeManager : Object {
         inner_deregister_active_mode (true);
     }
 
+    public void start_panning_mode () {
+        if (pan_mode != null) {
+            return;
+        }
+
+        pan_mode = new Akira.Lib.Modes.PanMode (canvas, this);
+        pan_mode.mode_begin ();
+
+        canvas.interaction_mode_changed ();
+    }
+
+    public void stop_panning_mode () {
+        if (pan_mode != null) {
+            inner_stop_panning_mode (true);
+        }
+    }
+
+    private void inner_stop_panning_mode (bool notify) {
+        pan_mode.mode_end ();
+        pan_mode = null;
+
+        if (notify) {
+            canvas.interaction_mode_changed ();
+        }
+    }
+
     private void inner_deregister_active_mode (bool notify) {
         active_mode.mode_end ();
         active_mode = null;
+
+        if (notify) {
+            canvas.interaction_mode_changed ();
+        }
     }
 
     public Gdk.CursorType? active_cursor_type () {
-        if (active_mode != null) {
-            return active_mode.cursor_type ();
+        if (pan_mode != null) {
+            return pan_mode.cursor_type ();
         }
 
-        return null;
+        return (active_mode != null) ? active_mode.cursor_type () : null;
     }
 
     public bool key_press_event (Gdk.EventKey event) {
-        if (active_mode != null) {
-            return active_mode.key_press_event (event);
+        if (pan_mode != null && pan_mode.key_press_event (event)) {
+            return false;
         }
 
-        return false;
+        return (active_mode != null) ? active_mode.key_press_event (event) : false;
     }
 
     public bool key_release_event (Gdk.EventKey event) {
-        if (active_mode != null) {
-            return active_mode.key_release_event (event);
+        if (pan_mode != null && pan_mode.key_release_event (event)) {
+            return true;
         }
 
-        return false;
+        return (active_mode != null) ? active_mode.key_release_event (event) : false;
     }
 
     public bool button_press_event (Gdk.EventButton event) {
-        if (active_mode != null) {
-            return active_mode.button_press_event (event);
+        if (pan_mode != null && pan_mode.button_press_event (event)) {
+            return true;
         }
 
-        return false;
+        return (active_mode != null) ? active_mode.button_press_event (event) : false;
     }
 
     public bool button_release_event (Gdk.EventButton event) {
-        if (active_mode != null) {
-            return active_mode.button_release_event (event);
+        if (pan_mode != null && pan_mode.button_release_event (event)) {
+            return true;
         }
 
-        return false;
+        return (active_mode != null) ? active_mode.button_release_event (event) : false;
     }
 
     public bool motion_notify_event (Gdk.EventMotion event) {
-        if (active_mode != null) {
-            return active_mode.motion_notify_event (event);
+        if (pan_mode != null && pan_mode.motion_notify_event (event)) {
+            return true;
         }
 
-        return false;
+        return (active_mode != null) ? active_mode.motion_notify_event (event) : false;
     }
 
 }

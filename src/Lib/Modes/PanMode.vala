@@ -20,13 +20,16 @@
  */
 
 
-public class Akira.Lib.Modes.ItemInsertMode : Object, InteractionMode {
+public class Akira.Lib.Modes.PanMode : Object, InteractionMode {
     public weak Akira.Lib.Canvas canvas { get; construct; }
     public weak Akira.Lib.Managers.ModeManager mode_manager { get; construct; }
 
-    private bool resizing = false;
+    private bool space_held = false;
+    private bool panning = false;
+    private double origin_x = 0;
+    private double origin_y = 0;
 
-    public ItemInsertMode (Akira.Lib.Canvas canvas, Akira.Lib.Managers.ModeManager mode_manager) {
+    public PanMode (Akira.Lib.Canvas canvas, Akira.Lib.Managers.ModeManager mode_manager) {
         Object (
             canvas: canvas,
             mode_manager : mode_manager
@@ -35,62 +38,64 @@ public class Akira.Lib.Modes.ItemInsertMode : Object, InteractionMode {
 
     public void mode_begin () {}
     public void mode_end () {}
-    public InteractionMode.ModeType mode_type () { return InteractionMode.ModeType.ITEM_INSERT; }
+    public InteractionMode.ModeType mode_type () { return InteractionMode.ModeType.PAN; }
 
 
     public Gdk.CursorType? cursor_type () {
-        if (resizing) {
-            return TransformMode.cursor_type_from_nob_state (Akira.Lib.Managers.NobManager.Nob.BOTTOM_RIGHT);
-        }
-
-        return Gdk.CursorType.CROSSHAIR;
+        return panning ? Gdk.CursorType.HAND2 : Gdk.CursorType.HAND1;
     }
 
     public bool key_press_event (Gdk.EventKey event) {
-        return false;
+        uint uppercase_keyval = Gdk.keyval_to_upper (event.keyval);
+        if (uppercase_keyval == Gdk.Key.space) {
+            space_held = true;
+        }
+        return true;
     }
 
     public bool key_release_event (Gdk.EventKey event) {
-        return false;
+        uint uppercase_keyval = Gdk.keyval_to_upper (event.keyval);
+        if (uppercase_keyval == Gdk.Key.space) {
+            space_held = false;
+
+            if (!panning) {
+                mode_manager.deregister_mode (mode_type ());
+            }
+        }
+        return true;
     }
 
     public bool button_press_event (Gdk.EventButton event) {
-        if (event.button == Gdk.BUTTON_PRIMARY) {
-            var sel_manager = canvas.selected_bound_manager;
-            sel_manager.reset_selection ();
+        if (!panning && (space_held || event.button == Gdk.BUTTON_MIDDLE)) {
+            origin_x = event.x;
+            origin_y = event.y;
+            canvas.canvas_scroll_set_origin (origin_x, origin_y);
 
-            var new_item = canvas.window.items_manager.insert_item (event.x, event.y);
-
-            sel_manager.add_item_to_selection (new_item);
-            sel_manager.set_initial_coordinates (event.x, event.y);
-
-            canvas.nob_manager.selected_nob = Managers.NobManager.Nob.BOTTOM_RIGHT;
-
-            canvas.update_pixel_grid_if_visible();
-
-            // Synchronous update to make sure item is initialized before any other event.
-            canvas.update ();
-
-            resizing = true;
+            togglePanning(true);
         }
-
-        return false;
+        return true;
     }
 
     public bool button_release_event (Gdk.EventButton event) {
-        if (event.button == Gdk.BUTTON_PRIMARY) {
+        togglePanning(false);
+
+        if (!space_held) {
             mode_manager.deregister_mode (mode_type ());
         }
-
-        return resizing;
+        return true;
     }
 
     public bool motion_notify_event (Gdk.EventMotion event) {
-        if (resizing) {
-            TransformMode.handle_motion_event (event, canvas);
+        if (panning) {
+            canvas.canvas_moved (event.x, event.y);
         }
-
-        return false;
+        return true;
     }
 
+    private void togglePanning(bool newState) {
+        if (panning != newState) {
+            panning = newState;
+            canvas.interaction_mode_changed ();
+        }
+    }
 }

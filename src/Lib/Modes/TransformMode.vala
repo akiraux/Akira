@@ -31,11 +31,9 @@ public class Akira.Lib.Modes.TransformMode : Object, InteractionMode {
         );
     }
 
-    public void mode_begin () {
-        debug("resize begin");
-    }
+    public void mode_begin () {}
     public void mode_end () {
-        debug("resize end");
+        canvas.selected_bound_manager.reset_snap_decorators ();
     }
     public InteractionMode.ModeType mode_type () { return InteractionMode.ModeType.RESIZE; }
 
@@ -45,7 +43,7 @@ public class Akira.Lib.Modes.TransformMode : Object, InteractionMode {
     }
 
     public bool key_press_event (Gdk.EventKey event) {
-        return false;
+        return true;
     }
 
     public bool key_release_event (Gdk.EventKey event) {
