@@ -27,7 +27,10 @@
  * Only one InteractionMode is guaranteed to exist at a time, and this manager will correctly alert the
  * beginning and end of a registered mode.
  *
- * The exception to the above rule is pan_mode, which can be running on top of another mode in certain cases.
+ * The exception to the above rule is pan_mode, which can be running on top of another mode in certain cases and
+ * masks events appropriately.
+ *
+ * See ItneractionMode.vala for more details on how to create modes.
  */
 public class Akira.Lib.Managers.ModeManager : Object {
     public weak Akira.Lib.Canvas canvas { get; construct; }
@@ -41,6 +44,9 @@ public class Akira.Lib.Managers.ModeManager : Object {
         );
     }
 
+    /*
+     * Register a new mode as the active mode. Any prior mode will be deregistered.
+     */
     public void register_mode (Akira.Lib.Modes.InteractionMode new_mode) {
         if (active_mode != null) {
             inner_deregister_active_mode (false);
@@ -51,6 +57,11 @@ public class Akira.Lib.Managers.ModeManager : Object {
         canvas.interaction_mode_changed ();
     }
 
+    /*
+     * Deregister active mode or pan mode if it matches the mode_type.
+     * This should generally be used for safety since a new mode may already have been
+     * registered by the time this method is called.
+     */
     public void deregister_mode (Akira.Lib.Modes.InteractionMode.ModeType mode_type) {
         if (active_mode != null && active_mode.mode_type () == mode_type) {
             inner_deregister_active_mode (true);
@@ -59,10 +70,17 @@ public class Akira.Lib.Managers.ModeManager : Object {
         }
     }
 
+    /*
+     * Deregister the currently active mode.
+     */
     public void deregister_active_mode () {
         inner_deregister_active_mode (true);
     }
 
+    /*
+     * Start panning mode that will mask any existing mode. Also, other modes may be started
+     * during panning mode in certain conditions.
+     */
     public void start_panning_mode () {
         if (pan_mode != null) {
             return;
@@ -74,12 +92,18 @@ public class Akira.Lib.Managers.ModeManager : Object {
         canvas.interaction_mode_changed ();
     }
 
+    /*
+     * Stops panning mode.
+     */
     public void stop_panning_mode () {
         if (pan_mode != null) {
             inner_stop_panning_mode (true);
         }
     }
 
+    /*
+     * Inner panning mode stop method with optional notification to canvas.
+     */
     private void inner_stop_panning_mode (bool notify) {
         pan_mode.mode_end ();
         pan_mode = null;
@@ -89,6 +113,9 @@ public class Akira.Lib.Managers.ModeManager : Object {
         }
     }
 
+    /*
+     * Inner mode deregistration method with optional notification to canvas.
+     */
     private void inner_deregister_active_mode (bool notify) {
         active_mode.mode_end ();
         active_mode = null;
@@ -98,6 +125,9 @@ public class Akira.Lib.Managers.ModeManager : Object {
         }
     }
 
+    /*
+     * Returns cursor that should be used based on active modes.
+     */
     public Gdk.CursorType? active_cursor_type () {
         if (pan_mode != null) {
             return pan_mode.cursor_type ();
