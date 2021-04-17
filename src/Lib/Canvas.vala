@@ -89,7 +89,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         window.event_bus.set_scale.connect (on_set_scale);
         window.event_bus.request_change_cursor.connect (on_request_change_cursor);
         window.event_bus.set_focus_on_canvas.connect (on_set_focus_on_canvas);
-        window.event_bus.request_escape.connect (on_set_focus_on_canvas);
+        window.event_bus.request_escape.connect (on_escape_key);
         window.event_bus.insert_item.connect (on_insert_item);
     }
 
@@ -183,14 +183,6 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         uint uppercase_keyval = Gdk.keyval_to_upper (event.keyval);
 
         switch (uppercase_keyval) {
-            case Gdk.Key.Escape:
-                mode_manager.deregister_active_mode ();
-                // Clear the selected export area to be sure to not leave anything behind.
-                export_manager.clear ();
-                // Clear the image manager in case the user was adding an image.
-                window.items_manager.image_manager = null;
-                break;
-
             case Gdk.Key.Control_L:
             case Gdk.Key.Control_R:
                 ctrl_is_pressed = true;
@@ -318,7 +310,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         mode_manager.register_mode (new_mode);
     }
 
-    /**
+    /*
      * Perform a series of updates after an item is created.
      */
     public void update_canvas () {
@@ -328,6 +320,19 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         }
         // Synchronous update to make sure item is initialized before any other event.
         update ();
+    }
+
+    /*
+     * Handle escape key.
+     */
+    public void on_escape_key () {
+        mode_manager.deregister_active_mode ();
+        // Clear the selected export area to be sure to not leave anything behind.
+        export_manager.clear ();
+        // Clear the image manager in case the user was adding an image.
+        window.items_manager.image_manager = null;
+
+        on_set_focus_on_canvas ();
     }
 
     public void on_set_focus_on_canvas () {
