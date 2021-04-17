@@ -171,6 +171,10 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         selected_items = new List<Items.CanvasItem> ();
     }
 
+    public void reset_snap_decorators () {
+        snap_manager.reset_decorators ();
+    }
+
     public void reset_selection () {
         if (selected_items.length () == 0) {
             return;
@@ -181,10 +185,6 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         }
 
         selected_items = new List<Items.CanvasItem> ();
-    }
-
-    public void alert_held_button_release () {
-        snap_manager.reset_decorators ();
     }
 
     private void update_selected_items () {

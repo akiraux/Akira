@@ -118,6 +118,8 @@ sources = files(
     'Lib/Modes/InteractionMode.vala',
     'Lib/Modes/TransformMode.vala',
     'Lib/Modes/ItemInsertMode.vala',
+    'Lib/Modes/ExportMode.vala',
+    'Lib/Modes/PanMode.vala',
 
 )
 

@@ -38,7 +38,6 @@ public class Akira.Services.EventBus : Object {
     public signal void item_inserted ();
     public signal void move_item_from_canvas (Gdk.EventKey event);
     public signal void request_change_cursor (Gdk.CursorType? cursor_type);
-    public signal void request_change_mode (Lib.Canvas.EditMode mode);
     public signal void request_escape ();
     public signal void set_focus_on_canvas ();
     public signal void update_nob_size ();

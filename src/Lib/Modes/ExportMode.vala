@@ -20,13 +20,13 @@
  */
 
 
-public class Akira.Lib.Modes.ItemInsertMode : Object, InteractionMode {
+public class Akira.Lib.Modes.ExportMode : Object, InteractionMode {
     public weak Akira.Lib.Canvas canvas { get; construct; }
     public weak Akira.Lib.Managers.ModeManager mode_manager { get; construct; }
 
     private bool resizing = false;
 
-    public ItemInsertMode (Akira.Lib.Canvas canvas, Akira.Lib.Managers.ModeManager mode_manager) {
+    public ExportMode (Akira.Lib.Canvas canvas, Akira.Lib.Managers.ModeManager mode_manager) {
         Object (
             canvas: canvas,
             mode_manager : mode_manager
@@ -35,14 +35,10 @@ public class Akira.Lib.Modes.ItemInsertMode : Object, InteractionMode {
 
     public void mode_begin () {}
     public void mode_end () {}
-    public InteractionMode.ModeType mode_type () { return InteractionMode.ModeType.ITEM_INSERT; }
+    public InteractionMode.ModeType mode_type () { return InteractionMode.ModeType.EXPORT; }
 
 
     public Gdk.CursorType? cursor_type () {
-        if (resizing) {
-            return TransformMode.cursor_type_from_nob_state (Akira.Lib.Managers.NobManager.Nob.BOTTOM_RIGHT);
-        }
-
         return Gdk.CursorType.CROSSHAIR;
     }
 
@@ -55,39 +51,24 @@ public class Akira.Lib.Modes.ItemInsertMode : Object, InteractionMode {
     }
 
     public bool button_press_event (Gdk.EventButton event) {
-        if (event.button == Gdk.BUTTON_PRIMARY) {
-            var sel_manager = canvas.selected_bound_manager;
-            sel_manager.reset_selection ();
-
-            var new_item = canvas.window.items_manager.insert_item (event.x, event.y);
-
-            sel_manager.add_item_to_selection (new_item);
-            sel_manager.set_initial_coordinates (event.x, event.y);
-
-            canvas.nob_manager.selected_nob = Managers.NobManager.Nob.BOTTOM_RIGHT;
-
-            canvas.update_canvas();
-
-            resizing = true;
-        }
-
-        return false;
+        canvas.selected_bound_manager.reset_selection ();
+        canvas.export_manager.create_area (event);
+        resizing = true;
+        return true;
     }
 
     public bool button_release_event (Gdk.EventButton event) {
-        if (event.button == Gdk.BUTTON_PRIMARY) {
-            mode_manager.deregister_mode (mode_type ());
-        }
-
-        return resizing;
+        canvas.export_manager.create_area_snapshot ();
+        mode_manager.deregister_mode (mode_type ());
+        return true;
     }
 
     public bool motion_notify_event (Gdk.EventMotion event) {
         if (resizing) {
-            TransformMode.handle_motion_event (event, canvas);
+            canvas.export_manager.resize_area (event.x, event.y);
         }
-
-        return false;
+        return true;
     }
-
 }
+
+
