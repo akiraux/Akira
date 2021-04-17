@@ -25,9 +25,23 @@
  * events, as well as having a well defined beginning and end. How these things are defined is up to a higher
  * class such as the ModeManager.
  *
- * A canvas using these modes should have exactly one active at a time.
+ * In general only one InteractionMode will be active at a time. There are some exceptions where a mode may
+ * be masked by another, but this should be handled with a Manager with strong invariant management.
+ *
+ * To create a new mode:
+ * 1. Add a new ModeType
+ * 2. Create a new class that inherits from Object and InteractionMode
+ * 3. Implement all abstract methods, and return the correct mode_type
+ * 4. Create the new mode with the right trigger in Canvas, and ModeManager will automatically handle it
+ *    based on the abstract methods below. Sometimes the same event that creates the mode should be passed
+ *    to the mode_manager after the creation of the mode in order to guarantee correct behavior.
+ * 5. For now, modes should take mode_manager on construction in order to be able to stop themselves. In
+ *    the future this should be built into the api in a more abstract way.
  */
 public interface Akira.Lib.Modes.InteractionMode : Object {
+    /*
+     * Mode type that is used for introspection.
+     */
     public enum ModeType {
         UNDEFINED = 0,
         RESIZE,
@@ -36,15 +50,49 @@ public interface Akira.Lib.Modes.InteractionMode : Object {
         PAN
     }
 
+    /*
+     * Override to add startup behavior to the mode.
+     */
     public abstract void mode_begin ();
+
+    /*
+     * Override to add shutdown behavior to mode.
+     */
     public abstract void mode_end ();
+
+    /*
+     * Override to define ModeType associated to mode.
+     */
     public abstract ModeType mode_type ();
+
+    /*
+     * Override to define cursor associated to mode.
+     */
     public abstract Gdk.CursorType? cursor_type ();
 
+    /*
+     * Override to define key press event. Return true to absorb.
+     */
     public abstract bool key_press_event (Gdk.EventKey event);
+
+    /*
+     * Override to define key release event. Return true to absorb.
+     */
     public abstract bool key_release_event (Gdk.EventKey event);
+
+    /*
+     * Override to define button press event. Return true to absorb.
+     */
     public abstract bool button_press_event (Gdk.EventButton event);
+
+    /*
+     * Override to define button release event. Return true to absorb.
+     */
     public abstract bool button_release_event (Gdk.EventButton event);
+
+    /*
+     * Override to define mouse motion event. Return true to absorb.
+     */
     public abstract bool motion_notify_event (Gdk.EventMotion event);
 
 }

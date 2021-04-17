@@ -210,14 +210,14 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
         }
 
-        if (mode_manager.key_press_event(event)) {
+        if (mode_manager.key_press_event (event)) {
             return true;
         }
 
         switch (uppercase_keyval) {
             case Gdk.Key.space:
                 mode_manager.start_panning_mode ();
-                if (mode_manager.key_press_event(event)) {
+                if (mode_manager.key_press_event (event)) {
                     return true;
                 }
                 break;
@@ -254,7 +254,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 break;
         }
 
-        if (mode_manager.key_release_event(event)) {
+        if (mode_manager.key_release_event (event)) {
             return true;
         }
 
@@ -276,7 +276,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         }
 
         if (event.button == Gdk.BUTTON_MIDDLE) {
-            mode_manager.start_panning_mode();
+            mode_manager.start_panning_mode ();
             if (mode_manager.button_press_event (event)) {
                 return true;
             }
@@ -309,13 +309,13 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     }
 
     public void start_export_area_selection () {
-        var newMode = new Akira.Lib.Modes.ExportMode(this, mode_manager);
-        mode_manager.register_mode(newMode);
+        var new_mode = new Akira.Lib.Modes.ExportMode (this, mode_manager);
+        mode_manager.register_mode (new_mode);
     }
 
     public void on_insert_item () {
-        var newMode = new Akira.Lib.Modes.ItemInsertMode(this, mode_manager);
-        mode_manager.register_mode(newMode);
+        var new_mode = new Akira.Lib.Modes.ItemInsertMode (this, mode_manager);
+        mode_manager.register_mode (new_mode);
     }
 
     /**
@@ -392,8 +392,8 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         selected_bound_manager.set_initial_coordinates (event.x, event.y);
 
         if (selected_bound_manager.selected_items.length () > 0) {
-            var newMode = new Akira.Lib.Modes.TransformMode(this, mode_manager);
-            mode_manager.register_mode(newMode);
+            var new_mode = new Akira.Lib.Modes.TransformMode (this, mode_manager);
+            mode_manager.register_mode (new_mode);
 
             if (mode_manager.button_press_event (event)) {
                 return true;
@@ -496,7 +496,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         }
     }
 
-    /**
+    /*
      * Show or hide the pixel grid based on its state.
      */
     private void on_toggle_pixel_grid () {
@@ -510,9 +510,12 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         is_grid_visible = false;
     }
 
-    public void update_pixel_grid_if_visible() {
+    /*
+     * Updates pixel grid if visible, useful to guarantee z-order in paint composition.
+     */
+    public void update_pixel_grid_if_visible () {
         if (is_grid_visible) {
-            update_pixel_grid();
+            update_pixel_grid ();
         }
     }
 

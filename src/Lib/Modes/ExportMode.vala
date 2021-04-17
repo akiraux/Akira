@@ -20,6 +20,9 @@
  */
 
 
+/*
+ * ExportMode handles selecting an area for exporting.
+ */
 public class Akira.Lib.Modes.ExportMode : Object, InteractionMode {
     public weak Akira.Lib.Canvas canvas { get; construct; }
     public weak Akira.Lib.Managers.ModeManager mode_manager { get; construct; }
@@ -58,8 +61,10 @@ public class Akira.Lib.Modes.ExportMode : Object, InteractionMode {
     }
 
     public bool button_release_event (Gdk.EventButton event) {
-        canvas.export_manager.create_area_snapshot ();
-        mode_manager.deregister_mode (mode_type ());
+        if (resizing) {
+            canvas.export_manager.create_area_snapshot ();
+            mode_manager.deregister_mode (mode_type ());
+        }
         return true;
     }
 
@@ -70,5 +75,3 @@ public class Akira.Lib.Modes.ExportMode : Object, InteractionMode {
         return true;
     }
 }
-
-

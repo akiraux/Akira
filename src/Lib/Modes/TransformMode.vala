@@ -19,7 +19,11 @@
  * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
  */
 
-
+/*
+ * TransformMode handles mouse-activated transformations. Static methods can
+ * be used to apply the underlying code on top of other modes that may need to
+ * use the functionality.
+ */
 public class Akira.Lib.Modes.TransformMode : Object, InteractionMode {
     public weak Akira.Lib.Canvas canvas { get; construct; }
     public weak Akira.Lib.Managers.ModeManager mode_manager { get; construct; }
@@ -64,6 +68,9 @@ public class Akira.Lib.Modes.TransformMode : Object, InteractionMode {
         return true;
     }
 
+    /*
+     * Handle a motion event on a canvas. Will forward event to the canvas for now.
+     */
     public static bool handle_motion_event (Gdk.EventMotion event, Akira.Lib.Canvas canvas) {
         var selected_nob = canvas.nob_manager.selected_nob;
         canvas.selected_bound_manager.transform_bound (event.x, event.y, selected_nob);
@@ -71,6 +78,9 @@ public class Akira.Lib.Modes.TransformMode : Object, InteractionMode {
     }
 
 
+    /*
+     * Returns a cursor type based on a NobManager.Nob.
+     */
     public static Gdk.CursorType? cursor_type_from_nob_state (Akira.Lib.Managers.NobManager.Nob nob) {
         switch (nob) {
             case Managers.NobManager.Nob.TOP_LEFT:

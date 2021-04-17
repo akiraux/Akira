@@ -20,10 +20,17 @@
  */
 
 
+/*
+ * ItemInsertMode handles item insertion. After the first click, this mode will use static methods
+ * in the TransformMode to transform the inserted items.
+ *
+ * In the future, this mode can be kept alive during multiple clicks when inserting items like polylines.
+ */
 public class Akira.Lib.Modes.ItemInsertMode : Object, InteractionMode {
     public weak Akira.Lib.Canvas canvas { get; construct; }
     public weak Akira.Lib.Managers.ModeManager mode_manager { get; construct; }
 
+    private bool item_created = false;
     private bool resizing = false;
 
     public ItemInsertMode (Akira.Lib.Canvas canvas, Akira.Lib.Managers.ModeManager mode_manager) {
@@ -66,20 +73,22 @@ public class Akira.Lib.Modes.ItemInsertMode : Object, InteractionMode {
 
             canvas.nob_manager.selected_nob = Managers.NobManager.Nob.BOTTOM_RIGHT;
 
-            canvas.update_pixel_grid_if_visible();
+            canvas.update_pixel_grid_if_visible ();
 
             // Synchronous update to make sure item is initialized before any other event.
             canvas.update ();
 
             resizing = true;
+            return true;
         }
 
         return false;
     }
 
     public bool button_release_event (Gdk.EventButton event) {
-        if (event.button == Gdk.BUTTON_PRIMARY) {
+        if (resizing) {
             mode_manager.deregister_mode (mode_type ());
+            return true;
         }
 
         return resizing;
