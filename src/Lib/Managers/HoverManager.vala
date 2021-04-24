@@ -25,10 +25,7 @@ public class Akira.Lib.Managers.HoverManager : Object {
 
     public weak Akira.Lib.Canvas canvas { get; construct; }
 
-    private double initial_event_x;
-    private double initial_event_y;
     private Goo.CanvasItem hover_effect;
-    private Lib.Managers.NobManager.Nob current_hovering_nob;
     private Lib.Items.CanvasItem current_hover_item;
 
     public HoverManager (Akira.Lib.Canvas canvas) {
@@ -40,11 +37,6 @@ public class Akira.Lib.Managers.HoverManager : Object {
     construct {
         canvas.window.event_bus.zoom.connect (on_canvas_zoom);
         canvas.window.event_bus.hover_over_layer.connect (on_layer_hovered);
-    }
-
-    public void set_initial_coordinates (double event_x, double event_y) {
-        initial_event_x = event_x;
-        initial_event_y = event_y;
     }
 
     public void add_hover_effect (double event_x, double event_y) {
@@ -63,13 +55,6 @@ public class Akira.Lib.Managers.HoverManager : Object {
             current_hover_item = null;
             remove_hover_effect ();
 
-            set_cursor_for_nob (Managers.NobManager.Nob.NONE);
-            return;
-        }
-
-        if (target is Selection.Nob) {
-            var nob = target as Selection.Nob;
-            set_cursor_for_nob (nob.handle_id);
             return;
         }
 
@@ -102,8 +87,6 @@ public class Akira.Lib.Managers.HoverManager : Object {
         if (!item.layer.selected) {
             canvas.window.event_bus.hover_over_item (item);
         }
-
-        set_cursor_for_nob (Managers.NobManager.Nob.NONE);
     }
 
     private void on_layer_hovered (Items.CanvasItem? item) {
@@ -155,48 +138,6 @@ public class Akira.Lib.Managers.HoverManager : Object {
         hover_effect = null;
 
         canvas.window.event_bus.hover_over_item (null);
-    }
-
-    private void set_cursor_for_nob (Lib.Managers.NobManager.Nob grabbed_id) {
-        Gdk.CursorType? selected_cursor = null;
-
-        switch (grabbed_id) {
-            case Managers.NobManager.Nob.NONE:
-                selected_cursor = null;
-                break;
-            case Managers.NobManager.Nob.TOP_LEFT:
-                selected_cursor = Gdk.CursorType.TOP_LEFT_CORNER;
-                break;
-            case Managers.NobManager.Nob.TOP_CENTER:
-                selected_cursor = Gdk.CursorType.TOP_SIDE;
-                break;
-            case Managers.NobManager.Nob.TOP_RIGHT:
-                selected_cursor = Gdk.CursorType.TOP_RIGHT_CORNER;
-                break;
-            case Managers.NobManager.Nob.RIGHT_CENTER:
-                selected_cursor = Gdk.CursorType.RIGHT_SIDE;
-                break;
-            case Managers.NobManager.Nob.BOTTOM_RIGHT:
-                selected_cursor = Gdk.CursorType.BOTTOM_RIGHT_CORNER;
-                break;
-            case Managers.NobManager.Nob.BOTTOM_CENTER:
-                selected_cursor = Gdk.CursorType.BOTTOM_SIDE;
-                break;
-            case Managers.NobManager.Nob.BOTTOM_LEFT:
-                selected_cursor = Gdk.CursorType.BOTTOM_LEFT_CORNER;
-                break;
-            case Managers.NobManager.Nob.LEFT_CENTER:
-                selected_cursor = Gdk.CursorType.LEFT_SIDE;
-                break;
-            case Managers.NobManager.Nob.ROTATE:
-                selected_cursor = Gdk.CursorType.EXCHANGE;
-                break;
-        }
-
-        if (grabbed_id != current_hovering_nob) {
-            canvas.window.event_bus.request_change_cursor (selected_cursor);
-            current_hovering_nob = grabbed_id;
-        }
     }
 
     private void on_canvas_zoom () {

@@ -51,6 +51,7 @@ public class Akira.Lib.Managers.NobManager : Object {
     public weak Akira.Lib.Canvas canvas { get; construct; }
 
     public Nob selected_nob;
+    public Nob hovered_nob;
 
     private Goo.CanvasItem root;
     private Goo.CanvasRect? select_effect;
@@ -103,21 +104,18 @@ public class Akira.Lib.Managers.NobManager : Object {
         this.selected_nob = selected_nob;
     }
 
-    /**
-     * Compares a target item to the current nobs to see if there is a match.
-     * Otherwise returns Nob.NONE.
-     */
-    public Nob get_grabbed_id (Goo.CanvasItem? target) {
-        int grabbed_id = Nob.NONE;
-
-        for (var i = 0; i < 9; ++i) {
-            if (target == nobs[i]) {
-                grabbed_id = i;
-                break;
+    public Nob hit_test (double x, double y) {
+        double scale = canvas.current_scale;
+        foreach (var ui_nob_s in nobs) {
+            if (ui_nob_s != null && ui_nob_s.is_visible ()) {
+                var ui_nob = ui_nob_s as Akira.Lib.Selection.Nob;
+                if (ui_nob.hit_test (x, y, scale)) {
+                    return ui_nob.handle_id;
+                }
             }
         }
 
-        return (Nob) grabbed_id;
+        return Nob.NONE;
     }
 
     public static bool is_top_nob (Nob nob) {
@@ -135,6 +133,48 @@ public class Akira.Lib.Managers.NobManager : Object {
     public static bool is_right_nob (Nob nob) {
         return nob == Nob.TOP_RIGHT || nob == Nob.RIGHT_CENTER || nob == Nob.BOTTOM_RIGHT;
     }
+
+    /*
+     * Return a cursor type based of the type of nob.
+     */
+    public static Gdk.CursorType? cursor_from_nob (Nob nob_id) {
+        Gdk.CursorType? result = null;
+        switch (nob_id) {
+            case Managers.NobManager.Nob.NONE:
+                result = null;
+                break;
+            case Managers.NobManager.Nob.TOP_LEFT:
+                result = Gdk.CursorType.TOP_LEFT_CORNER;
+                break;
+            case Managers.NobManager.Nob.TOP_CENTER:
+                result = Gdk.CursorType.TOP_SIDE;
+                break;
+            case Managers.NobManager.Nob.TOP_RIGHT:
+                result = Gdk.CursorType.TOP_RIGHT_CORNER;
+                break;
+            case Managers.NobManager.Nob.RIGHT_CENTER:
+                result = Gdk.CursorType.RIGHT_SIDE;
+                break;
+            case Managers.NobManager.Nob.BOTTOM_RIGHT:
+                result = Gdk.CursorType.BOTTOM_RIGHT_CORNER;
+                break;
+            case Managers.NobManager.Nob.BOTTOM_CENTER:
+                result = Gdk.CursorType.BOTTOM_SIDE;
+                break;
+            case Managers.NobManager.Nob.BOTTOM_LEFT:
+                result = Gdk.CursorType.BOTTOM_LEFT_CORNER;
+                break;
+            case Managers.NobManager.Nob.LEFT_CENTER:
+                result = Gdk.CursorType.LEFT_SIDE;
+                break;
+            case Managers.NobManager.Nob.ROTATE:
+                result = Gdk.CursorType.EXCHANGE;
+                break;
+        }
+
+        return result;
+    }
+
 
     /**
      * Takes a set of items and populates information needed to determine
@@ -509,6 +549,7 @@ public class Akira.Lib.Managers.NobManager : Object {
         for (int i = 0; i < 9; i++) {
             var nob = new Selection.Nob (root, (Managers.NobManager.Nob) i);
             nob.set ("visibility", Goo.CanvasItemVisibility.HIDDEN);
+            nob.pointer_events = Goo.CanvasPointerEvents.NONE;
             nobs[i] = nob;
         }
 

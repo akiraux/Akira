@@ -87,7 +87,6 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         window.event_bus.update_pixel_grid.connect (on_update_pixel_grid);
         window.event_bus.update_scale.connect (on_update_scale);
         window.event_bus.set_scale.connect (on_set_scale);
-        window.event_bus.request_change_cursor.connect (on_request_change_cursor);
         window.event_bus.set_focus_on_canvas.connect (on_set_focus_on_canvas);
         window.event_bus.request_escape.connect (on_escape_key);
         window.event_bus.insert_item.connect (on_insert_item);
@@ -170,7 +169,8 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         Gdk.CursorType? new_cursor = mode_manager.active_cursor_type ();
 
         if (new_cursor == null) {
-            new_cursor = Gdk.CursorType.ARROW;
+            var hover_cursor = Akira.Lib.Managers.NobManager.cursor_from_nob (nob_manager.hovered_nob);
+            new_cursor = (hover_cursor == null) ? Gdk.CursorType.ARROW : hover_cursor;
         }
 
         if (current_cursor != new_cursor) {
@@ -258,8 +258,8 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
         holding = true;
 
-        event.x = Math.round (event.x / current_scale);
-        event.y = Math.round (event.y / current_scale);
+        event.x = event.x / current_scale;
+        event.y = event.y / current_scale;
 
         hover_manager.remove_hover_effect ();
 
@@ -286,8 +286,8 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     }
 
     public override bool motion_notify_event (Gdk.EventMotion event) {
-        event.x = Math.round (event.x / current_scale);
-        event.y = Math.round (event.y / current_scale);
+        event.x = event.x / current_scale;
+        event.y = event.y / current_scale;
 
         window.event_bus.coordinate_change (event.x, event.y);
 
@@ -295,7 +295,18 @@ public class Akira.Lib.Canvas : Goo.Canvas {
             return true;
         }
 
-        hover_manager.add_hover_effect (event.x, event.y);
+        var nob_hovered = nob_manager.hit_test (event.x, event.y);
+        if (nob_hovered != nob_manager.hovered_nob) {
+            nob_manager.hovered_nob = nob_hovered;
+            set_cursor_by_interaction_mode ();
+        }
+
+        if (nob_hovered != Akira.Lib.Managers.NobManager.Nob.NONE) {
+            hover_manager.remove_hover_effect ();
+        }
+        else {
+            hover_manager.add_hover_effect (event.x, event.y);
+        }
 
         return false;
     }
@@ -347,51 +358,47 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     }
 
     private bool press_event_on_selection (Gdk.EventButton event) {
-        var clicked_item = get_item_at (event.x, event.y, true);
 
-        // Deselect if no item was clicked, or a non selected artboard was clicked.
-        // We do this to allow users to clear the selection when clicking on the
-        // empty artboard space, which is a white GooCanvasRect item.
-        if (
-            clicked_item == null ||
-            (
-                clicked_item is Goo.CanvasRect &&
-                !(clicked_item is Items.CanvasItem) &&
-                !(clicked_item is Selection.Nob) &&
-                !((Items.CanvasItem) clicked_item.parent).layer.selected
-            )
-        ) {
-            selected_bound_manager.reset_selection ();
-            // TODO: allow for multi select with click & drag on canvas
-            // Workaround: when no item is clicked, there's no point in keeping holding active
-            holding = false;
-            return true;
-        }
+        var nob_clicked = nob_manager.hit_test (event.x, event.y);
+        nob_manager.set_selected_by_name (nob_clicked);
 
-        var clicked_nob_name = Managers.NobManager.Nob.NONE;
+        if (nob_clicked == Akira.Lib.Managers.NobManager.Nob.NONE) {
+            var clicked_item = get_item_at (event.x, event.y, true);
 
-        if (clicked_item is Selection.Nob) {
-            var selected_nob = clicked_item as Selection.Nob;
+            // Deselect if no item was clicked, or a non selected artboard was clicked.
+            // We do this to allow users to clear the selection when clicking on the
+            // empty artboard space, which is a white GooCanvasRect item.
+            if (
+                clicked_item == null ||
+                (
+                    clicked_item is Goo.CanvasRect &&
+                    !(clicked_item is Items.CanvasItem) &&
+                    !(clicked_item is Selection.Nob) &&
+                    !((Items.CanvasItem) clicked_item.parent).layer.selected
+                )
+            ) {
+                selected_bound_manager.reset_selection ();
+                // TODO: allow for multi select with click & drag on canvas
+                // Workaround: when no item is clicked, there's no point in keeping holding active
+                holding = false;
+                return true;
+            }
 
-            clicked_nob_name = nob_manager.get_grabbed_id (selected_nob);
-        }
+            // If we're clicking on the Artboard's label, change the target to the Artboard.
+            if (
+                clicked_item is Goo.CanvasText &&
+                clicked_item.parent is Items.CanvasArtboard &&
+                !(clicked_item is Items.CanvasItem)
+            ) {
+                clicked_item = clicked_item.parent as Items.CanvasItem;
+            }
 
-        nob_manager.selected_nob = clicked_nob_name;
+            if (clicked_item is Items.CanvasItem) {
+                var item = clicked_item as Items.CanvasItem;
 
-        // If we're clicking on the Artboard's label, change the target to the Artboard.
-        if (
-            clicked_item is Goo.CanvasText &&
-            clicked_item.parent is Items.CanvasArtboard &&
-            !(clicked_item is Items.CanvasItem)
-        ) {
-            clicked_item = clicked_item.parent as Items.CanvasItem;
-        }
-
-        if (clicked_item is Items.CanvasItem) {
-            var item = clicked_item as Items.CanvasItem;
-
-            // Item has been selected.
-            selected_bound_manager.add_item_to_selection (item);
+                // Item has been selected.
+                selected_bound_manager.add_item_to_selection (item);
+            }
         }
 
         selected_bound_manager.set_initial_coordinates (event.x, event.y);
@@ -403,6 +410,9 @@ public class Akira.Lib.Canvas : Goo.Canvas {
             if (mode_manager.button_press_event (event)) {
                 return true;
             }
+        }
+        else {
+            nob_manager.set_selected_by_name (Akira.Lib.Managers.NobManager.Nob.NONE);
         }
 
         return false;
@@ -449,16 +459,6 @@ public class Akira.Lib.Canvas : Goo.Canvas {
             var root = get_root_item ();
             root.move_child (root.find_child (pixel_grid), window.items_manager.get_items_count ());
         }
-    }
-
-    private void on_request_change_cursor (Gdk.CursorType? cursor_type) {
-        // debug ("Setting cursor from on_request_change_cursor");
-        if (cursor_type == null) {
-            set_cursor_by_interaction_mode ();
-            return;
-        }
-
-        set_cursor (cursor_type);
     }
 
     private void set_cursor (Gdk.CursorType? cursor_type) {

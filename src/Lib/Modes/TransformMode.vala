@@ -37,13 +37,14 @@ public class Akira.Lib.Modes.TransformMode : Object, InteractionMode {
 
     public void mode_begin () {}
     public void mode_end () {
+        canvas.nob_manager.set_selected_by_name (Akira.Lib.Managers.NobManager.Nob.NONE);
         canvas.selected_bound_manager.reset_snap_decorators ();
     }
     public InteractionMode.ModeType mode_type () { return InteractionMode.ModeType.RESIZE; }
 
     public Gdk.CursorType? cursor_type () {
         var selected_nob = canvas.nob_manager.selected_nob;
-        return cursor_type_from_nob_state (selected_nob);
+        return Managers.NobManager.cursor_from_nob (selected_nob);
     }
 
     public bool key_press_event (Gdk.EventKey event) {
@@ -76,34 +77,4 @@ public class Akira.Lib.Modes.TransformMode : Object, InteractionMode {
         canvas.selected_bound_manager.transform_bound (event.x, event.y, selected_nob);
         return true;
     }
-
-
-    /*
-     * Returns a cursor type based on a NobManager.Nob.
-     */
-    public static Gdk.CursorType? cursor_type_from_nob_state (Akira.Lib.Managers.NobManager.Nob nob) {
-        switch (nob) {
-            case Managers.NobManager.Nob.TOP_LEFT:
-                return Gdk.CursorType.TOP_LEFT_CORNER;
-            case Managers.NobManager.Nob.TOP_CENTER:
-                return Gdk.CursorType.TOP_SIDE;
-            case Managers.NobManager.Nob.TOP_RIGHT:
-                return Gdk.CursorType.TOP_RIGHT_CORNER;
-            case Managers.NobManager.Nob.RIGHT_CENTER:
-                return Gdk.CursorType.RIGHT_SIDE;
-            case Managers.NobManager.Nob.BOTTOM_RIGHT:
-                return Gdk.CursorType.BOTTOM_RIGHT_CORNER;
-            case Managers.NobManager.Nob.BOTTOM_CENTER:
-                return Gdk.CursorType.BOTTOM_SIDE;
-            case Managers.NobManager.Nob.BOTTOM_LEFT:
-                return Gdk.CursorType.BOTTOM_LEFT_CORNER;
-            case Managers.NobManager.Nob.LEFT_CENTER:
-                return Gdk.CursorType.LEFT_SIDE;
-            case Managers.NobManager.Nob.ROTATE:
-                return Gdk.CursorType.EXCHANGE;
-        }
-
-        return null;
-    }
-
 }
