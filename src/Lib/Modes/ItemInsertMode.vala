@@ -46,7 +46,7 @@ public class Akira.Lib.Modes.ItemInsertMode : Object, InteractionMode {
 
     public Gdk.CursorType? cursor_type () {
         if (resizing) {
-            return TransformMode.cursor_type_from_nob_state (Akira.Lib.Managers.NobManager.Nob.BOTTOM_RIGHT);
+            return Akira.Lib.Managers.NobManager.cursor_from_nob (Akira.Lib.Managers.NobManager.Nob.BOTTOM_RIGHT);
         }
 
         return Gdk.CursorType.CROSSHAIR;
