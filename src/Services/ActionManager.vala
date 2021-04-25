@@ -295,7 +295,8 @@ public class Akira.Services.ActionManager : Object {
     }
 
     private void action_export_grab () {
-        window.event_bus.request_change_mode (Akira.Lib.Canvas.EditMode.MODE_EXPORT_AREA);
+        weak Akira.Lib.Canvas canvas = window.main_window.main_canvas.canvas;
+        canvas.start_export_area_selection ();
     }
 
     private void action_zoom_in () {
@@ -421,8 +422,6 @@ public class Akira.Services.ActionManager : Object {
     }
 
     private void on_choose_image_response (Gtk.FileChooserNative dialog, int response_id) {
-        window.event_bus.request_change_mode (Akira.Lib.Canvas.EditMode.MODE_SELECTION);
-
         switch (response_id) {
             case Gtk.ResponseType.ACCEPT:
             case Gtk.ResponseType.OK:

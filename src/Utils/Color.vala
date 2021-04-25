@@ -105,4 +105,11 @@ public class Akira.Utils.Color : Object {
 
         return rgba;
     }
+
+    public static uint color_string_to_uint (string color) {
+        var rgba = Gdk.RGBA ();
+        rgba.parse (color);
+
+        return rgba_to_uint (rgba);
+    }
 }

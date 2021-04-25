@@ -40,6 +40,16 @@ public class Akira.Lib.Selection.Nob : Goo.CanvasRect {
         set_rectangle ();
     }
 
+    /*
+     * Returns true if position is within a circular area around center.
+     */
+    public bool hit_test (double x, double y, double scale) {
+        double xd = center_x - x;
+        double yd = center_y - y;
+        double dist = GLib.Math.sqrt (xd * xd + yd * yd);
+        return (dist <= (NOB_SIZE / scale));
+    }
+
     public void update_state (Cairo.Matrix matrix, double new_x, double new_y, bool visible) {
         matrix.x0 = new_x;
         matrix.y0 = new_y;
