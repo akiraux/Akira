@@ -72,10 +72,7 @@ public class Akira.Lib.Modes.ItemInsertMode : Object, InteractionMode {
 
             canvas.nob_manager.selected_nob = Managers.NobManager.Nob.BOTTOM_RIGHT;
 
-            canvas.update_pixel_grid_if_visible ();
-
-            // Synchronous update to make sure item is initialized before any other event.
-            canvas.update ();
+            canvas.update_canvas ();
 
             resizing = true;
             return true;
