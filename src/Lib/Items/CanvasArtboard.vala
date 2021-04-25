@@ -37,8 +37,8 @@ public class Akira.Lib.Items.CanvasArtboard : Goo.CanvasGroup, Akira.Lib.Items.C
    public Goo.CanvasText label;
 
    private const int FONT_SIZE = 10;
-   private uint LIGHT_COLOR;
-   private uint DARK_COLOR;
+   private uint light_color;
+   private uint dark_color;
 
    public CanvasArtboard (double _x, double _y, Goo.CanvasItem? _parent) {
       parent = _parent;
@@ -95,8 +95,8 @@ public class Akira.Lib.Items.CanvasArtboard : Goo.CanvasGroup, Akira.Lib.Items.C
 
    private void create_label () {
       // Define the label colors for dark/light theme variation.
-      LIGHT_COLOR = Utils.Color.color_string_to_uint ("rgba(255, 255, 255, 0.75)");
-      DARK_COLOR = Utils.Color.color_string_to_uint ("rgba(0, 0, 0, 0.75)");
+      light_color = Utils.Color.color_string_to_uint ("rgba(255, 255, 255, 0.75)");
+      dark_color = Utils.Color.color_string_to_uint ("rgba(0, 0, 0, 0.75)");
 
       // Type cast the akira canvas to gain access to its attributes.
       var akira_canvas = canvas as Lib.Canvas;
@@ -107,7 +107,7 @@ public class Akira.Lib.Items.CanvasArtboard : Goo.CanvasGroup, Akira.Lib.Items.C
          Goo.CanvasAnchorType.SW,
          "font", "Open Sans " + (FONT_SIZE / akira_canvas.current_scale).to_string (),
          "ellipsize", Pango.EllipsizeMode.END,
-         "fill-color-rgba", settings.dark_theme ? LIGHT_COLOR : DARK_COLOR,
+         "fill-color-rgba", settings.dark_theme ? light_color : dark_color,
          null);
       label.can_focus = false;
       // Change the parent to allow mouse pointer selection.
@@ -120,7 +120,7 @@ public class Akira.Lib.Items.CanvasArtboard : Goo.CanvasGroup, Akira.Lib.Items.C
 
       // Listen to the theme changing event to update the label color.
       akira_canvas.window.event_bus.change_theme.connect (() => {
-         label.set ("fill-color-rgba", settings.dark_theme ? LIGHT_COLOR : DARK_COLOR);
+         label.set ("fill-color-rgba", settings.dark_theme ? light_color : dark_color);
       });
 
       // Update the label font size when the canvas zoom changes.
