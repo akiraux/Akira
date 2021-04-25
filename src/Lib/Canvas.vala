@@ -301,12 +301,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
             set_cursor_by_interaction_mode ();
         }
 
-        if (nob_hovered != Akira.Lib.Managers.NobManager.Nob.NONE) {
-            hover_manager.remove_hover_effect ();
-        }
-        else {
-            hover_manager.add_hover_effect (event.x, event.y);
-        }
+        hover_manager.on_mouse_over (event.x, event.y, nob_hovered);
 
         return false;
     }

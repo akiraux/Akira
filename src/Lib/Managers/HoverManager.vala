@@ -39,23 +39,21 @@ public class Akira.Lib.Managers.HoverManager : Object {
         canvas.window.event_bus.hover_over_layer.connect (on_layer_hovered);
     }
 
-    public void add_hover_effect (double event_x, double event_y) {
+    public bool on_mouse_over (double event_x, double event_y, Akira.Lib.Managers.NobManager.Nob nob) {
+        if (nob != Akira.Lib.Managers.NobManager.Nob.NONE) {
+            current_hover_item = null;
+            remove_hover_effect ();
+            return true;
+        }
+
         var target = canvas.get_item_at (event_x, event_y, true);
 
         // Remove the hover effect is no item is hovered, or the item is the
         // white background of the CanvasArtboard, which is a GooCanvasRect item.
-        if (
-            target == null ||
-            (
-                target is Goo.CanvasRect &&
-                !(target is Items.CanvasItem) &&
-                !(target is Selection.Nob)
-            )
-        ) {
+        if (target == null || (target is Goo.CanvasRect && !(target is Items.CanvasItem))) {
             current_hover_item = null;
             remove_hover_effect ();
-
-            return;
+            return false;
         }
 
         // If we're hovering over the Artboard's label, change the target to the Artboard.
@@ -68,14 +66,14 @@ public class Akira.Lib.Managers.HoverManager : Object {
         }
 
         if (!(target is Items.CanvasItem)) {
-            return;
+            return false;
         }
 
         var item = target as Items.CanvasItem;
 
         if (current_hover_item != null && item.name.id == current_hover_item.name.id) {
             // We already have the hover effect rendered correctly.
-            return;
+            return true;
         }
 
         // We need to recreate it.
@@ -87,6 +85,8 @@ public class Akira.Lib.Managers.HoverManager : Object {
         if (!item.layer.selected) {
             canvas.window.event_bus.hover_over_item (item);
         }
+
+        return true;
     }
 
     private void on_layer_hovered (Items.CanvasItem? item) {
