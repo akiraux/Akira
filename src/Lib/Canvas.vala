@@ -351,7 +351,6 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     }
 
     private bool press_event_on_selection (Gdk.EventButton event) {
-
         var nob_clicked = nob_manager.hit_test (event.x, event.y);
         nob_manager.set_selected_by_name (nob_clicked);
 

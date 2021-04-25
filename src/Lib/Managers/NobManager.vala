@@ -55,7 +55,7 @@ public class Akira.Lib.Managers.NobManager : Object {
 
     private Goo.CanvasItem root;
     private Goo.CanvasRect? select_effect;
-    private Goo.CanvasItemSimple[] nobs = new Goo.CanvasItemSimple[9];
+    private Akira.Lib.Selection.Nob[] nobs = new Akira.Lib.Selection.Nob[9];
     private Goo.CanvasPolyline? rotation_line;
 
     // Values in canvas coordinates.
@@ -106,9 +106,8 @@ public class Akira.Lib.Managers.NobManager : Object {
 
     public Nob hit_test (double x, double y) {
         double scale = canvas.current_scale;
-        foreach (var ui_nob_s in nobs) {
-            if (ui_nob_s != null && ui_nob_s.is_visible ()) {
-                var ui_nob = ui_nob_s as Akira.Lib.Selection.Nob;
+        foreach (var ui_nob in nobs) {
+            if (ui_nob != null && ui_nob.is_visible ()) {
                 if (ui_nob.hit_test (x, y, scale)) {
                     return ui_nob.handle_id;
                 }
@@ -472,8 +471,7 @@ public class Akira.Lib.Managers.NobManager : Object {
         bool print_middle_width_nobs = bb_width > nob_size * 3;
         bool print_middle_height_nobs = bb_height > nob_size * 3;
 
-        foreach (var nob_simple in nobs) {
-            var nob = nob_simple as Selection.Nob;
+        foreach (var nob in nobs) {
             bool set_visible = true;
             double center_x = 0;
             double center_y = 0;
@@ -538,6 +536,7 @@ public class Akira.Lib.Managers.NobManager : Object {
 
     /**
      * Constructs all nobs and the rotation line if they haven't been constructed already.
+     * Nobs don't take mouse events, instead hit_test () is used to interact with nobs.
      */
     private void populate_nobs () {
         if (nobs_constructed) {

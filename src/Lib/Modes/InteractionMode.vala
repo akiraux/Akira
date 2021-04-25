@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2021 Alecaddd (http://alecaddd.com)
+ * Copyright (c) 2021 Alecaddd (https://alecaddd.com)
  *
  * This file is part of Akira.
  *
@@ -43,7 +43,6 @@ public interface Akira.Lib.Modes.InteractionMode : Object {
      * Mode type that is used for introspection.
      */
     public enum ModeType {
-        UNDEFINED = 0,
         RESIZE,
         ITEM_INSERT,
         EXPORT,

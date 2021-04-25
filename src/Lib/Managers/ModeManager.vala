@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2021 Alecaddd (http://alecaddd.com)
+ * Copyright (c) 2021 Alecaddd (https://alecaddd.com)
  *
  * This file is part of Akira.
  *
@@ -30,7 +30,7 @@
  * The exception to the above rule is pan_mode, which can be running on top of another mode in certain cases and
  * masks events appropriately.
  *
- * See ItneractionMode.vala for more details on how to create modes.
+ * See InteractionMode.vala for more details on how to create modes.
  */
 public class Akira.Lib.Managers.ModeManager : Object {
     public weak Akira.Lib.Canvas canvas { get; construct; }

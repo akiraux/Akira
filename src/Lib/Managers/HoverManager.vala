@@ -39,11 +39,11 @@ public class Akira.Lib.Managers.HoverManager : Object {
         canvas.window.event_bus.hover_over_layer.connect (on_layer_hovered);
     }
 
-    public bool on_mouse_over (double event_x, double event_y, Akira.Lib.Managers.NobManager.Nob nob) {
+    public void on_mouse_over (double event_x, double event_y, Akira.Lib.Managers.NobManager.Nob nob) {
         if (nob != Akira.Lib.Managers.NobManager.Nob.NONE) {
             current_hover_item = null;
             remove_hover_effect ();
-            return true;
+            return;
         }
 
         var target = canvas.get_item_at (event_x, event_y, true);
@@ -53,7 +53,7 @@ public class Akira.Lib.Managers.HoverManager : Object {
         if (target == null || (target is Goo.CanvasRect && !(target is Items.CanvasItem))) {
             current_hover_item = null;
             remove_hover_effect ();
-            return false;
+            return;
         }
 
         // If we're hovering over the Artboard's label, change the target to the Artboard.
@@ -66,14 +66,14 @@ public class Akira.Lib.Managers.HoverManager : Object {
         }
 
         if (!(target is Items.CanvasItem)) {
-            return false;
+            return;
         }
 
         var item = target as Items.CanvasItem;
 
         if (current_hover_item != null && item.name.id == current_hover_item.name.id) {
             // We already have the hover effect rendered correctly.
-            return true;
+            return;
         }
 
         // We need to recreate it.
@@ -86,7 +86,7 @@ public class Akira.Lib.Managers.HoverManager : Object {
             canvas.window.event_bus.hover_over_item (item);
         }
 
-        return true;
+        return;
     }
 
     private void on_layer_hovered (Items.CanvasItem? item) {

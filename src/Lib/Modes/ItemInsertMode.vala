@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2021 Alecaddd (http://alecaddd.com)
+ * Copyright (c) 2021 Alecaddd (https://alecaddd.com)
  *
  * This file is part of Akira.
  *
@@ -42,7 +42,6 @@ public class Akira.Lib.Modes.ItemInsertMode : Object, InteractionMode {
     public void mode_begin () {}
     public void mode_end () {}
     public InteractionMode.ModeType mode_type () { return InteractionMode.ModeType.ITEM_INSERT; }
-
 
     public Gdk.CursorType? cursor_type () {
         if (resizing) {
