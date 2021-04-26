@@ -32,6 +32,24 @@
 		<binary>@APP_ID@</binary>
 	</provides>
   <releases>
+    <release version="0.0.14" date="2021-04-25">
+      <description>
+        <p>New Features and Bug Fixes</p>
+        <ul>
+          <li>Complete rebuild of the Canvas library architecture.</li>
+          <li>Implemented Pixel Grid.</li>
+          <li>Customize color of Pixel Grid.</li>
+          <li>Implemented smart Snapping Guides.</li>
+          <li>Customize color and magnetic threshold of Snapping Guides.</li>
+          <li>Allow items resizing in all directions.</li>
+          <li>Add images via click and drag with the Image Tool.</li>
+          <li>Handle multiple Fills and Border colors for each item.</li>
+          <li>Allow scaling items from the center.</li>
+          <li>Enable dropping images on the canvas.</li>
+          <li>A lot of code improvements and optimization.</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.0.13" date="2020-09-02">
       <description>
         <p>New Features and Bug Fixes</p>

@@ -1,3 +1,19 @@
+com.github.akiraux.akira (0.0.14) xenial; urgency=medium
+
+  * Complete rebuild of the Canvas library architecture.
+  * Implemented Pixel Grid.
+  * Customize color of Pixel Grid.
+  * Implemented smart Snapping Guides.
+  * Customize color and magnetic threshold of Snapping Guides.
+  * Allow items resizing in all directions.
+  * Add images via click and drag with the Image Tool.
+  * Handle multiple Fills and Border colors for each item.
+  * Allow scaling items from the center.
+  * Enable dropping images on the canvas.
+  * A lot of code improvements and optimization.
+
+ -- Alessandro Castellani <castellani.ale@gmail.com>  Sun, 25 Apr 2021 09:00:00 -0800
+
 com.github.akiraux.akira (0.0.13) xenial; urgency=medium
 
   * New color picker for Fills and Borders.
