@@ -81,7 +81,7 @@ public class Akira.Dialogs.ReleaseDialog : Gtk.Dialog {
         scrolled.expand = true;
 
         var release_info = new Gtk.TextView ();
-        release_info.buffer.text = "✓ New color picker for Fills and Borders.\n✓ Zooming with mouse wheel follows the position of the cursor.\n✓ Fix loading Artboards background color when opening a file.\n✓ Fix numbering of newly created items.\n✓ Fix Gtk-CRITICAL warning when opening the Export Dialog.\n✓ Fix flipping items inside Artboards.\n✓ Fix crash when dropping flipped items inside Artboards.\n✓ General code improvements and optimization.\n";
+        release_info.buffer.text = "✓ Complete rebuild of the Canvas library architecture.\n✓ Implemented Pixel Grid.\n✓ Customize color of Pixel Grid.\n✓ Implemented smart Snapping Guides.\n✓ Customize color and magnetic threshold of Snapping Guides.\n✓ Allow items resizing in all directions.\n✓ Add images via click and drag with the Image Tool.\n✓ Handle multiple Fills and Border colors for each item.\n✓ Allow scaling items from the center.\n✓ Enable dropping images on the canvas.\n✓ A lot of code improvements and optimization.\n";
         release_info.pixels_below_lines = 3;
         release_info.border_width = 12;
         release_info.wrap_mode = Gtk.WrapMode.WORD;
