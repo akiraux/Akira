@@ -48,7 +48,6 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         canvas.window.event_bus.item_deleted.connect (remove_item_from_selection);
         canvas.window.event_bus.request_add_item_to_selection.connect (add_item_to_selection);
         canvas.window.event_bus.item_locked.connect (remove_item_from_selection);
-        canvas.window.event_bus.zoom.connect (on_canvas_zoom);
     }
 
     construct {
@@ -251,18 +250,4 @@ public class Akira.Lib.Managers.SelectedBoundManager : Object {
         canvas.window.event_bus.set_focus_on_canvas ();
     }
 
-    private void on_canvas_zoom () {
-        update_grid_decorators (false);
-    }
-
-    public void update_grid_decorators (bool force) {
-        /*
-        if (force || snap_manager.is_active ()) {
-            var sensitivity = Utils.Snapping.adjusted_sensitivity (canvas.current_scale);
-            var snap_grid = Utils.Snapping.generate_best_snap_grid (canvas, selected_items, sensitivity);
-            var matches = Utils.Snapping.generate_snap_matches (snap_grid, selected_items, sensitivity);
-            snap_manager.populate_decorators_from_data (matches, snap_grid);
-        }
-        */
-    }
 }

@@ -437,6 +437,8 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         set_scale (scale);
         window.event_bus.zoom ();
 
+        window.event_bus.update_snap_decorators();
+
         // Check if the user requested the pixel grid and if is not already visible.
         if (!is_grid_visible) {
             return;

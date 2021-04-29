@@ -30,9 +30,7 @@ public class Akira.Lib.Modes.ItemInsertMode : InteractionMode {
     public weak Akira.Lib.Canvas canvas { get; construct; }
     public weak Akira.Lib.Managers.ModeManager mode_manager { get; construct; }
 
-    private bool resizing = false;
-    public Akira.Lib.Modes.TransformMode.InitialDragState initial_drag_state;
-    public Akira.Lib.Modes.TransformMode.TransformExtraContext transform_extra_context;
+    private Akira.Lib.Modes.TransformMode transform_mode;
 
     public ItemInsertMode (Akira.Lib.Canvas canvas, Akira.Lib.Managers.ModeManager mode_manager) {
         Object (
@@ -42,27 +40,44 @@ public class Akira.Lib.Modes.ItemInsertMode : InteractionMode {
     }
 
     construct {
-        initial_drag_state = new Akira.Lib.Modes.TransformMode.InitialDragState ();
-        transform_extra_context = new Akira.Lib.Modes.TransformMode.TransformExtraContext ();
-        transform_extra_context.snap_guide_data = new Akira.Lib.Managers.SnapManager.SnapGuideData ();
+        transform_mode = null;
     }
 
     public override InteractionMode.ModeType mode_type () { return InteractionMode.ModeType.ITEM_INSERT; }
 
     public override void mode_end () {
-        transform_extra_context = null;
-        canvas.window.event_bus.update_snap_decorators ();
+        if (transform_mode != null) {
+            transform_mode.mode_end ();
+        }
     }
 
     public override Gdk.CursorType? cursor_type () {
-        if (resizing) {
-            return Akira.Lib.Managers.NobManager.cursor_from_nob (Akira.Lib.Managers.NobManager.Nob.BOTTOM_RIGHT);
+        if (transform_mode != null) {
+            return transform_mode.cursor_type ();
         }
 
         return Gdk.CursorType.CROSSHAIR;
     }
 
+    public override bool key_press_event (Gdk.EventKey event) {
+        if (transform_mode != null) {
+            return transform_mode.key_press_event (event);
+        }
+        return false;
+    }
+
+    public override bool key_release_event (Gdk.EventKey event) {
+        if (transform_mode != null) {
+            return transform_mode.key_press_event (event);
+        }
+        return false;
+     }
+
     public override bool button_press_event (Gdk.EventButton event) {
+        if (transform_mode != null) {
+            return transform_mode.button_press_event (event);
+        }
+
         if (event.button == Gdk.BUTTON_PRIMARY) {
             var sel_manager = canvas.selected_bound_manager;
             sel_manager.reset_selection ();
@@ -73,18 +88,10 @@ public class Akira.Lib.Modes.ItemInsertMode : InteractionMode {
 
             canvas.nob_manager.selected_nob = Managers.NobManager.Nob.BOTTOM_RIGHT;
             canvas.update_canvas ();
-            resizing = true;
 
-            if (!Akira.Lib.Modes.TransformMode.initialize_items_drag_state (
-                sel_manager.selected_items,
-                ref initial_drag_state
-            )) {
-                mode_manager.deregister_mode (mode_type ());
-                return true;
-            }
-
-            initial_drag_state.press_x = event.x;
-            initial_drag_state.press_y = event.y;
+            transform_mode = new Akira.Lib.Modes.TransformMode (canvas, null);
+            transform_mode.mode_begin ();
+            transform_mode.button_press_event (event);
 
             return true;
         }
@@ -93,26 +100,29 @@ public class Akira.Lib.Modes.ItemInsertMode : InteractionMode {
     }
 
     public override bool button_release_event (Gdk.EventButton event) {
-        if (resizing) {
+        if (transform_mode != null) {
+            transform_mode.button_release_event (event);
             mode_manager.deregister_mode (mode_type ());
-            return true;
         }
 
-        return resizing;
+        return true;
     }
 
     public override bool motion_notify_event (Gdk.EventMotion event) {
-        if (resizing) {
-            TransformMode.handle_motion_event (event, canvas, initial_drag_state, ref transform_extra_context.snap_guide_data);
-            return true;
+        if (transform_mode != null) {
+            return transform_mode.motion_notify_event (event);
         }
 
-        return resizing;
+        return true;
     }
 
     public override Object? extra_context ()
     {
-        return transform_extra_context;
+        if (transform_mode != null) {
+            return transform_mode.extra_context ();
+        }
+
+        return null;
     }
 
 }

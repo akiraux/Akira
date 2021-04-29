@@ -87,34 +87,18 @@ public class Akira.StateManagers.CoordinatesMiddleware : Object {
     }
 
     private void get_coordinates_from_items () {
-        var dummy_matrix = Cairo.Matrix.identity ();
-        double dummy_top_left_x = 0;
-        double dummy_top_left_y = 0;
-        double dummy_width_offset_x = 0;
-        double dummy_width_offset_y = 0;
-        double dummy_height_offset_x = 0;
-        double dummy_height_offset_y = 0;
-        double dummy_width = 0;
-        double dummy_height = 0;
-
         // Reset the selected coordinates to always get correct values.
         initial_x = 0;
         initial_y = 0;
 
+        var nob_data = new Akira.Lib.Managers.NobManager.ItemNobData ();
         Lib.Managers.NobManager.populate_nob_bounds_from_items (
             canvas.selected_bound_manager.selected_items,
-            ref dummy_matrix,
-            ref dummy_top_left_x,
-            ref dummy_top_left_y,
-            ref dummy_width_offset_x,
-            ref dummy_width_offset_y,
-            ref dummy_height_offset_x,
-            ref dummy_height_offset_y,
-            ref dummy_width,
-            ref dummy_height,
-            ref initial_x,
-            ref initial_y
+            ref nob_data
         );
+
+        initial_x = nob_data.selected_x;
+        initial_y = nob_data.selected_y;
     }
 
     /**

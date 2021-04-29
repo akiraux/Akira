@@ -56,7 +56,7 @@ public class Akira.Lib.Modes.TransformMode : InteractionMode {
     public TransformExtraContext transform_extra_context;
 
 
-    public TransformMode (Akira.Lib.Canvas canvas, Akira.Lib.Managers.ModeManager mode_manager) {
+    public TransformMode (Akira.Lib.Canvas canvas, Akira.Lib.Managers.ModeManager? mode_manager) {
         Object (
             canvas: canvas,
             mode_manager : mode_manager
@@ -73,13 +73,16 @@ public class Akira.Lib.Modes.TransformMode : InteractionMode {
         unowned var selected_items = canvas.selected_bound_manager.selected_items;
         if (!initialize_items_drag_state(selected_items, ref initial_drag_state)) {
             debug("TransformMode only works if an item is selected");
-            mode_manager.deregister_mode (mode_type ());
+            if (mode_manager != null) {
+                mode_manager.deregister_mode (mode_type ());
+            }
         }
     }
 
     public override void mode_end () {
         transform_extra_context = null;
         canvas.nob_manager.set_selected_by_name (Akira.Lib.Managers.NobManager.Nob.NONE);
+        canvas.window.event_bus.detect_artboard_change ();
         canvas.window.event_bus.update_snap_decorators ();
     }
 
@@ -105,7 +108,9 @@ public class Akira.Lib.Modes.TransformMode : InteractionMode {
     }
 
     public override bool button_release_event (Gdk.EventButton event) {
-        mode_manager.deregister_mode (mode_type ());
+        if (mode_manager != null) {
+            mode_manager.deregister_mode (mode_type ());
+        }
         return true;
     }
 
@@ -133,8 +138,8 @@ public class Akira.Lib.Modes.TransformMode : InteractionMode {
         var item = selected_items.nth_data (0);
 
         drag_state.item_registered = true;
-        drag_state.item_x = item.coordinates.x1;
-        drag_state.item_y = item.coordinates.y1;
+        drag_state.item_x = item.coordinates.x;
+        drag_state.item_y = item.coordinates.y;
 
         item.get_transform (out drag_state.item_transform);
 

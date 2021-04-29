@@ -86,34 +86,18 @@ public class Akira.StateManagers.SizeMiddleware : Object {
     }
 
     private void get_size_from_items () {
-        var dummy_matrix = Cairo.Matrix.identity ();
-        double dummy_top_left_x = 0;
-        double dummy_top_left_y = 0;
-        double dummy_width_offset_x = 0;
-        double dummy_width_offset_y = 0;
-        double dummy_height_offset_x = 0;
-        double dummy_height_offset_y = 0;
-        double dummy_x = 0;
-        double dummy_y = 0;
-
         // Reset the selected coordinates to always get correct values.
         initial_width = 0;
         initial_height = 0;
 
+        var nob_data = new Akira.Lib.Managers.NobManager.ItemNobData ();
         Lib.Managers.NobManager.populate_nob_bounds_from_items (
             canvas.selected_bound_manager.selected_items,
-            ref dummy_matrix,
-            ref dummy_top_left_x,
-            ref dummy_top_left_y,
-            ref dummy_width_offset_x,
-            ref dummy_width_offset_y,
-            ref dummy_height_offset_x,
-            ref dummy_height_offset_y,
-            ref initial_width,
-            ref initial_height,
-            ref dummy_x,
-            ref dummy_y
+            ref nob_data
         );
+
+        initial_width = nob_data.bb_width;
+        initial_height = nob_data.bb_height;
     }
 
     /**
