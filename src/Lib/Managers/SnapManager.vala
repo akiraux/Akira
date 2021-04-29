@@ -34,6 +34,20 @@ public class Akira.Lib.Managers.SnapManager : Object {
     private Gee.ArrayList<Goo.CanvasItemSimple> h_decorator_lines;
     private Gee.ArrayList<Goo.CanvasItemSimple> decorator_dots;
 
+    public enum SnapGuideType
+    {
+        NONE,
+        SELECTION,
+        POINT
+    }
+
+    public class SnapGuideData
+    {
+        public SnapGuideType type = SnapGuideType.NONE;
+        public double x = 0.0;
+        public double y = 0.0;
+    }
+
     private bool any_decorators_visible = false;
 
     public SnapManager (Akira.Lib.Canvas canvas) {
@@ -50,14 +64,38 @@ public class Akira.Lib.Managers.SnapManager : Object {
         canvas.window.event_bus.update_snaps_color.connect (on_update_snaps_color);
     }
 
-    /**
+    /*
+     * Generate guides as indicated by the data.
+     */
+    public void generate_decorators (SnapGuideData newData)
+    {
+        switch (newData.type)
+        {
+            case SnapGuideType.NONE:
+                reset_decorators ();
+                break;
+            case SnapGuideType.SELECTION:
+                unowned var selected_items = canvas.selected_bound_manager.selected_items;
+                var sensitivity = Utils.Snapping.adjusted_sensitivity (canvas.current_scale);
+                var snap_grid = Utils.Snapping.generate_best_snap_grid (canvas, selected_items, sensitivity);
+                var matches = Utils.Snapping.generate_snap_matches (snap_grid, selected_items, sensitivity);
+
+                populate_decorators_from_data (matches, snap_grid);
+                break;
+            case SnapGuideType.POINT:
+                // TODO
+                break;
+        }
+    }
+
+    /*
      * Returns true if the manager has active decorators
      */
     public bool is_active () {
         return any_decorators_visible;
     }
 
-    /**
+    /*
      * Makes all decorators invisible, and ready to be reused
      */
     public void reset_decorators () {
@@ -74,7 +112,7 @@ public class Akira.Lib.Managers.SnapManager : Object {
         any_decorators_visible = false;
     }
 
-    /**
+    /*
      * Populates decorators (if applicable) based on match data and the snap grid.
      * Reuses decorator Goo.CanvasItems if possible, otherwise constructs new ones.
      */

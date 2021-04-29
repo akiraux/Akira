@@ -128,6 +128,19 @@ public class Akira.Lib.Managers.ModeManager : Object {
     }
 
     /*
+     * Returns optional extra context. See InteractionMode for more details.
+     */
+    public Object? active_mode_extra_context ()
+    {
+        if (pan_mode != null) {
+            return pan_mode.extra_context ();
+        }
+
+        return (active_mode != null) ? active_mode.extra_context () : null;
+
+    }
+
+    /*
      * Returns cursor that should be used based on active modes.
      */
     public Gdk.CursorType? active_cursor_type () {

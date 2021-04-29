@@ -168,14 +168,22 @@ public class Akira.StateManagers.CoordinatesMiddleware : Object {
 
         // Get the current item X & Y coordinates before translating.
         get_coordinates_from_items ();
-        // Reset the SelectedBoundManager initial coordinates.
-        canvas.selected_bound_manager.set_initial_coordinates (initial_x, initial_y);
 
         // Loop through all the selected items to update their position.
         foreach (Lib.Items.CanvasItem item in canvas.selected_bound_manager.selected_items) {
             // Set the ignore_offset attribute to true to avoid the forced
             // respositioning of the item (magnetic offset snapping).
-            canvas.selected_bound_manager.move_from_event (item, x, y, true);
+
+            var drag_state = new Akira.Lib.Modes.TransformMode.InitialDragState ();
+            var tmp = new GLib.List<Lib.Items.CanvasItem>();
+            tmp.append (item);
+            if (Akira.Lib.Modes.TransformMode.initialize_items_drag_state(tmp, ref drag_state)) {
+                drag_state.wants_snapping = false;
+                drag_state.press_x = initial_x;
+                drag_state.press_y = initial_y;
+                var guide_data = new Akira.Lib.Managers.SnapManager.SnapGuideData ();
+                Akira.Lib.Modes.TransformMode.move_from_event(canvas, tmp, drag_state, x, y, ref guide_data);
+            }
         }
 
         window.event_bus.item_value_changed ();

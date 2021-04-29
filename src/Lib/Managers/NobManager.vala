@@ -133,6 +133,10 @@ public class Akira.Lib.Managers.NobManager : Object {
         return nob == Nob.TOP_RIGHT || nob == Nob.RIGHT_CENTER || nob == Nob.BOTTOM_RIGHT;
     }
 
+    public static bool is_corner_nob (Nob nob) {
+        return nob == Nob.TOP_RIGHT || nob == Nob.TOP_LEFT || nob == Nob.BOTTOM_RIGHT || nob == Nob.BOTTOM_LEFT;
+    }
+
     /*
      * Return a cursor type based of the type of nob.
      */
