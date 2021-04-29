@@ -25,6 +25,8 @@
  * use the functionality.
  */
 public class Akira.Lib.Modes.TransformMode : InteractionMode {
+    private const double ROTATION_FIXED_STEP = 15.0;
+
     public weak Akira.Lib.Canvas canvas { get; construct; }
     public weak Akira.Lib.Managers.ModeManager mode_manager { get; construct; }
 
@@ -33,7 +35,6 @@ public class Akira.Lib.Modes.TransformMode : InteractionMode {
         public double press_x = 0.0;
         public double press_y = 0.0;
 
-        public bool   item_registered = false;
         public double item_x = 0.0;
         public double item_y = 0.0;
         public double item_width = 0.0;
@@ -43,6 +44,8 @@ public class Akira.Lib.Modes.TransformMode : InteractionMode {
         public double item_scale_x_adj = 0.0;
         public double item_scale_y_adj = 0.0;
 
+        public double rotation_center_x = 0.0;
+        public double rotation_center_y = 0.0;
 
         public bool wants_snapping = true;
     }
@@ -71,10 +74,11 @@ public class Akira.Lib.Modes.TransformMode : InteractionMode {
 
     public override void mode_begin () {
         unowned var selected_items = canvas.selected_bound_manager.selected_items;
-        if (!initialize_items_drag_state(selected_items, ref initial_drag_state)) {
+        if (!initialize_items_drag_state (selected_items, ref initial_drag_state)) {
             debug("TransformMode only works if an item is selected");
             if (mode_manager != null) {
                 mode_manager.deregister_mode (mode_type ());
+                return;
             }
         }
     }
@@ -115,7 +119,12 @@ public class Akira.Lib.Modes.TransformMode : InteractionMode {
     }
 
     public override bool motion_notify_event (Gdk.EventMotion event) {
-        handle_motion_event (event, canvas, initial_drag_state, ref transform_extra_context.snap_guide_data);
+        handle_motion_event (
+            event,
+            canvas,
+            initial_drag_state,
+            ref transform_extra_context.snap_guide_data
+        );
         return true;
     }
 
@@ -137,7 +146,6 @@ public class Akira.Lib.Modes.TransformMode : InteractionMode {
 
         var item = selected_items.nth_data (0);
 
-        drag_state.item_registered = true;
         drag_state.item_x = item.coordinates.x;
         drag_state.item_y = item.coordinates.y;
 
@@ -161,6 +169,9 @@ public class Akira.Lib.Modes.TransformMode : InteractionMode {
             drag_state.item_width = Utils.AffineTransform.fix_size (drag_state.item_width);
             drag_state.item_height = Utils.AffineTransform.fix_size (drag_state.item_height);
         }
+
+        drag_state.rotation_center_x = (item.coordinates.x1 +item.coordinates.x2) / 2.0;
+        drag_state.rotation_center_y = (item.coordinates.y1 +item.coordinates.y2) / 2.0;
 
         return true;
     }
@@ -199,7 +210,8 @@ public class Akira.Lib.Modes.TransformMode : InteractionMode {
                     canvas,
                     selected_items,
                     initial_drag_state,
-                    event,
+                    event.x,
+                    event.y,
                     ref guide_data
                 );
                 break;
@@ -372,21 +384,30 @@ public class Akira.Lib.Modes.TransformMode : InteractionMode {
         Akira.Lib.Canvas canvas,
         GLib.List<Akira.Lib.Items.CanvasItem> selected_items,
         InitialDragState initial_drag_state,
-        Gdk.EventMotion event,
+        double event_x,
+        double event_y,
         ref Akira.Lib.Managers.SnapManager.SnapGuideData guide_data
     ) {
-        /*
         if (selected_items.length() != 1) {
             return;
         }
 
-        // for now we only transform one item
-        Akira.Lib.Items.CanvasItem item = selected_items.nth_data (0);
-        Utils.AffineTransform.rotate_from_event (
-            selected_item, event_x, event_y,
-            ref initial_event_x, ref initial_event_y
+        var radians = GLib.Math.atan2 (
+            event_x - initial_drag_state.rotation_center_x,
+            initial_drag_state.rotation_center_y - event_y
         );
-        */
+
+        var new_rotation = radians * (180 / Math.PI) + 360;
+
+        if (canvas.ctrl_is_pressed) {
+            var step_num = GLib.Math.round (new_rotation / 15.0);
+            new_rotation = 15.0 * step_num;
+        }
+
+        Akira.Lib.Items.CanvasItem item = selected_items.nth_data (0);
+        // Cap new_rotation to the [0, 360] range.
+        new_rotation = GLib.Math.fmod (new_rotation + 360, 360);
+        item.rotation.rotation = Akira.Utils.AffineTransform.fix_size (new_rotation);
     }
 
 }
