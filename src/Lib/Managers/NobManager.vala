@@ -51,8 +51,7 @@ public class Akira.Lib.Managers.NobManager : Object {
     /*
      * Nob data associated with an item selection.
      */
-    public class ItemNobData : Object
-    {
+    public class ItemNobData : Object {
         construct {
             bb_matrix = Cairo.Matrix.identity ();
         }

@@ -34,15 +34,19 @@ public class Akira.Lib.Managers.SnapManager : Object {
     private Gee.ArrayList<Goo.CanvasItemSimple> h_decorator_lines;
     private Gee.ArrayList<Goo.CanvasItemSimple> decorator_dots;
 
-    public enum SnapGuideType
-    {
+    /*
+     * Type of snap guides to show (could be a selection or just a point).
+     */
+    public enum SnapGuideType {
         NONE,
         SELECTION,
         POINT
     }
 
-    public class SnapGuideData
-    {
+    /*
+     * Data that can be used to tell the SnapManager details on how to show snap guides.
+     */
+    public class SnapGuideData {
         public SnapGuideType type = SnapGuideType.NONE;
         public double x = 0.0;
         public double y = 0.0;
@@ -67,10 +71,8 @@ public class Akira.Lib.Managers.SnapManager : Object {
     /*
      * Generate guides as indicated by the data.
      */
-    public void generate_decorators (SnapGuideData newData)
-    {
-        switch (newData.type)
-        {
+    public void generate_decorators (SnapGuideData new_data) {
+        switch (new_data.type) {
             case SnapGuideType.NONE:
                 reset_decorators ();
                 break;

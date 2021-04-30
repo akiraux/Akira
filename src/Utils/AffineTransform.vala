@@ -26,11 +26,6 @@ using Akira.Lib.Managers;
 public class Akira.Utils.AffineTransform : Object {
     private const int MIN_SIZE = 1;
     private const int MIN_POS = 10;
-    private const double ROTATION_FIXED_STEP = 15.0;
-    private const bool ALLOW_SCALE_OVERFLOW = false;
-
-    private static double temp_rotation = 0.0;
-    private static double prev_rotation_difference = 0.0;
 
     /**
      * Calculate adjustments necessary for a nob resize operation. All inputs

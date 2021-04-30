@@ -30,8 +30,7 @@ public class Akira.Lib.Modes.TransformMode : InteractionMode {
     public weak Akira.Lib.Canvas canvas { get; construct; }
     public weak Akira.Lib.Managers.ModeManager mode_manager { get; construct; }
 
-    public class InitialDragState
-    {
+    public class InitialDragState {
         public double press_x = 0.0;
         public double press_y = 0.0;
 
@@ -50,12 +49,11 @@ public class Akira.Lib.Modes.TransformMode : InteractionMode {
         public bool wants_snapping = true;
     }
 
-    public class TransformExtraContext : Object
-    {
+    public class TransformExtraContext : Object {
         public Akira.Lib.Managers.SnapManager.SnapGuideData snap_guide_data;
     }
 
-    public InitialDragState      initial_drag_state;
+    public InitialDragState initial_drag_state;
     public TransformExtraContext transform_extra_context;
 
 
@@ -75,7 +73,7 @@ public class Akira.Lib.Modes.TransformMode : InteractionMode {
     public override void mode_begin () {
         unowned var selected_items = canvas.selected_bound_manager.selected_items;
         if (!initialize_items_drag_state (selected_items, ref initial_drag_state)) {
-            debug("TransformMode only works if an item is selected");
+            debug ("TransformMode only works if an item is selected");
             if (mode_manager != null) {
                 mode_manager.deregister_mode (mode_type ());
                 return;
@@ -128,8 +126,7 @@ public class Akira.Lib.Modes.TransformMode : InteractionMode {
         return true;
     }
 
-    public override Object? extra_context ()
-    {
+    public override Object? extra_context () {
         return transform_extra_context;
     }
 
@@ -154,8 +151,7 @@ public class Akira.Lib.Modes.TransformMode : InteractionMode {
         if (selected_items.length () == 1) {
             drag_state.item_width = item.size.width;
             drag_state.item_height = item.size.height;
-        }
-        else {
+        } else {
             // TODO there should probably be a nice method to get a bounding box from a list of items.
         }
 
@@ -170,8 +166,8 @@ public class Akira.Lib.Modes.TransformMode : InteractionMode {
             drag_state.item_height = Utils.AffineTransform.fix_size (drag_state.item_height);
         }
 
-        drag_state.rotation_center_x = (item.coordinates.x1 +item.coordinates.x2) / 2.0;
-        drag_state.rotation_center_y = (item.coordinates.y1 +item.coordinates.y2) / 2.0;
+        drag_state.rotation_center_x = (item.coordinates.x1 + item.coordinates.x2) / 2.0;
+        drag_state.rotation_center_y = (item.coordinates.y1 + item.coordinates.y2) / 2.0;
 
         return true;
     }
@@ -189,7 +185,7 @@ public class Akira.Lib.Modes.TransformMode : InteractionMode {
 
         unowned var selected_items = canvas.selected_bound_manager.selected_items;
 
-        if (selected_items.length() != 1) {
+        if (selected_items.length () != 1) {
             return false;
         }
 
@@ -243,7 +239,7 @@ public class Akira.Lib.Modes.TransformMode : InteractionMode {
         double event_y,
         ref Akira.Lib.Managers.SnapManager.SnapGuideData guide_data
     ) {
-        if (selected_items.length() != 1) {
+        if (selected_items.length () != 1) {
             return;
         }
 
@@ -323,7 +319,7 @@ public class Akira.Lib.Modes.TransformMode : InteractionMode {
         double event_y,
         ref Akira.Lib.Managers.SnapManager.SnapGuideData guide_data
     ) {
-        if (selected_items.length() != 1) {
+        if (selected_items.length () != 1) {
             return;
         }
 
@@ -388,7 +384,7 @@ public class Akira.Lib.Modes.TransformMode : InteractionMode {
         double event_y,
         ref Akira.Lib.Managers.SnapManager.SnapGuideData guide_data
     ) {
-        if (selected_items.length() != 1) {
+        if (selected_items.length () != 1) {
             return;
         }
 

@@ -130,8 +130,7 @@ public class Akira.Lib.Managers.ModeManager : Object {
     /*
      * Returns optional extra context. See InteractionMode for more details.
      */
-    public Object? active_mode_extra_context ()
-    {
+    public Object? active_mode_extra_context () {
         if (pan_mode != null) {
             return pan_mode.extra_context ();
         }

@@ -437,7 +437,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         set_scale (scale);
         window.event_bus.zoom ();
 
-        window.event_bus.update_snap_decorators();
+        window.event_bus.update_snap_decorators ();
 
         // Check if the user requested the pixel grid and if is not already visible.
         if (!is_grid_visible) {
@@ -499,9 +499,8 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     /*
      * Will update snap decorators if necessary.
      */
-    private void on_update_snap_decorators ()
-    {
-        var extra_context = mode_manager.active_mode_extra_context();
+    private void on_update_snap_decorators () {
+        var extra_context = mode_manager.active_mode_extra_context ();
         if (extra_context is Akira.Lib.Modes.TransformMode.TransformExtraContext) {
             var tec = extra_context as Akira.Lib.Modes.TransformMode.TransformExtraContext;
             snap_manager.generate_decorators (tec.snap_guide_data);

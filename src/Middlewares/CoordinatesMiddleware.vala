@@ -159,14 +159,14 @@ public class Akira.StateManagers.CoordinatesMiddleware : Object {
             // respositioning of the item (magnetic offset snapping).
 
             var drag_state = new Akira.Lib.Modes.TransformMode.InitialDragState ();
-            var tmp = new GLib.List<Lib.Items.CanvasItem>();
+            var tmp = new GLib.List<Lib.Items.CanvasItem> ();
             tmp.append (item);
-            if (Akira.Lib.Modes.TransformMode.initialize_items_drag_state(tmp, ref drag_state)) {
+            if (Akira.Lib.Modes.TransformMode.initialize_items_drag_state (tmp, ref drag_state)) {
                 drag_state.wants_snapping = false;
                 drag_state.press_x = initial_x;
                 drag_state.press_y = initial_y;
                 var guide_data = new Akira.Lib.Managers.SnapManager.SnapGuideData ();
-                Akira.Lib.Modes.TransformMode.move_from_event(canvas, tmp, drag_state, x, y, ref guide_data);
+                Akira.Lib.Modes.TransformMode.move_from_event (canvas, tmp, drag_state, x, y, ref guide_data);
             }
         }
 

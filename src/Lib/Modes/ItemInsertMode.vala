@@ -116,8 +116,7 @@ public class Akira.Lib.Modes.ItemInsertMode : InteractionMode {
         return true;
     }
 
-    public override Object? extra_context ()
-    {
+    public override Object? extra_context () {
         if (transform_mode != null) {
             return transform_mode.extra_context ();
         }
