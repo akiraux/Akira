@@ -165,6 +165,8 @@ public class Akira.StateManagers.CoordinatesMiddleware : Object {
                 drag_state.wants_snapping = false;
                 drag_state.press_x = initial_x;
                 drag_state.press_y = initial_y;
+                drag_state.nob_x = initial_x;
+                drag_state.nob_y = initial_y;
                 var guide_data = new Akira.Lib.Managers.SnapManager.SnapGuideData ();
                 Akira.Lib.Modes.TransformMode.move_from_event (canvas, tmp, drag_state, x, y, ref guide_data);
             }

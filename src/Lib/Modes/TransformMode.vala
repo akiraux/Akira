@@ -33,6 +33,8 @@ public class Akira.Lib.Modes.TransformMode : InteractionMode {
     public class InitialDragState {
         public double press_x = 0.0;
         public double press_y = 0.0;
+        public double nob_x = 0.0;
+        public double nob_y = 0.0;
 
         public double item_x = 0.0;
         public double item_y = 0.0;
@@ -106,6 +108,14 @@ public class Akira.Lib.Modes.TransformMode : InteractionMode {
     public override bool button_press_event (Gdk.EventButton event) {
         initial_drag_state.press_x = event.x;
         initial_drag_state.press_y = event.y;
+
+        Akira.Lib.Managers.NobManager.nob_position_from_items (
+            canvas.selected_bound_manager.selected_items,
+            canvas.nob_manager.selected_nob,
+            ref initial_drag_state.nob_x,
+            ref initial_drag_state.nob_y
+        );
+
         return true;
     }
 
@@ -117,12 +127,54 @@ public class Akira.Lib.Modes.TransformMode : InteractionMode {
     }
 
     public override bool motion_notify_event (Gdk.EventMotion event) {
-        handle_motion_event (
-            event,
-            canvas,
-            initial_drag_state,
-            ref transform_extra_context.snap_guide_data
-        );
+        var selected_nob = canvas.nob_manager.selected_nob;
+
+        unowned var selected_items = canvas.selected_bound_manager.selected_items;
+
+        if (selected_items.length () != 1) {
+            return false;
+        }
+
+        switch (selected_nob) {
+            case Managers.NobManager.Nob.NONE:
+                move_from_event (
+                    canvas,
+                    selected_items,
+                    initial_drag_state,
+                    event.x,
+                    event.y,
+                    ref transform_extra_context.snap_guide_data
+                );
+                break;
+
+            case Managers.NobManager.Nob.ROTATE:
+                rotate_from_event (
+                    canvas,
+                    selected_items,
+                    initial_drag_state,
+                    event.x,
+                    event.y,
+                    ref transform_extra_context.snap_guide_data
+                );
+                break;
+
+            default:
+                scale_from_event (
+                    canvas,
+                    selected_items,
+                    initial_drag_state,
+                    selected_nob,
+                    event.x,
+                    event.y,
+                    ref transform_extra_context.snap_guide_data
+                );
+                break;
+        }
+
+        // Notify the X & Y values in the state manager.
+        canvas.window.event_bus.reset_state_coords ();
+
+
         return true;
     }
 
@@ -168,65 +220,6 @@ public class Akira.Lib.Modes.TransformMode : InteractionMode {
 
         drag_state.rotation_center_x = (item.coordinates.x1 + item.coordinates.x2) / 2.0;
         drag_state.rotation_center_y = (item.coordinates.y1 + item.coordinates.y2) / 2.0;
-
-        return true;
-    }
-
-    /*
-     * Handle a motion event on a canvas. Will forward event to the canvas for now.
-     */
-    public static bool handle_motion_event (
-        Gdk.EventMotion event,
-        Akira.Lib.Canvas canvas,
-        InitialDragState initial_drag_state,
-        ref Akira.Lib.Managers.SnapManager.SnapGuideData guide_data
-    ) {
-        var selected_nob = canvas.nob_manager.selected_nob;
-
-        unowned var selected_items = canvas.selected_bound_manager.selected_items;
-
-        if (selected_items.length () != 1) {
-            return false;
-        }
-
-        switch (selected_nob) {
-            case Managers.NobManager.Nob.NONE:
-                move_from_event (
-                    canvas,
-                    selected_items,
-                    initial_drag_state,
-                    event.x,
-                    event.y,
-                    ref guide_data
-                );
-                break;
-
-            case Managers.NobManager.Nob.ROTATE:
-                rotate_from_event (
-                    canvas,
-                    selected_items,
-                    initial_drag_state,
-                    event.x,
-                    event.y,
-                    ref guide_data
-                );
-                break;
-
-            default:
-                scale_from_event (
-                    canvas,
-                    selected_items,
-                    initial_drag_state,
-                    selected_nob,
-                    event.x,
-                    event.y,
-                    ref guide_data
-                );
-                break;
-        }
-
-        // Notify the X & Y values in the state manager.
-        canvas.window.event_bus.reset_state_coords ();
 
         return true;
     }
@@ -326,10 +319,13 @@ public class Akira.Lib.Modes.TransformMode : InteractionMode {
         // for now we only transform one item
         Akira.Lib.Items.CanvasItem item = selected_items.nth_data (0);
 
+        event_x = Akira.Utils.AffineTransform.fix_size (event_x);
+        event_y = Akira.Utils.AffineTransform.fix_size (event_y);
+
         double rel_event_x = event_x;
         double rel_event_y = event_y;
-        double rel_press_x = initial_drag_state.press_x;
-        double rel_press_y = initial_drag_state.press_y;
+        double rel_press_x = initial_drag_state.nob_x;
+        double rel_press_y = initial_drag_state.nob_y;
 
         // Convert the coordinates from the canvas to the item so we know the real
         // values even if the item is rotated.
