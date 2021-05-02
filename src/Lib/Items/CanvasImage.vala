@@ -92,7 +92,7 @@ public class Akira.Lib.Items.CanvasImage : Goo.CanvasImage, Akira.Lib.Items.Canv
                 // the Size component properly calculate the correct size ratio.
                 size.locked = true;
 
-                // Reset the size to a 2px initial value after the size ratio was properly defined
+                // Reset the size to a 4px initial value after the size ratio was properly defined
                 // in order to allow the user to decide the initial image size. We use 2px in order
                 // to avoid issues when dividing by the ratio in case of narrow images.
                 size.width = 4;
