@@ -135,8 +135,7 @@ public class Akira.Lib.Managers.ModeManager : Object {
             return pan_mode.extra_context ();
         }
 
-        return (active_mode != null) ? active_mode.extra_context () : null;
-
+        return active_mode != null ? active_mode.extra_context () : null;
     }
 
     /*
@@ -147,7 +146,7 @@ public class Akira.Lib.Managers.ModeManager : Object {
             return pan_mode.cursor_type ();
         }
 
-        return (active_mode != null) ? active_mode.cursor_type () : null;
+        return active_mode != null ? active_mode.cursor_type () : null;
     }
 
     public bool key_press_event (Gdk.EventKey event) {

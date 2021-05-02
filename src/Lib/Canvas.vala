@@ -502,8 +502,8 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     private void on_update_snap_decorators () {
         var extra_context = mode_manager.active_mode_extra_context ();
         if (extra_context is Akira.Lib.Modes.TransformMode.TransformExtraContext) {
-            var tec = extra_context as Akira.Lib.Modes.TransformMode.TransformExtraContext;
-            snap_manager.generate_decorators (tec.snap_guide_data);
+            snap_manager.generate_decorators (
+                ((Lib.Modes.TransformMode.TransformExtraContext) extra_context).snap_guide_data);
         }
         else if (snap_manager.is_active ()) {
             snap_manager.reset_decorators ();

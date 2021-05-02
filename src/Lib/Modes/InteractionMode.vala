@@ -95,7 +95,7 @@ public abstract class Akira.Lib.Modes.InteractionMode : Object {
     public virtual bool motion_notify_event (Gdk.EventMotion event) { return false; }
 
     /*
-     * Optionally override to provide some extra context that may be used.
+     * Optionally override to provide some extra context that may be used
      * further up to know how to update other managers based on this mode.
      *
      * This context should not be relied upon for vital opertions or anything

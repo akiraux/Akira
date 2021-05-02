@@ -74,12 +74,11 @@ public class Akira.Lib.Modes.TransformMode : InteractionMode {
 
     public override void mode_begin () {
         unowned var selected_items = canvas.selected_bound_manager.selected_items;
-        if (!initialize_items_drag_state (selected_items, ref initial_drag_state)) {
-            debug ("TransformMode only works if an item is selected");
-            if (mode_manager != null) {
-                mode_manager.deregister_mode (mode_type ());
-                return;
-            }
+        var success = initialize_items_drag_state (selected_items, ref initial_drag_state);
+
+        if (!success && mode_manager != null) {
+            mode_manager.deregister_mode (mode_type ());
+            return;
         }
     }
 
@@ -173,7 +172,6 @@ public class Akira.Lib.Modes.TransformMode : InteractionMode {
 
         // Notify the X & Y values in the state manager.
         canvas.window.event_bus.reset_state_coords ();
-
 
         return true;
     }
@@ -401,5 +399,4 @@ public class Akira.Lib.Modes.TransformMode : InteractionMode {
         new_rotation = GLib.Math.fmod (new_rotation + 360, 360);
         item.rotation.rotation = Akira.Utils.AffineTransform.fix_size (new_rotation);
     }
-
 }
