@@ -23,7 +23,7 @@
 /*
  * ExportMode handles selecting an area for exporting.
  */
-public class Akira.Lib.Modes.ExportMode : Object, InteractionMode {
+public class Akira.Lib.Modes.ExportMode : InteractionMode {
     public weak Akira.Lib.Canvas canvas { get; construct; }
     public weak Akira.Lib.Managers.ModeManager mode_manager { get; construct; }
 
@@ -36,31 +36,23 @@ public class Akira.Lib.Modes.ExportMode : Object, InteractionMode {
         );
     }
 
-    public void mode_begin () {}
-    public void mode_end () {}
-    public InteractionMode.ModeType mode_type () { return InteractionMode.ModeType.EXPORT; }
+    public override InteractionMode.ModeType mode_type () {
+        return InteractionMode.ModeType.EXPORT;
+    }
 
 
-    public Gdk.CursorType? cursor_type () {
+    public override Gdk.CursorType? cursor_type () {
         return Gdk.CursorType.CROSSHAIR;
     }
 
-    public bool key_press_event (Gdk.EventKey event) {
-        return false;
-    }
-
-    public bool key_release_event (Gdk.EventKey event) {
-        return false;
-    }
-
-    public bool button_press_event (Gdk.EventButton event) {
+    public override bool button_press_event (Gdk.EventButton event) {
         canvas.selected_bound_manager.reset_selection ();
         canvas.export_manager.create_area (event);
         resizing = true;
         return true;
     }
 
-    public bool button_release_event (Gdk.EventButton event) {
+    public override bool button_release_event (Gdk.EventButton event) {
         if (resizing) {
             canvas.export_manager.create_area_snapshot ();
             mode_manager.deregister_mode (mode_type ());
@@ -68,7 +60,7 @@ public class Akira.Lib.Modes.ExportMode : Object, InteractionMode {
         return true;
     }
 
-    public bool motion_notify_event (Gdk.EventMotion event) {
+    public override bool motion_notify_event (Gdk.EventMotion event) {
         if (resizing) {
             canvas.export_manager.resize_area (event.x, event.y);
         }

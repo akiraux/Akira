@@ -87,34 +87,18 @@ public class Akira.StateManagers.CoordinatesMiddleware : Object {
     }
 
     private void get_coordinates_from_items () {
-        var dummy_matrix = Cairo.Matrix.identity ();
-        double dummy_top_left_x = 0;
-        double dummy_top_left_y = 0;
-        double dummy_width_offset_x = 0;
-        double dummy_width_offset_y = 0;
-        double dummy_height_offset_x = 0;
-        double dummy_height_offset_y = 0;
-        double dummy_width = 0;
-        double dummy_height = 0;
-
         // Reset the selected coordinates to always get correct values.
         initial_x = 0;
         initial_y = 0;
 
+        var nob_data = new Akira.Lib.Managers.NobManager.ItemNobData ();
         Lib.Managers.NobManager.populate_nob_bounds_from_items (
             canvas.selected_bound_manager.selected_items,
-            ref dummy_matrix,
-            ref dummy_top_left_x,
-            ref dummy_top_left_y,
-            ref dummy_width_offset_x,
-            ref dummy_width_offset_y,
-            ref dummy_height_offset_x,
-            ref dummy_height_offset_y,
-            ref dummy_width,
-            ref dummy_height,
-            ref initial_x,
-            ref initial_y
+            ref nob_data
         );
+
+        initial_x = nob_data.selected_x;
+        initial_y = nob_data.selected_y;
     }
 
     /**
@@ -168,14 +152,24 @@ public class Akira.StateManagers.CoordinatesMiddleware : Object {
 
         // Get the current item X & Y coordinates before translating.
         get_coordinates_from_items ();
-        // Reset the SelectedBoundManager initial coordinates.
-        canvas.selected_bound_manager.set_initial_coordinates (initial_x, initial_y);
 
         // Loop through all the selected items to update their position.
         foreach (Lib.Items.CanvasItem item in canvas.selected_bound_manager.selected_items) {
             // Set the ignore_offset attribute to true to avoid the forced
             // respositioning of the item (magnetic offset snapping).
-            canvas.selected_bound_manager.move_from_event (item, x, y, true);
+
+            var drag_state = new Akira.Lib.Modes.TransformMode.InitialDragState ();
+            var tmp = new GLib.List<Lib.Items.CanvasItem> ();
+            tmp.append (item);
+            if (Akira.Lib.Modes.TransformMode.initialize_items_drag_state (tmp, ref drag_state)) {
+                drag_state.wants_snapping = false;
+                drag_state.press_x = initial_x;
+                drag_state.press_y = initial_y;
+                drag_state.nob_x = initial_x;
+                drag_state.nob_y = initial_y;
+                var guide_data = new Akira.Lib.Managers.SnapManager.SnapGuideData ();
+                Akira.Lib.Modes.TransformMode.move_from_event (canvas, tmp, drag_state, x, y, ref guide_data);
+            }
         }
 
         window.event_bus.item_value_changed ();

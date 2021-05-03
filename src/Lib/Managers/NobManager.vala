@@ -48,6 +48,34 @@ public class Akira.Lib.Managers.NobManager : Object {
         ROTATE
     }
 
+    /*
+     * Nob data associated with an item selection.
+     */
+    public class ItemNobData : Object {
+        construct {
+            bb_matrix = Cairo.Matrix.identity ();
+        }
+
+        // Values in canvas coordinates.
+        public double top_left_x = 0.0;
+        public double top_left_y = 0.0;
+        public double width_offset_x = 0.0;
+        public double width_offset_y = 0.0;
+        public double height_offset_x = 0.0;
+        public double height_offset_y = 0.0;
+
+        // bb_width and bb_height are also used by the SizeMiddleware to represent
+        // the width and height of selected items in the Transform Panel.
+        public double bb_width = 0.0;
+        public double bb_height = 0.0;
+
+        public Cairo.Matrix bb_matrix;
+
+        // Values for the Transform Panel fields.
+        public double selected_x = 0.0;
+        public double selected_y = 0.0;
+    }
+
     public weak Akira.Lib.Canvas canvas { get; construct; }
 
     public Nob selected_nob;
@@ -58,22 +86,8 @@ public class Akira.Lib.Managers.NobManager : Object {
     private Akira.Lib.Selection.Nob[] nobs = new Akira.Lib.Selection.Nob[9];
     private Goo.CanvasPolyline? rotation_line;
 
-    // Values in canvas coordinates.
-    private double top_left_x;
-    private double top_left_y;
-    private double width_offset_x;
-    private double width_offset_y;
-    private double height_offset_x;
-    private double height_offset_y;
-    // bb_width and bb_height are also used by the SizeMiddleware to represent
-    // the width and height of selected items in the Transform Panel.
-    private double bb_width;
-    private double bb_height;
-    private Cairo.Matrix bb_matrix;
-
-    // Values for the Transform Panel fields.
-    private double selected_x;
-    private double selected_y;
+    // Active nob data associated with current selection.
+    // private ItemNobData active_nob_data;
 
     // Tracks if an artboard is part of the current selection.
     private bool is_artboard;
@@ -133,6 +147,10 @@ public class Akira.Lib.Managers.NobManager : Object {
         return nob == Nob.TOP_RIGHT || nob == Nob.RIGHT_CENTER || nob == Nob.BOTTOM_RIGHT;
     }
 
+    public static bool is_corner_nob (Nob nob) {
+        return nob == Nob.TOP_RIGHT || nob == Nob.TOP_LEFT || nob == Nob.BOTTOM_RIGHT || nob == Nob.BOTTOM_LEFT;
+    }
+
     /*
      * Return a cursor type based of the type of nob.
      */
@@ -180,54 +198,45 @@ public class Akira.Lib.Managers.NobManager : Object {
      * the selection box and nob positions. If the number of items is one,
      * the selection box may be rotated, otherwise it is never rotated.
      */
-    public static void populate_nob_bounds_from_items (
-        List<Items.CanvasItem> items,
-        ref Cairo.Matrix matrix,
-        ref double top_left_x,
-        ref double top_left_y,
-        ref double width_offset_x,
-        ref double width_offset_y,
-        ref double height_offset_x,
-        ref double height_offset_y,
-        ref double width,
-        ref double height,
-        ref double selected_x,
-        ref double selected_y
-    ) {
-        top_left_x = 0;
-        top_left_y = 0;
+    public static void populate_nob_bounds_from_items (List<Items.CanvasItem> items, ref ItemNobData nob_data) {
+        nob_data.top_left_x = 0;
+        nob_data.top_left_y = 0;
 
         // Check if we only have one item currently selected.
         if (items.length () == 1) {
             var item = items.first ().data;
-            item.get_transform (out matrix);
+            item.get_transform (out nob_data.bb_matrix);
 
             // Set the coordinates for the transform panel.
             // Use x and y coordinates to account for the item being inside artboard.
-            selected_x = item.coordinates.x;
-            selected_y = item.coordinates.y;
+            nob_data.selected_x = item.coordinates.x;
+            nob_data.selected_y = item.coordinates.y;
 
-            Cairo.Matrix nob_matrix = matrix;
+            Cairo.Matrix nob_matrix = nob_data.bb_matrix;
             if (item.artboard != null) {
                 Cairo.Matrix artboard_matrix;
                 item.artboard.get_transform (out artboard_matrix);
-                nob_matrix.multiply (matrix, artboard_matrix);
+                nob_matrix.multiply (nob_data.bb_matrix, artboard_matrix);
             }
 
-            width = item.size.width;
-            height = item.size.height;
+            nob_data.bb_width = item.size.width;
+            nob_data.bb_height = item.size.height;
 
-            width_offset_x = width;
-            width_offset_y = 0;
-            height_offset_x = 0;
-            height_offset_y = height;
+            double width_offset_x = nob_data.bb_width;
+            double width_offset_y = 0;
+            double height_offset_x = 0;
+            double height_offset_y = nob_data.bb_height;
             nob_matrix.transform_distance (ref width_offset_x, ref width_offset_y);
             nob_matrix.transform_distance (ref height_offset_x, ref height_offset_y);
-            nob_matrix.transform_point (ref top_left_x, ref top_left_y);
+            nob_matrix.transform_point (ref nob_data.top_left_x, ref nob_data.top_left_y);
+            nob_data.width_offset_x = width_offset_x;
+            nob_data.width_offset_y = width_offset_y;
+            nob_data.height_offset_x = height_offset_x;
+            nob_data.height_offset_y = height_offset_y;
             return;
         }
 
-        matrix = Cairo.Matrix.identity ();
+        nob_data.bb_matrix = Cairo.Matrix.identity ();
 
         bool first = true;
         double x = 0;
@@ -249,18 +258,18 @@ public class Akira.Lib.Managers.NobManager : Object {
         }
 
         // Set the coordinates for the transform panel.
-        selected_x = x;
-        selected_y = y;
+        nob_data.selected_x = x;
+        nob_data.selected_y = y;
 
-        width = x2 - x1;
-        height = y2 - y1;
+        nob_data.bb_width = x2 - x1;
+        nob_data.bb_height = y2 - y1;
 
-        top_left_x = x1;
-        top_left_y = y1;
-        width_offset_x = width;
-        width_offset_y = 0;
-        height_offset_x = 0;
-        height_offset_y = height;
+        nob_data.top_left_x = x1;
+        nob_data.top_left_y = y1;
+        nob_data.width_offset_x = nob_data.bb_width;
+        nob_data.width_offset_y = 0;
+        nob_data.height_offset_x = 0;
+        nob_data.height_offset_y = nob_data.bb_height;
     }
 
     /**
@@ -269,15 +278,17 @@ public class Akira.Lib.Managers.NobManager : Object {
      */
     private static void calculate_nob_position (
         Nob nob_name,
-        double top_left_x,
-        double top_left_y,
-        double width_offset_x,
-        double width_offset_y,
-        double height_offset_x,
-        double height_offset_y,
+        ItemNobData nob_data,
         ref double pos_x,
         ref double pos_y
     ) {
+        double top_left_x = nob_data.top_left_x;
+        double top_left_y = nob_data.top_left_y;
+        double width_offset_x = nob_data.width_offset_x;
+        double width_offset_y = nob_data.width_offset_y;
+        double height_offset_x = nob_data.height_offset_x;
+        double height_offset_y = nob_data.height_offset_y;
+
         switch (nob_name) {
             case Nob.TOP_LEFT:
                 pos_x = top_left_x;
@@ -326,44 +337,9 @@ public class Akira.Lib.Managers.NobManager : Object {
         ref double pos_x,
         ref double pos_y
     ) {
-        Cairo.Matrix dummy_matrix = Cairo.Matrix.identity ();
-        double dummy_top_left_x = 0;
-        double dummy_top_left_y = 0;
-        double dummy_width_offset_x = 0;
-        double dummy_width_offset_y = 0;
-        double dummy_height_offset_x = 0;
-        double dummy_height_offset_y = 0;
-        double dummy_width = 0;
-        double dummy_height = 0;
-        double dummy_selected_x = 0;
-        double dummy_selected_y = 0;
-
-        populate_nob_bounds_from_items (
-            items,
-            ref dummy_matrix,
-            ref dummy_top_left_x,
-            ref dummy_top_left_y,
-            ref dummy_width_offset_x,
-            ref dummy_width_offset_y,
-            ref dummy_height_offset_x,
-            ref dummy_height_offset_y,
-            ref dummy_width,
-            ref dummy_height,
-            ref dummy_selected_x,
-            ref dummy_selected_y
-        );
-
-        calculate_nob_position (
-            nob_name,
-            dummy_top_left_x,
-            dummy_top_left_y,
-            dummy_width_offset_x,
-            dummy_width_offset_y,
-            dummy_height_offset_x,
-            dummy_height_offset_y,
-            ref pos_x,
-            ref pos_y
-         );
+        var nob_data = new ItemNobData ();
+        populate_nob_bounds_from_items (items, ref nob_data);
+        calculate_nob_position (nob_name, nob_data, ref pos_x, ref pos_y);
     }
 
     /**
@@ -385,23 +361,11 @@ public class Akira.Lib.Managers.NobManager : Object {
 
         populate_nobs ();
 
-        populate_nob_bounds_from_items (
-            selected_items,
-            ref bb_matrix,
-            ref top_left_x,
-            ref top_left_y,
-            ref width_offset_x,
-            ref width_offset_y,
-            ref height_offset_x,
-            ref height_offset_y,
-            ref bb_width,
-            ref bb_height,
-            ref selected_x,
-            ref selected_y
-        );
+        var active_nob_data = new ItemNobData ();
+        populate_nob_bounds_from_items (selected_items, ref active_nob_data);
 
-        update_select_effect (selected_items);
-        update_nob_position (selected_items);
+        update_select_effect (selected_items, active_nob_data);
+        update_nob_position (selected_items, active_nob_data);
     }
 
     /**
@@ -425,12 +389,12 @@ public class Akira.Lib.Managers.NobManager : Object {
     /**
      * Updates selection items, constructing them if necessary.
      */
-    private void update_select_effect (List<Items.CanvasItem> selected_items) {
+    private void update_select_effect (List<Items.CanvasItem> selected_items, ItemNobData nob_data) {
         if (select_effect == null) {
             select_effect = new Goo.CanvasRect (
                 null,
                 0, 0,
-                bb_width, bb_height,
+                nob_data.bb_width, nob_data.bb_height,
                 "line-width", LINE_WIDTH / canvas.current_scale,
                 "stroke-color", STROKE_COLOR,
                 null
@@ -442,15 +406,15 @@ public class Akira.Lib.Managers.NobManager : Object {
 
         // If only one item is selected and it's inside an artboard,
         // we need to convert its coordinates from the artboard space.
-        Cairo.Matrix tmp_matrix = bb_matrix;
+        Cairo.Matrix tmp_matrix = nob_data.bb_matrix;
         var item = selected_items.first ().data;
         if (selected_items.length () == 1 && item.artboard != null) {
             item.canvas.convert_from_item_space (item.artboard, ref tmp_matrix.x0, ref tmp_matrix.y0);
         }
 
         select_effect.set_transform (tmp_matrix);
-        select_effect.set ("width", bb_width);
-        select_effect.set ("height", bb_height);
+        select_effect.set ("width", nob_data.bb_width);
+        select_effect.set ("height", nob_data.bb_height);
         select_effect.set ("line-width", LINE_WIDTH / canvas.current_scale);
     }
 
@@ -458,7 +422,7 @@ public class Akira.Lib.Managers.NobManager : Object {
      * Update the position of all nobs of selected items. It will show or hide them based on
      * the properties of the selection.
      */
-    private void update_nob_position (List<Items.CanvasItem> selected_items) {
+    private void update_nob_position (List<Items.CanvasItem> selected_items, ItemNobData nob_data) {
         is_artboard = false;
         foreach (var item in selected_items) {
             if (item is Items.CanvasArtboard) {
@@ -468,8 +432,8 @@ public class Akira.Lib.Managers.NobManager : Object {
         }
 
         var nob_size = Selection.Nob.NOB_SIZE / canvas.current_scale;
-        bool print_middle_width_nobs = bb_width > nob_size * 3;
-        bool print_middle_height_nobs = bb_height > nob_size * 3;
+        bool print_middle_width_nobs = nob_data.bb_width > nob_size * 3;
+        bool print_middle_height_nobs = nob_data.bb_height > nob_size * 3;
 
         foreach (var nob in nobs) {
             bool set_visible = true;
@@ -478,17 +442,7 @@ public class Akira.Lib.Managers.NobManager : Object {
 
             var nob_name = nob.handle_id;
 
-            calculate_nob_position (
-                nob_name,
-                top_left_x,
-                top_left_y,
-                width_offset_x,
-                width_offset_y,
-                height_offset_x,
-                height_offset_y,
-                ref center_x,
-                ref center_y
-            );
+            calculate_nob_position ( nob_name, nob_data, ref center_x, ref center_y );
 
             if (!print_middle_height_nobs && (nob_name == Nob.RIGHT_CENTER || nob_name == Nob.LEFT_CENTER)) {
                 set_visible = false;
@@ -497,24 +451,24 @@ public class Akira.Lib.Managers.NobManager : Object {
             } else if (nob.handle_id == Nob.ROTATE) {
                 double line_offset_x = 0;
                 double line_offset_y = - (LINE_HEIGHT / canvas.current_scale);
-                bb_matrix.transform_distance (ref line_offset_x, ref line_offset_y);
+                nob_data.bb_matrix.transform_distance (ref line_offset_x, ref line_offset_y);
 
                 // If only one item is selected and it's inside an artboard,
                 // we need to convert its coordinates from the artboard space.
-                Cairo.Matrix tmp_matrix = bb_matrix;
+                Cairo.Matrix tmp_matrix = nob_data.bb_matrix;
                 var item = selected_items.first ().data;
                 if (selected_items.length () == 1 && item.artboard != null) {
                     item.canvas.convert_from_item_space (item.artboard, ref tmp_matrix.x0, ref tmp_matrix.y0);
                 }
 
-                center_x = top_left_x + width_offset_x / 2.0 + line_offset_x;
-                center_y = top_left_y + width_offset_y / 2.0 + line_offset_y;
+                center_x = nob_data.top_left_x + nob_data.width_offset_x / 2.0 + line_offset_x;
+                center_y = nob_data.top_left_y + nob_data.width_offset_y / 2.0 + line_offset_y;
 
                 set_visible = !is_artboard;
 
                 if (set_visible) {
                     rotation_line.set_transform (tmp_matrix);
-                    rotation_line.translate (bb_width / 2.0, - LINE_HEIGHT / canvas.current_scale);
+                    rotation_line.translate (nob_data.bb_width / 2.0, - LINE_HEIGHT / canvas.current_scale);
                     rotation_line.set ("line-width", LINE_WIDTH / canvas.current_scale);
                     rotation_line.set ("height", LINE_HEIGHT / canvas.current_scale);
                     rotation_line.set ("visibility", Goo.CanvasItemVisibility.VISIBLE);
@@ -524,12 +478,12 @@ public class Akira.Lib.Managers.NobManager : Object {
                 }
 
                 // Raise to the rotation_line, so the line is under the rotation nob.
-                nob.update_state (bb_matrix, center_x, center_y, set_visible);
+                nob.update_state (nob_data.bb_matrix, center_x, center_y, set_visible);
                 nob.raise (rotation_line);
                 return;
             }
 
-            nob.update_state (bb_matrix, center_x, center_y, set_visible);
+            nob.update_state (nob_data.bb_matrix, center_x, center_y, set_visible);
             nob.raise (select_effect);
         }
     }

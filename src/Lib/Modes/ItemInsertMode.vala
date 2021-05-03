@@ -26,11 +26,11 @@
  *
  * In the future, this mode can be kept alive during multiple clicks when inserting items like polylines.
  */
-public class Akira.Lib.Modes.ItemInsertMode : Object, InteractionMode {
+public class Akira.Lib.Modes.ItemInsertMode : InteractionMode {
     public weak Akira.Lib.Canvas canvas { get; construct; }
     public weak Akira.Lib.Managers.ModeManager mode_manager { get; construct; }
 
-    private bool resizing = false;
+    private Akira.Lib.Modes.TransformMode transform_mode;
 
     public ItemInsertMode (Akira.Lib.Canvas canvas, Akira.Lib.Managers.ModeManager mode_manager) {
         Object (
@@ -39,27 +39,45 @@ public class Akira.Lib.Modes.ItemInsertMode : Object, InteractionMode {
         );
     }
 
-    public void mode_begin () {}
-    public void mode_end () {}
-    public InteractionMode.ModeType mode_type () { return InteractionMode.ModeType.ITEM_INSERT; }
+    construct {
+        transform_mode = null;
+    }
 
-    public Gdk.CursorType? cursor_type () {
-        if (resizing) {
-            return Akira.Lib.Managers.NobManager.cursor_from_nob (Akira.Lib.Managers.NobManager.Nob.BOTTOM_RIGHT);
+    public override InteractionMode.ModeType mode_type () { return InteractionMode.ModeType.ITEM_INSERT; }
+
+    public override void mode_end () {
+        if (transform_mode != null) {
+            transform_mode.mode_end ();
+        }
+    }
+
+    public override Gdk.CursorType? cursor_type () {
+        if (transform_mode != null) {
+            return transform_mode.cursor_type ();
         }
 
         return Gdk.CursorType.CROSSHAIR;
     }
 
-    public bool key_press_event (Gdk.EventKey event) {
+    public override bool key_press_event (Gdk.EventKey event) {
+        if (transform_mode != null) {
+            return transform_mode.key_press_event (event);
+        }
         return false;
     }
 
-    public bool key_release_event (Gdk.EventKey event) {
+    public override bool key_release_event (Gdk.EventKey event) {
+        if (transform_mode != null) {
+            return transform_mode.key_press_event (event);
+        }
         return false;
-    }
+     }
 
-    public bool button_press_event (Gdk.EventButton event) {
+    public override bool button_press_event (Gdk.EventButton event) {
+        if (transform_mode != null) {
+            return transform_mode.button_press_event (event);
+        }
+
         if (event.button == Gdk.BUTTON_PRIMARY) {
             var sel_manager = canvas.selected_bound_manager;
             sel_manager.reset_selection ();
@@ -67,34 +85,43 @@ public class Akira.Lib.Modes.ItemInsertMode : Object, InteractionMode {
             var new_item = canvas.window.items_manager.insert_item (event.x, event.y);
 
             sel_manager.add_item_to_selection (new_item);
-            sel_manager.set_initial_coordinates (event.x, event.y);
 
             canvas.nob_manager.selected_nob = Managers.NobManager.Nob.BOTTOM_RIGHT;
-
             canvas.update_canvas ();
 
-            resizing = true;
+            transform_mode = new Akira.Lib.Modes.TransformMode (canvas, null);
+            transform_mode.mode_begin ();
+            transform_mode.button_press_event (event);
+
             return true;
         }
 
         return false;
     }
 
-    public bool button_release_event (Gdk.EventButton event) {
-        if (resizing) {
+    public override bool button_release_event (Gdk.EventButton event) {
+        if (transform_mode != null) {
+            transform_mode.button_release_event (event);
             mode_manager.deregister_mode (mode_type ());
-            return true;
         }
 
-        return resizing;
+        return true;
     }
 
-    public bool motion_notify_event (Gdk.EventMotion event) {
-        if (resizing) {
-            TransformMode.handle_motion_event (event, canvas);
+    public override bool motion_notify_event (Gdk.EventMotion event) {
+        if (transform_mode != null) {
+            return transform_mode.motion_notify_event (event);
         }
 
-        return false;
+        return true;
+    }
+
+    public override Object? extra_context () {
+        if (transform_mode != null) {
+            return transform_mode.extra_context ();
+        }
+
+        return null;
     }
 
 }

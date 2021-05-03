@@ -49,6 +49,7 @@ public class Akira.Services.EventBus : Object {
     public signal void toggle_pixel_grid ();
     public signal void update_pixel_grid ();
     public signal void update_snaps_color ();
+    public signal void update_snap_decorators ();
 
     // Options panel signals.
     public signal void align_items (string align_action);
