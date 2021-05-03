@@ -304,7 +304,7 @@ public class Akira.Dialogs.SettingsDialog : Gtk.Dialog {
         app_icon.pixel_size = 64;
         app_icon.margin_top = 12;
 
-        var app_name = new Gtk.Label (APP_NAME);
+        var app_name = new Gtk.Label (Constants.APP_NAME);
         app_name.get_style_context ().add_class ("h2");
         app_name.margin_top = 6;
 
