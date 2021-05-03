@@ -42,6 +42,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     public Managers.NobManager nob_manager;
     private Managers.HoverManager hover_manager;
     private Managers.ModeManager mode_manager;
+    private Managers.SnapManager snap_manager;
 
     public bool ctrl_is_pressed = false;
     public bool shift_is_pressed = false;
@@ -76,6 +77,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
         hover_manager = new Managers.HoverManager (this);
         mode_manager = new Managers.ModeManager (this);
+        snap_manager = new Managers.SnapManager (this);
 
         create_pixel_grid ();
 
@@ -90,6 +92,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         window.event_bus.set_focus_on_canvas.connect (on_set_focus_on_canvas);
         window.event_bus.request_escape.connect (on_escape_key);
         window.event_bus.insert_item.connect (on_insert_item);
+        window.event_bus.update_snap_decorators.connect (on_update_snap_decorators);
     }
 
     /**
@@ -395,8 +398,6 @@ public class Akira.Lib.Canvas : Goo.Canvas {
             }
         }
 
-        selected_bound_manager.set_initial_coordinates (event.x, event.y);
-
         if (selected_bound_manager.selected_items.length () > 0) {
             var new_mode = new Akira.Lib.Modes.TransformMode (this, mode_manager);
             mode_manager.register_mode (new_mode);
@@ -437,6 +438,8 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         current_scale = scale;
         set_scale (scale);
         window.event_bus.zoom ();
+
+        window.event_bus.update_snap_decorators ();
 
         // Check if the user requested the pixel grid and if is not already visible.
         if (!is_grid_visible) {
@@ -492,6 +495,19 @@ public class Akira.Lib.Canvas : Goo.Canvas {
 
         if (ghost != null) {
             ghost.remove ();
+        }
+    }
+
+    /*
+     * Will update snap decorators if necessary.
+     */
+    private void on_update_snap_decorators () {
+        var extra_context = mode_manager.active_mode_extra_context ();
+        if (extra_context is Akira.Lib.Modes.TransformMode.TransformExtraContext) {
+            snap_manager.generate_decorators (
+                ((Lib.Modes.TransformMode.TransformExtraContext) extra_context).snap_guide_data);
+        } else if (snap_manager.is_active ()) {
+            snap_manager.reset_decorators ();
         }
     }
 

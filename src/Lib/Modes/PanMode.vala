@@ -24,7 +24,7 @@
  * PanMode handles panning. This will handle space or middle click panning. This mode should
  * be used as a secondary mode that overrides masks other modes. See ModeManager.
  */
-public class Akira.Lib.Modes.PanMode : Object, InteractionMode {
+public class Akira.Lib.Modes.PanMode : InteractionMode {
     public weak Akira.Lib.Canvas canvas { get; construct; }
     public weak Akira.Lib.Managers.ModeManager mode_manager { get; construct; }
 
@@ -40,16 +40,14 @@ public class Akira.Lib.Modes.PanMode : Object, InteractionMode {
         );
     }
 
-    public void mode_begin () {}
-    public void mode_end () {}
-    public InteractionMode.ModeType mode_type () { return InteractionMode.ModeType.PAN; }
+    public override InteractionMode.ModeType mode_type () { return InteractionMode.ModeType.PAN; }
 
 
-    public Gdk.CursorType? cursor_type () {
+    public override Gdk.CursorType? cursor_type () {
         return panning ? Gdk.CursorType.HAND2 : Gdk.CursorType.HAND1;
     }
 
-    public bool key_press_event (Gdk.EventKey event) {
+    public override bool key_press_event (Gdk.EventKey event) {
         uint uppercase_keyval = Gdk.keyval_to_upper (event.keyval);
         if (uppercase_keyval == Gdk.Key.space) {
             space_held = true;
@@ -57,7 +55,7 @@ public class Akira.Lib.Modes.PanMode : Object, InteractionMode {
         return true;
     }
 
-    public bool key_release_event (Gdk.EventKey event) {
+    public override bool key_release_event (Gdk.EventKey event) {
         uint uppercase_keyval = Gdk.keyval_to_upper (event.keyval);
         if (uppercase_keyval == Gdk.Key.space) {
             space_held = false;
@@ -69,7 +67,7 @@ public class Akira.Lib.Modes.PanMode : Object, InteractionMode {
         return true;
     }
 
-    public bool button_press_event (Gdk.EventButton event) {
+    public override bool button_press_event (Gdk.EventButton event) {
         if (!panning && (space_held || event.button == Gdk.BUTTON_MIDDLE)) {
             origin_x = event.x;
             origin_y = event.y;
@@ -80,7 +78,7 @@ public class Akira.Lib.Modes.PanMode : Object, InteractionMode {
         return true;
     }
 
-    public bool button_release_event (Gdk.EventButton event) {
+    public override bool button_release_event (Gdk.EventButton event) {
         toggle_panning (false);
 
         if (!space_held) {
@@ -89,7 +87,7 @@ public class Akira.Lib.Modes.PanMode : Object, InteractionMode {
         return true;
     }
 
-    public bool motion_notify_event (Gdk.EventMotion event) {
+    public override bool motion_notify_event (Gdk.EventMotion event) {
         if (panning) {
             canvas.canvas_moved (event.x, event.y);
         }
