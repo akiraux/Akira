@@ -19,16 +19,13 @@
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
 
-public const string APP_NAME = "Akira";
-public const string TERMINAL_NAME = "akira";
-
 public static bool verbose = false;
 
 public static int main (string[] args) {
     verbose = "-d" in args;
 
-    Environment.set_application_name (APP_NAME);
-    Environment.set_prgname (APP_NAME);
+    Environment.set_application_name (Constants.APP_NAME);
+    Environment.set_prgname (Constants.APP_NAME);
 
     var application = new Akira.Application ();
 
