@@ -15,7 +15,6 @@ config_header = configure_file(
 )
 
 sources = files(
-    'Main.vala',
     'Application.vala',
     'Window.vala',
 
@@ -134,7 +133,7 @@ deps = [
     m_dep
 ]
 
-akira_library = shared_library(
+akira_library = library(
     'akira-library-1.0',
     sources,
     asresources,
@@ -151,9 +150,8 @@ akira_dep = declare_dependency(
 # Create a new executable, list the files we want to compile, list the dependencies we need, and install
 executable(
     application_id,
-    sources,
+    'Main.vala',
     asresources,
-    config_header,
-    dependencies: deps,
+    dependencies: deps + [akira_dep],
     install: true
 )
