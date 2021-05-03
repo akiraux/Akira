@@ -221,6 +221,8 @@ public class Akira.Lib.Canvas : Goo.Canvas {
             case Gdk.Key.Left:
                 window.event_bus.move_item_from_canvas (event);
                 window.event_bus.detect_artboard_change ();
+                return true;
+            default:
                 break;
         }
 
