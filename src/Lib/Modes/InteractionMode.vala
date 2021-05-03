@@ -67,41 +67,54 @@ public abstract class Akira.Lib.Modes.InteractionMode : Object {
     /*
      * Override to define cursor associated to mode.
      */
-    public virtual Gdk.CursorType? cursor_type () { return Gdk.CursorType.ARROW; }
+    public virtual Gdk.CursorType? cursor_type () {
+        return Gdk.CursorType.ARROW;
+    }
 
     /*
      * Override to define key press event. Return true to absorb.
      */
-    public virtual bool key_press_event (Gdk.EventKey event) { return false; }
+    public virtual bool key_press_event (Gdk.EventKey event) {
+        return false;
+    }
 
     /*
      * Override to define key release event. Return true to absorb.
      */
-    public virtual bool key_release_event (Gdk.EventKey event) { return false; }
+    public virtual bool key_release_event (Gdk.EventKey event) {
+        return false;
+    }
 
     /*
      * Override to define button press event. Return true to absorb.
      */
-    public virtual bool button_press_event (Gdk.EventButton event) { return false; }
+    public virtual bool button_press_event (Gdk.EventButton event) {
+        return false;
+    }
 
     /*
      * Override to define button release event. Return true to absorb.
      */
-    public virtual bool button_release_event (Gdk.EventButton event) { return false; }
+    public virtual bool button_release_event (Gdk.EventButton event) {
+        return false;
+    }
 
     /*
      * Override to define mouse motion event. Return true to absorb.
      */
-    public virtual bool motion_notify_event (Gdk.EventMotion event) { return false; }
+    public virtual bool motion_notify_event (Gdk.EventMotion event) {
+        return false;
+    }
 
     /*
      * Optionally override to provide some extra context that may be used
      * further up to know how to update other managers based on this mode.
      *
-     * This context should not be relied upon for vital opertions or anything
+     * This context should not be relied upon for vital operations or anything
      * that requires a specific order of operations. It is generally meant for
-     * more cosmetic featurs.
+     * more cosmetic features.
      */
-    public virtual Object? extra_context () { return null; }
-
+    public virtual Object? extra_context () {
+        return null;
+    }
 }

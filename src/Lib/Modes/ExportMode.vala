@@ -36,7 +36,9 @@ public class Akira.Lib.Modes.ExportMode : InteractionMode {
         );
     }
 
-    public override InteractionMode.ModeType mode_type () { return InteractionMode.ModeType.EXPORT; }
+    public override InteractionMode.ModeType mode_type () {
+        return InteractionMode.ModeType.EXPORT;
+    }
 
 
     public override Gdk.CursorType? cursor_type () {

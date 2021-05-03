@@ -506,8 +506,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         if (extra_context is Akira.Lib.Modes.TransformMode.TransformExtraContext) {
             snap_manager.generate_decorators (
                 ((Lib.Modes.TransformMode.TransformExtraContext) extra_context).snap_guide_data);
-        }
-        else if (snap_manager.is_active ()) {
+        } else if (snap_manager.is_active ()) {
             snap_manager.reset_decorators ();
         }
     }

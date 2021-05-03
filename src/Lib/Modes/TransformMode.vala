@@ -58,7 +58,6 @@ public class Akira.Lib.Modes.TransformMode : InteractionMode {
     public InitialDragState initial_drag_state;
     public TransformExtraContext transform_extra_context;
 
-
     public TransformMode (Akira.Lib.Canvas canvas, Akira.Lib.Managers.ModeManager? mode_manager) {
         Object (
             canvas: canvas,
@@ -262,9 +261,9 @@ public class Akira.Lib.Modes.TransformMode : InteractionMode {
 
         // Interrupt if the user disabled the snapping or we don't have any
         // adjacent item to snap to.
-         if (!settings.enable_snaps) {
-             return;
-         }
+        if (!settings.enable_snaps) {
+            return;
+        }
 
         // Make adjustment basted on snaps.
         // Double the sensitivity to allow for reuse of grid after snap.
