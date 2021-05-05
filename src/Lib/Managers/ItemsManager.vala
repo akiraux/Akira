@@ -153,6 +153,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         item.parent.add_child (item, -1);
         free_items.add_item.begin (item);
         window.event_bus.file_edited ();
+        ((Lib.Canvas) item.canvas).update_canvas ();
     }
 
     /**
@@ -191,8 +192,9 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             free_items.remove_item.begin (item);
         }
 
-        item.delete ();
+        // Let the app know we're deleting an item.
         window.event_bus.item_deleted (item);
+        item.delete ();
         window.event_bus.file_edited ();
     }
 
@@ -688,14 +690,5 @@ public class Akira.Lib.Managers.ItemsManager : Object {
 
             return;
         }
-    }
-
-    /**
-     * Helper method to get the count of all the created items in the canvas.
-     * This count excludes pseudo items like the select effect, hover effect,
-     * or grids items.
-     */
-    public int get_items_count () {
-        return (int) free_items.get_n_items () + (int) artboards.get_n_items ();
     }
 }
