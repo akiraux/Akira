@@ -111,6 +111,11 @@ public class Akira.Services.Settings : GLib.Settings {
         set { set_strv ("recently-opened", value); }
     }
 
+    public string[] global_colors {
+        owned get { return get_strv ("global-colors"); }
+        set { set_strv ("global-colors", value); }
+    }
+
     // Export Settings.
     public string export_folder {
         owned get { return get_string ("export-folder"); }

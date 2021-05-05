@@ -125,6 +125,12 @@
             <description>Keep track of the 10 most recently opened files.</description>
         </key>
 
+        <key name="global-colors" type="as">
+            <default>[]</default>
+            <summary>Global colors</summary>
+            <description>The Global colors array.</description>
+        </key>
+
         <key name="export-folder" type="s">
             <default>''</default>
             <summary>Default export folder.</summary>

@@ -58,6 +58,7 @@ sources = files(
     'Partials/HeaderBarButton.vala',
     'Partials/MenuButton.vala',
     'Partials/ZoomButton.vala',
+    'Partials/RoundedColorButton.vala',
     'Partials/ButtonImage.vala',
     'Partials/AlignBoxButton.vala',
     'Partials/InputField.vala',
