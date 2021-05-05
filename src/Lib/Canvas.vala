@@ -517,6 +517,9 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         is_grid_visible = false;
     }
 
+    /*
+     * Updates pixel grid if visible, useful to guarantee z-order in paint composition.
+     */
     private void update_pixel_grid_visibility () {
         // If the pixel grid is visible, hide it based on the canvas scale
         // in order to avoid a visually jarring canvas.
