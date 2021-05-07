@@ -227,22 +227,10 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         document_lbl.halign = Gtk.Align.START;
         document_grid.attach (document_lbl, 0, 0, 1, 1);
         document_grid.row_spacing = 12;
-        var document_colors_grid = new Gtk.Grid ();
+        var document_colors_grid = new Gtk.FlowBox ();
+        document_colors_grid.set_selection_mode (Gtk.SelectionMode.NONE);
         document_colors_grid.column_spacing = 5;
         document_colors_grid.row_spacing = 5;
-
-        int document_column_counter = 0;
-        int document_row_counter = 0;
-
-        if (document_column_counter % 11 == 0) {
-            document_column_counter = 0;
-            document_row_counter++;
-        }
-        var document_add_btn = new Gtk.Image.from_icon_name ("list-add-symbolic", Gtk.IconSize.LARGE_TOOLBAR);
-        var document_btn_event_box = new Gtk.EventBox ();
-        document_btn_event_box.add (document_add_btn);
-
-        document_colors_grid.attach (document_btn_event_box, document_column_counter, document_row_counter, 1, 1);
         document_grid.attach (document_colors_grid, 0, 1, 1, 1);
 
         // Global Grid - The Grid that will have all of the document saved colors
@@ -253,12 +241,13 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         global_lbl.halign = Gtk.Align.START;
         global_grid.attach (global_lbl, 0, 0, 1, 1);
         global_grid.row_spacing = 12;
-        var global_colors_grid = new Gtk.Grid ();
+        var global_colors_grid = new Gtk.FlowBox ();
+        global_colors_grid.max_children_per_line = 11;
+        global_colors_grid.set_selection_mode (Gtk.SelectionMode.NONE);
+        global_colors_grid.hexpand = true;
         global_colors_grid.column_spacing = 5;
         global_colors_grid.row_spacing = 5;
 
-        int global_column_counter = 0;
-        int global_row_counter = 0;
         foreach (string global_color in settings.global_colors) {
             var color_item = new Akira.Partials.RoundedColorButton (global_color);
             color_item.clicked.connect (()=>{
@@ -266,29 +255,16 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
                 rgba_color.parse (color_item.background_color);
                 color_chooser_widget.set_rgba (rgba_color);
             });
-            // Break to the next row if the umber of colors in current row = 10
-            if (global_column_counter == 11) {
-                global_column_counter = 0;
-                global_row_counter++;
-            }
-            global_colors_grid.attach (color_item, global_column_counter, global_row_counter, 1, 1);
-            global_column_counter++;
+            global_colors_grid.insert (color_item, -1);
         }
-        if (global_column_counter == 11) {
-            global_column_counter = 0;
-            global_row_counter++;
-        }
-        var global_add_btn = new Gtk.Image.from_icon_name ("list-add-symbolic", Gtk.IconSize.LARGE_TOOLBAR);
-        var global_btn_event_box = new Gtk.EventBox ();
-        global_btn_event_box.add (global_add_btn);
-        global_btn_event_box.button_press_event.connect (()=> {
-            // Create the Array
-            string[] array = {};
-            array = settings.global_colors;
+
+        var add_btn = new Akira.Partials.ColorAddButton ();
+        add_btn.button_press_event.connect (() => {
+            string[] array = settings.global_colors;
             array += color_chooser_widget.rgba.to_string ();
             settings.set_strv ("global-colors", array);
-            // Remove add_btn to add color item in it's location
-            global_colors_grid.remove (global_btn_event_box);
+            // Remove Add Button to place it as the last in the end
+            global_colors_grid.remove (add_btn);
             // Create Item
             var color_item = new Akira.Partials.RoundedColorButton (color_chooser_widget.rgba.to_string ());
             color_item.clicked.connect (()=>{
@@ -296,19 +272,12 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
                 rgba_color.parse (color_item.background_color);
                 color_chooser_widget.set_rgba (rgba_color);
             });
-            global_colors_grid.attach (color_item, global_column_counter, global_row_counter, 1, 1);
-
-            if (global_column_counter == 10) {
-                global_row_counter++;
-                global_column_counter = 0;
-                global_colors_grid.attach (global_btn_event_box, global_column_counter, global_row_counter, 1, 1);
-                return false;
-            }
-            global_column_counter++;
-            global_colors_grid.attach (global_btn_event_box, global_column_counter, global_row_counter, 1, 1);
+            global_colors_grid.insert (color_item, -1);
+            global_colors_grid.insert (add_btn, -1);
             return false;
         });
-        global_colors_grid.attach (global_btn_event_box, global_column_counter, global_row_counter, 1, 1);
+        global_colors_grid.insert (add_btn, -1);
+
         global_grid.attach (global_colors_grid, 0, 1, 1, 1);
 
         color_picker.attach (color_chooser_widget, 0, 0, 1, 1);
