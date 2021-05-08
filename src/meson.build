@@ -120,6 +120,22 @@ sources = files(
     'Lib/Modes/ItemInsertMode.vala',
     'Lib/Modes/ExportMode.vala',
     'Lib/Modes/PanMode.vala',
+
+    'Lib2/Components/Border.vala',
+    'Lib2/Components/Borders.vala',
+    'Lib2/Components/BorderRadius.vala',
+    'Lib2/Components/Color.vala',
+    'Lib2/Components/Component.vala',
+    'Lib2/Components/Components.vala',
+    'Lib2/Components/Coordinates.vala',
+    'Lib2/Components/Fill.vala',
+    'Lib2/Components/Fills.vala',
+    'Lib2/Components/Flipped.vala',
+    'Lib2/Components/Layer.vala',
+    'Lib2/Components/Name.vala',
+    'Lib2/Components/Opacity.vala',
+    'Lib2/Components/Rotation.vala',
+    'Lib2/Components/Size.vala',
 )
 
 deps = [
