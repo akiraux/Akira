@@ -40,6 +40,7 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
     public Akira.Models.FillsItemModel model { get; construct; }
 
     private string old_color;
+    private string current_color;
 
     // If the color or alpha are manually set from the ColorPicker.
     // If true, the ColorChooserWidget doesn't need to be updated.
@@ -214,6 +215,7 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         color_chooser_widget = new Gtk.ColorChooserWidget ();
         color_chooser_widget.hexpand = true;
         color_chooser_widget.show_editor = true;
+        current_color = color_chooser_widget.rgba.to_string ();
 
         color_picker = new Gtk.Grid ();
         color_picker.get_style_context ().add_class ("color-picker");
@@ -261,10 +263,10 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         var add_btn = new Akira.Partials.ColorAddButton ();
         add_btn.button_press_event.connect (() => {
             string[] colors_array = settings.global_colors;
-            colors_array += color_chooser_widget.rgba.to_string ();
+            colors_array += current_color;
             settings.global_colors = colors_array;
             // Create Item
-            var color_item = new Akira.Partials.RoundedColorButton (color_chooser_widget.rgba.to_string ());
+            var color_item = new Akira.Partials.RoundedColorButton (current_color);
             color_item.clicked.connect (()=>{
                 var rgba_color = Gdk.RGBA ();
                 rgba_color.parse (color_item.background_color);
@@ -314,6 +316,7 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         color_set_manually = true;
         color = color_chooser_widget.rgba.to_string ();
         alpha = ((int)(color_chooser_widget.rgba.alpha * 255));
+        current_color = color_chooser_widget.rgba.to_string ();
         set_button_color ();
     }
 
