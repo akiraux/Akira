@@ -24,15 +24,11 @@ public class Akira.Lib2.Components.Name : Object {
     private string _name;
 
     public string id {
-        get {
-            return _id;
-        }
+        get { return _id; }
     }
 
     public string name {
-        get {
-            return _name;
-        }
+        get { return _name; }
     }
 
     public Name (string name, string id) {

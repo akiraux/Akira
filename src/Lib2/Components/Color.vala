@@ -23,42 +23,26 @@ public class Akira.Lib2.Components.Color : Object {
 
     // Or to a given value
     private Gdk.RGBA _color;
-    private int _alpha;
     private bool _hidden;
 
     public Gdk.RGBA color {
-        get {
-            return _color;
-        }
-    }
-
-    public int alpha {
-        get {
-            return _alpha;
-        }
+        get { return _color; }
     }
 
     public bool hidden {
-        get {
-            return _hidden;
-        }
+        get { return _hidden; }
     }
 
-    public Color (Gdk.RGBA new_color, int alpha, bool hidden) {
+    public Color (Gdk.RGBA new_color, bool hidden = false) {
         _color = new_color;
-        _alpha = alpha;
         _hidden = hidden;
     }
 
     public Color with_color (Gdk.RGBA new_color) {
-        return new Color (new_color, _alpha, _hidden);
-    }
-
-    public Color with_alpha (int new_alpha) {
-        return new Color (_color, new_alpha, _hidden);
+        return new Color (new_color, _hidden);
     }
 
     public Color with_hidden (bool new_hidden) {
-        return new Color (_color, _alpha, new_hidden);
+        return new Color (_color, new_hidden);
     }
 }

@@ -19,6 +19,20 @@
  * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
  */
 
-public class Akira.Lib2.Components.Component : Object {
 
+/*
+ * For now this is used as a namespace to hold some introspection.
+ */
+public class Akira.Lib2.Components.Component {
+    /*
+     * Type of component.
+     * For now this is only used for marking components dirty. It is technically
+     * not necessary to have all components have anenum Type. Only the ones
+     * that need respective View updates.
+     */
+    public enum Type {
+        COMPILED_BORDER,
+        COMPILED_FILL,
+        COMPILED_GEOMETRY
+    }
 }

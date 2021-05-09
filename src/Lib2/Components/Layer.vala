@@ -24,15 +24,11 @@ public class Akira.Lib2.Components.Layer : Object {
     private bool _locked;
 
     public bool selected {
-        get {
-            return _selected;
-        }
+        get { return _selected; }
     }
 
     public bool locked {
-        get {
-            return _locked;
-        }
+        get { return _locked; }
     }
 
     public Layer (bool selected, bool locked) {
@@ -41,9 +37,9 @@ public class Akira.Lib2.Components.Layer : Object {
     }
 
     public Layer with_selected (bool new_selected) {
-        return new Layer(new_selected, _locked);
+        return new Layer (new_selected, _locked);
     }
     public Layer with_locked (bool new_locked) {
-        return new Layer(_selected, new_locked);
+        return new Layer (_selected, new_locked);
     }
 }

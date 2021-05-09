@@ -24,18 +24,14 @@ public class Akira.Lib2.Components.Coordinates : Object {
     private double _y;
 
     public double x {
-        get {
-            return _x;
-        }
+        get { return _x; }
     }
 
     public double y {
-        get {
-            return _y;
-        }
+        get { return _y; }
     }
 
-    public Coordinates(double x, double y) {
+    public Coordinates (double x, double y) {
         _x = x;
         _y = y;
     }

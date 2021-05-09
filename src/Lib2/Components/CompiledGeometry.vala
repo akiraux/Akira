@@ -19,15 +19,28 @@
  * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
  */
 
-public class Akira.Lib2.Components.Borders : Object {
-    private Gee.ArrayList<Lib2.Components.Border> _borders;
+public class Akira.Lib2.Components.CompiledGeometry : Object {
+    private Cairo.Matrix _transform;
 
-    public Gee.ArrayList<Lib2.Components.Border> borders {
-        get { return _borders; }
+    public Cairo.Matrix transform {
+        get { return _transform; }
     }
 
-    public Borders (Gee.ArrayList<Lib2.Components.Border> borders) {
-        _borders = borders;
+    public CompiledGeometry (Cairo.Matrix transform) {
+        _transform = transform;
     }
 
+    public static CompiledGeometry compile (
+        Coordinates coordinates,
+        Size size,
+        Rotation rotation,
+        Borders? borders,
+        Flipped? flipped
+    ) {
+        var mat = Cairo.Matrix.identity();
+        mat.x0 = coordinates.x;
+        mat.y0 = coordinates.y;
+
+        return new CompiledGeometry (mat);
+    }
 }

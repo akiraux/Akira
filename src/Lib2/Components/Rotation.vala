@@ -23,12 +23,10 @@ public class Akira.Lib2.Components.Rotation : Object {
     private double _rotation;
 
     public double rotation {
-        get {
-            return _rotation;
-        }
+        get { return _rotation; }
     }
 
-    Rotation(double rotation) {
+    public Rotation(double rotation) {
         _rotation = rotation;
      }
 }

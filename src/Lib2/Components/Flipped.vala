@@ -25,15 +25,11 @@ public class Akira.Lib2.Components.Flipped : Object {
     private bool _vertical;
 
     public bool horizontal {
-        get {
-            return _horizontal;
-        }
+        get { return _horizontal; }
     }
 
     public bool vertical {
-        get {
-            return _vertical;
-        }
+        get { return _vertical; }
     }
 
     public Flipped (bool horizontal, bool vertical) {

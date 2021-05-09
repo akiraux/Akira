@@ -19,19 +19,34 @@
  * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
  */
 
-public class Akira.Lib2.Components.Opacity : Object {
-    private double _opacity;
+public class Akira.Lib2.Items.ModelItem : Object {
+    public int id = -1;
+    public Goo.CanvasItem item = null;
+    public Lib2.Components.Components components = null;
 
-    public double opacity {
-        get { return _opacity; }
+    public void compile_components (bool notify_view) {
+        components.maybe_compile_geometry ();
+        components.maybe_compile_fill ();
+        components.maybe_compile_border ();
+
+        if (notify_view) {
+            notify_view_of_changes ();
+        }
     }
 
-    public Opacity (double opacity) {
-        if (opacity < 0.0) {
-            _opacity = 0.0;
+    public void notify_view_of_changes() {
+        if (item == null) {
             return;
         }
 
-        _opacity = opacity <= 100.0 ? opacity : 100.0;
+        foreach (var dirty in components.dirty_components) {
+            component_updated (dirty);
+        }
+
+        components.dirty_components.clear ();
     }
+
+    public virtual void add_to_canvas (Goo.Canvas canvas) {}
+
+    public virtual void component_updated (Lib2.Components.Component.Type type) {}
 }

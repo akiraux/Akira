@@ -20,16 +20,13 @@
  */
 
 public class Akira.Lib2.Components.Fills : Object {
-  private Gee.ArrayList<Lib2.Components.Fill> _fills;
+    private Gee.ArrayList<Lib2.Components.Fill> _fills;
 
-  public Gee.ArrayList<Lib2.Components.Fill> fills {
-    get {
-      return _fills;
+    public Gee.ArrayList<Lib2.Components.Fill> fills {
+        get { return _fills; }
     }
-  }
 
-  public Fills (Gee.ArrayList<Lib2.Components.Fill> fills) {
-    _fills = fills;
-  }
-
-}
+    public Fills (Gee.ArrayList<Lib2.Components.Fill> fills) {
+        _fills = fills;
+    }
+ }

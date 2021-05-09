@@ -20,24 +20,22 @@
 * Authored by: Giacomo "giacomoalbe" Alberini <giacomoalbe@gmail.com>
 */
 
-public class Akira.Layouts.MainCanvas : Gtk.Grid {
+public class Akira.Layouts.MainViewCanvas : Gtk.Grid {
     public const int CANVAS_SIZE = 100000;
     public const double SCROLL_DISTANCE = 0;
 
     public Gtk.ScrolledWindow main_scroll;
 
-    public Akira.Lib.Canvas canvas;
+    public Akira.Lib2.ViewCanvas canvas;
 
     public weak Akira.Window window { get; construct; }
 
     private Gtk.Overlay main_overlay;
-    private Granite.Widgets.OverlayBar overlaybar;
-    private Granite.Widgets.Toast notification;
 
     private double scroll_origin_x = 0;
     private double scroll_origin_y = 0;
 
-    public MainCanvas (Akira.Window window) {
+    public MainViewCanvas (Akira.Window window) {
         Object (window: window, orientation: Gtk.Orientation.VERTICAL);
     }
 
@@ -45,7 +43,6 @@ public class Akira.Layouts.MainCanvas : Gtk.Grid {
         get_style_context ().add_class ("main-canvas");
 
         main_overlay = new Gtk.Overlay ();
-        notification = new Granite.Widgets.Toast (_(""));
 
         main_scroll = new Gtk.ScrolledWindow (null, null);
         main_scroll.expand = true;
@@ -56,7 +53,7 @@ public class Akira.Layouts.MainCanvas : Gtk.Grid {
         // Change visibility of canvas scrollbars
         main_scroll.set_policy (Gtk.PolicyType.NEVER, Gtk.PolicyType.NEVER);
 
-        canvas = new Akira.Lib.Canvas (window);
+        canvas = new Akira.Lib2.ViewCanvas (window);
         canvas.set_bounds (0, 0, CANVAS_SIZE, CANVAS_SIZE);
         canvas.set_scale (1.0);
 
@@ -93,14 +90,8 @@ public class Akira.Layouts.MainCanvas : Gtk.Grid {
         main_scroll.add (canvas);
 
         main_overlay.add (main_scroll);
-        main_overlay.add_overlay (notification);
 
         add (main_overlay);
-
-        // Set up event listeners.
-        window.event_bus.exporting.connect (on_exporting);
-        window.event_bus.export_completed.connect (on_export_completed);
-        window.event_bus.canvas_notification.connect (trigger_notification);
     }
 
     public bool on_scroll (Gdk.EventScroll event) {
@@ -189,23 +180,5 @@ public class Akira.Layouts.MainCanvas : Gtk.Grid {
             (new_event_x - main_scroll.hadjustment.value) - (event.x - old_hadjustment);
         main_scroll.vadjustment.value +=
             (new_event_y - main_scroll.vadjustment.value) - (event.y - old_vadjustment);
-    }
-
-    private async void on_exporting (string message) {
-        overlaybar = new Granite.Widgets.OverlayBar (main_overlay);
-        overlaybar.label = message;
-        overlaybar.active = true;
-        show_all ();
-    }
-
-    private async void on_export_completed () {
-        main_overlay.remove (overlaybar);
-        overlaybar = null;
-        yield trigger_notification (_("Export completed!"));
-    }
-
-    private async void trigger_notification (string message) {
-        notification.title = message;
-        notification.send_notification ();
     }
 }

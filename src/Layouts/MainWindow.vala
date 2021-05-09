@@ -23,6 +23,7 @@ public class Akira.Layouts.MainWindow : Gtk.Grid {
     public weak Akira.Window window { get; construct; }
 
     public Akira.Layouts.MainCanvas main_canvas;
+    public Akira.Layouts.MainViewCanvas main_view_canvas;
     public Akira.Layouts.LeftSideBar left_sidebar;
     public Akira.Layouts.RightSideBar right_sidebar;
 
@@ -37,12 +38,13 @@ public class Akira.Layouts.MainWindow : Gtk.Grid {
         left_sidebar = new Akira.Layouts.LeftSideBar (window);
         right_sidebar = new Akira.Layouts.RightSideBar (window);
         main_canvas = new Akira.Layouts.MainCanvas (window);
+        main_view_canvas = new Akira.Layouts.MainViewCanvas (window);
 
         pane = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);
         pane2 = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);
 
         pane.pack2 (pane2, true, false);
-        pane2.pack1 (main_canvas, true, false);
+        pane2.pack1 (main_canvas, true, true);
 
         if (!settings.get_boolean ("invert-sidebar")) {
             pane.pack1 (left_sidebar, false, false);
@@ -52,6 +54,6 @@ public class Akira.Layouts.MainWindow : Gtk.Grid {
             pane2.pack2 (left_sidebar, false, false);
         }
 
-        attach (pane, 0, 0, 1, 1);
+        attach (main_view_canvas, 0, 0, 1, 1);
     }
 }

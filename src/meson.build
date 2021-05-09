@@ -40,6 +40,7 @@ sources = files(
     'Layouts/HeaderBar.vala',
     'Layouts/LeftSideBar.vala',
     'Layouts/MainCanvas.vala',
+    'Layouts/MainViewCanvas.vala',
     'Layouts/MainWindow.vala',
     'Layouts/RightSideBar.vala',
     'Layouts/Partials/LayersPanel.vala',
@@ -125,6 +126,9 @@ sources = files(
     'Lib2/Components/Borders.vala',
     'Lib2/Components/BorderRadius.vala',
     'Lib2/Components/Color.vala',
+    'Lib2/Components/CompiledBorder.vala',
+    'Lib2/Components/CompiledFill.vala',
+    'Lib2/Components/CompiledGeometry.vala',
     'Lib2/Components/Component.vala',
     'Lib2/Components/Components.vala',
     'Lib2/Components/Coordinates.vala',
@@ -136,6 +140,11 @@ sources = files(
     'Lib2/Components/Opacity.vala',
     'Lib2/Components/Rotation.vala',
     'Lib2/Components/Size.vala',
+
+    'Lib2/Items/ModelItem.vala',
+    'Lib2/Items/ModelRect.vala',
+
+    'Lib2/ViewCanvas.vala',
 )
 
 deps = [

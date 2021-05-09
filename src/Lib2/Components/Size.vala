@@ -25,27 +25,19 @@ public class Akira.Lib2.Components.Size : Object {
     private bool _locked;
 
     public double width {
-        get {
-            return _width;
-        }
+        get { return _width; }
     }
 
     public double height {
-        get {
-            return _height;
-        }
+        get { return _height; }
     }
 
     public bool locked {
-        get {
-            return _locked;
-        }
+        get { return _locked; }
     }
 
     public double ratio {
-        get {
-            return _height == 0 ? 0.0 : _width / _height;
-        }
+        get { return _height == 0 ? 0.0 : _width / _height; }
     }
 
     public Size (double width, double height, bool locked) {
@@ -55,10 +47,10 @@ public class Akira.Lib2.Components.Size : Object {
     }
 
     public Size with_width (double new_width) {
-        return new Size(new_width, _height, _locked);
+        return new Size (new_width, _height, _locked);
     }
 
     public Size with_height (double new_height) {
-        return new Size(_width, new_height, _locked);
+        return new Size (_width, new_height, _locked);
     }
 }

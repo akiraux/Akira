@@ -20,17 +20,92 @@
  */
 
 public class Akira.Lib2.Components.Components : Object {
-    public Borders? borders;
-    public BorderRadius? border_radius;
-    public Fills? fills;
-    public Flipped? flipped;
-    public Layer? layer;
-    public Name? name;
-    public Opacity? opacity;
+    public Borders? borders = null;
+    public BorderRadius? border_radius = null;
+    public Fills? fills = null;
+    public Flipped? flipped = null;
+    public Layer? layer = null;
+    public Name? name = null;
+    public Opacity? opacity = null;
 
-    public Coordinates? coordinates;
-    public Size? size;
-    public Rotation? rotation;
+    public Coordinates? coordinates = null;
+    public Size? size = null;
+    public Rotation? rotation = null;
+
+    public CompiledFill? compiled_fill = null;
+    public CompiledBorder? compiled_border = null;
+    public CompiledGeometry? compiled_geometry = null;
+
+    public Gee.HashSet<Component.Type> dirty_components;
+
+    construct {
+        dirty_components = new Gee.HashSet<Component.Type> ();
+    }
+
+    /*
+     * Return true if new fill color was generated.
+     */
+    public bool maybe_compile_fill () {
+        if (compiled_fill != null) {
+            return false;
+        }
+
+        compiled_fill = CompiledFill.compile (fills, opacity);
+        dirty_components.add(Component.Type.COMPILED_FILL);
+        return true;
+    }
+
+    /*
+     * Return true if new border color was generated.
+     */
+    public bool maybe_compile_border () {
+        if (compiled_border != null) {
+            return false;
+        }
+        compiled_border = CompiledBorder.compile (borders, opacity);
+        dirty_components.add(Component.Type.COMPILED_BORDER);
+        return true;
+    }
+
+    /*
+     * Return true if new geometry was generated.
+     */
+    public bool maybe_compile_geometry () {
+        if (compiled_geometry != null) {
+            return false;
+        }
+
+        compiled_geometry = CompiledGeometry.compile (
+            coordinates,
+            size,
+            rotation,
+            borders,
+            flipped
+        );
+
+        dirty_components.add(Component.Type.COMPILED_GEOMETRY);
+
+        return true;
+    }
 
 
+    public static Opacity default_opacity () {
+        return new Opacity (100.0);
+    }
+
+    public static Rotation default_rotation () {
+        return new Rotation (0.0);
+    }
+
+    public static Flipped default_flipped () {
+        return new Flipped (false, false);
+    }
+
+    public static BorderRadius default_border_radius () {
+        return new BorderRadius (0, 0, false, false);
+    }
+
+    public static Layer default_layer () {
+        return new Layer (false, false);
+    }
 }
