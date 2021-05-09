@@ -261,21 +261,7 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         }
 
         var add_btn = new Akira.Partials.ColorAddButton ();
-        add_btn.button_press_event.connect (() => {
-            string[] colors_array = settings.global_colors;
-            colors_array += current_color;
-            settings.global_colors = colors_array;
-            // Create Item
-            var color_item = new Akira.Partials.RoundedColorButton (current_color);
-            color_item.clicked.connect (()=>{
-                var rgba_color = Gdk.RGBA ();
-                rgba_color.parse (color_item.background_color);
-                color_chooser_widget.set_rgba (rgba_color);
-            });
-            global_colors_grid.insert (color_item, -1);
-            global_colors_grid.insert (add_btn, -1);
-            return false;
-        });
+        add_btn.clicked.connect (()=> { add_btn_clicked (add_btn, global_colors_grid); });
         global_colors_grid.insert (add_btn, -1);
 
         global_grid.attach (global_colors_grid, 0, 1, 1, 1);
@@ -289,6 +275,21 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
 
         set_color_chooser_color ();
         color_chooser_widget.notify["rgba"].connect (on_color_changed);
+    }
+
+    private void add_btn_clicked (Gtk.Button add_btn, Gtk.FlowBox parent) {
+        string[] colors_array = settings.global_colors;
+        colors_array += current_color;
+        settings.global_colors = colors_array;
+        // Create Item
+        var color_item = new Akira.Partials.RoundedColorButton (current_color);
+        color_item.clicked.connect (()=>{
+            var rgba_color = Gdk.RGBA ();
+            rgba_color.parse (color_item.background_color);
+            color_chooser_widget.set_rgba (rgba_color);
+        });
+        parent.insert (color_item, -1);
+        parent.insert (add_btn, -1);
     }
 
     private void create_event_bindings () {
