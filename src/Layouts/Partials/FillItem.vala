@@ -260,11 +260,9 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
 
         var add_btn = new Akira.Partials.ColorAddButton ();
         add_btn.button_press_event.connect (() => {
-            string[] array = settings.global_colors;
-            array += color_chooser_widget.rgba.to_string ();
-            settings.set_strv ("global-colors", array);
-            // Remove Add Button to place it as the last in the end
-            global_colors_grid.remove (add_btn);
+            string[] colors_array = settings.global_colors;
+            colors_array += color_chooser_widget.rgba.to_string ();
+            settings.global_colors = colors_array;
             // Create Item
             var color_item = new Akira.Partials.RoundedColorButton (color_chooser_widget.rgba.to_string ());
             color_item.clicked.connect (()=>{
