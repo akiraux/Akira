@@ -103,20 +103,22 @@
      * as well as number of columns and rows based on the canvas current scale.
      */
     private void recalculate () {
-        double thickness = 1;
+        double thickness = 0.02;
         double steps = 1;
         var scale = canvas.current_scale;
 
-        // -20%
+        // Hide the pixel grid if the zoom is below or equal to 20%.
         if (scale < 0.2) {
             pixel_grid.visibility = Goo.CanvasItemVisibility.HIDDEN;
             return;
         }
 
-        pixel_grid.visibility = Goo.CanvasItemVisibility.VISIBLE;
+        if (pixel_grid.visibility == Goo.CanvasItemVisibility.HIDDEN) {
+            pixel_grid.visibility = Goo.CanvasItemVisibility.VISIBLE;
+        }
 
-        // 20% - 50%
-        if (scale >= 0.2 && scale < 0.5) {
+        // -50%
+        if (scale < 0.5) {
             thickness = 1;
             steps = 40;
         }
@@ -127,81 +129,35 @@
             steps = 20;
         }
 
-        // 150% - 200%
-        if (scale >= 1.4 && scale < 2) {
-            thickness = 0.2;
+        // 150% - 250%
+        if (scale >= 1.5 && scale < 2.5) {
+            thickness = 0.25;
             steps = 10;
         }
 
-        // 200% - 250%
-        if (scale >= 2 && scale < 2.5) {
-            thickness = 0.15;
-            steps = 9;
-        }
-
-        // 250% - 300%
-        if (scale >= 2.5 && scale < 3) {
-            thickness = 0.1;
-            steps = 8;
-        }
-
-        // 300% - 350%
-        if (scale >= 3 && scale < 3.5) {
-            thickness = 0.09;
-            steps = 7;
-        }
-
-        // 350% - 400%
-        if (scale >= 3.5 && scale < 4) {
-            thickness = 0.08;
-            steps = 7;
-        }
-
-        // 400% - 450%
-        if (scale >= 4 && scale < 4.5) {
-            thickness = 0.08;
-            steps = 7;
-        }
-
-        // 450% - 500%
-        if (scale >= 4.5 && scale < 5) {
-            thickness = 0.08;
-            steps = 6;
-        }
-
-        // 500% - 550%
-        if (scale >= 5 && scale < 5.5) {
-            thickness = 0.07;
+        // 250% - 350%
+        if (scale >= 2.5 && scale < 3.5) {
+            thickness = 0.125;
             steps = 5;
         }
 
-        // 550% - 600%
-        if (scale >= 5.5 && scale < 6) {
-            thickness = 0.07;
-            steps = 4;
+        // 350% - 450%
+        if (scale >= 3.5 && scale < 4.5) {
+            thickness = 0.06;
+            steps = 2.5;
         }
 
-        // 600% - 650%
-        if (scale >= 6 && scale < 6.5) {
-            thickness = 0.05;
-            steps = 3;
-        }
-
-        // 650% - 700%
-        if (scale >= 6.5 && scale < 7) {
-            thickness = 0.05;
-            steps = 2;
-        }
-
-        // 700%+
-        if (scale >= 7) {
-            thickness = 0.02;
+        // 450% - 600%
+        if (scale >= 4.5 && scale < 6) {
+            thickness = 0.04;
             steps = 1;
         }
 
-        // Update line thickness.
+        // Update the grid offset to always be half of the line thickness
+        // in order to guarantee a sharp line rendering.
+        pixel_grid.x_offset = pixel_grid.y_offset = thickness / 2;
+        // Update the line thickness.
         pixel_grid.horz_grid_line_width = pixel_grid.vert_grid_line_width = thickness;
-
         // Update the steps between columns and rows.
         pixel_grid.x_step = pixel_grid.y_step = steps;
     }
