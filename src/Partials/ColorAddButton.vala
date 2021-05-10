@@ -21,30 +21,13 @@
 
 public class Akira.Partials.ColorAddButton : Gtk.Button {
     public ColorAddButton () {
-        var global_add_btn = new Gtk.Image.from_icon_name ("list-add-symbolic", Gtk.IconSize.LARGE_TOOLBAR);
+        var add_icon = new Gtk.Image.from_icon_name ("list-add-symbolic", Gtk.IconSize.MENU);
         can_focus = false;
+        get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
+        valign = halign = Gtk.Align.CENTER;
+        set_tooltip_text (_("Add color to globals"));
+        image = add_icon;
         width_request = height_request = 24;
-        add (global_add_btn);
-        add_css ();
-        get_style_context ().add_class ("color-add-btn");
         show_all ();
-    }
-
-    private void add_css () {
-        try {
-            var provider = new Gtk.CssProvider ();
-            var context = get_style_context ();
-
-            var css = """.color-add-btn {
-                    background: none;
-                    border-color: none;
-                }""";
-
-            provider.load_from_data (css, css.length);
-
-            context.add_provider (provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
-        } catch (Error e) {
-            warning ("Style error: %s", e.message);
-        }
     }
 }

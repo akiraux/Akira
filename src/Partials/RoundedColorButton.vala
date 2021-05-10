@@ -40,7 +40,7 @@ public class Akira.Partials.RoundedColorButton : Gtk.Button {
                     background-color: %s;
                     border-color: white;
                     border-radius:50%;
-                }""".printf (background_color, background_color);
+                }""".printf (background_color);
 
             provider.load_from_data (css, css.length);
 

@@ -245,6 +245,7 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         global_grid.row_spacing = 12;
         var global_colors_grid = new Gtk.FlowBox ();
         global_colors_grid.max_children_per_line = 11;
+        global_colors_grid.homogeneous = true;
         global_colors_grid.set_selection_mode (Gtk.SelectionMode.NONE);
         global_colors_grid.hexpand = true;
         global_colors_grid.column_spacing = 5;
