@@ -22,13 +22,10 @@
 public class Akira.Lib2.ViewCanvas : Goo.Canvas {
     public weak Akira.Window window { get; construct; }
 
+    public Lib2.Managers.ItemsManager items_manager;
+    public Lib2.Managers.ModeManager mode_manager;
+
     public double current_scale = 1.0;
-
-    private Gee.ArrayList<Lib2.Items.ModelItem> items;
-
-    private double drag_x;
-    private double drag_y;
-    private Lib2.Items.ModelItem? drag_item = null;
 
     public ViewCanvas (Akira.Window window) {
         Object(window: window);
@@ -44,15 +41,24 @@ public class Akira.Lib2.ViewCanvas : Goo.Canvas {
         events |= Gdk.EventMask.TOUCHPAD_GESTURE_MASK;
         events |= Gdk.EventMask.TOUCH_MASK;
 
-        items = new Gee.ArrayList<Lib2.Items.ModelItem> ();
+        items_manager = new Lib2.Managers.ItemsManager (this);
+        mode_manager = new Lib2.Managers.ModeManager (this);
 
         window.event_bus.update_scale.connect (on_update_scale);
         window.event_bus.set_scale.connect (on_set_scale);
-        window.event_bus.set_focus_on_canvas.connect (on_set_focus_on_canvas);
+        window.event_bus.set_focus_on_canvas.connect (focus_canvas);
+        window.event_bus.insert_item.connect (start_insert_mode);
     }
 
     public signal void canvas_moved (double delta_x, double delta_y);
     public signal void canvas_scroll_set_origin (double origin_x, double origin_y);
+
+    public void start_insert_mode (string insert_item_type) {
+        var new_mode = new Akira.Lib2.Modes.ItemInsertMode (this, mode_manager, insert_item_type);
+        mode_manager.register_mode (new_mode);
+    }
+
+    public void interaction_mode_changed () {}
 
     private void on_update_scale (double zoom) {
         // Force the zoom value to 8% if we're currently at a 2% scale in order
@@ -83,67 +89,61 @@ public class Akira.Lib2.ViewCanvas : Goo.Canvas {
         window.event_bus.update_snap_decorators ();
     }
 
-    public void on_set_focus_on_canvas () {
+    public void focus_canvas () {
         grab_focus (get_root_item ());
     }
 
     public override bool button_press_event (Gdk.EventButton event) {
+        //hover_manager.remove_hover_effect ();
 
-        if (event.button == Gdk.BUTTON_PRIMARY) {
-            drag_x = event.x * current_scale;
-            drag_y = event.y * current_scale;
-            drag_item = add_rect (drag_x, drag_y);
+        if (mode_manager.button_press_event (event)) {
+            return true;
         }
 
+        if (event.button == Gdk.BUTTON_MIDDLE) {
+            mode_manager.start_panning_mode ();
+            if (mode_manager.button_press_event (event)) {
+                return true;
+            }
+        }
+
+        event.x = event.x / current_scale;
+        event.y = event.y / current_scale;
+
+        //return press_event_on_selection (event)
         return false;
     }
+
     public override bool button_release_event (Gdk.EventButton event) {
-        drag_item = null;
+        event.x = event.x / current_scale;
+        event.y = event.y / current_scale;
+
+        if (mode_manager.button_release_event (event)) {
+            return true;
+        }
         return false;
     }
 
     public override bool motion_notify_event (Gdk.EventMotion event) {
-        if (drag_item != null) {
-            move_item_to (drag_item, event.x * current_scale, event.y * current_scale);
+        event.x = event.x / current_scale;
+        event.y = event.y / current_scale;
+
+        //window.event_bus.coordinate_change (event.x, event.y);
+
+        if (mode_manager.motion_notify_event (event)) {
+            return true;
         }
+
+        /*
+        var nob_hovered = nob_manager.hit_test (event.x, event.y);
+        if (nob_hovered != nob_manager.hovered_nob) {
+            nob_manager.hovered_nob = nob_hovered;
+            set_cursor_by_interaction_mode ();
+        }
+
+        hover_manager.on_mouse_over (event.x, event.y, nob_hovered);
+        */
 
         return false;
-    }
-
-    private Lib2.Items.ModelItem add_rect (double x, double y) {
-        var fill_color = Gdk.RGBA () { red = 1.0 , alpha = 1.0};
-        var fills = new Gee.ArrayList<Lib2.Components.Fill> ();
-        fills.add(new Lib2.Components.Fill (0, new Lib2.Components.Color (fill_color)));
-
-        var new_rect = new Lib2.Items.ModelRect (
-            new Lib2.Components.Coordinates (x, y),
-            new Lib2.Components.Size (50.0, 50.0, false),
-            null,
-            new Lib2.Components.Fills (fills)
-        );
-
-        items.add(new_rect);
-
-        compile_items ();
-        add_item_to_canvas (new_rect);
-
-        return new_rect;
-    }
-
-    private void compile_items() {
-        foreach (var item in items) {
-            item.compile_components (false);
-        }
-    }
-
-    private void add_item_to_canvas (Lib2.Items.ModelItem item) {
-        item.add_to_canvas (this);
-        item.notify_view_of_changes ();
-    }
-
-    private void move_item_to (Lib2.Items.ModelItem item, double new_x, double new_y) {
-        item.components.coordinates = new Lib2.Components.Coordinates (new_x, new_y);
-        item.components.compiled_geometry = null;
-        item.compile_components (true);
     }
 }

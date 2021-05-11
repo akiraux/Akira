@@ -19,7 +19,7 @@
  * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
  */
 
-public class Akira.Lib2.Components.BorderRadius : Object {
+public class Akira.Lib2.Components.BorderRadius {
 
     private int _x;
     private int _y;
@@ -36,6 +36,15 @@ public class Akira.Lib2.Components.BorderRadius : Object {
             _x = _y;
         }
     }
+
+    // Recommended accessors
+
+    public int x () { return _x; }
+    public int y () { return _x; }
+    public bool autoscale () { return _autoscale; }
+    public bool uniform () { return _uniform; }
+
+    // Mutators
 
     public BorderRadius with_x (int new_x) {
         return new BorderRadius (_x, _y, _autoscale, _uniform);

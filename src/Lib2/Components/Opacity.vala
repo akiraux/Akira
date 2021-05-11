@@ -19,7 +19,7 @@
  * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
  */
 
-public class Akira.Lib2.Components.Opacity : Object {
+public class Akira.Lib2.Components.Opacity {
     private double _opacity;
 
     public double opacity {

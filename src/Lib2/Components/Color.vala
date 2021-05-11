@@ -19,30 +19,24 @@
  * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
  */
 
-public class Akira.Lib2.Components.Color : Object {
+public struct Akira.Lib2.Components.Color {
+    public Gdk.RGBA _rgba;
+    public bool _hidden;
 
-    // Or to a given value
-    private Gdk.RGBA _color;
-    private bool _hidden;
+    public Color (double r = 0.0, double g = 0.0, double b = 0.0, double a = 1.0, bool hidden = false) {
 
-    public Gdk.RGBA color {
-        get { return _color; }
+        _rgba = Gdk.RGBA () { red = r, green = g, blue = b, alpha = a };
     }
 
-    public bool hidden {
-        get { return _hidden; }
+    public static Color from_rgba (Gdk.RGBA rgba, bool hidden = false) {
+        return Color (rgba.red, rgba.green, rgba.blue, rgba.alpha, hidden);
     }
 
-    public Color (Gdk.RGBA new_color, bool hidden = false) {
-        _color = new_color;
-        _hidden = hidden;
-    }
+    // Recommended accessors
 
-    public Color with_color (Gdk.RGBA new_color) {
-        return new Color (new_color, _hidden);
-    }
+    public Gdk.RGBA rgba () { return _rgba; }
+    public bool is_hidden () { return _hidden; }
 
-    public Color with_hidden (bool new_hidden) {
-        return new Color (_color, new_hidden);
-    }
+    // Mutators
+    public Color with_hidden (bool hidden) { return Color (_rgba.red, _rgba.green, _rgba.blue, _rgba.alpha, _hidden); }
 }

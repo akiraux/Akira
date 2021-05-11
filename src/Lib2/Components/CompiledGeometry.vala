@@ -19,7 +19,7 @@
  * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
  */
 
-public class Akira.Lib2.Components.CompiledGeometry : Object {
+public class Akira.Lib2.Components.CompiledGeometry {
     private Cairo.Matrix _transform;
 
     public Cairo.Matrix transform {

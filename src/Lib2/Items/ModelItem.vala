@@ -39,11 +39,15 @@ public class Akira.Lib2.Items.ModelItem : Object {
             return;
         }
 
-        foreach (var dirty in components.dirty_components) {
-            component_updated (dirty);
-        }
+        var dirty_types = components.dirty_components.types;
+        for (var i = 0; i < dirty_types.length; ++i) {
+            var type = dirty_types[i];
+            if (type.dirty) {
+                component_updated (type.type);
+            }
 
-        components.dirty_components.clear ();
+            dirty_types[i].dirty = false;
+        }
     }
 
     public virtual void add_to_canvas (Goo.Canvas canvas) {}

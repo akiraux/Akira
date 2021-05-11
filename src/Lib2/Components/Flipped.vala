@@ -20,7 +20,7 @@
  */
 
 
-public class Akira.Lib2.Components.Flipped : Object {
+public class Akira.Lib2.Components.Flipped {
     private bool _horizontal;
     private bool _vertical;
 

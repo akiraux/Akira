@@ -19,7 +19,7 @@
  * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
  */
 
-public class Akira.Lib2.Components.CompiledBorder : Object {
+public class Akira.Lib2.Components.CompiledBorder {
     private Gdk.RGBA _color;
     private int _size;
 
@@ -50,15 +50,15 @@ public class Akira.Lib2.Components.CompiledBorder : Object {
         }
 
         // Loop through all the configured borders and reload the color.
-        foreach (var border in borders.borders) {
+        for (var i = 0; i < borders._data.length; ++i) {
             // Skip if the border is hidden as we don't need to blend colors.
-            if (border.color.hidden) {
+            if (borders._data[i].is_color_hidden ()) {
                 continue;
             }
 
             // Set the new blended color.
-            rgba_border = Utils.Color.blend_colors (rgba_border, border.color.color);
-            size = int.max (size, border.size);
+            rgba_border = Utils.Color.blend_colors (rgba_border, borders._data[i].color ());
+            size = int.max (size, borders._data[i].size ());
             has_colors = true;
         }
 

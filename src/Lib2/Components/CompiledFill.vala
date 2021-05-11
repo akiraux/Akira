@@ -19,7 +19,7 @@
  * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
  */
 
-public class Akira.Lib2.Components.CompiledFill : Object {
+public class Akira.Lib2.Components.CompiledFill {
     private Gdk.RGBA _color;
 
     public Gdk.RGBA color {
@@ -43,14 +43,14 @@ public class Akira.Lib2.Components.CompiledFill : Object {
         }
 
         // Loop through all the configured fills.
-        foreach (var fill in fills.fills) {
+        for (var i = 0; i < fills._data.length; ++i) {
             // Skip if the fill is hidden as we don't need to blend colors.
-            if (fill.color.hidden) {
+            if (fills._data[i].is_color_hidden ()) {
                 continue;
             }
 
             // Set the new blended color.
-            rgba_fill = Utils.Color.blend_colors (rgba_fill, fill.color.color);
+            rgba_fill = Utils.Color.blend_colors (rgba_fill, fills._data[i].color ());
             has_colors = true;
         }
 

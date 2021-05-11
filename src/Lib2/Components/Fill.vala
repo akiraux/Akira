@@ -19,28 +19,39 @@
  * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
  */
 
-public class Akira.Lib2.Components.Fill : Object {
-    private int _id;
-    private Color _color;
+public class Akira.Lib2.Components.Fill {
+    public struct FillData {
+        public int _id;
+        public Color _color;
 
-    public int id {
-        get { return _id; }
+        public FillData (int id = -1, Color color = Color ()) {
+            _id = id;
+            _color = color;
+        }
+
+        // Recommended accessors
+
+        public int id () { return _id; }
+        public Gdk.RGBA color () { return _color.rgba (); }
+        public bool is_color_hidden () { return _color.is_hidden (); }
+
+        // Mutators
+
+        public FillData with_color (int new_id, Color new_color) {
+            return FillData (new_id, new_color);
+        }
     }
 
-    public Lib2.Components.Color color {
-        get { return _color; }
+    // main data for boxed Fill
+    private FillData _data;
+
+    public Fill (FillData data) {
+        _data = data;
     }
 
-    public Fill (int id, Lib2.Components.Color color) {
-        _id = id;
-        _color = color;
-    }
+    // Recommended accessors
 
-    public Fill with_id (int new_id) {
-        return new Fill (new_id, _color);
-    }
-
-    public Fill with_color (Lib2.Components.Color new_color) {
-        return new Fill (_id, new_color);
-    }
+    public int id () { return _data._id; }
+    public Gdk.RGBA color () { return _data._color.rgba (); }
+    public bool is_color_hidden () { return _data._color.is_hidden (); }
 }

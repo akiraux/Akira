@@ -31,8 +31,37 @@ public class Akira.Lib2.Components.Component {
      * that need respective View updates.
      */
     public enum Type {
-        COMPILED_BORDER,
-        COMPILED_FILL,
-        COMPILED_GEOMETRY
+        COMPILED_BORDER = 0,
+        COMPILED_FILL = 1,
+        COMPILED_GEOMETRY = 2
+    }
+
+    public struct RegisteredType {
+        public Type type;
+        public bool dirty;
+
+        public RegisteredType(Type t) {
+            type = t;
+            dirty = false;
+        }
+    }
+
+    public struct RegisteredTypes {
+        RegisteredType[] types;
+
+        public RegisteredTypes () {
+            types = new RegisteredType[3];
+            types[0] = RegisteredType (Type.COMPILED_BORDER);
+            types[1] = RegisteredType (Type.COMPILED_FILL);
+            types[2] = RegisteredType (Type.COMPILED_GEOMETRY);
+        }
+
+        public void mark_dirty (Type type, bool new_state) {
+            for (var i = 0; i < types.length; ++i) {
+                if (types[i].type == type) {
+                    types[i].dirty = new_state;
+                }
+            }
+        }
     }
 }

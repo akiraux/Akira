@@ -19,7 +19,7 @@
  * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
  */
 
-public class Akira.Lib2.Components.Rotation : Object {
+public class Akira.Lib2.Components.Rotation {
     private double _rotation;
 
     public double rotation {

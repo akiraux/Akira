@@ -19,7 +19,7 @@
  * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
  */
 
-public class Akira.Lib2.Components.Name : Object {
+public class Akira.Lib2.Components.Name {
     private string _id;
     private string _name;
 

@@ -19,15 +19,40 @@
  * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
  */
 
-public class Akira.Lib2.Components.Borders : Object {
-    private Gee.ArrayList<Lib2.Components.Border> _borders;
+public class Akira.Lib2.Components.Borders {
+    public Border.BorderData[] _data;
 
-    public Gee.ArrayList<Lib2.Components.Border> borders {
-        get { return _borders; }
+    public Borders () {}
+
+    // Recommended accessors
+
+    public Gee.ArrayList<Border> borders () {
+        var tmp = new Gee.ArrayList<Border> ();
+        for (var i = 0; i < _data.length; ++i) {
+            tmp.add(new Border(_data[i]));
+        }
+        return tmp;
     }
 
-    public Borders (Gee.ArrayList<Lib2.Components.Border> borders) {
-        _borders = borders;
+    public void prep_borders (uint number_to_prep) {
+        _data = new Border.BorderData[number_to_prep];
+        for (var i = 0; i < number_to_prep; ++i) {
+            _data[i]._id = i;
+        }
     }
 
+    // Mutators
+
+    public static Borders single_color (Color color, int size) {
+        var tmp = new Borders ();
+        tmp._data = new Border.BorderData[1];
+        tmp._data[0] = Border.BorderData(0, color, size);
+        return tmp;
+    }
+
+    public Borders clone () {
+        var cln = new Borders();
+        cln._data = _data;
+        return cln;
+    }
 }

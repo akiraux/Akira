@@ -19,7 +19,7 @@
  * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
  */
 
-public class Akira.Lib2.Components.Size : Object {
+public class Akira.Lib2.Components.Size {
     private double _width;
     private double _height;
     private bool _locked;

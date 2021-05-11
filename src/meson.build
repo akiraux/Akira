@@ -143,6 +143,16 @@ sources = files(
 
     'Lib2/Items/ModelItem.vala',
     'Lib2/Items/ModelRect.vala',
+    'Lib2/Items/ModelEllipse.vala',
+
+    'Lib2/Managers/ItemsManager.vala',
+    'Lib2/Managers/ModeManager.vala',
+
+    'Lib2/Modes/AbstractInteractionMode.vala',
+    'Lib2/Modes/TransformMode.vala',
+    'Lib2/Modes/ItemInsertMode.vala',
+    'Lib2/Modes/ExportMode.vala',
+    'Lib2/Modes/PanMode.vala',
 
     'Lib2/ViewCanvas.vala',
 )

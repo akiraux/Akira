@@ -19,38 +19,47 @@
  * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
  */
 
-public class Akira.Lib2.Components.Border : Object {
-    private int _id;
-    private int _size;
-    private Color _color;
+public class Akira.Lib2.Components.Border {
+    public struct BorderData {
+        public int _id;
+        public Color _color;
+        public int _size;
 
-    public int id {
-        get { return _id; }
+        public BorderData (int id = -1, Color color = Color (), int size = 0) {
+            _id = id;
+            _color = color;
+            _size = size;
+        }
+
+        // Recommended accessors
+
+        public int id () { return _id; }
+        public Gdk.RGBA color () { return _color.rgba (); }
+        public bool is_color_hidden () { return _color.is_hidden (); }
+        public int size () { return _size; }
+
+        // Mutators
+
+        public BorderData with_color (int new_id, Color new_color) {
+            return BorderData (new_id, new_color, _size);
+        }
+
+        public BorderData with_size (int new_id, int new_size) {
+            return BorderData (new_id, _color, new_size);
+        }
     }
 
-    public int size {
-        get { return _size; }
+    // main data for boxed Border
+    private BorderData _data;
+
+    public Border (BorderData data) {
+        _data = data;
     }
 
-    public Lib2.Components.Color color {
-        get { return _color; }
-    }
+    // Recommended accessors
 
-    public Border (int id, Lib2.Components.Color color, int size) {
-        _id = id;
-        _color = color;
-        _size = size;
-    }
-
-    public Border with_id (int new_id) {
-        return new Border (new_id, _color, _size);
-    }
-
-    public Border with_color (Lib2.Components.Color new_color) {
-        return new Border (_id, new_color, _size);
-    }
-
-    public Border with_size (int new_size) {
-        return new Border (_id, _color, new_size);
-    }
+    public int id () { return _data._id; }
+    public Gdk.RGBA color () { return _data._color.rgba (); }
+    public bool is_color_hidden () { return _data._color.is_hidden (); }
+    public int size () { return _data._size; }
 }

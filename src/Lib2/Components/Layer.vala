@@ -19,7 +19,7 @@
  * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
  */
 
-public class Akira.Lib2.Components.Layer : Object {
+public class Akira.Lib2.Components.Layer {
     private bool _selected;
     private bool _locked;
 

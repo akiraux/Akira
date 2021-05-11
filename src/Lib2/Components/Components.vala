@@ -36,10 +36,10 @@ public class Akira.Lib2.Components.Components : Object {
     public CompiledBorder? compiled_border = null;
     public CompiledGeometry? compiled_geometry = null;
 
-    public Gee.HashSet<Component.Type> dirty_components;
+    public Lib2.Components.Component.RegisteredTypes dirty_components;
 
     construct {
-        dirty_components = new Gee.HashSet<Component.Type> ();
+        dirty_components = Lib2.Components.Component.RegisteredTypes ();
     }
 
     /*
@@ -51,7 +51,7 @@ public class Akira.Lib2.Components.Components : Object {
         }
 
         compiled_fill = CompiledFill.compile (fills, opacity);
-        dirty_components.add(Component.Type.COMPILED_FILL);
+        dirty_components.mark_dirty(Component.Type.COMPILED_FILL, true);
         return true;
     }
 
@@ -63,7 +63,7 @@ public class Akira.Lib2.Components.Components : Object {
             return false;
         }
         compiled_border = CompiledBorder.compile (borders, opacity);
-        dirty_components.add(Component.Type.COMPILED_BORDER);
+        dirty_components.mark_dirty(Component.Type.COMPILED_BORDER, true);
         return true;
     }
 
@@ -83,7 +83,7 @@ public class Akira.Lib2.Components.Components : Object {
             flipped
         );
 
-        dirty_components.add(Component.Type.COMPILED_GEOMETRY);
+        dirty_components.mark_dirty(Component.Type.COMPILED_GEOMETRY, true);
 
         return true;
     }

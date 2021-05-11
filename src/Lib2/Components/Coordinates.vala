@@ -19,7 +19,7 @@
  * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
  */
 
-public class Akira.Lib2.Components.Coordinates : Object {
+public class Akira.Lib2.Components.Coordinates {
     private double _x;
     private double _y;
 

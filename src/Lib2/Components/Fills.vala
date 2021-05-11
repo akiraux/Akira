@@ -19,14 +19,40 @@
  * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
  */
 
-public class Akira.Lib2.Components.Fills : Object {
-    private Gee.ArrayList<Lib2.Components.Fill> _fills;
+public class Akira.Lib2.Components.Fills {
+    public Fill.FillData[] _data;
 
-    public Gee.ArrayList<Lib2.Components.Fill> fills {
-        get { return _fills; }
+    public Fills () {}
+
+    // Recommended accessors
+
+    public Gee.ArrayList<Fill> fills () {
+        var tmp = new Gee.ArrayList<Fill> ();
+        for (var i = 0; i < _data.length; ++i) {
+            tmp.add(new Fill(_data[i]));
+        }
+        return tmp;
     }
 
-    public Fills (Gee.ArrayList<Lib2.Components.Fill> fills) {
-        _fills = fills;
+    public void prep_fills (uint number_to_prep) {
+        _data = new Fill.FillData[number_to_prep];
+        for (var i = 0; i < number_to_prep; ++i) {
+            _data[i]._id = i;
+        }
+    }
+
+    // Mutators
+
+    public static Fills single_color (Color color) {
+        var tmp = new Fills ();
+        tmp._data = new Fill.FillData[1];
+        tmp._data[0] = Fill.FillData(0, color);
+        return tmp;
+    }
+
+    public Fills clone () {
+        var cln = new Fills();
+        cln._data = _data;
+        return cln;
     }
  }
