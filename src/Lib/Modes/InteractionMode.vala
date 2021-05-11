@@ -46,7 +46,8 @@ public abstract class Akira.Lib.Modes.InteractionMode : Object {
         RESIZE,
         ITEM_INSERT,
         EXPORT,
-        PAN
+        PAN,
+        EDIT
     }
 
     /*

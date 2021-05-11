@@ -31,6 +31,11 @@ public class Akira.Dialogs.SettingsDialog : Gtk.Dialog {
     private Gtk.ColorButton fill_color;
     private Gtk.ColorButton border_color;
     private Gtk.SpinButton border_size;
+    private Gtk.ColorButton text_fill_color;
+    private Partials.InputField text_size;
+    private Gtk.ComboBoxText font_name;
+
+    public string [] fonts = Utils.Font.get_fonts ();
 
     public SettingsDialog (Akira.Window _window) {
         Object (
@@ -223,6 +228,9 @@ public class Akira.Dialogs.SettingsDialog : Gtk.Dialog {
         var border_rgba = Gdk.RGBA ();
         border_rgba.parse (settings.border_color);
 
+        var text_fill_rgba = Gdk.RGBA ();
+        text_fill_rgba.parse (settings.text_color);
+
         grid.attach (new SettingsHeader (_("Default Colors")), 0, 0, 2, 1);
 
         var description = new Gtk.Label (_("Define the default style used when creating a new shape."));
@@ -232,6 +240,8 @@ public class Akira.Dialogs.SettingsDialog : Gtk.Dialog {
 
         grid.attach (new SettingsLabel (_("Fill Color:")), 0, 2, 1, 1);
         fill_color = new Gtk.ColorButton.with_rgba (fill_rgba);
+        text_fill_color = new Gtk.ColorButton.with_rgba (text_fill_rgba);
+        text_fill_color.halign = Gtk.Align.START;
         fill_color.halign = Gtk.Align.START;
         grid.attach (fill_color, 1, 2, 1, 1);
 
@@ -249,6 +259,22 @@ public class Akira.Dialogs.SettingsDialog : Gtk.Dialog {
             debug ("setting color: %s", rgba_str);
 
             settings.fill_color = rgba_str;
+        });
+
+        text_fill_color.color_set.connect (() => {
+            var rgba = text_fill_color.get_rgba ();
+
+            // Gdk.RGBA uses rgb() if alpha is 1.
+            string rgba_str = "rgba(%d,%d,%d,%d)".printf (
+                (int) (rgba.red * 255),
+                (int) (rgba.green * 255),
+                (int) (rgba.blue * 255),
+                (int) (rgba.alpha)
+            );
+
+            debug ("setting color: %s", rgba_str);
+
+            settings.text_color = rgba_str;
         });
 
         grid.attach (new SettingsLabel (_("Enable Border Style:")), 0, 3, 1, 1);
@@ -284,8 +310,26 @@ public class Akira.Dialogs.SettingsDialog : Gtk.Dialog {
         border_size.secondary_icon_sensitive = false;
         border_size.secondary_icon_activatable = false;
         grid.attach (border_size, 1, 5, 1, 1);
+        grid.attach (new SettingsLabel (_("Text Tool Fill:")), 0, 6, 1, 1);
+        grid.attach (text_fill_color, 1, 6, 1, 1);
+        text_size = new Akira.Partials.InputField (Akira.Partials.InputField.Unit.PIXEL, 6, true, true);
+        text_size.halign = Gtk.Align.START;
+        text_size.entry.hexpand = false;
+        text_size.entry.sensitive = true;
+        text_size.set_range (1, 5000);
+        grid.attach (new SettingsLabel (_("Text Tool Font Size:")), 0, 7, 1, 1);
+        grid.attach (text_size, 1, 7, 1, 1);
+        font_name = new Gtk.ComboBoxText.with_entry ();
+        font_name.halign = Gtk.Align.START;
+        foreach (string font in fonts) {
+            font_name.append (font, font);
+        }
+        grid.attach (new SettingsLabel (_("Text Tool Font Name:")), 0, 8, 1, 1);
+        grid.attach (font_name, 1, 8, 1, 1);
 
         settings.bind ("border-size", border_size, "value", SettingsBindFlags.DEFAULT);
+        settings.bind ("text-size", text_size.entry, "value", SettingsBindFlags.DEFAULT);
+        settings.bind ("text-font", font_name, "active_id", SettingsBindFlags.DEFAULT);
 
         border_switch.bind_property ("active", border_color, "sensitive", BindingFlags.SYNC_CREATE);
         border_switch.bind_property ("active", border_size, "sensitive", BindingFlags.SYNC_CREATE);

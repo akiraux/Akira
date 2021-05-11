@@ -51,6 +51,7 @@ public class Akira.Layouts.LeftSideBar : Gtk.Grid {
         var align_items_panel = new Akira.Layouts.Partials.AlignItemsPanel (window);
         transform_panel = new Akira.Layouts.Partials.TransformPanel (window);
         var border_radius_panel = new Akira.Layouts.Partials.BorderRadiusPanel (window);
+        var text_options_panel = new Akira.Layouts.Partials.TextOptionsPanel (window);
         fills_panel = new Akira.Layouts.Partials.FillsPanel (window);
         borders_panel = new Akira.Layouts.Partials.BordersPanel (window);
 
@@ -61,6 +62,7 @@ public class Akira.Layouts.LeftSideBar : Gtk.Grid {
         scrolled_grid.expand = true;
         scrolled_grid.attach (transform_panel, 0, 0, 1, 1);
         scrolled_grid.attach (border_radius_panel, 0, 1, 1, 1);
+        scrolled_grid.attach (text_options_panel, 0, 4, 1, 1);
         scrolled_grid.attach (fills_panel, 0, 2, 1, 1);
         scrolled_grid.attach (borders_panel, 0, 3, 1, 1);
         scrolled_window.add (scrolled_grid);

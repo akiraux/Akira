@@ -100,6 +100,18 @@ public class Akira.Services.Settings : GLib.Settings {
         owned get { return get_string ("border-color"); }
         set { set_string ("border-color", value); }
     }
+    public string text_color {
+        owned get { return get_string ("text-color"); }
+        set { set_string ("text-color", value); }
+    }
+    public int text_size {
+        get { return get_int ("text-size"); }
+        set { set_int ("text-size", value); }
+    }
+    public string text_font {
+        owned get { return get_string ("text-font"); }
+        set { set_string ("text-font", value); }
+    }
 
     // File settings.
     public bool open_quick {

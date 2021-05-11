@@ -31,6 +31,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
     private int border_size;
     private Gdk.RGBA border_color;
     private Gdk.RGBA fill_color;
+    private Gdk.RGBA text_fill_color;
 
     // Keep track of the expensive Artboard change method.
     private bool is_changing = false;
@@ -51,6 +52,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
 
         border_color = Gdk.RGBA ();
         fill_color = Gdk.RGBA ();
+        text_fill_color = Gdk.RGBA ();
 
         window.event_bus.insert_item.connect (set_item_to_insert);
         window.event_bus.request_delete_item.connect (on_request_delete_item);
@@ -153,6 +155,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         item.parent.add_child (item, -1);
         free_items.add_item.begin (item);
         window.event_bus.file_edited ();
+        ((Lib.Canvas) item.canvas).update_canvas ();
     }
 
     /**
@@ -191,8 +194,9 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             free_items.remove_item.begin (item);
         }
 
-        item.delete ();
+        // Let the app know we're deleting an item.
         window.event_bus.item_deleted (item);
+        item.delete ();
         window.event_bus.file_edited ();
     }
 
@@ -253,7 +257,9 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             200,
             25f,
             Goo.CanvasAnchorType.NW,
-            "Open Sans 18",
+            settings.text_font,
+            settings.text_size,
+            text_fill_color,
             parent,
             artboard
         );
@@ -334,6 +340,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
 
     private void update_default_values () {
         fill_color.parse (settings.fill_color);
+        text_fill_color.parse (settings.text_color);
 
         // Do not set the border if the user disabled it.
         if (settings.set_border) {
@@ -688,14 +695,5 @@ public class Akira.Lib.Managers.ItemsManager : Object {
 
             return;
         }
-    }
-
-    /**
-     * Helper method to get the count of all the created items in the canvas.
-     * This count excludes pseudo items like the select effect, hover effect,
-     * or grids items.
-     */
-    public int get_items_count () {
-        return (int) free_items.get_n_items () + (int) artboards.get_n_items ();
     }
 }

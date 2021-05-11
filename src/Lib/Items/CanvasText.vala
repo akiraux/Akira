@@ -17,6 +17,7 @@
  * along with Akira. If not, see <https://www.gnu.org/licenses/>.
  *
  * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
+ * Authored by: Abdallah "Abdallah-Moh" Mohammad <abdullah_mam1@icloud.com>
  */
 
 using Akira.Lib.Components;
@@ -36,7 +37,9 @@ public class Akira.Lib.Items.CanvasText : Goo.CanvasText, Akira.Lib.Items.Canvas
         double _width,
         double _height,
         Goo.CanvasAnchorType _anchor = Goo.CanvasAnchorType.NW,
-        string _font = "Open Sans 16",
+        string font_name,
+        int font_size,
+        Gdk.RGBA fill_color,
         Goo.CanvasItem? _parent,
         Items.CanvasArtboard? _artboard
     ) {
@@ -48,7 +51,8 @@ public class Akira.Lib.Items.CanvasText : Goo.CanvasText, Akira.Lib.Items.Canvas
         width = height = 1;
         text = _text;
         anchor = _anchor;
-        font = _font;
+        font = font_name + " " + font_size.to_string ();
+
         init_position (this, _x, _y);
 
         // Add the newly created item to the Canvas or Artboard.
@@ -67,6 +71,8 @@ public class Akira.Lib.Items.CanvasText : Goo.CanvasText, Akira.Lib.Items.Canvas
         components.add (new Size (this));
         components.add (new Flipped (this));
         components.add (new Layer ());
+        components.add (new Fills (this, fill_color));
+        components.add (new Font (this, font_name, font_size));
 
         check_add_to_artboard (this);
     }

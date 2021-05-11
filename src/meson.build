@@ -35,6 +35,7 @@ sources = files(
     'Utils/Color.vala',
     'Utils/Image.vala',
     'Utils/ColorPicker.vala',
+    'Utils/Font.vala',
     'Utils/Snapping.vala',
 
     'Layouts/HeaderBar.vala',
@@ -54,6 +55,7 @@ sources = files(
     'Layouts/Partials/TransformPanel.vala',
     'Layouts/Partials/BorderRadiusPanel.vala',
     'Layouts/Partials/AlignItemsPanel.vala',
+    'Layouts/Partials/TextOptionsPanel.vala',
 
     'Partials/HeaderBarButton.vala',
     'Partials/MenuButton.vala',
@@ -87,6 +89,7 @@ sources = files(
     'Lib/Components/Fill.vala',
     'Lib/Components/Fills.vala',
     'Lib/Components/Flipped.vala',
+    'Lib/Components/Font.vala',
     'Lib/Components/Layer.vala',
     'Lib/Components/Name.vala',
     'Lib/Components/Opacity.vala',
@@ -99,6 +102,7 @@ sources = files(
     'Lib/Items/CanvasItem.vala',
     'Lib/Items/CanvasRect.vala',
     'Lib/Items/CanvasText.vala',
+    'Lib/Items/CanvasTextView.vala',
 
     'Lib/Managers/ExportManager.vala',
     'Lib/Managers/HoverManager.vala',
@@ -115,6 +119,7 @@ sources = files(
     'Middlewares/SizeMiddleware.vala',
 
     'Lib/Modes/InteractionMode.vala',
+    'Lib/Modes/EditMode.vala',
     'Lib/Modes/TransformMode.vala',
     'Lib/Modes/ItemInsertMode.vala',
     'Lib/Modes/ExportMode.vala',

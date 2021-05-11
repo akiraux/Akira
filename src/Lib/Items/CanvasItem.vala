@@ -134,6 +134,13 @@ public interface Akira.Lib.Items.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasIt
         }
     }
 
+    public Components.Font? text_font {
+        get {
+            Component? component = this.get_component (typeof (Components.Font));
+            return (Components.Font) component;
+        }
+    }
+
     public Components.Layer? layer {
         get {
             Component? component = this.get_component (typeof (Components.Layer));

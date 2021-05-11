@@ -112,6 +112,21 @@
             <summary>Default Border Color.</summary>
             <description>The default color of the border for a newly created shape.</description>
         </key>
+        <key name="text-color" type="s">
+            <default>'#000'</default>
+            <summary>Default CanvasText Font Color.</summary>
+            <description>The default color of the CanvasText font for a newly created shape.</description>
+        </key>
+        <key name="text-size" type="i">
+            <default>18</default>
+            <summary>Default CanvasText Text Size</summary>
+            <description>The default font size of the CanvasText for a newly created shape.</description>
+        </key>
+        <key name="text-font" type="s">
+            <default>'OpenSans'</default>
+            <summary>Default CanvasText Font.</summary>
+            <description>The default font for the CanvasText.</description>
+        </key>
 
         <key name="open-quick" type="b">
             <default>false</default>
