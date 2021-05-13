@@ -38,7 +38,7 @@
 
         canvas.window.event_bus.toggle_pixel_grid.connect (on_toggle_pixel_grid);
         canvas.window.event_bus.update_pixel_grid.connect (on_update_pixel_grid);
-        canvas.window.event_bus.set_scale.connect (on_set_scale);
+        canvas.window.event_bus.zoom.connect (on_canvas_zoom);
     }
 
     /*
@@ -89,7 +89,7 @@
         is_grid_visible = false;
     }
 
-    private void on_set_scale (double scale) {
+    private void on_canvas_zoom () {
         // Check if the user requested the pixel grid and if is not already visible.
         if (!is_grid_visible) {
             return;
@@ -103,7 +103,7 @@
      * as well as number of columns and rows based on the canvas current scale.
      */
     private void recalculate () {
-        double thickness = 0.02;
+        double thickness = 0.04;
         double steps = 1;
         var scale = canvas.current_scale;
 
@@ -143,14 +143,18 @@
 
         // 350% - 450%
         if (scale >= 3.5 && scale < 4.5) {
-            thickness = 0.06;
-            steps = 2.5;
+            thickness = 0.1;
+            steps = 3;
         }
 
         // 450% - 600%
         if (scale >= 4.5 && scale < 6) {
-            thickness = 0.04;
-            steps = 1;
+            thickness = 0.08;
+            steps = 2;
+        }
+
+        if (scale > 14) {
+            thickness = 0.02;
         }
 
         // Update the grid offset to always be half of the line thickness
