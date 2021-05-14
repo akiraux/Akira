@@ -38,7 +38,6 @@ public class Akira.Partials.ZoomButton : Gtk.Grid {
         hexpand = false;
 
         zoom_out_button = new Gtk.Button.from_icon_name ("zoom-out-symbolic", Gtk.IconSize.MENU);
-        zoom_out_button.clicked.connect (zoom_out);
         zoom_out_button.get_style_context ().add_class ("button-zoom");
         zoom_out_button.get_style_context ().add_class ("button-zoom-start");
         zoom_out_button.can_focus = false;
@@ -46,12 +45,13 @@ public class Akira.Partials.ZoomButton : Gtk.Grid {
 
         zoom_default_button = new Gtk.Button.with_label ("100%");
         zoom_default_button.hexpand = true;
-        zoom_default_button.clicked.connect (zoom_reset);
         zoom_default_button.can_focus = false;
-        zoom_default_button.tooltip_markup = Granite.markup_accel_tooltip ({"<Ctrl>0"}, _("Reset Zoom"));
+        zoom_default_button.tooltip_markup = Granite.markup_accel_tooltip (
+            {"<Ctrl>0"},
+            _("Reset Zoom. Ctrl+click to input value")
+        );
 
         zoom_in_button = new Gtk.Button.from_icon_name ("zoom-in-symbolic", Gtk.IconSize.MENU);
-        zoom_in_button.clicked.connect (zoom_in);
         zoom_in_button.get_style_context ().add_class ("button-zoom");
         zoom_in_button.get_style_context ().add_class ("button-zoom-end");
         zoom_in_button.can_focus = false;
@@ -66,16 +66,13 @@ public class Akira.Partials.ZoomButton : Gtk.Grid {
         label_btn.margin_top = 4;
 
         attach (label_btn, 0, 1, 3, 1);
-        update_label ();
 
-        settings.changed["show-label"].connect ( () => {
-            update_label ();
-        });
-    }
+        zoom_out_button.clicked.connect (zoom_out);
+        zoom_default_button.clicked.connect (zoom_reset);
+        zoom_in_button.clicked.connect (zoom_in);
 
-    private void update_label () {
-        label_btn.visible = settings.show_label;
-        label_btn.no_show_all = !settings.show_label;
+        settings.bind("show-label", label_btn, "visible", SettingsBindFlags.DEFAULT);
+        settings.bind("show-label", label_btn, "no-show-all", SettingsBindFlags.INVERT_BOOLEAN);
     }
 
     public void zoom_out () {
