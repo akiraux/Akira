@@ -1,26 +1,26 @@
 /*
-* Copyright (c) 2019 Alecaddd (http://alecaddd.com)
-*
-* This file is part of Akira.
-*
-* Akira is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
+ * Copyright (c) 2019-2021 Alecaddd (https://alecaddd.com)
+ *
+ * This file is part of Akira.
+ *
+ * Akira is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
 
-* Akira is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
+ * Akira is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
 
-* You should have received a copy of the GNU General Public License
-* along with Akira.  If not, see <https://www.gnu.org/licenses/>.
-*
-* Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
-*/
+ * You should have received a copy of the GNU General Public License
+ * along with Akira. If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
+ */
 
 public class Akira.Partials.ZoomButton : Gtk.Grid {
-    public weak Akira.Window window { get; construct; }
+    public weak Akira.Window window { get; set construct; }
 
     private Gtk.Label label_btn;
     public Gtk.Button zoom_out_button;
@@ -28,14 +28,10 @@ public class Akira.Partials.ZoomButton : Gtk.Grid {
     public Gtk.Button zoom_in_button;
 
     public ZoomButton (Akira.Window window) {
-        Object (
-            window: window
-        );
-    }
+        this.window = window;
 
-    construct {
         get_style_context ().add_class (Gtk.STYLE_CLASS_LINKED);
-        get_style_context ().add_class ("linked-flat");
+        get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
         valign = Gtk.Align.CENTER;
         column_homogeneous = false;
         width_request = 140;
@@ -43,8 +39,8 @@ public class Akira.Partials.ZoomButton : Gtk.Grid {
 
         zoom_out_button = new Gtk.Button.from_icon_name ("zoom-out-symbolic", Gtk.IconSize.MENU);
         zoom_out_button.clicked.connect (zoom_out);
-        zoom_out_button.get_style_context ().add_class ("raised");
         zoom_out_button.get_style_context ().add_class ("button-zoom");
+        zoom_out_button.get_style_context ().add_class ("button-zoom-start");
         zoom_out_button.can_focus = false;
         zoom_out_button.tooltip_markup = Granite.markup_accel_tooltip ({"<Ctrl>minus"}, _("Zoom Out"));
 
@@ -56,8 +52,8 @@ public class Akira.Partials.ZoomButton : Gtk.Grid {
 
         zoom_in_button = new Gtk.Button.from_icon_name ("zoom-in-symbolic", Gtk.IconSize.MENU);
         zoom_in_button.clicked.connect (zoom_in);
-        zoom_in_button.get_style_context ().add_class ("raised");
         zoom_in_button.get_style_context ().add_class ("button-zoom");
+        zoom_in_button.get_style_context ().add_class ("button-zoom-end");
         zoom_in_button.can_focus = false;
         zoom_in_button.tooltip_markup = Granite.markup_accel_tooltip ({"<Ctrl>plus"}, _("Zoom In"));
 

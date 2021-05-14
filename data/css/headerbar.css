@@ -6,6 +6,16 @@
     padding: 0 6px;
 }
 
+.button-zoom-start {
+    border-top-left-radius: 3px;
+    border-bottom-left-radius: 3px;
+}
+
+.button-zoom-end {
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;
+}
+
 .linked-flat button {
     background-color: shade (@bg_color, 1);
 }
