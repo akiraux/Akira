@@ -100,8 +100,8 @@ public class Akira.Partials.ZoomButton : Gtk.Grid {
         zoom_input.focus_out_event.connect (handle_focus_out);
 
         // Bind the visibility of the button label to the gsetting attribute.
-        settings.bind("show-label", label_btn, "visible", SettingsBindFlags.DEFAULT);
-        settings.bind("show-label", label_btn, "no-show-all", SettingsBindFlags.INVERT_BOOLEAN);
+        settings.bind ("show-label", label_btn, "visible", SettingsBindFlags.DEFAULT);
+        settings.bind ("show-label", label_btn, "no-show-all", SettingsBindFlags.INVERT_BOOLEAN);
 
         // Event listeners.
         window.event_bus.set_scale.connect (on_set_scale);
