@@ -20,9 +20,11 @@
  */
 
 public class Akira.Lib2.ViewCanvas : Goo.Canvas {
+    private const int SIZE = 30;
     public weak Akira.Window window { get; construct; }
 
     public Lib2.Managers.ItemsManager items_manager;
+    public Lib2.Managers.SelectionManager selection_manager;
     public Lib2.Managers.ModeManager mode_manager;
 
     public double current_scale = 1.0;
@@ -43,6 +45,7 @@ public class Akira.Lib2.ViewCanvas : Goo.Canvas {
 
         items_manager = new Lib2.Managers.ItemsManager (this);
         mode_manager = new Lib2.Managers.ModeManager (this);
+        selection_manager = new Lib2.Managers.SelectionManager (this);
 
         window.event_bus.update_scale.connect (on_update_scale);
         window.event_bus.set_scale.connect (on_set_scale);
@@ -145,5 +148,99 @@ public class Akira.Lib2.ViewCanvas : Goo.Canvas {
         */
 
         return false;
+    }
+
+    public override bool draw (Cairo.Context ctx) {
+        base.draw (ctx);
+
+        /*
+        foreach (var item in items_manager.items) {
+            draw_debug_info (ctx, item);
+        }
+        */
+
+        draw_debug_selection(ctx);
+
+        return false;
+    }
+
+    public void draw_debug_info (Cairo.Context ctx, Lib2.Items.ModelItem item) {
+        var xadj = hadjustment.value;
+        var yadj = vadjustment.value;
+
+        ctx.save ();
+        var cg = item.components.compiled_geometry;
+        var top = cg.bb_top () * current_scale;
+        var left = cg.bb_left () * current_scale;
+        var bottom = cg.bb_bottom () * current_scale;
+        var right = cg.bb_right () * current_scale;
+
+        var width = right - left;
+        var height = bottom - top;
+        ctx.move_to (left - xadj, top - yadj);
+        ctx.set_source_rgba (1.0, 0.0, 0.0, 1.0);
+        ctx.rel_line_to (width, 0);
+        ctx.rel_line_to (0, height);
+        ctx.rel_line_to (-width, 0);
+        ctx.close_path ();
+        ctx.stroke ();
+
+        ctx.arc (cg.x0 () - xadj, cg.y0 () - yadj, 5, 0, 2.0 * GLib.Math.PI);
+        ctx.fill ();
+        ctx.arc (cg.x1 () - xadj, cg.y1 () - yadj, 5, 0, 2.0 * GLib.Math.PI);
+        ctx.fill ();
+        ctx.arc (cg.x2 () - xadj, cg.y2 () - yadj, 5, 0, 2.0 * GLib.Math.PI);
+        ctx.fill ();
+        ctx.arc (cg.x3 () - xadj, cg.y3 () - yadj, 5, 0, 2.0 * GLib.Math.PI);
+        ctx.fill ();
+
+        ctx.restore ();
+    }
+
+    public void draw_debug_selection (Cairo.Context ctx) {
+        if (selection_manager.selection.is_empty ()) {
+            return;
+        }
+
+        var xadj = hadjustment.value;
+        var yadj = vadjustment.value;
+
+        double x0 = 0;
+        double y0 = 0;
+        double x1 = 0;
+        double y1 = 0;
+        double x2 = 0;
+        double y2 = 0;
+        double x3 = 0;
+        double y3 = 0;
+
+        selection_manager.selection.coordinates(
+            ref x0,
+            ref y0,
+            ref x1,
+            ref y1,
+            ref x2,
+            ref y2,
+            ref x3,
+            ref y3
+        );
+        x0 -= xadj;
+        y0 -= yadj;
+        x1 -= xadj;
+        y1 -= yadj;
+        x2 -= xadj;
+        y2 -= yadj;
+        x3 -= xadj;
+        y3 -= yadj;
+
+        ctx.save ();
+        ctx.move_to (x0, y0);
+        ctx.set_source_rgba (1.0, 0.0, 0.0, 1.0);
+        ctx.line_to (x1, y1);
+        ctx.line_to (x3, y3);
+        ctx.line_to (x2, y2);
+        ctx.close_path ();
+        ctx.stroke ();
+        ctx.restore ();
     }
 }

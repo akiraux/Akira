@@ -53,4 +53,9 @@ public class Akira.Lib2.Items.ModelItem : Object {
     public virtual void add_to_canvas (Goo.Canvas canvas) {}
 
     public virtual void component_updated (Lib2.Components.Component.Type type) {}
+
+    public Lib2.Components.CompiledGeometry compiled_geometry () {
+        components.maybe_compile_geometry ();
+        return components.compiled_geometry;
+    }
 }

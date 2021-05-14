@@ -28,7 +28,7 @@ public class Akira.Lib2.Components.Components : Object {
     public Name? name = null;
     public Opacity? opacity = null;
 
-    public Coordinates? coordinates = null;
+    public Coordinates? center = null;
     public Size? size = null;
     public Rotation? rotation = null;
 
@@ -76,7 +76,7 @@ public class Akira.Lib2.Components.Components : Object {
         }
 
         compiled_geometry = CompiledGeometry.compile (
-            coordinates,
+            center,
             size,
             rotation,
             borders,

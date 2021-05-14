@@ -21,13 +21,13 @@
 
 public class Akira.Lib2.Items.ModelRect : ModelItem {
     public ModelRect (
-        Lib2.Components.Coordinates coordinates,
+        Lib2.Components.Coordinates center,
         Lib2.Components.Size size,
         Lib2.Components.Borders? borders,
         Lib2.Components.Fills? fills
     ) {
         components = new Lib2.Components.Components();
-        components.coordinates = coordinates;
+        components.center = center;
         components.size = size;
         components.borders = borders;
         components.fills = fills;
@@ -37,10 +37,12 @@ public class Akira.Lib2.Items.ModelRect : ModelItem {
     }
 
     public override void add_to_canvas (Goo.Canvas canvas) {
+        var mid_x = components.size.width / 2.0;
+        var mid_y = components.size.height / 2.0;
         item = new Goo.CanvasRect (
             canvas.get_root_item (),
-            0,
-            0,
+            -mid_x,
+            -mid_y,
             components.size.width,
             components.size.height
         );
@@ -75,7 +77,9 @@ public class Akira.Lib2.Items.ModelRect : ModelItem {
                 }
                 break;
             case Lib2.Components.Component.Type.COMPILED_GEOMETRY:
-                item.set_transform (components.compiled_geometry.transform);
+                item.set ("x", -components.size.width / 2.0);
+                item.set ("y", -components.size.height / 2.0);
+                item.set_transform (components.compiled_geometry.transform ());
                 break;
         }
     }

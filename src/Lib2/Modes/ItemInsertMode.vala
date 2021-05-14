@@ -99,7 +99,12 @@ public class Akira.Lib2.Modes.ItemInsertMode : AbstractInteractionMode {
             canvas.update_canvas ();
 
             */
-            view_canvas.items_manager.add_item_to_canvas (construct_item (item_insert_type, event.x, event.y));
+            var item = construct_item (item_insert_type, event.x, event.y);
+
+            view_canvas.items_manager.add_item_to_canvas (item);
+
+            view_canvas.selection_manager.reset_selection (item);
+
             transform_mode = new Akira.Lib2.Modes.TransformMode (view_canvas, null);
             transform_mode.mode_begin ();
             transform_mode.button_press_event (event);
@@ -161,6 +166,13 @@ public class Akira.Lib2.Modes.ItemInsertMode : AbstractInteractionMode {
                 break;
 
             case "text":
+                new_item = new Lib2.Items.ModelRect (
+                    coordinates,
+                    size,
+                    borders_from_settings (),
+                    fills_from_settings ()
+                );
+                new_item.components.rotation = new Lib2.Components.Rotation(30);
                 break;
 
             case "artboard":

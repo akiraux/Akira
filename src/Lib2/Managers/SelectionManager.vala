@@ -17,20 +17,25 @@
  * along with Akira. If not, see <https://www.gnu.org/licenses/>.
  *
  * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
+ * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
  */
 
-public class Akira.Lib2.Components.Rotation {
-    private double _degrees;
+public class Akira.Lib2.Managers.SelectionManager : Object {
+    public unowned ViewCanvas view_canvas;
 
-    public Rotation(double degrees) {
-        _degrees = degrees;
-     }
+    public Lib2.Items.ItemSelection selection;
 
-     public double in_degrees () {
-        return _degrees;
-     }
+    public SelectionManager (ViewCanvas canvas) {
+        view_canvas = canvas;
+        reset_selection (null);
+    }
 
-     public double in_radians () {
-        return _degrees * GLib.Math.PI / 180.0;
-     }
+    public void reset_selection (Lib2.Items.ModelItem? selected_item) {
+        selection = new Lib2.Items.ItemSelection (selected_item);
+    }
+
+    public void add_to_selection (Lib2.Items.ModelItem item) {
+        selection.items.add (item);
+    }
 }
+

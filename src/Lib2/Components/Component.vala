@@ -31,9 +31,9 @@ public class Akira.Lib2.Components.Component {
      * that need respective View updates.
      */
     public enum Type {
-        COMPILED_BORDER = 0,
-        COMPILED_FILL = 1,
-        COMPILED_GEOMETRY = 2
+        COMPILED_BORDER,
+        COMPILED_FILL,
+        COMPILED_GEOMETRY
     }
 
     public struct RegisteredType {

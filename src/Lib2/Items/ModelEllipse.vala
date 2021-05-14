@@ -21,13 +21,13 @@
 
 public class Akira.Lib2.Items.ModelEllipse : ModelItem {
     public ModelEllipse (
-        Lib2.Components.Coordinates coordinates,
+        Lib2.Components.Coordinates center,
         Lib2.Components.Size size,
         Lib2.Components.Borders? borders,
         Lib2.Components.Fills? fills
     ) {
         components = new Lib2.Components.Components();
-        components.coordinates = coordinates;
+        components.center = center;
         components.size = size;
         components.borders = borders;
         components.fills = fills;
@@ -40,7 +40,7 @@ public class Akira.Lib2.Items.ModelEllipse : ModelItem {
         var radius_x = components.size.width / 2.0;
         var radius_y = components.size.height / 2.0;
 
-        item = new Goo.CanvasEllipse (canvas.get_root_item (), radius_x, radius_y, radius_x, radius_y);
+        item = new Goo.CanvasEllipse (canvas.get_root_item (), 0, 0, radius_x, radius_y);
     }
 
     public override void component_updated (Lib2.Components.Component.Type type) {
@@ -72,7 +72,7 @@ public class Akira.Lib2.Items.ModelEllipse : ModelItem {
                 }
                 break;
             case Lib2.Components.Component.Type.COMPILED_GEOMETRY:
-                item.set_transform (components.compiled_geometry.transform);
+                item.set_transform (components.compiled_geometry.transform ());
                 break;
         }
     }

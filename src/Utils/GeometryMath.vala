@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Alecaddd (https://alecaddd.com)
+ * Copyright (c) 2021 Alecaddd (http://alecaddd.com)
  *
  * This file is part of Akira.
  *
@@ -19,18 +19,22 @@
  * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
  */
 
-public class Akira.Lib2.Components.Rotation {
-    private double _degrees;
+public class Akira.Utils.GeometryMath : Object {
 
-    public Rotation(double degrees) {
-        _degrees = degrees;
-     }
+    public static void min_max (ref double x0, ref double x1) {
+        if (x1 < x0) {
+            double t = x0;
+            x0 = x1;
+            x1 = t;
+        }
+    }
 
-     public double in_degrees () {
-        return _degrees;
-     }
+    public static void min_max_coords(double x0, double x1, double x2, double x3, ref double min, ref double max) {
+        min_max(ref x0, ref x1);
+        min_max(ref x2, ref x3);
 
-     public double in_radians () {
-        return _degrees * GLib.Math.PI / 180.0;
-     }
+        min = x0 < x2 ? x0 : x2;
+        max = x1 > x3 ? x1 : x3;
+    }
+
 }

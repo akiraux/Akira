@@ -57,7 +57,7 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
     }
 
     public void move_item_to (Lib2.Items.ModelItem item, double new_x, double new_y) {
-        item.components.coordinates = new Lib2.Components.Coordinates (new_x, new_y);
+        item.components.center = new Lib2.Components.Coordinates (new_x, new_y);
         item.components.compiled_geometry = null;
         item.compile_components (true);
     }

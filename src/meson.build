@@ -36,6 +36,7 @@ sources = files(
     'Utils/Image.vala',
     'Utils/ColorPicker.vala',
     'Utils/Snapping.vala',
+    'Utils/GeometryMath.vala',
 
     'Layouts/HeaderBar.vala',
     'Layouts/LeftSideBar.vala',
@@ -144,9 +145,11 @@ sources = files(
     'Lib2/Items/ModelItem.vala',
     'Lib2/Items/ModelRect.vala',
     'Lib2/Items/ModelEllipse.vala',
+    'Lib2/Items/ItemSelection.vala',
 
     'Lib2/Managers/ItemsManager.vala',
     'Lib2/Managers/ModeManager.vala',
+    'Lib2/Managers/SelectionManager.vala',
 
     'Lib2/Modes/AbstractInteractionMode.vala',
     'Lib2/Modes/TransformMode.vala',
