@@ -65,7 +65,7 @@ public class Akira.Partials.ZoomButton : Gtk.Grid {
         zoom_input.secondary_icon_sensitive = false;
         zoom_input.secondary_icon_activatable = false;
         zoom_input.xalign = 1.0f;
-        zoom_input.width_chars = 9;
+        zoom_input.width_chars = 8;
         // Hide the input by default.
         zoom_input.visible = false;
         zoom_input.no_show_all = true;

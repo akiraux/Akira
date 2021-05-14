@@ -16,9 +16,10 @@
     border-bottom-left-radius: 0px;
 }
 
-.input-zoom {
+entry.input-zoom {
     border-radius: 0;
-    margin: 0
+    margin: 0;
+    padding: 3px 8px 4px;
 }
 
 .linked-flat button {
