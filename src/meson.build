@@ -35,6 +35,7 @@ sources = files(
     'Utils/Color.vala',
     'Utils/Image.vala',
     'Utils/ColorPicker.vala',
+    'Utils/Nobs.vala',
     'Utils/Snapping.vala',
     'Utils/GeometryMath.vala',
 
@@ -142,6 +143,7 @@ sources = files(
     'Lib2/Components/Rotation.vala',
     'Lib2/Components/Size.vala',
 
+    'Lib2/Items/CanvasItem.vala',
     'Lib2/Items/ModelItem.vala',
     'Lib2/Items/ModelRect.vala',
     'Lib2/Items/ModelEllipse.vala',
@@ -149,6 +151,8 @@ sources = files(
 
     'Lib2/Managers/ItemsManager.vala',
     'Lib2/Managers/ModeManager.vala',
+    'Lib2/Managers/NobManager.vala',
+    'Lib2/Managers/HoverManager.vala',
     'Lib2/Managers/SelectionManager.vala',
 
     'Lib2/Modes/AbstractInteractionMode.vala',

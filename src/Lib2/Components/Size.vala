@@ -46,6 +46,10 @@ public class Akira.Lib2.Components.Size {
         _height = height;
     }
 
+    public Size copy () {
+        return new Size (_width, _height, _locked);
+    }
+
     public Size with_width (double new_width) {
         return new Size (new_width, _height, _locked);
     }

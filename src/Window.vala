@@ -40,7 +40,7 @@ public class Akira.Window : Gtk.ApplicationWindow {
 
     public bool edited { get; set; default = false; }
 
-    public bool use_new_components = true;
+    public bool use_new_components = false;
 
 
     public Window (Akira.Application akira_app) {

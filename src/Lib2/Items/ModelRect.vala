@@ -36,10 +36,10 @@ public class Akira.Lib2.Items.ModelRect : ModelItem {
         components.border_radius = Lib2.Components.Components.default_border_radius ();
     }
 
-    public override void add_to_canvas (Goo.Canvas canvas) {
+    public override void construct_canvas_item (Goo.Canvas canvas) {
         var mid_x = components.size.width / 2.0;
         var mid_y = components.size.height / 2.0;
-        item = new Goo.CanvasRect (
+        canvas_item = new Lib2.Items.CanvasRect (
             canvas.get_root_item (),
             -mid_x,
             -mid_y,
@@ -55,31 +55,33 @@ public class Akira.Lib2.Items.ModelRect : ModelItem {
                 var size = components.compiled_border.size;
 
                 if (size == 0 || rgba.alpha == 0.0) {
-                    item.set ("stroke-color-rgba", null);
+                    canvas_item.set ("stroke-color-rgba", null);
                 }
                 else {
                     uint urgba = Utils.Color.rgba_to_uint (rgba);
                     // The "line-width" property expects a DOUBLE type, but we don't support subpixels
                     // so we always handle the border size as INT, therefore we need to type cast it here.
-                    item.set ("line-width", (double) size);
-                    item.set ("stroke-color-rgba", urgba);
+                    canvas_item.set ("line-width", (double) size);
+                    canvas_item.set ("stroke-color-rgba", urgba);
                 }
                 break;
             case Lib2.Components.Component.Type.COMPILED_FILL:
                 var rgba = components.compiled_fill.color;
 
                 if (rgba.alpha == 0.0) {
-                    item.set ("fill-color-rgba", null);
+                    canvas_item.set ("fill-color-rgba", null);
                 }
                 else {
                     uint urgba = Utils.Color.rgba_to_uint (rgba);
-                    item.set ("fill-color-rgba", urgba);
+                    canvas_item.set ("fill-color-rgba", urgba);
                 }
                 break;
             case Lib2.Components.Component.Type.COMPILED_GEOMETRY:
-                item.set ("x", -components.size.width / 2.0);
-                item.set ("y", -components.size.height / 2.0);
-                item.set_transform (components.compiled_geometry.transform ());
+                canvas_item.set ("x", -components.size.width / 2.0);
+                canvas_item.set ("y", -components.size.height / 2.0);
+                canvas_item.set ("width", components.size.width);
+                canvas_item.set ("height", components.size.height);
+                canvas_item.set_transform (components.compiled_geometry.transform ());
                 break;
         }
     }

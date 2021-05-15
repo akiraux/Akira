@@ -23,13 +23,13 @@ public class Akira.Lib.Selection.Nob : Goo.CanvasRect {
     public const double NOB_SIZE = 10;
     public const double LINE_WIDTH = 1;
 
-    public Managers.NobManager.Nob handle_id;
+    public Utils.Nobs.Nob handle_id;
 
     private double nob_size;
     public double center_x;
     public double center_y;
 
-    public Nob (Goo.CanvasItem? root, Managers.NobManager.Nob _handle_id) {
+    public Nob (Goo.CanvasItem? root, Utils.Nobs.Nob _handle_id) {
         Object (
             parent: root
         );
@@ -57,9 +57,36 @@ public class Akira.Lib.Selection.Nob : Goo.CanvasRect {
         center_x = new_x;
         center_y = new_y;
 
-        var canvas = canvas as Akira.Lib.Canvas;
-        line_width = LINE_WIDTH / canvas.current_scale;
-        nob_size = NOB_SIZE / canvas.current_scale;
+        line_width = LINE_WIDTH / canvas.scale;
+        nob_size = NOB_SIZE / canvas.scale;
+
+        set ("line-width", line_width);
+        set ("x", - nob_size / 2.0);
+        set ("y", - nob_size / 2.0);
+        set ("height", nob_size);
+        set ("width", nob_size);
+
+        this.set (
+            "visibility",
+            visible ? Goo.CanvasItemVisibility.VISIBLE: Goo.CanvasItemVisibility.HIDDEN
+        );
+    }
+
+    /*
+     * Updates the sate using global coordinates, and a local rotation
+     */
+    public void update_global_state (double new_x, double new_y, double rotation, bool visible) {
+        var tr = Cairo.Matrix.identity ();
+        tr.x0 = new_x;
+        tr.y0 = new_y;
+        tr.rotate (rotation);
+        set_transform (tr);
+
+        center_x = new_x;
+        center_y = new_y;
+
+        line_width = LINE_WIDTH / canvas.scale;
+        nob_size = NOB_SIZE / canvas.scale;
 
         set ("line-width", line_width);
         set ("x", - nob_size / 2.0);
@@ -79,7 +106,7 @@ public class Akira.Lib.Selection.Nob : Goo.CanvasRect {
 
         update_state (Cairo.Matrix.identity (), 0, 0, false);
 
-        if (handle_id == Managers.NobManager.Nob.ROTATE) {
+        if (handle_id == Utils.Nobs.Nob.ROTATE) {
             set ("radius-x", nob_size);
             set ("radius-y", nob_size);
         }

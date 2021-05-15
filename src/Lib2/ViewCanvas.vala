@@ -26,8 +26,13 @@ public class Akira.Lib2.ViewCanvas : Goo.Canvas {
     public Lib2.Managers.ItemsManager items_manager;
     public Lib2.Managers.SelectionManager selection_manager;
     public Lib2.Managers.ModeManager mode_manager;
+    public Lib2.Managers.HoverManager hover_manager;
+    public Lib2.Managers.NobManager nob_manager;
 
+    public bool ctrl_is_pressed = false;
+    public bool shift_is_pressed = false;
     public double current_scale = 1.0;
+    private Gdk.CursorType current_cursor = Gdk.CursorType.ARROW;
 
     public ViewCanvas (Akira.Window window) {
         Object(window: window);
@@ -44,8 +49,10 @@ public class Akira.Lib2.ViewCanvas : Goo.Canvas {
         events |= Gdk.EventMask.TOUCH_MASK;
 
         items_manager = new Lib2.Managers.ItemsManager (this);
-        mode_manager = new Lib2.Managers.ModeManager (this);
         selection_manager = new Lib2.Managers.SelectionManager (this);
+        mode_manager = new Lib2.Managers.ModeManager (this);
+        hover_manager = new Lib2.Managers.HoverManager (this);
+        nob_manager = new Lib2.Managers.NobManager (this);
 
         window.event_bus.update_scale.connect (on_update_scale);
         window.event_bus.set_scale.connect (on_set_scale);
@@ -61,7 +68,26 @@ public class Akira.Lib2.ViewCanvas : Goo.Canvas {
         mode_manager.register_mode (new_mode);
     }
 
-    public void interaction_mode_changed () {}
+    public void interaction_mode_changed () {
+        set_cursor_by_interaction_mode ();
+    }
+
+    public void set_cursor_by_interaction_mode () {
+        hover_manager.remove_hover_effect ();
+        Gdk.CursorType? new_cursor = mode_manager.active_cursor_type ();
+
+        /*
+        if (new_cursor == null) {
+            var hover_cursor = Akira.Lib.Managers.NobManager.cursor_from_nob (nob_manager.hovered_nob);
+            new_cursor = (hover_cursor == null) ? Gdk.CursorType.ARROW : hover_cursor;
+        }
+        */
+
+        if (current_cursor != new_cursor) {
+            // debug (@"Changing cursor. $new_cursor");
+            set_cursor (new_cursor);
+        }
+    }
 
     private void on_update_scale (double zoom) {
         // Force the zoom value to 8% if we're currently at a 2% scale in order
@@ -96,8 +122,93 @@ public class Akira.Lib2.ViewCanvas : Goo.Canvas {
         grab_focus (get_root_item ());
     }
 
+    public override bool key_press_event (Gdk.EventKey event) {
+        uint uppercase_keyval = Gdk.keyval_to_upper (event.keyval);
+
+        switch (uppercase_keyval) {
+            case Gdk.Key.Control_L:
+            case Gdk.Key.Control_R:
+                ctrl_is_pressed = true;
+                //toggle_item_ghost (false);
+                break;
+
+            case Gdk.Key.Shift_L:
+            case Gdk.Key.Shift_R:
+                shift_is_pressed = true;
+                break;
+
+            case Gdk.Key.Alt_L:
+            case Gdk.Key.Alt_R:
+                // Show the ghost item only if the CTRL button is not pressed.
+                //toggle_item_ghost (!ctrl_is_pressed);
+                break;
+
+        }
+
+        if (mode_manager.key_press_event (event)) {
+            return true;
+        }
+
+        switch (uppercase_keyval) {
+            case Gdk.Key.space:
+                mode_manager.start_panning_mode ();
+                if (mode_manager.key_press_event (event)) {
+                    return true;
+                }
+                break;
+
+            case Gdk.Key.Up:
+            case Gdk.Key.Down:
+            case Gdk.Key.Right:
+            case Gdk.Key.Left:
+                //window.event_bus.move_item_from_canvas (event);
+                //window.event_bus.detect_artboard_change ();
+                return true;
+            default:
+                break;
+        }
+
+        if (uppercase_keyval == Gdk.Key.J) {
+            items_manager.debug_add_rectangles(100000, true);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    public override bool key_release_event (Gdk.EventKey event) {
+        uint uppercase_keyval = Gdk.keyval_to_upper (event.keyval);
+
+        switch (uppercase_keyval) {
+            case Gdk.Key.Control_L:
+            case Gdk.Key.Control_R:
+                ctrl_is_pressed = false;
+                break;
+
+            case Gdk.Key.Shift_L:
+            case Gdk.Key.Shift_R:
+                shift_is_pressed = false;
+                break;
+
+            case Gdk.Key.Alt_L:
+            case Gdk.Key.Alt_R:
+                //toggle_item_ghost (false);
+                break;
+        }
+
+        if (mode_manager.key_release_event (event)) {
+            return true;
+        }
+
+        return false;
+    }
+
     public override bool button_press_event (Gdk.EventButton event) {
-        //hover_manager.remove_hover_effect ();
+        hover_manager.remove_hover_effect ();
+
+        event.x = event.x / current_scale;
+        event.y = event.y / current_scale;
 
         if (mode_manager.button_press_event (event)) {
             return true;
@@ -109,9 +220,6 @@ public class Akira.Lib2.ViewCanvas : Goo.Canvas {
                 return true;
             }
         }
-
-        event.x = event.x / current_scale;
-        event.y = event.y / current_scale;
 
         //return press_event_on_selection (event)
         return false;
@@ -143,37 +251,48 @@ public class Akira.Lib2.ViewCanvas : Goo.Canvas {
             nob_manager.hovered_nob = nob_hovered;
             set_cursor_by_interaction_mode ();
         }
-
-        hover_manager.on_mouse_over (event.x, event.y, nob_hovered);
         */
+
+        hover_manager.on_mouse_over (event.x, event.y); //, nob_hovered);
 
         return false;
     }
 
+    private void set_cursor (Gdk.CursorType? cursor_type) {
+        current_cursor = (cursor_type == null ? Gdk.CursorType.ARROW : cursor_type);
+        var cursor = new Gdk.Cursor.for_display (Gdk.Display.get_default (), current_cursor);
+        get_window ().set_cursor (cursor);
+    }
+
+
+
+    // #TODO temporary
+    /*
     public override bool draw (Cairo.Context ctx) {
         base.draw (ctx);
 
-        /*
         foreach (var item in items_manager.items) {
-            draw_debug_info (ctx, item);
+            //draw_debug_info (ctx, item);
         }
-        */
 
         draw_debug_selection(ctx);
 
         return false;
     }
+    */
 
     public void draw_debug_info (Cairo.Context ctx, Lib2.Items.ModelItem item) {
         var xadj = hadjustment.value;
         var yadj = vadjustment.value;
 
+        var cs = current_scale;
+
         ctx.save ();
         var cg = item.components.compiled_geometry;
-        var top = cg.bb_top () * current_scale;
-        var left = cg.bb_left () * current_scale;
-        var bottom = cg.bb_bottom () * current_scale;
-        var right = cg.bb_right () * current_scale;
+        var top = cg.bb_top () * cs;
+        var left = cg.bb_left () * cs;
+        var bottom = cg.bb_bottom () * cs;
+        var right = cg.bb_right () * cs;
 
         var width = right - left;
         var height = bottom - top;
@@ -185,13 +304,13 @@ public class Akira.Lib2.ViewCanvas : Goo.Canvas {
         ctx.close_path ();
         ctx.stroke ();
 
-        ctx.arc (cg.x0 () - xadj, cg.y0 () - yadj, 5, 0, 2.0 * GLib.Math.PI);
+        ctx.arc (cg.x0 () * cs - xadj, cg.y0 () * cs - yadj, 5, 0, 2.0 * GLib.Math.PI);
         ctx.fill ();
-        ctx.arc (cg.x1 () - xadj, cg.y1 () - yadj, 5, 0, 2.0 * GLib.Math.PI);
+        ctx.arc (cg.x1 () * cs - xadj, cg.y1 () * cs - yadj, 5, 0, 2.0 * GLib.Math.PI);
         ctx.fill ();
-        ctx.arc (cg.x2 () - xadj, cg.y2 () - yadj, 5, 0, 2.0 * GLib.Math.PI);
+        ctx.arc (cg.x2 () * cs - xadj, cg.y2 () * cs - yadj, 5, 0, 2.0 * GLib.Math.PI);
         ctx.fill ();
-        ctx.arc (cg.x3 () - xadj, cg.y3 () - yadj, 5, 0, 2.0 * GLib.Math.PI);
+        ctx.arc (cg.x3 () * cs - xadj, cg.y3 () * cs - yadj, 5, 0, 2.0 * GLib.Math.PI);
         ctx.fill ();
 
         ctx.restore ();
@@ -201,6 +320,7 @@ public class Akira.Lib2.ViewCanvas : Goo.Canvas {
         if (selection_manager.selection.is_empty ()) {
             return;
         }
+        var cs = current_scale;
 
         var xadj = hadjustment.value;
         var yadj = vadjustment.value;
@@ -213,25 +333,27 @@ public class Akira.Lib2.ViewCanvas : Goo.Canvas {
         double y2 = 0;
         double x3 = 0;
         double y3 = 0;
+        double rotation = 0;
 
         selection_manager.selection.coordinates(
-            ref x0,
-            ref y0,
-            ref x1,
-            ref y1,
-            ref x2,
-            ref y2,
-            ref x3,
-            ref y3
+            out x0,
+            out y0,
+            out x1,
+            out y1,
+            out x2,
+            out y2,
+            out x3,
+            out y3,
+            out rotation
         );
-        x0 -= xadj;
-        y0 -= yadj;
-        x1 -= xadj;
-        y1 -= yadj;
-        x2 -= xadj;
-        y2 -= yadj;
-        x3 -= xadj;
-        y3 -= yadj;
+        x0 = x0 * cs - xadj;
+        y0 = y0 * cs - yadj;
+        x1 = x1 * cs - xadj;
+        y1 = y1 * cs - yadj;
+        x2 = x2 * cs - xadj;
+        y2 = y2 * cs - yadj;
+        x3 = x3 * cs - xadj;
+        y3 = y3 * cs - yadj;
 
         ctx.save ();
         ctx.move_to (x0, y0);

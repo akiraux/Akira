@@ -27,16 +27,16 @@
  * In the future, this mode can be kept alive during multiple clicks when inserting items like polylines.
  */
 public class Akira.Lib2.Modes.ItemInsertMode : AbstractInteractionMode {
-    public weak Akira.Lib2.ViewCanvas view_canvas { get; construct; }
-    public weak Akira.Lib2.Managers.ModeManager mode_manager { get; construct; }
+    public weak Lib2.ViewCanvas view_canvas { get; construct; }
+    public weak Lib2.Managers.ModeManager mode_manager { get; construct; }
 
     private string item_insert_type;
 
-    private Akira.Lib2.Modes.TransformMode transform_mode;
+    private Lib2.Modes.TransformMode transform_mode;
 
     public ItemInsertMode (
-        Akira.Lib2.ViewCanvas canvas,
-        Akira.Lib2.Managers.ModeManager mode_manager,
+        Lib2.ViewCanvas canvas,
+        Lib2.Managers.ModeManager mode_manager,
         string item_type
     ) {
         Object (
@@ -142,8 +142,23 @@ public class Akira.Lib2.Modes.ItemInsertMode : AbstractInteractionMode {
 
     private static Lib2.Items.ModelItem construct_item (string from_type, double x, double y)
     {
-        var coordinates = new Lib2.Components.Coordinates (x, y);
-        var size = new Lib2.Components.Size (50.0, 50.0, false);
+        double center_x = 0.0;
+        double center_y = 0.0;
+        double width = 1.0;
+        double height = 1.0;
+
+        // We use floor to align to the pixel that is clicked.
+        Utils.AffineTransform.geometry_from_top_left (
+            GLib.Math.floor (x),
+            GLib.Math.floor (y),
+            ref center_x,
+            ref center_y,
+            ref width,
+            ref height
+        );
+
+        var coordinates = new Lib2.Components.Coordinates (center_x, center_y);
+        var size = new Lib2.Components.Size (width, height, false);
 
         Lib2.Items.ModelItem new_item = null;
         switch (from_type) {

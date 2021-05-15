@@ -21,8 +21,10 @@
 
 public class Akira.Lib2.Items.ModelItem : Object {
     public int id = -1;
-    public Goo.CanvasItem item = null;
+    public Lib2.Items.CanvasItem canvas_item = null;
     public Lib2.Components.Components components = null;
+
+    public signal void geometry_changed (int id);
 
     public void compile_components (bool notify_view) {
         components.maybe_compile_geometry ();
@@ -34,8 +36,22 @@ public class Akira.Lib2.Items.ModelItem : Object {
         }
     }
 
+    public bool hit_test (double x, double y) {
+        components.maybe_compile_geometry ();
+        return components.compiled_geometry.contains (x, y);
+    }
+
+    public void recompile_geometry (bool notify) {
+        components.compiled_geometry = null;
+        components.maybe_compile_geometry ();
+
+        if (notify) {
+            notify_view_of_changes ();
+        }
+    }
+
     public void notify_view_of_changes() {
-        if (item == null) {
+        if (canvas_item == null) {
             return;
         }
 
@@ -44,13 +60,25 @@ public class Akira.Lib2.Items.ModelItem : Object {
             var type = dirty_types[i];
             if (type.dirty) {
                 component_updated (type.type);
+
+                if (type.type == Lib2.Components.Component.Type.COMPILED_GEOMETRY) {
+                    geometry_changed (id);
+                }
             }
 
             dirty_types[i].dirty = false;
         }
     }
 
-    public virtual void add_to_canvas (Goo.Canvas canvas) {}
+    public void add_to_canvas (Goo.Canvas canvas) {
+        construct_canvas_item (canvas);
+
+        if (canvas_item != null) {
+            canvas_item.parent_id = id;
+        }
+    }
+
+    public virtual void construct_canvas_item (Goo.Canvas canvas) {}
 
     public virtual void component_updated (Lib2.Components.Component.Type type) {}
 

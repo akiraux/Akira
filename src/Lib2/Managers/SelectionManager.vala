@@ -30,12 +30,24 @@ public class Akira.Lib2.Managers.SelectionManager : Object {
         reset_selection (null);
     }
 
+    public bool is_empty () {
+        return selection.is_empty ();
+    }
+
     public void reset_selection (Lib2.Items.ModelItem? selected_item) {
         selection = new Lib2.Items.ItemSelection (selected_item);
     }
 
     public void add_to_selection (Lib2.Items.ModelItem item) {
         selection.items.add (item);
+    }
+
+    public bool item_selected (Lib2.Items.ModelItem item) {
+        return selection.has_item (item);
+    }
+
+    public void on_selection_changed () {
+        view_canvas.window.event_bus.selection_modified ();
     }
 }
 

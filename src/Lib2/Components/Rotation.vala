@@ -26,6 +26,10 @@ public class Akira.Lib2.Components.Rotation {
         _degrees = degrees;
      }
 
+    public Rotation copy () {
+        return new Rotation (_degrees);
+    }
+
      public double in_degrees () {
         return _degrees;
      }

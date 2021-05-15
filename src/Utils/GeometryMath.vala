@@ -37,4 +37,17 @@ public class Akira.Utils.GeometryMath : Object {
         max = x1 > x3 ? x1 : x3;
     }
 
+    public static double distance (double x0, double y0, double x1, double y1) {
+        var xx = (x1 - x0) * (x1 - x0);
+        var yy = (y1 - y0) * (y1 - y0);
+
+        return GLib.Math.sqrt(xx + yy);
+    }
+
+    public static void normalize (ref double dx, ref double dy) {
+        var dm = GLib.Math.sqrt(dx * dx + dy * dy);
+        dx = dm > 0 ? (dx / dm) : 0;
+        dy = dm > 0 ? (dy / dm) : 0;
+    }
+
 }

@@ -26,29 +26,6 @@ public class Akira.Lib.Managers.NobManager : Object {
     private const double LINE_HEIGHT = 40.0;
 
     /*
-    Grabber Pos:
-      8
-      |
-    0 1 2
-    7   3
-    6 5 4
-
-    // -1 if no nob is grabbed.
-    */
-    public enum Nob {
-        NONE=-1,
-        TOP_LEFT,
-        TOP_CENTER,
-        TOP_RIGHT,
-        RIGHT_CENTER,
-        BOTTOM_RIGHT,
-        BOTTOM_CENTER,
-        BOTTOM_LEFT,
-        LEFT_CENTER,
-        ROTATE
-    }
-
-    /*
      * Nob data associated with an item selection.
      */
     public class ItemNobData : Object {
@@ -78,8 +55,8 @@ public class Akira.Lib.Managers.NobManager : Object {
 
     public weak Akira.Lib.Canvas canvas { get; construct; }
 
-    public Nob selected_nob;
-    public Nob hovered_nob;
+    public Utils.Nobs.Nob selected_nob;
+    public Utils.Nobs.Nob hovered_nob;
 
     private Goo.CanvasItem root;
     private Goo.CanvasRect? select_effect;
@@ -92,9 +69,6 @@ public class Akira.Lib.Managers.NobManager : Object {
     // Tracks if an artboard is part of the current selection.
     private bool is_artboard;
     private bool nobs_constructed = false;
-
-    // If the effect needs to be created or it's only a value update.
-    private bool create { get; set; default = true; }
 
     public NobManager (Akira.Lib.Canvas canvas) {
         Object (
@@ -114,11 +88,11 @@ public class Akira.Lib.Managers.NobManager : Object {
     /**
      * Set which nob is selected by its Nob name.
      */
-    public void set_selected_by_name (Nob selected_nob) {
+    public void set_selected_by_name (Utils.Nobs.Nob selected_nob) {
         this.selected_nob = selected_nob;
     }
 
-    public Nob hit_test (double x, double y) {
+    public Utils.Nobs.Nob hit_test (double x, double y) {
         double scale = canvas.current_scale;
         foreach (var ui_nob in nobs) {
             if (ui_nob != null && ui_nob.is_visible ()) {
@@ -128,72 +102,10 @@ public class Akira.Lib.Managers.NobManager : Object {
             }
         }
 
-        return Nob.NONE;
-    }
-
-    public static bool is_top_nob (Nob nob) {
-        return nob == Nob.TOP_LEFT || nob == Nob.TOP_CENTER || nob == Nob.TOP_RIGHT;
-    }
-
-    public static bool is_bot_nob (Nob nob) {
-        return nob == Nob.BOTTOM_LEFT || nob == Nob.BOTTOM_CENTER || nob == Nob.BOTTOM_RIGHT;
-    }
-
-    public static bool is_left_nob (Nob nob) {
-        return nob == Nob.TOP_LEFT || nob == Nob.LEFT_CENTER || nob == Nob.BOTTOM_LEFT;
-    }
-
-    public static bool is_right_nob (Nob nob) {
-        return nob == Nob.TOP_RIGHT || nob == Nob.RIGHT_CENTER || nob == Nob.BOTTOM_RIGHT;
-    }
-
-    public static bool is_corner_nob (Nob nob) {
-        return nob == Nob.TOP_RIGHT || nob == Nob.TOP_LEFT || nob == Nob.BOTTOM_RIGHT || nob == Nob.BOTTOM_LEFT;
+        return Utils.Nobs.Nob.NONE;
     }
 
     /*
-     * Return a cursor type based of the type of nob.
-     */
-    public static Gdk.CursorType? cursor_from_nob (Nob nob_id) {
-        Gdk.CursorType? result = null;
-        switch (nob_id) {
-            case Managers.NobManager.Nob.NONE:
-                result = null;
-                break;
-            case Managers.NobManager.Nob.TOP_LEFT:
-                result = Gdk.CursorType.TOP_LEFT_CORNER;
-                break;
-            case Managers.NobManager.Nob.TOP_CENTER:
-                result = Gdk.CursorType.TOP_SIDE;
-                break;
-            case Managers.NobManager.Nob.TOP_RIGHT:
-                result = Gdk.CursorType.TOP_RIGHT_CORNER;
-                break;
-            case Managers.NobManager.Nob.RIGHT_CENTER:
-                result = Gdk.CursorType.RIGHT_SIDE;
-                break;
-            case Managers.NobManager.Nob.BOTTOM_RIGHT:
-                result = Gdk.CursorType.BOTTOM_RIGHT_CORNER;
-                break;
-            case Managers.NobManager.Nob.BOTTOM_CENTER:
-                result = Gdk.CursorType.BOTTOM_SIDE;
-                break;
-            case Managers.NobManager.Nob.BOTTOM_LEFT:
-                result = Gdk.CursorType.BOTTOM_LEFT_CORNER;
-                break;
-            case Managers.NobManager.Nob.LEFT_CENTER:
-                result = Gdk.CursorType.LEFT_SIDE;
-                break;
-            case Managers.NobManager.Nob.ROTATE:
-                result = Gdk.CursorType.EXCHANGE;
-                break;
-        }
-
-        return result;
-    }
-
-
-    /**
      * Takes a set of items and populates information needed to determine
      * the selection box and nob positions. If the number of items is one,
      * the selection box may be rotated, otherwise it is never rotated.
@@ -277,7 +189,7 @@ public class Akira.Lib.Managers.NobManager : Object {
      * calculated using `populate_nob_bounds_from_items`.
      */
     private static void calculate_nob_position (
-        Nob nob_name,
+        Utils.Nobs.Nob nob_name,
         ItemNobData nob_data,
         ref double pos_x,
         ref double pos_y
@@ -290,39 +202,39 @@ public class Akira.Lib.Managers.NobManager : Object {
         double height_offset_y = nob_data.height_offset_y;
 
         switch (nob_name) {
-            case Nob.TOP_LEFT:
+            case Utils.Nobs.Nob.TOP_LEFT:
                 pos_x = top_left_x;
                 pos_y = top_left_y;
                 break;
-            case Nob.TOP_CENTER:
+            case Utils.Nobs.Nob.TOP_CENTER:
                 pos_x = top_left_x + width_offset_x / 2.0;
                 pos_y = top_left_y + width_offset_y / 2.0;
                 break;
-            case Nob.TOP_RIGHT:
+            case Utils.Nobs.Nob.TOP_RIGHT:
                 pos_x = top_left_x + width_offset_x;
                 pos_y = top_left_y + width_offset_y;
                 break;
-            case Nob.RIGHT_CENTER:
+            case Utils.Nobs.Nob.RIGHT_CENTER:
                 pos_x = top_left_x + width_offset_x + height_offset_x / 2.0;
                 pos_y = top_left_y + width_offset_y + height_offset_y / 2.0;
                 break;
-            case Nob.BOTTOM_RIGHT:
+            case Utils.Nobs.Nob.BOTTOM_RIGHT:
                 pos_x = top_left_x + width_offset_x + height_offset_x;
                 pos_y = top_left_y + width_offset_y + height_offset_y;
                 break;
-            case Nob.BOTTOM_CENTER:
+            case Utils.Nobs.Nob.BOTTOM_CENTER:
                 pos_x = top_left_x + width_offset_x / 2.0 + height_offset_x;
                 pos_y = top_left_y + width_offset_y / 2.0 + height_offset_y;
                 break;
-            case Nob.BOTTOM_LEFT:
+            case Utils.Nobs.Nob.BOTTOM_LEFT:
                 pos_x = top_left_x + height_offset_x;
                 pos_y = top_left_y + height_offset_y;
                 break;
-            case Nob.LEFT_CENTER:
+            case Utils.Nobs.Nob.LEFT_CENTER:
                 pos_x = top_left_x + height_offset_x / 2.0;
                 pos_y = top_left_y + height_offset_y / 2.0;
                 break;
-            case Nob.NONE:
+            case Utils.Nobs.Nob.NONE:
             default:
                 break;
         }
@@ -333,7 +245,7 @@ public class Akira.Lib.Managers.NobManager : Object {
      */
     public static void nob_position_from_items (
         List<Items.CanvasItem> items,
-        Nob nob_name,
+        Utils.Nobs.Nob nob_name,
         ref double pos_x,
         ref double pos_y
     ) {
@@ -444,11 +356,11 @@ public class Akira.Lib.Managers.NobManager : Object {
 
             calculate_nob_position ( nob_name, nob_data, ref center_x, ref center_y );
 
-            if (!print_middle_height_nobs && (nob_name == Nob.RIGHT_CENTER || nob_name == Nob.LEFT_CENTER)) {
+            if (!print_middle_height_nobs && (nob_name == Utils.Nobs.Nob.RIGHT_CENTER || nob_name == Utils.Nobs.Nob.LEFT_CENTER)) {
                 set_visible = false;
-            } else if (!print_middle_width_nobs && (nob_name == Nob.TOP_CENTER || nob_name == Nob.BOTTOM_CENTER)) {
+            } else if (!print_middle_width_nobs && (nob_name == Utils.Nobs.Nob.TOP_CENTER || nob_name == Utils.Nobs.Nob.BOTTOM_CENTER)) {
                 set_visible = false;
-            } else if (nob.handle_id == Nob.ROTATE) {
+            } else if (nob.handle_id == Utils.Nobs.Nob.ROTATE) {
                 double line_offset_x = 0;
                 double line_offset_y = - (LINE_HEIGHT / canvas.current_scale);
                 nob_data.bb_matrix.transform_distance (ref line_offset_x, ref line_offset_y);
@@ -500,7 +412,7 @@ public class Akira.Lib.Managers.NobManager : Object {
         root = canvas.get_root_item ();
 
         for (int i = 0; i < 9; i++) {
-            var nob = new Selection.Nob (root, (Managers.NobManager.Nob) i);
+            var nob = new Selection.Nob (root, (Utils.Nobs.Nob) i);
             nob.set ("visibility", Goo.CanvasItemVisibility.HIDDEN);
             nob.pointer_events = Goo.CanvasPointerEvents.NONE;
             nobs[i] = nob;

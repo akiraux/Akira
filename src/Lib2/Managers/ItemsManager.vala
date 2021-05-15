@@ -23,14 +23,17 @@
 public class Akira.Lib2.Managers.ItemsManager : Object {
     public unowned Lib2.ViewCanvas view_canvas {set; get;}
 
-    public Gee.ArrayList<Lib2.Items.ModelItem> items;
+    private int last_id = 100;
+    public Gee.LinkedList<Lib2.Items.ModelItem> items;
+    public Gee.HashMap<int, Lib2.Items.ModelItem> items_by_id;
 
     public ItemsManager (Lib2.ViewCanvas canvas) {
         Object (view_canvas: canvas);
     }
 
     construct {
-        items = new Gee.ArrayList<Lib2.Items.ModelItem> ();
+        items = new Gee.LinkedList<Lib2.Items.ModelItem> ();
+        items_by_id = new Gee.HashMap<int, Lib2.Items.ModelItem> ();
     }
 
     public void add_item_to_canvas (Lib2.Items.ModelItem item) {
@@ -38,22 +41,33 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
             return;
         }
 
-        items.add(item);
-        item.compile_components(false);
+        item.id = ++last_id;
+        items.add (item);
+        items_by_id[item.id] = item;
+
+        item.geometry_changed.connect(on_item_geometry_changed);
+
+        item.compile_components (false);
         item.add_to_canvas (view_canvas);
         item.notify_view_of_changes ();
+
     }
 
-    public Lib2.Items.ModelItem add_debug_rect (double x, double y) {
-        var new_rect = new Lib2.Items.ModelRect (
-            new Lib2.Components.Coordinates (x, y),
-            new Lib2.Components.Size (50.0, 50.0, false),
-            Lib2.Components.Borders.single_color (Lib2.Components.Color (1.0, 1.0), 2),
-            Lib2.Components.Fills.single_color (Lib2.Components.Color (1.0))
-        );
+    public Lib2.Items.ModelItem? hit_test (double x, double y) {
+        Lib2.Items.ModelItem? result = null;
 
-        add_item_to_canvas(new_rect);
-        return new_rect;
+        var target = view_canvas.get_item_at (x, y, true);
+
+        if (target == null || !(target is Lib2.Items.CanvasItem)) {
+            return result;
+        }
+
+        var c_item = target as Lib2.Items.CanvasItem;
+        if (items_by_id.has_key (c_item.parent_id)) {
+            result = items_by_id[c_item.parent_id];
+        }
+
+        return result;
     }
 
     public void move_item_to (Lib2.Items.ModelItem item, double new_x, double new_y) {
@@ -68,5 +82,46 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
         }
     }
 
+    public Lib2.Items.ModelItem add_debug_rect (double x, double y) {
+        var new_rect = new Lib2.Items.ModelRect (
+            new Lib2.Components.Coordinates (x, y),
+            new Lib2.Components.Size (50.0, 50.0, false),
+            Lib2.Components.Borders.single_color (Lib2.Components.Color (0.3, 0.3, 0.3, 1.0), 2),
+            Lib2.Components.Fills.single_color (Lib2.Components.Color (0.0, 0.0, 0.0, 1.0))
+        );
+
+        add_item_to_canvas(new_rect);
+        return new_rect;
+    }
+
+    public void debug_add_rectangles (uint num_of, bool debug_timer = false) {
+    	ulong microseconds;
+        double seconds;
+
+        // create a timer object:
+        Timer timer = new Timer ();
+
+        for (var i = 0; i < num_of; ++i) {
+            var x = GLib.Random.double_range(0, (GLib.Math.log(num_of + GLib.Math.E) - 1) * 10000);
+            var y = GLib.Random.double_range(0, (GLib.Math.log(num_of + GLib.Math.E) - 1) * 10000);
+            add_debug_rect(x, y);
+        }
+
+        if (debug_timer) {
+            timer.stop ();
+         	seconds = timer.elapsed (out microseconds);
+            print ("Created %u items in %s s\n", num_of, seconds.to_string ());
+        }
+    }
+
+    public void on_item_geometry_changed (int id) {
+        if (items_by_id.has_key (id)) {
+            var target = items_by_id[id];
+
+            if (view_canvas.selection_manager.item_selected (target)) {
+                view_canvas.selection_manager.on_selection_changed ();
+            }
+        }
+    }
 
 }
