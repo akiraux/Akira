@@ -26,6 +26,7 @@ public class Akira.Partials.ZoomButton : Gtk.Grid {
     private Gtk.Button zoom_out_button;
     private Gtk.Button zoom_in_button;
     private Gtk.Button zoom_default_button;
+    private Gtk.Popover zoom_popover;
     private Gtk.Entry zoom_input;
 
     public ZoomButton (Akira.Window window) {
@@ -55,6 +56,10 @@ public class Akira.Partials.ZoomButton : Gtk.Grid {
             _("Reset Zoom. Ctrl+click to input value")
         );
 
+        // Zoom popover containing the input field.
+        zoom_popover = new Gtk.Popover (zoom_default_button);
+        zoom_popover.position = Gtk.PositionType.BOTTOM;
+
         // The zoom input field.
         zoom_input = new Gtk.Entry ();
         zoom_input.text = "100";
@@ -66,9 +71,8 @@ public class Akira.Partials.ZoomButton : Gtk.Grid {
         zoom_input.secondary_icon_activatable = false;
         zoom_input.xalign = 1.0f;
         zoom_input.width_chars = 8;
-        // Hide the input by default.
-        zoom_input.visible = false;
-        zoom_input.no_show_all = true;
+        zoom_input.show_all ();
+        zoom_popover.add (zoom_input);
 
         // Zoom in button.
         zoom_in_button = new Gtk.Button.from_icon_name ("zoom-in-symbolic", Gtk.IconSize.MENU);
@@ -79,8 +83,7 @@ public class Akira.Partials.ZoomButton : Gtk.Grid {
 
         attach (zoom_out_button, 0, 0, 1, 1);
         attach (zoom_default_button, 1, 0, 1, 1);
-        attach (zoom_input, 2, 0, 1, 1);
-        attach (zoom_in_button, 3, 0, 1, 1);
+        attach (zoom_in_button, 2, 0, 1, 1);
 
         // Headerbar button label.
         label_btn = new Gtk.Label (_("Zoom"));
@@ -122,19 +125,14 @@ public class Akira.Partials.ZoomButton : Gtk.Grid {
     }
 
     /*
-     * Reset the zoom to 100%, or replaces the central button
-     * with a numeric input field for manual inputing if the user
-     * pressed the CTRL key while clicking on the button.
+     * Reset the zoom to 100%, or reveal a popover with the numberic
+     * input field for manual inputing if the user pressed the CTRL key
+     * while clicking on the button.
      */
     public bool zoom_reset (Gdk.EventButton event) {
-        // If the CTRL key was pressed, show the input field.
+        // If the CTRL key was pressed, show the popover with the input field.
         if ((event.state & Gdk.ModifierType.CONTROL_MASK) > 0) {
-            zoom_default_button.visible = false;
-            zoom_default_button.no_show_all = true;
-            zoom_input.visible = true;
-            zoom_input.no_show_all = false;
-            zoom_input.grab_focus ();
-
+            zoom_popover.popup ();
             return true;
         }
 
@@ -146,12 +144,18 @@ public class Akira.Partials.ZoomButton : Gtk.Grid {
         return true;
     }
 
+    /*
+     * Update the button and the input field when the canvas scale is changed.
+     */
     private void on_set_scale (double scale) {
         var perc_scale = scale * 100;
         zoom_default_button.label = "%.0f%%".printf (perc_scale);
         zoom_input.text = perc_scale.to_string ();
     }
 
+    /*
+     * Key press events on the input field.
+     */
     private bool handle_key_press (Gdk.EventKey event) {
         // Arrow UP pressed, increase value by 1.
         if (event.keyval == Gdk.Key.Up) {
@@ -203,26 +207,30 @@ public class Akira.Partials.ZoomButton : Gtk.Grid {
 
         // Gtk.Entry doesn't currently support the "number only" filter, so
         // we need to intercept the keypress and prevent typing if the value
-        // is not a number.
-        if (!(event.keyval >= Gdk.Key.@0 && event.keyval <= Gdk.Key.@9)) {
+        // is not a number, or the CTRL modifier is not pressed.
+        if (
+            !(event.keyval >= Gdk.Key.@0 && event.keyval <= Gdk.Key.@9) &&
+            (event.state & Gdk.ModifierType.CONTROL_MASK) == 0
+        ) {
             return true;
         }
 
         return false;
     }
 
+    /*
+     * When the input field gains focus.
+     */
     private bool handle_focus_in (Gdk.EventFocus event) {
         window.event_bus.disconnect_typing_accel ();
         return false;
     }
 
+    /*
+     * When the input field loses focus.
+     */
     private bool handle_focus_out (Gdk.EventFocus event) {
         window.event_bus.connect_typing_accel ();
-        zoom_input.visible = false;
-        zoom_input.no_show_all = true;
-
-        zoom_default_button.visible = true;
-        zoom_default_button.no_show_all = false;
         return false;
     }
 }
