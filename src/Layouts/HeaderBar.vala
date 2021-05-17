@@ -401,12 +401,7 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
         window.event_bus.selected_items_list_changed.connect (on_selected_items_changed);
         window.event_bus.selected_items_changed.connect (on_selected_items_changed);
         window.event_bus.z_selected_changed.connect (update_button_sensitivity);
-        window.event_bus.set_scale.connect (on_set_scale);
         window.event_bus.update_recent_files_list.connect (fetch_recent_files);
-    }
-
-    private void on_set_scale (double scale) {
-        zoom.zoom_default_button.label = "%.0f%%".printf (scale * 100);
     }
 
     private void toggle () {

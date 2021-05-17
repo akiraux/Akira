@@ -6,6 +6,21 @@
     padding: 0 6px;
 }
 
+.button-zoom-start {
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+}
+
+.button-zoom-end {
+    border-top-left-radius: 0px;
+    border-bottom-left-radius: 0px;
+}
+
+entry.input-zoom {
+    padding: 3px 8px 4px;
+    margin: 6px;
+}
+
 .linked-flat button {
     background-color: shade (@bg_color, 1);
 }

@@ -20,7 +20,7 @@
  */
 
 /**
- * Manages the Canvas Pixel grid. This class take case of generating and updating
+ * Manages the Canvas Pixel grid. This class takes care of generating and updating
  * the global pixel grid whenever the user requires it. It also listens to the scale
  * variation of the main Canvas in order to return a properly usable grid with decently
  * spaced columns and rows, and a decently rendered grid thickness.
