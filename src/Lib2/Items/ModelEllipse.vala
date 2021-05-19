@@ -46,30 +46,28 @@ public class Akira.Lib2.Items.ModelEllipse : ModelItem {
     public override void component_updated (Lib2.Components.Component.Type type) {
         switch (type) {
             case Lib2.Components.Component.Type.COMPILED_BORDER:
-                var rgba = components.compiled_border.color;
-                var size = components.compiled_border.size;
-
-                if (size == 0 || rgba.alpha == 0.0) {
+                if (!components.compiled_border.is_visible) {
+                    canvas_item.set ("line-width", 0);
                     canvas_item.set ("stroke-color-rgba", null);
+                    break;
                 }
-                else {
-                    uint urgba = Utils.Color.rgba_to_uint (rgba);
-                    // The "line-width" property expects a DOUBLE type, but we don't support subpixels
-                    // so we always handle the border size as INT, therefore we need to type cast it here.
-                    canvas_item.set ("line-width", (double) size);
-                    canvas_item.set ("stroke-color-rgba", urgba);
-                }
+
+                var rgba = components.compiled_border.color;
+                uint urgba = Utils.Color.rgba_to_uint (rgba);
+                // The "line-width" property expects a DOUBLE type, but we don't support subpixels
+                // so we always handle the border size as INT, therefore we need to type cast it here.
+                canvas_item.set ("line-width", (double) components.compiled_border.size);
+                canvas_item.set ("stroke-color-rgba", urgba);
                 break;
             case Lib2.Components.Component.Type.COMPILED_FILL:
-                var rgba = components.compiled_fill.color;
+                if (!components.compiled_fill.is_visible) {
+                    canvas_item.set ("stroke-color-rgba", null);
+                    break;
+                }
 
-                if (rgba.alpha == 0.0) {
-                    canvas_item.set ("fill-color-rgba", null);
-                }
-                else {
-                    uint urgba = Utils.Color.rgba_to_uint (rgba);
-                    canvas_item.set ("fill-color-rgba", urgba);
-                }
+                var rgba = components.compiled_fill.color;
+                uint urgba = Utils.Color.rgba_to_uint (rgba);
+                canvas_item.set ("fill-color-rgba", urgba);
                 break;
             case Lib2.Components.Component.Type.COMPILED_GEOMETRY:
                 canvas_item.set ("radius-x", components.size.width / 2.0);

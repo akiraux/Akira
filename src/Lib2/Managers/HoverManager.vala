@@ -24,14 +24,16 @@ public class Akira.Lib2.Managers.HoverManager : Object {
     private const string STROKE_COLOR = "#41c9fd";
     private const double LINE_WIDTH = 2.0;
 
-    public unowned ViewCanvas view_canvas;
+    public unowned ViewCanvas view_canvas { get; construct; }
 
     private int current_hovered_id = -1;
     private Goo.CanvasItem hover_effect;
 
     public HoverManager (ViewCanvas canvas) {
-        view_canvas = canvas;
+        Object(view_canvas : canvas);
+    }
 
+    construct {
         view_canvas.window.event_bus.zoom.connect (on_canvas_zoom);
     }
 
@@ -73,14 +75,16 @@ public class Akira.Lib2.Managers.HoverManager : Object {
             remove_hover_effect ();
         }
 
-        var width = item.components.size.width + LINE_WIDTH / 4.0;
-        var height = item.components.size.height + LINE_WIDTH / 4.0;
+        var scale = view_canvas.current_scale;
+
+        var width = item.components.size.width + LINE_WIDTH / 4.0 / scale;
+        var height = item.components.size.height + LINE_WIDTH / 4.0 / scale;
 
         hover_effect = new Goo.CanvasRect (
             null,
             -(width / 2.0), -(height / 2.0),
             width, height,
-            "line-width", LINE_WIDTH / view_canvas.current_scale,
+            "line-width", LINE_WIDTH / scale,
             "stroke-color", STROKE_COLOR,
             null
         );

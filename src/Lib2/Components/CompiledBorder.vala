@@ -22,6 +22,7 @@
 public class Akira.Lib2.Components.CompiledBorder {
     private Gdk.RGBA _color;
     private int _size;
+    private bool _visible;
 
     public Gdk.RGBA color {
         get { return _color; }
@@ -31,9 +32,14 @@ public class Akira.Lib2.Components.CompiledBorder {
         get { return _size; }
     }
 
-    public CompiledBorder (Gdk.RGBA color, int size) {
+    public bool is_visible {
+        get { return _visible; }
+    }
+
+    public CompiledBorder (Gdk.RGBA color, int size, bool visible) {
         _color = color;
         _size = size;
+        _visible = visible;
     }
 
     public static CompiledBorder compile (Borders? borders, Opacity? opacity) {
@@ -46,7 +52,7 @@ public class Akira.Lib2.Components.CompiledBorder {
         rgba_border.alpha = 0;
 
         if (borders == null) {
-            return new CompiledBorder(rgba_border, size);
+            return new CompiledBorder(rgba_border, size, false);
         }
 
         // Loop through all the configured borders and reload the color.
@@ -68,6 +74,6 @@ public class Akira.Lib2.Components.CompiledBorder {
             rgba_border.alpha = rgba_border.alpha * opacity.opacity / 100;
         }
 
-        return new CompiledBorder(rgba_border, size);
+        return new CompiledBorder (rgba_border, size, has_colors && size != 0);
     }
 }

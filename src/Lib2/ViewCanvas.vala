@@ -21,7 +21,7 @@
 
 public class Akira.Lib2.ViewCanvas : Goo.Canvas {
     private const int SIZE = 30;
-    public weak Akira.Window window { get; construct; }
+    public unowned Akira.Window window { get; construct; }
 
     public Lib2.Managers.ItemsManager items_manager;
     public Lib2.Managers.SelectionManager selection_manager;
@@ -32,6 +32,8 @@ public class Akira.Lib2.ViewCanvas : Goo.Canvas {
     public bool ctrl_is_pressed = false;
     public bool shift_is_pressed = false;
     public double current_scale = 1.0;
+
+    private Utils.Nobs.Nob hovered_nob = Utils.Nobs.Nob.NONE;
     private Gdk.CursorType current_cursor = Gdk.CursorType.ARROW;
 
     public ViewCanvas (Akira.Window window) {
@@ -76,12 +78,10 @@ public class Akira.Lib2.ViewCanvas : Goo.Canvas {
         hover_manager.remove_hover_effect ();
         Gdk.CursorType? new_cursor = mode_manager.active_cursor_type ();
 
-        /*
         if (new_cursor == null) {
-            var hover_cursor = Akira.Lib.Managers.NobManager.cursor_from_nob (nob_manager.hovered_nob);
+            var hover_cursor = Utils.Nobs.cursor_from_nob (hovered_nob);
             new_cursor = (hover_cursor == null) ? Gdk.CursorType.ARROW : hover_cursor;
         }
-        */
 
         if (current_cursor != new_cursor) {
             // debug (@"Changing cursor. $new_cursor");
@@ -169,7 +169,7 @@ public class Akira.Lib2.ViewCanvas : Goo.Canvas {
         }
 
         if (uppercase_keyval == Gdk.Key.J) {
-            items_manager.debug_add_rectangles(100000, true);
+            items_manager.debug_add_rectangles(2500, true);
 
             return true;
         }
@@ -221,7 +221,55 @@ public class Akira.Lib2.ViewCanvas : Goo.Canvas {
             }
         }
 
-        //return press_event_on_selection (event)
+        handle_selection_press_event (event);
+
+        var target_nob = nob_manager.hit_test (event.x, event.y);
+
+        if (target_nob != Utils.Nobs.Nob.NONE) {
+            // TODO - hook up transform
+
+            return true;
+        }
+
+        var target = items_manager.hit_test (event.x, event.y);
+        if (target != null) {
+            if (!selection_manager.item_selected (target)) {
+                selection_manager.add_to_selection (target);
+                return true;
+            }
+        }
+        else {
+            selection_manager.reset_selection (null);
+        }
+
+
+        return false;
+    }
+
+    private bool handle_selection_press_event (Gdk.EventButton event) {
+        var nob_clicked = nob_manager.hit_test (event.x, event.y);
+
+        if (nob_clicked == Utils.Nobs.Nob.NONE) {
+            var target = items_manager.hit_test (event.x, event.y);
+            if (target != null) {
+                if (!selection_manager.item_selected (target)) {
+                    selection_manager.add_to_selection (target);
+                }
+            }
+            else {
+                selection_manager.reset_selection (null);
+            }
+        }
+
+        if (!selection_manager.is_empty ()) {
+            var new_mode = new Lib2.Modes.TransformMode (this, mode_manager, nob_clicked);
+            mode_manager.register_mode (new_mode);
+
+            if (mode_manager.button_press_event (event)) {
+                return true;
+            }
+        }
+
         return false;
     }
 
@@ -239,21 +287,26 @@ public class Akira.Lib2.ViewCanvas : Goo.Canvas {
         event.x = event.x / current_scale;
         event.y = event.y / current_scale;
 
-        //window.event_bus.coordinate_change (event.x, event.y);
-
         if (mode_manager.motion_notify_event (event)) {
             return true;
         }
 
-        /*
-        var nob_hovered = nob_manager.hit_test (event.x, event.y);
-        if (nob_hovered != nob_manager.hovered_nob) {
-            nob_manager.hovered_nob = nob_hovered;
+        var target_nob = nob_manager.hit_test (event.x, event.y);
+
+        if (target_nob != Utils.Nobs.Nob.NONE) {
+            hover_manager.remove_hover_effect ();
+            if (hovered_nob != target_nob) {
+                hovered_nob = target_nob;
+                set_cursor_by_interaction_mode ();
+            }
+            return true;
+        }
+        else if (hovered_nob != Utils.Nobs.Nob.NONE) {
+            hovered_nob = Utils.Nobs.Nob.NONE;
             set_cursor_by_interaction_mode ();
         }
-        */
 
-        hover_manager.on_mouse_over (event.x, event.y); //, nob_hovered);
+        hover_manager.on_mouse_over (event.x, event.y);
 
         return false;
     }

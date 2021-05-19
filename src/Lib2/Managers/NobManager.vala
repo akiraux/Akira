@@ -35,11 +35,10 @@ public class Akira.Lib2.Managers.NobManager : Object  {
 
     // Tracks if an artboard is part of the current selection.
     private bool is_artboard = false;
+    private int last_id = -1;
 
     public NobManager (Lib2.ViewCanvas canvas) {
-        Object (
-            view_canvas: canvas
-        );
+        Object (view_canvas: canvas);
     }
 
     construct {
@@ -64,17 +63,40 @@ public class Akira.Lib2.Managers.NobManager : Object  {
         var sm = view_canvas.selection_manager;
         if (sm.is_empty ()) {
             remove_select_effect ();
+            return;
         }
 
         populate_nobs (sm.selection);
+
+        int new_id = sm.selection.items[0].id;
+        bool needs_raising = new_id != last_id;
+
+        last_id = new_id;
+
         update_select_effect (sm.selection);
         update_nob_positions (sm.selection);
+
+        if (needs_raising) {
+            if (select_effect.is_visible ()) {
+                select_effect.raise (null);
+            }
+
+            if (rotation_line.is_visible ()) {
+                rotation_line.raise (null);
+            }
+
+            foreach (var nob in nobs) {
+                nob.raise (null);
+            }
+        }
+
     }
 
     /*
      * Resets all selection and nob items.
      */
     private void remove_select_effect () {
+        last_id = -1;
         if (select_effect != null) {
             select_effect.set ("visibility", Goo.CanvasItemVisibility.HIDDEN);
         }
@@ -187,6 +209,8 @@ public class Akira.Lib2.Managers.NobManager : Object  {
         double cy = 0;
         Utils.Nobs.nob_xy_from_coordinates (n0, tl_x, tl_y, tr_x, tr_y, bl_x, bl_y, br_x, br_y, sc, ref cx, ref cy);
 
+        bool visibility_changed = (show != nob.is_visible ());
+
         if (nob.handle_id == Utils.Nobs.Nob.ROTATE) {
             if (show) {
                 var n1 = Utils.Nobs.Nob.TOP_CENTER;
@@ -216,13 +240,16 @@ public class Akira.Lib2.Managers.NobManager : Object  {
         }
 
         nob.update_global_state (cx, cy, rotation, show);
-        nob.raise (select_effect);
     }
 
     /**
      * Updates selection items, constructing them if necessary.
      */
     private void update_select_effect (Lib2.Items.ItemSelection selection) {
+        if (selection.is_empty ()) {
+            return;
+        }
+
         double tl_x;
         double tl_y;
         double tr_x;
@@ -277,8 +304,8 @@ public class Akira.Lib2.Managers.NobManager : Object  {
         tr.rotate (rotation);
 
         select_effect.set_transform (tr);
+
         select_effect.set ("visibility", Goo.CanvasItemVisibility.VISIBLE);
-        select_effect.raise (null);
     }
 }
 

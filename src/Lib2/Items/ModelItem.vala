@@ -57,8 +57,7 @@ public class Akira.Lib2.Items.ModelItem : Object {
 
         var dirty_types = components.dirty_components.types;
         for (var i = 0; i < dirty_types.length; ++i) {
-            var type = dirty_types[i];
-            if (type.dirty) {
+            var type = dirty_types[i];            if (type.dirty) {
                 component_updated (type.type);
 
                 if (type.type == Lib2.Components.Component.Type.COMPILED_GEOMETRY) {
@@ -66,9 +65,10 @@ public class Akira.Lib2.Items.ModelItem : Object {
                 }
             }
 
-            dirty_types[i].dirty = false;
+            components.dirty_components.mark_dirty (type.type, false);
         }
-    }
+
+   }
 
     public void add_to_canvas (Goo.Canvas canvas) {
         construct_canvas_item (canvas);

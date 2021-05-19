@@ -114,6 +114,31 @@ public class Akira.Utils.Nobs : Object {
         return result;
     }
 
+    public static Nob opposite_nob (Nob nob_id) {
+        switch (nob_id) {
+            case Nob.TOP_LEFT:
+                return Nob.BOTTOM_RIGHT;
+            case Nob.TOP_CENTER:
+                return Nob.BOTTOM_CENTER;
+            case Nob.TOP_RIGHT:
+                return Nob.BOTTOM_LEFT;
+            case Nob.RIGHT_CENTER:
+                return Nob.LEFT_CENTER;
+            case Nob.BOTTOM_RIGHT:
+                return Nob.TOP_LEFT;
+            case Nob.BOTTOM_CENTER:
+                return Nob.TOP_CENTER;
+            case Nob.BOTTOM_LEFT:
+                return Nob.TOP_RIGHT;
+            case Nob.LEFT_CENTER:
+                return Nob.RIGHT_CENTER;
+            default:
+                break;
+        }
+
+        return Nob.NONE;
+    }
+
 
     public static void nob_xy_from_coordinates (
         Utils.Nobs.Nob nob,
@@ -175,6 +200,22 @@ public class Akira.Utils.Nobs : Object {
                 x = (tl_x + tr_x) / 2.0 + dx * ROTATION_LINE_HEIGHT / scale;
                 y = (tl_y + tr_y) / 2.0 + dy * ROTATION_LINE_HEIGHT / scale;
                 break;
+        }
+    }
+
+    /*
+     * Turns x or y values to zero if they are not affected by the nob.
+     * Assumes local x y coordinates.
+     */
+    public static void rectify_nob_xy (Nob nob, ref double x, ref double y) {
+        if (is_horizontal_center (nob)) {
+            y = 0.0;
+            return;
+        }
+
+        if (is_vertical_center (nob)) {
+            x = 0.0;
+            return;
         }
     }
 }

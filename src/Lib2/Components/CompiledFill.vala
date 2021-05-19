@@ -21,13 +21,19 @@
 
 public class Akira.Lib2.Components.CompiledFill {
     private Gdk.RGBA _color;
+    private bool _visible;
 
     public Gdk.RGBA color {
         get { return _color; }
     }
 
-    public CompiledFill (Gdk.RGBA color) {
+    public bool is_visible {
+        get { return _visible; }
+    }
+
+    public CompiledFill (Gdk.RGBA color, bool visible) {
         _color = color;
+        _visible = visible;
     }
 
 
@@ -39,7 +45,7 @@ public class Akira.Lib2.Components.CompiledFill {
         rgba_fill.alpha = 0;
 
         if (fills == null) {
-            return new CompiledFill (rgba_fill);
+            return new CompiledFill (rgba_fill, has_colors);
         }
 
         // Loop through all the configured fills.
@@ -60,6 +66,6 @@ public class Akira.Lib2.Components.CompiledFill {
             rgba_fill.alpha = rgba_fill.alpha * opacity.opacity / 100;
         }
 
-        return new CompiledFill (rgba_fill);
+        return new CompiledFill (rgba_fill, has_colors);
     }
 }

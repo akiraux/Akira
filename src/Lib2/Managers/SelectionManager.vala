@@ -21,13 +21,35 @@
  */
 
 public class Akira.Lib2.Managers.SelectionManager : Object {
-    public unowned ViewCanvas view_canvas;
+    public unowned ViewCanvas view_canvas { get; construct; }
+
+    /*
+     * Blocks notifications until class is destructed.
+     */
+    public class ChangeSignalBlocker {
+        private unowned SelectionManager manager;
+
+        public ChangeSignalBlocker (SelectionManager sm) {
+            this.manager = sm;
+            this.manager.block_change_notifications += 1;
+        }
+
+        ~ChangeSignalBlocker () {
+            manager.block_change_notifications -= 1;
+            manager.on_selection_changed ();
+        }
+
+    }
 
     public Lib2.Items.ItemSelection selection;
+    protected int block_change_notifications = 0;
 
     public SelectionManager (ViewCanvas canvas) {
-        view_canvas = canvas;
-        reset_selection (null);
+        Object (view_canvas : canvas);
+    }
+
+    construct {
+        selection = new Lib2.Items.ItemSelection (null);
     }
 
     public bool is_empty () {
@@ -35,11 +57,17 @@ public class Akira.Lib2.Managers.SelectionManager : Object {
     }
 
     public void reset_selection (Lib2.Items.ModelItem? selected_item) {
+        if (is_empty () && selected_item == null) {
+            return;
+        }
+
         selection = new Lib2.Items.ItemSelection (selected_item);
+        on_selection_changed ();
     }
 
     public void add_to_selection (Lib2.Items.ModelItem item) {
         selection.items.add (item);
+        on_selection_changed ();
     }
 
     public bool item_selected (Lib2.Items.ModelItem item) {
@@ -47,7 +75,9 @@ public class Akira.Lib2.Managers.SelectionManager : Object {
     }
 
     public void on_selection_changed () {
-        view_canvas.window.event_bus.selection_modified ();
+        if (block_change_notifications == 0) {
+            view_canvas.window.event_bus.selection_modified ();
+        }
     }
 }
 

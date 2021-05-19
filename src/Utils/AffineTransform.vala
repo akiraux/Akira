@@ -281,24 +281,6 @@ public class Akira.Utils.AffineTransform : Object {
         return deg * Math.PI / 180.0;
     }
 
-    public static void translate_center (
-        Lib2.Components.CompiledGeometry geometry,
-        double delta_x,
-        double delta_y,
-        ref double center_x,
-        ref double center_y
-    ) {
-        var new_left = geometry.bb_left ();
-        var new_top = geometry.bb_top ();
-        var offset_x = fix_size (new_left) - new_left;
-        var offset_y = fix_size (new_top) - new_top;
-
-        print("%f %f\n", offset_x, offset_y);
-
-        center_x += fix_size (delta_x) + offset_x;
-        center_y += fix_size (delta_y) + offset_y;
-    }
-
     /*
      * Rectifies and positions a center and size based on the top-left corner and a starting size.
      */
@@ -315,5 +297,17 @@ public class Akira.Utils.AffineTransform : Object {
 
         center_x = fix_size (left) + width / 2.0;
         center_y = fix_size (top) + height / 2.0;
+    }
+
+    public static void add_grid_snap_delta (
+        double x,
+        double y,
+        ref double delta_x,
+        ref double delta_y
+    ) {
+        var combined_x = x + delta_x;
+        var combined_y = y + delta_y;
+        delta_x += fix_size (combined_x) - combined_x;
+        delta_y += fix_size (combined_y) - combined_y;
     }
 }

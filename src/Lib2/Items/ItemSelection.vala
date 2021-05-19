@@ -24,26 +24,32 @@
  */
 public class Akira.Lib2.Items.ItemSelection : Object {
     public Gee.ArrayList<ModelItem> items;
+    public Gee.HashSet<int> item_ids;
 
     public ItemSelection (ModelItem? item) {
         items = new Gee.ArrayList<ModelItem> ();
+        item_ids = new Gee.HashSet<int> ();
+
         if (item != null) {
-            items.add(item);
+            add_item (item);
         }
     }
 
     public void add_item (ModelItem item) {
-        foreach (var exitem in items) {
-            if (item == exitem) {
-                return;
-            }
+        if (item_ids.contains (item.id)) {
+            return;
         }
 
         items.add (item);
+        item_ids.add (item.id);
     }
 
     public bool has_item (ModelItem item) {
         return items.contains (item);
+    }
+
+    public bool has_item_id (int id) {
+        return item_ids.contains (id);
     }
 
     public bool is_empty () { return items.size == 0; }

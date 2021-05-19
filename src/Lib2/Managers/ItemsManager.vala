@@ -21,7 +21,7 @@
  */
 
 public class Akira.Lib2.Managers.ItemsManager : Object {
-    public unowned Lib2.ViewCanvas view_canvas {set; get;}
+    public unowned Lib2.ViewCanvas view_canvas { get; construct; }
 
     private int last_id = 100;
     public Gee.LinkedList<Lib2.Items.ModelItem> items;
@@ -101,10 +101,12 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
         // create a timer object:
         Timer timer = new Timer ();
 
+        var blocker = new SelectionManager.ChangeSignalBlocker (view_canvas.selection_manager);
         for (var i = 0; i < num_of; ++i) {
-            var x = GLib.Random.double_range(0, (GLib.Math.log(num_of + GLib.Math.E) - 1) * 10000);
-            var y = GLib.Random.double_range(0, (GLib.Math.log(num_of + GLib.Math.E) - 1) * 10000);
-            add_debug_rect(x, y);
+            var x = GLib.Random.double_range(0, (GLib.Math.log(num_of + GLib.Math.E) - 1) * 1000);
+            var y = GLib.Random.double_range(0, (GLib.Math.log(num_of + GLib.Math.E) - 1) * 1000);
+            var new_item = add_debug_rect(x, y);
+            view_canvas.selection_manager.add_to_selection (new_item);
         }
 
         if (debug_timer) {
@@ -115,13 +117,8 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
     }
 
     public void on_item_geometry_changed (int id) {
-        if (items_by_id.has_key (id)) {
-            var target = items_by_id[id];
-
-            if (view_canvas.selection_manager.item_selected (target)) {
-                view_canvas.selection_manager.on_selection_changed ();
-            }
+        if (view_canvas.selection_manager.selection.has_item_id (id)) {
+            view_canvas.selection_manager.on_selection_changed ();
         }
     }
-
 }

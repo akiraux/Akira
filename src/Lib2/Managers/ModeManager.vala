@@ -34,15 +34,13 @@
  * See InteractionMode.vala for more details on how to create modes.
  */
 public class Akira.Lib2.Managers.ModeManager : Object {
-    public unowned Lib2.ViewCanvas view_canvas { set; get; }
+    public unowned Lib2.ViewCanvas view_canvas { get; construct; }
 
     private Akira.Lib2.Modes.PanMode pan_mode;
     private Akira.Lib2.Modes.AbstractInteractionMode active_mode;
 
     public ModeManager (Akira.Lib2.ViewCanvas canvas) {
-        Object (
-            view_canvas: canvas
-        );
+        Object (view_canvas: canvas);
     }
 
     /*

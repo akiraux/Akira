@@ -105,7 +105,7 @@ public class Akira.Lib2.Modes.ItemInsertMode : AbstractInteractionMode {
 
             view_canvas.selection_manager.reset_selection (item);
 
-            transform_mode = new Akira.Lib2.Modes.TransformMode (view_canvas, null);
+            transform_mode = new Akira.Lib2.Modes.TransformMode (view_canvas, null, Utils.Nobs.Nob.BOTTOM_LEFT);
             transform_mode.mode_begin ();
             transform_mode.button_press_event (event);
 
