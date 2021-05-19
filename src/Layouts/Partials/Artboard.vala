@@ -55,7 +55,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
     private Gtk.Revealer motion_revealer;
     public Gtk.Revealer motion_artboard_revealer;
 
-    private bool _editing { get; set; default = false; }
+    private bool _editing;
     public bool editing {
         get { return _editing; } set { _editing = value; }
     }

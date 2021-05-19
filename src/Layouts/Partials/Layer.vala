@@ -64,12 +64,12 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
     public Gtk.Revealer revealer;
     public Gtk.ListBox container;
 
-    private bool _editing { get; set; default = false; }
+    private bool _editing;
     public bool editing {
         get { return _editing; } set { _editing = value; }
     }
 
-    private bool _grouped { get; set; default = false; }
+    private bool _grouped;
     public bool grouped {
         get { return _grouped; } set construct { _grouped = value; }
     }
