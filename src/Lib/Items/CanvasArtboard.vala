@@ -119,14 +119,24 @@ public class Akira.Lib.Items.CanvasArtboard : Goo.CanvasGroup, Akira.Lib.Items.C
       this.size.bind_property ("width", label, "width", BindingFlags.SYNC_CREATE);
 
       // Listen to the theme changing event to update the label color.
-      akira_canvas.window.event_bus.change_theme.connect (() => {
-         label.set ("fill-color-rgba", settings.dark_theme ? light_color : dark_color);
-      });
+      akira_canvas.window.event_bus.change_theme.connect (on_theme_changed);
 
       // Update the label font size when the canvas zoom changes.
-      akira_canvas.window.event_bus.set_scale.connect ((scale) => {
-         label.set ("font", "Open Sans " + (FONT_SIZE / scale).to_string ());
-      });
+      akira_canvas.window.event_bus.set_scale.connect (on_canvas_scaled);
+   }
+
+   /*
+    * Update the color of the artboard label based on the light/dark theme.
+    */
+   private void on_theme_changed () {
+      label.set ("fill-color-rgba", settings.dark_theme ? light_color : dark_color);
+   }
+
+   /*
+    * Update the artboard label font size based on the current scale.
+    */
+   private void on_canvas_scaled (double scale) {
+      label.set ("font", "Open Sans " + (FONT_SIZE / scale).to_string ());
    }
 
    /**
@@ -167,6 +177,13 @@ public class Akira.Lib.Items.CanvasArtboard : Goo.CanvasGroup, Akira.Lib.Items.C
 
    public void delete () {
       background.remove ();
+
+      // Type cast the akira canvas to gain access to its attributes.
+      var akira_canvas = canvas as Lib.Canvas;
+      // Disconnect previously set events.
+      akira_canvas.window.event_bus.change_theme.disconnect (on_theme_changed);
+      akira_canvas.window.event_bus.set_scale.disconnect (on_canvas_scaled);
+
       // Reassign the Canvas as parent to the label in order to remove it.
       label.parent = parent;
       label.remove ();
