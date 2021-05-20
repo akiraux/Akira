@@ -28,6 +28,7 @@ public class Akira.Lib2.ViewCanvas : Goo.Canvas {
     public Lib2.Managers.ModeManager mode_manager;
     public Lib2.Managers.HoverManager hover_manager;
     public Lib2.Managers.NobManager nob_manager;
+    public Lib2.Managers.SnapManager snap_manager;
 
     public bool ctrl_is_pressed = false;
     public bool shift_is_pressed = false;
@@ -37,7 +38,7 @@ public class Akira.Lib2.ViewCanvas : Goo.Canvas {
     private Gdk.CursorType current_cursor = Gdk.CursorType.ARROW;
 
     public ViewCanvas (Akira.Window window) {
-        Object(window: window);
+        Object (window: window);
     }
 
     construct {
@@ -55,15 +56,29 @@ public class Akira.Lib2.ViewCanvas : Goo.Canvas {
         mode_manager = new Lib2.Managers.ModeManager (this);
         hover_manager = new Lib2.Managers.HoverManager (this);
         nob_manager = new Lib2.Managers.NobManager (this);
+        snap_manager = new Lib2.Managers.SnapManager (this);
 
         window.event_bus.update_scale.connect (on_update_scale);
         window.event_bus.set_scale.connect (on_set_scale);
         window.event_bus.set_focus_on_canvas.connect (focus_canvas);
         window.event_bus.insert_item.connect (start_insert_mode);
+        window.event_bus.update_snap_decorators.connect (on_update_snap_decorators);
     }
 
     public signal void canvas_moved (double delta_x, double delta_y);
     public signal void canvas_scroll_set_origin (double origin_x, double origin_y);
+
+    public void visible_bounds (
+        ref double top,
+        ref double left,
+        ref double bottom,
+        ref double right
+    ) {
+        top = vadjustment.value / current_scale;
+        left = hadjustment.value / current_scale;
+        bottom = top + get_allocated_height () / current_scale;
+        right = left + get_allocated_width () / current_scale;
+    }
 
     public void start_insert_mode (string insert_item_type) {
         var new_mode = new Akira.Lib2.Modes.ItemInsertMode (this, mode_manager, insert_item_type);
@@ -169,7 +184,7 @@ public class Akira.Lib2.ViewCanvas : Goo.Canvas {
         }
 
         if (uppercase_keyval == Gdk.Key.J) {
-            items_manager.debug_add_rectangles(2500, true);
+            items_manager.debug_add_rectangles (100000, true);
 
             return true;
         }
@@ -388,7 +403,7 @@ public class Akira.Lib2.ViewCanvas : Goo.Canvas {
         double y3 = 0;
         double rotation = 0;
 
-        selection_manager.selection.coordinates(
+        selection_manager.selection.coordinates (
             out x0,
             out y0,
             out x1,
@@ -417,5 +432,18 @@ public class Akira.Lib2.ViewCanvas : Goo.Canvas {
         ctx.close_path ();
         ctx.stroke ();
         ctx.restore ();
+    }
+
+    /*
+     * Will update snap decorators if necessary.
+     */
+    private void on_update_snap_decorators () {
+        var extra_context = mode_manager.active_mode_extra_context ();
+        if (extra_context is Akira.Lib2.Modes.TransformMode.TransformExtraContext) {
+            snap_manager.generate_decorators (
+                ((Lib2.Modes.TransformMode.TransformExtraContext) extra_context).snap_guide_data);
+        } else if (snap_manager.is_active ()) {
+            snap_manager.reset_decorators ();
+        }
     }
 }

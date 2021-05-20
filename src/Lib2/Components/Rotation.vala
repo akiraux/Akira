@@ -22,9 +22,13 @@
 public class Akira.Lib2.Components.Rotation {
     private double _degrees;
 
-    public Rotation(double degrees) {
+    public Rotation (double degrees) {
         _degrees = degrees;
      }
+
+    public Rotation from_radians (double radians) {
+        return new Rotation (180 * GLib.Math.PI * radians);
+    }
 
     public Rotation copy () {
         return new Rotation (_degrees);

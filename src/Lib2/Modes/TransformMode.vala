@@ -32,7 +32,7 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
 
     public Utils.Nobs.Nob nob = Utils.Nobs.Nob.NONE;
 
-    public class DragItemData : Object{
+    public class DragItemData : Object {
         public Lib2.Components.Coordinates item_center;
         public Lib2.Components.Size item_size;
         public Lib2.Components.Rotation item_rotation;
@@ -74,7 +74,7 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
             Utils.GeometryMath.min_max_coords (sel_tl_x, sel_tr_x, sel_bl_x, sel_br_x, ref left, ref right);
         }
 
-        public void nob_xy (Utils.Nobs.Nob nob, ref double x, ref double y)  {
+        public void nob_xy (Utils.Nobs.Nob nob, ref double x, ref double y) {
             Utils.Nobs.nob_xy_from_coordinates (
                 nob,
                 sel_tl_x,
@@ -98,8 +98,13 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
         }
     }
 
+    public class TransformExtraContext : Object {
+        public Lib2.Managers.SnapManager.SnapGuideData snap_guide_data;
+    }
+
     private Lib2.Items.ItemSelection selection;
     private InitialDragState initial_drag_state;
+    public TransformExtraContext transform_extra_context;
 
 
     public TransformMode (
@@ -117,7 +122,10 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
         initial_drag_state = new InitialDragState ();
     }
 
-    construct {}
+    construct {
+        transform_extra_context = new TransformExtraContext ();
+        transform_extra_context.snap_guide_data = new Lib2.Managers.SnapManager.SnapGuideData ();
+    }
 
     public override void mode_begin () {
         if (view_canvas.selection_manager.selection.is_empty ()) {
@@ -151,7 +159,10 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
         }
     }
 
-    public override void mode_end () {}
+    public override void mode_end () {
+        transform_extra_context = null;
+        view_canvas.window.event_bus.update_snap_decorators ();
+    }
 
     public override AbstractInteractionMode.ModeType mode_type () { return AbstractInteractionMode.ModeType.RESIZE; }
 
@@ -190,7 +201,8 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
                     selection,
                     initial_drag_state,
                     event.x,
-                    event.y
+                    event.y,
+                    ref transform_extra_context.snap_guide_data
                 );
                 break;
             case Utils.Nobs.Nob.ROTATE:
@@ -217,14 +229,20 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
         return true;
     }
 
+    public override Object? extra_context () {
+        return transform_extra_context;
+    }
+
     public static void move_from_event (
         ViewCanvas view_canvas,
         Lib2.Items.ItemSelection selection,
         InitialDragState initial_drag_state,
         double event_x,
-        double event_y
+        double event_y,
+        ref Lib2.Managers.SnapManager.SnapGuideData guide_data
     ) {
         var blocker = new Lib2.Managers.SelectionManager.ChangeSignalBlocker (view_canvas.selection_manager);
+        (void) blocker;
 
         var delta_x = event_x - initial_drag_state.press_x;
         var delta_y = event_y - initial_drag_state.press_y;
@@ -238,15 +256,58 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
 
         Utils.AffineTransform.add_grid_snap_delta (top, left, ref delta_x, ref delta_y);
 
+        int snap_offset_x = 0;
+        int snap_offset_y = 0;
+
+        if (settings.enable_snaps) {
+            guide_data.type = Akira.Lib2.Managers.SnapManager.SnapGuideType.NONE;
+            var sensitivity = Utils.Snapping2.adjusted_sensitivity (view_canvas.current_scale);
+            var selection_area = Goo.CanvasBounds () {
+                    x1 = left + delta_x,
+                    x2 = right + delta_x,
+                    y1 = top + delta_y,
+                    y2 = bottom + delta_y
+                };
+
+            var snap_grid = Utils.Snapping2.generate_best_snap_grid (
+                view_canvas,
+                selection,
+                selection_area,
+                sensitivity
+            );
+
+            if (!snap_grid.is_empty ()) {
+                var matches = Utils.Snapping2.generate_snap_matches (
+                    snap_grid,
+                    selection,
+                    selection_area,
+                    sensitivity
+                );
+
+
+                if (matches.h_data.snap_found ()) {
+                    snap_offset_x = matches.h_data.snap_offset ();
+                    guide_data.type = Akira.Lib2.Managers.SnapManager.SnapGuideType.SELECTION;
+                }
+
+                if (matches.v_data.snap_found ()) {
+                    snap_offset_y = matches.v_data.snap_offset ();
+                    guide_data.type = Akira.Lib2.Managers.SnapManager.SnapGuideType.SELECTION;
+                }
+            }
+        }
+
         var ct = 0;
         foreach (var item in selection.items) {
             var item_drag_data = initial_drag_state.items_data[ct];
-            var new_center_x = item_drag_data.item_center.x + delta_x;
-            var new_center_y = item_drag_data.item_center.y + delta_y;
+            var new_center_x = item_drag_data.item_center.x + delta_x + snap_offset_x;
+            var new_center_y = item_drag_data.item_center.y + delta_y + snap_offset_y;
             item.components.center = new Lib2.Components.Coordinates (new_center_x, new_center_y);
             item.recompile_geometry (true);
             ++ct;
         }
+
+        view_canvas.window.event_bus.update_snap_decorators ();
     }
 
     public static void scale_from_event (
@@ -257,7 +318,9 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
         double event_x,
         double event_y
     ) {
+        // TODO WIP
         var blocker = new Lib2.Managers.SelectionManager.ChangeSignalBlocker (view_canvas.selection_manager);
+        (void) blocker;
 
         if (selection.items.size != 1) {
             return;
@@ -308,8 +371,8 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
             double new_width_tmp = item_drag_data.item_size.width + width_change;
             double new_height_tmp = item_drag_data.item_size.height + height_change;
 
-            double new_width = new_width_tmp.abs();
-            double new_height = new_height_tmp.abs();
+            double new_width = new_width_tmp.abs ();
+            double new_height = new_height_tmp.abs ();
             double new_center_x = nob1_x + grid_offset_x + new_width / 2.0;
             double new_center_y = nob1_y + grid_offset_y + new_height / 2.0;
 
@@ -347,7 +410,6 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
 
             return;
         }
-        */
 
 
 
@@ -360,8 +422,8 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
             double new_width_tmp = item_drag_data.item_size.width + width_change;
             double new_height_tmp = item_drag_data.item_size.height + height_change;
 
-            double new_width = new_width_tmp.abs();
-            double new_height = new_height_tmp.abs();
+            double new_width = new_width_tmp.abs ();
+            double new_height = new_height_tmp.abs ();
             double new_center_x = nob1_x + grid_offset_x + new_width / 2.0;
             double new_center_y = nob1_y + grid_offset_y + new_height / 2.0;
 
@@ -378,6 +440,7 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
             item.recompile_geometry (true);
             ct++;
         }
+        */
     }
 
 
@@ -389,6 +452,7 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
         double event_y
     ) {
         var blocker = new Lib2.Managers.SelectionManager.ChangeSignalBlocker (view_canvas.selection_manager);
+        (void) blocker;
 
         double original_center_x = initial_drag_state.selection_center_x;
         double original_center_y = initial_drag_state.selection_center_y;

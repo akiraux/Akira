@@ -66,7 +66,7 @@ public class Akira.Lib2.Managers.SelectionManager : Object {
     }
 
     public void add_to_selection (Lib2.Items.ModelItem item) {
-        selection.items.add (item);
+        selection.add_item (item);
         on_selection_changed ();
     }
 
@@ -80,4 +80,3 @@ public class Akira.Lib2.Managers.SelectionManager : Object {
         }
     }
 }
-

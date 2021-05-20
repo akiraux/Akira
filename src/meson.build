@@ -37,6 +37,7 @@ sources = files(
     'Utils/ColorPicker.vala',
     'Utils/Nobs.vala',
     'Utils/Snapping.vala',
+    'Utils/Snapping2.vala',
     'Utils/GeometryMath.vala',
 
     'Layouts/HeaderBar.vala',
@@ -154,6 +155,7 @@ sources = files(
     'Lib2/Managers/NobManager.vala',
     'Lib2/Managers/HoverManager.vala',
     'Lib2/Managers/SelectionManager.vala',
+    'Lib2/Managers/SnapManager.vala',
 
     'Lib2/Modes/AbstractInteractionMode.vala',
     'Lib2/Modes/TransformMode.vala',

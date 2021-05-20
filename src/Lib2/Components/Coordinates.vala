@@ -37,6 +37,6 @@ public class Akira.Lib2.Components.Coordinates {
     }
 
     public Coordinates copy () {
-        return new Coordinates(_x, _y);
+        return new Coordinates (_x, _y);
     }
 }

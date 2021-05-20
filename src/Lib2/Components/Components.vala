@@ -51,7 +51,7 @@ public class Akira.Lib2.Components.Components : Object {
         }
 
         compiled_fill = CompiledFill.compile (fills, opacity);
-        dirty_components.mark_dirty(Component.Type.COMPILED_FILL, true);
+        dirty_components.mark_dirty (Component.Type.COMPILED_FILL, true);
         return true;
     }
 
@@ -63,7 +63,7 @@ public class Akira.Lib2.Components.Components : Object {
             return false;
         }
         compiled_border = CompiledBorder.compile (borders, opacity);
-        dirty_components.mark_dirty(Component.Type.COMPILED_BORDER, true);
+        dirty_components.mark_dirty (Component.Type.COMPILED_BORDER, true);
         return true;
     }
 
@@ -83,7 +83,7 @@ public class Akira.Lib2.Components.Components : Object {
             flipped
         );
 
-        dirty_components.mark_dirty(Component.Type.COMPILED_GEOMETRY, true);
+        dirty_components.mark_dirty (Component.Type.COMPILED_GEOMETRY, true);
 
         return true;
     }

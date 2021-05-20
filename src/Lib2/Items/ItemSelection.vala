@@ -36,7 +36,7 @@ public class Akira.Lib2.Items.ItemSelection : Object {
     }
 
     public void add_item (ModelItem item) {
-        if (item_ids.contains (item.id)) {
+        if (has_item (item)) {
             return;
         }
 
@@ -45,7 +45,7 @@ public class Akira.Lib2.Items.ItemSelection : Object {
     }
 
     public bool has_item (ModelItem item) {
-        return items.contains (item);
+        return item_ids.contains (item.id);
     }
 
     public bool has_item_id (int id) {
@@ -97,10 +97,10 @@ public class Akira.Lib2.Items.ItemSelection : Object {
 
         foreach (var item in items) {
             var cg = item.compiled_geometry ();
-            top = double.min(top, cg.bb_top ());
-            bottom = double.max(bottom, cg.bb_bottom ());
-            left = double.min(left, cg.bb_left ());
-            right = double.max(right, cg.bb_right ());
+            top = double.min (top, cg.bb_top ());
+            bottom = double.max (bottom, cg.bb_bottom ());
+            left = double.min (left, cg.bb_left ());
+            right = double.max (right, cg.bb_right ());
         }
 
         tl_x = left;
@@ -125,7 +125,7 @@ public class Akira.Lib2.Items.ItemSelection : Object {
         double br_y;
         double rot;
 
-        coordinates(out tl_x, out tl_y, out tr_x, out tr_y, out bl_x, out bl_y, out br_x, out br_y, out rot);
+        coordinates (out tl_x, out tl_y, out tr_x, out tr_y, out bl_x, out bl_y, out br_x, out br_y, out rot);
 
         Utils.Nobs.nob_xy_from_coordinates (nob, tl_x, tl_y, tr_x, tr_y, bl_x, bl_y, br_x, br_y, scale, ref x, ref y);
     }
@@ -151,10 +151,10 @@ public class Akira.Lib2.Items.ItemSelection : Object {
 
         foreach (var item in items) {
             var cg = item.compiled_geometry ();
-            top = double.min(top, cg.bb_top ());
-            bottom = double.max(bottom, cg.bb_bottom ());
-            left = double.min(left, cg.bb_left ());
-            right = double.max(right, cg.bb_right ());
+            top = double.min (top, cg.bb_top ());
+            bottom = double.max (bottom, cg.bb_bottom ());
+            left = double.min (left, cg.bb_left ());
+            right = double.max (right, cg.bb_right ());
         }
     }
 }

@@ -24,7 +24,7 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
     public unowned Lib2.ViewCanvas view_canvas { get; construct; }
 
     private int last_id = 100;
-    public Gee.LinkedList<Lib2.Items.ModelItem> items;
+    public Gee.ArrayList<Lib2.Items.ModelItem> items;
     public Gee.HashMap<int, Lib2.Items.ModelItem> items_by_id;
 
     public ItemsManager (Lib2.ViewCanvas canvas) {
@@ -32,7 +32,7 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
     }
 
     construct {
-        items = new Gee.LinkedList<Lib2.Items.ModelItem> ();
+        items = new Gee.ArrayList<Lib2.Items.ModelItem> ();
         items_by_id = new Gee.HashMap<int, Lib2.Items.ModelItem> ();
     }
 
@@ -45,7 +45,7 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
         items.add (item);
         items_by_id[item.id] = item;
 
-        item.geometry_changed.connect(on_item_geometry_changed);
+        item.geometry_changed.connect (on_item_geometry_changed);
 
         item.compile_components (false);
         item.add_to_canvas (view_canvas);
@@ -76,12 +76,6 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
         item.compile_components (true);
     }
 
-    private void compile_items() {
-        foreach (var item in items) {
-            item.compile_components (false);
-        }
-    }
-
     public Lib2.Items.ModelItem add_debug_rect (double x, double y) {
         var new_rect = new Lib2.Items.ModelRect (
             new Lib2.Components.Coordinates (x, y),
@@ -90,28 +84,29 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
             Lib2.Components.Fills.single_color (Lib2.Components.Color (0.0, 0.0, 0.0, 1.0))
         );
 
-        add_item_to_canvas(new_rect);
+        add_item_to_canvas (new_rect);
         return new_rect;
     }
 
     public void debug_add_rectangles (uint num_of, bool debug_timer = false) {
-    	ulong microseconds;
+        ulong microseconds;
         double seconds;
 
         // create a timer object:
         Timer timer = new Timer ();
 
         var blocker = new SelectionManager.ChangeSignalBlocker (view_canvas.selection_manager);
+        (void) blocker;
         for (var i = 0; i < num_of; ++i) {
-            var x = GLib.Random.double_range(0, (GLib.Math.log(num_of + GLib.Math.E) - 1) * 1000);
-            var y = GLib.Random.double_range(0, (GLib.Math.log(num_of + GLib.Math.E) - 1) * 1000);
-            var new_item = add_debug_rect(x, y);
+            var x = GLib.Random.double_range (0, (GLib.Math.log (num_of + GLib.Math.E) - 1) * 1000);
+            var y = GLib.Random.double_range (0, (GLib.Math.log (num_of + GLib.Math.E) - 1) * 1000);
+            var new_item = add_debug_rect (x, y);
             view_canvas.selection_manager.add_to_selection (new_item);
         }
 
         if (debug_timer) {
             timer.stop ();
-         	seconds = timer.elapsed (out microseconds);
+            seconds = timer.elapsed (out microseconds);
             print ("Created %u items in %s s\n", num_of, seconds.to_string ());
         }
     }

@@ -26,7 +26,7 @@ public class Akira.Lib2.Items.ModelEllipse : ModelItem {
         Lib2.Components.Borders? borders,
         Lib2.Components.Fills? fills
     ) {
-        components = new Lib2.Components.Components();
+        components = new Lib2.Components.Components ();
         components.center = center;
         components.size = size;
         components.borders = borders;

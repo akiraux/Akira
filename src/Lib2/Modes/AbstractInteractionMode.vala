@@ -49,6 +49,8 @@ public abstract class Akira.Lib2.Modes.AbstractInteractionMode : Object {
         PAN
     }
 
+    //public signal void request_deregistration ();
+
     /*
      * Override to define ModeType associated to mode.
      */
@@ -118,4 +120,3 @@ public abstract class Akira.Lib2.Modes.AbstractInteractionMode : Object {
         return null;
     }
 }
-

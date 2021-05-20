@@ -40,7 +40,7 @@ public class Akira.Lib2.Components.Component {
         public Type type;
         public bool dirty;
 
-        public RegisteredType(Type t) {
+        public RegisteredType (Type t) {
             type = t;
             dirty = false;
         }

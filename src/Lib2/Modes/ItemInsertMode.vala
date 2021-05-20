@@ -140,8 +140,7 @@ public class Akira.Lib2.Modes.ItemInsertMode : AbstractInteractionMode {
         return null;
     }
 
-    private static Lib2.Items.ModelItem construct_item (string from_type, double x, double y)
-    {
+    private static Lib2.Items.ModelItem construct_item (string from_type, double x, double y) {
         double center_x = 0.0;
         double center_y = 0.0;
         double width = 1.0;
@@ -187,7 +186,7 @@ public class Akira.Lib2.Modes.ItemInsertMode : AbstractInteractionMode {
                     borders_from_settings (),
                     fills_from_settings ()
                 );
-                new_item.components.rotation = new Lib2.Components.Rotation(30);
+                new_item.components.rotation = new Lib2.Components.Rotation (30);
                 break;
 
             case "artboard":
@@ -212,7 +211,7 @@ public class Akira.Lib2.Modes.ItemInsertMode : AbstractInteractionMode {
     private static Lib2.Components.Fills fills_from_settings () {
         var fill_rgba = Gdk.RGBA ();
         fill_rgba.parse (settings.fill_color);
-        return Lib2.Components.Fills.single_color(Lib2.Components.Color.from_rgba (fill_rgba));
+        return Lib2.Components.Fills.single_color (Lib2.Components.Color.from_rgba (fill_rgba));
     }
 
     private static Lib2.Components.Borders? borders_from_settings () {

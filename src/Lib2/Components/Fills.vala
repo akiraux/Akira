@@ -20,7 +20,7 @@
  */
 
 public class Akira.Lib2.Components.Fills {
-    public Fill.FillData[] _data;
+    public Fill.FillData[] data;
 
     public Fills () {}
 
@@ -28,16 +28,16 @@ public class Akira.Lib2.Components.Fills {
 
     public Gee.ArrayList<Fill> fills () {
         var tmp = new Gee.ArrayList<Fill> ();
-        for (var i = 0; i < _data.length; ++i) {
-            tmp.add(new Fill(_data[i]));
+        for (var i = 0; i < data.length; ++i) {
+            tmp.add (new Fill (data[i]));
         }
         return tmp;
     }
 
     public void prep_fills (uint number_to_prep) {
-        _data = new Fill.FillData[number_to_prep];
+        data = new Fill.FillData[number_to_prep];
         for (var i = 0; i < number_to_prep; ++i) {
-            _data[i]._id = i;
+            data[i]._id = i;
         }
     }
 
@@ -45,14 +45,14 @@ public class Akira.Lib2.Components.Fills {
 
     public static Fills single_color (Color color) {
         var tmp = new Fills ();
-        tmp._data = new Fill.FillData[1];
-        tmp._data[0] = Fill.FillData(0, color);
+        tmp.data = new Fill.FillData[1];
+        tmp.data[0] = Fill.FillData (0, color);
         return tmp;
     }
 
     public Fills clone () {
-        var cln = new Fills();
-        cln._data = _data;
+        var cln = new Fills ();
+        cln.data = data;
         return cln;
     }
  }

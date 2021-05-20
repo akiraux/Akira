@@ -32,13 +32,13 @@ public class Akira.Lib2.Components.Fill {
         // Recommended accessors
 
         public int id () { return _id; }
-        public Gdk.RGBA color () { return _color.rgba (); }
-        public bool is_color_hidden () { return _color.is_hidden (); }
+        public Gdk.RGBA color () { return _color.rgba; }
+        public bool is_color_hidden () { return _color.hidden; }
 
         // Mutators
 
-        public FillData with_color (int new_id, Color new_color) {
-            return FillData (new_id, new_color);
+        public FillData with_color (Color new_color) {
+            return FillData (_id, new_color);
         }
     }
 
@@ -52,6 +52,6 @@ public class Akira.Lib2.Components.Fill {
     // Recommended accessors
 
     public int id () { return _data._id; }
-    public Gdk.RGBA color () { return _data._color.rgba (); }
-    public bool is_color_hidden () { return _data._color.is_hidden (); }
+    public Gdk.RGBA color () { return _data._color.rgba; }
+    public bool is_color_hidden () { return _data._color.hidden; }
 }

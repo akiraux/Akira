@@ -34,18 +34,18 @@ public class Akira.Lib2.Components.Border {
         // Recommended accessors
 
         public int id () { return _id; }
-        public Gdk.RGBA color () { return _color.rgba (); }
-        public bool is_color_hidden () { return _color.is_hidden (); }
+        public Gdk.RGBA color () { return _color.rgba; }
+        public bool is_color_hidden () { return _color.hidden; }
         public int size () { return _size; }
 
         // Mutators
 
-        public BorderData with_color (int new_id, Color new_color) {
-            return BorderData (new_id, new_color, _size);
+        public BorderData with_color (Color new_color) {
+            return BorderData (_id, new_color, _size);
         }
 
-        public BorderData with_size (int new_id, int new_size) {
-            return BorderData (new_id, _color, new_size);
+        public BorderData with_size (int new_size) {
+            return BorderData (_id, _color, new_size);
         }
     }
 
@@ -59,7 +59,7 @@ public class Akira.Lib2.Components.Border {
     // Recommended accessors
 
     public int id () { return _data._id; }
-    public Gdk.RGBA color () { return _data._color.rgba (); }
-    public bool is_color_hidden () { return _data._color.is_hidden (); }
+    public Gdk.RGBA color () { return _data._color.rgba; }
+    public bool is_color_hidden () { return _data._color.hidden; }
     public int size () { return _data._size; }
 }

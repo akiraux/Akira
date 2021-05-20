@@ -20,23 +20,17 @@
  */
 
 public struct Akira.Lib2.Components.Color {
-    public Gdk.RGBA _rgba;
-    public bool _hidden;
+    public Gdk.RGBA rgba;
+    public bool hidden;
 
     public Color (double r = 0.0, double g = 0.0, double b = 0.0, double a = 1.0, bool hidden = false) {
-
-        _rgba = Gdk.RGBA () { red = r, green = g, blue = b, alpha = a };
+        rgba = Gdk.RGBA () { red = r, green = g, blue = b, alpha = a };
     }
 
     public static Color from_rgba (Gdk.RGBA rgba, bool hidden = false) {
         return Color (rgba.red, rgba.green, rgba.blue, rgba.alpha, hidden);
     }
 
-    // Recommended accessors
-
-    public Gdk.RGBA rgba () { return _rgba; }
-    public bool is_hidden () { return _hidden; }
-
     // Mutators
-    public Color with_hidden (bool hidden) { return Color (_rgba.red, _rgba.green, _rgba.blue, _rgba.alpha, _hidden); }
+    public Color with_hidden (bool hidden) { return Color (rgba.red, rgba.green, rgba.blue, rgba.alpha, hidden); }
 }

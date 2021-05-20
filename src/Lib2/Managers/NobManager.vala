@@ -23,7 +23,7 @@
 /*
  *
  */
-public class Akira.Lib2.Managers.NobManager : Object  {
+public class Akira.Lib2.Managers.NobManager : Object {
     private const string STROKE_COLOR = "#666";
     private const double LINE_WIDTH = 1.0;
 
@@ -34,7 +34,6 @@ public class Akira.Lib2.Managers.NobManager : Object  {
     private Goo.CanvasPolyline? rotation_line = null;
 
     // Tracks if an artboard is part of the current selection.
-    private bool is_artboard = false;
     private int last_id = -1;
 
     public NobManager (Lib2.ViewCanvas canvas) {
@@ -209,8 +208,6 @@ public class Akira.Lib2.Managers.NobManager : Object  {
         double cy = 0;
         Utils.Nobs.nob_xy_from_coordinates (n0, tl_x, tl_y, tr_x, tr_y, bl_x, bl_y, br_x, br_y, sc, ref cx, ref cy);
 
-        bool visibility_changed = (show != nob.is_visible ());
-
         if (nob.handle_id == Utils.Nobs.Nob.ROTATE) {
             if (show) {
                 var n1 = Utils.Nobs.Nob.TOP_CENTER;
@@ -230,8 +227,8 @@ public class Akira.Lib2.Managers.NobManager : Object  {
                 double pp1 = 0.0;
                 double pp2 = 0.0;
                 double pp3 = 0.0;
-                rotation_line.points.get_point(0, out pp0, out pp1);
-                rotation_line.points.get_point(1, out pp2, out pp3);
+                rotation_line.points.get_point (0, out pp0, out pp1);
+                rotation_line.points.get_point (1, out pp2, out pp3);
             }
             else {
                 rotation_line.set ("visibility", Goo.CanvasItemVisibility.HIDDEN);
@@ -308,4 +305,3 @@ public class Akira.Lib2.Managers.NobManager : Object  {
         select_effect.set ("visibility", Goo.CanvasItemVisibility.VISIBLE);
     }
 }
-

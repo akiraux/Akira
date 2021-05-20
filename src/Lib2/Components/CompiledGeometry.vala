@@ -48,18 +48,18 @@ public class Akira.Lib2.Components.CompiledGeometry {
 
         // This is cached data used for hit-testing
         public Cairo.Matrix _ht_transform;
-        private double _ht_half_width;
-        private double _ht_half_height;
+        public double _ht_half_width;
+        public double _ht_half_height;
     }
 
-    public CompiledGeometryData _data;
+    private CompiledGeometryData _data;
 
     public CompiledGeometry (CompiledGeometryData data) {
         _data = data;
     }
 
     public CompiledGeometry copy () {
-        return new CompiledGeometry(_data);
+        return new CompiledGeometry (_data);
     }
 
     public Cairo.Matrix transform () { return _data._transform; }
@@ -68,6 +68,9 @@ public class Akira.Lib2.Components.CompiledGeometry {
     public double bb_right () { return _data._bb_right; }
     public double bb_bottom () { return _data._bb_bottom; }
     public double bb_left () { return _data._bb_left; }
+
+    public double bb_center_x () { return (_data._bb_right + _data._bb_left) / 2.0; }
+    public double bb_center_y () { return (_data._bb_bottom + _data._bb_top) / 2.0; }
 
     public double x0 () { return _data._x0; }
     public double y0 () { return _data._y0; }
@@ -86,6 +89,22 @@ public class Akira.Lib2.Components.CompiledGeometry {
                (y >= -_data._ht_half_height && y <= _data._ht_half_height);
     }
 
+    public void bounding_box (
+        out double top,
+        out double left,
+        out double bottom,
+        out double right,
+        out double center_x,
+        out double center_y
+    ) {
+        top = _data._bb_top;
+        left = _data._bb_left;
+        bottom = _data._bb_bottom;
+        right = _data._bb_right;
+        center_x = (left + right) / 2.0;
+        center_y = (top + bottom) / 2.0;
+    }
+
     public static CompiledGeometry compile (
         Coordinates center,
         Size size,
@@ -94,7 +113,7 @@ public class Akira.Lib2.Components.CompiledGeometry {
         Flipped? flipped
     ) {
         var data = CompiledGeometryData ();
-        data._transform = Cairo.Matrix.identity();
+        data._transform = Cairo.Matrix.identity ();
         data._transform.rotate (rotation.in_radians ());
 
         var half_height = size.height / 2.0;
@@ -116,10 +135,10 @@ public class Akira.Lib2.Components.CompiledGeometry {
         var y3 = bottom;
         var x3 = right;
 
-        data._transform.transform_point(ref x0, ref y0);
-        data._transform.transform_point(ref x1, ref y1);
-        data._transform.transform_point(ref x2, ref y2);
-        data._transform.transform_point(ref x3, ref y3);
+        data._transform.transform_point (ref x0, ref y0);
+        data._transform.transform_point (ref x1, ref y1);
+        data._transform.transform_point (ref x2, ref y2);
+        data._transform.transform_point (ref x3, ref y3);
 
         data._transform.x0 = center.x;
         data._transform.y0 = center.y;
@@ -145,7 +164,7 @@ public class Akira.Lib2.Components.CompiledGeometry {
         data._x3 = x3;
         data._y3 = y3;
 
-        data._ht_transform = Cairo.Matrix.identity();
+        data._ht_transform = Cairo.Matrix.identity ();
         data._ht_transform.rotate (-rotation.in_radians ());
         data._ht_transform.x0 = center.x;
         data._ht_transform.y0 = center.y;

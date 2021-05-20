@@ -381,7 +381,7 @@ public class Akira.Utils.Snapping : Object {
     /**
      * Generate a default match data.
      */
-    private static SnapMatchData default_match_data () {
+    public static SnapMatchData default_match_data () {
         var matches = SnapMatchData ();
         matches.v_data.type = MatchType.NONE;
         matches.v_data.snap_position = 0;

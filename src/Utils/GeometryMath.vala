@@ -29,9 +29,9 @@ public class Akira.Utils.GeometryMath : Object {
         }
     }
 
-    public static void min_max_coords(double x0, double x1, double x2, double x3, ref double min, ref double max) {
-        min_max(ref x0, ref x1);
-        min_max(ref x2, ref x3);
+    public static void min_max_coords (double x0, double x1, double x2, double x3, ref double min, ref double max) {
+        min_max (ref x0, ref x1);
+        min_max (ref x2, ref x3);
 
         min = x0 < x2 ? x0 : x2;
         max = x1 > x3 ? x1 : x3;
@@ -41,11 +41,11 @@ public class Akira.Utils.GeometryMath : Object {
         var xx = (x1 - x0) * (x1 - x0);
         var yy = (y1 - y0) * (y1 - y0);
 
-        return GLib.Math.sqrt(xx + yy);
+        return GLib.Math.sqrt (xx + yy);
     }
 
     public static void normalize (ref double dx, ref double dy) {
-        var dm = GLib.Math.sqrt(dx * dx + dy * dy);
+        var dm = GLib.Math.sqrt (dx * dx + dy * dy);
         dx = dm > 0 ? (dx / dm) : 0;
         dy = dm > 0 ? (dy / dm) : 0;
     }

@@ -50,14 +50,15 @@ public class Akira.Lib2.Items.ModelItem : Object {
         }
     }
 
-    public void notify_view_of_changes() {
+    public void notify_view_of_changes () {
         if (canvas_item == null) {
             return;
         }
 
         var dirty_types = components.dirty_components.types;
         for (var i = 0; i < dirty_types.length; ++i) {
-            var type = dirty_types[i];            if (type.dirty) {
+            var type = dirty_types[i];
+            if (type.dirty) {
                 component_updated (type.type);
 
                 if (type.type == Lib2.Components.Component.Type.COMPILED_GEOMETRY) {
@@ -82,7 +83,7 @@ public class Akira.Lib2.Items.ModelItem : Object {
 
     public virtual void component_updated (Lib2.Components.Component.Type type) {}
 
-    public Lib2.Components.CompiledGeometry compiled_geometry () {
+    public unowned Lib2.Components.CompiledGeometry compiled_geometry () {
         components.maybe_compile_geometry ();
         return components.compiled_geometry;
     }

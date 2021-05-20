@@ -30,7 +30,7 @@ public class Akira.Lib2.Managers.HoverManager : Object {
     private Goo.CanvasItem hover_effect;
 
     public HoverManager (ViewCanvas canvas) {
-        Object(view_canvas : canvas);
+        Object (view_canvas : canvas);
     }
 
     construct {
@@ -82,7 +82,7 @@ public class Akira.Lib2.Managers.HoverManager : Object {
 
         hover_effect = new Goo.CanvasRect (
             null,
-            -(width / 2.0), -(height / 2.0),
+            - (width / 2.0), - (height / 2.0),
             width, height,
             "line-width", LINE_WIDTH / scale,
             "stroke-color", STROKE_COLOR,
@@ -108,4 +108,3 @@ public class Akira.Lib2.Managers.HoverManager : Object {
         hover_effect.set ("line-width", LINE_WIDTH / view_canvas.current_scale);
     }
 }
-

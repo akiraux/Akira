@@ -52,19 +52,19 @@ public class Akira.Lib2.Components.CompiledBorder {
         rgba_border.alpha = 0;
 
         if (borders == null) {
-            return new CompiledBorder(rgba_border, size, false);
+            return new CompiledBorder (rgba_border, size, false);
         }
 
         // Loop through all the configured borders and reload the color.
-        for (var i = 0; i < borders._data.length; ++i) {
+        for (var i = 0; i < borders.data.length; ++i) {
             // Skip if the border is hidden as we don't need to blend colors.
-            if (borders._data[i].is_color_hidden ()) {
+            if (borders.data[i].is_color_hidden ()) {
                 continue;
             }
 
             // Set the new blended color.
-            rgba_border = Utils.Color.blend_colors (rgba_border, borders._data[i].color ());
-            size = int.max (size, borders._data[i].size ());
+            rgba_border = Utils.Color.blend_colors (rgba_border, borders.data[i].color ());
+            size = int.max (size, borders.data[i].size ());
             has_colors = true;
         }
 
