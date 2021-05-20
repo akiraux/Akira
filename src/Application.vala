@@ -41,7 +41,7 @@ public class Akira.Application : Gtk.Application {
 
         weak Gtk.IconTheme default_theme = Gtk.IconTheme.get_default ();
         default_theme.add_resource_path ("/com/github/akiraux/akira");
-            
+
         foreach (var file in files) {
             if (is_file_opened (file)) {
                 // Present active window with currently opened file.
