@@ -23,7 +23,7 @@
  * Rotation component to keep track of the item's rotation.
  */
 public class Akira.Lib.Components.Rotation : Component {
-    private double _rotation { get; set; }
+    private double _rotation;
     public double rotation {
         get {
             return _rotation;
