@@ -20,7 +20,6 @@
 */
 
 public class Akira.Partials.InputField : Gtk.EventBox {
-    //  private Akira.Window window;
     public Gtk.SpinButton entry { get; construct set; }
 
     public int chars { get; construct set; }

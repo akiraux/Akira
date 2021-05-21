@@ -27,7 +27,7 @@ public class Akira.Partials.HeaderBarButton : Gtk.Grid {
     public string? sensitive_type;
 
     public HeaderBarButton (Akira.Window _window, string icon_name, string name,
-        string[]? accels = null,string? type = null) {
+        string[]? accels = null, string? type = null) {
         window = _window;
         sensitive_type = type;
         label_btn = new Gtk.Label (name);
