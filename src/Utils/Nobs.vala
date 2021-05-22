@@ -139,6 +139,114 @@ public class Akira.Utils.Nobs : Object {
         return Nob.NONE;
     }
 
+    /*
+     *
+     */
+    public static void rectify_nob (
+        double top,
+        double left,
+        double bottom,
+        double right,
+        double ev_x,
+        double ev_y,
+        ref Nob nob
+    ) {
+        switch (nob) {
+            case Nob.TOP_LEFT:
+                rectify_top_nob (bottom, ev_y, ref nob);
+                rectify_left_nob (right, ev_x, ref nob);
+                return;
+            case Nob.TOP_CENTER:
+                rectify_top_nob (bottom, ev_y, ref nob);
+                return;
+            case Nob.TOP_RIGHT:
+                rectify_top_nob (bottom, ev_y, ref nob);
+                rectify_right_nob (left, ev_x, ref nob);
+                return;
+            case Nob.RIGHT_CENTER:
+                rectify_right_nob (left, ev_x, ref nob);
+                return;
+            case Nob.BOTTOM_RIGHT:
+                rectify_bottom_nob (top, ev_y, ref nob);
+                rectify_right_nob (left, ev_x, ref nob);
+                return;
+            case Nob.BOTTOM_CENTER:
+                rectify_bottom_nob (top, ev_y, ref nob);
+                return;
+            case Nob.BOTTOM_LEFT:
+                rectify_bottom_nob (top, ev_y, ref nob);
+                rectify_left_nob (right, ev_x, ref nob);
+                return;
+            case Nob.LEFT_CENTER:
+                rectify_left_nob (right, ev_x, ref nob);
+                return;
+            default:
+                break;
+        }
+    }
+    public static void rectify_left_nob (double right, double ev_x, ref Nob nob) {
+        if (ev_x <= right) {
+            return;
+        }
+
+        if (nob == Nob.LEFT_CENTER) {
+            nob = Nob.RIGHT_CENTER;
+        }
+        else if (nob == Nob.TOP_LEFT) {
+            nob = Nob.TOP_RIGHT;
+        }
+        else if (nob == Nob.BOTTOM_LEFT) {
+            nob = Nob.BOTTOM_RIGHT;
+        }
+    }
+
+    public static void rectify_right_nob (double left, double ev_x, ref Nob nob) {
+        if (ev_x >= left) {
+            return;
+        }
+
+        if (nob == Nob.RIGHT_CENTER) {
+            nob = Nob.LEFT_CENTER;
+        }
+        else if (nob == Nob.TOP_RIGHT) {
+            nob = Nob.TOP_LEFT;
+        }
+        else if (nob == Nob.BOTTOM_RIGHT) {
+            nob = Nob.BOTTOM_LEFT;
+        }
+    }
+
+    public static void rectify_top_nob (double bottom, double ev_y, ref Nob nob) {
+        if (ev_y <= bottom) {
+            return;
+        }
+
+        if (nob == Nob.TOP_CENTER) {
+            nob = Nob.BOTTOM_CENTER;
+        }
+        else if (nob == Nob.TOP_RIGHT) {
+            nob = Nob.BOTTOM_RIGHT;
+        }
+        else if (nob == Nob.TOP_LEFT) {
+            nob = Nob.BOTTOM_LEFT;
+        }
+    }
+
+    public static void rectify_bottom_nob (double top, double ev_y, ref Nob nob) {
+        if (ev_y >= top) {
+            return;
+        }
+
+        if (nob == Nob.BOTTOM_CENTER) {
+            nob = Nob.TOP_CENTER;
+        }
+        else if (nob == Nob.BOTTOM_RIGHT) {
+            nob = Nob.TOP_RIGHT;
+        }
+        else if (nob == Nob.BOTTOM_LEFT) {
+            nob = Nob.TOP_LEFT;
+        }
+    }
 
     public static void nob_xy_from_coordinates (
         Utils.Nobs.Nob nob,

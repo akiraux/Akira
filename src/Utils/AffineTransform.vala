@@ -146,6 +146,123 @@ public class Akira.Utils.AffineTransform : Object {
     }
 
     /**
+     * Calculate adjustments necessary for a nob resize operation. All inputs
+     * should have already been transformed to the correct space.
+     */
+    public static void calculate_size_adjustments2 (
+        Utils.Nobs.Nob nob,
+        double item_width,
+        double item_height,
+        double delta_x,
+        double delta_y,
+        double size_ratio,
+        bool ratio_locked,
+        bool symmetric,
+        Cairo.Matrix transform,
+        ref double inc_x,
+        ref double inc_y,
+        ref double inc_width,
+        ref double inc_height
+    ) {
+        double local_x_adj = 0.0;
+        double local_y_adj = 0.0;
+        double perm_x_adj = 0.0;
+        double perm_y_adj = 0.0;
+        double perm_w_adj = 0;
+        double perm_h_adj = 0;
+
+        nob = correct_nob (
+            nob,
+            item_width,
+            item_height,
+            symmetric,
+            ref delta_x,
+            ref delta_y,
+            ref perm_x_adj,
+            ref perm_y_adj,
+            ref perm_w_adj,
+            ref perm_h_adj
+        );
+
+        double symmetry_offset_x = 0;
+        double symmetry_offset_y = 0;
+
+        // Handle vertical adjustment.
+        if (Utils.Nobs.is_top_nob (nob)) {
+            inc_height = -delta_y;
+            local_y_adj = -inc_height;
+
+            if (symmetric) {
+                inc_height *= 2;
+            }
+        } else if (Utils.Nobs.is_bot_nob (nob)) {
+            inc_height = inc_height + delta_y;
+
+            if (symmetric) {
+                symmetry_offset_y = -delta_y;
+                local_y_adj = symmetry_offset_y;
+                inc_height += delta_y;
+            }
+        }
+
+        // Handle horizontal adjustment.
+        if (Utils.Nobs.is_left_nob (nob)) {
+            inc_width = inc_width - delta_x;
+            local_x_adj = -inc_width;
+
+            if (symmetric) {
+                inc_width *= 2;
+            }
+        } else if (Utils.Nobs.is_right_nob (nob)) {
+            inc_width = delta_x;
+
+            if (symmetric) {
+                symmetry_offset_x = -delta_x;
+                local_x_adj = symmetry_offset_x;
+                inc_width += delta_x;
+            }
+        }
+
+        if (ratio_locked) {
+            item_width += perm_w_adj;
+            item_height += perm_h_adj;
+
+            bool pure_v = (nob == Utils.Nobs.Nob.TOP_CENTER || nob == Utils.Nobs.Nob.BOTTOM_CENTER);
+            bool pure_h = (nob == Utils.Nobs.Nob.RIGHT_CENTER || nob == Utils.Nobs.Nob.LEFT_CENTER);
+
+            if (pure_v || (!pure_h && (item_width + inc_width) / (item_height + inc_height) < size_ratio)) {
+                inc_width = (inc_height + perm_h_adj) * size_ratio - perm_w_adj;
+                if (symmetric) {
+                    local_x_adj = -inc_width / 2.0;
+                } else if (nob == Utils.Nobs.Nob.TOP_LEFT || nob == Utils.Nobs.Nob.BOTTOM_LEFT) {
+                    local_x_adj = -inc_width;
+                } else if (pure_v) {
+                    local_x_adj = - inc_width / 2.0;
+                }
+            } else if (!pure_v) {
+                inc_height = (inc_width + perm_w_adj) / size_ratio - perm_h_adj;
+                if (symmetric) {
+                    local_y_adj = -inc_height / 2.0;
+                } else if (nob == Utils.Nobs.Nob.TOP_LEFT || nob == Utils.Nobs.Nob.TOP_RIGHT) {
+                    local_y_adj = -inc_height;
+                } else if (pure_h) {
+                    local_y_adj = - inc_height / 2.0;
+                }
+            }
+        }
+
+        apply_transform_to_adjustment (
+            transform,
+            local_x_adj + perm_x_adj,
+            local_y_adj - perm_y_adj,
+            ref inc_x,
+            ref inc_y
+        );
+
+        inc_width += perm_w_adj;
+        inc_height += perm_h_adj;
+    }
+    /**
      * Corrects which nob should be used for scaling depending on the delta change of the drag.
      * The nob will be flipped in the vertical and horizontal directions if needed, and
      * the necessary adjustments to delta_x, delta_y and other adjustments will be populated.

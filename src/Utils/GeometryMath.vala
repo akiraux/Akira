@@ -50,4 +50,32 @@ public class Akira.Utils.GeometryMath : Object {
         dy = dm > 0 ? (dy / dm) : 0;
     }
 
+    public static void to_local (
+        double rotation_rad,
+        double rot_center_x,
+        double rot_center_y,
+        ref double x,
+        ref double y
+    ) {
+        var tr = Cairo.Matrix.identity ();
+        tr.rotate (rotation_rad);
+        to_local_from_matrix (tr, rot_center_x, rot_center_y, ref x, ref y);
+    }
+
+    public static void to_local_from_matrix (
+        Cairo.Matrix tr,
+        double rot_center_x,
+        double rot_center_y,
+        ref double x,
+        ref double y
+    ) {
+        double dx = x - rot_center_x;
+        double dy = y - rot_center_y;
+
+        tr.transform_distance (ref dx, ref dy);
+
+        x = rot_center_x + dx;
+        y = rot_center_y + dy;
+    }
+
 }

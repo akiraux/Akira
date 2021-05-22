@@ -41,4 +41,8 @@ public class Akira.Lib2.Components.Rotation {
      public double in_radians () {
         return _degrees * GLib.Math.PI / 180.0;
      }
+
+     public bool has_normal_rotation () {
+         return GLib.Math.fmod (_degrees, 90) == 0;
+     }
 }

@@ -318,6 +318,7 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
         double event_x,
         double event_y
     ) {
+
         // TODO WIP
         var blocker = new Lib2.Managers.SelectionManager.ChangeSignalBlocker (view_canvas.selection_manager);
         (void) blocker;
@@ -326,121 +327,109 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
             return;
         }
 
-        var opposite_nob = Utils.Nobs.opposite_nob (nob);
+        var local_top = initial_drag_state.sel_tl_y;
+        var local_left = initial_drag_state.sel_tl_x;
+        var local_bottom = initial_drag_state.sel_br_y;
+        var local_right = initial_drag_state.sel_br_x;
 
-        double nob0_x = 0.0;
-        double nob0_y = 0.0;
-        double nob1_x = 0.0;
-        double nob1_y = 0.0;
+        double grid_offset_x = 0.0;
+        double grid_offset_y = 0.0;
+        Utils.AffineTransform.add_grid_snap_delta (local_top, local_left, ref grid_offset_x, ref grid_offset_y);
 
-        initial_drag_state.nob_xy (nob, ref nob0_x, ref nob0_y);
-        initial_drag_state.nob_xy (opposite_nob, ref nob1_x, ref nob1_y);
+        double rot_center_x = initial_drag_state.selection_center_x;
+        double rot_center_y = initial_drag_state.selection_center_y;
 
-        var delta_x = event_x - nob0_x;
-        var delta_y = event_y - nob0_y;
+        var itr = Cairo.Matrix.identity();
+        itr.rotate (-initial_drag_state.sel_rotation);
 
-        var tr = Cairo.Matrix.identity ();
-        tr.rotate (-initial_drag_state.sel_rotation);
+        Utils.GeometryMath.to_local_from_matrix (itr, rot_center_x, rot_center_y, ref local_left, ref local_top);
+        Utils.GeometryMath.to_local_from_matrix (itr, rot_center_x, rot_center_y, ref local_right, ref local_bottom);
+        var start_width = double.max(1.0, local_right - local_left);
+        var start_height = double.max(1.0, local_bottom - local_top);
 
-        tr.transform_distance (ref delta_x, ref delta_y);
+        double nob_x = 0.0;
+        double nob_y = 0.0;
 
+        Utils.Nobs.nob_xy_from_coordinates (
+            nob,
+            initial_drag_state.sel_tl_x,
+            initial_drag_state.sel_tl_y,
+            initial_drag_state.sel_tr_x,
+            initial_drag_state.sel_tr_y,
+            initial_drag_state.sel_bl_x,
+            initial_drag_state.sel_bl_y,
+            initial_drag_state.sel_br_x,
+            initial_drag_state.sel_br_y,
+            1.0,
+            ref nob_x,
+            ref nob_y
+        );
 
-        Utils.Nobs.rectify_nob_xy (nob, ref delta_x, ref delta_y);
+        double local_ev_x = event_x;
+        double local_ev_y = event_y;
+        Utils.GeometryMath.to_local_from_matrix (itr, rot_center_x, rot_center_y, ref local_ev_x, ref local_ev_y);
 
-        var grid_offset_x = 0.0;
-        var grid_offset_y = 0.0;
-        Utils.AffineTransform.add_grid_snap_delta (nob1_x, nob1_y, ref grid_offset_x, ref grid_offset_y);
+        double local_nob_x = nob_x;
+        double local_nob_y = nob_y;
+        Utils.GeometryMath.to_local_from_matrix (itr, rot_center_x, rot_center_y, ref local_nob_x, ref local_nob_y);
 
-        var sel_width = (nob1_x + grid_offset_x - nob0_x).abs ();
-        var sel_height = (nob1_y + grid_offset_y - nob0_y).abs ();
+        double inc_width = 0;
+        double inc_height = 0;
+        double inc_x = 0;
+        double inc_y = 0;
 
-        delta_x = Utils.AffineTransform.fix_size (delta_x);
-        delta_y = Utils.AffineTransform.fix_size (delta_y);
-        delta_x += (sel_width + delta_x == 0) ? 1 : 0;
-        delta_y += (sel_height + delta_y == 0) ? 1 : 0;
+        var tr = Cairo.Matrix.identity();
+        tr.rotate (initial_drag_state.sel_rotation);
 
-        double sx = sel_width == 0 ? 1 : delta_x / (sel_width);
-        double sy = sel_height == 0 ? 1 : delta_y / (sel_height);
+        Utils.AffineTransform.calculate_size_adjustments2 (
+            nob,
+            start_width,
+            start_height,
+            local_ev_x - local_nob_x,
+            local_ev_y - local_nob_y,
+            start_width / start_height,
+            false,
+            view_canvas.shift_is_pressed,
+            tr,
+            ref inc_x,
+            ref inc_y,
+            ref inc_width,
+            ref inc_height
+        );
+
+        double size_off_x = inc_width / 2.0;
+        double size_off_y = inc_height / 2.0;
+        tr.transform_distance (ref size_off_x, ref size_off_y);
 
         var ct = 0;
         foreach (var item in selection.items) {
             var item_drag_data = initial_drag_state.items_data[ct];
-            double width_change = Utils.AffineTransform.fix_size (item_drag_data.item_size.width * sx);
-            double height_change = Utils.AffineTransform.fix_size (item_drag_data.item_size.height * sy);
 
-            double new_width_tmp = item_drag_data.item_size.width + width_change;
-            double new_height_tmp = item_drag_data.item_size.height + height_change;
+            double new_center_x = item_drag_data.item_center.x + inc_x + size_off_x + grid_offset_x;
+            double new_center_y = item_drag_data.item_center.y + inc_y + size_off_y + grid_offset_y;
 
-            double new_width = new_width_tmp.abs ();
-            double new_height = new_height_tmp.abs ();
-            double new_center_x = nob1_x + grid_offset_x + new_width / 2.0;
-            double new_center_y = nob1_y + grid_offset_y + new_height / 2.0;
+            double new_width = item_drag_data.item_size.width + inc_width;
+            double new_height = item_drag_data.item_size.height + inc_height;
 
-            if (new_width_tmp < 0) {
-                new_center_x += width_change;
+            if (item_drag_data.item_rotation.has_normal_rotation ()) {
+                new_width = Utils.AffineTransform.fix_size (new_width);
+                new_height = Utils.AffineTransform.fix_size (new_height);
+
+                var tmp_left = new_center_x - new_width / 2.0;
+                var tmp_top = new_center_y - new_height / 2.0;
+
+                new_center_x = Utils.AffineTransform.fix_size (tmp_left) + new_width / 2.0;
+                new_center_y = Utils.AffineTransform.fix_size (tmp_top) + new_height / 2.0;
             }
 
-            if (new_height_tmp < 0) {
-                new_center_y += height_change;
-            }
+
 
             item.components.center = new Lib2.Components.Coordinates (new_center_x, new_center_y);
             item.components.size = new Lib2.Components.Size (new_width, new_height, false);
             item.recompile_geometry (true);
+
             ct++;
         }
-
-        return;
-
-        /*
-        if (selection.items.size == 1) {
-            var item_drag_data = initial_drag_state.items_data[0];
-            var tr = Cairo.Matrix.identity ();
-            tr.rotate (-item_drag_data.item_rotation.in_radians ());
-            var tr_delta_x = delta_x;
-            var tr_delta_y = delta_y;
-            tr.transform_distance (ref tr_delta_x, ref tr_delta_y);
-            item.components.center = new Lib2.Components.Coordinates (new_center_x + cdx, new_center_y + cdy);
-            item.components.size = new Lib2.Components.Size (
-                double.max (1.0, new_width.abs ()),
-                double.max (1.0, new_height.abs ()),
-                false
-            );
-            item.recompile_geometry (true);
-
-            return;
-        }
-
-
-
-        ct = 0;
-        foreach (var item in selection.items) {
-            var item_drag_data = initial_drag_state.items_data[ct];
-            double width_change = Utils.AffineTransform.fix_size (item_drag_data.item_size.width * sx);
-            double height_change = Utils.AffineTransform.fix_size (item_drag_data.item_size.height * sy);
-
-            double new_width_tmp = item_drag_data.item_size.width + width_change;
-            double new_height_tmp = item_drag_data.item_size.height + height_change;
-
-            double new_width = new_width_tmp.abs ();
-            double new_height = new_height_tmp.abs ();
-            double new_center_x = nob1_x + grid_offset_x + new_width / 2.0;
-            double new_center_y = nob1_y + grid_offset_y + new_height / 2.0;
-
-            if (new_width_tmp < 0) {
-                new_center_x += width_change;
-            }
-
-            if (new_height_tmp < 0) {
-                new_center_y += height_change;
-            }
-
-            item.components.center = new Lib2.Components.Coordinates (new_center_x, new_center_y);
-            item.components.size = new Lib2.Components.Size (new_width, new_height, false);
-            item.recompile_geometry (true);
-            ct++;
-        }
-        */
     }
 
 
