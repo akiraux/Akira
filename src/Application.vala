@@ -36,6 +36,7 @@ public class Akira.Application : Gtk.Application {
     }
 
     public override void open (File[] files, string hint) {
+        // Loop through all selected files.
         foreach (var file in files) {
             if (is_file_opened (file)) {
                 // Present active window with currently opened file.
@@ -52,6 +53,10 @@ public class Akira.Application : Gtk.Application {
                 current_window.event_bus.file_saved (file.get_basename ());
                 continue;
             }
+
+            // The application was requested to open some files. Be sure to
+            // initialize the theme in case it wasn't already running.
+            init_theme ();
 
             // Open a new window.
             var window = new Akira.Window (this);
@@ -107,11 +112,7 @@ public class Akira.Application : Gtk.Application {
     }
 
     protected override void activate () {
-        Gtk.Settings.get_default ().set_property ("gtk-icon-theme-name", "elementary");
-        Gtk.Settings.get_default ().set_property ("gtk-theme-name", "io.elementary.stylesheet.blueberry");
-
-        weak Gtk.IconTheme default_theme = Gtk.IconTheme.get_default ();
-        default_theme.add_resource_path ("/com/github/akiraux/akira");
+        init_theme ();
 
         var window = new Akira.Window (this);
         this.add_window (window);
@@ -129,5 +130,19 @@ public class Akira.Application : Gtk.Application {
         if (settings.open_quick) {
             window.action_manager.action_load_first ();
         }
+    }
+
+    private void init_theme () {
+        // Interrupt if we have at least one existing window, meaning the theme
+        // was previously initialized.
+        if (windows.length () > 0) {
+            return;
+        }
+
+        Gtk.Settings.get_default ().set_property ("gtk-icon-theme-name", "elementary");
+        Gtk.Settings.get_default ().set_property ("gtk-theme-name", "io.elementary.stylesheet.blueberry");
+
+        weak Gtk.IconTheme default_theme = Gtk.IconTheme.get_default ();
+        default_theme.add_resource_path ("/com/github/akiraux/akira");
     }
 }
