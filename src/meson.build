@@ -83,7 +83,6 @@ sources = files(
     'Lib/Components/Borders.vala',
     'Lib/Components/BorderRadius.vala',
     'Lib/Components/Component.vala',
-    'Lib/Components/VectorCords.vala',
     'Lib/Components/Coordinates.vala',
     'Lib/Components/Fill.vala',
     'Lib/Components/Fills.vala',

@@ -29,6 +29,7 @@ public class Akira.Lib.Items.CanvasVector : Goo.CanvasPath, Lib.Items.CanvasItem
 
     public Items.CanvasArtboard? artboard { get; set; }
 
+
     public CanvasVector (
         double _x,
         double _y,
@@ -43,12 +44,9 @@ public class Akira.Lib.Items.CanvasVector : Goo.CanvasPath, Lib.Items.CanvasItem
         parent = _artboard != null ? _artboard : _parent;
         artboard = _artboard;
 
-        init_position(this, _x, _y);
+        init_position (this, _x, _y);
 
-        // Create Vector Items
-        data = "M 0 0 C 20 20, 40 20, 50 0";
-        this.fill_color = null;
-        this.stroke_color = "#fff";
+        data = "M 0 0 H 90 V 90 H 0 L 0 0";
 
         // Add the newly created item to the Canvas or Artboard.
         parent.add_child (this, -1);

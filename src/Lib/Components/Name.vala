@@ -61,6 +61,11 @@ public class Akira.Lib.Components.Name : Component {
             icon = "shape-image-symbolic";
             name = _("Image");
         }
+
+        if (item is Items.CanvasVector) {
+            icon = "segment-curve-symbolic";
+            name = _("Vector");
+        }
     }
 
     private void update_name () {
