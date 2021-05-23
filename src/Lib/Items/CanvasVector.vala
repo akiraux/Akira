@@ -40,11 +40,9 @@ public class Akira.Lib.Items.CanvasVector : Goo.CanvasPath, Akira.Lib.Items.Canv
         parent = _artboard != null ? _artboard : _parent;
         artboard = _artboard;
 
-        // Create the ellipse.
+        // Create the vector.
         x = y = 0;
-        width = height = 1;
-        // The CanvasEllipse needs a starting radius at least half of the initial width.
-        radius_x = radius_y = 0.5;
+
         init_position (this, _x, _y);
 
         // Add the newly created item to the Canvas or Artboard.
@@ -61,7 +59,6 @@ public class Akira.Lib.Items.CanvasVector : Goo.CanvasPath, Akira.Lib.Items.Canv
         components.add (new Opacity (this));
         components.add (new Rotation (this));
         components.add (new Fills (this, fill_color));
-        components.add (new Borders (this, border_color, border_size));
         components.add (new Size (this));
         components.add (new Flipped (this));
         components.add (new Layer ());
