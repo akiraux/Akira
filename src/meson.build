@@ -99,6 +99,7 @@ sources = files(
     'Lib/Items/CanvasItem.vala',
     'Lib/Items/CanvasRect.vala',
     'Lib/Items/CanvasText.vala',
+    'Lib/Items/CanvasVector.vala',
 
     'Lib/Managers/ExportManager.vala',
     'Lib/Managers/GridManager.vala',
