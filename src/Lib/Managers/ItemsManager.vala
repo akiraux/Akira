@@ -264,7 +264,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             artboard
         );
     }
-    
+
     public Items.CanvasVector add_vector (
         double x,
         double y,
