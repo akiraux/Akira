@@ -60,6 +60,7 @@ public class Akira.Services.ActionManager : Object {
     public const string ACTION_ELLIPSE_TOOL = "action_ellipse_tool";
     public const string ACTION_TEXT_TOOL = "action_text_tool";
     public const string ACTION_IMAGE_TOOL = "action_image_tool";
+    public const string ACTION_VECTOR_TOOL = "action_vector_tool";
     public const string ACTION_DELETE = "action_delete";
     public const string ACTION_FLIP_H = "action_flip_h";
     public const string ACTION_FLIP_V = "action_flip_v";
@@ -98,6 +99,7 @@ public class Akira.Services.ActionManager : Object {
         { ACTION_ELLIPSE_TOOL, action_ellipse_tool },
         { ACTION_TEXT_TOOL, action_text_tool },
         { ACTION_IMAGE_TOOL, action_image_tool },
+        { ACTION_VECTOR_TOOL, action_vector_tool },
         { ACTION_DELETE, action_delete },
         { ACTION_FLIP_H, action_flip_h },
         { ACTION_FLIP_V, action_flip_v },
@@ -146,6 +148,7 @@ public class Akira.Services.ActionManager : Object {
         typing_accelerators.set (ACTION_ELLIPSE_TOOL, "e");
         typing_accelerators.set (ACTION_TEXT_TOOL, "t");
         typing_accelerators.set (ACTION_IMAGE_TOOL, "i");
+        typing_accelerators.set (ACTION_VECTOR_TOOL, "v");
         typing_accelerators.set (ACTION_DELETE, "Delete");
         typing_accelerators.set (ACTION_DELETE, "BackSpace");
         typing_accelerators.set (ACTION_TOGGLE_PIXEL_GRID, "<Shift>Tab");
@@ -358,6 +361,10 @@ public class Akira.Services.ActionManager : Object {
 
     private void action_text_tool () {
         window.event_bus.insert_item ("text");
+    }
+
+    private void action_vector_tool () {
+        window.event_bus.insert_item ("vector");
     }
 
     private void action_image_tool () {

@@ -287,7 +287,9 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
         var separator2 = new Gtk.Separator (Gtk.Orientation.HORIZONTAL);
         separator2.margin_top = separator2.margin_bottom = 3;
 
-        var vector = create_model_button (_("Vector"), "segment-curve", "V");
+        var vector = create_model_button (_("Vector"), "segment-curve",
+            Akira.Services.ActionManager.ACTION_PREFIX +
+            Akira.Services.ActionManager.ACTION_VECTOR_TOOL);
 
         var pencil = create_model_button (_("Pencil"), "edit-symbolic", "P");
 

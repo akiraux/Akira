@@ -117,6 +117,10 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             image_manager = null;
         }
 
+        if (item_type == typeof (Items.CanvasVector)) {
+            new_item = add_vector (x, y, root, artboard);
+        }
+
         if (new_item == null) {
             return null;
         }
@@ -260,6 +264,16 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             artboard
         );
     }
+    
+    public Items.CanvasVector add_vector (
+        double x,
+        double y,
+        Goo.CanvasItem parent,
+        Items.CanvasArtboard? artboard
+    ) {
+        //  return new Items.CanvasVector ();
+        return null;
+    }
 
     public Items.CanvasImage add_image (
         double x,
@@ -314,6 +328,9 @@ public class Akira.Lib.Managers.ItemsManager : Object {
 
             case "image":
                 item_type = typeof (Items.CanvasImage);
+                break;
+            case "vector":
+                item_type = typeof (Items.CanvasVector);
                 break;
         }
     }
