@@ -35,6 +35,8 @@ public class Akira.Lib.Items.CanvasVector : Goo.CanvasPath, Lib.Items.CanvasItem
         int line_width,
         bool is_curved,
         Gdk.RGBA fill_color,
+        Gdk.RGBA border_color,
+        int border_size,
         Goo.CanvasItem? _parent,
         Items.CanvasArtboard? _artboard
     ) {
@@ -62,6 +64,7 @@ public class Akira.Lib.Items.CanvasVector : Goo.CanvasPath, Lib.Items.CanvasItem
         components.add (new Opacity (this));
         components.add (new Rotation (this));
         components.add (new Fills (this, fill_color));
+        components.add (new Borders (this, border_color, border_size));
         components.add (new Size (this));
         components.add (new Flipped (this));
         components.add (new Layer ());

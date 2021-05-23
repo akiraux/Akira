@@ -271,7 +271,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         Goo.CanvasItem parent,
         Items.CanvasArtboard? artboard
     ) {
-        return new Items.CanvasVector (x, y, 1, false, fill_color, parent, artboard);
+        return new Items.CanvasVector (x, y, 1, false, fill_color, border_color, border_size, parent, artboard);
     }
 
     public Items.CanvasImage add_image (
