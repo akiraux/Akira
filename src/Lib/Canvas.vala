@@ -117,6 +117,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         }
 
         Gtk.drag_finish (drag_context, true, false, time);
+        mode_manager.deregister_mode (Modes.InteractionMode.ModeType.ITEM_INSERT);
 
         update_canvas ();
     }
