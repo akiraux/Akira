@@ -24,7 +24,7 @@ using Akira.Lib.Components;
 /*
  * Generate a simple Ellipse.
 */
-public class Akira.Lib.Items.CanvasVector : Goo.CanvasPath, Akira.Lib.Items.CanvasItem {
+public class Akira.Lib.Items.CanvasVector : Goo.CanvasPath, Lib.Items.CanvasItem {
     public Gee.ArrayList<Component> components { get; set; }
 
     public Items.CanvasArtboard? artboard { get; set; }
@@ -33,17 +33,19 @@ public class Akira.Lib.Items.CanvasVector : Goo.CanvasPath, Akira.Lib.Items.Canv
         double _x,
         double _y,
         int line_width,
+        bool is_curved,
         Gdk.RGBA fill_color,
         Goo.CanvasItem? _parent,
         Items.CanvasArtboard? _artboard
     ) {
         parent = _artboard != null ? _artboard : _parent;
         artboard = _artboard;
+        translate(0,0);
 
-        // Create the vector.
-        x = y = 0;
+        init_position(this, _x, _y);
 
-        init_position (this, _x, _y);
+        // Create Vector Items
+        data = "M 0 0 C 20 20, 40 20, 50 0";
 
         // Add the newly created item to the Canvas or Artboard.
         parent.add_child (this, -1);
