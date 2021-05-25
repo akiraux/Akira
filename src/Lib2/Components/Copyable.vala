@@ -1,3 +1,4 @@
+
 /**
  * Copyright (c) 2019-2021 Alecaddd (https://alecaddd.com)
  *
@@ -20,25 +21,10 @@
  */
 
 
-public class Akira.Lib2.Components.Flipped : Copyable<Flipped> {
-    private bool _horizontal;
-    private bool _vertical;
+/*
+ * Defines a copyable interface for components
+ */
+public interface Akira.Lib2.Components.Copyable<T> {
 
-    public bool horizontal {
-        get { return _horizontal; }
-    }
-
-    public bool vertical {
-        get { return _vertical; }
-    }
-
-    public Flipped (bool horizontal, bool vertical) {
-        _horizontal = horizontal;
-        _vertical = vertical;
-    }
-
-    public override Flipped copy () {
-        return new Flipped (horizontal, vertical);
-    }
-
+    public abstract T copy ();
 }

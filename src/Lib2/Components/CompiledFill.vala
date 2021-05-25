@@ -19,7 +19,7 @@
  * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
  */
 
-public class Akira.Lib2.Components.CompiledFill {
+public class Akira.Lib2.Components.CompiledFill : Copyable<CompiledFill> {
     private Gdk.RGBA _color;
     private bool _visible;
 
@@ -36,6 +36,9 @@ public class Akira.Lib2.Components.CompiledFill {
         _visible = visible;
     }
 
+    public override CompiledFill copy () {
+        return new CompiledFill (_color, _visible);
+    }
 
     public static CompiledFill compile (Fills? fills, Opacity? opacity) {
 

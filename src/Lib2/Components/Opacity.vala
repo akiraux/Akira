@@ -19,7 +19,7 @@
  * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
  */
 
-public class Akira.Lib2.Components.Opacity {
+public class Akira.Lib2.Components.Opacity : Copyable<Opacity> {
     private double _opacity;
 
     public double opacity {
@@ -33,5 +33,9 @@ public class Akira.Lib2.Components.Opacity {
         }
 
         _opacity = opacity <= 100.0 ? opacity : 100.0;
+    }
+
+    public override Opacity copy () {
+        return new Opacity (_opacity);
     }
 }

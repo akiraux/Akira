@@ -19,7 +19,7 @@
  * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
  */
 
-public class Akira.Lib2.Components.BorderRadius {
+public class Akira.Lib2.Components.BorderRadius : Copyable<BorderRadius> {
 
     private int _x;
     private int _y;
@@ -35,6 +35,11 @@ public class Akira.Lib2.Components.BorderRadius {
         if (_uniform) {
             _x = _y;
         }
+    }
+
+    public override BorderRadius copy () {
+        return new BorderRadius (_x, _y, _autoscale, _uniform);
+
     }
 
     // Recommended accessors

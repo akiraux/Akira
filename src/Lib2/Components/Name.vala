@@ -19,7 +19,7 @@
  * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
  */
 
-public class Akira.Lib2.Components.Name {
+public class Akira.Lib2.Components.Name : Copyable<Name> {
     private string _id;
     private string _name;
 
@@ -34,5 +34,9 @@ public class Akira.Lib2.Components.Name {
     public Name (string name, string id) {
         _id = id;
         _name = name;
+    }
+
+    public override Name copy () {
+        return new Name (_name, _id);
     }
 }

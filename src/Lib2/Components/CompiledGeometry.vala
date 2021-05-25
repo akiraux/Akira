@@ -19,7 +19,7 @@
  * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
  */
 
-public class Akira.Lib2.Components.CompiledGeometry {
+public class Akira.Lib2.Components.CompiledGeometry : Copyable<CompiledGeometry> {
     public struct CompiledGeometryData {
         public Cairo.Matrix _transform;
         /* Coordinates
@@ -58,7 +58,7 @@ public class Akira.Lib2.Components.CompiledGeometry {
         _data = data;
     }
 
-    public CompiledGeometry copy () {
+    public override CompiledGeometry copy () {
         return new CompiledGeometry (_data);
     }
 

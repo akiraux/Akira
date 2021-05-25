@@ -19,7 +19,7 @@
  * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
  */
 
-public class Akira.Lib2.Components.CompiledBorder {
+public class Akira.Lib2.Components.CompiledBorder : Copyable<CompiledBorder> {
     private Gdk.RGBA _color;
     private int _size;
     private bool _visible;
@@ -40,6 +40,10 @@ public class Akira.Lib2.Components.CompiledBorder {
         _color = color;
         _size = size;
         _visible = visible;
+    }
+
+    public override CompiledBorder copy () {
+        return new CompiledBorder (_color, _size, _visible);
     }
 
     public static CompiledBorder compile (Borders? borders, Opacity? opacity) {

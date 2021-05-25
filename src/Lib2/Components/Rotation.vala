@@ -19,7 +19,7 @@
  * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
  */
 
-public class Akira.Lib2.Components.Rotation {
+public class Akira.Lib2.Components.Rotation : Copyable<Rotation> {
     private double _degrees;
 
     public Rotation (double degrees) {
@@ -30,7 +30,7 @@ public class Akira.Lib2.Components.Rotation {
         return new Rotation (180 * GLib.Math.PI * radians);
     }
 
-    public Rotation copy () {
+    public override Rotation copy () {
         return new Rotation (_degrees);
     }
 

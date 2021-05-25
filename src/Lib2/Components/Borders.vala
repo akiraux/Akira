@@ -19,7 +19,7 @@
  * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
  */
 
-public class Akira.Lib2.Components.Borders {
+public class Akira.Lib2.Components.Borders : Copyable<Borders> {
     public Border.BorderData[] data;
 
     public Borders () {}
@@ -50,7 +50,7 @@ public class Akira.Lib2.Components.Borders {
         return tmp;
     }
 
-    public Borders clone () {
+    public override Borders copy () {
         var cln = new Borders ();
         cln.data = data;
         return cln;

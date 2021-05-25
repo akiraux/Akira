@@ -134,6 +134,7 @@ sources = files(
     'Lib2/Components/CompiledGeometry.vala',
     'Lib2/Components/Component.vala',
     'Lib2/Components/Components.vala',
+    'Lib2/Components/Copyable.vala',
     'Lib2/Components/Coordinates.vala',
     'Lib2/Components/Fill.vala',
     'Lib2/Components/Fills.vala',

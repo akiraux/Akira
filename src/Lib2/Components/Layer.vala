@@ -19,7 +19,7 @@
  * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
  */
 
-public class Akira.Lib2.Components.Layer {
+public class Akira.Lib2.Components.Layer : Copyable<Layer> {
     private bool _selected;
     private bool _locked;
 
@@ -34,6 +34,10 @@ public class Akira.Lib2.Components.Layer {
     public Layer (bool selected, bool locked) {
         _selected = selected;
         _locked = locked;
+    }
+
+    public override Layer copy () {
+        return new Layer (_selected, _locked);
     }
 
     public Layer with_selected (bool new_selected) {

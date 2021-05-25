@@ -19,7 +19,7 @@
  * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
  */
 
-public class Akira.Lib2.Components.Coordinates {
+public class Akira.Lib2.Components.Coordinates : Copyable<Coordinates> {
     private double _x;
     private double _y;
 
@@ -36,7 +36,7 @@ public class Akira.Lib2.Components.Coordinates {
         _y = y;
     }
 
-    public Coordinates copy () {
+    public override Coordinates copy () {
         return new Coordinates (_x, _y);
     }
 }

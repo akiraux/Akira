@@ -19,7 +19,7 @@
  * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
  */
 
-public class Akira.Lib2.Components.Size {
+public class Akira.Lib2.Components.Size : Copyable<Size> {
     private double _width;
     private double _height;
     private bool _locked;
@@ -46,7 +46,7 @@ public class Akira.Lib2.Components.Size {
         _height = height;
     }
 
-    public Size copy () {
+    public override Size copy () {
         return new Size (_width, _height, _locked);
     }
 

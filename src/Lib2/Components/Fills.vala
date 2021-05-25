@@ -19,10 +19,16 @@
  * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
  */
 
-public class Akira.Lib2.Components.Fills {
+public class Akira.Lib2.Components.Fills : Copyable<Fills> {
     public Fill.FillData[] data;
 
     public Fills () {}
+
+    public override Fills copy () {
+        var cln = new Fills ();
+        cln.data = data;
+        return cln;
+    }
 
     // Recommended accessors
 
@@ -48,11 +54,5 @@ public class Akira.Lib2.Components.Fills {
         tmp.data = new Fill.FillData[1];
         tmp.data[0] = Fill.FillData (0, color);
         return tmp;
-    }
-
-    public Fills clone () {
-        var cln = new Fills ();
-        cln.data = data;
-        return cln;
     }
  }

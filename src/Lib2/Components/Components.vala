@@ -19,7 +19,7 @@
  * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
  */
 
-public class Akira.Lib2.Components.Components : Object {
+public class Akira.Lib2.Components.Components : Object, Copyable<Components>{
     public Borders? borders = null;
     public BorderRadius? border_radius = null;
     public Fills? fills = null;
@@ -40,6 +40,23 @@ public class Akira.Lib2.Components.Components : Object {
 
     construct {
         dirty_components = Lib2.Components.Component.RegisteredTypes ();
+    }
+
+    public override Components copy () {
+        var cln = new Components ();
+        cln.borders = borders.copy ();
+        cln.border_radius = border_radius.copy ();
+        cln.fills = fills.copy ();
+        cln.flipped = flipped.copy ();
+        cln.layer = layer.copy ();
+        cln.name = name.copy ();
+        cln.opacity = opacity.copy ();
+
+        cln.center = center.copy ();
+        cln.size = size.copy ();
+        cln.rotation = rotation.copy ();
+
+        return cln;
     }
 
     /*
