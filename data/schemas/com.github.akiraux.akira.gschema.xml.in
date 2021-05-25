@@ -107,6 +107,7 @@
             <summary>Default Border Width.</summary>
             <description>The default width of the border for a newly created shape.</description>
         </key>
+
         <key name="border-color" type="s">
             <default>'#AAAAAA'</default>
             <summary>Default Border Color.</summary>
@@ -177,6 +178,12 @@
             <default>true</default>
             <summary>The alpha setting for exporting PNG images.</summary>
             <description>The alpha setting for exporting PNG images in the export dialog.</description>
+        </key>
+
+        <key name="global-colors" type="as">
+            <default>[]</default>
+            <summary>The list of global colors</summary>
+            <description>Keep track of the colors saved by the user and available in every document file.</description>
         </key>
     </schema>
 </schemalist>
