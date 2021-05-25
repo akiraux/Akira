@@ -98,6 +98,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     ) {
         // Loop through the list of the dragged files.
         int index = 0;
+        window.event_bus.insert_item ("image");
         foreach (string link in data.get_uris ()) {
             var file_link = link.replace ("file://", "").replace ("file:/", "");
             file_link = Uri.unescape_string (file_link);
@@ -108,7 +109,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
             // Create the image manager.
             var manager = new Lib.Managers.ImageManager (image, index);
             // Let the app know that we're adding image items.
-            window.event_bus.insert_item ("image");
+
             // Create the item.
             var item = window.items_manager.insert_item (x, y, manager);
             // Force the resize of the item to its original size.
