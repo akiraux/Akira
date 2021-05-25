@@ -95,8 +95,6 @@ public class Akira.Lib.Items.CanvasImage : Goo.CanvasImage, Akira.Lib.Items.Canv
                 var adjusted_height = 2 * size.height / size.width;
                 var adjusted_width = size.width / size.height;
 
-                print(adjusted_width.to_string());
-
                 if (adjusted_height < 1) {
                     size.height = 1;
                     return;
