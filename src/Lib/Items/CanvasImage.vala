@@ -92,28 +92,41 @@ public class Akira.Lib.Items.CanvasImage : Goo.CanvasImage, Akira.Lib.Items.Canv
                 // the Size component properly calculate the correct size ratio.
                 size.locked = true;
 
-                var adjusted_height = 2 * size.height / size.width;
-                var adjusted_width = size.width / size.height;
-
-                if (adjusted_height < 1) {
-                    size.height = 1;
-                    return;
-                }
-
-                if (adjusted_width < 1) {
-                    size.width = 2;
-                    return;
-                }
+                if (is_height_small ((int)size.width, (int)size.height) || is_width_small ((int)size.width, (int)size.height)) return;
 
                 // Reset the size to a 2px initial value after the size ratio was properly defined
                 // in order to allow the user to decide the initial image size. We use 2px in order
                 // to avoid issues when dividing by the ratio in case of narrow images.
-                //  size.width = 2;
+                size.width = 2;
             } catch (Error e) {
                 warning (e.message);
                 ((Lib.Canvas) canvas).window.event_bus.canvas_notification (e.message);
             }
         });
+    }
+
+    private bool is_width_small (int width, int height) {
+        // Callculate the width if height was 1
+        var adjusted_width = width / height;
+
+        // If width is less than 1 then it is 0 we will set it to 1
+        if (adjusted_width < 1) {
+            size.width = 2;
+            return true;
+        }
+        return false;
+    }
+
+    private bool is_height_small (int width, int height) {
+        // Callculate the height if width was 2
+        var adjusted_height = 2 * height / width;
+
+        // If height is less than 1 then it is 0 we will set it to 1
+        if (adjusted_height < 1) {
+            size.height = 1;
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -144,10 +157,14 @@ public class Akira.Lib.Items.CanvasImage : Goo.CanvasImage, Akira.Lib.Items.Canv
         manager.get_pixbuf.begin (w, h, (obj, res) => {
             try {
                 var _pixbuf = manager.get_pixbuf.end (res);
+                // TODO: run is_height_small and is_width_small
+                var pixpuf_width = _pixbuf.get_width ();
+                var pixpuf_height = _pixbuf.get_height ();
+
                 pixbuf = _pixbuf;
                 if (update) {
-                    width = _pixbuf.get_width ();
-                    height = _pixbuf.get_height ();
+                    width = pixpuf_width;
+                    height = pixpuf_height;
                 }
             } catch (Error e) {
                 warning (e.message);
