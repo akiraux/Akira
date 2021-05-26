@@ -92,8 +92,12 @@ public class Akira.Lib.Items.CanvasImage : Goo.CanvasImage, Akira.Lib.Items.Canv
                 // the Size component properly calculate the correct size ratio.
                 size.locked = true;
 
+                // After the statment we are setting the width which may lead to issues because if the image's height was short
+                // when the ratio is calculated it may be set to 0 and some decimals which int will convert it to a 0 which will crash the app
+                // So in the 'is_height_small' and 'is_width_small' we are calculating the height if width was 2
+                // and calculating the width if height was 1
                 if (is_height_small ((int)size.width, (int)size.height) || is_width_small ((int)size.width, (int)size.height)) {
-                return;
+                    return;
                 }
 
                 // Reset the size to a 2px initial value after the size ratio was properly defined
