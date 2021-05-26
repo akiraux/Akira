@@ -124,7 +124,7 @@ public class Akira.Lib.Items.CanvasImage : Goo.CanvasImage, Akira.Lib.Items.Canv
     private bool is_height_small (int width, int height) {
         // Calculate the height of the image if width was 2 without changing image size
         // If height is less than 1 then it is 0 we will set it to 1
-        if (2 * height / width) {
+        if (2 * height / width < 1) {
             size.height = 1;
             return true;
         }
