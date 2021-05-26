@@ -108,11 +108,9 @@ public class Akira.Lib.Items.CanvasImage : Goo.CanvasImage, Akira.Lib.Items.Canv
     }
 
     private bool is_width_small (int width, int height) {
-        // Callculate the width if height was 1
-        var adjusted_width = width / height;
-
+        // Calculate the width of the image if height was 1 without changing image size
         // If width is less than 1 then it is 0 we will set it to 1
-        if (adjusted_width < 1) {
+        if (width / height < 1) {
             size.width = 2;
             return true;
         }
@@ -120,11 +118,9 @@ public class Akira.Lib.Items.CanvasImage : Goo.CanvasImage, Akira.Lib.Items.Canv
     }
 
     private bool is_height_small (int width, int height) {
-        // Callculate the height if width was 2
-        var adjusted_height = 2 * height / width;
-
+        // Calculate the height of the image if width was 2 without changing image size
         // If height is less than 1 then it is 0 we will set it to 1
-        if (adjusted_height < 1) {
+        if (2 * height / width) {
             size.height = 1;
             return true;
         }
