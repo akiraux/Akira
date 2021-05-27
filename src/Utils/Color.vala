@@ -50,6 +50,13 @@ public class Akira.Utils.Color : Object {
             return false;
         }
 
+        // Interrupt if there is no '#' in the hex value. This prevents the app
+        // from crashing when the user deletes the '#' already present in a
+        // valid hex value.
+        if (!hex.contains ("#")) {
+            return false;
+        }
+
         var hex_values = hex.split ("#") [1];
 
         if (hex_values.length != 3 && hex_values.length != 6) {
