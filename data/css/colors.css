@@ -11,6 +11,12 @@
 }
 
 .rounded-color-button {
-    border-radius: 12px;
-    border: 1px solid transparent;
+    background-image: /* tint image */
+                      linear-gradient(to right, rgba(192, 192, 192, 0.75), rgba(192, 192, 192, 0.75)),
+                      /* checkered effect */
+                      linear-gradient(to right, black 50%, white 50%),
+                      linear-gradient(to bottom, black 50%, white 50%);
+    background-blend-mode: normal, difference, normal;
+    background-size: 8px 8px;
+    border-radius: 4px;
 }

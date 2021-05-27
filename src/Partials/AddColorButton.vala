@@ -28,6 +28,6 @@ public class Akira.Partials.AddColorButton : Gtk.Button {
         can_focus = false;
         valign = halign = Gtk.Align.CENTER;
         image = new Gtk.Image.from_icon_name ("list-add-symbolic", Gtk.IconSize.MENU);
-        tooltip_text = _("Add current color to the library");
+        tooltip_text = _("Add the current color to the library");
     }
 }

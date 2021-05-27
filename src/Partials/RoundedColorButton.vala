@@ -18,21 +18,26 @@
  * Authored by: Alessandro "alecaddd" Castellani <castellani.ale@gmail.com>
  */
 
-public class Akira.Partials.RoundedColorButton : Gtk.Button {
+public class Akira.Partials.RoundedColorButton : Gtk.Grid {
+    public signal void set_color (string color);
+
     public RoundedColorButton (string color) {
-        var context = get_style_context ();
-        context.add_class ("rounded-color-button");
+        get_style_context ().add_class ("rounded-color-button");
+        valign = halign = Gtk.Align.CENTER;
+
+        var btn = new Gtk.Button ();
+        var context = btn.get_style_context ();
         context.add_class ("color-item");
-        width_request = height_request = 24;
-        can_focus = false;
-        tooltip_text = _("Apply this color to the current selection");
+        btn.width_request = btn.height_request = 24;
+        btn.valign = btn.halign = Gtk.Align.CENTER;
+        btn.can_focus = false;
+        btn.tooltip_text = color;
 
         try {
             var provider = new Gtk.CssProvider ();
             var css = """.color-item {
                     background-color: %s;
                     border-color: shade (%s, 0.75);
-                    border-radius:50%;
                 }""".printf (color, color);
 
             provider.load_from_data (css, css.length);
@@ -40,5 +45,12 @@ public class Akira.Partials.RoundedColorButton : Gtk.Button {
         } catch (Error e) {
             warning ("Style error: %s", e.message);
         }
+
+        // Emit the set_color signal when the button is clicked.
+        btn.clicked.connect (() => {
+            set_color (color);
+        });
+
+        add (btn);
     }
 }
