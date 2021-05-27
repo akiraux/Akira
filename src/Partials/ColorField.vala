@@ -37,7 +37,7 @@ public class Akira.Partials.ColorField : Gtk.Entry {
         focus_in_event.connect (handle_focus_in);
         focus_out_event.connect (handle_focus_out);
 
-        insert_text.connect ((_new_text, new_text_length) => {
+        insert_text.connect ((_new_text, new_text_length, ref position) => {
             string new_text = _new_text.strip ();
 
             if (new_text.contains ("#")) {
@@ -49,6 +49,8 @@ public class Akira.Partials.ColorField : Gtk.Entry {
                 builder.append (new_text);
                 builder.prepend ("#");
                 this.text = builder.str;
+
+                position = this.text.length;
             }
 
             bool is_valid_hex = true;
