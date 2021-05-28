@@ -149,6 +149,12 @@ public class Akira.Services.Settings : GLib.Settings {
         set { set_boolean ("export-alpha", value); }
     }
 
+    // Colors library.
+    public string[] global_colors {
+        owned get { return get_strv ("global-colors"); }
+        set { set_strv ("global-colors", value); }
+    }
+
     public Settings () {
         Object (schema_id: Constants.APP_ID);
     }

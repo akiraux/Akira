@@ -55,6 +55,7 @@ sources = files(
     'Layouts/Partials/BorderRadiusPanel.vala',
     'Layouts/Partials/AlignItemsPanel.vala',
 
+    'Partials/AddColorButton.vala',
     'Partials/HeaderBarButton.vala',
     'Partials/MenuButton.vala',
     'Partials/ZoomButton.vala',
@@ -64,6 +65,7 @@ sources = files(
     'Partials/ColorField.vala',
     'Partials/LinkedInput.vala',
     'Partials/PanelSeparator.vala',
+    'Partials/RoundedColorButton.vala',
     'Partials/ExportWidget.vala',
 
     'Models/BordersItemModel.vala',
