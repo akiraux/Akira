@@ -28,12 +28,19 @@
                       linear-gradient(to bottom, black 50%, white 50%);
     background-blend-mode: normal, difference, normal;
     background-size: 8px 8px;
-    border-radius: 3px 0 0 3px;
+}
+
+.selected-color-container {
+    border-radius: 4px 0 0 4px;
 }
 
 button.selected-color {
     border-radius: 3px 0 0 3px;
     border: 1px solid;
+}
+
+.saved-color-button {
+    border-radius: 4px;
 }
 
 /* spin button */

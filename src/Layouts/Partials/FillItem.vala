@@ -30,14 +30,25 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
     private Gtk.Button delete_button;
     private Gtk.Image hidden_button_icon;
     private Gtk.Button selected_color;
-    public Akira.Partials.InputField opacity_container;
-    public Akira.Partials.ColorField color_container;
+    private Akira.Partials.InputField opacity_container;
+    private Akira.Partials.ColorField color_container;
     private Gtk.Popover color_popover;
     private Gtk.Grid color_picker;
     private Gtk.ColorChooserWidget? color_chooser_widget = null;
     private Akira.Utils.ColorPicker eyedropper;
 
+    private Gtk.FlowBox global_colors_flowbox;
+
     public Akira.Models.FillsItemModel model { get; construct; }
+
+    /*
+     * Type of color containers to add new colors to. We can potentially create
+     * an API to allow adding more containers to the color picker popup.
+     */
+    private enum Container {
+        GLOBAL,
+        DOCUMENT
+    }
 
     private string old_color;
 
@@ -102,7 +113,9 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         fill_chooser.margin_end = 5;
 
         var selected_color_container = new Gtk.Grid ();
-        selected_color_container.get_style_context ().add_class ("bg-pattern");
+        var context = selected_color_container.get_style_context ();
+        context.add_class ("selected-color-container");
+        context.add_class ("bg-pattern");
 
         selected_color = new Gtk.Button ();
         selected_color.vexpand = true;
@@ -217,7 +230,36 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
 
         color_picker = new Gtk.Grid ();
         color_picker.get_style_context ().add_class ("color-picker");
+        color_picker.row_spacing = 12;
+
+        var global_colors_label = new Gtk.Label (_("Global colors"));
+        global_colors_label.halign = Gtk.Align.START;
+        global_colors_label.margin_start = global_colors_label.margin_end = 6;
+
+        global_colors_flowbox = new Gtk.FlowBox ();
+        global_colors_flowbox.get_style_context ().add_class ("color-grid");
+        global_colors_flowbox.selection_mode = Gtk.SelectionMode.NONE;
+        global_colors_flowbox.homogeneous = false;
+        global_colors_flowbox.column_spacing = global_colors_flowbox.row_spacing = 6;
+        global_colors_flowbox.margin_start = global_colors_flowbox.margin_end = 6;
+        // Large number to allow children to spread out the available space.
+        global_colors_flowbox.max_children_per_line = 100;
+        global_colors_flowbox.set_sort_func (sort_colors_function);
+
+        var add_global_color_btn = new Akira.Partials.AddColorButton ();
+        add_global_color_btn.clicked.connect (() => {
+            on_save_color (Container.GLOBAL);
+        });
+        global_colors_flowbox.add (add_global_color_btn);
+
+        foreach (string color in settings.global_colors) {
+            var btn = create_color_button (color);
+            global_colors_flowbox.add (btn);
+        }
+
         color_picker.attach (color_chooser_widget, 0, 0, 1, 1);
+        color_picker.attach (global_colors_label, 0, 1, 1, 1);
+        color_picker.attach (global_colors_flowbox, 0, 2, 1, 1);
         color_picker.show_all ();
         color_popover.add (color_picker);
 
@@ -229,6 +271,47 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         eyedropper_button.clicked.connect (on_eyedropper_click);
         delete_button.clicked.connect (on_delete_item);
         hidden_button.clicked.connect (toggle_visibility);
+    }
+
+    /*
+     * Add the current color to the parent flowbox.
+     */
+    private void on_save_color (Container parent) {
+        // Store the currently active color.
+        var color = color_chooser_widget.rgba.to_string ();
+
+        // Create the new color button and connect to its signal.
+        var btn = create_color_button (color);
+
+        // Update the colors list and the schema based on the colors container.
+        switch (parent) {
+            case Container.GLOBAL:
+                global_colors_flowbox.add (btn);
+                var array = settings.global_colors;
+                array += color;
+                settings.global_colors = array;
+                break;
+
+            case Container.DOCUMENT:
+                // TODO...
+                break;
+        }
+    }
+
+    private Gtk.FlowBoxChild create_color_button (string color) {
+        var child = new Gtk.FlowBoxChild ();
+        child.valign = child.halign = Gtk.Align.CENTER;
+
+        var btn = new Akira.Partials.RoundedColorButton (color);
+        btn.set_color.connect ((color) => {
+            var rgba_color = Gdk.RGBA ();
+            rgba_color.parse (color);
+            color_chooser_widget.set_rgba (rgba_color);
+        });
+
+        child.add (btn);
+        child.show_all ();
+        return child;
     }
 
     private void on_eyedropper_click () {
@@ -323,5 +406,9 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         new_rgba.alpha = (double) alpha / 255;
 
         color_chooser_widget.set_rgba (new_rgba);
+    }
+
+    private int sort_colors_function (Gtk.FlowBoxChild a, Gtk.FlowBoxChild b) {
+        return (a is Akira.Partials.AddColorButton) ? -1 : 1;
     }
 }

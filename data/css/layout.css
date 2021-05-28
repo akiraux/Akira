@@ -30,6 +30,16 @@
   padding: 8px 5px;
 }
 
+.color-grid flowboxchild {
+    background-color: transparent;
+}
+
+.color-picker label {
+    font-size: 9pt;
+    font-weight: bold;
+    color: @fg_color;
+}
+
 .popover-toggler {
     padding: 3px;
     margin: 3px;
