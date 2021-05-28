@@ -113,7 +113,9 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         fill_chooser.margin_end = 5;
 
         var selected_color_container = new Gtk.Grid ();
-        selected_color_container.get_style_context ().add_class ("bg-pattern");
+        var context = selected_color_container.get_style_context ();
+        context.add_class ("selected-color-container");
+        context.add_class ("bg-pattern");
 
         selected_color = new Gtk.Button ();
         selected_color.vexpand = true;

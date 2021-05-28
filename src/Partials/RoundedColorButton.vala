@@ -22,12 +22,14 @@ public class Akira.Partials.RoundedColorButton : Gtk.Grid {
     public signal void set_color (string color);
 
     public RoundedColorButton (string color) {
-        get_style_context ().add_class ("rounded-color-button");
+        var context = get_style_context ();
+        context.add_class ("saved-color-button");
+        context.add_class ("bg-pattern");
         valign = halign = Gtk.Align.CENTER;
 
         var btn = new Gtk.Button ();
-        var context = btn.get_style_context ();
-        context.add_class ("color-item");
+        var btn_context = btn.get_style_context ();
+        btn_context.add_class ("color-item");
         btn.width_request = btn.height_request = 24;
         btn.valign = btn.halign = Gtk.Align.CENTER;
         btn.can_focus = false;
@@ -41,7 +43,7 @@ public class Akira.Partials.RoundedColorButton : Gtk.Grid {
                 }""".printf (color, color);
 
             provider.load_from_data (css, css.length);
-            context.add_provider (provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
+            btn_context.add_provider (provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
         } catch (Error e) {
             warning ("Style error: %s", e.message);
         }
