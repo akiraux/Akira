@@ -30,8 +30,8 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
     private Gtk.Button delete_button;
     private Gtk.Image hidden_button_icon;
     private Gtk.Button selected_color;
-    private Akira.Partials.InputField opacity_container;
-    private Akira.Partials.ColorField color_container;
+    private Widgets.InputField opacity_container;
+    private Widgets.ColorField color_container;
     private Gtk.Popover color_popover;
     private Gtk.Grid color_picker;
     private Gtk.ColorChooserWidget? color_chooser_widget = null;
@@ -149,7 +149,7 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         picker_container.add (selected_color_container);
         picker_container.add (eyedropper_button);
 
-        color_container = new Akira.Partials.ColorField (window);
+        color_container = new Widgets.ColorField (window);
         color_container.text = Utils.Color.rgba_to_hex (color);
 
         model.bind_property (
@@ -177,8 +177,8 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
             }
         );
 
-        opacity_container = new Akira.Partials.InputField (
-            Akira.Partials.InputField.Unit.PERCENTAGE, 7, true, true);
+        opacity_container = new Widgets.InputField (
+            Widgets.InputField.Unit.PERCENTAGE, 7, true, true);
         opacity_container.entry.sensitive = true;
         opacity_container.entry.value = Math.round ((double) alpha / 255 * 100);
 
@@ -246,7 +246,7 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         global_colors_flowbox.max_children_per_line = 100;
         global_colors_flowbox.set_sort_func (sort_colors_function);
 
-        var add_global_color_btn = new Akira.Partials.AddColorButton ();
+        var add_global_color_btn = new Widgets.AddColorButton ();
         add_global_color_btn.clicked.connect (() => {
             on_save_color (Container.GLOBAL);
         });
@@ -302,7 +302,7 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         var child = new Gtk.FlowBoxChild ();
         child.valign = child.halign = Gtk.Align.CENTER;
 
-        var btn = new Akira.Partials.RoundedColorButton (color);
+        var btn = new Widgets.RoundedColorButton (color);
         btn.set_color.connect ((color) => {
             var rgba_color = Gdk.RGBA ();
             rgba_color.parse (color);
@@ -409,6 +409,6 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
     }
 
     private int sort_colors_function (Gtk.FlowBoxChild a, Gtk.FlowBoxChild b) {
-        return (a is Akira.Partials.AddColorButton) ? -1 : 1;
+        return (a is Widgets.AddColorButton) ? -1 : 1;
     }
 }

@@ -19,7 +19,7 @@
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
 
-public class Akira.Partials.ColorField : Gtk.Entry {
+public class Akira.Widgets.ColorField : Gtk.Entry {
     public weak Akira.Window window { get; construct; }
 
     public ColorField (Akira.Window window) {

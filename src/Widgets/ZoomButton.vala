@@ -19,7 +19,7 @@
  * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
  */
 
-public class Akira.Partials.ZoomButton : Gtk.Grid {
+public class Akira.Widgets.ZoomButton : Gtk.Grid {
     public weak Akira.Window window { get; set construct; }
 
     private Gtk.Label label_btn;

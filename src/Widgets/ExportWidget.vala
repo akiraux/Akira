@@ -19,7 +19,7 @@
  * Authored by: Alessandro "alecaddd" Castellani <castellani.ale@gmail.com>
  */
 
-public class Akira.Partials.ExportWidget : Gtk.Grid {
+public class Akira.Widgets.ExportWidget : Gtk.Grid {
     private const int MB = 1024 * 1024;
     private const int KB = 1024;
 

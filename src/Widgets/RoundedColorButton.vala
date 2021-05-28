@@ -18,7 +18,7 @@
  * Authored by: Alessandro "alecaddd" Castellani <castellani.ale@gmail.com>
  */
 
-public class Akira.Partials.RoundedColorButton : Gtk.Grid {
+public class Akira.Widgets.RoundedColorButton : Gtk.Grid {
     public signal void set_color (string color);
 
     public RoundedColorButton (string color) {

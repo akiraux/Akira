@@ -19,11 +19,11 @@
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
 
-public class Akira.Partials.MenuButton : Gtk.Grid {
+public class Akira.Widgets.MenuButton : Gtk.Grid {
 
     public Gtk.MenuButton button;
     private Gtk.Label label_btn;
-    public Akira.Partials.ButtonImage image;
+    public Widgets.ButtonImage image;
 
     public MenuButton (string icon_name, string name, string[]? accels = null) {
         label_btn = new Gtk.Label (name);

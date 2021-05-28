@@ -19,11 +19,11 @@
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
 
-public class Akira.Partials.HeaderBarButton : Gtk.Grid {
+public class Akira.Widgets.HeaderBarButton : Gtk.Grid {
     public weak Akira.Window window;
     public Gtk.Button button;
     private Gtk.Label label_btn;
-    public Akira.Partials.ButtonImage image;
+    public ButtonImage image;
     public string? sensitive_type;
 
     public HeaderBarButton (Akira.Window _window, string icon_name, string name,

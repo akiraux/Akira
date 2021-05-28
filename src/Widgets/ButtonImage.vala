@@ -19,7 +19,7 @@
 * Authored by: Bilal Elmoussaoui <bilal.elmoussaoui@gnome.org>
 */
 
-public class Akira.Partials.ButtonImage: Gtk.Image {
+public class Akira.Widgets.ButtonImage: Gtk.Image {
 
     private string icon;
     private Gtk.IconSize size;

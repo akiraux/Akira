@@ -21,7 +21,7 @@
 /*
  * Helper class to quickly create a simple style button with a + icon.
  */
-public class Akira.Partials.AddColorButton : Gtk.Button {
+public class Akira.Widgets.AddColorButton : Gtk.Button {
     public AddColorButton () {
         get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
         width_request = height_request = 24;

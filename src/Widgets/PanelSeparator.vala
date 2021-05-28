@@ -19,7 +19,7 @@
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
 
-public class Akira.Partials.PanelSeparator : Gtk.Separator {
+public class Akira.Widgets.PanelSeparator : Gtk.Separator {
     construct {
         orientation = Gtk.Orientation.HORIZONTAL;
         get_style_context ().add_class ("panel-separator");

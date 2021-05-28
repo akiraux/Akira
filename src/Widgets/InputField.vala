@@ -19,7 +19,7 @@
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
 
-public class Akira.Partials.InputField : Gtk.EventBox {
+public class Akira.Widgets.InputField : Gtk.EventBox {
     public Gtk.SpinButton entry { get; construct set; }
 
     public int chars { get; construct set; }

@@ -29,8 +29,8 @@ public class Akira.Layouts.Partials.BorderItem : Gtk.Grid {
     private Gtk.Button delete_button;
     private Gtk.Image hidden_button_icon;
     private Gtk.Button selected_color;
-    public Akira.Partials.InputField tickness_container;
-    public Akira.Partials.ColorField color_container;
+    public Widgets.InputField tickness_container;
+    public Widgets.ColorField color_container;
     private Gtk.Popover color_popover;
     private Gtk.Grid color_picker;
     private Akira.Utils.ColorPicker eyedropper;
@@ -145,7 +145,7 @@ public class Akira.Layouts.Partials.BorderItem : Gtk.Grid {
         picker_container.add (selected_color_container);
         picker_container.add (eyedropper_button);
 
-        color_container = new Akira.Partials.ColorField (window);
+        color_container = new Widgets.ColorField (window);
         color_container.text = Utils.Color.rgba_to_hex (color);
 
         model.bind_property (
@@ -173,8 +173,8 @@ public class Akira.Layouts.Partials.BorderItem : Gtk.Grid {
             }
         );
 
-        tickness_container = new Akira.Partials.InputField (
-            Akira.Partials.InputField.Unit.PIXEL, 7, true, true);
+        tickness_container = new Widgets.InputField (
+            Widgets.InputField.Unit.PIXEL, 7, true, true);
         tickness_container.set_range (0, Akira.Layouts.MainCanvas.CANVAS_SIZE / 2);
         tickness_container.entry.sensitive = true;
         tickness_container.entry.value = border_size;

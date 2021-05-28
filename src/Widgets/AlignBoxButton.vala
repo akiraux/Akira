@@ -18,14 +18,14 @@
  *
  * Authored by: Giacomo "giacomoalbe" Alberini <giacomoalbe@gmail.com>
  */
-public class Akira.Partials.AlignBoxButton : Gtk.Button {
-    public signal void triggered (Akira.Partials.AlignBoxButton emitter);
+public class Akira.Widgets.AlignBoxButton : Gtk.Button {
+    public signal void triggered (AlignBoxButton emitter);
 
     public weak Akira.Window window { get; construct; }
 
     public string icon { get; construct; }
     public string action { get; construct; }
-    public Akira.Partials.ButtonImage btn_image;
+    public ButtonImage btn_image;
 
     public AlignBoxButton (Akira.Window window, string action_name, string icon_name, string tooltip, string[] accels) {
         Object (

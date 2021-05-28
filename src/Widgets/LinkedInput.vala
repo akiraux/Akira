@@ -23,10 +23,10 @@
 /**
 * A digit input with a label next to it.
 */
-public class Akira.Partials.LinkedInput : Gtk.Grid {
+public class Akira.Widgets.LinkedInput : Gtk.Grid {
     public string label { get; construct set; }
     public string tooltip { get; construct set; }
-    public Akira.Partials.InputField input_field { get; construct set; }
+    public InputField input_field { get; construct set; }
 
     /**
     * Indicates whether the label or the entry should be first
@@ -95,7 +95,7 @@ public class Akira.Partials.LinkedInput : Gtk.Grid {
             break;
         }
 
-        input_field = new Akira.Partials.InputField (icon, 7, true, false);
+        input_field = new Widgets.InputField (icon, 7, true, false);
         bind_property (
             "value", input_field.entry, "value",
             BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE);
