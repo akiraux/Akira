@@ -29,6 +29,7 @@ public class Akira.Lib2.ViewCanvas : Goo.Canvas {
     public Lib2.Managers.HoverManager hover_manager;
     public Lib2.Managers.NobManager nob_manager;
     public Lib2.Managers.SnapManager snap_manager;
+    public Lib2.Managers.CopyManager copy_manager;
 
     public bool ctrl_is_pressed = false;
     public bool shift_is_pressed = false;
@@ -57,6 +58,7 @@ public class Akira.Lib2.ViewCanvas : Goo.Canvas {
         hover_manager = new Lib2.Managers.HoverManager (this);
         nob_manager = new Lib2.Managers.NobManager (this);
         snap_manager = new Lib2.Managers.SnapManager (this);
+        copy_manager = new Lib2.Managers.CopyManager (this);
 
         window.event_bus.update_scale.connect (on_update_scale);
         window.event_bus.set_scale.connect (on_set_scale);
@@ -184,7 +186,7 @@ public class Akira.Lib2.ViewCanvas : Goo.Canvas {
         }
 
         if (uppercase_keyval == Gdk.Key.J) {
-            items_manager.debug_add_rectangles (100000, true);
+            items_manager.debug_add_rectangles (10000, true);
 
             return true;
         }

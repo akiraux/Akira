@@ -151,6 +151,7 @@ sources = files(
     'Lib2/Items/ModelEllipse.vala',
     'Lib2/Items/ItemSelection.vala',
 
+    'Lib2/Managers/CopyManager.vala',
     'Lib2/Managers/ItemsManager.vala',
     'Lib2/Managers/ModeManager.vala',
     'Lib2/Managers/NobManager.vala',

@@ -24,16 +24,16 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
     public unowned Lib2.ViewCanvas view_canvas { get; construct; }
 
     private int last_id = 100;
-    public Gee.ArrayList<Lib2.Items.ModelItem> items;
     public Gee.HashMap<int, Lib2.Items.ModelItem> items_by_id;
+    public Gee.ArrayList<unowned Lib2.Items.ModelItem> items;
 
     public ItemsManager (Lib2.ViewCanvas canvas) {
         Object (view_canvas: canvas);
     }
 
     construct {
-        items = new Gee.ArrayList<Lib2.Items.ModelItem> ();
         items_by_id = new Gee.HashMap<int, Lib2.Items.ModelItem> ();
+        items = new Gee.ArrayList<unowned Lib2.Items.ModelItem> ();
     }
 
     public void add_item_to_canvas (Lib2.Items.ModelItem item) {
@@ -42,8 +42,9 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
         }
 
         item.id = ++last_id;
-        items.add (item);
+
         items_by_id[item.id] = item;
+        items.add (item);
 
         item.geometry_changed.connect (on_item_geometry_changed);
 
@@ -77,7 +78,7 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
     }
 
     public Lib2.Items.ModelItem add_debug_rect (double x, double y) {
-        var new_rect = new Lib2.Items.ModelRect (
+        var new_rect = Lib2.Items.ModelTypeRect.default_rect (
             new Lib2.Components.Coordinates (x, y),
             new Lib2.Components.Size (50.0, 50.0, false),
             Lib2.Components.Borders.single_color (Lib2.Components.Color (0.3, 0.3, 0.3, 1.0), 2),

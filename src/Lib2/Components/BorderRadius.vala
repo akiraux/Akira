@@ -37,7 +37,7 @@ public class Akira.Lib2.Components.BorderRadius : Copyable<BorderRadius> {
         }
     }
 
-    public override BorderRadius copy () {
+    public BorderRadius copy () {
         return new BorderRadius (_x, _y, _autoscale, _uniform);
 
     }

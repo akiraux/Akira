@@ -36,7 +36,7 @@ public class Akira.Lib2.Components.Name : Copyable<Name> {
         _name = name;
     }
 
-    public override Name copy () {
+    public Name copy () {
         return new Name (_name, _id);
     }
 }

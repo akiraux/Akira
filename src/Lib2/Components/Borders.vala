@@ -50,7 +50,7 @@ public class Akira.Lib2.Components.Borders : Copyable<Borders> {
         return tmp;
     }
 
-    public override Borders copy () {
+    public Borders copy () {
         var cln = new Borders ();
         cln.data = data;
         return cln;

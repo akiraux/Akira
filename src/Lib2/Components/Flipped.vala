@@ -37,7 +37,7 @@ public class Akira.Lib2.Components.Flipped : Copyable<Flipped> {
         _vertical = vertical;
     }
 
-    public override Flipped copy () {
+    public Flipped copy () {
         return new Flipped (horizontal, vertical);
     }
 

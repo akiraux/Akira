@@ -42,7 +42,7 @@ public class Akira.Lib2.Components.CompiledBorder : Copyable<CompiledBorder> {
         _visible = visible;
     }
 
-    public override CompiledBorder copy () {
+    public CompiledBorder copy () {
         return new CompiledBorder (_color, _size, _visible);
     }
 

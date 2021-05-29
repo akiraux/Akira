@@ -58,7 +58,7 @@ public class Akira.Lib2.Components.CompiledGeometry : Copyable<CompiledGeometry>
         _data = data;
     }
 
-    public override CompiledGeometry copy () {
+    public CompiledGeometry copy () {
         return new CompiledGeometry (_data);
     }
 

@@ -19,7 +19,8 @@
  * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
  */
 
-public class Akira.Lib2.Components.Components : Object, Copyable<Components>{
+[Compact]
+public class Akira.Lib2.Components.Components {
     public Borders? borders = null;
     public BorderRadius? border_radius = null;
     public Fills? fills = null;
@@ -38,23 +39,23 @@ public class Akira.Lib2.Components.Components : Object, Copyable<Components>{
 
     public Lib2.Components.Component.RegisteredTypes dirty_components;
 
-    construct {
+    public Components () {
         dirty_components = Lib2.Components.Component.RegisteredTypes ();
     }
 
-    public override Components copy () {
+    public Components copy () {
         var cln = new Components ();
-        cln.borders = borders.copy ();
-        cln.border_radius = border_radius.copy ();
-        cln.fills = fills.copy ();
-        cln.flipped = flipped.copy ();
-        cln.layer = layer.copy ();
-        cln.name = name.copy ();
-        cln.opacity = opacity.copy ();
+        cln.borders = (borders == null) ? null : borders.copy ();
+        cln.border_radius = (border_radius == null) ? null : border_radius.copy ();
+        cln.fills = (fills == null) ? null : fills.copy ();
+        cln.flipped = (flipped == null) ? null : flipped.copy ();
+        cln.layer = (layer == null) ? null : layer.copy ();
+        cln.name = (name == null) ? null : name.copy ();
+        cln.opacity = (opacity == null) ? null : opacity.copy ();
 
-        cln.center = center.copy ();
-        cln.size = size.copy ();
-        cln.rotation = rotation.copy ();
+        cln.center = (center == null) ? null : center.copy ();
+        cln.size = (size == null) ? null : size.copy ();
+        cln.rotation = (rotation == null) ? null : rotation.copy ();
 
         return cln;
     }

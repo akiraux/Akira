@@ -35,7 +35,7 @@ public class Akira.Lib2.Components.Opacity : Copyable<Opacity> {
         _opacity = opacity <= 100.0 ? opacity : 100.0;
     }
 
-    public override Opacity copy () {
+    public Opacity copy () {
         return new Opacity (_opacity);
     }
 }

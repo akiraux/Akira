@@ -36,7 +36,7 @@ public class Akira.Lib2.Components.CompiledFill : Copyable<CompiledFill> {
         _visible = visible;
     }
 
-    public override CompiledFill copy () {
+    public CompiledFill copy () {
         return new CompiledFill (_color, _visible);
     }
 

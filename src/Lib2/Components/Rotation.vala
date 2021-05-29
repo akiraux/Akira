@@ -30,7 +30,7 @@ public class Akira.Lib2.Components.Rotation : Copyable<Rotation> {
         return new Rotation (180 * GLib.Math.PI * radians);
     }
 
-    public override Rotation copy () {
+    public Rotation copy () {
         return new Rotation (_degrees);
     }
 

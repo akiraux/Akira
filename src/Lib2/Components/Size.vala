@@ -46,7 +46,7 @@ public class Akira.Lib2.Components.Size : Copyable<Size> {
         _height = height;
     }
 
-    public override Size copy () {
+    public Size copy () {
         return new Size (_width, _height, _locked);
     }
 

@@ -36,7 +36,7 @@ public class Akira.Lib2.Components.Layer : Copyable<Layer> {
         _locked = locked;
     }
 
-    public override Layer copy () {
+    public Layer copy () {
         return new Layer (_selected, _locked);
     }
 

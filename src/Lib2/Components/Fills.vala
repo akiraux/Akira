@@ -24,7 +24,7 @@ public class Akira.Lib2.Components.Fills : Copyable<Fills> {
 
     public Fills () {}
 
-    public override Fills copy () {
+    public Fills copy () {
         var cln = new Fills ();
         cln.data = data;
         return cln;

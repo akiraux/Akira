@@ -36,7 +36,7 @@ public class Akira.Lib2.Components.Coordinates : Copyable<Coordinates> {
         _y = y;
     }
 
-    public override Coordinates copy () {
+    public Coordinates copy () {
         return new Coordinates (_x, _y);
     }
 }

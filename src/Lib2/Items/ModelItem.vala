@@ -19,12 +19,28 @@
  * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
  */
 
+public interface Akira.Lib2.Items.ModelType<T> : Object {
+    public abstract ModelType copy ();
+
+    public abstract void construct_canvas_item (ModelItem item, Goo.Canvas canvas);
+
+    public abstract void component_updated (ModelItem item, Lib2.Components.Component.Type type);
+}
+
 public class Akira.Lib2.Items.ModelItem : Object {
     public int id = -1;
     public Lib2.Items.CanvasItem canvas_item = null;
     public Lib2.Components.Components components = null;
+    public ModelType item_type = null;
 
     public signal void geometry_changed (int id);
+
+    public ModelItem clone () {
+        var cln = new ModelItem ();
+        cln.components = components.copy ();
+        cln.item_type = item_type.copy ();
+        return cln;
+    }
 
     public void compile_components (bool notify_view) {
         components.maybe_compile_geometry ();
@@ -59,7 +75,7 @@ public class Akira.Lib2.Items.ModelItem : Object {
         for (var i = 0; i < dirty_types.length; ++i) {
             var type = dirty_types[i];
             if (type.dirty) {
-                component_updated (type.type);
+                item_type.component_updated (this, type.type);
 
                 if (type.type == Lib2.Components.Component.Type.COMPILED_GEOMETRY) {
                     geometry_changed (id);
@@ -72,16 +88,12 @@ public class Akira.Lib2.Items.ModelItem : Object {
    }
 
     public void add_to_canvas (Goo.Canvas canvas) {
-        construct_canvas_item (canvas);
+        item_type.construct_canvas_item (this, canvas);
 
         if (canvas_item != null) {
             canvas_item.parent_id = id;
         }
     }
-
-    public virtual void construct_canvas_item (Goo.Canvas canvas) {}
-
-    public virtual void component_updated (Lib2.Components.Component.Type type) {}
 
     public unowned Lib2.Components.CompiledGeometry compiled_geometry () {
         components.maybe_compile_geometry ();

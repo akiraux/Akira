@@ -162,7 +162,7 @@ public class Akira.Lib2.Modes.ItemInsertMode : AbstractInteractionMode {
         Lib2.Items.ModelItem new_item = null;
         switch (from_type) {
             case "rectangle":
-                new_item = new Lib2.Items.ModelRect (
+                new_item = Lib2.Items.ModelTypeRect.default_rect (
                     coordinates,
                     size,
                     borders_from_settings (),
@@ -171,7 +171,7 @@ public class Akira.Lib2.Modes.ItemInsertMode : AbstractInteractionMode {
                 break;
 
             case "ellipse":
-                new_item = new Lib2.Items.ModelEllipse (
+                new_item = Lib2.Items.ModelTypeEllipse.default_ellipse (
                     coordinates,
                     size,
                     borders_from_settings (),
@@ -180,7 +180,7 @@ public class Akira.Lib2.Modes.ItemInsertMode : AbstractInteractionMode {
                 break;
 
             case "text":
-                new_item = new Lib2.Items.ModelRect (
+                new_item = Lib2.Items.ModelTypeRect.default_rect (
                     coordinates,
                     size,
                     borders_from_settings (),
@@ -197,7 +197,7 @@ public class Akira.Lib2.Modes.ItemInsertMode : AbstractInteractionMode {
         }
 
         if (new_item == null) {
-            new_item = new Lib2.Items.ModelRect (
+            new_item = Lib2.Items.ModelTypeRect.default_rect (
                 coordinates,
                 size,
                 borders_from_settings (),
