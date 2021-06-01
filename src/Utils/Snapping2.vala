@@ -100,8 +100,11 @@ public class Akira.Utils.Snapping2 : Object {
         double vis_y2 = 0;
         canvas.visible_bounds (ref vis_y1, ref vis_x1, ref vis_y2, ref vis_x2);
 
-        foreach (var item in canvas.items_manager.items) {
-            if (selection.has_item_id (item.id)) {
+        var candidate_list = canvas.items_manager.children_in_group(Lib2.Items.Model.origin_id);
+        for (var i = 0; i < candidate_list.length; ++i) {
+            var item = candidate_list.index(i).instance.item;
+
+            if (item == null || selection.has_item_id (item.id)) {
                 continue;
             }
 

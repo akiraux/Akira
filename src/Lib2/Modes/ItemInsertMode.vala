@@ -101,7 +101,7 @@ public class Akira.Lib2.Modes.ItemInsertMode : AbstractInteractionMode {
             */
             var item = construct_item (item_insert_type, event.x, event.y);
 
-            view_canvas.items_manager.add_item_to_canvas (item);
+            view_canvas.items_manager.add_item_to_origin (item);
 
             view_canvas.selection_manager.reset_selection (item);
 

@@ -347,7 +347,7 @@ public class Akira.Services.ActionManager : Object {
 
     // Delete the currently selected items.
     private void action_delete () {
-        window.main_window.main_canvas.canvas.selected_bound_manager.delete_selection ();
+        window.event_bus.delete_selected_items ();
     }
 
     private void action_flip_h () {

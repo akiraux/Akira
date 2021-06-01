@@ -29,6 +29,7 @@ sources = files(
     'Services/ActionManager.vala',
     'Services/EventBus.vala',
 
+    'Utils/Array.vala',
     'Utils/Dialogs.vala',
     'Utils/BlendingMode.vala',
     'Utils/AffineTransform.vala',
@@ -146,6 +147,7 @@ sources = files(
     'Lib2/Components/Size.vala',
 
     'Lib2/Items/CanvasItem.vala',
+    'Lib2/Items/Model.vala',
     'Lib2/Items/ModelItem.vala',
     'Lib2/Items/ModelRect.vala',
     'Lib2/Items/ModelEllipse.vala',

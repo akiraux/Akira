@@ -22,7 +22,7 @@
 public class Akira.Lib2.Managers.CopyManager : Object {
     public unowned ViewCanvas view_canvas { get; construct; }
 
-    public Gee.ArrayList<Lib2.Items.ModelItem> candidates;
+    public Gee.TreeMap<Lib2.Items.PositionKey, Lib2.Items.ModelItem> candidates;
 
     public CopyManager (ViewCanvas canvas) {
         Object (view_canvas : canvas);
@@ -34,10 +34,17 @@ public class Akira.Lib2.Managers.CopyManager : Object {
     }
 
     public void do_copy () {
-        candidates = new Gee.ArrayList<Lib2.Items.ModelItem> ();
+        candidates = new Gee.TreeMap<Lib2.Items.PositionKey, Lib2.Items.ModelItem> (Lib2.Items.PositionKey.compare);
 
         foreach (var to_copy in view_canvas.selection_manager.selection.items) {
-            candidates.add (to_copy.clone ());
+
+            var original_node = view_canvas.items_manager.item_model.node_from_id (to_copy.id);
+            var key = new Lib2.Items.PositionKey ();
+            key.parent_path = view_canvas.items_manager.item_model.path_from_node (original_node.parent);
+            key.pos_in_parent = original_node.pos_in_parent;
+
+            var cln = to_copy.clone ();
+            candidates[key] = cln;
         }
     }
 
@@ -50,11 +57,10 @@ public class Akira.Lib2.Managers.CopyManager : Object {
         (void) blocker;
 
         view_canvas.selection_manager.reset_selection (null);
-        foreach (var to_paste in candidates) {
-            var new_item = to_paste.clone ();
-            view_canvas.items_manager.add_item_to_canvas (new_item);
-            view_canvas.selection_manager.add_to_selection (new_item);
-        }
 
+        foreach (var cand in candidates) {
+            view_canvas.items_manager.add_item_to_origin (cand.value);
+            view_canvas.selection_manager.add_to_selection (cand.value);
+        }
     }
 }

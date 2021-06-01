@@ -73,6 +73,7 @@ public class Akira.Services.EventBus : Object {
     public signal void selection_modified ();
     public signal void request_copy ();
     public signal void request_paste ();
+    public signal void delete_selected_items ();
 
     // Layers panel signals.
     public signal void hover_over_item (Lib.Items.CanvasItem? item);

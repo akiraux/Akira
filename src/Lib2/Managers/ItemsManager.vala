@@ -23,35 +23,176 @@
 public class Akira.Lib2.Managers.ItemsManager : Object {
     public unowned Lib2.ViewCanvas view_canvas { get; construct; }
 
-    private int last_id = 100;
-    public Gee.HashMap<int, Lib2.Items.ModelItem> items_by_id;
-    public Gee.ArrayList<unowned Lib2.Items.ModelItem> items;
+    public Lib2.Items.Model item_model;
 
     public ItemsManager (Lib2.ViewCanvas canvas) {
         Object (view_canvas: canvas);
     }
 
     construct {
-        items_by_id = new Gee.HashMap<int, Lib2.Items.ModelItem> ();
-        items = new Gee.ArrayList<unowned Lib2.Items.ModelItem> ();
+        item_model = new Lib2.Items.Model ();
     }
 
-    public void add_item_to_canvas (Lib2.Items.ModelItem item) {
+    public int add_item_to_origin (Lib2.Items.ModelItem item) {
         if (item == null) {
-            return;
+            return -1;
         }
 
-        item.id = ++last_id;
-
-        items_by_id[item.id] = item;
-        items.add (item);
+        var candidate = new Lib2.Items.ModelInstance.as_item (-1, item);
+        
+        if (item_model.append_item (Lib2.Items.Model.origin_id, candidate) <= 0) {
+            return -1;
+        }
 
         item.geometry_changed.connect (on_item_geometry_changed);
-
         item.compile_components (false);
         item.add_to_canvas (view_canvas);
         item.notify_view_of_changes ();
+        return item.id;
+    }
 
+    public int remove_items (GLib.Array<int> to_remove) {
+        var to_delete = new Gee.TreeMap<Lib2.Items.PositionKey, Lib2.Items.ModelInstance> (Lib2.Items.PositionKey.compare, null);
+        var modified_groups = new GLib.Array<int> ();
+
+        foreach (var id in to_remove.data) {
+            var node = item_model.node_from_id (id);
+
+            if (node == null) {
+                continue;
+            }
+
+            var key = new Lib2.Items.PositionKey ();
+            key.parent_path = node.parent == null ? "" : item_model.path_from_node (node.parent);
+            key.pos_in_parent = node.pos_in_parent;
+
+            to_delete[key] = node.instance;
+
+            if (modified_groups.length == 0) {
+                modified_groups.append_val (node.parent.id);
+                continue;
+            }
+
+            foreach (var gid in modified_groups.data) {
+                if (gid != node.parent.id) {
+                    modified_groups.append_val (node.parent.id);
+                    break;
+                }
+            }
+        }
+
+        var it = to_delete.bidir_map_iterator ();
+        for (var has_next = it.last (); has_next; has_next = it.previous ()) {
+            var inst = it.get_value ();
+
+            if (0 != item_model.remove (inst.id, false)) {
+                assert (false);
+                continue;
+            }
+
+            inst.item.remove_from_canvas ();
+        }
+
+        foreach (var gid in modified_groups.data) {
+            item_model.recalculate_children_stacking (gid);
+        }
+
+        return 0;
+    }
+
+    /*
+     * Shift items by an amount up or down.
+     * If to_end is true, amount is only used for direction (down/up)
+     */
+    public int shift_items (GLib.Array<int> ids, int amount, bool to_end) {
+        if (amount == 0) {
+            return 0;
+        }
+
+        var sorted_tree = new Gee.TreeMap<Lib2.Items.PositionKey, Lib2.Items.ModelNode> (Lib2.Items.PositionKey.compare, null);
+        var shift_groups = new Gee.ArrayList<Lib2.Items.ChildrenSet> ();
+        var modified_groups = new GLib.Array<int> ();
+
+        foreach (var id in ids.data) {
+            var node = item_model.node_from_id (id);
+            if (node == null) {
+                continue;
+            }
+
+            var key = new Lib2.Items.PositionKey ();
+            key.parent_path = node.parent == null ? "" : item_model.path_from_node (node.parent);
+            key.pos_in_parent = node.pos_in_parent;
+
+            sorted_tree[key] = node;
+        }
+
+        Lib2.Items.ChildrenSet current_set = null;
+        int last_group_id = -1;
+        int last_pos = -1;
+        foreach (var mapit in sorted_tree) {
+            var snode = mapit.value;
+            bool is_next = last_group_id == snode.parent.id && snode.pos_in_parent == last_pos + 1;
+
+            if (!is_next) {
+                last_group_id = snode.parent.id;
+                last_pos = snode.pos_in_parent;
+
+                current_set = new Lib2.Items.ChildrenSet ();
+                current_set.parent_node = snode.parent;
+                current_set.first_child = last_pos;
+                current_set.children_in_set = new GLib.Array<unowned Lib2.Items.ModelNode> ();
+                current_set.children_in_set.append_val (snode);
+                current_set.length = 1;
+
+                shift_groups.add (current_set);
+                continue;
+            }
+
+            last_pos = snode.pos_in_parent;
+            current_set.children_in_set.append_val (snode);
+            current_set.length++;
+        }
+
+        foreach (var cs in shift_groups) {
+            var pos = cs.first_child;
+
+            var newpos = pos + amount;
+
+            if (to_end) {
+                newpos = (amount > 0) ? (int)(cs.parent_node.children.length - cs.length) : 0;
+            }
+
+            if (newpos < 0) {
+                newpos = 0;
+            }
+
+            if (newpos + cs.length > cs.parent_node.children.length) {
+                newpos = (int)(cs.parent_node.children.length - cs.length);
+            }
+
+            if (newpos < 0 || newpos + cs.length > cs.parent_node.children.length) {
+                cs = null;
+                // at edges, nothing to do
+                continue;
+            }
+
+            if (0 >= item_model.move_items (cs.parent_node.id, pos, newpos, cs.length, true)) {
+                // no items were shifted
+                cs = null;
+            }
+        }
+
+        foreach (var cs in shift_groups) {
+            if (cs != null) {
+                view_restack (cs, amount > 0);
+            }
+        }
+
+        return 0;
+    }
+
+    public GLib.Array<unowned Lib2.Items.ModelNode> children_in_group (int group_id) {
+        return item_model.children_in_group (group_id);
     }
 
     public Lib2.Items.ModelItem? hit_test (double x, double y) {
@@ -64,17 +205,59 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
         }
 
         var c_item = target as Lib2.Items.CanvasItem;
-        if (items_by_id.has_key (c_item.parent_id)) {
-            result = items_by_id[c_item.parent_id];
+        var inst = item_model.instance_from_id (c_item.parent_id);
+        if (inst != null) {
+            result = inst.item;
         }
 
         return result;
     }
 
-    public void move_item_to (Lib2.Items.ModelItem item, double new_x, double new_y) {
-        item.components.center = new Lib2.Components.Coordinates (new_x, new_y);
-        item.components.compiled_geometry = null;
-        item.compile_components (true);
+    private void view_restack (Lib2.Items.ChildrenSet children_set, bool up) {
+            if (children_set.children_in_set.length == 0) {
+                return;
+            }
+
+            if (up) {
+                restack_up (children_set);
+                return;
+            }
+
+            restack_down (children_set);
+    }
+
+    private bool restack_up (Lib2.Items.ChildrenSet children_set) {
+        unowned var first_node = children_set.children_in_set.index(0);
+        var sibling_under = item_model.previous_sibling (first_node, true);
+
+        if (sibling_under == null) {
+            return false;
+        }
+
+        for (var i = (int)children_set.children_in_set.length - 1; i >= 0; --i) {
+            unowned var model_item = children_set.children_in_set.index(i).instance.item;
+            if (model_item.is_stackable ()) {
+                model_item.canvas_item.raise (sibling_under.instance.item.canvas_item);
+            }
+        }
+        return true;
+    }
+
+    private bool restack_down (Lib2.Items.ChildrenSet children_set) {
+        unowned var last_node = children_set.children_in_set.index(children_set.children_in_set.length -1);
+        var sibling_over = item_model.next_sibling (last_node, true);
+
+        if (sibling_over == null) {
+            return false;
+        }
+
+        foreach (var to_restack in children_set.children_in_set.data) {
+            unowned var model_item = to_restack.instance.item;
+            if (model_item.is_stackable ()) {
+                model_item.canvas_item.lower (sibling_over.instance.item.canvas_item);
+            }
+        }
+        return true;
     }
 
     public Lib2.Items.ModelItem add_debug_rect (double x, double y) {
@@ -85,7 +268,7 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
             Lib2.Components.Fills.single_color (Lib2.Components.Color (0.0, 0.0, 0.0, 1.0))
         );
 
-        add_item_to_canvas (new_rect);
+        add_item_to_origin (new_rect);
         return new_rect;
     }
 

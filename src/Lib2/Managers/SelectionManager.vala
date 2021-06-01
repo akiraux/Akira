@@ -50,6 +50,8 @@ public class Akira.Lib2.Managers.SelectionManager : Object {
 
     construct {
         selection = new Lib2.Items.ItemSelection (null);
+        view_canvas.window.event_bus.delete_selected_items.connect(delete_selected);
+        view_canvas.window.event_bus.change_z_selected.connect (change_z_order);
     }
 
     public bool is_empty () {
@@ -78,5 +80,24 @@ public class Akira.Lib2.Managers.SelectionManager : Object {
         if (block_change_notifications == 0) {
             view_canvas.window.event_bus.selection_modified ();
         }
+    }
+
+    public void delete_selected () {
+        var to_delete = new GLib.Array<int> ();
+        foreach (var item in selection.items) {
+            to_delete.append_val (item.id);
+        }
+        reset_selection (null);
+        view_canvas.items_manager.remove_items (to_delete);
+    }
+
+    public void change_z_order (bool up, bool to_end) {
+        var to_shift = new GLib.Array<int> ();
+        foreach (var item in selection.items) {
+            to_shift.append_val (item.id);
+        }
+
+        int amount = up ? 1 : -1;
+        view_canvas.items_manager.shift_items (to_shift, amount, to_end);
     }
 }

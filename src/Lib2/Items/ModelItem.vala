@@ -84,7 +84,6 @@ public class Akira.Lib2.Items.ModelItem : Object {
 
             components.dirty_components.mark_dirty (type.type, false);
         }
-
    }
 
     public void add_to_canvas (Goo.Canvas canvas) {
@@ -94,6 +93,15 @@ public class Akira.Lib2.Items.ModelItem : Object {
             canvas_item.parent_id = id;
         }
     }
+
+    public void remove_from_canvas () {
+        if (canvas_item != null) {
+            canvas_item.remove ();
+        }
+        canvas_item = null;
+    }
+
+    public bool is_stackable () { return canvas_item != null; }
 
     public unowned Lib2.Components.CompiledGeometry compiled_geometry () {
         components.maybe_compile_geometry ();
