@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (c) 2019-2021 Alecaddd (https://alecaddd.com)
  *
  * This file is part of Akira.

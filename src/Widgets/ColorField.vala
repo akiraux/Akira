@@ -28,6 +28,12 @@ public class Akira.Widgets.ColorField : Gtk.Entry {
         );
     }
 
+    ~ColorField () {
+        focus_in_event.disconnect (handle_focus_in);
+        focus_out_event.disconnect (handle_focus_out);
+        insert_text.disconnect (handle_insert_text);
+    }
+
     construct {
         margin_end = 10;
         width_chars = 8;
@@ -36,43 +42,44 @@ public class Akira.Widgets.ColorField : Gtk.Entry {
 
         focus_in_event.connect (handle_focus_in);
         focus_out_event.connect (handle_focus_out);
+        insert_text.connect (handle_insert_text);
+    }
 
-        insert_text.connect ((_new_text, new_text_length, ref position) => {
-            string new_text = _new_text.strip ();
+    private void handle_insert_text (string text, int length, ref int position) {
+        string new_text = text.strip ();
 
-            if (new_text.contains ("#")) {
-                new_text = new_text.substring (1, new_text.length - 1);
-            } else if (!this.text.contains ("#")) {
-                GLib.Signal.stop_emission_by_name (this, "insert-text");
+        if (new_text.contains ("#")) {
+            new_text = new_text.substring (1, new_text.length - 1);
+        } else if (!this.text.contains ("#")) {
+            GLib.Signal.stop_emission_by_name (this, "insert-text");
 
-                var builder = new StringBuilder ();
-                builder.append (new_text);
-                builder.prepend ("#");
-                this.text = builder.str;
+            var builder = new StringBuilder ();
+            builder.append (new_text);
+            builder.prepend ("#");
+            this.text = builder.str;
 
-                position = this.text.length;
-            }
+            position = this.text.length;
+        }
 
-            bool is_valid_hex = true;
-            bool char_is_numeric = true;
-            bool char_is_valid_alpha = true;
+        bool is_valid_hex = true;
+        bool char_is_numeric = true;
+        bool char_is_valid_alpha = true;
 
-            char keyval;
+        char keyval;
 
-            for (var i = 0; i < new_text.length; i++) {
-                keyval = new_text [i];
+        for (var i = 0; i < new_text.length; i++) {
+            keyval = new_text [i];
 
-                char_is_numeric = keyval >= Gdk.Key.@0 && keyval <= Gdk.Key.@9;
-                char_is_valid_alpha = keyval >= Gdk.Key.A && keyval <= Gdk.Key.F;
+            char_is_numeric = keyval >= Gdk.Key.@0 && keyval <= Gdk.Key.@9;
+            char_is_valid_alpha = keyval >= Gdk.Key.A && keyval <= Gdk.Key.F;
 
-                is_valid_hex &= keyval.isxdigit ();
-            }
+            is_valid_hex &= keyval.isxdigit ();
+        }
 
-            if (!is_valid_hex) {
-                GLib.Signal.stop_emission_by_name (this, "insert-text");
-                return;
-            }
-        });
+        if (!is_valid_hex) {
+            GLib.Signal.stop_emission_by_name (this, "insert-text");
+            return;
+        }
     }
 
     private bool handle_focus_in (Gdk.EventFocus event) {
