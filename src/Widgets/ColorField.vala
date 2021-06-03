@@ -20,21 +20,11 @@
  */
 
 public class Akira.Widgets.ColorField : Gtk.Entry {
-    public weak Akira.Window window { get; construct; }
+    private unowned Akira.Window window;
 
     public ColorField (Akira.Window window) {
-        Object (
-            window: window
-        );
-    }
+        this.window = window;
 
-    ~ColorField () {
-        focus_in_event.disconnect (handle_focus_in);
-        focus_out_event.disconnect (handle_focus_out);
-        insert_text.disconnect (handle_insert_text);
-    }
-
-    construct {
         margin_end = 10;
         width_chars = 8;
         max_length = 7;
@@ -43,6 +33,12 @@ public class Akira.Widgets.ColorField : Gtk.Entry {
         focus_in_event.connect (handle_focus_in);
         focus_out_event.connect (handle_focus_out);
         insert_text.connect (handle_insert_text);
+    }
+
+    ~ColorField () {
+        focus_in_event.disconnect (handle_focus_in);
+        focus_out_event.disconnect (handle_focus_out);
+        insert_text.disconnect (handle_insert_text);
     }
 
     private void handle_insert_text (string text, int length, ref int position) {
