@@ -20,7 +20,6 @@
  */
 
 public class Akira.Widgets.ButtonImage: Gtk.Image {
-
     private string icon;
     private Gtk.IconSize size;
 
@@ -29,16 +28,20 @@ public class Akira.Widgets.ButtonImage: Gtk.Image {
         size = icon_size;
         margin = 0;
 
-        settings.changed["use-symbolic"].connect ( () => {
-            update_image ();
-        });
-
+        settings.changed["use-symbolic"].connect (update_image);
         update_image ();
     }
 
+    ~ButtonImage () {
+        settings.changed["use-symbolic"].disconnect (update_image);
+    }
+
     private void update_image () {
-        var size = settings.use_symbolic ? Gtk.IconSize.SMALL_TOOLBAR : size;
-        var icon = settings.use_symbolic ? ("%s-symbolic".printf (icon)) : icon.replace ("-symbolic", "");
-        set_from_icon_name (icon, size);
+        if (settings.use_symbolic) {
+            set_from_icon_name ("%s-symbolic".printf (icon), Gtk.IconSize.SMALL_TOOLBAR);
+            return;
+        }
+
+        set_from_icon_name (icon.replace ("-symbolic", ""), size);
     }
 }
