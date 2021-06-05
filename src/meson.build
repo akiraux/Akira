@@ -58,6 +58,7 @@ sources = files(
     'Widgets/AddColorButton.vala',
     'Widgets/AlignBoxButton.vala',
     'Widgets/ButtonImage.vala',
+    'Widgets/ColorButton.vala',
     'Widgets/ColorField.vala',
     'Widgets/ExportWidget.vala',
     'Widgets/HeaderBarButton.vala',
