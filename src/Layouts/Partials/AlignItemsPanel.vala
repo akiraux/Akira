@@ -82,7 +82,7 @@ public class Akira.Layouts.Partials.AlignItemsPanel : Gtk.Grid {
 
                 case "btn":
                     var tmp_align_box_button =
-                        new Akira.Partials.AlignBoxButton (
+                        new Widgets.AlignBoxButton (
                             window,
                             item.action_name,
                             item.icon_name,

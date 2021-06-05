@@ -1,32 +1,32 @@
 /*
-* Copyright (c) 2019-2020 Alecaddd (https://alecaddd.com)
-*
-* This file is part of Akira.
-*
-* Akira is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
+ * Copyright (c) 2019-2021 Alecaddd (https://alecaddd.com)
+ *
+ * This file is part of Akira.
+ *
+ * Akira is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Akira is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Akira. If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Authored by: Ana Gelez <ana@gelez.xyz>
+ * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
+ */
 
-* Akira is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-* GNU General Public License for more details.
-
-* You should have received a copy of the GNU General Public License
-* along with Akira. If not, see <https://www.gnu.org/licenses/>.
-*
-* Authored by: Ana Gelez <ana@gelez.xyz>
-* Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
-*/
-
-/**
-* A digit input with a label next to it.
-*/
-public class Akira.Partials.LinkedInput : Gtk.Grid {
+/*
+ * A digit input with a label next to it.
+ */
+public class Akira.Widgets.LinkedInput : Gtk.Grid {
     public string label { get; construct set; }
     public string tooltip { get; construct set; }
-    public Akira.Partials.InputField input_field { get; construct set; }
+    public InputField input_field { get; construct set; }
 
     /**
     * Indicates whether the label or the entry should be first
@@ -95,7 +95,7 @@ public class Akira.Partials.LinkedInput : Gtk.Grid {
             break;
         }
 
-        input_field = new Akira.Partials.InputField (icon, 7, true, false);
+        input_field = new Widgets.InputField (icon, 7, true, false);
         bind_property (
             "value", input_field.entry, "value",
             BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE);

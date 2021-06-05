@@ -111,7 +111,7 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
         export_grid.get_style_context ().add_class ("export-panel");
 
         export_grid.bind_model (list_store, model => {
-            return new Akira.Partials.ExportWidget (model as Akira.Models.ExportModel);
+            return new Widgets.ExportWidget (model as Akira.Models.ExportModel);
         });
 
         var scrolled = new Gtk.ScrolledWindow (null, null);

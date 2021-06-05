@@ -24,16 +24,16 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
     public weak Akira.Window window { get; construct; }
     public weak Akira.Lib.Canvas canvas;
 
-    private Akira.Partials.LinkedInput x;
-    private Akira.Partials.LinkedInput y;
-    private Akira.Partials.LinkedInput width;
-    private Akira.Partials.LinkedInput height;
-    private Akira.Partials.LinkedInput rotation;
+    private Widgets.LinkedInput x;
+    private Widgets.LinkedInput y;
+    private Widgets.LinkedInput width;
+    private Widgets.LinkedInput height;
+    private Widgets.LinkedInput rotation;
     private Gtk.ToggleButton lock_changes;
     private Gtk.ToggleButton hflip_button;
     private Gtk.ToggleButton vflip_button;
     private Gtk.Adjustment opacity_adj;
-    private Akira.Partials.InputField opacity_entry;
+    private Widgets.InputField opacity_entry;
     private Gtk.Scale scale;
 
     // Bindings.
@@ -94,13 +94,13 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         column_spacing = 6;
         hexpand = true;
 
-        x = new Akira.Partials.LinkedInput (_("X"), _("Horizontal position"));
+        x = new Widgets.LinkedInput (_("X"), _("Horizontal position"));
         x.input_field.set_range (-Akira.Layouts.MainCanvas.CANVAS_SIZE, Akira.Layouts.MainCanvas.CANVAS_SIZE);
-        y = new Akira.Partials.LinkedInput (_("Y"), _("Vertical position"));
+        y = new Widgets.LinkedInput (_("Y"), _("Vertical position"));
         y.input_field.set_range (-Akira.Layouts.MainCanvas.CANVAS_SIZE, Akira.Layouts.MainCanvas.CANVAS_SIZE);
-        width = new Akira.Partials.LinkedInput (_("W"), _("Width"));
+        width = new Widgets.LinkedInput (_("W"), _("Width"));
         width.input_field.set_range (0, Akira.Layouts.MainCanvas.CANVAS_SIZE);
-        height = new Akira.Partials.LinkedInput (_("H"), _("Height"));
+        height = new Widgets.LinkedInput (_("H"), _("Height"));
         height.input_field.set_range (0, Akira.Layouts.MainCanvas.CANVAS_SIZE);
 
         var lock_image = new Gtk.Image.from_icon_name ("changes-allow-symbolic", Gtk.IconSize.BUTTON);
@@ -116,11 +116,11 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
             lock_changes.image = new Gtk.Image.from_icon_name (icon, Gtk.IconSize.BUTTON);
         });
 
-        rotation = new Akira.Partials.LinkedInput (_("R"), _("Rotation degrees"), "°");
+        rotation = new Widgets.LinkedInput (_("R"), _("Rotation degrees"), "°");
         rotation.input_field.set_range (-360, 360);
 
         hflip_button = new Gtk.ToggleButton ();
-        hflip_button.add (new Akira.Partials.ButtonImage ("object-flip-horizontal"));
+        hflip_button.add (new Widgets.ButtonImage ("object-flip-horizontal"));
         hflip_button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
         hflip_button.hexpand = false;
         hflip_button.can_focus = false;
@@ -131,7 +131,7 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
             Granite.markup_accel_tooltip ({"<Ctrl>bracketleft"}, _("Flip Horizontally"));
 
         vflip_button = new Gtk.ToggleButton ();
-        vflip_button.add (new Akira.Partials.ButtonImage ("object-flip-vertical"));
+        vflip_button.add (new Widgets.ButtonImage ("object-flip-vertical"));
         vflip_button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
         vflip_button.hexpand = false;
         vflip_button.can_focus = false;
@@ -154,8 +154,8 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         scale.draw_value = false;
         scale.digits = 0;
         scale.margin_end = 20;
-        opacity_entry = new Akira.Partials.InputField (
-            Akira.Partials.InputField.Unit.PERCENTAGE, 7, true, true);
+        opacity_entry = new Widgets.InputField (
+            Widgets.InputField.Unit.PERCENTAGE, 7, true, true);
         opacity_entry.entry.bind_property (
             "value", opacity_adj, "value",
             BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE);
@@ -170,16 +170,16 @@ public class Akira.Layouts.Partials.TransformPanel : Gtk.Grid {
         attach (group_title (_("Position")), 0, 0, 3);
         attach (x, 0, 1, 1);
         attach (y, 2, 1, 1);
-        attach (new Akira.Partials.PanelSeparator (), 0, 2, 3);
+        attach (new Widgets.PanelSeparator (), 0, 2, 3);
         attach (group_title (_("Size")), 0, 3, 3);
         attach (width, 0, 4, 1);
         attach (lock_changes, 1, 4, 1);
         attach (height, 2, 4, 1);
-        attach (new Akira.Partials.PanelSeparator (), 0, 5, 3);
+        attach (new Widgets.PanelSeparator (), 0, 5, 3);
         attach (group_title (_("Transform")), 0, 6, 3);
         attach (rotation, 0, 7, 1);
         attach (align_grid, 2, 7, 1);
-        attach (new Akira.Partials.PanelSeparator (), 0, 8, 3);
+        attach (new Widgets.PanelSeparator (), 0, 8, 3);
         attach (group_title (_("Opacity")), 0, 9, 3);
         attach (opacity_grid, 0, 10, 3);
 

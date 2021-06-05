@@ -24,25 +24,25 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
 
     private Lib.Items.CanvasItem selected_item;
 
-    public Akira.Partials.HeaderBarButton new_document;
-    public Akira.Partials.HeaderBarButton save_file;
-    public Akira.Partials.HeaderBarButton save_file_as;
+    public Widgets.HeaderBarButton new_document;
+    public Widgets.HeaderBarButton save_file;
+    public Widgets.HeaderBarButton save_file_as;
     public Gtk.Grid recent_files_grid;
 
-    public Akira.Partials.MenuButton menu;
-    public Akira.Partials.MenuButton items;
-    public Akira.Partials.ZoomButton zoom;
-    public Akira.Partials.HeaderBarButton group;
-    public Akira.Partials.HeaderBarButton ungroup;
-    public Akira.Partials.HeaderBarButton move_up;
-    public Akira.Partials.HeaderBarButton move_down;
-    public Akira.Partials.HeaderBarButton move_top;
-    public Akira.Partials.HeaderBarButton move_bottom;
-    public Akira.Partials.HeaderBarButton preferences;
-    public Akira.Partials.HeaderBarButton path_difference;
-    public Akira.Partials.HeaderBarButton path_exclusion;
-    public Akira.Partials.HeaderBarButton path_intersect;
-    public Akira.Partials.HeaderBarButton path_union;
+    public Widgets.MenuButton menu;
+    public Widgets.MenuButton items;
+    public Widgets.ZoomButton zoom;
+    public Widgets.HeaderBarButton group;
+    public Widgets.HeaderBarButton ungroup;
+    public Widgets.HeaderBarButton move_up;
+    public Widgets.HeaderBarButton move_down;
+    public Widgets.HeaderBarButton move_top;
+    public Widgets.HeaderBarButton move_bottom;
+    public Widgets.HeaderBarButton preferences;
+    public Widgets.HeaderBarButton path_difference;
+    public Widgets.HeaderBarButton path_exclusion;
+    public Widgets.HeaderBarButton path_intersect;
+    public Widgets.HeaderBarButton path_union;
 
     public Gtk.PopoverMenu popover_insert;
 
@@ -66,64 +66,64 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
         set_show_close_button (true);
         title = _("Untitled");
 
-        menu = new Akira.Partials.MenuButton ("document-open", _("Menu"), null);
+        menu = new Widgets.MenuButton ("document-open", _("Menu"), null);
         var menu_popover = build_main_menu_popover ();
         menu.button.popover = menu_popover;
 
-        items = new Akira.Partials.MenuButton ("insert-object", _("Insert"), null);
+        items = new Widgets.MenuButton ("insert-object", _("Insert"), null);
         var items_popover = build_items_popover ();
         items.button.popover = items_popover;
 
-        zoom = new Akira.Partials.ZoomButton (window);
+        zoom = new Widgets.ZoomButton (window);
 
-        group =new Akira.Partials.HeaderBarButton (window, "object-group",
+        group =new Widgets.HeaderBarButton (window, "object-group",
             _("Group"), {"<Ctrl>g"}, "multiple");
-        ungroup = new Akira.Partials.HeaderBarButton (window, "object-ungroup",
+        ungroup = new Widgets.HeaderBarButton (window, "object-ungroup",
             _("Ungroup"), {"<Ctrl><Shift>g"}, "group");
 
-        move_up = new Akira.Partials.HeaderBarButton (window, "selection-raise",
+        move_up = new Widgets.HeaderBarButton (window, "selection-raise",
             _("Up"), {"<Ctrl>Up"}, "single");
         move_up.button.action_name = Akira.Services.ActionManager.ACTION_PREFIX
             + Akira.Services.ActionManager.ACTION_MOVE_UP;
 
-        move_down = new Akira.Partials.HeaderBarButton (window, "selection-lower",
+        move_down = new Widgets.HeaderBarButton (window, "selection-lower",
             _("Down"), {"<Ctrl>Down"}, "single");
         move_down.button.action_name = Akira.Services.ActionManager.ACTION_PREFIX
             + Akira.Services.ActionManager.ACTION_MOVE_DOWN;
 
-        move_top = new Akira.Partials.HeaderBarButton (window, "selection-top",
+        move_top = new Widgets.HeaderBarButton (window, "selection-top",
             _("Top"), {"<Ctrl><Shift>Up"}, "single");
         move_top.button.action_name = Akira.Services.ActionManager.ACTION_PREFIX
             + Akira.Services.ActionManager.ACTION_MOVE_TOP;
 
-        move_bottom = new Akira.Partials.HeaderBarButton (window, "selection-bottom",
+        move_bottom = new Widgets.HeaderBarButton (window, "selection-bottom",
             _("Bottom"), {"<Ctrl><Shift>Down"}, "single");
         move_bottom.button.action_name = Akira.Services.ActionManager.ACTION_PREFIX
             + Akira.Services.ActionManager.ACTION_MOVE_BOTTOM;
 
-        preferences = new Akira.Partials.HeaderBarButton (window, "open-menu",
+        preferences = new Widgets.HeaderBarButton (window, "open-menu",
             _("Settings"), {"<Ctrl>comma"});
         preferences.button.action_name = Akira.Services.ActionManager.ACTION_PREFIX
             + Akira.Services.ActionManager.ACTION_PREFERENCES;
         preferences.sensitive = true;
 
-        var export = new Akira.Partials.MenuButton ("document-export", _("Export"), null);
+        var export = new Widgets.MenuButton ("document-export", _("Export"), null);
         var export_popover = build_export_popover ();
         export.button.popover = export_popover;
         export.sensitive = true;
 
-        var layout = new Akira.Partials.MenuButton ("document-layout", _("Layout"), null);
+        var layout = new Widgets.MenuButton ("document-layout", _("Layout"), null);
         var layout_popover = build_layout_popover ();
         layout.button.popover = layout_popover;
         layout.sensitive = true;
 
-        path_difference = new Akira.Partials.HeaderBarButton (window, "path-difference",
+        path_difference = new Widgets.HeaderBarButton (window, "path-difference",
             _("Difference"), null, "multiple");
-        path_exclusion = new Akira.Partials.HeaderBarButton (window, "path-exclusion",
+        path_exclusion = new Widgets.HeaderBarButton (window, "path-exclusion",
             _("Exclusion"), null, "multiple");
-        path_intersect = new Akira.Partials.HeaderBarButton (window, "path-intersection",
+        path_intersect = new Widgets.HeaderBarButton (window, "path-intersection",
             _("Intersect"), null, "multiple");
-        path_union = new Akira.Partials.HeaderBarButton (window, "path-union",
+        path_union = new Widgets.HeaderBarButton (window, "path-union",
             _("Union"), null, "multiple");
 
         pack_start (menu);
