@@ -7,10 +7,12 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
+ *
  * Akira is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
+ *
  * You should have received a copy of the GNU General Public License
  * along with Akira. If not, see <https://www.gnu.org/licenses/>.
  *
@@ -21,7 +23,7 @@
 /*
  * Helper class to quickly create a simple style button with a + icon.
  */
-public class Akira.Partials.AddColorButton : Gtk.Button {
+public class Akira.Widgets.AddColorButton : Gtk.Button {
     public AddColorButton () {
         get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
         width_request = height_request = 24;
