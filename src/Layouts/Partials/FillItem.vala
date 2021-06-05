@@ -22,33 +22,13 @@
  */
 
 public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
-    public weak Akira.Window window { get; construct; }
+    public unowned Akira.Window window;
+    private unowned Models.FillsItemModel model;
 
     private Gtk.Button hidden_button;
     private Gtk.Button delete_button;
     private Gtk.Image hidden_button_icon;
     private Widgets.InputField opacity_container;
-    private Widgets.ColorField color_container;
-
-    public Akira.Models.FillsItemModel model { get; construct; }
-
-    private string old_color;
-
-    private string color {
-        owned get {
-            return model.color;
-        } set {
-            model.color = value;
-        }
-    }
-
-    private int alpha {
-        owned get {
-            return model.alpha;
-        } set {
-            model.alpha = value;
-        }
-    }
 
     private bool hidden {
         owned get {
@@ -61,27 +41,14 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
     }
 
     public FillItem (Akira.Window window, Akira.Models.FillsItemModel model) {
-        Object (
-            window: window,
-            model: model
-        );
-    }
+        this.window = window;
+        this.model = model;
 
-    construct {
         create_ui ();
-
-        // Update view BEFORE event bindings in order
-        // to not trigger bindings on first assignment.
-        update_view ();
+        hidden = model.hidden;
 
         create_event_bindings ();
         show_all ();
-    }
-
-    private void update_view () {
-        hidden = model.hidden;
-        color = model.color;
-        old_color = color;
     }
 
     private void create_ui () {
@@ -91,40 +58,12 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         fill_chooser.hexpand = true;
         fill_chooser.margin_end = 5;
 
-        var color_button = new Widgets.ColorButton (model);
-
-        color_container = new Widgets.ColorField (window);
-        color_container.text = Utils.Color.rgba_to_hex (color);
-
-        model.bind_property (
-            "color", color_container, "text",
-            BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE,
-            // model => this
-            (binding, model_value, ref color_container_value) => {
-                var model_rgba = model_value.dup_string ();
-                old_color = model_rgba;
-                color_container_value.set_string (Utils.Color.rgba_to_hex (model_rgba));
-                return true;
-            },
-            // this => model
-            (binding, color_container_value, ref model_value) => {
-                color_button.color_set_manually = false;
-                var color_container_hex = color_container_value.dup_string ();
-                if (!Utils.Color.is_valid_hex (color_container_hex)) {
-                    model_value.set_string (Utils.Color.rgba_to_hex (old_color));
-                    return false;
-                }
-                var new_color_rgba = Utils.Color.hex_to_rgba (color_container_hex);
-                new_color_rgba.alpha = alpha / 100;
-                model_value.set_string (new_color_rgba.to_string ());
-                return true;
-            }
-        );
+        var color_button = new Widgets.ColorButton (window, model);
 
         opacity_container = new Widgets.InputField (
             Widgets.InputField.Unit.PERCENTAGE, 7, true, true);
         opacity_container.entry.sensitive = true;
-        opacity_container.entry.value = Math.round ((double) alpha / 255 * 100);
+        opacity_container.entry.value = Math.round ((double) model.alpha / 255 * 100);
 
         opacity_container.entry.bind_property (
             "value", model, "alpha",
@@ -140,8 +79,7 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
             });
 
         fill_chooser.attach (color_button, 0, 0, 1, 1);
-        fill_chooser.attach (color_container, 1, 0, 1, 1);
-        fill_chooser.attach (opacity_container, 2, 0, 1, 1);
+        fill_chooser.attach (opacity_container, 1, 0, 1, 1);
 
         hidden_button = new Gtk.Button ();
         hidden_button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
@@ -164,7 +102,6 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
     }
 
     private void create_event_bindings () {
-        // eyedropper_button.clicked.connect (on_eyedropper_click);
         delete_button.clicked.connect (on_delete_item);
         hidden_button.clicked.connect (toggle_visibility);
     }

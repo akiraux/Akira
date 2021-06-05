@@ -52,9 +52,9 @@ public class Akira.Models.FillsItemModel : Models.BaseModel {
 
     public Akira.Utils.BlendingMode blending_mode;
 
-    public FillsItemModel (Lib.Components.Fill _fill, ListModel _model) {
-        fill = _fill;
-        model = _model;
+    public FillsItemModel (Lib.Components.Fill fill, ListModel model) {
+        this.fill = fill;
+        this.model = model;
         blending_mode = Akira.Utils.BlendingMode.NORMAL;
     }
 

@@ -25,7 +25,7 @@ public class Akira.Widgets.ColorField : Gtk.Entry {
     public ColorField (Akira.Window window) {
         this.window = window;
 
-        margin_end = 10;
+        margin_end = margin_start = 10;
         width_chars = 8;
         max_length = 7;
         hexpand = true;

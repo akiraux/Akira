@@ -24,7 +24,8 @@
  * picker. The color button opens up the Gtk Color chooser.
  */
 public class Akira.Widgets.ColorButton : Gtk.Grid {
-    private Models.FillsItemModel model;
+    private unowned Akira.Window window;
+    private unowned Models.FillsItemModel model;
 
     private Gtk.Button color_button;
     private Gtk.Popover color_popover;
@@ -38,6 +39,12 @@ public class Akira.Widgets.ColorButton : Gtk.Grid {
     public bool color_set_manually = false;
 
     /*
+     * Keep track of the current color when the user is updating the string
+     * and the format is not valid.
+     */
+    private string old_color;
+
+    /*
      * Type of color containers to add new colors to. We can potentially create
      * an API to allow adding more containers to the color picker popup.
      */
@@ -46,10 +53,11 @@ public class Akira.Widgets.ColorButton : Gtk.Grid {
         DOCUMENT
     }
 
-    public ColorButton (Models.FillsItemModel model) {
+    public ColorButton (Akira.Window window, Models.FillsItemModel model) {
+        this.window = window;
         this.model = model;
+        old_color = model.color;
 
-        margin_end = 10;
         margin_top = margin_bottom = 1;
 
         var container = new Gtk.Grid ();
@@ -81,13 +89,44 @@ public class Akira.Widgets.ColorButton : Gtk.Grid {
         eyedropper_button.can_focus = false;
         eyedropper_button.valign = Gtk.Align.CENTER;
         eyedropper_button.set_tooltip_text (_("Pick color"));
-        eyedropper_button.add (new Gtk.Image.from_icon_name ("color-select-symbolic",
-            Gtk.IconSize.SMALL_TOOLBAR));
+        eyedropper_button.add (
+            new Gtk.Image.from_icon_name ("color-select-symbolic",
+            Gtk.IconSize.SMALL_TOOLBAR)
+        );
+        eyedropper_button.clicked.connect (on_eyedropper_click);
 
         add (container);
         add (eyedropper_button);
 
-        eyedropper_button.clicked.connect (on_eyedropper_click);
+        var field = new ColorField (window);
+        field.text = Utils.Color.rgba_to_hex (model.color);
+
+        model.bind_property (
+            "color", field, "text",
+            BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE,
+            // model => this
+            (binding, model_value, ref field_value) => {
+                var model_rgba = model_value.dup_string ();
+                old_color = model_rgba;
+                field_value.set_string (Utils.Color.rgba_to_hex (model_rgba));
+                return true;
+            },
+            // this => model
+            (binding, field_value, ref model_value) => {
+                color_set_manually = false;
+                var field_hex = field_value.dup_string ();
+                if (!Utils.Color.is_valid_hex (field_hex)) {
+                    model_value.set_string (Utils.Color.rgba_to_hex (old_color));
+                    return false;
+                }
+                var new_color_rgba = Utils.Color.hex_to_rgba (field_hex);
+                new_color_rgba.alpha = model.alpha / 100;
+                model_value.set_string (new_color_rgba.to_string ());
+                return true;
+            }
+        );
+
+        add (field);
     }
 
     private void init_color_chooser () {
@@ -207,8 +246,8 @@ public class Akira.Widgets.ColorButton : Gtk.Grid {
     }
 
     private void set_color_chooser_color () {
-        // Prevent infinite loop by checking whether the color
-        // has been set manually or not
+        // Prevent infinite loop by checking whether the color has been manually
+        // set or not.
         if (color_set_manually) {
             return;
         }
