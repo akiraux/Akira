@@ -24,26 +24,18 @@ public class Akira.Lib2.Items.ModelInstance {
     public ModelItem item;
     public int[] children;
 
-    private ModelInstance () {}
-
-    public ModelInstance.as_item (int uid, ModelItem item) {
+    public ModelInstance (int uid, ModelItem? item) {
+        if (item == null || item.item_type.is_group ()) {
+            this.children = new int[0];
+        }
         this.id = uid;
-        this.item = item;
-        this.item.id = uid;
-    }
-
-    public ModelInstance.as_group (int uid, ModelItem? item) {
-        this.id = uid;
-        this.children = new int[0];
         this.item = item;
         if (item != null) {
             this.item.id = uid;
         }
     }
 
-    public virtual bool has_children () { return false; }
-
-    public virtual GLib.Array<int>? get_children () { return null; }
+    public bool is_group () { return item == null || item.item_type.is_group (); }
 }
 
 public class Akira.Lib2.Items.ModelNode {
@@ -55,15 +47,7 @@ public class Akira.Lib2.Items.ModelNode {
     public unowned ModelNode parent = null;
     public GLib.Array<unowned ModelNode> children;
 
-    private ModelNode () {}
-
-    public ModelNode.as_item_node (ModelInstance instance, int pos_in_parent) {
-        this.instance = instance;
-        this.id = instance.id;
-        this.pos_in_parent = pos_in_parent;
-    }
-
-    public ModelNode.as_group_node (ModelInstance instance, int pos_in_parent) {
+    public ModelNode (ModelInstance instance, int pos_in_parent) {
         this.instance = instance;
         this.id = instance.id;
         this.pos_in_parent = pos_in_parent;
@@ -143,9 +127,9 @@ public class Akira.Lib2.Items.Model : Object {
         item_nodes = new Gee.HashMap<int, ModelNode> ();
         group_nodes = new Gee.HashMap<int, ModelNode> ();
 
-        var group_instance = new ModelInstance.as_group (origin_id, null);
+        var group_instance = new ModelInstance (origin_id, null);
         group_map[origin_id] = group_instance;
-        group_nodes[origin_id] = new ModelNode.as_group_node (group_instance, 0);
+        group_nodes[origin_id] = new ModelNode (group_instance, 0);
     }
 
     public ModelInstance? instance_from_id (int id) {
@@ -212,10 +196,6 @@ public class Akira.Lib2.Items.Model : Object {
     }
 
     public int remove (int id, bool restack) {
-        if (id <= item_start_id) {
-            return -1;
-        }
-
         var node = node_from_id (id);
         
         if (node == null) {
@@ -238,19 +218,7 @@ public class Akira.Lib2.Items.Model : Object {
 
         var target_node = parent_node.children.index (pos);
 
-        if (target_node.id < item_start_id) {
-            needs_dag_build = true;
-            // TODO -- handle group deletion
-            return 0;
-        }
-
-        // delete leaf
-
-        Utils.Array.remove_from_iarray (ref parent_node.instance.children, (int) pos, 1);
-        parent_node.children.remove_index (pos);
-        target_node.parent = null;
-        item_nodes.unset(target_node.id);
-        item_map.unset(target_node.id);
+        inner_remove (parent_node, target_node, pos);
 
         if (restack) {
             for (var i = (int)pos; i < parent_node.children.length; ++i) {
@@ -260,22 +228,23 @@ public class Akira.Lib2.Items.Model : Object {
         return 0;
     }
 
-    public int append_item (int parent_id, ModelInstance candidate) {
+    public int append_new_item (int parent_id, Lib2.Items.ModelItem candidate) {
         if (!group_map.has_key (parent_id)) {
             return -1;
         }
 
         var parent_node = group_nodes[parent_id];
         var pos = parent_node.children == null ? 0 : parent_node.children.length;
-        return inner_splice_item (parent_node, pos, candidate);
+
+        return inner_splice_new_item (parent_node, pos, new ModelInstance (-1, candidate));
     }
 
-    public int splice_item (int parent_id, uint pos, ModelInstance candidate) {
+    public int splice_new_item (int parent_id, uint pos, Lib2.Items.ModelItem candidate) {
         if (!group_map.has_key (parent_id)) {
             return -1;
         }
 
-        return inner_splice_item (group_nodes[parent_id], pos, candidate);
+        return inner_splice_new_item (group_nodes[parent_id], pos, new ModelInstance (-1, candidate));
     }
 
     public int move_items (int parent_id, uint pos, uint newpos, int length, bool restack) {
@@ -289,19 +258,11 @@ public class Akira.Lib2.Items.Model : Object {
 
         var parent_node = group_nodes[parent_id];
 
-        if (pos >= parent_node.children.length) {
+        if (pos >= parent_node.children.length || pos + length >= parent_node.children.length) {
             return -1;
         }
 
         if (newpos + length > parent_node.children.length) {
-            return 0;
-        }
-
-        var target_node = parent_node.children.index (pos);
-
-        if (target_node.id < item_start_id) {
-            needs_dag_build = true;
-            // TODO -- handle group deletion
             return 0;
         }
 
@@ -320,7 +281,7 @@ public class Akira.Lib2.Items.Model : Object {
             }
         }
 
-        return (int) (newpos - pos);
+        return 1;
     }
 
     public ModelNode? next_sibling (ModelNode node, bool only_stackable) {
@@ -365,78 +326,12 @@ public class Akira.Lib2.Items.Model : Object {
         }
     }
 
-    private int inner_splice_item (ModelNode parent_node, uint pos, ModelInstance candidate) {
-        var new_id = ++last_item_id;
-        candidate.id = new_id;
-        if (candidate.item != null) {
-            candidate.item.id = new_id;
-        }
-
-        item_map[new_id] = candidate;
-
-        var new_node = new ModelNode.as_item_node (candidate, (int) pos);
-        item_nodes[new_id] = new_node;
-
-        if (parent_node.children == null) {
-            parent_node.children = new GLib.Array<unowned ModelNode> ();
-        }
-
-        bool update_sibling_locations = false;
-        if (pos >= parent_node.children.length) {
-            parent_node.children.append_val (new_node);
-            Utils.Array.append_to_iarray (ref parent_node.instance.children, new_id);
-        } else {
-            parent_node.children.insert_val (pos, new_node);
-            Utils.Array.insert_at_iarray (ref parent_node.instance.children, (int)pos, new_id);
-            update_sibling_locations = true;
-        }
-
-        if (update_sibling_locations) {
-            var ipos = (int) pos;
-            for (var i = ipos; i < parent_node.children.length; ++i) {
-                parent_node.children.index(ipos).pos_in_parent = ipos++;
-            }
-        }
-
-        new_node.parent = parent_node;
-        return new_id;
-    }
-
-    private static void build_dag (
-        Gee.HashMap<int, ModelInstance> group_map,
-        Gee.HashMap<int, ModelInstance> item_map,
-        ref Gee.HashMap<int, ModelNode> group_nodes,
-        ref Gee.HashMap<int, ModelNode>? item_nodes
-    ) {
-    }
-
-    private static void build_dag_recursive (
-        ModelNode node,
-        Gee.HashMap<int, ModelInstance> group_map,
-        Gee.HashMap<int, ModelInstance> item_map,
-        ref Gee.HashMap<int, ModelNode> group_nodes,
-        ref Gee.HashMap<int, ModelNode>? item_nodes
-    ) {
-    }
-
-    private void build_path_recursive (ModelNode node, ref StringBuilder builder) {
-        if (node.parent != null) {
-            build_path_recursive (node.parent, ref builder);
-        }
-
-        if (builder.len > 0) {
-            builder.append ("_");
-        }
-
-        builder.append (node.pos_in_parent.to_string ());
-    }
-
     public void print_instances () {
         print ("Groups: \n");
         foreach (var inst in group_map) {
             print ("  >%d -- ", inst.value.id);
 
-            if (inst.value.has_children ()) {
+            if (inst.value.children != null) {
                 foreach (var id in inst.value.children) {
                     print ("%d ", id);
                 }
@@ -475,6 +370,113 @@ public class Akira.Lib2.Items.Model : Object {
             }
         }
 
+    }
+
+    private int inner_splice_new_item (ModelNode parent_node, uint pos, ModelInstance candidate) {
+        var new_id = candidate.is_group () ? ++last_group_id : ++last_item_id;
+        candidate.id = new_id;
+        if (candidate.item != null) {
+            candidate.item.id = new_id;
+        }
+
+
+        var new_node = new ModelNode (candidate, (int) pos);
+
+        if (candidate.is_group ()) {
+            group_map[new_id] = candidate;
+            group_nodes[new_id] = new_node;
+        } else {
+            item_map[new_id] = candidate;
+            item_nodes[new_id] = new_node;
+        }
+
+        if (parent_node.children == null) {
+            parent_node.children = new GLib.Array<unowned ModelNode> ();
+        }
+
+        bool update_sibling_locations = false;
+        if (pos >= parent_node.children.length) {
+            parent_node.children.append_val (new_node);
+            Utils.Array.append_to_iarray (ref parent_node.instance.children, new_id);
+        } else {
+            parent_node.children.insert_val (pos, new_node);
+            Utils.Array.insert_at_iarray (ref parent_node.instance.children, (int)pos, new_id);
+            update_sibling_locations = true;
+        }
+
+        if (update_sibling_locations) {
+            var ipos = (int) pos;
+            for (var i = ipos; i < parent_node.children.length; ++i) {
+                parent_node.children.index(ipos).pos_in_parent = ipos++;
+            }
+        }
+
+        new_node.parent = parent_node;
+        return new_id;
+    }
+
+    private int inner_remove (ModelNode parent_node, ModelNode to_delete, uint pos_in_parent) {
+        if (to_delete.children != null) {
+            for (var ci = (int) to_delete.children.length - 1; ci >= 0; --ci) {
+                var child_node = to_delete.children.index(ci);
+                if (child_node.children != null && child_node.children.length > 0) {
+                    inner_remove (to_delete, child_node, ci);
+                    continue;
+                }
+
+                child_node.instance.item.remove_from_canvas ();
+                child_node.parent = null;
+                remove_from_maps (child_node.id);
+            }
+        }
+
+        to_delete.instance.item.remove_from_canvas ();
+        to_delete.parent = null;
+
+        Utils.Array.remove_from_iarray (ref parent_node.instance.children, (int)pos_in_parent, 1);
+        parent_node.children.remove_index (pos_in_parent);
+
+        remove_from_maps (to_delete.id);
+        return 0;
+    }
+
+    private void remove_from_maps (int id) {
+        if (id <item_start_id) {
+            group_nodes.unset(id);
+            group_map.unset(id);
+        } else {
+            item_nodes.unset(id);
+            item_map.unset(id);
+        }
+    }
+
+    private static void build_dag (
+        Gee.HashMap<int, ModelInstance> group_map,
+        Gee.HashMap<int, ModelInstance> item_map,
+        ref Gee.HashMap<int, ModelNode> group_nodes,
+        ref Gee.HashMap<int, ModelNode>? item_nodes
+    ) {
+    }
+
+    private static void build_dag_recursive (
+        ModelNode node,
+        Gee.HashMap<int, ModelInstance> group_map,
+        Gee.HashMap<int, ModelInstance> item_map,
+        ref Gee.HashMap<int, ModelNode> group_nodes,
+        ref Gee.HashMap<int, ModelNode>? item_nodes
+    ) {
+    }
+
+    private void build_path_recursive (ModelNode node, ref StringBuilder builder) {
+        if (node.parent != null) {
+            build_path_recursive (node.parent, ref builder);
+        }
+
+        if (builder.len > 0) {
+            builder.append ("_");
+        }
+
+        builder.append (node.pos_in_parent.to_string ());
     }
 
     private void inner_recalculate_children_stacking (ModelNode parent_node) {

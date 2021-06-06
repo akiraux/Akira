@@ -39,6 +39,7 @@ sources = files(
     'Utils/Nobs.vala',
     'Utils/Snapping.vala',
     'Utils/Snapping2.vala',
+    'Utils/SVGUtil.vala',
     'Utils/GeometryMath.vala',
 
     'Layouts/HeaderBar.vala',
@@ -148,6 +149,7 @@ sources = files(
 
     'Lib2/Items/CanvasItem.vala',
     'Lib2/Items/Model.vala',
+    'Lib2/Items/ModelArtboard.vala',
     'Lib2/Items/ModelItem.vala',
     'Lib2/Items/ModelRect.vala',
     'Lib2/Items/ModelEllipse.vala',

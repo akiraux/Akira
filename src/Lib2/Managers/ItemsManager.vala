@@ -38,9 +38,7 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
             return -1;
         }
 
-        var candidate = new Lib2.Items.ModelInstance.as_item (-1, item);
-        
-        if (item_model.append_item (Lib2.Items.Model.origin_id, candidate) <= 0) {
+        if (item_model.append_new_item (Lib2.Items.Model.origin_id, item) <= 0) {
             return -1;
         }
 
@@ -89,8 +87,6 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
                 assert (false);
                 continue;
             }
-
-            inst.item.remove_from_canvas ();
         }
 
         foreach (var gid in modified_groups.data) {
@@ -153,6 +149,8 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
             current_set.length++;
         }
 
+        Lib2.Items.ModelNode reference = null;
+
         foreach (var cs in shift_groups) {
             var pos = cs.first_child;
 
@@ -179,16 +177,68 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
             if (0 >= item_model.move_items (cs.parent_node.id, pos, newpos, cs.length, true)) {
                 // no items were shifted
                 cs = null;
+                continue;
             }
         }
 
-        foreach (var cs in shift_groups) {
-            if (cs != null) {
-                view_restack (cs, amount > 0);
-            }
-        }
+
+        //print ("ref: %d\n", reference.id);
+        //foreach (var cs in shift_groups) {
+        //    if (cs != null) {
+        //        view_restack (cs, amount > 0, reference);
+        //    }
+        //}
+
+        item_model.print_dag ();
 
         return 0;
+    }
+
+    public void flip_items (GLib.Array<int> ids, bool vertical) {
+        var blocker = new Lib2.Managers.SelectionManager.ChangeSignalBlocker (view_canvas.selection_manager);
+        (void) blocker;
+
+        foreach (var target_id in ids.data) {
+            var target = item_model.instance_from_id (target_id); 
+            if (target.item != null) {
+                unowned var old_flipped = target.item.components.flipped;
+                bool new_h = false;
+                bool new_v = false;
+
+                if (old_flipped != null) {
+                    new_h = old_flipped.horizontal;
+                    new_v = old_flipped.vertical;
+                }
+
+                new_h = vertical ? new_h : !new_h;
+                new_v = vertical ? !new_v : new_h;
+
+                if (target.item.components.rotation != null) {
+                    var tr = target.item.compiled_geometry ().transform ();
+                    tr.x0 = 0;
+                    tr.y0 = 0;
+
+                    double offset = vertical ? 0 : 90;
+                    double start_x = vertical ? 0 : -1;
+                    double start_y = vertical ? -1 : 0;
+                    tr.transform_point (ref start_x, ref start_y);
+                    double flipped_x = start_x;
+                    double flipped_y = start_y;
+
+                    var radians = GLib.Math.atan2 (
+                        flipped_x,
+                        flipped_y
+                    );
+
+                    var rotation = GLib.Math.fmod (radians * 180 / GLib.Math.PI + offset, 360);
+                    target.item.components.rotation = new Lib2.Components.Rotation (rotation);
+                }
+
+
+                target.item.components.flipped = new Lib2.Components.Flipped (new_h, new_v);
+                target.item.recompile_geometry (true);
+            }
+        }
     }
 
     public GLib.Array<unowned Lib2.Items.ModelNode> children_in_group (int group_id) {
@@ -213,29 +263,34 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
         return result;
     }
 
-    private void view_restack (Lib2.Items.ChildrenSet children_set, bool up) {
+    private void view_restack (Lib2.Items.ChildrenSet children_set, bool up, Lib2.Items.ModelNode reference) {
+            if (reference == null) {
+                assert (reference != null);
+                return;
+            }
             if (children_set.children_in_set.length == 0) {
                 return;
             }
 
             if (up) {
-                restack_up (children_set);
+                restack_up (children_set, reference);
                 return;
             }
 
-            restack_down (children_set);
+            restack_down (children_set, reference);
     }
 
-    private bool restack_up (Lib2.Items.ChildrenSet children_set) {
-        unowned var first_node = children_set.children_in_set.index(0);
-        var sibling_under = item_model.previous_sibling (first_node, true);
+    private bool restack_up (Lib2.Items.ChildrenSet children_set, Lib2.Items.ModelNode reference) {
+        var sibling_under = item_model.previous_sibling (reference, true);
 
         if (sibling_under == null) {
             return false;
         }
 
+
         for (var i = (int)children_set.children_in_set.length - 1; i >= 0; --i) {
             unowned var model_item = children_set.children_in_set.index(i).instance.item;
+            print ("%d %d\n", sibling_under.id, model_item.id);
             if (model_item.is_stackable ()) {
                 model_item.canvas_item.raise (sibling_under.instance.item.canvas_item);
             }
@@ -243,9 +298,9 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
         return true;
     }
 
-    private bool restack_down (Lib2.Items.ChildrenSet children_set) {
+    private bool restack_down (Lib2.Items.ChildrenSet children_set, Lib2.Items.ModelNode reference) {
         unowned var last_node = children_set.children_in_set.index(children_set.children_in_set.length -1);
-        var sibling_over = item_model.next_sibling (last_node, true);
+        var sibling_over = item_model.next_sibling (reference, true);
 
         if (sibling_over == null) {
             return false;

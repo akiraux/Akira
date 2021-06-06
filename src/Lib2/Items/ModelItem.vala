@@ -25,19 +25,47 @@ public interface Akira.Lib2.Items.ModelType<T> : Object {
     public abstract void construct_canvas_item (ModelItem item, Goo.Canvas canvas);
 
     public abstract void component_updated (ModelItem item, Lib2.Components.Component.Type type);
+
+    public abstract bool is_group ();
+}
+
+public class Akira.Lib2.Items.DummyItemType : Object, ModelType<DummyItemType> {
+    public ModelType copy () { return new DummyItemType (); }
+    public void construct_canvas_item (ModelItem item, Goo.Canvas canvas) {}
+    public void component_updated (ModelItem item, Lib2.Components.Component.Type type) {}
+    public bool is_group () { return false; }
+}
+
+public class Akira.Lib2.Items.DummyGroupType : Object, ModelType<DummyGroupType> {
+    public ModelType copy () { return new DummyGroupType (); }
+    public void construct_canvas_item (ModelItem item, Goo.Canvas canvas) {}
+    public void component_updated (ModelItem item, Lib2.Components.Component.Type type) {}
+    public bool is_group () { return true; }
 }
 
 public class Akira.Lib2.Items.ModelItem : Object {
     public int id = -1;
     public Lib2.Items.CanvasItem canvas_item = null;
+    // Only non-null if it is a group with an associated canvas (e.g., artboard)
+    public Goo.CanvasGroup container_item = null;
     public Lib2.Components.Components components = null;
     public ModelType item_type = null;
+
+    public ModelItem.dummy_item () {
+        item_type = new DummyItemType ();
+    }
+
+    public ModelItem.dummy_group () {
+        item_type = new DummyGroupType ();
+    }
 
     public signal void geometry_changed (int id);
 
     public ModelItem clone () {
         var cln = new ModelItem ();
-        cln.components = components.copy ();
+        if (components != null) {
+            cln.components = components.copy ();
+        }
         cln.item_type = item_type.copy ();
         return cln;
     }
@@ -67,7 +95,7 @@ public class Akira.Lib2.Items.ModelItem : Object {
     }
 
     public void notify_view_of_changes () {
-        if (canvas_item == null) {
+        if (canvas_item == null && container_item == null) {
             return;
         }
 

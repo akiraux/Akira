@@ -77,7 +77,7 @@ public class Akira.Lib2.Items.ModelTypeEllipse : Object, ModelType<ModelTypeElli
                 break;
             case Lib2.Components.Component.Type.COMPILED_FILL:
                 if (!item.components.compiled_fill.is_visible) {
-                    item.canvas_item.set ("stroke-color-rgba", null);
+                    item.canvas_item.set ("fill-color-rgba", null);
                     break;
                 }
 
@@ -93,4 +93,5 @@ public class Akira.Lib2.Items.ModelTypeEllipse : Object, ModelType<ModelTypeElli
         }
     }
 
+    public bool is_group () { return false; }
 }

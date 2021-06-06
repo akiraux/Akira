@@ -59,3 +59,28 @@ public class Akira.Lib2.Items.CanvasEllipse : Goo.CanvasEllipse, CanvasItem {
         parent.add_child (this, -1);
     }
 }
+
+public class Akira.Lib2.Items.CanvasArtboardLabel : Goo.CanvasText, CanvasItem {
+    private const int FONT_SIZE = 10;
+    public int parent_id { get; set; default = -1; }
+
+    public CanvasArtboardLabel (Goo.CanvasItem parent, double center_x, double center_y) {
+        // Define the label colors for dark/light theme variation.
+        var light_color = Utils.Color.color_string_to_uint ("rgba(255, 255, 255, 0.75)");
+        var dark_color = Utils.Color.color_string_to_uint ("rgba(0, 0, 0, 0.75)");
+        this.parent = parent;
+        this.x = x;
+        this.y = y;
+        this.width = 1.0;
+        this.height = width;
+        this.anchor = Goo.CanvasAnchorType.SW;
+        set("font", "Open Sans " + (FONT_SIZE/* / akira_canvas.current_scale*/).to_string ());
+        set("ellipsize", Pango.EllipsizeMode.END);
+        set("fill-color-rgba", settings.dark_theme ? light_color : dark_color);
+
+        can_focus = false;
+
+        // Add the newly created item to the Canvas or Artboard.
+        parent.add_child (this, -1);
+    }
+}

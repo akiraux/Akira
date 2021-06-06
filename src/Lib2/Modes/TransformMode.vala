@@ -241,6 +241,10 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
         double event_y,
         ref Lib2.Managers.SnapManager.SnapGuideData guide_data
     ) {
+        //ulong microseconds;
+        //double seconds;
+        //Timer timer = new Timer ();
+
         var blocker = new Lib2.Managers.SelectionManager.ChangeSignalBlocker (view_canvas.selection_manager);
         (void) blocker;
 
@@ -307,6 +311,9 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
             ++ct;
         }
 
+        //timer.stop ();
+        //seconds = timer.elapsed (out microseconds);
+        //print ("Moved %u items in %s s\n", initial_drag_state.items_data.size, seconds.to_string ());
         view_canvas.window.event_bus.update_snap_decorators ();
     }
 

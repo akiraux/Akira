@@ -50,6 +50,7 @@ public class Akira.Lib2.Managers.SelectionManager : Object {
 
     construct {
         selection = new Lib2.Items.ItemSelection (null);
+        view_canvas.window.event_bus.flip_item.connect (on_flip_selected);
         view_canvas.window.event_bus.delete_selected_items.connect(delete_selected);
         view_canvas.window.event_bus.change_z_selected.connect (change_z_order);
     }
@@ -99,5 +100,14 @@ public class Akira.Lib2.Managers.SelectionManager : Object {
 
         int amount = up ? 1 : -1;
         view_canvas.items_manager.shift_items (to_shift, amount, to_end);
+    }
+
+    public void on_flip_selected (bool vertical) {
+        var to_flip = new GLib.Array<int> ();
+        foreach (var item in selection.items) {
+            to_flip.append_val (item.id);
+        }
+
+        view_canvas.items_manager.flip_items (to_flip, vertical);
     }
 }

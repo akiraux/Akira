@@ -190,6 +190,10 @@ public class Akira.Lib2.Modes.ItemInsertMode : AbstractInteractionMode {
                 break;
 
             case "artboard":
+                new_item = Lib2.Items.ModelTypeArtboard.default_artboard (
+                    coordinates,
+                    size
+                );
                 break;
 
             case "image":
