@@ -36,14 +36,15 @@ public class Akira.Lib2.Managers.CopyManager : Object {
     public void do_copy () {
         candidates = new Gee.TreeMap<Lib2.Items.PositionKey, Lib2.Items.ModelItem> (Lib2.Items.PositionKey.compare);
 
-        foreach (var to_copy in view_canvas.selection_manager.selection.items) {
+        foreach (var to_copy in view_canvas.selection_manager.selection.nodes.values) {
 
             var original_node = view_canvas.items_manager.item_model.node_from_id (to_copy.id);
             var key = new Lib2.Items.PositionKey ();
             key.parent_path = view_canvas.items_manager.item_model.path_from_node (original_node.parent);
             key.pos_in_parent = original_node.pos_in_parent;
 
-            var cln = to_copy.clone ();
+            var cln = to_copy.instance.item.clone ();
+            cln.id = -1;
             candidates[key] = cln;
         }
     }
@@ -56,11 +57,12 @@ public class Akira.Lib2.Managers.CopyManager : Object {
         var blocker = new SelectionManager.ChangeSignalBlocker (view_canvas.selection_manager);
         (void) blocker;
 
-        view_canvas.selection_manager.reset_selection (null);
+        view_canvas.selection_manager.reset_selection ();
 
         foreach (var cand in candidates) {
-            view_canvas.items_manager.add_item_to_origin (cand.value);
-            view_canvas.selection_manager.add_to_selection (cand.value);
+            var cln = cand.value.clone ();
+            view_canvas.items_manager.add_item_to_origin (cln);
+            view_canvas.selection_manager.add_to_selection (cln.id);
         }
     }
 }

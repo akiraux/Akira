@@ -58,6 +58,26 @@ public class Akira.Lib2.Items.ModelNode {
         children.data[pos] = children.data[newpos];
         children.data[newpos] = tmp;
     }
+
+    public bool has_child (int id, bool recurse = true) {
+        if (children == null) {
+            return false;
+        }
+
+        foreach (var child in children.data) {
+            if (child.id == id) {
+                return true;
+            }
+
+            if (recurse && child.instance.is_group ()) {
+                if (child.has_child (id)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
 }
 
 public class Akira.Lib2.Items.PositionKey
@@ -284,7 +304,19 @@ public class Akira.Lib2.Items.Model : Object {
         return 1;
     }
 
-    public ModelNode? next_sibling (ModelNode node, bool only_stackable) {
+    public static ModelNode? root (ModelNode node) {
+        if (node.parent == null) {
+            return node;
+        }
+
+        if (node.parent.id == origin_id) {
+            return node;
+        }
+
+        return root (node.parent);
+    }
+
+    public static ModelNode? next_sibling (ModelNode node, bool only_stackable) {
         if (node == null || node.parent == null) {
             return null;
         }
@@ -302,7 +334,7 @@ public class Akira.Lib2.Items.Model : Object {
         return null;
     }
 
-    public ModelNode? previous_sibling (ModelNode node, bool only_stackable) {
+    public static ModelNode? previous_sibling (ModelNode node, bool only_stackable) {
         if (node == null || node.parent == null) {
             return null;
         }

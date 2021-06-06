@@ -75,15 +75,7 @@ public class Akira.Lib2.Managers.SnapManager : Object {
             case SnapGuideType.SELECTION:
                 unowned var selection = view_canvas.selection_manager.selection;
                 var sensitivity = Utils.Snapping2.adjusted_sensitivity (view_canvas.current_scale);
-
-                var selection_area = Goo.CanvasBounds ();
-
-                selection.bounding_box (
-                    ref selection_area.y1,
-                    ref selection_area.x1,
-                    ref selection_area.y2,
-                    ref selection_area.x2
-                );
+                var selection_area = selection.bounding_box ();
 
                 var snap_grid = Utils.Snapping2.generate_best_snap_grid (
                     view_canvas,

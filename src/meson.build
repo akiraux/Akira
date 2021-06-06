@@ -153,6 +153,7 @@ sources = files(
     'Lib2/Items/ModelItem.vala',
     'Lib2/Items/ModelRect.vala',
     'Lib2/Items/ModelEllipse.vala',
+    'Lib2/Items/ModelGroup.vala',
     'Lib2/Items/ItemSelection.vala',
 
     'Lib2/Managers/CopyManager.vala',
@@ -170,6 +171,10 @@ sources = files(
     'Lib2/Modes/PanMode.vala',
 
     'Lib2/ViewCanvas.vala',
+
+    'Geometry/Rectangle.vala',
+    'Geometry/RotatedRectangle.vala',
+
 )
 
 deps = [

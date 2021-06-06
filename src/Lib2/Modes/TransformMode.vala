@@ -28,7 +28,6 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
     private const double ROTATION_FIXED_STEP = 15.0;
 
     public unowned Lib2.ViewCanvas view_canvas { get; construct; }
-    public unowned Lib2.Managers.ModeManager mode_manager { get; construct; }
 
     public Utils.Nobs.Nob nob = Utils.Nobs.Nob.NONE;
 
@@ -44,52 +43,7 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
         public double press_y;
 
         // initial_selection_data
-        public double sel_tl_x;
-        public double sel_tl_y;
-        public double sel_tr_x;
-        public double sel_tr_y;
-        public double sel_bl_x;
-        public double sel_bl_y;
-        public double sel_br_x;
-        public double sel_br_y;
-        public double sel_rotation;
-
-        public double selection_center_x {
-            get {
-                return (sel_tl_x + sel_tr_x + sel_bl_x + sel_br_x) / 4.0;
-            }
-        }
-
-        public double selection_center_y {
-            get {
-                return (sel_tl_y + sel_tr_y + sel_bl_y + sel_br_y) / 4.0;
-            }
-        }
-
-        public void top_bottom (ref double top, ref double bottom) {
-            Utils.GeometryMath.min_max_coords (sel_tl_y, sel_tr_y, sel_bl_y, sel_br_y, ref top, ref bottom);
-        }
-
-        public void left_right (ref double left, ref double right) {
-            Utils.GeometryMath.min_max_coords (sel_tl_x, sel_tr_x, sel_bl_x, sel_br_x, ref left, ref right);
-        }
-
-        public void nob_xy (Utils.Nobs.Nob nob, ref double x, ref double y) {
-            Utils.Nobs.nob_xy_from_coordinates (
-                nob,
-                sel_tl_x,
-                sel_tl_y,
-                sel_tr_x,
-                sel_tr_y,
-                sel_bl_x,
-                sel_bl_y,
-                sel_br_x,
-                sel_br_y,
-                1.0,
-                ref x,
-                ref y
-            );
-        }
+        public Geometry.RotatedRectangle area;
 
         public Gee.ArrayList<DragItemData> items_data;
 
@@ -102,23 +56,14 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
         public Lib2.Managers.SnapManager.SnapGuideData snap_guide_data;
     }
 
-    private Lib2.Items.ItemSelection selection;
+    private Lib2.Items.NodeSelection selection;
     private InitialDragState initial_drag_state;
     public TransformExtraContext transform_extra_context;
 
 
-    public TransformMode (
-        Akira.Lib2.ViewCanvas canvas,
-        Akira.Lib2.Managers.ModeManager? mode_manager,
-        Utils.Nobs.Nob selected_nob
-    ) {
-        Object (
-            view_canvas: canvas,
-            mode_manager : mode_manager
-        );
-
+    public TransformMode (Akira.Lib2.ViewCanvas canvas, Utils.Nobs.Nob selected_nob) {
+        Object (view_canvas: canvas);
         nob = selected_nob;
-
         initial_drag_state = new InitialDragState ();
     }
 
@@ -129,27 +74,15 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
 
     public override void mode_begin () {
         if (view_canvas.selection_manager.selection.is_empty ()) {
-            if (mode_manager != null) {
-                mode_manager.deregister_mode (mode_type ());
-            }
+            request_deregistration (mode_type ());
             return;
         }
 
         selection = view_canvas.selection_manager.selection;
+        initial_drag_state.area = selection.coordinates ();
 
-        selection.coordinates (
-            out initial_drag_state.sel_tl_x,
-            out initial_drag_state.sel_tl_y,
-            out initial_drag_state.sel_tr_x,
-            out initial_drag_state.sel_tr_y,
-            out initial_drag_state.sel_bl_x,
-            out initial_drag_state.sel_bl_y,
-            out initial_drag_state.sel_br_x,
-            out initial_drag_state.sel_br_y,
-            out initial_drag_state.sel_rotation
-        );
-
-        foreach (var item in selection.items) {
+        foreach (var node in selection.nodes.values) {
+            unowned var item = node.instance.item;
             var data = new DragItemData ();
             data.item_center = item.components.center.copy ();
             data.item_size = item.components.size.copy ();
@@ -185,11 +118,7 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
     }
 
     public override bool button_release_event (Gdk.EventButton event) {
-        if (mode_manager == null) {
-            return false;
-        }
-
-        mode_manager.deregister_mode (mode_type ());
+        request_deregistration (mode_type ());
         return true;
     }
 
@@ -235,7 +164,7 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
 
     public static void move_from_event (
         ViewCanvas view_canvas,
-        Lib2.Items.ItemSelection selection,
+        Lib2.Items.NodeSelection selection,
         InitialDragState initial_drag_state,
         double event_x,
         double event_y,
@@ -255,8 +184,8 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
         double left = 0.0;
         double bottom = 0.0;
         double right = 0.0;
-        initial_drag_state.top_bottom (ref top, ref bottom);
-        initial_drag_state.left_right (ref left, ref right);
+        initial_drag_state.area.top_bottom (ref top, ref bottom);
+        initial_drag_state.area.left_right (ref left, ref right);
 
         Utils.AffineTransform.add_grid_snap_delta (top, left, ref delta_x, ref delta_y);
 
@@ -266,12 +195,12 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
         if (settings.enable_snaps) {
             guide_data.type = Akira.Lib2.Managers.SnapManager.SnapGuideType.NONE;
             var sensitivity = Utils.Snapping2.adjusted_sensitivity (view_canvas.current_scale);
-            var selection_area = Goo.CanvasBounds () {
-                    x1 = left + delta_x,
-                    x2 = right + delta_x,
-                    y1 = top + delta_y,
-                    y2 = bottom + delta_y
-                };
+            var selection_area = Geometry.Rectangle () {
+                    left = left + delta_x,
+                    top = top + delta_y,
+                    right = right + delta_x,
+                    bottom = bottom + delta_y
+            };
 
             var snap_grid = Utils.Snapping2.generate_best_snap_grid (
                 view_canvas,
@@ -302,7 +231,8 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
         }
 
         var ct = 0;
-        foreach (var item in selection.items) {
+        foreach (var node in selection.nodes.values) {
+            unowned var item = node.instance.item;
             var item_drag_data = initial_drag_state.items_data[ct];
             var new_center_x = item_drag_data.item_center.x + delta_x + snap_offset_x;
             var new_center_y = item_drag_data.item_center.y + delta_y + snap_offset_y;
@@ -319,7 +249,7 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
 
     public static void scale_from_event (
         ViewCanvas view_canvas,
-        Lib2.Items.ItemSelection selection,
+        Lib2.Items.NodeSelection selection,
         InitialDragState initial_drag_state,
         Utils.Nobs.Nob nob,
         double event_x,
@@ -330,24 +260,24 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
         var blocker = new Lib2.Managers.SelectionManager.ChangeSignalBlocker (view_canvas.selection_manager);
         (void) blocker;
 
-        if (selection.items.size != 1) {
+        if (selection.nodes.size != 1) {
             return;
         }
 
-        var local_top = initial_drag_state.sel_tl_y;
-        var local_left = initial_drag_state.sel_tl_x;
-        var local_bottom = initial_drag_state.sel_br_y;
-        var local_right = initial_drag_state.sel_br_x;
+        var local_top = initial_drag_state.area.tl_y;
+        var local_left = initial_drag_state.area.tl_x;
+        var local_bottom = initial_drag_state.area.br_y;
+        var local_right = initial_drag_state.area.br_x;
 
         double grid_offset_x = 0.0;
         double grid_offset_y = 0.0;
         Utils.AffineTransform.add_grid_snap_delta (local_top, local_left, ref grid_offset_x, ref grid_offset_y);
 
-        double rot_center_x = initial_drag_state.selection_center_x;
-        double rot_center_y = initial_drag_state.selection_center_y;
+        double rot_center_x = initial_drag_state.area.center_x;
+        double rot_center_y = initial_drag_state.area.center_y;
 
         var itr = Cairo.Matrix.identity();
-        itr.rotate (-initial_drag_state.sel_rotation);
+        itr.rotate (-initial_drag_state.area.rotation);
 
         Utils.GeometryMath.to_local_from_matrix (itr, rot_center_x, rot_center_y, ref local_left, ref local_top);
         Utils.GeometryMath.to_local_from_matrix (itr, rot_center_x, rot_center_y, ref local_right, ref local_bottom);
@@ -359,14 +289,7 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
 
         Utils.Nobs.nob_xy_from_coordinates (
             nob,
-            initial_drag_state.sel_tl_x,
-            initial_drag_state.sel_tl_y,
-            initial_drag_state.sel_tr_x,
-            initial_drag_state.sel_tr_y,
-            initial_drag_state.sel_bl_x,
-            initial_drag_state.sel_bl_y,
-            initial_drag_state.sel_br_x,
-            initial_drag_state.sel_br_y,
+            initial_drag_state.area,
             1.0,
             ref nob_x,
             ref nob_y
@@ -386,7 +309,7 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
         double inc_y = 0;
 
         var tr = Cairo.Matrix.identity();
-        tr.rotate (initial_drag_state.sel_rotation);
+        tr.rotate (initial_drag_state.area.rotation);
 
         Utils.AffineTransform.calculate_size_adjustments2 (
             nob,
@@ -409,7 +332,8 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
         tr.transform_distance (ref size_off_x, ref size_off_y);
 
         var ct = 0;
-        foreach (var item in selection.items) {
+        foreach (var node in selection.nodes.values) {
+            unowned var item = node.instance.item;
             var item_drag_data = initial_drag_state.items_data[ct];
 
             double new_center_x = item_drag_data.item_center.x + inc_x + size_off_x + grid_offset_x;
@@ -442,7 +366,7 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
 
     public static void rotate_from_event (
         ViewCanvas view_canvas,
-        Lib2.Items.ItemSelection selection,
+        Lib2.Items.NodeSelection selection,
         InitialDragState initial_drag_state,
         double event_x,
         double event_y
@@ -450,8 +374,8 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
         var blocker = new Lib2.Managers.SelectionManager.ChangeSignalBlocker (view_canvas.selection_manager);
         (void) blocker;
 
-        double original_center_x = initial_drag_state.selection_center_x;
-        double original_center_y = initial_drag_state.selection_center_y;
+        double original_center_x = initial_drag_state.area.center_x;
+        double original_center_y = initial_drag_state.area.center_y;
 
         var radians = GLib.Math.atan2 (
             event_x - original_center_x,
@@ -465,10 +389,11 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
             new_rotation = 15.0 * step_num;
         }
 
-        var single_item = selection.items.size == 1;
+        var single_item = selection.nodes.size == 1;
 
         var ct = 0;
-        foreach (var item in selection.items) {
+        foreach (var node in selection.nodes.values) {
+            unowned var item = node.instance.item;
             if (single_item) {
                 new_rotation = GLib.Math.fmod (new_rotation + 360, 360);
                 item.components.rotation = new Lib2.Components.Rotation (new_rotation);

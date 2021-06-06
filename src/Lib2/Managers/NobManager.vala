@@ -67,7 +67,7 @@ public class Akira.Lib2.Managers.NobManager : Object {
 
         populate_nobs (sm.selection);
 
-        int new_id = sm.selection.items[0].id;
+        int new_id = sm.selection.first_node ().id;
         bool needs_raising = new_id != last_id;
 
         last_id = new_id;
@@ -115,7 +115,7 @@ public class Akira.Lib2.Managers.NobManager : Object {
      * Constructs all nobs and the rotation line if they haven't been constructed already.
      * Nobs don't take mouse events, instead hit_test () is used to interact with nobs.
      */
-    private void populate_nobs (Lib2.Items.ItemSelection selection) {
+    private void populate_nobs (Lib2.Items.NodeSelection selection) {
         if (nobs != null) {
             return;
         }
@@ -144,33 +144,13 @@ public class Akira.Lib2.Managers.NobManager : Object {
      * Update the position of all nobs of selected items. It will show or hide them based on
      * the properties of the selection.
      */
-    private void update_nob_positions (Lib2.Items.ItemSelection selection) {
+    private void update_nob_positions (Lib2.Items.NodeSelection selection) {
         var nob_size = Lib.Selection.Nob.NOB_SIZE / view_canvas.current_scale;
 
-        double tl_x;
-        double tl_y;
-        double tr_x;
-        double tr_y;
-        double bl_x;
-        double bl_y;
-        double br_x;
-        double br_y;
-        double rotation;
+        var rect = selection.coordinates ();
 
-        selection.coordinates (
-            out tl_x,
-            out tl_y,
-            out tr_x,
-            out tr_y,
-            out bl_x,
-            out bl_y,
-            out br_x,
-            out br_y,
-            out rotation
-        );
-
-        var width = Utils.GeometryMath.distance (tl_x, tl_y, tr_x, tr_y).abs ();
-        var height = Utils.GeometryMath.distance (tl_x, tl_y, bl_x, bl_y).abs ();
+        var width = rect.width;
+        var height = rect.height;
 
         bool show_h_centers = height > nob_size * 3;
         bool show_v_centers = width > nob_size * 3;
@@ -185,35 +165,27 @@ public class Akira.Lib2.Managers.NobManager : Object {
                 set_visible = false;
             }
 
-            update_nob (nob, tl_x, tl_y, tr_x, tr_y, bl_x, bl_y, br_x, br_y, rotation, set_visible);
+            update_nob (nob, rect, set_visible);
         }
     }
 
     private void update_nob (
         Lib.Selection.Nob nob,
-        double tl_x,
-        double tl_y,
-        double tr_x,
-        double tr_y,
-        double bl_x,
-        double bl_y,
-        double br_x,
-        double br_y,
-        double rotation,
+        Geometry.RotatedRectangle rect,
         bool show
     ) {
         double sc = view_canvas.current_scale;
         var n0 = nob.handle_id;
         double cx = 0;
         double cy = 0;
-        Utils.Nobs.nob_xy_from_coordinates (n0, tl_x, tl_y, tr_x, tr_y, bl_x, bl_y, br_x, br_y, sc, ref cx, ref cy);
+        Utils.Nobs.nob_xy_from_coordinates (n0, rect, sc, ref cx, ref cy);
 
         if (nob.handle_id == Utils.Nobs.Nob.ROTATE) {
             if (show) {
                 var n1 = Utils.Nobs.Nob.TOP_CENTER;
                 double tx = 0;
                 double ty = 0;
-                Utils.Nobs.nob_xy_from_coordinates (n1, tl_x, tl_y, tr_x, tr_y, bl_x, bl_y, br_x, br_y, sc, ref tx, ref ty);
+                Utils.Nobs.nob_xy_from_coordinates (n1, rect, sc, ref tx, ref ty);
 
                 var new_pts = new Goo.CanvasPoints (2);
                 new_pts.set_point (0, cx, cy);
@@ -236,44 +208,21 @@ public class Akira.Lib2.Managers.NobManager : Object {
 
         }
 
-        nob.update_global_state (cx, cy, rotation, show);
+        nob.update_global_state (cx, cy, rect.rotation, show);
     }
 
     /**
      * Updates selection items, constructing them if necessary.
      */
-    private void update_select_effect (Lib2.Items.ItemSelection selection) {
+    private void update_select_effect (Lib2.Items.NodeSelection selection) {
         if (selection.is_empty ()) {
             return;
         }
 
-        double tl_x;
-        double tl_y;
-        double tr_x;
-        double tr_y;
-        double bl_x;
-        double bl_y;
-        double br_x;
-        double br_y;
-        double rotation;
+        var rect = selection.coordinates ();
 
-        selection.coordinates (
-            out tl_x,
-            out tl_y,
-            out tr_x,
-            out tr_y,
-            out bl_x,
-            out bl_y,
-            out br_x,
-            out br_y,
-            out rotation
-        );
-
-        var center_x = (tl_x + tr_x + bl_x + br_x) / 4.0;
-        var center_y = (tl_y + tr_y + bl_y + br_y) / 4.0;
-
-        var width = Utils.GeometryMath.distance (tl_x, tl_y, tr_x, tr_y).abs ();
-        var height = Utils.GeometryMath.distance (tl_x, tl_y, bl_x, bl_y).abs ();
+        var width = rect.width;
+        var height = rect.height;
 
         if (select_effect == null) {
             select_effect = new Goo.CanvasRect (
@@ -296,9 +245,9 @@ public class Akira.Lib2.Managers.NobManager : Object {
         select_effect.set ("line-width", LINE_WIDTH / view_canvas.current_scale);
 
         var tr = Cairo.Matrix.identity ();
-        tr.x0 = center_x;
-        tr.y0 = center_y;
-        tr.rotate (rotation);
+        tr.x0 = rect.center_x;
+        tr.y0 = rect.center_y;
+        tr.rotate (rect.rotation);
 
         select_effect.set_transform (tr);
 

@@ -41,7 +41,7 @@ public class Akira.Lib2.Managers.SelectionManager : Object {
 
     }
 
-    public Lib2.Items.ItemSelection selection;
+    public Lib2.Items.NodeSelection selection;
     protected int block_change_notifications = 0;
 
     public SelectionManager (ViewCanvas canvas) {
@@ -49,7 +49,7 @@ public class Akira.Lib2.Managers.SelectionManager : Object {
     }
 
     construct {
-        selection = new Lib2.Items.ItemSelection (null);
+        selection = new Lib2.Items.NodeSelection (null);
         view_canvas.window.event_bus.flip_item.connect (on_flip_selected);
         view_canvas.window.event_bus.delete_selected_items.connect(delete_selected);
         view_canvas.window.event_bus.change_z_selected.connect (change_z_order);
@@ -59,22 +59,26 @@ public class Akira.Lib2.Managers.SelectionManager : Object {
         return selection.is_empty ();
     }
 
-    public void reset_selection (Lib2.Items.ModelItem? selected_item) {
-        if (is_empty () && selected_item == null) {
+    public void reset_selection () {
+        if (is_empty ()) {
             return;
         }
 
-        selection = new Lib2.Items.ItemSelection (selected_item);
+        selection = new Lib2.Items.NodeSelection (null);
         on_selection_changed ();
     }
 
-    public void add_to_selection (Lib2.Items.ModelItem item) {
-        selection.add_item (item);
+    public void add_to_selection (int id) {
+        var node = view_canvas.items_manager.node_from_id (id);
+        if (node == null) {
+            return;
+        }
+        selection.add_node (node);
         on_selection_changed ();
     }
 
-    public bool item_selected (Lib2.Items.ModelItem item) {
-        return selection.has_item (item);
+    public bool item_selected (int id) {
+        return selection.has_id (id);
     }
 
     public void on_selection_changed () {
@@ -85,17 +89,18 @@ public class Akira.Lib2.Managers.SelectionManager : Object {
 
     public void delete_selected () {
         var to_delete = new GLib.Array<int> ();
-        foreach (var item in selection.items) {
-            to_delete.append_val (item.id);
+        foreach (var node_id in selection.nodes.keys) {
+            to_delete.append_val (node_id);
         }
-        reset_selection (null);
+
+        reset_selection ();
         view_canvas.items_manager.remove_items (to_delete);
     }
 
     public void change_z_order (bool up, bool to_end) {
         var to_shift = new GLib.Array<int> ();
-        foreach (var item in selection.items) {
-            to_shift.append_val (item.id);
+        foreach (var node_id in selection.nodes.keys) {
+            to_shift.append_val (node_id);
         }
 
         int amount = up ? 1 : -1;
@@ -104,8 +109,8 @@ public class Akira.Lib2.Managers.SelectionManager : Object {
 
     public void on_flip_selected (bool vertical) {
         var to_flip = new GLib.Array<int> ();
-        foreach (var item in selection.items) {
-            to_flip.append_val (item.id);
+        foreach (var node_id in selection.nodes.keys) {
+            to_flip.append_val (node_id);
         }
 
         view_canvas.items_manager.flip_items (to_flip, vertical);

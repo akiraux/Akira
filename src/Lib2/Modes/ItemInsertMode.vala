@@ -28,22 +28,13 @@
  */
 public class Akira.Lib2.Modes.ItemInsertMode : AbstractInteractionMode {
     public weak Lib2.ViewCanvas view_canvas { get; construct; }
-    public weak Lib2.Managers.ModeManager mode_manager { get; construct; }
 
     private string item_insert_type;
 
     private Lib2.Modes.TransformMode transform_mode;
 
-    public ItemInsertMode (
-        Lib2.ViewCanvas canvas,
-        Lib2.Managers.ModeManager mode_manager,
-        string item_type
-    ) {
-        Object (
-            view_canvas: canvas,
-            mode_manager : mode_manager
-        );
-
+    public ItemInsertMode (Lib2.ViewCanvas canvas, string item_type) {
+        Object (view_canvas: canvas);
         item_insert_type = item_type;
     }
 
@@ -103,9 +94,10 @@ public class Akira.Lib2.Modes.ItemInsertMode : AbstractInteractionMode {
 
             view_canvas.items_manager.add_item_to_origin (item);
 
-            view_canvas.selection_manager.reset_selection (item);
+            view_canvas.selection_manager.reset_selection ();
+            view_canvas.selection_manager.add_to_selection (item.id);
 
-            transform_mode = new Akira.Lib2.Modes.TransformMode (view_canvas, null, Utils.Nobs.Nob.BOTTOM_LEFT);
+            transform_mode = new Akira.Lib2.Modes.TransformMode (view_canvas, Utils.Nobs.Nob.BOTTOM_LEFT);
             transform_mode.mode_begin ();
             transform_mode.button_press_event (event);
 
@@ -118,7 +110,7 @@ public class Akira.Lib2.Modes.ItemInsertMode : AbstractInteractionMode {
     public override bool button_release_event (Gdk.EventButton event) {
         if (transform_mode != null) {
             transform_mode.button_release_event (event);
-            mode_manager.deregister_mode (mode_type ());
+            request_deregistration (mode_type ());
         }
 
         return true;

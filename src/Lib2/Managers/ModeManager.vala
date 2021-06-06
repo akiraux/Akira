@@ -52,6 +52,7 @@ public class Akira.Lib2.Managers.ModeManager : Object {
         }
 
         active_mode = new_mode;
+        active_mode.request_deregistration.connect (on_deregistration_request);
         active_mode.mode_begin ();
         view_canvas.interaction_mode_changed ();
     }
@@ -87,7 +88,8 @@ public class Akira.Lib2.Managers.ModeManager : Object {
             return;
         }
 
-        pan_mode = new Akira.Lib2.Modes.PanMode (view_canvas, this);
+        pan_mode = new Akira.Lib2.Modes.PanMode (view_canvas);
+        pan_mode.request_deregistration.connect (on_deregistration_request);
         pan_mode.mode_begin ();
 
         view_canvas.interaction_mode_changed ();
@@ -106,6 +108,7 @@ public class Akira.Lib2.Managers.ModeManager : Object {
      * Inner panning mode stop method with optional notification to canvas.
      */
     private void inner_stop_panning_mode (bool notify) {
+        pan_mode.request_deregistration.disconnect (on_deregistration_request);
         pan_mode.mode_end ();
         pan_mode = null;
 
@@ -118,6 +121,7 @@ public class Akira.Lib2.Managers.ModeManager : Object {
      * Inner mode deregistration method with optional notification to canvas.
      */
     private void inner_deregister_active_mode (bool notify) {
+        active_mode.request_deregistration.disconnect (on_deregistration_request);
         active_mode.mode_end ();
         active_mode = null;
 
@@ -188,4 +192,7 @@ public class Akira.Lib2.Managers.ModeManager : Object {
         return (active_mode != null) ? active_mode.motion_notify_event (event) : false;
     }
 
+    private void on_deregistration_request (Lib2.Modes.AbstractInteractionMode.ModeType type) {
+        deregister_mode (type);
+    }
 }

@@ -33,12 +33,24 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
         item_model = new Lib2.Items.Model ();
     }
 
+    public Lib2.Items.ModelInstance? instance_from_id (int id) {
+        return item_model.instance_from_id (id);
+    }
+
+    public Lib2.Items.ModelNode? node_from_id (int id) {
+        return item_model.node_from_id (id);
+    }
+
     public int add_item_to_origin (Lib2.Items.ModelItem item) {
+        return add_item_to_group (Lib2.Items.Model.origin_id, item);
+    }
+
+    public int add_item_to_group (int group_id, Lib2.Items.ModelItem item) {
         if (item == null) {
             return -1;
         }
 
-        if (item_model.append_new_item (Lib2.Items.Model.origin_id, item) <= 0) {
+        if (item_model.append_new_item (group_id, item) <= 0) {
             return -1;
         }
 
@@ -189,6 +201,7 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
         //    }
         //}
 
+        print ("shift item zorder-----\n");
         item_model.print_dag ();
 
         return 0;
@@ -245,7 +258,7 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
         return item_model.children_in_group (group_id);
     }
 
-    public Lib2.Items.ModelItem? hit_test (double x, double y) {
+    public Lib2.Items.ModelItem? hit_test (double x, double y, bool ignore_groups = true) {
         Lib2.Items.ModelItem? result = null;
 
         var target = view_canvas.get_item_at (x, y, true);
@@ -255,12 +268,23 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
         }
 
         var c_item = target as Lib2.Items.CanvasItem;
-        var inst = item_model.instance_from_id (c_item.parent_id);
-        if (inst != null) {
-            result = inst.item;
+        var node = item_model.node_from_id (c_item.parent_id);
+        if (node == null) {
+            return null;
         }
 
-        return result;
+        if (ignore_groups) {
+            return node.instance.item;
+        }
+
+        var root = Lib2.Items.Model.root (node);
+        if (root == null) {
+            // this is not stable behavior -- it should never happen
+            assert (false);
+            return node.instance.item;
+        }
+
+        return root.instance.item;
     }
 
     private void view_restack (Lib2.Items.ChildrenSet children_set, bool up, Lib2.Items.ModelNode reference) {
@@ -326,6 +350,26 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
         add_item_to_origin (new_rect);
         return new_rect;
     }
+    
+    public Lib2.Items.ModelItem add_debug_group (double x, double y) {
+        var group = Lib2.Items.ModelTypeGroup.default_group ();
+        add_item_to_origin (group);
+
+        for (var i = 0; i < 5; ++i) {
+            var new_rect = Lib2.Items.ModelTypeRect.default_rect (
+                new Lib2.Components.Coordinates (x + i * 60, y),
+                new Lib2.Components.Size (50.0, 50.0, false),
+                Lib2.Components.Borders.single_color (Lib2.Components.Color (0.3, 0.3, 0.3, 1.0), 2),
+                Lib2.Components.Fills.single_color (Lib2.Components.Color (0.0, 0.0, 0.0, 1.0))
+            );
+            add_item_to_group (group.id, new_rect);
+        }
+
+        print ("add item to group-----\n");
+        item_model.print_dag ();
+
+        return group;
+    }
 
     public void debug_add_rectangles (uint num_of, bool debug_timer = false) {
         ulong microseconds;
@@ -340,7 +384,7 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
             var x = GLib.Random.double_range (0, (GLib.Math.log (num_of + GLib.Math.E) - 1) * 1000);
             var y = GLib.Random.double_range (0, (GLib.Math.log (num_of + GLib.Math.E) - 1) * 1000);
             var new_item = add_debug_rect (x, y);
-            view_canvas.selection_manager.add_to_selection (new_item);
+            view_canvas.selection_manager.add_to_selection (new_item.id);
         }
 
         if (debug_timer) {
@@ -351,7 +395,7 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
     }
 
     public void on_item_geometry_changed (int id) {
-        if (view_canvas.selection_manager.selection.has_item_id (id)) {
+        if (view_canvas.selection_manager.selection.has_id (id)) {
             view_canvas.selection_manager.on_selection_changed ();
         }
     }

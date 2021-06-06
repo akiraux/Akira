@@ -250,14 +250,7 @@ public class Akira.Utils.Nobs : Object {
 
     public static void nob_xy_from_coordinates (
         Utils.Nobs.Nob nob,
-        double tl_x,
-        double tl_y,
-        double tr_x,
-        double tr_y,
-        double bl_x,
-        double bl_y,
-        double br_x,
-        double br_y,
+        Geometry.RotatedRectangle rect,
         double scale,
         ref double x,
         ref double y
@@ -268,45 +261,45 @@ public class Akira.Utils.Nobs : Object {
 
         switch (nob) {
             case Utils.Nobs.Nob.TOP_LEFT:
-                x = tl_x;
-                y = tl_y;
+                x = rect.tl_x;
+                y = rect.tl_y;
                 break;
             case Utils.Nobs.Nob.TOP_CENTER:
-                x = (tl_x + tr_x) / 2.0;
-                y = (tl_y + tr_y) / 2.0;
+                x = (rect.tl_x + rect.tr_x) / 2.0;
+                y = (rect.tl_y + rect.tr_y) / 2.0;
                 break;
             case Utils.Nobs.Nob.TOP_RIGHT:
-                x = tr_x;
-                y = tr_y;
+                x = rect.tr_x;
+                y = rect.tr_y;
                 break;
             case Utils.Nobs.Nob.RIGHT_CENTER:
-                x = (tr_x + br_x) / 2.0;
-                y = (tr_y + br_y) / 2.0;
+                x = (rect.tr_x + rect.br_x) / 2.0;
+                y = (rect.tr_y + rect.br_y) / 2.0;
                 break;
             case Utils.Nobs.Nob.BOTTOM_RIGHT:
-                x = br_x;
-                y = br_y;
+                x = rect.br_x;
+                y = rect.br_y;
                 break;
             case Utils.Nobs.Nob.BOTTOM_CENTER:
-                x = (br_x + bl_x) / 2.0;
-                y = (br_y + bl_y) / 2.0;
+                x = (rect.br_x + rect.bl_x) / 2.0;
+                y = (rect.br_y + rect.bl_y) / 2.0;
                 break;
             case Utils.Nobs.Nob.BOTTOM_LEFT:
-                x = bl_x;
-                y = bl_y;
+                x = rect.bl_x;
+                y = rect.bl_y;
                 break;
             case Utils.Nobs.Nob.LEFT_CENTER:
-                x = (tl_x + bl_x) / 2.0;
-                y = (tl_y + bl_y) / 2.0;
+                x = (rect.tl_x + rect.bl_x) / 2.0;
+                y = (rect.tl_y + rect.bl_y) / 2.0;
                 break;
             case Utils.Nobs.Nob.ROTATE:
-                var dx = tl_x - bl_x;
-                var dy = tl_y - bl_y;
+                var dx = rect.tl_x - rect.bl_x;
+                var dy = rect.tl_y - rect.bl_y;
                 Utils.GeometryMath.normalize (ref dx, ref dy);
 
 
-                x = (tl_x + tr_x) / 2.0 + dx * ROTATION_LINE_HEIGHT / scale;
-                y = (tl_y + tr_y) / 2.0 + dy * ROTATION_LINE_HEIGHT / scale;
+                x = (rect.tl_x + rect.tr_x) / 2.0 + dx * ROTATION_LINE_HEIGHT / scale;
+                y = (rect.tl_y + rect.tr_y) / 2.0 + dy * ROTATION_LINE_HEIGHT / scale;
                 break;
         }
     }

@@ -83,7 +83,7 @@ public class Akira.Lib2.ViewCanvas : Goo.Canvas {
     }
 
     public void start_insert_mode (string insert_item_type) {
-        var new_mode = new Akira.Lib2.Modes.ItemInsertMode (this, mode_manager, insert_item_type);
+        var new_mode = new Akira.Lib2.Modes.ItemInsertMode (this, insert_item_type);
         mode_manager.register_mode (new_mode);
     }
 
@@ -191,6 +191,11 @@ public class Akira.Lib2.ViewCanvas : Goo.Canvas {
             return true;
         }
 
+        if (uppercase_keyval == Gdk.Key.G) {
+            items_manager.add_debug_group (300, 300);
+            return true;
+        }
+
         return false;
     }
 
@@ -250,13 +255,13 @@ public class Akira.Lib2.ViewCanvas : Goo.Canvas {
 
         var target = items_manager.hit_test (event.x, event.y);
         if (target != null) {
-            if (!selection_manager.item_selected (target)) {
-                selection_manager.add_to_selection (target);
+            if (!selection_manager.item_selected (target.id)) {
+                selection_manager.add_to_selection (target.id);
                 return true;
             }
         }
         else {
-            selection_manager.reset_selection (null);
+            selection_manager.reset_selection ();
         }
 
 
@@ -269,17 +274,17 @@ public class Akira.Lib2.ViewCanvas : Goo.Canvas {
         if (nob_clicked == Utils.Nobs.Nob.NONE) {
             var target = items_manager.hit_test (event.x, event.y);
             if (target != null) {
-                if (!selection_manager.item_selected (target)) {
-                    selection_manager.add_to_selection (target);
+                if (!selection_manager.item_selected (target.id)) {
+                    selection_manager.add_to_selection (target.id);
                 }
             }
             else {
-                selection_manager.reset_selection (null);
+                selection_manager.reset_selection ();
             }
         }
 
         if (!selection_manager.is_empty ()) {
-            var new_mode = new Lib2.Modes.TransformMode (this, mode_manager, nob_clicked);
+            var new_mode = new Lib2.Modes.TransformMode (this, nob_clicked);
             mode_manager.register_mode (new_mode);
 
             if (mode_manager.button_press_event (event)) {
@@ -352,6 +357,7 @@ public class Akira.Lib2.ViewCanvas : Goo.Canvas {
     */
 
     public void draw_debug_info (Cairo.Context ctx, Lib2.Items.ModelItem item) {
+        /*
         var xadj = hadjustment.value;
         var yadj = vadjustment.value;
 
@@ -384,9 +390,11 @@ public class Akira.Lib2.ViewCanvas : Goo.Canvas {
         ctx.fill ();
 
         ctx.restore ();
+        */
     }
 
     public void draw_debug_selection (Cairo.Context ctx) {
+        /*
         if (selection_manager.selection.is_empty ()) {
             return;
         }
@@ -434,6 +442,7 @@ public class Akira.Lib2.ViewCanvas : Goo.Canvas {
         ctx.close_path ();
         ctx.stroke ();
         ctx.restore ();
+        */
     }
 
     /*

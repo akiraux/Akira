@@ -32,7 +32,7 @@ public class Akira.Lib2.Components.Components {
     public Coordinates? center = null;
     public Size? size = null;
     public Rotation? rotation = null;
-
+    
     public CompiledFill? compiled_fill = null;
     public CompiledBorder? compiled_border = null;
     public CompiledGeometry? compiled_geometry = null;

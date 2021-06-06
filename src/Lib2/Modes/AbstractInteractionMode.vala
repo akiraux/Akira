@@ -49,7 +49,7 @@ public abstract class Akira.Lib2.Modes.AbstractInteractionMode : Object {
         PAN
     }
 
-    //public signal void request_deregistration ();
+    public signal void request_deregistration (ModeType type);
 
     /*
      * Override to define ModeType associated to mode.

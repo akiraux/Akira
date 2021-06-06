@@ -26,18 +26,14 @@
  */
 public class Akira.Lib2.Modes.PanMode : AbstractInteractionMode {
     public unowned Akira.Lib2.ViewCanvas canvas { get; construct; }
-    public unowned Akira.Lib2.Managers.ModeManager mode_manager { get; construct; }
 
     private bool space_held = false;
     private bool panning = false;
     private double origin_x = 0;
     private double origin_y = 0;
 
-    public PanMode (Akira.Lib2.ViewCanvas canvas, Akira.Lib2.Managers.ModeManager mode_manager) {
-        Object (
-            canvas: canvas,
-            mode_manager : mode_manager
-        );
+    public PanMode (Akira.Lib2.ViewCanvas canvas) {
+        Object (canvas: canvas);
     }
 
     public override AbstractInteractionMode.ModeType mode_type () { return AbstractInteractionMode.ModeType.PAN; }
@@ -61,7 +57,7 @@ public class Akira.Lib2.Modes.PanMode : AbstractInteractionMode {
             space_held = false;
 
             if (!panning) {
-                mode_manager.deregister_mode (mode_type ());
+                request_deregistration (mode_type ());
             }
         }
         return true;
@@ -82,8 +78,9 @@ public class Akira.Lib2.Modes.PanMode : AbstractInteractionMode {
         toggle_panning (false);
 
         if (!space_held) {
-            mode_manager.deregister_mode (mode_type ());
+            request_deregistration (mode_type ());
         }
+
         return true;
     }
 

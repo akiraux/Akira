@@ -38,7 +38,7 @@ public class Akira.Lib2.Managers.HoverManager : Object {
     }
 
     public void on_mouse_over (double event_x, double event_y) {
-        var target = view_canvas.items_manager.hit_test (event_x, event_y);
+        var target = view_canvas.items_manager.hit_test (event_x, event_y, false);
 
         // Remove the hover effect is no item is hovered
         // TODO: artboard
@@ -64,7 +64,7 @@ public class Akira.Lib2.Managers.HoverManager : Object {
     }
 
     private void maybe_create_hover_effect (Lib2.Items.ModelItem item) {
-        if (view_canvas.selection_manager.item_selected (item)) {
+        if (view_canvas.selection_manager.item_selected (item.id)) {
             return;
         }
 
@@ -73,6 +73,11 @@ public class Akira.Lib2.Managers.HoverManager : Object {
         }
         else {
             remove_hover_effect ();
+        }
+
+        if (item.item_type.is_group ()) {
+            remove_hover_effect ();
+            return;
         }
 
         var scale = view_canvas.current_scale;

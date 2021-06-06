@@ -22,29 +22,11 @@
 public class Akira.Lib2.Components.CompiledGeometry : Copyable<CompiledGeometry> {
     public struct CompiledGeometryData {
         public Cairo.Matrix _transform;
-        /* Coordinates
-         * x0, y0 are top left
-         * x1, y1 are top right
-         * x2, y2 are bottom left
-         * x3, y3 are bottom right
-         * However, they are the rotated coordinates, so there is no guarantee that
-         * they will maintain that order after rotation.
-         */
-
-        public double _x0;
-        public double _y0;
-        public double _x1;
-        public double _y1;
-        public double _x2;
-        public double _y2;
-        public double _x3;
-        public double _y3;
+        // These rectangles are in global coordinates
+        public Geometry.RotatedRectangle area;
 
         // This is the bounding box that contains the rotated area
-        public double _bb_top;
-        public double _bb_left;
-        public double _bb_bottom;
-        public double _bb_right;
+        public Geometry.Rectangle area_bb;
 
         // This is cached data used for hit-testing
         public Cairo.Matrix _ht_transform;
@@ -53,6 +35,23 @@ public class Akira.Lib2.Components.CompiledGeometry : Copyable<CompiledGeometry>
     }
 
     private CompiledGeometryData _data;
+
+    public Geometry.RotatedRectangle area { get { return _data.area; }}
+    public Geometry.Rectangle area_bb { get { return _data.area_bb; }}
+
+    public double tl_x { get { return _data.area.tl_x; }}
+    public double tl_y { get { return _data.area.tl_y; }}
+    public double tr_x { get { return _data.area.tr_x; }}
+    public double tr_y { get { return _data.area.tr_y; }}
+    public double bl_x { get { return _data.area.bl_x; }}
+    public double bl_y { get { return _data.area.bl_y; }}
+    public double br_x { get { return _data.area.br_x; }}
+    public double br_y { get { return _data.area.br_y; }}
+
+    public double bb_top { get { return _data.area_bb.top; }}
+    public double bb_left { get { return _data.area_bb.left; }}
+    public double bb_bottom { get { return _data.area_bb.bottom; }}
+    public double bb_right { get { return _data.area_bb.right; }}
 
     public CompiledGeometry (CompiledGeometryData data) {
         _data = data;
@@ -64,45 +63,12 @@ public class Akira.Lib2.Components.CompiledGeometry : Copyable<CompiledGeometry>
 
     public Cairo.Matrix transform () { return _data._transform; }
 
-    public double bb_top () { return _data._bb_top; }
-    public double bb_right () { return _data._bb_right; }
-    public double bb_bottom () { return _data._bb_bottom; }
-    public double bb_left () { return _data._bb_left; }
-
-    public double bb_center_x () { return (_data._bb_right + _data._bb_left) / 2.0; }
-    public double bb_center_y () { return (_data._bb_bottom + _data._bb_top) / 2.0; }
-
-    public double x0 () { return _data._x0; }
-    public double y0 () { return _data._y0; }
-    public double x1 () { return _data._x1; }
-    public double y1 () { return _data._y1; }
-    public double x2 () { return _data._x2; }
-    public double y2 () { return _data._y2; }
-    public double x3 () { return _data._x3; }
-    public double y3 () { return _data._y3; }
-
     public bool contains (double x, double y) {
         x = _data._ht_transform.x0 - x;
         y = _data._ht_transform.y0 - y;
         _data._ht_transform.transform_distance (ref x, ref y);
         return (x >= -_data._ht_half_width && x <= _data._ht_half_width) &&
                (y >= -_data._ht_half_height && y <= _data._ht_half_height);
-    }
-
-    public void bounding_box (
-        out double top,
-        out double left,
-        out double bottom,
-        out double right,
-        out double center_x,
-        out double center_y
-    ) {
-        top = _data._bb_top;
-        left = _data._bb_left;
-        bottom = _data._bb_bottom;
-        right = _data._bb_right;
-        center_x = (left + right) / 2.0;
-        center_y = (top + bottom) / 2.0;
     }
 
     public static CompiledGeometry compile (
@@ -155,14 +121,14 @@ public class Akira.Lib2.Components.CompiledGeometry : Copyable<CompiledGeometry>
         y3 += center.y;
         x3 += center.x;
 
-        data._x0 = x0;
-        data._y0 = y0;
-        data._x1 = x1;
-        data._y1 = y1;
-        data._x2 = x2;
-        data._y2 = y2;
-        data._x3 = x3;
-        data._y3 = y3;
+        data.area.tl_x = x0;
+        data.area.tl_y = y0;
+        data.area.tr_x = x1;
+        data.area.tr_y = y1;
+        data.area.bl_x = x2;
+        data.area.bl_y = y2;
+        data.area.br_x = x3;
+        data.area.br_y = y3;
 
         data._ht_transform = Cairo.Matrix.identity ();
         data._ht_transform.rotate (-rotation.in_radians ());
@@ -172,8 +138,8 @@ public class Akira.Lib2.Components.CompiledGeometry : Copyable<CompiledGeometry>
         data._ht_half_width = half_width;
         data._ht_half_height = half_height;
 
-        Utils.GeometryMath.min_max_coords (x0, x1, x2, x3, ref data._bb_left, ref data._bb_right);
-        Utils.GeometryMath.min_max_coords (y0, y1, y2, y3, ref data._bb_top, ref data._bb_bottom);
+        Utils.GeometryMath.min_max_coords (x0, x1, x2, x3, ref data.area_bb.left, ref data.area_bb.right);
+        Utils.GeometryMath.min_max_coords (y0, y1, y2, y3, ref data.area_bb.top, ref data.area_bb.bottom);
 
         return new CompiledGeometry (data);
     }
