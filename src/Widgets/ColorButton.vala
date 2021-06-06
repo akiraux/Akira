@@ -21,7 +21,7 @@
 
 /*
  * Helper class to quickly create a container with a color button and a color
- * picker. The color button opens up the Gtk Color chooser.
+ * picker. The color button opens up the GtkColorChooser.
  */
 public class Akira.Widgets.ColorButton : Gtk.Grid {
     private unowned Akira.Window window;
@@ -36,7 +36,7 @@ public class Akira.Widgets.ColorButton : Gtk.Grid {
      * If the color or alpha are manually set from the ColorPicker.
      * If true, the ColorChooserWidget doesn't need to be updated.
      */
-    public bool color_set_manually = false;
+    private bool color_set_manually = false;
 
     /*
      * Keep track of the current color when the user is updating the string
@@ -127,6 +127,26 @@ public class Akira.Widgets.ColorButton : Gtk.Grid {
         );
 
         add (field);
+
+        var opacity = new Widgets.InputField (
+            Widgets.InputField.Unit.PERCENTAGE, 7, true, true);
+        opacity.entry.sensitive = true;
+        opacity.entry.value = Math.round ((double) model.alpha / 255 * 100);
+
+        opacity.entry.bind_property (
+            "value", model, "alpha",
+            BindingFlags.BIDIRECTIONAL,
+            (binding, srcval, ref targetval) => {
+                color_set_manually = false;
+                targetval.set_int ((int) ((double) srcval / 100 * 255));
+                return true;
+            },
+            (binding, srcval, ref targetval) => {
+                targetval.set_double ((srcval.get_int () * 100) / 255);
+                return true;
+            });
+
+        add (opacity);
     }
 
     private void init_color_chooser () {

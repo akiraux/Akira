@@ -22,13 +22,12 @@
  */
 
 public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
-    public unowned Akira.Window window;
+    private unowned Akira.Window window;
     private unowned Models.FillsItemModel model;
 
     private Gtk.Button hidden_button;
     private Gtk.Button delete_button;
     private Gtk.Image hidden_button_icon;
-    private Widgets.InputField opacity_container;
 
     private bool hidden {
         owned get {
@@ -57,29 +56,7 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         var fill_chooser = new Gtk.Grid ();
         fill_chooser.hexpand = true;
         fill_chooser.margin_end = 5;
-
-        var color_button = new Widgets.ColorButton (window, model);
-
-        opacity_container = new Widgets.InputField (
-            Widgets.InputField.Unit.PERCENTAGE, 7, true, true);
-        opacity_container.entry.sensitive = true;
-        opacity_container.entry.value = Math.round ((double) model.alpha / 255 * 100);
-
-        opacity_container.entry.bind_property (
-            "value", model, "alpha",
-            BindingFlags.BIDIRECTIONAL,
-            (binding, srcval, ref targetval) => {
-                color_button.color_set_manually = false;
-                targetval.set_int ((int) ((double) srcval / 100 * 255));
-                return true;
-            },
-            (binding, srcval, ref targetval) => {
-                targetval.set_double ((srcval.get_int () * 100) / 255);
-                return true;
-            });
-
-        fill_chooser.attach (color_button, 0, 0, 1, 1);
-        fill_chooser.attach (opacity_container, 1, 0, 1, 1);
+        fill_chooser.add (new Widgets.ColorButton (window, model));
 
         hidden_button = new Gtk.Button ();
         hidden_button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
