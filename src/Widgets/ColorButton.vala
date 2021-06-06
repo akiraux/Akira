@@ -128,19 +128,20 @@ public class Akira.Widgets.ColorButton : Gtk.Grid {
 
         add (field);
 
-        var opacity = new Widgets.InputField (
-            Widgets.InputField.Unit.PERCENTAGE, 7, true, true);
+        var opacity = new InputField (InputField.Unit.PERCENTAGE, 7, true, true);
         opacity.entry.sensitive = true;
         opacity.entry.value = Math.round ((double) model.alpha / 255 * 100);
 
         opacity.entry.bind_property (
             "value", model, "alpha",
             BindingFlags.BIDIRECTIONAL,
+            // field => model
             (binding, srcval, ref targetval) => {
                 color_set_manually = false;
                 targetval.set_int ((int) ((double) srcval / 100 * 255));
                 return true;
             },
+            // model => field
             (binding, srcval, ref targetval) => {
                 targetval.set_double ((srcval.get_int () * 100) / 255);
                 return true;
