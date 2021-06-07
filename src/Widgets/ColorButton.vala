@@ -81,7 +81,7 @@ public class Akira.Widgets.ColorButton : Gtk.Grid {
         });
 
         container.add (color_button);
-        set_button_color ();
+        set_button_color (model.color, model.alpha);
 
         // Define the eye dropper button.
         var eyedropper_button = new Gtk.Button ();
@@ -120,8 +120,8 @@ public class Akira.Widgets.ColorButton : Gtk.Grid {
                     return false;
                 }
                 var new_color_rgba = Utils.Color.hex_to_rgba (field_hex);
-                new_color_rgba.alpha = model.alpha / 100;
                 model_value.set_string (new_color_rgba.to_string ());
+                set_button_color (field_hex, model.alpha);
                 return true;
             }
         );
@@ -138,7 +138,9 @@ public class Akira.Widgets.ColorButton : Gtk.Grid {
             // field => model
             (binding, srcval, ref targetval) => {
                 color_set_manually = false;
-                targetval.set_int ((int) ((double) srcval / 100 * 255));
+                var alpha = (int) ((double) srcval / 100 * 255);
+                targetval.set_int (alpha);
+                set_button_color (field.text, alpha);
                 return true;
             },
             // model => field
@@ -227,14 +229,14 @@ public class Akira.Widgets.ColorButton : Gtk.Grid {
         }
     }
 
-    private void set_button_color () {
+    private void set_button_color (string color, int alpha) {
         try {
             var provider = new Gtk.CssProvider ();
             var context = color_button.get_style_context ();
 
             var new_rgba = Gdk.RGBA ();
-            new_rgba.parse (model.color);
-            new_rgba.alpha = (double) model.alpha / 255;
+            new_rgba.parse (color);
+            new_rgba.alpha = (double) alpha / 255;
             var new_color = new_rgba.to_string ();
 
             var css = """.selected-color {
@@ -284,7 +286,7 @@ public class Akira.Widgets.ColorButton : Gtk.Grid {
         color_set_manually = true;
         model.color = color_chooser_widget.rgba.to_string ();
         model.alpha = ((int)(color_chooser_widget.rgba.alpha * 255));
-        set_button_color ();
+        set_button_color (model.color, model.alpha);
     }
 
     private void on_eyedropper_click () {

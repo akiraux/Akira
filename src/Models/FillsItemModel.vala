@@ -28,6 +28,7 @@ public class Akira.Models.FillsItemModel : Models.BaseModel {
         set {
             var new_rgba = Gdk.RGBA ();
             new_rgba.parse (value);
+            new_rgba.alpha = (double) alpha / 255;
             fill.color = new_rgba;
         }
     }
