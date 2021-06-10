@@ -58,8 +58,8 @@ sources = files(
     'Widgets/AddColorButton.vala',
     'Widgets/AlignBoxButton.vala',
     'Widgets/ButtonImage.vala',
-    'Widgets/ColorButton.vala',
     'Widgets/ColorField.vala',
+    'Widgets/ColorRow.vala',
     'Widgets/ExportWidget.vala',
     'Widgets/HeaderBarButton.vala',
     'Widgets/InputField.vala',
@@ -72,6 +72,7 @@ sources = files(
     'Models/BordersItemModel.vala',
     'Models/FillsItemModel.vala',
     'Models/BaseModel.vala',
+    'Models/ColorModel.vala',
     'Models/ListModel.vala',
     'Models/ExportModel.vala',
 

@@ -23,7 +23,7 @@
 
 public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
     private unowned Akira.Window window;
-    private unowned Models.FillsItemModel model;
+    private unowned Lib.Components.Fill fill;
 
     private Gtk.Button hidden_button;
     private Gtk.Button delete_button;
@@ -31,20 +31,20 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
 
     private bool hidden {
         owned get {
-            return model.hidden;
+            return fill.hidden;
         } set {
-            model.hidden = value;
+            fill.hidden = value;
             set_hidden_button ();
             toggle_ui_visibility ();
         }
     }
 
-    public FillItem (Akira.Window window, Akira.Models.FillsItemModel model) {
+    public FillItem (Akira.Window window, Lib.Components.Fill fill) {
         this.window = window;
-        this.model = model;
+        this.fill = fill;
 
         create_ui ();
-        hidden = model.hidden;
+        hidden = fill.hidden;
 
         create_event_bindings ();
         show_all ();
@@ -56,7 +56,8 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         var fill_chooser = new Gtk.Grid ();
         fill_chooser.hexpand = true;
         fill_chooser.margin_end = 5;
-        fill_chooser.add (new Widgets.ColorButton (window, model));
+
+        fill_chooser.add (new Widgets.ColorRow (window, new Models.ColorModel (fill)));
 
         hidden_button = new Gtk.Button ();
         hidden_button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
@@ -84,9 +85,7 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
     }
 
     private void on_delete_item () {
-        model.model.remove_item.begin (model);
-        // Actually remove the Fill component only if the user requests it.
-        model.fill.remove ();
+        fill.remove ();
     }
 
     private void set_hidden_button () {

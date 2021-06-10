@@ -23,9 +23,9 @@
  * Helper class to quickly create a container with a color button and a color
  * picker. The color button opens up the GtkColorChooser.
  */
-public class Akira.Widgets.ColorButton : Gtk.Grid {
+public class Akira.Widgets.ColorRow : Gtk.Grid {
     private unowned Akira.Window window;
-    private unowned Models.FillsItemModel model;
+    private unowned Models.ColorModel model;
 
     private Gtk.Button color_button;
     private Gtk.Popover color_popover;
@@ -53,9 +53,10 @@ public class Akira.Widgets.ColorButton : Gtk.Grid {
         DOCUMENT
     }
 
-    public ColorButton (Akira.Window window, Models.FillsItemModel model) {
+    public ColorRow (Akira.Window window, Models.ColorModel model) {
         this.window = window;
         this.model = model;
+
         old_color = model.color;
 
         margin_top = margin_bottom = 1;
@@ -128,28 +129,42 @@ public class Akira.Widgets.ColorButton : Gtk.Grid {
 
         add (field);
 
-        var opacity = new InputField (InputField.Unit.PERCENTAGE, 7, true, true);
-        opacity.entry.sensitive = true;
-        opacity.entry.value = Math.round ((double) model.alpha / 255 * 100);
+        // Show the opacity field if this widget was generated from the Fills list.
+        if (model.type == Models.ColorModel.Type.FILL) {
+            var opacity = new InputField (InputField.Unit.PERCENTAGE, 7, true, true);
+            opacity.entry.sensitive = true;
+            opacity.entry.value = Math.round ((double) model.alpha / 255 * 100);
 
-        opacity.entry.bind_property (
-            "value", model, "alpha",
-            BindingFlags.BIDIRECTIONAL,
-            // field => model
-            (binding, srcval, ref targetval) => {
-                color_set_manually = false;
-                var alpha = (int) ((double) srcval / 100 * 255);
-                targetval.set_int (alpha);
-                set_button_color (field.text, alpha);
-                return true;
-            },
-            // model => field
-            (binding, srcval, ref targetval) => {
-                targetval.set_double ((srcval.get_int () * 100) / 255);
-                return true;
-            });
+            opacity.entry.bind_property (
+                "value", model, "alpha",
+                BindingFlags.BIDIRECTIONAL,
+                // field => model
+                (binding, srcval, ref targetval) => {
+                    color_set_manually = false;
+                    var alpha = (int) ((double) srcval / 100 * 255);
+                    targetval.set_int (alpha);
+                    set_button_color (model.color, alpha);
+                    return true;
+                },
+                // model => field
+                (binding, srcval, ref targetval) => {
+                    targetval.set_double ((srcval.get_int () * 100) / 255);
+                    return true;
+                });
 
-        add (opacity);
+            add (opacity);
+        }
+
+        // Show the border field if this widget was generated from the Borders list.
+        if (model.type == Models.ColorModel.Type.BORDER) {
+            var border = new InputField (InputField.Unit.PIXEL, 7, true, true);
+            border.set_range (0, Layouts.MainCanvas.CANVAS_SIZE / 2);
+            border.entry.sensitive = true;
+            border.entry.value = model.size;
+            border.entry.bind_property ("value", model, "size", BindingFlags.BIDIRECTIONAL);
+
+            add (border);
+        }
     }
 
     private void init_color_chooser () {
@@ -179,7 +194,7 @@ public class Akira.Widgets.ColorButton : Gtk.Grid {
         global_colors_flowbox.max_children_per_line = 100;
         global_colors_flowbox.set_sort_func (sort_colors_function);
 
-        var add_global_color_btn = new Widgets.AddColorButton ();
+        var add_global_color_btn = new AddColorButton ();
         add_global_color_btn.clicked.connect (() => {
             on_save_color (Container.GLOBAL);
         });
