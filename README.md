@@ -78,7 +78,7 @@ ninja && sudo ninja install
 ## 🤔 Questions
 
 If you want to ask any questions about the project, join us on our public Matrix channel at 
-[#akiraux:matrix.org](https://matrix.to/#/!kpfeTRbpocQrOFCFnJ:matrix.org) or on IRC at #akiraux on Freenode.
+[#akiraux:matrix.org](https://matrix.to/#/#akiraux:matrix.org) or on IRC at #akiraux on LiberaChat.
 
 We also have a dedicated Discord channel available to any [Patreon](https://www.patreon.com/akiraux) supporters where we offer more direct support, and we're open to discussing new features and implementations.
 
