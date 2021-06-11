@@ -31,6 +31,8 @@ public class Akira.Widgets.ColorRow : Gtk.Grid {
     private Gtk.Popover color_popover;
     private Gtk.ColorChooserWidget? color_chooser_widget = null;
     private Gtk.FlowBox global_colors_flowbox;
+    private ColorField field;
+    private InputField opacity_field;
 
     /*
      * If the color or alpha are manually set from the ColorPicker.
@@ -99,60 +101,67 @@ public class Akira.Widgets.ColorRow : Gtk.Grid {
         add (container);
         add (eyedropper_button);
 
-        var field = new ColorField (window);
+        field = new ColorField (window);
         field.text = Utils.Color.rgba_to_hex (model.color);
-
-        model.bind_property (
-            "color", field, "text",
-            BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE,
-            // model => this
-            (binding, model_value, ref field_value) => {
-                var model_rgba = model_value.dup_string ();
-                old_color = model_rgba;
-                field_value.set_string (Utils.Color.rgba_to_hex (model_rgba));
-                return true;
-            },
-            // this => model
-            (binding, field_value, ref model_value) => {
-                color_set_manually = false;
-                var field_hex = field_value.dup_string ();
-                if (!Utils.Color.is_valid_hex (field_hex)) {
-                    model_value.set_string (Utils.Color.rgba_to_hex (old_color));
-                    return false;
-                }
-                var new_color_rgba = Utils.Color.hex_to_rgba (field_hex);
-                model_value.set_string (new_color_rgba.to_string ());
-                set_button_color (field_hex, model.alpha);
-                return true;
+        field.changed.connect (() => {
+            // Don't do anything if the color change came from the chooser.
+            if (color_set_manually) {
+                return;
             }
-        );
+
+            var field_hex = field.text;
+            // Interrupt if what's written is not a valid color value.
+            if (!Utils.Color.is_valid_hex (field_hex)) {
+                return;
+            }
+
+            // Since we will update the color picker, prevent an infinite loop.
+            color_set_manually = true;
+
+            var new_rgba = Utils.Color.hex_to_rgba (field_hex);
+            model.color = new_rgba.to_string ();
+            set_button_color (field_hex, model.alpha);
+
+            // Update the chooser widget only if it was already initialized.
+            if (color_chooser_widget != null) {
+                set_chooser_color (new_rgba.to_string (), model.alpha);
+            }
+
+            // Reset the bool to allow edits from the color chooser.
+            color_set_manually = false;
+        });
 
         add (field);
 
         // Show the opacity field if this widget was generated from the Fills list.
         if (model.type == Models.ColorModel.Type.FILL) {
-            var opacity = new InputField (InputField.Unit.PERCENTAGE, 7, true, true);
-            opacity.entry.sensitive = true;
-            opacity.entry.value = Math.round ((double) model.alpha / 255 * 100);
+            opacity_field = new InputField (InputField.Unit.PERCENTAGE, 7, true, true);
+            opacity_field.entry.sensitive = true;
+            opacity_field.entry.value = Math.round ((double) model.alpha / 255 * 100);
 
-            opacity.entry.bind_property (
-                "value", model, "alpha",
-                BindingFlags.BIDIRECTIONAL,
-                // field => model
-                (binding, srcval, ref targetval) => {
-                    color_set_manually = false;
-                    var alpha = (int) ((double) srcval / 100 * 255);
-                    targetval.set_int (alpha);
-                    set_button_color (model.color, alpha);
-                    return true;
-                },
-                // model => field
-                (binding, srcval, ref targetval) => {
-                    targetval.set_double ((srcval.get_int () * 100) / 255);
-                    return true;
-                });
+            opacity_field.entry.value_changed.connect (() => {
+                // Don't do anything if the color change came from the chooser.
+                if (color_set_manually) {
+                    return;
+                }
 
-            add (opacity);
+                // Since we will update the color picker, prevent an infinite loop.
+                color_set_manually = true;
+
+                var alpha = (int) ((double) opacity_field.entry.value / 100 * 255);
+                model.alpha = alpha;
+                set_button_color (model.color, alpha);
+
+                // Update the chooser widget only if it was already initialized.
+                if (color_chooser_widget != null) {
+                    set_chooser_color (model.color, alpha);
+                }
+
+                // Reset the bool to allow edits from the color chooser.
+                color_set_manually = false;
+            });
+
+            add (opacity_field);
         }
 
         // Show the border field if this widget was generated from the Borders list.
@@ -211,7 +220,9 @@ public class Akira.Widgets.ColorRow : Gtk.Grid {
         color_grid.show_all ();
         color_popover.add (color_grid);
 
-        set_color_chooser_color ();
+        // Set the chooser color before connecting the signal.
+        set_chooser_color (model.color, model.alpha);
+
         color_chooser_widget.notify["rgba"].connect (on_color_changed);
     }
 
@@ -242,6 +253,13 @@ public class Akira.Widgets.ColorRow : Gtk.Grid {
                 // TODO...
                 break;
         }
+    }
+
+    private void set_chooser_color (string color, int alpha) {
+        var new_rgba = Gdk.RGBA ();
+        new_rgba.parse (color);
+        new_rgba.alpha = (double) alpha / 255;
+        color_chooser_widget.set_rgba (new_rgba);
     }
 
     private void set_button_color (string color, int alpha) {
@@ -283,25 +301,29 @@ public class Akira.Widgets.ColorRow : Gtk.Grid {
         return child;
     }
 
-    private void set_color_chooser_color () {
-        // Prevent infinite loop by checking whether the color has been manually
-        // set or not.
+    private void on_color_changed () {
+        // The color change came from the input field, prevent an infinite loop.
         if (color_set_manually) {
             return;
         }
 
-        var new_rgba = Gdk.RGBA ();
-        new_rgba.parse (model.color);
-        new_rgba.alpha = (double) model.alpha / 255;
-
-        color_chooser_widget.set_rgba (new_rgba);
-    }
-
-    private void on_color_changed () {
+        // Prevent visible updated fields like hex and opacity from triggering
+        // the update of the model values.
         color_set_manually = true;
+
+        // Update the model values.
         model.color = color_chooser_widget.rgba.to_string ();
-        model.alpha = ((int)(color_chooser_widget.rgba.alpha * 255));
+        model.alpha = (int) (color_chooser_widget.rgba.alpha * 255);
+
+        // Update the UI.
         set_button_color (model.color, model.alpha);
+        field.text = Utils.Color.rgba_to_hex (model.color);
+        if (model.type == Models.ColorModel.Type.FILL) {
+            opacity_field.entry.value = Math.round ((double) model.alpha / 255 * 100);
+        }
+
+        // Allow manual edit from the input fields.
+        color_set_manually = false;
     }
 
     private void on_eyedropper_click () {

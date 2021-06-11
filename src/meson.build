@@ -70,7 +70,6 @@ sources = files(
     'Widgets/ZoomButton.vala',
 
     'Models/BordersItemModel.vala',
-    'Models/FillsItemModel.vala',
     'Models/BaseModel.vala',
     'Models/ColorModel.vala',
     'Models/ListModel.vala',
