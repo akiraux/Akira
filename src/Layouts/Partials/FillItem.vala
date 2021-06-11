@@ -39,6 +39,8 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         }
     }
 
+    public signal void fill_deleted ();
+
     public FillItem (Akira.Window window, Lib.Components.Fill fill) {
         this.window = window;
         this.fill = fill;
@@ -86,6 +88,7 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
 
     private void on_delete_item () {
         fill.remove ();
+        fill_deleted ();
     }
 
     private void set_hidden_button () {

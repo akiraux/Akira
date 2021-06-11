@@ -73,7 +73,11 @@ public class Akira.Layouts.Partials.FillsPanel : Gtk.Grid {
         fills_list_container.get_style_context ().add_class ("fills-list");
 
         fills_list_container.bind_model (list, item => {
-            return new Layouts.Partials.FillItem (window, (Lib.Components.Fill) item);
+            var fill_item = new Layouts.Partials.FillItem (window, (Lib.Components.Fill) item);
+            fill_item.fill_deleted.connect (() => {
+                reload_list (items);
+            });
+            return fill_item;
         });
 
         attach (title_cont, 0, 0, 1, 1);
