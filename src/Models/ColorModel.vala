@@ -21,7 +21,7 @@
 
 /*
  * Model to keep track of Fills and Borders colors of an item. We use this
- * model to easily bind the GtkListBox UI to the Fills and Borders Components..
+ * model to easily bind the GtkListBox UI to the Fills and Borders Components.
  */
 public class Akira.Models.ColorModel : GLib.Object {
     private unowned Lib.Components.Fill? fill;

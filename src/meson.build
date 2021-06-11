@@ -69,11 +69,9 @@ sources = files(
     'Widgets/RoundedColorButton.vala',
     'Widgets/ZoomButton.vala',
 
-    'Models/BordersItemModel.vala',
-    'Models/BaseModel.vala',
     'Models/ColorModel.vala',
-    'Models/ListModel.vala',
     'Models/ExportModel.vala',
+    'Models/ListModel.vala',
 
     'Dialogs/ShortcutsDialog.vala',
     'Dialogs/SettingsDialog.vala',

@@ -73,7 +73,7 @@ public class Akira.Widgets.ColorRow : Gtk.Grid {
         color_button.width_request = 40;
         color_button.can_focus = false;
         color_button.get_style_context ().add_class ("selected-color");
-        color_button.set_tooltip_text (_("Choose fill color"));
+        color_button.set_tooltip_text (_("Choose color"));
 
         color_popover = new Gtk.Popover (color_button);
         color_popover.position = Gtk.PositionType.BOTTOM;
