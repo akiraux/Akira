@@ -21,11 +21,11 @@
  */
 
 public class Akira.Layouts.Partials.FillsPanel : Gtk.Grid {
-    public weak Akira.Window window { get; construct; }
+    private unowned Akira.Window window;
 
-    public Gtk.Button add_btn;
-    public Gtk.ListBox fills_list_container;
-    public Akira.Models.ListModel<Akira.Models.FillsItemModel> list_model;
+    private Gtk.Button add_btn;
+    private Gtk.ListBox fills_list_container;
+    private GLib.ListStore list;
     private unowned List<Lib.Items.CanvasItem>? items;
 
     public bool toggled {
@@ -38,13 +38,8 @@ public class Akira.Layouts.Partials.FillsPanel : Gtk.Grid {
     }
 
     public FillsPanel (Akira.Window window) {
-        Object (
-            window: window,
-            orientation: Gtk.Orientation.HORIZONTAL
-        );
-    }
+        this.window = window;
 
-    construct {
         var title_cont = new Gtk.Grid ();
         title_cont.orientation = Gtk.Orientation.HORIZONTAL;
         title_cont.hexpand = true;
@@ -67,7 +62,7 @@ public class Akira.Layouts.Partials.FillsPanel : Gtk.Grid {
         title_cont.attach (label, 0, 0, 1, 1);
         title_cont.attach (add_btn, 1, 0, 1, 1);
 
-        list_model = new Akira.Models.ListModel<Akira.Models.FillsItemModel> ();
+        list = new GLib.ListStore (typeof (Lib.Components.Fill));
 
         fills_list_container = new Gtk.ListBox ();
         fills_list_container.margin_top = 5;
@@ -77,8 +72,12 @@ public class Akira.Layouts.Partials.FillsPanel : Gtk.Grid {
         fills_list_container.selection_mode = Gtk.SelectionMode.NONE;
         fills_list_container.get_style_context ().add_class ("fills-list");
 
-        fills_list_container.bind_model (list_model, item => {
-            return new Akira.Layouts.Partials.FillItem (window, (Akira.Models.FillsItemModel) item);
+        fills_list_container.bind_model (list, item => {
+            var fill_item = new Layouts.Partials.FillItem (window, (Lib.Components.Fill) item);
+            fill_item.fill_deleted.connect (() => {
+                reload_list (items);
+            });
+            return fill_item;
         });
 
         attach (title_cont, 0, 0, 1, 1);
@@ -90,37 +89,34 @@ public class Akira.Layouts.Partials.FillsPanel : Gtk.Grid {
 
     private void create_event_bindings () {
         toggled = false;
-        window.event_bus.selected_items_list_changed.connect (on_selected_items_list_changed);
+        window.event_bus.selected_items_list_changed.connect (reload_list);
 
         add_btn.clicked.connect (() => {
             var fill_color = Gdk.RGBA ();
             fill_color.parse (settings.fill_color);
 
             foreach (Lib.Items.CanvasItem item in items) {
-                Lib.Components.Fill fill = item.fills.add_fill_color (fill_color);
-                var model_item = create_model (fill);
-                list_model.add_item.begin (model_item);
+                list.insert (0, item.fills.add_fill_color (fill_color));
             }
         });
 
-        // Listen to the model changes when adding/removing items.
-        list_model.items_changed.connect ((position, removed, added) => {
+        // Listen to the model changes when adding or removing items.
+        list.items_changed.connect ((position, removed, added) => {
             window.main_window.left_sidebar.queue_resize ();
         });
     }
 
-    private void on_selected_items_list_changed (List<Lib.Items.CanvasItem> selected_items) {
+    private void reload_list (List<Lib.Items.CanvasItem> selected_items) {
+        // Always clear the list model when a selection changes.
+        list.remove_all ();
+
         if (selected_items.length () == 0) {
             items = null;
-            list_model.clear.begin ();
             toggled = false;
             return;
         }
 
         items = selected_items;
-
-        // Always clear the list model when a selection changes.
-        list_model.clear.begin ();
 
         bool show = false;
         foreach (Lib.Items.CanvasItem item in selected_items) {
@@ -135,15 +131,10 @@ public class Akira.Layouts.Partials.FillsPanel : Gtk.Grid {
             // Loops through all the available fills and add them tot he list model.
             // TODO: handle duplicate identical colors.
             foreach (Lib.Components.Fill fill in item.fills.fills) {
-                var model_item = create_model (fill);
-                list_model.add_item.begin (model_item);
+                list.insert (0, fill);
             }
         }
 
         toggled = show;
-    }
-
-    private Akira.Models.FillsItemModel create_model (Lib.Components.Fill fill) {
-        return new Akira.Models.FillsItemModel (fill, list_model);
     }
 }

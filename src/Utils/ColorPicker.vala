@@ -15,7 +15,7 @@
 
 * You should have received a copy of the GNU General Public License
 * along with Akira. If not, see <https://www.gnu.org/licenses/>.
-* 
+*
 * Authored by: Ivan "isneezy" Vilanculo <vilanculoivan@gmail.com>
 * Ported from: https://github.com/ColorPicker/RonnyDo
 */
@@ -194,7 +194,7 @@ public class Akira.Utils.ColorPicker : Gtk.Window {
          }
 
 
-        // Draw an outside bright magnifier border  
+        // Draw an outside bright magnifier border
         Gdk.cairo_set_source_rgba (base_context, bright_border_color);
         base_context.arc (radius + shadow_width, radius + shadow_width, radius - 1, 0, 2 * Math.PI);
         base_context.stroke ();

@@ -59,6 +59,7 @@ sources = files(
     'Widgets/AlignBoxButton.vala',
     'Widgets/ButtonImage.vala',
     'Widgets/ColorField.vala',
+    'Widgets/ColorRow.vala',
     'Widgets/ExportWidget.vala',
     'Widgets/HeaderBarButton.vala',
     'Widgets/InputField.vala',
@@ -68,11 +69,9 @@ sources = files(
     'Widgets/RoundedColorButton.vala',
     'Widgets/ZoomButton.vala',
 
-    'Models/BordersItemModel.vala',
-    'Models/FillsItemModel.vala',
-    'Models/BaseModel.vala',
-    'Models/ListModel.vala',
+    'Models/ColorModel.vala',
     'Models/ExportModel.vala',
+    'Models/ListModel.vala',
 
     'Dialogs/ShortcutsDialog.vala',
     'Dialogs/SettingsDialog.vala',
