@@ -52,6 +52,13 @@ public class Akira.Lib.Components.Fill : Component {
         this.notify["hidden"].connect (() => {
             fills.reload ();
         });
+
+        this.notify["alpha"].connect (() => {
+            var rgba = Gdk.RGBA ();
+            rgba = color;
+            rgba.alpha = ((double) alpha) / 255;
+            color = rgba;
+        });
     }
 
     public void remove () {

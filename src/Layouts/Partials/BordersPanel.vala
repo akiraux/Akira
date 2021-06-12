@@ -20,11 +20,11 @@
  */
 
 public class Akira.Layouts.Partials.BordersPanel : Gtk.Grid {
-    public weak Akira.Window window { get; construct; }
+    private unowned Akira.Window window;
 
     public Gtk.Button add_btn;
     public Gtk.ListBox borders_list_container;
-    public Akira.Models.ListModel<Akira.Models.BordersItemModel> list_model;
+    private GLib.ListStore list;
     private unowned List<Lib.Items.CanvasItem>? items;
 
     public bool toggled {
@@ -37,13 +37,8 @@ public class Akira.Layouts.Partials.BordersPanel : Gtk.Grid {
     }
 
     public BordersPanel (Akira.Window window) {
-        Object (
-            window: window,
-            orientation: Gtk.Orientation.HORIZONTAL
-        );
-    }
+        this.window = window;
 
-    construct {
         var title_cont = new Gtk.Grid ();
         title_cont.orientation = Gtk.Orientation.HORIZONTAL;
         title_cont.hexpand = true;
@@ -66,7 +61,7 @@ public class Akira.Layouts.Partials.BordersPanel : Gtk.Grid {
         title_cont.attach (label, 0, 0, 1, 1);
         title_cont.attach (add_btn, 1, 0, 1, 1);
 
-        list_model = new Akira.Models.ListModel<Akira.Models.BordersItemModel> ();
+        list = new GLib.ListStore (typeof (Lib.Components.Border));
 
         borders_list_container = new Gtk.ListBox ();
         borders_list_container.margin_top = 5;
@@ -76,8 +71,12 @@ public class Akira.Layouts.Partials.BordersPanel : Gtk.Grid {
         borders_list_container.selection_mode = Gtk.SelectionMode.NONE;
         borders_list_container.get_style_context ().add_class ("fills-list");
 
-        borders_list_container.bind_model (list_model, item => {
-            return new Akira.Layouts.Partials.BorderItem (window, (Akira.Models.BordersItemModel) item);
+        borders_list_container.bind_model (list, item => {
+            var border_items = new Layouts.Partials.BorderItem (window, (Lib.Components.Border) item);
+            border_items.border_deleted.connect (() => {
+                reload_list (items);
+            });
+            return border_items;
         });
 
         attach (title_cont, 0, 0, 1, 1);
@@ -89,37 +88,34 @@ public class Akira.Layouts.Partials.BordersPanel : Gtk.Grid {
 
     private void create_event_bindings () {
         toggled = false;
-        window.event_bus.selected_items_list_changed.connect (on_selected_items_list_changed);
+        window.event_bus.selected_items_list_changed.connect (reload_list);
 
         add_btn.clicked.connect (() => {
             var border_color = Gdk.RGBA ();
             border_color.parse (settings.border_color);
 
             foreach (Lib.Items.CanvasItem item in items) {
-                Lib.Components.Border border = item.borders.add_border_color (border_color, (int) settings.border_size);
-                var model_item = create_model (border);
-                list_model.add_item.begin (model_item);
+                list.insert (0, item.borders.add_border_color (border_color, (int) settings.border_size));
             }
         });
 
         // Listen to the model changes when adding/removing items.
-        list_model.items_changed.connect ((position, removed, added) => {
+        list.items_changed.connect ((position, removed, added) => {
             window.main_window.left_sidebar.queue_resize ();
         });
     }
 
-    private void on_selected_items_list_changed (List<Lib.Items.CanvasItem> selected_items) {
+    private void reload_list (List<Lib.Items.CanvasItem> selected_items) {
+         // Always clear the list model when a selection changes.
+         list.remove_all ();
+
         if (selected_items.length () == 0) {
             items = null;
-            list_model.clear.begin ();
             toggled = false;
             return;
         }
 
         items = selected_items;
-
-        // Always clear the list model when a selection changes.
-        list_model.clear.begin ();
 
         bool show = false;
         foreach (Lib.Items.CanvasItem item in selected_items) {
@@ -134,15 +130,10 @@ public class Akira.Layouts.Partials.BordersPanel : Gtk.Grid {
             // Loops through all the available borders and add them tot he list model.
             // TODO: handle duplicate identical colors.
             foreach (Lib.Components.Border border in item.borders.borders) {
-                var model_item = create_model (border);
-                list_model.add_item.begin (model_item);
+                list.insert (0, border);
             }
         }
 
         toggled = show;
-    }
-
-    private Akira.Models.BordersItemModel create_model (Lib.Components.Border border) {
-        return new Akira.Models.BordersItemModel (border, list_model);
     }
 }

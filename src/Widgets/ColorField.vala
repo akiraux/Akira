@@ -25,7 +25,7 @@ public class Akira.Widgets.ColorField : Gtk.Entry {
     public ColorField (Akira.Window window) {
         this.window = window;
 
-        margin_end = 10;
+        margin_end = margin_start = 10;
         width_chars = 8;
         max_length = 7;
         hexpand = true;
@@ -33,12 +33,14 @@ public class Akira.Widgets.ColorField : Gtk.Entry {
         focus_in_event.connect (handle_focus_in);
         focus_out_event.connect (handle_focus_out);
         insert_text.connect (handle_insert_text);
+        key_press_event.connect (handle_key_press);
     }
 
     ~ColorField () {
         focus_in_event.disconnect (handle_focus_in);
         focus_out_event.disconnect (handle_focus_out);
         insert_text.disconnect (handle_insert_text);
+        key_press_event.disconnect (handle_key_press);
     }
 
     private void handle_insert_text (string text, int length, ref int position) {
@@ -85,6 +87,16 @@ public class Akira.Widgets.ColorField : Gtk.Entry {
 
     private bool handle_focus_out (Gdk.EventFocus event) {
         window.event_bus.connect_typing_accel ();
+        return false;
+    }
+
+    private bool handle_key_press (Gdk.EventKey event) {
+        // Enter or Escape
+        if (event.keyval == Gdk.Key.Return || event.keyval == Gdk.Key.Escape) {
+            window.event_bus.set_focus_on_canvas ();
+            return true;
+        }
+
         return false;
     }
 }
