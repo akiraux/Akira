@@ -71,13 +71,12 @@ public class Akira.Lib2.Components.CompiledGeometry : Copyable<CompiledGeometry>
                (y >= -_data._ht_half_height && y <= _data._ht_half_height);
     }
 
-    public static CompiledGeometry compile (
-        Coordinates center,
-        Size size,
-        Rotation rotation,
-        Borders? borders,
-        Flipped? flipped
-    ) {
+    public static CompiledGeometry compile (Components components) {
+
+        unowned var rotation = components.rotation;
+        unowned var size = components.size;
+        unowned var center = components.center;
+
         var data = CompiledGeometryData ();
         data._transform = Cairo.Matrix.identity ();
         data._transform.rotate (rotation.in_radians ());

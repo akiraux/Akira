@@ -100,7 +100,7 @@ public class Akira.Utils.Snapping2 : Object {
                 continue;
             }
 
-            var bb = item.compiled_geometry ().area_bb;
+            var bb = item.compiled_components.compiled_geometry.area_bb;
 
             if ((bb.right < vis_x1 || bb.left > vis_x2) ||
                 (bb.bottom < vis_y1 || bb.top > vis_y2)) {

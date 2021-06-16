@@ -20,6 +20,57 @@
  */
 
 [Compact]
+public class Akira.Lib2.Components.CompiledComponents {
+    public CompiledFill? compiled_fill = null;
+    public CompiledBorder? compiled_border = null;
+    public CompiledGeometry? compiled_geometry = null;
+
+    public Lib2.Components.Component.RegisteredTypes dirty_components;
+
+    public CompiledComponents () {
+        dirty_components = Lib2.Components.Component.RegisteredTypes ();
+    }
+
+    /*
+     * Return true if new fill color was generated.
+     */
+    public bool maybe_compile_fill (Components components) {
+        if (compiled_fill != null) {
+            return false;
+        }
+
+        compiled_fill = CompiledFill.compile (components);
+        dirty_components.mark_dirty (Component.Type.COMPILED_FILL, true);
+        return true;
+    }
+
+    /*
+     * Return true if new border color was generated.
+     */
+    public bool maybe_compile_border (Components components) {
+        if (compiled_border != null) {
+            return false;
+        }
+        compiled_border = CompiledBorder.compile (components);
+        dirty_components.mark_dirty (Component.Type.COMPILED_BORDER, true);
+        return true;
+    }
+
+    /*
+     * Return true if new geometry was generated.
+     */
+    public bool maybe_compile_geometry (Components components) {
+        if (compiled_geometry != null) {
+            return false;
+        }
+
+        compiled_geometry = CompiledGeometry.compile (components);
+        dirty_components.mark_dirty (Component.Type.COMPILED_GEOMETRY, true);
+        return true;
+    }
+}
+
+[Compact]
 public class Akira.Lib2.Components.Components {
     public Borders? borders = null;
     public BorderRadius? border_radius = null;
@@ -33,16 +84,6 @@ public class Akira.Lib2.Components.Components {
     public Size? size = null;
     public Rotation? rotation = null;
     
-    public CompiledFill? compiled_fill = null;
-    public CompiledBorder? compiled_border = null;
-    public CompiledGeometry? compiled_geometry = null;
-
-    public Lib2.Components.Component.RegisteredTypes dirty_components;
-
-    public Components () {
-        dirty_components = Lib2.Components.Component.RegisteredTypes ();
-    }
-
     public Components copy () {
         var cln = new Components ();
         cln.borders = (borders == null) ? null : borders.copy ();
@@ -59,53 +100,6 @@ public class Akira.Lib2.Components.Components {
 
         return cln;
     }
-
-    /*
-     * Return true if new fill color was generated.
-     */
-    public bool maybe_compile_fill () {
-        if (compiled_fill != null) {
-            return false;
-        }
-
-        compiled_fill = CompiledFill.compile (fills, opacity);
-        dirty_components.mark_dirty (Component.Type.COMPILED_FILL, true);
-        return true;
-    }
-
-    /*
-     * Return true if new border color was generated.
-     */
-    public bool maybe_compile_border () {
-        if (compiled_border != null) {
-            return false;
-        }
-        compiled_border = CompiledBorder.compile (borders, opacity);
-        dirty_components.mark_dirty (Component.Type.COMPILED_BORDER, true);
-        return true;
-    }
-
-    /*
-     * Return true if new geometry was generated.
-     */
-    public bool maybe_compile_geometry () {
-        if (compiled_geometry != null) {
-            return false;
-        }
-
-        compiled_geometry = CompiledGeometry.compile (
-            center,
-            size,
-            rotation,
-            borders,
-            flipped
-        );
-
-        dirty_components.mark_dirty (Component.Type.COMPILED_GEOMETRY, true);
-
-        return true;
-    }
-
 
     public static Opacity default_opacity () {
         return new Opacity (100.0);

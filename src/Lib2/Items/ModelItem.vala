@@ -43,20 +43,35 @@ public class Akira.Lib2.Items.DummyGroupType : Object, ModelType<DummyGroupType>
     public bool is_group () { return true; }
 }
 
-public class Akira.Lib2.Items.ModelItem : Object {
+public class Akira.Lib2.Items.ModelItem {
     public int id = -1;
     public Lib2.Items.CanvasItem canvas_item = null;
     // Only non-null if it is a group with an associated canvas (e.g., artboard)
     public Goo.CanvasGroup container_item = null;
     public Lib2.Components.Components components = null;
+    public Lib2.Components.CompiledComponents compiled_components = null;
     public ModelType item_type = null;
+
+    public Components.CompiledGeometry compiled_geometry { get { return compiled_components.compiled_geometry; }}
+    public Components.CompiledFill  compiled_fill { get { return compiled_components.compiled_fill; }}
+    public Components.CompiledBorder  compiled_border { get { return compiled_components.compiled_border; }}
+
+    public ModelItem () {
+        prep ();
+    }
 
     public ModelItem.dummy_item () {
         item_type = new DummyItemType ();
+        prep ();
     }
 
     public ModelItem.dummy_group () {
         item_type = new DummyGroupType ();
+        prep ();
+    }
+
+    private void prep () {
+        compiled_components = new Lib2.Components.CompiledComponents ();
     }
 
     public signal void geometry_changed (int id);
@@ -71,23 +86,18 @@ public class Akira.Lib2.Items.ModelItem : Object {
     }
 
     public void compile_components (bool notify_view) {
-        components.maybe_compile_geometry ();
-        components.maybe_compile_fill ();
-        components.maybe_compile_border ();
+        compiled_components.maybe_compile_geometry (components);
+        compiled_components.maybe_compile_fill (components);
+        compiled_components.maybe_compile_border (components);
 
         if (notify_view) {
             notify_view_of_changes ();
         }
     }
 
-    public bool hit_test (double x, double y) {
-        components.maybe_compile_geometry ();
-        return components.compiled_geometry.contains (x, y);
-    }
-
     public void recompile_geometry (bool notify) {
-        components.compiled_geometry = null;
-        components.maybe_compile_geometry ();
+        compiled_components.compiled_geometry = null;
+        compiled_components.maybe_compile_geometry (components);
 
         if (notify) {
             notify_view_of_changes ();
@@ -95,11 +105,15 @@ public class Akira.Lib2.Items.ModelItem : Object {
     }
 
     public void notify_view_of_changes () {
+        if (compiled_components == null) {
+            return;
+        }
+
         if (canvas_item == null && container_item == null) {
             return;
         }
 
-        var dirty_types = components.dirty_components.types;
+        var dirty_types = compiled_components.dirty_components.types;
         for (var i = 0; i < dirty_types.length; ++i) {
             var type = dirty_types[i];
             if (type.dirty) {
@@ -110,7 +124,7 @@ public class Akira.Lib2.Items.ModelItem : Object {
                 }
             }
 
-            components.dirty_components.mark_dirty (type.type, false);
+            compiled_components.dirty_components.mark_dirty (type.type, false);
         }
    }
 
@@ -130,9 +144,4 @@ public class Akira.Lib2.Items.ModelItem : Object {
     }
 
     public bool is_stackable () { return canvas_item != null; }
-
-    public unowned Lib2.Components.CompiledGeometry compiled_geometry () {
-        components.maybe_compile_geometry ();
-        return components.compiled_geometry;
-    }
 }

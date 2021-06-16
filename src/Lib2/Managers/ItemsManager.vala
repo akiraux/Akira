@@ -227,7 +227,7 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
                 new_v = vertical ? !new_v : new_h;
 
                 if (target.item.components.rotation != null) {
-                    var tr = target.item.compiled_geometry ().transform ();
+                    var tr = target.item.compiled_geometry.transform ();
                     tr.x0 = 0;
                     tr.y0 = 0;
 

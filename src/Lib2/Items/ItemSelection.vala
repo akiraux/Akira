@@ -92,7 +92,7 @@ public class Akira.Lib2.Items.NodeSelection : Object {
 
         if (nodes.size == 1) {
             unowned var item = first_node ().instance.item;
-            var cg = item.compiled_geometry ();
+            unowned var cg = item.compiled_geometry;
             if (cg == null) {
                 return result;
             }
@@ -108,7 +108,7 @@ public class Akira.Lib2.Items.NodeSelection : Object {
         double right = int.MIN;
 
         foreach (var node in nodes) {
-            var cg = node.value.instance.item.compiled_geometry ();
+            unowned var cg = node.value.instance.item.compiled_geometry;
             if (cg == null) {
                 continue;
             }
@@ -147,7 +147,7 @@ public class Akira.Lib2.Items.NodeSelection : Object {
         var right = double.MIN;
 
         foreach (var node in nodes.values) {
-            var cg = node.instance.item.compiled_geometry ();
+            unowned var cg = node.instance.item.compiled_geometry;
             if (cg == null) {
                 continue;
             }

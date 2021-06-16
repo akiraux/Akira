@@ -87,7 +87,7 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
             data.item_center = item.components.center.copy ();
             data.item_size = item.components.size.copy ();
             data.item_rotation = item.components.rotation.copy ();
-            data.item_geometry = item.compiled_geometry ().copy ();
+            data.item_geometry = item.compiled_geometry.copy ();
             initial_drag_state.items_data.add (data);
         }
     }

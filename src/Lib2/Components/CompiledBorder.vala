@@ -46,11 +46,14 @@ public class Akira.Lib2.Components.CompiledBorder : Copyable<CompiledBorder> {
         return new CompiledBorder (_color, _size, _visible);
     }
 
-    public static CompiledBorder compile (Borders? borders, Opacity? opacity) {
+    public static CompiledBorder compile (Components components) {
 
         var rgba_border = Gdk.RGBA ();
         bool has_colors = false;
         int size = 0;
+
+        unowned var borders = components.borders;
+        unowned var opacity = components.opacity;
 
         // Set an initial arbitrary color with full transparency.
         rgba_border.alpha = 0;

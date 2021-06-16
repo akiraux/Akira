@@ -75,12 +75,12 @@ public class Akira.Lib2.Items.ModelTypeArtboard : Object, ModelType<ModelTypeArt
             case Lib2.Components.Component.Type.COMPILED_BORDER:
                 break;
             case Lib2.Components.Component.Type.COMPILED_FILL:
-                if (!item.components.compiled_fill.is_visible) {
+                if (!item.compiled_fill.is_visible) {
                     item.canvas_item.set ("fill-color-rgba", null);
                     break;
                 }
 
-                var rgba = item.components.compiled_fill.color;
+                var rgba = item.compiled_fill.color;
                 uint urgba = Utils.Color.rgba_to_uint (rgba);
                 print ("here\n");
                 item.canvas_item.set ("fill-color-rgba", urgba);
@@ -90,7 +90,7 @@ public class Akira.Lib2.Items.ModelTypeArtboard : Object, ModelType<ModelTypeArt
                 item.canvas_item.set ("y", -item.components.size.height / 2.0);
                 item.canvas_item.set ("width", item.components.size.width);
                 item.canvas_item.set ("height", item.components.size.height);
-                item.canvas_item.set_transform (item.components.compiled_geometry.transform ());
+                item.canvas_item.set_transform (item.compiled_geometry.transform ());
                 print ("%s", item.canvas_item.is_visible ().to_string ());
                 break;
         }
