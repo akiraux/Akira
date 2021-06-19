@@ -490,26 +490,25 @@ public class Akira.Lib.Managers.NobManager : Object {
                 set_visible = false;
             }
 
+            nob.update_state (nob_data.bb_matrix, center_x, center_y, set_visible);
+            nob.raise (select_effect);
+
             // If we're hiding all centered nobs, we need to shift the position
             // of the corner nobs to improve the grabbing area.
             if (!print_middle_width_nobs && !print_middle_height_nobs) {
+                var half = nob_size / 2;
+
+                // Use Cairo.translate to automatically account for the item's rotation.
                 if (nob_name == Nob.TOP_LEFT) {
-                    center_x -= nob_size / 2;
-                    center_y -= nob_size / 2;
+                    nob.translate (-half, -half);
                 } else if (nob_name == Nob.TOP_RIGHT) {
-                    center_x += nob_size / 2;
-                    center_y -= nob_size / 2;
+                    nob.translate (half, -half);
                 } else if (nob_name == Nob.BOTTOM_RIGHT) {
-                    center_x += nob_size / 2;
-                    center_y += nob_size / 2;
+                    nob.translate (half, half);
                 } else if (nob_name == Nob.BOTTOM_LEFT) {
-                    center_x -= nob_size / 2;
-                    center_y += nob_size / 2;
+                    nob.translate (-half, half);
                 }
             }
-
-            nob.update_state (nob_data.bb_matrix, center_x, center_y, set_visible);
-            nob.raise (select_effect);
         }
     }
 
