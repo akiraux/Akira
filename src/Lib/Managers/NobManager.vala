@@ -442,13 +442,38 @@ public class Akira.Lib.Managers.NobManager : Object {
 
             var nob_name = nob.handle_id;
 
-            calculate_nob_position ( nob_name, nob_data, ref center_x, ref center_y );
+            calculate_nob_position (nob_name, nob_data, ref center_x, ref center_y);
 
+            // Check if we need to hide the vertically centered nobs.
             if (!print_middle_height_nobs && (nob_name == Nob.RIGHT_CENTER || nob_name == Nob.LEFT_CENTER)) {
                 set_visible = false;
-            } else if (!print_middle_width_nobs && (nob_name == Nob.TOP_CENTER || nob_name == Nob.BOTTOM_CENTER)) {
+            }
+
+            // Check if we need to hide the horizontally centere nobs.
+            if (!print_middle_width_nobs && (nob_name == Nob.TOP_CENTER || nob_name == Nob.BOTTOM_CENTER)) {
                 set_visible = false;
-            } else if (nob.handle_id == Nob.ROTATE) {
+            }
+
+            // If we're hiding all centered nobs, we need to shift the position
+            // of the corner nobs to improve the grabbing area.
+            if (!print_middle_width_nobs && !print_middle_height_nobs) {
+                if (nob_name == Nob.TOP_LEFT) {
+                    center_x -= nob_size / 2;
+                    center_y -= nob_size / 2;
+                } else if (nob_name == Nob.TOP_RIGHT) {
+                    center_x += nob_size / 2;
+                    center_y -= nob_size / 2;
+                } else if (nob_name == Nob.BOTTOM_RIGHT) {
+                    center_x += nob_size / 2;
+                    center_y += nob_size / 2;
+                } else if (nob_name == Nob.BOTTOM_LEFT) {
+                    center_x -= nob_size / 2;
+                    center_y += nob_size / 2;
+                }
+            }
+
+            // Unique calculation for the rotation nob.
+            if (nob.handle_id == Nob.ROTATE) {
                 double line_offset_x = 0;
                 double line_offset_y = - (LINE_HEIGHT / canvas.current_scale);
                 nob_data.bb_matrix.transform_distance (ref line_offset_x, ref line_offset_y);
