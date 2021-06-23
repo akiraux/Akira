@@ -18,11 +18,6 @@
  *
  * Authored by: Ashish Shevale <shevaleashish@gmail.com>
  */
-
-/*
- * Helper class to quickly create a container with a color button and a color
- * picker. The color button opens up the GtkColorChooser.
- */
  public class Akira.Widgets.ColorMode {
     // these buttons will be used to switch between different coloring modes
     private Gtk.Button solid_color_button;
@@ -114,7 +109,6 @@
     }
     
     private void on_delete_button_pressed () {
-        print("calling delete stop\n");
         gradient_editor.delete_selected_step();
     }
 

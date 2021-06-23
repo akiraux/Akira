@@ -1,4 +1,24 @@
-public class Akira.Widgets.GradientEditor : Gtk.EventBox {
+/*
+ * Copyright (c) 2021 Alecaddd (https://alecaddd.com)
+ *
+ * This file is part of Akira.
+ *
+ * Akira is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Akira is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Akira. If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Authored by: Ashish Shevale <shevaleashish@gmail.com>
+ */
+ public class Akira.Widgets.GradientEditor : Gtk.EventBox {
     // dimensions of GradientEditor that we will fetch after size has been allocated to it
     private int widget_width;
     private int widget_height;
@@ -37,6 +57,7 @@ public class Akira.Widgets.GradientEditor : Gtk.EventBox {
         draw.connect_after ( (context) => {return redraw_editor(context);});
         
         button_press_event.connect( (event) => {return on_button_press(event);});
+        button_release_event.connect ( (event) => {return on_button_release(event); });
 
         });
 
@@ -89,16 +110,27 @@ public class Akira.Widgets.GradientEditor : Gtk.EventBox {
             queue_draw_area(widget_x, widget_y, widget_width, widget_height);
         }
         
+        // start the on motion event handler
+        // this will drag the stop color around as long as the button is pressed
+        motion_notify_event.connect( on_motion_event );
+        
         return false;
     }
 
     private bool on_motion_event (Gdk.EventMotion event) {
-
+        int index = stop_colors.index_of(selected_stop_color);
+        
+        stop_colors[index].position = (event.x / widget_width) * 100;
+        
+        queue_draw_area(widget_x, widget_y, widget_width, widget_height);
         return false;
     }
-
-    private void on_button_release (Gdk.EventButton event) {
+    
+    private bool on_button_release (Gdk.EventButton event) {
+        // after user releases the button, stop dragging the stop color 
         motion_notify_event.disconnect (on_motion_event);
+        
+        return false;
     }
 
     public void on_color_changed(string color, double alpha) {
