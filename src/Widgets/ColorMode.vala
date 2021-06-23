@@ -65,6 +65,7 @@
         delete_step_button.can_focus = false;
         delete_step_button.valign = Gtk.Align.CENTER;
         delete_step_button.halign = Gtk.Align.CENTER;
+        delete_step_button.margin = 10;
 
         solid_color_button.clicked.connect ( () => mode_button_pressed ("solid"));
         linear_gradient_button.clicked.connect ( () => mode_button_pressed ("linear"));
@@ -82,7 +83,7 @@
         buttons_grid.attach (radial_gradient_button, 2, 0);
         buttons_grid.attach (separator, 3, 0);
         
-        buttons_grid.attach (gradient_editor, 0, 1, 4, 4);
+        buttons_grid.attach (gradient_editor, 0, 1, 4, 1);
         buttons_grid.attach (delete_step_button, 4, 1);
     }
 

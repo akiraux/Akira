@@ -181,7 +181,7 @@
         index = 0;
 
         for(index = 0; index < stop_colors.size; ++index) {
-            if(stop_colors[index].is_close_to(coordinate)) {
+            if(stop_colors[index].is_close_to(coordinate, widget_width)) {
                 return true;
             } else if (stop_colors[index].position > coordinate) {
                 return false;
@@ -259,9 +259,13 @@
             position = _position;
         }
 
-        public bool is_close_to (double other_position) {
+        public bool is_close_to (double other_position, double width) {
+            var distance = (position - other_position).abs();
+            distance = (distance * width ) / 100;
             // there has to be a min distance between 2 stop colors to easily select them
-            if( (position - other_position).abs() < 1 ) {
+            // this distance is taken as 7 because that is the radius the StopColor is drawn
+            // in the gradient editor
+            if( distance <= 7 ) {
                 return true;
             }
 
