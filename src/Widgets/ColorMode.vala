@@ -74,7 +74,7 @@
         solid_color_button.clicked.connect ( () => mode_button_pressed ("solid"));
         linear_gradient_button.clicked.connect ( () => mode_button_pressed ("linear"));
         radial_gradient_button.clicked.connect ( () => mode_button_pressed ("radial"));
-        delete_step_button.clicked.connect (delete_selected_step);
+        delete_step_button.clicked.connect (on_delete_button_pressed);
 
         gradient_editor = new GradientEditor(this);
 
@@ -109,8 +109,13 @@
             
     }
     
-    private void delete_selected_step () {
-
+    public string get_css_style() {
+        return gradient_editor.css_style;
+    }
+    
+    private void on_delete_button_pressed () {
+        print("calling delete stop\n");
+        gradient_editor.delete_selected_step();
     }
 
  }

@@ -8,7 +8,6 @@ public class Akira.Widgets.GradientEditor : Gtk.EventBox {
     private ColorMode color_mode_widget;
     private bool is_gradient_mode = false;
 
-    private Gdk.RGBA color;
     public string css_style;
 
     // list to store all stop colors in order
@@ -23,8 +22,6 @@ public class Akira.Widgets.GradientEditor : Gtk.EventBox {
 
         set_events(Gdk.EventMask.BUTTON_PRESS_MASK);
         set_above_child(false);
-
-        color.parse("#333");
 
         // the stop colors at start and end are fixed. StopColor has been defined at the end
         stop_colors = new Gee.ArrayList<StopColor>();
@@ -105,7 +102,27 @@ public class Akira.Widgets.GradientEditor : Gtk.EventBox {
     }
 
     public void on_color_changed(string color, double alpha) {
-
+        int index = stop_colors.index_of(selected_stop_color);
+        
+        stop_colors[index].color = color;
+        
+        queue_draw_area(widget_x, widget_y, widget_width, widget_height);
+    }
+    
+    public void delete_selected_step () {
+        // get the index of selected step
+        int index = stop_colors.index_of(selected_stop_color);
+        
+        // the first and stop colors are fixed and should not be deleted
+        if(index == 0 || index == stop_colors.size - 1) {
+            return;
+        }
+        
+        selected_stop_color = stop_colors[index-1];
+        stop_colors.remove_at(index);
+        
+        // redraw the new widget 
+        queue_draw_area(widget_x, widget_y, widget_width, widget_height);
     }
 
     private void get_stop_color_at(double position) {
@@ -147,38 +164,25 @@ public class Akira.Widgets.GradientEditor : Gtk.EventBox {
 
         switch(button_type) {
             case "solid":
-                color.parse("#333");
-                css_style = """
-                *{
-                    background: none;
-                    background-color: @bg_color;
-                    border: none;
-                }""";
+                css_style = "@bg_color";
                 break;
-
             case "linear":
-                color.parse("#212121");
-                css_style = """
-                * {
-                    border: 1px solid @fg_color;
-                    background: linear-gradient(to right%s);
-                }""".printf( stop_color_string);
+                css_style = """linear-gradient(to right %s)""".printf(stop_color_string);
                 break;
             case "radial":
-                color.parse("#212121");
-                css_style = """
-                *{
-                    border: 1px solid @fg_color;
-                    background: linear-gradient(to right %s);
-                }""".printf(stop_color_string);
-            break;
+                css_style = """radial-gradient(circle farthest-side %s)""".printf(stop_color_string);
+                break;
         }
 
         try {
             var provider = new Gtk.CssProvider ();
             var context = get_style_context ();
+            
+            var editor_css_style = """*{
+                background: %s
+            }""".printf(css_style);
 
-            provider.load_from_data (css_style, css_style.length);
+            provider.load_from_data (editor_css_style, editor_css_style.length);
             context.add_provider (provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
         } catch (Error e) {
             warning ("Style error: %s", e.message);
