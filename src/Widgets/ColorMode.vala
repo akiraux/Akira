@@ -106,7 +106,9 @@
     }
 
     private void on_delete_button_pressed () {
-        gradient_editor.delete_selected_step();
+        if(color_mode_type != "solid") {
+            gradient_editor.delete_selected_step();
+        }
     }
 
  }
