@@ -118,11 +118,18 @@
     }
 
     private bool on_motion_event (Gdk.EventMotion event) {
-        int index = stop_colors.index_of(selected_stop_color);
+        if(is_gradient_mode) {
+            int index = stop_colors.index_of(selected_stop_color);
+            
+            if(index == 0 || index == stop_colors.size - 1) {
+                return false;
+            }
+            
+            stop_colors[index].position = (event.x / widget_width) * 100;
+            
+            queue_draw_area(widget_x, widget_y, widget_width, widget_height);
+        }
         
-        stop_colors[index].position = (event.x / widget_width) * 100;
-        
-        queue_draw_area(widget_x, widget_y, widget_width, widget_height);
         return false;
     }
     
