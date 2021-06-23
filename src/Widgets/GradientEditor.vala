@@ -26,16 +26,19 @@
     private int widget_y;
     
     private ColorMode color_mode_widget;
+    private Models.ColorModel model;
     private bool is_gradient_mode = false;
-
-    public string css_style;
 
     // list to store all stop colors in order
     private Gee.ArrayList<StopColor> stop_colors;
     private StopColor selected_stop_color;
+    
+    // Cairo.Pattern to color the Canvas.Item
+    private Cairo.Pattern gradient_pattern;
 
-    public GradientEditor(ColorMode _color_mode_widget) {
+    public GradientEditor(ColorMode _color_mode_widget, Models.ColorModel _model) {
         color_mode_widget = _color_mode_widget;
+        model = _model;
 
         set_hexpand(true);
         height_request = 35;
@@ -95,7 +98,12 @@
             // here we are calling update style with the button_type argument as linear.
             // this is because in order to display a gradient at the background, anything other 
             // than "solid" can be used.
-            update_style("linear");
+            //update_style("linear");
+            if(color_mode_widget.color_mode_type == "linear") {
+                update_style("linear");
+            } else {
+                update_style("radial");
+            }
         }
         
         return false;
@@ -192,7 +200,7 @@
     }
 
     private void update_style(string button_type) {
-        css_style = "";
+        string css_style = "";
         string stop_color_string = stop_colors_as_string();
 
         if(button_type != "solid") {
@@ -201,16 +209,10 @@
             is_gradient_mode = false;
         }
 
-        switch(button_type) {
-            case "solid":
-                css_style = "@bg_color";
-                break;
-            case "linear":
-                css_style = """linear-gradient(to right %s)""".printf(stop_color_string);
-                break;
-            case "radial":
-                css_style = """radial-gradient(circle farthest-side %s)""".printf(stop_color_string);
-                break;
+        if(button_type == "solid") {
+            css_style = "@bg_color";
+        } else {
+            css_style = """linear-gradient(to right %s)""".printf(stop_color_string);
         }
 
         try {
@@ -223,10 +225,13 @@
 
             provider.load_from_data (editor_css_style, editor_css_style.length);
             context.add_provider (provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
+            
         } catch (Error e) {
             warning ("Style error: %s", e.message);
             debug ("%s %s\n", name, css_style);
         }
+        
+        create_gradient_pattern(button_type);
     }
 
     private string stop_colors_as_string() {
@@ -248,11 +253,45 @@
         
         update_style(color_mode_widget.color_mode_type);
     }
+    
+    private void create_gradient_pattern (string color_mode) {
+        double item_height, item_width;
+        model.get("height", out item_height);
+        model.get("width", out item_width);
+        
+        if(color_mode == "solid") {
+            // for solid color, create an empty pattern. In Fills, we check if stop colors exists
+            // for this pattern. If they dont, then the Pattern is not applied
+            gradient_pattern = new Cairo.Pattern.linear(0,0,0,0);
+            model.pattern = gradient_pattern;
+            return;
+        } else if(color_mode == "linear") {
+            gradient_pattern = new Cairo.Pattern.linear(0, 0, 
+                                             item_width,  item_height);
+        } else {
+            int radius = (int) Math.sqrt( item_width * item_width + item_height * item_height);
+            gradient_pattern = new Cairo.Pattern.radial(0, 0, 0, 0, 0, radius);
+        }
+        
+        for(int index = 0; index < stop_colors.size; ++index) {
+            var stop_color = stop_colors[index];
+            
+            var rgba = Gdk.RGBA();
+            rgba.parse(stop_color.color);
+            
+            double offset = stop_color.position / 100;
+            
+            gradient_pattern.add_color_stop_rgba(offset, rgba.red, rgba.green, rgba.blue, 1);
+        }
+        
+        model.pattern = gradient_pattern;
+    }
 
     private class StopColor {
         public string color;
         // position denotes position of stop color in percentage
         public double position;
+        // TODO: add alpha here
 
         public StopColor(string _color, double _position) {
             color = _color;

@@ -72,7 +72,7 @@
         radial_gradient_button.clicked.connect ( () => mode_button_pressed ("radial"));
         delete_step_button.clicked.connect (on_delete_button_pressed);
 
-        gradient_editor = new GradientEditor(this);
+        gradient_editor = new GradientEditor(this, model);
 
         Gtk.Separator separator = new Gtk.Separator (Gtk.Orientation.VERTICAL);
         separator.hexpand = true;
@@ -104,11 +104,7 @@
             }
             
     }
-    
-    public string get_css_style() {
-        return gradient_editor.css_style;
-    }
-    
+
     private void on_delete_button_pressed () {
         gradient_editor.delete_selected_step();
     }

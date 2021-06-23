@@ -51,8 +51,8 @@ public class Akira.Lib.Components.Fills : Component {
         id++;
 
         // Trigger the generation of the fill color.
-        reload ();
-
+       reload ();
+       
         return new_fill;
     }
 
@@ -68,8 +68,10 @@ public class Akira.Lib.Components.Fills : Component {
         if (count () == 0) {
             if (item is Items.CanvasArtboard) {
                 ((Items.CanvasArtboard) item).background.set ("fill-color-rgba", null);
+                ((Items.CanvasArtboard) item).background.set ("fill-pattern", null);
             } else {
                 item.set ("fill-color-rgba", null);
+                item.set ("fill-pattern", null);
             }
             return;
         }
@@ -86,6 +88,21 @@ public class Akira.Lib.Components.Fills : Component {
                 continue;
             }
 
+            var stop_colors = 0;
+            fill.gradient_pattern.get_color_stop_count(out stop_colors);
+            
+            // if for this fill, either of the gradient modes have been selected,
+            // the stop_colors value would not be zero.
+            if(stop_colors != 0 && has_colors == false) {
+                if(item is Items.CanvasArtboard) {
+                    ((Items.CanvasArtboard) item).background.set ("fill-pattern", fill.gradient_pattern);
+                } else {
+                    item.set("fill-pattern", fill.gradient_pattern);
+                }
+                
+                // since we dont have the functionality of blending gradients,
+                return;
+            }
             // Set the new blended color.
             rgba_fill = Utils.Color.blend_colors (rgba_fill, fill.color);
             has_colors = true;
