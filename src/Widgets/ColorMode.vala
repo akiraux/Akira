@@ -31,14 +31,12 @@
 
     public Gtk.Grid buttons_grid;
     private Models.ColorModel model;
-    private ColorRow color_row;
+    private Window window;
 
-    public ColorMode (Models.ColorModel _model, ColorRow _color_row) {
+    public ColorMode (Models.ColorModel _model, Window _window) {
         model = _model;
-        color_row = _color_row;
         color_mode_type = "solid";
-        
-        color_row.color_changed.connect(on_color_changed);
+        window = _window;
 
         init_button_ui ();
     }
@@ -72,7 +70,7 @@
         radial_gradient_button.clicked.connect ( () => mode_button_pressed ("radial"));
         delete_step_button.clicked.connect (on_delete_button_pressed);
 
-        gradient_editor = new GradientEditor(this, model);
+        gradient_editor = new GradientEditor(window, model);
 
         Gtk.Separator separator = new Gtk.Separator (Gtk.Orientation.VERTICAL);
         separator.hexpand = true;
@@ -89,20 +87,7 @@
 
     private void mode_button_pressed(string _color_mode_type) {
         color_mode_type = _color_mode_type;
-        gradient_editor.on_color_mode_changed();
-
-    }
-
-    public void on_color_changed (string color, double alpha) {
-        if(color_mode_type == "solid") {
-            // Update the model values.
-            model.color = color;
-            model.alpha = (int) (alpha * 255);
-            
-            } else {
-                gradient_editor.on_color_changed (color, alpha);
-            }
-            
+        window.event_bus.color_mode_changed(color_mode_type);
     }
 
     private void on_delete_button_pressed () {

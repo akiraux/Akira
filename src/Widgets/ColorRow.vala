@@ -35,8 +35,6 @@ public class Akira.Widgets.ColorRow : Gtk.Grid {
     private InputField opacity_field;
     private ColorMode color_mode_widget;
 
-    public signal void color_changed(string color, double alpha);
-
     /*
      * If the color or alpha are manually set from the ColorPicker.
      * If true, the ColorChooserWidget doesn't need to be updated.
@@ -125,7 +123,7 @@ public class Akira.Widgets.ColorRow : Gtk.Grid {
             var new_rgba = Utils.Color.hex_to_rgba (field_hex);
             
             set_button_color (field_hex, model.alpha);
-            color_changed(field_hex, opacity_field.entry.value);
+            window.event_bus.color_changed(field_hex, opacity_field.entry.value);
 
             // Update the chooser widget only if it was already initialized.
             if (color_chooser_widget != null) {
@@ -159,7 +157,7 @@ public class Akira.Widgets.ColorRow : Gtk.Grid {
                 //model.alpha = alpha;
                 set_button_color (model.color, alpha);
                 
-                color_changed(field.text, alpha);
+                window.event_bus.color_changed(field.text, alpha);
 
                 // Update the chooser widget only if it was already initialized.
                 if (color_chooser_widget != null) {
@@ -223,7 +221,7 @@ public class Akira.Widgets.ColorRow : Gtk.Grid {
             global_colors_flowbox.add (btn);
         }
 
-        color_mode_widget = new ColorMode(model, this);
+        color_mode_widget = new ColorMode(model, this.window);
 
         color_grid.attach (color_mode_widget.buttons_grid, 0, 0, 1, 1);
         color_grid.attach (color_chooser_widget, 0, 1, 1, 1);
@@ -239,7 +237,8 @@ public class Akira.Widgets.ColorRow : Gtk.Grid {
             string new_color = color_chooser_widget.rgba.to_string();
             double alpha = color_chooser_widget.rgba.alpha;
 
-            color_mode_widget.on_color_changed(new_color, alpha);
+            //color_mode_widget.on_color_changed(new_color, alpha);
+            window.event_bus.color_changed(new_color, alpha);
         });
     }
 

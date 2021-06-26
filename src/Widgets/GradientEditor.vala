@@ -25,9 +25,9 @@
     private int widget_x;
     private int widget_y;
     
-    private ColorMode color_mode_widget;
+    private Window window;
     private Models.ColorModel model;
-    private bool is_gradient_mode = false;
+    private string color_mode_type;
 
     // list to store all stop colors in order
     private Gee.ArrayList<StopColor> stop_colors;
@@ -36,9 +36,10 @@
     // Cairo.Pattern to color the Canvas.Item
     private Cairo.Pattern gradient_pattern;
 
-    public GradientEditor(ColorMode _color_mode_widget, Models.ColorModel _model) {
-        color_mode_widget = _color_mode_widget;
+    public GradientEditor(Window _window, Models.ColorModel _model) {
+        window = _window;
         model = _model;
+        color_mode_type = "solid";
 
         set_hexpand(true);
         height_request = 35;
@@ -61,13 +62,16 @@
         
         button_press_event.connect( (event) => {return on_button_press(event);});
         button_release_event.connect ( (event) => {return on_button_release(event); });
+        
+        window.event_bus.color_mode_changed.connect(on_color_mode_changed);
+        window.event_bus.color_changed.connect(on_color_changed);
 
         });
 
     }
 
     private bool redraw_editor(Cairo.Context context) {
-        if (is_gradient_mode) {
+        if (color_mode_type != "solid") {
             double center_y = widget_y + widget_height / 2;
             
             // line through the center. acts as a guideline for the user to place the stop colors   
@@ -95,22 +99,14 @@
                 context.fill();
             }
             
-            // here we are calling update style with the button_type argument as linear.
-            // this is because in order to display a gradient at the background, anything other 
-            // than "solid" can be used.
-            //update_style("linear");
-            if(color_mode_widget.color_mode_type == "linear") {
-                update_style("linear");
-            } else {
-                update_style("radial");
-            }
+            update_style();
         }
         
         return false;
     }
 
     private bool on_button_press (Gdk.EventButton event) {
-        if (is_gradient_mode) {
+        if (color_mode_type != "solid") {
             var position = (event.x / widget_width) * 100;
             get_stop_color_at(position);
             
@@ -126,7 +122,7 @@
     }
 
     private bool on_motion_event (Gdk.EventMotion event) {
-        if(is_gradient_mode) {
+        if(color_mode_type != "solid") {
             int index = stop_colors.index_of(selected_stop_color);
             
             if(index == 0 || index == stop_colors.size - 1) {
@@ -201,17 +197,11 @@
         return false;
     }
 
-    private void update_style(string button_type) {
+    private void update_style() {
         string css_style = "";
         string stop_color_string = stop_colors_as_string();
 
-        if(button_type != "solid") {
-            is_gradient_mode = true;
-        } else {
-            is_gradient_mode = false;
-        }
-
-        if(button_type == "solid") {
+        if(color_mode_type == "solid") {
             css_style = "@bg_color";
         } else {
             css_style = """linear-gradient(to right %s)""".printf(stop_color_string);
@@ -233,43 +223,38 @@
             debug ("%s %s\n", name, css_style);
         }
         
-        create_gradient_pattern(button_type);
+        create_gradient_pattern();
     }
 
     private string stop_colors_as_string() {
         string colors_string = "";
 
         foreach(StopColor item in stop_colors) {
-            //colors_string += ", " + "%s ".printf( item.color) + item.position.to_string() + "%";
             colors_string += "," + item.to_string();
         }
         
         return colors_string;
     }
 
-    public void on_color_mode_changed () {
+    private void on_color_mode_changed (string _color_mode_type) {
     
-        if(color_mode_widget.color_mode_type != "solid") {
-            is_gradient_mode = true;
-        } else {
-            is_gradient_mode = false;
-        }
+        color_mode_type = _color_mode_type;
         
-        update_style(color_mode_widget.color_mode_type);
+        update_style();
     }
     
-    private void create_gradient_pattern (string color_mode) {
+    private void create_gradient_pattern () {
         double item_height, item_width;
         model.get("height", out item_height);
         model.get("width", out item_width);
         
-        if(color_mode == "solid") {
+        if(color_mode_type == "solid") {
             // for solid color, create an empty pattern. In Fills, we check if stop colors exists
             // for this pattern. If they dont, then the Pattern is not applied
             gradient_pattern = new Cairo.Pattern.linear(0,0,0,0);
             model.pattern = gradient_pattern;
             return;
-        } else if(color_mode == "linear") {
+        } else if(color_mode_type == "linear") {
             gradient_pattern = new Cairo.Pattern.linear(0, 0, 
                                              item_width,  item_height);
         } else {
