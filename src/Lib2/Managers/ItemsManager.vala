@@ -45,7 +45,7 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
         return add_item_to_group (Lib2.Items.Model.origin_id, item);
     }
 
-    public int add_item_to_group (int group_id, Lib2.Items.ModelItem item) {
+    public int add_item_to_group (int group_id, Lib2.Items.ModelItem item, bool pause_compile = false) {
         if (item == null) {
             return -1;
         }
@@ -55,8 +55,14 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
         }
 
         item.geometry_changed.connect (on_item_geometry_changed);
-        item.compile_components (false);
+        item.mark_geometry_dirty ();
+
+        if (!pause_compile) {
+            compile_model ();
+        }
+
         item.add_to_canvas (view_canvas);
+
         item.notify_view_of_changes ();
         return item.id;
     }
@@ -106,6 +112,13 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
         }
 
         return 0;
+    }
+
+    /*
+     * Alerts the model to recompile all dirty geometries.
+    */
+    public void compile_model () {
+        item_model.compile_geometries ();
     }
 
     /*
@@ -249,9 +262,11 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
 
 
                 target.item.components.flipped = new Lib2.Components.Flipped (new_h, new_v);
-                target.item.recompile_geometry (true);
+                target.item.mark_geometry_dirty ();
             }
         }
+
+        compile_model ();
     }
 
     public GLib.Array<unowned Lib2.Items.ModelNode> children_in_group (int group_id) {
@@ -351,22 +366,42 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
         return new_rect;
     }
     
-    public Lib2.Items.ModelItem add_debug_group (double x, double y) {
+    public Lib2.Items.ModelItem add_debug_group (double x, double y, bool debug_timer = false) {
+        ulong microseconds;
+        double seconds;
+
+        // create a timer object:
+        Timer timer = new Timer ();
+
+        var blocker = new Lib2.Managers.SelectionManager.ChangeSignalBlocker (view_canvas.selection_manager);
+        (void) blocker;
+
         var group = Lib2.Items.ModelTypeGroup.default_group ();
         add_item_to_origin (group);
 
-        for (var i = 0; i < 5; ++i) {
+        var num_of = 5000;
+
+        for (var i = 0; i < num_of; ++i) {
+                x = GLib.Random.double_range (0, 1000);
+                y = GLib.Random.double_range (0, 1000);
             var new_rect = Lib2.Items.ModelTypeRect.default_rect (
-                new Lib2.Components.Coordinates (x + i * 60, y),
+                //new Lib2.Components.Coordinates (x + i * 60, y),
+                new Lib2.Components.Coordinates (x, y),
                 new Lib2.Components.Size (50.0, 50.0, false),
                 Lib2.Components.Borders.single_color (Lib2.Components.Color (0.3, 0.3, 0.3, 1.0), 2),
                 Lib2.Components.Fills.single_color (Lib2.Components.Color (0.0, 0.0, 0.0, 1.0))
             );
-            add_item_to_group (group.id, new_rect);
+
+            add_item_to_group (group.id, new_rect, true);
         }
 
-        print ("add item to group-----\n");
-        item_model.print_dag ();
+        compile_model ();
+
+        if (debug_timer) {
+            timer.stop ();
+            seconds = timer.elapsed (out microseconds);
+            print ("Created %u items in %s s\n", num_of, seconds.to_string ());
+        }
 
         return group;
     }
@@ -380,6 +415,7 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
 
         var blocker = new SelectionManager.ChangeSignalBlocker (view_canvas.selection_manager);
         (void) blocker;
+
         for (var i = 0; i < num_of; ++i) {
             var x = GLib.Random.double_range (0, (GLib.Math.log (num_of + GLib.Math.E) - 1) * 1000);
             var y = GLib.Random.double_range (0, (GLib.Math.log (num_of + GLib.Math.E) - 1) * 1000);
@@ -395,8 +431,6 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
     }
 
     public void on_item_geometry_changed (int id) {
-        if (view_canvas.selection_manager.selection.has_id (id)) {
-            view_canvas.selection_manager.on_selection_changed ();
-        }
+        view_canvas.selection_manager.on_selection_changed (id);
     }
 }

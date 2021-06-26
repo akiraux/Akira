@@ -40,12 +40,15 @@ public class Akira.Lib2.Components.CompiledFill : Copyable<CompiledFill> {
         return new CompiledFill (_color, _visible);
     }
 
-    public static CompiledFill compile (Components components) {
-
+    public static CompiledFill compile (Components? components, Lib2.Items.ModelNode? node) {
         var rgba_fill = Gdk.RGBA ();
         bool has_colors = false;
         // Set an initial arbitrary color with full transparency.
         rgba_fill.alpha = 0;
+
+        if (components == null) {
+            return new CompiledFill (rgba_fill, has_colors);
+        }
 
         unowned var fills = components.fills;
         unowned var opacity = components.opacity;

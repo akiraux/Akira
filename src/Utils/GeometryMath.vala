@@ -78,4 +78,8 @@ public class Akira.Utils.GeometryMath : Object {
         y = rot_center_y + dy;
     }
 
+    public static bool is_normal_rotation (double rot_in_degrees) {
+         return GLib.Math.fmod (rot_in_degrees, 90) == 0;
+    }
+
 }

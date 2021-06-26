@@ -32,9 +32,6 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
     public Utils.Nobs.Nob nob = Utils.Nobs.Nob.NONE;
 
     public class DragItemData : Object {
-        public Lib2.Components.Coordinates item_center;
-        public Lib2.Components.Size item_size;
-        public Lib2.Components.Rotation item_rotation;
         public Lib2.Components.CompiledGeometry item_geometry;
     }
 
@@ -45,10 +42,10 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
         // initial_selection_data
         public Geometry.RotatedRectangle area;
 
-        public Gee.ArrayList<DragItemData> items_data;
+        public Gee.HashMap<int, DragItemData> item_data_map;
 
         construct {
-            items_data = new Gee.ArrayList<DragItemData> ();
+            item_data_map = new Gee.HashMap<int, DragItemData> ();
         }
     }
 
@@ -82,13 +79,25 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
         initial_drag_state.area = selection.coordinates ();
 
         foreach (var node in selection.nodes.values) {
-            unowned var item = node.instance.item;
-            var data = new DragItemData ();
-            data.item_center = item.components.center.copy ();
-            data.item_size = item.components.size.copy ();
-            data.item_rotation = item.components.rotation.copy ();
-            data.item_geometry = item.compiled_geometry.copy ();
-            initial_drag_state.items_data.add (data);
+            collect_geometries (node, ref initial_drag_state);
+        }
+    }
+
+    private static void collect_geometries (Lib2.Items.ModelNode subtree, ref InitialDragState state) {
+        if (state.item_data_map.has_key (subtree.id)) {
+            return;
+        }
+
+        var data = new DragItemData ();
+        data.item_geometry = subtree.instance.item.compiled_geometry.copy ();
+        state.item_data_map[subtree.id] = data;
+
+        if (subtree.children == null || subtree.children.length == 0) {
+            return;
+        }
+
+        foreach (var child in subtree.children.data) {
+            collect_geometries (child, ref state);
         }
     }
 
@@ -170,10 +179,6 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
         double event_y,
         ref Lib2.Managers.SnapManager.SnapGuideData guide_data
     ) {
-        //ulong microseconds;
-        //double seconds;
-        //Timer timer = new Timer ();
-
         var blocker = new Lib2.Managers.SelectionManager.ChangeSignalBlocker (view_canvas.selection_manager);
         (void) blocker;
 
@@ -230,21 +235,48 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
             }
         }
 
-        var ct = 0;
+        ulong microseconds;
+        double seconds;
+
         foreach (var node in selection.nodes.values) {
+            if (node.instance.is_group ()) {
+                translate_group (view_canvas, node, initial_drag_state, delta_x, delta_y, snap_offset_x, snap_offset_y);
+                continue;
+            }
             unowned var item = node.instance.item;
-            var item_drag_data = initial_drag_state.items_data[ct];
-            var new_center_x = item_drag_data.item_center.x + delta_x + snap_offset_x;
-            var new_center_y = item_drag_data.item_center.y + delta_y + snap_offset_y;
+            var item_drag_data = initial_drag_state.item_data_map[node.id];
+            var new_center_x = item_drag_data.item_geometry.area.center_x + delta_x + snap_offset_x;
+            var new_center_y = item_drag_data.item_geometry.area.center_y + delta_y + snap_offset_y;
             item.components.center = new Lib2.Components.Coordinates (new_center_x, new_center_y);
-            item.recompile_geometry (true);
-            ++ct;
+            item.mark_geometry_dirty ();
         }
 
-        //timer.stop ();
-        //seconds = timer.elapsed (out microseconds);
-        //print ("Moved %u items in %s s\n", initial_drag_state.items_data.size, seconds.to_string ());
+        view_canvas.items_manager.compile_model ();
         view_canvas.window.event_bus.update_snap_decorators ();
+    }
+
+    private static void translate_group (
+        ViewCanvas view_canvas,
+        Lib2.Items.ModelNode group,
+        InitialDragState initial_drag_state,
+        double delta_x,
+        double delta_y,
+        double snap_offset_x,
+        double snap_offset_y
+    ) {
+        foreach (var child in group.children.data) {
+            if (child.instance.is_group ()) {
+                translate_group (view_canvas, group, initial_drag_state, delta_x, delta_y, snap_offset_x, snap_offset_y);
+                continue;
+            }
+
+            unowned var item = child.instance.item;
+            var item_drag_data = initial_drag_state.item_data_map[child.id];
+            var new_center_x = item_drag_data.item_geometry.area.center_x + delta_x + snap_offset_x;
+            var new_center_y = item_drag_data.item_geometry.area.center_y + delta_y + snap_offset_y;
+            item.components.center = new Lib2.Components.Coordinates (new_center_x, new_center_y);
+            item.mark_geometry_dirty (true);
+        }
     }
 
     public static void scale_from_event (
@@ -255,7 +287,6 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
         double event_x,
         double event_y
     ) {
-
         // TODO WIP
         var blocker = new Lib2.Managers.SelectionManager.ChangeSignalBlocker (view_canvas.selection_manager);
         (void) blocker;
@@ -333,16 +364,21 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
 
         var ct = 0;
         foreach (var node in selection.nodes.values) {
+            if (node.instance.is_group ()) {
+                print ("IMPLEMENT GROUP SCALING\n");
+                ct++;
+                continue;
+            }
             unowned var item = node.instance.item;
-            var item_drag_data = initial_drag_state.items_data[ct];
+            var item_drag_data = initial_drag_state.item_data_map[node.id];
 
-            double new_center_x = item_drag_data.item_center.x + inc_x + size_off_x + grid_offset_x;
-            double new_center_y = item_drag_data.item_center.y + inc_y + size_off_y + grid_offset_y;
+            double new_center_x = item_drag_data.item_geometry.area.center_x + inc_x + size_off_x + grid_offset_x;
+            double new_center_y = item_drag_data.item_geometry.area.center_y + inc_y + size_off_y + grid_offset_y;
 
-            double new_width = item_drag_data.item_size.width + inc_width;
-            double new_height = item_drag_data.item_size.height + inc_height;
+            double new_width = item_drag_data.item_geometry.area.width + inc_width;
+            double new_height = item_drag_data.item_geometry.area.height + inc_height;
 
-            if (item_drag_data.item_rotation.has_normal_rotation ()) {
+            if (Utils.GeometryMath.is_normal_rotation (item_drag_data.item_geometry.area.rotation * 180 / Math.PI)) {
                 new_width = Utils.AffineTransform.fix_size (new_width);
                 new_height = Utils.AffineTransform.fix_size (new_height);
 
@@ -357,10 +393,12 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
 
             item.components.center = new Lib2.Components.Coordinates (new_center_x, new_center_y);
             item.components.size = new Lib2.Components.Size (new_width, new_height, false);
-            item.recompile_geometry (true);
+            item.mark_geometry_dirty ();
 
             ct++;
         }
+
+        view_canvas.items_manager.compile_model ();
     }
 
 
@@ -393,20 +431,26 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
 
         var ct = 0;
         foreach (var node in selection.nodes.values) {
+            if (node.instance.is_group ()) {
+                print ("IMPLEMENT GROUP ROTATION\n");
+                ct++;
+                continue;
+            }
             unowned var item = node.instance.item;
             if (single_item) {
                 new_rotation = GLib.Math.fmod (new_rotation + 360, 360);
                 item.components.rotation = new Lib2.Components.Rotation (new_rotation);
-                item.recompile_geometry (true);
+                item.mark_geometry_dirty ();
+                view_canvas.items_manager.compile_model ();
                 return;
             }
 
-            var item_drag_data = initial_drag_state.items_data[ct];
-            var old_center_x = item_drag_data.item_center.x;
-            var old_center_y = item_drag_data.item_center.y;
+            var item_drag_data = initial_drag_state.item_data_map[item.id];
+            var old_center_x = item_drag_data.item_geometry.area.center_x;
+            var old_center_y = item_drag_data.item_geometry.area.center_y;
 
             var tmp_rotation = new_rotation;
-            var item_rotation = item_drag_data.item_rotation.in_degrees ();
+            var item_rotation = item_drag_data.item_geometry.area.rotation * 180 / Math.PI;
 
             if (old_center_x != original_center_x || old_center_y != original_center_y) {
                 var tr = Cairo.Matrix.identity ();
@@ -424,8 +468,10 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
             tmp_rotation = GLib.Math.fmod (item_rotation + tmp_rotation + 360, 360);
             item.components.rotation = new Lib2.Components.Rotation (tmp_rotation);
 
-            item.recompile_geometry (true);
+            item.mark_geometry_dirty ();
             ct++;
         }
+
+        view_canvas.items_manager.compile_model ();
     }
 }

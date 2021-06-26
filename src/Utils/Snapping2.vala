@@ -96,7 +96,7 @@ public class Akira.Utils.Snapping2 : Object {
         for (var i = 0; i < candidate_list.length; ++i) {
             var item = candidate_list.index(i).instance.item;
 
-            if (item == null || selection.has_id (item.id)) {
+            if (item == null || selection.has_id (item.id, true)) {
                 continue;
             }
 

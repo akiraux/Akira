@@ -46,7 +46,7 @@ public class Akira.Lib2.Items.NodeSelection : Object {
     }
 
     public void add_node (ModelNode node) {
-        if (has_id (node.id)) {
+        if (has_id (node.id, true)) {
             return;
         }
 
@@ -54,6 +54,17 @@ public class Akira.Lib2.Items.NodeSelection : Object {
 
         if (node.instance.is_group ()) {
             groups.add (node.id);
+
+            var to_del = new GLib.Array<int> ();
+            foreach (var test in nodes.keys) {
+                if (node.has_child (test)) {
+                    to_del.append_val (test);
+                }
+            }
+
+            foreach (var did in to_del.data) {
+                nodes.unset (did);
+            }
         }
     }
 
@@ -67,9 +78,17 @@ public class Akira.Lib2.Items.NodeSelection : Object {
         }
     }
 
-    public bool has_id (int id) {
+    public bool has_id (int id, bool nested) {
         if (nodes.has_key (id)) {
             return true;
+        }
+
+        if (groups.contains (id)) {
+            return true;
+        }
+
+        if (!nested) {
+            return false;
         }
 
         foreach (var group in groups) {
@@ -98,7 +117,9 @@ public class Akira.Lib2.Items.NodeSelection : Object {
             }
 
             result = cg.area;
-            result.rotation = item.components.rotation == null ? 0 : item.components.rotation.in_radians ();
+            if (item.components != null && item.components.rotation != null) {
+                result.rotation = item.components.rotation == null ? 0 : item.components.rotation.in_radians ();
+            }
             return result;
         }
 

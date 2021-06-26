@@ -27,11 +27,6 @@ public class Akira.Lib2.Components.CompiledGeometry : Copyable<CompiledGeometry>
 
         // This is the bounding box that contains the rotated area
         public Geometry.Rectangle area_bb;
-
-        // This is cached data used for hit-testing
-        public Cairo.Matrix _ht_transform;
-        public double _ht_half_width;
-        public double _ht_half_height;
     }
 
     private CompiledGeometryData _data;
@@ -63,21 +58,27 @@ public class Akira.Lib2.Components.CompiledGeometry : Copyable<CompiledGeometry>
 
     public Cairo.Matrix transform () { return _data._transform; }
 
-    public bool contains (double x, double y) {
-        x = _data._ht_transform.x0 - x;
-        y = _data._ht_transform.y0 - y;
-        _data._ht_transform.transform_distance (ref x, ref y);
-        return (x >= -_data._ht_half_width && x <= _data._ht_half_width) &&
-               (y >= -_data._ht_half_height && y <= _data._ht_half_height);
+    public static CompiledGeometry compile (Components? components, Lib2.Items.ModelNode? node) {
+        //print ("compile %d\n", (node == null) ? -2 : node.id);
+        var data = CompiledGeometryData ();
+        if (node == null || !node.instance.is_group ()) {
+            if (components == null) {
+                return new CompiledGeometry(data);
+            }
+            compile_item (components, ref data);
+        }
+        else {
+            compile_group (components, node, ref data);
+        }
+
+        return new CompiledGeometry (data);
     }
 
-    public static CompiledGeometry compile (Components components) {
-
+    public static void compile_item (Components? components, ref CompiledGeometryData data) {
         unowned var rotation = components.rotation;
         unowned var size = components.size;
         unowned var center = components.center;
 
-        var data = CompiledGeometryData ();
         data._transform = Cairo.Matrix.identity ();
         data._transform.rotate (rotation.in_radians ());
 
@@ -128,18 +129,52 @@ public class Akira.Lib2.Components.CompiledGeometry : Copyable<CompiledGeometry>
         data.area.bl_y = y2;
         data.area.br_x = x3;
         data.area.br_y = y3;
-
-        data._ht_transform = Cairo.Matrix.identity ();
-        data._ht_transform.rotate (-rotation.in_radians ());
-        data._ht_transform.x0 = center.x;
-        data._ht_transform.y0 = center.y;
-
-        data._ht_half_width = half_width;
-        data._ht_half_height = half_height;
+        data.area.rotation = components.rotation.in_radians ();
 
         Utils.GeometryMath.min_max_coords (x0, x1, x2, x3, ref data.area_bb.left, ref data.area_bb.right);
         Utils.GeometryMath.min_max_coords (y0, y1, y2, y3, ref data.area_bb.top, ref data.area_bb.bottom);
+    }
 
-        return new CompiledGeometry (data);
+    public static void compile_group (Components? components, Lib2.Items.ModelNode? node, ref CompiledGeometryData data) {
+        if (node == null || node.children == null) {
+            return;
+        }
+
+        data._transform = Cairo.Matrix.identity ();
+
+        double top = int.MAX;
+        double bottom = int.MIN;
+        double left = int.MAX;
+        double right = int.MIN;
+
+        foreach (var child in node.children.data) {
+            unowned var cg = child.instance.item.compiled_geometry;
+            if (cg == null) {
+                continue;
+            }
+
+            top = double.min (top, cg.bb_top);
+            bottom = double.max (bottom, cg.bb_bottom);
+            left = double.min (left, cg.bb_left);
+            right = double.max (right, cg.bb_right);
+        }
+
+        data.area.tl_x = left;
+        data.area.tl_y = top;
+        data.area.tr_x = right;
+        data.area.tr_y = top;
+        data.area.bl_x = left;
+        data.area.bl_y = bottom;
+        data.area.br_x = right;
+        data.area.br_y = bottom;
+        data.area.rotation = 0;
+
+        data.area_bb.top = top;
+        data.area_bb.left = left;
+        data.area_bb.bottom = bottom;
+        data.area_bb.right = right;
+
+        data._transform.x0 = data.area_bb.center_x;
+        data._transform.y0 = data.area_bb.center_y;
     }
 }

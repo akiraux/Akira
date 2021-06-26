@@ -139,6 +139,9 @@ public class Akira.Lib2.Items.Model : Object {
     public Gee.HashMap<int, ModelNode> group_nodes;
     public Gee.HashMap<int, ModelNode> item_nodes;
 
+    public Gee.HashSet<int> dirty_items;
+    public Gee.HashSet<int> dirty_groups;
+
     private bool needs_dag_build = true;
 
     construct {
@@ -147,9 +150,15 @@ public class Akira.Lib2.Items.Model : Object {
         item_nodes = new Gee.HashMap<int, ModelNode> ();
         group_nodes = new Gee.HashMap<int, ModelNode> ();
 
+        dirty_items = new Gee.HashSet<int> ();
+        dirty_groups = new Gee.HashSet<int> ();
+
         var group_instance = new ModelInstance (origin_id, null);
-        group_map[origin_id] = group_instance;
-        group_nodes[origin_id] = new ModelNode (group_instance, 0);
+        add_to_maps (new ModelNode (group_instance, 0), false);
+    }
+
+    public void compile_geometries () {
+        internal_compile_geometries ();
     }
 
     public ModelInstance? instance_from_id (int id) {
@@ -212,7 +221,7 @@ public class Akira.Lib2.Items.Model : Object {
             return;
         }
 
-        inner_recalculate_children_stacking (group);
+        internal_recalculate_children_stacking (group);
     }
 
     public int remove (int id, bool restack) {
@@ -414,13 +423,7 @@ public class Akira.Lib2.Items.Model : Object {
 
         var new_node = new ModelNode (candidate, (int) pos);
 
-        if (candidate.is_group ()) {
-            group_map[new_id] = candidate;
-            group_nodes[new_id] = new_node;
-        } else {
-            item_map[new_id] = candidate;
-            item_nodes[new_id] = new_node;
-        }
+        add_to_maps (new_node, true);
 
         if (parent_node.children == null) {
             parent_node.children = new GLib.Array<unowned ModelNode> ();
@@ -472,8 +475,30 @@ public class Akira.Lib2.Items.Model : Object {
         return 0;
     }
 
+    private void add_to_maps (ModelNode node, bool listen) {
+        if (node.instance.is_group ()) {
+            group_map[node.id] = node.instance;
+            group_nodes[node.id] = node;
+        } else {
+            item_map[node.id] = node.instance;
+            item_nodes[node.id] = node;
+        }
+
+        if (listen) {
+            node.instance.item.geometry_compilation_requested.connect (on_item_geometry_changed);
+        }
+    }
+
+
     private void remove_from_maps (int id) {
-        if (id <item_start_id) {
+        var target = instance_from_id (id);
+        if (target == null) {
+            return;
+        }
+
+        target.item.geometry_compilation_requested.disconnect (on_item_geometry_changed);
+
+        if (id < item_start_id) {
             group_nodes.unset(id);
             group_map.unset(id);
         } else {
@@ -508,14 +533,74 @@ public class Akira.Lib2.Items.Model : Object {
             builder.append ("_");
         }
 
-        builder.append (node.pos_in_parent.to_string ());
+        builder.append ((node.id == origin_id) ? node.id.to_string () : node.pos_in_parent.to_string ());
     }
 
-    private void inner_recalculate_children_stacking (ModelNode parent_node) {
+    private void on_item_geometry_changed (int id) {
+        var target = node_from_id (id);
+
+        if (target.instance.is_group ()) {
+            dirty_groups.add (id);
+        }
+        else {
+            dirty_items.add (id);
+        }
+
+        var parent = target.parent;
+        while (parent.id != origin_id) {
+            parent.instance.item.mark_geometry_dirty (false);
+            on_item_geometry_changed (parent.id);
+            parent = parent.parent;
+        }
+    }
+
+    private void internal_recalculate_children_stacking (ModelNode parent_node) {
         int ct = 0;
         foreach (unowned var child in parent_node.children.data) {
             child.pos_in_parent = ct++;
         }
+    }
+    
+
+    private void internal_compile_geometries () {
+
+        // create a timer object:
+        ulong microseconds;
+        double seconds;
+        Timer timer = new Timer ();
+        timer.start ();
+
+        if (dirty_items.size == 0 && dirty_groups.size == 0) {
+            return;
+        }
+
+        foreach (var leaf in dirty_items) {
+            var node = node_from_id (leaf);
+            node.instance.item.compile_components (true, node);
+        }
+
+        timer.stop ();
+        seconds = timer.elapsed (out microseconds);
+
+        dirty_items.clear ();
+
+        if (dirty_groups.size == 0) {
+            return;
+        }
+
+        var sorted = new Gee.TreeMap<string, ModelNode> ();
+        foreach (var group_id in dirty_groups) {
+            var group_node = node_from_id (group_id);
+            sorted[path_from_node (group_node)] = group_node;
+        }
+
+        var it = sorted.bidir_map_iterator ();
+        for (var has_next = it.last (); has_next; has_next = it.previous ()) {
+            var node = it.get_value ();
+            node.instance.item.compile_components (true, node);
+        }
+
+        dirty_groups.clear ();
     }
 }
 

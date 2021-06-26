@@ -43,7 +43,7 @@ public class Akira.Lib2.Items.DummyGroupType : Object, ModelType<DummyGroupType>
     public bool is_group () { return true; }
 }
 
-public class Akira.Lib2.Items.ModelItem {
+public class Akira.Lib2.Items.ModelItem : Object {
     public int id = -1;
     public Lib2.Items.CanvasItem canvas_item = null;
     // Only non-null if it is a group with an associated canvas (e.g., artboard)
@@ -76,6 +76,12 @@ public class Akira.Lib2.Items.ModelItem {
 
     public signal void geometry_changed (int id);
 
+    /*
+     * When an item is a part of the model, this signal will be used to let the model know
+     * that this item needs to have its geometry compiled.
+     */
+    public signal void geometry_compilation_requested (int id);
+
     public ModelItem clone () {
         var cln = new ModelItem ();
         if (components != null) {
@@ -85,21 +91,36 @@ public class Akira.Lib2.Items.ModelItem {
         return cln;
     }
 
-    public void compile_components (bool notify_view) {
-        compiled_components.maybe_compile_geometry (components);
-        compiled_components.maybe_compile_fill (components);
-        compiled_components.maybe_compile_border (components);
+    /*
+     * Invalidates compiled geometry and requests a listener (the model) to eventually
+     * update this geometry. At the end of a scope that called this method, the model
+     * should be told to recompile all dirty items.
+     */
+    public void mark_geometry_dirty (bool notify_listeners = true) {
+        compiled_components.compiled_geometry = null;
 
-        if (notify_view) {
-            notify_view_of_changes ();
+        if (notify_listeners) {
+            geometry_compilation_requested (id);
         }
     }
 
-    public void recompile_geometry (bool notify) {
-        compiled_components.compiled_geometry = null;
-        compiled_components.maybe_compile_geometry (components);
+    public void mark_cosmetics_dirty () {
+        compiled_components.compiled_fill = null;
+        compiled_components.compiled_border = null;
+    }
 
-        if (notify) {
+    /*
+     * Compiles the component for this item. If a corresponding node is passed, that node
+     * is used in the compilation process.
+     * This should almost always be called by the model--unless you really know what you are doing.
+     * If in doubt, you don't.
+     */
+    public void compile_components (bool notify_view, ModelNode? node) {
+        compiled_components.maybe_compile_geometry (components, node);
+        compiled_components.maybe_compile_fill (components, node);
+        compiled_components.maybe_compile_border (components, node);
+
+        if (notify_view) {
             notify_view_of_changes ();
         }
     }

@@ -36,7 +36,7 @@ public class Akira.Lib2.Managers.SelectionManager : Object {
 
         ~ChangeSignalBlocker () {
             manager.block_change_notifications -= 1;
-            manager.on_selection_changed ();
+            manager.on_selection_changed (-1);
         }
 
     }
@@ -65,7 +65,7 @@ public class Akira.Lib2.Managers.SelectionManager : Object {
         }
 
         selection = new Lib2.Items.NodeSelection (null);
-        on_selection_changed ();
+        on_selection_changed (-1);
     }
 
     public void add_to_selection (int id) {
@@ -74,16 +74,18 @@ public class Akira.Lib2.Managers.SelectionManager : Object {
             return;
         }
         selection.add_node (node);
-        on_selection_changed ();
+        on_selection_changed (-1);
     }
 
     public bool item_selected (int id) {
-        return selection.has_id (id);
+        return selection.has_id (id, true);
     }
 
-    public void on_selection_changed () {
+    public void on_selection_changed (int id) {
         if (block_change_notifications == 0) {
-            view_canvas.window.event_bus.selection_modified ();
+            if (id < 0 || selection.has_id (id, false)) {
+                view_canvas.window.event_bus.selection_modified ();
+            }
         }
     }
 

@@ -75,15 +75,16 @@ public class Akira.Lib2.Managers.HoverManager : Object {
             remove_hover_effect ();
         }
 
-        if (item.item_type.is_group ()) {
-            remove_hover_effect ();
-            return;
-        }
+        double item_width = 0;
+        double item_height = 0;
+
+        item_width = item.compiled_geometry.area.width;
+        item_height = item.compiled_geometry.area.height;
 
         var scale = view_canvas.current_scale;
 
-        var width = item.components.size.width + LINE_WIDTH / 4.0 / scale;
-        var height = item.components.size.height + LINE_WIDTH / 4.0 / scale;
+        var width = item_width + LINE_WIDTH / 4.0 / scale;
+        var height = item_height + LINE_WIDTH / 4.0 / scale;
 
         hover_effect = new Goo.CanvasRect (
             null,

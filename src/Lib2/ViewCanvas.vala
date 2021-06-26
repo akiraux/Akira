@@ -192,7 +192,7 @@ public class Akira.Lib2.ViewCanvas : Goo.Canvas {
         }
 
         if (uppercase_keyval == Gdk.Key.G) {
-            items_manager.add_debug_group (300, 300);
+            items_manager.add_debug_group (300, 300, true);
             return true;
         }
 
@@ -272,7 +272,7 @@ public class Akira.Lib2.ViewCanvas : Goo.Canvas {
         var nob_clicked = nob_manager.hit_test (event.x, event.y);
 
         if (nob_clicked == Utils.Nobs.Nob.NONE) {
-            var target = items_manager.hit_test (event.x, event.y);
+            var target = items_manager.hit_test (event.x, event.y, false);
             if (target != null) {
                 if (!selection_manager.item_selected (target.id)) {
                     selection_manager.add_to_selection (target.id);

@@ -34,12 +34,12 @@ public class Akira.Lib2.Components.CompiledComponents {
     /*
      * Return true if new fill color was generated.
      */
-    public bool maybe_compile_fill (Components components) {
+    public bool maybe_compile_fill (Components? components, Lib2.Items.ModelNode? node) {
         if (compiled_fill != null) {
             return false;
         }
 
-        compiled_fill = CompiledFill.compile (components);
+        compiled_fill = CompiledFill.compile (components, node);
         dirty_components.mark_dirty (Component.Type.COMPILED_FILL, true);
         return true;
     }
@@ -47,11 +47,11 @@ public class Akira.Lib2.Components.CompiledComponents {
     /*
      * Return true if new border color was generated.
      */
-    public bool maybe_compile_border (Components components) {
+    public bool maybe_compile_border (Components? components, Lib2.Items.ModelNode? node) {
         if (compiled_border != null) {
             return false;
         }
-        compiled_border = CompiledBorder.compile (components);
+        compiled_border = CompiledBorder.compile (components, node);
         dirty_components.mark_dirty (Component.Type.COMPILED_BORDER, true);
         return true;
     }
@@ -59,12 +59,12 @@ public class Akira.Lib2.Components.CompiledComponents {
     /*
      * Return true if new geometry was generated.
      */
-    public bool maybe_compile_geometry (Components components) {
+    public bool maybe_compile_geometry (Components? components, Lib2.Items.ModelNode? node) {
         if (compiled_geometry != null) {
             return false;
         }
 
-        compiled_geometry = CompiledGeometry.compile (components);
+        compiled_geometry = CompiledGeometry.compile (components, node);
         dirty_components.mark_dirty (Component.Type.COMPILED_GEOMETRY, true);
         return true;
     }
