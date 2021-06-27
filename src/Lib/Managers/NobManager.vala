@@ -442,13 +442,10 @@ public class Akira.Lib.Managers.NobManager : Object {
 
             var nob_name = nob.handle_id;
 
-            calculate_nob_position ( nob_name, nob_data, ref center_x, ref center_y );
+            calculate_nob_position (nob_name, nob_data, ref center_x, ref center_y);
 
-            if (!print_middle_height_nobs && (nob_name == Nob.RIGHT_CENTER || nob_name == Nob.LEFT_CENTER)) {
-                set_visible = false;
-            } else if (!print_middle_width_nobs && (nob_name == Nob.TOP_CENTER || nob_name == Nob.BOTTOM_CENTER)) {
-                set_visible = false;
-            } else if (nob.handle_id == Nob.ROTATE) {
+            // Unique calculation for the rotation nob.
+            if (nob.handle_id == Nob.ROTATE) {
                 double line_offset_x = 0;
                 double line_offset_y = - (LINE_HEIGHT / canvas.current_scale);
                 nob_data.bb_matrix.transform_distance (ref line_offset_x, ref line_offset_y);
@@ -480,11 +477,38 @@ public class Akira.Lib.Managers.NobManager : Object {
                 // Raise to the rotation_line, so the line is under the rotation nob.
                 nob.update_state (nob_data.bb_matrix, center_x, center_y, set_visible);
                 nob.raise (rotation_line);
-                return;
+                continue;
+            }
+
+            // Check if we need to hide the vertically centered nobs.
+            if (!print_middle_height_nobs && (nob_name == Nob.RIGHT_CENTER || nob_name == Nob.LEFT_CENTER)) {
+                set_visible = false;
+            }
+
+            // Check if we need to hide the horizontally centere nobs.
+            if (!print_middle_width_nobs && (nob_name == Nob.TOP_CENTER || nob_name == Nob.BOTTOM_CENTER)) {
+                set_visible = false;
             }
 
             nob.update_state (nob_data.bb_matrix, center_x, center_y, set_visible);
             nob.raise (select_effect);
+
+            // If we're hiding all centered nobs, we need to shift the position
+            // of the corner nobs to improve the grabbing area.
+            if (!print_middle_width_nobs && !print_middle_height_nobs) {
+                var half = nob_size / 2;
+
+                // Use Cairo.translate to automatically account for the item's rotation.
+                if (nob_name == Nob.TOP_LEFT) {
+                    nob.translate (-half, -half);
+                } else if (nob_name == Nob.TOP_RIGHT) {
+                    nob.translate (half, -half);
+                } else if (nob_name == Nob.BOTTOM_RIGHT) {
+                    nob.translate (half, half);
+                } else if (nob_name == Nob.BOTTOM_LEFT) {
+                    nob.translate (-half, half);
+                }
+            }
         }
     }
 
