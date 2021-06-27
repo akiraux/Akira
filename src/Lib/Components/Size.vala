@@ -43,7 +43,6 @@ public class Akira.Lib.Components.Size : Component {
                 auto_resize = true;
                 if (item is Items.CanvasImage && Utils.AffineTransform.fix_size (value / ratio) < 1) {
                     height = 1;
-                    print("SHit");
                 }
                 else {
                     height = Utils.AffineTransform.fix_size (value / ratio);
