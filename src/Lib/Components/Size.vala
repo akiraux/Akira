@@ -41,7 +41,13 @@ public class Akira.Lib.Components.Size : Component {
 
             if (locked && !auto_resize) {
                 auto_resize = true;
-                height = Utils.AffineTransform.fix_size (value / ratio);
+                if (item is Items.CanvasImage && Utils.AffineTransform.fix_size (value / ratio) < 1) {
+                    height = 1;
+                    print("SHit");
+                }
+                else {
+                    height = Utils.AffineTransform.fix_size (value / ratio);
+                }
                 auto_resize = false;
             }
 
@@ -70,7 +76,12 @@ public class Akira.Lib.Components.Size : Component {
 
             if (locked && !auto_resize) {
                 auto_resize = true;
-                width = Utils.AffineTransform.fix_size (value * ratio);
+                if (item is Items.CanvasImage && Utils.AffineTransform.fix_size (value / ratio) < 1) {
+                    width = 2;
+                }
+                else {
+                    width = Utils.AffineTransform.fix_size (value / ratio);
+                }
                 auto_resize = false;
             }
 
