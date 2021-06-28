@@ -12,7 +12,7 @@ msgstr ""
 "Language-Team: Italian <saverio.morelli@outlook.it>\n"
 "Language: it\n"
 "Content-Transfer-Encoding: 8bit\n"
-"PO-Revision-Date: 2021-06-28 03:30+0200\n"
+"PO-Revision-Date: 2021-06-28 18:59+0200\n"
 "X-Generator: Gtranslator 40.0\n"
 
 #: Dialogs/ExportDialog.vala:151
@@ -62,8 +62,8 @@ msgid ""
 msgstr ""
 "ATTENZIONE!\n"
 "Akira è ancora in fase di sviluppo e non è pronta per la produzione. "
-"Potrebbero verificarsi bug casuali, funzionalità mancanti, buchi neri "
-"durante l'apertura nella tua cucina."
+"Potrebbero verificarsi bug casuali, funzionalità mancanti, o apertura di "
+"buchi neri nella tua cucina."
 
 #: Dialogs/ReleaseDialog.vala:100 Dialogs/SettingsDialog.vala:249
 msgid "Make a Donation"
@@ -113,7 +113,7 @@ msgstr "Inverti l'ordine dei pannelli:"
 
 #: Dialogs/SettingsDialog.vala:96
 msgid "Restart application to apply this change."
-msgstr "Riavvia l'applicazione per applicare questa modifica"
+msgstr "Riavvia l'applicazione  applicare questa modifica"
 
 #: Dialogs/SettingsDialog.vala:100
 msgid "ToolBar Style"
@@ -158,7 +158,7 @@ msgstr "Lo strumento di design di Linux"
 
 #: Dialogs/SettingsDialog.vala:226
 msgid "Thanks to our awesome supporters!"
-msgstr "Grazie per ai nostri meravigliosi collaboratori!"
+msgstr "Grazie ai nostri meravigliosi collaboratori!"
 
 #: Dialogs/SettingsDialog.vala:231
 msgid "View the list of supporters"
@@ -266,7 +266,7 @@ msgstr "Porta la selezione in primo piano:"
 
 #: Dialogs/ShortcutsDialog.vala:104
 msgid "Lower selection to bottom:"
-msgstr "Porta la selezione più in basso:"
+msgstr "Porta la selezione in ultimo piano:"
 
 #: Dialogs/ShortcutsDialog.vala:106
 msgid "Flip horizontally:"
@@ -425,7 +425,7 @@ msgstr "Menu principale"
 #: Services/ActionManager.vala:237 Services/ActionManager.vala:256
 #, c-format
 msgid "Unable to open file at '%s'"
-msgstr "Non è possibile aprirle il file '%s'"
+msgstr "Non è possibile aprirle il file “%s”"
 
 #: Layouts/MainCanvas.vala:52
 msgid "Button was pressed!"
@@ -470,20 +470,20 @@ msgstr "Allineamento in basso"
 #: Layouts/Partials/Artboard.vala:144 Layouts/Partials/Artboard.vala:487
 #: Layouts/Partials/Layer.vala:139 Layouts/Partials/Layer.vala:687
 msgid "Lock Layer"
-msgstr "Blocca layer"
+msgstr "Blocca livello"
 
 #: Layouts/Partials/Artboard.vala:155 Layouts/Partials/Artboard.vala:529
 #: Layouts/Partials/Layer.vala:156 Layouts/Partials/Layer.vala:729
 msgid "Hide Layer"
-msgstr "Nascondi layer"
+msgstr "Nascondi livello"
 
 #: Layouts/Partials/Artboard.vala:487 Layouts/Partials/Layer.vala:687
 msgid "Unlock Layer"
-msgstr "Sblocca layer"
+msgstr "Sblocca livello"
 
 #: Layouts/Partials/Artboard.vala:529 Layouts/Partials/Layer.vala:729
 msgid "Show Layer"
-msgstr "Mostra layer"
+msgstr "Mostra livello"
 
 #: Layouts/Partials/BorderRadiusPanel.vala:86
 msgid "Style"
@@ -575,7 +575,7 @@ msgstr "Opacità"
 
 #: Layouts/RightSideBar.vala:111
 msgid "Search Layer"
-msgstr "Cerca layer"
+msgstr "Cerca livello"
 
 #: Lib/Managers/ExportManager.vala:192 Lib/Managers/ExportManager.vala:219
 msgid "Generating preview, please wait…"
@@ -597,7 +597,7 @@ msgstr "%i × %i px · %s"
 
 #: Partials/ExportWidget.vala:124
 msgid "Fetching image size…"
-msgstr "Calcolo delle dimenzioni dell'immagine in corso…"
+msgstr "Calcolo delle dimensioni dell'immagine in corso…"
 
 #: Partials/ZoomButton.vala:49
 msgid "Zoom Out"
