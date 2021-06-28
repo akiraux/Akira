@@ -86,17 +86,17 @@ public class Akira.Lib2.Components.Components {
     
     public Components copy () {
         var cln = new Components ();
-        cln.borders = (borders == null) ? null : borders.copy ();
-        cln.border_radius = (border_radius == null) ? null : border_radius.copy ();
-        cln.fills = (fills == null) ? null : fills.copy ();
-        cln.flipped = (flipped == null) ? null : flipped.copy ();
-        cln.layer = (layer == null) ? null : layer.copy ();
-        cln.name = (name == null) ? null : name.copy ();
-        cln.opacity = (opacity == null) ? null : opacity.copy ();
+        cln.borders = (borders == null) ? null : borders;
+        cln.border_radius = (border_radius == null) ? null : border_radius;
+        cln.fills = (fills == null) ? null : fills;
+        cln.flipped = (flipped == null) ? null : flipped;
+        cln.layer = (layer == null) ? null : layer;
+        cln.name = (name == null) ? null : name;
+        cln.opacity = (opacity == null) ? null : opacity;
 
-        cln.center = (center == null) ? null : center.copy ();
-        cln.size = (size == null) ? null : size.copy ();
-        cln.rotation = (rotation == null) ? null : rotation.copy ();
+        cln.center = (center == null) ? null : center;
+        cln.size = (size == null) ? null : size;
+        cln.rotation = (rotation == null) ? null : rotation;
 
         return cln;
     }

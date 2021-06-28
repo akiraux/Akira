@@ -59,7 +59,6 @@ public class Akira.Lib2.Components.CompiledGeometry : Copyable<CompiledGeometry>
     public Cairo.Matrix transform () { return _data._transform; }
 
     public static CompiledGeometry compile (Components? components, Lib2.Items.ModelNode? node) {
-        //print ("compile %d\n", (node == null) ? -2 : node.id);
         var data = CompiledGeometryData ();
         if (node == null || !node.instance.is_group ()) {
             if (components == null) {

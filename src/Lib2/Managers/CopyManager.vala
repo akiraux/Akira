@@ -22,7 +22,7 @@
 public class Akira.Lib2.Managers.CopyManager : Object {
     public unowned ViewCanvas view_canvas { get; construct; }
 
-    public Gee.TreeMap<Lib2.Items.PositionKey, Lib2.Items.ModelItem> candidates;
+    private Lib2.Items.Model copy_model;
 
     public CopyManager (ViewCanvas canvas) {
         Object (view_canvas : canvas);
@@ -34,23 +34,31 @@ public class Akira.Lib2.Managers.CopyManager : Object {
     }
 
     public void do_copy () {
-        candidates = new Gee.TreeMap<Lib2.Items.PositionKey, Lib2.Items.ModelItem> (Lib2.Items.PositionKey.compare);
+        copy_model = new Lib2.Items.Model ();
 
+        int res = 0;
         foreach (var to_copy in view_canvas.selection_manager.selection.nodes.values) {
-
-            var original_node = view_canvas.items_manager.item_model.node_from_id (to_copy.id);
-            var key = new Lib2.Items.PositionKey ();
-            key.parent_path = view_canvas.items_manager.item_model.path_from_node (original_node.parent);
-            key.pos_in_parent = original_node.pos_in_parent;
-
-            var cln = to_copy.instance.item.clone ();
-            cln.id = -1;
-            candidates[key] = cln;
+            res += Utils.ModelUtil.clone_from_model (
+                view_canvas.items_manager.item_model,
+                to_copy.id,
+                copy_model,
+                Lib2.Items.Model.origin_id
+            );
         }
+
+        var children = copy_model.node_from_id (Lib2.Items.Model.origin_id).children;
+
+        assert (res == 0);
     }
 
     public void do_paste () {
-        if (candidates.size == 0) {
+        if (copy_model == null) {
+            return;
+        }
+
+        var children = copy_model.node_from_id (Lib2.Items.Model.origin_id).children;
+
+        if (children == null || children.length == 0) {
             return;
         }
 
@@ -59,10 +67,17 @@ public class Akira.Lib2.Managers.CopyManager : Object {
 
         view_canvas.selection_manager.reset_selection ();
 
-        foreach (var cand in candidates) {
-            var cln = cand.value.clone ();
-            view_canvas.items_manager.add_item_to_origin (cln);
-            view_canvas.selection_manager.add_to_selection (cln.id);
+        int res = 0;
+        foreach (var child in children.data) {
+            res += Utils.ModelUtil.clone_from_model (
+                copy_model,
+                child.id,
+                view_canvas.items_manager.item_model,
+                Lib2.Items.Model.origin_id
+            );
         }
+
+        view_canvas.items_manager.compile_model ();
+        assert (res == 0);
     }
 }

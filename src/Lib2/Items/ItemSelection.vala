@@ -46,7 +46,11 @@ public class Akira.Lib2.Items.NodeSelection : Object {
     }
 
     public void add_node (ModelNode node) {
-        if (has_id (node.id, true)) {
+        if (has_id (node.id, false)) {
+            return;
+        }
+
+        if (ancestor_selected (node)) {
             return;
         }
 
@@ -183,5 +187,17 @@ public class Akira.Lib2.Items.NodeSelection : Object {
         result.left = left;
         result.right = right;
         return result;
+    }
+
+    private bool ancestor_selected (ModelNode target) {
+        var parent = target.parent;
+        while (parent.id != Model.origin_id) {
+            if (groups.contains (parent.id)) {
+                return true;
+            }
+            parent = parent.parent;
+        }
+
+        return false;
     }
 }

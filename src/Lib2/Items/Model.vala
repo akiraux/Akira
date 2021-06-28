@@ -19,96 +19,6 @@
  * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
  */
 
-public class Akira.Lib2.Items.ModelInstance {
-    public int id;
-    public ModelItem item;
-    public int[] children;
-
-    public ModelInstance (int uid, ModelItem? item) {
-        if (item == null || item.item_type.is_group ()) {
-            this.children = new int[0];
-        }
-        this.id = uid;
-        this.item = item;
-        if (item != null) {
-            this.item.id = uid;
-        }
-    }
-
-    public bool is_group () { return item == null || item.item_type.is_group (); }
-}
-
-public class Akira.Lib2.Items.ModelNode {
-    public int id;
-    // This is the position of the node relative to its parent.
-    public int pos_in_parent = -1;
-    public unowned ModelInstance instance;
-
-    public unowned ModelNode parent = null;
-    public GLib.Array<unowned ModelNode> children;
-
-    public ModelNode (ModelInstance instance, int pos_in_parent) {
-        this.instance = instance;
-        this.id = instance.id;
-        this.pos_in_parent = pos_in_parent;
-    }
-
-    public void swap_children (int pos, int newpos) {
-        var tmp = children.data[pos];
-        children.data[pos] = children.data[newpos];
-        children.data[newpos] = tmp;
-    }
-
-    public bool has_child (int id, bool recurse = true) {
-        if (children == null) {
-            return false;
-        }
-
-        foreach (var child in children.data) {
-            if (child.id == id) {
-                return true;
-            }
-
-            if (recurse && child.instance.is_group ()) {
-                if (child.has_child (id)) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-}
-
-public class Akira.Lib2.Items.PositionKey
-{
-    public string parent_path;
-    public int pos_in_parent;
-
-    public static int compare (PositionKey a, PositionKey b) {
-        if (a.parent_path == b.parent_path) {
-            if (a.pos_in_parent == b.pos_in_parent) {
-                return 0;
-            }
-
-            return a.pos_in_parent < b.pos_in_parent ? -1 : 1;
-
-        }
-
-        return a.parent_path < b.parent_path ? -1 : 1;
-    }
-}
-
-public class Akira.Lib2.Items.ChildrenSet
-{
-    public ModelNode parent_node;
-    public int first_child;
-    public int length;
-
-    // optional array with children nodes
-    public GLib.Array<unowned ModelNode> children_in_set;
-}
-
 /*
  * Holds maps to instances that define connectivity between items and groups.
  * Holds a dag based on nodes (starting from an origin node with `origin_id`.
@@ -143,6 +53,11 @@ public class Akira.Lib2.Items.Model : Object {
     public Gee.HashSet<int> dirty_groups;
 
     private bool needs_dag_build = true;
+    private bool is_live = false;
+
+    public Model.live_model () {
+        is_live = true;
+    }
 
     construct {
         item_map = new Gee.HashMap<int, ModelInstance> ();
@@ -156,6 +71,9 @@ public class Akira.Lib2.Items.Model : Object {
         var group_instance = new ModelInstance (origin_id, null);
         add_to_maps (new ModelNode (group_instance, 0), false);
     }
+
+    public signal void item_added (int id);
+    public signal void item_geometry_changed (int id);
 
     public void compile_geometries () {
         internal_compile_geometries ();
@@ -361,12 +279,6 @@ public class Akira.Lib2.Items.Model : Object {
         return null;
     }
 
-    public void maybe_rebuild_dag () {
-        if (needs_dag_build) {
-            build_dag (group_map, item_map, ref group_nodes, ref item_nodes);
-        }
-    }
-
     public void print_instances () {
         print ("Groups: \n");
         foreach (var inst in group_map) {
@@ -420,7 +332,6 @@ public class Akira.Lib2.Items.Model : Object {
             candidate.item.id = new_id;
         }
 
-
         var new_node = new ModelNode (candidate, (int) pos);
 
         add_to_maps (new_node, true);
@@ -447,6 +358,9 @@ public class Akira.Lib2.Items.Model : Object {
         }
 
         new_node.parent = parent_node;
+
+        new_node.instance.item.mark_geometry_dirty ();
+
         return new_id;
     }
 
@@ -476,6 +390,7 @@ public class Akira.Lib2.Items.Model : Object {
     }
 
     private void add_to_maps (ModelNode node, bool listen) {
+
         if (node.instance.is_group ()) {
             group_map[node.id] = node.instance;
             group_nodes[node.id] = node;
@@ -484,8 +399,10 @@ public class Akira.Lib2.Items.Model : Object {
             item_nodes[node.id] = node;
         }
 
-        if (listen) {
-            node.instance.item.geometry_compilation_requested.connect (on_item_geometry_changed);
+        if (is_live && listen) {
+            item_added (node.id);
+            node.instance.item.geometry_changed.connect (on_item_geometry_changed);
+            node.instance.item.geometry_compilation_requested.connect (on_item_geometry_compilation_requested);
         }
     }
 
@@ -496,7 +413,10 @@ public class Akira.Lib2.Items.Model : Object {
             return;
         }
 
-        target.item.geometry_compilation_requested.disconnect (on_item_geometry_changed);
+        if (is_live) {
+            target.item.geometry_changed.disconnect (on_item_geometry_changed);
+            target.item.geometry_compilation_requested.disconnect (on_item_geometry_compilation_requested);
+        }
 
         if (id < item_start_id) {
             group_nodes.unset(id);
@@ -505,23 +425,6 @@ public class Akira.Lib2.Items.Model : Object {
             item_nodes.unset(id);
             item_map.unset(id);
         }
-    }
-
-    private static void build_dag (
-        Gee.HashMap<int, ModelInstance> group_map,
-        Gee.HashMap<int, ModelInstance> item_map,
-        ref Gee.HashMap<int, ModelNode> group_nodes,
-        ref Gee.HashMap<int, ModelNode>? item_nodes
-    ) {
-    }
-
-    private static void build_dag_recursive (
-        ModelNode node,
-        Gee.HashMap<int, ModelInstance> group_map,
-        Gee.HashMap<int, ModelInstance> item_map,
-        ref Gee.HashMap<int, ModelNode> group_nodes,
-        ref Gee.HashMap<int, ModelNode>? item_nodes
-    ) {
     }
 
     private void build_path_recursive (ModelNode node, ref StringBuilder builder) {
@@ -537,20 +440,30 @@ public class Akira.Lib2.Items.Model : Object {
     }
 
     private void on_item_geometry_changed (int id) {
+        item_geometry_changed (id);
+    }
+
+    private void on_item_geometry_compilation_requested (int id) {
+        if (!is_live) {
+            return;
+        }
         var target = node_from_id (id);
 
-        if (target.instance.is_group ()) {
-            dirty_groups.add (id);
-        }
-        else {
-            dirty_items.add (id);
-        }
+        mark_dirty (target);
 
         var parent = target.parent;
         while (parent.id != origin_id) {
             parent.instance.item.mark_geometry_dirty (false);
-            on_item_geometry_changed (parent.id);
+            on_item_geometry_compilation_requested (parent.id);
             parent = parent.parent;
+        }
+    }
+
+    private void mark_dirty (ModelNode node) {
+        if (node.instance.is_group ()) {
+            dirty_groups.add (node.id);
+        } else {
+            dirty_items.add (node.id);
         }
     }
 
@@ -563,12 +476,9 @@ public class Akira.Lib2.Items.Model : Object {
     
 
     private void internal_compile_geometries () {
-
-        // create a timer object:
-        ulong microseconds;
-        double seconds;
-        Timer timer = new Timer ();
-        timer.start ();
+        if (!is_live) {
+            return;
+        }
 
         if (dirty_items.size == 0 && dirty_groups.size == 0) {
             return;
@@ -578,9 +488,6 @@ public class Akira.Lib2.Items.Model : Object {
             var node = node_from_id (leaf);
             node.instance.item.compile_components (true, node);
         }
-
-        timer.stop ();
-        seconds = timer.elapsed (out microseconds);
 
         dirty_items.clear ();
 

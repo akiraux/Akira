@@ -30,7 +30,9 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
     }
 
     construct {
-        item_model = new Lib2.Items.Model ();
+        item_model = new Lib2.Items.Model.live_model ();
+        item_model.item_geometry_changed.connect (on_item_geometry_changed);
+        item_model.item_added.connect (on_item_added);
     }
 
     public Lib2.Items.ModelInstance? instance_from_id (int id) {
@@ -54,16 +56,10 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
             return -1;
         }
 
-        item.geometry_changed.connect (on_item_geometry_changed);
-        item.mark_geometry_dirty ();
-
         if (!pause_compile) {
             compile_model ();
         }
 
-        item.add_to_canvas (view_canvas);
-
-        item.notify_view_of_changes ();
         return item.id;
     }
 
@@ -427,6 +423,13 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
             timer.stop ();
             seconds = timer.elapsed (out microseconds);
             print ("Created %u items in %s s\n", num_of, seconds.to_string ());
+        }
+    }
+
+    public void on_item_added (int id) {
+        var inst = item_model.instance_from_id (id);
+        if (inst != null) {
+            inst.item.add_to_canvas (view_canvas);
         }
     }
 
