@@ -328,16 +328,10 @@ public class Akira.Widgets.ColorRow : Gtk.Grid {
 
     private void on_eyedropper_click () {
         var eyedropper = new Akira.Utils.ColorPicker ();
-        eyedropper.show_all ();
 
         eyedropper.picked.connect ((picked_color) => {
             init_color_chooser ();
             color_chooser_widget.set_rgba (picked_color);
-            eyedropper.close ();
-        });
-
-        eyedropper.cancelled.connect (() => {
-            eyedropper.close ();
         });
     }
 }

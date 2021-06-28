@@ -23,7 +23,16 @@
     "--filesystem=xdg-run/gvfs",
     "--filesystem=xdg-run/gvfsd"
   ],
-  "modules": [{
+  "modules": [
+   {
+      "name": "libportal",
+      "buildsystem": "meson",
+      "sources": [{
+        "type": "git",
+        "url": "https://github.com/flatpak/libportal.git"
+      }]
+  },
+  {
       "name": "goocanvas",
       "config-opts": ["--enable-python=no"],
       "build-options": {
