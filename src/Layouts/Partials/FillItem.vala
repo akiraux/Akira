@@ -86,13 +86,6 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         hidden_button.clicked.connect (toggle_visibility);
     }
 
-    private void on_color_changed () {
-        color_set_manually = true;
-        color = color_chooser_widget.rgba.to_string ();
-        alpha = ((int)(color_chooser_widget.rgba.alpha * 255));
-        set_button_color ();
-    }
-
     private void on_delete_item () {
         fill.remove ();
         fill_deleted ();
