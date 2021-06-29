@@ -21,17 +21,25 @@
 public class Akira.Widgets.DirectionLine {
     private Lib.Selection.Nob start_nob;
     private Lib.Selection.Nob end_nob;
+
+    // dummy identity matrix
+    private Cairo.Matrix identity_mat = Cairo.Matrix.identity();
     
     public DirectionLine (Window window, GradientEditor gradient_editor) {
-        var root = window.main_window.main_canvas.canvas.get_root_item();
+        var canvas = window.main_window.main_canvas.canvas as Lib.Canvas;
+        var root = canvas.get_root_item();
+
         start_nob = new Lib.Selection.Nob(root, Lib.Managers.NobManager.Nob.GRADIENT_START);
         end_nob = new Lib.Selection.Nob(root, Lib.Managers.NobManager.Nob.GRADIENT_END);
 
         start_nob.set_rectangle();
         end_nob.set_rectangle();
 
-        start_nob.update_state(Cairo.Matrix.identity(), 50, 50, false);
-        end_nob.update_state(Cairo.Matrix.identity(), 150, 150, false);
+        start_nob.update_state(identity_mat, 50, 50, false);
+        end_nob.update_state(identity_mat, 150, 150, false);
+
+        set_initial_position(canvas.selected_bound_manager.selected_items);
+        update_visibility("solid");
 
         window.event_bus.color_mode_changed.connect(update_visibility);
     }
@@ -53,6 +61,25 @@ public class Akira.Widgets.DirectionLine {
 
             start_nob.update_state(Cairo.Matrix.identity(), start_x, start_y, true);
             end_nob.update_state(Cairo.Matrix.identity(), end_x, end_y, true);
+        }
+    }
+
+    private void set_initial_position (List<Lib.Items.CanvasItem> items) {
+        if(items.length() == 1) {
+            var item = items.first().data;
+
+            double pos_x = item.coordinates.x;
+            double pos_y = item.coordinates.y;
+            double width = item.size.width;
+            double height = item.size.height;
+
+            // TODO: get the rotation matrix and artboard matrix from item and recalculate position
+
+            start_nob.update_state(identity_mat, pos_x+10, pos_y+10, true);
+            end_nob.update_state(identity_mat, pos_x+width-10, pos_y+height-10, true);
+
+        } else {
+            // TODO: implement gradients when multiple items are selected
         }
     }
 }
