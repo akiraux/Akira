@@ -18,7 +18,7 @@
  *
  * Authored by: Ashish Shevale <shevaleashish@gmail.com>
  */
- public class Akira.Widgets.GradientEditor : Gtk.EventBox {
+public class Akira.Widgets.GradientEditor : Gtk.EventBox {
     // dimensions of GradientEditor that we will fetch after size has been allocated to it
     private int widget_width;
     private int widget_height;
@@ -35,11 +35,14 @@
     
     // Cairo.Pattern to color the Canvas.Item
     private Cairo.Pattern gradient_pattern;
+    private DirectionLine direction_line;
 
     public GradientEditor(Window _window, Models.ColorModel _model) {
         window = _window;
         model = _model;
         color_mode_type = "solid";
+
+        direction_line = new DirectionLine(_window, this);
 
         set_hexpand(true);
         height_request = 35;
@@ -237,9 +240,7 @@
     }
 
     private void on_color_mode_changed (string _color_mode_type) {
-    
         color_mode_type = _color_mode_type;
-        
         update_style();
     }
     
