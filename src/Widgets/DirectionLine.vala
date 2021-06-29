@@ -22,6 +22,8 @@ public class Akira.Widgets.DirectionLine {
     private Lib.Selection.Nob start_nob;
     private Lib.Selection.Nob end_nob;
 
+    private string color_mode_type;
+
     // dummy identity matrix
     private Cairo.Matrix identity_mat = Cairo.Matrix.identity();
     
@@ -42,26 +44,46 @@ public class Akira.Widgets.DirectionLine {
         update_visibility("solid");
 
         window.event_bus.color_mode_changed.connect(update_visibility);
+
+        window.event_bus.selected_items_list_changed.connect (() => {
+            if(canvas.selected_bound_manager.selected_items.length() == 0) {
+                hide_direction_line();
+            } else {
+                if(color_mode_type != "solid") {
+                    show_direction_line();
+                }
+            }
+        });
+
+        start_nob.button_press_event.connect((event) => {return on_button_press(event);});
+    }
+
+    private bool on_button_press (Goo.CanvasItem event) {
+        print("button pressed\n");
+
+        return false;
     }
 
     private void update_visibility(string color_mode) {
+        color_mode_type = color_mode;
+
         if(color_mode == "solid") {
-            var start_x = start_nob.center_x;
-            var start_y = start_nob.center_y;
-            var end_x = end_nob.center_x;
-            var end_y = end_nob.center_y;
-
-            start_nob.update_state(Cairo.Matrix.identity(), start_x, start_y, false);
-            end_nob.update_state(Cairo.Matrix.identity(), end_x, end_y, false);
+            hide_direction_line();
         } else {
-            var start_x = start_nob.center_x;
-            var start_y = start_nob.center_y;
-            var end_x = end_nob.center_x;
-            var end_y = end_nob.center_y;
-
-            start_nob.update_state(Cairo.Matrix.identity(), start_x, start_y, true);
-            end_nob.update_state(Cairo.Matrix.identity(), end_x, end_y, true);
+            show_direction_line();
         }
+    }
+
+    private void hide_direction_line() {
+        print("hide selection\n");
+        start_nob.set("visibility", Goo.CanvasItemVisibility.HIDDEN);
+        end_nob.set("visibility", Goo.CanvasItemVisibility.HIDDEN);
+    }
+
+    private void show_direction_line() {
+        print("show selection\n");
+        start_nob.set("visibility", Goo.CanvasItemVisibility.VISIBLE);
+        end_nob.set("visibility", Goo.CanvasItemVisibility.VISIBLE);
     }
 
     private void set_initial_position (List<Lib.Items.CanvasItem> items) {
