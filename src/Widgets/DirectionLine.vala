@@ -19,17 +19,24 @@
  * Authored by: Ashish Shevale <shevaleashish@gmail.com>
 */
 public class Akira.Widgets.DirectionLine {
-    private Lib.Selection.Nob start_nob;
-    private Lib.Selection.Nob end_nob;
+    public Lib.Selection.Nob start_nob;
+    public Lib.Selection.Nob end_nob;
+    private Lib.Selection.Nob selected_nob;
 
     private string color_mode_type;
+
+    private Lib.Canvas canvas;
+    private Lib.Items.CanvasItem selected_item;
+    private GradientEditor gradient_editor;
 
     // dummy identity matrix
     private Cairo.Matrix identity_mat = Cairo.Matrix.identity();
     
-    public DirectionLine (Window window, GradientEditor gradient_editor) {
-        var canvas = window.main_window.main_canvas.canvas as Lib.Canvas;
+    public DirectionLine (Window window, GradientEditor _gradient_editor) {
+        canvas = window.main_window.main_canvas.canvas as Lib.Canvas;
+        selected_item = canvas.selected_bound_manager.selected_items.nth_data(0);
         var root = canvas.get_root_item();
+        gradient_editor = _gradient_editor;
 
         start_nob = new Lib.Selection.Nob(root, Lib.Managers.NobManager.Nob.GRADIENT_START);
         end_nob = new Lib.Selection.Nob(root, Lib.Managers.NobManager.Nob.GRADIENT_END);
@@ -44,6 +51,8 @@ public class Akira.Widgets.DirectionLine {
         update_visibility("solid");
 
         window.event_bus.color_mode_changed.connect(update_visibility);
+        canvas.button_press_event.connect(on_buton_press_event);
+        canvas.button_release_event.connect(on_button_release_event);
 
         window.event_bus.selected_items_list_changed.connect (() => {
             if(canvas.selected_bound_manager.selected_items.length() == 0) {
@@ -54,13 +63,44 @@ public class Akira.Widgets.DirectionLine {
                 }
             }
         });
-
-        start_nob.button_press_event.connect((event) => {return on_button_press(event);});
     }
 
-    private bool on_button_press (Goo.CanvasItem event) {
-        print("button pressed\n");
+    public void get_direction_coords(out double x0, out double y0, out double x1, out double y1) {
+        x0 = start_nob.center_x - selected_item.coordinates.x;
+        y0 = start_nob.center_y - selected_item.coordinates.y;
+        x1 = end_nob.center_x - selected_item.coordinates.x;
+        y1 = end_nob.center_y - selected_item.coordinates.y;
 
+    }
+
+    private bool on_buton_press_event(Gdk.EventButton event) {
+        if(start_nob.hit_test(event.x, event.y, canvas.get_scale())) {
+            selected_nob = start_nob;
+
+            canvas.motion_notify_event.connect(on_motion_event);
+
+            // return true here to prevent the button press event from propogating.
+            // this is because in transform_manager, this event causes the canvas item to move
+            return true;
+        } else if(end_nob.hit_test(event.x, event.y, canvas.get_scale())) {
+            selected_nob = end_nob;
+
+            canvas.motion_notify_event.connect(on_motion_event);
+
+            return true;
+        }
+        return false;
+    }
+
+    private bool on_motion_event(Gdk.EventMotion event) {
+        selected_nob.update_state(identity_mat, event.x, event.y, true);
+        gradient_editor.create_gradient_pattern();
+
+        return true;
+    }
+
+    private bool on_button_release_event(Gdk.EventButton event) {
+        canvas.motion_notify_event.disconnect(on_motion_event);
         return false;
     }
 
@@ -75,13 +115,11 @@ public class Akira.Widgets.DirectionLine {
     }
 
     private void hide_direction_line() {
-        print("hide selection\n");
         start_nob.set("visibility", Goo.CanvasItemVisibility.HIDDEN);
         end_nob.set("visibility", Goo.CanvasItemVisibility.HIDDEN);
     }
 
     private void show_direction_line() {
-        print("show selection\n");
         start_nob.set("visibility", Goo.CanvasItemVisibility.VISIBLE);
         end_nob.set("visibility", Goo.CanvasItemVisibility.VISIBLE);
     }

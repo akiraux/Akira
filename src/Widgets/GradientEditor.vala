@@ -40,6 +40,17 @@ public class Akira.Widgets.GradientEditor : Gtk.EventBox {
     public GradientEditor(Window _window, Models.ColorModel _model) {
         window = _window;
         model = _model;
+        
+        /*
+        if(model.pattern.get_type() == Cairo.PatternType.LINEAR) {
+            color_mode_type = "linear";
+        } else if(model.pattern.get_type() == Cairo.PatternType.RADIAL) {
+            color_mode_type = "radial";
+        } else {
+            print("set color solid\n");
+            color_mode_type = "solid";
+        }
+        */
         color_mode_type = "solid";
 
         direction_line = new DirectionLine(_window, this);
@@ -244,23 +255,25 @@ public class Akira.Widgets.GradientEditor : Gtk.EventBox {
         update_style();
     }
     
-    private void create_gradient_pattern () {
+    public void create_gradient_pattern () {
         double item_height, item_width;
         model.get("height", out item_height);
         model.get("width", out item_width);
+
+        double x0, y0, x1, y1;
+        direction_line.get_direction_coords(out x0, out y0, out x1, out y1);
         
         if(color_mode_type == "solid") {
             // for solid color, create an empty pattern. In Fills, we check if stop colors exists
             // for this pattern. If they dont, then the Pattern is not applied
-            gradient_pattern = new Cairo.Pattern.linear(0,0,0,0);
+            gradient_pattern = new Cairo.Pattern.linear(x0, y0, x1, y1);
             model.pattern = gradient_pattern;
             return;
         } else if(color_mode_type == "linear") {
-            gradient_pattern = new Cairo.Pattern.linear(0, 0, 
-                                             item_width,  item_height);
+            gradient_pattern = new Cairo.Pattern.linear(x0, y0, x1, y1);
         } else {
             int radius = (int) Math.sqrt( item_width * item_width + item_height * item_height);
-            gradient_pattern = new Cairo.Pattern.radial(0, 0, 0, 0, 0, radius);
+            gradient_pattern = new Cairo.Pattern.radial(x0, y0, 0, x1, y1, radius);
         }
         
         for(int index = 0; index < stop_colors.size; ++index) {
