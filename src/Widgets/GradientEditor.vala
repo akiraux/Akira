@@ -268,8 +268,10 @@ public class Akira.Widgets.GradientEditor : Gtk.EventBox {
         } else if(color_mode_type == "linear") {
             gradient_pattern = new Cairo.Pattern.linear(x0, y0, x1, y1);
         } else {
-            int radius = (int) Math.sqrt( item_width * item_width + item_height * item_height);
-            gradient_pattern = new Cairo.Pattern.radial(x0, y0, 0, x1, y1, radius);
+            double dx = x0 - x1;
+            double dy = y0 - y1;
+            int radius = (int) Math.sqrt( dx*dx + dy*dy );
+            gradient_pattern = new Cairo.Pattern.radial(x0, y0, 0, x0, y0, radius);
         }
         
         for(int index = 0; index < stop_colors.size; ++index) {
