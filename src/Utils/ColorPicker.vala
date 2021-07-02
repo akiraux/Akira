@@ -21,35 +21,34 @@
 */
 
 public class Akira.Utils.ColorPicker {
-	public signal void picked (Gdk.RGBA color);
-	private Xdp.Parent parent;
-	private Xdp.Portal portal;
+    public signal void picked (Gdk.RGBA color);
+    private Xdp.Parent parent;
+    private Xdp.Portal portal;
 
 
-	public ColorPicker () {
-		Gtk.Application app = (Gtk.Application) GLib.Application.get_default ();
-		Gtk.Window window = app.get_active_window ();
-		
-		parent = new Xdp.Parent (window);
-		portal = new Xdp.Portal ();
+    public ColorPicker () {
+        Gtk.Application app = (Gtk.Application) GLib.Application.get_default ();
+        Gtk.Window window = app.get_active_window ();
 
-		portal.pick_color.begin(parent, null, picked_color);
-	}
+        parent = new Xdp.Parent (window);
+        portal = new Xdp.Portal ();
 
-	public void picked_color (GLib.Object? object, GLib.AsyncResult? result) {
-		GLib.Variant v = portal.pick_color_finish (result);
-		if (v == null) 
-			return;
-		
-		Gdk.RGBA color = Gdk.RGBA ();
-		color.alpha = 1;
+        portal.pick_color.begin(parent, null, picked_color);
+    }
 
-		VariantIter iterator = v.iterator ();
-		iterator.next ("d", &color.red);
-		iterator.next ("d", &color.green);
-		iterator.next ("d", &color.blue);
+    public void picked_color (GLib.Object? object, GLib.AsyncResult? result) {
+        GLib.Variant v = portal.pick_color_finish (result);
+        if (v == null)
+            return;
 
-		picked (color);
-	}
+        Gdk.RGBA color = Gdk.RGBA ();
+        color.alpha = 1;
 
+        VariantIter iterator = v.iterator ();
+        iterator.next ("d", &color.red);
+        iterator.next ("d", &color.green);
+        iterator.next ("d", &color.blue);
+
+        picked (color);
+    }
 }

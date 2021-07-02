@@ -22,8 +22,5 @@ namespace Xdp {
 
         [CCode (cname = "xdp_parent_new_gtk")]
         public Parent (Gtk.Window window);
-
-        [CCode (cname = "_xdp_parent_export_gtk")]
-        public async bool export_gtk () throws GLib.Error;
     }
 }
