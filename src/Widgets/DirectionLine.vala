@@ -28,11 +28,14 @@ public class Akira.Widgets.DirectionLine {
     private Lib.Canvas canvas;
     private Lib.Items.CanvasItem selected_item;
     private GradientEditor gradient_editor;
+    private Window window;
 
     // dummy identity matrix
     private Cairo.Matrix identity_mat = Cairo.Matrix.identity();
     
-    public DirectionLine (Window window, GradientEditor _gradient_editor) {
+    public DirectionLine (Window _window, GradientEditor _gradient_editor) {
+        print("create new direction \n");  
+        window = _window; 
         canvas = window.main_window.main_canvas.canvas as Lib.Canvas;
         selected_item = canvas.selected_bound_manager.selected_items.nth_data(0);
         var root = canvas.get_root_item();
@@ -56,7 +59,7 @@ public class Akira.Widgets.DirectionLine {
 
         window.event_bus.selected_items_list_changed.connect (() => {
             if(canvas.selected_bound_manager.selected_items.length() == 0) {
-                hide_direction_line();
+                destroy_direction_line();
             } else {
                 if(color_mode_type != "solid") {
                     show_direction_line();
@@ -122,6 +125,19 @@ public class Akira.Widgets.DirectionLine {
     private void show_direction_line() {
         start_nob.set("visibility", Goo.CanvasItemVisibility.VISIBLE);
         end_nob.set("visibility", Goo.CanvasItemVisibility.VISIBLE);
+    }
+
+    private void destroy_direction_line() {
+        // we need to destroy direction line everytime an item is deselected. This is because
+        // when and item is selected, it creates a new instance of DirectionLine. This results in duplicate 
+        // start_nob and end_nob
+        window.event_bus.color_mode_changed.disconnect(update_visibility);
+        canvas.button_press_event.disconnect(on_buton_press_event);
+        canvas.button_release_event.disconnect(on_button_release_event);
+
+        hide_direction_line();
+        start_nob.remove();
+        end_nob.remove();
     }
 
     private void set_initial_position (List<Lib.Items.CanvasItem> items) {

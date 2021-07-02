@@ -41,19 +41,10 @@ public class Akira.Widgets.GradientEditor : Gtk.EventBox {
         window = _window;
         model = _model;
         
-        /*
-        if(model.pattern.get_type() == Cairo.PatternType.LINEAR) {
-            color_mode_type = "linear";
-        } else if(model.pattern.get_type() == Cairo.PatternType.RADIAL) {
-            color_mode_type = "radial";
-        } else {
-            print("set color solid\n");
-            color_mode_type = "solid";
-        }
-        */
         color_mode_type = "solid";
 
         direction_line = new DirectionLine(_window, this);
+        gradient_pattern = new Cairo.Pattern.linear(0,0,0,0);
 
         set_hexpand(true);
         height_request = 35;
