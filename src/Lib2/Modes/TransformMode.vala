@@ -96,7 +96,7 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
             return;
         }
 
-        foreach (var child in subtree.children.data) {
+        foreach (unowned var child in subtree.children.data) {
             collect_geometries (child, ref state);
         }
     }
@@ -264,7 +264,7 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
         double snap_offset_x,
         double snap_offset_y
     ) {
-        foreach (var child in group.children.data) {
+        foreach (unowned var child in group.children.data) {
             if (child.instance.is_group ()) {
                 translate_group (view_canvas, group, initial_drag_state, delta_x, delta_y, snap_offset_x, snap_offset_y);
                 continue;
@@ -401,7 +401,6 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
         view_canvas.items_manager.compile_model ();
     }
 
-
     public static void rotate_from_event (
         ViewCanvas view_canvas,
         Lib2.Items.NodeSelection selection,
@@ -427,51 +426,55 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
             new_rotation = 15.0 * step_num;
         }
 
-        var single_item = selection.nodes.size == 1;
-
-        var ct = 0;
         foreach (var node in selection.nodes.values) {
-            if (node.instance.is_group ()) {
-                print ("IMPLEMENT GROUP ROTATION\n");
-                ct++;
-                continue;
-            }
-            unowned var item = node.instance.item;
-            if (single_item) {
-                new_rotation = GLib.Math.fmod (new_rotation + 360, 360);
-                item.components.rotation = new Lib2.Components.Rotation (new_rotation);
-                item.mark_geometry_dirty ();
-                view_canvas.items_manager.compile_model ();
-                return;
-            }
-
-            var item_drag_data = initial_drag_state.item_data_map[item.id];
-            var old_center_x = item_drag_data.item_geometry.area.center_x;
-            var old_center_y = item_drag_data.item_geometry.area.center_y;
-
-            var tmp_rotation = new_rotation;
-            var item_rotation = item_drag_data.item_geometry.area.rotation * 180 / Math.PI;
-
-            if (old_center_x != original_center_x || old_center_y != original_center_y) {
-                var tr = Cairo.Matrix.identity ();
-                tr.rotate (tmp_rotation * Math.PI / 180);
-                var new_center_delta_x = old_center_x - original_center_x;
-                var new_center_delta_y = old_center_y - original_center_y;
-                tr.transform_point (ref new_center_delta_x, ref new_center_delta_y);
-
-                item.components.center = new Lib2.Components.Coordinates (
-                    original_center_x + new_center_delta_x,
-                    original_center_y + new_center_delta_y
-                );
-            }
-
-            tmp_rotation = GLib.Math.fmod (item_rotation + tmp_rotation + 360, 360);
-            item.components.rotation = new Lib2.Components.Rotation (tmp_rotation);
-
-            item.mark_geometry_dirty ();
-            ct++;
+            rotate_node (view_canvas, node, initial_drag_state, new_rotation, original_center_x, original_center_y);
         }
 
         view_canvas.items_manager.compile_model ();
+    }
+
+    private static void rotate_node (
+        ViewCanvas view_canvas,
+        Lib2.Items.ModelNode node,
+        InitialDragState initial_drag_state,
+        double new_rotation,
+        double rotation_center_x,
+        double rotation_center_y
+    ) {
+        unowned var item = node.instance.item;
+        var item_drag_data = initial_drag_state.item_data_map[item.id];
+
+        var tmp_rotation = new_rotation;
+        var old_center_x = item_drag_data.item_geometry.area.center_x;
+        var old_center_y = item_drag_data.item_geometry.area.center_y;
+        var item_rotation = item_drag_data.item_geometry.area.rotation * 180 / Math.PI;
+
+        if (item.components.center != null) {
+            if (old_center_x != rotation_center_x || old_center_y != rotation_center_y) {
+                var tr = Cairo.Matrix.identity ();
+                tr.rotate (tmp_rotation * Math.PI / 180);
+                var new_center_delta_x = old_center_x - rotation_center_x;
+                var new_center_delta_y = old_center_y - rotation_center_y;
+                tr.transform_point (ref new_center_delta_x, ref new_center_delta_y);
+
+                item.components.center = new Lib2.Components.Coordinates (
+                    rotation_center_x + new_center_delta_x,
+                    rotation_center_y + new_center_delta_y
+                );
+            }
+        }
+
+        if (item.components.rotation != null) {
+            tmp_rotation = GLib.Math.fmod (item_rotation + tmp_rotation + 360, 360);
+            item.components.rotation = new Lib2.Components.Rotation (tmp_rotation);
+        }
+
+        item.mark_geometry_dirty ();
+
+        if (node.children != null && node.children.length > 0) {
+            foreach (unowned var child in node.children.data) {
+                rotate_node (view_canvas, child, initial_drag_state, new_rotation, rotation_center_x, rotation_center_y);
+            }
+        }
     }
 }

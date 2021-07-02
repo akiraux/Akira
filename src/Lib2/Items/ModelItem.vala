@@ -19,38 +19,17 @@
  * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
  */
 
-public interface Akira.Lib2.Items.ModelType<T> : Object {
-    public abstract ModelType copy ();
-
-    public abstract void construct_canvas_item (ModelItem item, Goo.Canvas canvas);
-
-    public abstract void component_updated (ModelItem item, Lib2.Components.Component.Type type);
-
-    public abstract bool is_group ();
-}
-
-public class Akira.Lib2.Items.DummyItemType : Object, ModelType<DummyItemType> {
-    public ModelType copy () { return new DummyItemType (); }
-    public void construct_canvas_item (ModelItem item, Goo.Canvas canvas) {}
-    public void component_updated (ModelItem item, Lib2.Components.Component.Type type) {}
-    public bool is_group () { return false; }
-}
-
-public class Akira.Lib2.Items.DummyGroupType : Object, ModelType<DummyGroupType> {
-    public ModelType copy () { return new DummyGroupType (); }
-    public void construct_canvas_item (ModelItem item, Goo.Canvas canvas) {}
-    public void component_updated (ModelItem item, Lib2.Components.Component.Type type) {}
-    public bool is_group () { return true; }
-}
-
 public class Akira.Lib2.Items.ModelItem : Object {
     public int id = -1;
+
+    public ModelType item_type = null;
+
     public Lib2.Items.CanvasItem canvas_item = null;
     // Only non-null if it is a group with an associated canvas (e.g., artboard)
-    public Goo.CanvasGroup container_item = null;
+    public Goo.CanvasItem container_item = null;
+
     public Lib2.Components.Components components = null;
     public Lib2.Components.CompiledComponents compiled_components = null;
-    public ModelType item_type = null;
 
     public Components.CompiledGeometry compiled_geometry { get { return compiled_components.compiled_geometry; }}
     public Components.CompiledFill  compiled_fill { get { return compiled_components.compiled_fill; }}
@@ -116,9 +95,9 @@ public class Akira.Lib2.Items.ModelItem : Object {
      * If in doubt, you don't.
      */
     public void compile_components (bool notify_view, ModelNode? node) {
-        compiled_components.maybe_compile_geometry (components, node);
-        compiled_components.maybe_compile_fill (components, node);
-        compiled_components.maybe_compile_border (components, node);
+        compiled_components.maybe_compile_geometry (item_type, components, node);
+        compiled_components.maybe_compile_fill (item_type, components, node);
+        compiled_components.maybe_compile_border (item_type, components, node);
 
         if (notify_view) {
             notify_view_of_changes ();

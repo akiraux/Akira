@@ -24,6 +24,8 @@
  */
  public class Akira.Utils.ModelUtil : Object {
 
+    public delegate void OnSubtreeCloned (int id);
+
     /*
      * Clones an instance with `source_id` from a source model, into a target model into a specific
      * group with id `tagret_group_id`.
@@ -34,7 +36,8 @@
          Lib2.Items.Model source_model,
          int source_id,
          Lib2.Items.Model target_model,
-         int target_group_id
+         int target_group_id,
+         OnSubtreeCloned? on_subtree_cloned = null
     ) {
         var target_node = target_model.node_from_id (target_group_id);
         if (target_node == null || !target_node.instance.is_group ()) {
@@ -46,11 +49,16 @@
             return -1;
         }
 
-        recursive_clone (source_node, target_node, target_model);
+        var new_id = recursive_clone (source_node, target_node, target_model);
+
+        if (new_id >= Lib2.Items.Model.group_start_id && on_subtree_cloned != null) {
+            on_subtree_cloned (new_id);
+        }
+
         return 0;
     }
 
-    private static void recursive_clone (
+    private static int recursive_clone (
         Lib2.Items.ModelNode source_node,
         Lib2.Items.ModelNode target_node,
         Lib2.Items.Model target_model
@@ -62,5 +70,7 @@
                 recursive_clone (child, target_model.node_from_id (new_id), target_model);
             }
         }
+
+        return new_id;
     }
  }

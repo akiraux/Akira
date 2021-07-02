@@ -19,66 +19,79 @@
  * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
  */
 
-public class Akira.Lib2.Items.ModelTypeRect : Object, ModelType<ModelTypeRect> {
-    public static ModelItem minimal_rect () {
-        return default_rect (
-            new Lib2.Components.Coordinates (0.5, 0.5),
-            new Lib2.Components.Size (1, 1, false),
-            null,
-            null
-        );
-    }
+public class Akira.Lib2.Items.ModelTypeArtboard : Object, ModelType<ModelTypeArtboard> {
+    //Goo.CanvasItem background;
 
-    public static ModelItem default_rect (
+    public static ModelItem default_artboard (
         Lib2.Components.Coordinates center,
-        Lib2.Components.Size size,
-        Lib2.Components.Borders? borders,
-        Lib2.Components.Fills? fills
+        Lib2.Components.Size size
     ) {
         var new_item = new ModelItem ();
         new_item.components = new Lib2.Components.Components ();
         new_item.components.center = center;
         new_item.components.size = size;
-        new_item.components.borders = borders;
-        new_item.components.fills = fills;
         new_item.components.rotation = Lib2.Components.Components.default_rotation ();
         new_item.components.flipped = Lib2.Components.Components.default_flipped ();
         new_item.components.border_radius = Lib2.Components.Components.default_border_radius ();
-        new_item.item_type = new ModelTypeRect ();
+        new_item.components.fills = Lib2.Components.Fills.single_color (Lib2.Components.Color (1.0, 1.0, 1.0, 1.0));
+
+        var layout_data = Components.Layout.LayoutData () {
+            can_rotate = true,
+            dilated_resize = true
+        };
+        new_item.components.layout = new Components.Layout (layout_data);
+
+        new_item.item_type = new ModelTypeArtboard ();
         return new_item;
     }
 
     public ModelType copy () {
-        return new ModelTypeRect ();
+        return new ModelTypeArtboard ();
+    }
+
+    public Components.CompiledFill compile_fill (Components.Components? components, Lib2.Items.ModelNode? node) {
+        return Components.CompiledFill.compile (components, node);
+    }
+
+    public Components.CompiledBorder compile_border (Components.Components? components, Lib2.Items.ModelNode? node) {
+        return Components.CompiledBorder.compile (components, node);
+    }
+
+    public Components.CompiledGeometry compile_geometry (Components.Components? components, Lib2.Items.ModelNode? node) {
+        return new Components.CompiledGeometry.from_components (components, node);
     }
 
     public void construct_canvas_item (ModelItem item, Goo.Canvas canvas) {
         var mid_x = item.components.size.width / 2.0;
         var mid_y = item.components.size.height / 2.0;
-        item.canvas_item = new Lib2.Items.CanvasRect (
+
+        var artboard = new Lib2.Items.CanvasRect (
             canvas.get_root_item (),
             -mid_x,
             -mid_y,
             item.components.size.width,
             item.components.size.height
         );
+        //var artboard = new Goo.CanvasRect (canvas.get_root_item(), null);
+        //artboard.x = -mid_x;
+        //artboard.y = -mid_y;
+        //artboard.width = item.components.size.width;
+        //artboard.height = item.components.size.height;
+
+        //background = new Goo.CanvasRect (artboard, 0, 0, 1, 1, "line-width", 0.0, null);
+        //background.translate (0, 0);
+        //background.can_focus = false;
+
+        item.canvas_item = artboard;
+
+        var fill_color = Gdk.RGBA ();
+        fill_color.parse ("#fff");
+        //item.canvas_item.set ("fill-color-rgba", fill_color);
     }
 
     public void component_updated (ModelItem item, Lib2.Components.Component.Type type) {
         switch (type) {
             case Lib2.Components.Component.Type.COMPILED_BORDER:
-                if (!item.compiled_border.is_visible) {
-                    item.canvas_item.set ("line-width", 0);
-                    item.canvas_item.set ("stroke-color-rgba", null);
-                    break;
-                }
-
-                var rgba = item.compiled_border.color;
-                uint urgba = Utils.Color.rgba_to_uint (rgba);
-                // The "line-width" property expects a DOUBLE type, but we don't support subpixels
-                // so we always handle the border size as INT, therefore we need to type cast it here.
-                item.canvas_item.set ("line-width", (double) item.compiled_border.size);
-                item.canvas_item.set ("stroke-color-rgba", urgba);
                 break;
             case Lib2.Components.Component.Type.COMPILED_FILL:
                 if (!item.compiled_fill.is_visible) {
@@ -88,6 +101,7 @@ public class Akira.Lib2.Items.ModelTypeRect : Object, ModelType<ModelTypeRect> {
 
                 var rgba = item.compiled_fill.color;
                 uint urgba = Utils.Color.rgba_to_uint (rgba);
+                print ("here\n");
                 item.canvas_item.set ("fill-color-rgba", urgba);
                 break;
             case Lib2.Components.Component.Type.COMPILED_GEOMETRY:
@@ -95,21 +109,11 @@ public class Akira.Lib2.Items.ModelTypeRect : Object, ModelType<ModelTypeRect> {
                 item.canvas_item.set ("y", -item.components.size.height / 2.0);
                 item.canvas_item.set ("width", item.components.size.width);
                 item.canvas_item.set ("height", item.components.size.height);
-                item.canvas_item.set_transform (item.compiled_geometry.transform ());
-
-                /*
-                double shift_x = -item.components.compiled_geometry.transform ().x0;
-                double shift_y = -item.components.compiled_geometry.transform ().y0;
-                double t = 500;
-                double l = 500;
-                double b = 1000;
-                double r = 1000;
-
-                item.canvas_item.set ("clip_path", Utils.SVGUtil.rect_to_svg_path (shift_x, shift_y, t, l, b, r));
-                */
+                item.canvas_item.set_transform (item.compiled_geometry.transform);
+                print ("%s", item.canvas_item.is_visible ().to_string ());
                 break;
         }
     }
 
-    public bool is_group () { return false; }
+    public bool is_group () { return true; }
 }

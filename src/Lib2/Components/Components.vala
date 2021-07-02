@@ -34,12 +34,13 @@ public class Akira.Lib2.Components.CompiledComponents {
     /*
      * Return true if new fill color was generated.
      */
-    public bool maybe_compile_fill (Components? components, Lib2.Items.ModelNode? node) {
+    public bool maybe_compile_fill (Lib2.Items.ModelType type, Components? components, Lib2.Items.ModelNode? node) {
         if (compiled_fill != null) {
             return false;
         }
 
-        compiled_fill = CompiledFill.compile (components, node);
+        compiled_fill = type.compile_fill (components, node);
+        
         dirty_components.mark_dirty (Component.Type.COMPILED_FILL, true);
         return true;
     }
@@ -47,11 +48,12 @@ public class Akira.Lib2.Components.CompiledComponents {
     /*
      * Return true if new border color was generated.
      */
-    public bool maybe_compile_border (Components? components, Lib2.Items.ModelNode? node) {
+    public bool maybe_compile_border (Lib2.Items.ModelType type, Components? components, Lib2.Items.ModelNode? node) {
         if (compiled_border != null) {
             return false;
         }
-        compiled_border = CompiledBorder.compile (components, node);
+
+        compiled_border = type.compile_border (components, node);
         dirty_components.mark_dirty (Component.Type.COMPILED_BORDER, true);
         return true;
     }
@@ -59,12 +61,12 @@ public class Akira.Lib2.Components.CompiledComponents {
     /*
      * Return true if new geometry was generated.
      */
-    public bool maybe_compile_geometry (Components? components, Lib2.Items.ModelNode? node) {
+    public bool maybe_compile_geometry (Lib2.Items.ModelType type, Components? components, Lib2.Items.ModelNode? node) {
         if (compiled_geometry != null) {
             return false;
         }
 
-        compiled_geometry = CompiledGeometry.compile (components, node);
+        compiled_geometry = type.compile_geometry (components, node);
         dirty_components.mark_dirty (Component.Type.COMPILED_GEOMETRY, true);
         return true;
     }
@@ -83,6 +85,8 @@ public class Akira.Lib2.Components.Components {
     public Coordinates? center = null;
     public Size? size = null;
     public Rotation? rotation = null;
+
+    public Layout? layout = null;
     
     public Components copy () {
         var cln = new Components ();

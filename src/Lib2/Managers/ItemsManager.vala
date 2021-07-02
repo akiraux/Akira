@@ -236,7 +236,7 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
                 new_v = vertical ? !new_v : new_h;
 
                 if (target.item.components.rotation != null) {
-                    var tr = target.item.compiled_geometry.transform ();
+                    var tr = target.item.compiled_geometry.transform;
                     tr.x0 = 0;
                     tr.y0 = 0;
 
@@ -375,7 +375,7 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
         var group = Lib2.Items.ModelTypeGroup.default_group ();
         add_item_to_origin (group);
 
-        var num_of = 5000;
+        var num_of = 1000;
 
         for (var i = 0; i < num_of; ++i) {
                 x = GLib.Random.double_range (0, 1000);

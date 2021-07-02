@@ -36,17 +36,23 @@ public class Akira.Lib2.Managers.CopyManager : Object {
     public void do_copy () {
         copy_model = new Lib2.Items.Model ();
 
-        int res = 0;
+        var sorted_candidates = new Gee.TreeMap<Lib2.Items.PositionKey, int> (Lib2.Items.PositionKey.compare);
         foreach (var to_copy in view_canvas.selection_manager.selection.nodes.values) {
+            var key = new Lib2.Items.PositionKey ();
+            key.parent_path = view_canvas.items_manager.item_model.path_from_node (to_copy.parent);
+            key.pos_in_parent = to_copy.pos_in_parent;
+            sorted_candidates[key] = to_copy.id;
+        }
+
+        int res = 0;
+        foreach (var sorted_id in sorted_candidates.values) {
             res += Utils.ModelUtil.clone_from_model (
                 view_canvas.items_manager.item_model,
-                to_copy.id,
+                sorted_id,
                 copy_model,
                 Lib2.Items.Model.origin_id
             );
         }
-
-        var children = copy_model.node_from_id (Lib2.Items.Model.origin_id).children;
 
         assert (res == 0);
     }
@@ -73,11 +79,16 @@ public class Akira.Lib2.Managers.CopyManager : Object {
                 copy_model,
                 child.id,
                 view_canvas.items_manager.item_model,
-                Lib2.Items.Model.origin_id
+                Lib2.Items.Model.origin_id,
+                on_subtree_cloned
             );
         }
 
         view_canvas.items_manager.compile_model ();
         assert (res == 0);
+    }
+
+    private void on_subtree_cloned (int id) {
+        view_canvas.selection_manager.add_to_selection (id);
     }
 }

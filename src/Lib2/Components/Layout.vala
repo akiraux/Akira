@@ -19,20 +19,29 @@
  * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
  */
 
-public class Akira.Lib2.Items.ModelTypeGroup : Object, ModelType<ModelTypeGroup> {
-    public static ModelItem default_group () {
-        var new_item = new ModelItem ();
-        new_item.item_type = new ModelTypeGroup ();
-        return new_item;
+ /*
+  * Defines how children will behave while in affine transforms.
+  * For now the options are quite simple, in the future more data
+  * and context could be added for more complex layouts.
+  */
+public class Akira.Lib2.Components.Layout : Copyable<Layout> {
+    public struct LayoutData {
+        public bool can_rotate;
+        public bool dilated_resize;
     }
 
-    public ModelType copy () {
-        return new ModelTypeGroup ();
+    // main data for boxed Fill
+    private LayoutData _data;
+
+    public Layout (LayoutData data) {
+        _data = data;
     }
 
-    public void construct_canvas_item (ModelItem item, Goo.Canvas canvas) {}
+    public Layout copy () {
+        return new Layout (_data);
+    }
 
-    public void component_updated (ModelItem item, Lib2.Components.Component.Type type) {}
-
-    public bool is_group () { return true; }
+    // Recommended accessors
+    public bool can_rotate { get { return _data.can_rotate; }}
+    public bool dilated_resize { get { return _data.dilated_resize; }}
 }

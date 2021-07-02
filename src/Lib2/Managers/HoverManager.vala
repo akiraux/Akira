@@ -95,7 +95,7 @@ public class Akira.Lib2.Managers.HoverManager : Object {
             null
         );
 
-        hover_effect.set_transform (item.compiled_geometry.transform ());
+        hover_effect.set_transform (item.compiled_geometry.transform);
 
         hover_effect.set ("parent", view_canvas.get_root_item ());
         hover_effect.can_focus = false;

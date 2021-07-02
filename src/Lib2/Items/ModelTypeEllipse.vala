@@ -52,6 +52,18 @@ public class Akira.Lib2.Items.ModelTypeEllipse : Object, ModelType<ModelTypeElli
         return new ModelTypeEllipse ();
     }
 
+    public Components.CompiledFill compile_fill (Components.Components? components, Lib2.Items.ModelNode? node) {
+        return Components.CompiledFill.compile (components, node);
+    }
+
+    public Components.CompiledBorder compile_border (Components.Components? components, Lib2.Items.ModelNode? node) {
+        return Components.CompiledBorder.compile (components, node);
+    }
+
+    public Components.CompiledGeometry compile_geometry (Components.Components? components, Lib2.Items.ModelNode? node) {
+        return new Components.CompiledGeometry.from_components (components, node);
+    }
+
     public void construct_canvas_item (ModelItem item, Goo.Canvas canvas) {
         var radius_x = item.components.size.width / 2.0;
         var radius_y = item.components.size.height / 2.0;
@@ -88,7 +100,7 @@ public class Akira.Lib2.Items.ModelTypeEllipse : Object, ModelType<ModelTypeElli
             case Lib2.Components.Component.Type.COMPILED_GEOMETRY:
                 item.canvas_item.set ("radius-x", item.components.size.width / 2.0);
                 item.canvas_item.set ("radius-y", item.components.size.height / 2.0);
-                item.canvas_item.set_transform (item.compiled_geometry.transform ());
+                item.canvas_item.set_transform (item.compiled_geometry.transform);
                 break;
         }
     }

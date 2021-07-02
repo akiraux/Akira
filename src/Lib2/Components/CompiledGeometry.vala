@@ -48,6 +48,8 @@ public class Akira.Lib2.Components.CompiledGeometry : Copyable<CompiledGeometry>
     public double bb_bottom { get { return _data.area_bb.bottom; }}
     public double bb_right { get { return _data.area_bb.right; }}
 
+    public Cairo.Matrix transform { get { return _data._transform; }}
+
     public CompiledGeometry (CompiledGeometryData data) {
         _data = data;
     }
@@ -56,30 +58,23 @@ public class Akira.Lib2.Components.CompiledGeometry : Copyable<CompiledGeometry>
         return new CompiledGeometry (_data);
     }
 
-    public Cairo.Matrix transform () { return _data._transform; }
-
-    public static CompiledGeometry compile (Components? components, Lib2.Items.ModelNode? node) {
-        var data = CompiledGeometryData ();
-        if (node == null || !node.instance.is_group ()) {
-            if (components == null) {
-                return new CompiledGeometry(data);
-            }
-            compile_item (components, ref data);
-        }
-        else {
-            compile_group (components, node, ref data);
-        }
-
-        return new CompiledGeometry (data);
+    public CompiledGeometry.dummy () {
+        _data = CompiledGeometryData ();
     }
 
-    public static void compile_item (Components? components, ref CompiledGeometryData data) {
+    public CompiledGeometry.from_components (Components? components, Lib2.Items.ModelNode? node) {
+        _data = CompiledGeometryData ();
+
+        if (components == null) {
+            return;
+        }
+
         unowned var rotation = components.rotation;
         unowned var size = components.size;
         unowned var center = components.center;
 
-        data._transform = Cairo.Matrix.identity ();
-        data._transform.rotate (rotation.in_radians ());
+        _data._transform = Cairo.Matrix.identity ();
+        _data._transform.rotate (rotation.in_radians ());
 
         var half_height = size.height / 2.0;
         var half_width = size.width / 2.0;
@@ -100,13 +95,13 @@ public class Akira.Lib2.Components.CompiledGeometry : Copyable<CompiledGeometry>
         var y3 = bottom;
         var x3 = right;
 
-        data._transform.transform_point (ref x0, ref y0);
-        data._transform.transform_point (ref x1, ref y1);
-        data._transform.transform_point (ref x2, ref y2);
-        data._transform.transform_point (ref x3, ref y3);
+        _data._transform.transform_point (ref x0, ref y0);
+        _data._transform.transform_point (ref x1, ref y1);
+        _data._transform.transform_point (ref x2, ref y2);
+        _data._transform.transform_point (ref x3, ref y3);
 
-        data._transform.x0 = center.x;
-        data._transform.y0 = center.y;
+        _data._transform.x0 = center.x;
+        _data._transform.y0 = center.y;
 
         y0 += center.y;
         x0 += center.x;
@@ -120,26 +115,27 @@ public class Akira.Lib2.Components.CompiledGeometry : Copyable<CompiledGeometry>
         y3 += center.y;
         x3 += center.x;
 
-        data.area.tl_x = x0;
-        data.area.tl_y = y0;
-        data.area.tr_x = x1;
-        data.area.tr_y = y1;
-        data.area.bl_x = x2;
-        data.area.bl_y = y2;
-        data.area.br_x = x3;
-        data.area.br_y = y3;
-        data.area.rotation = components.rotation.in_radians ();
+        _data.area.tl_x = x0;
+        _data.area.tl_y = y0;
+        _data.area.tr_x = x1;
+        _data.area.tr_y = y1;
+        _data.area.bl_x = x2;
+        _data.area.bl_y = y2;
+        _data.area.br_x = x3;
+        _data.area.br_y = y3;
+        _data.area.rotation = components.rotation.in_radians ();
 
-        Utils.GeometryMath.min_max_coords (x0, x1, x2, x3, ref data.area_bb.left, ref data.area_bb.right);
-        Utils.GeometryMath.min_max_coords (y0, y1, y2, y3, ref data.area_bb.top, ref data.area_bb.bottom);
+        Utils.GeometryMath.min_max_coords (x0, x1, x2, x3, ref _data.area_bb.left, ref _data.area_bb.right);
+        Utils.GeometryMath.min_max_coords (y0, y1, y2, y3, ref _data.area_bb.top, ref _data.area_bb.bottom);
     }
 
-    public static void compile_group (Components? components, Lib2.Items.ModelNode? node, ref CompiledGeometryData data) {
+    public static CompiledGeometry.from_descendants (Components? components, Lib2.Items.ModelNode? node) {
+        _data = CompiledGeometryData ();
         if (node == null || node.children == null) {
             return;
         }
 
-        data._transform = Cairo.Matrix.identity ();
+        _data._transform = Cairo.Matrix.identity ();
 
         double top = int.MAX;
         double bottom = int.MIN;
@@ -158,22 +154,22 @@ public class Akira.Lib2.Components.CompiledGeometry : Copyable<CompiledGeometry>
             right = double.max (right, cg.bb_right);
         }
 
-        data.area.tl_x = left;
-        data.area.tl_y = top;
-        data.area.tr_x = right;
-        data.area.tr_y = top;
-        data.area.bl_x = left;
-        data.area.bl_y = bottom;
-        data.area.br_x = right;
-        data.area.br_y = bottom;
-        data.area.rotation = 0;
+        _data.area.tl_x = left;
+        _data.area.tl_y = top;
+        _data.area.tr_x = right;
+        _data.area.tr_y = top;
+        _data.area.bl_x = left;
+        _data.area.bl_y = bottom;
+        _data.area.br_x = right;
+        _data.area.br_y = bottom;
+        _data.area.rotation = 0;
 
-        data.area_bb.top = top;
-        data.area_bb.left = left;
-        data.area_bb.bottom = bottom;
-        data.area_bb.right = right;
+        _data.area_bb.top = top;
+        _data.area_bb.left = left;
+        _data.area_bb.bottom = bottom;
+        _data.area_bb.right = right;
 
-        data._transform.x0 = data.area_bb.center_x;
-        data._transform.y0 = data.area_bb.center_y;
+        _data._transform.x0 = _data.area_bb.center_x;
+        _data._transform.y0 = _data.area_bb.center_y;
     }
 }
