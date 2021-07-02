@@ -33,7 +33,12 @@ public class Akira.Widgets.DirectionLine {
     // dummy identity matrix
     private Cairo.Matrix identity_mat = Cairo.Matrix.identity();
     
-    public DirectionLine (Window _window, GradientEditor _gradient_editor) {
+    public DirectionLine (Window _window, GradientEditor _gradient_editor, Akira.Models.ColorModel.Type type) {
+        // since gradients on borders are not yet supported, dont draw direction line
+        if(type == Akira.Models.ColorModel.Type.BORDER) {
+            return;
+        }
+
         print("create new direction \n");  
         window = _window; 
         canvas = window.main_window.main_canvas.canvas as Lib.Canvas;

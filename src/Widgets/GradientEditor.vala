@@ -43,7 +43,7 @@ public class Akira.Widgets.GradientEditor : Gtk.EventBox {
         
         color_mode_type = "solid";
 
-        direction_line = new DirectionLine(_window, this);
+        direction_line = new DirectionLine(_window, this, model.type);
         gradient_pattern = new Cairo.Pattern.linear(0,0,0,0);
 
         set_hexpand(true);
@@ -203,6 +203,11 @@ public class Akira.Widgets.GradientEditor : Gtk.EventBox {
     }
 
     private void update_style() {
+        // since gradients on direction line are not supported, dont draw direction line
+        if(model.type == Akira.Models.ColorModel.Type.BORDER) {
+            return;
+        }
+
         string css_style = "";
         string stop_color_string = stop_colors_as_string();
 
