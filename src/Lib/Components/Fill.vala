@@ -43,7 +43,7 @@ public class Akira.Lib.Components.Fill : Component {
         color = init_color;
         hex = color.to_string ();
         alpha = 255;
-        gradient_pattern = new Cairo.Pattern.linear(0,0,0,0);
+        gradient_pattern = new Cairo.Pattern.linear (0,0,0,0);
 
         // Listen for changed to the fill attributes to properly trigger the color generation.
         this.notify["color"].connect (() => {

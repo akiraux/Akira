@@ -52,7 +52,7 @@ public class Akira.Lib.Components.Fills : Component {
 
         // Trigger the generation of the fill color.
        reload ();
-       
+
         return new_fill;
     }
 
@@ -89,17 +89,17 @@ public class Akira.Lib.Components.Fills : Component {
             }
 
             var stop_colors = 0;
-            fill.gradient_pattern.get_color_stop_count(out stop_colors);
-            
+            fill.gradient_pattern.get_color_stop_count (out stop_colors);
+
             // if for this fill, either of the gradient modes have been selected,
             // the stop_colors value would not be zero.
-            if(stop_colors != 0 && has_colors == false) {
-                if(item is Items.CanvasArtboard) {
+            if (stop_colors != 0 && has_colors == false) {
+                if (item is Items.CanvasArtboard) {
                     ((Items.CanvasArtboard) item).background.set ("fill-pattern", fill.gradient_pattern);
                 } else {
-                    item.set("fill-pattern", fill.gradient_pattern);
+                    item.set ("fill-pattern", fill.gradient_pattern);
                 }
-                
+
                 // since we dont have the functionality of blending gradients,
                 return;
             }

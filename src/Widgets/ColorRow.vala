@@ -79,7 +79,7 @@ public class Akira.Widgets.ColorRow : Gtk.Grid {
         color_popover = new Gtk.Popover (color_button);
         color_popover.position = Gtk.PositionType.BOTTOM;
 
-        color_mode_widget = new ColorMode(model, this.window);
+        color_mode_widget = new ColorMode (model, this.window);
 
         color_button.clicked.connect (() => {
             init_color_chooser ();
@@ -123,12 +123,12 @@ public class Akira.Widgets.ColorRow : Gtk.Grid {
             color_set_manually = true;
 
             var new_rgba = Utils.Color.hex_to_rgba (field_hex);
-            
-            set_button_color (field_hex, model.alpha);
-            window.event_bus.color_changed(new_rgba.to_string(), model.alpha / 255.0);
 
-            if(color_mode_widget.color_mode_type == "solid") {
-                model.color = new_rgba.to_string();
+            set_button_color (field_hex, model.alpha);
+            window.event_bus.color_changed (new_rgba.to_string (), model.alpha / 255.0);
+
+            if (color_mode_widget.color_mode_type == "solid") {
+                model.color = new_rgba.to_string ();
             }
 
             // Update the chooser widget only if it was already initialized.
@@ -150,7 +150,6 @@ public class Akira.Widgets.ColorRow : Gtk.Grid {
             opacity_field.entry.value = Math.round ((double) model.alpha / 255 * 100);
 
             opacity_field.entry.value_changed.connect (() => {
-                
                 // Don't do anything if the color change came from the chooser.
                 if (color_set_manually) {
                     return;
@@ -171,8 +170,8 @@ public class Akira.Widgets.ColorRow : Gtk.Grid {
                 var alpha = (int) ((double) opacity_field.entry.value / 100 * 255);
                 //model.alpha = alpha;
                 set_button_color (model.color, alpha);
-                
-                window.event_bus.color_changed(new_rgba.to_string(), alpha);
+
+                window.event_bus.color_changed (new_rgba.to_string (), alpha);
 
                 // Update the chooser widget only if it was already initialized.
                 if (color_chooser_widget != null) {
@@ -247,11 +246,11 @@ public class Akira.Widgets.ColorRow : Gtk.Grid {
         set_chooser_color (model.color, model.alpha);
 
         color_chooser_widget.notify["rgba"].connect (() => {
-            string new_color = color_chooser_widget.rgba.to_string();
+            string new_color = color_chooser_widget.rgba.to_string ();
             double alpha = color_chooser_widget.rgba.alpha;
 
             //color_mode_widget.on_color_changed(new_color, alpha);
-            window.event_bus.color_changed(new_color, alpha);
+            window.event_bus.color_changed (new_color, alpha);
         });
     }
 
