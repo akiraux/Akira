@@ -25,8 +25,8 @@ public class Akira.Widgets.GradientEditor : Gtk.EventBox {
     private int widget_x;
     private int widget_y;
     
-    private unowned Window window;
-    private unowned Models.ColorModel model;
+    private Window window;
+    private Models.ColorModel model;
     private string color_mode_type;
 
     // list to store all stop colors in order
@@ -238,7 +238,7 @@ public class Akira.Widgets.GradientEditor : Gtk.EventBox {
             warning ("Style error: %s", e.message);
             debug ("%s %s\n", name, css_style);
         }
-        
+
         create_gradient_pattern();
     }
 

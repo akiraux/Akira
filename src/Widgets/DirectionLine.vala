@@ -48,7 +48,6 @@ public class Akira.Widgets.DirectionLine {
         var root = canvas.get_root_item();
         gradient_editor = _gradient_editor;
 
-        print("create new direction line\n");
         start_nob = new Lib.Selection.Nob(root, Lib.Managers.NobManager.Nob.GRADIENT_START);
         end_nob = new Lib.Selection.Nob(root, Lib.Managers.NobManager.Nob.GRADIENT_END);
 
