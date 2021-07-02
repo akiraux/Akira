@@ -54,11 +54,12 @@ public class Akira.Widgets.DirectionLine {
         start_nob.set_rectangle();
         end_nob.set_rectangle();
 
-        start_nob.update_state(identity_mat, 50, 50, false);
-        end_nob.update_state(identity_mat, 150, 150, false);
-
-        set_initial_position(canvas.selected_bound_manager.selected_items);
         update_visibility("solid");
+
+        // initial position of direction nobs will be outside the canvas.
+        // when CanvasItem gets selected, they will be placed along the diagonal
+        start_nob.update_state(identity_mat, -10, -10, false);
+        end_nob.update_state(identity_mat, -10, -10, false);
 
         window.event_bus.color_mode_changed.connect(update_visibility);
         canvas.button_press_event.connect(on_buton_press_event);
@@ -129,6 +130,22 @@ public class Akira.Widgets.DirectionLine {
             return;
         }
 
+        if(start_nob.center_x == -10 || start_nob.center_y == -10) {
+            print("first time setup\n");
+            // if this is the first time the direction line is being displayed,
+            // set its default position along diagonal
+            double pos_x = selected_item.coordinates.x;
+            double pos_y = selected_item.coordinates.y;
+            double width = selected_item.size.width;
+            double height = selected_item.size.height;
+            double offset = Akira.Lib.Selection.Nob.NOB_SIZE;
+
+            // TODO: get the rotation matrix and artboard matrix from item and recalculate position
+
+            start_nob.update_state(identity_mat, pos_x+offset, pos_y+offset, true);
+            end_nob.update_state(identity_mat, pos_x+width-offset, pos_y+height-offset, true);
+        }
+
         color_mode_type = color_mode;
 
         if(color_mode == "solid") {
@@ -171,24 +188,5 @@ public class Akira.Widgets.DirectionLine {
         hide_direction_line();
         start_nob.remove();
         end_nob.remove();
-    }
-
-    private void set_initial_position (List<Lib.Items.CanvasItem> items) {
-        if(items.length() == 1) {
-            var item = items.first().data;
-
-            double pos_x = item.coordinates.x;
-            double pos_y = item.coordinates.y;
-            double width = item.size.width;
-            double height = item.size.height;
-
-            // TODO: get the rotation matrix and artboard matrix from item and recalculate position
-
-            start_nob.update_state(identity_mat, pos_x+10, pos_y+10, true);
-            end_nob.update_state(identity_mat, pos_x+width-10, pos_y+height-10, true);
-
-        } else {
-            // TODO: implement gradients when multiple items are selected
-        }
     }
 }
