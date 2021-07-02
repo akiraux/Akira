@@ -30,8 +30,8 @@
     public string color_mode_type;
 
     public Gtk.Grid buttons_grid;
-    private Models.ColorModel model;
-    private Window window;
+    private unowned Models.ColorModel model;
+    private unowned Window window;
 
     public ColorMode (Models.ColorModel _model, Window _window) {
         model = _model;
@@ -71,6 +71,15 @@
         delete_step_button.clicked.connect (on_delete_button_pressed);
 
         gradient_editor = new GradientEditor(window, model);
+
+        // since color modes on border havent been implmented yet, disable these buttons
+        if(model.type == Akira.Models.ColorModel.Type.BORDER) {
+            solid_color_button.sensitive = false;
+            linear_gradient_button.sensitive = false;
+            radial_gradient_button.sensitive = false;
+            delete_step_button.sensitive = false;
+
+        }
 
         Gtk.Separator separator = new Gtk.Separator (Gtk.Orientation.VERTICAL);
         separator.hexpand = true;

@@ -25,8 +25,8 @@ public class Akira.Widgets.GradientEditor : Gtk.EventBox {
     private int widget_x;
     private int widget_y;
     
-    private Window window;
-    private Models.ColorModel model;
+    private unowned Window window;
+    private unowned Models.ColorModel model;
     private string color_mode_type;
 
     // list to store all stop colors in order
@@ -60,19 +60,20 @@ public class Akira.Widgets.GradientEditor : Gtk.EventBox {
         selected_stop_color = stop_colors[0];
 
         size_allocate.connect( () => {
-        widget_width = get_allocated_width();
-        widget_height = get_allocated_height();
+            widget_width = get_allocated_width();
+            widget_height = get_allocated_height();
 
-        draw.connect_after ( (context) => {return redraw_editor(context);});
-        
-        button_press_event.connect( (event) => {return on_button_press(event);});
-        button_release_event.connect ( (event) => {return on_button_release(event); });
-        
-        window.event_bus.color_mode_changed.connect(on_color_mode_changed);
-        window.event_bus.color_changed.connect(on_color_changed);
+            draw.connect_after ( (context) => {return redraw_editor(context);});
+            
+            button_press_event.connect( (event) => {return on_button_press(event);});
+            button_release_event.connect ( (event) => {return on_button_release(event); });
+            
+            window.event_bus.color_mode_changed.connect(on_color_mode_changed);
+            window.event_bus.color_changed.connect(on_color_changed);
 
         });
 
+        //window.event_bus.color_changed.connect(on_color_changed);
     }
 
     private bool redraw_editor(Cairo.Context context) {
@@ -150,12 +151,17 @@ public class Akira.Widgets.GradientEditor : Gtk.EventBox {
     }
 
     public void on_color_changed(string color, double alpha) {
-        int index = stop_colors.index_of(selected_stop_color);
-        
-        stop_colors[index].color = color;
-        stop_colors[index].alpha = alpha;
-        
-        queue_draw_area(widget_x, widget_y, widget_width, widget_height);
+        if(color_mode_type != "solid") {
+            int index = stop_colors.index_of(selected_stop_color);
+            
+            stop_colors[index].color = color;
+            stop_colors[index].alpha = alpha;
+            
+            queue_draw_area(widget_x, widget_y, widget_width, widget_height);
+        } else {
+            model.color = color;
+            model.alpha = (int) (alpha * 255);
+        }
     }
     
     public void delete_selected_step () {

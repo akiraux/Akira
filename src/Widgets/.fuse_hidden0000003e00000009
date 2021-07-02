@@ -28,27 +28,25 @@ public class Akira.Widgets.DirectionLine {
     private Lib.Canvas canvas;
     private Lib.Items.CanvasItem selected_item;
     private unowned GradientEditor gradient_editor;
-    private unowned Window window;
-    private unowned Akira.Models.ColorModel.Type type;
+    private unowned Akira.Window window;
 
     // dummy identity matrix
     private Cairo.Matrix identity_mat = Cairo.Matrix.identity();
     
     public DirectionLine (Window _window, GradientEditor _gradient_editor, Akira.Models.ColorModel.Type type) {
-        this.type = type;
+        print("create direction line\n");
         // since gradients on borders are not yet supported, dont draw direction line
-
         if(type == Akira.Models.ColorModel.Type.BORDER) {
             return;
         }
- 
+
+        print("create new direction \n");  
         window = _window; 
         canvas = window.main_window.main_canvas.canvas as Lib.Canvas;
         selected_item = canvas.selected_bound_manager.selected_items.nth_data(0);
         var root = canvas.get_root_item();
         gradient_editor = _gradient_editor;
 
-        print("create new direction line\n");
         start_nob = new Lib.Selection.Nob(root, Lib.Managers.NobManager.Nob.GRADIENT_START);
         end_nob = new Lib.Selection.Nob(root, Lib.Managers.NobManager.Nob.GRADIENT_END);
 
@@ -64,18 +62,16 @@ public class Akira.Widgets.DirectionLine {
         window.event_bus.color_mode_changed.connect(update_visibility);
         canvas.button_press_event.connect(on_buton_press_event);
         canvas.button_release_event.connect(on_button_release_event);
-        
-        window.event_bus.selected_items_list_changed.connect (() => {
-            if(type == Akira.Models.ColorModel.Type.BORDER) {
-                return;
-            }
 
+        window.event_bus.selected_items_list_changed.connect (() => {
             if(canvas.selected_bound_manager.selected_items.length() == 0) {
                 destroy_direction_line();
+            } else {
+                if(color_mode_type != "solid") {
+                    show_direction_line();
+                }
             }
-            
         });
-        
     }
 
     public void get_direction_coords(out double x0, out double y0, out double x1, out double y1) {
@@ -87,10 +83,6 @@ public class Akira.Widgets.DirectionLine {
     }
 
     private bool on_buton_press_event(Gdk.EventButton event) {
-        if(type == Akira.Models.ColorModel.Type.BORDER) {
-            return false;
-        }
-
         if(start_nob.hit_test(event.x, event.y, canvas.get_scale())) {
             selected_nob = start_nob;
 
@@ -117,19 +109,11 @@ public class Akira.Widgets.DirectionLine {
     }
 
     private bool on_button_release_event(Gdk.EventButton event) {
-        if(type == Akira.Models.ColorModel.Type.BORDER) {
-            return false;
-        }
-
         canvas.motion_notify_event.disconnect(on_motion_event);
         return false;
     }
 
     private void update_visibility(string color_mode) {
-        if(type == Akira.Models.ColorModel.Type.BORDER) {
-            return;
-        }
-
         color_mode_type = color_mode;
 
         if(color_mode == "solid") {
@@ -140,28 +124,16 @@ public class Akira.Widgets.DirectionLine {
     }
 
     private void hide_direction_line() {
-        if(type == Akira.Models.ColorModel.Type.BORDER) {
-            return;
-        }
-
         start_nob.set("visibility", Goo.CanvasItemVisibility.HIDDEN);
         end_nob.set("visibility", Goo.CanvasItemVisibility.HIDDEN);
     }
 
     private void show_direction_line() {
-        if(type == Akira.Models.ColorModel.Type.BORDER) {
-            return;
-        }
-
         start_nob.set("visibility", Goo.CanvasItemVisibility.VISIBLE);
         end_nob.set("visibility", Goo.CanvasItemVisibility.VISIBLE);
     }
 
     private void destroy_direction_line() {
-        if(type == Akira.Models.ColorModel.Type.BORDER) {
-            return;
-        }
-
         // we need to destroy direction line everytime an item is deselected. This is because
         // when and item is selected, it creates a new instance of DirectionLine. This results in duplicate 
         // start_nob and end_nob
