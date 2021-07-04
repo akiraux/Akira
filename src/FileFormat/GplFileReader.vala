@@ -41,7 +41,7 @@ public class Akira.FileFormat.GplFileReader {
                 var parsed_line = /\s\s+/.split (line);
                 var rgba = Gdk.RGBA ();
                 rgba.parse ("rgb(" + parsed_line[0] + "," + parsed_line[1] + "," + parsed_line[2] + ")");
-                gpl_colors.colors.add(rgba);         
+                gpl_colors.colors.add (rgba);
             }
         } catch (Error e) {
             //  error(e.message);
