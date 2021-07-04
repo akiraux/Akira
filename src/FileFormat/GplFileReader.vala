@@ -33,18 +33,21 @@ public class Akira.FileFormat.GplFileReader {
                 print ("File is Corrupted");
             }
 
-            gpl_colors.name = lines[1].replace ("Name:", "").replace (" ", "");
+            else {
+                gpl_colors.name = lines[1].replace ("Name:", "").replace (" ", "");
 
-            // We used the index 3 because that is where the colors start from
-            for (int i = 3; i < lines.length; i++) {
-                string line = lines[i];
-                var parsed_line = /\s\s+/.split (line);
-                var rgba = Gdk.RGBA ();
-                rgba.parse ("rgb(" + parsed_line[0] + "," + parsed_line[1] + "," + parsed_line[2] + ")");
-                gpl_colors.colors.add (rgba);
+                // We used the index 3 because that is where the colors start from
+                for (int i = 3; i < lines.length; i++) {
+                    string line = lines[i];
+                    var parsed_line = /\s\s+/.split (line);
+                    var rgba = Gdk.RGBA ();
+                    rgba.parse ("rgb(" + parsed_line[0] + "," + parsed_line[1] + "," + parsed_line[2] + ")");
+                    gpl_colors.colors.add (rgba);
+                }
+
             }
         } catch (Error e) {
-            //  error(e.message);
+            error(e.message);
         }
         return gpl_colors;
     }
