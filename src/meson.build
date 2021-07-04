@@ -24,6 +24,8 @@ sources = files(
     'FileFormat/JsonItemSerializer.vala',
     'FileFormat/JsonDeserializer.vala',
     'FileFormat/ZipArchiveHandler.vala',
+    'FileFormat/GplFileReader.vala',
+    'FileFormat/GplObject.vala',
 
     'Services/Settings.vala',
     'Services/ActionManager.vala',
