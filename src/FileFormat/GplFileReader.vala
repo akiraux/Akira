@@ -47,7 +47,7 @@ public class Akira.FileFormat.GplFileReader {
 
             }
         } catch (Error e) {
-            error(e.message);
+            error (e.message);
         }
         return gpl_colors;
     }
