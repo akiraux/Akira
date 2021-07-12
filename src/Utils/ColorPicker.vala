@@ -17,7 +17,6 @@
 * along with Akira. If not, see <https://www.gnu.org/licenses/>.
 *
 * Authored by: Ivan "isneezy" Vilanculo <vilanculoivan@gmail.com>
-* Ported from: https://github.com/ColorPicker/RonnyDo
 */
 
 public class Akira.Utils.ColorPicker {
@@ -33,7 +32,7 @@ public class Akira.Utils.ColorPicker {
         parent = new Xdp.Parent (window);
         portal = new Xdp.Portal ();
 
-        portal.pick_color.begin(parent, null, picked_color);
+        portal.pick_color.begin (parent, null, picked_color);
     }
 
     public void picked_color (GLib.Object? object, GLib.AsyncResult? result) {

@@ -16,7 +16,7 @@ jobs:
       - name: Install Dependencies
         run: |
           apt update
-          apt install -y libarchive-dev libportal-dev valac meson appstream-util xvfb at-spi2-core git build-essential autoconf autoconf-archive autopoint automake pkg-config libtool m4 autoconf-archive gtk-doc-tools libxml2-utils gobject-introspection libgirepository1.0-dev libglib2.0-dev libjson-glib-dev gettext libcairo2-dev libgtk-3-dev
+          apt install -y libarchive-dev valac meson appstream-util xvfb at-spi2-core git build-essential autoconf autoconf-archive autopoint automake pkg-config libtool m4 autoconf-archive gtk-doc-tools libxml2-utils gobject-introspection libgirepository1.0-dev libglib2.0-dev libjson-glib-dev gettext libcairo2-dev libgtk-3-dev
       - name: goocanvas-3.0 from source
         run: |
           git clone https://gitlab.gnome.org/GNOME/goocanvas
@@ -29,6 +29,13 @@ jobs:
           ../configure --prefix /usr
           make
           make install
+      - name: libportal-4.0 from source
+        run: |
+          git cline https://github.com/flatpak/libportal/
+          cd libportal
+          git checkout f68764e
+          meson build
+          ninja install
       - name: Build
         # env:
         #   DESTDIR: out
