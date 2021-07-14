@@ -29,22 +29,19 @@ public struct Akira.Geometry.Rectangle {
     public double bottom;
     public double right;
 
-    public double center_x {
-        get { return (left + right) / 2.0; }
-    }
+    public double center_x { get { return (left + right) / 2.0; } }
+    public double center_y { get { return (bottom + top) / 2.0; } }
+    public double width { get { return (right - left).abs (); } }
+    public double height { get { return (bottom - top).abs (); } }
 
-    public double center_y {
-        get { return (bottom + top) / 2.0; }
-    }
-
-    Rectangle.empty () {
+    public Rectangle.empty () {
         top = 0;
         bottom = 0;
         left = 0;
         right = 0;
     }
 
-    Rectangle.with_coordinates (double x0, double y0, double x1, double y1) {
+    public Rectangle.with_coordinates (double x0, double y0, double x1, double y1) {
         if (x0 < x1) {
             left = x0;
             right = x1;

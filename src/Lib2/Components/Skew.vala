@@ -19,30 +19,19 @@
  * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
  */
 
-public class Akira.Lib2.Components.Rotation : Copyable<Rotation> {
-    private double _degrees;
+public class Akira.Lib2.Components.Skew : Copyable<Skew> {
+    private double _horizontal;
+    private double _vertical;
 
-    public Rotation (double degrees) {
-        _degrees = degrees;
+    public double horizontal { get { return _horizontal; } }
+    public double vertical { get { return _vertical; } }
+
+    public Skew (double horizontal, double _vertical) {
+        _horizontal = horizontal;
+        _vertical = vertical;
      }
 
-    public Rotation.from_radians (double radians) {
-        _degrees = 180 / GLib.Math.PI * radians;
+    public Skew copy () {
+        return new Skew (_horizontal, _vertical);
     }
-
-    public Rotation copy () {
-        return new Rotation (_degrees);
-    }
-
-     public double in_degrees () {
-        return _degrees;
-     }
-
-     public double in_radians () {
-        return _degrees * GLib.Math.PI / 180.0;
-     }
-
-     public bool has_normal_rotation () {
-         return GLib.Math.fmod (_degrees, 90) == 0;
-     }
 }

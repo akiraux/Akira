@@ -29,7 +29,7 @@ public class Akira.Lib2.Managers.NobManager : Object {
 
     public weak Lib2.ViewCanvas view_canvas { get; construct; }
 
-    private Goo.CanvasRect? select_effect = null;
+    private Goo.CanvasPolyline? select_effect = null;
     private Akira.Lib.Selection.Nob[] nobs = null;
     private Goo.CanvasPolyline? rotation_line = null;
 
@@ -171,7 +171,7 @@ public class Akira.Lib2.Managers.NobManager : Object {
 
     private void update_nob (
         Lib.Selection.Nob nob,
-        Geometry.RotatedRectangle rect,
+        Geometry.TransformedRectangle rect,
         bool show
     ) {
         double sc = view_canvas.current_scale;
@@ -194,13 +194,6 @@ public class Akira.Lib2.Managers.NobManager : Object {
 
                 rotation_line.set ("line-width", LINE_WIDTH / view_canvas.current_scale);
                 rotation_line.set ("visibility", Goo.CanvasItemVisibility.VISIBLE);
-
-                double pp0 = 0.0;
-                double pp1 = 0.0;
-                double pp2 = 0.0;
-                double pp3 = 0.0;
-                rotation_line.points.get_point (0, out pp0, out pp1);
-                rotation_line.points.get_point (1, out pp2, out pp3);
             }
             else {
                 rotation_line.set ("visibility", Goo.CanvasItemVisibility.HIDDEN);
@@ -221,36 +214,30 @@ public class Akira.Lib2.Managers.NobManager : Object {
 
         var rect = selection.coordinates ();
 
-        var width = rect.width;
-        var height = rect.height;
-
         if (select_effect == null) {
-            select_effect = new Goo.CanvasRect (
+            select_effect = new Goo.CanvasPolyline (
                 null,
-                -width / 2.0, -height / 2.0,
-                width, height,
-                "line-width", LINE_WIDTH / view_canvas.current_scale,
-                "stroke-color", STROKE_COLOR,
+                true,
+                4,
+                0.0, 0.0,
+                1.0, 0.0,
+                1.0, 1.0,
+                0.0, 1.0,
                 null
-            );
 
+            );
             select_effect.set ("parent", view_canvas.get_root_item ());
             select_effect.pointer_events = Goo.CanvasPointerEvents.NONE;
         }
 
-        select_effect.set ("x", -width / 2.0);
-        select_effect.set ("y", -height / 2.0);
-        select_effect.set ("width", width);
-        select_effect.set ("height", height);
+        var new_pts = new Goo.CanvasPoints (4);
+        new_pts.set_point (0, rect.tl_x, rect.tl_y);
+        new_pts.set_point (1, rect.tr_x, rect.tr_y);
+        new_pts.set_point (2, rect.br_x, rect.br_y);
+        new_pts.set_point (3, rect.bl_x, rect.bl_y);
+        select_effect.points = new_pts;
+
         select_effect.set ("line-width", LINE_WIDTH / view_canvas.current_scale);
-
-        var tr = Cairo.Matrix.identity ();
-        tr.x0 = rect.center_x;
-        tr.y0 = rect.center_y;
-        tr.rotate (rect.rotation);
-
-        select_effect.set_transform (tr);
-
         select_effect.set ("visibility", Goo.CanvasItemVisibility.VISIBLE);
     }
 }

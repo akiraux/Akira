@@ -24,8 +24,10 @@
   * that the properties of a rectangle are kept. For all intents and purposes, this
   * is simply a collection of four points and a rotation.
   */
-public struct Akira.Geometry.RotatedRectangle {
+public struct Akira.Geometry.TransformedRectangle {
     public double rotation;
+    public double horizontal_skew;
+    public double vertical_skew;
     public double tl_x;
     public double tl_y;
     public double tr_x;
@@ -49,8 +51,25 @@ public struct Akira.Geometry.RotatedRectangle {
         Utils.GeometryMath.min_max_coords (tl_x, tr_x, bl_x, br_x, ref left, ref right);
     }
 
-    public RotatedRectangle () {
+    public Rectangle bounding_box {
+        get {
+            double min_x = 0;
+            double max_x = 0;
+            Utils.GeometryMath.min_max_coords (tl_x, tr_x, bl_x, br_x, ref min_x, ref max_x);
+
+            double min_y = 0;
+            double max_y = 0;
+            Utils.GeometryMath.min_max_coords (tl_y, tr_y, bl_y, br_y, ref min_y, ref max_y);
+
+            return Rectangle .with_coordinates (min_x, min_y, max_x, max_y);
+        } 
+    }
+
+
+    public TransformedRectangle () {
         rotation = 0;
+        horizontal_skew = 0;
+        vertical_skew = 0;
         tl_x = 0;
         tl_y = 0;
         tr_x = 0;
@@ -60,4 +79,62 @@ public struct Akira.Geometry.RotatedRectangle {
         br_x = 0;
         br_y = 0;
     }
+
+    public TransformedRectangle.from_components (
+        double center_x, 
+        double center_y,
+        double width,
+        double height,
+        double rot_in_rads,
+        double h_skew,
+        double v_skew
+    ) {
+        rotation = rot_in_rads;
+        horizontal_skew = h_skew;
+        vertical_skew = v_skew;
+
+        var tr = Cairo.Matrix.identity();
+        tr.rotate (rot_in_rads);
+
+        var sr = Cairo.Matrix.identity();
+        sr.xy += horizontal_skew;
+        sr.yx += vertical_skew;
+
+        tr = Utils.GeometryMath.multiply_matrices (tr, sr);
+
+        tl_x = - width / 2.0;
+        tl_y = - height / 2.0;
+        br_x = width / 2.0;
+        br_y = height / 2.0;
+
+        var woffx = width;
+        var woffy = 0.0;
+        tr.transform_distance (ref tl_x, ref tl_y);
+        tr.transform_distance (ref br_x, ref br_y);
+        tr.transform_distance (ref woffx, ref woffy);
+
+        tl_x = center_x + tl_x;
+        tl_y = center_y + tl_y;
+
+        tr_x = tl_x + woffx;
+        tr_y = tl_y + woffy;
+
+        br_x = center_x + br_x;
+        br_y = center_y + br_y;
+        bl_x = br_x - woffx;
+        bl_y = br_y - woffy;
+    }
+
+    public void translate (double dx, double dy) {
+        tl_x += dx;
+        tr_x += dx;
+        bl_x += dx;
+        br_x += dx;
+
+        tl_y += dy;
+        tr_y += dy;
+        bl_y += dy;
+        br_y += dy;
+    }
+
 }

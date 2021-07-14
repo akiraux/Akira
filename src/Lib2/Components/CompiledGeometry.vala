@@ -21,9 +21,11 @@
 
 public class Akira.Lib2.Components.CompiledGeometry : Copyable<CompiledGeometry> {
     public struct CompiledGeometryData {
+        public Cairo.Matrix _rotation_transform;
+        public Cairo.Matrix _skew_transform;
         public Cairo.Matrix _transform;
         // These rectangles are in global coordinates
-        public Geometry.RotatedRectangle area;
+        public Geometry.TransformedRectangle area;
 
         // This is the bounding box that contains the rotated area
         public Geometry.Rectangle area_bb;
@@ -31,7 +33,7 @@ public class Akira.Lib2.Components.CompiledGeometry : Copyable<CompiledGeometry>
 
     private CompiledGeometryData _data;
 
-    public Geometry.RotatedRectangle area { get { return _data.area; }}
+    public Geometry.TransformedRectangle area { get { return _data.area; }}
     public Geometry.Rectangle area_bb { get { return _data.area_bb; }}
 
     public double tl_x { get { return _data.area.tl_x; }}
@@ -48,6 +50,8 @@ public class Akira.Lib2.Components.CompiledGeometry : Copyable<CompiledGeometry>
     public double bb_bottom { get { return _data.area_bb.bottom; }}
     public double bb_right { get { return _data.area_bb.right; }}
 
+    public Cairo.Matrix rotation_transform { get { return _data._rotation_transform; }}
+    public Cairo.Matrix skew_transform { get { return _data._skew_transform; }}
     public Cairo.Matrix transform { get { return _data._transform; }}
 
     public CompiledGeometry (CompiledGeometryData data) {
@@ -72,9 +76,26 @@ public class Akira.Lib2.Components.CompiledGeometry : Copyable<CompiledGeometry>
         unowned var rotation = components.rotation;
         unowned var size = components.size;
         unowned var center = components.center;
+        unowned var skew = components.skew;
 
-        _data._transform = Cairo.Matrix.identity ();
-        _data._transform.rotate (rotation.in_radians ());
+        _data._rotation_transform = Cairo.Matrix.identity ();
+        _data._skew_transform = Cairo.Matrix.identity ();
+        _data._rotation_transform.rotate (rotation.in_radians ());
+
+        _data.area.rotation = rotation.in_radians ();
+
+        if (skew == null) {
+            _data.area.horizontal_skew = 0;
+            _data.area.vertical_skew = 0;
+            _data._transform = _data._rotation_transform;
+        } else {
+            _data.area.horizontal_skew = skew.horizontal;
+            _data.area.vertical_skew = skew.vertical;
+            _data._skew_transform = Cairo.Matrix.identity ();
+            _data._skew_transform.xy = skew.horizontal;
+            _data._skew_transform.yx = skew.vertical;
+            _data._transform = Utils.GeometryMath.multiply_matrices (_data._skew_transform, _data._rotation_transform);
+        }
 
         var half_height = size.height / 2.0;
         var half_width = size.width / 2.0;
@@ -123,7 +144,6 @@ public class Akira.Lib2.Components.CompiledGeometry : Copyable<CompiledGeometry>
         _data.area.bl_y = y2;
         _data.area.br_x = x3;
         _data.area.br_y = y3;
-        _data.area.rotation = components.rotation.in_radians ();
 
         Utils.GeometryMath.min_max_coords (x0, x1, x2, x3, ref _data.area_bb.left, ref _data.area_bb.right);
         Utils.GeometryMath.min_max_coords (y0, y1, y2, y3, ref _data.area_bb.top, ref _data.area_bb.bottom);

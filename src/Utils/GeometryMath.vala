@@ -82,4 +82,83 @@ public class Akira.Utils.GeometryMath : Object {
          return GLib.Math.fmod (rot_in_degrees, 90) == 0;
     }
 
+    public static double vector2_dot_product (double x0, double y0, double x1, double y1) {
+        return x0 * x1 + y0 * y1;
+    }
+
+    public static double vector2_cross_product (double x0, double y0, double x1, double y1) {
+        return x0 * y1 - y0 * x1;
+    }
+
+
+    public static double angle_between_vectors (double x0, double y0, double x1, double y1) {
+        return GLib.Math.atan2 (
+            vector2_cross_product (x0, y0, x1, y1),
+            vector2_dot_product (x0, y0, x1, y1)
+        );
+    }
+
+    public static Cairo.Matrix multiply_matrices (Cairo.Matrix a, Cairo.Matrix b) {
+        return Cairo.Matrix (
+            a.xx * b.xx + a.yx * b.xy,
+            a.xx * b.yx + a.yx * b.yy,
+            a.xy * b.xx + a.yy * b.xy,
+            a.xy * b.yx + a.yy * b.yy,
+            a.x0 * b.xx + a.y0 * b.xy + b.x0,
+            a.x0 * b.yx + a.y0 * b.yy + b.y0);
+    }
+
+    public static Geometry.TransformedRectangle apply_stretch (
+        Cairo.Matrix stretch_mat,
+        Geometry.TransformedRectangle area,
+        double offset_x,
+        double offset_y,
+        double center_offset_x,
+        double center_offset_y,
+        ref double width,
+        ref double height,
+        ref double rotation,
+        ref double skew_h,
+        ref double skew_v
+    ) {
+        var tmp_rot = area.rotation;
+        stretch_mat.transform_distance (ref center_offset_x, ref center_offset_y);
+
+        var dx = area.center_x;
+        var dy = area.center_y;
+        area.translate (-dx, -dy);
+
+        stretch_mat.transform_distance (ref area.tl_x, ref area.tl_y);
+        stretch_mat.transform_distance (ref area.tr_x, ref area.tr_y);
+        stretch_mat.transform_distance (ref area.bl_x, ref area.bl_y);
+        stretch_mat.transform_distance (ref area.br_x, ref area.br_y);
+
+        width = (area.tl_x - area.tr_x).abs ();
+        height = (area.tl_y - area.bl_y).abs ();
+
+        var ltor_x = area.tr_x - area.tl_x;
+        var ltor_y = area.tr_y - area.tl_y;
+
+        rotation = angle_between_vectors (1, 0, ltor_x, ltor_y);
+
+        var extra_rot_mat = Cairo.Matrix.identity ();
+        extra_rot_mat.rotate (-rotation);
+
+        extra_rot_mat.transform_distance (ref area.tl_x, ref area.tl_y);
+        extra_rot_mat.transform_distance (ref area.tr_x, ref area.tr_y);
+        extra_rot_mat.transform_distance (ref area.bl_x, ref area.bl_y);
+        extra_rot_mat.transform_distance (ref area.br_x, ref area.br_y);
+
+        skew_h = GLib.Math.tan (GLib.Math.fmod (GLib.Math.PI - angle_between_vectors (0, 1, area.br_x - area.tr_x, area.br_y - area.tr_y), GLib.Math.PI));
+
+        ltor_x = area.tr_x - area.tl_x;
+        ltor_y = area.tr_y - area.tl_y;
+        var srot = angle_between_vectors (1, 0, ltor_x, ltor_y);
+
+        //print ("skew_h: %f %f %f\n", area.br_x - area.tr_x, area.br_y - area.tr_y, skew_h);
+        //skew_v = area.tl_y - area.tr_y;
+
+        area.translate (dx + offset_x + center_offset_x, dy + offset_y + center_offset_y);
+        return area;
+    }
 }

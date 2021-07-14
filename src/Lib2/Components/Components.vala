@@ -85,22 +85,24 @@ public class Akira.Lib2.Components.Components {
     public Coordinates? center = null;
     public Size? size = null;
     public Rotation? rotation = null;
+    public Skew? skew = null;
 
     public Layout? layout = null;
     
     public Components copy () {
         var cln = new Components ();
-        cln.borders = (borders == null) ? null : borders;
-        cln.border_radius = (border_radius == null) ? null : border_radius;
-        cln.fills = (fills == null) ? null : fills;
-        cln.flipped = (flipped == null) ? null : flipped;
-        cln.layer = (layer == null) ? null : layer;
-        cln.name = (name == null) ? null : name;
-        cln.opacity = (opacity == null) ? null : opacity;
+        cln.borders = borders;
+        cln.border_radius = border_radius;
+        cln.fills = fills;
+        cln.flipped = flipped;
+        cln.layer = layer;
+        cln.name = name;
+        cln.opacity = opacity;
 
-        cln.center = (center == null) ? null : center;
-        cln.size = (size == null) ? null : size;
-        cln.rotation = (rotation == null) ? null : rotation;
+        cln.center = center;
+        cln.size = size;
+        cln.rotation = rotation;
+        cln.skew = skew;
 
         return cln;
     }

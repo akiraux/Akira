@@ -414,7 +414,7 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
 
         for (var i = 0; i < num_of; ++i) {
             var x = GLib.Random.double_range (0, (GLib.Math.log (num_of + GLib.Math.E) - 1) * 1000);
-            var y = GLib.Random.double_range (0, (GLib.Math.log (num_of + GLib.Math.E) - 1) * 1000);
+            var y = GLib.Random.double_range (0, (GLib.Math.log (num_of + GLib.Math.E) - 1) * 1000) + 500;
             var new_item = add_debug_rect (x, y);
             view_canvas.selection_manager.add_to_selection (new_item.id);
         }

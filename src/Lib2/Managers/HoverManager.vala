@@ -78,8 +78,9 @@ public class Akira.Lib2.Managers.HoverManager : Object {
         double item_width = 0;
         double item_height = 0;
 
-        item_width = item.compiled_geometry.area.width;
-        item_height = item.compiled_geometry.area.height;
+        unowned var size = item.components.size;
+        item_width = size == null ? item.compiled_geometry.area.width : size.width;
+        item_height = size == null ? item.compiled_geometry.area.height : size.height;
 
         var scale = view_canvas.current_scale;
 

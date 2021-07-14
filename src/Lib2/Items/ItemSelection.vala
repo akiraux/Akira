@@ -106,26 +106,19 @@ public class Akira.Lib2.Items.NodeSelection : Object {
 
     public bool is_empty () { return nodes.size == 0; }
 
-    public Geometry.RotatedRectangle coordinates () {
-        var result = Geometry.RotatedRectangle ();
+    public Geometry.TransformedRectangle coordinates () {
+        var result = Geometry.TransformedRectangle ();
 
         if (nodes.size == 0) {
             return result;
         }
 
+        /* 
         if (nodes.size == 1) {
             unowned var item = first_node ().instance.item;
-            unowned var cg = item.compiled_geometry;
-            if (cg == null) {
-                return result;
-            }
-
-            result = cg.area;
-            if (item.components != null && item.components.rotation != null) {
-                result.rotation = item.components.rotation == null ? 0 : item.components.rotation.in_radians ();
-            }
-            return result;
+            return item.compiled_geometry.area;
         }
+        */
 
         double top = int.MAX;
         double bottom = int.MIN;

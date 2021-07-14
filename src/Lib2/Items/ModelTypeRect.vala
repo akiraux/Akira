@@ -108,17 +108,6 @@ public class Akira.Lib2.Items.ModelTypeRect : Object, ModelType<ModelTypeRect> {
                 item.canvas_item.set ("width", item.components.size.width);
                 item.canvas_item.set ("height", item.components.size.height);
                 item.canvas_item.set_transform (item.compiled_geometry.transform);
-
-                /*
-                double shift_x = -item.components.compiled_geometry.transform ().x0;
-                double shift_y = -item.components.compiled_geometry.transform ().y0;
-                double t = 500;
-                double l = 500;
-                double b = 1000;
-                double r = 1000;
-
-                item.canvas_item.set ("clip_path", Utils.SVGUtil.rect_to_svg_path (shift_x, shift_y, t, l, b, r));
-                */
                 break;
         }
     }

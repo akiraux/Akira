@@ -23,6 +23,9 @@ public class Akira.Lib2.ViewCanvas : Goo.Canvas {
     private const int SIZE = 30;
     public unowned Akira.Window window { get; construct; }
 
+    public Geometry.TransformedRectangle to_draw_1;
+    public Geometry.TransformedRectangle to_draw_2;
+
     public Lib2.Managers.ItemsManager items_manager;
     public Lib2.Managers.SelectionManager selection_manager;
     public Lib2.Managers.ModeManager mode_manager;
@@ -344,17 +347,68 @@ public class Akira.Lib2.ViewCanvas : Goo.Canvas {
     // #TODO temporary
     /*
     public override bool draw (Cairo.Context ctx) {
+
         base.draw (ctx);
+        draw_debug_rect (ctx, to_draw_1.bounding_box, Gdk.RGBA () { red = 1.0, green = 0.0, blue = 0.0, alpha = 1.0});
+        draw_debug_rotated_rect (ctx, to_draw_1, Gdk.RGBA () { red = 0.0, green = 1.0, blue = 0.5, alpha = 1.0});
 
-        foreach (var item in items_manager.items) {
-            //draw_debug_info (ctx, item);
-        }
-
-        draw_debug_selection(ctx);
+        draw_debug_rect (ctx, to_draw_2.bounding_box, Gdk.RGBA () { red = 5.0, green = 0.0, blue = 0.0, alpha = 1.0});
+        draw_debug_rotated_rect (ctx, to_draw_2, Gdk.RGBA () { red = 0.0, green = 5.0, blue = 0.2, alpha = 1.0});
 
         return false;
     }
     */
+
+    public void draw_debug_rect (Cairo.Context ctx, Geometry.Rectangle rect, Gdk.RGBA color) {
+        var xadj = hadjustment.value;
+        var yadj = vadjustment.value;
+
+        var cs = current_scale;
+
+        ctx.save ();
+        var top = rect.top * cs;
+        var left = rect.left * cs;
+        var bottom = rect.bottom * cs;
+        var right = rect.right * cs;
+
+        var width = right - left;
+        var height = bottom - top;
+        ctx.move_to (left - xadj, top - yadj);
+        ctx.set_source_rgba (color.red, color.green, color.blue, color.alpha);
+        ctx.rel_line_to (width, 0);
+        ctx.rel_line_to (0, height);
+        ctx.rel_line_to (-width, 0);
+        ctx.close_path ();
+        ctx.stroke ();
+
+        ctx.restore ();
+    }
+
+    public void draw_debug_rotated_rect (Cairo.Context ctx, Geometry.TransformedRectangle rect, Gdk.RGBA color) {
+        var xadj = hadjustment.value;
+        var yadj = vadjustment.value;
+
+        var cs = current_scale;
+
+        var x0 = rect.tl_x * cs - xadj;
+        var y0 = rect.tl_y * cs - yadj;
+        var x1 = rect.tr_x * cs - xadj;
+        var y1 = rect.tr_y * cs - yadj;
+        var x2 = rect.bl_x * cs - xadj;
+        var y2 = rect.bl_y * cs - yadj;
+        var x3 = rect.br_x * cs - xadj;
+        var y3 = rect.br_y * cs - yadj;
+
+        ctx.save ();
+        ctx.move_to (x0, y0);
+        ctx.set_source_rgba (color.red, color.green, color.blue, color.alpha);
+        ctx.line_to (x1, y1);
+        ctx.line_to (x3, y3);
+        ctx.line_to (x2, y2);
+        ctx.close_path ();
+        ctx.stroke ();
+        ctx.restore ();
+    }
 
     public void draw_debug_info (Cairo.Context ctx, Lib2.Items.ModelItem item) {
         /*

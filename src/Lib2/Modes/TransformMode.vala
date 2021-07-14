@@ -40,7 +40,7 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
         public double press_y;
 
         // initial_selection_data
-        public Geometry.RotatedRectangle area;
+        public Geometry.TransformedRectangle area;
 
         public Gee.HashMap<int, DragItemData> item_data_map;
 
@@ -235,9 +235,6 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
             }
         }
 
-        ulong microseconds;
-        double seconds;
-
         foreach (var node in selection.nodes.values) {
             if (node.instance.is_group ()) {
                 translate_group (view_canvas, node, initial_drag_state, delta_x, delta_y, snap_offset_x, snap_offset_y);
@@ -291,9 +288,8 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
         var blocker = new Lib2.Managers.SelectionManager.ChangeSignalBlocker (view_canvas.selection_manager);
         (void) blocker;
 
-        if (selection.nodes.size != 1) {
-            return;
-        }
+        //view_canvas.to_draw_1 = initial_drag_state.area;
+        //view_canvas.request_redraw (Goo.CanvasBounds () { x1 = 0, y1 = 0, x2 = 3000, y2 = 3000 });
 
         var local_top = initial_drag_state.area.tl_y;
         var local_left = initial_drag_state.area.tl_x;
@@ -349,7 +345,7 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
             local_ev_x - local_nob_x,
             local_ev_y - local_nob_y,
             start_width / start_height,
-            false,
+            view_canvas.ctrl_is_pressed,
             view_canvas.shift_is_pressed,
             tr,
             ref inc_x,
@@ -362,21 +358,75 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
         double size_off_y = inc_height / 2.0;
         tr.transform_distance (ref size_off_x, ref size_off_y);
 
-        var ct = 0;
+        var offset_x =  inc_x + size_off_x + grid_offset_x;
+        var offset_y = inc_y + size_off_y + grid_offset_y;
+
+        var new_area = Geometry.TransformedRectangle.from_components (
+            rot_center_x + offset_x,
+            rot_center_y + offset_y,
+            start_width + inc_width,
+            start_height + inc_height,
+            initial_drag_state.area.rotation,
+            0.0,
+            0.0
+        );
+
+        //view_canvas.to_draw_2 = new_area;
+
         foreach (var node in selection.nodes.values) {
-            if (node.instance.is_group ()) {
-                print ("IMPLEMENT GROUP SCALING\n");
-                ct++;
-                continue;
-            }
-            unowned var item = node.instance.item;
+            scale_node (
+                view_canvas, 
+                node, 
+                initial_drag_state, 
+                new_area,
+                offset_x,
+                offset_y,
+                inc_width,
+                inc_height
+            );
+
+        }
+
+        view_canvas.items_manager.compile_model ();
+    }
+
+    public static void scale_node (
+        ViewCanvas view_canvas,
+        Lib2.Items.ModelNode node,
+        InitialDragState initial_drag_state,
+        Geometry.TransformedRectangle new_area,
+        double offset_x,
+        double offset_y,
+        double offset_local_width,
+        double offset_local_height
+    ){
+        // #TODO wip
+        unowned var item = node.instance.item;
+        if (item.components.center != null && item.components.size != null) {
             var item_drag_data = initial_drag_state.item_data_map[node.id];
 
-            double new_center_x = item_drag_data.item_geometry.area.center_x + inc_x + size_off_x + grid_offset_x;
-            double new_center_y = item_drag_data.item_geometry.area.center_y + inc_y + size_off_y + grid_offset_y;
+            double old_center_x = item_drag_data.item_geometry.area.center_x;
+            double old_center_y = item_drag_data.item_geometry.area.center_y;
 
-            double new_width = item_drag_data.item_geometry.area.width + inc_width;
-            double new_height = item_drag_data.item_geometry.area.height + inc_height;
+            double center_offset_x = old_center_x - initial_drag_state.area.center_x;
+            double center_offset_y = old_center_y - initial_drag_state.area.center_y;
+
+            var sx = new_area.width / initial_drag_state.area.width;
+            var sy = new_area.height / initial_drag_state.area.height;
+
+            double new_center_x = item_drag_data.item_geometry.area.center_x + offset_x + center_offset_x * (sx - 1);
+            double new_center_y = item_drag_data.item_geometry.area.center_y + offset_y + center_offset_y * (sy - 1);
+
+            double width_adj = item_drag_data.item_geometry.area.width * (sx - 1);
+            double height_adj = item_drag_data.item_geometry.area.height * (sy - 1);
+            var tr = Cairo.Matrix.identity ();
+
+            tr.rotate (-(item_drag_data.item_geometry.area.rotation - initial_drag_state.area.rotation));
+            tr.transform_distance (ref width_adj, ref height_adj);
+
+            double new_width = item_drag_data.item_geometry.area.width + width_adj;
+            double new_height = item_drag_data.item_geometry.area.height + height_adj;
+
 
             if (Utils.GeometryMath.is_normal_rotation (item_drag_data.item_geometry.area.rotation * 180 / Math.PI)) {
                 new_width = Utils.AffineTransform.fix_size (new_width);
@@ -390,15 +440,57 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
             }
 
 
+            /*
+            var d_w = 0.0;
+            var d_h = 0.0;
+            var d_r = 0.0;
+            var d_sh = 0.0;
+            var d_sv = 0.0;
+
+            var strf = Cairo.Matrix.identity ();
+            strf.scale (
+                new_area.bounding_box.width / initial_drag_state.area.bounding_box.width, 
+                new_area.bounding_box.height / initial_drag_state.area.bounding_box.height
+            );
+
+            var ress = Utils.GeometryMath.apply_stretch (
+                strf, 
+                item_drag_data.item_geometry.area,
+                offset_x,
+                offset_y,
+                center_offset_x,
+                center_offset_y,
+                ref d_w,
+                ref d_h,
+                ref d_r,
+                ref d_sh,
+                ref d_sv
+            );
+            view_canvas.to_draw_1 = ress;
+            view_canvas.to_draw_2 = item_drag_data.item_geometry.area;
+            view_canvas.request_redraw (Goo.CanvasBounds () { x1 = 0, y1 = 0, x2 = 3000, y2 = 3000 });
+            */
 
             item.components.center = new Lib2.Components.Coordinates (new_center_x, new_center_y);
+            //item.components.skew = new Lib2.Components.Skew (d_sh, d_sv);
             item.components.size = new Lib2.Components.Size (new_width, new_height, false);
             item.mark_geometry_dirty ();
-
-            ct++;
         }
 
-        view_canvas.items_manager.compile_model ();
+        if (node.children != null && node.children.length > 0) {
+            foreach (unowned var child in node.children.data) {
+                scale_node (
+                    view_canvas,
+                    child,
+                    initial_drag_state,
+                    new_area,
+                    offset_x,
+                    offset_y,
+                    offset_local_width,
+                    offset_local_height
+                );
+            }
+        }
     }
 
     public static void rotate_from_event (
