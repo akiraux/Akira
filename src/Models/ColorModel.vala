@@ -33,6 +33,15 @@ public class Akira.Models.ColorModel : GLib.Object {
         BORDER
     }
 
+    public string color_mode {
+        get {
+            return "solid";
+        }
+        set {
+            color_mode = value;
+        }
+    }
+
     public Cairo.Pattern pattern {
             owned get {
                 return pattern;

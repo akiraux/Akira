@@ -27,17 +27,17 @@ public class Akira.Widgets.DirectionLine {
 
     private Lib.Canvas canvas;
     private Lib.Items.CanvasItem selected_item;
-    private unowned GradientEditor gradient_editor;
-    private unowned Window window;
-    private unowned Akira.Models.ColorModel.Type type;
+    private GradientEditor gradient_editor;
+    private Window window;
+    private Akira.Models.ColorModel.Type type;
 
     // dummy identity matrix
     private Cairo.Matrix identity_mat = Cairo.Matrix.identity ();
 
-    public DirectionLine (Window _window, GradientEditor _gradient_editor, Akira.Models.ColorModel.Type type) {
-        this.type = type;
-        // since gradients on borders are not yet supported, dont draw direction line
+    public DirectionLine (Window _window, GradientEditor _gradient_editor, Akira.Models.ColorModel model) {
+        type = model.type;
 
+        // since gradients on borders are not yet supported, dont draw direction line
         if (type == Akira.Models.ColorModel.Type.BORDER) {
             return;
         }
@@ -54,7 +54,8 @@ public class Akira.Widgets.DirectionLine {
         start_nob.set_rectangle ();
         end_nob.set_rectangle ();
 
-        update_visibility ("solid");
+        color_mode_type = model.color_mode;
+        update_visibility (model.color_mode);
 
         // initial position of direction nobs will be outside the canvas.
         // when CanvasItem gets selected, they will be placed along the diagonal

@@ -41,9 +41,9 @@ public class Akira.Widgets.GradientEditor : Gtk.EventBox {
         window = _window;
         model = _model;
 
-        color_mode_type = "solid";
+        color_mode_type = model.color_mode;
 
-        direction_line = new DirectionLine (_window, this, model.type);
+        direction_line = new DirectionLine (_window, this, _model);
         gradient_pattern = new Cairo.Pattern.linear (0,0,0,0);
 
         set_hexpand (true);
