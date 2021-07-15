@@ -35,6 +35,22 @@ public class Akira.Models.ColorModel : GLib.Object {
 
     public string color_mode {
         get {
+            if(type == Type.FILL) {
+
+                int stop_count;
+                fill.gradient_pattern.get_color_stop_count(out stop_count);
+
+                if(stop_count != 0) {
+                    // if the gradient pattern has at least 1 stop color and is of linear type
+                    if(fill.gradient_pattern.get_type() == Cairo.PatternType.LINEAR) {
+                        return "linear";
+                    }
+
+                    return "radial";
+                }
+            }
+
+            // in all other cases and for border type, color mode is solid
             return "solid";
         }
         set {
