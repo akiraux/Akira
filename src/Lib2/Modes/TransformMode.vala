@@ -106,7 +106,13 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
         view_canvas.window.event_bus.update_snap_decorators ();
     }
 
-    public override AbstractInteractionMode.ModeType mode_type () { return AbstractInteractionMode.ModeType.RESIZE; }
+    public override AbstractInteractionMode.ModeType mode_type () { 
+        return AbstractInteractionMode.ModeType.TRANSFORM; 
+    }
+
+    public override Utils.Nobs.Nob acitve_nob () { 
+        return nob; 
+    }
 
     public override Gdk.CursorType? cursor_type () {
         return Utils.Nobs.cursor_from_nob (nob);

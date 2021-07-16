@@ -43,6 +43,7 @@ public class Akira.Lib2.Managers.NobManager : Object {
     construct {
         view_canvas.window.event_bus.selection_modified.connect (on_update_select_effect);
         view_canvas.window.event_bus.zoom.connect (on_update_select_effect);
+        view_canvas.mode_manager.mode_changed.connect (on_update_select_effect);
     }
 
     public Utils.Nobs.Nob hit_test (double x, double y) {
@@ -155,6 +156,8 @@ public class Akira.Lib2.Managers.NobManager : Object {
         bool show_h_centers = height > nob_size * 3;
         bool show_v_centers = width > nob_size * 3;
 
+        var active_nob_id = view_canvas.mode_manager.active_mode_nob;
+
         foreach (var nob in nobs) {
             bool set_visible = true;
 
@@ -165,8 +168,18 @@ public class Akira.Lib2.Managers.NobManager : Object {
                 set_visible = false;
             }
 
-            update_nob (nob, rect, set_visible);
+            update_nob (nob, rect, set_visible && !nob_masked (nob, active_nob_id));
         }
+    }
+
+    private bool nob_masked (Lib.Selection.Nob nob, Utils.Nobs.Nob nob_id) {
+        if (nob_id == Utils.Nobs.Nob.NONE) {
+            return true;
+        } else  if (nob_id == Utils.Nobs.Nob.ALL) {
+            return false;
+        }
+
+        return nob.handle_id != nob_id;
     }
 
     private void update_nob (

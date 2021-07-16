@@ -36,12 +36,22 @@
 public class Akira.Lib2.Managers.ModeManager : Object {
     public unowned Lib2.ViewCanvas view_canvas { get; construct; }
 
-    private Akira.Lib2.Modes.PanMode pan_mode;
-    private Akira.Lib2.Modes.AbstractInteractionMode active_mode;
+    private Lib2.Modes.PanMode pan_mode;
+    private Lib2.Modes.AbstractInteractionMode active_mode;
+
+    public Lib2.Modes.AbstractInteractionMode.ModeType active_mode_type { 
+        get { 
+            return (active_mode == null) ? Lib2.Modes.AbstractInteractionMode.ModeType.NONE : active_mode.mode_type (); 
+        } 
+    }
+
+    public Utils.Nobs.Nob active_mode_nob { get { return (active_mode == null) ? Utils.Nobs.Nob.ALL : active_mode.acitve_nob (); } }
 
     public ModeManager (Akira.Lib2.ViewCanvas canvas) {
         Object (view_canvas: canvas);
     }
+
+    public signal void mode_changed ();
 
     /*
      * Register a new mode as the active mode. Any prior mode will be deregistered.
@@ -54,7 +64,7 @@ public class Akira.Lib2.Managers.ModeManager : Object {
         active_mode = new_mode;
         active_mode.request_deregistration.connect (on_deregistration_request);
         active_mode.mode_begin ();
-        view_canvas.interaction_mode_changed ();
+        mode_changed ();
     }
 
     /*
@@ -92,7 +102,7 @@ public class Akira.Lib2.Managers.ModeManager : Object {
         pan_mode.request_deregistration.connect (on_deregistration_request);
         pan_mode.mode_begin ();
 
-        view_canvas.interaction_mode_changed ();
+        mode_changed ();
     }
 
     /*
@@ -113,7 +123,7 @@ public class Akira.Lib2.Managers.ModeManager : Object {
         pan_mode = null;
 
         if (notify) {
-            view_canvas.interaction_mode_changed ();
+            mode_changed ();
         }
     }
 
@@ -126,7 +136,7 @@ public class Akira.Lib2.Managers.ModeManager : Object {
         active_mode = null;
 
         if (notify) {
-            view_canvas.interaction_mode_changed ();
+            mode_changed ();
         }
     }
 

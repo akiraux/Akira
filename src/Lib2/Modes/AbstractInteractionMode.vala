@@ -43,7 +43,11 @@ public abstract class Akira.Lib2.Modes.AbstractInteractionMode : Object {
      * Mode type that is used for introspection.
      */
     public enum ModeType {
-        RESIZE,
+        NONE,
+        TRANSFORM,
+        TRANSLATE,
+        SCALE,
+        ROTATE,
         ITEM_INSERT,
         EXPORT,
         PAN
@@ -55,6 +59,13 @@ public abstract class Akira.Lib2.Modes.AbstractInteractionMode : Object {
      * Override to define ModeType associated to mode.
      */
     public abstract ModeType mode_type ();
+
+    /*
+     * Override to define a sub ModeType associated to mode.
+     */
+    public virtual Utils.Nobs.Nob acitve_nob () { 
+        return Utils.Nobs.Nob.ALL;
+    }
 
     /*
      * Override to add startup behavior to the mode.

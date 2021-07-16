@@ -23,6 +23,7 @@
 public class Akira.Lib2.Managers.SnapManager : Object {
     private const double LINE_WIDTH = 0.5;
     private const double DOT_RADIUS = 2.0;
+    public const int MAX_CANDIDATES = 1000;
 
     public unowned ViewCanvas view_canvas { get; construct; }
 
@@ -127,7 +128,7 @@ public class Akira.Lib2.Managers.SnapManager : Object {
      * Populates decorators (if applicable) based on match data and the snap grid.
      * Reuses decorator Goo.CanvasItems if possible, otherwise constructs new ones.
      */
-    public void populate_decorators_from_data (Utils.Snapping.SnapMatchData data, Utils.Snapping.SnapGrid grid) {
+    public void populate_decorators_from_data (Utils.Snapping2.SnapMatchData2 data, Utils.Snapping2.SnapGrid2 grid) {
         if (root == null) {
             root = view_canvas.get_root_item ();
         }
@@ -137,24 +138,24 @@ public class Akira.Lib2.Managers.SnapManager : Object {
         if (data.v_data.snap_found ()) {
             foreach (var snap_position in data.v_data.exact_matches) {
                 any_decorators_visible = true;
-                add_vertical_decorator_line (snap_position.key, snap_position.value, grid);
+                add_vertical_decorator_line (snap_position, grid);
             }
         }
 
         if (data.h_data.snap_found ()) {
             foreach (var snap_position in data.h_data.exact_matches) {
                 any_decorators_visible = true;
-                add_horizontal_decorator_line (snap_position.key, snap_position.value, grid);
+                add_horizontal_decorator_line (snap_position, grid);
             }
         }
     }
 
-    private void add_vertical_decorator_line (int pos, int polarity_offset, Utils.Snapping.SnapGrid grid) {
+    private void add_vertical_decorator_line (int pos, Utils.Snapping2.SnapGrid2 grid) {
         double lw = LINE_WIDTH / view_canvas.current_scale;
         var snap_value = grid.v_snaps.get (pos);
         if (snap_value != null) {
             // To actually show decorators in their exact position, we offset by 0.5.
-            double actual_pos = (double) (pos + polarity_offset);
+            double actual_pos = (double) (pos);
 
             // Add dots.
             foreach (var normal in snap_value.normals) {
@@ -190,11 +191,11 @@ public class Akira.Lib2.Managers.SnapManager : Object {
         }
     }
 
-    private void add_horizontal_decorator_line (int pos, int polarity_offset, Utils.Snapping.SnapGrid grid) {
+    private void add_horizontal_decorator_line (int pos, Utils.Snapping2.SnapGrid2 grid) {
         double lw = LINE_WIDTH / view_canvas.current_scale;
         var snap_value = grid.h_snaps.get (pos);
         if (snap_value != null) {
-            double actual_pos = (double) (pos + polarity_offset);
+            double actual_pos = (double) (pos);
 
             // Add dots.
             foreach (var normal in snap_value.normals) {

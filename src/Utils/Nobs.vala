@@ -42,7 +42,8 @@ public class Akira.Utils.Nobs : Object {
         BOTTOM_CENTER,
         BOTTOM_LEFT,
         LEFT_CENTER,
-        ROTATE
+        ROTATE,
+        ALL
     }
 
     public static bool is_top_nob (Nob nob) {

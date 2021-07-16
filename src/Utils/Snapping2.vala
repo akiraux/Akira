@@ -24,6 +24,75 @@
  * For Lib2
  */
 public class Akira.Utils.Snapping2 : Object {
+    /**
+     * Metadata used in the cosmetic aspects of snap lines and dots.
+     */
+    public class SnapMeta2 {
+        public int[] normals;
+        public int polarity;
+    }
+
+    /**
+     * Grid snaps found for a given selection and set of candidates.
+     */
+    public struct SnapGrid2 {
+        public bool is_empty () {
+            return (v_snaps.size == 0 && h_snaps.size == 0);
+        }
+
+        public Gee.TreeMap<int, SnapMeta2> v_snaps;
+        public Gee.TreeMap<int, SnapMeta2> h_snaps;
+    }
+
+    /**
+     * Type of match that was found for a snap.
+     */
+    public enum MatchType2 {
+        NONE = -1,  //< No match was found.
+        FUZZY,      //< A match was found, but requires an offset.
+        EXACT,      //< An exact match was found, no offset is necessary.
+    }
+
+    /**
+     * Information used to define a match for a given selection.
+     * An instance of this class corresponds to a single direction (vertical or horizontal).
+     */
+    public struct SnapMatch2 {
+        /**
+         * Returns true if a match was found
+         */
+        public bool snap_found () {
+            return type != MatchType2.NONE;
+        }
+
+        /**
+         * Returns the offset necessary to bring the reference position to the selected items.
+         */
+        public int snap_offset () {
+            if (snap_found ()) {
+                return snap_position - reference_position;
+            }
+            return 0;
+        }
+
+        public MatchType2 type;
+        public int snap_position; //< Position of matched snap.
+        public int reference_position; //< Position relative to the selection used as a reference.
+        public Gee.Set<int> exact_matches; //< map of exact matches.
+    }
+
+    /**
+     * Couple of MatchData used for convenience.
+     */
+    public struct SnapMatchData2 {
+        public bool snap_found () {
+            return h_data.snap_found () || v_data.snap_found ();
+        }
+
+        SnapMatch2 h_data;
+        SnapMatch2 v_data;
+    }
+
     /*
      * Returns a sensitivity adjusted to the given canvas scale.
      */
@@ -40,7 +109,7 @@ public class Akira.Utils.Snapping2 : Object {
     /*
      * Generates the best snap grid from selection.
      */
-    public static Utils.Snapping.SnapGrid generate_best_snap_grid (
+    public static SnapGrid2 generate_best_snap_grid (
         Lib2.ViewCanvas canvas,
         Lib2.Items.NodeSelection selection,
         Geometry.Rectangle selection_area,
@@ -52,9 +121,9 @@ public class Akira.Utils.Snapping2 : Object {
         selection_area.bottom += sensitivity;
 
         //Lib2.Items.CanvasArtboard artboard = null;
+        /*
         bool all_in_same_artboard = false;
 
-        /*
         foreach (var sel in selection) {
             if (artboard != null && artboard != sel.artboard) {
                 all_in_same_artboard = false;
@@ -76,15 +145,15 @@ public class Akira.Utils.Snapping2 : Object {
     /*
      * Generates a snap grid from a canvas.
      */
-    public static Utils.Snapping.SnapGrid snap_grid_from_canvas (
+    public static SnapGrid2 snap_grid_from_canvas (
         Lib2.ViewCanvas canvas,
         Lib2.Items.NodeSelection selection,
         Geometry.Rectangle selection_area,
         int sensitivity
     ) {
-        var grid = Utils.Snapping.SnapGrid ();
-        grid.v_snaps = new Gee.HashMap<int, Utils.Snapping.SnapMeta> ();
-        grid.h_snaps = new Gee.HashMap<int, Utils.Snapping.SnapMeta> ();
+        var grid = SnapGrid2 ();
+        grid.v_snaps = new Gee.TreeMap<int, SnapMeta2> ();
+        grid.h_snaps = new Gee.TreeMap<int, SnapMeta2> ();
 
         double vis_x1 = 0;
         double vis_x2 = 0;
@@ -93,14 +162,18 @@ public class Akira.Utils.Snapping2 : Object {
         canvas.visible_bounds (ref vis_y1, ref vis_x1, ref vis_y2, ref vis_x2);
 
         var candidate_list = canvas.items_manager.children_in_group(Lib2.Items.Model.origin_id);
+
+        int v_added = 0;
+        int h_added = 0;
+
         for (var i = 0; i < candidate_list.length; ++i) {
-            var item = candidate_list.index(i).instance.item;
+            unowned var item = candidate_list.index(i).instance.item;
 
             if (item == null || selection.has_id (item.id, true)) {
                 continue;
             }
 
-            var bb = item.compiled_components.compiled_geometry.area_bb;
+            unowned var bb = item.compiled_components.compiled_geometry.area_bb;
 
             if ((bb.right < vis_x1 || bb.left > vis_x2) ||
                 (bb.bottom < vis_y1 || bb.top > vis_y2)) {
@@ -110,10 +183,16 @@ public class Akira.Utils.Snapping2 : Object {
 
             if (!(bb.right < selection_area.left || bb.left > selection_area.right)) {
                 populate_horizontal_snaps (bb, ref grid.h_snaps);
+                h_added++;
             }
 
             if (!(bb.bottom < selection_area.top || bb.top > selection_area.bottom)) {
                 populate_vertical_snaps (bb, ref grid.v_snaps);
+                v_added++;
+            }
+
+            if (v_added >= Lib2.Managers.SnapManager.MAX_CANDIDATES || h_added >= Lib2.Managers.SnapManager.MAX_CANDIDATES) {
+                break;
             }
         }
 
@@ -123,16 +202,16 @@ public class Akira.Utils.Snapping2 : Object {
     /**
      * Calculate snaps inside a grid that match the selection input.
      */
-    public static Utils.Snapping.SnapMatchData generate_snap_matches (
-        Utils.Snapping.SnapGrid grid,
+    public static SnapMatchData2 generate_snap_matches (
+        SnapGrid2 grid,
         Lib2.Items.NodeSelection selection,
         Geometry.Rectangle selection_area,
         int sensitivity
     ) {
-        var matches = Utils.Snapping.default_match_data ();
+        var matches = Utils.Snapping2.default_match_data ();
 
-        var v_sel_snaps = new Gee.HashMap<int, Utils.Snapping.SnapMeta> ();
-        var h_sel_snaps = new Gee.HashMap<int, Utils.Snapping.SnapMeta> ();
+        var v_sel_snaps = new Gee.TreeMap<int, SnapMeta2> ();
+        var h_sel_snaps = new Gee.TreeMap<int, SnapMeta2> ();
 
         populate_vertical_snaps (selection_area, ref v_sel_snaps);
         populate_horizontal_snaps (selection_area, ref h_sel_snaps);
@@ -149,7 +228,7 @@ public class Akira.Utils.Snapping2 : Object {
      */
     private static void populate_horizontal_snaps (
         Geometry.Rectangle rect,
-        ref Gee.HashMap<int, Utils.Snapping.SnapMeta> map
+        ref Gee.TreeMap<int, SnapMeta2> s_map
     ) {
         int x_1 = (int) Math.round (rect.left);
         int x_2 = (int) Math.round (rect.right);
@@ -158,9 +237,9 @@ public class Akira.Utils.Snapping2 : Object {
         int cx = snap_ceil (rect.center_x);
         int cy = snap_ceil (rect.center_y);
 
-        add_to_map (x_1, y_1, y_2, cy, -1, ref map);
-        add_to_map (x_2, y_1, y_2, cy, 1, ref map);
-        add_to_map (cx, cy, cy, cy, 0, ref map);
+        add_to_map (x_1, y_1, y_2, cy, -1, ref s_map);
+        add_to_map (x_2, y_1, y_2, cy, 1, ref s_map);
+        add_to_map (cx, cy, cy, cy, 0, ref s_map);
     }
 
     /*
@@ -168,7 +247,7 @@ public class Akira.Utils.Snapping2 : Object {
      */
     private static void populate_vertical_snaps (
         Geometry.Rectangle rect,
-        ref Gee.HashMap<int, Utils.Snapping.SnapMeta> map
+        ref Gee.TreeMap<int, SnapMeta2> s_map
     ) {
         int x_1 = (int) Math.round (rect.left);
         int x_2 = (int) Math.round (rect.right);
@@ -177,9 +256,9 @@ public class Akira.Utils.Snapping2 : Object {
         int cx = snap_ceil (rect.center_x);
         int cy = snap_ceil (rect.center_y);
 
-        add_to_map (y_1, x_1, x_2, cx, -1, ref map);
-        add_to_map (y_2, x_1, x_2, cx, 1, ref map);
-        add_to_map (cy, cx, cx, cx, 0, ref map);
+        add_to_map (y_1, x_1, x_2, cx, -1, ref s_map);
+        add_to_map (y_2, x_1, x_2, cx, 1, ref s_map);
+        add_to_map (cy, cx, cx, cx, 0, ref s_map);
     }
 
     /*
@@ -191,24 +270,23 @@ public class Akira.Utils.Snapping2 : Object {
         int n2,
         int n3,
         int polarity,
-        ref Gee.HashMap<int, Utils.Snapping.SnapMeta> map
+        ref Gee.TreeMap<int, SnapMeta2> s_map
     ) {
-        if (map.has_key (pos)) {
-            Utils.Snapping.SnapMeta k = map.get (pos);
-            k.normals.add (n1);
-            k.normals.add (n2);
-            k.normals.add (n3);
+        if (s_map.has_key (pos)) {
+            var k = s_map[pos];
+            Utils.Array.append_to_iarray (ref k.normals, n1);
+            Utils.Array.append_to_iarray (ref k.normals, n2);
+            Utils.Array.append_to_iarray (ref k.normals, n3);
             k.polarity += polarity;
             return;
         }
 
-        var v = new Utils.Snapping.SnapMeta ();
-        v.normals = new Gee.HashSet<int> ();
-        v.normals.add (n1);
-        v.normals.add (n2);
-        v.normals.add (n3);
-        v.polarity = polarity;
-        map.set (pos, v);
+        var k = new SnapMeta2 ();
+        k.normals = new int[0];
+        Utils.Array.append_to_iarray (ref k.normals, n1);
+        Utils.Array.append_to_iarray (ref k.normals, n2);
+        Utils.Array.append_to_iarray (ref k.normals, n3);
+        s_map.set (pos, k);
     }
 
 
@@ -216,42 +294,32 @@ public class Akira.Utils.Snapping2 : Object {
      * Matches in one direction (vertical / horizontal).
      */
     private static void populate_snap_matches_from_list (
-        Gee.HashMap<int, Utils.Snapping.SnapMeta> target_snap_list,
-        Gee.HashMap<int, Utils.Snapping.SnapMeta> grid_snap_list,
-        ref Utils.Snapping.SnapMatch matches,
+        Gee.TreeMap<int, SnapMeta2> target_snap_list,
+        Gee.TreeMap<int, SnapMeta2> grid_snap_list,
+        ref SnapMatch2 matches,
         int sensitivity
     ) {
-        var sorted_target_snaps = new Gee.TreeMap<int, Utils.Snapping.SnapMeta> ();
-        var sorted_grid_snaps = new Gee.TreeMap<int, Utils.Snapping.SnapMeta> ();
-
-        sorted_target_snaps.set_all (target_snap_list);
-        sorted_grid_snaps.set_all (grid_snap_list);
-
         int diff = 0;
-        int polarity_offset = 0;
         var tmpdiff = sensitivity;
-        foreach (var target_snap in sorted_target_snaps) {
-            foreach (var cand in sorted_grid_snaps) {
-                polarity_offset = 0;
-                diff = (int) (cand.key - target_snap.key);
+        foreach (var target_snap in target_snap_list.keys) {
+            foreach (var cand in grid_snap_list.keys) {
+                diff = (int) (cand - target_snap);
                 diff = diff.abs ();
 
                if (diff < sensitivity) {
-                    if ((int) (cand.key + polarity_offset - target_snap.key) == 0) {
-                        matches.type = Utils.Snapping.MatchType.EXACT;
-                        matches.snap_position = cand.key;
-                        matches.reference_position = target_snap.key;
-                        matches.polarity_offset = polarity_offset;
-                        matches.exact_matches[cand.key] = polarity_offset;
+                    if ((int) (cand - target_snap) == 0) {
+                        matches.type = MatchType2.EXACT;
+                        matches.snap_position = cand;
+                        matches.reference_position = target_snap;
+                        matches.exact_matches.add (cand);
+                        tmpdiff = 0;
                     } else if (diff < tmpdiff) {
-                        matches.type = Utils.Snapping.MatchType.FUZZY;
-                        matches.snap_position = cand.key;
-                        matches.reference_position = target_snap.key;
-                        matches.polarity_offset = polarity_offset;
+                        matches.type = MatchType2.FUZZY;
+                        matches.snap_position = cand;
+                        matches.reference_position = target_snap;
+                        tmpdiff = diff;
                     }
                 }
-
-                tmpdiff = diff;
             }
         }
     }
@@ -265,5 +333,23 @@ public class Akira.Utils.Snapping2 : Object {
             res += 1;
         }
         return res;
+    }
+
+    /**
+     * Generate a default match data.
+     */
+    public static SnapMatchData2 default_match_data () {
+        var matches = SnapMatchData2 ();
+        matches.v_data.type = MatchType2.NONE;
+        matches.v_data.snap_position = 0;
+        matches.v_data.reference_position = 0;
+        matches.v_data.exact_matches = new Gee.TreeSet<int>();
+
+        matches.h_data.type = MatchType2.NONE;
+        matches.h_data.snap_position = 0;
+        matches.h_data.reference_position = 0;
+        matches.h_data.exact_matches = new Gee.TreeSet<int>();
+
+        return matches;
     }
 }
