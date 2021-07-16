@@ -31,7 +31,7 @@ jobs:
           make install
       - name: libportal-4.0 from source
         run: |
-          git cline https://github.com/flatpak/libportal/
+          git clone https://github.com/flatpak/libportal.git
           cd libportal
           git checkout f68764e
           meson build
