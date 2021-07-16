@@ -245,11 +245,12 @@ public class Akira.Widgets.ColorRow : Gtk.Grid {
         // Set the chooser color before connecting the signal.
         set_chooser_color (model.color, model.alpha);
 
+        window.event_bus.color_mode_changed(model.color_mode);
+
         color_chooser_widget.notify["rgba"].connect (() => {
             string new_color = color_chooser_widget.rgba.to_string ();
             double alpha = color_chooser_widget.rgba.alpha;
 
-            //color_mode_widget.on_color_changed(new_color, alpha);
             window.event_bus.color_changed (new_color, alpha);
         });
     }

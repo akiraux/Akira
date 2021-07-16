@@ -35,7 +35,7 @@
 
     public ColorMode (Models.ColorModel _model, Window _window) {
         model = _model;
-        color_mode_type = "solid";
+        color_mode_type = model.color_mode;
         window = _window;
 
         init_button_ui ();
@@ -70,7 +70,7 @@
         radial_gradient_button.clicked.connect ( () => mode_button_pressed ("radial"));
         delete_step_button.clicked.connect (on_delete_button_pressed);
 
-        gradient_editor = new GradientEditor (window, model);
+        gradient_editor = new GradientEditor (window, model, model.pattern);
 
         // since color modes on border havent been implmented yet, disable these buttons
         if (model.type == Akira.Models.ColorModel.Type.BORDER) {
@@ -95,6 +95,7 @@
 
     private void mode_button_pressed (string _color_mode_type) {
         color_mode_type = _color_mode_type;
+        model.color_mode = color_mode_type;
         window.event_bus.color_mode_changed (color_mode_type);
     }
 

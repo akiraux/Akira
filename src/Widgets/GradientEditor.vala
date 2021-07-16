@@ -27,7 +27,6 @@ public class Akira.Widgets.GradientEditor : Gtk.EventBox {
 
     private Window window;
     private Models.ColorModel model;
-    private string color_mode_type;
 
     // list to store all stop colors in order
     private Gee.ArrayList<StopColor> stop_colors;
@@ -37,25 +36,19 @@ public class Akira.Widgets.GradientEditor : Gtk.EventBox {
     private Cairo.Pattern gradient_pattern;
     private DirectionLine direction_line;
 
-    public GradientEditor (Window _window, Models.ColorModel _model) {
+    public GradientEditor (Window _window, Models.ColorModel _model, Cairo.Pattern pattern) {
         window = _window;
         model = _model;
 
-        color_mode_type = model.color_mode;
-
         direction_line = new DirectionLine (_window, this, _model);
-        gradient_pattern = new Cairo.Pattern.linear (0,0,0,0);
+        gradient_pattern = pattern;
+        parse_stop_colors_from_pattern();
 
         set_hexpand (true);
         height_request = 35;
 
         set_events (Gdk.EventMask.BUTTON_PRESS_MASK);
         set_above_child (false);
-
-        // the stop colors at start and end are fixed. StopColor has been defined at the end
-        stop_colors = new Gee.ArrayList<StopColor> ();
-        stop_colors.insert (0, new StopColor ("#000", 1, 0));
-        stop_colors.insert (1, new StopColor ("#fff", 1, 100));
 
         selected_stop_color = stop_colors[0];
 
@@ -75,7 +68,7 @@ public class Akira.Widgets.GradientEditor : Gtk.EventBox {
     }
 
     private bool redraw_editor (Cairo.Context context) {
-        if (color_mode_type != "solid") {
+        if (model.color_mode != "solid") {
             double center_y = widget_y + widget_height / 2;
 
             // line through the center. acts as a guideline for the user to place the stop colors   
@@ -110,7 +103,7 @@ public class Akira.Widgets.GradientEditor : Gtk.EventBox {
     }
 
     private bool on_button_press (Gdk.EventButton event) {
-        if (color_mode_type != "solid") {
+        if (model.color_mode != "solid") {
             var position = (event.x / widget_width) * 100;
             get_stop_color_at (position);
 
@@ -126,7 +119,7 @@ public class Akira.Widgets.GradientEditor : Gtk.EventBox {
     }
 
     private bool on_motion_event (Gdk.EventMotion event) {
-        if (color_mode_type != "solid") {
+        if (model.color_mode != "solid") {
             int index = stop_colors.index_of (selected_stop_color);
 
             if (index == 0 || index == stop_colors.size - 1) {
@@ -149,7 +142,7 @@ public class Akira.Widgets.GradientEditor : Gtk.EventBox {
     }
 
     public void on_color_changed (string color, double alpha) {
-        if (color_mode_type != "solid") {
+        if (model.color_mode != "solid") {
             int index = stop_colors.index_of (selected_stop_color);
 
             stop_colors[index].color = color;
@@ -160,6 +153,37 @@ public class Akira.Widgets.GradientEditor : Gtk.EventBox {
             model.color = color;
             model.alpha = (int) (alpha * 255);
         }
+    }
+
+    private void parse_stop_colors_from_pattern() {
+        stop_colors = new Gee.ArrayList<StopColor> ();
+
+        int stop_color_count;
+        gradient_pattern.get_color_stop_count(out stop_color_count);
+
+        if(stop_color_count == 0) {
+            // default value when no gradient has been added
+            stop_colors.insert (0, new StopColor ("#000", 1, 0));
+            stop_colors.insert (1, new StopColor ("#fff", 1, 100));
+
+            return;
+        }
+
+        for(int i = 0; i < stop_color_count; ++i) {
+            double offset, red, green, blue, alpha;
+            gradient_pattern.get_color_stop_rgba(i, out offset, out red, out green, out blue, out alpha);
+
+            Gdk.RGBA color = Gdk.RGBA();
+            color.red = red;
+            color.green = green;
+            color.blue = blue;
+
+            StopColor stop_color = new StopColor(color.to_string(), alpha, offset * 100);
+
+            print("offsets %f\n", offset*100);
+            stop_colors.insert(i, stop_color);
+        }
+
     }
 
     public void delete_selected_step () {
@@ -206,7 +230,7 @@ public class Akira.Widgets.GradientEditor : Gtk.EventBox {
         return false;
     }
 
-    private void update_style () {
+    public void update_style () {
         // since gradients on direction line are not supported, dont draw direction line
         if (model.type == Akira.Models.ColorModel.Type.BORDER) {
             return;
@@ -215,7 +239,7 @@ public class Akira.Widgets.GradientEditor : Gtk.EventBox {
         string css_style = "";
         string stop_color_string = stop_colors_as_string ();
 
-        if (color_mode_type == "solid") {
+        if (model.color_mode == "solid") {
             css_style = "@bg_color";
         } else {
             css_style = """linear-gradient(to right %s)""".printf (stop_color_string);
@@ -250,8 +274,7 @@ public class Akira.Widgets.GradientEditor : Gtk.EventBox {
         return colors_string;
     }
 
-    private void on_color_mode_changed (string _color_mode_type) {
-        color_mode_type = _color_mode_type;
+    private void on_color_mode_changed (string color_mode) {
         update_style ();
     }
 
@@ -263,13 +286,13 @@ public class Akira.Widgets.GradientEditor : Gtk.EventBox {
         double x0, y0, x1, y1;
         direction_line.get_direction_coords (out x0, out y0, out x1, out y1);
 
-        if (color_mode_type == "solid") {
+        if (model.color_mode == "solid") {
             // for solid color, create an empty pattern. In Fills, we check if stop colors exists
             // for this pattern. If they dont, then the Pattern is not applied
             gradient_pattern = new Cairo.Pattern.linear (x0, y0, x1, y1);
             model.pattern = gradient_pattern;
             return;
-        } else if (color_mode_type == "linear") {
+        } else if (model.color_mode == "linear") {
             gradient_pattern = new Cairo.Pattern.linear (x0, y0, x1, y1);
         } else {
             double dx = x0 - x1;

@@ -30,6 +30,7 @@ public class Akira.Lib.Components.Fill : Component {
 
     public Gdk.RGBA color { get; set; }
     public Cairo.Pattern gradient_pattern { get; set; }
+    public string color_mode { get; set; default = "solid"; }
 
     // Store the hexadecimal string version of the color (E.g.: #FF00CC)
     public string hex { get; set; }

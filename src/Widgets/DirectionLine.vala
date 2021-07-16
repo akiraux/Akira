@@ -23,8 +23,6 @@ public class Akira.Widgets.DirectionLine {
     public Lib.Selection.Nob end_nob;
     private Lib.Selection.Nob selected_nob;
 
-    private string color_mode_type;
-
     private Lib.Canvas canvas;
     private Lib.Items.CanvasItem selected_item;
     private GradientEditor gradient_editor;
@@ -54,7 +52,6 @@ public class Akira.Widgets.DirectionLine {
         start_nob.set_rectangle ();
         end_nob.set_rectangle ();
 
-        color_mode_type = model.color_mode;
         update_visibility (model.color_mode);
 
         // initial position of direction nobs will be outside the canvas.
@@ -137,13 +134,9 @@ public class Akira.Widgets.DirectionLine {
             double height = selected_item.size.height;
             double offset = Akira.Lib.Selection.Nob.NOB_SIZE;
 
-            // TODO: get the rotation matrix and artboard matrix from item and recalculate position
-
             start_nob.update_state (identity_mat, pos_x + offset, pos_y + offset, true);
             end_nob.update_state (identity_mat, pos_x + width - offset, pos_y + height - offset, true);
         }
-
-        color_mode_type = color_mode;
 
         if (color_mode == "solid") {
             hide_direction_line ();
