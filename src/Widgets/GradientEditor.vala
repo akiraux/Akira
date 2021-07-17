@@ -108,6 +108,13 @@ public class Akira.Widgets.GradientEditor : Gtk.EventBox {
             var position = (event.x / widget_width) * 100;
             get_stop_color_at (position);
 
+            Gdk.RGBA selected_color = Gdk.RGBA();
+            selected_color.parse(selected_stop_color.color);
+            selected_color.alpha = selected_stop_color.alpha;
+            window.event_bus.change_editor_color(selected_color);
+
+            print("selected color %s\n", selected_stop_color.color);
+
             // trigger redraw for the Editor. This renders the stop color 
             queue_draw_area (widget_x, widget_y, widget_width, widget_height);
         }
@@ -147,7 +154,10 @@ public class Akira.Widgets.GradientEditor : Gtk.EventBox {
             int index = stop_colors.index_of (selected_stop_color);
 
             stop_colors[index].color = color;
+            selected_stop_color.color = color;
+            
             stop_colors[index].alpha = alpha;
+            selected_stop_color.alpha = alpha;
 
             queue_draw_area (widget_x, widget_y, widget_width, widget_height);
         } else {
@@ -188,7 +198,14 @@ public class Akira.Widgets.GradientEditor : Gtk.EventBox {
             stop_colors.insert(i, stop_color);
         }
 
-        gradient_pattern.get_linear_points(out coords[0], out coords[1], out coords[2], out coords[3]);
+        // TODO: there's a bug here. Cant retrieve coordinates if gradient is radial
+        // will fix when I update to libcairo 1.4
+        if(gradient_pattern.get_type() == Cairo.PatternType.LINEAR) {
+            gradient_pattern.get_linear_points(out coords[0], out coords[1], out coords[2], out coords[3]);
+        } else {
+            coords[0] = coords[1] = coords[2] = coords[3] = -10;
+        }
+
         return coords;
 
     }

@@ -248,10 +248,21 @@ public class Akira.Widgets.ColorRow : Gtk.Grid {
         window.event_bus.color_mode_changed(model.color_mode);
 
         color_chooser_widget.notify["rgba"].connect (() => {
+            if(color_set_manually) {
+                color_set_manually = false;
+                return;
+            }
+
+            color_set_manually = true;
             string new_color = color_chooser_widget.rgba.to_string ();
             double alpha = color_chooser_widget.rgba.alpha;
 
             window.event_bus.color_changed (new_color, alpha);
+        });
+
+        window.event_bus.change_editor_color.connect((color) => {
+            color_set_manually = true;
+            color_chooser_widget.rgba = color;
         });
     }
 
