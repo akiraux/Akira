@@ -111,6 +111,9 @@ public class Akira.Widgets.DirectionLine {
             canvas.motion_notify_event.connect (on_motion_event);
 
             return true;
+        } else {
+            // if neighter of the buttons nobs were pressed, the user has clicked elsewhere
+            window.event_bus.color_chooser_popdown();
         }
         return false;
     }

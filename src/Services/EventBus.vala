@@ -56,6 +56,7 @@ public class Akira.Services.EventBus : Object {
     public signal void color_mode_changed (string color_mode);
     // this signal is used to change color in ColorChooserWidget when new stop color selected
     public signal void change_editor_color(Gdk.RGBA color);
+    public signal void color_chooser_popdown();
 
     // Options panel signals.
     public signal void align_items (string align_action);

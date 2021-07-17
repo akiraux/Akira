@@ -202,6 +202,14 @@ public class Akira.Widgets.ColorRow : Gtk.Grid {
             return;
         }
 
+        // makeing color_popover non modal allows recieving events in the window.
+        // this will allow user to modify direction line with the color picker open
+        color_popover.modal = false;
+
+        window.event_bus.color_chooser_popdown.connect(() => {
+            color_popover.popdown();
+        });
+
         color_chooser_widget = new Gtk.ColorChooserWidget ();
         color_chooser_widget.hexpand = true;
         color_chooser_widget.show_editor = true;
