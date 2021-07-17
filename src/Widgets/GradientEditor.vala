@@ -40,9 +40,10 @@ public class Akira.Widgets.GradientEditor : Gtk.EventBox {
         window = _window;
         model = _model;
 
-        direction_line = new DirectionLine (_window, this, _model);
         gradient_pattern = pattern;
-        parse_stop_colors_from_pattern();
+        double[] coords = parse_stop_colors_from_pattern();
+
+        direction_line = new DirectionLine (_window, this, _model, coords);
 
         set_hexpand (true);
         height_request = 35;
@@ -56,7 +57,7 @@ public class Akira.Widgets.GradientEditor : Gtk.EventBox {
             widget_width = get_allocated_width ();
             widget_height = get_allocated_height ();
 
-            draw.connect_after ( (context) => {return redraw_editor (context);});
+            draw.connect_after (redraw_editor);
 
             button_press_event.connect ( (event) => {return on_button_press (event);});
             button_release_event.connect ( (event) => {return on_button_release (event); });
@@ -155,8 +156,11 @@ public class Akira.Widgets.GradientEditor : Gtk.EventBox {
         }
     }
 
-    private void parse_stop_colors_from_pattern() {
+    // this method retrieves the stop colors from gradient_pattern from model.
+    // returns a list of points [x0, y0, x1, y1] representing the coordinates of start and end nob
+    private double[] parse_stop_colors_from_pattern() {
         stop_colors = new Gee.ArrayList<StopColor> ();
+        double[] coords = new double[4];
 
         int stop_color_count;
         gradient_pattern.get_color_stop_count(out stop_color_count);
@@ -166,7 +170,8 @@ public class Akira.Widgets.GradientEditor : Gtk.EventBox {
             stop_colors.insert (0, new StopColor ("#000", 1, 0));
             stop_colors.insert (1, new StopColor ("#fff", 1, 100));
 
-            return;
+            coords[0] = coords[1] = coords[2] = coords[3] = -10;
+            return coords;
         }
 
         for(int i = 0; i < stop_color_count; ++i) {
@@ -180,9 +185,11 @@ public class Akira.Widgets.GradientEditor : Gtk.EventBox {
 
             StopColor stop_color = new StopColor(color.to_string(), alpha, offset * 100);
 
-            print("offsets %f\n", offset*100);
             stop_colors.insert(i, stop_color);
         }
+
+        gradient_pattern.get_linear_points(out coords[0], out coords[1], out coords[2], out coords[3]);
+        return coords;
 
     }
 
@@ -230,7 +237,7 @@ public class Akira.Widgets.GradientEditor : Gtk.EventBox {
         return false;
     }
 
-    public void update_style () {
+    private void update_style () {
         // since gradients on direction line are not supported, dont draw direction line
         if (model.type == Akira.Models.ColorModel.Type.BORDER) {
             return;

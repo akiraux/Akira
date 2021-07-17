@@ -32,7 +32,7 @@ public class Akira.Widgets.DirectionLine {
     // dummy identity matrix
     private Cairo.Matrix identity_mat = Cairo.Matrix.identity ();
 
-    public DirectionLine (Window _window, GradientEditor _gradient_editor, Akira.Models.ColorModel model) {
+    public DirectionLine (Window _window, GradientEditor _gradient_editor, Akira.Models.ColorModel model, double[] coords) {
         type = model.type;
 
         // since gradients on borders are not yet supported, dont draw direction line
@@ -53,11 +53,7 @@ public class Akira.Widgets.DirectionLine {
         end_nob.set_rectangle ();
 
         update_visibility (model.color_mode);
-
-        // initial position of direction nobs will be outside the canvas.
-        // when CanvasItem gets selected, they will be placed along the diagonal
-        start_nob.update_state (identity_mat, -10, -10, false);
-        end_nob.update_state (identity_mat, -10, -10, false);
+        set_nob_initial_position(coords);
 
         window.event_bus.color_mode_changed.connect (update_visibility);
         canvas.button_press_event.connect (on_buton_press_event);
@@ -81,6 +77,21 @@ public class Akira.Widgets.DirectionLine {
         y0 = start_nob.center_y - selected_item.coordinates.y;
         x1 = end_nob.center_x - selected_item.coordinates.x;
         y1 = end_nob.center_y - selected_item.coordinates.y;
+    }
+
+    private void set_nob_initial_position(double[] coords) {
+        double x = 0, y = 0;
+
+        // if this is the first time we are applying gradients to the item,
+        // set the nobs outside the canvas.
+        if(coords[0] != -10 || coords[1] != -10) {
+            x = selected_item.coordinates.x;
+            y = selected_item.coordinates.y;
+        }
+
+        start_nob.update_state (identity_mat, coords[0] + x, coords[1] + y, false);
+        end_nob.update_state (identity_mat, coords[2] + x, coords[3] + y, false);
+
     }
 
     private bool on_buton_press_event (Gdk.EventButton event) {
