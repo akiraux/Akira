@@ -55,6 +55,8 @@ public class Akira.Models.ColorModel : GLib.Object {
             }
     }
 
+    public string fill_css { get; set; }
+
     public string color {
         owned get {
             return type == Type.FILL ? fill.color.to_string () : border.color.to_string ();
@@ -126,5 +128,7 @@ public class Akira.Models.ColorModel : GLib.Object {
         type = fill != null ? Type.FILL : Type.BORDER;
         this.fill = fill;
         this.border = border;
+
+        fill_css = "@bg_color";
     }
 }

@@ -256,13 +256,13 @@ public class Akira.Widgets.GradientEditor : Gtk.EventBox {
             return;
         }
 
-        string css_style = "";
+        string fill_css = "";
         string stop_color_string = stop_colors_as_string ();
 
         if (model.color_mode == "solid") {
-            css_style = "@bg_color";
+            fill_css = "@bg_color";
         } else {
-            css_style = """linear-gradient(to right %s)""".printf (stop_color_string);
+            fill_css = """linear-gradient(to right %s)""".printf (stop_color_string);
         }
 
         try {
@@ -271,16 +271,17 @@ public class Akira.Widgets.GradientEditor : Gtk.EventBox {
 
             var editor_css_style = """*{
                 background: %s
-            }""".printf (css_style);
+            }""".printf (fill_css);
 
             provider.load_from_data (editor_css_style, editor_css_style.length);
             context.add_provider (provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
 
         } catch (Error e) {
             warning ("Style error: %s", e.message);
-            debug ("%s %s\n", name, css_style);
+            debug ("%s %s\n", name, fill_css);
         }
 
+        model.fill_css = fill_css;
         create_gradient_pattern ();
     }
 

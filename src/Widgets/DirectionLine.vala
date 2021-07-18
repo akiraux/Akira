@@ -81,7 +81,6 @@ public class Akira.Widgets.DirectionLine {
 
     private void set_nob_initial_position(double[] coords) {
         double x = 0, y = 0;
-        print("%f %f %f %f\n", coords[0], coords[1], coords[2], coords[3] );
 
         if(coords[0] != -10 || coords[1] != -10) {
             x = selected_item.coordinates.x;
@@ -139,7 +138,6 @@ public class Akira.Widgets.DirectionLine {
         }
 
         if (start_nob.center_x == -10 || start_nob.center_y == -10) {
-            print("setting initial position\n");
             selected_item = canvas.selected_bound_manager.selected_items.nth_data (0);
             
             // if this is the first time the direction line is being displayed,

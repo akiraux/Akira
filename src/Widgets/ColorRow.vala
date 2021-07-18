@@ -83,6 +83,12 @@ public class Akira.Widgets.ColorRow : Gtk.Grid {
 
         color_button.clicked.connect (() => {
             init_color_chooser ();
+
+            window.event_bus.color_chooser_popdown.connect(() => {
+                var rgba = color_chooser_widget.rgba;
+                set_button_color(rgba.to_string(), (int)rgba.alpha * 255, model.fill_css);
+            });
+
             color_popover.popup ();
         });
 
@@ -202,7 +208,7 @@ public class Akira.Widgets.ColorRow : Gtk.Grid {
             return;
         }
 
-        // makeing color_popover non modal allows recieving events in the window.
+        // making color_popover non modal allows recieving events in the window.
         // this will allow user to modify direction line with the color picker open
         color_popover.modal = false;
 
@@ -310,21 +316,28 @@ public class Akira.Widgets.ColorRow : Gtk.Grid {
         color_chooser_widget.set_rgba (new_rgba);
     }
 
-    private void set_button_color (string color, int alpha) {
+    private void set_button_color (string color, int alpha, string gradient_css = "") {
         try {
             var provider = new Gtk.CssProvider ();
             var context = color_button.get_style_context ();
 
+            string background, border_color;
+
             var new_rgba = Gdk.RGBA ();
             new_rgba.parse (color);
             new_rgba.alpha = (double) alpha / 255;
-            var new_color = new_rgba.to_string ();
 
-            // TODO: when in gradient mode, add css_style from gradient editor here
+            background = new_rgba.to_string ();
+            border_color = background;
+
+            if(gradient_css != null && gradient_css.contains("gradient")) {
+                background = gradient_css;
+            }
+
             var css = """.selected-color {
-                    background-color: %s;
+                    background: %s;
                     border-color: shade (%s, 0.75);
-                }""".printf (new_color, new_color);
+                }""".printf (background, border_color);
 
             provider.load_from_data (css, css.length);
 
