@@ -41,7 +41,7 @@ public class Akira.Widgets.GradientEditor : Gtk.EventBox {
         model = _model;
 
         gradient_pattern = pattern;
-        double[] coords = parse_stop_colors_from_pattern();
+        double[] coords = parse_stop_colors_from_pattern ();
 
         direction_line = new DirectionLine (_window, this, _model, coords);
 
@@ -106,10 +106,10 @@ public class Akira.Widgets.GradientEditor : Gtk.EventBox {
             var position = (event.x / widget_width) * 100;
             get_stop_color_at (position);
 
-            Gdk.RGBA selected_color = Gdk.RGBA();
-            selected_color.parse(selected_stop_color.color);
+            Gdk.RGBA selected_color = Gdk.RGBA ();
+            selected_color.parse (selected_stop_color.color);
             selected_color.alpha = selected_stop_color.alpha;
-            window.event_bus.change_editor_color(selected_color);
+            window.event_bus.change_editor_color (selected_color);
 
             // trigger redraw for the Editor. This renders the stop color 
             queue_draw_area (widget_x, widget_y, widget_width, widget_height);
@@ -151,7 +151,7 @@ public class Akira.Widgets.GradientEditor : Gtk.EventBox {
 
             stop_colors[index].color = color;
             selected_stop_color.color = color;
-            
+
             stop_colors[index].alpha = alpha;
             selected_stop_color.alpha = alpha;
 
@@ -164,14 +164,14 @@ public class Akira.Widgets.GradientEditor : Gtk.EventBox {
 
     // this method retrieves the stop colors from gradient_pattern from model.
     // returns a list of points [x0, y0, x1, y1] representing the coordinates of start and end nob
-    private double[] parse_stop_colors_from_pattern() {
+    private double[] parse_stop_colors_from_pattern () {
         stop_colors = new Gee.ArrayList<StopColor> ();
         double[] coords = new double[4];
 
         int stop_color_count;
-        gradient_pattern.get_color_stop_count(out stop_color_count);
+        gradient_pattern.get_color_stop_count (out stop_color_count);
 
-        if(stop_color_count == 0) {
+        if (stop_color_count == 0) {
             // default value when no gradient has been added
             stop_colors.insert (0, new StopColor ("#000", 1, 0));
             stop_colors.insert (1, new StopColor ("#fff", 1, 100));
@@ -180,24 +180,24 @@ public class Akira.Widgets.GradientEditor : Gtk.EventBox {
             return coords;
         }
 
-        for(int i = 0; i < stop_color_count; ++i) {
+        for (int i = 0; i < stop_color_count; ++i) {
             double offset, red, green, blue, alpha;
-            gradient_pattern.get_color_stop_rgba(i, out offset, out red, out green, out blue, out alpha);
+            gradient_pattern.get_color_stop_rgba (i, out offset, out red, out green, out blue, out alpha);
 
-            Gdk.RGBA color = Gdk.RGBA();
+            Gdk.RGBA color = Gdk.RGBA ();
             color.red = red;
             color.green = green;
             color.blue = blue;
 
-            StopColor stop_color = new StopColor(color.to_string(), alpha, offset * 100);
+            StopColor stop_color = new StopColor (color.to_string (), alpha, offset * 100);
 
-            stop_colors.insert(i, stop_color);
+            stop_colors.insert (i, stop_color);
         }
 
         // TODO: there's a bug here. Cant retrieve coordinates if gradient is radial
-        // will fix when I update to libcairo 1.4
-        if(gradient_pattern.get_type() == Cairo.PatternType.LINEAR) {
-            gradient_pattern.get_linear_points(out coords[0], out coords[1], out coords[2], out coords[3]);
+        // To fix, need to upgrade libcairo to >=1.4
+        if (gradient_pattern.get_type () == Cairo.PatternType.LINEAR) {
+            gradient_pattern.get_linear_points (out coords[0], out coords[1], out coords[2], out coords[3]);
         } else {
             coords[0] = coords[1] = coords[2] = coords[3] = -10;
         }
@@ -296,7 +296,7 @@ public class Akira.Widgets.GradientEditor : Gtk.EventBox {
     }
 
     private void on_color_mode_changed (string color_mode) {
-        if(color_mode == "solid") {
+        if (color_mode == "solid") {
             height_request = 1;
         } else {
             height_request = 44;

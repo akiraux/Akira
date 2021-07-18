@@ -97,8 +97,9 @@ public class Akira.Lib.Components.Fills : Component {
                 if (item is Items.CanvasArtboard) {
                     ((Items.CanvasArtboard) item).background.set ("fill-pattern", fill.gradient_pattern);
                 } else {
-                    item.set ("fill-pattern", fill.gradient_pattern);                    double x0, y0, x1, y1;
-                    fill.gradient_pattern.get_linear_points(out x0, out y0, out x1, out y1);
+                    item.set ("fill-pattern", fill.gradient_pattern);
+                    double x0, y0, x1, y1;
+                    fill.gradient_pattern.get_linear_points (out x0, out y0, out x1, out y1);
                 }
 
                 // since we dont have the functionality of blending gradients,

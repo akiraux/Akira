@@ -72,10 +72,10 @@
 
         gradient_editor = new GradientEditor (window, model, model.pattern);
 
-        mode_button_pressed(color_mode_type);
+        mode_button_pressed (color_mode_type);
 
-        delete_step_button.size_allocate.connect(() => {
-            if(color_mode_type == "solid") {
+        delete_step_button.size_allocate.connect ( () => {
+            if (color_mode_type == "solid") {
                 delete_step_button.visible = false;
             }
         });
@@ -101,7 +101,7 @@
     }
 
     private void mode_button_pressed (string _color_mode_type) {
-        if(_color_mode_type == "solid") {
+        if (_color_mode_type == "solid") {
             delete_step_button.visible = false;
         } else {
             delete_step_button.visible = true;

@@ -32,7 +32,10 @@ public class Akira.Widgets.DirectionLine {
     // dummy identity matrix
     private Cairo.Matrix identity_mat = Cairo.Matrix.identity ();
 
-    public DirectionLine (Window _window, GradientEditor _gradient_editor, Akira.Models.ColorModel model, double[] coords) {
+    public DirectionLine (Window _window,
+                          GradientEditor _gradient_editor,
+                          Akira.Models.ColorModel model,
+                          double[] coords) {
         type = model.type;
 
         // since gradients on borders are not yet supported, dont draw direction line
@@ -53,7 +56,7 @@ public class Akira.Widgets.DirectionLine {
         end_nob.set_rectangle ();
 
         update_visibility (model.color_mode);
-        set_nob_initial_position(coords);
+        set_nob_initial_position (coords);
 
         window.event_bus.color_mode_changed.connect (update_visibility);
         canvas.button_press_event.connect (on_buton_press_event);
@@ -79,10 +82,10 @@ public class Akira.Widgets.DirectionLine {
         y1 = end_nob.center_y - selected_item.coordinates.y;
     }
 
-    private void set_nob_initial_position(double[] coords) {
+    private void set_nob_initial_position (double[] coords) {
         double x = 0, y = 0;
 
-        if(coords[0] != -10 || coords[1] != -10) {
+        if (coords[0] != -10 || coords[1] != -10) {
             x = selected_item.coordinates.x;
             y = selected_item.coordinates.y;
         }
@@ -111,7 +114,7 @@ public class Akira.Widgets.DirectionLine {
             return true;
         } else {
             // if neighter of the buttons nobs were pressed, the user has clicked elsewhere
-            window.event_bus.color_chooser_popdown();
+            window.event_bus.color_chooser_popdown ();
         }
         return false;
     }
@@ -139,7 +142,7 @@ public class Akira.Widgets.DirectionLine {
 
         if (start_nob.center_x == -10 || start_nob.center_y == -10) {
             selected_item = canvas.selected_bound_manager.selected_items.nth_data (0);
-            
+
             // if this is the first time the direction line is being displayed,
             // set its default position along diagonal
             double pos_x = selected_item.coordinates.x;
@@ -149,7 +152,7 @@ public class Akira.Widgets.DirectionLine {
             double offset = Akira.Lib.Selection.Nob.NOB_SIZE;
 
             // if height and width allocation was not completed, then put off setting the initial positions
-            if(width == 1 || height == 1) {
+            if (width == 1 || height == 1) {
                 return;
             }
 

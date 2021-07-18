@@ -84,9 +84,9 @@ public class Akira.Widgets.ColorRow : Gtk.Grid {
         color_button.clicked.connect (() => {
             init_color_chooser ();
 
-            window.event_bus.color_chooser_popdown.connect(() => {
+            window.event_bus.color_chooser_popdown.connect ( () => {
                 var rgba = color_chooser_widget.rgba;
-                set_button_color(rgba.to_string(), (int)rgba.alpha * 255, model.fill_css);
+                set_button_color (rgba.to_string (), (int) rgba.alpha * 255, model.fill_css);
             });
 
             color_popover.popup ();
@@ -212,8 +212,8 @@ public class Akira.Widgets.ColorRow : Gtk.Grid {
         // this will allow user to modify direction line with the color picker open
         color_popover.modal = false;
 
-        window.event_bus.color_chooser_popdown.connect(() => {
-            color_popover.popdown();
+        window.event_bus.color_chooser_popdown.connect ( () => {
+            color_popover.popdown ();
         });
 
         color_chooser_widget = new Gtk.ColorChooserWidget ();
@@ -259,10 +259,10 @@ public class Akira.Widgets.ColorRow : Gtk.Grid {
         // Set the chooser color before connecting the signal.
         set_chooser_color (model.color, model.alpha);
 
-        window.event_bus.color_mode_changed(model.color_mode);
+        window.event_bus.color_mode_changed (model.color_mode);
 
         color_chooser_widget.notify["rgba"].connect (() => {
-            if(color_set_manually) {
+            if (color_set_manually) {
                 color_set_manually = false;
                 return;
             }
@@ -274,7 +274,7 @@ public class Akira.Widgets.ColorRow : Gtk.Grid {
             window.event_bus.color_changed (new_color, alpha);
         });
 
-        window.event_bus.change_editor_color.connect((color) => {
+        window.event_bus.change_editor_color.connect ( (color) => {
             color_set_manually = true;
             color_chooser_widget.rgba = color;
         });
@@ -330,7 +330,7 @@ public class Akira.Widgets.ColorRow : Gtk.Grid {
             background = new_rgba.to_string ();
             border_color = background;
 
-            if(gradient_css != null && gradient_css.contains("gradient")) {
+            if (gradient_css != null && gradient_css.contains ("gradient")) {
                 background = gradient_css;
             }
 

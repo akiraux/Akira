@@ -38,7 +38,7 @@ public class Akira.Models.ColorModel : GLib.Object {
             return type == Type.FILL ? fill.color_mode : "solid";
         }
         set {
-            if(type == Type.FILL) {
+            if (type == Type.FILL) {
                 fill.color_mode = value;
             }
         }
@@ -46,11 +46,11 @@ public class Akira.Models.ColorModel : GLib.Object {
 
     public Cairo.Pattern pattern {
             owned get {
-                return type == Type.FILL ? fill.gradient_pattern : new Cairo.Pattern.linear(0,0,0,0);
+                return type == Type.FILL ? fill.gradient_pattern : new Cairo.Pattern.linear (0,0,0,0);
             }
             set {
                 if (type == Type.FILL) {
-                    fill.set("gradient-pattern", value);
+                    fill.set ("gradient-pattern", value);
                 }
             }
     }
