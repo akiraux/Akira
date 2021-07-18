@@ -72,6 +72,13 @@
 
         gradient_editor = new GradientEditor (window, model, model.pattern);
 
+        mode_button_pressed(color_mode_type);
+
+        delete_step_button.size_allocate.connect(() => {
+            if(color_mode_type == "solid") {
+                delete_step_button.visible = false;
+            }
+        });
         // since color modes on border havent been implmented yet, disable these buttons
         if (model.type == Akira.Models.ColorModel.Type.BORDER) {
             solid_color_button.sensitive = false;
@@ -94,6 +101,11 @@
     }
 
     private void mode_button_pressed (string _color_mode_type) {
+        if(_color_mode_type == "solid") {
+            delete_step_button.visible = false;
+        } else {
+            delete_step_button.visible = true;
+        }
         color_mode_type = _color_mode_type;
         model.color_mode = color_mode_type;
         window.event_bus.color_mode_changed (color_mode_type);

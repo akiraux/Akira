@@ -81,9 +81,8 @@ public class Akira.Widgets.DirectionLine {
 
     private void set_nob_initial_position(double[] coords) {
         double x = 0, y = 0;
+        print("%f %f %f %f\n", coords[0], coords[1], coords[2], coords[3] );
 
-        // if this is the first time we are applying gradients to the item,
-        // set the nobs outside the canvas.
         if(coords[0] != -10 || coords[1] != -10) {
             x = selected_item.coordinates.x;
             y = selected_item.coordinates.y;
@@ -140,6 +139,9 @@ public class Akira.Widgets.DirectionLine {
         }
 
         if (start_nob.center_x == -10 || start_nob.center_y == -10) {
+            print("setting initial position\n");
+            selected_item = canvas.selected_bound_manager.selected_items.nth_data (0);
+            
             // if this is the first time the direction line is being displayed,
             // set its default position along diagonal
             double pos_x = selected_item.coordinates.x;
@@ -147,6 +149,11 @@ public class Akira.Widgets.DirectionLine {
             double width = selected_item.size.width;
             double height = selected_item.size.height;
             double offset = Akira.Lib.Selection.Nob.NOB_SIZE;
+
+            // if height and width allocation was not completed, then put off setting the initial positions
+            if(width == 1 || height == 1) {
+                return;
+            }
 
             start_nob.update_state (identity_mat, pos_x + offset, pos_y + offset, true);
             end_nob.update_state (identity_mat, pos_x + width - offset, pos_y + height - offset, true);

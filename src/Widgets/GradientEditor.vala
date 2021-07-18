@@ -46,8 +46,6 @@ public class Akira.Widgets.GradientEditor : Gtk.EventBox {
         direction_line = new DirectionLine (_window, this, _model, coords);
 
         set_hexpand (true);
-        height_request = 35;
-
         set_events (Gdk.EventMask.BUTTON_PRESS_MASK);
         set_above_child (false);
 
@@ -112,8 +110,6 @@ public class Akira.Widgets.GradientEditor : Gtk.EventBox {
             selected_color.parse(selected_stop_color.color);
             selected_color.alpha = selected_stop_color.alpha;
             window.event_bus.change_editor_color(selected_color);
-
-            print("selected color %s\n", selected_stop_color.color);
 
             // trigger redraw for the Editor. This renders the stop color 
             queue_draw_area (widget_x, widget_y, widget_width, widget_height);
@@ -299,6 +295,12 @@ public class Akira.Widgets.GradientEditor : Gtk.EventBox {
     }
 
     private void on_color_mode_changed (string color_mode) {
+        if(color_mode == "solid") {
+            height_request = 1;
+        } else {
+            height_request = 44;
+        }
+
         update_style ();
     }
 
