@@ -347,7 +347,6 @@ public class Akira.Lib2.ViewCanvas : Goo.Canvas {
 
 
     // #TODO temporary
-    /*
     public override bool draw (Cairo.Context ctx) {
 
         base.draw (ctx);
@@ -359,7 +358,6 @@ public class Akira.Lib2.ViewCanvas : Goo.Canvas {
 
         return false;
     }
-    */
 
     public void draw_debug_rect (Cairo.Context ctx, Geometry.Rectangle rect, Gdk.RGBA color) {
         var xadj = hadjustment.value;

@@ -19,19 +19,19 @@
  * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
  */
 
-public class Akira.Lib2.Components.Skew : Copyable<Skew> {
+public class Akira.Lib2.Components.Scale : Copyable<Scale> {
     private double _horizontal;
     private double _vertical;
 
     public double horizontal { get { return _horizontal; } }
     public double vertical { get { return _vertical; } }
 
-    public Skew (double horizontal, double _vertical) {
+    public Scale (double horizontal, double _vertical) {
         _horizontal = horizontal;
         _vertical = vertical;
      }
 
-    public Skew copy () {
-        return new Skew (_horizontal, _vertical);
+    public Scale copy () {
+        return new Scale (_horizontal, _vertical);
     }
 }

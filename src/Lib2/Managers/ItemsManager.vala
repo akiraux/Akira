@@ -217,6 +217,7 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
     }
 
     public void flip_items (GLib.Array<int> ids, bool vertical) {
+        /*
         var blocker = new Lib2.Managers.SelectionManager.ChangeSignalBlocker (view_canvas.selection_manager);
         (void) blocker;
 
@@ -263,6 +264,7 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
         }
 
         compile_model ();
+        */
     }
 
     public GLib.Array<unowned Lib2.Items.ModelNode> children_in_group (int group_id) {

@@ -25,9 +25,7 @@
   * is simply a collection of four points and a rotation.
   */
 public struct Akira.Geometry.TransformedRectangle {
-    public double rotation;
-    public double horizontal_skew;
-    public double vertical_skew;
+    public double main_rotation;
     public double tl_x;
     public double tl_y;
     public double tr_x;
@@ -67,9 +65,7 @@ public struct Akira.Geometry.TransformedRectangle {
 
 
     public TransformedRectangle () {
-        rotation = 0;
-        horizontal_skew = 0;
-        vertical_skew = 0;
+        main_rotation = 0;
         tl_x = 0;
         tl_y = 0;
         tr_x = 0;
@@ -85,22 +81,10 @@ public struct Akira.Geometry.TransformedRectangle {
         double center_y,
         double width,
         double height,
-        double rot_in_rads,
-        double h_skew,
-        double v_skew
+        double rotation,
+        Cairo.Matrix transform
     ) {
-        rotation = rot_in_rads;
-        horizontal_skew = h_skew;
-        vertical_skew = v_skew;
-
-        var tr = Cairo.Matrix.identity();
-        tr.rotate (rot_in_rads);
-
-        var sr = Cairo.Matrix.identity();
-        sr.xy += horizontal_skew;
-        sr.yx += vertical_skew;
-
-        tr = Utils.GeometryMath.multiply_matrices (tr, sr);
+        main_rotation = rotation;
 
         tl_x = - width / 2.0;
         tl_y = - height / 2.0;
@@ -109,9 +93,9 @@ public struct Akira.Geometry.TransformedRectangle {
 
         var woffx = width;
         var woffy = 0.0;
-        tr.transform_distance (ref tl_x, ref tl_y);
-        tr.transform_distance (ref br_x, ref br_y);
-        tr.transform_distance (ref woffx, ref woffy);
+        transform.transform_distance (ref tl_x, ref tl_y);
+        transform.transform_distance (ref br_x, ref br_y);
+        transform.transform_distance (ref woffx, ref woffy);
 
         tl_x = center_x + tl_x;
         tl_y = center_y + tl_y;

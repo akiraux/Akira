@@ -84,8 +84,7 @@ public class Akira.Lib2.Components.Components {
 
     public Coordinates? center = null;
     public Size? size = null;
-    public Rotation? rotation = null;
-    public Skew? skew = null;
+    public Transform? transform = null;
 
     public Layout? layout = null;
     
@@ -101,8 +100,7 @@ public class Akira.Lib2.Components.Components {
 
         cln.center = center;
         cln.size = size;
-        cln.rotation = rotation;
-        cln.skew = skew;
+        cln.transform = transform;
 
         return cln;
     }
@@ -111,8 +109,8 @@ public class Akira.Lib2.Components.Components {
         return new Opacity (100.0);
     }
 
-    public static Rotation default_rotation () {
-        return new Rotation (0.0);
+    public static Transform default_transform () {
+        return new Transform.from_rotation (0.0);
     }
 
     public static Flipped default_flipped () {

@@ -179,8 +179,7 @@ public class Akira.Lib2.Modes.ItemInsertMode : AbstractInteractionMode {
                     fills_from_settings ()
                 );
                 //new_item.components.rotation = new Lib2.Components.Rotation (30);
-
-                new_item.components.skew = new Lib2.Components.Skew (GLib.Math.PI / 4.0, 0.0);
+                //new_item.components.skew = new Lib2.Components.Skew (GLib.Math.PI / 4.0, 0.0);
                 break;
 
             case "artboard":

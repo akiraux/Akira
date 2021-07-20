@@ -146,9 +146,8 @@ sources = files(
     'Lib2/Components/Layout.vala',
     'Lib2/Components/Name.vala',
     'Lib2/Components/Opacity.vala',
-    'Lib2/Components/Rotation.vala',
-    'Lib2/Components/Skew.vala',
     'Lib2/Components/Size.vala',
+    'Lib2/Components/Transform.vala',
 
     'Lib2/Items/CanvasItem.vala',
     'Lib2/Items/Model.vala',

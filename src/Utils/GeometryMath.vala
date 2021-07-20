@@ -118,10 +118,11 @@ public class Akira.Utils.GeometryMath : Object {
         ref double width,
         ref double height,
         ref double rotation,
-        ref double skew_h,
-        ref double skew_v
+        ref double xx,
+        ref double yy,
+        ref double xy,
+        ref double yx
     ) {
-        var tmp_rot = area.rotation;
         stretch_mat.transform_distance (ref center_offset_x, ref center_offset_y);
 
         var dx = area.center_x;
@@ -133,8 +134,8 @@ public class Akira.Utils.GeometryMath : Object {
         stretch_mat.transform_distance (ref area.bl_x, ref area.bl_y);
         stretch_mat.transform_distance (ref area.br_x, ref area.br_y);
 
-        width = (area.tl_x - area.tr_x).abs ();
-        height = (area.tl_y - area.bl_y).abs ();
+        width = distance (area.tl_x, area.tl_y, area.tr_x, area.tr_y).abs ();
+        height = distance (area.tl_x, area.tl_y, area.bl_x, area.bl_y).abs ();
 
         var ltor_x = area.tr_x - area.tl_x;
         var ltor_y = area.tr_y - area.tl_y;
@@ -149,16 +150,11 @@ public class Akira.Utils.GeometryMath : Object {
         extra_rot_mat.transform_distance (ref area.bl_x, ref area.bl_y);
         extra_rot_mat.transform_distance (ref area.br_x, ref area.br_y);
 
-        skew_h = GLib.Math.tan (GLib.Math.fmod (GLib.Math.PI - angle_between_vectors (0, 1, area.br_x - area.tr_x, area.br_y - area.tr_y), GLib.Math.PI));
-
-        ltor_x = area.tr_x - area.tl_x;
-        ltor_y = area.tr_y - area.tl_y;
-        var srot = angle_between_vectors (1, 0, ltor_x, ltor_y);
-
-        //print ("skew_h: %f %f %f\n", area.br_x - area.tr_x, area.br_y - area.tr_y, skew_h);
-        //skew_v = area.tl_y - area.tr_y;
+        yy = (area.br_y - area.tr_y).abs() / height;
+        xy = (area.br_x - area.tr_x) / (area.br_y - area.tr_y) * yy;
 
         area.translate (dx + offset_x + center_offset_x, dy + offset_y + center_offset_y);
+
         return area;
     }
 }

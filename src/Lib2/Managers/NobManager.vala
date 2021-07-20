@@ -214,7 +214,7 @@ public class Akira.Lib2.Managers.NobManager : Object {
 
         }
 
-        nob.update_global_state (cx, cy, rect.rotation, show);
+        nob.update_global_state (cx, cy, rect.main_rotation, show);
     }
 
     /**

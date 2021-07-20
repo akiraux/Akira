@@ -41,7 +41,7 @@ public class Akira.Lib2.Items.ModelTypeRect : Object, ModelType<ModelTypeRect> {
         new_item.components.size = size;
         new_item.components.borders = borders;
         new_item.components.fills = fills;
-        new_item.components.rotation = Lib2.Components.Components.default_rotation ();
+        new_item.components.transform = Lib2.Components.Components.default_transform ();
         new_item.components.flipped = Lib2.Components.Components.default_flipped ();
         new_item.components.border_radius = Lib2.Components.Components.default_border_radius ();
         new_item.item_type = new ModelTypeRect ();

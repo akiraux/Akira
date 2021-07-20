@@ -137,6 +137,7 @@ public class Akira.Lib2.Items.NodeSelection : Object {
             right = double.max (right, cg.bb_right);
         }
 
+        result.main_rotation = 0.0;
         result.tl_x = left;
         result.tl_y = top;
         result.tr_x = right;
@@ -145,7 +146,6 @@ public class Akira.Lib2.Items.NodeSelection : Object {
         result.bl_y = bottom;
         result.br_x = right;
         result.br_y = bottom;
-        result.rotation = 0;
         return result;
     }
 
