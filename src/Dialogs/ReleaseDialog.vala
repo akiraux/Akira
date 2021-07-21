@@ -63,10 +63,10 @@ public class Akira.Dialogs.ReleaseDialog : Gtk.Dialog {
         app_version.get_style_context ().add_class ("h2");
         app_version.selectable = true;
 
-        var version_title = new Gtk.Label ("New Features and Bug Fixes");
+        var version_title = new Gtk.Label ("Performance improvements and Global colors library");
         version_title.get_style_context ().add_class ("h3");
 
-        var version_date = new Gtk.Label ("Sept 2nd, 2020");
+        var version_date = new Gtk.Label ("Jul 20th, 2021");
         version_date.get_style_context ().add_class ("dim-label");
 
         var header_grid = new Gtk.Grid ();
@@ -81,7 +81,7 @@ public class Akira.Dialogs.ReleaseDialog : Gtk.Dialog {
         scrolled.expand = true;
 
         var release_info = new Gtk.TextView ();
-        release_info.buffer.text = "✓ Complete rebuild of the Canvas library architecture.\n✓ Implemented Pixel Grid.\n✓ Customize color of Pixel Grid.\n✓ Implemented smart Snapping Guides.\n✓ Customize color and magnetic threshold of Snapping Guides.\n✓ Allow items resizing in all directions.\n✓ Add images via click and drag with the Image Tool.\n✓ Handle multiple Fills and Border colors for each item.\n✓ Allow scaling items from the center.\n✓ Enable dropping images on the canvas.\n✓ A lot of code improvements and optimization.\n";
+        release_info.buffer.text = "✓ Improved 'Modes' detection (insert, select, transform).\n✓ Fixed Artboard label issues on zoom.\n✓ Improved Pixel Grid detection and z-index stack with other items.\n✓ Implemented editable zoom value.\n✓ Fix application activation when opening a new file.\n✓ Fix sizing issue when dropping images into the Canvas.\n✓ Implemented Global colors library.\n✓ Italian translation.\n";
         release_info.pixels_below_lines = 3;
         release_info.border_width = 12;
         release_info.wrap_mode = Gtk.WrapMode.WORD;
