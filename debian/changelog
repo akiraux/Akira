@@ -1,3 +1,16 @@
+com.github.akiraux.akira (0.0.15) xenial; urgency=medium
+
+  * Improved "Modes" detection (insert, select, transform).
+  * Fixed Artboard label issues on zoom.
+  * Improved Pixel Grid detection and z-index stack with other items.
+  * Implemented editable zoom value.
+  * Fix application activation when opening a new file.
+  * Fix sizing issue when dropping images into the Canvas.
+  * Implemented Global colors library.
+  * Italian translation.
+
+ -- Alessandro Castellani <castellani.ale@gmail.com>  Tue, 20 Jul 2021 09:00:00 -0800
+
 com.github.akiraux.akira (0.0.14) xenial; urgency=medium
 
   * Complete rebuild of the Canvas library architecture.
