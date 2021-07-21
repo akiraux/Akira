@@ -32,5 +32,9 @@
     <file alias="shape-triangle-symbolic.svg">icons/symbolic/shape-triangle-symbolic.svg</file>
     <file alias="shape-circle-symbolic.svg">icons/symbolic/shape-circle-symbolic.svg</file>
     <file alias="shape-text-symbolic.svg">icons/symbolic/shape-text-symbolic.svg</file>
+
+    <file alias="solid-color-button.svg">icons/hicolor/solid-color.svg</file>
+    <file alias="linear-gradient-button.svg">icons/hicolor/linear-gradient.svg</file>
+    <file alias="radial-gradient-button.svg">icons/hicolor/radial-gradient.svg</file>
   </gresource>
 </gresources>

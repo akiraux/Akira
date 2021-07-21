@@ -45,7 +45,9 @@ public class Akira.Lib.Managers.NobManager : Object {
         BOTTOM_CENTER,
         BOTTOM_LEFT,
         LEFT_CENTER,
-        ROTATE
+        ROTATE,
+        GRADIENT_START,
+        GRADIENT_END
     }
 
     /*

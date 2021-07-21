@@ -51,6 +51,13 @@ public class Akira.Services.EventBus : Object {
     public signal void update_snaps_color ();
     public signal void update_snap_decorators ();
 
+    // this signal will be triggered every time color gets modified
+    public signal void color_changed (string color, double alpha);
+    public signal void color_mode_changed (string color_mode);
+    // this signal is used to change color in ColorChooserWidget when new stop color selected
+    public signal void change_editor_color (Gdk.RGBA color);
+    public signal void color_chooser_popdown ();
+
     // Options panel signals.
     public signal void align_items (string align_action);
     public signal void init_state_coords ();

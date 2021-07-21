@@ -79,7 +79,9 @@ public class Akira.Lib.Selection.Nob : Goo.CanvasRect {
 
         update_state (Cairo.Matrix.identity (), 0, 0, false);
 
-        if (handle_id == Managers.NobManager.Nob.ROTATE) {
+        if (handle_id == Managers.NobManager.Nob.ROTATE ||
+            handle_id == Managers.NobManager.Nob.GRADIENT_START ||
+            handle_id == Managers.NobManager.Nob.GRADIENT_END) {
             set ("radius-x", nob_size);
             set ("radius-y", nob_size);
         }

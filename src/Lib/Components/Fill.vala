@@ -29,6 +29,8 @@ public class Akira.Lib.Components.Fill : Component {
     public int id { get; set; }
 
     public Gdk.RGBA color { get; set; }
+    public Cairo.Pattern gradient_pattern { get; set; }
+    public string color_mode { get; set; default = "solid"; }
 
     // Store the hexadecimal string version of the color (E.g.: #FF00CC)
     public string hex { get; set; }
@@ -42,6 +44,7 @@ public class Akira.Lib.Components.Fill : Component {
         color = init_color;
         hex = color.to_string ();
         alpha = 255;
+        gradient_pattern = new Cairo.Pattern.linear (0,0,0,0);
 
         // Listen for changed to the fill attributes to properly trigger the color generation.
         this.notify["color"].connect (() => {
@@ -59,6 +62,11 @@ public class Akira.Lib.Components.Fill : Component {
             rgba.alpha = ((double) alpha) / 255;
             color = rgba;
         });
+
+        this.notify["gradient-pattern"].connect (() => {
+            fills.reload ();
+        });
+
     }
 
     public void remove () {

@@ -68,6 +68,9 @@ sources = files(
     'Widgets/PanelSeparator.vala',
     'Widgets/RoundedColorButton.vala',
     'Widgets/ZoomButton.vala',
+    'Widgets/ColorMode.vala',
+    'Widgets/GradientEditor.vala',
+    'Widgets/DirectionLine.vala',
 
     'Models/ColorModel.vala',
     'Models/ExportModel.vala',
