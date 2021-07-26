@@ -24,6 +24,7 @@ public class Akira.Layouts.Partials.ArtboardSizesPanel : Gtk.Grid {
 
     private Gtk.Button add_category_btn;
     private Gtk.ListBox size_list_container;
+    private GLib.ListStore list;
     private string[] category_names = {"Desktop", "Laptop", "Mobile"};
 
     public bool toggled {
@@ -68,12 +69,14 @@ public class Akira.Layouts.Partials.ArtboardSizesPanel : Gtk.Grid {
         title_cont.attach (label, 0, 0, 1, 1);
         title_cont.attach (add_category_btn, 1, 0, 1, 1);
 
-        for(int i = 0; i < 3; ++i) {
-            Gtk.Expander category_expander = new Gtk.Expander(category_names[i]);
-            category_expander.get_style_context().add_class("size-category-item");
-
-            size_list_container.add(category_expander);
+        list = new GLib.ListStore(Type.OBJECT);
+        foreach(string category in category_names) {
+            list.insert(0, new SizeCategoryItem(category));
         }
+
+        size_list_container.bind_model (list, item => {
+            return create_category_expander((SizeCategoryItem)item);
+        });
 
         attach (title_cont, 0, 0, 1, 1);
         attach (size_list_container, 0, 1, 1, 1);
@@ -86,6 +89,13 @@ public class Akira.Layouts.Partials.ArtboardSizesPanel : Gtk.Grid {
         });
     }
 
+    private Gtk.Expander create_category_expander(SizeCategoryItem category) {
+        Gtk.Expander category_expander = new Gtk.Expander(category.size);
+        category_expander.get_style_context().add_class("size-category-item");
+
+        return category_expander;
+    }
+
     private void handle_add_category() {
         Gtk.Entry category_name_entry = new Gtk.Entry();
 
@@ -94,14 +104,26 @@ public class Akira.Layouts.Partials.ArtboardSizesPanel : Gtk.Grid {
         category_name_entry.hexpand = true;
         category_name_entry.visible = true;
 
+        // when the user starts typing, disable all shortcut commands
         category_name_entry.insert_text.connect(() => {
             window.event_bus.disconnect_typing_accel();
         });
 
-        size_list_container.add(category_name_entry);
+        // when the user hits enter, add this category
+        category_name_entry.activate.connect(() => {
+
+        });
     }
 
     private void reload_list (bool show) {
 
+    }
+}
+
+private class SizeCategoryItem : Object {
+    public string size;
+
+    public SizeCategoryItem(string _size) {
+        size = _size;
     }
 }
