@@ -20,22 +20,55 @@
 */
 
 public class Akira.Layouts.Partials.ArtboardSizesPanel : Gtk.Grid {
-    // list to store all size categories
-    private Gee.ArrayList<Gtk.Expander> categories;
-    // these are the names of default cattegories
-    // TODO: move these to the gschema
-    private string[] category_names = {"Desktop", "Tablet", "Phone"};
+    private unowned Akira.Window window;
 
-    public ArtboardSizesPanel(Akira.Window window) {
-        create_categories();
+    private Gtk.Button add_category_btn;
+    private Gtk.ListBox fills_list_container;
+    private unowned List<Lib.Items.CanvasItem>? items;
+
+    public bool toggled {
+        get {
+            return visible;
+        } set {
+            visible = value;
+            no_show_all = !value;
+        }
     }
 
-    private void create_categories() {
-        categories = new Gee.ArrayList<Gtk.Expander>();
+    public ArtboardSizesPanel (Akira.Window window) {
+        this.window = window;
 
-        for(int i = 0; i < category_names.length; ++i) {
-          Gtk.Expander exp = new Gtk.Expander(category_names[i]);
-          attach(exp, 0, i, 1, 1);
-        }
+        var title_cont = new Gtk.Grid ();
+        title_cont.orientation = Gtk.Orientation.HORIZONTAL;
+        title_cont.hexpand = true;
+        title_cont.get_style_context ().add_class ("option-panel");
+
+        var label = new Gtk.Label (_("Artboard Sizes"));
+        label.halign = Gtk.Align.FILL;
+        label.xalign = 0;
+        label.hexpand = true;
+        label.set_ellipsize (Pango.EllipsizeMode.END);
+
+        add_category_btn = new Gtk.Button ();
+        add_category_btn.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
+        add_category_btn.can_focus = false;
+        add_category_btn.valign = Gtk.Align.CENTER;
+        add_category_btn.halign = Gtk.Align.CENTER;
+        add_category_btn.set_tooltip_text (_("Create new size category"));
+        add_category_btn.add (new Gtk.Image.from_icon_name ("list-add-symbolic", Gtk.IconSize.SMALL_TOOLBAR));
+
+        title_cont.attach (label, 0, 0, 1, 1);
+        title_cont.attach (add_category_btn, 1, 0, 1, 1);
+
+        attach (title_cont, 0, 0, 1, 1);
+        show_all ();
+
+        window.event_bus.insert_item.connect((item_type) => {
+            reload_list( (item_type == "artboard") );
+        });
+    }
+
+    private void reload_list (bool show) {
+
     }
 }
