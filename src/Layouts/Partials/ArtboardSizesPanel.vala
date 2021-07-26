@@ -79,9 +79,26 @@ public class Akira.Layouts.Partials.ArtboardSizesPanel : Gtk.Grid {
         attach (size_list_container, 0, 1, 1, 1);
         show_all ();
 
+        add_category_btn.clicked.connect(handle_add_category);
+
         window.event_bus.insert_item.connect((item_type) => {
             reload_list( (item_type == "artboard") );
         });
+    }
+
+    private void handle_add_category() {
+        Gtk.Entry category_name_entry = new Gtk.Entry();
+
+        category_name_entry.get_style_context().add_class("size-category-item");
+        category_name_entry.width_chars = 8;
+        category_name_entry.hexpand = true;
+        category_name_entry.visible = true;
+
+        category_name_entry.insert_text.connect(() => {
+            window.event_bus.disconnect_typing_accel();
+        });
+
+        size_list_container.add(category_name_entry);
     }
 
     private void reload_list (bool show) {
