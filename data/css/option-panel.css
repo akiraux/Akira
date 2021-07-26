@@ -49,3 +49,11 @@ button.selected-color {
     -gtk-icon-transform: scale(0.7);
     padding: 0 1px;
 }
+
+/* artboard size panel items */
+.size-category-item {
+    font-weight: bold;
+    background-color: @base_color;
+    margin: 2px;
+    padding: 10px;
+}
