@@ -23,8 +23,8 @@ public class Akira.Layouts.Partials.ArtboardSizesPanel : Gtk.Grid {
     private unowned Akira.Window window;
 
     private Gtk.Button add_category_btn;
-    private Gtk.ListBox fills_list_container;
-    private unowned List<Lib.Items.CanvasItem>? items;
+    private Gtk.ListBox size_list_container;
+    private string[] category_names = {"Desktop", "Laptop", "Mobile"};
 
     public bool toggled {
         get {
@@ -57,10 +57,26 @@ public class Akira.Layouts.Partials.ArtboardSizesPanel : Gtk.Grid {
         add_category_btn.set_tooltip_text (_("Create new size category"));
         add_category_btn.add (new Gtk.Image.from_icon_name ("list-add-symbolic", Gtk.IconSize.SMALL_TOOLBAR));
 
+        size_list_container = new Gtk.ListBox ();
+        size_list_container.margin_top = 5;
+        size_list_container.margin_bottom = 15;
+        size_list_container.margin_start = 10;
+        size_list_container.margin_end = 5;
+        size_list_container.selection_mode = Gtk.SelectionMode.NONE;
+        size_list_container.get_style_context ().add_class ("fills-list");
+
         title_cont.attach (label, 0, 0, 1, 1);
         title_cont.attach (add_category_btn, 1, 0, 1, 1);
 
+        for(int i = 0; i < 3; ++i) {
+            Gtk.Expander category_expander = new Gtk.Expander(category_names[i]);
+            category_expander.get_style_context().add_class("size-category-item");
+
+            size_list_container.add(category_expander);
+        }
+
         attach (title_cont, 0, 0, 1, 1);
+        attach (size_list_container, 0, 1, 1, 1);
         show_all ();
 
         window.event_bus.insert_item.connect((item_type) => {
