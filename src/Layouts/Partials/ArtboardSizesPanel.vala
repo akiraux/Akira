@@ -71,7 +71,7 @@ public class Akira.Layouts.Partials.ArtboardSizesPanel : Gtk.Grid {
         list = new GLib.ListStore(Type.OBJECT);
 
         foreach(string category in settings.artboard_size_categories) {
-            list.insert(0, new SizeCategoryItem(category));
+            list.append(new SizeCategoryItem(category));
         }
 
         size_list_container.bind_model (list, item => {
@@ -102,7 +102,12 @@ public class Akira.Layouts.Partials.ArtboardSizesPanel : Gtk.Grid {
 
         new_category_popup.closed.connect(()=>{
             if(new_category_popup.item_name != "") {
-                list.insert(0, new SizeCategoryItem(new_category_popup.item_name));
+                list.append(new SizeCategoryItem(new_category_popup.item_name));
+                
+                // make this category name permanent by adding it to the gsettings
+                var category_list = settings.artboard_size_categories;
+                category_list += new_category_popup.item_name;
+                settings.artboard_size_categories = category_list;
             }
         });
 

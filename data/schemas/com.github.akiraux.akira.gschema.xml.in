@@ -187,7 +187,7 @@
         </key>
 
         <key name="artboard-size-categories" type="as">
-            <default>["Mobile", "Ipad", "Desktop"]</default>
+            <default>["Desktop", "Ipad", "Mobile"]</default>
             <summary>The list of categories of artboard sizes</summary>
             <description>Stores names of all screen size categories for artboard sizes</description>
         </key>
