@@ -185,5 +185,13 @@
             <summary>The list of global colors</summary>
             <description>Keep track of the colors saved by the user and available in every document file.</description>
         </key>
+
+        <key name="artboard-size-categories" type="as">
+            <default>["Mobile", "Ipad", "Desktop"]</default>
+            <summary>The list of categories of artboard sizes</summary>
+            <description>Stores names of all screen size categories for artboard sizes</description>
+        </key>
+
+
     </schema>
 </schemalist>

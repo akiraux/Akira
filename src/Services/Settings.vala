@@ -155,6 +155,12 @@ public class Akira.Services.Settings : GLib.Settings {
         set { set_strv ("global-colors", value); }
     }
 
+    // Artboard sizes and categories
+    public string[] artboard_size_categories {
+        owned get { return get_strv("artboard-size-categories");}
+        set { set_strv("artboard-size-categories", value);}
+    }
+
     public Settings () {
         Object (schema_id: Constants.APP_ID);
     }
