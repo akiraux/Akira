@@ -25,7 +25,6 @@ public class Akira.Layouts.Partials.ArtboardSizesPanel : Gtk.Grid {
     private Gtk.Button add_category_btn;
     private Gtk.ListBox size_list_container;
     private GLib.ListStore list;
-    private string[] category_names = {"Desktop", "Laptop", "Mobile"};
 
     public bool toggled {
         get {
@@ -70,7 +69,8 @@ public class Akira.Layouts.Partials.ArtboardSizesPanel : Gtk.Grid {
         title_cont.attach (add_category_btn, 1, 0, 1, 1);
 
         list = new GLib.ListStore(Type.OBJECT);
-        foreach(string category in category_names) {
+
+        foreach(string category in settings.artboard_size_categories) {
             list.insert(0, new SizeCategoryItem(category));
         }
 
