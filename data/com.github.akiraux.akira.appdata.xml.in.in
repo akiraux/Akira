@@ -32,6 +32,21 @@
 		<binary>@APP_ID@</binary>
 	</provides>
   <releases>
+    <release version="0.0.15" date="2021-07-20">
+      <description>
+        <p>Performance improvements and Global colors library</p>
+        <ul>
+          <li>Improved "Modes" detection (insert, select, transform).</li>
+          <li>Fixed Artboard label issues on zoom.</li>
+          <li>Improved Pixel Grid detection and z-index stack with other items.</li>
+          <li>Implemented editable zoom value.</li>
+          <li>Fix application activation when opening a new file.</li>
+          <li>Fix sizing issue when dropping images into the Canvas.</li>
+          <li>Implemented Global colors library.</li>
+          <li>Italian translation.</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.0.14" date="2021-04-25">
       <description>
         <p>New Features and Bug Fixes</p>
@@ -179,5 +194,6 @@
     <value key="x-appcenter-color-primary">#3f3f3f</value>
     <value key="x-appcenter-color-primary-text">#ffffff</value>
     <value key="x-appcenter-suggested-price">15</value>
+    <value key="x-appcenter-stripe">pk_live_515yF9YDvXGakAYGJ74PQwmIwxs6xQrm0q0ULEAYO6vZyzsTIaOI40ZtDYj6qUGq6sjzCgwd25VQ4REbJob6pkB9r00tU1lgu6W</value>
   </custom>
 </component>

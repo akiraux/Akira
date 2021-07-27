@@ -33,7 +33,7 @@ Feel free to download the Alpha and help us testing it.
 
 | elementaryOS AppCenter 	| FlatHub       	| Snapcraft Store 	|
 |------------------------	|---------------	|-----------------	|
-|[![Get it on AppCenter](https://appcenter.elementary.io/badge.svg)](https://appcenter.elementary.io/com.github.akiraux.akira/)|<a href="#flathub-beta"><img src="https://flathub.org/assets/badges/flathub-badge-i-en.svg" width="160px" alt="Get it from Flathub!"></a>|[![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-white.svg)](https://snapcraft.io/akira)|
+|[![Get it on AppCenter](https://appcenter.elementary.io/badge.svg)](https://appcenter.elementary.io/com.github.akiraux.akira/)|<a href="#flathub-beta"><img src="https://flathub.org/assets/badges/flathub-badge-i-en.svg" width="160px" alt="Get it from Flathub!"></a>
 
 ### Flathub Beta
 ```
@@ -77,7 +77,7 @@ ninja && sudo ninja install
 
 ## 🤔 Questions
 
-If you want to ask any questions about the project, join us on our public Matrix channel at 
+If you want to ask any questions about the project, join us on our public Matrix channel at
 [#akiraux:matrix.org](https://matrix.to/#/#akiraux:matrix.org) or on IRC at #akiraux on LiberaChat.
 
 We also have a dedicated Discord channel available to any [Patreon](https://www.patreon.com/akiraux) supporters where we offer more direct support, and we're open to discussing new features and implementations.
