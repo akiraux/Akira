@@ -99,6 +99,13 @@ public class Akira.Layouts.Partials.ArtboardSizesPanel : Gtk.Grid {
     private void handle_add_category() {
         InsertItemPopover new_category_popup = new InsertItemPopover(add_category_btn);
         new_category_popup.iniitalizePopover(false);
+
+        new_category_popup.closed.connect(()=>{
+            if(new_category_popup.item_name != "") {
+                list.insert(0, new SizeCategoryItem(new_category_popup.item_name));
+            }
+        });
+
         new_category_popup.popup();
     }
 
@@ -141,6 +148,9 @@ private class InsertItemPopover : Gtk.Popover {
         // other widgets do not recieve inputs
         modal = true;
         position = Gtk.PositionType.BOTTOM;
+
+        item_name = "";
+        item_size = "";
     }
 
     public void iniitalizePopover(bool show_size) {
@@ -155,6 +165,19 @@ private class InsertItemPopover : Gtk.Popover {
         name_input.hexpand = true;
         name_input.get_style_context().add_class("size-category-item");
         name_input.visible = true;
+
+        name_input.activate.connect(()=>{
+            if(show_size) {
+
+            } else {
+                if(name_input.text == "") {
+                    return;
+                }
+
+                item_name = name_input.text;
+                popdown();
+            }
+        });
 
         size_label = new Gtk.Label("Size");
         size_label.hexpand = true;
