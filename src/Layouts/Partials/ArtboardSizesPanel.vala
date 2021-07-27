@@ -97,22 +97,9 @@ public class Akira.Layouts.Partials.ArtboardSizesPanel : Gtk.Grid {
     }
 
     private void handle_add_category() {
-        Gtk.Entry category_name_entry = new Gtk.Entry();
-
-        category_name_entry.get_style_context().add_class("size-category-item");
-        category_name_entry.width_chars = 8;
-        category_name_entry.hexpand = true;
-        category_name_entry.visible = true;
-
-        // when the user starts typing, disable all shortcut commands
-        category_name_entry.insert_text.connect(() => {
-            window.event_bus.disconnect_typing_accel();
-        });
-
-        // when the user hits enter, add this category
-        category_name_entry.activate.connect(() => {
-
-        });
+        InsertItemPopover new_category_popup = new InsertItemPopover(add_category_btn);
+        new_category_popup.iniitalizePopover(false);
+        new_category_popup.popup();
     }
 
     private void reload_list (bool show) {
@@ -120,10 +107,73 @@ public class Akira.Layouts.Partials.ArtboardSizesPanel : Gtk.Grid {
     }
 }
 
+// this class represents a category of artboard sizes.
+// since this will not be user elsewhere, it is private and has been placed here
 private class SizeCategoryItem : Object {
     public string size;
 
     public SizeCategoryItem(string _size) {
         size = _size;
+    }
+}
+
+// this class represents a popver that opens when user clicks on a "+" button to
+// add a new category or artboard size.
+private class InsertItemPopover : Gtk.Popover {
+    // label for the name of category or size
+    private Gtk.Label name_label;
+    // input for name of category or size
+    private Gtk.Entry name_input;
+
+    // label for the size of artboard
+    private Gtk.Label size_label;
+    // input for size of input
+    private Gtk.Entry size_input;
+
+    // string containing the name of category of size
+    public string item_name;
+    // string containing the size of created artboard
+    public string item_size;
+
+    public InsertItemPopover(Gtk.Widget widget) {
+        set("relative-to", widget);
+        // the popover is modal so when user enters values here,
+        // other widgets do not recieve inputs
+        modal = true;
+        position = Gtk.PositionType.BOTTOM;
+    }
+
+    public void iniitalizePopover(bool show_size) {
+        Gtk.Grid grid = new Gtk.Grid();
+
+        name_label = new Gtk.Label("Name");
+        name_label.hexpand = true;
+        name_label.get_style_context().add_class("size-category-item");
+        name_label.visible = true;
+
+        name_input = new Gtk.Entry();
+        name_input.hexpand = true;
+        name_input.get_style_context().add_class("size-category-item");
+        name_input.visible = true;
+
+        size_label = new Gtk.Label("Size");
+        size_label.hexpand = true;
+        size_label.get_style_context().add_class("size-category-item");
+
+        size_input = new Gtk.Entry();
+        size_input.hexpand = true;
+        size_input.get_style_context().add_class("size-category-item");
+
+        grid.attach(name_label, 0, 0, 1, 1);
+        grid.attach(name_input, 1, 0, 1, 1);
+
+        if(show_size) {
+            grid.attach(size_label, 0, 1, 1, 1);
+            grid.attach(size_input, 1, 1, 1, 1);
+        }
+
+        grid.show_all();
+
+        add(grid);
     }
 }
