@@ -114,9 +114,6 @@ public class Akira.Layouts.Partials.ArtboardSizesPanel : Gtk.Grid {
     	Json.Node node = parser.get_root ();
     	Json.Reader reader = new Json.Reader (node);
 
-        string[] string_items;
-        int[] int_items;
-
         bool tmp = reader.read_member("sizes");
         assert(tmp == true);
         assert(reader.is_object());
@@ -132,41 +129,36 @@ public class Akira.Layouts.Partials.ArtboardSizesPanel : Gtk.Grid {
 
             for(int i = 0; i < count_members; ++i) {
                 reader.read_element(i);
-                parse_array(reader, false, out int_items, out string_items);
+                var int_items = parse_array(reader);
                 foreach(var item in int_items) {
                     print(item.to_string() + "\n");
                 }
-                reader.end_element();
             }
 
             reader.end_member();
 
         }
         reader.end_member();
-        
+
     }
 
-    private void parse_array(Json.Reader reader, bool is_string, out int[] out_ints, out string[] out_strings) {
+    private int[] parse_array(Json.Reader reader) {
         int[] parsed_ints = {};
-        string[] parsed_strings = {};
 
         int members = reader.count_elements();
 
         for(int i = 0; i < members; ++i) {
             reader.read_element(i);
 
-            if(is_string) {
-                string item = reader.get_string_value();
-                parsed_strings += item;
-            } else {
-                int item = (int)reader.get_int_value();
-                parsed_ints += item;
-            }
+            int item = (int)reader.get_int_value();
+            parsed_ints += item;
+
             reader.end_element();
         }
 
-        out_ints = parsed_ints;
-        out_strings = parsed_strings;
+        reader.end_element();
+
+        return parsed_ints;
     }
 
     private Gtk.Expander create_category_expander(SizeCategoryItem category) {
