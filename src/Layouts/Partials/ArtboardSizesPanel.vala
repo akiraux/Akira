@@ -26,6 +26,18 @@ public class Akira.Layouts.Partials.ArtboardSizesPanel : Gtk.Grid {
     private Gtk.ListBox size_list_container;
     private GLib.ListStore list;
 
+    private string sizes_json = """
+        {
+            "categories": 3,
+            "category_names": ['Desktop', 'Ipad', 'Mobile'],
+            "sizes": {
+                'Desktop': [[1000,1000],[2000,2000]],
+                'Ipad': [[3000,3000],[4000,4000]],
+                'Mobile': [[5000,5000],[6000,6000]]
+            }
+        }
+    """;
+
     public bool toggled {
         get {
             return visible;
@@ -68,6 +80,8 @@ public class Akira.Layouts.Partials.ArtboardSizesPanel : Gtk.Grid {
         title_cont.attach (label, 0, 0, 1, 1);
         title_cont.attach (add_category_btn, 1, 0, 1, 1);
 
+        parseJson(sizes_json);
+
         list = new GLib.ListStore(Type.OBJECT);
 
         foreach(string category in settings.artboard_size_categories) {
@@ -89,6 +103,109 @@ public class Akira.Layouts.Partials.ArtboardSizesPanel : Gtk.Grid {
         });
     }
 
+    private void parseJson(string json_string) {
+        Json.Parser parser = new Json.Parser();
+        try {
+    		parser.load_from_data (sizes_json);
+    	} catch (Error e) {
+    		print ("Unable to parse data: %s\n", e.message);
+    	}
+
+    	Json.Node node = parser.get_root ();
+    	Json.Reader reader = new Json.Reader (node);
+
+        string[] string_items;
+        int[] int_items;
+
+        print("members are\n");
+        foreach(string member in reader.list_members()) {
+            switch (member) {
+          		case "categories":
+          			bool tmp = reader.read_member ("categories");
+          			assert (tmp == true);
+          			assert (reader.is_value ());
+
+          			int64 val = reader.get_int_value ();
+          			reader.end_member ();
+                    print("categorys:: "+ val.to_string()+"\n");
+          			break;
+
+          		case "category_names":
+          			bool tmp = reader.read_member ("category_names");
+          			assert (tmp == true);
+          			assert (reader.is_array ());
+
+                    print("category nams\n");
+                    parse_array(reader, true, out int_items, out string_items);
+
+                    foreach (var item in string_items) {
+                        print(item.to_string() + "\n");
+                    }
+
+                    reader.end_member();
+                    print("\n");
+                    break;
+
+                case "sizes":
+                    bool tmp = reader.read_member("sizes");
+                    assert(tmp == true);
+                    assert(reader.is_object());
+
+                    int members = reader.count_members();
+                    string[] member_names = reader.list_members();
+                    print("sizes\n");
+                    foreach(string mem in member_names) {
+                        tmp = reader.read_member(mem);
+                        assert(tmp == true);
+                        print(mem+"\n");
+
+                        int count_members = reader.count_elements();
+
+                        for(int i = 0; i < count_members; ++i) {
+                            reader.read_element(i);
+                            parse_array(reader, false, out int_items, out string_items);
+                            foreach(var item in int_items) {
+                                print(item.to_string() + "\n");
+                            }
+                            reader.end_element();
+                        }
+
+                        reader.end_member();
+
+                    }
+                    reader.end_member();
+                    break;
+
+          		default:
+                    print("assert not reached\n");
+                    break;
+      		}
+        }
+    }
+
+    private void parse_array(Json.Reader reader, bool is_string, out int[] out_ints, out string[] out_strings) {
+        int[] parsed_ints = {};
+        string[] parsed_strings = {};
+
+        int members = reader.count_elements();
+
+        for(int i = 0; i < members; ++i) {
+            reader.read_element(i);
+
+            if(is_string) {
+                string item = reader.get_string_value();
+                parsed_strings += item;
+            } else {
+                int item = (int)reader.get_int_value();
+                parsed_ints += item;
+            }
+            reader.end_element();
+        }
+
+        out_ints = parsed_ints;
+        out_strings = parsed_strings;
+    }
+
     private Gtk.Expander create_category_expander(SizeCategoryItem category) {
         Gtk.Expander category_expander = new Gtk.Expander(category.size);
         category_expander.get_style_context().add_class("size-category-item");
@@ -103,7 +220,7 @@ public class Akira.Layouts.Partials.ArtboardSizesPanel : Gtk.Grid {
         new_category_popup.closed.connect(()=>{
             if(new_category_popup.item_name != "") {
                 list.append(new SizeCategoryItem(new_category_popup.item_name));
-                
+
                 // make this category name permanent by adding it to the gsettings
                 var category_list = settings.artboard_size_categories;
                 category_list += new_category_popup.item_name;
