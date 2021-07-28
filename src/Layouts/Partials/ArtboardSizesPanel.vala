@@ -28,8 +28,6 @@ public class Akira.Layouts.Partials.ArtboardSizesPanel : Gtk.Grid {
 
     private string sizes_json = """
         {
-            "categories": 3,
-            "category_names": ['Desktop', 'Ipad', 'Mobile'],
             "sizes": {
                 'Desktop': [[1000,1000],[2000,2000]],
                 'Ipad': [[3000,3000],[4000,4000]],
@@ -104,6 +102,8 @@ public class Akira.Layouts.Partials.ArtboardSizesPanel : Gtk.Grid {
     }
 
     private void parseJson(string json_string) {
+        //list = new GLib.ListStore(Type.Object);
+
         Json.Parser parser = new Json.Parser();
         try {
     		parser.load_from_data (sizes_json);
@@ -117,70 +117,33 @@ public class Akira.Layouts.Partials.ArtboardSizesPanel : Gtk.Grid {
         string[] string_items;
         int[] int_items;
 
-        print("members are\n");
-        foreach(string member in reader.list_members()) {
-            switch (member) {
-          		case "categories":
-          			bool tmp = reader.read_member ("categories");
-          			assert (tmp == true);
-          			assert (reader.is_value ());
+        bool tmp = reader.read_member("sizes");
+        assert(tmp == true);
+        assert(reader.is_object());
 
-          			int64 val = reader.get_int_value ();
-          			reader.end_member ();
-                    print("categorys:: "+ val.to_string()+"\n");
-          			break;
+        string[] member_names = reader.list_members();
+        print("sizes\n");
+        foreach(string mem in member_names) {
+            tmp = reader.read_member(mem);
+            assert(tmp == true);
+            print(mem+"\n");
 
-          		case "category_names":
-          			bool tmp = reader.read_member ("category_names");
-          			assert (tmp == true);
-          			assert (reader.is_array ());
+            int count_members = reader.count_elements();
 
-                    print("category nams\n");
-                    parse_array(reader, true, out int_items, out string_items);
+            for(int i = 0; i < count_members; ++i) {
+                reader.read_element(i);
+                parse_array(reader, false, out int_items, out string_items);
+                foreach(var item in int_items) {
+                    print(item.to_string() + "\n");
+                }
+                reader.end_element();
+            }
 
-                    foreach (var item in string_items) {
-                        print(item.to_string() + "\n");
-                    }
+            reader.end_member();
 
-                    reader.end_member();
-                    print("\n");
-                    break;
-
-                case "sizes":
-                    bool tmp = reader.read_member("sizes");
-                    assert(tmp == true);
-                    assert(reader.is_object());
-
-                    int members = reader.count_members();
-                    string[] member_names = reader.list_members();
-                    print("sizes\n");
-                    foreach(string mem in member_names) {
-                        tmp = reader.read_member(mem);
-                        assert(tmp == true);
-                        print(mem+"\n");
-
-                        int count_members = reader.count_elements();
-
-                        for(int i = 0; i < count_members; ++i) {
-                            reader.read_element(i);
-                            parse_array(reader, false, out int_items, out string_items);
-                            foreach(var item in int_items) {
-                                print(item.to_string() + "\n");
-                            }
-                            reader.end_element();
-                        }
-
-                        reader.end_member();
-
-                    }
-                    reader.end_member();
-                    break;
-
-          		default:
-                    print("assert not reached\n");
-                    break;
-      		}
         }
+        reader.end_member();
+        
     }
 
     private void parse_array(Json.Reader reader, bool is_string, out int[] out_ints, out string[] out_strings) {
