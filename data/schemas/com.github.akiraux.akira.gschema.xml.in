@@ -191,22 +191,49 @@
                 {
                     'categories': {
                         'Desktop': {
-                            'Desktop-1': [1000,1000],
-                            'Desktop-2': [2000,2000]
+                            'Dell XPS 13': [1920, 1280],
+                            'Apple MacBook Pro 13-inch': [2560, 1600],
+                            'Microsoft Surface Book': [3000, 2000],
+                            'Samsung Chromebook': [1366, 768],
+                            'Acer Chromebook': [1366, 768],
+                            'Panasonic BT-4LH310P': [2160, 4096],
+                            'Panasonic BT-LH1850': [768, 1366],
+                            'Asus K55N-DS81 15.6 in': [1366, 768],
+                            'Asus PB287Q': [3840, 2160],
+                            'Dell Inspiron 14 series 36 in': [1600, 900]
                         },
                         'Ipad': {
-                            'Ipad-1': [3000,3000],
-                            'IPad-2': [4000,4000]
+                            'Apple iPad Pro': [2732, 2048],
+                            'Apple iPad Mini': [768, 1024],
+                            'Apple iPad Air': [2048, 1536],
+                            'Apple iPad Air 2': [2048, 1536],
+                            'Amazon Fire': [1024, 600],
+                            'Microsoft Surface Pro (2017)': [2736, 1824],
+                            'Apple iPad Mini 4': [2048, 1536],
+                            'Apple iPad Mini 2': [2048, 1536],
+                            'Huawei Mat': [1920, 1080],
+                            'Sony Xperia Z4': [2560, 1600]
                         },
                         'Mobile': {
-                            'Mobile-1': [5000,5000],
-                            'Mobile-2': [6000,6000]
+                            'Apple iPhone 8 Plus': [1080, 1920],
+                            'Apple iPhone 7 Plus': [1080, 1920],
+                            'Apple iPhone XR': [828, 1792],
+                            'Apple iPhone XS': [1124, 2436],
+                            'Apple iPhone SE': [640, 1136],
+                            'Apple iPhone XS Max': [1242, 2688],
+                            'Samsung Galaxy S': [480, 800],
+                            'Apple iPhone 6 Plus': [1080, 1920],
+                            'Samsung Galaxy S8+': [2960, 1440],
+                            'Apple iPhone 5 (5c, 5s)': [640, 1136]
                         }
                     }
                 }
             "</default>
             <summary>List of artboard sizes and categories</summary>
-            <description>List of artboard sizes and categories for drawing artboards of custom sizes</description>
+            <description>
+                List of artboard sizes and categories for drawing artboards of custom sizes
+                Values have been taken from https://screensiz.es
+            </description>
         </key>
 
 
