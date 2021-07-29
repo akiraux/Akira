@@ -80,12 +80,6 @@ public class Akira.Layouts.Partials.ArtboardSizesPanel : Gtk.Grid {
 
         parseJson(sizes_json);
 
-        list = new GLib.ListStore(Type.OBJECT);
-
-        foreach(string category in settings.artboard_size_categories) {
-            list.append(new SizeCategoryItem(category));
-        }
-
         size_list_container.bind_model (list, item => {
             return create_category_expander((SizeCategoryItem)item);
         });
@@ -102,13 +96,14 @@ public class Akira.Layouts.Partials.ArtboardSizesPanel : Gtk.Grid {
     }
 
     private void parseJson(string json_string) {
-        //list = new GLib.ListStore(Type.Object);
+        list = new GLib.ListStore(Type.OBJECT);
 
         Json.Parser parser = new Json.Parser();
         try {
     		parser.load_from_data (sizes_json);
     	} catch (Error e) {
     		print ("Unable to parse data: %s\n", e.message);
+            return;
     	}
 
     	Json.Node node = parser.get_root ();
@@ -125,6 +120,8 @@ public class Akira.Layouts.Partials.ArtboardSizesPanel : Gtk.Grid {
             assert(tmp == true);
             print(mem+"\n");
 
+            SizeCategoryItem category_item = new SizeCategoryItem(mem);
+
             int count_members = reader.count_elements();
 
             for(int i = 0; i < count_members; ++i) {
@@ -133,8 +130,10 @@ public class Akira.Layouts.Partials.ArtboardSizesPanel : Gtk.Grid {
                 foreach(var item in int_items) {
                     print(item.to_string() + "\n");
                 }
+                category_item.add_size(int_items);
             }
 
+            list.append(category_item);
             reader.end_member();
 
         }
@@ -162,8 +161,24 @@ public class Akira.Layouts.Partials.ArtboardSizesPanel : Gtk.Grid {
     }
 
     private Gtk.Expander create_category_expander(SizeCategoryItem category) {
-        Gtk.Expander category_expander = new Gtk.Expander(category.size);
+        // create expander for each category of sizes
+        Gtk.Expander category_expander = new Gtk.Expander(category.category_name);
         category_expander.get_style_context().add_class("size-category-item");
+
+        // create items inside each category
+        Gtk.Grid size_items_grid = new Gtk.Grid();
+        for(int i = 0; i < category.artboard_sizes.size; ++i) {
+            string button_label = """%d x %d""".printf(category.artboard_sizes[i][0], category.artboard_sizes[i][1]);
+
+            Gtk.Button size_button = new Gtk.Button.with_label(button_label);
+            size_button.height_request = 35;
+            size_button.hexpand = true;
+            size_button.get_style_context().add_class("artboard-size-button");
+
+            size_items_grid.attach(size_button, 0, i, 1, 1);
+        }
+
+        category_expander.add(size_items_grid);
 
         return category_expander;
     }
@@ -194,10 +209,20 @@ public class Akira.Layouts.Partials.ArtboardSizesPanel : Gtk.Grid {
 // this class represents a category of artboard sizes.
 // since this will not be user elsewhere, it is private and has been placed here
 private class SizeCategoryItem : Object {
-    public string size;
+    public string category_name;
+    public Gee.ArrayList<GenericArray<int>> artboard_sizes;
 
-    public SizeCategoryItem(string _size) {
-        size = _size;
+    public SizeCategoryItem(string _category_name) {
+        category_name = _category_name;
+        artboard_sizes = new Gee.ArrayList<GenericArray<int>>();
+    }
+
+    public void add_size(int[] new_size)  {
+        GLib.GenericArray<int> array = new GLib.GenericArray<int>();
+        array.add(new_size[1]);
+        array.add(new_size[0]);
+
+        artboard_sizes.add(array);
     }
 }
 

@@ -57,3 +57,7 @@ button.selected-color {
     margin: 2px;
     padding: 10px;
 }
+
+.artboard-size-button {
+    background-color: @base_color;
+}
