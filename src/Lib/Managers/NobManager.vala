@@ -357,7 +357,7 @@ public class Akira.Lib.Managers.NobManager : Object {
             calculate_nob_position (nob_name, nob_data, ref center_x, ref center_y);
 
             // Unique calculation for the rotation nob.
-            if (nob.handle_id == Nob.ROTATE) {
+            if (nob.handle_id == Utils.Nobs.Nob.ROTATE) {
                 double line_offset_x = 0;
                 double line_offset_y = - (LINE_HEIGHT / canvas.current_scale);
                 nob_data.bb_matrix.transform_distance (ref line_offset_x, ref line_offset_y);
@@ -393,12 +393,12 @@ public class Akira.Lib.Managers.NobManager : Object {
             }
 
             // Check if we need to hide the vertically centered nobs.
-            if (!print_middle_height_nobs && (nob_name == Nob.RIGHT_CENTER || nob_name == Nob.LEFT_CENTER)) {
+            if (!print_middle_height_nobs && (nob_name == Utils.Nobs.Nob.RIGHT_CENTER || nob_name == Utils.Nobs.Nob.LEFT_CENTER)) {
                 set_visible = false;
             }
 
             // Check if we need to hide the horizontally centere nobs.
-            if (!print_middle_width_nobs && (nob_name == Nob.TOP_CENTER || nob_name == Nob.BOTTOM_CENTER)) {
+            if (!print_middle_width_nobs && (nob_name == Utils.Nobs.Nob.TOP_CENTER || nob_name == Utils.Nobs.Nob.BOTTOM_CENTER)) {
                 set_visible = false;
             }
 
@@ -411,13 +411,13 @@ public class Akira.Lib.Managers.NobManager : Object {
                 var half = nob_size / 2;
 
                 // Use Cairo.translate to automatically account for the item's rotation.
-                if (nob_name == Nob.TOP_LEFT) {
+                if (nob_name == Utils.Nobs.Nob.TOP_LEFT) {
                     nob.translate (-half, -half);
-                } else if (nob_name == Nob.TOP_RIGHT) {
+                } else if (nob_name == Utils.Nobs.Nob.TOP_RIGHT) {
                     nob.translate (half, -half);
-                } else if (nob_name == Nob.BOTTOM_RIGHT) {
+                } else if (nob_name == Utils.Nobs.Nob.BOTTOM_RIGHT) {
                     nob.translate (half, half);
-                } else if (nob_name == Nob.BOTTOM_LEFT) {
+                } else if (nob_name == Utils.Nobs.Nob.BOTTOM_LEFT) {
                     nob.translate (-half, half);
                 }
             }
