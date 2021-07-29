@@ -186,10 +186,27 @@
             <description>Keep track of the colors saved by the user and available in every document file.</description>
         </key>
 
-        <key name="artboard-size-categories" type="as">
-            <default>["Desktop", "Ipad", "Mobile"]</default>
-            <summary>The list of categories of artboard sizes</summary>
-            <description>Stores names of all screen size categories for artboard sizes</description>
+        <key name="artboard-size-categories" type="s">
+            <default>"
+                {
+                    'categories': {
+                        'Desktop': {
+                            'Desktop-1': [1000,1000],
+                            'Desktop-2': [2000,2000]
+                        },
+                        'Ipad': {
+                            'Ipad-1': [3000,3000],
+                            'IPad-2': [4000,4000]
+                        },
+                        'Mobile': {
+                            'Mobile-1': [5000,5000],
+                            'Mobile-2': [6000,6000]
+                        }
+                    }
+                }
+            "</default>
+            <summary>List of artboard sizes and categories</summary>
+            <description>List of artboard sizes and categories for drawing artboards of custom sizes</description>
         </key>
 
 

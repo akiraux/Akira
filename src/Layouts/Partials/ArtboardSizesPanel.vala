@@ -25,25 +25,8 @@ public class Akira.Layouts.Partials.ArtboardSizesPanel : Gtk.Grid {
     private Gtk.Button add_category_btn;
     private Gtk.ListBox size_list_container;
     private GLib.ListStore list;
-
-    private string sizes_json = """
-        {
-            'categories': {
-                'Desktop': {
-                    'Desktop-1': [1000,1000],
-                    'Desktop-2': [2000,2000]
-                },
-                'Ipad': {
-                    'Ipad-1': [3000,3000],
-                    'IPad-2': [4000,4000]
-                },
-                'Mobile': {
-                    'Mobile-1': [5000,5000],
-                    'Mobile-2': [6000,6000]
-                }
-            }
-        }
-    """;
+    // json object read from settings
+    private string sizes_json;
 
     public bool toggled {
         get {
@@ -87,6 +70,8 @@ public class Akira.Layouts.Partials.ArtboardSizesPanel : Gtk.Grid {
         title_cont.attach (label, 0, 0, 1, 1);
         title_cont.attach (add_category_btn, 1, 0, 1, 1);
 
+        // read the json object containing info about sizes and category names
+        sizes_json = settings.artboard_size_categories;
         parseJson(sizes_json);
 
         size_list_container.bind_model (list, item => {
@@ -208,11 +193,6 @@ public class Akira.Layouts.Partials.ArtboardSizesPanel : Gtk.Grid {
         new_category_popup.closed.connect(()=>{
             if(new_category_popup.item_name != "") {
                 list.append(new SizeCategoryItem(new_category_popup.item_name));
-
-                // make this category name permanent by adding it to the gsettings
-                var category_list = settings.artboard_size_categories;
-                category_list += new_category_popup.item_name;
-                settings.artboard_size_categories = category_list;
             }
         });
 
