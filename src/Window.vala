@@ -40,6 +40,8 @@ public class Akira.Window : Gtk.ApplicationWindow {
 
     public bool edited { get; set; default = false; }
 
+    public bool use_new_components = true;
+
     public Window (Akira.Application akira_app) {
         Object (
             application: akira_app,
@@ -53,14 +55,21 @@ public class Akira.Window : Gtk.ApplicationWindow {
         add_accel_group (accel_group);
 
         event_bus = new Akira.Services.EventBus ();
-        items_manager = new Akira.Lib.Managers.ItemsManager (this);
         action_manager = new Akira.Services.ActionManager (app, this);
-        file_manager = new Akira.FileFormat.FileManager (this);
+
         headerbar = new Akira.Layouts.HeaderBar (this);
-        main_window = new Akira.Layouts.MainWindow (this);
-        coords_middleware = new Akira.StateManagers.CoordinatesMiddleware (this);
-        size_middleware = new Akira.StateManagers.SizeMiddleware (this);
-        dialogs = new Akira.Utils.Dialogs (this);
+
+        if (use_new_components) {
+            main_window = new Akira.Layouts.MainWindow (this);
+        }
+        else {
+            items_manager = new Akira.Lib.Managers.ItemsManager (this);
+            file_manager = new Akira.FileFormat.FileManager (this);
+            main_window = new Akira.Layouts.MainWindow (this);
+            coords_middleware = new Akira.StateManagers.CoordinatesMiddleware (this);
+            size_middleware = new Akira.StateManagers.SizeMiddleware (this);
+            dialogs = new Akira.Utils.Dialogs (this);
+        }
 
         build_ui ();
 
@@ -69,7 +78,7 @@ public class Akira.Window : Gtk.ApplicationWindow {
         show_app ();
 
         // Let the canvas grab the focus after the app is visible.
-        main_window.main_canvas.canvas.focus_canvas ();
+        main_window.focus_canvas ();
 
         event_bus.file_edited.connect (on_file_edited);
         event_bus.file_saved.connect (on_file_saved);

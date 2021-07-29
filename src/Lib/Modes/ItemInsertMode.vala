@@ -86,7 +86,7 @@ public class Akira.Lib.Modes.ItemInsertMode : InteractionMode {
 
             sel_manager.add_item_to_selection (new_item);
 
-            canvas.nob_manager.selected_nob = Managers.NobManager.Nob.BOTTOM_RIGHT;
+            canvas.nob_manager.selected_nob = Utils.Nobs.Nob.BOTTOM_RIGHT;
             canvas.update_canvas ();
 
             transform_mode = new Akira.Lib.Modes.TransformMode (canvas, null);

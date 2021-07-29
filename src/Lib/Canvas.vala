@@ -134,7 +134,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         Gdk.CursorType? new_cursor = mode_manager.active_cursor_type ();
 
         if (new_cursor == null) {
-            var hover_cursor = Akira.Lib.Managers.NobManager.cursor_from_nob (nob_manager.hovered_nob);
+            var hover_cursor = Utils.Nobs.cursor_from_nob (nob_manager.hovered_nob);
             new_cursor = (hover_cursor == null) ? Gdk.CursorType.ARROW : hover_cursor;
         }
 
@@ -321,7 +321,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         var nob_clicked = nob_manager.hit_test (event.x, event.y);
         nob_manager.set_selected_by_name (nob_clicked);
 
-        if (nob_clicked == Akira.Lib.Managers.NobManager.Nob.NONE) {
+        if (nob_clicked == Utils.Nobs.Nob.NONE) {
             var clicked_item = get_item_at (event.x, event.y, true);
 
             // Deselect if no item was clicked, or a non selected artboard was clicked.
@@ -368,7 +368,7 @@ public class Akira.Lib.Canvas : Goo.Canvas {
                 return true;
             }
         } else {
-            nob_manager.set_selected_by_name (Akira.Lib.Managers.NobManager.Nob.NONE);
+            nob_manager.set_selected_by_name (Utils.Nobs.Nob.NONE);
         }
 
         return false;
