@@ -28,10 +28,19 @@ public class Akira.Layouts.Partials.ArtboardSizesPanel : Gtk.Grid {
 
     private string sizes_json = """
         {
-            "sizes": {
-                'Desktop': [[1000,1000],[2000,2000]],
-                'Ipad': [[3000,3000],[4000,4000]],
-                'Mobile': [[5000,5000],[6000,6000]]
+            'categories': {
+                'Desktop': {
+                    'Desktop-1': [1000,1000],
+                    'Desktop-2': [2000,2000]
+                },
+                'Ipad': {
+                    'Ipad-1': [3000,3000],
+                    'IPad-2': [4000,4000]
+                },
+                'Mobile': {
+                    'Mobile-1': [5000,5000],
+                    'Mobile-2': [6000,6000]
+                }
             }
         }
     """;
@@ -109,36 +118,41 @@ public class Akira.Layouts.Partials.ArtboardSizesPanel : Gtk.Grid {
     	Json.Node node = parser.get_root ();
     	Json.Reader reader = new Json.Reader (node);
 
-        bool tmp = reader.read_member("sizes");
+        // the one and only key inside the json object is 'categories'
+        bool tmp = reader.read_member("categories");
         assert(tmp == true);
         assert(reader.is_object());
 
-        string[] member_names = reader.list_members();
-        print("sizes\n");
-        foreach(string mem in member_names) {
-            tmp = reader.read_member(mem);
+        // get the list of all keys inside 'categories'
+        // they represent the individual categories like 'Desktop', 'Mobile'
+        string[] category_names = reader.list_members();
+
+        foreach(string category in category_names) {
+            // read the current category
+            tmp = reader.read_member(category);
             assert(tmp == true);
-            print(mem+"\n");
+            assert(reader.is_object());
 
-            SizeCategoryItem category_item = new SizeCategoryItem(mem);
+            SizeCategoryItem category_item = new SizeCategoryItem(category);
 
-            int count_members = reader.count_elements();
+            string[] device_names = reader.list_members();
+            // each category contains an object with name of the device as key
+            // and the screen size as value
+            foreach(string device_name in device_names) {
+                // read the device name and its size array
+                tmp = reader.read_member(device_name);
+                assert(tmp == true);
+                assert(reader.is_array());
 
-            for(int i = 0; i < count_members; ++i) {
-                reader.read_element(i);
                 var int_items = parse_array(reader);
-                foreach(var item in int_items) {
-                    print(item.to_string() + "\n");
-                }
-                category_item.add_size(int_items);
+
+                category_item.add_size(int_items, device_name);
             }
 
             list.append(category_item);
             reader.end_member();
-
         }
         reader.end_member();
-
     }
 
     private int[] parse_array(Json.Reader reader) {
@@ -168,7 +182,11 @@ public class Akira.Layouts.Partials.ArtboardSizesPanel : Gtk.Grid {
         // create items inside each category
         Gtk.Grid size_items_grid = new Gtk.Grid();
         for(int i = 0; i < category.artboard_sizes.size; ++i) {
-            string button_label = """%d x %d""".printf(category.artboard_sizes[i][0], category.artboard_sizes[i][1]);
+            string button_label = """%s (%d x %d)""".printf(
+                category.artboard_device_names[i],
+                category.artboard_sizes[i][0],
+                category.artboard_sizes[i][1]
+            );
 
             Gtk.Button size_button = new Gtk.Button.with_label(button_label);
             size_button.height_request = 35;
@@ -211,16 +229,20 @@ public class Akira.Layouts.Partials.ArtboardSizesPanel : Gtk.Grid {
 private class SizeCategoryItem : Object {
     public string category_name;
     public Gee.ArrayList<GenericArray<int>> artboard_sizes;
+    public Gee.ArrayList<string> artboard_device_names;
 
     public SizeCategoryItem(string _category_name) {
         category_name = _category_name;
         artboard_sizes = new Gee.ArrayList<GenericArray<int>>();
+        artboard_device_names = new Gee.ArrayList<string>();
     }
 
-    public void add_size(int[] new_size)  {
+    public void add_size(int[] new_size, string device_name)  {
         GLib.GenericArray<int> array = new GLib.GenericArray<int>();
         array.add(new_size[1]);
         array.add(new_size[0]);
+
+        artboard_device_names.add(device_name);
 
         artboard_sizes.add(array);
     }
