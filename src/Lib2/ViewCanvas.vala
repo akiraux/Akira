@@ -69,7 +69,7 @@ public class Akira.Lib2.ViewCanvas : Goo.Canvas {
         window.event_bus.insert_item.connect (start_insert_mode);
         window.event_bus.update_snap_decorators.connect (on_update_snap_decorators);
 
-        mode_manager.mode_changed.connect(interaction_mode_changed);
+        mode_manager.mode_changed.connect (interaction_mode_changed);
     }
 
     public signal void canvas_moved (double delta_x, double delta_y);

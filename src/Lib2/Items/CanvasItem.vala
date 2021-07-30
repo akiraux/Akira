@@ -74,9 +74,9 @@ public class Akira.Lib2.Items.CanvasArtboardLabel : Goo.CanvasText, CanvasItem {
         this.width = 1.0;
         this.height = width;
         this.anchor = Goo.CanvasAnchorType.SW;
-        set("font", "Open Sans " + (FONT_SIZE/* / akira_canvas.current_scale*/).to_string ());
-        set("ellipsize", Pango.EllipsizeMode.END);
-        set("fill-color-rgba", settings.dark_theme ? light_color : dark_color);
+        set ("font", "Open Sans " + (FONT_SIZE/* / akira_canvas.current_scale*/).to_string ());
+        set ("ellipsize", Pango.EllipsizeMode.END);
+        set ("fill-color-rgba", settings.dark_theme ? light_color : dark_color);
 
         can_focus = false;
 

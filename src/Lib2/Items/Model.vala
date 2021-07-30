@@ -36,12 +36,12 @@
  * begin with.
  */
 public class Akira.Lib2.Items.Model : Object {
-    public const int origin_id = 5;
-    public const int group_start_id = 10;
-    public const int item_start_id = 10000000;
+    public const int ORIGIN_ID = 5;
+    public const int GROUP_START_ID = 10;
+    public const int ITEM_START_ID = 10000000;
 
-    public int last_group_id = group_start_id;
-    public int last_item_id = item_start_id;
+    public int last_group_id = GROUP_START_ID;
+    public int last_item_id = ITEM_START_ID;
 
     public Gee.HashMap<int, ModelInstance> group_map;
     public Gee.HashMap<int, ModelInstance> item_map;
@@ -68,7 +68,7 @@ public class Akira.Lib2.Items.Model : Object {
         dirty_items = new Gee.HashSet<int> ();
         dirty_groups = new Gee.HashSet<int> ();
 
-        var group_instance = new ModelInstance (origin_id, null);
+        var group_instance = new ModelInstance (ORIGIN_ID, null);
         add_to_maps (new ModelNode (group_instance, 0), false);
     }
 
@@ -80,7 +80,7 @@ public class Akira.Lib2.Items.Model : Object {
     }
 
     public ModelInstance? instance_from_id (int id) {
-        if (id >= item_start_id) {
+        if (id >= ITEM_START_ID) {
             return item_map.has_key (id) ? item_map[id] : null;
         }
 
@@ -88,22 +88,22 @@ public class Akira.Lib2.Items.Model : Object {
     }
 
     public ModelInstance? child_instance_at (int parent_id, int pos) {
-        if (parent_id >= item_start_id) {
+        if (parent_id >= ITEM_START_ID) {
             // items don't have children
             return null;
         }
-        
+
         var node = node_from_id (parent_id);
 
         if (node == null || pos >= node.children.length) {
             return null;
         }
 
-        return node.children.index(pos).instance;
+        return node.children.index (pos).instance;
     }
 
     public ModelNode? node_from_id (int id) {
-        if (id >= item_start_id) {
+        if (id >= ITEM_START_ID) {
             return item_nodes.has_key (id) ? item_nodes[id] : null;
         }
 
@@ -144,7 +144,7 @@ public class Akira.Lib2.Items.Model : Object {
 
     public int remove (int id, bool restack) {
         var node = node_from_id (id);
-        
+
         if (node == null) {
             return -1;
         }
@@ -169,7 +169,7 @@ public class Akira.Lib2.Items.Model : Object {
 
         if (restack) {
             for (var i = (int)pos; i < parent_node.children.length; ++i) {
-                parent_node.children.index(i).pos_in_parent--;
+                parent_node.children.index (i).pos_in_parent--;
             }
         }
         return 0;
@@ -224,7 +224,7 @@ public class Akira.Lib2.Items.Model : Object {
         if (restack) {
             var start = int.min ((int)pos, (int)newpos);
             for (var i = start; i < parent_node.children.length; ++i) {
-                parent_node.children.index(i).pos_in_parent = i;
+                parent_node.children.index (i).pos_in_parent = i;
             }
         }
 
@@ -236,7 +236,7 @@ public class Akira.Lib2.Items.Model : Object {
             return node;
         }
 
-        if (node.parent.id == origin_id) {
+        if (node.parent.id == ORIGIN_ID) {
             return node;
         }
 
@@ -251,7 +251,7 @@ public class Akira.Lib2.Items.Model : Object {
         var sibling_pos = node.pos_in_parent + 1;
         unowned ModelNode sibling = null;
         while (sibling_pos < node.parent.children.length) {
-            sibling = node.parent.children.index(sibling_pos);
+            sibling = node.parent.children.index (sibling_pos);
             if (!only_stackable || sibling.instance.item.is_stackable ()) {
                 return sibling;
             }
@@ -269,7 +269,7 @@ public class Akira.Lib2.Items.Model : Object {
         var sibling_pos = node.pos_in_parent - 1;
         unowned ModelNode sibling = null;
         while (sibling_pos >= 0) {
-            sibling = node.parent.children.index(sibling_pos);
+            sibling = node.parent.children.index (sibling_pos);
             if (!only_stackable || sibling.instance.item.is_stackable ()) {
                 return sibling;
             }
@@ -300,11 +300,11 @@ public class Akira.Lib2.Items.Model : Object {
 
     public void print_dag () {
         print ("DAG: \n");
-        print_dag_recurse (group_nodes[origin_id], 1);
+        print_dag_recurse (group_nodes[ORIGIN_ID], 1);
     }
 
     public void print_dag_recurse (ModelNode node, int level) {
-        for(var d = 0; d < level; ++d) {
+        for (var d = 0; d < level; ++d) {
             print ("  ");
         }
 
@@ -319,7 +319,7 @@ public class Akira.Lib2.Items.Model : Object {
 
         if (node.children != null) {
             for (var i = 0; i < node.children.length; ++i) {
-                print_dag_recurse (node.children.index(i), level + 1);
+                print_dag_recurse (node.children.index (i), level + 1);
             }
         }
 
@@ -353,7 +353,7 @@ public class Akira.Lib2.Items.Model : Object {
         if (update_sibling_locations) {
             var ipos = (int) pos;
             for (var i = ipos; i < parent_node.children.length; ++i) {
-                parent_node.children.index(ipos).pos_in_parent = ipos++;
+                parent_node.children.index (ipos).pos_in_parent = ipos++;
             }
         }
 
@@ -367,7 +367,7 @@ public class Akira.Lib2.Items.Model : Object {
     private int inner_remove (ModelNode parent_node, ModelNode to_delete, uint pos_in_parent) {
         if (to_delete.children != null) {
             for (var ci = (int) to_delete.children.length - 1; ci >= 0; --ci) {
-                var child_node = to_delete.children.index(ci);
+                var child_node = to_delete.children.index (ci);
                 if (child_node.children != null && child_node.children.length > 0) {
                     inner_remove (to_delete, child_node, ci);
                     continue;
@@ -418,12 +418,12 @@ public class Akira.Lib2.Items.Model : Object {
             target.item.geometry_compilation_requested.disconnect (on_item_geometry_compilation_requested);
         }
 
-        if (id < item_start_id) {
-            group_nodes.unset(id);
-            group_map.unset(id);
+        if (id < ITEM_START_ID) {
+            group_nodes.unset (id);
+            group_map.unset (id);
         } else {
-            item_nodes.unset(id);
-            item_map.unset(id);
+            item_nodes.unset (id);
+            item_map.unset (id);
         }
     }
 
@@ -436,7 +436,7 @@ public class Akira.Lib2.Items.Model : Object {
             builder.append ("_");
         }
 
-        builder.append ((node.id == origin_id) ? node.id.to_string () : node.pos_in_parent.to_string ());
+        builder.append ((node.id == ORIGIN_ID) ? node.id.to_string () : node.pos_in_parent.to_string ());
     }
 
     private void on_item_geometry_changed (int id) {
@@ -452,7 +452,7 @@ public class Akira.Lib2.Items.Model : Object {
         mark_dirty (target);
 
         var parent = target.parent;
-        while (parent.id != origin_id) {
+        while (parent.id != ORIGIN_ID) {
             parent.instance.item.mark_geometry_dirty (false);
             on_item_geometry_compilation_requested (parent.id);
             parent = parent.parent;
@@ -473,7 +473,7 @@ public class Akira.Lib2.Items.Model : Object {
             child.pos_in_parent = ct++;
         }
     }
-    
+
 
     private void internal_compile_geometries () {
         if (!is_live) {
@@ -510,5 +510,3 @@ public class Akira.Lib2.Items.Model : Object {
         dirty_groups.clear ();
     }
 }
-
-

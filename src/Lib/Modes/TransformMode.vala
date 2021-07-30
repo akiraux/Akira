@@ -201,7 +201,8 @@ public class Akira.Lib.Modes.TransformMode : InteractionMode {
             drag_state.item_width = item.size.width;
             drag_state.item_height = item.size.height;
         } else {
-            // TODO there should probably be a nice method to get a bounding box from a list of items.
+            // TODO there should probably be a nice method to get a bounding box
+            // from a list of items.
         }
 
         drag_state.item_scale_x_adj = 0;
@@ -268,7 +269,11 @@ public class Akira.Lib.Modes.TransformMode : InteractionMode {
         // Make adjustment basted on snaps.
         // Double the sensitivity to allow for reuse of grid after snap.
         var sensitivity = Utils.Snapping.adjusted_sensitivity (canvas.current_scale);
-        var snap_grid = Utils.Snapping.generate_best_snap_grid (canvas, selected_items, sensitivity);
+        var snap_grid = Utils.Snapping.generate_best_snap_grid (
+                            canvas,
+                            selected_items,
+                            sensitivity
+                        );
 
         // Interrupt if we don't have any snap to use.
         if (snap_grid.is_empty ()) {

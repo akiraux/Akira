@@ -45,7 +45,10 @@ public class Akira.Lib2.Items.ModelTypeGroup : Object, ModelType<ModelTypeGroup>
         return Components.CompiledBorder.compile (components, node);
     }
 
-    public Components.CompiledGeometry compile_geometry (Components.Components? components, Lib2.Items.ModelNode? node) {
+    public Components.CompiledGeometry compile_geometry (
+        Components.Components? components,
+        Lib2.Items.ModelNode? node
+    ) {
         return new Components.CompiledGeometry.from_descendants (components, node);
     }
 

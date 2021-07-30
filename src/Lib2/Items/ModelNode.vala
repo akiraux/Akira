@@ -62,8 +62,7 @@ public class Akira.Lib2.Items.ModelNode {
 
 }
 
-public class Akira.Lib2.Items.PositionKey
-{
+public class Akira.Lib2.Items.PositionKey {
     public string parent_path;
     public int pos_in_parent;
 
@@ -81,8 +80,7 @@ public class Akira.Lib2.Items.PositionKey
     }
 }
 
-public class Akira.Lib2.Items.ChildrenSet
-{
+public class Akira.Lib2.Items.ChildrenSet {
     public ModelNode parent_node;
     public int first_child;
     public int length;

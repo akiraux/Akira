@@ -60,7 +60,10 @@ public class Akira.Lib2.Items.ModelTypeRect : Object, ModelType<ModelTypeRect> {
         return Components.CompiledBorder.compile (components, node);
     }
 
-    public Components.CompiledGeometry compile_geometry (Components.Components? components, Lib2.Items.ModelNode? node) {
+    public Components.CompiledGeometry compile_geometry (
+        Components.Components? components,
+        Lib2.Items.ModelNode? node
+    ) {
         return new Components.CompiledGeometry.from_components (components, node);
     }
 
@@ -107,7 +110,7 @@ public class Akira.Lib2.Items.ModelTypeRect : Object, ModelType<ModelTypeRect> {
                 item.canvas_item.set ("y", -item.components.size.height / 2.0);
                 item.canvas_item.set ("width", item.components.size.width);
                 item.canvas_item.set ("height", item.components.size.height);
-                item.canvas_item.set_transform (item.compiled_geometry.transform);
+                item.canvas_item.set_transform (item.compiled_geometry.transformation_matrix);
                 break;
         }
     }

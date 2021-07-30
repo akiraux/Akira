@@ -24,11 +24,11 @@
  */
  public class Akira.Utils.SVGUtil : Object {
      public static string rect_to_svg_path (
-         double shift_x, 
-         double shift_y, 
-         double top, 
-         double left, 
-         double bottom, 
+         double shift_x,
+         double shift_y,
+         double top,
+         double left,
+         double bottom,
          double right
     ) {
          var dx = right - left;

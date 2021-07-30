@@ -175,7 +175,7 @@ public class Akira.Lib2.Managers.NobManager : Object {
     private bool nob_masked (Lib.Selection.Nob nob, Utils.Nobs.Nob nob_id) {
         if (nob_id == Utils.Nobs.Nob.NONE) {
             return true;
-        } else  if (nob_id == Utils.Nobs.Nob.ALL) {
+        } else if (nob_id == Utils.Nobs.Nob.ALL) {
             return false;
         }
 
@@ -214,7 +214,7 @@ public class Akira.Lib2.Managers.NobManager : Object {
 
         }
 
-        nob.update_global_state (cx, cy, rect.main_rotation, show);
+        nob.update_global_state (cx, cy, 0, show);
     }
 
     /**

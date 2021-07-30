@@ -113,7 +113,7 @@ public class Akira.Lib2.Items.NodeSelection : Object {
             return result;
         }
 
-        /* 
+        /*
         if (nodes.size == 1) {
             unowned var item = first_node ().instance.item;
             return item.compiled_geometry.area;
@@ -137,7 +137,7 @@ public class Akira.Lib2.Items.NodeSelection : Object {
             right = double.max (right, cg.bb_right);
         }
 
-        result.main_rotation = 0.0;
+        result.transformation = Cairo.Matrix.identity ();
         result.tl_x = left;
         result.tl_y = top;
         result.tr_x = right;
@@ -184,7 +184,7 @@ public class Akira.Lib2.Items.NodeSelection : Object {
 
     private bool ancestor_selected (ModelNode target) {
         var parent = target.parent;
-        while (parent.id != Model.origin_id) {
+        while (parent.id != Model.ORIGIN_ID) {
             if (groups.contains (parent.id)) {
                 return true;
             }

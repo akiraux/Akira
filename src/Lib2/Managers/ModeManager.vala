@@ -39,13 +39,17 @@ public class Akira.Lib2.Managers.ModeManager : Object {
     private Lib2.Modes.PanMode pan_mode;
     private Lib2.Modes.AbstractInteractionMode active_mode;
 
-    public Lib2.Modes.AbstractInteractionMode.ModeType active_mode_type { 
-        get { 
-            return (active_mode == null) ? Lib2.Modes.AbstractInteractionMode.ModeType.NONE : active_mode.mode_type (); 
-        } 
+    public Lib2.Modes.AbstractInteractionMode.ModeType active_mode_type {
+        get {
+            return (active_mode == null) ? Lib2.Modes.AbstractInteractionMode.ModeType.NONE : active_mode.mode_type ();
+        }
     }
 
-    public Utils.Nobs.Nob active_mode_nob { get { return (active_mode == null) ? Utils.Nobs.Nob.ALL : active_mode.acitve_nob (); } }
+    public Utils.Nobs.Nob active_mode_nob {
+        get {
+            return (active_mode == null) ? Utils.Nobs.Nob.ALL : active_mode.acitve_nob ();
+        }
+    }
 
     public ModeManager (Akira.Lib2.ViewCanvas canvas) {
         Object (view_canvas: canvas);

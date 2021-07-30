@@ -44,7 +44,7 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
     }
 
     public int add_item_to_origin (Lib2.Items.ModelItem item) {
-        return add_item_to_group (Lib2.Items.Model.origin_id, item);
+        return add_item_to_group (Lib2.Items.Model.ORIGIN_ID, item);
     }
 
     public int add_item_to_group (int group_id, Lib2.Items.ModelItem item, bool pause_compile = false) {
@@ -64,7 +64,11 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
     }
 
     public int remove_items (GLib.Array<int> to_remove) {
-        var to_delete = new Gee.TreeMap<Lib2.Items.PositionKey, Lib2.Items.ModelInstance> (Lib2.Items.PositionKey.compare, null);
+        var to_delete = new Gee.TreeMap<Lib2.Items.PositionKey, Lib2.Items.ModelInstance> (
+            Lib2.Items.PositionKey.compare,
+            null
+        );
+
         var modified_groups = new GLib.Array<int> ();
 
         foreach (var id in to_remove.data) {
@@ -126,7 +130,11 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
             return 0;
         }
 
-        var sorted_tree = new Gee.TreeMap<Lib2.Items.PositionKey, Lib2.Items.ModelNode> (Lib2.Items.PositionKey.compare, null);
+        var sorted_tree = new Gee.TreeMap<Lib2.Items.PositionKey, Lib2.Items.ModelNode> (
+            Lib2.Items.PositionKey.compare,
+            null
+        );
+
         var shift_groups = new Gee.ArrayList<Lib2.Items.ChildrenSet> ();
         var modified_groups = new GLib.Array<int> ();
 
@@ -222,7 +230,7 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
         (void) blocker;
 
         foreach (var target_id in ids.data) {
-            var target = item_model.instance_from_id (target_id); 
+            var target = item_model.instance_from_id (target_id);
             if (target.item != null) {
                 unowned var old_flipped = target.item.components.flipped;
                 bool new_h = false;
@@ -325,8 +333,8 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
         }
 
 
-        for (var i = (int)children_set.children_in_set.length - 1; i >= 0; --i) {
-            unowned var model_item = children_set.children_in_set.index(i).instance.item;
+        for (var i = (int) children_set.children_in_set.length - 1; i >= 0; --i) {
+            unowned var model_item = children_set.children_in_set.index (i).instance.item;
             print ("%d %d\n", sibling_under.id, model_item.id);
             if (model_item.is_stackable ()) {
                 model_item.canvas_item.raise (sibling_under.instance.item.canvas_item);
@@ -336,7 +344,7 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
     }
 
     private bool restack_down (Lib2.Items.ChildrenSet children_set, Lib2.Items.ModelNode reference) {
-        unowned var last_node = children_set.children_in_set.index(children_set.children_in_set.length -1);
+        unowned var last_node = children_set.children_in_set.index (children_set.children_in_set.length - 1);
         var sibling_over = item_model.next_sibling (reference, true);
 
         if (sibling_over == null) {
@@ -363,7 +371,7 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
         add_item_to_origin (new_rect);
         return new_rect;
     }
-    
+
     public Lib2.Items.ModelItem add_debug_group (double x, double y, bool debug_timer = false) {
         ulong microseconds;
         double seconds;

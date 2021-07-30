@@ -31,9 +31,9 @@ public class Akira.Lib2.Items.ModelItem : Object {
     public Lib2.Components.Components components = null;
     public Lib2.Components.CompiledComponents compiled_components = null;
 
-    public Components.CompiledGeometry compiled_geometry { get { return compiled_components.compiled_geometry; }}
-    public Components.CompiledFill  compiled_fill { get { return compiled_components.compiled_fill; }}
-    public Components.CompiledBorder  compiled_border { get { return compiled_components.compiled_border; }}
+    public Components.CompiledGeometry compiled_geometry { get { return compiled_components.compiled_geometry; } }
+    public Components.CompiledFill compiled_fill { get { return compiled_components.compiled_fill; } }
+    public Components.CompiledBorder compiled_border { get { return compiled_components.compiled_border; } }
 
     public ModelItem () {
         prep ();

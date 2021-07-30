@@ -20,12 +20,12 @@
  */
 
  /*
-  * Naive rotated rectangle meant for convenience. This struct does not guarantee 
+  * Naive rotated rectangle meant for convenience. This struct does not guarantee
   * that the properties of a rectangle are kept. For all intents and purposes, this
   * is simply a collection of four points and a rotation.
   */
 public struct Akira.Geometry.TransformedRectangle {
-    public double main_rotation;
+    public Cairo.Matrix transformation;
     public double tl_x;
     public double tl_y;
     public double tr_x;
@@ -60,12 +60,12 @@ public struct Akira.Geometry.TransformedRectangle {
             Utils.GeometryMath.min_max_coords (tl_y, tr_y, bl_y, br_y, ref min_y, ref max_y);
 
             return Rectangle .with_coordinates (min_x, min_y, max_x, max_y);
-        } 
+        }
     }
 
 
     public TransformedRectangle () {
-        main_rotation = 0;
+        transformation = Cairo.Matrix.identity ();
         tl_x = 0;
         tl_y = 0;
         tr_x = 0;
@@ -77,14 +77,13 @@ public struct Akira.Geometry.TransformedRectangle {
     }
 
     public TransformedRectangle.from_components (
-        double center_x, 
+        double center_x,
         double center_y,
         double width,
         double height,
-        double rotation,
         Cairo.Matrix transform
     ) {
-        main_rotation = rotation;
+        transformation = transform;
 
         tl_x = - width / 2.0;
         tl_y = - height / 2.0;

@@ -1,4 +1,3 @@
-
 /**
  * Copyright (c) 2021 Alecaddd (http://alecaddd.com)
  *
@@ -26,7 +25,7 @@
 public class Akira.Utils.Array : Object {
     public static bool insert_at_iarray (ref int[] a, int pos, int value) {
         if (pos >= a.length || pos < 0) {
-            assert(false);
+            assert (false);
             return false;
         }
 
@@ -44,7 +43,7 @@ public class Akira.Utils.Array : Object {
 
     public static bool swap_within_iarray (ref int[] a, int pos, int newpos) {
         if (pos >= a.length || newpos >= a.length || pos < 0 || newpos < 0) {
-            assert(false);
+            assert (false);
             return false;
         }
 
@@ -55,7 +54,7 @@ public class Akira.Utils.Array : Object {
     }
     public static bool remove_from_iarray (ref int[] a, int pos, int length) {
         if (pos >= a.length || pos + length > a.length || pos < 0 || length < 0) {
-            assert(false);
+            assert (false);
             return false;
         }
 
@@ -71,12 +70,12 @@ public class Akira.Utils.Array : Object {
             assert (end < arr.length);
             return;
         }
-    
+
         assert (middle >= first);
         assert (end >= middle);
-    
+
         var next = middle;
-    
+
         while (first != next) {
             swap (ref arr, first ++, next++);
             if (next == end) {
@@ -93,16 +92,16 @@ public class Akira.Utils.Array : Object {
             assert (end < arr.length);
             return;
         }
-    
+
         assert (middle >= first);
         assert (end >= middle);
-    
+
         if (first == middle || middle == end) {
             return;
         }
-    
+
         var next = middle;
-    
+
         while (first != next) {
             swap_garray (ref arr, first++, next++);
             if (next == end) {
@@ -119,16 +118,16 @@ public class Akira.Utils.Array : Object {
             assert (end < arr.length);
             return;
         }
-    
+
         assert (middle >= first);
         assert (end >= middle);
-    
+
         if (first == middle || middle == end) {
             return;
         }
-    
+
         var next = middle;
-    
+
         while (first != next) {
             swap_weak_garray (ref arr, first++, next++);
             if (next == end) {
@@ -144,16 +143,16 @@ public class Akira.Utils.Array : Object {
         arr[a] = arr[b];
         arr[b] = tmp;
     }
-    
+
     public static void swap_garray<T> (ref GLib.Array<T> arr, int a, int b) {
-        var tmp = arr.index(a);
-        arr.data[a] = arr.index(b);
+        var tmp = arr.index (a);
+        arr.data[a] = arr.index (b);
         arr.data[b] = tmp;
     }
 
     public static void swap_weak_garray<T> (ref GLib.Array<weak T> arr, int a, int b) {
-        var tmp = arr.index(a);
-        arr.data[a] = arr.index(b);
+        var tmp = arr.index (a);
+        arr.data[a] = arr.index (b);
         arr.data[b] = tmp;
     }
 }

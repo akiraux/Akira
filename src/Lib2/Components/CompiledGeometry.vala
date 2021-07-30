@@ -21,9 +21,7 @@
 
 public class Akira.Lib2.Components.CompiledGeometry : Copyable<CompiledGeometry> {
     public struct CompiledGeometryData {
-        public Cairo.Matrix _rotation_transform;
-        public Cairo.Matrix _extra_transform;
-        public Cairo.Matrix _transform;
+        public Cairo.Matrix _transformation_matrix;
         // These rectangles are in global coordinates
         public Geometry.TransformedRectangle area;
 
@@ -36,7 +34,6 @@ public class Akira.Lib2.Components.CompiledGeometry : Copyable<CompiledGeometry>
     public Geometry.TransformedRectangle area { get { return _data.area; }}
     public Geometry.Rectangle area_bb { get { return _data.area_bb; }}
 
-    public double main_rotation { get { return _data.area.main_rotation; }}
     public double tl_x { get { return _data.area.tl_x; }}
     public double tl_y { get { return _data.area.tl_y; }}
     public double tr_x { get { return _data.area.tr_x; }}
@@ -51,9 +48,7 @@ public class Akira.Lib2.Components.CompiledGeometry : Copyable<CompiledGeometry>
     public double bb_bottom { get { return _data.area_bb.bottom; }}
     public double bb_right { get { return _data.area_bb.right; }}
 
-    public Cairo.Matrix rotation_transform { get { return _data._rotation_transform; }}
-    public Cairo.Matrix extra_transform { get { return _data._extra_transform; }}
-    public Cairo.Matrix transform { get { return _data._transform; }}
+    public Cairo.Matrix transformation_matrix { get { return _data._transformation_matrix; }}
 
     public CompiledGeometry (CompiledGeometryData data) {
         _data = data;
@@ -78,18 +73,13 @@ public class Akira.Lib2.Components.CompiledGeometry : Copyable<CompiledGeometry>
         unowned var size = components.size;
         unowned var center = components.center;
 
-        _data._rotation_transform = Cairo.Matrix.identity ();
-        _data._extra_transform = Cairo.Matrix.identity ();
-
         if (transform == null) {
-            _data.area.main_rotation = 0.0;
-            _data._transform = _data._rotation_transform;
+            _data._transformation_matrix = Cairo.Matrix.identity ();
         } else {
-            _data.area.main_rotation = transform.rotation;
-            _data._rotation_transform = transform.rotation_matrix;
-            _data._extra_transform = transform.extra_matrix;
-            _data._transform = Utils.GeometryMath.multiply_matrices (_data._extra_transform, _data._rotation_transform);
+            _data._transformation_matrix = transform.transformation_matrix;
         }
+
+        _data.area.transformation = _data._transformation_matrix;
 
         var half_height = size.height / 2.0;
         var half_width = size.width / 2.0;
@@ -110,13 +100,13 @@ public class Akira.Lib2.Components.CompiledGeometry : Copyable<CompiledGeometry>
         var y3 = bottom;
         var x3 = right;
 
-        _data._transform.transform_point (ref x0, ref y0);
-        _data._transform.transform_point (ref x1, ref y1);
-        _data._transform.transform_point (ref x2, ref y2);
-        _data._transform.transform_point (ref x3, ref y3);
+        _data._transformation_matrix.transform_point (ref x0, ref y0);
+        _data._transformation_matrix.transform_point (ref x1, ref y1);
+        _data._transformation_matrix.transform_point (ref x2, ref y2);
+        _data._transformation_matrix.transform_point (ref x3, ref y3);
 
-        _data._transform.x0 = center.x;
-        _data._transform.y0 = center.y;
+        _data._transformation_matrix.x0 = center.x;
+        _data._transformation_matrix.y0 = center.y;
 
         y0 += center.y;
         x0 += center.x;
@@ -149,7 +139,7 @@ public class Akira.Lib2.Components.CompiledGeometry : Copyable<CompiledGeometry>
             return;
         }
 
-        _data._transform = Cairo.Matrix.identity ();
+        _data._transformation_matrix = Cairo.Matrix.identity ();
 
         double top = int.MAX;
         double bottom = int.MIN;
@@ -182,7 +172,7 @@ public class Akira.Lib2.Components.CompiledGeometry : Copyable<CompiledGeometry>
         _data.area_bb.bottom = bottom;
         _data.area_bb.right = right;
 
-        _data._transform.x0 = _data.area_bb.center_x;
-        _data._transform.y0 = _data.area_bb.center_y;
+        _data._transformation_matrix.x0 = _data.area_bb.center_x;
+        _data._transformation_matrix.y0 = _data.area_bb.center_y;
     }
 }

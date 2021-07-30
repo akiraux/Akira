@@ -22,9 +22,20 @@
 public interface Akira.Lib2.Items.ModelType<T> : Object {
     public abstract ModelType copy ();
 
-    public abstract Components.CompiledFill compile_fill (Components.Components? components, Lib2.Items.ModelNode? node);
-    public abstract Components.CompiledBorder compile_border (Components.Components? components, Lib2.Items.ModelNode? node);
-    public abstract Components.CompiledGeometry compile_geometry (Components.Components? components, Lib2.Items.ModelNode? node);
+    public abstract Components.CompiledFill compile_fill (
+        Components.Components? components,
+        Lib2.Items.ModelNode? node
+    );
+
+    public abstract Components.CompiledBorder compile_border (
+        Components.Components? components,
+        Lib2.Items.ModelNode? node
+    );
+
+    public abstract Components.CompiledGeometry compile_geometry (
+        Components.Components? components,
+        Lib2.Items.ModelNode? node
+    );
 
     public abstract void construct_canvas_item (ModelItem item, Goo.Canvas canvas);
 
@@ -43,7 +54,10 @@ public class Akira.Lib2.Items.DummyItemType : Object, ModelType<DummyItemType> {
         return Components.CompiledBorder.compile (components, node);
     }
 
-    public Components.CompiledGeometry compile_geometry (Components.Components? components, Lib2.Items.ModelNode? node) {
+    public Components.CompiledGeometry compile_geometry (
+        Components.Components? components,
+        Lib2.Items.ModelNode? node
+    ) {
         return new Components.CompiledGeometry.dummy ();
     }
 
@@ -62,7 +76,10 @@ public class Akira.Lib2.Items.DummyGroupType : Object, ModelType<DummyGroupType>
         return Components.CompiledBorder.compile (components, node);
     }
 
-    public Components.CompiledGeometry compile_geometry (Components.Components? components, Lib2.Items.ModelNode? node) {
+    public Components.CompiledGeometry compile_geometry (
+        Components.Components? components,
+        Lib2.Items.ModelNode? node
+    ) {
         return new Components.CompiledGeometry.dummy ();
     }
 

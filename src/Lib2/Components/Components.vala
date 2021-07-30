@@ -40,7 +40,7 @@ public class Akira.Lib2.Components.CompiledComponents {
         }
 
         compiled_fill = type.compile_fill (components, node);
-        
+
         dirty_components.mark_dirty (Component.Type.COMPILED_FILL, true);
         return true;
     }
@@ -87,7 +87,7 @@ public class Akira.Lib2.Components.Components {
     public Transform? transform = null;
 
     public Layout? layout = null;
-    
+
     public Components copy () {
         var cln = new Components ();
         cln.borders = borders;

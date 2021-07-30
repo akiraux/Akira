@@ -20,50 +20,56 @@
  */
 
 public class Akira.Lib2.Components.Transform : Copyable<Transform> {
-    private double _main_rotation = 0.0;
-
-    private double _transform_rotation = 0.0;
+    private double _rotation = 0.0;
     private double _scale_x = 1.0;
     private double _scale_y = 1.0;
     private double _skew_xy = 0.0;
     private double _skew_yx = 0.0;
 
-    public double rotation { get { return _main_rotation; } }
-    public double rotation_in_degrees { get { return _main_rotation * 180 / GLib.Math.PI; } }
-    public double total_rotation { get { return _main_rotation; } }
+    public double rotation { get { return _rotation; } }
+    public double rotation_in_degrees { get { return _rotation * 180 / GLib.Math.PI; } }
 
     public Cairo.Matrix rotation_matrix {
         get {
             var mat = Cairo.Matrix.identity ();
-            mat.rotate(_main_rotation);
+            mat.rotate (_rotation);
             return mat;
         }
     }
 
-    public Cairo.Matrix extra_matrix {
+    public Cairo.Matrix scale_matrix {
         get {
             var mat = Cairo.Matrix.identity ();
-            mat.rotate(_transform_rotation);
+            mat.scale (_scale_x, _scale_y);
+            return mat;
+        }
+    }
 
-            var mat2 = Cairo.Matrix.identity ();
-            mat2.xx = _scale_x;
-            mat2.yy = _scale_y;
-            mat2.xy = _skew_xy;
-            mat2.yx = _skew_yx;
-            return Utils.GeometryMath.multiply_matrices (mat2, mat);
+    public Cairo.Matrix skew_matrix {
+        get {
+            var mat = Cairo.Matrix.identity ();
+            mat.xy = _skew_xy;
+            mat.yx = _skew_yx;
+            return mat;
+        }
+    }
+
+    public Cairo.Matrix transformation_matrix {
+        get {
+            var mat = Utils.GeometryMath.multiply_matrices (scale_matrix, skew_matrix);
+            mat = Utils.GeometryMath.multiply_matrices (mat, rotation_matrix);
+            return mat;
         }
     }
 
     public Transform (
-        double main_radians, 
-        double transform_rotation, 
-        double scale_x, 
-        double scale_y, 
-        double skew_xy, 
+        double radians,
+        double scale_x,
+        double scale_y,
+        double skew_xy,
         double skew_yx
     ) {
-        _main_rotation = main_radians;
-        _transform_rotation = transform_rotation;
+        _rotation = radians;
         _scale_x = scale_x;
         _scale_y = scale_y;
         _skew_xy = skew_xy;
@@ -71,13 +77,12 @@ public class Akira.Lib2.Components.Transform : Copyable<Transform> {
     }
 
     public Transform.from_rotation (double in_radians) {
-        _main_rotation = in_radians;
+        _rotation = in_radians;
     }
 
     public Transform copy () {
         return new Transform (
-            _main_rotation,
-            _transform_rotation,
+            _rotation,
             _scale_x,
             _scale_y,
             _skew_xy,
@@ -88,7 +93,6 @@ public class Akira.Lib2.Components.Transform : Copyable<Transform> {
     public Transform with_main_rotation (double in_radians) {
         return new Transform (
             in_radians,
-            _transform_rotation,
             _scale_x,
             _scale_y,
             _skew_xy,

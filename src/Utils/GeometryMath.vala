@@ -98,6 +98,19 @@ public class Akira.Utils.GeometryMath : Object {
         );
     }
 
+    public static void matrix_skew_x (ref Cairo.Matrix mat, double factor) {
+        var skew_mat = Cairo.Matrix.identity ();
+        skew_mat.xy = factor;
+        mat = multiply_matrices (mat, skew_mat);
+    }
+
+    public static void matrix_skew_y (ref Cairo.Matrix mat, double factor) {
+        var skew_mat = Cairo.Matrix.identity ();
+        skew_mat.yx = factor;
+        mat = multiply_matrices (mat, skew_mat);
+    }
+
+
     public static Cairo.Matrix multiply_matrices (Cairo.Matrix a, Cairo.Matrix b) {
         return Cairo.Matrix (
             a.xx * b.xx + a.yx * b.xy,
@@ -106,6 +119,60 @@ public class Akira.Utils.GeometryMath : Object {
             a.xy * b.yx + a.yy * b.yy,
             a.x0 * b.xx + a.y0 * b.xy + b.x0,
             a.x0 * b.yx + a.y0 * b.yy + b.y0);
+    }
+
+    /*
+     * Decomposes a matrix to three operations (scale, shear and rotation)
+     *
+     * To recompose run two multiplications:
+     * var new_matrix = multiply_matrices (scale_matrix, shear_matrix);
+     * new_matrix = multiply_matrices (new_matrix, rotation_matrix);
+     */
+    public static bool decompose_matrix (
+        Cairo.Matrix mat,
+        ref double scale_x,
+        ref double scale_y,
+        ref double shear_x,
+        ref double angle
+    ) {
+        // https://math.stackexchange.com/questions/612006/decomposing-an-affine-transformation
+        var xx = mat.xx;
+        var xy = mat.xy;
+        var yx = mat.yx;
+        var yy = mat.yy;
+
+        double det = xx * yy - xy * yx;
+        if (det.abs () < 0.000001) {
+            return false;
+        }
+
+        scale_x = GLib.Math.sqrt (xx * xx + yx * yx);
+
+        angle = GLib.Math.atan2 (yx, xx);
+
+        var sin_th = GLib.Math.sin (angle);
+        var cos_th = GLib.Math.cos (angle);
+
+        var msy = xy * cos_th + yy * sin_th;
+
+        if (sin_th != 0) {
+            scale_y = (msy * cos_th - xy) / sin_th;
+        } else {
+            scale_y = (yy - sin_th * msy) / cos_th;
+        }
+
+        // Not sure about this
+        //if (det < 0) {
+        //    if (xx < yy) {
+        //        scale_x = -scale_x;
+        //    } else {
+        //        scale_y = -scale_y;
+        //    }
+        //}
+
+        shear_x = msy / scale_y;
+
+        return true;
     }
 
     public static Geometry.TransformedRectangle apply_stretch (
@@ -150,7 +217,7 @@ public class Akira.Utils.GeometryMath : Object {
         extra_rot_mat.transform_distance (ref area.bl_x, ref area.bl_y);
         extra_rot_mat.transform_distance (ref area.br_x, ref area.br_y);
 
-        yy = (area.br_y - area.tr_y).abs() / height;
+        yy = (area.br_y - area.tr_y).abs () / height;
         xy = (area.br_x - area.tr_x) / (area.br_y - area.tr_y) * yy;
 
         area.translate (dx + offset_x + center_offset_x, dy + offset_y + center_offset_y);

@@ -63,7 +63,7 @@ public abstract class Akira.Lib2.Modes.AbstractInteractionMode : Object {
     /*
      * Override to define a sub ModeType associated to mode.
      */
-    public virtual Utils.Nobs.Nob acitve_nob () { 
+    public virtual Utils.Nobs.Nob acitve_nob () {
         return Utils.Nobs.Nob.ALL;
     }
 

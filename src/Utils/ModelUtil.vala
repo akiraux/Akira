@@ -51,7 +51,7 @@
 
         var new_id = recursive_clone (source_node, target_node, target_model);
 
-        if (new_id >= Lib2.Items.Model.group_start_id && on_subtree_cloned != null) {
+        if (new_id >= Lib2.Items.Model.GROUP_START_ID && on_subtree_cloned != null) {
             on_subtree_cloned (new_id);
         }
 

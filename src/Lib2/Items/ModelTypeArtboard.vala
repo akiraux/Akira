@@ -57,7 +57,10 @@ public class Akira.Lib2.Items.ModelTypeArtboard : Object, ModelType<ModelTypeArt
         return Components.CompiledBorder.compile (components, node);
     }
 
-    public Components.CompiledGeometry compile_geometry (Components.Components? components, Lib2.Items.ModelNode? node) {
+    public Components.CompiledGeometry compile_geometry (
+        Components.Components? components,
+        Lib2.Items.ModelNode? node
+    ) {
         return new Components.CompiledGeometry.from_components (components, node);
     }
 
@@ -109,7 +112,7 @@ public class Akira.Lib2.Items.ModelTypeArtboard : Object, ModelType<ModelTypeArt
                 item.canvas_item.set ("y", -item.components.size.height / 2.0);
                 item.canvas_item.set ("width", item.components.size.width);
                 item.canvas_item.set ("height", item.components.size.height);
-                item.canvas_item.set_transform (item.compiled_geometry.transform);
+                item.canvas_item.set_transform (item.compiled_geometry.transformation_matrix);
                 print ("%s", item.canvas_item.is_visible ().to_string ());
                 break;
         }

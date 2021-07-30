@@ -29,8 +29,8 @@ public class Akira.Lib2.Managers.CopyManager : Object {
     }
 
     construct {
-        view_canvas.window.event_bus.request_copy.connect(do_copy);
-        view_canvas.window.event_bus.request_paste.connect(do_paste);
+        view_canvas.window.event_bus.request_copy.connect (do_copy);
+        view_canvas.window.event_bus.request_paste.connect (do_paste);
     }
 
     public void do_copy () {
@@ -50,7 +50,7 @@ public class Akira.Lib2.Managers.CopyManager : Object {
                 view_canvas.items_manager.item_model,
                 sorted_id,
                 copy_model,
-                Lib2.Items.Model.origin_id
+                Lib2.Items.Model.ORIGIN_ID
             );
         }
 
@@ -62,7 +62,7 @@ public class Akira.Lib2.Managers.CopyManager : Object {
             return;
         }
 
-        var children = copy_model.node_from_id (Lib2.Items.Model.origin_id).children;
+        var children = copy_model.node_from_id (Lib2.Items.Model.ORIGIN_ID).children;
 
         if (children == null || children.length == 0) {
             return;
@@ -79,7 +79,7 @@ public class Akira.Lib2.Managers.CopyManager : Object {
                 copy_model,
                 child.id,
                 view_canvas.items_manager.item_model,
-                Lib2.Items.Model.origin_id,
+                Lib2.Items.Model.ORIGIN_ID,
                 on_subtree_cloned
             );
         }

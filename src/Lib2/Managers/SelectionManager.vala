@@ -51,7 +51,7 @@ public class Akira.Lib2.Managers.SelectionManager : Object {
     construct {
         selection = new Lib2.Items.NodeSelection (null);
         view_canvas.window.event_bus.flip_item.connect (on_flip_selected);
-        view_canvas.window.event_bus.delete_selected_items.connect(delete_selected);
+        view_canvas.window.event_bus.delete_selected_items.connect (delete_selected);
         view_canvas.window.event_bus.change_z_selected.connect (change_z_order);
     }
 

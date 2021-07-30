@@ -393,12 +393,14 @@ public class Akira.Lib.Managers.NobManager : Object {
             }
 
             // Check if we need to hide the vertically centered nobs.
-            if (!print_middle_height_nobs && (nob_name == Utils.Nobs.Nob.RIGHT_CENTER || nob_name == Utils.Nobs.Nob.LEFT_CENTER)) {
+            if (!print_middle_height_nobs &&
+                (nob_name == Utils.Nobs.Nob.RIGHT_CENTER || nob_name == Utils.Nobs.Nob.LEFT_CENTER)) {
                 set_visible = false;
             }
 
             // Check if we need to hide the horizontally centere nobs.
-            if (!print_middle_width_nobs && (nob_name == Utils.Nobs.Nob.TOP_CENTER || nob_name == Utils.Nobs.Nob.BOTTOM_CENTER)) {
+            if (!print_middle_width_nobs &&
+                (nob_name == Utils.Nobs.Nob.TOP_CENTER || nob_name == Utils.Nobs.Nob.BOTTOM_CENTER)) {
                 set_visible = false;
             }
 

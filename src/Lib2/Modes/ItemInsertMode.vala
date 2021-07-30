@@ -42,7 +42,9 @@ public class Akira.Lib2.Modes.ItemInsertMode : AbstractInteractionMode {
         transform_mode = null;
     }
 
-    public override AbstractInteractionMode.ModeType mode_type () { return AbstractInteractionMode.ModeType.ITEM_INSERT; }
+    public override AbstractInteractionMode.ModeType mode_type () {
+        return AbstractInteractionMode.ModeType.ITEM_INSERT;
+    }
 
     public override void mode_end () {
         if (transform_mode != null) {

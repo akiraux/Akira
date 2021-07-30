@@ -161,13 +161,13 @@ public class Akira.Utils.Snapping2 : Object {
         double vis_y2 = 0;
         canvas.visible_bounds (ref vis_y1, ref vis_x1, ref vis_y2, ref vis_x2);
 
-        var candidate_list = canvas.items_manager.children_in_group(Lib2.Items.Model.origin_id);
+        var candidate_list = canvas.items_manager.children_in_group (Lib2.Items.Model.ORIGIN_ID);
 
         int v_added = 0;
         int h_added = 0;
 
         for (var i = 0; i < candidate_list.length; ++i) {
-            unowned var item = candidate_list.index(i).instance.item;
+            unowned var item = candidate_list.index (i).instance.item;
 
             if (item == null || selection.has_id (item.id, true)) {
                 continue;
@@ -191,7 +191,8 @@ public class Akira.Utils.Snapping2 : Object {
                 v_added++;
             }
 
-            if (v_added >= Lib2.Managers.SnapManager.MAX_CANDIDATES || h_added >= Lib2.Managers.SnapManager.MAX_CANDIDATES) {
+            if (v_added >= Lib2.Managers.SnapManager.MAX_CANDIDATES ||
+                h_added >= Lib2.Managers.SnapManager.MAX_CANDIDATES) {
                 break;
             }
         }
@@ -343,12 +344,12 @@ public class Akira.Utils.Snapping2 : Object {
         matches.v_data.type = MatchType2.NONE;
         matches.v_data.snap_position = 0;
         matches.v_data.reference_position = 0;
-        matches.v_data.exact_matches = new Gee.TreeSet<int>();
+        matches.v_data.exact_matches = new Gee.TreeSet<int> ();
 
         matches.h_data.type = MatchType2.NONE;
         matches.h_data.snap_position = 0;
         matches.h_data.reference_position = 0;
-        matches.h_data.exact_matches = new Gee.TreeSet<int>();
+        matches.h_data.exact_matches = new Gee.TreeSet<int> ();
 
         return matches;
     }
