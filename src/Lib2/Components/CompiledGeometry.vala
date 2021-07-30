@@ -21,12 +21,22 @@
 
 public class Akira.Lib2.Components.CompiledGeometry : Copyable<CompiledGeometry> {
     public struct CompiledGeometryData {
+        public Coordinates? source_center;
+        public Size? source_size;
+        public Transform? source_transform;
         public Cairo.Matrix _transformation_matrix;
         // These rectangles are in global coordinates
         public Geometry.TransformedRectangle area;
 
         // This is the bounding box that contains the rotated area
         public Geometry.Rectangle area_bb;
+
+        public CompiledGeometryData () {
+            source_center = null;
+            source_size = null;
+            source_transform = null;
+        }
+
     }
 
     private CompiledGeometryData _data;
@@ -34,6 +44,8 @@ public class Akira.Lib2.Components.CompiledGeometry : Copyable<CompiledGeometry>
     public Geometry.TransformedRectangle area { get { return _data.area; }}
     public Geometry.Rectangle area_bb { get { return _data.area_bb; }}
 
+    public double source_width { get { return _data.source_size == null ? 0 : _data.source_size.width; } }
+    public double source_height { get { return _data.source_size == null ? 0 : _data.source_size.height; } }
     public double tl_x { get { return _data.area.tl_x; }}
     public double tl_y { get { return _data.area.tl_y; }}
     public double tr_x { get { return _data.area.tr_x; }}
@@ -69,20 +81,23 @@ public class Akira.Lib2.Components.CompiledGeometry : Copyable<CompiledGeometry>
             return;
         }
 
-        unowned var transform = components.transform;
-        unowned var size = components.size;
-        unowned var center = components.center;
+        _data.source_center = components.center;
+        _data.source_size = components.size;
+        _data.source_transform = components.transform;
 
-        if (transform == null) {
+        assert (_data.source_center != null);
+        assert (_data.source_size != null);
+
+        if (_data.source_transform == null) {
             _data._transformation_matrix = Cairo.Matrix.identity ();
         } else {
-            _data._transformation_matrix = transform.transformation_matrix;
+            _data._transformation_matrix = _data.source_transform.transformation_matrix;
         }
 
         _data.area.transformation = _data._transformation_matrix;
 
-        var half_height = size.height / 2.0;
-        var half_width = size.width / 2.0;
+        var half_height = _data.source_size.height / 2.0;
+        var half_width = _data.source_size.width / 2.0;
         var top = -half_height;
         var bottom = half_height;
         var left = -half_width;
@@ -105,20 +120,22 @@ public class Akira.Lib2.Components.CompiledGeometry : Copyable<CompiledGeometry>
         _data._transformation_matrix.transform_point (ref x2, ref y2);
         _data._transformation_matrix.transform_point (ref x3, ref y3);
 
-        _data._transformation_matrix.x0 = center.x;
-        _data._transformation_matrix.y0 = center.y;
+        var center_x = _data.source_center.x;
+        var center_y = _data.source_center.y;
+        _data._transformation_matrix.x0 = center_x;
+        _data._transformation_matrix.y0 = center_y;
 
-        y0 += center.y;
-        x0 += center.x;
+        y0 += center_y;
+        x0 += center_x;
 
-        y1 += center.y;
-        x1 += center.x;
+        y1 += center_y;
+        x1 += center_x;
 
-        y2 += center.y;
-        x2 += center.x;
+        y2 += center_y;
+        x2 += center_x;
 
-        y3 += center.y;
-        x3 += center.x;
+        y3 += center_y;
+        x3 += center_x;
 
         _data.area.tl_x = x0;
         _data.area.tl_y = y0;

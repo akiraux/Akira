@@ -99,17 +99,20 @@ public class Akira.Utils.GeometryMath : Object {
     }
 
     public static void matrix_skew_x (ref Cairo.Matrix mat, double factor) {
-        var skew_mat = Cairo.Matrix.identity ();
-        skew_mat.xy = factor;
+        var skew_mat = Cairo.Matrix (1.0, 0.0, factor, 1.0, 0, 0);
         mat = multiply_matrices (mat, skew_mat);
     }
 
     public static void matrix_skew_y (ref Cairo.Matrix mat, double factor) {
-        var skew_mat = Cairo.Matrix.identity ();
-        skew_mat.yx = factor;
+        var skew_mat = Cairo.Matrix (1.0, factor, 0.0, 1.0, 0, 0);
         mat = multiply_matrices (mat, skew_mat);
     }
 
+    public static void matrix_rotate (ref Cairo.Matrix mat, double angle) {
+        var rot_mat = Cairo.Matrix.identity ();
+        rot_mat.rotate (angle);
+        mat = multiply_matrices (mat, rot_mat);
+    }
 
     public static Cairo.Matrix multiply_matrices (Cairo.Matrix a, Cairo.Matrix b) {
         return Cairo.Matrix (
@@ -173,6 +176,36 @@ public class Akira.Utils.GeometryMath : Object {
         shear_x = msy / scale_y;
 
         return true;
+    }
+
+    public static void recompose_matrix (
+        out Cairo.Matrix mat,
+        double scale_x,
+        double scale_y,
+        double shear_x,
+        double angle
+    ) {
+        mat = Cairo.Matrix (scale_x, 0.0, 0.0, scale_y, 0.0, 0.0);
+        matrix_skew_x (ref mat, shear_x);
+        var rot = Cairo.Matrix.identity ();
+        rot.rotate (angle);
+        mat = multiply_matrices (mat, rot);
+    }
+
+    public static void transform_quad (
+        Cairo.Matrix transform,
+        ref Geometry.TransformedRectangle area
+    ) {
+        var center_x = area.center_x;
+        var center_y = area.center_y;
+        area.translate (-center_x, -center_y);
+        area.transformation = multiply_matrices (area.transformation, transform);
+
+        transform.transform_distance (ref area.tr_x, ref area.tr_y);
+        transform.transform_distance (ref area.tl_x, ref area.tl_y);
+        transform.transform_distance (ref area.br_x, ref area.br_y);
+        transform.transform_distance (ref area.bl_x, ref area.bl_y);
+        area.translate (center_x, center_y);
     }
 
     public static Geometry.TransformedRectangle apply_stretch (

@@ -302,8 +302,8 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
         var blocker = new Lib2.Managers.SelectionManager.ChangeSignalBlocker (view_canvas.selection_manager);
         (void) blocker;
 
-        view_canvas.to_draw_1 = initial_drag_state.area;
-        view_canvas.request_redraw (Goo.CanvasBounds () { x1 = 0, y1 = 0, x2 = 3000, y2 = 3000 });
+        //view_canvas.to_draw_1 = initial_drag_state.area;
+        //view_canvas.request_redraw (Goo.CanvasBounds () { x1 = 0, y1 = 0, x2 = 3000, y2 = 3000 });
 
         var local_top = initial_drag_state.area.tl_y;
         var local_left = initial_drag_state.area.tl_x;
@@ -383,7 +383,7 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
             initial_drag_state.area.transformation
         );
 
-        view_canvas.to_draw_2 = new_area;
+        //view_canvas.to_draw_1 = new_area;
 
         foreach (var node in selection.nodes.values) {
             scale_node (
@@ -429,10 +429,13 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
                 new_area.bounding_box.height / initial_drag_state.area.bounding_box.height
             );
 
+            var new_transform = Utils.GeometryMath.multiply_matrices (
+                item_drag_data.item_geometry.transformation_matrix,
+                strf
+            );
 
-            var old_transform = item_drag_data.item_geometry.transformation_matrix;
-            var new_transform = Utils.GeometryMath.multiply_matrices (old_transform, strf);
-
+            var new_width = item_drag_data.item_geometry.source_width;
+            var new_height = item_drag_data.item_geometry.source_height;
             double scale_x = 0.0;
             double scale_y = 0.0;
             double shear_x = 0.0;
@@ -440,16 +443,15 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
 
             Utils.GeometryMath.decompose_matrix (new_transform, ref scale_x, ref scale_y, ref shear_x, ref angle);
 
-            var new_width = item_drag_data.item_geometry.area.width * scale_x;
-            var new_height = item_drag_data.item_geometry.area.height * scale_y;
-            var new_angle = angle;
+            var scale_transform = Cairo.Matrix (scale_x, 0, 0, scale_y, 0, 0);
+            scale_transform.transform_distance (ref new_width, ref new_height);
 
             strf.transform_distance (ref center_offset_x, ref center_offset_y);
             var d_x = initial_drag_state.area.center_x + offset_x + center_offset_x;
             var d_y = initial_drag_state.area.center_y + offset_y + center_offset_y;
 
             item.components.center = new Lib2.Components.Coordinates (d_x, d_y);
-            item.components.transform = new Lib2.Components.Transform (new_angle, 1.0, 1.0, shear_x, 0);
+            item.components.transform = new Lib2.Components.Transform (angle, 1.0, 1.0, shear_x, 0);
             item.components.size = new Lib2.Components.Size (new_width, new_height, false);
             item.mark_geometry_dirty ();
         }

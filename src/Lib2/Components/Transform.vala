@@ -56,8 +56,8 @@ public class Akira.Lib2.Components.Transform : Copyable<Transform> {
 
     public Cairo.Matrix transformation_matrix {
         get {
-            var mat = Utils.GeometryMath.multiply_matrices (scale_matrix, skew_matrix);
-            mat = Utils.GeometryMath.multiply_matrices (mat, rotation_matrix);
+            Cairo.Matrix mat;
+            Utils.GeometryMath.recompose_matrix (out mat, _scale_x, _scale_y, _skew_xy, _rotation);
             return mat;
         }
     }
