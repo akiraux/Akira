@@ -136,7 +136,6 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
         );
 
         var shift_groups = new Gee.ArrayList<Lib2.Items.ChildrenSet> ();
-        var modified_groups = new GLib.Array<int> ();
 
         foreach (var id in ids.data) {
             var node = item_model.node_from_id (id);
@@ -177,8 +176,6 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
             current_set.children_in_set.append_val (snode);
             current_set.length++;
         }
-
-        Lib2.Items.ModelNode reference = null;
 
         foreach (var cs in shift_groups) {
             var pos = cs.first_child;
@@ -308,6 +305,7 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
         return root.instance.item;
     }
 
+    /*
     private void view_restack (Lib2.Items.ChildrenSet children_set, bool up, Lib2.Items.ModelNode reference) {
             if (reference == null) {
                 assert (reference != null);
@@ -326,7 +324,7 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
     }
 
     private bool restack_up (Lib2.Items.ChildrenSet children_set, Lib2.Items.ModelNode reference) {
-        var sibling_under = item_model.previous_sibling (reference, true);
+        var sibling_under = Lib2.Items.Model.previous_sibling (reference, true);
 
         if (sibling_under == null) {
             return false;
@@ -335,7 +333,6 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
 
         for (var i = (int) children_set.children_in_set.length - 1; i >= 0; --i) {
             unowned var model_item = children_set.children_in_set.index (i).instance.item;
-            print ("%d %d\n", sibling_under.id, model_item.id);
             if (model_item.is_stackable ()) {
                 model_item.canvas_item.raise (sibling_under.instance.item.canvas_item);
             }
@@ -344,8 +341,7 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
     }
 
     private bool restack_down (Lib2.Items.ChildrenSet children_set, Lib2.Items.ModelNode reference) {
-        unowned var last_node = children_set.children_in_set.index (children_set.children_in_set.length - 1);
-        var sibling_over = item_model.next_sibling (reference, true);
+        var sibling_over = Lib2.Items.Model.next_sibling (reference, true);
 
         if (sibling_over == null) {
             return false;
@@ -359,6 +355,7 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
         }
         return true;
     }
+    */
 
     public Lib2.Items.ModelItem add_debug_rect (double x, double y) {
         var new_rect = Lib2.Items.ModelTypeRect.default_rect (

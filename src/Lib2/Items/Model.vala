@@ -52,7 +52,6 @@ public class Akira.Lib2.Items.Model : Object {
     public Gee.HashSet<int> dirty_items;
     public Gee.HashSet<int> dirty_groups;
 
-    private bool needs_dag_build = true;
     private bool is_live = false;
 
     public Model.live_model () {
