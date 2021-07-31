@@ -302,47 +302,34 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
         var blocker = new Lib2.Managers.SelectionManager.ChangeSignalBlocker (view_canvas.selection_manager);
         (void) blocker;
 
-        //view_canvas.to_draw_1 = initial_drag_state.area;
-        //view_canvas.request_redraw (Goo.CanvasBounds () { x1 = 0, y1 = 0, x2 = 3000, y2 = 3000 });
-
-        var local_top = initial_drag_state.area.tl_y;
-        var local_left = initial_drag_state.area.tl_x;
-        var local_bottom = initial_drag_state.area.br_y;
-        var local_right = initial_drag_state.area.br_x;
-
-        double grid_offset_x = 0.0;
-        double grid_offset_y = 0.0;
-        Utils.AffineTransform.add_grid_snap_delta (local_top, local_left, ref grid_offset_x, ref grid_offset_y);
-
         double rot_center_x = initial_drag_state.area.center_x;
         double rot_center_y = initial_drag_state.area.center_y;
 
-        var itr = Cairo.Matrix.identity ();
-        //itr.rotate (-initial_drag_state.area.rotation);
+        var itr = initial_drag_state.area.transformation;
+        itr.invert ();
 
-        Utils.GeometryMath.to_local_from_matrix (itr, rot_center_x, rot_center_y, ref local_left, ref local_top);
-        Utils.GeometryMath.to_local_from_matrix (itr, rot_center_x, rot_center_y, ref local_right, ref local_bottom);
-        var start_width = double.max (1.0, local_right - local_left);
-        var start_height = double.max (1.0, local_bottom - local_top);
+        var local_area = initial_drag_state.area;
+        Utils.GeometryMath.transform_quad (itr, ref local_area);
+
+        var adjusted_event_x = event_x - rot_center_x;
+        var adjusted_event_y = event_y - rot_center_y;
+        itr.transform_distance (ref adjusted_event_x, ref adjusted_event_y);
+        adjusted_event_x += rot_center_x;
+        adjusted_event_y += rot_center_y;
+
+        var start_width = double.max (1.0, local_area.width);
+        var start_height = double.max (1.0, local_area.height);
 
         double nob_x = 0.0;
         double nob_y = 0.0;
 
         Utils.Nobs.nob_xy_from_coordinates (
             nob,
-            initial_drag_state.area,
+            local_area,
             1.0,
             ref nob_x,
             ref nob_y
         );
-
-        double local_ev_x = event_x;
-        double local_ev_y = event_y;
-        Utils.GeometryMath.to_local_from_matrix (itr, rot_center_x, rot_center_y, ref local_ev_x, ref local_ev_y);
-
-        double local_nob_x = nob_x;
-        double local_nob_y = nob_y;
-        Utils.GeometryMath.to_local_from_matrix (itr, rot_center_x, rot_center_y, ref local_nob_x, ref local_nob_y);
 
         double inc_width = 0;
         double inc_height = 0;
@@ -350,14 +337,12 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
         double inc_y = 0;
 
         var tr = Cairo.Matrix.identity ();
-        //tr.rotate (initial_drag_state.area.rotation);
-
         Utils.AffineTransform.calculate_size_adjustments2 (
             nob,
             start_width,
             start_height,
-            local_ev_x - local_nob_x,
-            local_ev_y - local_nob_y,
+            adjusted_event_x - nob_x,
+            adjusted_event_y - nob_y,
             start_width / start_height,
             view_canvas.ctrl_is_pressed,
             view_canvas.shift_is_pressed,
@@ -372,29 +357,34 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
         double size_off_y = inc_height / 2.0;
         tr.transform_distance (ref size_off_x, ref size_off_y);
 
-        var offset_x = inc_x + size_off_x + grid_offset_x;
-        var offset_y = inc_y + size_off_y + grid_offset_y;
+        var local_offset_x = inc_x + size_off_x;
+        var local_offset_y = inc_y + size_off_y;
 
         var new_area = Geometry.TransformedRectangle.from_components (
-            rot_center_x + offset_x,
-            rot_center_y + offset_y,
+            rot_center_x + local_offset_x,
+            rot_center_y + local_offset_y,
             start_width + inc_width,
             start_height + inc_height,
-            initial_drag_state.area.transformation
+            tr
         );
 
-        //view_canvas.to_draw_1 = new_area;
+        var global_offset_x = local_offset_x;
+        var global_offset_y = local_offset_y;
+        initial_drag_state.area.transformation.transform_distance (ref global_offset_x, ref global_offset_y);
+
+        var local_sx = new_area.bounding_box.width / local_area.bounding_box.width;
+        var local_sy = new_area.bounding_box.height / local_area.bounding_box.height;
 
         foreach (var node in selection.nodes.values) {
             scale_node (
                 view_canvas,
                 node,
                 initial_drag_state,
-                new_area,
-                offset_x,
-                offset_y,
-                inc_width,
-                inc_height
+                itr,
+                global_offset_x,
+                global_offset_y,
+                local_sx,
+                local_sy
             );
 
         }
@@ -402,36 +392,37 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
         view_canvas.items_manager.compile_model ();
     }
 
+    /*
+     * Scales a node and its children relative to a reference frame.
+     */
     public static void scale_node (
         ViewCanvas view_canvas,
         Lib2.Items.ModelNode node,
         InitialDragState initial_drag_state,
-        Geometry.TransformedRectangle new_area,
-        double offset_x,
-        double offset_y,
-        double offset_local_width,
-        double offset_local_height
+        Cairo.Matrix inverse_reference_matrix,
+        double global_offset_x,
+        double global_offset_y,
+        double reference_sx,
+        double reference_sy
     ) {
         // #TODO wip
         unowned var item = node.instance.item;
         if (item.components.center != null && item.components.size != null) {
             var item_drag_data = initial_drag_state.item_data_map[node.id];
 
-            double old_center_x = item_drag_data.item_geometry.area.center_x;
-            double old_center_y = item_drag_data.item_geometry.area.center_y;
-
-            double center_offset_x = old_center_x - initial_drag_state.area.center_x;
-            double center_offset_y = old_center_y - initial_drag_state.area.center_y;
-
-            var strf = Cairo.Matrix.identity ();
-            strf.scale (
-                new_area.bounding_box.width / initial_drag_state.area.bounding_box.width,
-                new_area.bounding_box.height / initial_drag_state.area.bounding_box.height
-            );
+            var strf = Cairo.Matrix (reference_sx, 0, 0, reference_sy, 0, 0);
+            double center_offset_x = item_drag_data.item_geometry.area.center_x - initial_drag_state.area.center_x;
+            double center_offset_y = item_drag_data.item_geometry.area.center_y - initial_drag_state.area.center_y;
 
             var new_transform = Utils.GeometryMath.multiply_matrices (
                 item_drag_data.item_geometry.transformation_matrix,
-                strf
+                inverse_reference_matrix
+            );
+
+            new_transform = Utils.GeometryMath.multiply_matrices (new_transform, strf);
+            new_transform = Utils.GeometryMath.multiply_matrices (
+                new_transform,
+                initial_drag_state.area.transformation
             );
 
             var new_width = item_drag_data.item_geometry.source_width;
@@ -447,8 +438,8 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
             scale_transform.transform_distance (ref new_width, ref new_height);
 
             strf.transform_distance (ref center_offset_x, ref center_offset_y);
-            var d_x = initial_drag_state.area.center_x + offset_x + center_offset_x;
-            var d_y = initial_drag_state.area.center_y + offset_y + center_offset_y;
+            var d_x = initial_drag_state.area.center_x + global_offset_x + center_offset_x;
+            var d_y = initial_drag_state.area.center_y + global_offset_y + center_offset_y;
 
             item.components.center = new Lib2.Components.Coordinates (d_x, d_y);
             item.components.transform = new Lib2.Components.Transform (angle, 1.0, 1.0, shear_x, 0);
@@ -462,11 +453,11 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
                     view_canvas,
                     child,
                     initial_drag_state,
-                    new_area,
-                    offset_x,
-                    offset_y,
-                    offset_local_width,
-                    offset_local_height
+                    inverse_reference_matrix,
+                    global_offset_x,
+                    global_offset_y,
+                    reference_sx,
+                    reference_sy
                 );
             }
         }
