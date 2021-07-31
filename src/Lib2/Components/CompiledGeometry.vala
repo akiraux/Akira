@@ -28,7 +28,7 @@ public class Akira.Lib2.Components.CompiledGeometry : Copyable<CompiledGeometry>
         // These rectangles are in global coordinates
         public Geometry.TransformedRectangle area;
 
-        // This is the bounding box that contains the rotated area
+        // Cahced bounding box that contains the rotated area
         public Geometry.Rectangle area_bb;
 
         public CompiledGeometryData () {
@@ -156,8 +156,7 @@ public class Akira.Lib2.Components.CompiledGeometry : Copyable<CompiledGeometry>
         _data.area.br_x = x3;
         _data.area.br_y = y3;
 
-        Utils.GeometryMath.min_max_coords (x0, x1, x2, x3, ref _data.area_bb.left, ref _data.area_bb.right);
-        Utils.GeometryMath.min_max_coords (y0, y1, y2, y3, ref _data.area_bb.top, ref _data.area_bb.bottom);
+        _data.area_bb = _data.area.bounding_box;
     }
 
     public static CompiledGeometry.from_descendants (Components? components, Lib2.Items.ModelNode? node) {
@@ -167,6 +166,7 @@ public class Akira.Lib2.Components.CompiledGeometry : Copyable<CompiledGeometry>
         }
 
         _data._transformation_matrix = Cairo.Matrix.identity ();
+        _data.area.transformation = _data._transformation_matrix;
 
         double top = int.MAX;
         double bottom = int.MIN;
@@ -194,11 +194,7 @@ public class Akira.Lib2.Components.CompiledGeometry : Copyable<CompiledGeometry>
         _data.area.br_x = right;
         _data.area.br_y = bottom;
 
-        _data.area_bb.top = top;
-        _data.area_bb.left = left;
-        _data.area_bb.bottom = bottom;
-        _data.area_bb.right = right;
-
+        _data.area_bb = _data.area.bounding_box;
         _data._transformation_matrix.x0 = _data.area_bb.center_x;
         _data._transformation_matrix.y0 = _data.area_bb.center_y;
     }

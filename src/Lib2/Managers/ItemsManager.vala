@@ -379,7 +379,10 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
         var blocker = new Lib2.Managers.SelectionManager.ChangeSignalBlocker (view_canvas.selection_manager);
         (void) blocker;
 
-        var group = Lib2.Items.ModelTypeGroup.default_group ();
+        var group = Lib2.Items.ModelTypeArtboard.default_artboard (
+            new Lib2.Components.Coordinates (500, 500),
+            new Lib2.Components.Size (1000, 1000, false)
+        );
         add_item_to_origin (group);
 
         var num_of = 1000;

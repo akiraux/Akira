@@ -37,7 +37,7 @@ public class Akira.Lib2.Items.ModelTypeArtboard : Object, ModelType<ModelTypeArt
 
         var layout_data = Components.Layout.LayoutData () {
             can_rotate = true,
-            dilated_resize = true
+            dilated_resize = false
         };
         new_item.components.layout = new Components.Layout (layout_data);
 
@@ -104,7 +104,6 @@ public class Akira.Lib2.Items.ModelTypeArtboard : Object, ModelType<ModelTypeArt
 
                 var rgba = item.compiled_fill.color;
                 uint urgba = Utils.Color.rgba_to_uint (rgba);
-                print ("here\n");
                 item.canvas_item.set ("fill-color-rgba", urgba);
                 break;
             case Lib2.Components.Component.Type.COMPILED_GEOMETRY:
@@ -113,7 +112,6 @@ public class Akira.Lib2.Items.ModelTypeArtboard : Object, ModelType<ModelTypeArt
                 item.canvas_item.set ("width", item.components.size.width);
                 item.canvas_item.set ("height", item.components.size.height);
                 item.canvas_item.set_transform (item.compiled_geometry.transformation_matrix);
-                print ("%s", item.canvas_item.is_visible ().to_string ());
                 break;
         }
     }

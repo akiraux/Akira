@@ -243,8 +243,18 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
 
         foreach (var node in selection.nodes.values) {
             if (node.instance.is_group ()) {
-                translate_group (view_canvas, node, initial_drag_state, delta_x, delta_y, snap_offset_x, snap_offset_y);
-                continue;
+                translate_group (
+                    view_canvas,
+                    node,
+                    initial_drag_state,
+                    delta_x, delta_y,
+                    snap_offset_x,
+                    snap_offset_y
+                );
+
+                if (node.instance.item.components.center == null) {
+                    continue;
+                }
             }
             unowned var item = node.instance.item;
             var item_drag_data = initial_drag_state.item_data_map[node.id];
@@ -267,6 +277,10 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
         double snap_offset_x,
         double snap_offset_y
     ) {
+        if (group.children == null) {
+            return;
+        }
+
         foreach (unowned var child in group.children.data) {
             if (child.instance.is_group ()) {
                 translate_group (
@@ -386,7 +400,6 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
                 local_sx,
                 local_sy
             );
-
         }
 
         view_canvas.items_manager.compile_model ();
@@ -444,10 +457,13 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
             item.components.center = new Lib2.Components.Coordinates (d_x, d_y);
             item.components.transform = new Lib2.Components.Transform (angle, 1.0, 1.0, shear_x, 0);
             item.components.size = new Lib2.Components.Size (new_width, new_height, false);
+
             item.mark_geometry_dirty ();
         }
 
-        if (node.children != null && node.children.length > 0) {
+
+        unowned var layout = node.instance.item.components.layout;
+        if ((layout == null || layout.dilated_resize) && node.children != null) {
             foreach (unowned var child in node.children.data) {
                 scale_node (
                     view_canvas,
