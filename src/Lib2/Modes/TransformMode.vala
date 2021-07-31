@@ -541,11 +541,13 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
                     rotation_center_x + new_center_delta_x,
                     rotation_center_y + new_center_delta_y
                 );
+
+                tmp_rotation += item_rotation;
             }
         }
 
         if (item.components.transform != null) {
-            tmp_rotation = GLib.Math.fmod (item_rotation + tmp_rotation + GLib.Math.PI * 2, GLib.Math.PI * 2);
+            tmp_rotation = GLib.Math.fmod (tmp_rotation + GLib.Math.PI * 2, GLib.Math.PI * 2);
             item.components.transform = item.components.transform.with_main_rotation (tmp_rotation);
         }
 
