@@ -249,13 +249,13 @@ public class Akira.Lib2.Managers.NobManager : Object {
 
         select_effect.set ("line-width", LINE_WIDTH / view_canvas.current_scale);
 
-        // Always show the select effect when  resizing multiple items.
+        // Always show the select effect when resizing multiple items.
         if (view_canvas.selection_manager.selection.nodes.size > 1) {
             select_effect.set ("visibility", Goo.CanvasItemVisibility.VISIBLE);
             return;
         }
 
-        // Hide the selection effect if the user is moving or resizing the item.
+        // Hide the select effect if the user is moving or resizing the item.
         select_effect.set ("visibility",
             view_canvas.mode_manager.active_mode_nob == Utils.Nobs.Nob.ALL ?
             Goo.CanvasItemVisibility.VISIBLE :
