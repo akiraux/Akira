@@ -39,8 +39,8 @@ public class Akira.Lib.Managers.HoverManager : Object {
         canvas.window.event_bus.hover_over_layer.connect (on_layer_hovered);
     }
 
-    public void on_mouse_over (double event_x, double event_y, Akira.Lib.Managers.NobManager.Nob nob) {
-        if (nob != Akira.Lib.Managers.NobManager.Nob.NONE) {
+    public void on_mouse_over (double event_x, double event_y, Utils.Nobs.Nob nob) {
+        if (nob != Utils.Nobs.Nob.NONE) {
             current_hover_item = null;
             remove_hover_effect ();
             return;

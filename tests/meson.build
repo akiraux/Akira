@@ -19,6 +19,7 @@ canvas_tests = executable (
     'tests-model.vala',
 
     'canvas/test-fills-item.vala',
+    'canvas/test-lib2-model.vala',
     'canvas/test-main.vala',
     c_args: test_cflags,
     dependencies: [akira_dep]

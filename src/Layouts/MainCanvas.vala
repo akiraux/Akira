@@ -25,7 +25,9 @@ public class Akira.Layouts.MainCanvas : Gtk.Grid {
     public const double SCROLL_DISTANCE = 0;
 
     public Gtk.ScrolledWindow main_scroll;
+
     public Akira.Lib.Canvas canvas;
+
     public weak Akira.Window window { get; construct; }
 
     private Gtk.Overlay main_overlay;

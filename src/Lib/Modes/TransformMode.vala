@@ -83,7 +83,7 @@ public class Akira.Lib.Modes.TransformMode : InteractionMode {
 
     public override void mode_end () {
         transform_extra_context = null;
-        canvas.nob_manager.set_selected_by_name (Akira.Lib.Managers.NobManager.Nob.NONE);
+        canvas.nob_manager.set_selected_by_name (Utils.Nobs.Nob.NONE);
         canvas.window.event_bus.detect_artboard_change ();
         canvas.window.event_bus.update_snap_decorators ();
     }
@@ -92,7 +92,7 @@ public class Akira.Lib.Modes.TransformMode : InteractionMode {
 
     public override Gdk.CursorType? cursor_type () {
         var selected_nob = canvas.nob_manager.selected_nob;
-        return Managers.NobManager.cursor_from_nob (selected_nob);
+        return Utils.Nobs.cursor_from_nob (selected_nob);
     }
 
     public override bool key_press_event (Gdk.EventKey event) {
@@ -134,7 +134,7 @@ public class Akira.Lib.Modes.TransformMode : InteractionMode {
         }
 
         switch (selected_nob) {
-            case Managers.NobManager.Nob.NONE:
+            case Utils.Nobs.Nob.NONE:
                 move_from_event (
                     canvas,
                     selected_items,
@@ -145,7 +145,7 @@ public class Akira.Lib.Modes.TransformMode : InteractionMode {
                 );
                 break;
 
-            case Managers.NobManager.Nob.ROTATE:
+            case Utils.Nobs.Nob.ROTATE:
                 rotate_from_event (
                     canvas,
                     selected_items,
@@ -201,7 +201,8 @@ public class Akira.Lib.Modes.TransformMode : InteractionMode {
             drag_state.item_width = item.size.width;
             drag_state.item_height = item.size.height;
         } else {
-            // TODO there should probably be a nice method to get a bounding box from a list of items.
+            // TODO there should probably be a nice method to get a bounding box
+            // from a list of items.
         }
 
         drag_state.item_scale_x_adj = 0;
@@ -268,7 +269,11 @@ public class Akira.Lib.Modes.TransformMode : InteractionMode {
         // Make adjustment basted on snaps.
         // Double the sensitivity to allow for reuse of grid after snap.
         var sensitivity = Utils.Snapping.adjusted_sensitivity (canvas.current_scale);
-        var snap_grid = Utils.Snapping.generate_best_snap_grid (canvas, selected_items, sensitivity);
+        var snap_grid = Utils.Snapping.generate_best_snap_grid (
+                            canvas,
+                            selected_items,
+                            sensitivity
+                        );
 
         // Interrupt if we don't have any snap to use.
         if (snap_grid.is_empty ()) {
@@ -304,7 +309,7 @@ public class Akira.Lib.Modes.TransformMode : InteractionMode {
         Akira.Lib.Canvas canvas,
         GLib.List<Akira.Lib.Items.CanvasItem> selected_items,
         InitialDragState initial_drag_state,
-        Akira.Lib.Managers.NobManager.Nob selected_nob,
+        Utils.Nobs.Nob selected_nob,
         double event_x,
         double event_y,
         ref Akira.Lib.Managers.SnapManager.SnapGuideData guide_data

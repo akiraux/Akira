@@ -66,6 +66,8 @@ public class Akira.Services.ActionManager : Object {
     public const string ACTION_ESCAPE = "action_escape";
     public const string ACTION_SHORTCUTS = "action_shortcuts";
     public const string ACTION_PICK_COLOR = "action_pick_color";
+    public const string ACTION_COPY = "action_copy";
+    public const string ACTION_PASTE = "action_paste";
 
     public static Gee.MultiMap<string, string> action_accelerators = new Gee.HashMultiMap<string, string> ();
     public static Gee.MultiMap<string, string> typing_accelerators = new Gee.HashMultiMap<string, string> ();
@@ -104,6 +106,8 @@ public class Akira.Services.ActionManager : Object {
         { ACTION_ESCAPE, action_escape },
         { ACTION_SHORTCUTS, action_shortcuts },
         { ACTION_PICK_COLOR, action_pick_color },
+        { ACTION_COPY, action_copy },
+        { ACTION_PASTE, action_paste },
     };
 
     public ActionManager (Akira.Application akira_app, Akira.Window window) {
@@ -139,6 +143,8 @@ public class Akira.Services.ActionManager : Object {
         action_accelerators.set (ACTION_FLIP_V, "<Control>bracketright");
         action_accelerators.set (ACTION_SHORTCUTS, "F1");
         action_accelerators.set (ACTION_PICK_COLOR, "<Alt>c");
+        action_accelerators.set (ACTION_COPY, "<Control>c");
+        action_accelerators.set (ACTION_PASTE, "<Control>v");
 
         typing_accelerators.set (ACTION_ESCAPE, "Escape");
         typing_accelerators.set (ACTION_ARTBOARD_TOOL, "a");
@@ -341,7 +347,7 @@ public class Akira.Services.ActionManager : Object {
 
     // Delete the currently selected items.
     private void action_delete () {
-        window.main_window.main_canvas.canvas.selected_bound_manager.delete_selection ();
+        window.event_bus.delete_selected_items ();
     }
 
     private void action_flip_h () {
@@ -506,6 +512,14 @@ public class Akira.Services.ActionManager : Object {
             // had their properties changed.
             canvas.window.event_bus.selected_items_list_changed (canvas.selected_bound_manager.selected_items);
         });
+    }
+
+    private void action_copy () {
+        window.event_bus.request_copy ();
+    }
+
+    private void action_paste () {
+        window.event_bus.request_paste ();
     }
 
     public static void action_from_group (string action_name, ActionGroup? action_group) {
