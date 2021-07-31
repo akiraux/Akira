@@ -25,6 +25,11 @@ public class Akira.Lib2.ViewCanvas : Goo.Canvas {
 
     public Geometry.TransformedRectangle to_draw_1;
     public Geometry.TransformedRectangle to_draw_2;
+    public Geometry.TransformedRectangle to_draw_3;
+    public double debug_point1_x = 0;
+    public double debug_point1_y = 0;
+    public double debug_point2_x = 0;
+    public double debug_point2_y = 0;
 
     public Lib2.Managers.ItemsManager items_manager;
     public Lib2.Managers.SelectionManager selection_manager;
@@ -350,13 +355,40 @@ public class Akira.Lib2.ViewCanvas : Goo.Canvas {
     public override bool draw (Cairo.Context ctx) {
 
         base.draw (ctx);
-        draw_debug_rect (ctx, to_draw_1.bounding_box, Gdk.RGBA () { red = 1.0, green = 0.0, blue = 0.0, alpha = 1.0});
+        //draw_debug_rect (ctx, to_draw_1.bounding_box, Gdk.RGBA () { red = 1.0, green = 0.0, blue = 0.0, alpha = 1.0});
         draw_debug_rotated_rect (ctx, to_draw_1, Gdk.RGBA () { red = 0.0, green = 1.0, blue = 0.5, alpha = 1.0});
 
-        draw_debug_rect (ctx, to_draw_2.bounding_box, Gdk.RGBA () { red = 5.0, green = 0.0, blue = 0.0, alpha = 1.0});
-        draw_debug_rotated_rect (ctx, to_draw_2, Gdk.RGBA () { red = 0.0, green = 5.0, blue = 0.2, alpha = 1.0});
+        //draw_debug_rect (ctx, to_draw_2.bounding_box, Gdk.RGBA () { red = 5.0, green = 0.0, blue = 0.0, alpha = 1.0});
+        draw_debug_rotated_rect (ctx, to_draw_2, Gdk.RGBA () { red = 1.0, green = 0.0, blue = 0.0, alpha = 1.0});
+
+        draw_debug_rotated_rect (ctx, to_draw_3, Gdk.RGBA () { red = 0.0, green = 0.0, blue = 1.0, alpha = 1.0});
+
+        if (debug_point1_x > 0 && debug_point1_y > 0) {
+            draw_debug_point (ctx, debug_point1_x, debug_point1_y, Gdk.RGBA () { red = 0.0, green = 1.0, blue = 0.5, alpha = 1.0});
+        }
+
+        if (debug_point2_x > 0 && debug_point2_y > 0) {
+            draw_debug_point (ctx, debug_point2_x, debug_point2_y, Gdk.RGBA () { red = 1.0, green = 0.0, blue = 0.0, alpha = 1.0});
+        }
 
         return false;
+    }
+
+    public void draw_debug_point (Cairo.Context ctx, double point_x, double point_y, Gdk.RGBA color) {
+        var xadj = hadjustment.value;
+        var yadj = vadjustment.value;
+
+        var cs = current_scale;
+
+        ctx.save ();
+        point_x *= cs;
+        point_y *= cs;
+
+        ctx.move_to (point_x, point_y);
+        ctx.arc (point_x - xadj, point_y - yadj, 5, 0, 2.0 * GLib.Math.PI);
+        ctx.set_source_rgba (color.red, color.green, color.blue, color.alpha);
+        ctx.fill ();
+        ctx.restore ();
     }
 
     public void draw_debug_rect (Cairo.Context ctx, Geometry.Rectangle rect, Gdk.RGBA color) {
@@ -374,11 +406,11 @@ public class Akira.Lib2.ViewCanvas : Goo.Canvas {
         var width = right - left;
         var height = bottom - top;
         ctx.move_to (left - xadj, top - yadj);
-        ctx.set_source_rgba (color.red, color.green, color.blue, color.alpha);
         ctx.rel_line_to (width, 0);
         ctx.rel_line_to (0, height);
         ctx.rel_line_to (-width, 0);
         ctx.close_path ();
+        ctx.set_source_rgba (color.red, color.green, color.blue, color.alpha);
         ctx.stroke ();
 
         ctx.restore ();

@@ -44,8 +44,18 @@ public class Akira.Lib2.Components.CompiledGeometry : Copyable<CompiledGeometry>
     public Geometry.TransformedRectangle area { get { return _data.area; }}
     public Geometry.Rectangle area_bb { get { return _data.area_bb; }}
 
-    public double source_width { get { return _data.source_size == null ? 0 : _data.source_size.width; } }
-    public double source_height { get { return _data.source_size == null ? 0 : _data.source_size.height; } }
+    public double source_width {
+        get {
+            return _data.source_size == null ? area_bb.width : _data.source_size.width;
+        }
+    }
+
+    public double source_height {
+        get {
+            return _data.source_size == null ? area_bb.height : _data.source_size.height;
+        }
+    }
+
     public double tl_x { get { return _data.area.tl_x; }}
     public double tl_y { get { return _data.area.tl_y; }}
     public double tr_x { get { return _data.area.tr_x; }}

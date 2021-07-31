@@ -113,12 +113,10 @@ public class Akira.Lib2.Items.NodeSelection : Object {
             return result;
         }
 
-        /*
         if (nodes.size == 1) {
             unowned var item = first_node ().instance.item;
             return item.compiled_geometry.area;
         }
-        */
 
         double top = int.MAX;
         double bottom = int.MIN;
