@@ -125,6 +125,13 @@ public class Akira.Utils.GeometryMath : Object {
     }
 
     /*
+     * Returns the rotation component of a matrix.
+     */
+    public static double matrix_rotation_component (Cairo.Matrix mat) {
+        return GLib.Math.atan2 (mat.yx, mat.xx);
+    }
+
+    /*
      * Decomposes a matrix to three operations (scale, shear and rotation)
      *
      * To recompose run two multiplications:
