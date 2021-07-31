@@ -163,8 +163,7 @@ public class Akira.Lib2.Managers.NobManager : Object {
 
             if (!show_h_centers && Utils.Nobs.is_horizontal_center (nob.handle_id)) {
                 set_visible = false;
-            }
-            else if (!show_v_centers && Utils.Nobs.is_vertical_center (nob.handle_id)) {
+            } else if (!show_v_centers && Utils.Nobs.is_vertical_center (nob.handle_id)) {
                 set_visible = false;
             }
 
@@ -207,11 +206,9 @@ public class Akira.Lib2.Managers.NobManager : Object {
 
                 rotation_line.set ("line-width", LINE_WIDTH / view_canvas.current_scale);
                 rotation_line.set ("visibility", Goo.CanvasItemVisibility.VISIBLE);
-            }
-            else {
+            } else {
                 rotation_line.set ("visibility", Goo.CanvasItemVisibility.HIDDEN);
             }
-
         }
 
         nob.update_global_state (cx, cy, 0, show);
@@ -237,8 +234,8 @@ public class Akira.Lib2.Managers.NobManager : Object {
                 1.0, 1.0,
                 0.0, 1.0,
                 null
-
             );
+
             select_effect.set ("parent", view_canvas.get_root_item ());
             select_effect.pointer_events = Goo.CanvasPointerEvents.NONE;
         }
@@ -251,6 +248,17 @@ public class Akira.Lib2.Managers.NobManager : Object {
         select_effect.points = new_pts;
 
         select_effect.set ("line-width", LINE_WIDTH / view_canvas.current_scale);
-        select_effect.set ("visibility", Goo.CanvasItemVisibility.VISIBLE);
+
+        // Always show the select effect when  resizing multiple items.
+        if (view_canvas.selection_manager.selection.nodes.size > 1) {
+            select_effect.set ("visibility", Goo.CanvasItemVisibility.VISIBLE);
+            return;
+        }
+
+        // Hide the selection effect if the user is moving or resizing the item.
+        select_effect.set ("visibility",
+            view_canvas.mode_manager.active_mode_nob == Utils.Nobs.Nob.ALL ?
+            Goo.CanvasItemVisibility.VISIBLE :
+            Goo.CanvasItemVisibility.HIDDEN);
     }
 }
