@@ -37,7 +37,8 @@ public class Akira.Lib2.Items.ModelTypeArtboard : Object, ModelType<ModelTypeArt
 
         var layout_data = Components.Layout.LayoutData () {
             can_rotate = true,
-            dilated_resize = false
+            dilated_resize = false,
+            clips_children = true
         };
         new_item.components.layout = new Components.Layout (layout_data);
 
@@ -68,50 +69,34 @@ public class Akira.Lib2.Items.ModelTypeArtboard : Object, ModelType<ModelTypeArt
         var mid_x = item.components.size.width / 2.0;
         var mid_y = item.components.size.height / 2.0;
 
-        var artboard = new Lib2.Items.CanvasRect (
+        item.drawable = new Drawables.DrawableArtboard (
             canvas.get_root_item (),
             -mid_x,
             -mid_y,
             item.components.size.width,
             item.components.size.height
         );
-        //var artboard = new Goo.CanvasRect (canvas.get_root_item(), null);
-        //artboard.x = -mid_x;
-        //artboard.y = -mid_y;
-        //artboard.width = item.components.size.width;
-        //artboard.height = item.components.size.height;
-
-        //background = new Goo.CanvasRect (artboard, 0, 0, 1, 1, "line-width", 0.0, null);
-        //background.translate (0, 0);
-        //background.can_focus = false;
-
-        item.canvas_item = artboard;
-
-        var fill_color = Gdk.RGBA ();
-        fill_color.parse ("#fff");
-        //item.canvas_item.set ("fill-color-rgba", fill_color);
     }
 
     public void component_updated (ModelItem item, Lib2.Components.Component.Type type) {
         switch (type) {
             case Lib2.Components.Component.Type.COMPILED_BORDER:
+                item.drawable.line_width = 0;
                 break;
             case Lib2.Components.Component.Type.COMPILED_FILL:
                 if (!item.compiled_fill.is_visible) {
-                    item.canvas_item.set ("fill-color-rgba", null);
+                    item.drawable.fill_color_rgba = 0;
                     break;
                 }
 
-                var rgba = item.compiled_fill.color;
-                uint urgba = Utils.Color.rgba_to_uint (rgba);
-                item.canvas_item.set ("fill-color-rgba", urgba);
+                item.drawable.fill_color_gdk_rgba = item.compiled_fill.color;
                 break;
             case Lib2.Components.Component.Type.COMPILED_GEOMETRY:
-                item.canvas_item.set ("x", -item.components.size.width / 2.0);
-                item.canvas_item.set ("y", -item.components.size.height / 2.0);
-                item.canvas_item.set ("width", item.components.size.width);
-                item.canvas_item.set ("height", item.components.size.height);
-                item.canvas_item.set_transform (item.compiled_geometry.transformation_matrix);
+                item.drawable.set ("x", -item.components.size.width / 2.0);
+                item.drawable.set ("y", -item.components.size.height / 2.0);
+                item.drawable.set ("width", item.components.size.width);
+                item.drawable.set ("height", item.components.size.height);
+                item.drawable.set_transform (item.compiled_geometry.transformation_matrix);
                 break;
         }
     }

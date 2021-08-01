@@ -504,6 +504,22 @@ public class Akira.Lib2.Items.Model : Object {
         for (var has_next = it.last (); has_next; has_next = it.previous ()) {
             var node = it.get_value ();
             node.instance.item.compile_components (true, node);
+
+            // #TODO improve this
+            if (node.instance.item.components.layout.clips_children) {
+                if (node.children == null) {
+                    continue;
+                }
+
+                foreach (unowned var child in node.children.data) {
+                    unowned var dr = child.instance.item.drawable;
+                    if (dr != null) {
+                        var clip = node.instance.item.compiled_geometry.area;
+                        clip.translate (-child.instance.item.components.center.x, -child.instance.item.components.center.y);
+                        dr.clipping_path = clip;
+                    }
+                }
+            }
         }
 
         dirty_groups.clear ();

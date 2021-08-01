@@ -25,7 +25,8 @@ public class Akira.Lib2.Items.ModelTypeGroup : Object, ModelType<ModelTypeGroup>
         new_item.components = new Lib2.Components.Components ();
         var layout_data = Components.Layout.LayoutData () {
             can_rotate = true,
-            dilated_resize = true
+            dilated_resize = true,
+            clips_children = false
         };
         new_item.components.layout = new Components.Layout (layout_data);
 

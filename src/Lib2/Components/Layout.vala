@@ -28,6 +28,7 @@ public class Akira.Lib2.Components.Layout : Copyable<Layout> {
     public struct LayoutData {
         public bool can_rotate;
         public bool dilated_resize;
+        public bool clips_children;
     }
 
     // main data for boxed Fill
@@ -42,6 +43,7 @@ public class Akira.Lib2.Components.Layout : Copyable<Layout> {
     }
 
     // Recommended accessors
-    public bool can_rotate { get { return _data.can_rotate; }}
-    public bool dilated_resize { get { return _data.dilated_resize; }}
+    public bool can_rotate { get { return _data.can_rotate; } }
+    public bool dilated_resize { get { return _data.dilated_resize; } }
+    public bool clips_children { get { return _data.clips_children; } }
 }

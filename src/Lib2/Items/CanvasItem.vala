@@ -26,8 +26,15 @@ public interface Akira.Lib2.Items.CanvasItem : Goo.CanvasItemSimple, Goo.CanvasI
     public abstract int parent_id { get; set;}
 }
 
-public class Akira.Lib2.Items.CanvasRect : Goo.CanvasRect, CanvasItem {
+public class Akira.Lib2.Items.CanvasRect : Goo.CanvasItemSimple , CanvasItem {
      public int parent_id { get; set; default = -1; }
+
+     public double x { get; set; }
+     public double y { get; set; }
+     public double width { get; set; }
+     public double height { get; set; }
+     public double radius_x { get; set; }
+     public double radius_y { get; set; }
 
      public CanvasRect (Goo.CanvasItem parent, double x, double y, double width, double height) {
         this.parent = parent;
@@ -35,11 +42,62 @@ public class Akira.Lib2.Items.CanvasRect : Goo.CanvasRect, CanvasItem {
         this.y = y;
         this.width = width;
         this.height = height;
-        this.radius_x = 0.0;
-        this.radius_y = 0.0;
+        this.radius_x = 0;
+        this.radius_y = 0;
 
         // Add the newly created item to the Canvas or Artboard.
         parent.add_child (this, -1);
+     }
+
+     public override void simple_create_path (Cairo.Context cr) {
+        if (radius_x > 0 || radius_y > 0) {
+            /* The radii can't be more than half the size of the rect. */
+            double rx = double.min (radius_x, width / 2);
+            double ry = double.min (radius_y, height / 2);
+
+            /* Draw the top-right arc. */
+            cr.save ();
+            cr.translate (x + width - rx, y + ry);
+            cr.scale (rx, ry);
+            cr.arc (0.0, 0.0, 1.0, 1.5 * GLib.Math.PI, 2.0 * GLib.Math.PI);
+            cr.restore ();
+
+            /* Draw the line down the right side. */
+            cr.line_to (x + width, y + height - ry);
+
+            /* Draw the bottom-right arc. */
+            cr.save ();
+            cr.translate (x + width - rx, y + height - ry);
+            cr.scale (rx, ry);
+            cr.arc (0.0, 0.0, 1.0, 0.0, 0.5 * GLib.Math.PI);
+            cr.restore ();
+
+            /* Draw the line left across the bottom. */
+            cr.line_to (x + rx, y + height);
+
+            /* Draw the bottom-left arc. */
+            cr.save ();
+            cr.translate (x + rx, y + height - y);
+            cr.scale (rx, ry);
+            cr.arc (0.0, 0.0, 1.0, 0.5 * GLib.Math.PI, GLib.Math.PI);
+            cr.restore ();
+
+            /* Draw the line up the left side. */
+            cr.line_to (x, y + ry);
+
+            /* Draw the top-left arc. */
+            cr.save ();
+            cr.translate (x + rx, y + ry);
+            cr.scale (rx, ry);
+            cr.arc (0.0, 0.0, 1.0, GLib.Math.PI, 1.5 * GLib.Math.PI);
+            cr.restore ();
+
+            /* Close the path across the top. */
+            cr.close_path ();
+        }
+        else {
+            cr.rectangle (x, y, width, height);
+        }
      }
 }
 

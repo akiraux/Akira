@@ -27,7 +27,7 @@ public class Akira.Lib2.Managers.HoverManager : Object {
     public unowned ViewCanvas view_canvas { get; construct; }
 
     private int current_hovered_id = -1;
-    private Goo.CanvasItem hover_effect;
+    private Drawables.Drawable hover_effect;
 
     public HoverManager (ViewCanvas canvas) {
         Object (view_canvas : canvas);
@@ -87,14 +87,9 @@ public class Akira.Lib2.Managers.HoverManager : Object {
         var width = item_width + LINE_WIDTH / 4.0 / scale;
         var height = item_height + LINE_WIDTH / 4.0 / scale;
 
-        hover_effect = new Goo.CanvasRect (
-            null,
-            - (width / 2.0), - (height / 2.0),
-            width, height,
-            "line-width", LINE_WIDTH / scale,
-            "stroke-color", STROKE_COLOR,
-            null
-        );
+        hover_effect = new Drawables.DrawableRect ( view_canvas.get_root_item (), - (width / 2.0), - (height / 2.0), width, height);
+        hover_effect.line_width = LINE_WIDTH / scale;
+        hover_effect.stroke_color = STROKE_COLOR;
 
         hover_effect.set_transform (item.compiled_geometry.transformation_matrix);
 
@@ -112,6 +107,6 @@ public class Akira.Lib2.Managers.HoverManager : Object {
         }
 
         // Update the line width of the hover effect based on the canvas scale.
-        hover_effect.set ("line-width", LINE_WIDTH / view_canvas.current_scale);
+        hover_effect.line_width = LINE_WIDTH / view_canvas.current_scale;
     }
 }

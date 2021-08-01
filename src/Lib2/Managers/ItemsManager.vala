@@ -71,6 +71,9 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
 
         var modified_groups = new GLib.Array<int> ();
 
+        ulong microseconds;
+        double seconds;
+
         foreach (var id in to_remove.data) {
             var node = item_model.node_from_id (id);
 
@@ -281,17 +284,27 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
 
         var target = view_canvas.get_item_at (x, y, true);
 
-        if (target == null || !(target is Lib2.Items.CanvasItem)) {
+        if (target == null || !(target is Drawables.Drawable)) {
             return result;
         }
 
-        var c_item = target as Lib2.Items.CanvasItem;
+        var c_item = target as Drawables.Drawable;
         var node = item_model.node_from_id (c_item.parent_id);
         if (node == null) {
             return null;
         }
 
         if (ignore_groups) {
+            return node.instance.item;
+        }
+
+        unowned var parent = node.parent;
+
+        if (parent == null || parent.id == Lib2.Items.Model.ORIGIN_ID) {
+            return node.instance.item;
+        }
+
+        if (parent.instance.item.item_type is Lib2.Items.ModelTypeArtboard) {
             return node.instance.item;
         }
 

@@ -24,9 +24,7 @@ public class Akira.Lib2.Items.ModelItem : Object {
 
     public ModelType item_type = null;
 
-    public Lib2.Items.CanvasItem canvas_item = null;
-    // Only non-null if it is a group with an associated canvas (e.g., artboard)
-    public Goo.CanvasItem container_item = null;
+    public Drawables.Drawable drawable = null;
 
     public Lib2.Components.Components components = null;
     public Lib2.Components.CompiledComponents compiled_components = null;
@@ -109,7 +107,7 @@ public class Akira.Lib2.Items.ModelItem : Object {
             return;
         }
 
-        if (canvas_item == null && container_item == null) {
+        if (drawable == null) {
             return;
         }
 
@@ -131,17 +129,17 @@ public class Akira.Lib2.Items.ModelItem : Object {
     public void add_to_canvas (Goo.Canvas canvas) {
         item_type.construct_canvas_item (this, canvas);
 
-        if (canvas_item != null) {
-            canvas_item.parent_id = id;
+        if (drawable != null) {
+            drawable.parent_id = id;
         }
     }
 
     public void remove_from_canvas () {
-        if (canvas_item != null) {
-            canvas_item.remove ();
+        if (drawable != null) {
+            drawable.remove ();
         }
-        canvas_item = null;
+        drawable = null;
     }
 
-    public bool is_stackable () { return canvas_item != null; }
+    public bool is_stackable () { return drawable != null; }
 }

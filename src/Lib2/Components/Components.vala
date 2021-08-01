@@ -102,6 +102,8 @@ public class Akira.Lib2.Components.Components {
         cln.size = size;
         cln.transform = transform;
 
+        cln.layout = layout;
+
         return cln;
     }
 

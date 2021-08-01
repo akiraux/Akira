@@ -70,7 +70,7 @@ public class Akira.Lib2.Items.ModelTypeRect : Object, ModelType<ModelTypeRect> {
     public void construct_canvas_item (ModelItem item, Goo.Canvas canvas) {
         var mid_x = item.components.size.width / 2.0;
         var mid_y = item.components.size.height / 2.0;
-        item.canvas_item = new Lib2.Items.CanvasRect (
+        item.drawable = new Drawables.DrawableRect (
             canvas.get_root_item (),
             -mid_x,
             -mid_y,
@@ -83,34 +83,30 @@ public class Akira.Lib2.Items.ModelTypeRect : Object, ModelType<ModelTypeRect> {
         switch (type) {
             case Lib2.Components.Component.Type.COMPILED_BORDER:
                 if (!item.compiled_border.is_visible) {
-                    item.canvas_item.set ("line-width", 0);
-                    item.canvas_item.set ("stroke-color-rgba", null);
+                    item.drawable.line_width = 0;
+                    item.drawable.stroke_color_rgba = 0;
                     break;
                 }
 
-                var rgba = item.compiled_border.color;
-                uint urgba = Utils.Color.rgba_to_uint (rgba);
                 // The "line-width" property expects a DOUBLE type, but we don't support subpixels
                 // so we always handle the border size as INT, therefore we need to type cast it here.
-                item.canvas_item.set ("line-width", (double) item.compiled_border.size);
-                item.canvas_item.set ("stroke-color-rgba", urgba);
+                item.drawable.line_width = (double) item.compiled_border.size;
+                item.drawable.stroke_color_gdk_rgba = item.compiled_border.color;
                 break;
             case Lib2.Components.Component.Type.COMPILED_FILL:
                 if (!item.compiled_fill.is_visible) {
-                    item.canvas_item.set ("fill-color-rgba", null);
+                    item.drawable.fill_color_rgba = 0;
                     break;
                 }
 
-                var rgba = item.compiled_fill.color;
-                uint urgba = Utils.Color.rgba_to_uint (rgba);
-                item.canvas_item.set ("fill-color-rgba", urgba);
+                item.drawable.fill_color_gdk_rgba = item.compiled_fill.color;
                 break;
             case Lib2.Components.Component.Type.COMPILED_GEOMETRY:
-                item.canvas_item.set ("x", -item.components.size.width / 2.0);
-                item.canvas_item.set ("y", -item.components.size.height / 2.0);
-                item.canvas_item.set ("width", item.components.size.width);
-                item.canvas_item.set ("height", item.components.size.height);
-                item.canvas_item.set_transform (item.compiled_geometry.transformation_matrix);
+                item.drawable.set ("x", -item.components.size.width / 2.0);
+                item.drawable.set ("y", -item.components.size.height / 2.0);
+                item.drawable.set ("width", item.components.size.width);
+                item.drawable.set ("height", item.components.size.height);
+                item.drawable.set_transform (item.compiled_geometry.transformation_matrix);
                 break;
         }
     }

@@ -36,7 +36,6 @@ public class Akira.Lib2.Components.CompiledGeometry : Copyable<CompiledGeometry>
             source_size = null;
             source_transform = null;
         }
-
     }
 
     private CompiledGeometryData _data;

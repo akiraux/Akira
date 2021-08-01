@@ -257,6 +257,7 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
                 }
             }
             unowned var item = node.instance.item;
+
             var item_drag_data = initial_drag_state.item_data_map[node.id];
             var new_center_x = item_drag_data.item_geometry.area.center_x + delta_x + snap_offset_x;
             var new_center_y = item_drag_data.item_geometry.area.center_y + delta_y + snap_offset_y;

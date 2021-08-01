@@ -29,6 +29,7 @@ public class Akira.Lib2.Managers.SnapManager : Object {
 
     // Decorator items to be drawn in the Canvas.
     private Goo.CanvasItem root;
+    private Drawables.DrawableSnapData decorators;
     private Gee.ArrayList<Goo.CanvasItemSimple> v_decorator_lines;
     private Gee.ArrayList<Goo.CanvasItemSimple> h_decorator_lines;
     private Gee.ArrayList<Goo.CanvasItemSimple> decorator_dots;
@@ -111,6 +112,9 @@ public class Akira.Lib2.Managers.SnapManager : Object {
      * Makes all decorators invisible, and ready to be reused
      */
     public void reset_decorators () {
+        if (decorators != null) {
+            decorators.set ("visibility", Goo.CanvasItemVisibility.HIDDEN);
+        }
         foreach (var decorator in v_decorator_lines) {
             decorator.set ("visibility", Goo.CanvasItemVisibility.HIDDEN);
         }
@@ -135,19 +139,36 @@ public class Akira.Lib2.Managers.SnapManager : Object {
 
         reset_decorators ();
 
-        if (data.v_data.snap_found ()) {
-            foreach (var snap_position in data.v_data.exact_matches) {
-                any_decorators_visible = true;
-                add_vertical_decorator_line (snap_position, grid);
+        if (data.v_data.snap_found () || data.h_data.snap_found ()) {
+            if (decorators == null) {
+                decorators = new Drawables.DrawableSnapData (
+                    view_canvas.get_root_item (),
+                    0,
+                    0,
+                    Layouts.MainCanvas.CANVAS_SIZE,
+                    Layouts.MainCanvas.CANVAS_SIZE
+                );
             }
+
+            decorators.update_data (data, grid);
+            decorators.set ("visibility", Goo.CanvasItemVisibility.VISIBLE);
+            decorators.raise (null);
+            any_decorators_visible = true;
         }
 
-        if (data.h_data.snap_found ()) {
-            foreach (var snap_position in data.h_data.exact_matches) {
-                any_decorators_visible = true;
-                add_horizontal_decorator_line (snap_position, grid);
-            }
-        }
+        //if (data.v_data.snap_found ()) {
+        //    foreach (var snap_position in data.v_data.exact_matches) {
+        //        any_decorators_visible = true;
+        //        add_vertical_decorator_line (snap_position, grid);
+        //    }
+        //}
+
+        //if (data.h_data.snap_found ()) {
+        //    foreach (var snap_position in data.h_data.exact_matches) {
+        //        any_decorators_visible = true;
+        //        add_horizontal_decorator_line (snap_position, grid);
+        //    }
+        //}
     }
 
     private void add_vertical_decorator_line (int pos, Utils.Snapping2.SnapGrid2 grid) {
