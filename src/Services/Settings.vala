@@ -157,8 +157,8 @@ public class Akira.Services.Settings : GLib.Settings {
 
     // Artboard sizes and categories
     public string artboard_size_categories {
-        owned get { return get_string("artboard-size-categories");}
-        set { set_string("artboard-size-categories", value);}
+        owned get { return get_string ("artboard-size-categories"); }
+        set { set_string ("artboard-size-categories", value); }
     }
 
     public Settings () {

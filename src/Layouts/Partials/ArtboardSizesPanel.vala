@@ -72,131 +72,131 @@ public class Akira.Layouts.Partials.ArtboardSizesPanel : Gtk.Grid {
 
         // read the json object containing info about sizes and category names
         sizes_json = settings.artboard_size_categories;
-        parseJson(sizes_json);
+        parse_json (sizes_json);
 
         size_list_container.bind_model (list, item => {
-            return create_category_expander((SizeCategoryItem)item);
+            return create_category_expander ( (SizeCategoryItem) item );
         });
 
         attach (title_cont, 0, 0, 1, 1);
         attach (size_list_container, 0, 1, 1, 1);
         show_all ();
 
-        add_category_btn.clicked.connect(handle_add_category);
+        add_category_btn.clicked.connect (handle_add_category);
 
-        window.event_bus.insert_item.connect((item_type) => {
-            reload_list( (item_type == "artboard") );
+        window.event_bus.insert_item.connect ( (item_type) => {
+            reload_list ( (item_type == "artboard") );
         });
     }
 
-    private void parseJson(string json_string) {
-        list = new GLib.ListStore(Type.OBJECT);
+    private void parse_json (string json_string) {
+        list = new GLib.ListStore (Type.OBJECT);
 
-        Json.Parser parser = new Json.Parser();
+        Json.Parser parser = new Json.Parser ();
         try {
-    		parser.load_from_data (sizes_json);
-    	} catch (Error e) {
-    		print ("Unable to parse data: %s\n", e.message);
-            return;
-    	}
+          parser.load_from_data (sizes_json);
+        } catch (Error e) {
+          print ("Unable to parse data: %s\n", e.message);
+          return;
+        }
 
-    	Json.Node node = parser.get_root ();
-    	Json.Reader reader = new Json.Reader (node);
+        Json.Node node = parser.get_root ();
+        Json.Reader reader = new Json.Reader (node);
 
         // the one and only key inside the json object is 'categories'
-        bool tmp = reader.read_member("categories");
-        assert(tmp == true);
-        assert(reader.is_object());
+        bool tmp = reader.read_member ("categories");
+        assert (tmp == true);
+        assert (reader.is_object ());
 
         // get the list of all keys inside 'categories'
         // they represent the individual categories like 'Desktop', 'Mobile'
-        string[] category_names = reader.list_members();
+        string[] category_names = reader.list_members ();
 
-        foreach(string category in category_names) {
+        foreach (string category in category_names) {
             // read the current category
-            tmp = reader.read_member(category);
-            assert(tmp == true);
-            assert(reader.is_object());
+            tmp = reader.read_member (category);
+            assert (tmp == true);
+            assert (reader.is_object ());
 
-            SizeCategoryItem category_item = new SizeCategoryItem(category);
+            SizeCategoryItem category_item = new SizeCategoryItem (category);
 
-            string[] device_names = reader.list_members();
+            string[] device_names = reader.list_members ();
             // each category contains an object with name of the device as key
             // and the screen size as value
-            foreach(string device_name in device_names) {
+            foreach (string device_name in device_names) {
                 // read the device name and its size array
-                tmp = reader.read_member(device_name);
-                assert(tmp == true);
-                assert(reader.is_array());
+                tmp = reader.read_member (device_name);
+                assert (tmp == true);
+                assert (reader.is_array ());
 
-                var int_items = parse_array(reader);
+                var int_items = parse_array (reader);
 
-                category_item.add_size(int_items, device_name);
+                category_item.add_size (int_items, device_name);
             }
 
-            list.append(category_item);
-            reader.end_member();
+            list.append (category_item);
+            reader.end_member ();
         }
-        reader.end_member();
+        reader.end_member ();
     }
 
-    private int[] parse_array(Json.Reader reader) {
+    private int[] parse_array (Json.Reader reader) {
         int[] parsed_ints = {};
 
-        int members = reader.count_elements();
+        int members = reader.count_elements ();
 
-        for(int i = 0; i < members; ++i) {
-            reader.read_element(i);
+        for (int i = 0; i < members; ++i) {
+            reader.read_element (i);
 
-            int item = (int)reader.get_int_value();
+            int item = (int) reader.get_int_value ();
             parsed_ints += item;
 
-            reader.end_element();
+            reader.end_element ();
         }
 
-        reader.end_element();
+        reader.end_element ();
 
         return parsed_ints;
     }
 
-    private Gtk.Expander create_category_expander(SizeCategoryItem category) {
+    private Gtk.Expander create_category_expander (SizeCategoryItem category) {
         // create expander for each category of sizes
-        Gtk.Expander category_expander = new Gtk.Expander(category.category_name);
-        category_expander.get_style_context().add_class("size-category-item");
+        Gtk.Expander category_expander = new Gtk.Expander (category.category_name);
+        category_expander.get_style_context ().add_class ("size-category-item");
 
         // create items inside each category
-        Gtk.Grid size_items_grid = new Gtk.Grid();
-        for(int i = 0; i < category.artboard_sizes.size; ++i) {
-            string button_label = """%s (%d x %d)""".printf(
+        Gtk.Grid size_items_grid = new Gtk.Grid ();
+        for (int i = 0; i < category.artboard_sizes.size; ++i) {
+            string button_label = """%s (%d x %d)""".printf (
                 category.artboard_device_names[i],
                 category.artboard_sizes[i][0],
                 category.artboard_sizes[i][1]
             );
 
-            Gtk.Button size_button = new Gtk.Button.with_label(button_label);
+            Gtk.Button size_button = new Gtk.Button.with_label (button_label);
             size_button.height_request = 35;
             size_button.hexpand = true;
-            size_button.get_style_context().add_class("artboard-size-button");
+            size_button.get_style_context ().add_class ("artboard-size-button");
 
-            size_items_grid.attach(size_button, 0, i, 1, 1);
+            size_items_grid.attach (size_button, 0, i, 1, 1);
         }
 
-        category_expander.add(size_items_grid);
+        category_expander.add (size_items_grid);
 
         return category_expander;
     }
 
-    private void handle_add_category() {
-        InsertItemPopover new_category_popup = new InsertItemPopover(add_category_btn);
-        new_category_popup.iniitalizePopover(false);
+    private void handle_add_category () {
+        InsertItemPopover new_category_popup = new InsertItemPopover (add_category_btn);
+        new_category_popup.initialize_popover (false);
 
-        new_category_popup.closed.connect(()=>{
-            if(new_category_popup.item_name != "") {
-                list.append(new SizeCategoryItem(new_category_popup.item_name));
+        new_category_popup.closed.connect ( ()=>{
+            if (new_category_popup.item_name != "") {
+                list.append (new SizeCategoryItem (new_category_popup.item_name));
             }
         });
 
-        new_category_popup.popup();
+        new_category_popup.popup ();
     }
 
     private void reload_list (bool show) {
@@ -211,20 +211,20 @@ private class SizeCategoryItem : Object {
     public Gee.ArrayList<GenericArray<int>> artboard_sizes;
     public Gee.ArrayList<string> artboard_device_names;
 
-    public SizeCategoryItem(string _category_name) {
+    public SizeCategoryItem (string _category_name) {
         category_name = _category_name;
-        artboard_sizes = new Gee.ArrayList<GenericArray<int>>();
-        artboard_device_names = new Gee.ArrayList<string>();
+        artboard_sizes = new Gee.ArrayList<GenericArray<int>> ();
+        artboard_device_names = new Gee.ArrayList<string> ();
     }
 
-    public void add_size(int[] new_size, string device_name)  {
-        GLib.GenericArray<int> array = new GLib.GenericArray<int>();
-        array.add(new_size[1]);
-        array.add(new_size[0]);
+    public void add_size (int[] new_size, string device_name) {
+        GLib.GenericArray<int> array = new GLib.GenericArray<int> ();
+        array.add (new_size[1]);
+        array.add (new_size[0]);
 
-        artboard_device_names.add(device_name);
+        artboard_device_names.add (device_name);
 
-        artboard_sizes.add(array);
+        artboard_sizes.add (array);
     }
 }
 
@@ -246,8 +246,8 @@ private class InsertItemPopover : Gtk.Popover {
     // string containing the size of created artboard
     public string item_size;
 
-    public InsertItemPopover(Gtk.Widget widget) {
-        set("relative-to", widget);
+    public InsertItemPopover (Gtk.Widget widget) {
+        set ("relative-to", widget);
         // the popover is modal so when user enters values here,
         // other widgets do not recieve inputs
         modal = true;
@@ -257,50 +257,50 @@ private class InsertItemPopover : Gtk.Popover {
         item_size = "";
     }
 
-    public void iniitalizePopover(bool show_size) {
-        Gtk.Grid grid = new Gtk.Grid();
+    public void initialize_popover (bool show_size) {
+        Gtk.Grid grid = new Gtk.Grid ();
 
-        name_label = new Gtk.Label("Name");
+        name_label = new Gtk.Label ("Name");
         name_label.hexpand = true;
-        name_label.get_style_context().add_class("size-category-item");
+        name_label.get_style_context ().add_class ("size-category-item");
         name_label.visible = true;
 
-        name_input = new Gtk.Entry();
+        name_input = new Gtk.Entry ();
         name_input.hexpand = true;
-        name_input.get_style_context().add_class("size-category-item");
+        name_input.get_style_context ().add_class ("size-category-item");
         name_input.visible = true;
 
-        name_input.activate.connect(()=>{
-            if(show_size) {
+        name_input.activate.connect ( ()=>{
+            if (show_size) {
 
             } else {
-                if(name_input.text == "") {
+                if (name_input.text == "") {
                     return;
                 }
 
                 item_name = name_input.text;
-                popdown();
+                popdown ();
             }
         });
 
-        size_label = new Gtk.Label("Size");
+        size_label = new Gtk.Label ("Size");
         size_label.hexpand = true;
-        size_label.get_style_context().add_class("size-category-item");
+        size_label.get_style_context ().add_class ("size-category-item");
 
-        size_input = new Gtk.Entry();
+        size_input = new Gtk.Entry ();
         size_input.hexpand = true;
-        size_input.get_style_context().add_class("size-category-item");
+        size_input.get_style_context ().add_class ("size-category-item");
 
-        grid.attach(name_label, 0, 0, 1, 1);
-        grid.attach(name_input, 1, 0, 1, 1);
+        grid.attach (name_label, 0, 0, 1, 1);
+        grid.attach (name_input, 1, 0, 1, 1);
 
-        if(show_size) {
-            grid.attach(size_label, 0, 1, 1, 1);
-            grid.attach(size_input, 1, 1, 1, 1);
+        if (show_size) {
+            grid.attach (size_label, 0, 1, 1, 1);
+            grid.attach (size_input, 1, 1, 1, 1);
         }
 
-        grid.show_all();
+        grid.show_all ();
 
-        add(grid);
+        add (grid);
     }
 }
