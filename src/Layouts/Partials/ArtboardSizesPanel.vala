@@ -183,12 +183,47 @@ public class Akira.Layouts.Partials.ArtboardSizesPanel : Gtk.Grid {
             size_button.hexpand = true;
             size_button.get_style_context ().add_class ("artboard-size-button");
 
+            size_button.clicked.connect(() => {
+                insert_artboard(size_button.label);
+            });
+
             size_items_grid.attach (size_button, 0, i, 1, 1);
         }
 
         category_expander.add (size_items_grid);
 
         return category_expander;
+    }
+
+    private void insert_artboard(string label) {
+        try {
+            // create a regex object to match the sizes from label
+            Regex reg = new Regex("""\d+\sx\s\d+""");
+
+            // match the label using regex
+            MatchInfo match_info;
+            if( reg.match(label, 0, out match_info) ) {
+                // the output we get after regex looks like "width x height"
+                // get the actual width and height from it
+                    string[] split_string = Regex.split_simple("""\sx\s""", match_info.fetch(0));
+
+                int width = int.parse(split_string[0]);
+                int height = int.parse(split_string[1]);
+
+                var canvas = window.main_window.main_canvas.canvas;
+                canvas.selected_bound_manager.reset_selection();
+
+                window.items_manager.set_item_to_insert("artboard");
+                var new_artboard = window.items_manager.insert_item(100, 100);
+                new_artboard.size.width = width;
+                new_artboard.size.height = height;
+
+                canvas.selected_bound_manager.add_item_to_selection(new_artboard);
+                canvas.update_canvas();
+            }
+        } catch (Error error) {
+            print("Regex error in ArtboardSizesPanel: %s\n", error.message);
+        }
     }
 
     private void handle_add_category () {
