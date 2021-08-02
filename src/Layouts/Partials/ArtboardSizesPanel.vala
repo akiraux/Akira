@@ -70,9 +70,7 @@ public class Akira.Layouts.Partials.ArtboardSizesPanel : Gtk.Grid {
         title_cont.attach (label, 0, 0, 1, 1);
         title_cont.attach (add_category_btn, 1, 0, 1, 1);
 
-        // read the json object containing info about sizes and category names
-        sizes_json = settings.artboard_size_categories;
-        parse_json (sizes_json);
+        list = new GLib.ListStore (Type.OBJECT);
 
         size_list_container.bind_model (list, item => {
             return create_category_expander ( (SizeCategoryItem) item );
@@ -87,10 +85,16 @@ public class Akira.Layouts.Partials.ArtboardSizesPanel : Gtk.Grid {
         window.event_bus.insert_item.connect ( (item_type) => {
             reload_list ( (item_type == "artboard") );
         });
+
+        window.event_bus.request_escape.connect( () => {
+            list.remove_all();
+            toggled = false;
+        });
+
+        toggled = false;
     }
 
     private void parse_json (string json_string) {
-        list = new GLib.ListStore (Type.OBJECT);
 
         Json.Parser parser = new Json.Parser ();
         try {
@@ -160,6 +164,7 @@ public class Akira.Layouts.Partials.ArtboardSizesPanel : Gtk.Grid {
     }
 
     private Gtk.Expander create_category_expander (SizeCategoryItem category) {
+
         // create expander for each category of sizes
         Gtk.Expander category_expander = new Gtk.Expander (category.category_name);
         category_expander.get_style_context ().add_class ("size-category-item");
@@ -200,7 +205,18 @@ public class Akira.Layouts.Partials.ArtboardSizesPanel : Gtk.Grid {
     }
 
     private void reload_list (bool show) {
+        list.remove_all();
 
+        if(show) {
+            toggled = true;
+            // read the json object containing info about sizes and category names
+            sizes_json = settings.artboard_size_categories;
+            parse_json (sizes_json);
+
+            show_all();
+        } else {
+            toggled = false;
+        }
     }
 }
 
