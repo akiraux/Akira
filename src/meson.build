@@ -157,7 +157,6 @@ sources = files(
     'Lib2/Components/Transform.vala',
 
     'Lib2/Items/Model.vala',
-    'Lib2/Items/ModelItem.vala',
     'Lib2/Items/ModelInstance.vala',
     'Lib2/Items/ModelNode.vala',
     'Lib2/Items/ItemSelection.vala',
@@ -184,7 +183,7 @@ sources = files(
     'Lib2/ViewCanvas.vala',
 
     'Geometry/Rectangle.vala',
-    'Geometry/TransformedRectangle.vala',
+    'Geometry/Quad.vala',
 
 )
 

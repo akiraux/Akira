@@ -19,95 +19,105 @@
  * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
  */
 
- // #TODO: ATTRIBUTE GOOCANVAS
-
 /*
  * A drawable for handling snapping lines and dots.
  */
 public class Akira.Drawables.DrawableSnapData : Goo.CanvasItemSimple, Goo.CanvasItem {
+    private const double LINE_WIDTH = 0.5;
+    private const double DOT_RADIUS = 2;
     public double x { get; set; default = 0; }
     public double y { get; set; default = 0; }
     public double width { get; set; default = 0; }
     public double height { get; set; default = 0; }
 
-    private Utils.Snapping2.SnapMatchData2 _data;
-    private Utils.Snapping2.SnapGrid2 _grid;
-
-    private double[] v_lines;
-    private double[] h_lines;
-
+    private double[] line_pos;
     private double[] dot_x;
     private double[] dot_y;
+    private bool vertical_lines = false;
 
-    public DrawableSnapData (Goo.CanvasItem parent, double x, double y, double width, double height) {
+    private Gdk.RGBA color;
+
+    public DrawableSnapData (
+        Goo.CanvasItem parent,
+        double x,
+        double y,
+        double width,
+        double height,
+        bool vertical_lines
+    ) {
        this.parent = parent;
        this.x = x;
        this.y = y;
        this.width = width;
        this.height = height;
+       this.vertical_lines = vertical_lines;
 
        // Add the newly created item to the Canvas or Artboard.
        parent.add_child (this, -1);
     }
 
-    public void update_data (Utils.Snapping2.SnapMatchData2 data, Utils.Snapping2.SnapGrid2 grid) {
-        _data = data;
-        _grid = grid;
-
-        // #TODO Obvious optimizations possible
-        v_lines = new double[0];
-        h_lines = new double[0];
+    /*
+     * Updates drawable data.
+     * It shouldn't be hard to optimize this code.
+     */
+    public void update_data (
+        Utils.Snapping2.SnapMatch2 match_data,
+        Gee.TreeMap<int, Utils.Snapping2.SnapMeta2> grid_points
+    ) {
+        line_pos = new double[0];
         dot_x = new double[0];
         dot_y = new double[0];
 
-        if (data.v_data.snap_found ()) {
-            foreach (var snap_position in data.v_data.exact_matches) {
-                add_decorator_line (snap_position, grid.v_snaps, true);
+        if (match_data.snap_found ()) {
+            foreach (var match in match_data.exact_matches) {
+                var snap_value = grid_points.get (match);
+                if (snap_value == null) {
+                    return;
+                }
+                add_decorator_line (match, snap_value);
             }
         }
-
-        if (data.h_data.snap_found ()) {
-            foreach (var snap_position in data.h_data.exact_matches) {
-                add_decorator_line (snap_position, grid.h_snaps, false);
-            }
-        }
-
     }
 
-    private void add_decorator_line (
-        int pos,
-        Gee.TreeMap<int, Utils.Snapping2.SnapMeta2> exact_matches,
-        bool vertical
-    ) {
-
-        var snap_value = exact_matches.get (pos);
-        if (snap_value == null) {
+    /*
+     * Public method to update the color of decorators.
+     */
+    public void update_color (Gdk.RGBA new_color) {
+        if (color == new_color) {
             return;
         }
 
-        double actual_pos = (double) pos;
-
-        if (vertical) {
-            add_to_darray (ref h_lines, actual_pos);
-        }
-        else {
-            add_to_darray (ref v_lines, actual_pos);
-        }
-
-        foreach (var normal in snap_value.normals) {
-            add_dot (actual_pos, normal, vertical);
-        }
-
+        color = new_color;
+        changed (false);
     }
 
-    private void add_dot (double pos, double normal, bool vertical) {
-        if (vertical) {
-            add_to_darray (ref dot_x, normal);
-            add_to_darray (ref dot_y, pos);
+    /*
+     * Adds decorator lines and corresponding dots for given matches.
+     */
+    private void add_decorator_line (
+        int pos,
+        Utils.Snapping2.SnapMeta2 grid_snap_value
+    ) {
+        double actual_pos = (double) pos;
+
+        add_to_darray (ref line_pos, actual_pos);
+
+        foreach (var normal in grid_snap_value.normals) {
+            add_dot (actual_pos, normal);
         }
-        else {
+    }
+
+    /*
+     * Adds dots to the array depending on whether or not the drawable is vertical.
+     * This can probably be improved by having a better data structure.
+     */
+    private void add_dot (double pos, double normal) {
+        if (vertical_lines) {
             add_to_darray (ref dot_x, pos);
             add_to_darray (ref dot_y, normal);
+        } else {
+            add_to_darray (ref dot_y, pos);
+            add_to_darray (ref dot_x, normal);
         }
     }
 
@@ -117,6 +127,10 @@ public class Akira.Drawables.DrawableSnapData : Goo.CanvasItemSimple, Goo.Canvas
     }
 
     // CanvasItemSimple methods
+
+    /*
+     * No hit testing on this.
+     */
     public unowned GLib.List<Goo.CanvasItem> get_items_at (
         double x,
         double y,
@@ -128,16 +142,28 @@ public class Akira.Drawables.DrawableSnapData : Goo.CanvasItemSimple, Goo.Canvas
         return found_items;
     }
 
+    /*
+     * No path necessary, so override this method and ignore it.
+     */
     public override void simple_create_path (Cairo.Context cr) {}
 
+    /*
+     * For now updates the entire screen. In the future this could be made smarter.
+     * Note that this gets called on changed(true), so simply figuring out the area needed for
+     * the extents of the lines is NOT enough.
+     */
     public override void simple_update (Cairo.Context cr) {
-        bounds.x1 = x;
-        bounds.y1 = y;
-        bounds.x2 = x + width;
-        bounds.y2 = y + height;
+            bounds.x1 = x;
+            bounds.y1 = y;
+
+            bounds.x2 = x + width;
+            bounds.y2 = y + height;
     }
 
 
+    /*
+     * Overrides paint method and draws decorator lines and dots.
+     */
     public void paint (Cairo.Context cr, Goo.CanvasBounds target_bounds, double scale) {
         /* Skip the item if the bounds don't intersect the expose rectangle. */
         if (bounds.x1 > target_bounds.x2 || bounds.x2 < target_bounds.x1
@@ -152,51 +178,41 @@ public class Akira.Drawables.DrawableSnapData : Goo.CanvasItemSimple, Goo.Canvas
           return;
         }
 
-        draw_vertical_lines (cr, target_bounds, scale);
-        draw_horizontal_lines (cr, target_bounds, scale);
+        draw_lines (cr, target_bounds, scale);
         draw_dots (cr, target_bounds, scale);
     }
 
-    private void draw_vertical_lines (Cairo.Context cr, Goo.CanvasBounds target_bounds, double scale) {
-        if (v_lines.length == 0) {
+    /*
+     * Draw lines. This could be improved to better render lines (more crisp).
+     */
+    private void draw_lines (Cairo.Context cr, Goo.CanvasBounds target_bounds, double scale) {
+        if (line_pos.length == 0) {
             return;
         }
 
         cr.save ();
         cr.new_path ();
 
-        cr.set_source_rgba (1.0, 0.0, 0.0, 1.0);
+        cr.set_source_rgba (color.red, color.green, color.blue, color.alpha);
         cr.set_line_width (1 / scale);
 
-        foreach (var v in v_lines) {
-            cr.move_to (v, y);
-            cr.line_to (v, height);
+        foreach (var pos in line_pos) {
+            if (vertical_lines) {
+                cr.move_to (pos, y);
+                cr.line_to (pos, height);
+            } else {
+                cr.move_to (x, pos);
+                cr.line_to (width, pos);
+            }
             cr.stroke ();
         }
 
         cr.restore ();
     }
 
-    private void draw_horizontal_lines (Cairo.Context cr, Goo.CanvasBounds target_bounds, double scale) {
-        if (h_lines.length == 0) {
-            return;
-        }
-
-        cr.save ();
-        cr.new_path ();
-
-        cr.set_source_rgba (1.0, 0.0, 0.0, 1.0);
-        cr.set_line_width (1 / scale);
-
-        foreach (var v in h_lines) {
-            cr.move_to (x, v);
-            cr.line_to (width, v);
-            cr.stroke ();
-        }
-
-        cr.restore ();
-    }
-
+    /*
+     * Draw dots.
+     */
     private void draw_dots (Cairo.Context cr, Goo.CanvasBounds target_bounds, double scale) {
         if (dot_x.length == 0 || dot_x.length != dot_y.length) {
             return;
@@ -205,11 +221,11 @@ public class Akira.Drawables.DrawableSnapData : Goo.CanvasItemSimple, Goo.Canvas
         cr.save ();
         cr.new_path ();
 
-        cr.set_line_width (1 / scale);
+        cr.set_line_width (LINE_WIDTH / scale);
 
-        cr.set_source_rgba (1.0, 0.0, 0.0, 1.0);
+        cr.set_source_rgba (color.red, color.green, color.blue, color.alpha);
         for (var i = 0; i < dot_x.length; ++i) {
-            cr.arc (dot_x[i], dot_y[i], 2 / scale, 0, 2.0 * GLib.Math.PI);
+            cr.arc (dot_x[i], dot_y[i], DOT_RADIUS / scale, 0, 2.0 * GLib.Math.PI);
             cr.fill ();
         }
 

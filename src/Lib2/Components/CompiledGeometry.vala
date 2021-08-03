@@ -26,7 +26,7 @@ public class Akira.Lib2.Components.CompiledGeometry : Copyable<CompiledGeometry>
         public Transform? source_transform;
         public Cairo.Matrix _transformation_matrix;
         // These rectangles are in global coordinates
-        public Geometry.TransformedRectangle area;
+        public Geometry.Quad area;
 
         // Cahced bounding box that contains the rotated area
         public Geometry.Rectangle area_bb;
@@ -38,9 +38,9 @@ public class Akira.Lib2.Components.CompiledGeometry : Copyable<CompiledGeometry>
         }
     }
 
-    private CompiledGeometryData _data;
+    public CompiledGeometryData _data;
 
-    public Geometry.TransformedRectangle area { get { return _data.area; }}
+    public Geometry.Quad area { get { return _data.area; }}
     public Geometry.Rectangle area_bb { get { return _data.area_bb; }}
 
     public double source_width {
@@ -173,7 +173,7 @@ public class Akira.Lib2.Components.CompiledGeometry : Copyable<CompiledGeometry>
         double right = int.MIN;
 
         foreach (var child in node.children.data) {
-            unowned var cg = child.instance.item.compiled_geometry;
+            unowned var cg = child.instance.compiled_geometry;
             if (cg == null) {
                 continue;
             }

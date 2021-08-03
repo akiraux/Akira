@@ -21,6 +21,7 @@
  */
 
 public class Akira.Lib2.Managers.ItemsManager : Object {
+    private const bool CUSTOM_HITTEST = true;
     public unowned Lib2.ViewCanvas view_canvas { get; construct; }
 
     public Lib2.Items.Model item_model;
@@ -43,16 +44,16 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
         return item_model.node_from_id (id);
     }
 
-    public int add_item_to_origin (Lib2.Items.ModelItem item) {
-        return add_item_to_group (Lib2.Items.Model.ORIGIN_ID, item);
+    public int add_item_to_origin (Lib2.Items.ModelInstance instance) {
+        return add_item_to_group (Lib2.Items.Model.ORIGIN_ID, instance);
     }
 
-    public int add_item_to_group (int group_id, Lib2.Items.ModelItem item, bool pause_compile = false) {
-        if (item == null) {
+    public int add_item_to_group (int group_id, Lib2.Items.ModelInstance instance, bool pause_compile = false) {
+        if (instance == null) {
             return -1;
         }
 
-        if (item_model.append_new_item (group_id, item) <= 0) {
+        if (item_model.append_new_item (group_id, instance) <= 0) {
             return -1;
         }
 
@@ -60,7 +61,7 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
             compile_model ();
         }
 
-        return item.id;
+        return instance.id;
     }
 
     public int remove_items (GLib.Array<int> to_remove) {
@@ -279,43 +280,71 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
         return item_model.children_in_group (group_id);
     }
 
-    public Lib2.Items.ModelItem? hit_test (double x, double y, bool ignore_groups = true) {
-        Lib2.Items.ModelItem? result = null;
+    public Lib2.Items.ModelInstance? hit_test (double x, double y, bool ignore_groups = true) {
+        Lib2.Items.ModelNode node;
+        if (CUSTOM_HITTEST) {
+            node = node_at_canvas_position (x, y);
+        }
+        else {
+            var target = view_canvas.get_item_at (x, y, true);
+            if (target == null || !(target is Drawables.Drawable)) {
+                return null;
+            }
 
-        var target = view_canvas.get_item_at (x, y, true);
+            var c_item = target as Drawables.Drawable;
 
-        if (target == null || !(target is Drawables.Drawable)) {
-            return result;
+            node = item_model.node_from_id (c_item.parent_id);
         }
 
-        var c_item = target as Drawables.Drawable;
-        var node = item_model.node_from_id (c_item.parent_id);
         if (node == null) {
             return null;
         }
 
         if (ignore_groups) {
-            return node.instance.item;
+            return node.instance;
         }
 
         unowned var parent = node.parent;
 
         if (parent == null || parent.id == Lib2.Items.Model.ORIGIN_ID) {
-            return node.instance.item;
+            return node.instance;
         }
 
-        if (parent.instance.item.item_type is Lib2.Items.ModelTypeArtboard) {
-            return node.instance.item;
+        if (parent.instance.type is Lib2.Items.ModelTypeArtboard) {
+            return node.instance;
         }
 
         var root = Lib2.Items.Model.root (node);
         if (root == null) {
             // this is not stable behavior -- it should never happen
             assert (false);
-            return node.instance.item;
+            return node.instance;
         }
 
-        return root.instance.item;
+        return root.instance;
+    }
+
+    public Lib2.Items.ModelNode? node_at_canvas_position (double x, double y) {
+        Cairo.ImageSurface surface = new Cairo.ImageSurface (Cairo.Format.ARGB32, 1, 1);
+        Cairo.Context context = new Cairo.Context (surface);
+        context.set_antialias (Cairo.Antialias.GRAY);
+        context.set_line_width (2.0);
+
+        var origin = item_model.node_from_id (Lib2.Items.Model.ORIGIN_ID);
+        if (origin.children == null) {
+            return null;
+        }
+
+        var found_items = new Gee.ArrayList<unowned Lib2.Items.ModelNode> ();
+        foreach (unowned var root in origin.children.data) {
+            root.items_in_canvas (x, y, context, ref found_items);
+        }
+
+        if (found_items.size == 0) {
+            return null;
+        }
+
+        return found_items.last ();
     }
 
     /*
@@ -370,7 +399,7 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
     }
     */
 
-    public Lib2.Items.ModelItem add_debug_rect (double x, double y) {
+    public Lib2.Items.ModelInstance add_debug_rect (double x, double y) {
         var new_rect = Lib2.Items.ModelTypeRect.default_rect (
             new Lib2.Components.Coordinates (x, y),
             new Lib2.Components.Size (50.0, 50.0, false),
@@ -382,7 +411,7 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
         return new_rect;
     }
 
-    public Lib2.Items.ModelItem add_debug_group (double x, double y, bool debug_timer = false) {
+    public Lib2.Items.ModelInstance add_debug_group (double x, double y, bool debug_timer = false) {
         ulong microseconds;
         double seconds;
 
@@ -439,7 +468,7 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
             var x = GLib.Random.double_range (0, (GLib.Math.log (num_of + GLib.Math.E) - 1) * 1000);
             var y = GLib.Random.double_range (0, (GLib.Math.log (num_of + GLib.Math.E) - 1) * 1000) + 500;
             var new_item = add_debug_rect (x, y);
-            view_canvas.selection_manager.add_to_selection (new_item.id);
+            //view_canvas.selection_manager.add_to_selection (new_item.id);
         }
 
         if (debug_timer) {
@@ -452,7 +481,7 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
     public void on_item_added (int id) {
         var inst = item_model.instance_from_id (id);
         if (inst != null) {
-            inst.item.add_to_canvas (view_canvas);
+            inst.add_to_canvas (view_canvas);
         }
     }
 

@@ -23,17 +23,13 @@
  * Drawable for artboards.
  */
 public class Akira.Drawables.DrawableArtboard : Drawable {
-    public double x { get; set; default = 0; }
-    public double y { get; set; default = 0; }
-    public double width { get; set; default = 0; }
-    public double height { get; set; default = 0; }
     public double radius_x { get; set; default = 0; }
     public double radius_y { get; set; default = 0; }
 
     public DrawableArtboard (Goo.CanvasItem parent, double x, double y, double width, double height) {
        this.parent = parent;
-       this.x = x;
-       this.y = y;
+       this.center_x = x;
+       this.center_y = y;
        this.width = width;
        this.height = height;
 
@@ -49,37 +45,37 @@ public class Akira.Drawables.DrawableArtboard : Drawable {
 
            /* Draw the top-right arc. */
            cr.save ();
-           cr.translate (x + width - rx, y + ry);
+           cr.translate (center_x + width - rx, center_y + ry);
            cr.scale (rx, ry);
            cr.arc (0.0, 0.0, 1.0, 1.5 * GLib.Math.PI, 2.0 * GLib.Math.PI);
            cr.restore ();
 
            /* Draw the line down the right side. */
-           cr.line_to (x + width, y + height - ry);
+           cr.line_to (center_x + width, center_y + height - ry);
 
            /* Draw the bottom-right arc. */
            cr.save ();
-           cr.translate (x + width - rx, y + height - ry);
+           cr.translate (center_x + width - rx, center_y + height - ry);
            cr.scale (rx, ry);
            cr.arc (0.0, 0.0, 1.0, 0.0, 0.5 * GLib.Math.PI);
            cr.restore ();
 
            /* Draw the line left across the bottom. */
-           cr.line_to (x + rx, y + height);
+           cr.line_to (center_x + rx, center_y + height);
 
            /* Draw the bottom-left arc. */
            cr.save ();
-           cr.translate (x + rx, y + height - y);
+           cr.translate (center_x + rx, center_y + height - center_y);
            cr.scale (rx, ry);
            cr.arc (0.0, 0.0, 1.0, 0.5 * GLib.Math.PI, GLib.Math.PI);
            cr.restore ();
 
            /* Draw the line up the left side. */
-           cr.line_to (x, y + ry);
+           cr.line_to (center_x, center_y + ry);
 
            /* Draw the top-left arc. */
            cr.save ();
-           cr.translate (x + rx, y + ry);
+           cr.translate (center_x + rx, center_y + ry);
            cr.scale (rx, ry);
            cr.arc (0.0, 0.0, 1.0, GLib.Math.PI, 1.5 * GLib.Math.PI);
            cr.restore ();
@@ -88,7 +84,7 @@ public class Akira.Drawables.DrawableArtboard : Drawable {
            cr.close_path ();
        }
        else {
-           cr.rectangle (x, y, width, height);
+           cr.rectangle (center_x, center_y, width, height);
        }
     }
 
@@ -98,9 +94,9 @@ public class Akira.Drawables.DrawableArtboard : Drawable {
            For now we keep it as the full width to avoid weird clipping issues*/
         var half_line_width = get_line_width (); // / 2;
 
-        bounds.x1 = x - half_line_width;
-        bounds.y1 = y - half_line_width;
-        bounds.x2 = x + width + half_line_width;
-        bounds.y2 = y + height + half_line_width;
+        bounds.x1 = center_x - half_line_width;
+        bounds.y1 = center_y - half_line_width;
+        bounds.x2 = center_x + width + half_line_width;
+        bounds.y2 = center_y + height + half_line_width;
     }
 }

@@ -40,7 +40,7 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
         public double press_y;
 
         // initial_selection_data
-        public Geometry.TransformedRectangle area;
+        public Geometry.Quad area;
 
         public Gee.HashMap<int, DragItemData> item_data_map;
 
@@ -79,7 +79,7 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
         initial_drag_state.area = selection.coordinates ();
 
         foreach (var node in selection.nodes.values) {
-            collect_geometries (node, ref initial_drag_state);
+            collect_geometries (node.node, ref initial_drag_state);
         }
     }
 
@@ -89,7 +89,7 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
         }
 
         var data = new DragItemData ();
-        data.item_geometry = subtree.instance.item.compiled_geometry.copy ();
+        data.item_geometry = subtree.instance.compiled_geometry.copy ();
         state.item_data_map[subtree.id] = data;
 
         if (subtree.children == null || subtree.children.length == 0) {
@@ -241,24 +241,25 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
             }
         }
 
-        foreach (var node in selection.nodes.values) {
-            if (node.instance.is_group ()) {
+        foreach (var sel_node in selection.nodes.values) {
+            unowned var item = sel_node.node.instance;
+
+            if (item.is_group) {
                 translate_group (
                     view_canvas,
-                    node,
+                    sel_node.node,
                     initial_drag_state,
                     delta_x, delta_y,
                     snap_offset_x,
                     snap_offset_y
                 );
 
-                if (node.instance.item.components.center == null) {
+                if (item.components.center == null) {
                     continue;
                 }
             }
-            unowned var item = node.instance.item;
 
-            var item_drag_data = initial_drag_state.item_data_map[node.id];
+            var item_drag_data = initial_drag_state.item_data_map[sel_node.node.id];
             var new_center_x = item_drag_data.item_geometry.area.center_x + delta_x + snap_offset_x;
             var new_center_y = item_drag_data.item_geometry.area.center_y + delta_y + snap_offset_y;
             item.components.center = new Lib2.Components.Coordinates (new_center_x, new_center_y);
@@ -283,7 +284,7 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
         }
 
         foreach (unowned var child in group.children.data) {
-            if (child.instance.is_group ()) {
+            if (child.instance.is_group) {
                 translate_group (
                     view_canvas,
                     group,
@@ -296,7 +297,7 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
                 continue;
             }
 
-            unowned var item = child.instance.item;
+            unowned var item = child.instance;
             var item_drag_data = initial_drag_state.item_data_map[child.id];
             var new_center_x = item_drag_data.item_geometry.area.center_x + delta_x + snap_offset_x;
             var new_center_y = item_drag_data.item_geometry.area.center_y + delta_y + snap_offset_y;
@@ -375,7 +376,7 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
         var local_offset_x = inc_x + size_off_x;
         var local_offset_y = inc_y + size_off_y;
 
-        var new_area = Geometry.TransformedRectangle.from_components (
+        var new_area = Geometry.Quad.from_components (
             rot_center_x + local_offset_x,
             rot_center_y + local_offset_y,
             start_width + inc_width,
@@ -393,7 +394,7 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
         foreach (var node in selection.nodes.values) {
             scale_node (
                 view_canvas,
-                node,
+                node.node,
                 initial_drag_state,
                 itr,
                 global_offset_x,
@@ -420,7 +421,7 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
         double reference_sy
     ) {
         // #TODO wip
-        unowned var item = node.instance.item;
+        unowned var item = node.instance;
         if (item.components.center != null && item.components.size != null) {
             var item_drag_data = initial_drag_state.item_data_map[node.id];
 
@@ -463,7 +464,7 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
         }
 
 
-        unowned var layout = node.instance.item.components.layout;
+        unowned var layout = item.components.layout;
         if ((layout == null || layout.dilated_resize) && node.children != null) {
             foreach (unowned var child in node.children.data) {
                 scale_node (
@@ -508,7 +509,7 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
         foreach (var node in selection.nodes.values) {
             rotate_node (
                 view_canvas,
-                node,
+                node.node,
                 initial_drag_state,
                 new_rotation * Math.PI / 180,
                 original_center_x,
@@ -527,7 +528,7 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
         double rotation_center_x,
         double rotation_center_y
     ) {
-        unowned var item = node.instance.item;
+        unowned var item = node.instance;
         var item_drag_data = initial_drag_state.item_data_map[item.id];
 
         var tmp_rotation = new_rotation;

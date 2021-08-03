@@ -23,10 +23,6 @@
  * Drawable for ellipses.
  */
 public class Akira.Drawables.DrawableEllipse : Drawable {
-    public double center_x { get; set; default = 0; }
-    public double center_y { get; set; default = 0; }
-    public double width { get; set; default = 0; }
-    public double height { get; set; default = 0; }
     public double radius_x { get; set; default = 0; }
     public double radius_y { get; set; default = 0; }
 

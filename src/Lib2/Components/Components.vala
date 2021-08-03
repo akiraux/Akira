@@ -19,15 +19,21 @@
  * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
  */
 
-[Compact]
-public class Akira.Lib2.Components.CompiledComponents {
-    public CompiledFill? compiled_fill = null;
-    public CompiledBorder? compiled_border = null;
-    public CompiledGeometry? compiled_geometry = null;
+public struct Akira.Lib2.Components.CompiledComponents {
+    public CompiledFill? compiled_fill;
+    public CompiledBorder? compiled_border;
+    public CompiledGeometry? compiled_geometry;
+
+    public bool is_empty { get {
+        return compiled_fill == null && compiled_border == null && compiled_geometry == null;
+    }}
 
     public Lib2.Components.Component.RegisteredTypes dirty_components;
 
     public CompiledComponents () {
+        compiled_fill = null;
+        compiled_border = null;
+        compiled_geometry = null;
         dirty_components = Lib2.Components.Component.RegisteredTypes ();
     }
 
@@ -72,40 +78,20 @@ public class Akira.Lib2.Components.CompiledComponents {
     }
 }
 
-[Compact]
-public class Akira.Lib2.Components.Components {
-    public Borders? borders = null;
-    public BorderRadius? border_radius = null;
-    public Fills? fills = null;
-    public Flipped? flipped = null;
-    public Layer? layer = null;
-    public Name? name = null;
-    public Opacity? opacity = null;
+public struct Akira.Lib2.Components.Components {
+    public Borders? borders;
+    public BorderRadius? border_radius;
+    public Fills? fills;
+    public Flipped? flipped;
+    public Layer? layer;
+    public Name? name;
+    public Opacity? opacity;
 
-    public Coordinates? center = null;
-    public Size? size = null;
-    public Transform? transform = null;
+    public Coordinates? center;
+    public Size? size;
+    public Transform? transform;
 
-    public Layout? layout = null;
-
-    public Components copy () {
-        var cln = new Components ();
-        cln.borders = borders;
-        cln.border_radius = border_radius;
-        cln.fills = fills;
-        cln.flipped = flipped;
-        cln.layer = layer;
-        cln.name = name;
-        cln.opacity = opacity;
-
-        cln.center = center;
-        cln.size = size;
-        cln.transform = transform;
-
-        cln.layout = layout;
-
-        return cln;
-    }
+    public Layout? layout;
 
     public static Opacity default_opacity () {
         return new Opacity (100.0);

@@ -22,12 +22,11 @@
 public class Akira.Lib2.Items.ModelTypeArtboard : Object, ModelType<ModelTypeArtboard> {
     //Goo.CanvasItem background;
 
-    public static ModelItem default_artboard (
+    public static ModelInstance default_artboard (
         Lib2.Components.Coordinates center,
         Lib2.Components.Size size
     ) {
-        var new_item = new ModelItem ();
-        new_item.components = new Lib2.Components.Components ();
+        var new_item = new ModelInstance (-1, new ModelTypeArtboard ());
         new_item.components.center = center;
         new_item.components.size = size;
         new_item.components.transform = Lib2.Components.Components.default_transform ();
@@ -41,8 +40,6 @@ public class Akira.Lib2.Items.ModelTypeArtboard : Object, ModelType<ModelTypeArt
             clips_children = true
         };
         new_item.components.layout = new Components.Layout (layout_data);
-
-        new_item.item_type = new ModelTypeArtboard ();
         return new_item;
     }
 
@@ -65,38 +62,37 @@ public class Akira.Lib2.Items.ModelTypeArtboard : Object, ModelType<ModelTypeArt
         return new Components.CompiledGeometry.from_components (components, node);
     }
 
-    public void construct_canvas_item (ModelItem item, Goo.Canvas canvas) {
-        var mid_x = item.components.size.width / 2.0;
-        var mid_y = item.components.size.height / 2.0;
-
-        item.drawable = new Drawables.DrawableArtboard (
+    public void construct_canvas_item (ModelInstance instance, Goo.Canvas canvas) {
+        var w = instance.components.size.width;
+        var h = instance.components.size.height;
+        instance.drawable = new Drawables.DrawableArtboard (
             canvas.get_root_item (),
-            -mid_x,
-            -mid_y,
-            item.components.size.width,
-            item.components.size.height
+            - (w / 2.0),
+            - (h / 2.0),
+            w,
+            h
         );
     }
 
-    public void component_updated (ModelItem item, Lib2.Components.Component.Type type) {
+    public void component_updated (ModelInstance instance, Lib2.Components.Component.Type type) {
         switch (type) {
             case Lib2.Components.Component.Type.COMPILED_BORDER:
-                item.drawable.line_width = 0;
+                instance.drawable.line_width = 0;
                 break;
             case Lib2.Components.Component.Type.COMPILED_FILL:
-                if (!item.compiled_fill.is_visible) {
-                    item.drawable.fill_color_rgba = 0;
+                if (!instance.compiled_fill.is_visible) {
+                    instance.drawable.fill_color_rgba = 0;
                     break;
                 }
 
-                item.drawable.fill_color_gdk_rgba = item.compiled_fill.color;
+                instance.drawable.fill_color_gdk_rgba = instance.compiled_fill.color;
                 break;
             case Lib2.Components.Component.Type.COMPILED_GEOMETRY:
-                item.drawable.set ("x", -item.components.size.width / 2.0);
-                item.drawable.set ("y", -item.components.size.height / 2.0);
-                item.drawable.set ("width", item.components.size.width);
-                item.drawable.set ("height", item.components.size.height);
-                item.drawable.set_transform (item.compiled_geometry.transformation_matrix);
+                var w = instance.components.size.width;
+                var h = instance.components.size.height;
+                instance.drawable.center_x = - (w / 2.0);
+                instance.drawable.center_y = - (h / 2.0);
+                instance.drawable.set_transform (instance.compiled_geometry.transformation_matrix);
                 break;
         }
     }

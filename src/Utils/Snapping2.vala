@@ -120,33 +120,20 @@ public class Akira.Utils.Snapping2 : Object {
         selection_area.top -= sensitivity;
         selection_area.bottom += sensitivity;
 
-        //Lib2.Items.CanvasArtboard artboard = null;
-        /*
-        bool all_in_same_artboard = false;
+        int group_id;
+        selection.spans_one_group (out group_id);
+        group_id = int.max (group_id, Lib2.Items.Model.ORIGIN_ID);
 
-        foreach (var sel in selection) {
-            if (artboard != null && artboard != sel.artboard) {
-                all_in_same_artboard = false;
-                break;
-            }
-
-            artboard = sel.artboard;
-            all_in_same_artboard = artboard != null;
-        }
-
-        if (artboard != null && all_in_same_artboard) {
-            return snap_grid_from_artboard (canvas, artboard, selection, sensitivity);
-        }
-        */
-
-        return snap_grid_from_canvas (canvas, selection, selection_area, sensitivity);
+        return snap_grid_from_canvas (canvas, group_id, selection, selection_area, sensitivity);
     }
 
     /*
      * Generates a snap grid from a canvas.
+     * If group_node is passed, then it will be used to generate snaps only within that group.
      */
     public static SnapGrid2 snap_grid_from_canvas (
         Lib2.ViewCanvas canvas,
+        int group_id,
         Lib2.Items.NodeSelection selection,
         Geometry.Rectangle selection_area,
         int sensitivity
@@ -161,46 +148,38 @@ public class Akira.Utils.Snapping2 : Object {
         double vis_y2 = 0;
         canvas.visible_bounds (ref vis_y1, ref vis_x1, ref vis_y2, ref vis_x2);
 
-        var candidate_list = canvas.items_manager.children_in_group (Lib2.Items.Model.ORIGIN_ID);
+        var candidate_list = canvas.items_manager.children_in_group (group_id);
 
         int v_added = 0;
         int h_added = 0;
 
-        for (var i = 0; i < candidate_list.length; ++i) {
-            unowned var item = candidate_list.index (i).instance.item;
-
-            if (item == null || selection.has_id (item.id, true)) {
+        foreach (unowned var node in candidate_list.data) {
+            if (selection.has_id (node.id, false)) {
                 continue;
             }
 
-            unowned var bb = item.compiled_components.compiled_geometry.area.bounding_box;
-
-            if ((bb.right < vis_x1 || bb.left > vis_x2) ||
-                (bb.bottom < vis_y1 || bb.top > vis_y2)) {
+            unowned var inst = node.instance;
+            if ((inst.bounding_box.right < vis_x1 || inst.bounding_box.left > vis_x2) ||
+                (inst.bounding_box.bottom < vis_y1 || inst.bounding_box.top > vis_y2)) {
                 // the candidate is not in view
                 continue;
             }
 
-            if (!(bb.right < selection_area.left || bb.left > selection_area.right)) {
-                populate_horizontal_snaps (bb, ref grid.h_snaps);
+            if (!(inst.bounding_box.right < selection_area.left || inst.bounding_box.left > selection_area.right)) {
+                populate_horizontal_snaps (inst.bounding_box, ref grid.h_snaps);
                 h_added++;
             }
 
-            if (!(bb.bottom < selection_area.top || bb.top > selection_area.bottom)) {
-                populate_vertical_snaps (bb, ref grid.v_snaps);
+            if (!(inst.bounding_box.bottom < selection_area.top || inst.bounding_box.top > selection_area.bottom)) {
+                populate_vertical_snaps (inst.bounding_box, ref grid.v_snaps);
                 v_added++;
-            }
-
-            if (v_added >= Lib2.Managers.SnapManager.MAX_CANDIDATES ||
-                h_added >= Lib2.Managers.SnapManager.MAX_CANDIDATES) {
-                break;
             }
         }
 
         return grid;
     }
 
-    /**
+    /*
      * Calculate snaps inside a grid that match the selection input.
      */
     public static SnapMatchData2 generate_snap_matches (

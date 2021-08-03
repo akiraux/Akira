@@ -184,7 +184,7 @@ public class Akira.Lib2.Managers.NobManager : Object {
 
     private void update_nob (
         Lib.Selection.Nob nob,
-        Geometry.TransformedRectangle rect,
+        Geometry.Quad rect,
         bool show
     ) {
         double sc = view_canvas.current_scale;

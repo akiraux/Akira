@@ -24,7 +24,7 @@
   * that the properties of a rectangle are kept. For all intents and purposes, this
   * is simply a collection of four points and a rotation.
   */
-public struct Akira.Geometry.TransformedRectangle {
+public struct Akira.Geometry.Quad {
     public Cairo.Matrix transformation;
     public double tl_x;
     public double tl_y;
@@ -64,7 +64,7 @@ public struct Akira.Geometry.TransformedRectangle {
     }
 
 
-    public TransformedRectangle () {
+    public Quad () {
         transformation = Cairo.Matrix.identity ();
         tl_x = 0;
         tl_y = 0;
@@ -76,7 +76,19 @@ public struct Akira.Geometry.TransformedRectangle {
         br_y = 0;
     }
 
-    public TransformedRectangle.from_components (
+    public Quad.from_rectangle (Geometry.Rectangle rect) {
+        transformation = Cairo.Matrix.identity ();
+        tl_x = rect.left;
+        tl_y = rect.top;
+        tr_x = rect.right;
+        tr_y = rect.top;
+        bl_x = rect.left;
+        bl_y = rect.bottom;
+        br_x = rect.right;
+        br_y = rect.bottom;
+    }
+
+    public Quad.from_components (
         double center_x,
         double center_y,
         double width,

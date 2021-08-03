@@ -251,7 +251,7 @@ public class Akira.Utils.Nobs : Object {
 
     public static void nob_xy_from_coordinates (
         Utils.Nobs.Nob nob,
-        Geometry.TransformedRectangle rect,
+        Geometry.Quad rect,
         double scale,
         ref double x,
         ref double y

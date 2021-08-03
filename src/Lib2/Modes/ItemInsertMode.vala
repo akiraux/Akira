@@ -92,12 +92,12 @@ public class Akira.Lib2.Modes.ItemInsertMode : AbstractInteractionMode {
             canvas.update_canvas ();
 
             */
-            var item = construct_item (item_insert_type, event.x, event.y);
+            var instance = construct_item (item_insert_type, event.x, event.y);
 
-            view_canvas.items_manager.add_item_to_origin (item);
+            view_canvas.items_manager.add_item_to_origin (instance);
 
             view_canvas.selection_manager.reset_selection ();
-            view_canvas.selection_manager.add_to_selection (item.id);
+            view_canvas.selection_manager.add_to_selection (instance.id);
 
             transform_mode = new Akira.Lib2.Modes.TransformMode (view_canvas, Utils.Nobs.Nob.BOTTOM_LEFT);
             transform_mode.mode_begin ();
@@ -134,7 +134,7 @@ public class Akira.Lib2.Modes.ItemInsertMode : AbstractInteractionMode {
         return null;
     }
 
-    private static Lib2.Items.ModelItem construct_item (string from_type, double x, double y) {
+    private static Lib2.Items.ModelInstance construct_item (string from_type, double x, double y) {
         double center_x = 0.0;
         double center_y = 0.0;
         double width = 1.0;
@@ -153,7 +153,7 @@ public class Akira.Lib2.Modes.ItemInsertMode : AbstractInteractionMode {
         var coordinates = new Lib2.Components.Coordinates (center_x, center_y);
         var size = new Lib2.Components.Size (width, height, false);
 
-        Lib2.Items.ModelItem new_item = null;
+        Lib2.Items.ModelInstance new_item = null;
         switch (from_type) {
             case "rectangle":
                 new_item = Lib2.Items.ModelTypeRect.default_rect (

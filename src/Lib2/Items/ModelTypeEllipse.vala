@@ -20,7 +20,7 @@
  */
 
 public class Akira.Lib2.Items.ModelTypeEllipse : Object, ModelType<ModelTypeEllipse> {
-    public static ModelItem minimal_ellipse () {
+    public static ModelInstance minimal_ellipse () {
         return default_ellipse (
             new Lib2.Components.Coordinates (0.5, 0.5),
             new Lib2.Components.Size (1, 1, false),
@@ -29,14 +29,13 @@ public class Akira.Lib2.Items.ModelTypeEllipse : Object, ModelType<ModelTypeElli
         );
     }
 
-    public static ModelItem default_ellipse (
+    public static ModelInstance default_ellipse (
         Lib2.Components.Coordinates center,
         Lib2.Components.Size size,
         Lib2.Components.Borders? borders,
         Lib2.Components.Fills? fills
     ) {
-        var new_item = new ModelItem ();
-        new_item.components = new Lib2.Components.Components ();
+        var new_item = new ModelInstance (-1, new ModelTypeEllipse ());
         new_item.components.center = center;
         new_item.components.size = size;
         new_item.components.borders = borders;
@@ -44,7 +43,6 @@ public class Akira.Lib2.Items.ModelTypeEllipse : Object, ModelType<ModelTypeElli
         new_item.components.transform = Lib2.Components.Components.default_transform ();
         new_item.components.flipped = Lib2.Components.Components.default_flipped ();
         new_item.components.border_radius = Lib2.Components.Components.default_border_radius ();
-        new_item.item_type = new ModelTypeEllipse ();
         return new_item;
     }
 
@@ -67,38 +65,38 @@ public class Akira.Lib2.Items.ModelTypeEllipse : Object, ModelType<ModelTypeElli
         return new Components.CompiledGeometry.from_components (components, node);
     }
 
-    public void construct_canvas_item (ModelItem item, Goo.Canvas canvas) {
-        var radius_x = item.components.size.width / 2.0;
-        var radius_y = item.components.size.height / 2.0;
-        item.drawable = new Drawables.DrawableEllipse (canvas.get_root_item (), 0, 0, radius_x, radius_y);
+    public void construct_canvas_item (ModelInstance instance, Goo.Canvas canvas) {
+        var radius_x = instance.components.size.width / 2.0;
+        var radius_y = instance.components.size.height / 2.0;
+        instance.drawable = new Drawables.DrawableEllipse (canvas.get_root_item (), 0, 0, radius_x, radius_y);
     }
 
-    public void component_updated (ModelItem item, Lib2.Components.Component.Type type) {
+    public void component_updated (ModelInstance instance, Lib2.Components.Component.Type type) {
         switch (type) {
             case Lib2.Components.Component.Type.COMPILED_BORDER:
-                if (!item.compiled_border.is_visible) {
-                    item.drawable.line_width = 0;
-                    item.drawable.stroke_color_rgba = 0;
+                if (!instance.compiled_border.is_visible) {
+                    instance.drawable.line_width = 0;
+                    instance.drawable.stroke_color_rgba = 0;
                     break;
                 }
 
                 // The "line-width" property expects a DOUBLE type, but we don't support subpixels
                 // so we always handle the border size as INT, therefore we need to type cast it here.
-                item.drawable.line_width = (double) item.compiled_border.size;
-                item.drawable.stroke_color_gdk_rgba = item.compiled_border.color;
+                instance.drawable.line_width = (double) instance.compiled_border.size;
+                instance.drawable.stroke_color_gdk_rgba = instance.compiled_border.color;
                 break;
             case Lib2.Components.Component.Type.COMPILED_FILL:
-                if (!item.compiled_fill.is_visible) {
-                    item.drawable.fill_color_rgba = 0;
+                if (!instance.compiled_fill.is_visible) {
+                    instance.drawable.fill_color_rgba = 0;
                     break;
                 }
 
-                item.drawable.fill_color_gdk_rgba = item.compiled_fill.color;
+                instance.drawable.fill_color_gdk_rgba = instance.compiled_fill.color;
                 break;
             case Lib2.Components.Component.Type.COMPILED_GEOMETRY:
-                item.drawable.set ("radius-x", item.components.size.width / 2.0);
-                item.drawable.set ("radius-y", item.components.size.height / 2.0);
-                item.drawable.set_transform (item.compiled_geometry.transformation_matrix);
+                instance.drawable.set ("radius-x", instance.components.size.width / 2.0);
+                instance.drawable.set ("radius-y", instance.components.size.height / 2.0);
+                instance.drawable.set_transform (instance.compiled_geometry.transformation_matrix);
                 break;
         }
     }
