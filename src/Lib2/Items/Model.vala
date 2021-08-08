@@ -132,6 +132,20 @@ public class Akira.Lib2.Items.Model : Object {
         return group_nodes[group_id].children;
     }
 
+    public void mark_node_geometry_dirty_by_id (int id) {
+        var node = node_from_id (id);
+        if (node == null) {
+            assert (false);
+            return;
+        }
+
+        mark_node_geometry_dirty (node);
+    }
+
+    public void mark_node_geometry_dirty (Lib2.Items.ModelNode node) {
+        internal_mark_geometry_dirty (node, false);
+    }
+
     public void recalculate_children_stacking (int parent_id) {
         var group = group_nodes.has_key (parent_id) ? group_nodes[parent_id] : null;
         if (group == null) {
@@ -354,7 +368,7 @@ public class Akira.Lib2.Items.Model : Object {
 
         new_node.parent = parent_node;
 
-        new_node.instance.mark_geometry_dirty ();
+        internal_mark_geometry_dirty (new_node, false);
 
         return new_id;
     }
@@ -395,8 +409,6 @@ public class Akira.Lib2.Items.Model : Object {
 
         if (is_live && listen) {
             item_added (node.id);
-            node.instance.geometry_changed.connect (on_item_geometry_changed);
-            node.instance.geometry_compilation_requested.connect (on_item_geometry_compilation_requested);
         }
     }
 
@@ -405,11 +417,6 @@ public class Akira.Lib2.Items.Model : Object {
         var target = instance_from_id (id);
         if (target == null) {
             return;
-        }
-
-        if (is_live) {
-            target.geometry_changed.disconnect (on_item_geometry_changed);
-            target.geometry_compilation_requested.disconnect (on_item_geometry_compilation_requested);
         }
 
         if (id < ITEM_START_ID) {
@@ -433,22 +440,27 @@ public class Akira.Lib2.Items.Model : Object {
         builder.append ((node.id == ORIGIN_ID) ? node.id.to_string () : node.pos_in_parent.to_string ());
     }
 
-    private void on_item_geometry_changed (int id) {
-        item_geometry_changed (id);
+    /*
+     * Internal operation to mark an instance as dirty. If 'simple' is true, only the instance's geometry is nullified.
+     * Otherwise a recursive dirtying of items occurs.
+     */
+    private void internal_mark_geometry_dirty (Lib2.Items.ModelNode node, bool simple) {
+        node.instance.compiled_components.compiled_geometry = null;
+        if (!simple) {
+            on_item_geometry_compilation_requested (node);
+        }
     }
 
-    private void on_item_geometry_compilation_requested (int id) {
+    private void on_item_geometry_compilation_requested (Lib2.Items.ModelNode node) {
         if (!is_live) {
             return;
         }
-        var target = node_from_id (id);
+        mark_dirty (node);
 
-        mark_dirty (target);
-
-        var parent = target.parent;
+        var parent = node.parent;
         while (parent.id != ORIGIN_ID) {
-            parent.instance.mark_geometry_dirty (false);
-            on_item_geometry_compilation_requested (parent.id);
+            internal_mark_geometry_dirty (parent, true);
+            on_item_geometry_compilation_requested (parent);
             parent = parent.parent;
         }
     }
@@ -480,7 +492,9 @@ public class Akira.Lib2.Items.Model : Object {
 
         foreach (var leaf in dirty_items) {
             var node = node_from_id (leaf);
-            node.instance.compile_components (true, node);
+            if (node.instance.compile_components (true, node)) {
+                item_geometry_changed (node.id);
+            }
         }
 
         dirty_items.clear ();
@@ -498,7 +512,9 @@ public class Akira.Lib2.Items.Model : Object {
         var it = sorted.bidir_map_iterator ();
         for (var has_next = it.last (); has_next; has_next = it.previous ()) {
             var node = it.get_value ();
-            node.instance.compile_components (true, node);
+            if (node.instance.compile_components (true, node)) {
+                item_geometry_changed (node.id);
+            }
 
             // #TODO improve this
             if (node.instance.components.layout.clips_children) {
