@@ -235,14 +235,14 @@ public class Akira.Drawables.Drawable : Goo.CanvasItemSimple, Goo.CanvasItem {
 
         simple_create_path (context);
 
+        context.set_matrix (Cairo.Matrix (1.0, 0.0, 0.0, 1.0, translate_x, translate_y));
+
         context.fill_extents (
             out fill_bounds.left,
             out fill_bounds.top,
             out fill_bounds.right,
             out fill_bounds.bottom
         );
-
-        context.set_matrix (Cairo.Matrix (1.0, 0.0, 0.0, 1.0, translate_x, translate_y));
 
         style.set_stroke_options (context);
         context.stroke_extents (
