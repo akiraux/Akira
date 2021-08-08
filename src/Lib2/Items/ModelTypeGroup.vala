@@ -20,16 +20,14 @@
  */
 
 public class Akira.Lib2.Items.ModelTypeGroup : Object, ModelType<ModelTypeGroup> {
-    public static ModelItem default_group () {
-        var new_item = new ModelItem ();
-        new_item.components = new Lib2.Components.Components ();
+    public static ModelInstance default_group () {
+        var new_item = new ModelInstance (-1, new ModelTypeGroup ());
         var layout_data = Components.Layout.LayoutData () {
             can_rotate = true,
-            dilated_resize = true
+            dilated_resize = true,
+            clips_children = false
         };
         new_item.components.layout = new Components.Layout (layout_data);
-
-        new_item.item_type = new ModelTypeGroup ();
         return new_item;
     }
 
@@ -52,9 +50,9 @@ public class Akira.Lib2.Items.ModelTypeGroup : Object, ModelType<ModelTypeGroup>
         return new Components.CompiledGeometry.from_descendants (components, node);
     }
 
-    public void construct_canvas_item (ModelItem item, Goo.Canvas canvas) {}
+    public void construct_canvas_item (ModelInstance instance, Goo.Canvas canvas) {}
 
-    public void component_updated (ModelItem item, Lib2.Components.Component.Type type) {}
+    public void component_updated (ModelInstance instance, Lib2.Components.Component.Type type) {}
 
     public bool is_group () { return true; }
 }

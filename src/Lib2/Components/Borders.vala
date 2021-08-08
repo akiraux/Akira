@@ -24,6 +24,11 @@ public class Akira.Lib2.Components.Borders : Copyable<Borders> {
 
     public Borders () {}
 
+    public Borders.single_color (Color color, int size) {
+        data = new Border.BorderData[1];
+        data[0] = Border.BorderData (0, color, size);
+    }
+
     // Recommended accessors
 
     public Gee.ArrayList<Border> borders () {
@@ -42,13 +47,6 @@ public class Akira.Lib2.Components.Borders : Copyable<Borders> {
     }
 
     // Mutators
-
-    public static Borders single_color (Color color, int size) {
-        var tmp = new Borders ();
-        tmp.data = new Border.BorderData[1];
-        tmp.data[0] = Border.BorderData (0, color, size);
-        return tmp;
-    }
 
     public Borders copy () {
         var cln = new Borders ();

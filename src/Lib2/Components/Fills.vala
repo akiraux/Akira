@@ -24,6 +24,11 @@ public class Akira.Lib2.Components.Fills : Copyable<Fills> {
 
     public Fills () {}
 
+    public Fills.single_color (Color color) {
+        data = new Fill.FillData[1];
+        data[0] = Fill.FillData (0, color);
+    }
+
     public Fills copy () {
         var cln = new Fills ();
         cln.data = data;
@@ -45,14 +50,5 @@ public class Akira.Lib2.Components.Fills : Copyable<Fills> {
         for (var i = 0; i < number_to_prep; ++i) {
             data[i]._id = i;
         }
-    }
-
-    // Mutators
-
-    public static Fills single_color (Color color) {
-        var tmp = new Fills ();
-        tmp.data = new Fill.FillData[1];
-        tmp.data[0] = Fill.FillData (0, color);
-        return tmp;
     }
  }

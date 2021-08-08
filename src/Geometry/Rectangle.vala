@@ -58,4 +58,15 @@ public struct Akira.Geometry.Rectangle {
             top = y1;
         }
     }
+
+    public void translate (double dx, double dy) {
+        left += dx;
+        right += dx;
+        top += dy;
+        bottom += dy;
+    }
+
+    public string to_string () {
+        return "t: %f l: %f b: %f r: %f".printf (top, left, bottom , right);
+    }
 }

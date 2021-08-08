@@ -201,7 +201,7 @@ public class Akira.Utils.GeometryMath : Object {
 
     public static void transform_quad (
         Cairo.Matrix transform,
-        ref Geometry.TransformedRectangle area
+        ref Geometry.Quad area
     ) {
         var center_x = area.center_x;
         var center_y = area.center_y;
@@ -215,9 +215,9 @@ public class Akira.Utils.GeometryMath : Object {
         area.translate (center_x, center_y);
     }
 
-    public static Geometry.TransformedRectangle apply_stretch (
+    public static Geometry.Quad apply_stretch (
         Cairo.Matrix stretch_mat,
-        Geometry.TransformedRectangle area,
+        Geometry.Quad area,
         double offset_x,
         double offset_y,
         double center_offset_x,
