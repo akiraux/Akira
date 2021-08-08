@@ -28,10 +28,10 @@ public class Akira.Drawables.DrawableRect : Drawable {
     public double radius_x { get; set; default = 0; }
     public double radius_y { get; set; default = 0; }
 
-    public DrawableRect (Goo.CanvasItem parent, double top_x, double top_y, double width, double height) {
+    public DrawableRect (Goo.CanvasItem parent, double tl_x, double tl_y, double width, double height) {
        this.parent = parent;
-       this.center_x = top_x + width / 2.0;
-       this.center_y = top_y + height / 2.0;
+       this.center_x = tl_x + width / 2.0;
+       this.center_y = tl_y + height / 2.0;
        this.width = width;
        this.height = height;
 

@@ -100,10 +100,8 @@ public class Akira.Lib2.Items.ModelTypeRect : Object, ModelType<ModelTypeRect> {
                 instance.drawable.fill_color_gdk_rgba = instance.compiled_fill.color;
                 break;
             case Lib2.Components.Component.Type.COMPILED_GEOMETRY:
-                var w = instance.components.size.width;
-                var h = instance.components.size.height;
-                instance.drawable.set ("width", w);
-                instance.drawable.set ("height", h);
+                instance.drawable.width = instance.components.size.width;
+                instance.drawable.height = instance.components.size.height;
                 instance.drawable.set_transform (instance.compiled_geometry.transformation_matrix);
                 break;
         }

@@ -80,21 +80,11 @@ public class Akira.Lib2.Modes.ItemInsertMode : AbstractInteractionMode {
         }
 
         if (event.button == Gdk.BUTTON_PRIMARY) {
-            /*
-            var sel_manager = canvas.selected_bound_manager;
-            sel_manager.reset_selection ();
-
-            var new_item = canvas.window.items_manager.insert_item (event.x, event.y);
-
-            sel_manager.add_item_to_selection (new_item);
-
-            canvas.nob_manager.selected_nob = Managers.NobManager.Nob.BOTTOM_RIGHT;
-            canvas.update_canvas ();
-
-            */
             var instance = construct_item (item_insert_type, event.x, event.y);
 
-            view_canvas.items_manager.add_item_to_origin (instance);
+            var group = view_canvas.items_manager.first_group_at (event.x, event.y);
+
+            view_canvas.items_manager.add_item_to_group (group.id, instance, false);
 
             view_canvas.selection_manager.reset_selection ();
             view_canvas.selection_manager.add_to_selection (instance.id);
@@ -210,7 +200,7 @@ public class Akira.Lib2.Modes.ItemInsertMode : AbstractInteractionMode {
     private static Lib2.Components.Fills fills_from_settings () {
         var fill_rgba = Gdk.RGBA ();
         fill_rgba.parse (settings.fill_color);
-        return Lib2.Components.Fills.single_color (Lib2.Components.Color.from_rgba (fill_rgba));
+        return new Lib2.Components.Fills.single_color (Lib2.Components.Color.from_rgba (fill_rgba));
     }
 
     private static Lib2.Components.Borders? borders_from_settings () {
@@ -220,7 +210,7 @@ public class Akira.Lib2.Modes.ItemInsertMode : AbstractInteractionMode {
 
         var border_rgba = Gdk.RGBA ();
         border_rgba.parse (settings.border_color);
-        return Lib2.Components.Borders.single_color (
+        return new Lib2.Components.Borders.single_color (
             Lib2.Components.Color.from_rgba (border_rgba),
             settings.border_size
         );

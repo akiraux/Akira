@@ -132,4 +132,16 @@ public struct Akira.Geometry.Quad {
         br_y += dy;
     }
 
+    public string to_string () {
+        return "tl: %f %f tr: %f %f br: %f %f bl: %f %f".printf (
+        tl_x,
+        tl_y,
+        tr_x,
+        tr_y,
+        br_x,
+        br_y,
+        bl_x,
+        bl_y
+        );
+    }
 }

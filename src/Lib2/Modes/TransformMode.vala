@@ -499,19 +499,21 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
             original_center_y - event_y
         );
 
-        var new_rotation = radians * (180 / Math.PI);
+        var added_rotation = radians * (180 / Math.PI);
 
         if (view_canvas.ctrl_is_pressed) {
-            var step_num = GLib.Math.round (new_rotation / 15.0);
-            new_rotation = 15.0 * step_num;
+            var step_num = GLib.Math.round (added_rotation / 15.0);
+            added_rotation = 15.0 * step_num;
         }
+
+        var rot = Utils.GeometryMath.matrix_rotation_component (initial_drag_state.area.transformation);
 
         foreach (var node in selection.nodes.values) {
             rotate_node (
                 view_canvas,
                 node.node,
                 initial_drag_state,
-                new_rotation * Math.PI / 180,
+                added_rotation * Math.PI / 180 - rot,
                 original_center_x,
                 original_center_y
             );
@@ -524,33 +526,23 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
         ViewCanvas view_canvas,
         Lib2.Items.ModelNode node,
         InitialDragState initial_drag_state,
-        double new_rotation,
+        double added_rotation,
         double rotation_center_x,
         double rotation_center_y
     ) {
         unowned var item = node.instance;
-        var item_drag_data = initial_drag_state.item_data_map[item.id];
+        if (item.components.transform != null) {
+            var item_drag_data = initial_drag_state.item_data_map[item.id];
 
-        var tmp_rotation = new_rotation;
-        var old_center_x = item_drag_data.item_geometry.area.center_x;
-        var old_center_y = item_drag_data.item_geometry.area.center_y;
+            var old_center_x = item_drag_data.item_geometry.area.center_x;
+            var old_center_y = item_drag_data.item_geometry.area.center_y;
 
-        double sx = 0;
-        double sy = 0;
-        double shx = 0;
-        double item_rotation = 0;
-        Utils.GeometryMath.decompose_matrix (
-            item_drag_data.item_geometry.transformation_matrix,
-            ref sx,
-            ref sy,
-            ref shx,
-            ref item_rotation
-        );
+            var new_transform = item_drag_data.item_geometry.transformation_matrix;
 
-        if (item.components.center != null) {
+            var tr = Cairo.Matrix.identity ();
+            tr.rotate (added_rotation);
+
             if (old_center_x != rotation_center_x || old_center_y != rotation_center_y) {
-                var tr = Cairo.Matrix.identity ();
-                tr.rotate (tmp_rotation);
                 var new_center_delta_x = old_center_x - rotation_center_x;
                 var new_center_delta_y = old_center_y - rotation_center_y;
                 tr.transform_point (ref new_center_delta_x, ref new_center_delta_y);
@@ -559,17 +551,19 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
                     rotation_center_x + new_center_delta_x,
                     rotation_center_y + new_center_delta_y
                 );
-
-                tmp_rotation += item_rotation;
             }
-        }
 
-        if (item.components.transform != null) {
-            tmp_rotation = GLib.Math.fmod (tmp_rotation + GLib.Math.PI * 2, GLib.Math.PI * 2);
-            item.components.transform = item.components.transform.with_main_rotation (tmp_rotation);
-        }
+            new_transform = Utils.GeometryMath.multiply_matrices (new_transform, tr);
 
-        item.mark_geometry_dirty ();
+            double new_rotation = Utils.GeometryMath.matrix_rotation_component (new_transform);
+
+            if (item.components.transform != null) {
+                new_rotation = GLib.Math.fmod (new_rotation + GLib.Math.PI * 2, GLib.Math.PI * 2);
+                item.components.transform = item.components.transform.with_main_rotation (new_rotation);
+            }
+
+            item.mark_geometry_dirty ();
+        }
 
         if (node.children != null && node.children.length > 0) {
             foreach (unowned var child in node.children.data) {
@@ -577,7 +571,7 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
                     view_canvas,
                     child,
                     initial_drag_state,
-                    new_rotation,
+                    added_rotation,
                     rotation_center_x,
                     rotation_center_y
                 );

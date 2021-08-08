@@ -506,11 +506,10 @@ public class Akira.Lib2.Items.Model : Object {
                     continue;
                 }
 
+                unowned var clip = node.instance.compiled_geometry.area;
                 foreach (unowned var child in node.children.data) {
                     unowned var dr = child.instance.drawable;
                     if (dr != null) {
-                        var clip = node.instance.compiled_geometry.area;
-                        clip.translate (-child.instance.components.center.x, -child.instance.components.center.y);
                         dr.clipping_path = clip;
                     }
                 }

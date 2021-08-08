@@ -31,8 +31,13 @@ public class Akira.Lib2.Items.ModelTypeArtboard : Object, ModelType<ModelTypeArt
         new_item.components.size = size;
         new_item.components.transform = Lib2.Components.Components.default_transform ();
         new_item.components.flipped = Lib2.Components.Components.default_flipped ();
-        new_item.components.border_radius = Lib2.Components.Components.default_border_radius ();
-        new_item.components.fills = Lib2.Components.Fills.single_color (Lib2.Components.Color (1.0, 1.0, 1.0, 1.0));
+
+        new_item.components.borders = new Lib2.Components.Borders.single_color (
+            Lib2.Components.Color (0.0, 0.0, 0.0, 1.0),
+            2
+        );
+
+        new_item.components.fills = new Lib2.Components.Fills.single_color (Lib2.Components.Color (1.0, 1.0, 1.0, 1.0));
 
         var layout_data = Components.Layout.LayoutData () {
             can_rotate = true,
@@ -77,7 +82,16 @@ public class Akira.Lib2.Items.ModelTypeArtboard : Object, ModelType<ModelTypeArt
     public void component_updated (ModelInstance instance, Lib2.Components.Component.Type type) {
         switch (type) {
             case Lib2.Components.Component.Type.COMPILED_BORDER:
-                instance.drawable.line_width = 0;
+                if (!instance.compiled_border.is_visible) {
+                    instance.drawable.line_width = 0;
+                    instance.drawable.stroke_color_rgba = 0;
+                    break;
+                }
+
+                // The "line-width" property expects a DOUBLE type, but we don't support subpixels
+                // so we always handle the border size as INT, therefore we need to type cast it here.
+                instance.drawable.line_width = (double) instance.compiled_border.size;
+                instance.drawable.stroke_color_gdk_rgba = instance.compiled_border.color;
                 break;
             case Lib2.Components.Component.Type.COMPILED_FILL:
                 if (!instance.compiled_fill.is_visible) {
@@ -88,10 +102,8 @@ public class Akira.Lib2.Items.ModelTypeArtboard : Object, ModelType<ModelTypeArt
                 instance.drawable.fill_color_gdk_rgba = instance.compiled_fill.color;
                 break;
             case Lib2.Components.Component.Type.COMPILED_GEOMETRY:
-                var w = instance.components.size.width;
-                var h = instance.components.size.height;
-                instance.drawable.center_x = - (w / 2.0);
-                instance.drawable.center_y = - (h / 2.0);
+                instance.drawable.width = instance.components.size.width;
+                instance.drawable.height = instance.components.size.height;
                 instance.drawable.set_transform (instance.compiled_geometry.transformation_matrix);
                 break;
         }

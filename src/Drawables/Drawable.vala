@@ -31,6 +31,7 @@ public class Akira.Drawables.Drawable : Goo.CanvasItemSimple, Goo.CanvasItem {
     public double width { get; set; default = 0; }
     public double height { get; set; default = 0; }
 
+    /// Clipping path in global reference frame
     public Geometry.Quad? clipping_path = null;
 
     public bool new_hit_test (
@@ -47,12 +48,12 @@ public class Akira.Drawables.Drawable : Goo.CanvasItemSimple, Goo.CanvasItem {
             ensure_updated ();
         }
 
-        /* Skip the item if the bounds don't intersect the expose rectangle. */
+        // Ignore if out of bounds
         if (bounds.x1 > x || bounds.x2 < x || bounds.y1 > y || bounds.y2 < y) {
           return false;
         }
 
-        /* Check if the item should receive events. */
+        // Check if item should receive events. We probably need to redo this for Akira.
         if (is_pointer_event) {
             if (pointer_events == Goo.CanvasPointerEvents.NONE) {
                 return false;
@@ -66,7 +67,8 @@ public class Akira.Drawables.Drawable : Goo.CanvasItemSimple, Goo.CanvasItem {
             }
         }
 
-        Cairo.Matrix old = cr.get_matrix ();
+        Cairo.Matrix global_transform = cr.get_matrix ();
+
         cr.save ();
 
         Cairo.Matrix tr;
@@ -74,15 +76,7 @@ public class Akira.Drawables.Drawable : Goo.CanvasItemSimple, Goo.CanvasItem {
             cr.transform (tr);
         }
 
-        cr.device_to_user (ref user_x, ref user_y);
-
-        /* Remove any current translation, to avoid the 16-bit cairo limit. */
-        var tmp = cr.get_matrix ();
-        tmp.x0 = 0.0;
-        tmp.y0 = 0.0;
-        cr.set_matrix (tmp);
-
-        /* If the item has a clip path, check if the point is inside it. */
+        // Account for clipping path first, since they should be in the global reference
         if (clipping_path != null) {
             cr.move_to (clipping_path.tl_x, clipping_path.tl_y);
             cr.line_to (clipping_path.tr_x, clipping_path.tr_y);
@@ -93,9 +87,18 @@ public class Akira.Drawables.Drawable : Goo.CanvasItemSimple, Goo.CanvasItem {
             cr.set_fill_rule (Cairo.FillRule.WINDING);
             if (!cr.in_fill (user_x, user_y)) {
                 cr.restore ();
+                cr.new_path ();
                 return false;
             }
         }
+
+        cr.device_to_user (ref user_x, ref user_y);
+
+        /* Remove any current translation, to avoid the 16-bit cairo limit. */
+        var tmp = cr.get_matrix ();
+        tmp.x0 = 0.0;
+        tmp.y0 = 0.0;
+        cr.set_matrix (tmp);
 
         simple_create_path (cr);
 
@@ -119,7 +122,7 @@ public class Akira.Drawables.Drawable : Goo.CanvasItemSimple, Goo.CanvasItem {
         if (!add_item && Goo.CanvasPointerEvents.STROKE_MASK in pe) {
             do_stroke = style.set_stroke_options (cr);
             if (!(Goo.CanvasPointerEvents.PAINTED_MASK in pe) || do_stroke) {
-                cr.set_matrix (old);
+                cr.set_matrix (global_transform);
                 user_x = x - tr.x0;
                 user_y = y - tr.y0;
 
@@ -130,6 +133,7 @@ public class Akira.Drawables.Drawable : Goo.CanvasItemSimple, Goo.CanvasItem {
         }
 
         cr.restore ();
+        cr.new_path ();
 
         return add_item;
     }
@@ -151,13 +155,13 @@ public class Akira.Drawables.Drawable : Goo.CanvasItemSimple, Goo.CanvasItem {
     }
 
     public void paint (Cairo.Context cr, Goo.CanvasBounds target_bounds, double scale) {
-        /* Skip the item if the bounds don't intersect the expose rectangle. */
+        // Simple bounds check
         if (bounds.x1 > target_bounds.x2 || bounds.x2 < target_bounds.x1
             || bounds.y1 > target_bounds.y2 || bounds.y2 < target_bounds.y1) {
           return;
         }
 
-        /* Check if the item should be visible. */
+        // Check transparency/visibility details
         if (visibility <= Goo.CanvasItemVisibility.INVISIBLE
             || (visibility == Goo.CanvasItemVisibility.VISIBLE_ABOVE_THRESHOLD
             && scale < visibility_threshold)) {
@@ -165,15 +169,9 @@ public class Akira.Drawables.Drawable : Goo.CanvasItemSimple, Goo.CanvasItem {
         }
 
         cr.save ();
+        Cairo.Matrix global_transform = cr.get_matrix ();
 
-        Cairo.Matrix old = cr.get_matrix ();
-
-        Cairo.Matrix tr;
-        if (get_transform (out tr)) {
-          cr.transform (tr);
-        }
-
-        ///* Clip with the item's clip path, if it is set. */
+        // The clipping path is in global coordinates, so we can ignore the transformation.
         if (clipping_path != null) {
             cr.move_to (clipping_path.tl_x, clipping_path.tl_y);
             cr.line_to (clipping_path.tr_x, clipping_path.tr_y);
@@ -185,19 +183,30 @@ public class Akira.Drawables.Drawable : Goo.CanvasItemSimple, Goo.CanvasItem {
         }
 
         unowned var style = get_style ();
+
+        // We apply the item transform before creating the path
+        Cairo.Matrix tr;
+        if (get_transform (out tr)) {
+          cr.transform (tr);
+        }
+
         simple_create_path (cr);
 
         if (style.set_fill_options (cr)) {
             cr.fill_preserve ();
         }
 
-        cr.set_matrix (old);
+        // We restore the global transformation to draw strokes with uniform width. Changing
+        // the matrix does not affect the path already generated.
+        cr.set_matrix (global_transform);
 
         if (style.set_stroke_options (cr)) {
             cr.stroke ();
         }
+
         cr.restore ();
 
+        // Very important to initialize new path
         cr.new_path ();
     }
 

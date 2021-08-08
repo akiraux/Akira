@@ -72,9 +72,6 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
 
         var modified_groups = new GLib.Array<int> ();
 
-        ulong microseconds;
-        double seconds;
-
         foreach (var id in to_remove.data) {
             var node = item_model.node_from_id (id);
 
@@ -325,26 +322,48 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
     }
 
     public Lib2.Items.ModelNode? node_at_canvas_position (double x, double y) {
-        Cairo.ImageSurface surface = new Cairo.ImageSurface (Cairo.Format.ARGB32, 1, 1);
-        Cairo.Context context = new Cairo.Context (surface);
-        context.set_antialias (Cairo.Antialias.GRAY);
-        context.set_line_width (2.0);
-
-        var origin = item_model.node_from_id (Lib2.Items.Model.ORIGIN_ID);
-        if (origin.children == null) {
-            return null;
-        }
-
-        var found_items = new Gee.ArrayList<unowned Lib2.Items.ModelNode> ();
-        foreach (unowned var root in origin.children.data) {
-            root.items_in_canvas (x, y, context, ref found_items);
-        }
-
+        var found_items = nodes_at_canvas_position (x, y);
         if (found_items.size == 0) {
             return null;
         }
 
         return found_items.last ();
+    }
+
+    /*
+     * Returns the top-most group at position. Origin if no other group found.
+     */
+    public Lib2.Items.ModelNode first_group_at (double x, double y) {
+        var found_items = nodes_at_canvas_position (x, y);
+
+        var it = found_items.bidir_list_iterator ();
+        for (var has_next = it.last (); has_next; has_next = it.previous ()) {
+            unowned var cand = it.get ();
+            if (cand.instance.is_group) {
+                return cand;
+            }
+        }
+
+        return item_model.node_from_id (Lib2.Items.Model.ORIGIN_ID);
+    }
+
+    public Gee.ArrayList<unowned Lib2.Items.ModelNode> nodes_at_canvas_position (double x, double y) {
+        Cairo.ImageSurface surface = new Cairo.ImageSurface (Cairo.Format.ARGB32, 1, 1);
+        Cairo.Context context = new Cairo.Context (surface);
+        context.set_antialias (Cairo.Antialias.GRAY);
+        context.set_line_width (2.0);
+
+        var found_items = new Gee.ArrayList<unowned Lib2.Items.ModelNode> ();
+
+        var origin = item_model.node_from_id (Lib2.Items.Model.ORIGIN_ID);
+        if (origin.children == null) {
+            return found_items;
+        }
+
+        foreach (unowned var root in origin.children.data) {
+            root.items_in_canvas (x, y, context, ref found_items);
+        }
+        return found_items;
     }
 
     /*
@@ -403,8 +422,8 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
         var new_rect = Lib2.Items.ModelTypeRect.default_rect (
             new Lib2.Components.Coordinates (x, y),
             new Lib2.Components.Size (50.0, 50.0, false),
-            Lib2.Components.Borders.single_color (Lib2.Components.Color (0.3, 0.3, 0.3, 1.0), 2),
-            Lib2.Components.Fills.single_color (Lib2.Components.Color (0.0, 0.0, 0.0, 1.0))
+            new Lib2.Components.Borders.single_color (Lib2.Components.Color (0.3, 0.3, 0.3, 1.0), 2),
+            new Lib2.Components.Fills.single_color (Lib2.Components.Color (0.0, 0.0, 0.0, 1.0))
         );
 
         add_item_to_origin (new_rect);
@@ -436,8 +455,8 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
                 //new Lib2.Components.Coordinates (x + i * 60, y),
                 new Lib2.Components.Coordinates (x, y),
                 new Lib2.Components.Size (50.0, 50.0, false),
-                Lib2.Components.Borders.single_color (Lib2.Components.Color (0.3, 0.3, 0.3, 1.0), 2),
-                Lib2.Components.Fills.single_color (Lib2.Components.Color (0.0, 0.0, 0.0, 1.0))
+                new Lib2.Components.Borders.single_color (Lib2.Components.Color (0.3, 0.3, 0.3, 1.0), 2),
+                new Lib2.Components.Fills.single_color (Lib2.Components.Color (0.0, 0.0, 0.0, 1.0))
             );
 
             add_item_to_group (group.id, new_rect, true);
