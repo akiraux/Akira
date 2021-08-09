@@ -492,7 +492,7 @@ public class Akira.Lib2.Items.Model : Object {
 
         foreach (var leaf in dirty_items) {
             var node = node_from_id (leaf);
-            if (node.instance.compile_components (true, node)) {
+            if (node.instance.compile_components (node)) {
                 item_geometry_changed (node.id);
             }
         }
@@ -512,7 +512,7 @@ public class Akira.Lib2.Items.Model : Object {
         var it = sorted.bidir_map_iterator ();
         for (var has_next = it.last (); has_next; has_next = it.previous ()) {
             var node = it.get_value ();
-            if (node.instance.compile_components (true, node)) {
+            if (node.instance.compile_components (node)) {
                 item_geometry_changed (node.id);
             }
 
