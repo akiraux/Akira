@@ -69,6 +69,7 @@ sources = files(
     'Widgets/PanelSeparator.vala',
     'Widgets/RoundedColorButton.vala',
     'Widgets/ZoomButton.vala',
+    'Widgets/ArtboardPanelInsertPopover.vala',
 
     'Models/ColorModel.vala',
     'Models/ExportModel.vala',

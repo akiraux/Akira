@@ -230,7 +230,7 @@ public class Akira.Layouts.Partials.ArtboardSizesPanel : Gtk.Grid {
     }
 
     private void handle_add_category () {
-        InsertItemPopover new_category_popup = new InsertItemPopover (add_category_btn);
+        Akira.Widgets.ArtboardPanelInsertPopover new_category_popup = new Akira.Widgets.ArtboardPanelInsertPopover (add_category_btn);
         new_category_popup.initialize_popover (false);
 
         new_category_popup.closed.connect ( ()=>{
@@ -334,82 +334,5 @@ private class SizeCategoryItem : Object {
         artboard_device_names.add (device_name);
 
         artboard_sizes.add (array);
-    }
-}
-
-// this class represents a popver that opens when user clicks on a "+" button to
-// add a new category or artboard size.
-private class InsertItemPopover : Gtk.Popover {
-    // label for the name of category or size
-    private Gtk.Label name_label;
-    // input for name of category or size
-    private Gtk.Entry name_input;
-
-    // label for the size of artboard
-    private Gtk.Label size_label;
-    // input for size of input
-    private Gtk.Entry size_input;
-
-    // string containing the name of category of size
-    public string item_name;
-    // string containing the size of created artboard
-    public string item_size;
-
-    public InsertItemPopover (Gtk.Widget widget) {
-        set ("relative-to", widget);
-        // the popover is modal so when user enters values here,
-        // other widgets do not recieve inputs
-        modal = true;
-        position = Gtk.PositionType.BOTTOM;
-
-        item_name = "";
-        item_size = "";
-    }
-
-    public void initialize_popover (bool show_size) {
-        Gtk.Grid grid = new Gtk.Grid ();
-
-        name_label = new Gtk.Label ("Name");
-        name_label.hexpand = true;
-        name_label.get_style_context ().add_class ("size-category-item");
-        name_label.visible = true;
-
-        name_input = new Gtk.Entry ();
-        name_input.hexpand = true;
-        name_input.get_style_context ().add_class ("size-category-item");
-        name_input.visible = true;
-
-        name_input.activate.connect ( ()=>{
-            if (show_size) {
-
-            } else {
-                if (name_input.text == "") {
-                    return;
-                }
-
-                item_name = name_input.text;
-                popdown ();
-            }
-        });
-
-        size_label = new Gtk.Label ("Size");
-        size_label.hexpand = true;
-        size_label.get_style_context ().add_class ("size-category-item");
-
-        size_input = new Gtk.Entry ();
-        size_input.hexpand = true;
-        size_input.get_style_context ().add_class ("size-category-item");
-
-        grid.attach (name_label, 0, 0, 1, 1);
-        grid.attach (name_input, 1, 0, 1, 1);
-
-        if (show_size) {
-            grid.attach (size_label, 0, 1, 1, 1);
-            grid.attach (size_input, 1, 1, 1, 1);
-        }
-
-        grid.show_all ();
-
-        add (grid);
     }
 }
