@@ -241,6 +241,7 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
             }
         }
 
+        unowned var items_manager = view_canvas.items_manager;
         foreach (var sel_node in selection.nodes.values) {
             unowned var item = sel_node.node.instance;
 
@@ -263,10 +264,10 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
             var new_center_x = item_drag_data.item_geometry.area.center_x + delta_x + snap_offset_x;
             var new_center_y = item_drag_data.item_geometry.area.center_y + delta_y + snap_offset_y;
             item.components.center = new Lib2.Components.Coordinates (new_center_x, new_center_y);
-            item.mark_geometry_dirty ();
+            items_manager.item_model.mark_node_geometry_dirty (sel_node.node);
         }
 
-        view_canvas.items_manager.compile_model ();
+        items_manager.compile_model ();
         view_canvas.window.event_bus.update_snap_decorators ();
     }
 
@@ -282,6 +283,8 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
         if (group.children == null) {
             return;
         }
+
+        unowned var model = view_canvas.items_manager.item_model;
 
         foreach (unowned var child in group.children.data) {
             if (child.instance.is_group) {
@@ -302,7 +305,7 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
             var new_center_x = item_drag_data.item_geometry.area.center_x + delta_x + snap_offset_x;
             var new_center_y = item_drag_data.item_geometry.area.center_y + delta_y + snap_offset_y;
             item.components.center = new Lib2.Components.Coordinates (new_center_x, new_center_y);
-            item.mark_geometry_dirty (true);
+            model.mark_node_geometry_dirty (child);
         }
     }
 
@@ -422,6 +425,7 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
     ) {
         // #TODO wip
         unowned var item = node.instance;
+
         if (item.components.center != null && item.components.size != null) {
             var item_drag_data = initial_drag_state.item_data_map[node.id];
 
@@ -460,7 +464,7 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
             item.components.transform = new Lib2.Components.Transform (angle, 1.0, 1.0, shear_x, 0);
             item.components.size = new Lib2.Components.Size (new_width, new_height, false);
 
-            item.mark_geometry_dirty ();
+            view_canvas.items_manager.item_model.mark_node_geometry_dirty (node);
         }
 
 
@@ -562,7 +566,7 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
                 item.components.transform = item.components.transform.with_main_rotation (new_rotation);
             }
 
-            item.mark_geometry_dirty ();
+            view_canvas.items_manager.item_model.mark_node_geometry_dirty (node);
         }
 
         if (node.children != null && node.children.length > 0) {

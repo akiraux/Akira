@@ -194,7 +194,7 @@ public class Akira.Lib2.ViewCanvas : Goo.Canvas {
         }
 
         if (uppercase_keyval == Gdk.Key.J) {
-            items_manager.debug_add_rectangles (200000, true);
+            items_manager.debug_add_rectangles (10000, true);
             return true;
         }
 
