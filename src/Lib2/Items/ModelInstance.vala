@@ -59,26 +59,19 @@ public class Akira.Lib2.Items.ModelInstance {
         return cln;
     }
 
-    public void mark_cosmetics_dirty () {
-        compiled_components.compiled_fill = null;
-        compiled_components.compiled_border = null;
-    }
-
     /*
      * Compiles the component for this item. If a corresponding node is passed, that node
      * is used in the compilation process.
      * This should almost always be called by the model--unless you really know what you are doing.
      * If in doubt, you don't.
      */
-    public bool compile_components (bool notify_view, ModelNode? node) {
+    public bool compile_components (ModelNode node) {
         bool something_changed = false;
         something_changed = compiled_components.maybe_compile_geometry (type, components, node) || something_changed;
         something_changed = compiled_components.maybe_compile_fill (type, components, node) || something_changed;
         something_changed = compiled_components.maybe_compile_border (type, components, node) || something_changed;
 
-        if (notify_view) {
-            notify_view_of_changes ();
-        }
+        notify_view_of_changes ();
 
         if (something_changed) {
             update_drawable_bounds ();
