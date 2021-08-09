@@ -31,8 +31,8 @@ Feel free to download the Alpha and help us testing it.
 
 ## 📦 Install
 
-| elementaryOS AppCenter 	| FlatHub       	| Snapcraft Store 	|
-|------------------------	|---------------	|-----------------	|
+| elementaryOS AppCenter 	| FlatHub       	|
+|------------------------	|---------------	|
 |[![Get it on AppCenter](https://appcenter.elementary.io/badge.svg)](https://appcenter.elementary.io/com.github.akiraux.akira/)|<a href="#flathub-beta"><img src="https://flathub.org/assets/badges/flathub-badge-i-en.svg" width="160px" alt="Get it from Flathub!"></a>
 
 ### Flathub Beta
