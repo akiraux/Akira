@@ -31,7 +31,7 @@ public class Akira.Drawables.Drawable : Goo.CanvasItemSimple, Goo.CanvasItem {
     public double width { get; set; default = 0; }
     public double height { get; set; default = 0; }
 
-    /// Clipping path in global reference frame
+    // Clipping path in global reference frame
     public Geometry.Quad? clipping_path = null;
 
     public bool new_hit_test (

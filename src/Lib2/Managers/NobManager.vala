@@ -142,8 +142,8 @@ public class Akira.Lib2.Managers.NobManager : Object {
     }
 
     /**
-     * Update the position of all nobs of selected items. It will show or hide them based on
-     * the properties of the selection.
+     * Update the position of all nobs of selected items. It will show or hide
+     * them based on the properties of the selection.
      */
     private void update_nob_positions (Lib2.Items.NodeSelection selection) {
         var nob_size = Lib.Selection.Nob.NOB_SIZE / view_canvas.current_scale;
@@ -163,8 +163,7 @@ public class Akira.Lib2.Managers.NobManager : Object {
 
             if (!show_h_centers && Utils.Nobs.is_horizontal_center (nob.handle_id)) {
                 set_visible = false;
-            }
-            else if (!show_v_centers && Utils.Nobs.is_vertical_center (nob.handle_id)) {
+            } else if (!show_v_centers && Utils.Nobs.is_vertical_center (nob.handle_id)) {
                 set_visible = false;
             }
 
@@ -207,11 +206,9 @@ public class Akira.Lib2.Managers.NobManager : Object {
 
                 rotation_line.set ("line-width", LINE_WIDTH / view_canvas.current_scale);
                 rotation_line.set ("visibility", Goo.CanvasItemVisibility.VISIBLE);
-            }
-            else {
+            } else {
                 rotation_line.set ("visibility", Goo.CanvasItemVisibility.HIDDEN);
             }
-
         }
 
         nob.update_global_state (cx, cy, 0, show);

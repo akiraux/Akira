@@ -25,10 +25,10 @@ public class Akira.Lib2.Components.CompiledGeometry : Copyable<CompiledGeometry>
         public Size? source_size;
         public Transform? source_transform;
         public Cairo.Matrix _transformation_matrix;
-        // These rectangles are in global coordinates
+        // These rectangles are in global coordinates.
         public Geometry.Quad area;
 
-        // Cahced bounding box that contains the rotated area
+        // Cached bounding box that contains the rotated area.
         public Geometry.Rectangle area_bb;
 
         public CompiledGeometryData () {

@@ -31,6 +31,10 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
 
     public Utils.Nobs.Nob nob = Utils.Nobs.Nob.NONE;
 
+    // Keeps track of the currently used nob to quickly change selection when
+    // an item is scaled below its sizing, causing a "flip" in the transformation.
+    public Utils.Nobs.Nob effective_nob = Utils.Nobs.Nob.NONE;
+
     public class DragItemData : Object {
         public Lib2.Components.CompiledGeometry item_geometry;
     }
@@ -60,7 +64,9 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
 
     public TransformMode (Akira.Lib2.ViewCanvas canvas, Utils.Nobs.Nob selected_nob) {
         Object (view_canvas: canvas);
-        nob = selected_nob;
+        // Set the effective_nob when the transform mode is first initialized in
+        // order to get the correct first clicked nob to show when scaling.
+        nob = effective_nob = selected_nob;
         initial_drag_state = new InitialDragState ();
     }
 
@@ -110,8 +116,11 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
         return AbstractInteractionMode.ModeType.TRANSFORM;
     }
 
-    public override Utils.Nobs.Nob acitve_nob () {
-        return nob;
+    /*
+     * Returns the currently active nob the user is holding to resize the item.
+     */
+    public override Utils.Nobs.Nob active_nob () {
+        return effective_nob;
     }
 
     public override Gdk.CursorType? cursor_type () {
@@ -159,7 +168,7 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
                 );
                 break;
             default:
-                scale_from_event (
+                effective_nob = scale_from_event (
                     view_canvas,
                     selection,
                     initial_drag_state,
@@ -306,7 +315,7 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
         }
     }
 
-    public static void scale_from_event (
+    public static Utils.Nobs.Nob scale_from_event (
         ViewCanvas view_canvas,
         Lib2.Items.NodeSelection selection,
         InitialDragState initial_drag_state,
@@ -353,7 +362,7 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
         double inc_y = 0;
 
         var tr = Cairo.Matrix.identity ();
-        Utils.AffineTransform.calculate_size_adjustments2 (
+        var updated_nob = Utils.AffineTransform.calculate_size_adjustments2 (
             nob,
             start_width,
             start_height,
@@ -405,6 +414,8 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
         }
 
         view_canvas.items_manager.compile_model ();
+
+        return updated_nob;
     }
 
     /*

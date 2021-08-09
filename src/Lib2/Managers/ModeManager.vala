@@ -47,7 +47,7 @@ public class Akira.Lib2.Managers.ModeManager : Object {
 
     public Utils.Nobs.Nob active_mode_nob {
         get {
-            return (active_mode == null) ? Utils.Nobs.Nob.ALL : active_mode.acitve_nob ();
+            return (active_mode == null) ? Utils.Nobs.Nob.ALL : active_mode.active_nob ();
         }
     }
 
