@@ -86,8 +86,8 @@ public class Akira.Layouts.Partials.ArtboardSizesPanel : Gtk.Grid {
             reload_list ( (item_type == "artboard") );
         });
 
-        window.event_bus.request_escape.connect( () => {
-            list.remove_all();
+        window.event_bus.request_escape.connect ( () => {
+            list.remove_all ();
             toggled = false;
         });
 
@@ -183,8 +183,8 @@ public class Akira.Layouts.Partials.ArtboardSizesPanel : Gtk.Grid {
             size_button.hexpand = true;
             size_button.get_style_context ().add_class ("artboard-size-button");
 
-            size_button.clicked.connect(() => {
-                insert_artboard(size_button.label);
+            size_button.clicked.connect ( () => {
+                insert_artboard (size_button.label);
             });
 
             size_items_grid.attach (size_button, 0, i, 1, 1);
@@ -195,34 +195,37 @@ public class Akira.Layouts.Partials.ArtboardSizesPanel : Gtk.Grid {
         return category_expander;
     }
 
-    private void insert_artboard(string label) {
+    private void insert_artboard (string label) {
         try {
             // create a regex object to match the sizes from label
-            Regex reg = new Regex("""\d+\sx\s\d+""");
+            Regex reg = new Regex ("""\d+\sx\s\d+""");
 
             // match the label using regex
             MatchInfo match_info;
-            if( reg.match(label, 0, out match_info) ) {
+            if ( reg.match (label, 0, out match_info) ) {
                 // the output we get after regex looks like "width x height"
                 // get the actual width and height from it
-                    string[] split_string = Regex.split_simple("""\sx\s""", match_info.fetch(0));
+                    string[] split_string = Regex.split_simple ("""\sx\s""", match_info.fetch (0));
 
-                int width = int.parse(split_string[0]);
-                int height = int.parse(split_string[1]);
+                int width = int.parse (split_string[0]);
+                int height = int.parse (split_string[1]);
 
                 var canvas = window.main_window.main_canvas.canvas;
-                canvas.selected_bound_manager.reset_selection();
+                canvas.selected_bound_manager.reset_selection ();
 
-                window.items_manager.set_item_to_insert("artboard");
-                var new_artboard = window.items_manager.insert_item(100, 100);
+                double pos_x, pos_y;
+                get_new_artboard_pos (window.items_manager.artboards, width, height, out pos_x, out pos_y);
+
+                window.items_manager.set_item_to_insert ("artboard");
+                var new_artboard = window.items_manager.insert_item (pos_x, pos_y);
                 new_artboard.size.width = width;
                 new_artboard.size.height = height;
 
-                canvas.selected_bound_manager.add_item_to_selection(new_artboard);
-                canvas.update_canvas();
+                canvas.selected_bound_manager.add_item_to_selection (new_artboard);
+                canvas.update_canvas ();
             }
         } catch (Error error) {
-            print("Regex error in ArtboardSizesPanel: %s\n", error.message);
+            print ("Regex error in ArtboardSizesPanel: %s\n", error.message);
         }
     }
 
@@ -240,18 +243,73 @@ public class Akira.Layouts.Partials.ArtboardSizesPanel : Gtk.Grid {
     }
 
     private void reload_list (bool show) {
-        list.remove_all();
+        list.remove_all ();
 
-        if(show) {
+        if (show) {
             toggled = true;
             // read the json object containing info about sizes and category names
             sizes_json = settings.artboard_size_categories;
             parse_json (sizes_json);
 
-            show_all();
+            show_all ();
         } else {
             toggled = false;
         }
+    }
+
+    private void get_new_artboard_pos (
+        Akira.Models.ListModel<Lib.Items.CanvasArtboard> artboards,
+        int width,
+        int height,
+        out double pos_x,
+        out double pos_y
+    ) {
+        // if there are no artboards present,
+        if (artboards.get_n_items () == 0) {
+            pos_x = 10;
+            pos_y = 10;
+
+            return;
+        }
+
+        // calculate the new canvas bounds from these
+        Goo.CanvasBounds curr_bounds = Goo.CanvasBounds ();
+
+        var previous_artboard = artboards.get_item (0) as Akira.Lib.Items.CanvasArtboard;
+
+        // initially, the x coordinate will be the same as that of previously inserted artboard
+        // with a little offset
+        curr_bounds.x1 = previous_artboard.coordinates.x + previous_artboard.size.width + 10;
+        // the new artboard will be at the same height as the previous artboard
+        curr_bounds.y1 = previous_artboard.coordinates.y;
+        curr_bounds.x2 = curr_bounds.x1 + width;
+        curr_bounds.y2 = curr_bounds.y1 + height;
+
+        // for every artboard check if there is overlap and move the new artboard
+        foreach (var artboard in artboards) {
+            Goo.CanvasBounds bounds;
+            artboard.get_bounds (out bounds);
+            update_pos_till_no_overlap (ref curr_bounds, bounds);
+        }
+
+        pos_x = curr_bounds.x1;
+        pos_y = curr_bounds.y1;
+    }
+
+    private void update_pos_till_no_overlap (ref Goo.CanvasBounds curr_bounds, Goo.CanvasBounds bounds) {
+        // check if there is overlap
+        if (curr_bounds.x1 >= bounds.x2 || bounds.x1 >= curr_bounds.x2) {
+            // exit loop if one artboard is completely to left of other
+            return;
+        }
+
+        if (curr_bounds.y2 <= bounds.y1 || bounds.y2 <= curr_bounds.y1) {
+            // exit loop is one artboard is completely below other
+            return;
+        }
+
+        // if the artboard overlaps, then move the current artboard accordingly
+        curr_bounds.x1 = bounds.x2 + 10;
     }
 }
 
