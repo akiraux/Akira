@@ -149,7 +149,7 @@ public class Akira.Utils.AffineTransform : Object {
      * Calculate adjustments necessary for a nob resize operation. All inputs
      * should have already been transformed to the correct space.
      */
-    public static void calculate_size_adjustments2 (
+    public static Utils.Nobs.Nob calculate_size_adjustments2 (
         Utils.Nobs.Nob nob,
         double item_width,
         double item_height,
@@ -261,6 +261,8 @@ public class Akira.Utils.AffineTransform : Object {
 
         inc_width += perm_w_adj;
         inc_height += perm_h_adj;
+
+        return nob;
     }
     /**
      * Corrects which nob should be used for scaling depending on the delta change of the drag.
