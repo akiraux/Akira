@@ -67,7 +67,7 @@ public class Akira.Lib2.Items.Model : Object {
         dirty_items = new Gee.HashSet<int> ();
         dirty_groups = new Gee.HashSet<int> ();
 
-        var group_instance = new ModelInstance (ORIGIN_ID, null);
+        var group_instance = new ModelInstance (ORIGIN_ID, new ModelTypeGroup ());
         add_to_maps (new ModelNode (group_instance, 0), false);
     }
 
@@ -132,6 +132,20 @@ public class Akira.Lib2.Items.Model : Object {
         return group_nodes[group_id].children;
     }
 
+    public void mark_node_geometry_dirty_by_id (int id) {
+        var node = node_from_id (id);
+        if (node == null) {
+            assert (false);
+            return;
+        }
+
+        mark_node_geometry_dirty (node);
+    }
+
+    public void mark_node_geometry_dirty (Lib2.Items.ModelNode node) {
+        internal_mark_geometry_dirty (node, false);
+    }
+
     public void recalculate_children_stacking (int parent_id) {
         var group = group_nodes.has_key (parent_id) ? group_nodes[parent_id] : null;
         if (group == null) {
@@ -174,7 +188,7 @@ public class Akira.Lib2.Items.Model : Object {
         return 0;
     }
 
-    public int append_new_item (int parent_id, Lib2.Items.ModelItem candidate) {
+    public int append_new_item (int parent_id, Lib2.Items.ModelInstance candidate) {
         if (!group_map.has_key (parent_id)) {
             return -1;
         }
@@ -182,15 +196,15 @@ public class Akira.Lib2.Items.Model : Object {
         var parent_node = group_nodes[parent_id];
         var pos = parent_node.children == null ? 0 : parent_node.children.length;
 
-        return inner_splice_new_item (parent_node, pos, new ModelInstance (-1, candidate));
+        return inner_splice_new_item (parent_node, pos, candidate);
     }
 
-    public int splice_new_item (int parent_id, uint pos, Lib2.Items.ModelItem candidate) {
+    public int splice_new_item (int parent_id, uint pos, Lib2.Items.ModelInstance candidate) {
         if (!group_map.has_key (parent_id)) {
             return -1;
         }
 
-        return inner_splice_new_item (group_nodes[parent_id], pos, new ModelInstance (-1, candidate));
+        return inner_splice_new_item (group_nodes[parent_id], pos, candidate);
     }
 
     public int move_items (int parent_id, uint pos, uint newpos, int length, bool restack) {
@@ -251,7 +265,7 @@ public class Akira.Lib2.Items.Model : Object {
         unowned ModelNode sibling = null;
         while (sibling_pos < node.parent.children.length) {
             sibling = node.parent.children.index (sibling_pos);
-            if (!only_stackable || sibling.instance.item.is_stackable ()) {
+            if (!only_stackable || sibling.instance.is_stackable) {
                 return sibling;
             }
             sibling_pos++;
@@ -269,7 +283,7 @@ public class Akira.Lib2.Items.Model : Object {
         unowned ModelNode sibling = null;
         while (sibling_pos >= 0) {
             sibling = node.parent.children.index (sibling_pos);
-            if (!only_stackable || sibling.instance.item.is_stackable ()) {
+            if (!only_stackable || sibling.instance.is_stackable) {
                 return sibling;
             }
             sibling_pos--;
@@ -325,12 +339,8 @@ public class Akira.Lib2.Items.Model : Object {
     }
 
     private int inner_splice_new_item (ModelNode parent_node, uint pos, ModelInstance candidate) {
-        var new_id = candidate.is_group () ? ++last_group_id : ++last_item_id;
+        var new_id = candidate.is_group ? ++last_group_id : ++last_item_id;
         candidate.id = new_id;
-        if (candidate.item != null) {
-            candidate.item.id = new_id;
-        }
-
         var new_node = new ModelNode (candidate, (int) pos);
 
         add_to_maps (new_node, true);
@@ -358,7 +368,7 @@ public class Akira.Lib2.Items.Model : Object {
 
         new_node.parent = parent_node;
 
-        new_node.instance.item.mark_geometry_dirty ();
+        internal_mark_geometry_dirty (new_node, false);
 
         return new_id;
     }
@@ -372,13 +382,13 @@ public class Akira.Lib2.Items.Model : Object {
                     continue;
                 }
 
-                child_node.instance.item.remove_from_canvas ();
+                child_node.instance.remove_from_canvas ();
                 child_node.parent = null;
                 remove_from_maps (child_node.id);
             }
         }
 
-        to_delete.instance.item.remove_from_canvas ();
+        to_delete.instance.remove_from_canvas ();
         to_delete.parent = null;
 
         Utils.Array.remove_from_iarray (ref parent_node.instance.children, (int)pos_in_parent, 1);
@@ -389,8 +399,7 @@ public class Akira.Lib2.Items.Model : Object {
     }
 
     private void add_to_maps (ModelNode node, bool listen) {
-
-        if (node.instance.is_group ()) {
+        if (node.instance.is_group) {
             group_map[node.id] = node.instance;
             group_nodes[node.id] = node;
         } else {
@@ -400,8 +409,6 @@ public class Akira.Lib2.Items.Model : Object {
 
         if (is_live && listen) {
             item_added (node.id);
-            node.instance.item.geometry_changed.connect (on_item_geometry_changed);
-            node.instance.item.geometry_compilation_requested.connect (on_item_geometry_compilation_requested);
         }
     }
 
@@ -410,11 +417,6 @@ public class Akira.Lib2.Items.Model : Object {
         var target = instance_from_id (id);
         if (target == null) {
             return;
-        }
-
-        if (is_live) {
-            target.item.geometry_changed.disconnect (on_item_geometry_changed);
-            target.item.geometry_compilation_requested.disconnect (on_item_geometry_compilation_requested);
         }
 
         if (id < ITEM_START_ID) {
@@ -438,28 +440,33 @@ public class Akira.Lib2.Items.Model : Object {
         builder.append ((node.id == ORIGIN_ID) ? node.id.to_string () : node.pos_in_parent.to_string ());
     }
 
-    private void on_item_geometry_changed (int id) {
-        item_geometry_changed (id);
+    /*
+     * Internal operation to mark an instance as dirty. If 'simple' is true, only the instance's geometry is nullified.
+     * Otherwise a recursive dirtying of items occurs.
+     */
+    private void internal_mark_geometry_dirty (Lib2.Items.ModelNode node, bool simple) {
+        node.instance.compiled_components.compiled_geometry = null;
+        if (!simple) {
+            on_item_geometry_compilation_requested (node);
+        }
     }
 
-    private void on_item_geometry_compilation_requested (int id) {
+    private void on_item_geometry_compilation_requested (Lib2.Items.ModelNode node) {
         if (!is_live) {
             return;
         }
-        var target = node_from_id (id);
+        mark_dirty (node);
 
-        mark_dirty (target);
-
-        var parent = target.parent;
+        var parent = node.parent;
         while (parent.id != ORIGIN_ID) {
-            parent.instance.item.mark_geometry_dirty (false);
-            on_item_geometry_compilation_requested (parent.id);
+            internal_mark_geometry_dirty (parent, true);
+            on_item_geometry_compilation_requested (parent);
             parent = parent.parent;
         }
     }
 
     private void mark_dirty (ModelNode node) {
-        if (node.instance.is_group ()) {
+        if (node.instance.is_group) {
             dirty_groups.add (node.id);
         } else {
             dirty_items.add (node.id);
@@ -485,7 +492,9 @@ public class Akira.Lib2.Items.Model : Object {
 
         foreach (var leaf in dirty_items) {
             var node = node_from_id (leaf);
-            node.instance.item.compile_components (true, node);
+            if (node.instance.compile_components (node)) {
+                item_geometry_changed (node.id);
+            }
         }
 
         dirty_items.clear ();
@@ -503,7 +512,24 @@ public class Akira.Lib2.Items.Model : Object {
         var it = sorted.bidir_map_iterator ();
         for (var has_next = it.last (); has_next; has_next = it.previous ()) {
             var node = it.get_value ();
-            node.instance.item.compile_components (true, node);
+            if (node.instance.compile_components (node)) {
+                item_geometry_changed (node.id);
+            }
+
+            // #TODO improve this
+            if (node.instance.components.layout.clips_children) {
+                if (node.children == null) {
+                    continue;
+                }
+
+                unowned var clip = node.instance.compiled_geometry.area;
+                foreach (unowned var child in node.children.data) {
+                    unowned var dr = child.instance.drawable;
+                    if (dr != null) {
+                        dr.clipping_path = clip;
+                    }
+                }
+            }
         }
 
         dirty_groups.clear ();

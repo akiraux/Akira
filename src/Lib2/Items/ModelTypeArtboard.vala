@@ -22,26 +22,29 @@
 public class Akira.Lib2.Items.ModelTypeArtboard : Object, ModelType<ModelTypeArtboard> {
     //Goo.CanvasItem background;
 
-    public static ModelItem default_artboard (
+    public static ModelInstance default_artboard (
         Lib2.Components.Coordinates center,
         Lib2.Components.Size size
     ) {
-        var new_item = new ModelItem ();
-        new_item.components = new Lib2.Components.Components ();
+        var new_item = new ModelInstance (-1, new ModelTypeArtboard ());
         new_item.components.center = center;
         new_item.components.size = size;
         new_item.components.transform = Lib2.Components.Components.default_transform ();
         new_item.components.flipped = Lib2.Components.Components.default_flipped ();
-        new_item.components.border_radius = Lib2.Components.Components.default_border_radius ();
-        new_item.components.fills = Lib2.Components.Fills.single_color (Lib2.Components.Color (1.0, 1.0, 1.0, 1.0));
+
+        new_item.components.borders = new Lib2.Components.Borders.single_color (
+            Lib2.Components.Color (0.0, 0.0, 0.0, 1.0),
+            2
+        );
+
+        new_item.components.fills = new Lib2.Components.Fills.single_color (Lib2.Components.Color (1.0, 1.0, 1.0, 1.0));
 
         var layout_data = Components.Layout.LayoutData () {
             can_rotate = true,
-            dilated_resize = true
+            dilated_resize = false,
+            clips_children = true
         };
         new_item.components.layout = new Components.Layout (layout_data);
-
-        new_item.item_type = new ModelTypeArtboard ();
         return new_item;
     }
 
@@ -64,56 +67,44 @@ public class Akira.Lib2.Items.ModelTypeArtboard : Object, ModelType<ModelTypeArt
         return new Components.CompiledGeometry.from_components (components, node);
     }
 
-    public void construct_canvas_item (ModelItem item, Goo.Canvas canvas) {
-        var mid_x = item.components.size.width / 2.0;
-        var mid_y = item.components.size.height / 2.0;
-
-        var artboard = new Lib2.Items.CanvasRect (
+    public void construct_canvas_item (ModelInstance instance, Goo.Canvas canvas) {
+        var w = instance.components.size.width;
+        var h = instance.components.size.height;
+        instance.drawable = new Drawables.DrawableArtboard (
             canvas.get_root_item (),
-            -mid_x,
-            -mid_y,
-            item.components.size.width,
-            item.components.size.height
+            - (w / 2.0),
+            - (h / 2.0),
+            w,
+            h
         );
-        //var artboard = new Goo.CanvasRect (canvas.get_root_item(), null);
-        //artboard.x = -mid_x;
-        //artboard.y = -mid_y;
-        //artboard.width = item.components.size.width;
-        //artboard.height = item.components.size.height;
-
-        //background = new Goo.CanvasRect (artboard, 0, 0, 1, 1, "line-width", 0.0, null);
-        //background.translate (0, 0);
-        //background.can_focus = false;
-
-        item.canvas_item = artboard;
-
-        var fill_color = Gdk.RGBA ();
-        fill_color.parse ("#fff");
-        //item.canvas_item.set ("fill-color-rgba", fill_color);
     }
 
-    public void component_updated (ModelItem item, Lib2.Components.Component.Type type) {
+    public void component_updated (ModelInstance instance, Lib2.Components.Component.Type type) {
         switch (type) {
             case Lib2.Components.Component.Type.COMPILED_BORDER:
-                break;
-            case Lib2.Components.Component.Type.COMPILED_FILL:
-                if (!item.compiled_fill.is_visible) {
-                    item.canvas_item.set ("fill-color-rgba", null);
+                if (!instance.compiled_border.is_visible) {
+                    instance.drawable.line_width = 0;
+                    instance.drawable.stroke_color_rgba = 0;
                     break;
                 }
 
-                var rgba = item.compiled_fill.color;
-                uint urgba = Utils.Color.rgba_to_uint (rgba);
-                print ("here\n");
-                item.canvas_item.set ("fill-color-rgba", urgba);
+                // The "line-width" property expects a DOUBLE type, but we don't support subpixels
+                // so we always handle the border size as INT, therefore we need to type cast it here.
+                instance.drawable.line_width = (double) instance.compiled_border.size;
+                instance.drawable.stroke_color_gdk_rgba = instance.compiled_border.color;
+                break;
+            case Lib2.Components.Component.Type.COMPILED_FILL:
+                if (!instance.compiled_fill.is_visible) {
+                    instance.drawable.fill_color_rgba = 0;
+                    break;
+                }
+
+                instance.drawable.fill_color_gdk_rgba = instance.compiled_fill.color;
                 break;
             case Lib2.Components.Component.Type.COMPILED_GEOMETRY:
-                item.canvas_item.set ("x", -item.components.size.width / 2.0);
-                item.canvas_item.set ("y", -item.components.size.height / 2.0);
-                item.canvas_item.set ("width", item.components.size.width);
-                item.canvas_item.set ("height", item.components.size.height);
-                item.canvas_item.set_transform (item.compiled_geometry.transformation_matrix);
-                print ("%s", item.canvas_item.is_visible ().to_string ());
+                instance.drawable.width = instance.components.size.width;
+                instance.drawable.height = instance.components.size.height;
+                instance.drawable.set_transform (instance.compiled_geometry.transformation_matrix);
                 break;
         }
     }

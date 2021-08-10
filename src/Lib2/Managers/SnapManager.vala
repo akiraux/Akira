@@ -21,17 +21,11 @@
  */
 
 public class Akira.Lib2.Managers.SnapManager : Object {
-    private const double LINE_WIDTH = 0.5;
-    private const double DOT_RADIUS = 2.0;
-    public const int MAX_CANDIDATES = 1000;
-
     public unowned ViewCanvas view_canvas { get; construct; }
 
     // Decorator items to be drawn in the Canvas.
-    private Goo.CanvasItem root;
-    private Gee.ArrayList<Goo.CanvasItemSimple> v_decorator_lines;
-    private Gee.ArrayList<Goo.CanvasItemSimple> h_decorator_lines;
-    private Gee.ArrayList<Goo.CanvasItemSimple> decorator_dots;
+    private Drawables.DrawableSnapData v_decorators;
+    private Drawables.DrawableSnapData h_decorators;
 
     /*
      * Type of snap guides to show (could be a selection or just a point).
@@ -58,10 +52,6 @@ public class Akira.Lib2.Managers.SnapManager : Object {
     }
 
     construct {
-        v_decorator_lines = new Gee.ArrayList<Goo.CanvasItemSimple> ();
-        h_decorator_lines = new Gee.ArrayList<Goo.CanvasItemSimple> ();
-        decorator_dots = new Gee.ArrayList<Goo.CanvasItemSimple> ();
-
         view_canvas.window.event_bus.update_snaps_color.connect (on_update_snaps_color);
     }
 
@@ -111,14 +101,12 @@ public class Akira.Lib2.Managers.SnapManager : Object {
      * Makes all decorators invisible, and ready to be reused
      */
     public void reset_decorators () {
-        foreach (var decorator in v_decorator_lines) {
-            decorator.set ("visibility", Goo.CanvasItemVisibility.HIDDEN);
+        if (v_decorators != null) {
+            v_decorators.set ("visibility", Goo.CanvasItemVisibility.HIDDEN);
         }
-        foreach (var decorator in h_decorator_lines) {
-            decorator.set ("visibility", Goo.CanvasItemVisibility.HIDDEN);
-        }
-        foreach (var decorator in decorator_dots) {
-            decorator.set ("visibility", Goo.CanvasItemVisibility.HIDDEN);
+
+        if (h_decorators != null) {
+            h_decorators.set ("visibility", Goo.CanvasItemVisibility.HIDDEN);
         }
 
         any_decorators_visible = false;
@@ -129,158 +117,65 @@ public class Akira.Lib2.Managers.SnapManager : Object {
      * Reuses decorator Goo.CanvasItems if possible, otherwise constructs new ones.
      */
     public void populate_decorators_from_data (Utils.Snapping2.SnapMatchData2 data, Utils.Snapping2.SnapGrid2 grid) {
-        if (root == null) {
-            root = view_canvas.get_root_item ();
-        }
-
         reset_decorators ();
 
-        if (data.v_data.snap_found ()) {
-            foreach (var snap_position in data.v_data.exact_matches) {
-                any_decorators_visible = true;
-                add_vertical_decorator_line (snap_position, grid);
+        if (data.v_data.snap_found () || data.h_data.snap_found ()) {
+            if (v_decorators == null) {
+                v_decorators = new Drawables.DrawableSnapData (
+                    view_canvas.get_root_item (),
+                    0,
+                    0,
+                    Layouts.MainCanvas.CANVAS_SIZE,
+                    Layouts.MainCanvas.CANVAS_SIZE,
+                    false
+                );
+
+                on_update_snaps_color ();
             }
+
+            if (h_decorators == null) {
+                h_decorators = new Drawables.DrawableSnapData (
+                    view_canvas.get_root_item (),
+                    0,
+                    0,
+                    Layouts.MainCanvas.CANVAS_SIZE,
+                    Layouts.MainCanvas.CANVAS_SIZE,
+                    true
+                );
+
+                on_update_snaps_color ();
+            }
+
+
+            v_decorators.update_data (data.v_data, grid.v_snaps);
+            h_decorators.update_data (data.h_data, grid.h_snaps);
+
+            if (!any_decorators_visible) {
+                v_decorators.set ("visibility", Goo.CanvasItemVisibility.VISIBLE);
+                v_decorators.raise (null);
+                h_decorators.set ("visibility", Goo.CanvasItemVisibility.VISIBLE);
+                h_decorators.raise (null);
+            }
+
+            any_decorators_visible = true;
         }
-
-        if (data.h_data.snap_found ()) {
-            foreach (var snap_position in data.h_data.exact_matches) {
-                any_decorators_visible = true;
-                add_horizontal_decorator_line (snap_position, grid);
-            }
-        }
-    }
-
-    private void add_vertical_decorator_line (int pos, Utils.Snapping2.SnapGrid2 grid) {
-        double lw = LINE_WIDTH / view_canvas.current_scale;
-        var snap_value = grid.v_snaps.get (pos);
-        if (snap_value != null) {
-            // To actually show decorators in their exact position, we offset by 0.5.
-            double actual_pos = (double) (pos);
-
-            // Add dots.
-            foreach (var normal in snap_value.normals) {
-                add_decorator_dot (normal, actual_pos);
-            }
-
-            // Add lines (reuse if possible).
-            foreach (var line in v_decorator_lines) {
-                if (line.visibility == Goo.CanvasItemVisibility.HIDDEN) {
-                    line.set ("visibility", Goo.CanvasItemVisibility.VISIBLE);
-                    line.set ("y", actual_pos);
-                    line.set ("line-width", lw);
-                    line.raise (null);
-                    return;
-                }
-            }
-
-            var tmp = new Goo.CanvasPolyline.line (
-                null,
-                view_canvas.x1, actual_pos,
-                view_canvas.x2, actual_pos,
-                "line-width", lw,
-                "stroke-color", settings.snaps_color,
-                null
-            );
-
-            tmp.can_focus = false;
-            tmp.pointer_events = Goo.CanvasPointerEvents.NONE;
-
-            tmp.set ("parent", root);
-            tmp.raise (null);
-            v_decorator_lines.add (tmp);
-        }
-    }
-
-    private void add_horizontal_decorator_line (int pos, Utils.Snapping2.SnapGrid2 grid) {
-        double lw = LINE_WIDTH / view_canvas.current_scale;
-        var snap_value = grid.h_snaps.get (pos);
-        if (snap_value != null) {
-            double actual_pos = (double) (pos);
-
-            // Add dots.
-            foreach (var normal in snap_value.normals) {
-                add_decorator_dot (actual_pos, normal);
-            }
-
-            // Add lines (reuse if possible).
-            foreach (var line in h_decorator_lines) {
-                if (line.visibility == Goo.CanvasItemVisibility.HIDDEN) {
-                    line.set ("visibility", Goo.CanvasItemVisibility.VISIBLE);
-                    line.set ("x", actual_pos);
-                    line.set ("line-width", lw);
-                    line.raise (null);
-                    return;
-                }
-            }
-
-            var tmp = new Goo.CanvasPolyline.line (
-                null,
-                actual_pos, view_canvas.y1,
-                actual_pos, view_canvas.y2,
-                "line-width", lw,
-                "stroke-color", settings.snaps_color,
-                null
-            );
-
-            tmp.can_focus = false;
-            tmp.pointer_events = Goo.CanvasPointerEvents.NONE;
-
-            tmp.set ("parent", root);
-            tmp.raise (null);
-            h_decorator_lines.add (tmp);
-        }
-    }
-
-    private void add_decorator_dot (double x, double y) {
-        double dot_radius = DOT_RADIUS / view_canvas.current_scale;
-
-        // Add dot.
-        foreach (var line in decorator_dots) {
-            if (line.visibility == Goo.CanvasItemVisibility.HIDDEN) {
-                line.set ("visibility", Goo.CanvasItemVisibility.VISIBLE);
-                line.set ("center_x", x);
-                line.set ("center_y", y);
-                line.set ("radius_x", dot_radius);
-                line.set ("radius_y", dot_radius);
-                line.raise (null);
-                return;
-            }
-        }
-
-        var tmp = new Goo.CanvasEllipse (
-            null,
-            x, y,
-            dot_radius, dot_radius,
-            "line-width", 0.0,
-            "fill-color", settings.snaps_color,
-            null
-        );
-
-        tmp.can_focus = false;
-        tmp.pointer_events = Goo.CanvasPointerEvents.NONE;
-
-        tmp.set ("parent", root);
-        tmp.raise (null);
-        decorator_dots.add (tmp);
     }
 
     /*
-     * Loop through all the existing guides and update the color.
+     * Update decorator colors
      */
     private void on_update_snaps_color () {
-        // Points.
-        foreach (var dot in decorator_dots) {
-            dot.set ("fill-color", settings.snaps_color);
+        var color = Gdk.RGBA ();
+        if (!color.parse (settings.snaps_color)) {
+            return;
         }
 
-        // Horizontal lines.
-        foreach (var line in h_decorator_lines) {
-            line.set ("stroke-color", settings.snaps_color);
+        if (v_decorators != null) {
+            v_decorators.update_color (color);
         }
 
-        // Vertical lines.
-        foreach (var line in v_decorator_lines) {
-            line.set ("stroke-color", settings.snaps_color);
+        if (h_decorators != null) {
+            h_decorators.update_color (color);
         }
     }
 }

@@ -23,6 +23,10 @@
  * Implements array methods that are useful. Some pertain to raw arrays and some to GLib.Array
  */
 public class Akira.Utils.Array : Object {
+
+    /*
+     * Insert value in an int array. Return true on sucess.
+     */
     public static bool insert_at_iarray (ref int[] a, int pos, int value) {
         if (pos >= a.length || pos < 0) {
             assert (false);
@@ -35,23 +39,18 @@ public class Akira.Utils.Array : Object {
         return true;
     }
 
+    /*
+     * Appends value at the end of an int array. Return true on sucess.
+     */
     public static bool append_to_iarray (ref int[] a, int value) {
         a.resize (a.length + 1);
         a[a.length - 1] = value;
         return true;
     }
 
-    public static bool swap_within_iarray (ref int[] a, int pos, int newpos) {
-        if (pos >= a.length || newpos >= a.length || pos < 0 || newpos < 0) {
-            assert (false);
-            return false;
-        }
-
-        var tmp = a[pos];
-        a[pos] = a[newpos];
-        a[newpos] = tmp;
-        return true;
-    }
+    /*
+     * Removes 'length' number of values at 'pos' from int array.
+     */
     public static bool remove_from_iarray (ref int[] a, int pos, int length) {
         if (pos >= a.length || pos + length > a.length || pos < 0 || length < 0) {
             assert (false);
@@ -64,6 +63,9 @@ public class Akira.Utils.Array : Object {
     }
 
 
+    /*
+     * Rotates an int array.
+     */
     public static void rotate_iarray (ref int[] arr, int first, int middle, int end) {
         if (first < 0 || end > arr.length) {
             assert (first >= 0);
@@ -77,7 +79,7 @@ public class Akira.Utils.Array : Object {
         var next = middle;
 
         while (first != next) {
-            swap (ref arr, first ++, next++);
+            swap_iarray (ref arr, first ++, next++);
             if (next == end) {
                 next = middle;
             } else if (first == middle) {
@@ -86,6 +88,45 @@ public class Akira.Utils.Array : Object {
         }
     }
 
+    /*
+     * Gets minimum and maximum value in an int array.
+     */
+    public static void min_max_in_iarray (int[] positions, ref int min, ref int max) {
+        foreach (var pos in positions) {
+            if (pos < min) {
+                min = pos;
+            }
+            if (pos > max) {
+                max = pos;
+            }
+        }
+
+        if (min == 0) {
+            min = max;
+        }
+    }
+
+    /*
+     * Gets minimum and maximum value in an double array.
+     */
+    public static void min_max_in_darray (double[] positions, ref double min, ref double max) {
+        foreach (var pos in positions) {
+            if (pos < min) {
+                min = pos;
+            }
+            if (pos > max) {
+                max = pos;
+            }
+        }
+
+        if (min == 0) {
+            min = max;
+        }
+    }
+
+    /*
+     * Rotates a GLib.Array.
+     */
     public static void rotate_garray<T> (ref GLib.Array<T> arr, int first, int middle, int end) {
         if (first < 0 || end > arr.length) {
             assert (first >= 0);
@@ -112,6 +153,9 @@ public class Akira.Utils.Array : Object {
         }
     }
 
+    /*
+     * Rotates a GLib.Array with unowned values.
+     */
     public static void rotate_weak_garray<T> (ref GLib.Array<unowned T> arr, int first, int middle, int end) {
         if (first < 0 || end > arr.length) {
             assert (first >= 0);
@@ -138,18 +182,36 @@ public class Akira.Utils.Array : Object {
         }
     }
 
-    private static void swap (ref int[] arr, int a, int b) {
+    /*
+     * Swaps 'a' and 'b' indices from an int array.
+     */
+    public static void swap_iarray (ref int[] arr, int a, int b) {
         var tmp = arr[a];
         arr[a] = arr[b];
         arr[b] = tmp;
     }
 
+    /*
+     * Swaps 'a' and 'b' indices from a double array.
+     */
+    public static void swap_darray (ref double[] arr, int a, int b) {
+        var tmp = arr[a];
+        arr[a] = arr[b];
+        arr[b] = tmp;
+    }
+
+    /*
+     * Swaps 'a' and 'b' indices from a GLib.Array.
+     */
     public static void swap_garray<T> (ref GLib.Array<T> arr, int a, int b) {
         var tmp = arr.index (a);
         arr.data[a] = arr.index (b);
         arr.data[b] = tmp;
     }
 
+    /*
+     * Swaps 'a' and 'b' indices from a GLib.Array of unowned objects.
+     */
     public static void swap_weak_garray<T> (ref GLib.Array<weak T> arr, int a, int b) {
         var tmp = arr.index (a);
         arr.data[a] = arr.index (b);

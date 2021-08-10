@@ -23,9 +23,9 @@ public class Akira.Lib2.ViewCanvas : Goo.Canvas {
     private const int SIZE = 30;
     public unowned Akira.Window window { get; construct; }
 
-    public Geometry.TransformedRectangle to_draw_1;
-    public Geometry.TransformedRectangle to_draw_2;
-    public Geometry.TransformedRectangle to_draw_3;
+    public Geometry.Quad to_draw_1;
+    public Geometry.Quad to_draw_2;
+    public Geometry.Quad to_draw_3;
     public double debug_point1_x = 0;
     public double debug_point1_y = 0;
     public double debug_point2_x = 0;
@@ -141,8 +141,6 @@ public class Akira.Lib2.ViewCanvas : Goo.Canvas {
         current_scale = scale;
         set_scale (scale);
         window.event_bus.zoom ();
-
-        window.event_bus.update_snap_decorators ();
     }
 
     public void focus_canvas () {
@@ -197,7 +195,6 @@ public class Akira.Lib2.ViewCanvas : Goo.Canvas {
 
         if (uppercase_keyval == Gdk.Key.J) {
             items_manager.debug_add_rectangles (10000, true);
-
             return true;
         }
 
@@ -416,7 +413,7 @@ public class Akira.Lib2.ViewCanvas : Goo.Canvas {
         ctx.restore ();
     }
 
-    public void draw_debug_rotated_rect (Cairo.Context ctx, Geometry.TransformedRectangle rect, Gdk.RGBA color) {
+    public void draw_debug_rotated_rect (Cairo.Context ctx, Geometry.Quad rect, Gdk.RGBA color) {
         var xadj = hadjustment.value;
         var yadj = vadjustment.value;
 
@@ -442,7 +439,7 @@ public class Akira.Lib2.ViewCanvas : Goo.Canvas {
         ctx.restore ();
     }
 
-    public void draw_debug_info (Cairo.Context ctx, Lib2.Items.ModelItem item) {
+    public void draw_debug_info (Cairo.Context ctx, Lib2.Items.ModelInstance instance) {
         /*
         var xadj = hadjustment.value;
         var yadj = vadjustment.value;

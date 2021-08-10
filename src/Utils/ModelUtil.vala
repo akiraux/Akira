@@ -40,7 +40,7 @@
          OnSubtreeCloned? on_subtree_cloned = null
     ) {
         var target_node = target_model.node_from_id (target_group_id);
-        if (target_node == null || !target_node.instance.is_group ()) {
+        if (target_node == null || !target_node.instance.is_group) {
             return -1;
         }
 
@@ -63,9 +63,9 @@
         Lib2.Items.ModelNode target_node,
         Lib2.Items.Model target_model
     ) {
-        var new_id = target_model.append_new_item (target_node.id, source_node.instance.item.clone ());
+        var new_id = target_model.append_new_item (target_node.id, source_node.instance.clone ());
 
-        if (source_node.instance.is_group ()) {
+        if (source_node.instance.is_group) {
             foreach (var child in source_node.children.data) {
                 recursive_clone (child, target_model.node_from_id (new_id), target_model);
             }

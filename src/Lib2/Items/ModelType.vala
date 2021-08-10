@@ -37,9 +37,9 @@ public interface Akira.Lib2.Items.ModelType<T> : Object {
         Lib2.Items.ModelNode? node
     );
 
-    public abstract void construct_canvas_item (ModelItem item, Goo.Canvas canvas);
+    public abstract void construct_canvas_item (ModelInstance item, Goo.Canvas canvas);
 
-    public abstract void component_updated (ModelItem item, Lib2.Components.Component.Type type);
+    public abstract void component_updated (ModelInstance item, Lib2.Components.Component.Type type);
 
     public abstract bool is_group ();
 }
@@ -61,8 +61,8 @@ public class Akira.Lib2.Items.DummyItemType : Object, ModelType<DummyItemType> {
         return new Components.CompiledGeometry.dummy ();
     }
 
-    public void construct_canvas_item (ModelItem item, Goo.Canvas canvas) {}
-    public void component_updated (ModelItem item, Lib2.Components.Component.Type type) {}
+    public void construct_canvas_item (ModelInstance item, Goo.Canvas canvas) {}
+    public void component_updated (ModelInstance item, Lib2.Components.Component.Type type) {}
     public bool is_group () { return false; }
 }
 
@@ -83,7 +83,7 @@ public class Akira.Lib2.Items.DummyGroupType : Object, ModelType<DummyGroupType>
         return new Components.CompiledGeometry.dummy ();
     }
 
-    public void construct_canvas_item (ModelItem item, Goo.Canvas canvas) {}
-    public void component_updated (ModelItem item, Lib2.Components.Component.Type type) {}
+    public void construct_canvas_item (ModelInstance item, Goo.Canvas canvas) {}
+    public void component_updated (ModelInstance item, Lib2.Components.Component.Type type) {}
     public bool is_group () { return true; }
 }

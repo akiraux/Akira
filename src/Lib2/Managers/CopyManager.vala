@@ -39,9 +39,9 @@ public class Akira.Lib2.Managers.CopyManager : Object {
         var sorted_candidates = new Gee.TreeMap<Lib2.Items.PositionKey, int> (Lib2.Items.PositionKey.compare);
         foreach (var to_copy in view_canvas.selection_manager.selection.nodes.values) {
             var key = new Lib2.Items.PositionKey ();
-            key.parent_path = view_canvas.items_manager.item_model.path_from_node (to_copy.parent);
-            key.pos_in_parent = to_copy.pos_in_parent;
-            sorted_candidates[key] = to_copy.id;
+            key.parent_path = view_canvas.items_manager.item_model.path_from_node (to_copy.node.parent);
+            key.pos_in_parent = to_copy.node.pos_in_parent;
+            sorted_candidates[key] = to_copy.node.id;
         }
 
         int res = 0;
