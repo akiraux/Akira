@@ -47,6 +47,14 @@ public class Akira.Layouts.MainWindow : Gtk.Grid {
         pane.pack2 (pane2, true, false);
         pane2.pack1 (main_view_canvas, true, true);
 
+        if (!settings.get_boolean ("invert-sidebar")) {
+            // pane.pack1 (left_sidebar, false, false);
+            pane2.pack2 (layers_sidebar, false, false);
+        } else {
+            pane.pack1 (layers_sidebar, false, false);
+            // pane2.pack2 (left_sidebar, false, false);
+        }
+
         attach (pane, 0, 0, 1, 1);
 
         // left_sidebar = new Akira.Layouts.LeftSideBar (window);
