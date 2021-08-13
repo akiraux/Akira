@@ -149,7 +149,6 @@ public class Akira.Utils.Snapping2 : Object {
         canvas.visible_bounds (ref vis_y1, ref vis_x1, ref vis_y2, ref vis_x2);
 
         var candidate_list = canvas.items_manager.children_in_group (group_id);
-
         int v_added = 0;
         int h_added = 0;
 

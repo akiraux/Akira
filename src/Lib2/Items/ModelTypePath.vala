@@ -19,42 +19,43 @@
  * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
  */
 
-public class Akira.Lib2.Items.ModelTypeRect : ModelType {
+public class Akira.Lib2.Items.ModelTypePath : ModelType {
     public static ModelInstance minimal_rect () {
-        return default_rect (
+        return default_path (
             new Lib2.Components.Coordinates (0.5, 0.5),
-            new Lib2.Components.Size (1, 1, false),
             null,
             null
         );
     }
 
-    public static ModelInstance default_rect (
+    public static ModelInstance default_path (
         Lib2.Components.Coordinates center,
-        Lib2.Components.Size size,
         Lib2.Components.Borders? borders,
         Lib2.Components.Fills? fills
     ) {
-        var new_item = new ModelInstance (-1, new ModelTypeRect ());
+        var new_item = new ModelInstance (-1, new ModelTypePath ());
         new_item.components.center = center;
-        new_item.components.size = size;
         new_item.components.borders = borders;
         new_item.components.fills = fills;
         new_item.components.transform = Lib2.Components.Components.default_transform ();
         new_item.components.flipped = Lib2.Components.Components.default_flipped ();
         new_item.components.border_radius = Lib2.Components.Components.default_border_radius ();
+        new_item.components.path = new Lib2.Components.Path.from_single_point (Akira.Geometry.Point (center.x, center.y), false);
         return new_item;
     }
 
+    public override Components.CompiledGeometry compile_geometry (
+        Components.Components? components,
+        Lib2.Items.ModelNode? node
+    ) {
+        return new Components.CompiledGeometry.from_components (components, node, true);
+    }
+
+
     public override void construct_canvas_item (ModelInstance instance, Goo.Canvas canvas) {
-        var w = instance.components.size.width;
-        var h = instance.components.size.height;
-        instance.drawable = new Drawables.DrawableRect (
+        instance.drawable = new Drawables.DrawablePath (
             canvas.get_root_item (),
-            - (w / 2.0),
-            - (h / 2.0),
-            w,
-            h
+            (instance.components.path == null) ? null : instance.components.path.data
         );
     }
 
@@ -81,8 +82,8 @@ public class Akira.Lib2.Items.ModelTypeRect : ModelType {
                 instance.drawable.fill_color_gdk_rgba = instance.compiled_fill.color;
                 break;
             case Lib2.Components.Component.Type.COMPILED_GEOMETRY:
-                instance.drawable.width = instance.components.size.width;
-                instance.drawable.height = instance.components.size.height;
+                instance.drawable.center_x = -instance.compiled_geometry.source_width / 2.0;
+                instance.drawable.center_y = -instance.compiled_geometry.source_height / 2.0;
                 instance.drawable.set_transform (instance.compiled_geometry.transformation_matrix);
                 break;
         }

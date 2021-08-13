@@ -350,8 +350,25 @@ public class Akira.Lib2.ViewCanvas : Goo.Canvas {
 
     // #TODO temporary
     public override bool draw (Cairo.Context ctx) {
-
         base.draw (ctx);
+
+        // Draw damage
+        var r = GLib.Random.double_range (0, 1.0);
+        var g = GLib.Random.double_range (0, 1.0);
+        var b = GLib.Random.double_range (0, 1.0);
+        var col = Gdk.RGBA () { red = r, green = g, blue = b, alpha = 0.3};
+        var xadj = hadjustment.value;
+        var yadj = vadjustment.value;
+
+        var cs = current_scale;
+
+        ctx.save ();
+        ctx.rectangle (xadj + 0, xadj + 0, xadj + 3000, xadj + 3000);
+        ctx.set_source_rgba (r, g, b, 0.3);
+        ctx.fill ();
+
+        ctx.restore ();
+
         //draw_debug_rect (ctx, to_draw_1.bounding_box, Gdk.RGBA () { red = 1.0, green = 0.0, blue = 0.0, alpha = 1.0});
         draw_debug_rotated_rect (ctx, to_draw_1, Gdk.RGBA () { red = 0.0, green = 1.0, blue = 0.5, alpha = 1.0});
 

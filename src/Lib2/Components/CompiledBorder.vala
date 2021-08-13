@@ -42,6 +42,12 @@ public class Akira.Lib2.Components.CompiledBorder : Copyable<CompiledBorder> {
         _visible = visible;
     }
 
+    public CompiledBorder.as_empty () {
+        _color = Gdk.RGBA () { red = 0.0, green = 0.0, blue = 0.0, alpha = 0.0};
+        _size = 0;
+        _visible = false;
+    }
+
     public CompiledBorder copy () {
         return new CompiledBorder (_color, _size, _visible);
     }

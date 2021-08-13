@@ -101,12 +101,14 @@ public class Akira.Lib2.Managers.SnapManager : Object {
      * Makes all decorators invisible, and ready to be reused
      */
     public void reset_decorators () {
-        if (v_decorators != null) {
-            v_decorators.set ("visibility", Goo.CanvasItemVisibility.HIDDEN);
-        }
+        if (any_decorators_visible) {
+            if (v_decorators != null) {
+                v_decorators.hide_drawable ();
+            }
 
-        if (h_decorators != null) {
-            h_decorators.set ("visibility", Goo.CanvasItemVisibility.HIDDEN);
+            if (h_decorators != null) {
+                h_decorators.hide_drawable ();
+            }
         }
 
         any_decorators_visible = false;

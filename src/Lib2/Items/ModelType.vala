@@ -19,71 +19,59 @@
  * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
  */
 
-public interface Akira.Lib2.Items.ModelType<T> : Object {
-    public abstract ModelType copy ();
-
-    public abstract Components.CompiledFill compile_fill (
+public class Akira.Lib2.Items.ModelType : Object {
+    public virtual Components.CompiledFill compile_fill (
         Components.Components? components,
         Lib2.Items.ModelNode? node
-    );
-
-    public abstract Components.CompiledBorder compile_border (
-        Components.Components? components,
-        Lib2.Items.ModelNode? node
-    );
-
-    public abstract Components.CompiledGeometry compile_geometry (
-        Components.Components? components,
-        Lib2.Items.ModelNode? node
-    );
-
-    public abstract void construct_canvas_item (ModelInstance item, Goo.Canvas canvas);
-
-    public abstract void component_updated (ModelInstance item, Lib2.Components.Component.Type type);
-
-    public abstract bool is_group ();
-}
-
-public class Akira.Lib2.Items.DummyItemType : Object, ModelType<DummyItemType> {
-    public ModelType copy () { return new DummyItemType (); }
-    public Components.CompiledFill compile_fill (Components.Components? components, Lib2.Items.ModelNode? node) {
+    ) { 
         return Components.CompiledFill.compile (components, node);
     }
 
-    public Components.CompiledBorder compile_border (Components.Components? components, Lib2.Items.ModelNode? node) {
-        return Components.CompiledBorder.compile (components, node);
-    }
-
-    public Components.CompiledGeometry compile_geometry (
+    public virtual Components.CompiledBorder compile_border (
         Components.Components? components,
         Lib2.Items.ModelNode? node
     ) {
-        return new Components.CompiledGeometry.dummy ();
+        return Components.CompiledBorder.compile (components, node);
     }
 
-    public void construct_canvas_item (ModelInstance item, Goo.Canvas canvas) {}
-    public void component_updated (ModelInstance item, Lib2.Components.Component.Type type) {}
-    public bool is_group () { return false; }
+    public virtual Components.CompiledGeometry compile_geometry (
+        Components.Components? components,
+        Lib2.Items.ModelNode? node
+    ) {
+        return new Components.CompiledGeometry.from_components (components, node);
+    }
+
+    public virtual void construct_canvas_item (ModelInstance item, Goo.Canvas canvas) {}
+
+    public virtual void component_updated (ModelInstance item, Lib2.Components.Component.Type type) {}
+
+    public virtual void apply_scale_transform (
+        Lib2.Items.Model item_model,
+        Lib2.Items.ModelNode node,
+        Lib2.Modes.TransformMode.InitialDragState initial_drag_state,
+        Cairo.Matrix inverse_reference_matrix,
+        double global_offset_x,
+        double global_offset_y,
+        double reference_sx,
+        double reference_sy
+    ) {
+        Utils.AffineTransform.scale_node (
+            item_model, 
+            node, 
+            initial_drag_state, 
+            inverse_reference_matrix, 
+            global_offset_x, 
+            global_offset_y, 
+            reference_sx, 
+            reference_sy
+        );
+    }
+
+    public virtual bool is_group () { return false; }
 }
 
-public class Akira.Lib2.Items.DummyGroupType : Object, ModelType<DummyGroupType> {
-    public ModelType copy () { return new DummyGroupType (); }
-    public Components.CompiledFill compile_fill (Components.Components? components, Lib2.Items.ModelNode? node) {
-        return Components.CompiledFill.compile (components, node);
-    }
+public class Akira.Lib2.Items.DummyItemType : ModelType {}
 
-    public Components.CompiledBorder compile_border (Components.Components? components, Lib2.Items.ModelNode? node) {
-        return Components.CompiledBorder.compile (components, node);
-    }
-
-    public Components.CompiledGeometry compile_geometry (
-        Components.Components? components,
-        Lib2.Items.ModelNode? node
-    ) {
-        return new Components.CompiledGeometry.dummy ();
-    }
-
-    public void construct_canvas_item (ModelInstance item, Goo.Canvas canvas) {}
-    public void component_updated (ModelInstance item, Lib2.Components.Component.Type type) {}
-    public bool is_group () { return true; }
+public class Akira.Lib2.Items.DummyGroupType : ModelType {
+    public override bool is_group () { return true; }
 }

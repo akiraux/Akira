@@ -25,11 +25,18 @@
  * 2. Add a clipping quad to make clipping more efficient.
  */
 public class Akira.Drawables.Drawable : Goo.CanvasItemSimple, Goo.CanvasItem {
+    public enum BorderType {
+        CENTER,
+        INSIDE,
+        OUTSIDE
+    }
+
     public int parent_id { get; set; default = -1; }
     public double center_x { get; set; default = 0; }
     public double center_y { get; set; default = 0; }
     public double width { get; set; default = 0; }
     public double height { get; set; default = 0; }
+    public BorderType border_type { get; set; default = BorderType.CENTER; }
 
     /// Clipping path in global reference frame
     public Geometry.Quad? clipping_path = null;

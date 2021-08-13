@@ -109,7 +109,10 @@ public class Akira.Utils.Array : Object {
     /*
      * Gets minimum and maximum value in an double array.
      */
-    public static void min_max_in_darray (double[] positions, ref double min, ref double max) {
+    public static void min_max_in_darray (double[] positions, out double min, out double max) {
+        min = double.MAX;
+        max = double.MIN;
+
         foreach (var pos in positions) {
             if (pos < min) {
                 min = pos;
@@ -119,8 +122,12 @@ public class Akira.Utils.Array : Object {
             }
         }
 
-        if (min == 0) {
-            min = max;
+        if (min == double.MAX) {
+            min = 0;
+        }
+
+        if (max == double.MIN) {
+            max = 0;
         }
     }
 
