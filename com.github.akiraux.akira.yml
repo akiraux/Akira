@@ -1,0 +1,47 @@
+app-id: com.github.akiraux.akira
+runtime: io.elementary.Platform
+runtime-version: '6'
+sdk: io.elementary.Sdk
+command: com.github.akiraux.akira
+
+finish-args:
+  - '--share=ipc'
+  - '--socket=fallback-x11'
+  - '--socket=wayland'
+
+  # needed for perfers-color-scheme
+  - '--system-talk-name=org.freedesktop.Accounts'
+
+  - '--filesystem=home'
+
+modules:
+  - name: goocanvas
+    config-opts:
+      - '--enable-python=no'
+    build-options:
+      make-install-args:
+        - 'girdir=/app/share/gir-1.0'
+        - 'typelibdir=/app/lib/girepository-1.0'
+    sources:
+      - type: git
+        url: https://gitlab.gnome.org/GNOME/goocanvas
+        branch: 'goocanvas-3.0'
+
+  - name: libarchive
+    buildsystem: simple
+    sources:
+      - type: git
+        url: https://github.com/libarchive/libarchive
+        tag: '3.5.1'
+    build-commands:
+      - ./build/autogen.sh
+    cleanup:
+      - /bin
+      - /include
+      - /lib/pkgconfig
+
+  - name: akira
+    buildsystem: meson
+    sources:
+      - type: dir
+        path: .
