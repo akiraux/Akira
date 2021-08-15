@@ -131,9 +131,10 @@ sources = files(
     'Lib/Modes/PanMode.vala',
 
     'Drawables/Drawable.vala',
-    'Drawables/DrawableRect.vala',
-    'Drawables/DrawableEllipse.vala',
     'Drawables/DrawableArtboard.vala',
+    'Drawables/DrawableEllipse.vala',
+    'Drawables/DrawablePath.vala',
+    'Drawables/DrawableRect.vala',
     'Drawables/DrawableSnapData.vala',
 
     'Lib2/Components/Border.vala',
@@ -154,6 +155,7 @@ sources = files(
     'Lib2/Components/Layout.vala',
     'Lib2/Components/Name.vala',
     'Lib2/Components/Opacity.vala',
+    'Lib2/Components/Path.vala',
     'Lib2/Components/Size.vala',
     'Lib2/Components/Transform.vala',
 
@@ -166,6 +168,7 @@ sources = files(
     'Lib2/Items/ModelTypeEllipse.vala',
     'Lib2/Items/ModelTypeGroup.vala',
     'Lib2/Items/ModelTypeRect.vala',
+    'Lib2/Items/ModelTypePath.vala',
 
     'Lib2/Managers/CopyManager.vala',
     'Lib2/Managers/ItemsManager.vala',
@@ -183,6 +186,7 @@ sources = files(
 
     'Lib2/ViewCanvas.vala',
 
+    'Geometry/Point.vala',
     'Geometry/Rectangle.vala',
     'Geometry/Quad.vala',
 

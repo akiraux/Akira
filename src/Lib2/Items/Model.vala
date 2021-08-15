@@ -80,10 +80,10 @@ public class Akira.Lib2.Items.Model : Object {
 
     public ModelInstance? instance_from_id (int id) {
         if (id >= ITEM_START_ID) {
-            return item_map.has_key (id) ? item_map[id] : null;
+            return item_map.get (id);
         }
 
-        return group_map.has_key (id) ? group_map[id] : null;
+        return group_map.get (id);
     }
 
     public ModelInstance? child_instance_at (int parent_id, int pos) {
@@ -103,15 +103,14 @@ public class Akira.Lib2.Items.Model : Object {
 
     public ModelNode? node_from_id (int id) {
         if (id >= ITEM_START_ID) {
-            return item_nodes.has_key (id) ? item_nodes[id] : null;
+            return item_nodes.get (id);
         }
 
-        return group_nodes.has_key (id) ? group_nodes[id] : null;
+        return group_nodes.get (id);
     }
 
     public string path_from_id (int id) {
-        var node = node_from_id (id);
-        return path_from_node (node);
+        return path_from_node (node_from_id (id));
     }
 
     public string path_from_node (ModelNode node) {
@@ -125,11 +124,8 @@ public class Akira.Lib2.Items.Model : Object {
     }
 
     public GLib.Array<unowned Lib2.Items.ModelNode> children_in_group (int group_id) {
-        if (!group_nodes.has_key (group_id)) {
-            return new GLib.Array<unowned Lib2.Items.ModelNode> ();
-        }
-
-        return group_nodes[group_id].children;
+        var group = group_nodes.get (group_id);
+        return group == null ? new GLib.Array<unowned Lib2.Items.ModelNode> () : group.children;
     }
 
     public void mark_node_geometry_dirty_by_id (int id) {
@@ -147,8 +143,9 @@ public class Akira.Lib2.Items.Model : Object {
     }
 
     public void recalculate_children_stacking (int parent_id) {
-        var group = group_nodes.has_key (parent_id) ? group_nodes[parent_id] : null;
+        var group = group_nodes.get (parent_id);
         if (group == null) {
+            assert (false);
             return;
         }
 
@@ -166,17 +163,13 @@ public class Akira.Lib2.Items.Model : Object {
     }
 
     public int extripate (int parent_id, uint pos, bool restack) {
-        if (!group_map.has_key (parent_id)) {
+        var parent_node = group_nodes.get (parent_id);
+
+        if (parent_node == null || pos >= parent_node.children.length) {
             return -1;
         }
 
-        var parent_node = group_nodes[parent_id];
-
-        if (pos >= parent_node.children.length) {
-            return -1;
-        }
-
-        var target_node = parent_node.children.index (pos);
+        unowned var target_node = parent_node.children.index (pos);
 
         inner_remove (parent_node, target_node, pos);
 
@@ -189,22 +182,21 @@ public class Akira.Lib2.Items.Model : Object {
     }
 
     public int append_new_item (int parent_id, Lib2.Items.ModelInstance candidate) {
-        if (!group_map.has_key (parent_id)) {
+        var parent_node = group_nodes.get (parent_id);
+        if (parent_node == null) {
             return -1;
         }
 
-        var parent_node = group_nodes[parent_id];
         var pos = parent_node.children == null ? 0 : parent_node.children.length;
-
         return inner_splice_new_item (parent_node, pos, candidate);
     }
 
     public int splice_new_item (int parent_id, uint pos, Lib2.Items.ModelInstance candidate) {
-        if (!group_map.has_key (parent_id)) {
+        var parent_node = group_nodes.get (parent_id);
+        if (parent_node == null) {
             return -1;
         }
-
-        return inner_splice_new_item (group_nodes[parent_id], pos, candidate);
+        return inner_splice_new_item (parent_node, pos, candidate);
     }
 
     public int move_items (int parent_id, uint pos, uint newpos, int length, bool restack) {
@@ -212,11 +204,10 @@ public class Akira.Lib2.Items.Model : Object {
             return 0;
         }
 
-        if (!group_map.has_key (parent_id)) {
+        var parent_node = group_nodes.get (parent_id);
+        if (parent_node == null) {
             return -1;
         }
-
-        var parent_node = group_nodes[parent_id];
 
         if (pos >= parent_node.children.length || pos + length >= parent_node.children.length) {
             return -1;
@@ -246,6 +237,7 @@ public class Akira.Lib2.Items.Model : Object {
 
     public static ModelNode? root (ModelNode node) {
         if (node.parent == null) {
+            assert (node.id == ORIGIN_ID);
             return node;
         }
 
@@ -376,7 +368,7 @@ public class Akira.Lib2.Items.Model : Object {
     private int inner_remove (ModelNode parent_node, ModelNode to_delete, uint pos_in_parent) {
         if (to_delete.children != null) {
             for (var ci = (int) to_delete.children.length - 1; ci >= 0; --ci) {
-                var child_node = to_delete.children.index (ci);
+                unowned var child_node = to_delete.children.index (ci);
                 if (child_node.children != null && child_node.children.length > 0) {
                     inner_remove (to_delete, child_node, ci);
                     continue;
@@ -457,7 +449,7 @@ public class Akira.Lib2.Items.Model : Object {
         }
         mark_dirty (node);
 
-        var parent = node.parent;
+        unowned var parent = node.parent;
         while (parent.id != ORIGIN_ID) {
             internal_mark_geometry_dirty (parent, true);
             on_item_geometry_compilation_requested (parent);

@@ -67,7 +67,7 @@ public class Akira.Lib2.Items.ModelNode {
         }
 
         unowned var dr = instance.drawable;
-        if (dr.new_hit_test (x, y, cr, true, true)) {
+        if (dr != null && dr.new_hit_test (x, y, cr, true, true)) {
           nodes.add (this);
         }
 

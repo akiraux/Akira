@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (c) 2019-2021 Alecaddd (https://alecaddd.com)
  *
  * This file is part of Akira.
@@ -19,24 +19,15 @@
  * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
  */
 
-public class Akira.Lib2.Items.ModelTypeGroup : ModelType {
-    public static ModelInstance default_group () {
-        var new_item = new ModelInstance (-1, new ModelTypeGroup ());
-        var layout_data = Components.Layout.LayoutData () {
-            can_rotate = true,
-            dilated_resize = true,
-            clips_children = false
-        };
-        new_item.components.layout = new Components.Layout (layout_data);
-        return new_item;
-    }
+ /*
+  * Simple 2d point.
+  */
+public struct Akira.Geometry.Point {
+    public double x;
+    public double y;
 
-    public override Components.CompiledGeometry compile_geometry (
-        Components.Components? components,
-        Lib2.Items.ModelNode? node
-    ) {
-        return new Components.CompiledGeometry.from_descendants (components, node);
+    public Point (double x = 0, double y = 0) {
+        this.x = x;
+        this.y = y;
     }
-
-    public override bool is_group () { return true; }
 }

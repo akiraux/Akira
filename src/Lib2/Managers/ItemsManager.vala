@@ -419,7 +419,14 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
     */
 
     public Lib2.Items.ModelInstance add_debug_rect (double x, double y) {
-        var new_rect = Lib2.Items.ModelTypeRect.default_rect (
+        //var new_rect = Lib2.Items.ModelTypeRect.default_rect (
+        //    new Lib2.Components.Coordinates (x, y),
+        //    new Lib2.Components.Size (50.0, 50.0, false),
+        //    new Lib2.Components.Borders.single_color (Lib2.Components.Color (0.3, 0.3, 0.3, 1.0), 2),
+        //    new Lib2.Components.Fills.single_color (Lib2.Components.Color (0.0, 0.0, 0.0, 1.0))
+        //);
+        var new_rect = Lib2.Items.ModelTypeEllipse.default_ellipse (
+            //new Lib2.Components.Coordinates (x + i * 60, y),
             new Lib2.Components.Coordinates (x, y),
             new Lib2.Components.Size (50.0, 50.0, false),
             new Lib2.Components.Borders.single_color (Lib2.Components.Color (0.3, 0.3, 0.3, 1.0), 2),
@@ -444,6 +451,7 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
             new Lib2.Components.Coordinates (500, 500),
             new Lib2.Components.Size (1000, 1000, false)
         );
+        //var group = Lib2.Items.ModelTypeGroup.default_group ();
         add_item_to_origin (group);
 
         var num_of = 1000;
@@ -451,7 +459,15 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
         for (var i = 0; i < num_of; ++i) {
                 x = GLib.Random.double_range (0, 1000);
                 y = GLib.Random.double_range (0, 1000);
-            var new_rect = Lib2.Items.ModelTypeRect.default_rect (
+            //var new_rect = Lib2.Items.ModelTypeRect.default_rect (
+            //    //new Lib2.Components.Coordinates (x + i * 60, y),
+            //    new Lib2.Components.Coordinates (x, y),
+            //    new Lib2.Components.Size (50.0, 50.0, false),
+            //    new Lib2.Components.Borders.single_color (Lib2.Components.Color (0.3, 0.3, 0.3, 1.0), 2),
+            //    new Lib2.Components.Fills.single_color (Lib2.Components.Color (0.0, 0.0, 0.0, 1.0))
+            //);
+
+            var new_rect = Lib2.Items.ModelTypeEllipse.default_ellipse (
                 //new Lib2.Components.Coordinates (x + i * 60, y),
                 new Lib2.Components.Coordinates (x, y),
                 new Lib2.Components.Size (50.0, 50.0, false),
@@ -487,7 +503,7 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
             var x = GLib.Random.double_range (0, (GLib.Math.log (num_of + GLib.Math.E) - 1) * 1000);
             var y = GLib.Random.double_range (0, (GLib.Math.log (num_of + GLib.Math.E) - 1) * 1000) + 500;
             var new_item = add_debug_rect (x, y);
-            //view_canvas.selection_manager.add_to_selection (new_item.id);
+            view_canvas.selection_manager.add_to_selection (new_item.id);
         }
 
         if (debug_timer) {

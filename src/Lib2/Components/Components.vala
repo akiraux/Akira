@@ -89,6 +89,7 @@ public struct Akira.Lib2.Components.Components {
 
     public Coordinates? center;
     public Size? size;
+    public Path? path;
     public Transform? transform;
 
     public Layout? layout;

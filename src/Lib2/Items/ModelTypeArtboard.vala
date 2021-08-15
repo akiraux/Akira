@@ -19,7 +19,7 @@
  * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
  */
 
-public class Akira.Lib2.Items.ModelTypeArtboard : Object, ModelType<ModelTypeArtboard> {
+public class Akira.Lib2.Items.ModelTypeArtboard : ModelType {
     //Goo.CanvasItem background;
 
     public static ModelInstance default_artboard (
@@ -48,26 +48,7 @@ public class Akira.Lib2.Items.ModelTypeArtboard : Object, ModelType<ModelTypeArt
         return new_item;
     }
 
-    public ModelType copy () {
-        return new ModelTypeArtboard ();
-    }
-
-    public Components.CompiledFill compile_fill (Components.Components? components, Lib2.Items.ModelNode? node) {
-        return Components.CompiledFill.compile (components, node);
-    }
-
-    public Components.CompiledBorder compile_border (Components.Components? components, Lib2.Items.ModelNode? node) {
-        return Components.CompiledBorder.compile (components, node);
-    }
-
-    public Components.CompiledGeometry compile_geometry (
-        Components.Components? components,
-        Lib2.Items.ModelNode? node
-    ) {
-        return new Components.CompiledGeometry.from_components (components, node);
-    }
-
-    public void construct_canvas_item (ModelInstance instance, Goo.Canvas canvas) {
+    public override void construct_canvas_item (ModelInstance instance, Goo.Canvas canvas) {
         var w = instance.components.size.width;
         var h = instance.components.size.height;
         instance.drawable = new Drawables.DrawableArtboard (
@@ -79,7 +60,7 @@ public class Akira.Lib2.Items.ModelTypeArtboard : Object, ModelType<ModelTypeArt
         );
     }
 
-    public void component_updated (ModelInstance instance, Lib2.Components.Component.Type type) {
+    public override void component_updated (ModelInstance instance, Lib2.Components.Component.Type type) {
         switch (type) {
             case Lib2.Components.Component.Type.COMPILED_BORDER:
                 if (!instance.compiled_border.is_visible) {
@@ -109,5 +90,5 @@ public class Akira.Lib2.Items.ModelTypeArtboard : Object, ModelType<ModelTypeArt
         }
     }
 
-    public bool is_group () { return true; }
+    public override bool is_group () { return true; }
 }

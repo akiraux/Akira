@@ -36,6 +36,11 @@ public class Akira.Lib2.Components.CompiledFill : Copyable<CompiledFill> {
         _visible = visible;
     }
 
+    public CompiledFill.as_empty () {
+        _color = Gdk.RGBA () { red = 0.0, green = 0.0, blue = 0.0, alpha = 0.0};
+        _visible = false;
+    }
+
     public CompiledFill copy () {
         return new CompiledFill (_color, _visible);
     }
