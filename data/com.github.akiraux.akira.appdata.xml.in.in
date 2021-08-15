@@ -32,6 +32,11 @@
 		<binary>@APP_ID@</binary>
 	</provides>
   <releases>
+    <release version="0.0.16" date="2021-08-15">
+      <description>
+        <p>elementary OS 6 Odin release</p>
+      </description>
+    </release>
     <release version="0.0.15" date="2021-07-20">
       <description>
         <p>Performance improvements and Global colors library</p>
