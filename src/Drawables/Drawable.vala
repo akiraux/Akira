@@ -293,6 +293,11 @@ public class Akira.Drawables.Drawable : Goo.CanvasItemSimple, Goo.CanvasItem {
           );
         }
 
-        return Geometry.Rectangle.with_coordinates (x1 + translate_x, y1 + translate_y, x2 + translate_x, y2 + translate_y);
+        return Geometry.Rectangle.with_coordinates (
+            x1 + translate_x,
+            y1 + translate_y,
+            x2 + translate_x,
+            y2 + translate_y
+        );
     }
 }

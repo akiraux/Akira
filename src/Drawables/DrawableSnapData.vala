@@ -178,26 +178,38 @@ public class Akira.Drawables.DrawableSnapData : Goo.CanvasItemSimple, Goo.Canvas
 
             if (vertical_lines) {
                 if (last_min > 0 || last_max > 0) {
-                    canvas.request_item_redraw (Goo.CanvasBounds () { x1 = last_min - ww, y1 = y, x2 = last_max + ww, y2 = y + height}, false);
+                    canvas.request_item_redraw (
+                        Goo.CanvasBounds () { x1 = last_min - ww, y1 = y, x2 = last_max + ww, y2 = y + height},
+                        false
+                    );
                     last_min = 0;
                     last_max = 0;
                 }
 
                 if (min > 0 || max > 0) {
-                    canvas.request_item_redraw (Goo.CanvasBounds () { x1 = min - ww, y1 = y, x2 = max + ww, y2 = y + height}, false);
+                    canvas.request_item_redraw
+                        (Goo.CanvasBounds () { x1 = min - ww, y1 = y, x2 = max + ww, y2 = y + height},
+                        false
+                    );
                     last_min = min;
                     last_max = max;
                 }
             }
             else {
                 if (last_min > 0 || last_max > 0) {
-                    canvas.request_item_redraw (Goo.CanvasBounds () { y1 = last_min - ww, x1 = x, y2 = last_max + ww, x2 = x + width}, false);
+                    canvas.request_item_redraw (
+                        Goo.CanvasBounds () { y1 = last_min - ww, x1 = x, y2 = last_max + ww, x2 = x + width},
+                        false
+                    );
                     last_min = 0;
                     last_max = 0;
                 }
 
                 if (min > 0 || max > 0) {
-                    canvas.request_item_redraw (Goo.CanvasBounds () { y1 = min - ww, x1 = x, y2 = max + ww, x2 = x + width}, false);
+                    canvas.request_item_redraw (
+                        Goo.CanvasBounds () { y1 = min - ww, x1 = x, y2 = max + ww, x2 = x + width},
+                        false
+                    );
                     last_min = min;
                     last_max = max;
                 }

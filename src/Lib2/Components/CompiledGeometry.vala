@@ -90,7 +90,11 @@ public class Akira.Lib2.Components.CompiledGeometry : Copyable<CompiledGeometry>
         _data = CompiledGeometryData ();
     }
 
-    public CompiledGeometry.from_components (Components? components, Lib2.Items.ModelNode? node, bool size_from_path = false) {
+    public CompiledGeometry.from_components (
+        Components? components,
+        Lib2.Items.ModelNode? node,
+        bool size_from_path = false
+    ) {
         _data = CompiledGeometryData ();
 
         if (components == null) {

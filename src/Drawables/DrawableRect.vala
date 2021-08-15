@@ -146,28 +146,28 @@ public class Akira.Drawables.DrawableRect : Drawable {
 
         // Add top-right
         if (rtr > 0) {
-            cr.arc(x + w - rtr, y + rtr, rtr, -90 * degrees, 0);
+            cr.arc (x + w - rtr, y + rtr, rtr, -90 * degrees, 0);
         } else {
             cr.move_to (x + w, y);
         }
 
         if (rbr > 0) {
             // Add bottom-right
-            cr.arc(x + w - rbr, y + h - rbr, rbr, 0, 90 * degrees);
+            cr.arc (x + w - rbr, y + h - rbr, rbr, 0, 90 * degrees);
         } else {
             cr.line_to (x + w, y + h);
         }
 
         if (rbl > 0) {
             // Add bottom-left
-            cr.arc(x + rbl, y + h - rbl, rbl, 90 * degrees, 180 * degrees);
+            cr.arc (x + rbl, y + h - rbl, rbl, 90 * degrees, 180 * degrees);
         } else {
             cr.line_to (x, y + h);
         }
 
         if (rtl > 0) {
             // Add top-left
-            cr.arc(x + rtl, y + rtl, rtl, 180 * degrees, 270 * degrees);
+            cr.arc (x + rtl, y + rtl, rtl, 180 * degrees, 270 * degrees);
         } else {
             cr.line_to (x, y);
         }

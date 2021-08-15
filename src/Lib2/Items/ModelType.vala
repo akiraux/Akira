@@ -23,7 +23,7 @@ public class Akira.Lib2.Items.ModelType : Object {
     public virtual Components.CompiledFill compile_fill (
         Components.Components? components,
         Lib2.Items.ModelNode? node
-    ) { 
+    ) {
         return Components.CompiledFill.compile (components, node);
     }
 
@@ -56,13 +56,13 @@ public class Akira.Lib2.Items.ModelType : Object {
         double reference_sy
     ) {
         Utils.AffineTransform.scale_node (
-            item_model, 
-            node, 
-            initial_drag_state, 
-            inverse_reference_matrix, 
-            global_offset_x, 
-            global_offset_y, 
-            reference_sx, 
+            item_model,
+            node,
+            initial_drag_state,
+            inverse_reference_matrix,
+            global_offset_x,
+            global_offset_y,
+            reference_sx,
             reference_sy
         );
     }

@@ -40,7 +40,10 @@ public class Akira.Lib2.Items.ModelTypePath : ModelType {
         new_item.components.transform = Lib2.Components.Components.default_transform ();
         new_item.components.flipped = Lib2.Components.Components.default_flipped ();
         new_item.components.border_radius = Lib2.Components.Components.default_border_radius ();
-        new_item.components.path = new Lib2.Components.Path.from_single_point (Akira.Geometry.Point (center.x, center.y), false);
+        new_item.components.path = new Lib2.Components.Path.from_single_point (
+            Akira.Geometry.Point (center.x, center.y),
+            false
+        );
         return new_item;
     }
 
@@ -50,7 +53,6 @@ public class Akira.Lib2.Items.ModelTypePath : ModelType {
     ) {
         return new Components.CompiledGeometry.from_components (components, node, true);
     }
-
 
     public override void construct_canvas_item (ModelInstance instance, Goo.Canvas canvas) {
         instance.drawable = new Drawables.DrawablePath (
