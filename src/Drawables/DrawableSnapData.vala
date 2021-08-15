@@ -33,7 +33,10 @@ public class Akira.Drawables.DrawableSnapData : Goo.CanvasItemSimple, Goo.Canvas
     private double[] line_pos;
     private double[] dot_x;
     private double[] dot_y;
+
     private bool vertical_lines = false;
+    private double last_min = 0;
+    private double last_max = 0;
 
     private Gdk.RGBA color;
 
@@ -77,6 +80,18 @@ public class Akira.Drawables.DrawableSnapData : Goo.CanvasItemSimple, Goo.Canvas
                 add_decorator_line (match, snap_value);
             }
         }
+
+        need_update = 1;
+        changed (false);
+    }
+
+    public void hide_drawable () {
+        line_pos = new double[0];
+        dot_x = new double[0];
+        dot_y = new double[0];
+        need_update = 1;
+        changed (false);
+        visibility = Goo.CanvasItemVisibility.HIDDEN;
     }
 
     /*
@@ -152,25 +167,61 @@ public class Akira.Drawables.DrawableSnapData : Goo.CanvasItemSimple, Goo.Canvas
      * Note that this gets called on changed(true), so simply figuring out the area needed for
      * the extents of the lines is NOT enough.
      */
-    public override void simple_update (Cairo.Context cr) {
-            bounds.x1 = x;
-            bounds.y1 = y;
+     public void update (bool entire_tree, Cairo.Context cr, ref Goo.CanvasBounds b) {
+        if (entire_tree || need_update > 0) {
+            need_update = 0;
+            double min;
+            double max;
+            Utils.Array.min_max_in_darray (line_pos, out min, out max);
 
-            bounds.x2 = x + width;
-            bounds.y2 = y + height;
-    }
+            var ww = DOT_RADIUS / canvas.scale;
 
+            if (vertical_lines) {
+                if (last_min > 0 || last_max > 0) {
+                    canvas.request_item_redraw (
+                        Goo.CanvasBounds () { x1 = last_min - ww, y1 = y, x2 = last_max + ww, y2 = y + height},
+                        false
+                    );
+                    last_min = 0;
+                    last_max = 0;
+                }
+
+                if (min > 0 || max > 0) {
+                    canvas.request_item_redraw
+                        (Goo.CanvasBounds () { x1 = min - ww, y1 = y, x2 = max + ww, y2 = y + height},
+                        false
+                    );
+                    last_min = min;
+                    last_max = max;
+                }
+            }
+            else {
+                if (last_min > 0 || last_max > 0) {
+                    canvas.request_item_redraw (
+                        Goo.CanvasBounds () { y1 = last_min - ww, x1 = x, y2 = last_max + ww, x2 = x + width},
+                        false
+                    );
+                    last_min = 0;
+                    last_max = 0;
+                }
+
+                if (min > 0 || max > 0) {
+                    canvas.request_item_redraw (
+                        Goo.CanvasBounds () { y1 = min - ww, x1 = x, y2 = max + ww, x2 = x + width},
+                        false
+                    );
+                    last_min = min;
+                    last_max = max;
+                }
+            }
+
+        }
+     }
 
     /*
      * Overrides paint method and draws decorator lines and dots.
      */
     public void paint (Cairo.Context cr, Goo.CanvasBounds target_bounds, double scale) {
-        /* Skip the item if the bounds don't intersect the expose rectangle. */
-        if (bounds.x1 > target_bounds.x2 || bounds.x2 < target_bounds.x1
-            || bounds.y1 > target_bounds.y2 || bounds.y2 < target_bounds.y1) {
-          return;
-        }
-
         /* Check if the item should be visible. */
         if (visibility <= Goo.CanvasItemVisibility.INVISIBLE
             || (visibility == Goo.CanvasItemVisibility.VISIBLE_ABOVE_THRESHOLD

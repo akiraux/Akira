@@ -836,7 +836,7 @@ namespace Goo {
 		public void skew_y (double degrees, double cx, double cy);
 		public void stop_animation ();
 		public void translate (double tx, double ty);
-		public abstract void update (bool entire_tree, Cairo.Context cr, Goo.CanvasBounds bounds);
+		public abstract void update (bool entire_tree, Cairo.Context cr, ref Goo.CanvasBounds bounds);
 		[NoAccessorMethod]
 		public abstract bool can_focus { get; set; }
 		[NoAccessorMethod]

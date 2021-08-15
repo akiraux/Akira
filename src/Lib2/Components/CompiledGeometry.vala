@@ -75,6 +75,13 @@ public class Akira.Lib2.Components.CompiledGeometry : Copyable<CompiledGeometry>
         _data = data;
     }
 
+    public CompiledGeometry.as_empty () {
+        _data = CompiledGeometryData ();
+        _data.area = Geometry.Quad ();
+        _data.area_bb = Geometry.Rectangle ();
+        _data._transformation_matrix = Cairo.Matrix.identity ();
+    }
+
     public CompiledGeometry copy () {
         return new CompiledGeometry (_data);
     }
@@ -83,7 +90,11 @@ public class Akira.Lib2.Components.CompiledGeometry : Copyable<CompiledGeometry>
         _data = CompiledGeometryData ();
     }
 
-    public CompiledGeometry.from_components (Components? components, Lib2.Items.ModelNode? node) {
+    public CompiledGeometry.from_components (
+        Components? components,
+        Lib2.Items.ModelNode? node,
+        bool size_from_path = false
+    ) {
         _data = CompiledGeometryData ();
 
         if (components == null) {
@@ -91,11 +102,9 @@ public class Akira.Lib2.Components.CompiledGeometry : Copyable<CompiledGeometry>
         }
 
         _data.source_center = components.center;
-        _data.source_size = components.size;
         _data.source_transform = components.transform;
 
         assert (_data.source_center != null);
-        assert (_data.source_size != null);
 
         if (_data.source_transform == null) {
             _data._transformation_matrix = Cairo.Matrix.identity ();
@@ -105,8 +114,32 @@ public class Akira.Lib2.Components.CompiledGeometry : Copyable<CompiledGeometry>
 
         _data.area.transformation = _data._transformation_matrix;
 
-        var half_height = _data.source_size.height / 2.0;
-        var half_width = _data.source_size.width / 2.0;
+        double half_width = 0;
+        double half_height = 0;
+
+        if (size_from_path) {
+            if (components.path == null) {
+                _data.area = Geometry.Quad ();
+                _data.area_bb = Geometry.Rectangle ();
+                return;
+            }
+
+            var ext = components.path.calculate_extents ();
+            half_width = ext.width / 2.0;
+            half_height = ext.height / 2.0;
+            _data.source_size = new Lib2.Components.Size (ext.width, ext.height, false);
+        } else {
+            if (components.size == null) {
+                _data.area = Geometry.Quad ();
+                _data.area_bb = Geometry.Rectangle ();
+                return;
+            }
+
+            _data.source_size = components.size;
+            half_height = _data.source_size.height / 2.0;
+            half_width = _data.source_size.width / 2.0;
+        }
+
         var top = -half_height;
         var bottom = half_height;
         var left = -half_width;

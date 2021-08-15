@@ -19,7 +19,7 @@
  * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
  */
 
-public class Akira.Lib2.Items.ModelTypeEllipse : Object, ModelType<ModelTypeEllipse> {
+public class Akira.Lib2.Items.ModelTypeEllipse : ModelType {
     public static ModelInstance minimal_ellipse () {
         return default_ellipse (
             new Lib2.Components.Coordinates (0.5, 0.5),
@@ -50,28 +50,13 @@ public class Akira.Lib2.Items.ModelTypeEllipse : Object, ModelType<ModelTypeElli
         return new ModelTypeEllipse ();
     }
 
-    public Components.CompiledFill compile_fill (Components.Components? components, Lib2.Items.ModelNode? node) {
-        return Components.CompiledFill.compile (components, node);
-    }
-
-    public Components.CompiledBorder compile_border (Components.Components? components, Lib2.Items.ModelNode? node) {
-        return Components.CompiledBorder.compile (components, node);
-    }
-
-    public Components.CompiledGeometry compile_geometry (
-        Components.Components? components,
-        Lib2.Items.ModelNode? node
-    ) {
-        return new Components.CompiledGeometry.from_components (components, node);
-    }
-
-    public void construct_canvas_item (ModelInstance instance, Goo.Canvas canvas) {
+    public override void construct_canvas_item (ModelInstance instance, Goo.Canvas canvas) {
         var radius_x = instance.components.size.width / 2.0;
         var radius_y = instance.components.size.height / 2.0;
         instance.drawable = new Drawables.DrawableEllipse (canvas.get_root_item (), 0, 0, radius_x, radius_y);
     }
 
-    public void component_updated (ModelInstance instance, Lib2.Components.Component.Type type) {
+    public override void component_updated (ModelInstance instance, Lib2.Components.Component.Type type) {
         switch (type) {
             case Lib2.Components.Component.Type.COMPILED_BORDER:
                 if (!instance.compiled_border.is_visible) {
@@ -100,6 +85,4 @@ public class Akira.Lib2.Items.ModelTypeEllipse : Object, ModelType<ModelTypeElli
                 break;
         }
     }
-
-    public bool is_group () { return false; }
 }

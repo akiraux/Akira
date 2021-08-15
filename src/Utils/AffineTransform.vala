@@ -27,6 +27,82 @@ public class Akira.Utils.AffineTransform : Object {
     private const int MIN_SIZE = 1;
     private const int MIN_POS = 10;
 
+    /*
+     * Scales a node and its children relative to a reference frame.
+     */
+    public static void scale_node (
+        Lib2.Items.Model item_model,
+        Lib2.Items.ModelNode node,
+        Lib2.Modes.TransformMode.InitialDragState initial_drag_state,
+        Cairo.Matrix inverse_reference_matrix,
+        double global_offset_x,
+        double global_offset_y,
+        double reference_sx,
+        double reference_sy
+    ) {
+        // #TODO wip
+        unowned var item = node.instance;
+
+        if ((item.components.center != null && item.components.size != null) || item.components.path != null) {
+            var item_drag_data = initial_drag_state.item_data_map[node.id];
+
+            var strf = Cairo.Matrix (reference_sx, 0, 0, reference_sy, 0, 0);
+            double center_offset_x = item_drag_data.item_geometry.area.center_x - initial_drag_state.area.center_x;
+            double center_offset_y = item_drag_data.item_geometry.area.center_y - initial_drag_state.area.center_y;
+
+            var new_transform = Utils.GeometryMath.multiply_matrices (
+                item_drag_data.item_geometry.transformation_matrix,
+                inverse_reference_matrix
+            );
+
+            new_transform = Utils.GeometryMath.multiply_matrices (new_transform, strf);
+            new_transform = Utils.GeometryMath.multiply_matrices (
+                new_transform,
+                initial_drag_state.area.transformation
+            );
+
+            var new_width = item_drag_data.item_geometry.source_width;
+            var new_height = item_drag_data.item_geometry.source_height;
+            double scale_x = 0.0;
+            double scale_y = 0.0;
+            double shear_x = 0.0;
+            double angle = 0.0;
+
+            Utils.GeometryMath.decompose_matrix (new_transform, ref scale_x, ref scale_y, ref shear_x, ref angle);
+
+            var scale_transform = Cairo.Matrix (scale_x, 0, 0, scale_y, 0, 0);
+            scale_transform.transform_distance (ref new_width, ref new_height);
+
+            strf.transform_distance (ref center_offset_x, ref center_offset_y);
+            var d_x = initial_drag_state.area.center_x + global_offset_x + center_offset_x;
+            var d_y = initial_drag_state.area.center_y + global_offset_y + center_offset_y;
+
+            item.components.center = new Lib2.Components.Coordinates (d_x, d_y);
+            item.components.transform = new Lib2.Components.Transform (angle, 1.0, 1.0, shear_x, 0);
+
+            item.components.size = new Lib2.Components.Size (new_width, new_height, false);
+
+            item_model.mark_node_geometry_dirty (node);
+        }
+
+
+        unowned var layout = item.components.layout;
+        if ((layout == null || layout.dilated_resize) && node.children != null) {
+            foreach (unowned var child in node.children.data) {
+                child.instance.type.apply_scale_transform (
+                    item_model,
+                    child,
+                    initial_drag_state,
+                    inverse_reference_matrix,
+                    global_offset_x,
+                    global_offset_y,
+                    reference_sx,
+                    reference_sy
+                );
+            }
+        }
+    }
+
     /**
      * Calculate adjustments necessary for a nob resize operation. All inputs
      * should have already been transformed to the correct space.
