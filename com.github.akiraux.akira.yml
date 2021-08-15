@@ -28,19 +28,6 @@ modules:
         url: https://gitlab.gnome.org/GNOME/goocanvas
         branch: 'goocanvas-3.0'
 
-  - name: libarchive
-    buildsystem: simple
-    sources:
-      - type: git
-        url: https://github.com/libarchive/libarchive
-        tag: '3.5.1'
-    build-commands:
-      - ./build/autogen.sh
-    cleanup:
-      - /bin
-      - /include
-      - /lib/pkgconfig
-
   - name: akira
     buildsystem: meson
     sources:
