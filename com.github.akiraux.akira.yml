@@ -13,6 +13,7 @@ finish-args:
   - '--system-talk-name=org.freedesktop.Accounts'
 
   - '--filesystem=home'
+  - '--device=dri'
 
 modules:
   - name: goocanvas
