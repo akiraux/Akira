@@ -205,7 +205,7 @@ public class Akira.Layouts.Partials.ArtboardSizesPanel : Gtk.Grid {
             if ( reg.match (label, 0, out match_info) ) {
                 // the output we get after regex looks like "width x height"
                 // get the actual width and height from it
-                    string[] split_string = Regex.split_simple ("""\sx\s""", match_info.fetch (0));
+                string[] split_string = Regex.split_simple ("""\sx\s""", match_info.fetch (0));
 
                 int width = int.parse (split_string[0]);
                 int height = int.parse (split_string[1]);
@@ -223,6 +223,21 @@ public class Akira.Layouts.Partials.ArtboardSizesPanel : Gtk.Grid {
 
                 canvas.selected_bound_manager.add_item_to_selection (new_artboard);
                 canvas.update_canvas ();
+
+                // amount of margin when artboard is inserted so that some background canvas is also visible
+                double artboard_margin = double.max(width, height) / 10;
+
+                // figure out the zoom level based on the window size and artboard size
+                double scale_x = (double) (window.main_window.main_canvas.get_allocated_width() - artboard_margin) / width;
+                double scale_y = (double) (window.main_window.main_canvas.get_allocated_height() - artboard_margin) / height;
+                double final_scale = double.min(scale_x, scale_y);
+
+                double old_scale = window.main_window.main_canvas.canvas.get_scale();
+
+                // first reset the zoom level to 100%
+                window.event_bus.update_scale( 1 - old_scale );
+                // then zoom as per the calcuated level
+                window.event_bus.update_scale( final_scale - 1 );
             }
         } catch (Error error) {
             print ("Regex error in ArtboardSizesPanel: %s\n", error.message);
