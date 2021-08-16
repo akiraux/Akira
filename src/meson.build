@@ -61,7 +61,9 @@ sources = files(
     'Layouts/Partials/TransformPanel.vala',
     'Layouts/Partials/BorderRadiusPanel.vala',
     'Layouts/Partials/AlignItemsPanel.vala',
+
     'Layouts/Sidebars/LayersSidebar.vala',
+    'Layouts/Sidebars/Partials/LayersPanel.vala',
 
     'Widgets/AddColorButton.vala',
     'Widgets/AlignBoxButton.vala',
