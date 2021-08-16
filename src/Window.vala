@@ -60,6 +60,7 @@ public class Akira.Window : Gtk.ApplicationWindow {
         headerbar = new Akira.Layouts.HeaderBar (this);
 
         if (use_new_components) {
+            file_manager = new Akira.FileFormat.FileManager (this);
             main_window = new Akira.Layouts.MainWindow (this);
         }
         else {

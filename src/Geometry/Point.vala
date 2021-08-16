@@ -30,4 +30,18 @@ public struct Akira.Geometry.Point {
         this.x = x;
         this.y = y;
     }
+
+    public Point.deserialized (Json.Object obj) {
+        x = obj.get_double_member ("x");
+        y = obj.get_double_member ("y");
+    }
+
+    public Json.Node serialize () {
+        var obj = new Json.Object ();
+        obj.set_double_member ("x", x);
+        obj.set_double_member ("y", y);
+        var node = new Json.Node (Json.NodeType.OBJECT);
+        node.set_object (obj);
+        return node;
+    }
 }

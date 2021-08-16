@@ -46,9 +46,7 @@ public class Akira.Lib2.Items.ModelTypeEllipse : ModelType {
         return new_item;
     }
 
-    public ModelType copy () {
-        return new ModelTypeEllipse ();
-    }
+    public override string name_id { get { return "ellipse"; } }
 
     public override void construct_canvas_item (ModelInstance instance, Goo.Canvas canvas) {
         var radius_x = instance.components.size.width / 2.0;

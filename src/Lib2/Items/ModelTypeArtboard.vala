@@ -48,6 +48,8 @@ public class Akira.Lib2.Items.ModelTypeArtboard : ModelType {
         return new_item;
     }
 
+    public override string name_id { get { return "artboard"; } }
+
     public override void construct_canvas_item (ModelInstance instance, Goo.Canvas canvas) {
         var w = instance.components.size.width;
         var h = instance.components.size.height;

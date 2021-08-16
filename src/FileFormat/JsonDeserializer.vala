@@ -35,38 +35,21 @@ public class Akira.FileFormat.JsonDeserializer {
      * Deserialize a Json.Node and apply it to the current world state.
      */
     public static void json_object_to_world (Json.Object obj, Akira.Window window, bool items_only = false) {
+        var view_canvas = window.main_window.main_view_canvas.canvas;
+
         // Se the canvas to simulate a click + holding state to avoid triggering
         // redrawing methods connected to that state.
-        window.main_window.main_canvas.canvas.holding = true;
+        view_canvas.holding = true;
 
-        // Load saved Artboards.
-        if (obj.get_member ("artboards") != null) {
-            Json.Array artboards = obj.get_member ("artboards").get_array ();
-            var artboards_list = artboards.get_elements ();
-            artboards_list.reverse ();
-
-            foreach (unowned Json.Node node in artboards_list) {
-                load_item (window, node.get_object (), "artboard");
-            }
-        }
-
-        // Load saved Items.
-        if (obj.get_member ("items") != null) {
-            Json.Array items = obj.get_member ("items").get_array ();
-            var items_list = items.get_elements ();
-            items_list.reverse ();
-
-            foreach (unowned Json.Node node in items_list) {
-                load_item (window, node.get_object (), "item");
-            }
-        }
 
         if (!items_only) {
             load_window_states (window, obj);
         }
 
+        deserialize_model (window.main_window.main_view_canvas.canvas, obj);
+
         // Reset the holding state at the end of it.
-        window.main_window.main_canvas.canvas.holding = false;
+        view_canvas.holding = false;
     }
 
     /*
@@ -74,17 +57,70 @@ public class Akira.FileFormat.JsonDeserializer {
      */
     private static void load_window_states (Akira.Window window, Json.Object obj) {
         window.event_bus.set_scale (obj.get_double_member ("scale"));
-        window.main_window.main_canvas.main_scroll.hadjustment.value = obj.get_double_member ("hadjustment");
-        window.main_window.main_canvas.main_scroll.vadjustment.value = obj.get_double_member ("vadjustment");
+        window.main_window.main_view_canvas.main_scroll.hadjustment.value = obj.get_double_member ("hadjustment");
+        window.main_window.main_view_canvas.main_scroll.vadjustment.value = obj.get_double_member ("vadjustment");
     }
 
     /*
-     * Deserialize item states and apply them to the window.
+     * Deserialize the model.
      */
-    private static void load_item (Akira.Window window, Json.Object obj, string type) {
-        var item = obj.get_member (type).get_object ();
-        if (item != null) {
-            window.items_manager.load_item (item);
+    private static void deserialize_model (Lib2.ViewCanvas view_canvas, Json.Object obj) {
+        var roots = obj.get_member ("roots");
+        if (roots == null) {
+            // bad file
+            assert (false);
+            return;
+        }
+
+        foreach (unowned Json.Node root in roots.get_array ().get_elements ()) {
+            deserialize_node (view_canvas, root.get_object (), Lib2.Items.Model.ORIGIN_ID);
+        }
+
+        view_canvas.items_manager.compile_model ();
+    }
+
+    /*
+     * Deserialize a specific node, recursive.
+     */
+    private static void deserialize_node (Lib2.ViewCanvas view_canvas, Json.Object node_obj, int group_id) {
+        if (!node_obj.has_member ("type")) {
+            assert (false);
+            return;
+        }
+
+        int new_id = -1;
+        var type = node_obj.get_string_member ("type");
+
+        var components_json = node_obj.get_member ("components");
+        var components = Lib2.Components.Components.deserialize (components_json);
+
+        Lib2.Items.ModelInstance? new_inst = null;
+        if (type == "rect") {
+            new_inst = new Lib2.Items.ModelInstance (-1, new Lib2.Items.ModelTypeRect ());
+        } else if (type == "ellipse") {
+            new_inst = new Lib2.Items.ModelInstance (-1, new Lib2.Items.ModelTypeEllipse ());
+        } else if (type == "group") {
+            new_inst = new Lib2.Items.ModelInstance (-1, new Lib2.Items.ModelTypeGroup ());
+        } else if (type == "artboard") {
+            new_inst = new Lib2.Items.ModelInstance (-1, new Lib2.Items.ModelTypeArtboard ());
+        } else if (type == "path") {
+            new_inst = new Lib2.Items.ModelInstance (-1, new Lib2.Items.ModelTypePath ());
+        }
+        else {
+            // Unknown type
+            assert (false);
+            return;
+        }
+
+        new_inst.components = components;
+
+        new_id = view_canvas.items_manager.add_item_to_group (group_id, new_inst, true);
+
+        var children = node_obj.get_member ("children");
+        if (children != null) {
+            foreach (unowned Json.Node child in children.get_array ().get_elements ()) {
+                deserialize_node (view_canvas, child.get_object (), new_id);
+            }
         }
     }
 }

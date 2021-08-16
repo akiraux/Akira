@@ -29,6 +29,11 @@ public class Akira.Lib2.Components.Fill {
             _color = color;
         }
 
+        public FillData.deserialized (int id, Json.Object obj) {
+            _id = id;
+            _color = Color.deserialized (obj.get_object_member ("color"));
+        }
+
         // Recommended accessors
 
         public int id () { return _id; }
@@ -39,6 +44,15 @@ public class Akira.Lib2.Components.Fill {
 
         public FillData with_color (Color new_color) {
             return FillData (_id, new_color);
+        }
+
+        public Json.Node serialize () {
+            var obj = new Json.Object ();
+            obj.set_int_member ("id", _id);
+            obj.set_member ("color", _color.serialize ());
+            var node = new Json.Node (Json.NodeType.OBJECT);
+            node.set_object (obj);
+            return node;
         }
     }
 

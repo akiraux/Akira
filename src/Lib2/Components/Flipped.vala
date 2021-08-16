@@ -20,7 +20,7 @@
  */
 
 
-public class Akira.Lib2.Components.Flipped : Copyable<Flipped> {
+public class Akira.Lib2.Components.Flipped : Component, Copyable<Flipped> {
     private bool _horizontal;
     private bool _vertical;
 
@@ -35,6 +35,16 @@ public class Akira.Lib2.Components.Flipped : Copyable<Flipped> {
     public Flipped (bool horizontal, bool vertical) {
         _horizontal = horizontal;
         _vertical = vertical;
+    }
+
+    public Flipped.deserialized (Json.Object obj) {
+        _horizontal = obj.get_boolean_member ("horizontal");
+        _vertical = obj.get_boolean_member ("vertical");
+    }
+
+    protected override void serialize_details (ref Json.Object obj) {
+        obj.set_boolean_member ("horizontal", _horizontal);
+        obj.set_boolean_member ("vertical", _vertical);
     }
 
     public Flipped copy () {

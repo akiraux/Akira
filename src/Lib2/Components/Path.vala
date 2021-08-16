@@ -19,7 +19,7 @@
  * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
  */
 
-public class Akira.Lib2.Components.Path : Copyable<Path> {
+public class Akira.Lib2.Components.Path : Component, Copyable<Path> {
     // Control points relative to a top-left of 0,0.
     // In the future we will probably want control points with more data.
     public Geometry.Point[] data;
@@ -41,6 +41,28 @@ public class Akira.Lib2.Components.Path : Copyable<Path> {
         this.close = close;
     }
 
+    public Path.deserialized (Json.Object obj) {
+        var arr = obj.get_array_member ("path_data").get_elements ();
+        data = new Geometry.Point[0];
+        var idx = 0;
+        foreach (unowned var pt in arr) {
+            data.resize (data.length + 1);
+            data[idx] = Geometry.Point.deserialized (pt.get_object ());
+            ++idx;
+        }
+    }
+
+    protected override void serialize_details (ref Json.Object obj) {
+        var array = new Json.Array ();
+
+        foreach (unowned var d in data) {
+            array.add_element (d.serialize ());
+        }
+
+        var node = new Json.Node (Json.NodeType.ARRAY);
+        node.set_array (array);
+        obj.set_member ("path_data", node);
+    }
 
     public Path copy () {
         var cln = new Path ();

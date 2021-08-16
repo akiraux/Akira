@@ -19,7 +19,7 @@
  * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
  */
 
-public class Akira.Lib2.Components.Borders : Copyable<Borders> {
+public class Akira.Lib2.Components.Borders : Component, Copyable<Borders> {
     public Border.BorderData[] data;
 
     public Borders () {}
@@ -27,6 +27,36 @@ public class Akira.Lib2.Components.Borders : Copyable<Borders> {
     public Borders.single_color (Color color, int size) {
         data = new Border.BorderData[1];
         data[0] = Border.BorderData (0, color, size);
+    }
+
+    public Borders.deserialized (Json.Object obj) {
+        var arr = obj.get_array_member ("border_data").get_elements ();
+        data = new Border.BorderData[0];
+
+        var idx = 0;
+        foreach (unowned var border in arr) {
+            data.resize (data.length + 1);
+            data[idx] = Border.BorderData.deserialized (idx, border.get_object ());
+            ++idx;
+        }
+    }
+
+    protected override void serialize_details (ref Json.Object obj) {
+        var array = new Json.Array ();
+
+        foreach (unowned var d in data) {
+            array.add_element (d.serialize ());
+        }
+
+        var node = new Json.Node (Json.NodeType.ARRAY);
+        node.set_array (array);
+        obj.set_member ("border_data", node);
+    }
+
+    public Borders copy () {
+        var cln = new Borders ();
+        cln.data = data;
+        return cln;
     }
 
     // Recommended accessors
@@ -44,13 +74,5 @@ public class Akira.Lib2.Components.Borders : Copyable<Borders> {
         for (var i = 0; i < number_to_prep; ++i) {
             data[i]._id = i;
         }
-    }
-
-    // Mutators
-
-    public Borders copy () {
-        var cln = new Borders ();
-        cln.data = data;
-        return cln;
     }
 }

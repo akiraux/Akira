@@ -20,6 +20,8 @@
  */
 
 public class Akira.Lib2.Items.ModelType : Object {
+    public virtual string name_id { get { return "empty"; } }
+
     public virtual Components.CompiledFill compile_fill (
         Components.Components? components,
         Lib2.Items.ModelNode? node
@@ -70,8 +72,10 @@ public class Akira.Lib2.Items.ModelType : Object {
     public virtual bool is_group () { return false; }
 }
 
-public class Akira.Lib2.Items.DummyItemType : ModelType {}
+public class Akira.Lib2.Items.DummyItemType : ModelType {
+    public override string name_id { get { return "dummy_item"; } }
+}
 
 public class Akira.Lib2.Items.DummyGroupType : ModelType {
-    public override bool is_group () { return true; }
+    public override string name_id { get { return "dummy_group"; } }
 }

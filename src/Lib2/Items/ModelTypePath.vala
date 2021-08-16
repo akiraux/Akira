@@ -47,6 +47,8 @@ public class Akira.Lib2.Items.ModelTypePath : ModelType {
         return new_item;
     }
 
+    public override string name_id { get { return "path"; } }
+
     public override Components.CompiledGeometry compile_geometry (
         Components.Components? components,
         Lib2.Items.ModelNode? node

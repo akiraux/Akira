@@ -57,7 +57,7 @@ public class Akira.FileFormat.AkiraFile : Akira.FileFormat.ZipArchiveHandler {
 
     public void save_file () {
         try {
-            save_images.begin ();
+            //save_images.begin ();
 
             var world_json = FileFormat.JsonSerializer.world_to_json_node (window);
             write_content_to_file (content_file, FileFormat.JsonSerializer.json_to_string (world_json, true));
