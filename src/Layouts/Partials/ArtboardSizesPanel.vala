@@ -207,8 +207,8 @@ public class Akira.Layouts.Partials.ArtboardSizesPanel : Gtk.Grid {
                 // get the actual width and height from it
                 string[] split_string = Regex.split_simple ("""\sx\s""", match_info.fetch (0));
 
-                int width = int.parse (split_string[0]);
-                int height = int.parse (split_string[1]);
+                double width = double.parse (split_string[0]);
+                double height = double.parse (split_string[1]);
 
                 var canvas = window.main_window.main_canvas.canvas;
                 canvas.selected_bound_manager.reset_selection ();
@@ -238,6 +238,16 @@ public class Akira.Layouts.Partials.ArtboardSizesPanel : Gtk.Grid {
                 window.event_bus.update_scale( 1 - old_scale );
                 // then zoom as per the calcuated level
                 window.event_bus.update_scale( final_scale - 1 );
+
+                // use the position and size of artboard to scroll canvas so that new artboard is in the center
+                canvas.convert_to_pixels(ref pos_x, ref pos_y);
+                canvas.convert_to_pixels(ref width, ref height);
+
+                pos_x = pos_x + width / 2 - window.main_window.main_canvas.get_allocated_width() / 2;
+                pos_y = pos_y + height / 2 - window.main_window.main_canvas.get_allocated_height() / 2;
+
+                window.main_window.main_canvas.main_scroll.hadjustment.value = pos_x;
+                window.main_window.main_canvas.main_scroll.vadjustment.value = pos_y;
             }
         } catch (Error error) {
             print ("Regex error in ArtboardSizesPanel: %s\n", error.message);
@@ -274,15 +284,16 @@ public class Akira.Layouts.Partials.ArtboardSizesPanel : Gtk.Grid {
 
     private void get_new_artboard_pos (
         Akira.Models.ListModel<Lib.Items.CanvasArtboard> artboards,
-        int width,
-        int height,
+        double width,
+        double height,
         out double pos_x,
         out double pos_y
     ) {
         // if there are no artboards present,
         if (artboards.get_n_items () == 0) {
-            pos_x = 10;
-            pos_y = 10;
+            // default positions with 10% margins on top and bottom
+            pos_x = width / 10;
+            pos_y = height / 10;
 
             return;
         }
@@ -295,7 +306,7 @@ public class Akira.Layouts.Partials.ArtboardSizesPanel : Gtk.Grid {
         // initially, the x coordinate will be the same as that of previously inserted artboard
         // with a little offset
         curr_bounds.x1 = previous_artboard.coordinates.x + previous_artboard.size.width + 10;
-        // the new artboard will be at the same height as the previous artboard
+        // the new artboard will be at the same y coordinate as the previous artboard
         curr_bounds.y1 = previous_artboard.coordinates.y;
         curr_bounds.x2 = curr_bounds.x1 + width;
         curr_bounds.y2 = curr_bounds.y1 + height;
