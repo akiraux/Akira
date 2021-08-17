@@ -27,15 +27,23 @@ public class Akira.Widgets.ArtboardPanelInsertPopover : Gtk.Popover {
     // input for name of category or size
     private Gtk.Entry name_input;
 
-    // label for the size of artboard
-    private Gtk.Label size_label;
-    // input for size of input
-    private Gtk.Entry size_input;
+    // label for the width of artboard
+    private Gtk.Label width_label;
+    // input for width of input
+    private Gtk.Entry width_input;
+
+    // label for the height of artboard
+    private Gtk.Label height_label;
+    // input for height of input
+    private Gtk.Entry height_input;
+
 
     // string containing the name of category of size
     public string item_name;
-    // string containing the size of created artboard
-    public string item_size;
+    // string containing the width of created artboard
+    public int item_width;
+    // string containing the height of created artboard
+    public int item_height;
 
     public ArtboardPanelInsertPopover (Gtk.Widget widget) {
         set ("relative-to", widget);
@@ -45,7 +53,8 @@ public class Akira.Widgets.ArtboardPanelInsertPopover : Gtk.Popover {
         position = Gtk.PositionType.BOTTOM;
 
         item_name = "";
-        item_size = "";
+        item_width = 0;
+        item_height = 0;
     }
 
     public void initialize_popover (bool show_size) {
@@ -61,37 +70,106 @@ public class Akira.Widgets.ArtboardPanelInsertPopover : Gtk.Popover {
         name_input.get_style_context ().add_class ("size-category-item");
         name_input.visible = true;
 
-        name_input.activate.connect ( ()=>{
-            if (show_size) {
+        width_label = new Gtk.Label ("Width");
+        width_label.hexpand = true;
+        width_label.get_style_context ().add_class ("size-category-item");
 
-            } else {
-                if (name_input.text == "") {
-                    return;
-                }
+        width_input = new Gtk.Entry ();
+        width_input.hexpand = true;
+        width_input.get_style_context ().add_class ("size-category-item");
 
-                item_name = name_input.text;
-                popdown ();
+        height_label = new Gtk.Label ("Height");
+        height_label.hexpand = true;
+        height_label.get_style_context ().add_class ("size-category-item");
+
+        height_input = new Gtk.Entry ();
+        height_input.hexpand = true;
+        height_input.get_style_context ().add_class ("size-category-item");
+
+        name_input.activate.connect ( ()=> {
+            if (name_input.text == "") {
+                return;
+            }
+
+            if( are_inputs_valid(show_size) ) {
+                popdown();
             }
         });
 
-        size_label = new Gtk.Label ("Size");
-        size_label.hexpand = true;
-        size_label.get_style_context ().add_class ("size-category-item");
+        width_input.activate.connect ( ()=> {
+            if (width_input.text == "") {
+                return;
+            }
 
-        size_input = new Gtk.Entry ();
-        size_input.hexpand = true;
-        size_input.get_style_context ().add_class ("size-category-item");
+            if( are_inputs_valid(show_size) ) {
+                popdown();
+            }
+        });
+
+        height_input.activate.connect ( ()=> {
+            if (name_input.text == "") {
+                return;
+            }
+
+            if( are_inputs_valid(show_size) ) {
+                popdown();
+            }
+        });
 
         grid.attach (name_label, 0, 0, 1, 1);
         grid.attach (name_input, 1, 0, 1, 1);
 
         if (show_size) {
-            grid.attach (size_label, 0, 1, 1, 1);
-            grid.attach (size_input, 1, 1, 1, 1);
+            grid.attach (width_label, 0, 1, 1, 1);
+            grid.attach (width_input, 1, 1, 1, 1);
+
+            grid.attach (height_label, 0, 2, 1, 1);
+            grid.attach (height_input, 1, 2, 1, 1);
         }
 
         grid.show_all ();
 
         add (grid);
+    }
+
+    private bool are_inputs_valid (bool show_size) {
+        bool is_valid = true;
+
+        if(name_input.text != "") {
+            item_name = name_input.text;
+        } else {
+            is_valid = false;
+        }
+
+        if(!show_size) {
+            return is_valid;
+        }
+
+        if(width_input.text != "") {
+            int width = int.parse(width_input.text);
+
+            // if width is negative or wasn't parsed correctly,
+            if(width <= 0) {
+                is_valid = false;
+            } else {
+                item_width = width;
+            }
+        } else {
+            is_valid = false;
+        }
+
+        if(height_input.text != "") {
+            int height = int.parse(height_input.text);
+
+            if(height <= 0) {
+                is_valid = false;
+            } else {
+                item_height = height;
+            }
+        } else {
+            is_valid = false;
+        }
+
+        return is_valid;
     }
 }

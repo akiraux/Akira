@@ -163,6 +163,42 @@ public class Akira.Layouts.Partials.ArtboardSizesPanel : Gtk.Grid {
         return parsed_ints;
     }
 
+    private void recreate_categories_json() {
+        Json.Builder builder = new Json.Builder();
+
+        builder.begin_object();
+        builder.set_member_name("categories");
+        builder.begin_object();
+
+        for (int j = 0; j < list.get_n_items(); ++j) {
+            SizeCategoryItem item = list.get_item(j) as SizeCategoryItem;
+
+            builder.set_member_name(item.category_name);
+            builder.begin_object();
+
+            for(int i = 0; i < item.artboard_sizes.size; ++i) {
+                builder.set_member_name(item.artboard_device_names[i]);
+
+                builder.begin_array();
+                builder.add_int_value(item.artboard_sizes[i][0]);
+                builder.add_int_value(item.artboard_sizes[i][1]);
+                builder.end_array();
+            }
+
+            builder.end_object();
+        }
+
+        builder.end_object();
+        builder.end_object();
+
+        Json.Generator generator = new Json.Generator();
+        Json.Node root = builder.get_root();
+        generator.set_root(root);
+        generator.set_pretty(true);
+
+        settings.artboard_size_categories = generator.to_data(null);
+    }
+
     private Gtk.Expander create_category_expander (SizeCategoryItem category) {
 
         // create expander for each category of sizes
@@ -190,7 +226,19 @@ public class Akira.Layouts.Partials.ArtboardSizesPanel : Gtk.Grid {
             size_items_grid.attach (size_button, 0, i, 1, 1);
         }
 
+        // this button is for adding new sizes to a category
+        Gtk.Button add_size_button = new Gtk.Button.with_label("Add a new size...");
+        add_size_button.height_request = 35;
+        add_size_button.hexpand = true;
+        add_size_button.get_style_context ().add_class ("artboard-size-button");
+
+        add_size_button.clicked.connect(() => {
+            handle_add_size(category.category_name, add_size_button);
+        });
+
+        size_items_grid.attach(add_size_button, 0, category.artboard_sizes.size+1, 1, 1);
         category_expander.add (size_items_grid);
+        size_items_grid.show_all();
 
         return category_expander;
     }
@@ -254,34 +302,6 @@ public class Akira.Layouts.Partials.ArtboardSizesPanel : Gtk.Grid {
         }
     }
 
-    private void handle_add_category () {
-        Akira.Widgets.ArtboardPanelInsertPopover new_category_popup = new Akira.Widgets.ArtboardPanelInsertPopover (add_category_btn);
-        new_category_popup.initialize_popover (false);
-
-        new_category_popup.closed.connect ( ()=>{
-            if (new_category_popup.item_name != "") {
-                list.append (new SizeCategoryItem (new_category_popup.item_name));
-            }
-        });
-
-        new_category_popup.popup ();
-    }
-
-    private void reload_list (bool show) {
-        list.remove_all ();
-
-        if (show) {
-            toggled = true;
-            // read the json object containing info about sizes and category names
-            sizes_json = settings.artboard_size_categories;
-            parse_json (sizes_json);
-
-            show_all ();
-        } else {
-            toggled = false;
-        }
-    }
-
     private void get_new_artboard_pos (
         Akira.Models.ListModel<Lib.Items.CanvasArtboard> artboards,
         double width,
@@ -337,6 +357,71 @@ public class Akira.Layouts.Partials.ArtboardSizesPanel : Gtk.Grid {
         // if the artboard overlaps, then move the current artboard accordingly
         curr_bounds.x1 = bounds.x2 + 10;
     }
+
+    private void handle_add_category () {
+        Akira.Widgets.ArtboardPanelInsertPopover new_category_popup = new Akira.Widgets.ArtboardPanelInsertPopover (add_category_btn);
+        new_category_popup.initialize_popover (false);
+
+        new_category_popup.closed.connect ( ()=>{
+            if (new_category_popup.item_name != "") {
+                list.append (new SizeCategoryItem (new_category_popup.item_name));
+
+                recreate_categories_json();
+            }
+        });
+
+        new_category_popup.popup ();
+    }
+
+    private void handle_add_size (string category_name, Gtk.Button add_button) {
+        Akira.Widgets.ArtboardPanelInsertPopover new_size_popup = new Akira.Widgets.ArtboardPanelInsertPopover (add_button);
+        new_size_popup.initialize_popover (true);
+
+        new_size_popup.closed.connect ( ()=>{
+
+            if (new_size_popup.item_name != "") {
+
+                SizeCategoryItem dummy_item = new SizeCategoryItem(category_name);
+                uint position;
+
+                if ( list.find_with_equal_func (
+                        dummy_item,
+                        (a, b) => {
+                            var _a = (SizeCategoryItem) a;
+                            var _b = (SizeCategoryItem) b;
+
+                            return (_a.category_name == _b.category_name);
+                        },
+                        out position) ) {
+                    // add the new device name and its size to the list
+                    int[] new_size = {new_size_popup.item_width, new_size_popup.item_height};
+
+                    SizeCategoryItem list_item = list.get_item(position) as SizeCategoryItem;
+                    list_item.add_size(new_size, new_size_popup.item_name);
+
+                    recreate_categories_json();
+                    reload_list(true);
+                }
+            }
+        });
+
+        new_size_popup.popup ();
+    }
+
+    private void reload_list (bool show) {
+        list.remove_all ();
+
+        if (show) {
+            toggled = true;
+            // read the json object containing info about sizes and category names
+            sizes_json = settings.artboard_size_categories;
+            parse_json (sizes_json);
+
+            show_all ();
+        } else {
+            toggled = false;
+        }
+    }
 }
 
 // this class represents a category of artboard sizes.
@@ -354,8 +439,8 @@ private class SizeCategoryItem : Object {
 
     public void add_size (int[] new_size, string device_name) {
         GLib.GenericArray<int> array = new GLib.GenericArray<int> ();
-        array.add (new_size[1]);
         array.add (new_size[0]);
+        array.add (new_size[1]);
 
         artboard_device_names.add (device_name);
 
