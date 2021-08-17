@@ -266,8 +266,7 @@ public class Akira.Layouts.Partials.ArtboardSizesPanel : Gtk.Grid {
 
                 window.items_manager.set_item_to_insert ("artboard");
                 var new_artboard = window.items_manager.insert_item (pos_x, pos_y);
-                new_artboard.size.width = width;
-                new_artboard.size.height = height;
+                new_artboard.name.name = label;
 
                 canvas.selected_bound_manager.add_item_to_selection (new_artboard);
                 canvas.update_canvas ();
@@ -289,6 +288,8 @@ public class Akira.Layouts.Partials.ArtboardSizesPanel : Gtk.Grid {
                 window.event_bus.update_scale ( 1 - old_scale );
                 // then zoom as per the calcuated level
                 window.event_bus.update_scale ( final_scale - 1 );
+
+                Utils.AffineTransform.adjust_size (new_artboard, width, height);
 
                 // use the position and size of artboard to scroll canvas so that new artboard is in the center
                 canvas.convert_to_pixels (ref pos_x, ref pos_y);
