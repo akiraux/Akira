@@ -25,7 +25,7 @@ public class Akira.Layouts.MainWindow : Gtk.Grid {
     // To be removed.
     public Layouts.MainCanvas main_canvas;
     public Layouts.LeftSideBar left_sidebar;
-    public Layouts.RightSideBar right_sidebar;
+    // public Layouts.RightSideBar right_sidebar;
     // end.
 
     private Layouts.MainViewCanvas main_view_canvas;

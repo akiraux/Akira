@@ -25,6 +25,9 @@
 public class Akira.Layouts.Sidebars.Partials.LayersPanel : Gtk.Grid {
     public unowned Lib2.ViewCanvas view_canvas { get; construct; }
 
+    private Gtk.ListBox artboards_list;
+    private Gtk.ListBox free_items_list;
+
     public LayersPanel (Lib2.ViewCanvas canvas) {
         Object (
             orientation: Gtk.Orientation.VERTICAL,
@@ -38,11 +41,11 @@ public class Akira.Layouts.Sidebars.Partials.LayersPanel : Gtk.Grid {
 
         // We need to keep free items (layers which parent is the canvas), and
         // artboards in different listboxes to properly handle drag&drop and hierarchy.
-        var free_items_list = new Gtk.ListBox ();
+        free_items_list = new Gtk.ListBox ();
         free_items_list.activate_on_single_click = false;
         free_items_list.selection_mode = Gtk.SelectionMode.SINGLE;
 
-        var artboards_list = new Gtk.ListBox ();
+        artboards_list = new Gtk.ListBox ();
         artboards_list.activate_on_single_click = false;
         artboards_list.selection_mode = Gtk.SelectionMode.SINGLE;
 
@@ -88,6 +91,15 @@ public class Akira.Layouts.Sidebars.Partials.LayersPanel : Gtk.Grid {
             return;
         }
 
-        // Create a new layer and add it to a specific listbox based on the type.
+        var new_layer = new LayerElement (node_instance, view_canvas);
+
+        // Create a new layer and add it to a specific listbox based on the
+        // node's type.
+        if (node_instance.type is Lib2.Items.ModelTypeArtboard) {
+            artboards_list.add (new_layer);
+            return;
+        }
+
+        free_items_list.add (new_layer);
     }
 }

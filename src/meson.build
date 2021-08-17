@@ -48,11 +48,11 @@ sources = files(
     'Layouts/MainCanvas.vala',
     'Layouts/MainViewCanvas.vala',
     'Layouts/MainWindow.vala',
-    'Layouts/RightSideBar.vala',
-    'Layouts/Partials/LayersPanel.vala',
+    #'Layouts/RightSideBar.vala',
+    #'Layouts/Partials/LayersPanel.vala',
     'Layouts/Partials/PagesPanel.vala',
-    'Layouts/Partials/Artboard.vala',
-    'Layouts/Partials/Layer.vala',
+    #'Layouts/Partials/Artboard.vala',
+    #'Layouts/Partials/Layer.vala',
     'Layouts/Partials/BordersPanel.vala',
     'Layouts/Partials/BorderItem.vala',
     'Layouts/Partials/FillsPanel.vala',
@@ -64,6 +64,7 @@ sources = files(
 
     'Layouts/Sidebars/LayersSidebar.vala',
     'Layouts/Sidebars/Partials/LayersPanel.vala',
+    'Layouts/Sidebars/Partials/LayerElement.vala',
 
     'Widgets/AddColorButton.vala',
     'Widgets/AlignBoxButton.vala',
