@@ -91,8 +91,8 @@ public class Akira.Widgets.ArtboardPanelInsertPopover : Gtk.Popover {
                 return;
             }
 
-            if( are_inputs_valid(show_size) ) {
-                popdown();
+            if (are_inputs_valid (show_size)) {
+                popdown ();
             }
         });
 
@@ -101,8 +101,8 @@ public class Akira.Widgets.ArtboardPanelInsertPopover : Gtk.Popover {
                 return;
             }
 
-            if( are_inputs_valid(show_size) ) {
-                popdown();
+            if (are_inputs_valid (show_size)) {
+                popdown ();
             }
         });
 
@@ -111,8 +111,8 @@ public class Akira.Widgets.ArtboardPanelInsertPopover : Gtk.Popover {
                 return;
             }
 
-            if( are_inputs_valid(show_size) ) {
-                popdown();
+            if (are_inputs_valid (show_size)) {
+                popdown ();
             }
         });
 
@@ -135,21 +135,21 @@ public class Akira.Widgets.ArtboardPanelInsertPopover : Gtk.Popover {
     private bool are_inputs_valid (bool show_size) {
         bool is_valid = true;
 
-        if(name_input.text != "") {
+        if (name_input.text != "") {
             item_name = name_input.text;
         } else {
             is_valid = false;
         }
 
-        if(!show_size) {
+        if (!show_size) {
             return is_valid;
         }
 
-        if(width_input.text != "") {
-            int width = int.parse(width_input.text);
+        if (width_input.text != "") {
+            int width = int.parse (width_input.text);
 
             // if width is negative or wasn't parsed correctly,
-            if(width <= 0) {
+            if (width <= 0) {
                 is_valid = false;
             } else {
                 item_width = width;
@@ -158,10 +158,10 @@ public class Akira.Widgets.ArtboardPanelInsertPopover : Gtk.Popover {
             is_valid = false;
         }
 
-        if(height_input.text != "") {
-            int height = int.parse(height_input.text);
+        if (height_input.text != "") {
+            int height = int.parse (height_input.text);
 
-            if(height <= 0) {
+            if (height <= 0) {
                 is_valid = false;
             } else {
                 item_height = height;

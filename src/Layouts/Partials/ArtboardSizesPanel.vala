@@ -163,40 +163,40 @@ public class Akira.Layouts.Partials.ArtboardSizesPanel : Gtk.Grid {
         return parsed_ints;
     }
 
-    private void recreate_categories_json() {
-        Json.Builder builder = new Json.Builder();
+    private void recreate_categories_json () {
+        Json.Builder builder = new Json.Builder ();
 
-        builder.begin_object();
-        builder.set_member_name("categories");
-        builder.begin_object();
+        builder.begin_object ();
+        builder.set_member_name ("categories");
+        builder.begin_object ();
 
-        for (int j = 0; j < list.get_n_items(); ++j) {
-            SizeCategoryItem item = list.get_item(j) as SizeCategoryItem;
+        for (int j = 0; j < list.get_n_items (); ++j) {
+            SizeCategoryItem item = list.get_item (j) as SizeCategoryItem;
 
-            builder.set_member_name(item.category_name);
-            builder.begin_object();
+            builder.set_member_name (item.category_name);
+            builder.begin_object ();
 
-            for(int i = 0; i < item.artboard_sizes.size; ++i) {
-                builder.set_member_name(item.artboard_device_names[i]);
+            for (int i = 0; i < item.artboard_sizes.size; ++i) {
+                builder.set_member_name (item.artboard_device_names[i]);
 
-                builder.begin_array();
-                builder.add_int_value(item.artboard_sizes[i][0]);
-                builder.add_int_value(item.artboard_sizes[i][1]);
-                builder.end_array();
+                builder.begin_array ();
+                builder.add_int_value (item.artboard_sizes[i][0]);
+                builder.add_int_value (item.artboard_sizes[i][1]);
+                builder.end_array ();
             }
 
-            builder.end_object();
+            builder.end_object ();
         }
 
-        builder.end_object();
-        builder.end_object();
+        builder.end_object ();
+        builder.end_object ();
 
-        Json.Generator generator = new Json.Generator();
-        Json.Node root = builder.get_root();
-        generator.set_root(root);
-        generator.set_pretty(true);
+        Json.Generator generator = new Json.Generator ();
+        Json.Node root = builder.get_root ();
+        generator.set_root (root);
+        generator.set_pretty (true);
 
-        settings.artboard_size_categories = generator.to_data(null);
+        settings.artboard_size_categories = generator.to_data (null);
     }
 
     private Gtk.Expander create_category_expander (SizeCategoryItem category) {
@@ -227,18 +227,18 @@ public class Akira.Layouts.Partials.ArtboardSizesPanel : Gtk.Grid {
         }
 
         // this button is for adding new sizes to a category
-        Gtk.Button add_size_button = new Gtk.Button.with_label("Add a new size...");
+        Gtk.Button add_size_button = new Gtk.Button.with_label ("Add a new size . . .");
         add_size_button.height_request = 35;
         add_size_button.hexpand = true;
         add_size_button.get_style_context ().add_class ("artboard-size-button");
 
-        add_size_button.clicked.connect(() => {
-            handle_add_size(category.category_name, add_size_button);
+        add_size_button.clicked.connect (() => {
+            handle_add_size (category.category_name, add_size_button);
         });
 
-        size_items_grid.attach(add_size_button, 0, category.artboard_sizes.size+1, 1, 1);
+        size_items_grid.attach (add_size_button, 0, category.artboard_sizes.size + 1, 1, 1);
         category_expander.add (size_items_grid);
-        size_items_grid.show_all();
+        size_items_grid.show_all ();
 
         return category_expander;
     }
@@ -273,26 +273,29 @@ public class Akira.Layouts.Partials.ArtboardSizesPanel : Gtk.Grid {
                 canvas.update_canvas ();
 
                 // amount of margin when artboard is inserted so that some background canvas is also visible
-                double artboard_margin = double.max(width, height) / 10;
+                double artboard_margin = double.max (width, height) / 10;
+                // size of visible canvas
+                double window_width = window.main_window.main_canvas.get_allocated_width ();
+                double window_height = window.main_window.main_canvas.get_allocated_height ();
 
                 // figure out the zoom level based on the window size and artboard size
-                double scale_x = (double) (window.main_window.main_canvas.get_allocated_width() - artboard_margin) / width;
-                double scale_y = (double) (window.main_window.main_canvas.get_allocated_height() - artboard_margin) / height;
-                double final_scale = double.min(scale_x, scale_y);
+                double scale_x = (double) (window_width - artboard_margin) / width;
+                double scale_y = (double) (window_height - artboard_margin) / height;
+                double final_scale = double.min (scale_x, scale_y);
 
-                double old_scale = window.main_window.main_canvas.canvas.get_scale();
+                double old_scale = window.main_window.main_canvas.canvas.get_scale ();
 
                 // first reset the zoom level to 100%
-                window.event_bus.update_scale( 1 - old_scale );
+                window.event_bus.update_scale ( 1 - old_scale );
                 // then zoom as per the calcuated level
-                window.event_bus.update_scale( final_scale - 1 );
+                window.event_bus.update_scale ( final_scale - 1 );
 
                 // use the position and size of artboard to scroll canvas so that new artboard is in the center
-                canvas.convert_to_pixels(ref pos_x, ref pos_y);
-                canvas.convert_to_pixels(ref width, ref height);
+                canvas.convert_to_pixels (ref pos_x, ref pos_y);
+                canvas.convert_to_pixels (ref width, ref height);
 
-                pos_x = pos_x + width / 2 - window.main_window.main_canvas.get_allocated_width() / 2;
-                pos_y = pos_y + height / 2 - window.main_window.main_canvas.get_allocated_height() / 2;
+                pos_x = pos_x + width / 2 - window_width / 2;
+                pos_y = pos_y + height / 2 - window_height / 2;
 
                 window.main_window.main_canvas.main_scroll.hadjustment.value = pos_x;
                 window.main_window.main_canvas.main_scroll.vadjustment.value = pos_y;
@@ -366,7 +369,7 @@ public class Akira.Layouts.Partials.ArtboardSizesPanel : Gtk.Grid {
             if (new_category_popup.item_name != "") {
                 list.append (new SizeCategoryItem (new_category_popup.item_name));
 
-                recreate_categories_json();
+                recreate_categories_json ();
             }
         });
 
@@ -381,7 +384,7 @@ public class Akira.Layouts.Partials.ArtboardSizesPanel : Gtk.Grid {
 
             if (new_size_popup.item_name != "") {
 
-                SizeCategoryItem dummy_item = new SizeCategoryItem(category_name);
+                SizeCategoryItem dummy_item = new SizeCategoryItem (category_name);
                 uint position;
 
                 if ( list.find_with_equal_func (
@@ -396,11 +399,11 @@ public class Akira.Layouts.Partials.ArtboardSizesPanel : Gtk.Grid {
                     // add the new device name and its size to the list
                     int[] new_size = {new_size_popup.item_width, new_size_popup.item_height};
 
-                    SizeCategoryItem list_item = list.get_item(position) as SizeCategoryItem;
-                    list_item.add_size(new_size, new_size_popup.item_name);
+                    SizeCategoryItem list_item = list.get_item (position) as SizeCategoryItem;
+                    list_item.add_size (new_size, new_size_popup.item_name);
 
-                    recreate_categories_json();
-                    reload_list(true);
+                    recreate_categories_json ();
+                    reload_list (true);
                 }
             }
         });
