@@ -60,6 +60,7 @@ public class Akira.Layouts.Sidebars.Partials.LayersPanel : Gtk.Grid {
 
         // Connect signals.
         view_canvas.items_manager.item_model.item_added.connect (on_item_added);
+        view_canvas.window.event_bus.selection_modified.connect (on_selection_modified);
     }
 
     /*
@@ -82,6 +83,16 @@ public class Akira.Layouts.Sidebars.Partials.LayersPanel : Gtk.Grid {
     public void clear_list () {
         foreach (var row in items_list.get_selected_rows ()) {
             row.destroy ();
+        }
+    }
+
+    private void on_selection_modified () {
+        foreach (var selected in view_canvas.selection_manager.selection.nodes.values) {
+            foreach (var row in items_list.get_selected_rows ()) {
+                if (((LayerElement) row).id () == selected.node.id) {
+                    items_list.select_row (row);
+                }
+            }
         }
     }
 }
