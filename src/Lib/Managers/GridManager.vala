@@ -38,7 +38,6 @@
 
         canvas.window.event_bus.toggle_pixel_grid.connect (on_toggle_pixel_grid);
         canvas.window.event_bus.update_pixel_grid.connect (on_update_pixel_grid);
-        canvas.window.event_bus.zoom.connect (on_canvas_zoom);
     }
 
     /*

@@ -56,7 +56,7 @@ public class Akira.FileFormat.JsonDeserializer {
      * Deserialize window states and apply them to the window.
      */
     private static void load_window_states (Akira.Window window, Json.Object obj) {
-        window.event_bus.set_scale (obj.get_double_member ("scale"));
+        window.event_bus.adjust_zoom (obj.get_double_member ("scale"), true, null);
         window.main_window.main_view_canvas.main_scroll.hadjustment.value = obj.get_double_member ("hadjustment");
         window.main_window.main_view_canvas.main_scroll.vadjustment.value = obj.get_double_member ("vadjustment");
     }

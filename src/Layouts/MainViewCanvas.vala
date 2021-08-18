@@ -55,8 +55,8 @@ public class Akira.Layouts.MainViewCanvas : Gtk.Grid {
         main_scroll.set_policy (Gtk.PolicyType.NEVER, Gtk.PolicyType.NEVER);
 
         canvas = new Akira.Lib2.ViewCanvas (window);
-        canvas.set_bounds (0, 0, CANVAS_SIZE, CANVAS_SIZE);
-        canvas.set_scale (1.0);
+        canvas.set_bounds (Geometry.Rectangle.with_coordinates (0, 0, CANVAS_SIZE, CANVAS_SIZE));
+        canvas.scale = 1.0;
 
         canvas.canvas_moved.connect ((event_x, event_y) => {
             // Move scroll window according to normalized mouse delta
@@ -102,52 +102,25 @@ public class Akira.Layouts.MainViewCanvas : Gtk.Grid {
         double delta_x, delta_y;
         event.get_scroll_deltas (out delta_x, out delta_y);
 
-        if (delta_y < -SCROLL_DISTANCE) {
-            // Scroll UP.
-            if (is_ctrl) {
-                // Divide the delta if it's too high. This fixes the zoom with
-                // the mouse wheel.
-                if (delta_y <= -1) {
-                    delta_y /= 10;
-                }
-                // Get the current zoom before zooming.
-                double old_zoom = canvas.get_scale ();
-                // Zoom in.
-                window.event_bus.update_scale (delta_y * -1);
-                // Adjust zoom based on cursor position.
-                zoom_on_cursor (event, old_zoom);
-            } else if (is_shift) {
-                main_scroll.hadjustment.value += delta_y * 10;
-            } else {
-                main_scroll.vadjustment.value += delta_y * 10;
+        if (is_ctrl) {
+            // Zoom change
+
+            // Divide the delta if it's too high. This fixes the zoom with
+            // the mouse wheel.
+            if (canvas.scale < 2) {
+                delta_y /= 10;
             }
-        } else if (delta_y > SCROLL_DISTANCE) {
-            // Scroll DOWN.
-            if (is_ctrl) {
-                // Divide the delta if it's too high. This fixes the zoom with
-                // the mouse wheel.
-                if (delta_y >= 1) {
-                    delta_y /= 10;
-                }
-                // Get the current zoom before zooming.
-                double old_zoom = canvas.get_scale ();
-                // Zoom out.
-                window.event_bus.update_scale (-delta_y);
-                // Adjust zoom based on cursor position.
-                zoom_on_cursor (event, old_zoom);
-            } else if (is_shift) {
-                main_scroll.hadjustment.value += delta_y * 10;
-            } else {
-                main_scroll.vadjustment.value += delta_y * 10;
-            }
+
+            window.event_bus.adjust_zoom (-delta_y, false, Geometry.Point (event.x, event.y));
+            return true;
         }
 
-        if (delta_x < -SCROLL_DISTANCE) {
-            main_scroll.hadjustment.value += delta_x * 10;
-        } else if (delta_x > SCROLL_DISTANCE) {
-            main_scroll.hadjustment.value += delta_x * 10;
+        if (is_shift) {
+            main_scroll.hadjustment.value += delta_y * 10;
+            return true;
         }
 
+        main_scroll.vadjustment.value += delta_y * 10;
         return true;
     }
 
@@ -162,24 +135,24 @@ public class Akira.Layouts.MainViewCanvas : Gtk.Grid {
         // in the current view scale to the left view border and the new
         // mouse location that has the new canvas scale applied to the
         // new left view border and shift the view by that difference.
-        int width = main_scroll.get_allocated_width ();
-        int height = main_scroll.get_allocated_height ();
+        //int width = main_scroll.get_allocated_width ();
+        //int height = main_scroll.get_allocated_height ();
 
-        var center_x = main_scroll.hadjustment.value + (width / 2);
-        var center_y = main_scroll.vadjustment.value + (height / 2);
+        //var center_x = main_scroll.hadjustment.value + (width / 2);
+        //var center_y = main_scroll.vadjustment.value + (height / 2);
 
-        var old_center_x = (center_x / canvas.get_scale ()) * old_zoom;
-        var old_center_y = (center_y / canvas.get_scale ()) * old_zoom;
+        //var old_center_x = (center_x / canvas.scale) * old_zoom;
+        //var old_center_y = (center_y / canvas.scale) * old_zoom;
 
-        var new_event_x = (event.x / old_zoom) * canvas.get_scale ();
-        var new_event_y = (event.y / old_zoom) * canvas.get_scale ();
+        //var new_event_x = (event.x / old_zoom) * canvas.scale;
+        //var new_event_y = (event.y / old_zoom) * canvas.scale;
 
-        var old_hadjustment = old_center_x - (width / 2);
-        var old_vadjustment = old_center_y - (height / 2);
+        //var old_hadjustment = old_center_x - (width / 2);
+        //var old_vadjustment = old_center_y - (height / 2);
 
-        main_scroll.hadjustment.value +=
-            (new_event_x - main_scroll.hadjustment.value) - (event.x - old_hadjustment);
-        main_scroll.vadjustment.value +=
-            (new_event_y - main_scroll.vadjustment.value) - (event.y - old_vadjustment);
+        //main_scroll.hadjustment.value +=
+        //    (new_event_x - main_scroll.hadjustment.value) - (event.x - old_hadjustment);
+        //main_scroll.vadjustment.value +=
+        //    (new_event_y - main_scroll.vadjustment.value) - (event.y - old_vadjustment);
     }
 }

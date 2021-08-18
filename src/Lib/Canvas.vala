@@ -77,8 +77,6 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         Gtk.drag_dest_set (this, Gtk.DestDefaults.ALL, TARGETS, Gdk.DragAction.COPY);
         drag_data_received.connect (on_drag_data_received);
 
-        window.event_bus.update_scale.connect (on_update_scale);
-        window.event_bus.set_scale.connect (on_set_scale);
         window.event_bus.set_focus_on_canvas.connect (on_set_focus_on_canvas);
         window.event_bus.request_escape.connect (on_escape_key);
         window.event_bus.insert_item.connect (on_insert_item);
@@ -372,35 +370,6 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         }
 
         return false;
-    }
-
-    private void on_update_scale (double zoom) {
-        // Force the zoom value to 8% if we're currently at a 2% scale in order
-        // to go back to 10% and increase from there.
-        if (current_scale == 0.02 && zoom == 0.1) {
-            zoom = 0.08;
-        }
-
-        current_scale += zoom;
-        // Prevent the canvas from shrinking below 2%;
-        if (current_scale < 0.02) {
-            current_scale = 0.02;
-        }
-
-        // Prevent the canvas from growing above 5000%;
-        if (current_scale > 50) {
-            current_scale = 50;
-        }
-
-        window.event_bus.set_scale (current_scale);
-    }
-
-    private void on_set_scale (double scale) {
-        current_scale = scale;
-        set_scale (scale);
-        window.event_bus.zoom ();
-
-        window.event_bus.update_snap_decorators ();
     }
 
     private void set_cursor (Gdk.CursorType? cursor_type) {

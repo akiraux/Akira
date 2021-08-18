@@ -48,10 +48,10 @@ public class Akira.Lib2.Items.ModelTypeEllipse : ModelType {
 
     public override string name_id { get { return "ellipse"; } }
 
-    public override void construct_canvas_item (ModelInstance instance, Goo.Canvas canvas) {
+    public override void construct_canvas_item (ModelInstance instance) {
         var radius_x = instance.components.size.width / 2.0;
         var radius_y = instance.components.size.height / 2.0;
-        instance.drawable = new Drawables.DrawableEllipse (canvas.get_root_item (), 0, 0, radius_x, radius_y);
+        instance.drawable = new Drawables.DrawableEllipse (0, 0, radius_x, radius_y);
     }
 
     public override void component_updated (ModelInstance instance, Lib2.Components.Component.Type type) {
@@ -59,27 +59,28 @@ public class Akira.Lib2.Items.ModelTypeEllipse : ModelType {
             case Lib2.Components.Component.Type.COMPILED_BORDER:
                 if (!instance.compiled_border.is_visible) {
                     instance.drawable.line_width = 0;
-                    instance.drawable.stroke_color_rgba = 0;
+                    instance.drawable.stroke_rgba = Gdk.RGBA () { alpha = 0 };
                     break;
                 }
 
                 // The "line-width" property expects a DOUBLE type, but we don't support subpixels
                 // so we always handle the border size as INT, therefore we need to type cast it here.
                 instance.drawable.line_width = (double) instance.compiled_border.size;
-                instance.drawable.stroke_color_gdk_rgba = instance.compiled_border.color;
+                instance.drawable.stroke_rgba = instance.compiled_border.color;
                 break;
             case Lib2.Components.Component.Type.COMPILED_FILL:
                 if (!instance.compiled_fill.is_visible) {
-                    instance.drawable.fill_color_rgba = 0;
+                    instance.drawable.fill_rgba = Gdk.RGBA () { alpha = 0 };
                     break;
                 }
 
-                instance.drawable.fill_color_gdk_rgba = instance.compiled_fill.color;
+                instance.drawable.fill_rgba = instance.compiled_fill.color;
                 break;
             case Lib2.Components.Component.Type.COMPILED_GEOMETRY:
-                instance.drawable.set ("radius-x", instance.components.size.width / 2.0);
-                instance.drawable.set ("radius-y", instance.components.size.height / 2.0);
-                instance.drawable.set_transform (instance.compiled_geometry.transformation_matrix);
+                var ellipse = instance.drawable as Drawables.DrawableEllipse;
+                ellipse.radius_x = instance.components.size.width / 2.0;
+                ellipse.radius_y = instance.components.size.height / 2.0;
+                instance.drawable.transform = instance.compiled_geometry.transformation_matrix;
                 break;
         }
     }

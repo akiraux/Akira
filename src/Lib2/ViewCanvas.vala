@@ -19,7 +19,7 @@
  * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
  */
 
-public class Akira.Lib2.ViewCanvas : Goo.Canvas {
+public class Akira.Lib2.ViewCanvas : ViewLayers.BaseCanvas {
     private const int SIZE = 30;
     public unowned Akira.Window window { get; construct; }
 
@@ -49,8 +49,16 @@ public class Akira.Lib2.ViewCanvas : Goo.Canvas {
     private Utils.Nobs.Nob hovered_nob = Utils.Nobs.Nob.NONE;
     private Gdk.CursorType current_cursor = Gdk.CursorType.ARROW;
 
+    private ViewLayers.ViewLayerGrid grid_layout;
+
     public ViewCanvas (Akira.Window window) {
-        Object (window: window);
+        Object (
+            window: window,
+            hadjustment : new Gtk.Adjustment (0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
+            vadjustment : new Gtk.Adjustment (0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+        );
+
+        set_can_focus (true);
     }
 
     construct {
@@ -71,8 +79,14 @@ public class Akira.Lib2.ViewCanvas : Goo.Canvas {
         snap_manager = new Lib2.Managers.SnapManager (this);
         copy_manager = new Lib2.Managers.CopyManager (this);
 
-        window.event_bus.update_scale.connect (on_update_scale);
-        window.event_bus.set_scale.connect (on_set_scale);
+        grid_layout = new ViewLayers.ViewLayerGrid (0, 0, Layouts.MainCanvas.CANVAS_SIZE, Layouts.MainCanvas.CANVAS_SIZE);
+        grid_layout.add_to_canvas (ViewLayers.ViewLayer.GRID_LAYER_ID, this);
+        grid_layout.set_visible (true);
+
+        set_model_to_render (items_manager.item_model);
+
+        window.event_bus.adjust_zoom.connect (trigger_adjust_zoom);
+
         window.event_bus.set_focus_on_canvas.connect (focus_canvas);
         window.event_bus.insert_item.connect (start_insert_mode);
         window.event_bus.update_snap_decorators.connect (on_update_snap_decorators);
@@ -119,35 +133,51 @@ public class Akira.Lib2.ViewCanvas : Goo.Canvas {
         }
     }
 
-    private void on_update_scale (double zoom) {
-        // Force the zoom value to 8% if we're currently at a 2% scale in order
-        // to go back to 10% and increase from there.
-        if (current_scale == 0.02 && zoom == 0.1) {
-            zoom = 0.08;
+    private void trigger_adjust_zoom (double zoom, bool absolute, Geometry.Point? reference) {
+        var start_x = hadjustment.get_value ();
+        var start_y = vadjustment.get_value ();
+
+        double x_offset = 0;
+        double y_offset = 0;
+        if (reference != null) {
+            print ("%f %f\n", reference.x, reference.y);
+            x_offset = reference.x;
+            y_offset = reference.y;
+            //convert_to_pixels (ref x_offset, ref y_offset);
+            print ("%f %f\n", x_offset, y_offset);
         }
 
-        current_scale += zoom;
-        // Prevent the canvas from shrinking below 2%;
-        if (current_scale < 0.02) {
-            current_scale = 0.02;
+        if (!absolute) {
+            // Force the zoom value to 8% if we're currently at a 2% scale in order
+            // to go back to 10% and increase from there.
+            if (current_scale == 0.02 && zoom == 0.1) {
+                zoom = 0.08;
+            }
+
+            zoom += current_scale;
+            // Prevent the canvas from shrinking below 2%;
+            if (zoom < 0.02) {
+                zoom = 0.02;
+            }
+
+            // Prevent the canvas from growing above 5000%;
+            if (zoom > 50) {
+                zoom = 50;
+            }
         }
 
-        // Prevent the canvas from growing above 5000%;
-        if (current_scale > 50) {
-            current_scale = 50;
-        }
+        current_scale = zoom;
+        this.scale = zoom;
+        window.event_bus.zoom_changed (zoom);
 
-        window.event_bus.set_scale (current_scale);
-    }
-
-    private void on_set_scale (double scale) {
-        current_scale = scale;
-        set_scale (scale);
-        window.event_bus.zoom ();
+        hadjustment.set_value (start_x + x_offset / scale);
+        vadjustment.set_value (start_y + y_offset / scale);
     }
 
     public void focus_canvas () {
-        grab_focus (get_root_item ());
+        // TODO
+        // grab_focus (get_root_item ());
+        grab_focus ();
     }
 
     public override bool key_press_event (Gdk.EventKey event) {
@@ -237,6 +267,8 @@ public class Akira.Lib2.ViewCanvas : Goo.Canvas {
     }
 
     public override bool button_press_event (Gdk.EventButton event) {
+        base.button_press_event (event);
+
         hover_manager.remove_hover_effect ();
 
         event.x = event.x / current_scale;

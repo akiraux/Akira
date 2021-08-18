@@ -107,21 +107,21 @@ public class Akira.Widgets.ZoomButton : Gtk.Grid {
         settings.bind ("show-label", label_btn, "no-show-all", SettingsBindFlags.INVERT_BOOLEAN);
 
         // Event listeners.
-        window.event_bus.set_scale.connect (on_set_scale);
+        window.event_bus.zoom_changed.connect (on_zoom_changed);
     }
 
     /*
      * Decrease the canvas scale by 50%.
      */
     public void zoom_out () {
-        window.event_bus.update_scale (-0.5);
+        window.event_bus.adjust_zoom (-0.5, false, null);
     }
 
     /*
      * Increase the canvas scale by 50%.
      */
     public void zoom_in () {
-        window.event_bus.update_scale (0.5);
+        window.event_bus.adjust_zoom (0.5, false, null);
     }
 
     /*
@@ -139,7 +139,7 @@ public class Akira.Widgets.ZoomButton : Gtk.Grid {
         // Otherwise reset the zoom to 100%.
         zoom_in_button.sensitive = true;
         zoom_out_button.sensitive = true;
-        window.event_bus.set_scale (1);
+        window.event_bus.adjust_zoom (1.0, true, null);
 
         return true;
     }
@@ -147,7 +147,7 @@ public class Akira.Widgets.ZoomButton : Gtk.Grid {
     /*
      * Update the button and the input field when the canvas scale is changed.
      */
-    private void on_set_scale (double scale) {
+    private void on_zoom_changed (double scale) {
         var perc_scale = scale * 100;
         zoom_default_button.label = "%.0f%%".printf (perc_scale);
         zoom_input.text = perc_scale.to_string ();
@@ -160,14 +160,14 @@ public class Akira.Widgets.ZoomButton : Gtk.Grid {
         // Arrow UP pressed, increase value by 1.
         if (event.keyval == Gdk.Key.Up) {
             var text_value = double.parse (zoom_input.text) + 1;
-            window.event_bus.set_scale (text_value / 100);
+            window.event_bus.adjust_zoom (text_value, true, null);
             return true;
         }
 
         // Arrow DOWN pressed, decreased value by 1.
         if (event.keyval == Gdk.Key.Down) {
             var text_value = double.parse (zoom_input.text) - 1;
-            window.event_bus.set_scale (text_value / 100);
+            window.event_bus.adjust_zoom (text_value, true, null);
             return true;
         }
 
@@ -183,7 +183,7 @@ public class Akira.Widgets.ZoomButton : Gtk.Grid {
                 text_value = 5000;
             }
 
-            window.event_bus.set_scale (text_value / 100);
+            window.event_bus.adjust_zoom (text_value, true, null);
             window.event_bus.set_focus_on_canvas ();
             return true;
         }
