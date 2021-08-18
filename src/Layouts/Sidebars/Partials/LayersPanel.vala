@@ -96,10 +96,15 @@ public class Akira.Layouts.Sidebars.Partials.LayersPanel : Gtk.Grid {
         // Create a new layer and add it to a specific listbox based on the
         // node's type.
         if (node_instance.type is Lib2.Items.ModelTypeArtboard) {
-            artboards_list.add (new_layer);
+            artboards_list.prepend (new_layer);
             return;
         }
 
-        free_items_list.add (new_layer);
+        free_items_list.prepend (new_layer);
+    }
+
+    public void refresh_lists () {
+        free_items_list.show_all ();
+        artboards_list.show_all ();
     }
 }

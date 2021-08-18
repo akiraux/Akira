@@ -88,6 +88,6 @@ public class Akira.Layouts.MainWindow : Gtk.Grid {
      * all items have actually been created.
      */
     public void update_layers_ui () {
-        layers_sidebar.layers_panel.show_all ();
+        layers_sidebar.layers_panel.refresh_lists ();
     }
 }
