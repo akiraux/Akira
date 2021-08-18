@@ -25,8 +25,7 @@
 public class Akira.Layouts.Sidebars.Partials.LayersPanel : Gtk.Grid {
     public unowned Lib2.ViewCanvas view_canvas { get; construct; }
 
-    private Gtk.ListBox artboards_list;
-    private Gtk.ListBox free_items_list;
+    private Gtk.ListBox items_list;
 
     public LayersPanel (Lib2.ViewCanvas canvas) {
         Object (
@@ -39,15 +38,9 @@ public class Akira.Layouts.Sidebars.Partials.LayersPanel : Gtk.Grid {
         get_style_context ().add_class ("layers-panel");
         expand = true;
 
-        // We need to keep free items (layers which parent is the canvas), and
-        // artboards in different listboxes to properly handle drag&drop and hierarchy.
-        free_items_list = new Gtk.ListBox ();
-        free_items_list.activate_on_single_click = false;
-        free_items_list.selection_mode = Gtk.SelectionMode.SINGLE;
-
-        artboards_list = new Gtk.ListBox ();
-        artboards_list.activate_on_single_click = false;
-        artboards_list.selection_mode = Gtk.SelectionMode.SINGLE;
+        items_list = new Gtk.ListBox ();
+        items_list.activate_on_single_click = false;
+        items_list.selection_mode = Gtk.SelectionMode.SINGLE;
 
         // Motion revealer for layers drag&drop on the empty area.
         var motion_grid = new Gtk.Grid ();
@@ -58,23 +51,11 @@ public class Akira.Layouts.Sidebars.Partials.LayersPanel : Gtk.Grid {
         motion_layer_revealer.transition_type = Gtk.RevealerTransitionType.SLIDE_DOWN;
         motion_layer_revealer.add (motion_grid);
 
-        // Motion revealer for artboards drag&drop reordering.
-        var motion_artboard_grid = new Gtk.Grid ();
-        motion_artboard_grid.get_style_context ().add_class ("grid-motion");
-        motion_artboard_grid.height_request = 2;
-
-        var motion_artboard_revealer = new Gtk.Revealer ();
-        motion_artboard_revealer.transition_type = Gtk.RevealerTransitionType.SLIDE_DOWN;
-        motion_artboard_revealer.add (motion_artboard_grid);
-
         var empty_area = new Gtk.Grid ();
         empty_area.expand = true;
 
-        // Free items are always listed above any other element.
-        attach (free_items_list, 0, 1);
+        attach (items_list, 0, 1);
         attach (motion_layer_revealer, 0, 2);
-        attach (artboards_list, 0, 3);
-        attach (motion_artboard_revealer, 0, 4);
         attach (empty_area, 0, 5);
 
         // Connect signals.
@@ -91,32 +72,16 @@ public class Akira.Layouts.Sidebars.Partials.LayersPanel : Gtk.Grid {
             return;
         }
 
-        var new_layer = new LayerElement (node_instance, view_canvas);
-
-        // Create a new layer and add it to a specific listbox based on the
-        // node's type.
-        if (node_instance.type is Lib2.Items.ModelTypeArtboard) {
-            artboards_list.prepend (new_layer);
-            return;
-        }
-
-        free_items_list.prepend (new_layer);
+        items_list.prepend (new LayerElement (node_instance, view_canvas));
     }
 
     public void refresh_lists () {
-        free_items_list.show_all ();
-        artboards_list.show_all ();
+        items_list.show_all ();
     }
 
-    public void clear_list (bool with_artboards) {
-        foreach (var row in free_items_list.get_selected_rows ()) {
+    public void clear_list () {
+        foreach (var row in items_list.get_selected_rows ()) {
             row.destroy ();
-        }
-
-        if (with_artboards) {
-            foreach (var row in artboards_list.get_selected_rows ()) {
-                row.destroy ();
-            }
         }
     }
 }

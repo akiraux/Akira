@@ -572,7 +572,7 @@ public class Akira.Lib2.ViewCanvas : Goo.Canvas {
         }
     }
 
-    private void on_items_removed (bool with_artboards) {
-        window.main_window.remove_layers (with_artboards);
+    private void on_items_removed () {
+        window.main_window.remove_layers ();
     }
 }

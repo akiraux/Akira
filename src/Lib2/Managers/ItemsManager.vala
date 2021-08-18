@@ -36,7 +36,7 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
         item_model.item_added.connect (on_item_added);
     }
 
-    public signal void items_removed (bool with_artboards);
+    public signal void items_removed ();
 
     public Lib2.Items.ModelInstance? instance_from_id (int id) {
         return item_model.instance_from_id (id);
@@ -120,7 +120,7 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
             item_model.recalculate_children_stacking (gid);
         }
 
-        items_removed (with_artboards);
+        items_removed ();
 
         return 0;
     }
