@@ -19,7 +19,7 @@
  * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
  */
 
-public class Akira.Lib2.Components.Fills : Copyable<Fills> {
+public class Akira.Lib2.Components.Fills : Component, Copyable<Fills> {
     public Fill.FillData[] data;
 
     public Fills () {}
@@ -27,6 +27,29 @@ public class Akira.Lib2.Components.Fills : Copyable<Fills> {
     public Fills.single_color (Color color) {
         data = new Fill.FillData[1];
         data[0] = Fill.FillData (0, color);
+    }
+
+    public Fills.deserialized (Json.Object obj) {
+        var arr = obj.get_array_member ("fill_data").get_elements ();
+        data = new Fill.FillData[0];
+        var idx = 0;
+        foreach (unowned var fill in arr) {
+            data.resize (data.length + 1);
+            data[idx] = Fill.FillData.deserialized (idx, fill.get_object ());
+            ++idx;
+        }
+    }
+
+    protected override void serialize_details (ref Json.Object obj) {
+        var array = new Json.Array ();
+
+        foreach (unowned var d in data) {
+            array.add_element (d.serialize ());
+        }
+
+        var node = new Json.Node (Json.NodeType.ARRAY);
+        node.set_array (array);
+        obj.set_member ("fill_data", node);
     }
 
     public Fills copy () {

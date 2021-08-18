@@ -21,9 +21,32 @@
 
 
 /*
+ * Defines a copyable interface for components
+ */
+public interface Akira.Lib2.Components.Copyable<T> {
+
+    public abstract T copy ();
+}
+
+/*
  * For now this is used as a namespace to hold some introspection.
  */
 public class Akira.Lib2.Components.Component {
+    /*
+     * Serialize the details of a component to an existing component
+     * object. This does not create a standalone node.
+     */
+    public virtual void serialize_details (ref Json.Object obj) {}
+
+    public Json.Node serialize_component (string cname) {
+        var obj = new Json.Object ();
+        obj.set_string_member ("cname", cname);
+        serialize_details (ref obj);
+        var res = new Json.Node (Json.NodeType.OBJECT);
+        res.set_object (obj);
+        return res;
+    }
+
     /*
      * Type of component.
      * For now this is only used for marking components dirty. It is technically
@@ -64,4 +87,6 @@ public class Akira.Lib2.Components.Component {
             }
         }
     }
+
+
 }

@@ -94,6 +94,21 @@ public struct Akira.Lib2.Components.Components {
 
     public Layout? layout;
 
+    public Components () {
+        borders = null;
+        border_radius = null;
+        fills = null;
+        flipped = null;
+        layer = null;
+        name = null;
+        opacity = null;
+        center = null;
+        size = null;
+        path = null;
+        transform = null;
+        layout = null;
+    }
+
     public static Opacity default_opacity () {
         return new Opacity (100.0);
     }
@@ -112,5 +127,90 @@ public struct Akira.Lib2.Components.Components {
 
     public static Layer default_layer () {
         return new Layer (false, false);
+    }
+
+    public void serialize (ref Json.Builder builder) {
+        builder.set_member_name ("components");
+
+        {
+            builder.begin_array ();
+
+            if (borders != null) {
+                builder.add_value (borders.serialize_component ("borders"));
+            }
+            if (border_radius != null) {
+                builder.add_value (border_radius.serialize_component ("border_radius"));
+            }
+            if (fills != null) {
+                builder.add_value (fills.serialize_component ("fills"));
+            }
+            if (flipped != null) {
+                builder.add_value (flipped.serialize_component ("flipped"));
+            }
+            if (layer != null) {
+                builder.add_value (layer.serialize_component ("layer"));
+            }
+            if (name != null) {
+                builder.add_value (name.serialize_component ("name"));
+            }
+            if (center != null) {
+                builder.add_value (center.serialize_component ("center"));
+            }
+            if (size != null) {
+                builder.add_value (size.serialize_component ("size"));
+            }
+            if (path != null) {
+                builder.add_value (path.serialize_component ("path"));
+            }
+            if (transform != null) {
+                builder.add_value (transform.serialize_component ("transform"));
+            }
+            if (layout != null) {
+                builder.add_value (layout.serialize_component ("layout"));
+            }
+
+            builder.end_array ();
+        }
+    }
+
+    public static Components deserialize (Json.Node? components) {
+        var new_components = Components ();
+
+        if (components == null) {
+            return new_components;
+        }
+
+        foreach (unowned var comp_node in components.get_array ().get_elements ()) {
+            unowned var comp_obj = comp_node.get_object ();
+            assert (comp_obj != null);
+            var cname = comp_obj.get_string_member ("cname");
+
+            // Here we could probably use delegates in the future.
+            if (cname == "borders") {
+                new_components.borders = new Lib2.Components.Borders.deserialized (comp_obj);
+            } else if (cname == "border_radius") {
+                new_components.border_radius = new Lib2.Components.BorderRadius.deserialized (comp_obj);
+            } else if (cname == "fills") {
+                new_components.fills = new Lib2.Components.Fills.deserialized (comp_obj);
+            } else if (cname == "flipped") {
+                new_components.flipped = new Lib2.Components.Flipped.deserialized (comp_obj);
+            } else if (cname == "layer") {
+                new_components.layer = new Lib2.Components.Layer.deserialized (comp_obj);
+            } else if (cname == "name") {
+                new_components.name = new Lib2.Components.Name.deserialized (comp_obj);
+            } else if (cname == "center") {
+                new_components.center = new Lib2.Components.Coordinates.deserialized (comp_obj);
+            } else if (cname == "size") {
+                new_components.size = new Lib2.Components.Size.deserialized (comp_obj);
+            } else if (cname == "path") {
+                new_components.path = new Lib2.Components.Path.deserialized (comp_obj);
+            } else if (cname == "transform") {
+                new_components.transform = new Lib2.Components.Transform.deserialized (comp_obj);
+            } else if (cname == "layout") {
+                new_components.layout = new Lib2.Components.Layout.deserialized (comp_obj);
+            }
+        }
+
+        return new_components;
     }
 }

@@ -31,6 +31,8 @@ public class Akira.Lib2.Items.ModelTypeGroup : ModelType {
         return new_item;
     }
 
+    public override string name_id { get { return "group"; } }
+
     public override Components.CompiledGeometry compile_geometry (
         Components.Components? components,
         Lib2.Items.ModelNode? node

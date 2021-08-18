@@ -19,7 +19,7 @@
  * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
  */
 
-public class Akira.Lib2.Components.Transform : Copyable<Transform> {
+public class Akira.Lib2.Components.Transform : Component, Copyable<Transform> {
     private double _rotation = 0.0;
     private double _scale_x = 1.0;
     private double _scale_y = 1.0;
@@ -78,6 +78,22 @@ public class Akira.Lib2.Components.Transform : Copyable<Transform> {
 
     public Transform.from_rotation (double in_radians) {
         _rotation = in_radians;
+    }
+
+    public Transform.deserialized (Json.Object obj) {
+        _rotation = obj.get_double_member ("rotation");
+        _scale_x = obj.get_double_member ("scale_x");
+        _scale_y = obj.get_double_member ("scale_y");
+        _skew_xy = obj.get_double_member ("skew_xy");
+        _skew_yx = obj.get_double_member ("skew_yx");
+    }
+
+    protected override void serialize_details (ref Json.Object obj) {
+        obj.set_double_member ("rotation", _rotation);
+        obj.set_double_member ("scale_x", _scale_x);
+        obj.set_double_member ("scale_y", _scale_y);
+        obj.set_double_member ("skew_xy", _skew_xy);
+        obj.set_double_member ("skew_yx", _skew_yx);
     }
 
     public Transform copy () {

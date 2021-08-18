@@ -19,7 +19,7 @@
  * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
  */
 
-public class Akira.Lib2.Components.Name : Copyable<Name> {
+public class Akira.Lib2.Components.Name : Component, Copyable<Name> {
     private string _id;
     private string _name;
 
@@ -34,6 +34,16 @@ public class Akira.Lib2.Components.Name : Copyable<Name> {
     public Name (string name, string id) {
         _id = id;
         _name = name;
+    }
+
+    public Name.deserialized (Json.Object obj) {
+        _id = obj.get_string_member ("name");
+        _name = obj.get_string_member ("id");
+    }
+
+    protected override void serialize_details (ref Json.Object obj) {
+        obj.set_string_member ("name", _name);
+        obj.set_string_member ("id", _id);
     }
 
     public Name copy () {

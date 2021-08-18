@@ -19,7 +19,7 @@
  * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
  */
 
-public class Akira.Lib2.Components.Coordinates : Copyable<Coordinates> {
+public class Akira.Lib2.Components.Coordinates : Component, Copyable<Coordinates> {
     private double _x;
     private double _y;
 
@@ -34,6 +34,16 @@ public class Akira.Lib2.Components.Coordinates : Copyable<Coordinates> {
     public Coordinates (double x, double y) {
         _x = x;
         _y = y;
+    }
+
+    public Coordinates.deserialized (Json.Object obj) {
+        _x = obj.get_double_member ("x");
+        _y = obj.get_double_member ("y");
+    }
+
+    protected override void serialize_details (ref Json.Object obj) {
+        obj.set_double_member ("x", _x);
+        obj.set_double_member ("y", _y);
     }
 
     public Coordinates copy () {

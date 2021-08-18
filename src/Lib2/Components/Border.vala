@@ -31,6 +31,22 @@ public class Akira.Lib2.Components.Border {
             _size = size;
         }
 
+        public BorderData.deserialized (int id, Json.Object obj) {
+            _id = id;
+            _color = Color.deserialized (obj.get_object_member ("color"));
+            _size = (int)obj.get_int_member ("size");
+        }
+
+        public Json.Node serialize () {
+            var obj = new Json.Object ();
+            obj.set_int_member ("id", _id);
+            obj.set_member ("color", _color.serialize ());
+            obj.set_int_member ("size", _size);
+            var node = new Json.Node (Json.NodeType.OBJECT);
+            node.set_object (obj);
+            return node;
+        }
+
         // Recommended accessors
 
         public int id () { return _id; }
@@ -62,4 +78,5 @@ public class Akira.Lib2.Components.Border {
     public Gdk.RGBA color () { return _data._color.rgba; }
     public bool is_color_hidden () { return _data._color.hidden; }
     public int size () { return _data._size; }
+
 }

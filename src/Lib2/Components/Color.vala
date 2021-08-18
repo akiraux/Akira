@@ -27,8 +27,30 @@ public struct Akira.Lib2.Components.Color {
         rgba = Gdk.RGBA () { red = r, green = g, blue = b, alpha = a };
     }
 
-    public static Color from_rgba (Gdk.RGBA rgba, bool hidden = false) {
-        return Color (rgba.red, rgba.green, rgba.blue, rgba.alpha, hidden);
+    public Color.from_rgba (Gdk.RGBA rgba, bool hidden = false) {
+        this.rgba = rgba;
+        this.hidden = hidden;
+    }
+
+    public Color.deserialized (Json.Object obj) {
+        var r = obj.get_double_member ("r");
+        var g = obj.get_double_member ("g");
+        var b = obj.get_double_member ("b");
+        var a = obj.get_double_member ("a");
+        rgba = Gdk.RGBA () { red = r, green = g, blue = b, alpha = a };
+        hidden = obj.get_boolean_member ("hidden");
+    }
+
+    public Json.Node serialize () {
+            var obj = new Json.Object ();
+            obj.set_double_member ("r", rgba.red);
+            obj.set_double_member ("g", rgba.green);
+            obj.set_double_member ("b", rgba.blue);
+            obj.set_double_member ("a", rgba.alpha);
+            obj.set_boolean_member ("hidden", hidden);
+            var node = new Json.Node (Json.NodeType.OBJECT);
+            node.set_object (obj);
+            return node;
     }
 
     // Mutators

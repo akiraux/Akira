@@ -19,8 +19,7 @@
  * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
  */
 
-public class Akira.Lib2.Components.BorderRadius : Copyable<BorderRadius> {
-
+public class Akira.Lib2.Components.BorderRadius : Component, Copyable<BorderRadius> {
     private int _x;
     private int _y;
     private bool _autoscale;
@@ -37,9 +36,22 @@ public class Akira.Lib2.Components.BorderRadius : Copyable<BorderRadius> {
         }
     }
 
+    public BorderRadius.deserialized (Json.Object obj) {
+        _x = (int)obj.get_int_member ("x");
+        _y = (int)obj.get_int_member ("y");
+        _autoscale = obj.get_boolean_member ("autoscale");
+        _uniform = obj.get_boolean_member ("uniform");
+    }
+
+    public override void serialize_details (ref Json.Object obj) {
+        obj.set_int_member ("x", _x);
+        obj.set_int_member ("y", _y);
+        obj.set_boolean_member ("autoscale", _autoscale);
+        obj.set_boolean_member ("uniform", _uniform);
+    }
+
     public BorderRadius copy () {
         return new BorderRadius (_x, _y, _autoscale, _uniform);
-
     }
 
     // Recommended accessors

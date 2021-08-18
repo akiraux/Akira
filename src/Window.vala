@@ -57,7 +57,7 @@ public class Akira.Window : Gtk.ApplicationWindow {
 
         headerbar = new Akira.Layouts.HeaderBar (this);
         // items_manager = new Akira.Lib.Managers.ItemsManager (this);
-        // file_manager = new Akira.FileFormat.FileManager (this);
+        file_manager = new Akira.FileFormat.FileManager (this);
         main_window = new Akira.Layouts.MainWindow (this);
         // coords_middleware = new Akira.StateManagers.CoordinatesMiddleware (this);
         // size_middleware = new Akira.StateManagers.SizeMiddleware (this);

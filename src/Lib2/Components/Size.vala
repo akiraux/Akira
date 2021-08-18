@@ -19,7 +19,7 @@
  * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
  */
 
-public class Akira.Lib2.Components.Size : Copyable<Size> {
+public class Akira.Lib2.Components.Size : Component, Copyable<Size> {
     private double _width;
     private double _height;
     private bool _locked;
@@ -44,6 +44,18 @@ public class Akira.Lib2.Components.Size : Copyable<Size> {
         _locked = locked;
         _width = width;
         _height = height;
+    }
+
+    public Size.deserialized (Json.Object obj) {
+        _width = obj.get_double_member ("width");
+        _height = obj.get_double_member ("height");
+        _locked = obj.get_boolean_member ("locked");
+    }
+
+    protected override void serialize_details (ref Json.Object obj) {
+        obj.set_double_member ("width", _width);
+        obj.set_double_member ("height", _height);
+        obj.set_boolean_member ("locked", _locked);
     }
 
     public Size copy () {

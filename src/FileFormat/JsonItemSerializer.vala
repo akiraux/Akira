@@ -28,180 +28,40 @@ public class Akira.FileFormat.JsonItemSerializer {
     /*
      * Serialize an item and return its corresponding Json.Node.
      */
-    public static Json.Node serialize_item (Lib.Items.CanvasItem item) {
-        var object = new Json.Object ();
+    public static void serialize_node (Akira.Lib2.Items.ModelNode node, ref Json.Builder builder) {
+        builder.begin_object ();
 
-        serialize_type_specifics (item, ref object);
-        serialize_matrix (item, ref object);
-        serialize_components (item, ref object);
+        // serialize type
+        {
+            builder.set_member_name ("type");
+            builder.add_string_value (node.instance.type.name_id);
+        }
 
-        var node = new Json.Node.alloc ();
-        node.set_object (object);
-        return node;
+        // serialize components
+        node.instance.components.serialize (ref builder);
+
+        // serialize children
+        if (node.instance.children != null && node.instance.children.length != 0) {
+            serialize_children (node, ref builder);
+        }
+
+        builder.end_object ();
     }
 
     /*
-     * Serialize type specifics of an item.
+     * Serialize all children of a node recursively.
      */
-    private static void serialize_type_specifics (Lib.Items.CanvasItem item, ref Json.Object object) {
-        // Set a string of the type so we're not tied to the namespace and location.
-        if (item is Lib.Items.CanvasArtboard) {
-            object.set_string_member ("type", "artboard");
-        }
+    public static void serialize_children (Akira.Lib2.Items.ModelNode node, ref Json.Builder builder) {
+        builder.set_member_name ("children");
 
-        if (item is Lib.Items.CanvasRect) {
-            object.set_string_member ("type", "rectangle");
-        }
+        {
+            builder.begin_array ();
 
-        if (item is Lib.Items.CanvasEllipse) {
-            object.set_string_member ("type", "ellipse");
-        }
-
-        if (item is Lib.Items.CanvasImage) {
-            object.set_string_member ("type", "image");
-            object.set_string_member ("image_id", ((Lib.Items.CanvasImage) item).manager.filename);
-        }
-
-        if (item is Lib.Items.CanvasText) {
-            object.set_string_member ("type", "text");
-        }
-
-        // Save the artboard ID if the item belongs to one.
-        if (item.artboard != null) {
-            object.set_string_member ("artboard", item.artboard.name.id);
-        }
-    }
-
-    /*
-     * Serialize item transform matrix.
-     */
-    private static void serialize_matrix (Lib.Items.CanvasItem item, ref Json.Object object) {
-        var identity = Cairo.Matrix.identity ();
-        item.get_transform (out identity);
-
-        var matrix = new Json.Object ();
-        matrix.set_double_member ("xx", identity.xx);
-        matrix.set_double_member ("yx", identity.yx);
-        matrix.set_double_member ("xy", identity.xy);
-        matrix.set_double_member ("yy", identity.yy);
-        matrix.set_double_member ("x0", identity.x0);
-        matrix.set_double_member ("y0", identity.y0);
-
-        object.set_object_member ("matrix", matrix);
-    }
-
-    /**
-     * Serialize all the Components used by the item.
-     */
-    private static void serialize_components (Lib.Items.CanvasItem item, ref Json.Object object) {
-        // Interrupt if this is not a CanvasItem.
-        if (!(item is Lib.Items.CanvasItem)) {
-            return;
-        }
-
-        // Create the components object.
-        var components = new Json.Object ();
-
-        if (item.name != null) {
-            var name = new Json.Object ();
-            name.set_string_member ("name", item.name.name);
-            name.set_string_member ("id", item.name.id);
-            name.set_string_member ("icon", item.name.icon);
-
-            components.set_object_member ("Name", name);
-        }
-
-        if (item.coordinates != null) {
-            var coordinates = new Json.Object ();
-            coordinates.set_double_member ("x", item.coordinates.x);
-            coordinates.set_double_member ("y", item.coordinates.y);
-
-            components.set_object_member ("Coordinates", coordinates);
-        }
-
-        if (item.opacity != null) {
-            var opacity = new Json.Object ();
-            opacity.set_double_member ("opacity", item.opacity.opacity);
-
-            components.set_object_member ("Opacity", opacity);
-        }
-
-        if (item.rotation != null) {
-            var rotation = new Json.Object ();
-            rotation.set_double_member ("rotation", item.rotation.rotation);
-
-            components.set_object_member ("Rotation", rotation);
-        }
-
-        if (item.size != null) {
-            var size = new Json.Object ();
-            size.set_boolean_member ("locked", item.size.locked);
-            size.set_double_member ("ratio", item.size.ratio);
-            size.set_double_member ("width", item.size.width);
-            size.set_double_member ("height", item.size.height);
-
-            components.set_object_member ("Size", size);
-        }
-
-        if (item.flipped != null) {
-            var flipped = new Json.Object ();
-            flipped.set_boolean_member ("horizontal", item.flipped.horizontal);
-            flipped.set_boolean_member ("vertical", item.flipped.vertical);
-
-            components.set_object_member ("Flipped", flipped);
-        }
-
-        if (item.border_radius != null) {
-            var border_radius = new Json.Object ();
-            border_radius.set_double_member ("x", item.border_radius.x);
-            border_radius.set_double_member ("y", item.border_radius.y);
-            border_radius.set_boolean_member ("uniform", item.border_radius.uniform);
-            border_radius.set_boolean_member ("autoscale", item.border_radius.autoscale);
-
-            components.set_object_member ("BorderRadius", border_radius);
-        }
-
-        if (item.layer != null) {
-            var layer = new Json.Object ();
-            layer.set_boolean_member ("locked", item.layer.locked);
-
-            components.set_object_member ("Layer", layer);
-        }
-
-        if (item.fills != null) {
-            var fills = new Json.Object ();
-
-            foreach (Lib.Components.Fill fill in item.fills.fills) {
-                var obj = new Json.Object ();
-                obj.set_int_member ("id", fill.id);
-                obj.set_string_member ("color", fill.color.to_string ());
-                obj.set_int_member ("alpha", fill.alpha);
-                obj.set_boolean_member ("hidden", fill.hidden);
-
-                fills.set_object_member ("Fill-" + fill.id.to_string (), obj);
+            foreach (unowned var child in node.children.data) {
+                serialize_node (child, ref builder);
             }
 
-            components.set_object_member ("Fills", fills);
+            builder.end_array ();
         }
-
-        if (item.borders != null) {
-            var borders = new Json.Object ();
-
-            foreach (Lib.Components.Border border in item.borders.borders) {
-                var obj = new Json.Object ();
-                obj.set_int_member ("id", border.id);
-                obj.set_string_member ("color", border.color.to_string ());
-                obj.set_int_member ("size", border.size);
-                obj.set_int_member ("alpha", border.alpha);
-                obj.set_boolean_member ("hidden", border.hidden);
-
-                borders.set_object_member ("Border-" + border.id.to_string (), obj);
-            }
-
-            components.set_object_member ("Borders", borders);
-        }
-
-        // Save all the components in the main object.
-        object.set_object_member ("Components", components);
     }
 }

@@ -19,7 +19,7 @@
  * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
  */
 
-public class Akira.Lib2.Components.Layer : Copyable<Layer> {
+public class Akira.Lib2.Components.Layer : Component, Copyable<Layer> {
     private bool _selected;
     private bool _locked;
 
@@ -34,6 +34,16 @@ public class Akira.Lib2.Components.Layer : Copyable<Layer> {
     public Layer (bool selected, bool locked) {
         _selected = selected;
         _locked = locked;
+    }
+
+    public Layer.deserialized (Json.Object obj) {
+        _selected = obj.get_boolean_member ("selected");
+        _locked = obj.get_boolean_member ("locked");
+    }
+
+    protected override void serialize_details (ref Json.Object obj) {
+        obj.set_boolean_member ("selected", _selected);
+        obj.set_boolean_member ("locked", _locked);
     }
 
     public Layer copy () {
