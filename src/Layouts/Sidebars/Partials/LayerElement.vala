@@ -36,6 +36,8 @@ public class Akira.Layouts.Sidebars.Partials.LayerElement : Gtk.ListBoxRow {
         );
     }
 
+    ~LayerElement () {}
+
     construct {
         can_focus = true;
 

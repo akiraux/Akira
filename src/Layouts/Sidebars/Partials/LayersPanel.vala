@@ -107,4 +107,16 @@ public class Akira.Layouts.Sidebars.Partials.LayersPanel : Gtk.Grid {
         free_items_list.show_all ();
         artboards_list.show_all ();
     }
+
+    public void clear_list (bool with_artboards) {
+        foreach (var row in free_items_list.get_selected_rows ()) {
+            row.destroy ();
+        }
+
+        if (with_artboards) {
+            foreach (var row in artboards_list.get_selected_rows ()) {
+                row.destroy ();
+            }
+        }
+    }
 }

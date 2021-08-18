@@ -78,6 +78,7 @@ public class Akira.Lib2.ViewCanvas : Goo.Canvas {
         window.event_bus.update_snap_decorators.connect (on_update_snap_decorators);
 
         mode_manager.mode_changed.connect (interaction_mode_changed);
+        items_manager.items_removed.connect (on_items_removed);
     }
 
     public signal void canvas_moved (double delta_x, double delta_y);
@@ -569,5 +570,9 @@ public class Akira.Lib2.ViewCanvas : Goo.Canvas {
         } else if (snap_manager.is_active ()) {
             snap_manager.reset_decorators ();
         }
+    }
+
+    private void on_items_removed (bool with_artboards) {
+        window.main_window.remove_layers (with_artboards);
     }
 }

@@ -92,7 +92,7 @@ public class Akira.Lib2.Modes.ItemInsertMode : AbstractInteractionMode {
             transform_mode = new Akira.Lib2.Modes.TransformMode (view_canvas, Utils.Nobs.Nob.BOTTOM_LEFT);
             transform_mode.mode_begin ();
             transform_mode.button_press_event (event);
-            view_canvas.window.main_window.update_layers_ui ();
+            view_canvas.window.main_window.show_added_layers ();
 
             return true;
         }

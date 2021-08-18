@@ -36,6 +36,8 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
         item_model.item_added.connect (on_item_added);
     }
 
+    public signal void items_removed (bool with_artboards);
+
     public Lib2.Items.ModelInstance? instance_from_id (int id) {
         return item_model.instance_from_id (id);
     }
@@ -65,6 +67,7 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
     }
 
     public int remove_items (GLib.Array<int> to_remove) {
+        bool with_artboards = false;
         var to_delete = new Gee.TreeMap<Lib2.Items.PositionKey, Lib2.Items.ModelInstance> (
             Lib2.Items.PositionKey.compare,
             null
@@ -83,7 +86,12 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
             key.parent_path = node.parent == null ? "" : item_model.path_from_node (node.parent);
             key.pos_in_parent = node.pos_in_parent;
 
-            to_delete[key] = node.instance;
+            var instance = node.instance;
+            to_delete[key] = instance;
+
+            if (!with_artboards) {
+                with_artboards = instance.type is Lib2.Items.ModelTypeArtboard;
+            }
 
             if (modified_groups.length == 0) {
                 modified_groups.append_val (node.parent.id);
@@ -111,6 +119,8 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
         foreach (var gid in modified_groups.data) {
             item_model.recalculate_children_stacking (gid);
         }
+
+        items_removed (with_artboards);
 
         return 0;
     }
@@ -434,7 +444,7 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
         );
 
         add_item_to_origin (new_rect);
-        view_canvas.window.main_window.update_layers_ui ();
+        view_canvas.window.main_window.show_added_layers ();
 
         return new_rect;
     }
@@ -481,7 +491,7 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
         }
 
         compile_model ();
-        view_canvas.window.main_window.update_layers_ui ();
+        view_canvas.window.main_window.show_added_layers ();
 
         if (debug_timer) {
             timer.stop ();
