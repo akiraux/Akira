@@ -25,14 +25,14 @@
  */
 public class Akira.Layouts.Sidebars.Partials.LayerElement : Gtk.ListBoxRow {
     public unowned Lib2.ViewCanvas view_canvas { get; construct; }
-    public unowned Lib2.Items.ModelInstance node { get; construct; }
+    public unowned Lib2.Items.ModelInstance node_instance { get; construct; }
 
     private Gtk.Label label;
 
-    public LayerElement (Lib2.Items.ModelInstance instance, Lib2.ViewCanvas canvas) {
+    public LayerElement (Lib2.Items.ModelInstance node, Lib2.ViewCanvas canvas) {
         Object (
             view_canvas: canvas,
-            node: instance
+            node_instance: node
         );
     }
 
@@ -46,23 +46,18 @@ public class Akira.Layouts.Sidebars.Partials.LayerElement : Gtk.ListBoxRow {
         label.set_ellipsize (Pango.EllipsizeMode.END);
 
         // Temporarily print the ID just to see something.
-        label.label = node.id.to_string ();
+        label.label = node_instance.id.to_string ();
 
         // Build a specific UI based on the node instance's type.
-        if (node.type is Lib2.Items.ModelTypeArtboard) {
+        if (node_instance.type is Lib2.Items.ModelTypeArtboard) {
             _build_artboard_ui ();
-        } else if (node.type is Lib2.Items.ModelTypeGroup) {
+        } else if (node_instance.type is Lib2.Items.ModelTypeGroup) {
             _build_group_ui ();
         } else {
             _build_layer_ui ();
         }
 
         add (label);
-
-        // This is bad and we shouldn't call show_all for each new layer, but
-        // rather batch creating all the layers and then calling a single
-        // show_all from the parent container.
-        show_all ();
     }
 
     /*

@@ -434,6 +434,8 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
         );
 
         add_item_to_origin (new_rect);
+        view_canvas.window.main_window.update_layers_ui ();
+
         return new_rect;
     }
 
@@ -457,8 +459,8 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
         var num_of = 1000;
 
         for (var i = 0; i < num_of; ++i) {
-                x = GLib.Random.double_range (0, 1000);
-                y = GLib.Random.double_range (0, 1000);
+            x = GLib.Random.double_range (0, 1000);
+            y = GLib.Random.double_range (0, 1000);
             //var new_rect = Lib2.Items.ModelTypeRect.default_rect (
             //    //new Lib2.Components.Coordinates (x + i * 60, y),
             //    new Lib2.Components.Coordinates (x, y),
@@ -479,6 +481,7 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
         }
 
         compile_model ();
+        view_canvas.window.main_window.update_layers_ui ();
 
         if (debug_timer) {
             timer.stop ();

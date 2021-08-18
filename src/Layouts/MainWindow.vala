@@ -29,6 +29,8 @@ public class Akira.Layouts.MainWindow : Gtk.Grid {
     // public Layouts.RightSideBar right_sidebar;
     // end.
 
+    private Layouts.Sidebars.LayersSidebar layers_sidebar;
+
     public Gtk.Paned pane;
     public Gtk.Paned pane2;
 
@@ -38,7 +40,7 @@ public class Akira.Layouts.MainWindow : Gtk.Grid {
 
     construct {
         main_view_canvas = new Layouts.MainViewCanvas (window);
-        var layers_sidebar = new Layouts.Sidebars.LayersSidebar (main_view_canvas.canvas);
+        layers_sidebar = new Layouts.Sidebars.LayersSidebar (main_view_canvas.canvas);
 
         pane = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);
         pane2 = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);
@@ -79,5 +81,13 @@ public class Akira.Layouts.MainWindow : Gtk.Grid {
 
     public void focus_canvas () {
         main_view_canvas.canvas.focus_canvas ();
+    }
+
+    /*
+     * Force the layers panel to show all its newly added children, only after
+     * all items have actually been created.
+     */
+    public void update_layers_ui () {
+        layers_sidebar.layers_panel.show_all ();
     }
 }
