@@ -33,11 +33,10 @@ public class Akira.FileFormat.JsonSerializer {
             serialize_window_state (window, ref builder);
         }
 
-        // Convert Artboards to JSON.
-        serialize_artboards (window, ref builder);
+        var view_canvas = window.main_window.main_view_canvas.canvas;
 
-        // Convert Items to JSON.
-        serialize_items (window, ref builder);
+        // Convert Model to JSON.
+        serialize_model (view_canvas.items_manager.item_model, ref builder);
 
         builder.end_object ();
 
@@ -64,52 +63,22 @@ public class Akira.FileFormat.JsonSerializer {
 
         // Save the current Canvas status.
         builder.set_member_name ("scale");
-        builder.add_double_value (window.main_window.main_canvas.canvas.get_scale ());
+        builder.add_double_value (window.main_window.main_view_canvas.canvas.get_scale ());
         builder.set_member_name ("hadjustment");
-        builder.add_double_value (window.main_window.main_canvas.main_scroll.hadjustment.value);
+        builder.add_double_value (window.main_window.main_view_canvas.main_scroll.hadjustment.value);
         builder.set_member_name ("vadjustment");
-        builder.add_double_value (window.main_window.main_canvas.main_scroll.vadjustment.value);
+        builder.add_double_value (window.main_window.main_view_canvas.main_scroll.vadjustment.value);
     }
 
     /*
      * Serialize canvas artboards to the builder.
      */
-    public static void serialize_artboards ( Akira.Window window, ref Json.Builder builder) {
-        builder.set_member_name ("artboards");
+    public static void serialize_model (Akira.Lib2.Items.Model item_model, ref Json.Builder builder) {
+        var origin = item_model.node_from_id (Akira.Lib2.Items.Model.ORIGIN_ID);
+        builder.set_member_name ("roots");
         builder.begin_array ();
-
-        foreach (var artboard in window.items_manager.artboards) {
-            builder.begin_object ();
-            builder.set_member_name ("artboard");
-            builder.add_value (JsonItemSerializer.serialize_item (artboard));
-            builder.end_object ();
-        }
-
-        builder.end_array ();
-    }
-
-    /*
-     * Serialize canvas items to the builder.
-     */
-    public static void serialize_items ( Akira.Window window, ref Json.Builder builder) {
-        builder.set_member_name ("items");
-        builder.begin_array ();
-
-        foreach (var _item in window.items_manager.free_items) {
-            builder.begin_object ();
-            builder.set_member_name ("item");
-            builder.add_value (JsonItemSerializer.serialize_item (_item));
-            builder.end_object ();
-        }
-
-        // Save all the items inside this Artboard.
-        foreach (var artboard in window.items_manager.artboards) {
-            foreach (var _item in artboard.items) {
-                builder.begin_object ();
-                builder.set_member_name ("item");
-                builder.add_value (JsonItemSerializer.serialize_item (_item));
-                builder.end_object ();
-            }
+        foreach (var root in origin.children.data) {
+            JsonItemSerializer.serialize_node (root, ref builder);
         }
 
         builder.end_array ();

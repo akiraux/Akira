@@ -43,6 +43,9 @@ public class Akira.Lib2.ViewCanvas : Goo.Canvas {
     public bool shift_is_pressed = false;
     public double current_scale = 1.0;
 
+    // RAIIify this?
+    public bool holding = false;
+
     private Utils.Nobs.Nob hovered_nob = Utils.Nobs.Nob.NONE;
     private Gdk.CursorType current_cursor = Gdk.CursorType.ARROW;
 

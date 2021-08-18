@@ -24,7 +24,7 @@
   * For now the options are quite simple, in the future more data
   * and context could be added for more complex layouts.
   */
-public class Akira.Lib2.Components.Layout : Copyable<Layout> {
+public class Akira.Lib2.Components.Layout : Component, Copyable<Layout> {
     public struct LayoutData {
         public bool can_rotate;
         public bool dilated_resize;
@@ -36,6 +36,18 @@ public class Akira.Lib2.Components.Layout : Copyable<Layout> {
 
     public Layout (LayoutData data) {
         _data = data;
+    }
+
+    public Layout.deserialized (Json.Object obj) {
+        _data.can_rotate = obj.get_boolean_member ("can_rotate");
+        _data.dilated_resize = obj.get_boolean_member ("dilated_resize");
+        _data.clips_children = obj.get_boolean_member ("clips_children");
+    }
+
+    protected override void serialize_details (ref Json.Object obj) {
+        obj.set_boolean_member ("can_rotate", can_rotate);
+        obj.set_boolean_member ("dilated_resize", dilated_resize);
+        obj.set_boolean_member ("clips_children", clips_children);
     }
 
     public Layout copy () {
