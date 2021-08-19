@@ -82,6 +82,7 @@ public class Akira.Lib.Managers.NobManager : Object {
 
         canvas.window.event_bus.hide_select_effect.connect (on_hide_select_effect);
         canvas.window.event_bus.show_select_effect.connect (on_show_select_effect);
+        canvas.window.event_bus.zoom_changed.connect (on_show_select_effect);
     }
 
     /**
@@ -251,13 +252,6 @@ public class Akira.Lib.Managers.NobManager : Object {
         var nob_data = new ItemNobData ();
         populate_nob_bounds_from_items (items, ref nob_data);
         calculate_nob_position (nob_name, nob_data, ref pos_x, ref pos_y);
-    }
-
-    /**
-     * What happens when the canvas is zoomed in.
-     */
-    private void on_canvas_zoom () {
-        on_add_select_effect (canvas.selected_bound_manager.selected_items);
     }
 
     /**
