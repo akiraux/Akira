@@ -21,6 +21,8 @@
 
 public class Akira.Lib2.ViewCanvas : ViewLayers.BaseCanvas {
     private const int SIZE = 30;
+    public const double MIN_SCALE = 0.02;
+    public const double MAX_SCALE = 50.0;
     public unowned Akira.Window window { get; construct; }
 
     public Geometry.Quad to_draw_1;
@@ -79,7 +81,13 @@ public class Akira.Lib2.ViewCanvas : ViewLayers.BaseCanvas {
         snap_manager = new Lib2.Managers.SnapManager (this);
         copy_manager = new Lib2.Managers.CopyManager (this);
 
-        grid_layout = new ViewLayers.ViewLayerGrid (0, 0, Layouts.MainCanvas.CANVAS_SIZE, Layouts.MainCanvas.CANVAS_SIZE);
+        grid_layout = new ViewLayers.ViewLayerGrid (
+            0,
+            0,
+            Layouts.MainCanvas.CANVAS_SIZE,
+            Layouts.MainCanvas.CANVAS_SIZE
+        );
+
         grid_layout.add_to_canvas (ViewLayers.ViewLayer.GRID_LAYER_ID, this);
         grid_layout.set_visible (true);
 
@@ -133,45 +141,42 @@ public class Akira.Lib2.ViewCanvas : ViewLayers.BaseCanvas {
         }
     }
 
-    private void trigger_adjust_zoom (double zoom, bool absolute, Geometry.Point? reference) {
-        var start_x = hadjustment.get_value ();
-        var start_y = vadjustment.get_value ();
+    private void trigger_adjust_zoom (double new_scale, bool absolute, Geometry.Point? reference) {
+        var initial_hx = hadjustment.get_value ();
+        var initial_hy = vadjustment.get_value ();
 
-        double x_offset = 0;
-        double y_offset = 0;
-        if (reference != null) {
-            print ("%f %f\n", reference.x, reference.y);
-            x_offset = reference.x;
-            y_offset = reference.y;
-            //convert_to_pixels (ref x_offset, ref y_offset);
-            print ("%f %f\n", x_offset, y_offset);
-        }
+        var local_hx = initial_hx / scale;
+        var local_hy = initial_hy / scale;
 
         if (!absolute) {
             // Force the zoom value to 8% if we're currently at a 2% scale in order
             // to go back to 10% and increase from there.
-            if (current_scale == 0.02 && zoom == 0.1) {
-                zoom = 0.08;
+            if (current_scale == MIN_SCALE && new_scale == 0.1) {
+                new_scale = 0.08;
             }
 
-            zoom += current_scale;
-            // Prevent the canvas from shrinking below 2%;
-            if (zoom < 0.02) {
-                zoom = 0.02;
-            }
-
-            // Prevent the canvas from growing above 5000%;
-            if (zoom > 50) {
-                zoom = 50;
-            }
+            new_scale += current_scale;
         }
 
-        current_scale = zoom;
-        this.scale = zoom;
-        window.event_bus.zoom_changed (zoom);
+        new_scale = Utils.GeometryMath.clamp (new_scale, Lib2.ViewCanvas.MIN_SCALE, Lib2.ViewCanvas.MAX_SCALE);
+        var zoom_diff = scale / new_scale;
 
-        hadjustment.set_value (start_x + x_offset / scale);
-        vadjustment.set_value (start_y + y_offset / scale);
+        current_scale = new_scale;
+        this.scale = new_scale;
+        window.event_bus.zoom_changed (new_scale);
+
+        if (reference == null) {
+            hadjustment.set_value (local_hx * scale);
+            vadjustment.set_value (local_hy * scale);
+            return;
+        }
+
+        var ref_x = reference.x - initial_hx;
+        var ref_y = reference.y - initial_hy;
+        var offset_x = ref_x - ref_x * zoom_diff;
+        var offset_y = ref_y - ref_y * zoom_diff;
+        hadjustment.set_value (local_hx * scale + offset_x);
+        vadjustment.set_value (local_hy * scale + offset_y);
     }
 
     public void focus_canvas () {

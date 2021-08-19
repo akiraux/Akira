@@ -116,7 +116,6 @@ sources = files(
     'Lib/Items/CanvasText.vala',
 
     'Lib/Managers/ExportManager.vala',
-    'Lib/Managers/GridManager.vala',
     'Lib/Managers/HoverManager.vala',
     'Lib/Managers/ImageManager.vala',
     'Lib/Managers/ItemsManager.vala',

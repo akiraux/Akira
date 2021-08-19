@@ -36,7 +36,6 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     public Managers.ExportManager export_manager;
     public Managers.SelectedBoundManager selected_bound_manager;
     public Managers.NobManager nob_manager;
-    private Managers.GridManager grid_manager;
     private Managers.HoverManager hover_manager;
     private Managers.ModeManager mode_manager;
     private Managers.SnapManager snap_manager;
@@ -68,7 +67,6 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         selected_bound_manager = new Managers.SelectedBoundManager (this);
         nob_manager = new Managers.NobManager (this);
 
-        grid_manager = new Managers.GridManager (this);
         hover_manager = new Managers.HoverManager (this);
         mode_manager = new Managers.ModeManager (this);
         snap_manager = new Managers.SnapManager (this);
@@ -287,8 +285,6 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     public void update_canvas () {
         // Synchronous update to make sure item is initialized before any other event.
         update ();
-
-        grid_manager.on_canvas_update ();
     }
 
     /*

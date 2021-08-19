@@ -103,14 +103,8 @@ public class Akira.Layouts.MainViewCanvas : Gtk.Grid {
         event.get_scroll_deltas (out delta_x, out delta_y);
 
         if (is_ctrl) {
-            // Zoom change
-
-            // Divide the delta if it's too high. This fixes the zoom with
-            // the mouse wheel.
-            if (canvas.scale < 2) {
-                delta_y /= 10;
-            }
-
+            var norm_scale = canvas.scale / Lib2.ViewCanvas.MAX_SCALE;
+            delta_y *= 1 - (1 - norm_scale) * (1 - norm_scale);
             window.event_bus.adjust_zoom (-delta_y, false, Geometry.Point (event.x, event.y));
             return true;
         }
@@ -120,39 +114,8 @@ public class Akira.Layouts.MainViewCanvas : Gtk.Grid {
             return true;
         }
 
+        main_scroll.hadjustment.value += delta_x * 10;
         main_scroll.vadjustment.value += delta_y * 10;
         return true;
-    }
-
-    private void zoom_on_cursor (Gdk.EventScroll event, double old_zoom) {
-        // The regular zoom mode shifts the visible viewing area
-        // to center itself (it already has one translation applied)
-        // so you cannot just move the viewing area by the distance
-        // of the current mouse location and the new mouse location.
-
-        // If you want to zoom to your mouse you need to find the
-        // difference between the distances of the current mouse location
-        // in the current view scale to the left view border and the new
-        // mouse location that has the new canvas scale applied to the
-        // new left view border and shift the view by that difference.
-        //int width = main_scroll.get_allocated_width ();
-        //int height = main_scroll.get_allocated_height ();
-
-        //var center_x = main_scroll.hadjustment.value + (width / 2);
-        //var center_y = main_scroll.vadjustment.value + (height / 2);
-
-        //var old_center_x = (center_x / canvas.scale) * old_zoom;
-        //var old_center_y = (center_y / canvas.scale) * old_zoom;
-
-        //var new_event_x = (event.x / old_zoom) * canvas.scale;
-        //var new_event_y = (event.y / old_zoom) * canvas.scale;
-
-        //var old_hadjustment = old_center_x - (width / 2);
-        //var old_vadjustment = old_center_y - (height / 2);
-
-        //main_scroll.hadjustment.value +=
-        //    (new_event_x - main_scroll.hadjustment.value) - (event.x - old_hadjustment);
-        //main_scroll.vadjustment.value +=
-        //    (new_event_y - main_scroll.vadjustment.value) - (event.y - old_vadjustment);
     }
 }

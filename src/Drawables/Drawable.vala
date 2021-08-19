@@ -196,10 +196,14 @@ public class Akira.Drawables.Drawable {
         cr.new_path ();
     }
 
-    public void paint_hover (Cairo.Context cr, Gdk.RGBA color, double line_width, Geometry.Rectangle target_bounds, double scale) {
+    public void paint_hover (
+        Cairo.Context cr,
+        Gdk.RGBA color,
+        double line_width,
+        Geometry.Rectangle target_bounds,
+        double scale
+    ) {
         cr.save ();
-        Cairo.Matrix global_transform = cr.get_matrix ();
-
         // We apply the item transform before creating the path
         Cairo.Matrix tr = transform;
         cr.transform (tr);

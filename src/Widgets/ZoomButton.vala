@@ -159,30 +159,19 @@ public class Akira.Widgets.ZoomButton : Gtk.Grid {
     private bool handle_key_press (Gdk.EventKey event) {
         // Arrow UP pressed, increase value by 1.
         if (event.keyval == Gdk.Key.Up) {
-            var text_value = double.parse (zoom_input.text) + 1;
-            window.event_bus.adjust_zoom (text_value, true, null);
+            window.event_bus.adjust_zoom (0.1, true, null);
             return true;
         }
 
         // Arrow DOWN pressed, decreased value by 1.
         if (event.keyval == Gdk.Key.Down) {
-            var text_value = double.parse (zoom_input.text) - 1;
-            window.event_bus.adjust_zoom (text_value, true, null);
+            window.event_bus.adjust_zoom (-0.1, true, null);
             return true;
         }
 
         // Enter pressed, update the scale and move the focus back to the canvas.
         if (event.keyval == Gdk.Key.Return) {
-            var text_value = double.parse (zoom_input.text);
-
-            // Be sure to stay within the canvas zoom in and out limits of 2% and 5000%.
-            if (text_value < 2) {
-                text_value = 2;
-            }
-            if (text_value > 5000) {
-                text_value = 5000;
-            }
-
+            var text_value = double.parse (zoom_input.text) / 100;
             window.event_bus.adjust_zoom (text_value, true, null);
             window.event_bus.set_focus_on_canvas ();
             return true;

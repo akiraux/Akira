@@ -60,7 +60,12 @@ public class Akira.ViewLayers.ViewLayerGrid : ViewLayer {
         context.new_path ();
     }
 
-    private void paint_horizontal_lines (Cairo.Context context, Geometry.Rectangle target_bounds, Geometry.Rectangle viewport_bounds, double scale) {
+    private void paint_horizontal_lines (
+        Cairo.Context context,
+        Geometry.Rectangle target_bounds,
+        Geometry.Rectangle viewport_bounds,
+        double scale
+    ) {
         if (spacing <= 0) {
             return;
         }
@@ -90,7 +95,12 @@ public class Akira.ViewLayers.ViewLayerGrid : ViewLayer {
         context.restore ();
     }
 
-    private void paint_vertical_lines (Cairo.Context context, Geometry.Rectangle target_bounds, Geometry.Rectangle viewport_bounds, double scale) {
+    private void paint_vertical_lines (
+        Cairo.Context context,
+        Geometry.Rectangle target_bounds,
+        Geometry.Rectangle viewport_bounds,
+        double scale
+    ) {
         if (spacing <= 0) {
             return;
         }

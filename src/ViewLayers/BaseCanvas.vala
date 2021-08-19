@@ -65,7 +65,7 @@ public class Akira.ViewLayers.BaseCanvas : Gtk.Widget , Gtk.Scrollable {
         set { this.internal_set_scale (value); }
     }
 
-    public double x1  {
+    public double x1 {
         get { return bounds.left; }
         set {
             bounds.left = value;
@@ -74,7 +74,7 @@ public class Akira.ViewLayers.BaseCanvas : Gtk.Widget , Gtk.Scrollable {
             queue_draw ();
         }
     }
-    public double y1  {
+    public double y1 {
         get { return bounds.top; }
         set {
             bounds.top = value;
@@ -83,7 +83,7 @@ public class Akira.ViewLayers.BaseCanvas : Gtk.Widget , Gtk.Scrollable {
             queue_draw ();
         }
     }
-    public double x2  {
+    public double x2 {
         get { return bounds.right; }
         set {
             bounds.right = value;
@@ -92,7 +92,7 @@ public class Akira.ViewLayers.BaseCanvas : Gtk.Widget , Gtk.Scrollable {
             queue_draw ();
         }
     }
-    public double y2  {
+    public double y2 {
         get { return bounds.bottom; }
         set {
             bounds.bottom = value;
@@ -102,11 +102,11 @@ public class Akira.ViewLayers.BaseCanvas : Gtk.Widget , Gtk.Scrollable {
         }
     }
 
-    public double resolution_x  {
+    public double resolution_x {
         get { return _resolution_x; }
         set { _resolution_x = value; needs_reconfigure = true; }
     }
-    public double resolution_y  {
+    public double resolution_y {
         get { return _resolution_y; }
         set { _resolution_y = value; needs_reconfigure = true; }
     }
@@ -507,8 +507,8 @@ public class Akira.ViewLayers.BaseCanvas : Gtk.Widget , Gtk.Scrollable {
 
     public void adjustment_value_changed () {
         if (freeze_count == 0 && get_realized ()) {
-            int new_window_x = -(int)hadjustment.get_value ();
-            int new_window_y = -(int)vadjustment.get_value ();
+            int new_window_x = - (int)hadjustment.get_value ();
+            int new_window_y = - (int)vadjustment.get_value ();
 
             window_x = new_window_x;
             window_y = new_window_y;
@@ -557,8 +557,8 @@ public class Akira.ViewLayers.BaseCanvas : Gtk.Widget , Gtk.Scrollable {
         if (clear_background) {
             Gtk.Allocation allocation;
             get_allocation (out allocation);
-            unowned var styleContext = get_style_context ();
-            styleContext.render_background (context, 0, 0, allocation.width, allocation.height);
+            unowned var style_context = get_style_context ();
+            style_context.render_background (context, 0, 0, allocation.width, allocation.height);
             context.set_source_rgb (0, 0, 0);
         }
 
