@@ -57,30 +57,13 @@ public class Akira.Layouts.MainWindow : Gtk.Grid {
         }
 
         attach (pane, 0, 0, 1, 1);
-
-        // left_sidebar = new Akira.Layouts.LeftSideBar (window);
-        // right_sidebar = new Akira.Layouts.RightSideBar (window);
-        // main_canvas = new Akira.Layouts.MainCanvas (window);
-
-        // pane = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);
-        // pane2 = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);
-
-        // pane.pack2 (pane2, true, false);
-        // pane2.pack1 (main_canvas, true, true);
-
-        // if (!settings.get_boolean ("invert-sidebar")) {
-        //     pane.pack1 (left_sidebar, false, false);
-        //     pane2.pack2 (right_sidebar, false, false);
-        // } else {
-        //     pane.pack1 (right_sidebar, false, false);
-        //     pane2.pack2 (left_sidebar, false, false);
-        // }
-
-        // attach (pane, 0, 0, 1, 1);
     }
 
     public void focus_canvas () {
-        main_view_canvas.canvas.focus_canvas ();
+        if (main_view_canvas != null) {
+            main_view_canvas.canvas.focus_canvas ();
+            return;
+        }
     }
 
     /*
@@ -91,6 +74,9 @@ public class Akira.Layouts.MainWindow : Gtk.Grid {
         layers_sidebar.layers_panel.refresh_lists ();
     }
 
+    /*
+     * Pass the list of nodes ids to be removed from the layers list.
+     */
     public void remove_layers (GLib.Array<int> ids) {
         layers_sidebar.layers_panel.delete_selected_layers (ids);
     }

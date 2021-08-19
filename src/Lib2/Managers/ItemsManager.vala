@@ -67,7 +67,6 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
     }
 
     public int remove_items (GLib.Array<int> to_remove) {
-        bool with_artboards = false;
         var to_delete = new Gee.TreeMap<Lib2.Items.PositionKey, Lib2.Items.ModelInstance> (
             Lib2.Items.PositionKey.compare,
             null
@@ -86,12 +85,7 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
             key.parent_path = node.parent == null ? "" : item_model.path_from_node (node.parent);
             key.pos_in_parent = node.pos_in_parent;
 
-            var instance = node.instance;
-            to_delete[key] = instance;
-
-            if (!with_artboards) {
-                with_artboards = instance.type is Lib2.Items.ModelTypeArtboard;
-            }
+            to_delete[key] = node.instance;
 
             if (modified_groups.length == 0) {
                 modified_groups.append_val (node.parent.id);
@@ -450,6 +444,7 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
         );
 
         add_item_to_origin (new_rect);
+        // Defer the print of the layer UI after all items have been created.
         view_canvas.window.main_window.show_added_layers ();
 
         return new_rect;
@@ -497,6 +492,7 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
         }
 
         compile_model ();
+        // Defer the print of the layer UI after all items have been created.
         view_canvas.window.main_window.show_added_layers ();
 
         if (debug_timer) {

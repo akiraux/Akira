@@ -572,6 +572,9 @@ public class Akira.Lib2.ViewCanvas : Goo.Canvas {
         }
     }
 
+    /*
+     * Helper method to interact with the layers panel without publicly exposing it.
+     */
     private void on_items_removed (GLib.Array<int> ids) {
         window.main_window.remove_layers (ids);
     }

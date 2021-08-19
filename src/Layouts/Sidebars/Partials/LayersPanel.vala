@@ -88,6 +88,12 @@ public class Akira.Layouts.Sidebars.Partials.LayersPanel : Gtk.Grid {
         items_list.show_all ();
     }
 
+    /*
+     * Use the received list of nodes' ids from the signal to loop through the
+     * layers list and remove rows. We do this because the on_selection_modified
+     * method runs first and all the rows have already been deselected, so we
+     * can't loop through them.
+     */
     public void delete_selected_layers (GLib.Array<int> ids) {
         foreach (var id in ids.data) {
             var row = list_map.get (id);
