@@ -212,6 +212,7 @@ public class Akira.Drawables.Drawable {
 
         cr.set_line_width (line_width / scale);
         cr.set_source_rgba (color.red, color.green, color.blue, color.alpha);
+        cr.set_matrix (Cairo.Matrix.identity ());
         cr.stroke ();
 
         cr.restore ();
