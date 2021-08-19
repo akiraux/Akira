@@ -91,7 +91,7 @@ public class Akira.Layouts.MainWindow : Gtk.Grid {
         layers_sidebar.layers_panel.refresh_lists ();
     }
 
-    public void remove_layers () {
-        layers_sidebar.layers_panel.clear_list ();
+    public void remove_layers (GLib.Array<int> ids) {
+        layers_sidebar.layers_panel.delete_selected_layers (ids);
     }
 }

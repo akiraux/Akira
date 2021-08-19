@@ -80,8 +80,4 @@ public class Akira.Layouts.Sidebars.Partials.LayerElement : Gtk.ListBoxRow {
     private void _build_layer_ui () {
         get_style_context ().add_class ("layer");
     }
-
-    public int id () {
-        return node_instance.id;
-    }
 }

@@ -26,6 +26,9 @@ public class Akira.Layouts.Sidebars.Partials.LayersPanel : Gtk.Grid {
     public unowned Lib2.ViewCanvas view_canvas { get; construct; }
 
     private Gtk.ListBox items_list;
+    // Keep track of each row associated to a node's ID in order to quickly get
+    // the layer to remove, move, or select, without doing nested foreach.
+    private Gee.HashMap<int, Gtk.ListBoxRow> list_map;
 
     public LayersPanel (Lib2.ViewCanvas canvas) {
         Object (
@@ -38,9 +41,10 @@ public class Akira.Layouts.Sidebars.Partials.LayersPanel : Gtk.Grid {
         get_style_context ().add_class ("layers-panel");
         expand = true;
 
+        list_map = new Gee.HashMap<int, Gtk.ListBoxRow> ();
         items_list = new Gtk.ListBox ();
         items_list.activate_on_single_click = false;
-        items_list.selection_mode = Gtk.SelectionMode.SINGLE;
+        items_list.selection_mode = Gtk.SelectionMode.MULTIPLE;
 
         // Motion revealer for layers drag&drop on the empty area.
         var motion_grid = new Gtk.Grid ();
@@ -73,26 +77,43 @@ public class Akira.Layouts.Sidebars.Partials.LayersPanel : Gtk.Grid {
             return;
         }
 
-        items_list.prepend (new LayerElement (node_instance, view_canvas));
+        var layer = new LayerElement (node_instance, view_canvas);
+        items_list.prepend (layer);
+
+        // Add the newly created layer to the list map.
+        list_map[node_instance.id] = layer;
     }
 
     public void refresh_lists () {
         items_list.show_all ();
     }
 
-    public void clear_list () {
-        foreach (var row in items_list.get_selected_rows ()) {
+    public void delete_selected_layers (GLib.Array<int> ids) {
+        foreach (var id in ids.data) {
+            var row = list_map.get (id);
+            if (row == null) {
+                continue;
+            }
+
             row.destroy ();
+            list_map.unset (id);
         }
     }
 
     private void on_selection_modified () {
-        foreach (var selected in view_canvas.selection_manager.selection.nodes.values) {
-            foreach (var row in items_list.get_selected_rows ()) {
-                if (((LayerElement) row).id () == selected.node.id) {
-                    items_list.select_row (row);
-                }
+        var sm = view_canvas.selection_manager;
+        if (sm.is_empty ()) {
+            items_list.unselect_all ();
+            return;
+        }
+
+        foreach (var selected in sm.selection.nodes.values) {
+            var row = list_map.get (selected.node.id);
+            if (row == null) {
+                continue;
             }
+
+            items_list.select_row (row);
         }
     }
 }

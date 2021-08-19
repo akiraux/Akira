@@ -36,7 +36,7 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
         item_model.item_added.connect (on_item_added);
     }
 
-    public signal void items_removed ();
+    public signal void items_removed (GLib.Array<int> ids);
 
     public Lib2.Items.ModelInstance? instance_from_id (int id) {
         return item_model.instance_from_id (id);
@@ -106,9 +106,15 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
             }
         }
 
+        // Collect the nodes' ids to be removed in order to let the layers UI
+        // be aware of what to remove without needing to access selection manager
+        // which immediately loses the list of selected nodes.
+        var ids_array = new GLib.Array<int> ();
+
         var it = to_delete.bidir_map_iterator ();
         for (var has_next = it.last (); has_next; has_next = it.previous ()) {
             var inst = it.get_value ();
+            ids_array.append_val (inst.id);
 
             if (0 != item_model.remove (inst.id, false)) {
                 assert (false);
@@ -120,7 +126,7 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
             item_model.recalculate_children_stacking (gid);
         }
 
-        items_removed ();
+        items_removed (ids_array);
 
         return 0;
     }
