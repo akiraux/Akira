@@ -21,20 +21,18 @@
  */
 
 public class Akira.Lib2.Managers.HoverManager : Object {
-    private const string STROKE_COLOR = "#41c9fd";
-    private const double LINE_WIDTH = 2.0;
-
     public unowned ViewCanvas view_canvas { get; construct; }
 
     private int current_hovered_id = -1;
-    private Drawables.Drawable hover_effect;
+    private ViewLayers.ViewLayerHover hover_layer;
 
     public HoverManager (ViewCanvas canvas) {
         Object (view_canvas : canvas);
     }
 
     construct {
-        view_canvas.window.event_bus.zoom.connect (on_canvas_zoom);
+        hover_layer = new ViewLayers.ViewLayerHover ();
+        hover_layer.add_to_canvas (ViewLayers.ViewLayer.HOVER_LAYER_ID, view_canvas);
     }
 
     public void on_mouse_over (double event_x, double event_y) {
@@ -52,15 +50,9 @@ public class Akira.Lib2.Managers.HoverManager : Object {
     }
 
     public void remove_hover_effect () {
-        if (hover_effect == null) {
-            return;
-        }
-
+        hover_layer.add_drawable (null);
+        hover_layer.set_visible (false);
         current_hovered_id = -1;
-        hover_effect.remove ();
-        hover_effect = null;
-
-        //view_canvas.window.event_bus.hover_over_item (null)
     }
 
     private void maybe_create_hover_effect (Lib2.Items.ModelInstance instance) {
@@ -75,45 +67,6 @@ public class Akira.Lib2.Managers.HoverManager : Object {
             remove_hover_effect ();
         }
 
-        double item_width = 0;
-        double item_height = 0;
-
-        unowned var size = instance.components.size;
-        item_width = size == null ? instance.compiled_geometry.area.width : size.width;
-        item_height = size == null ? instance.compiled_geometry.area.height : size.height;
-
-        var scale = view_canvas.current_scale;
-
-        var width = item_width + LINE_WIDTH / 4.0 / scale;
-        var height = item_height + LINE_WIDTH / 4.0 / scale;
-
-        hover_effect = new Drawables.DrawableRect (
-            view_canvas.get_root_item (),
-            - width / 2,
-            - height / 2,
-            width,
-            height
-        );
-
-        hover_effect.line_width = LINE_WIDTH / scale;
-        hover_effect.stroke_color = STROKE_COLOR;
-
-        hover_effect.set_transform (instance.compiled_geometry.transformation_matrix);
-
-        hover_effect.set ("parent", view_canvas.get_root_item ());
-        hover_effect.can_focus = false;
-        hover_effect.pointer_events = Goo.CanvasPointerEvents.NONE;
-
-        //view_canvas.window.event_bus.hover_over_item (null)
-    }
-
-    private void on_canvas_zoom () {
-        // Interrupt if we don't have any hover effect currently visible.
-        if (hover_effect == null) {
-            return;
-        }
-
-        // Update the line width of the hover effect based on the canvas scale.
-        hover_effect.line_width = LINE_WIDTH / view_canvas.current_scale;
+        hover_layer.add_drawable (instance.drawable);
     }
 }

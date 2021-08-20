@@ -65,7 +65,7 @@ public class Akira.Lib2.Items.ModelInstance {
      * This should almost always be called by the model--unless you really know what you are doing.
      * If in doubt, you don't.
      */
-    public bool compile_components (ModelNode node) {
+    public bool compile_components (ModelNode node, ViewLayers.BaseCanvas? canvas) {
         bool something_changed = false;
         something_changed = compiled_components.maybe_compile_geometry (type, components, node) || something_changed;
         something_changed = compiled_components.maybe_compile_fill (type, components, node) || something_changed;
@@ -74,7 +74,7 @@ public class Akira.Lib2.Items.ModelInstance {
         notify_view_of_changes ();
 
         if (something_changed) {
-            update_drawable_bounds ();
+            update_drawable_bounds (canvas);
         }
 
         return something_changed;
@@ -100,25 +100,30 @@ public class Akira.Lib2.Items.ModelInstance {
         }
    }
 
-    public void add_to_canvas (Goo.Canvas canvas) {
-        type.construct_canvas_item (this, canvas);
-
-        if (drawable != null) {
-            drawable.parent_id = id;
-        }
+    public void add_to_canvas () {
+        type.construct_canvas_item (this);
     }
 
-    public void remove_from_canvas () {
-        if (drawable != null) {
-            drawable.remove ();
+    public void remove_from_canvas (ViewLayers.BaseCanvas? canvas) {
+        if (canvas != null) {
+            canvas.request_redraw (drawable.bounds);
         }
         drawable = null;
     }
 
-    private void update_drawable_bounds () {
+    private void update_drawable_bounds (ViewLayers.BaseCanvas? canvas) {
         bounding_box = compiled_geometry.area_bb;
         if (drawable != null) {
-            drawable_bounding_box = drawable.bounding_box ();
+            if (canvas != null && drawable.bounds.width != 0) {
+                canvas.request_redraw (drawable.bounds);
+            }
+
+            drawable.bounds = drawable.generate_bounding_box ();
+            drawable_bounding_box = drawable.bounds;
+
+            if (canvas != null) {
+                canvas.request_redraw (drawable.bounds);
+            }
         } else {
             drawable_bounding_box = bounding_box;
         }

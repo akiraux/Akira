@@ -43,7 +43,7 @@ public class Akira.Lib2.Items.ModelType : Object {
         return new Components.CompiledGeometry.from_components (components, node);
     }
 
-    public virtual void construct_canvas_item (ModelInstance item, Goo.Canvas canvas) {}
+    public virtual void construct_canvas_item (ModelInstance item) {}
 
     public virtual void component_updated (ModelInstance item, Lib2.Components.Component.Type type) {}
 

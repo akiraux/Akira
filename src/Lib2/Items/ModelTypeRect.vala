@@ -48,11 +48,10 @@ public class Akira.Lib2.Items.ModelTypeRect : ModelType {
 
     public override string name_id { get { return "rect"; } }
 
-    public override void construct_canvas_item (ModelInstance instance, Goo.Canvas canvas) {
+    public override void construct_canvas_item (ModelInstance instance) {
         var w = instance.components.size.width;
         var h = instance.components.size.height;
         instance.drawable = new Drawables.DrawableRect (
-            canvas.get_root_item (),
             - (w / 2.0),
             - (h / 2.0),
             w,
@@ -65,27 +64,27 @@ public class Akira.Lib2.Items.ModelTypeRect : ModelType {
             case Lib2.Components.Component.Type.COMPILED_BORDER:
                 if (!instance.compiled_border.is_visible) {
                     instance.drawable.line_width = 0;
-                    instance.drawable.stroke_color_rgba = 0;
+                    instance.drawable.stroke_rgba = Gdk.RGBA () { alpha = 0 };
                     break;
                 }
 
                 // The "line-width" property expects a DOUBLE type, but we don't support subpixels
                 // so we always handle the border size as INT, therefore we need to type cast it here.
                 instance.drawable.line_width = (double) instance.compiled_border.size;
-                instance.drawable.stroke_color_gdk_rgba = instance.compiled_border.color;
+                instance.drawable.stroke_rgba = instance.compiled_border.color;
                 break;
             case Lib2.Components.Component.Type.COMPILED_FILL:
                 if (!instance.compiled_fill.is_visible) {
-                    instance.drawable.fill_color_rgba = 0;
+                    instance.drawable.fill_rgba = Gdk.RGBA () { alpha = 0 };
                     break;
                 }
 
-                instance.drawable.fill_color_gdk_rgba = instance.compiled_fill.color;
+                instance.drawable.fill_rgba = instance.compiled_fill.color;
                 break;
             case Lib2.Components.Component.Type.COMPILED_GEOMETRY:
                 instance.drawable.width = instance.components.size.width;
                 instance.drawable.height = instance.components.size.height;
-                instance.drawable.set_transform (instance.compiled_geometry.transformation_matrix);
+                instance.drawable.transform = instance.compiled_geometry.transformation_matrix;
                 break;
         }
     }

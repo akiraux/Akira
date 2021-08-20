@@ -31,9 +31,8 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
     }
 
     construct {
-        item_model = new Lib2.Items.Model.live_model ();
+        item_model = new Lib2.Items.Model.live_model (view_canvas);
         item_model.item_geometry_changed.connect (on_item_geometry_changed);
-        item_model.item_added.connect (on_item_added);
     }
 
     public Lib2.Items.ModelInstance? instance_from_id (int id) {
@@ -65,6 +64,12 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
     }
 
     public int remove_items (GLib.Array<int> to_remove) {
+        ulong microseconds;
+        double seconds;
+
+        // create a timer object:
+        Timer timer = new Timer ();
+
         var to_delete = new Gee.TreeMap<Lib2.Items.PositionKey, Lib2.Items.ModelInstance> (
             Lib2.Items.PositionKey.compare,
             null
@@ -112,6 +117,9 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
             item_model.recalculate_children_stacking (gid);
         }
 
+        timer.stop ();
+        seconds = timer.elapsed (out microseconds);
+        print ("Deleted %u items in %s s\n", to_remove.length, seconds.to_string ());
         return 0;
     }
 
@@ -278,20 +286,7 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
     }
 
     public Lib2.Items.ModelInstance? hit_test (double x, double y, bool ignore_groups = true) {
-        Lib2.Items.ModelNode node;
-        if (CUSTOM_HITTEST) {
-            node = node_at_canvas_position (x, y);
-        }
-        else {
-            var target = view_canvas.get_item_at (x, y, true);
-            if (target == null || !(target is Drawables.Drawable)) {
-                return null;
-            }
-
-            var c_item = target as Drawables.Drawable;
-
-            node = item_model.node_from_id (c_item.parent_id);
-        }
+        Lib2.Items.ModelNode node = node_at_canvas_position (x, y);
 
         if (node == null) {
             return null;
@@ -498,6 +493,7 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
 
         var blocker = new SelectionManager.ChangeSignalBlocker (view_canvas.selection_manager);
         (void) blocker;
+        view_canvas.pause_redraw = true;
 
         for (var i = 0; i < num_of; ++i) {
             var x = GLib.Random.double_range (0, (GLib.Math.log (num_of + GLib.Math.E) - 1) * 1000);
@@ -511,13 +507,9 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
             seconds = timer.elapsed (out microseconds);
             print ("Created %u items in %s s\n", num_of, seconds.to_string ());
         }
-    }
 
-    public void on_item_added (int id) {
-        var inst = item_model.instance_from_id (id);
-        if (inst != null) {
-            inst.add_to_canvas (view_canvas);
-        }
+        view_canvas.pause_redraw = false;
+        view_canvas.request_redraw (view_canvas.get_bounds ());
     }
 
     public void on_item_geometry_changed (int id) {

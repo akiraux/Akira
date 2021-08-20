@@ -46,6 +46,101 @@ public class Akira.Utils.Nobs : Object {
         ALL
     }
 
+    public class NobData {
+        public const double NOB_SIZE = 10;
+        public const double LINE_WIDTH = 1;
+
+        public Nob handle_id;
+        public double center_x;
+        public double center_y;
+        public bool active;
+
+        public NobData (Nob id, double center_x, double center_y, bool active) {
+            this.handle_id = id;
+            this.center_x = center_x;
+            this.center_y = center_y;
+            this.active = active;
+        }
+
+        public NobData copy () {
+            return new NobData (handle_id, center_x, center_y, active);
+        }
+    }
+
+    public class NobSet {
+        public NobData[] data;
+
+        public NobSet () {
+            data = new NobData[9];
+            for (var i = 0; i < 9; i++) {
+                data[i] = new NobData ((Nob)i, 0, 0, false);
+            }
+        }
+
+        public NobSet.clone (NobSet other) {
+            data = new NobData[9];
+            for (var i = 0; i < 9; i++) {
+                data[i] = other.data[i].copy ();
+            }
+        }
+
+        public bool any_active () {
+            foreach (unowned var nob in data) {
+                if (nob.active) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public Nob hit_test (double x, double y, double scale) {
+            foreach (unowned var nob in data) {
+                if (!nob.active) {
+                    continue;
+                }
+
+                double xd = nob.center_x - x;
+                double yd = nob.center_y - y;
+                double dist = GLib.Math.sqrt (xd * xd + yd * yd);
+                if (dist <= NobData.NOB_SIZE / scale) {
+                    return nob.handle_id;
+                }
+            }
+
+            return Nob.NONE;
+        }
+
+        public Geometry.Rectangle? extents (double scale, bool all) {
+            double left = double.MAX;
+            double right = double.MIN;
+            double top = double.MAX;
+            double bottom = double.MIN;
+
+            foreach (unowned var nob in data) {
+                if (all || nob.active) {
+                    left = double.min (left, nob.center_x);
+                    right = double.max (right, nob.center_x);
+                    top = double.min (top, nob.center_y);
+                    bottom = double.max (bottom, nob.center_y);
+                }
+            }
+
+            if (left == double.MAX || top == double.MAX) {
+                return null;
+            }
+
+            double off = NobData.NOB_SIZE / scale;
+            return Geometry.Rectangle.with_coordinates (left - off, top - off, right + off, bottom + off);
+        }
+
+        public void set_active (bool active) {
+            foreach (unowned var nob in data) {
+                nob.active = active;
+            }
+        }
+    }
+
     public static bool is_top_nob (Nob nob) {
         return nob == Nob.TOP_LEFT || nob == Nob.TOP_CENTER || nob == Nob.TOP_RIGHT;
     }

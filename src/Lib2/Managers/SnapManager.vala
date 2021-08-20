@@ -24,8 +24,8 @@ public class Akira.Lib2.Managers.SnapManager : Object {
     public unowned ViewCanvas view_canvas { get; construct; }
 
     // Decorator items to be drawn in the Canvas.
-    private Drawables.DrawableSnapData v_decorators;
-    private Drawables.DrawableSnapData h_decorators;
+    private ViewLayers.ViewLayerSnaps v_decorators;
+    private ViewLayers.ViewLayerSnaps h_decorators;
 
     /*
      * Type of snap guides to show (could be a selection or just a point).
@@ -123,8 +123,7 @@ public class Akira.Lib2.Managers.SnapManager : Object {
 
         if (data.v_data.snap_found () || data.h_data.snap_found ()) {
             if (v_decorators == null) {
-                v_decorators = new Drawables.DrawableSnapData (
-                    view_canvas.get_root_item (),
+                v_decorators = new ViewLayers.ViewLayerSnaps (
                     0,
                     0,
                     Layouts.MainCanvas.CANVAS_SIZE,
@@ -132,12 +131,12 @@ public class Akira.Lib2.Managers.SnapManager : Object {
                     false
                 );
 
+                v_decorators.add_to_canvas (ViewLayers.ViewLayer.VSNAPS_LAYER_ID, view_canvas);
                 on_update_snaps_color ();
             }
 
             if (h_decorators == null) {
-                h_decorators = new Drawables.DrawableSnapData (
-                    view_canvas.get_root_item (),
+                h_decorators = new ViewLayers.ViewLayerSnaps (
                     0,
                     0,
                     Layouts.MainCanvas.CANVAS_SIZE,
@@ -145,6 +144,7 @@ public class Akira.Lib2.Managers.SnapManager : Object {
                     true
                 );
 
+                h_decorators.add_to_canvas (ViewLayers.ViewLayer.HSNAPS_LAYER_ID, view_canvas);
                 on_update_snaps_color ();
             }
 
@@ -153,10 +153,8 @@ public class Akira.Lib2.Managers.SnapManager : Object {
             h_decorators.update_data (data.h_data, grid.h_snaps);
 
             if (!any_decorators_visible) {
-                v_decorators.set ("visibility", Goo.CanvasItemVisibility.VISIBLE);
-                v_decorators.raise (null);
-                h_decorators.set ("visibility", Goo.CanvasItemVisibility.VISIBLE);
-                h_decorators.raise (null);
+                v_decorators.set_visible (true);
+                h_decorators.set_visible (true);
             }
 
             any_decorators_visible = true;

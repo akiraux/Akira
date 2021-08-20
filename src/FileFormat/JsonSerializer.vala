@@ -63,7 +63,7 @@ public class Akira.FileFormat.JsonSerializer {
 
         // Save the current Canvas status.
         builder.set_member_name ("scale");
-        builder.add_double_value (window.main_window.main_view_canvas.canvas.get_scale ());
+        builder.add_double_value (window.main_window.main_view_canvas.canvas.scale);
         builder.set_member_name ("hadjustment");
         builder.add_double_value (window.main_window.main_view_canvas.main_scroll.hadjustment.value);
         builder.set_member_name ("vadjustment");

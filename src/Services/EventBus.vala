@@ -40,9 +40,6 @@ public class Akira.Services.EventBus : Object {
     public signal void request_escape ();
     public signal void set_focus_on_canvas ();
     public signal void update_nob_size ();
-    public signal void update_scale (double scale);
-    public signal void set_scale (double scale);
-    public signal void zoom ();
     public signal void canvas_notification (string message);
     public signal void hide_select_effect ();
     public signal void show_select_effect ();
@@ -50,6 +47,12 @@ public class Akira.Services.EventBus : Object {
     public signal void update_pixel_grid ();
     public signal void update_snaps_color ();
     public signal void update_snap_decorators ();
+    public signal void zoom_changed (double new_zoom);
+
+    // Canvas triggers.
+    public signal void adjust_zoom (double zoom, bool absolute, Geometry.Point? reference);
+
+
 
     // Options panel signals.
     public signal void align_items (string align_action);

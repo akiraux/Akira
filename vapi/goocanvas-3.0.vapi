@@ -828,7 +828,7 @@ namespace Goo {
 		public abstract void set_child_property (Goo.CanvasItem child, uint property_id, GLib.Value value, GLib.ParamSpec pspec);
 		public abstract void set_is_static (bool is_static);
 		public abstract void set_model (Goo.CanvasItemModel model);
-		public abstract void set_parent (Goo.CanvasItem parent);
+		public abstract void set_parent (Goo.CanvasItem? parent);
 		public void set_simple_transform (double x, double y, double scale, double rotation);
 		public abstract void set_style (Goo.CanvasStyle style);
 		public abstract void set_transform (Cairo.Matrix? transform);

@@ -35,7 +35,6 @@ public class Akira.Lib.Managers.HoverManager : Object {
     }
 
     construct {
-        canvas.window.event_bus.zoom.connect (on_canvas_zoom);
         canvas.window.event_bus.hover_over_layer.connect (on_layer_hovered);
     }
 

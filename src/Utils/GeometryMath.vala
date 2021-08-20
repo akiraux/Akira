@@ -21,6 +21,10 @@
 
 public class Akira.Utils.GeometryMath : Object {
 
+    public static double clamp (double value, double min, double max) {
+        return double.min (double.max (value, min), max);
+    }
+
     public static void min_max (ref double x0, ref double x1) {
         if (x1 < x0) {
             double t = x0;
