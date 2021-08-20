@@ -139,10 +139,19 @@ public class Akira.Application : Gtk.Application {
             return;
         }
 
-        Gtk.Settings.get_default ().set_property ("gtk-icon-theme-name", "elementary");
-        Gtk.Settings.get_default ().set_property ("gtk-theme-name", "io.elementary.stylesheet.blueberry");
 
         weak Gtk.IconTheme default_theme = Gtk.IconTheme.get_default ();
         default_theme.add_resource_path ("/com/github/akiraux/akira");
+
+        var granite_settings = Granite.Settings.get_default ();
+        var gtk_settings = Gtk.Settings.get_default ();
+
+        gtk_settings.set_property ("gtk-icon-theme-name", "elementary");
+        gtk_settings.set_property ("gtk-theme-name", "io.elementary.stylesheet.blueberry");
+
+        gtk_settings.gtk_application_prefer_dark_theme = settings.dark_theme = granite_settings.prefers_color_scheme == Granite.Settings.ColorScheme.DARK;
+        granite_settings.notify["prefers-color-scheme"].connect (() => {
+            gtk_settings.gtk_application_prefer_dark_theme = settings.dark_theme = granite_settings.prefers_color_scheme == Granite.Settings.ColorScheme.DARK;
+        });
     }
 }
