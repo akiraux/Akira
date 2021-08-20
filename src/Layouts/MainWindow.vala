@@ -22,10 +22,14 @@
 public class Akira.Layouts.MainWindow : Gtk.Grid {
     public weak Akira.Window window { get; construct; }
 
-    public Akira.Layouts.MainCanvas main_canvas;
-    public Akira.Layouts.MainViewCanvas main_view_canvas;
-    public Akira.Layouts.LeftSideBar left_sidebar;
-    public Akira.Layouts.RightSideBar right_sidebar;
+    // To be removed.
+    public Layouts.MainCanvas main_canvas;
+    public Layouts.MainViewCanvas main_view_canvas;
+    public Layouts.LeftSideBar left_sidebar;
+    // public Layouts.RightSideBar right_sidebar;
+    // end.
+
+    private Layouts.Sidebars.LayersSidebar layers_sidebar;
 
     public Gtk.Paned pane;
     public Gtk.Paned pane2;
@@ -35,32 +39,21 @@ public class Akira.Layouts.MainWindow : Gtk.Grid {
     }
 
     construct {
-        if (window.use_new_components) {
-            main_view_canvas = new Akira.Layouts.MainViewCanvas (window);
-            pane = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);
-            pane2 = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);
-            pane.pack2 (pane2, true, false);
-            pane2.pack1 (main_view_canvas, true, true);
-            attach (pane, 0, 0, 1, 1);
-            return;
-        }
-
-        left_sidebar = new Akira.Layouts.LeftSideBar (window);
-        right_sidebar = new Akira.Layouts.RightSideBar (window);
-        main_canvas = new Akira.Layouts.MainCanvas (window);
+        main_view_canvas = new Layouts.MainViewCanvas (window);
+        layers_sidebar = new Layouts.Sidebars.LayersSidebar (main_view_canvas.canvas);
 
         pane = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);
         pane2 = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);
 
         pane.pack2 (pane2, true, false);
-        pane2.pack1 (main_canvas, true, true);
+        pane2.pack1 (main_view_canvas, true, true);
 
         if (!settings.get_boolean ("invert-sidebar")) {
-            pane.pack1 (left_sidebar, false, false);
-            pane2.pack2 (right_sidebar, false, false);
+            // pane.pack1 (left_sidebar, false, false);
+            pane2.pack2 (layers_sidebar, false, false);
         } else {
-            pane.pack1 (right_sidebar, false, false);
-            pane2.pack2 (left_sidebar, false, false);
+            pane.pack1 (layers_sidebar, false, false);
+            // pane2.pack2 (left_sidebar, false, false);
         }
 
         attach (pane, 0, 0, 1, 1);
@@ -71,7 +64,20 @@ public class Akira.Layouts.MainWindow : Gtk.Grid {
             main_view_canvas.canvas.focus_canvas ();
             return;
         }
+    }
 
-        main_canvas.canvas.focus_canvas ();
+    /*
+     * Force the layers panel to show all its newly added children, only after
+     * all items have actually been created.
+     */
+    public void show_added_layers () {
+        layers_sidebar.layers_panel.refresh_lists ();
+    }
+
+    /*
+     * Pass the list of nodes ids to be removed from the layers list.
+     */
+    public void remove_layers (GLib.Array<int> ids) {
+        layers_sidebar.layers_panel.delete_selected_layers (ids);
     }
 }

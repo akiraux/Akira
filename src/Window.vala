@@ -40,8 +40,6 @@ public class Akira.Window : Gtk.ApplicationWindow {
 
     public bool edited { get; set; default = false; }
 
-    public bool use_new_components = true;
-
     public Window (Akira.Application akira_app) {
         Object (
             application: akira_app,
@@ -58,19 +56,12 @@ public class Akira.Window : Gtk.ApplicationWindow {
         action_manager = new Akira.Services.ActionManager (app, this);
 
         headerbar = new Akira.Layouts.HeaderBar (this);
-
-        if (use_new_components) {
-            file_manager = new Akira.FileFormat.FileManager (this);
-            main_window = new Akira.Layouts.MainWindow (this);
-        }
-        else {
-            items_manager = new Akira.Lib.Managers.ItemsManager (this);
-            file_manager = new Akira.FileFormat.FileManager (this);
-            main_window = new Akira.Layouts.MainWindow (this);
-            coords_middleware = new Akira.StateManagers.CoordinatesMiddleware (this);
-            size_middleware = new Akira.StateManagers.SizeMiddleware (this);
-            dialogs = new Akira.Utils.Dialogs (this);
-        }
+        // items_manager = new Akira.Lib.Managers.ItemsManager (this);
+        file_manager = new Akira.FileFormat.FileManager (this);
+        main_window = new Akira.Layouts.MainWindow (this);
+        // coords_middleware = new Akira.StateManagers.CoordinatesMiddleware (this);
+        // size_middleware = new Akira.StateManagers.SizeMiddleware (this);
+        // dialogs = new Akira.Utils.Dialogs (this);
 
         build_ui ();
 
