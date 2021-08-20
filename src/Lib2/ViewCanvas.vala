@@ -84,8 +84,8 @@ public class Akira.Lib2.ViewCanvas : ViewLayers.BaseCanvas {
         grid_layout = new ViewLayers.ViewLayerGrid (
             0,
             0,
-            Layouts.MainCanvas.CANVAS_SIZE,
-            Layouts.MainCanvas.CANVAS_SIZE
+            Layouts.MainViewCanvas.CANVAS_SIZE,
+            Layouts.MainViewCanvas.CANVAS_SIZE
         );
 
         grid_layout.add_to_canvas (ViewLayers.ViewLayer.GRID_LAYER_ID, this);

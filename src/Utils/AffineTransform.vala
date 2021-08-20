@@ -20,8 +20,8 @@
  * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
  */
 
-using Akira.Lib.Items;
-using Akira.Lib.Managers;
+// using Akira.Lib.Items;
+// using Akira.Lib.Managers;
 
 public class Akira.Utils.AffineTransform : Object {
     private const int MIN_SIZE = 1;
@@ -454,19 +454,19 @@ public class Akira.Utils.AffineTransform : Object {
         inc_y += adj_y;
     }
 
-    public static void adjust_size (Lib.Items.CanvasItem item, double adj_x, double adj_y) {
-        var new_width = item.size.width + adj_x;
-        var new_height = item.size.height + adj_y;
+    // public static void adjust_size (Lib.Items.CanvasItem item, double adj_x, double adj_y) {
+    //     var new_width = item.size.width + adj_x;
+    //     var new_height = item.size.height + adj_y;
 
-        // Prevent accidental negative values.
-        if (new_width > 0) {
-            item.size.width = new_width;
-        }
+    //     // Prevent accidental negative values.
+    //     if (new_width > 0) {
+    //         item.size.width = new_width;
+    //     }
 
-        if (new_height > 0) {
-            item.size.height = new_height;
-        }
-    }
+    //     if (new_height > 0) {
+    //         item.size.height = new_height;
+    //     }
+    // }
 
     public static double fix_size (double size) {
         return GLib.Math.round (size);
