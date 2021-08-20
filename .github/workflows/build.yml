@@ -1,9 +1,9 @@
-name: "CI"
+name: CI
 
 on:
   push:
     branches:
-      - "main"
+      - main
   pull_request:
 
 jobs:
@@ -24,16 +24,23 @@ jobs:
           ninja -C build install
 
   flatpak:
-    name: "Flatpak"
+    name: Flatpak
     runs-on: ubuntu-latest
+
     container:
-      image: bilelmoussaoui/flatpak-github-actions:elementary-juno
+      image: ghcr.io/elementary/flatpak-platform/runtime:6
       options: --privileged
+
     steps:
-      - uses: actions/checkout@v2
-      - uses: bilelmoussaoui/flatpak-github-actions/flatpak-builder@master
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Build
+        uses: bilelmoussaoui/flatpak-github-actions/flatpak-builder@v3
         with:
-          bundle: "akira-dev.flatpak"
-          manifest-path: "aux/flatpak/com.github.akiraux.akira.json"
-          cache-key: flatpak-builder-${{ github.sha }}
-          run-tests: "true"
+          bundle: akira-dev.flatpak
+          manifest-path: com.github.akiraux.akira.yml
+          run-tests: true
+          repository-name: appcenter
+          repository-url: https://flatpak.elementary.io/repo.flatpakrepo
+          cache-key: "flatpak-builder-${{ github.sha }}"
