@@ -27,20 +27,15 @@ public class Akira.Drawables.DrawableEllipse : Drawable {
     public double radius_y { get; set; default = 0; }
 
     public DrawableEllipse (
-        Goo.CanvasItem parent,
         double center_x,
         double center_y,
         double radius_x,
         double radius_y
     ) {
-       this.parent = parent;
        this.center_x = center_x;
        this.center_y = center_y;
        this.radius_x = radius_x;
        this.radius_y = radius_x;
-
-       // Add the newly created item to the Canvas or Artboard.
-       parent.add_child (this, -1);
     }
 
     public override void simple_create_path (Cairo.Context cr) {

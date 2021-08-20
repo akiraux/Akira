@@ -80,6 +80,13 @@ sources = files(
     'Widgets/RoundedColorButton.vala',
     'Widgets/ZoomButton.vala',
 
+    'ViewLayers/BaseCanvas.vala',
+    'ViewLayers/ViewLayer.vala',
+    'ViewLayers/ViewLayerSnaps.vala',
+    'ViewLayers/ViewLayerNobs.vala',
+    'ViewLayers/ViewLayerHover.vala',
+    'ViewLayers/ViewLayerGrid.vala',
+
     'Models/ColorModel.vala',
     'Models/ExportModel.vala',
     'Models/ListModel.vala',
@@ -113,7 +120,6 @@ sources = files(
     'Lib/Items/CanvasText.vala',
 
     'Lib/Managers/ExportManager.vala',
-    'Lib/Managers/GridManager.vala',
     'Lib/Managers/HoverManager.vala',
     'Lib/Managers/ImageManager.vala',
     'Lib/Managers/ItemsManager.vala',
@@ -138,7 +144,6 @@ sources = files(
     'Drawables/DrawableEllipse.vala',
     'Drawables/DrawablePath.vala',
     'Drawables/DrawableRect.vala',
-    'Drawables/DrawableSnapData.vala',
 
     'Lib2/Components/Border.vala',
     'Lib2/Components/Borders.vala',

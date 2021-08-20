@@ -122,7 +122,6 @@ public class Akira.Lib.Items.CanvasArtboard : Goo.CanvasGroup, Akira.Lib.Items.C
       akira_canvas.window.event_bus.change_theme.connect (on_theme_changed);
 
       // Update the label font size when the canvas zoom changes.
-      akira_canvas.window.event_bus.set_scale.connect (on_canvas_scaled);
    }
 
    /*
@@ -182,7 +181,6 @@ public class Akira.Lib.Items.CanvasArtboard : Goo.CanvasGroup, Akira.Lib.Items.C
       var akira_canvas = canvas as Lib.Canvas;
       // Disconnect previously set events.
       akira_canvas.window.event_bus.change_theme.disconnect (on_theme_changed);
-      akira_canvas.window.event_bus.set_scale.disconnect (on_canvas_scaled);
 
       // Reassign the Canvas as parent to the label in order to remove it.
       label.parent = parent;

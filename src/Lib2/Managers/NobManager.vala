@@ -29,9 +29,8 @@ public class Akira.Lib2.Managers.NobManager : Object {
 
     public weak Lib2.ViewCanvas view_canvas { get; construct; }
 
-    private Goo.CanvasPolyline? select_effect = null;
-    private Akira.Lib.Selection.Nob[] nobs = null;
-    private Goo.CanvasPolyline? rotation_line = null;
+    private Utils.Nobs.NobSet nobs;
+    private ViewLayers.ViewLayerNobs nob_layer = null;
 
     // Tracks if an artboard is part of the current selection.
     private int last_id = -1;
@@ -41,22 +40,17 @@ public class Akira.Lib2.Managers.NobManager : Object {
     }
 
     construct {
+        nobs = new Utils.Nobs.NobSet ();
+
         view_canvas.window.event_bus.selection_modified.connect (on_update_select_effect);
-        view_canvas.window.event_bus.zoom.connect (on_update_select_effect);
         view_canvas.mode_manager.mode_changed.connect (on_update_select_effect);
+        nob_layer = new ViewLayers.ViewLayerNobs ();
+        nob_layer.add_to_canvas (ViewLayers.ViewLayer.NOBS_LAYER_ID, view_canvas);
     }
 
     public Utils.Nobs.Nob hit_test (double x, double y) {
         double scale = view_canvas.current_scale;
-        foreach (var ui_nob in nobs) {
-            if (ui_nob != null && ui_nob.is_visible ()) {
-                if (ui_nob.hit_test (x, y, scale)) {
-                    return ui_nob.handle_id;
-                }
-            }
-        }
-
-        return Utils.Nobs.Nob.NONE;
+        return nobs.hit_test (x, y, scale);
     }
 
     private void on_update_select_effect () {
@@ -66,79 +60,20 @@ public class Akira.Lib2.Managers.NobManager : Object {
             return;
         }
 
-        populate_nobs (sm.selection);
-
         int new_id = sm.selection.first_node ().id;
-        bool needs_raising = new_id != last_id;
-
         last_id = new_id;
-
-        update_select_effect (sm.selection);
         update_nob_positions (sm.selection);
-
-        if (needs_raising) {
-            if (select_effect.is_visible ()) {
-                select_effect.raise (null);
-            }
-
-            if (rotation_line.is_visible ()) {
-                rotation_line.raise (null);
-            }
-
-            foreach (var nob in nobs) {
-                nob.raise (null);
-            }
-        }
-
+        update_nob_layer ();
     }
 
     /*
      * Resets all selection and nob items.
      */
     private void remove_select_effect () {
+        nobs.set_active (false);
+        update_nob_layer ();
+        nob_layer.set_visible (false);
         last_id = -1;
-        if (select_effect != null) {
-            select_effect.set ("visibility", Goo.CanvasItemVisibility.HIDDEN);
-        }
-
-        if (rotation_line != null) {
-            rotation_line.set ("visibility", Goo.CanvasItemVisibility.HIDDEN);
-        }
-
-        if (nobs != null) {
-            foreach (var nob in nobs) {
-                nob.set ("visibility", Goo.CanvasItemVisibility.HIDDEN);
-            }
-        }
-    }
-
-    /*
-     * Constructs all nobs and the rotation line if they haven't been constructed already.
-     * Nobs don't take mouse events, instead hit_test () is used to interact with nobs.
-     */
-    private void populate_nobs (Lib2.Items.NodeSelection selection) {
-        if (nobs != null) {
-            return;
-        }
-
-       nobs = new Lib.Selection.Nob[9];
-
-        for (int i = 0; i < 9; i++) {
-            var nob = new Lib.Selection.Nob (view_canvas.get_root_item (), (Utils.Nobs.Nob) i);
-            nob.set ("visibility", Goo.CanvasItemVisibility.HIDDEN);
-            nob.pointer_events = Goo.CanvasPointerEvents.NONE;
-            nobs[i] = nob;
-        }
-
-        // Create the line to visually connect the rotation nob to the item.
-        rotation_line = new Goo.CanvasPolyline.line (
-            null, 0, 0, 0, Utils.Nobs.ROTATION_LINE_HEIGHT,
-            "line-width", LINE_WIDTH / view_canvas.current_scale,
-            "stroke-color", STROKE_COLOR,
-            null);
-        rotation_line.set ("parent", view_canvas.get_root_item ());
-        rotation_line.set ("visibility", Goo.CanvasItemVisibility.HIDDEN);
-        rotation_line.pointer_events = Goo.CanvasPointerEvents.NONE;
     }
 
     /**
@@ -158,7 +93,7 @@ public class Akira.Lib2.Managers.NobManager : Object {
 
         var active_nob_id = view_canvas.mode_manager.active_mode_nob;
 
-        foreach (var nob in nobs) {
+        foreach (var nob in nobs.data) {
             bool set_visible = true;
 
             if (!show_h_centers && Utils.Nobs.is_horizontal_center (nob.handle_id)) {
@@ -167,11 +102,11 @@ public class Akira.Lib2.Managers.NobManager : Object {
                 set_visible = false;
             }
 
-            update_nob (nob, rect, set_visible && !nob_masked (nob, active_nob_id));
+            update_nob (ref nob, rect, set_visible && !nob_masked (nob, active_nob_id));
         }
     }
 
-    private bool nob_masked (Lib.Selection.Nob nob, Utils.Nobs.Nob nob_id) {
+    private bool nob_masked (Utils.Nobs.NobData nob, Utils.Nobs.Nob nob_id) {
         if (nob_id == Utils.Nobs.Nob.NONE) {
             return true;
         } else if (nob_id == Utils.Nobs.Nob.ALL) {
@@ -182,7 +117,7 @@ public class Akira.Lib2.Managers.NobManager : Object {
     }
 
     private void update_nob (
-        Lib.Selection.Nob nob,
+        ref Utils.Nobs.NobData nob,
         Geometry.Quad rect,
         bool show
     ) {
@@ -192,62 +127,13 @@ public class Akira.Lib2.Managers.NobManager : Object {
         double cy = 0;
         Utils.Nobs.nob_xy_from_coordinates (n0, rect, sc, ref cx, ref cy);
 
-        if (nob.handle_id == Utils.Nobs.Nob.ROTATE) {
-            if (show) {
-                var n1 = Utils.Nobs.Nob.TOP_CENTER;
-                double tx = 0;
-                double ty = 0;
-                Utils.Nobs.nob_xy_from_coordinates (n1, rect, sc, ref tx, ref ty);
-
-                var new_pts = new Goo.CanvasPoints (2);
-                new_pts.set_point (0, cx, cy);
-                new_pts.set_point (1, tx, ty);
-                rotation_line.points = new_pts;
-
-                rotation_line.set ("line-width", LINE_WIDTH / view_canvas.current_scale);
-                rotation_line.set ("visibility", Goo.CanvasItemVisibility.VISIBLE);
-            } else {
-                rotation_line.set ("visibility", Goo.CanvasItemVisibility.HIDDEN);
-            }
-        }
-
-        nob.update_global_state (cx, cy, 0, show);
+        nob.center_x = cx;
+        nob.center_y = cy;
+        nob.active = show;
     }
 
-    /**
-     * Updates selection items, constructing them if necessary.
-     */
-    private void update_select_effect (Lib2.Items.NodeSelection selection) {
-        if (selection.is_empty ()) {
-            return;
-        }
-
-        var rect = selection.coordinates ();
-
-        if (select_effect == null) {
-            select_effect = new Goo.CanvasPolyline (
-                null,
-                true,
-                4,
-                0.0, 0.0,
-                1.0, 0.0,
-                1.0, 1.0,
-                0.0, 1.0,
-                null
-
-            );
-            select_effect.set ("parent", view_canvas.get_root_item ());
-            select_effect.pointer_events = Goo.CanvasPointerEvents.NONE;
-        }
-
-        var new_pts = new Goo.CanvasPoints (4);
-        new_pts.set_point (0, rect.tl_x, rect.tl_y);
-        new_pts.set_point (1, rect.tr_x, rect.tr_y);
-        new_pts.set_point (2, rect.br_x, rect.br_y);
-        new_pts.set_point (3, rect.bl_x, rect.bl_y);
-        select_effect.points = new_pts;
-
-        select_effect.set ("line-width", LINE_WIDTH / view_canvas.current_scale);
-        select_effect.set ("visibility", Goo.CanvasItemVisibility.VISIBLE);
+    private void update_nob_layer () {
+        nob_layer.update_nob_data (nobs);
     }
+
 }

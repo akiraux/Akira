@@ -26,15 +26,11 @@ public class Akira.Drawables.DrawableArtboard : Drawable {
     public double radius_x { get; set; default = 0; }
     public double radius_y { get; set; default = 0; }
 
-    public DrawableArtboard (Goo.CanvasItem parent, double tl_x, double tl_y, double width, double height) {
-       this.parent = parent;
+    public DrawableArtboard (double tl_x, double tl_y, double width, double height) {
        this.center_x = tl_x + width / 2.0;
        this.center_y = tl_y + height / 2.0;
        this.width = width;
        this.height = height;
-
-       // Add the newly created item to the Canvas or Artboard.
-       parent.add_child (this, -1);
     }
 
     public override void simple_create_path (Cairo.Context cr) {
@@ -90,18 +86,18 @@ public class Akira.Drawables.DrawableArtboard : Drawable {
        }
     }
 
-    public override void simple_update (Cairo.Context cr) {
-        /* We can quickly compute the bounds as being just the rectangle's size
-           plus half the line width around each edge.
-           For now we keep it as the full width to avoid weird clipping issues*/
-        var half_line_width = get_line_width (); // / 2;
+    //public override void simple_update (Cairo.Context cr) {
+    //    /* We can quickly compute the bounds as being just the rectangle's size
+    //       plus half the line width around each edge.
+    //       For now we keep it as the full width to avoid weird clipping issues*/
+    //    var half_line_width = get_line_width (); // / 2;
 
-        var x = center_x - width / 2.0;
-        var y = center_y - height / 2.0;
+    //    var x = center_x - width / 2.0;
+    //    var y = center_y - height / 2.0;
 
-        bounds.x1 = x - half_line_width;
-        bounds.y1 = y - half_line_width;
-        bounds.x2 = x + width + half_line_width;
-        bounds.y2 = y + height + half_line_width;
-    }
+    //    bounds.x1 = x - half_line_width;
+    //    bounds.y1 = y - half_line_width;
+    //    bounds.x2 = x + width + half_line_width;
+    //    bounds.y2 = y + height + half_line_width;
+    //}
 }

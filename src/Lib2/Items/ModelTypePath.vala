@@ -56,9 +56,8 @@ public class Akira.Lib2.Items.ModelTypePath : ModelType {
         return new Components.CompiledGeometry.from_components (components, node, true);
     }
 
-    public override void construct_canvas_item (ModelInstance instance, Goo.Canvas canvas) {
+    public override void construct_canvas_item (ModelInstance instance) {
         instance.drawable = new Drawables.DrawablePath (
-            canvas.get_root_item (),
             (instance.components.path == null) ? null : instance.components.path.data
         );
     }
@@ -68,27 +67,27 @@ public class Akira.Lib2.Items.ModelTypePath : ModelType {
             case Lib2.Components.Component.Type.COMPILED_BORDER:
                 if (!instance.compiled_border.is_visible) {
                     instance.drawable.line_width = 0;
-                    instance.drawable.stroke_color_rgba = 0;
+                    instance.drawable.stroke_rgba = Gdk.RGBA () { alpha = 0 };
                     break;
                 }
 
                 // The "line-width" property expects a DOUBLE type, but we don't support subpixels
                 // so we always handle the border size as INT, therefore we need to type cast it here.
                 instance.drawable.line_width = (double) instance.compiled_border.size;
-                instance.drawable.stroke_color_gdk_rgba = instance.compiled_border.color;
+                instance.drawable.stroke_rgba = instance.compiled_border.color;
                 break;
             case Lib2.Components.Component.Type.COMPILED_FILL:
                 if (!instance.compiled_fill.is_visible) {
-                    instance.drawable.fill_color_rgba = 0;
+                    instance.drawable.fill_rgba = Gdk.RGBA () { alpha = 0 };
                     break;
                 }
 
-                instance.drawable.fill_color_gdk_rgba = instance.compiled_fill.color;
+                instance.drawable.fill_rgba = instance.compiled_fill.color;
                 break;
             case Lib2.Components.Component.Type.COMPILED_GEOMETRY:
                 instance.drawable.center_x = -instance.compiled_geometry.source_width / 2.0;
                 instance.drawable.center_y = -instance.compiled_geometry.source_height / 2.0;
-                instance.drawable.set_transform (instance.compiled_geometry.transformation_matrix);
+                instance.drawable.transform = instance.compiled_geometry.transformation_matrix;
                 break;
         }
     }

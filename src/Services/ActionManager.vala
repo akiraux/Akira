@@ -306,7 +306,7 @@ public class Akira.Services.ActionManager : Object {
     }
 
     private void action_zoom_in () {
-        window.event_bus.update_scale (0.1);
+        window.event_bus.adjust_zoom (0.1, false, null);
     }
 
     private void action_zoom_in_2 () {
@@ -314,11 +314,11 @@ public class Akira.Services.ActionManager : Object {
     }
 
     private void action_zoom_out () {
-        window.event_bus.update_scale (-0.1);
+        window.event_bus.adjust_zoom (-0.1, false, null);
     }
 
     private void action_zoom_reset () {
-        window.event_bus.set_scale (1);
+        window.event_bus.adjust_zoom (1, true, null);
     }
 
     private void action_move_up () {

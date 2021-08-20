@@ -36,7 +36,6 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     public Managers.ExportManager export_manager;
     public Managers.SelectedBoundManager selected_bound_manager;
     public Managers.NobManager nob_manager;
-    private Managers.GridManager grid_manager;
     private Managers.HoverManager hover_manager;
     private Managers.ModeManager mode_manager;
     private Managers.SnapManager snap_manager;
@@ -68,7 +67,6 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         selected_bound_manager = new Managers.SelectedBoundManager (this);
         nob_manager = new Managers.NobManager (this);
 
-        grid_manager = new Managers.GridManager (this);
         hover_manager = new Managers.HoverManager (this);
         mode_manager = new Managers.ModeManager (this);
         snap_manager = new Managers.SnapManager (this);
@@ -77,8 +75,6 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         Gtk.drag_dest_set (this, Gtk.DestDefaults.ALL, TARGETS, Gdk.DragAction.COPY);
         drag_data_received.connect (on_drag_data_received);
 
-        window.event_bus.update_scale.connect (on_update_scale);
-        window.event_bus.set_scale.connect (on_set_scale);
         window.event_bus.set_focus_on_canvas.connect (on_set_focus_on_canvas);
         window.event_bus.request_escape.connect (on_escape_key);
         window.event_bus.insert_item.connect (on_insert_item);
@@ -289,8 +285,6 @@ public class Akira.Lib.Canvas : Goo.Canvas {
     public void update_canvas () {
         // Synchronous update to make sure item is initialized before any other event.
         update ();
-
-        grid_manager.on_canvas_update ();
     }
 
     /*
@@ -372,35 +366,6 @@ public class Akira.Lib.Canvas : Goo.Canvas {
         }
 
         return false;
-    }
-
-    private void on_update_scale (double zoom) {
-        // Force the zoom value to 8% if we're currently at a 2% scale in order
-        // to go back to 10% and increase from there.
-        if (current_scale == 0.02 && zoom == 0.1) {
-            zoom = 0.08;
-        }
-
-        current_scale += zoom;
-        // Prevent the canvas from shrinking below 2%;
-        if (current_scale < 0.02) {
-            current_scale = 0.02;
-        }
-
-        // Prevent the canvas from growing above 5000%;
-        if (current_scale > 50) {
-            current_scale = 50;
-        }
-
-        window.event_bus.set_scale (current_scale);
-    }
-
-    private void on_set_scale (double scale) {
-        current_scale = scale;
-        set_scale (scale);
-        window.event_bus.zoom ();
-
-        window.event_bus.update_snap_decorators ();
     }
 
     private void set_cursor (Gdk.CursorType? cursor_type) {

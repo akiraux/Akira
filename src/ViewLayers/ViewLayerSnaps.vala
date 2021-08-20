@@ -22,9 +22,10 @@
 /*
  * A drawable for handling snapping lines and dots.
  */
-public class Akira.Drawables.DrawableSnapData : Goo.CanvasItemSimple, Goo.CanvasItem {
+public class Akira.ViewLayers.ViewLayerSnaps : ViewLayers.ViewLayer {
     private const double LINE_WIDTH = 0.5;
     private const double DOT_RADIUS = 2;
+
     public double x { get; set; default = 0; }
     public double y { get; set; default = 0; }
     public double width { get; set; default = 0; }
@@ -40,23 +41,18 @@ public class Akira.Drawables.DrawableSnapData : Goo.CanvasItemSimple, Goo.Canvas
 
     private Gdk.RGBA color;
 
-    public DrawableSnapData (
-        Goo.CanvasItem parent,
+    public ViewLayerSnaps (
         double x,
         double y,
         double width,
         double height,
         bool vertical_lines
     ) {
-       this.parent = parent;
        this.x = x;
        this.y = y;
        this.width = width;
        this.height = height;
        this.vertical_lines = vertical_lines;
-
-       // Add the newly created item to the Canvas or Artboard.
-       parent.add_child (this, -1);
     }
 
     /*
@@ -81,17 +77,14 @@ public class Akira.Drawables.DrawableSnapData : Goo.CanvasItemSimple, Goo.Canvas
             }
         }
 
-        need_update = 1;
-        changed (false);
+        update ();
     }
 
     public void hide_drawable () {
         line_pos = new double[0];
         dot_x = new double[0];
         dot_y = new double[0];
-        need_update = 1;
-        changed (false);
-        visibility = Goo.CanvasItemVisibility.HIDDEN;
+        set_visible (false);
     }
 
     /*
@@ -103,7 +96,7 @@ public class Akira.Drawables.DrawableSnapData : Goo.CanvasItemSimple, Goo.Canvas
         }
 
         color = new_color;
-        changed (false);
+        update ();
     }
 
     /*
@@ -144,99 +137,72 @@ public class Akira.Drawables.DrawableSnapData : Goo.CanvasItemSimple, Goo.Canvas
     // CanvasItemSimple methods
 
     /*
-     * No hit testing on this.
-     */
-    public unowned GLib.List<Goo.CanvasItem> get_items_at (
-        double x,
-        double y,
-        Cairo.Context cr,
-        bool is_pointer_event,
-        bool parent_visible,
-        GLib.List<Goo.CanvasItem> found_items
-    ) {
-        return found_items;
-    }
-
-    /*
-     * No path necessary, so override this method and ignore it.
-     */
-    public override void simple_create_path (Cairo.Context cr) {}
-
-    /*
      * For now updates the entire screen. In the future this could be made smarter.
      * Note that this gets called on changed(true), so simply figuring out the area needed for
      * the extents of the lines is NOT enough.
      */
-     public void update (bool entire_tree, Cairo.Context cr, ref Goo.CanvasBounds b) {
-        if (entire_tree || need_update > 0) {
-            need_update = 0;
-            double min;
-            double max;
-            Utils.Array.min_max_in_darray (line_pos, out min, out max);
+     public override void update () {
+        if (canvas == null) {
+            return;
+        }
 
-            var ww = DOT_RADIUS / canvas.scale;
+        double min;
+        double max;
+        Utils.Array.min_max_in_darray (line_pos, out min, out max);
 
-            if (vertical_lines) {
-                if (last_min > 0 || last_max > 0) {
-                    canvas.request_item_redraw (
-                        Goo.CanvasBounds () { x1 = last_min - ww, y1 = y, x2 = last_max + ww, y2 = y + height},
-                        false
-                    );
-                    last_min = 0;
-                    last_max = 0;
-                }
+        var ww = DOT_RADIUS / canvas.scale;
 
-                if (min > 0 || max > 0) {
-                    canvas.request_item_redraw
-                        (Goo.CanvasBounds () { x1 = min - ww, y1 = y, x2 = max + ww, y2 = y + height},
-                        false
-                    );
-                    last_min = min;
-                    last_max = max;
-                }
-            }
-            else {
-                if (last_min > 0 || last_max > 0) {
-                    canvas.request_item_redraw (
-                        Goo.CanvasBounds () { y1 = last_min - ww, x1 = x, y2 = last_max + ww, x2 = x + width},
-                        false
-                    );
-                    last_min = 0;
-                    last_max = 0;
-                }
-
-                if (min > 0 || max > 0) {
-                    canvas.request_item_redraw (
-                        Goo.CanvasBounds () { y1 = min - ww, x1 = x, y2 = max + ww, x2 = x + width},
-                        false
-                    );
-                    last_min = min;
-                    last_max = max;
-                }
+        if (vertical_lines) {
+            if (last_min > 0 || last_max > 0) {
+                canvas.request_redraw (Geometry.Rectangle () {
+                    left = last_min - ww, right = last_max + ww, top = y, bottom = y + height
+                });
+                last_min = 0;
+                last_max = 0;
             }
 
+            if (min > 0 || max > 0) {
+                canvas.request_redraw (Geometry.Rectangle () {
+                    left = min - ww, right = max + ww, top = y, bottom = y + height
+                });
+                last_min = min;
+                last_max = max;
+            }
+        }
+        else {
+            if (last_min > 0 || last_max > 0) {
+                canvas.request_redraw (Geometry.Rectangle () {
+                    top = last_min - ww, bottom = last_max + ww, left = x, right = x + width
+                });
+                last_min = 0;
+                last_max = 0;
+            }
+
+            if (min > 0 || max > 0) {
+                canvas.request_redraw (Geometry.Rectangle () {
+                    top = min - ww, bottom = max + ww, left = x, right = x + width
+                });
+                last_min = min;
+                last_max = max;
+            }
         }
      }
 
-    /*
-     * Overrides paint method and draws decorator lines and dots.
-     */
-    public void paint (Cairo.Context cr, Goo.CanvasBounds target_bounds, double scale) {
-        /* Check if the item should be visible. */
-        if (visibility <= Goo.CanvasItemVisibility.INVISIBLE
-            || (visibility == Goo.CanvasItemVisibility.VISIBLE_ABOVE_THRESHOLD
-            && scale < visibility_threshold)) {
-          return;
+     /*
+      * Draw layer.
+      */
+     public override void draw_layer (Cairo.Context context, Geometry.Rectangle target_bounds, double scale) {
+        if (!is_visible) {
+            return;
         }
-
-        draw_lines (cr, target_bounds, scale);
-        draw_dots (cr, target_bounds, scale);
-    }
+        draw_lines (context, target_bounds, scale);
+        draw_dots (context, target_bounds, scale);
+     }
 
     /*
      * Draw lines. This could be improved to better render lines (more crisp).
      */
-    private void draw_lines (Cairo.Context cr, Goo.CanvasBounds target_bounds, double scale) {
+    private void draw_lines (Cairo.Context cr, Geometry.Rectangle target_bounds, double scale) {
         if (line_pos.length == 0) {
             return;
         }
@@ -264,16 +230,13 @@ public class Akira.Drawables.DrawableSnapData : Goo.CanvasItemSimple, Goo.Canvas
     /*
      * Draw dots.
      */
-    private void draw_dots (Cairo.Context cr, Goo.CanvasBounds target_bounds, double scale) {
+    private void draw_dots (Cairo.Context cr, Geometry.Rectangle target_bounds, double scale) {
         if (dot_x.length == 0 || dot_x.length != dot_y.length) {
             return;
         }
 
         cr.save ();
         cr.new_path ();
-
-        cr.set_line_width (LINE_WIDTH / scale);
-
         cr.set_source_rgba (color.red, color.green, color.blue, color.alpha);
         for (var i = 0; i < dot_x.length; ++i) {
             cr.arc (dot_x[i], dot_y[i], DOT_RADIUS / scale, 0, 2.0 * GLib.Math.PI);

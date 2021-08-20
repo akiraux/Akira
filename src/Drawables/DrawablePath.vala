@@ -26,15 +26,10 @@ public class Akira.Drawables.DrawablePath : Drawable {
     // In the future we will probably want control points with more data.
     public Geometry.Point[]? points = null;
 
-    public DrawablePath (Goo.CanvasItem parent, Geometry.Point[]? points = null) {
-       this.parent = parent;
-
+    public DrawablePath (Geometry.Point[]? points = null) {
        if (points != null) {
            this.points = points;
        }
-
-       // Add the newly created item to the Canvas or Artboard.
-       parent.add_child (this, -1);
     }
 
     public override void simple_create_path (Cairo.Context cr) {

@@ -54,8 +54,11 @@ public class Akira.Lib2.Items.Model : Object {
 
     private bool is_live = false;
 
-    public Model.live_model () {
+    private unowned ViewLayers.BaseCanvas? canvas = null;
+
+    public Model.live_model (ViewLayers.BaseCanvas? canvas) {
         is_live = true;
+        this.canvas = canvas;
     }
 
     construct {
@@ -116,11 +119,11 @@ public class Akira.Lib2.Items.Model : Object {
     }
 
     public string path_from_node (ModelNode node) {
-        var builder = new GLib.StringBuilder ();
         if (node == null) {
-            return builder.str;
+            return "";
         }
 
+        var builder = new GLib.StringBuilder ();
         build_path_recursive (node, ref builder);
         return builder.str;
     }
@@ -376,23 +379,30 @@ public class Akira.Lib2.Items.Model : Object {
                     continue;
                 }
 
-                child_node.instance.remove_from_canvas ();
+                child_node.instance.remove_from_canvas (canvas);
                 child_node.parent = null;
                 remove_from_maps (child_node.id);
             }
         }
 
-        to_delete.instance.remove_from_canvas ();
+        to_delete.instance.remove_from_canvas (canvas);
         to_delete.parent = null;
 
         Utils.Array.remove_from_iarray (ref parent_node.instance.children, (int)pos_in_parent, 1);
         parent_node.children.remove_index (pos_in_parent);
+
+        if (parent_node.id != ORIGIN_ID) {
+            internal_mark_geometry_dirty (parent_node, false);
+        }
 
         remove_from_maps (to_delete.id);
         return 0;
     }
 
     private void add_to_maps (ModelNode node, bool listen) {
+        // TODO create drawable ina nicer way
+        node.instance.add_to_canvas ();
+
         if (node.instance.is_group) {
             group_map[node.id] = node.instance;
             group_nodes[node.id] = node;
@@ -439,6 +449,10 @@ public class Akira.Lib2.Items.Model : Object {
      * Otherwise a recursive dirtying of items occurs.
      */
     private void internal_mark_geometry_dirty (Lib2.Items.ModelNode node, bool simple) {
+        if (dirty_groups.contains (node.id) || dirty_items.contains (node.id)) {
+            return;
+        }
+
         node.instance.compiled_components.compiled_geometry = null;
         if (!simple) {
             on_item_geometry_compilation_requested (node);
@@ -486,7 +500,7 @@ public class Akira.Lib2.Items.Model : Object {
 
         foreach (var leaf in dirty_items) {
             var node = node_from_id (leaf);
-            if (node.instance.compile_components (node)) {
+            if (node.instance.compile_components (node, canvas)) {
                 item_geometry_changed (node.id);
             }
         }
@@ -506,7 +520,7 @@ public class Akira.Lib2.Items.Model : Object {
         var it = sorted.bidir_map_iterator ();
         for (var has_next = it.last (); has_next; has_next = it.previous ()) {
             var node = it.get_value ();
-            if (node.instance.compile_components (node)) {
+            if (node.instance.compile_components (node, canvas)) {
                 item_geometry_changed (node.id);
             }
 
