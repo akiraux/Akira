@@ -69,4 +69,4 @@ if install_tests
     subdir('tests')
 endif
 
-meson.add_install_script('build-aux/meson/post_install.py')
+meson.add_install_script('aux/meson/post_install.py')

@@ -34,6 +34,6 @@ jobs:
       - uses: bilelmoussaoui/flatpak-github-actions/flatpak-builder@master
         with:
           bundle: "akira-dev.flatpak"
-          manifest-path: "build-aux/flatpak/com.github.akiraux.akira.json"
+          manifest-path: "aux/flatpak/com.github.akiraux.akira.json"
           cache-key: flatpak-builder-${{ github.sha }}
           run-tests: "true"

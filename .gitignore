@@ -4,5 +4,6 @@ src/config.vala
 build/
 builddir/
 _build/
+build*/
 .flatpak-builder/
 *~
