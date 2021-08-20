@@ -23,21 +23,7 @@
     "--filesystem=xdg-run/gvfs",
     "--filesystem=xdg-run/gvfsd"
   ],
-  "modules": [{
-      "name": "goocanvas",
-      "config-opts": ["--enable-python=no"],
-      "build-options": {
-        "make-install-args": [
-          "girdir=/app/share/gir-1.0",
-          "typelibdir=/app/lib/girepository-1.0"
-        ]
-      },
-      "sources": [{
-        "type": "git",
-        "url": "https://gitlab.gnome.org/GNOME/goocanvas",
-        "branch": "goocanvas-3.0"
-      }]
-    },
+  "modules": [
     {
       "name": "elementary-stylesheet",
       "buildsystem": "meson",
