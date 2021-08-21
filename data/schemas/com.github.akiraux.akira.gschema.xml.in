@@ -42,16 +42,16 @@
             <description>The saved width of the left panel. Must be greater than 220, or it will not take effect.</description>
         </key>
 
-        <key name="show-label" type="b">
-            <default>true</default>
-            <summary>Show button labels</summary>
-            <description>Show or Hide the button labels to slim the UI.</description>
-        </key>
-
         <key name="dark-theme" type="b">
             <default>false</default>
             <summary>Use dark theme</summary>
             <description>Switch between Light and Dark theme.</description>
+        </key>
+
+        <key name="show-label" type="b">
+            <default>true</default>
+            <summary>Show button labels</summary>
+            <description>Show or Hide the button labels to slim the UI.</description>
         </key>
 
         <key name="use-symbolic" type="b">

@@ -50,6 +50,11 @@ public class Akira.Services.Settings : GLib.Settings {
         get { return get_int ("left-paned"); }
         set { set_int ("left-paned", value); }
     }
+    // Theme settings.
+    public bool dark_theme {
+        get { return get_boolean ("dark-theme"); }
+        set { set_boolean ("dark-theme", value); }
+    }
     public bool show_label {
         get { return get_boolean ("show-label"); }
         set { set_boolean ("show-label", value); }
@@ -141,11 +146,6 @@ public class Akira.Services.Settings : GLib.Settings {
     public bool export_alpha {
         get { return get_boolean ("export-alpha"); }
         set { set_boolean ("export-alpha", value); }
-    }
-    // Theme
-    public bool dark_theme {
-        get { return get_boolean ("dark-theme"); }
-        set { set_boolean ("dark-theme", value); }
     }
 
     // Colors library.
