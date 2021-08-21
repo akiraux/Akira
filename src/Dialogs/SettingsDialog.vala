@@ -91,6 +91,7 @@ public class Akira.Dialogs.SettingsDialog : Gtk.Dialog {
 
         grid.attach (new SettingsLabel (_("Use Dark Theme:")), 0, 1, 1, 1);
         dark_theme_switch = new SettingsSwitch ("dark-theme");
+        dark_theme_switch.sensitive = settings.follow_system_theme;
         grid.attach (dark_theme_switch, 1, 1, 1, 1);
 
         grid.attach (new SettingsLabel (_("Follow system's theme variant:")), 0, 2, 1, 1);
