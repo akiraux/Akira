@@ -204,6 +204,8 @@ public class Akira.Drawables.Drawable {
         double scale
     ) {
         cr.save ();
+        Cairo.Matrix global_transform = cr.get_matrix ();
+
         // We apply the item transform before creating the path
         Cairo.Matrix tr = transform;
         cr.transform (tr);
@@ -212,7 +214,7 @@ public class Akira.Drawables.Drawable {
 
         cr.set_line_width (line_width / scale);
         cr.set_source_rgba (color.red, color.green, color.blue, color.alpha);
-        cr.set_matrix (Cairo.Matrix.identity ());
+        cr.set_matrix (global_transform);
         cr.stroke ();
 
         cr.restore ();

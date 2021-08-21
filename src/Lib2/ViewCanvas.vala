@@ -100,6 +100,7 @@ public class Akira.Lib2.ViewCanvas : ViewLayers.BaseCanvas {
         window.event_bus.update_snap_decorators.connect (on_update_snap_decorators);
 
         mode_manager.mode_changed.connect (interaction_mode_changed);
+        items_manager.items_removed.connect (on_items_removed);
     }
 
     public signal void canvas_moved (double delta_x, double delta_y);
@@ -606,5 +607,12 @@ public class Akira.Lib2.ViewCanvas : ViewLayers.BaseCanvas {
         } else if (snap_manager.is_active ()) {
             snap_manager.reset_decorators ();
         }
+    }
+
+    /*
+     * Helper method to interact with the layers panel without publicly exposing it.
+     */
+    private void on_items_removed (GLib.Array<int> ids) {
+        window.main_window.remove_layers (ids);
     }
 }

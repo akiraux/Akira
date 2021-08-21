@@ -38,7 +38,6 @@ public class Akira.Lib2.Managers.SelectionManager : Object {
             manager.block_change_notifications -= 1;
             manager.on_selection_changed (-1);
         }
-
     }
 
     public Lib2.Items.NodeSelection selection;

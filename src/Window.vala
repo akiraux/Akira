@@ -36,8 +36,6 @@ public class Akira.Window : Gtk.ApplicationWindow {
 
     public bool edited { get; set; default = false; }
 
-    public bool use_new_components = true;
-
     public Window (Akira.Application akira_app) {
         Object (
             application: akira_app,
@@ -54,7 +52,6 @@ public class Akira.Window : Gtk.ApplicationWindow {
         action_manager = new Akira.Services.ActionManager (app, this);
 
         headerbar = new Akira.Layouts.HeaderBar (this);
-
         file_manager = new Akira.FileFormat.FileManager (this);
         main_window = new Akira.Layouts.MainWindow (this);
 

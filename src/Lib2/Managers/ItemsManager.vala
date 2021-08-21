@@ -35,6 +35,8 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
         item_model.item_geometry_changed.connect (on_item_geometry_changed);
     }
 
+    public signal void items_removed (GLib.Array<int> ids);
+
     public Lib2.Items.ModelInstance? instance_from_id (int id) {
         return item_model.instance_from_id (id);
     }
@@ -103,9 +105,15 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
             }
         }
 
+        // Collect the nodes' ids to be removed in order to let the layers UI
+        // be aware of what to remove without needing to access selection manager
+        // which immediately loses the list of selected nodes.
+        var ids_array = new GLib.Array<int> ();
+
         var it = to_delete.bidir_map_iterator ();
         for (var has_next = it.last (); has_next; has_next = it.previous ()) {
             var inst = it.get_value ();
+            ids_array.append_val (inst.id);
 
             if (0 != item_model.remove (inst.id, false)) {
                 assert (false);
@@ -116,6 +124,8 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
         foreach (var gid in modified_groups.data) {
             item_model.recalculate_children_stacking (gid);
         }
+
+        items_removed (ids_array);
 
         timer.stop ();
         seconds = timer.elapsed (out microseconds);
@@ -429,6 +439,9 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
         );
 
         add_item_to_origin (new_rect);
+        // Defer the print of the layer UI after all items have been created.
+        view_canvas.window.main_window.show_added_layers ();
+
         return new_rect;
     }
 
@@ -452,8 +465,8 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
         var num_of = 1000;
 
         for (var i = 0; i < num_of; ++i) {
-                x = GLib.Random.double_range (0, 1000);
-                y = GLib.Random.double_range (0, 1000);
+            x = GLib.Random.double_range (0, 1000);
+            y = GLib.Random.double_range (0, 1000);
             //var new_rect = Lib2.Items.ModelTypeRect.default_rect (
             //    //new Lib2.Components.Coordinates (x + i * 60, y),
             //    new Lib2.Components.Coordinates (x, y),
@@ -474,6 +487,8 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
         }
 
         compile_model ();
+        // Defer the print of the layer UI after all items have been created.
+        view_canvas.window.main_window.show_added_layers ();
 
         if (debug_timer) {
             timer.stop ();
