@@ -133,34 +133,34 @@ public class Akira.FileFormat.AkiraFile : Akira.FileFormat.ZipArchiveHandler {
     /**
      * Save all the images used in the Canvas and make a copy in the Pictures folder.
      */
-    public async void save_images () {
-        // Clear potential leftover images if we're overwriting an existing file.
-        if (overwrite) {
-            try {
-                Dir dir = Dir.open (pictures_folder.get_path (), 0);
-                string? name = null;
-                while ((name = dir.read_name ()) != null) {
-                    var file = File.new_for_path (Path.build_filename (pictures_folder.get_path (), name));
-                    file_collector.mark_for_deletion (file);
-                }
-            } catch (FileError err) {
-                stderr.printf (err.message);
-            }
-            overwrite = false;
-        }
+    // public async void save_images () {
+    //     // Clear potential leftover images if we're overwriting an existing file.
+    //     if (overwrite) {
+    //         try {
+    //             Dir dir = Dir.open (pictures_folder.get_path (), 0);
+    //             string? name = null;
+    //             while ((name = dir.read_name ()) != null) {
+    //                 var file = File.new_for_path (Path.build_filename (pictures_folder.get_path (), name));
+    //                 file_collector.mark_for_deletion (file);
+    //             }
+    //         } catch (FileError err) {
+    //             stderr.printf (err.message);
+    //         }
+    //         overwrite = false;
+    //     }
 
-        foreach (var image in window.items_manager.images) {
-            var image_file = File.new_for_path (
-                Path.build_filename (pictures_folder.get_path (), image.manager.filename)
-            );
+    //     foreach (var image in window.items_manager.images) {
+    //         var image_file = File.new_for_path (
+    //             Path.build_filename (pictures_folder.get_path (), image.manager.filename)
+    //         );
 
-            // Copy the file if it doesn't exist, or increase the reference count.
-            if (!image_file.query_exists ()) {
-                copy_image (image.manager.file, image_file);
-                continue;
-            }
-        }
-    }
+    //         // Copy the file if it doesn't exist, or increase the reference count.
+    //         if (!image_file.query_exists ()) {
+    //             copy_image (image.manager.file, image_file);
+    //             continue;
+    //         }
+    //     }
+    // }
 
     /**
      * Decrease the reference count to an existing image, which will cause its

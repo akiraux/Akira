@@ -84,8 +84,8 @@ public class Akira.Lib2.ViewCanvas : ViewLayers.BaseCanvas {
         grid_layout = new ViewLayers.ViewLayerGrid (
             0,
             0,
-            Layouts.MainCanvas.CANVAS_SIZE,
-            Layouts.MainCanvas.CANVAS_SIZE
+            Layouts.MainViewCanvas.CANVAS_SIZE,
+            Layouts.MainViewCanvas.CANVAS_SIZE
         );
 
         grid_layout.add_to_canvas (ViewLayers.ViewLayer.GRID_LAYER_ID, this);
@@ -386,8 +386,6 @@ public class Akira.Lib2.ViewCanvas : ViewLayers.BaseCanvas {
         var cursor = new Gdk.Cursor.for_display (Gdk.Display.get_default (), current_cursor);
         get_window ().set_cursor (cursor);
     }
-
-
 
     // #TODO temporary
     public override bool draw (Cairo.Context ctx) {

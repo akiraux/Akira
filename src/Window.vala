@@ -25,15 +25,11 @@ public class Akira.Window : Gtk.ApplicationWindow {
 
     public weak Akira.Application app { get; construct; }
     public Akira.Services.EventBus event_bus;
-    public Akira.Lib.Managers.ItemsManager items_manager;
 
     public Akira.Services.ActionManager action_manager;
     public Akira.Layouts.HeaderBar headerbar;
     public Akira.Layouts.MainWindow main_window;
     public Akira.Utils.Dialogs dialogs;
-
-    public Akira.StateManagers.CoordinatesMiddleware coords_middleware;
-    public Akira.StateManagers.SizeMiddleware size_middleware;
 
     public SimpleActionGroup actions { get; construct; }
     public Gtk.AccelGroup accel_group { get; construct; }
@@ -56,12 +52,8 @@ public class Akira.Window : Gtk.ApplicationWindow {
         action_manager = new Akira.Services.ActionManager (app, this);
 
         headerbar = new Akira.Layouts.HeaderBar (this);
-        // items_manager = new Akira.Lib.Managers.ItemsManager (this);
         file_manager = new Akira.FileFormat.FileManager (this);
         main_window = new Akira.Layouts.MainWindow (this);
-        // coords_middleware = new Akira.StateManagers.CoordinatesMiddleware (this);
-        // size_middleware = new Akira.StateManagers.SizeMiddleware (this);
-        // dialogs = new Akira.Utils.Dialogs (this);
 
         build_ui ();
 

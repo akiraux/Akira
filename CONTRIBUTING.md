@@ -39,36 +39,20 @@ These are mostly guidelines, not rules. Use your best judgment, and feel free to
     1. Install required dependencies:
 
         * `gtk+-3.0>=3.18`
-        * `granite>=5.3.0`
+        * `granite>=6.0.0`
         * `glib-2.0`
         * `gee-0.8`
         * `gobject-2.0`
         * `libxml-2.0`
-        * `gtksourceview-3.0`
-        * `goocanvas-3.0`
         * `cairo`
         * `meson`
 
         > For non-elementary distros, (such as Arch, Debian etc) you are required to install "vala" as additional dependency.
 
-        > If goocanvas-3.0 is still not available on your distro you can build from source:
-        
-            ```
-            git clone https://gitlab.gnome.org/GNOME/goocanvas
-            cd goocanvas
-            git checkout goocanvas-3.0
-            mkdir build
-            cd build
-            ../autogen.sh
-            ../configure --prefix /usr
-            make
-            make install
-            ```
-
     * Debian (Elementary/Ubuntu/Linux Mint)
 
         ```sh
-        sudo apt-get install gtk+-3.0 elementary-sdk glib-2.0 gee-0.8 gobject-2.0 libxml2 gtksourceview-3.0 libjson-glib-1.0 goocanvas-3.0-dev libarchive-dev libcairo2-dev meson valac
+        sudo apt-get install gtk+-3.0 elementary-sdk glib-2.0 gee-0.8 gobject-2.0 libxml2 libjson-glib-1.0  libarchive-dev libcairo2-dev meson valac
         ```
 
     2. Building:

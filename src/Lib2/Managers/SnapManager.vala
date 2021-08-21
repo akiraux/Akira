@@ -126,8 +126,8 @@ public class Akira.Lib2.Managers.SnapManager : Object {
                 v_decorators = new ViewLayers.ViewLayerSnaps (
                     0,
                     0,
-                    Layouts.MainCanvas.CANVAS_SIZE,
-                    Layouts.MainCanvas.CANVAS_SIZE,
+                    Layouts.MainViewCanvas.CANVAS_SIZE,
+                    Layouts.MainViewCanvas.CANVAS_SIZE,
                     false
                 );
 
@@ -139,8 +139,8 @@ public class Akira.Lib2.Managers.SnapManager : Object {
                 h_decorators = new ViewLayers.ViewLayerSnaps (
                     0,
                     0,
-                    Layouts.MainCanvas.CANVAS_SIZE,
-                    Layouts.MainCanvas.CANVAS_SIZE,
+                    Layouts.MainViewCanvas.CANVAS_SIZE,
+                    Layouts.MainViewCanvas.CANVAS_SIZE,
                     true
                 );
 
