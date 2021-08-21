@@ -22,40 +22,41 @@
 public class Akira.Lib2.Components.Path : Component, Copyable<Path> {
     // Control points relative to a top-left of 0,0.
     // In the future we will probably want control points with more data.
-    public Geometry.Point[] data;
+    public Gee.ArrayList<Geometry.Point?> data;
     public bool close = false;
 
     public Path (bool close = false) {
-        data = new Geometry.Point[0];
+        data = new Gee.ArrayList<Geometry.Point?>();
         this.close = close;
     }
 
     public Path.from_single_point (Geometry.Point pt, bool close = false) {
-        data = new Geometry.Point[1];
-        data[0] = pt;
+        data = new Gee.ArrayList<Geometry.Point?>();
+        data.add (pt);
         this.close = close;
     }
 
     public Path.from_points (Geometry.Point[] data, bool close = false) {
-        this.data = data;
+        this.data = new Gee.ArrayList<Geometry.Point?>();
+        foreach (var item in data) {
+            this.data.add (item);
+        }
+
         this.close = close;
     }
 
     public Path.deserialized (Json.Object obj) {
         var arr = obj.get_array_member ("path_data").get_elements ();
-        data = new Geometry.Point[0];
-        var idx = 0;
+        data = new Gee.ArrayList<Geometry.Point?>();
         foreach (unowned var pt in arr) {
-            data.resize (data.length + 1);
-            data[idx] = Geometry.Point.deserialized (pt.get_object ());
-            ++idx;
+            data.add (Geometry.Point.deserialized (pt.get_object ()));
         }
     }
 
     protected override void serialize_details (ref Json.Object obj) {
         var array = new Json.Array ();
 
-        foreach (unowned var d in data) {
+        foreach (var d in data) {
             array.add_element (d.serialize ());
         }
 

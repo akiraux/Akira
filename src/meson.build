@@ -190,6 +190,7 @@ sources = files(
     'Lib2/Modes/ItemInsertMode.vala',
     'Lib2/Modes/ExportMode.vala',
     'Lib2/Modes/PanMode.vala',
+    'Lib2/Modes/PathEditMode.vala',
 
     'Lib2/ViewCanvas.vala',
 

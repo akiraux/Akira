@@ -24,16 +24,16 @@
  */
 public class Akira.Drawables.DrawablePath : Drawable {
     // In the future we will probably want control points with more data.
-    public Geometry.Point[]? points = null;
+    public Gee.ArrayList<Geometry.Point?>? points = null;
 
-    public DrawablePath (Geometry.Point[]? points = null) {
+    public DrawablePath (Gee.ArrayList<Geometry.Point?>? points = null) {
        if (points != null) {
            this.points = points;
        }
     }
 
     public override void simple_create_path (Cairo.Context cr) {
-        if (points == null || points.length < 2) {
+        if (points == null || points.size < 2) {
             return;
         }
 

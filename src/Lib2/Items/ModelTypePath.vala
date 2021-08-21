@@ -44,6 +44,7 @@ public class Akira.Lib2.Items.ModelTypePath : ModelType {
             Akira.Geometry.Point (center.x, center.y),
             false
         );
+        new_item.components.size = new Lib2.Components.Size (1, 1, false);
         return new_item;
     }
 
