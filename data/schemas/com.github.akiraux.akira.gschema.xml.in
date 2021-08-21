@@ -48,6 +48,12 @@
             <description>Show or Hide the button labels to slim the UI.</description>
         </key>
 
+        <key name="dark-theme" type="b">
+            <default>false</default>
+            <summary>Use dark theme</summary>
+            <description>Switch between Light and Dark theme.</description>
+        </key>
+
         <key name="use-symbolic" type="b">
             <default>false</default>
             <summary>Use Symbolic Icons</summary>
