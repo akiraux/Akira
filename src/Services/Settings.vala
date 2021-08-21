@@ -50,6 +50,7 @@ public class Akira.Services.Settings : GLib.Settings {
         get { return get_int ("left-paned"); }
         set { set_int ("left-paned", value); }
     }
+
     // Theme settings.
     public bool dark_theme {
         get { return get_boolean ("dark-theme"); }
