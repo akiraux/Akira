@@ -106,7 +106,7 @@ public class Akira.Lib2.Items.ModelInstance {
 
     public void remove_from_canvas (ViewLayers.BaseCanvas? canvas) {
         if (canvas != null) {
-            canvas.request_redraw (drawable.bounds);
+            drawable.request_redraw (canvas, false);
         }
         drawable = null;
     }
@@ -114,16 +114,11 @@ public class Akira.Lib2.Items.ModelInstance {
     private void update_drawable_bounds (ViewLayers.BaseCanvas? canvas) {
         bounding_box = compiled_geometry.area_bb;
         if (drawable != null) {
-            if (canvas != null && drawable.bounds.width != 0) {
-                canvas.request_redraw (drawable.bounds);
-            }
-
-            drawable.bounds = drawable.generate_bounding_box ();
-            drawable_bounding_box = drawable.bounds;
-
             if (canvas != null) {
-                canvas.request_redraw (drawable.bounds);
+                drawable.request_redraw (canvas, false);
+                drawable.request_redraw (canvas, true);
             }
+            drawable_bounding_box = drawable.bounds;
         } else {
             drawable_bounding_box = bounding_box;
         }

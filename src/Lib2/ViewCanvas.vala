@@ -291,42 +291,35 @@ public class Akira.Lib2.ViewCanvas : ViewLayers.BaseCanvas {
             }
         }
 
-        handle_selection_press_event (event);
-
-        var target_nob = nob_manager.hit_test (event.x, event.y);
-
-        if (target_nob != Utils.Nobs.Nob.NONE) {
-            // TODO - hook up transform
-
+        if (handle_selection_press_event (event)) {
             return true;
         }
-
-        var target = items_manager.hit_test (event.x, event.y);
-        if (target != null) {
-            if (!selection_manager.item_selected (target.id)) {
-                selection_manager.add_to_selection (target.id);
-                return true;
-            }
-        }
-        else {
-            selection_manager.reset_selection ();
-        }
-
 
         return false;
     }
 
+    /*
+     * Check if a selection exists, and transform it appropriately, return true if
+     * the event should be abosrbed.
+     */
     private bool handle_selection_press_event (Gdk.EventButton event) {
         var nob_clicked = nob_manager.hit_test (event.x, event.y);
 
         if (nob_clicked == Utils.Nobs.Nob.NONE) {
-            var target = items_manager.hit_test (event.x, event.y, false);
+            // If no nob is selected, we test for an item.
+            var target = items_manager.node_at_canvas_position (
+                event.x,
+                event.y,
+                Drawables.Drawable.HitTestType.SELECT
+            );
+
             if (target != null) {
                 if (!selection_manager.item_selected (target.id)) {
                     selection_manager.add_to_selection (target.id);
                 }
             }
-            else {
+            else if (!selection_manager.selection.bounding_box ().contains (event.x, event.y)) {
+                // Selection area was not clicked, so we reset the selection
                 selection_manager.reset_selection ();
             }
         }

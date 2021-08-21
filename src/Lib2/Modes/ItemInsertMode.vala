@@ -80,11 +80,15 @@ public class Akira.Lib2.Modes.ItemInsertMode : AbstractInteractionMode {
         }
 
         if (event.button == Gdk.BUTTON_PRIMARY) {
-            var instance = construct_item (item_insert_type, event.x, event.y);
+            bool is_artboard;
+            var instance = construct_item (item_insert_type, event.x, event.y, out is_artboard);
 
-            var group = view_canvas.items_manager.first_group_at (event.x, event.y);
+            var group_id = Lib2.Items.Model.ORIGIN_ID;
+            if (!is_artboard) {
+                group_id = view_canvas.items_manager.first_group_at (event.x, event.y).id;
+            }
 
-            view_canvas.items_manager.add_item_to_group (group.id, instance, false);
+            view_canvas.items_manager.add_item_to_group (group_id, instance, false);
 
             view_canvas.selection_manager.reset_selection ();
             view_canvas.selection_manager.add_to_selection (instance.id);
@@ -126,11 +130,12 @@ public class Akira.Lib2.Modes.ItemInsertMode : AbstractInteractionMode {
         return null;
     }
 
-    private static Lib2.Items.ModelInstance construct_item (string from_type, double x, double y) {
+    private static Lib2.Items.ModelInstance construct_item (string from_type, double x, double y, out bool is_artboard) {
         double center_x = 0.0;
         double center_y = 0.0;
         double width = 1.0;
         double height = 1.0;
+        is_artboard = false;
 
         // We use floor to align to the pixel that is clicked.
         Utils.AffineTransform.geometry_from_top_left (
@@ -184,6 +189,7 @@ public class Akira.Lib2.Modes.ItemInsertMode : AbstractInteractionMode {
                 break;
 
             case "artboard":
+                is_artboard = true;
                 new_item = Lib2.Items.ModelTypeArtboard.default_artboard (
                     coordinates,
                     size

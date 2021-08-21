@@ -60,20 +60,29 @@ public class Akira.Lib2.Items.ModelNode {
         return false;
     }
 
-    public void items_in_canvas (double x, double y, Cairo.Context cr, ref Gee.ArrayList<unowned ModelNode> nodes) {
-        if (instance.drawable_bounding_box.left > x || instance.drawable_bounding_box.right < x
-            || instance.drawable_bounding_box.top > y || instance.drawable_bounding_box.bottom < y) {
-            return;
-        }
-
+    public void items_in_canvas (
+        double x,
+        double y,
+        Cairo.Context cr,
+        double scale,
+        Drawables.Drawable.HitTestType hit_test_type,
+        ref Gee.ArrayList<unowned ModelNode> nodes
+    ) {
         unowned var dr = instance.drawable;
-        if (dr != null && dr.new_hit_test (x, y, cr, true, true)) {
-          nodes.add (this);
+        if (dr == null) {
+            if (!instance.bounding_box.contains (x, y)) {
+                return;
+            }
+        }
+        else {
+            if (dr.hit_test (x, y, cr, scale, hit_test_type)) {
+                nodes.add (this);
+            }
         }
 
         if (children != null) {
             foreach (unowned var child in children.data) {
-                child.items_in_canvas (x, y, cr, ref nodes);
+                child.items_in_canvas (x, y, cr, scale, hit_test_type, ref nodes);
             }
         }
     }
