@@ -20,9 +20,6 @@
  * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
  */
 
-// using Akira.Lib.Items;
-// using Akira.Lib.Managers;
-
 public class Akira.Utils.AffineTransform : Object {
     private const int MIN_SIZE = 1;
     private const int MIN_POS = 10;
