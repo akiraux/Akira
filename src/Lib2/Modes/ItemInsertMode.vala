@@ -93,6 +93,10 @@ public class Akira.Lib2.Modes.ItemInsertMode : AbstractInteractionMode {
             return transform_mode.button_press_event (event);
         }
 
+        if (path_edit_mode != null) {
+            return path_edit_mode.button_press_event (event);
+        }
+
         if (event.button == Gdk.BUTTON_PRIMARY) {
             var instance = construct_item (item_insert_type, event.x, event.y);
             var group = view_canvas.items_manager.first_group_at (event.x, event.y);

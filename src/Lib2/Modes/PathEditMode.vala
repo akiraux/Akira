@@ -74,13 +74,18 @@ public class Akira.Lib2.Modes.PathEditMode : AbstractInteractionMode {
         point.x -= first_point.x;
         point.y -= first_point.y;
 
-        // tell the canvas item to update itself
-        //instance.drawable.changed(true);
+        // add the new points to the drawable and path
+        instance.components.path.add_point (point, -1);
+
+        // tell the canvas to update and redraw itself
+        var bounds = instance.components.path.calculate_extents ();
+        bounds.translate (instance.components.center.x, instance.components.center.y);
+        view_canvas.request_redraw (bounds);
+
         return false;
     }
 
     public override bool button_release_event (Gdk.EventButton event) {
-        print("button release in path\n");
         return false;
     }
 

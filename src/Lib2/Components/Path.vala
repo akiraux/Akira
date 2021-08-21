@@ -71,6 +71,12 @@ public class Akira.Lib2.Components.Path : Component, Copyable<Path> {
         return cln;
     }
 
+    public void add_point (Geometry.Point point, int index = -1) {
+        index = (index == -1) ? data.size : index;
+
+        data.insert(index, point);
+    }
+
     public Geometry.Rectangle calculate_extents () {
         double min_x = 0;
         double max_x = 0;
