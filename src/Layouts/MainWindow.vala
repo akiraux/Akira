@@ -49,6 +49,8 @@ public class Akira.Layouts.MainWindow : Gtk.Grid {
             pane.pack1 (layers_sidebar, false, false);
             // pane2.pack2 (left_sidebar, false, false);
         }
+
+        attach (pane, 0, 0, 1, 1);
     }
 
     public void focus_canvas () {
