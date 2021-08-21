@@ -148,9 +148,15 @@ public class Akira.Application : Gtk.Application {
         gtk_settings.set_property ("gtk-icon-theme-name", "elementary");
         gtk_settings.set_property ("gtk-theme-name", "io.elementary.stylesheet.blueberry");
 
-        gtk_settings.gtk_application_prefer_dark_theme = settings.dark_theme = granite_settings.prefers_color_scheme == Granite.Settings.ColorScheme.DARK;
+        if (settings.follow_system_theme) {
+            gtk_settings.gtk_application_prefer_dark_theme = granite_settings.prefers_color_scheme == Granite.Settings.ColorScheme.DARK;
+        }
+
+        // This was outside if statement because the settings.follow_system_theme may change while app running
         granite_settings.notify["prefers-color-scheme"].connect (() => {
-            gtk_settings.gtk_application_prefer_dark_theme = settings.dark_theme = granite_settings.prefers_color_scheme == Granite.Settings.ColorScheme.DARK;
+            if (settings.follow_system_theme) {
+                gtk_settings.gtk_application_prefer_dark_theme = granite_settings.prefers_color_scheme == Granite.Settings.ColorScheme.DARK;
+            }
         });
     }
 }

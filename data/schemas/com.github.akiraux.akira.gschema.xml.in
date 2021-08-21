@@ -48,6 +48,12 @@
             <description>Switch between Light and Dark theme.</description>
         </key>
 
+        <key name="follow-system-theme" type="b">
+            <default>true</default>
+            <summary>Follow system theme variant</summary>
+            <description>Follow system theme variant</description>
+        </key>
+
         <key name="show-label" type="b">
             <default>true</default>
             <summary>Show button labels</summary>
