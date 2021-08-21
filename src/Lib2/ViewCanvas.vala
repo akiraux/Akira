@@ -387,8 +387,6 @@ public class Akira.Lib2.ViewCanvas : ViewLayers.BaseCanvas {
         get_window ().set_cursor (cursor);
     }
 
-
-
     // #TODO temporary
     public override bool draw (Cairo.Context ctx) {
         base.draw (ctx);
