@@ -59,6 +59,14 @@ public struct Akira.Geometry.Rectangle {
         }
     }
 
+    public bool contains (double x, double y) {
+        return (left < x < right) && (top < y < bottom);
+    }
+
+    public bool does_not_contain (double x, double y) {
+        return x < left || x > right || y < top || y > bottom;
+    }
+
     public void translate (double dx, double dy) {
         left += dx;
         right += dx;

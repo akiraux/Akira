@@ -295,39 +295,12 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
         return item_model.children_in_group (group_id);
     }
 
-    public Lib2.Items.ModelInstance? hit_test (double x, double y, bool ignore_groups = true) {
-        Lib2.Items.ModelNode node = node_at_canvas_position (x, y);
-
-        if (node == null) {
-            return null;
-        }
-
-        if (ignore_groups) {
-            return node.instance;
-        }
-
-        unowned var parent = node.parent;
-
-        if (parent == null || parent.id == Lib2.Items.Model.ORIGIN_ID) {
-            return node.instance;
-        }
-
-        if (parent.instance.type is Lib2.Items.ModelTypeArtboard) {
-            return node.instance;
-        }
-
-        var root = Lib2.Items.Model.root (node);
-        if (root == null) {
-            // this is not stable behavior -- it should never happen
-            assert (false);
-            return node.instance;
-        }
-
-        return root.instance;
-    }
-
-    public Lib2.Items.ModelNode? node_at_canvas_position (double x, double y) {
-        var found_items = nodes_at_canvas_position (x, y);
+    public Lib2.Items.ModelNode? node_at_canvas_position (
+        double x,
+        double y,
+        Drawables.Drawable.HitTestType hit_test_type
+    ) {
+        var found_items = nodes_at_canvas_position (x, y, hit_test_type);
         if (found_items.size == 0) {
             return null;
         }
@@ -339,7 +312,7 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
      * Returns the top-most group at position. Origin if no other group found.
      */
     public Lib2.Items.ModelNode first_group_at (double x, double y) {
-        var found_items = nodes_at_canvas_position (x, y);
+        var found_items = nodes_at_canvas_position (x, y, Drawables.Drawable.HitTestType.GROUP_REGION);
 
         var it = found_items.bidir_list_iterator ();
         for (var has_next = it.last (); has_next; has_next = it.previous ()) {
@@ -352,7 +325,11 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
         return item_model.node_from_id (Lib2.Items.Model.ORIGIN_ID);
     }
 
-    public Gee.ArrayList<unowned Lib2.Items.ModelNode> nodes_at_canvas_position (double x, double y) {
+    public Gee.ArrayList<unowned Lib2.Items.ModelNode> nodes_at_canvas_position (
+        double x,
+        double y,
+        Drawables.Drawable.HitTestType hit_test_type
+    ) {
         Cairo.ImageSurface surface = new Cairo.ImageSurface (Cairo.Format.ARGB32, 1, 1);
         Cairo.Context context = new Cairo.Context (surface);
         context.set_antialias (Cairo.Antialias.GRAY);
@@ -366,7 +343,7 @@ public class Akira.Lib2.Managers.ItemsManager : Object {
         }
 
         foreach (unowned var root in origin.children.data) {
-            root.items_in_canvas (x, y, context, ref found_items);
+            root.items_in_canvas (x, y, context, view_canvas.scale, hit_test_type, ref found_items);
         }
         return found_items;
     }
