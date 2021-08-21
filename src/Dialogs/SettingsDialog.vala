@@ -22,7 +22,6 @@
 public class Akira.Dialogs.SettingsDialog : Gtk.Dialog {
     public weak Akira.Window window { get; construct; }
     private Gtk.Stack stack;
-    private Gtk.Switch dark_theme_switch;
     private Gtk.Switch label_switch;
     private Gtk.Switch symbolic_switch;
     private Gtk.Switch border_switch;
@@ -88,10 +87,6 @@ public class Akira.Dialogs.SettingsDialog : Gtk.Dialog {
 
         grid.attach (new SettingsHeader (_("Interface")), 0, 0, 2, 1);
 
-        grid.attach (new SettingsLabel (_("Use Dark Theme:")), 0, 1, 1, 1);
-        dark_theme_switch = new SettingsSwitch ("dark-theme");
-        grid.attach (dark_theme_switch, 1, 1, 1, 1);
-
         grid.attach (new SettingsLabel (_("Invert Panels Order:")), 0, 2, 1, 1);
         symbolic_switch = new SettingsSwitch ("invert-sidebar");
         grid.attach (symbolic_switch, 1, 2, 1, 1);
@@ -109,11 +104,6 @@ public class Akira.Dialogs.SettingsDialog : Gtk.Dialog {
         grid.attach (new SettingsLabel (_("Use Symbolic Icons:")), 0, 6, 1, 1);
         symbolic_switch = new SettingsSwitch ("use-symbolic");
         grid.attach (symbolic_switch, 1, 6, 1, 1);
-
-        dark_theme_switch.notify["active"].connect (() => {
-            Gtk.Settings.get_default ().gtk_application_prefer_dark_theme = settings.dark_theme;
-            window.event_bus.change_theme ();
-        });
 
         return grid;
     }
