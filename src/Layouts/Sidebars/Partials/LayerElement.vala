@@ -24,12 +24,12 @@
  * node's model type (Artboard, Layer, Group).
  */
 public class Akira.Layouts.Sidebars.Partials.LayerElement : Gtk.ListBoxRow {
-    public unowned Lib2.ViewCanvas view_canvas { get; construct; }
-    public unowned Lib2.Items.ModelInstance node_instance { get; construct; }
+    public unowned Lib.ViewCanvas view_canvas { get; construct; }
+    public unowned Lib.Items.ModelInstance node_instance { get; construct; }
 
     private Gtk.Label label;
 
-    public LayerElement (Lib2.Items.ModelInstance node, Lib2.ViewCanvas canvas) {
+    public LayerElement (Lib.Items.ModelInstance node, Lib.ViewCanvas canvas) {
         Object (
             view_canvas: canvas,
             node_instance: node
@@ -51,9 +51,9 @@ public class Akira.Layouts.Sidebars.Partials.LayerElement : Gtk.ListBoxRow {
         label.label = node_instance.id.to_string ();
 
         // Build a specific UI based on the node instance's type.
-        if (node_instance.type is Lib2.Items.ModelTypeArtboard) {
+        if (node_instance.type is Lib.Items.ModelTypeArtboard) {
             _build_artboard_ui ();
-        } else if (node_instance.type is Lib2.Items.ModelTypeGroup) {
+        } else if (node_instance.type is Lib.Items.ModelTypeGroup) {
             _build_group_ui ();
         } else {
             _build_layer_ui ();

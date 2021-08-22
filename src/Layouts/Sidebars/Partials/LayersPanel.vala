@@ -23,14 +23,14 @@
  * Layout component containing all layers related elements.
  */
 public class Akira.Layouts.Sidebars.Partials.LayersPanel : Gtk.Grid {
-    public unowned Lib2.ViewCanvas view_canvas { get; construct; }
+    public unowned Lib.ViewCanvas view_canvas { get; construct; }
 
     private Gtk.ListBox items_list;
     // Keep track of each row associated to a node's ID in order to quickly get
     // the layer to remove, move, or select, without doing nested foreach.
     private Gee.HashMap<int, Gtk.ListBoxRow> list_map;
 
-    public LayersPanel (Lib2.ViewCanvas canvas) {
+    public LayersPanel (Lib.ViewCanvas canvas) {
         Object (
             orientation: Gtk.Orientation.VERTICAL,
             view_canvas: canvas

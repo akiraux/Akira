@@ -28,9 +28,9 @@ public class Akira.Utils.AffineTransform : Object {
      * Scales a node and its children relative to a reference frame.
      */
     public static void scale_node (
-        Lib2.Items.Model item_model,
-        Lib2.Items.ModelNode node,
-        Lib2.Modes.TransformMode.InitialDragState initial_drag_state,
+        Lib.Items.Model item_model,
+        Lib.Items.ModelNode node,
+        Lib.Modes.TransformMode.InitialDragState initial_drag_state,
         Cairo.Matrix inverse_reference_matrix,
         double global_offset_x,
         double global_offset_y,
@@ -74,10 +74,10 @@ public class Akira.Utils.AffineTransform : Object {
             var d_x = initial_drag_state.area.center_x + global_offset_x + center_offset_x;
             var d_y = initial_drag_state.area.center_y + global_offset_y + center_offset_y;
 
-            item.components.center = new Lib2.Components.Coordinates (d_x, d_y);
-            item.components.transform = new Lib2.Components.Transform (angle, 1.0, 1.0, shear_x, 0);
+            item.components.center = new Lib.Components.Coordinates (d_x, d_y);
+            item.components.transform = new Lib.Components.Transform (angle, 1.0, 1.0, shear_x, 0);
 
-            item.components.size = new Lib2.Components.Size (new_width, new_height, false);
+            item.components.size = new Lib.Components.Size (new_width, new_height, false);
 
             item_model.mark_node_geometry_dirty (node);
         }

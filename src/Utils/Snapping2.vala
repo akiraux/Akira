@@ -21,7 +21,7 @@
 
 /**
  * Utility providing snap functionality between objects.
- * For Lib2
+ * For Lib
  */
 public class Akira.Utils.Snapping2 : Object {
     /**
@@ -110,8 +110,8 @@ public class Akira.Utils.Snapping2 : Object {
      * Generates the best snap grid from selection.
      */
     public static SnapGrid2 generate_best_snap_grid (
-        Lib2.ViewCanvas canvas,
-        Lib2.Items.NodeSelection selection,
+        Lib.ViewCanvas canvas,
+        Lib.Items.NodeSelection selection,
         Geometry.Rectangle selection_area,
         int sensitivity
     ) {
@@ -122,7 +122,7 @@ public class Akira.Utils.Snapping2 : Object {
 
         int group_id;
         selection.spans_one_group (out group_id);
-        group_id = int.max (group_id, Lib2.Items.Model.ORIGIN_ID);
+        group_id = int.max (group_id, Lib.Items.Model.ORIGIN_ID);
 
         return snap_grid_from_canvas (canvas, group_id, selection, selection_area, sensitivity);
     }
@@ -132,9 +132,9 @@ public class Akira.Utils.Snapping2 : Object {
      * If group_node is passed, then it will be used to generate snaps only within that group.
      */
     public static SnapGrid2 snap_grid_from_canvas (
-        Lib2.ViewCanvas canvas,
+        Lib.ViewCanvas canvas,
         int group_id,
-        Lib2.Items.NodeSelection selection,
+        Lib.Items.NodeSelection selection,
         Geometry.Rectangle selection_area,
         int sensitivity
     ) {
@@ -183,7 +183,7 @@ public class Akira.Utils.Snapping2 : Object {
      */
     public static SnapMatchData2 generate_snap_matches (
         SnapGrid2 grid,
-        Lib2.Items.NodeSelection selection,
+        Lib.Items.NodeSelection selection,
         Geometry.Rectangle selection_area,
         int sensitivity
     ) {
