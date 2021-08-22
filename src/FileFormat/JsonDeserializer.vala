@@ -64,7 +64,7 @@ public class Akira.FileFormat.JsonDeserializer {
     /*
      * Deserialize the model.
      */
-    private static void deserialize_model (Lib2.ViewCanvas view_canvas, Json.Object obj) {
+    private static void deserialize_model (Lib.ViewCanvas view_canvas, Json.Object obj) {
         var roots = obj.get_member ("roots");
         if (roots == null) {
             // bad file
@@ -73,7 +73,7 @@ public class Akira.FileFormat.JsonDeserializer {
         }
 
         foreach (unowned Json.Node root in roots.get_array ().get_elements ()) {
-            deserialize_node (view_canvas, root.get_object (), Lib2.Items.Model.ORIGIN_ID);
+            deserialize_node (view_canvas, root.get_object (), Lib.Items.Model.ORIGIN_ID);
         }
 
         view_canvas.items_manager.compile_model ();
@@ -82,7 +82,7 @@ public class Akira.FileFormat.JsonDeserializer {
     /*
      * Deserialize a specific node, recursive.
      */
-    private static void deserialize_node (Lib2.ViewCanvas view_canvas, Json.Object node_obj, int group_id) {
+    private static void deserialize_node (Lib.ViewCanvas view_canvas, Json.Object node_obj, int group_id) {
         if (!node_obj.has_member ("type")) {
             assert (false);
             return;
@@ -92,19 +92,19 @@ public class Akira.FileFormat.JsonDeserializer {
         var type = node_obj.get_string_member ("type");
 
         var components_json = node_obj.get_member ("components");
-        var components = Lib2.Components.Components.deserialize (components_json);
+        var components = Lib.Components.Components.deserialize (components_json);
 
-        Lib2.Items.ModelInstance? new_inst = null;
+        Lib.Items.ModelInstance? new_inst = null;
         if (type == "rect") {
-            new_inst = new Lib2.Items.ModelInstance (-1, new Lib2.Items.ModelTypeRect ());
+            new_inst = new Lib.Items.ModelInstance (-1, new Lib.Items.ModelTypeRect ());
         } else if (type == "ellipse") {
-            new_inst = new Lib2.Items.ModelInstance (-1, new Lib2.Items.ModelTypeEllipse ());
+            new_inst = new Lib.Items.ModelInstance (-1, new Lib.Items.ModelTypeEllipse ());
         } else if (type == "group") {
-            new_inst = new Lib2.Items.ModelInstance (-1, new Lib2.Items.ModelTypeGroup ());
+            new_inst = new Lib.Items.ModelInstance (-1, new Lib.Items.ModelTypeGroup ());
         } else if (type == "artboard") {
-            new_inst = new Lib2.Items.ModelInstance (-1, new Lib2.Items.ModelTypeArtboard ());
+            new_inst = new Lib.Items.ModelInstance (-1, new Lib.Items.ModelTypeArtboard ());
         } else if (type == "path") {
-            new_inst = new Lib2.Items.ModelInstance (-1, new Lib2.Items.ModelTypePath ());
+            new_inst = new Lib.Items.ModelInstance (-1, new Lib.Items.ModelTypePath ());
         }
         else {
             // Unknown type

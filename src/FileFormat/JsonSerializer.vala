@@ -73,8 +73,8 @@ public class Akira.FileFormat.JsonSerializer {
     /*
      * Serialize canvas artboards to the builder.
      */
-    public static void serialize_model (Akira.Lib2.Items.Model item_model, ref Json.Builder builder) {
-        var origin = item_model.node_from_id (Akira.Lib2.Items.Model.ORIGIN_ID);
+    public static void serialize_model (Akira.Lib.Items.Model item_model, ref Json.Builder builder) {
+        var origin = item_model.node_from_id (Akira.Lib.Items.Model.ORIGIN_ID);
         builder.set_member_name ("roots");
         builder.begin_array ();
         foreach (var root in origin.children.data) {

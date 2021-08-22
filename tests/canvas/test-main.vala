@@ -28,7 +28,7 @@ class Main : GLib.Object {
 
         var tests = new Akira.TestRunner ();
         tests.add (new Akira.FillsItemTest ());
-        tests.add (new Akira.Lib2ModelTests ());
+        tests.add (new Akira.LibModelTests ());
 
         GLib.Idle.add (() => {
             exit_status = tests.run ();
