@@ -275,6 +275,11 @@ public class Akira.Services.ActionManager : Object {
     }
 
     private void action_preferences () {
+        // Since the settings dialog was opened with the `CTRL+.` shortcut, we
+        // need to reset the boolean variable in the canvas to avoid affecting
+        // items resize and rotation.
+        window.main_window.main_view_canvas.canvas.ctrl_is_pressed = false;
+
         var settings_dialog = new Akira.Dialogs.SettingsDialog (window);
         settings_dialog.show_all ();
         settings_dialog.present ();
