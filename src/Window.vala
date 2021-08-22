@@ -83,6 +83,10 @@ public class Akira.Window : Gtk.ApplicationWindow {
     }
 
     private void apply_user_settings () {
+        if (!settings.follow_system_theme) {
+            Gtk.Settings.get_default ().gtk_application_prefer_dark_theme = settings.dark_theme;
+        }
+
         var css_provider = new Gtk.CssProvider ();
         css_provider.load_from_resource ("/com/github/akiraux/akira/stylesheet.css");
 
