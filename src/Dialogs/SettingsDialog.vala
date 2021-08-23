@@ -23,6 +23,7 @@ public class Akira.Dialogs.SettingsDialog : Gtk.Dialog {
     public weak Akira.Window window { get; construct; }
     private Gtk.Stack stack;
     private Gtk.Switch dark_theme_switch;
+    private Gtk.Switch follow_system_switch;
     private Gtk.Switch label_switch;
     private Gtk.Switch symbolic_switch;
     private Gtk.Switch border_switch;
@@ -90,15 +91,20 @@ public class Akira.Dialogs.SettingsDialog : Gtk.Dialog {
 
         grid.attach (new SettingsLabel (_("Use Dark Theme:")), 0, 1, 1, 1);
         dark_theme_switch = new SettingsSwitch ("dark-theme");
+        dark_theme_switch.sensitive = !settings.follow_system_theme;
         grid.attach (dark_theme_switch, 1, 1, 1, 1);
 
-        grid.attach (new SettingsLabel (_("Invert Panels Order:")), 0, 2, 1, 1);
+        grid.attach (new SettingsLabel (_("Follow system's theme variant:")), 0, 2, 1, 1);
+        follow_system_switch = new SettingsSwitch ("follow-system-theme");
+        grid.attach (follow_system_switch, 1, 2, 1, 1);
+
+        grid.attach (new SettingsLabel (_("Invert Panels Order:")), 0, 3, 1, 1);
         symbolic_switch = new SettingsSwitch ("invert-sidebar");
-        grid.attach (symbolic_switch, 1, 2, 1, 1);
+        grid.attach (symbolic_switch, 1, 3, 1, 1);
 
         var panels_helper_label = new Gtk.Label (_("Restart application to apply this change."));
         panels_helper_label.get_style_context ().add_class ("dim-label");
-        grid.attach (panels_helper_label, 1, 3, 1, 1);
+        grid.attach (panels_helper_label, 1, 4, 1, 1);
 
         grid.attach (new SettingsHeader (_("ToolBar Style")), 0, 4, 2, 1);
 
@@ -113,6 +119,16 @@ public class Akira.Dialogs.SettingsDialog : Gtk.Dialog {
         dark_theme_switch.notify["active"].connect (() => {
             Gtk.Settings.get_default ().gtk_application_prefer_dark_theme = settings.dark_theme;
             window.event_bus.change_theme ();
+        });
+
+        follow_system_switch.notify["active"].connect (() => {
+            if (settings.follow_system_theme) {
+                dark_theme_switch.sensitive = false;
+                Gtk.Settings.get_default ().gtk_application_prefer_dark_theme = Granite.Settings.get_default ().prefers_color_scheme == Granite.Settings.ColorScheme.DARK;
+                return;
+            }
+            dark_theme_switch.sensitive = true;
+            Gtk.Settings.get_default ().gtk_application_prefer_dark_theme = settings.dark_theme;
         });
 
         return grid;
