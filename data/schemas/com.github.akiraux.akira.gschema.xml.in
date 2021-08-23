@@ -50,8 +50,8 @@
 
         <key name="follow-system-theme" type="b">
             <default>true</default>
-            <summary>Follow system theme variant</summary>
-            <description>Follow system theme variant</description>
+            <summary>Follow system theme variation</summary>
+            <description>Follow system theme dark/light variation</description>
         </key>
 
         <key name="show-label" type="b">

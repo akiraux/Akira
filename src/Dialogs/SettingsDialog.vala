@@ -94,27 +94,33 @@ public class Akira.Dialogs.SettingsDialog : Gtk.Dialog {
         dark_theme_switch.sensitive = !settings.follow_system_theme;
         grid.attach (dark_theme_switch, 1, 1, 1, 1);
 
-        grid.attach (new SettingsLabel (_("Follow system's theme variant:")), 0, 2, 1, 1);
+        grid.attach (new SettingsLabel (_("Follow the system theme variation:")), 0, 2, 1, 1);
         follow_system_switch = new SettingsSwitch ("follow-system-theme");
         grid.attach (follow_system_switch, 1, 2, 1, 1);
 
-        grid.attach (new SettingsLabel (_("Invert Panels Order:")), 0, 3, 1, 1);
+        var theme_helper_label = new Gtk.Label (_("If enabled, the Dark Theme switch will be disabled."));
+        theme_helper_label.get_style_context ().add_class ("dim-label");
+        theme_helper_label.halign = Gtk.Align.START;
+        grid.attach (theme_helper_label, 1, 3, 1, 1);
+
+        grid.attach (new SettingsLabel (_("Invert Panels Order:")), 0, 4, 1, 1);
         symbolic_switch = new SettingsSwitch ("invert-sidebar");
-        grid.attach (symbolic_switch, 1, 3, 1, 1);
+        grid.attach (symbolic_switch, 1, 4, 1, 1);
 
         var panels_helper_label = new Gtk.Label (_("Restart application to apply this change."));
         panels_helper_label.get_style_context ().add_class ("dim-label");
-        grid.attach (panels_helper_label, 1, 4, 1, 1);
+        panels_helper_label.halign = Gtk.Align.START;
+        grid.attach (panels_helper_label, 1, 5, 1, 1);
 
-        grid.attach (new SettingsHeader (_("ToolBar Style")), 0, 4, 2, 1);
+        grid.attach (new SettingsHeader (_("ToolBar Style")), 0, 6, 2, 1);
 
-        grid.attach (new SettingsLabel (_("Show Button Labels:")), 0, 5, 1, 1);
+        grid.attach (new SettingsLabel (_("Show Button Labels:")), 0, 7, 1, 1);
         label_switch = new SettingsSwitch ("show-label");
-        grid.attach (label_switch, 1, 5, 1, 1);
+        grid.attach (label_switch, 1, 7, 1, 1);
 
-        grid.attach (new SettingsLabel (_("Use Symbolic Icons:")), 0, 6, 1, 1);
+        grid.attach (new SettingsLabel (_("Use Symbolic Icons:")), 0, 8, 1, 1);
         symbolic_switch = new SettingsSwitch ("use-symbolic");
-        grid.attach (symbolic_switch, 1, 6, 1, 1);
+        grid.attach (symbolic_switch, 1, 8, 1, 1);
 
         dark_theme_switch.notify["active"].connect (() => {
             Gtk.Settings.get_default ().gtk_application_prefer_dark_theme = settings.dark_theme;
