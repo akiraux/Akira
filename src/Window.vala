@@ -82,16 +82,10 @@ public class Akira.Window : Gtk.ApplicationWindow {
         add (main_window);
     }
 
+    /*
+     * Restore previously saved size and panels positions.
+     */
     private void apply_user_settings () {
-        Gtk.Settings.get_default ().gtk_application_prefer_dark_theme = settings.dark_theme;
-
-        var css_provider = new Gtk.CssProvider ();
-        css_provider.load_from_resource ("/com/github/akiraux/akira/stylesheet.css");
-
-        Gtk.StyleContext.add_provider_for_screen (
-            Gdk.Screen.get_default (), css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
-        );
-
         resize (settings.window_width, settings.window_height);
         main_window.pane.position = settings.left_paned;
         main_window.pane2.position = settings.right_paned;

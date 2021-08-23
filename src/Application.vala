@@ -139,10 +139,40 @@ public class Akira.Application : Gtk.Application {
             return;
         }
 
-        Gtk.Settings.get_default ().set_property ("gtk-icon-theme-name", "elementary");
-        Gtk.Settings.get_default ().set_property ("gtk-theme-name", "io.elementary.stylesheet.blueberry");
-
+        // Add the resource path to load custom icons.
         weak Gtk.IconTheme default_theme = Gtk.IconTheme.get_default ();
         default_theme.add_resource_path ("/com/github/akiraux/akira");
+
+        // Load the custom CSS.
+        var css_provider = new Gtk.CssProvider ();
+        css_provider.load_from_resource ("/com/github/akiraux/akira/stylesheet.css");
+        Gtk.StyleContext.add_provider_for_screen (
+            Gdk.Screen.get_default (), css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
+        );
+
+        // Force set the elementary OS style and icons for visual consistency.
+        // In the future we might support other themes if doable.
+        var gtk_settings = Gtk.Settings.get_default ();
+        gtk_settings.set_property ("gtk-icon-theme-name", "elementary");
+        gtk_settings.set_property ("gtk-theme-name", "io.elementary.stylesheet.blueberry");
+
+        // Use the Granite API to listen for global dark style changes.
+        var granite_settings = Granite.Settings.get_default ();
+        if (settings.follow_system_theme) {
+            // Follow the system themeing.
+            gtk_settings.gtk_application_prefer_dark_theme =
+                granite_settings.prefers_color_scheme == Granite.Settings.ColorScheme.DARK;
+        } else {
+            // Follow the user's settings.
+            gtk_settings.gtk_application_prefer_dark_theme = settings.dark_theme;
+        }
+
+        // Listen for the changes in the theme's preferences.
+        granite_settings.notify["prefers-color-scheme"].connect (() => {
+            if (settings.follow_system_theme) {
+                gtk_settings.gtk_application_prefer_dark_theme =
+                    granite_settings.prefers_color_scheme == Granite.Settings.ColorScheme.DARK;
+            }
+        });
     }
 }
