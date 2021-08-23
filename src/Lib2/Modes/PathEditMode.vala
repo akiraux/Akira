@@ -47,7 +47,8 @@ public class Akira.Lib2.Modes.PathEditMode : AbstractInteractionMode {
 
     public override void mode_begin () {}
 
-    public override void mode_end () {}
+    public override void mode_end () {
+    }
 
     public override Gdk.CursorType? cursor_type () {
         return Gdk.CursorType.CROSSHAIR;
@@ -67,6 +68,7 @@ public class Akira.Lib2.Modes.PathEditMode : AbstractInteractionMode {
 
         if (first_point.x == -1) {
             first_point = point;
+            print("First point %f %f\n", first_point.x, first_point.y);
             return false;
         }
 
@@ -77,12 +79,27 @@ public class Akira.Lib2.Modes.PathEditMode : AbstractInteractionMode {
         // add the new points to the drawable and path
         instance.components.path.add_point (point, -1);
 
-        // tell the canvas to update and redraw itself
         var bounds = instance.components.path.calculate_extents ();
-        bounds.translate (instance.components.center.x, instance.components.center.y);
-        view_canvas.request_redraw (bounds);
+        print("bounds center %f %f\n", bounds.center_x, bounds.center_y);
 
-        return false;
+        double center_x = first_point.x + bounds.width / 2.0;
+        double center_y = first_point.y + bounds.height / 2.0;
+
+        if (event.x < first_point.x) {
+            center_x -= (first_point.x - event.x);
+        }
+        if (event.y < first_point.y) {
+            center_y -= (first_point.y - event.y);
+        }
+
+        instance.components.center = new Lib2.Components.Coordinates (center_x, center_y);
+        instance.components.size = new Lib2.Components.Size (bounds.width, bounds.height, false);
+
+        // update the component
+        view_canvas.items_manager.item_model.mark_node_geometry_dirty (view_canvas.items_manager.node_from_id (instance.id));
+        view_canvas.items_manager.compile_model ();
+
+        return true;
     }
 
     public override bool button_release_event (Gdk.EventButton event) {
