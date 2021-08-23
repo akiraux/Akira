@@ -19,10 +19,10 @@
  * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
  */
 
-using Akira.Lib2;
+using Akira.Lib;
 
-public class Akira.Lib2ModelTests : Akira.TestSuite {
-    public Lib2ModelTests () {
+public class Akira.LibModelTests : Akira.TestSuite {
+    public LibModelTests () {
         this.add_test ("origin_splice_extripate", this.origin_splice_extripate);
         this.add_test ("origin_move", this.origin_move);
         this.add_test ("nested_ops", this.nested_ops);

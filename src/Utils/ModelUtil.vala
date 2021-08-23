@@ -33,9 +33,9 @@
      * Return 0 on success.
      */
      public static int clone_from_model (
-         Lib2.Items.Model source_model,
+         Lib.Items.Model source_model,
          int source_id,
-         Lib2.Items.Model target_model,
+         Lib.Items.Model target_model,
          int target_group_id,
          OnSubtreeCloned? on_subtree_cloned = null
     ) {
@@ -51,7 +51,7 @@
 
         var new_id = recursive_clone (source_node, target_node, target_model);
 
-        if (new_id >= Lib2.Items.Model.GROUP_START_ID && on_subtree_cloned != null) {
+        if (new_id >= Lib.Items.Model.GROUP_START_ID && on_subtree_cloned != null) {
             on_subtree_cloned (new_id);
         }
 
@@ -59,9 +59,9 @@
     }
 
     private static int recursive_clone (
-        Lib2.Items.ModelNode source_node,
-        Lib2.Items.ModelNode target_node,
-        Lib2.Items.Model target_model
+        Lib.Items.ModelNode source_node,
+        Lib.Items.ModelNode target_node,
+        Lib.Items.Model target_model
     ) {
         var new_id = target_model.append_new_item (target_node.id, source_node.instance.clone ());
 

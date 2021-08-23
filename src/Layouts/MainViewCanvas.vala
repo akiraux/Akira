@@ -26,7 +26,7 @@ public class Akira.Layouts.MainViewCanvas : Gtk.Grid {
 
     public Gtk.ScrolledWindow main_scroll;
 
-    public Akira.Lib2.ViewCanvas canvas;
+    public Akira.Lib.ViewCanvas canvas;
 
     public weak Akira.Window window { get; construct; }
 
@@ -54,7 +54,7 @@ public class Akira.Layouts.MainViewCanvas : Gtk.Grid {
         // Change visibility of canvas scrollbars
         main_scroll.set_policy (Gtk.PolicyType.NEVER, Gtk.PolicyType.NEVER);
 
-        canvas = new Akira.Lib2.ViewCanvas (window);
+        canvas = new Akira.Lib.ViewCanvas (window);
         canvas.set_bounds (Geometry.Rectangle.with_coordinates (0, 0, CANVAS_SIZE, CANVAS_SIZE));
         canvas.scale = 1.0;
 
@@ -103,7 +103,7 @@ public class Akira.Layouts.MainViewCanvas : Gtk.Grid {
         event.get_scroll_deltas (out delta_x, out delta_y);
 
         if (is_ctrl) {
-            var norm_scale = canvas.scale / Lib2.ViewCanvas.MAX_SCALE;
+            var norm_scale = canvas.scale / Lib.ViewCanvas.MAX_SCALE;
             delta_y *= 1 - (1 - norm_scale) * (1 - norm_scale);
             window.event_bus.adjust_zoom (-delta_y, false, Geometry.Point (event.x, event.y));
             return true;

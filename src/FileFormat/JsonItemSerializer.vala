@@ -28,7 +28,7 @@ public class Akira.FileFormat.JsonItemSerializer {
     /*
      * Serialize an item and return its corresponding Json.Node.
      */
-    public static void serialize_node (Akira.Lib2.Items.ModelNode node, ref Json.Builder builder) {
+    public static void serialize_node (Akira.Lib.Items.ModelNode node, ref Json.Builder builder) {
         builder.begin_object ();
 
         // serialize type
@@ -51,7 +51,7 @@ public class Akira.FileFormat.JsonItemSerializer {
     /*
      * Serialize all children of a node recursively.
      */
-    public static void serialize_children (Akira.Lib2.Items.ModelNode node, ref Json.Builder builder) {
+    public static void serialize_children (Akira.Lib.Items.ModelNode node, ref Json.Builder builder) {
         builder.set_member_name ("children");
 
         {

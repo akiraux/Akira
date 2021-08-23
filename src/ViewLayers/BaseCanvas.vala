@@ -48,7 +48,7 @@ public class Akira.ViewLayers.BaseCanvas : Gtk.Widget , Gtk.Scrollable {
     // The main window that gets scrolled around
     private Gdk.Window canvas_window;
 
-    private unowned Lib2.Items.Model? model_to_render = null;
+    private unowned Lib.Items.Model? model_to_render = null;
 
     private double _scale { get; set; default = 1.0; }
     private double _resolution_x { get; set; default = 96.0; }
@@ -135,7 +135,7 @@ public class Akira.ViewLayers.BaseCanvas : Gtk.Widget , Gtk.Scrollable {
         vadjustment = new Gtk.Adjustment (0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
     }
 
-    public void set_model_to_render (Lib2.Items.Model model) {
+    public void set_model_to_render (Lib.Items.Model model) {
         model_to_render = model;
         request_redraw (bounds);
         queue_draw ();
@@ -620,7 +620,7 @@ public class Akira.ViewLayers.BaseCanvas : Gtk.Widget , Gtk.Scrollable {
             return;
         }
 
-        var origin = model_to_render.node_from_id (Lib2.Items.Model.ORIGIN_ID);
+        var origin = model_to_render.node_from_id (Lib.Items.Model.ORIGIN_ID);
         if (origin == null || origin.children == null) {
             return;
         }
@@ -630,7 +630,7 @@ public class Akira.ViewLayers.BaseCanvas : Gtk.Widget , Gtk.Scrollable {
         }
     }
 
-    public void draw_model_node (Lib2.Items.ModelNode node, Cairo.Context context, Geometry.Rectangle bounds) {
+    public void draw_model_node (Lib.Items.ModelNode node, Cairo.Context context, Geometry.Rectangle bounds) {
         if (node.instance.drawable != null) {
             node.instance.drawable.paint (context, bounds, scale);
         }
