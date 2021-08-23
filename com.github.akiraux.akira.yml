@@ -1,8 +1,19 @@
 app-id: com.github.akiraux.akira
-runtime: io.elementary.Platform
-runtime-version: '6'
-sdk: io.elementary.Sdk
+#runtime: io.elementary.Platform
+#runtime-version: '6'
+#sdk: io.elementary.Sdk
+runtime: org.gnome.Platform
+runtime-version: '40'
+sdk: org.gnome.Sdk
 command: com.github.akiraux.akira
+cleanup:
+  - '/include'
+  - '/lib/pkgconfig'
+  - '/lib/debug'
+  - '/share/vala'
+  - '/man'
+  - '*.a'
+  - '*.la'
 
 finish-args:
   - '--share=ipc'
@@ -16,6 +27,65 @@ finish-args:
   - '--device=dri'
 
 modules:
+  - name: granite
+    buildsystem: meson
+    cleanup:
+      - /bin
+      - /share/applications
+    sources:
+      - type: git
+        url: https://github.com/elementary/granite.git
+        tag: 6.0.0
+        commit: e6212b8e55bb35b14b1ebcb199ae2978b518a7f9
+
+  - name: elementary-stylesheet
+    buildsystem: meson
+    sources:
+      - type: git
+        url: https://github.com/elementary/stylesheet.git
+        tag: 6.0.0
+    modules:
+      - name: sassc
+        sources:
+          - type: git
+            url: https://github.com/sass/sassc.git
+            tag: 3.6.2
+          - type: script
+            dest-filename: autogen.sh
+            commands:
+              - autoreconf -si
+        cleanup:
+          - '*'
+        modules:
+          - name: libsass
+            cleanup:
+              - "*"
+            sources:
+              - type: git
+                url: https://github.com/sass/libsass.git
+                tag: 3.6.5
+              - type: script
+                dest-filename: autogen.sh
+                commands:
+                  - autoreconf -si
+
+  - name: elementary-icons
+    buildsystem: meson
+    config-opts:
+      - -Dpalettes=false
+    sources:
+      - type: git
+        url: https://github.com/elementary/icons.git
+        tag: 6.0.0
+    modules:
+      - name: xcursorgen
+        cleanup:
+          - "*"
+        sources:
+          - type: archive
+            url: https://gitlab.freedesktop.org/xorg/app/xcursorgen/-/archive/xcursorgen-1.0.7/xcursorgen-xcursorgen-1.0.7.tar.gz
+            sha256: 7fb30a052b63e3ed02c9e43bd70fe1bf8189f2f3d702ab43b5b0726a2dbafccd
+
   - name: akira
     buildsystem: meson
     sources:

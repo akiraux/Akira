@@ -47,7 +47,7 @@ You can install Akira by compiling it from the source
 
 ### Install Dependencies
 
- - `gtk+-3.0>=3.18`
+ - `gtk4>=4.0`
  - `granite>=6.0.0`
  - `glib-2.0`
  - `gee-0.8`

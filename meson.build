@@ -14,7 +14,7 @@ add_project_arguments('--vapidir=' + vapi_dir, language: 'vala')
 # Include the translations module
 i18n = import('i18n')
 # Dependencies
-gtk_dependency = dependency('gtk+-3.0')
+gtk_dependency = dependency('gtk4', version: '>= 4.0')
 granite_dependency = dependency('granite', version: '>= 6.0.0')
 gee_dependency = dependency('gee-0.8')
 libxml_dependency = dependency('libxml-2.0')
