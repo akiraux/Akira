@@ -68,7 +68,6 @@ public class Akira.Lib2.Modes.PathEditMode : AbstractInteractionMode {
 
         if (first_point.x == -1) {
             first_point = point;
-            print("First point %f %f\n", first_point.x, first_point.y);
             return false;
         }
 
@@ -79,18 +78,12 @@ public class Akira.Lib2.Modes.PathEditMode : AbstractInteractionMode {
         // add the new points to the drawable and path
         instance.components.path.add_point (point, -1);
 
+        // To calculate the new center of bounds of rectangle,
+        // move the center to point where user placed first point. This is represented as (0,0) internally
+        // then translate it to the relative center of bounding box of path.
         var bounds = instance.components.path.calculate_extents ();
-        print("bounds center %f %f\n", bounds.center_x, bounds.center_y);
-
-        double center_x = first_point.x + bounds.width / 2.0;
-        double center_y = first_point.y + bounds.height / 2.0;
-
-        if (event.x < first_point.x) {
-            center_x -= (first_point.x - event.x);
-        }
-        if (event.y < first_point.y) {
-            center_y -= (first_point.y - event.y);
-        }
+        double center_x = first_point.x + bounds.center_x;
+        double center_y = first_point.y + bounds.center_y;
 
         instance.components.center = new Lib2.Components.Coordinates (center_x, center_y);
         instance.components.size = new Lib2.Components.Size (bounds.width, bounds.height, false);

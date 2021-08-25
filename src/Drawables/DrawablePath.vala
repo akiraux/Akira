@@ -37,11 +37,14 @@ public class Akira.Drawables.DrawablePath : Drawable {
             return;
         }
 
+        Gee.ArrayList <Geometry.Point?> translated_points = recalculate_points ();
+
         cr.save ();
         cr.translate (center_x, center_y);
         cr.new_path ();
         var ct = 0;
-        foreach (var p in points) {
+
+        foreach (var p in translated_points) {
             if (ct == 0) {
                 cr.move_to (p.x, p.y);
             } else {
@@ -50,5 +53,28 @@ public class Akira.Drawables.DrawablePath : Drawable {
             ++ct;
         }
         cr.restore ();
+    }
+
+    /*
+     * This function shifts all points so that none of them are in negative space.
+     */
+    private Gee.ArrayList <Geometry.Point?> recalculate_points () {
+        double min_x = 0, min_y = 0;
+
+        foreach (var pt in points) {
+            if (pt.x < min_x) {
+                min_x = pt.x;
+            }
+            if (pt.y < min_y) {
+                min_y = pt.y;
+            }
+        }
+
+        Gee.ArrayList <Geometry.Point?> translated_points = new Gee.ArrayList<Geometry.Point?>();
+        foreach (var pt in points) {
+            translated_points.add (Geometry.Point (pt.x - min_x, pt.y - min_y));
+        }
+
+        return translated_points;
     }
 }
