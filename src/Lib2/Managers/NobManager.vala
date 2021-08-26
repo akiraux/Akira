@@ -46,6 +46,7 @@ public class Akira.Lib2.Managers.NobManager : Object {
         view_canvas.mode_manager.mode_changed.connect (on_update_select_effect);
         nob_layer = new ViewLayers.ViewLayerNobs ();
         nob_layer.add_to_canvas (ViewLayers.ViewLayer.NOBS_LAYER_ID, view_canvas);
+        nob_layer.set_visible(false);
     }
 
     public Utils.Nobs.Nob hit_test (double x, double y) {
@@ -56,6 +57,11 @@ public class Akira.Lib2.Managers.NobManager : Object {
     private void on_update_select_effect () {
         var sm = view_canvas.selection_manager;
         if (sm.is_empty ()) {
+            remove_select_effect ();
+            return;
+        }
+
+        if (nob_layer.is_visible == false) {
             remove_select_effect ();
             return;
         }

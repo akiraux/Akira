@@ -26,6 +26,8 @@ public class Akira.Lib2.Modes.PathEditMode : AbstractInteractionMode {
     public bool is_insert { get; construct; }
     // keep track of previous point for calculating relative positions of points
     private Geometry.Point first_point;
+    private ViewLayers.ViewLayerPath path_layer;
+
 
     public PathEditMode (Lib2.ViewCanvas canvas, bool is_insert, Lib2.Items.ModelInstance instance) {
         Object(
@@ -35,6 +37,10 @@ public class Akira.Lib2.Modes.PathEditMode : AbstractInteractionMode {
         );
 
         first_point = Geometry.Point(-1, -1);
+
+        // layer to show when editing paths
+        path_layer = new ViewLayers.ViewLayerPath ();
+        path_layer.add_to_canvas (ViewLayers.ViewLayer.PATH_LAYER_ID, view_canvas);
     }
 
     public override AbstractInteractionMode.ModeType mode_type () {
@@ -42,7 +48,7 @@ public class Akira.Lib2.Modes.PathEditMode : AbstractInteractionMode {
     }
 
     public override Utils.Nobs.Nob active_nob () {
-        return Utils.Nobs.Nob.ALL;
+        return Utils.Nobs.Nob.NONE;
     }
 
     public override void mode_begin () {}
@@ -68,6 +74,7 @@ public class Akira.Lib2.Modes.PathEditMode : AbstractInteractionMode {
 
         if (first_point.x == -1) {
             first_point = point;
+            path_layer.set_reference_point (first_point);
             return false;
         }
 
@@ -91,6 +98,8 @@ public class Akira.Lib2.Modes.PathEditMode : AbstractInteractionMode {
         // update the component
         view_canvas.items_manager.item_model.mark_node_geometry_dirty (view_canvas.items_manager.node_from_id (instance.id));
         view_canvas.items_manager.compile_model ();
+
+        path_layer.update_path_data (instance.components.path.data);
 
         return true;
     }
