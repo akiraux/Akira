@@ -418,7 +418,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
         model.changed (true);
     }
 
-    private bool on_click_event (Gdk.EventButton event) {
+    private bool on_click_event (Gdk.ButtonEvent event) {
         if (model.layer.locked) {
             return true;
         }
@@ -471,7 +471,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
         return false;
     }
 
-    public bool update_on_escape (Gdk.EventKey key) {
+    public bool update_on_escape (Gdk.KeyEvent key) {
         if (key.keyval == Gdk.Key.Escape) {
             entry.text = label.label;
 
@@ -499,7 +499,7 @@ public class Akira.Layouts.Partials.Artboard : Gtk.ListBoxRow {
         label.label = new_label;
     }
 
-    private bool handle_focus_in (Gdk.EventFocus event) {
+    private bool handle_focus_in (Gdk.FocusEvent event) {
         window.event_bus.disconnect_typing_accel ();
         return false;
     }

@@ -107,7 +107,7 @@ public class Akira.Widgets.InputField : Gtk.EventBox {
         entry.set_range (min_value, max_value);
     }
 
-    private bool handle_key_press (Gdk.EventKey event) {
+    private bool handle_key_press (Gdk.KeyEvent event) {
         // Arrow UP
         if (event.keyval == Gdk.Key.Up && (event.state & Gdk.ModifierType.SHIFT_MASK) > 0) {
             entry.spin (Gtk.SpinType.STEP_FORWARD, 10);
@@ -130,7 +130,7 @@ public class Akira.Widgets.InputField : Gtk.EventBox {
         return false;
     }
 
-    private bool handle_scroll_event (Gdk.EventScroll event) {
+    private bool handle_scroll_event (Gdk.ScrollEvent event) {
         // If the input field is not focused, don't change the value.
         if (!entry.has_focus) {
             return true;
@@ -138,7 +138,7 @@ public class Akira.Widgets.InputField : Gtk.EventBox {
         return false;
     }
 
-    private bool handle_focus_in (Gdk.EventFocus event) {
+    private bool handle_focus_in (Gdk.FocusEvent event) {
         Akira.Window window = get_toplevel () as Akira.Window;
         if (!(window is Akira.Window)) {
             return true;
@@ -148,7 +148,7 @@ public class Akira.Widgets.InputField : Gtk.EventBox {
         return false;
     }
 
-    private bool handle_focus_out (Gdk.EventFocus event) {
+    private bool handle_focus_out (Gdk.FocusEvent event) {
         Akira.Window window = get_toplevel () as Akira.Window;
         if (!(window is Akira.Window)) {
             return true;

@@ -43,7 +43,7 @@ public class Akira.Lib.Modes.PanMode : AbstractInteractionMode {
         return panning ? Gdk.CursorType.HAND2 : Gdk.CursorType.HAND1;
     }
 
-    public override bool key_press_event (Gdk.EventKey event) {
+    public override bool key_press_event (Gdk.KeyEvent event) {
         uint uppercase_keyval = Gdk.keyval_to_upper (event.keyval);
         if (uppercase_keyval == Gdk.Key.space) {
             space_held = true;
@@ -51,7 +51,7 @@ public class Akira.Lib.Modes.PanMode : AbstractInteractionMode {
         return true;
     }
 
-    public override bool key_release_event (Gdk.EventKey event) {
+    public override bool key_release_event (Gdk.KeyEvent event) {
         uint uppercase_keyval = Gdk.keyval_to_upper (event.keyval);
         if (uppercase_keyval == Gdk.Key.space) {
             space_held = false;
@@ -63,7 +63,7 @@ public class Akira.Lib.Modes.PanMode : AbstractInteractionMode {
         return true;
     }
 
-    public override bool button_press_event (Gdk.EventButton event) {
+    public override bool button_press_event (Gdk.ButtonEvent event) {
         if (!panning && (space_held || event.button == Gdk.BUTTON_MIDDLE)) {
             origin_x = event.x;
             origin_y = event.y;
@@ -74,7 +74,7 @@ public class Akira.Lib.Modes.PanMode : AbstractInteractionMode {
         return true;
     }
 
-    public override bool button_release_event (Gdk.EventButton event) {
+    public override bool button_release_event (Gdk.ButtonEvent event) {
         toggle_panning (false);
 
         if (!space_held) {
@@ -84,7 +84,7 @@ public class Akira.Lib.Modes.PanMode : AbstractInteractionMode {
         return true;
     }
 
-    public override bool motion_notify_event (Gdk.EventMotion event) {
+    public override bool motion_notify_event (Gdk.MotionEvent event) {
         if (panning) {
             canvas.canvas_moved (event.x, event.y);
         }

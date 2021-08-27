@@ -108,37 +108,37 @@ public class Akira.Window : Gtk.ApplicationWindow {
             on_destroy ();
         }
 
-        if (edited) {
-            var dialog = dialogs.message_dialog (
-                _("Are you sure you want to quit?"),
-                _("All unsaved data will be lost and impossible to recover."),
-                "system-shutdown",
-                _("Quit without saving!"),
-                _("Save file")
-            );
+        // if (edited) {
+        //     var dialog = dialogs.message_dialog (
+        //         _("Are you sure you want to quit?"),
+        //         _("All unsaved data will be lost and impossible to recover."),
+        //         "system-shutdown",
+        //         _("Quit without saving!"),
+        //         _("Save file")
+        //     );
 
-            dialog.show_all ();
+        //     dialog.show_all ();
 
-            dialog.response.connect ((id) => {
-                switch (id) {
-                    case Gtk.ResponseType.ACCEPT:
-                        dialog.destroy ();
-                        close_current_file ();
-                        app.get_active_window ().destroy ();
-                        on_destroy ();
-                        break;
-                    case 2:
-                        dialog.destroy ();
-                        file_manager.save_file ();
-                        break;
-                    default:
-                        dialog.destroy ();
-                        break;
-                }
-            });
+        //     dialog.response.connect ((id) => {
+        //         switch (id) {
+        //             case Gtk.ResponseType.ACCEPT:
+        //                 dialog.destroy ();
+        //                 close_current_file ();
+        //                 app.get_active_window ().destroy ();
+        //                 on_destroy ();
+        //                 break;
+        //             case 2:
+        //                 dialog.destroy ();
+        //                 file_manager.save_file ();
+        //                 break;
+        //             default:
+        //                 dialog.destroy ();
+        //                 break;
+        //         }
+        //     });
 
-            dialog.run ();
-        }
+        //     dialog.run ();
+        // }
 
         return true;
     }

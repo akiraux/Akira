@@ -156,23 +156,25 @@ public class Akira.Application : Gtk.Application {
         gtk_settings.set_property ("gtk-icon-theme-name", "elementary");
         gtk_settings.set_property ("gtk-theme-name", "io.elementary.stylesheet.blueberry");
 
-        // Use the Granite API to listen for global dark style changes.
-        var granite_settings = Granite.Settings.get_default ();
-        if (settings.follow_system_theme) {
-            // Follow the system themeing.
-            gtk_settings.gtk_application_prefer_dark_theme =
-                granite_settings.prefers_color_scheme == Granite.Settings.ColorScheme.DARK;
-        } else {
-            // Follow the user's settings.
-            gtk_settings.gtk_application_prefer_dark_theme = settings.dark_theme;
-        }
+        gtk_settings.gtk_application_prefer_dark_theme = settings.dark_theme;
 
-        // Listen for the changes in the theme's preferences.
-        granite_settings.notify["prefers-color-scheme"].connect (() => {
-            if (settings.follow_system_theme) {
-                gtk_settings.gtk_application_prefer_dark_theme =
-                    granite_settings.prefers_color_scheme == Granite.Settings.ColorScheme.DARK;
-            }
-        });
+        // Use the Granite API to listen for global dark style changes.
+        // var granite_settings = Granite.Settings.get_default ();
+        // if (settings.follow_system_theme) {
+        //     // Follow the system themeing.
+        //     gtk_settings.gtk_application_prefer_dark_theme =
+        //         granite_settings.prefers_color_scheme == Granite.Settings.ColorScheme.DARK;
+        // } else {
+        //     // Follow the user's settings.
+        //     gtk_settings.gtk_application_prefer_dark_theme = settings.dark_theme;
+        // }
+
+        // // Listen for the changes in the theme's preferences.
+        // granite_settings.notify["prefers-color-scheme"].connect (() => {
+        //     if (settings.follow_system_theme) {
+        //         gtk_settings.gtk_application_prefer_dark_theme =
+        //             granite_settings.prefers_color_scheme == Granite.Settings.ColorScheme.DARK;
+        //     }
+        // });
     }
 }

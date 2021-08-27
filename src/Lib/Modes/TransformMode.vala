@@ -127,26 +127,26 @@ public class Akira.Lib.Modes.TransformMode : AbstractInteractionMode {
         return Utils.Nobs.cursor_from_nob (nob);
     }
 
-    public override bool key_press_event (Gdk.EventKey event) {
+    public override bool key_press_event (Gdk.KeyEvent event) {
         return true;
     }
 
-    public override bool key_release_event (Gdk.EventKey event) {
+    public override bool key_release_event (Gdk.KeyEvent event) {
         return false;
     }
 
-    public override bool button_press_event (Gdk.EventButton event) {
+    public override bool button_press_event (Gdk.ButtonEvent event) {
         initial_drag_state.press_x = event.x;
         initial_drag_state.press_y = event.y;
         return true;
     }
 
-    public override bool button_release_event (Gdk.EventButton event) {
+    public override bool button_release_event (Gdk.ButtonEvent event) {
         request_deregistration (mode_type ());
         return true;
     }
 
-    public override bool motion_notify_event (Gdk.EventMotion event) {
+    public override bool motion_notify_event (Gdk.MotionEvent event) {
         switch (nob) {
             case Utils.Nobs.Nob.NONE:
                 move_from_event (

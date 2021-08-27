@@ -60,21 +60,21 @@ public class Akira.Lib.Modes.ItemInsertMode : AbstractInteractionMode {
         return Gdk.CursorType.CROSSHAIR;
     }
 
-    public override bool key_press_event (Gdk.EventKey event) {
+    public override bool key_press_event (Gdk.KeyEvent event) {
         if (transform_mode != null) {
             return transform_mode.key_press_event (event);
         }
         return false;
     }
 
-    public override bool key_release_event (Gdk.EventKey event) {
+    public override bool key_release_event (Gdk.KeyEvent event) {
         if (transform_mode != null) {
             return transform_mode.key_press_event (event);
         }
         return false;
      }
 
-    public override bool button_press_event (Gdk.EventButton event) {
+    public override bool button_press_event (Gdk.ButtonEvent event) {
         if (transform_mode != null) {
             return transform_mode.button_press_event (event);
         }
@@ -105,7 +105,7 @@ public class Akira.Lib.Modes.ItemInsertMode : AbstractInteractionMode {
         return false;
     }
 
-    public override bool button_release_event (Gdk.EventButton event) {
+    public override bool button_release_event (Gdk.ButtonEvent event) {
         if (transform_mode != null) {
             transform_mode.button_release_event (event);
             request_deregistration (mode_type ());
@@ -114,7 +114,7 @@ public class Akira.Lib.Modes.ItemInsertMode : AbstractInteractionMode {
         return true;
     }
 
-    public override bool motion_notify_event (Gdk.EventMotion event) {
+    public override bool motion_notify_event (Gdk.MotionEvent event) {
         if (transform_mode != null) {
             return transform_mode.motion_notify_event (event);
         }

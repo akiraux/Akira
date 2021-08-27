@@ -166,7 +166,7 @@ public class Akira.Lib.Managers.ModeManager : Object {
         return active_mode != null ? active_mode.cursor_type () : null;
     }
 
-    public bool key_press_event (Gdk.EventKey event) {
+    public bool key_press_event (Gdk.KeyEvent event) {
         if (pan_mode != null && pan_mode.key_press_event (event)) {
             return false;
         }
@@ -174,7 +174,7 @@ public class Akira.Lib.Managers.ModeManager : Object {
         return (active_mode != null) ? active_mode.key_press_event (event) : false;
     }
 
-    public bool key_release_event (Gdk.EventKey event) {
+    public bool key_release_event (Gdk.KeyEvent event) {
         if (pan_mode != null && pan_mode.key_release_event (event)) {
             return true;
         }
@@ -182,7 +182,7 @@ public class Akira.Lib.Managers.ModeManager : Object {
         return (active_mode != null) ? active_mode.key_release_event (event) : false;
     }
 
-    public bool button_press_event (Gdk.EventButton event) {
+    public bool button_press_event (Gdk.ButtonEvent event) {
         if (pan_mode != null && pan_mode.button_press_event (event)) {
             return true;
         }
@@ -190,7 +190,7 @@ public class Akira.Lib.Managers.ModeManager : Object {
         return (active_mode != null) ? active_mode.button_press_event (event) : false;
     }
 
-    public bool button_release_event (Gdk.EventButton event) {
+    public bool button_release_event (Gdk.ButtonEvent event) {
         if (pan_mode != null && pan_mode.button_release_event (event)) {
             return true;
         }
@@ -198,7 +198,7 @@ public class Akira.Lib.Managers.ModeManager : Object {
         return (active_mode != null) ? active_mode.button_release_event (event) : false;
     }
 
-    public bool motion_notify_event (Gdk.EventMotion event) {
+    public bool motion_notify_event (Gdk.MotionEvent event) {
         if (pan_mode != null && pan_mode.motion_notify_event (event)) {
             return true;
         }

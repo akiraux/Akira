@@ -186,7 +186,7 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
         grab_focus ();
     }
 
-    public override bool key_press_event (Gdk.EventKey event) {
+    public override bool key_press_event (Gdk.KeyEvent event) {
         uint uppercase_keyval = Gdk.keyval_to_upper (event.keyval);
 
         switch (uppercase_keyval) {
@@ -245,7 +245,7 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
         return false;
     }
 
-    public override bool key_release_event (Gdk.EventKey event) {
+    public override bool key_release_event (Gdk.KeyEvent event) {
         uint uppercase_keyval = Gdk.keyval_to_upper (event.keyval);
 
         switch (uppercase_keyval) {
@@ -272,7 +272,7 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
         return false;
     }
 
-    public override bool button_press_event (Gdk.EventButton event) {
+    public override bool button_press_event (Gdk.ButtonEvent event) {
         base.button_press_event (event);
 
         hover_manager.remove_hover_effect ();
@@ -302,7 +302,7 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
      * Check if a selection exists, and transform it appropriately, return true if
      * the event should be abosrbed.
      */
-    private bool handle_selection_press_event (Gdk.EventButton event) {
+    private bool handle_selection_press_event (Gdk.ButtonEvent event) {
         var nob_clicked = nob_manager.hit_test (event.x, event.y);
 
         if (nob_clicked == Utils.Nobs.Nob.NONE) {
@@ -336,7 +336,7 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
         return false;
     }
 
-    public override bool button_release_event (Gdk.EventButton event) {
+    public override bool button_release_event (Gdk.ButtonEvent event) {
         event.x = event.x / current_scale;
         event.y = event.y / current_scale;
 
@@ -346,7 +346,7 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
         return false;
     }
 
-    public override bool motion_notify_event (Gdk.EventMotion event) {
+    public override bool motion_notify_event (Gdk.MotionEvent event) {
         event.x = event.x / current_scale;
         event.y = event.y / current_scale;
 

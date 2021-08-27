@@ -95,7 +95,7 @@ public class Akira.Layouts.MainViewCanvas : Gtk.Grid {
         add (main_overlay);
     }
 
-    public bool on_scroll (Gdk.EventScroll event) {
+    public bool on_scroll (Gdk.ScrollEvent event) {
         bool is_shift = (event.state & Gdk.ModifierType.SHIFT_MASK) > 0;
         bool is_ctrl = (event.state & Gdk.ModifierType.CONTROL_MASK) > 0;
 

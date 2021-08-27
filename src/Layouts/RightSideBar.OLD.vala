@@ -76,9 +76,9 @@ public class Akira.Layouts.RightSideBar : Gtk.Grid {
         layers_scroll.add (layers_grid);
 
         var scrolled_child = layers_scroll.get_child ();
-        if (scrolled_child is Gtk.Container) {
-            ((Gtk.Container) scrolled_child).set_focus_vadjustment (new Gtk.Adjustment (0, 0, 0, 0, 0, 0));
-        }
+        // if (scrolled_child is Gtk.Container) {
+        //     ((Gtk.Container) scrolled_child).set_focus_vadjustment (new Gtk.Adjustment (0, 0, 0, 0, 0, 0));
+        // }
 
         // Motion revealer for Drag and Drop on the top search bar.
         var motion_grid = new Gtk.Grid ();
@@ -213,7 +213,7 @@ public class Akira.Layouts.RightSideBar : Gtk.Grid {
         window.event_bus.change_z_selected (true, true);
     }
 
-    private bool handle_focus_in (Gdk.EventFocus event) {
+    private bool handle_focus_in (Gdk.FocusEvent event) {
         if (!(window is Akira.Window)) {
             return true;
         }
@@ -222,7 +222,7 @@ public class Akira.Layouts.RightSideBar : Gtk.Grid {
         return false;
     }
 
-    private bool handle_focus_out (Gdk.EventFocus event) {
+    private bool handle_focus_out (Gdk.FocusEvent event) {
         if (!(window is Akira.Window)) {
             return true;
         }

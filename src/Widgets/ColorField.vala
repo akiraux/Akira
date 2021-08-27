@@ -80,17 +80,17 @@ public class Akira.Widgets.ColorField : Gtk.Entry {
         }
     }
 
-    private bool handle_focus_in (Gdk.EventFocus event) {
+    private bool handle_focus_in (Gdk.FocusEvent event) {
         window.event_bus.disconnect_typing_accel ();
         return false;
     }
 
-    private bool handle_focus_out (Gdk.EventFocus event) {
+    private bool handle_focus_out (Gdk.FocusEvent event) {
         window.event_bus.connect_typing_accel ();
         return false;
     }
 
-    private bool handle_key_press (Gdk.EventKey event) {
+    private bool handle_key_press (Gdk.KeyEvent event) {
         // Enter or Escape
         if (event.keyval == Gdk.Key.Return || event.keyval == Gdk.Key.Escape) {
             window.event_bus.set_focus_on_canvas ();

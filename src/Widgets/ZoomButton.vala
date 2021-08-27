@@ -129,7 +129,7 @@ public class Akira.Widgets.ZoomButton : Gtk.Grid {
      * input field for manual inputing if the user pressed the CTRL key
      * while clicking on the button.
      */
-    public bool zoom_reset (Gdk.EventButton event) {
+    public bool zoom_reset (Gdk.ButtonEvent event) {
         // If the CTRL key was pressed, show the popover with the input field.
         if ((event.state & Gdk.ModifierType.CONTROL_MASK) > 0) {
             zoom_popover.popup ();
@@ -156,7 +156,7 @@ public class Akira.Widgets.ZoomButton : Gtk.Grid {
     /*
      * Key press events on the input field.
      */
-    private bool handle_key_press (Gdk.EventKey event) {
+    private bool handle_key_press (Gdk.KeyEvent event) {
         // Arrow UP pressed, increase value by 1.
         if (event.keyval == Gdk.Key.Up) {
             window.event_bus.adjust_zoom (0.1, true, null);
@@ -210,7 +210,7 @@ public class Akira.Widgets.ZoomButton : Gtk.Grid {
     /*
      * When the input field gains focus.
      */
-    private bool handle_focus_in (Gdk.EventFocus event) {
+    private bool handle_focus_in (Gdk.FocusEvent event) {
         window.event_bus.disconnect_typing_accel ();
         return false;
     }
@@ -218,7 +218,7 @@ public class Akira.Widgets.ZoomButton : Gtk.Grid {
     /*
      * When the input field loses focus.
      */
-    private bool handle_focus_out (Gdk.EventFocus event) {
+    private bool handle_focus_out (Gdk.FocusEvent event) {
         window.event_bus.connect_typing_accel ();
         return false;
     }

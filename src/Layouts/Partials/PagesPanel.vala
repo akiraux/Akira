@@ -31,9 +31,9 @@ public class Akira.Layouts.Partials.PagesPanel : Gtk.ListBox {
     // private const int SCROLL_DISTANCE = 30;
     // private const int SCROLL_DELAY = 50;
 
-    private const Gtk.TargetEntry TARGET_ENTRIES[] = {
-        { "PAGES", Gtk.TargetFlags.SAME_APP, 0 }
-    };
+    // private const Gtk.TargetEntry TARGET_ENTRIES[] = {
+    //     { "PAGES", Gtk.TargetFlags.SAME_APP, 0 }
+    // };
 
     public PagesPanel (Akira.Window window) {
         Object (

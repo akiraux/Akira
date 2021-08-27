@@ -36,7 +36,7 @@ public class Akira.Services.EventBus : Object {
     public signal void coordinate_change (double x, double y);
     public signal void insert_item (string type);
     public signal void item_inserted ();
-    public signal void move_item_from_canvas (Gdk.EventKey event);
+    public signal void move_item_from_canvas (Gdk.KeyEvent event);
     public signal void request_escape ();
     public signal void set_focus_on_canvas ();
     public signal void update_nob_size ();

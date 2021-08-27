@@ -103,7 +103,7 @@ public class Akira.Layouts.MainCanvas : Gtk.Grid {
         window.event_bus.canvas_notification.connect (trigger_notification);
     }
 
-    public bool on_scroll (Gdk.EventScroll event) {
+    public bool on_scroll (Gdk.ScrollEvent event) {
         bool is_shift = (event.state & Gdk.ModifierType.SHIFT_MASK) > 0;
         bool is_ctrl = (event.state & Gdk.ModifierType.CONTROL_MASK) > 0;
 
@@ -159,7 +159,7 @@ public class Akira.Layouts.MainCanvas : Gtk.Grid {
         return true;
     }
 
-    private void zoom_on_cursor (Gdk.EventScroll event, double old_zoom) {
+    private void zoom_on_cursor (Gdk.ScrollEvent event, double old_zoom) {
         // The regular zoom mode shifts the visible viewing area
         // to center itself (it already has one translation applied)
         // so you cannot just move the viewing area by the distance

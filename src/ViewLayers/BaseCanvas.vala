@@ -235,7 +235,7 @@ public class Akira.ViewLayers.BaseCanvas : Gtk.Widget , Gtk.Scrollable {
         reconfigure (true);
     }
 
-    public override bool scroll_event (Gdk.EventScroll event) {
+    public override bool scroll_event (Gdk.ScrollEvent event) {
         Gtk.Adjustment adj;
         if (event.direction == Gdk.ScrollDirection.UP || event.direction == Gdk.ScrollDirection.DOWN) {
             adj = vadjustment;

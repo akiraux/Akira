@@ -27,16 +27,16 @@ finish-args:
   - '--device=dri'
 
 modules:
-  - name: granite
-    buildsystem: meson
-    cleanup:
-      - /bin
-      - /share/applications
-    sources:
-      - type: git
-        url: https://github.com/elementary/granite.git
-        tag: 6.0.0
-        commit: e6212b8e55bb35b14b1ebcb199ae2978b518a7f9
+  #- name: granite
+  #  buildsystem: meson
+  #  cleanup:
+  #    - /bin
+  #    - /share/applications
+  #  sources:
+  #    - type: git
+  #      url: https://github.com/elementary/granite.git
+  #      tag: 6.0.0
+  #      commit: e6212b8e55bb35b14b1ebcb199ae2978b518a7f9
 
   - name: elementary-stylesheet
     buildsystem: meson

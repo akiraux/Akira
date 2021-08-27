@@ -87,35 +87,35 @@ public abstract class Akira.Lib.Modes.AbstractInteractionMode : Object {
     /*
      * Override to define key press event. Return true to absorb.
      */
-    public virtual bool key_press_event (Gdk.EventKey event) {
+    public virtual bool key_press_event (Gdk.KeyEvent event) {
         return false;
     }
 
     /*
      * Override to define key release event. Return true to absorb.
      */
-    public virtual bool key_release_event (Gdk.EventKey event) {
+    public virtual bool key_release_event (Gdk.KeyEvent event) {
         return false;
     }
 
     /*
      * Override to define button press event. Return true to absorb.
      */
-    public virtual bool button_press_event (Gdk.EventButton event) {
+    public virtual bool button_press_event (Gdk.ButtonEvent event) {
         return false;
     }
 
     /*
      * Override to define button release event. Return true to absorb.
      */
-    public virtual bool button_release_event (Gdk.EventButton event) {
+    public virtual bool button_release_event (Gdk.ButtonEvent event) {
         return false;
     }
 
     /*
      * Override to define mouse motion event. Return true to absorb.
      */
-    public virtual bool motion_notify_event (Gdk.EventMotion event) {
+    public virtual bool motion_notify_event (Gdk.MotionEvent event) {
         return false;
     }
 

@@ -143,7 +143,7 @@ sources = files(
 
 deps = [
     gtk_dependency,
-    granite_dependency,
+    #granite_dependency,
     gee_dependency,
     libxml_dependency,
     cairo_dependency,

@@ -41,11 +41,11 @@ public class Akira.Layouts.Sidebars.LayersSidebar : Gtk.Grid {
 
     // Drag and Drop properties.
     private Gtk.Revealer motion_revealer;
-    private Gtk.TargetList drop_targets;
-    private const Gtk.TargetEntry TARGET_ENTRIES[] = {
-        { "ARTBOARD", Gtk.TargetFlags.SAME_APP, 0 },
-        { "LAYER", Gtk.TargetFlags.SAME_APP, 0 }
-    };
+    // private Gtk.TargetList drop_targets;
+    // private const Gtk.TargetEntry TARGET_ENTRIES[] = {
+    //     { "ARTBOARD", Gtk.TargetFlags.SAME_APP, 0 },
+    //     { "LAYER", Gtk.TargetFlags.SAME_APP, 0 }
+    // };
 
     public Layouts.Sidebars.Partials.LayersPanel layers_panel;
     public Gtk.ScrolledWindow layers_scroll;
@@ -76,13 +76,6 @@ public class Akira.Layouts.Sidebars.LayersSidebar : Gtk.Grid {
         layers_scroll = new Gtk.ScrolledWindow (null, null);
         layers_scroll.expand = true;
         layers_scroll.add (layers_grid);
-
-        var scrolled_child = layers_scroll.get_child ();
-        if (scrolled_child is Gtk.Container) {
-           ((Gtk.Container) scrolled_child).set_focus_vadjustment (
-               new Gtk.Adjustment (0, 0, 0, 0, 0, 0)
-            );
-        }
 
         // Motion revealer for Drag and Drop on the top search bar.
         var motion_grid = new Gtk.Grid ();
@@ -122,12 +115,12 @@ public class Akira.Layouts.Sidebars.LayersSidebar : Gtk.Grid {
         return search_grid;
     }
 
-    private bool handle_focus_in (Gdk.EventFocus event) {
+    private bool handle_focus_in (Gdk.FocusEvent event) {
         view_canvas.window.event_bus.disconnect_typing_accel ();
         return false;
     }
 
-    private bool handle_focus_out (Gdk.EventFocus event) {
+    private bool handle_focus_out (Gdk.FocusEvent event) {
         view_canvas.window.event_bus.connect_typing_accel ();
         return false;
     }

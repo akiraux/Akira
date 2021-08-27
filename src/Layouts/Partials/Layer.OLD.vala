@@ -499,7 +499,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
      * @param {Gdk.Event} event - The button click event.
      * @return {bool} True to stop propagation, False to let other events run.
      */
-    public bool on_click_event (Gdk.EventButton event) {
+    public bool on_click_event (Gdk.ButtonEvent event) {
         if (model.layer.locked) {
             return true;
         }
@@ -556,7 +556,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
         return false;
     }
 
-    public bool update_on_escape (Gdk.EventKey key) {
+    public bool update_on_escape (Gdk.KeyEvent key) {
         if (key.keyval == Gdk.Key.Escape) {
             entry.text = label.label;
 
@@ -697,7 +697,7 @@ public class Akira.Layouts.Partials.Layer : Gtk.ListBoxRow {
         return should_scroll;
     }
 
-    private bool handle_focus_in (Gdk.EventFocus event) {
+    private bool handle_focus_in (Gdk.FocusEvent event) {
         window.event_bus.disconnect_typing_accel ();
         return false;
     }

@@ -24,8 +24,8 @@ public class Akira.Utils.ColorPicker : Gtk.Window {
     public signal void picked (Gdk.RGBA color);
     public signal void cancelled ();
     public signal void moved (Gdk.RGBA color);
-    public signal void key_pressed (Gdk.EventKey e);
-    public signal void key_released (Gdk.EventKey e);
+    public signal void key_pressed (Gdk.KeyEvent e);
+    public signal void key_released (Gdk.KeyEvent e);
 
     const string DARK_BORDER_COLOR_STRING = "#333333";
     private Gdk.RGBA dark_border_color = Gdk.RGBA ();
@@ -83,7 +83,7 @@ public class Akira.Utils.ColorPicker : Gtk.Window {
     }
 
 
-    public override bool button_release_event (Gdk.EventButton e) {
+    public override bool button_release_event (Gdk.ButtonEvent e) {
         // button_1 is left mouse button
         if (e.button == 1) {
             Gdk.RGBA color = get_color_at ((int) e.x_root, (int) e.y_root);
@@ -102,7 +102,7 @@ public class Akira.Utils.ColorPicker : Gtk.Window {
     }
 
 
-    public override bool motion_notify_event (Gdk.EventMotion e) {
+    public override bool motion_notify_event (Gdk.MotionEvent e) {
         Gdk.RGBA color = get_color_at ((int) e.x_root, (int) e.y_root);
 
         moved (color);
@@ -113,7 +113,7 @@ public class Akira.Utils.ColorPicker : Gtk.Window {
     }
 
 
-    public override bool scroll_event (Gdk.EventScroll e) {
+    public override bool scroll_event (Gdk.ScrollEvent e) {
         switch (e.direction) {
             case Gdk.ScrollDirection.UP:
                 if (zoomlevel < max_zoomlevel) {
@@ -246,7 +246,7 @@ public class Akira.Utils.ColorPicker : Gtk.Window {
     }
 
 
-    public override bool key_press_event (Gdk.EventKey e) {
+    public override bool key_press_event (Gdk.KeyEvent e) {
         var manager = Gdk.Display.get_default ().get_default_seat ();
         int px, py;
         get_window ().get_device_position (manager.get_pointer (), out px, out py, null);
@@ -278,7 +278,7 @@ public class Akira.Utils.ColorPicker : Gtk.Window {
         return true;
     }
 
-    public override bool key_release_event (Gdk.EventKey e) {
+    public override bool key_release_event (Gdk.KeyEvent e) {
         key_released (e);
 
         return true;
