@@ -133,10 +133,6 @@ public class Akira.Lib2.Modes.ItemInsertMode : AbstractInteractionMode {
             request_deregistration (mode_type ());
         }
 
-        if (path_edit_mode != null) {
-            return false;
-        }
-
         return true;
     }
 

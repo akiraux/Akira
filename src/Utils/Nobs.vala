@@ -56,7 +56,6 @@ public class Akira.Utils.Nobs : Object {
         public bool active;
 
         public NobData (Nob id, double center_x, double center_y, bool active) {
-            print("create nobs at %f %f\n", center_x, center_y);
             this.handle_id = id;
             this.center_x = center_x;
             this.center_y = center_y;

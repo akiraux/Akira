@@ -81,6 +81,7 @@ public class Akira.Lib2.Modes.TransformMode : AbstractInteractionMode {
             return;
         }
 
+        view_canvas.toggle_layer_visibility (ViewLayers.ViewLayer.NOBS_LAYER_ID, true);
         selection = view_canvas.selection_manager.selection;
         initial_drag_state.area = selection.coordinates ();
 

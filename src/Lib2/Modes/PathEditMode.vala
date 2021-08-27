@@ -51,9 +51,16 @@ public class Akira.Lib2.Modes.PathEditMode : AbstractInteractionMode {
         return Utils.Nobs.Nob.NONE;
     }
 
-    public override void mode_begin () {}
+    public override void mode_begin () {
+        // hide the nobs and show the path layer
+        view_canvas.toggle_layer_visibility (ViewLayers.ViewLayer.NOBS_LAYER_ID, false);
+        view_canvas.toggle_layer_visibility (ViewLayers.ViewLayer.PATH_LAYER_ID, true);
+    }
 
     public override void mode_end () {
+        // hide the path layer and show nobs
+        view_canvas.toggle_layer_visibility (ViewLayers.ViewLayer.NOBS_LAYER_ID, true);
+        view_canvas.toggle_layer_visibility (ViewLayers.ViewLayer.PATH_LAYER_ID, false);
     }
 
     public override Gdk.CursorType? cursor_type () {
@@ -74,7 +81,8 @@ public class Akira.Lib2.Modes.PathEditMode : AbstractInteractionMode {
 
         if (first_point.x == -1) {
             first_point = point;
-            path_layer.set_reference_point (first_point);
+            var coords = view_canvas.selection_manager.selection.coordinates();
+            path_layer.set_reference_point ( Geometry.Point (coords.center_x, coords.center_y));
             return false;
         }
 

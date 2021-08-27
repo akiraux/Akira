@@ -39,6 +39,10 @@ public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
     }
 
     public override void draw_layer (Cairo.Context context, Geometry.Rectangle target_bounds, double scale) {
+        if (is_visible == false) {
+            return;
+        }
+
         if (canvas == null || points == null) {
             return;
         }
@@ -52,7 +56,7 @@ public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
         context.new_path ();
     }
 
-    public void draw_points (Cairo.Context context) {
+    private void draw_points (Cairo.Context context) {
         if (points == null) {
             return;
         }
@@ -78,7 +82,7 @@ public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
     }
 
     private void recalculate_extents () {
-        extents = new Geometry.Rectangle.empty ();
+        extents = Geometry.Rectangle.empty ();
 
         foreach (var pt in points) {
             if (pt.x < extents.left) {

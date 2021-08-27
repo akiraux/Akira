@@ -36,6 +36,10 @@ public class Akira.ViewLayers.ViewLayerNobs : ViewLayer {
     }
 
     public override void draw_layer (Cairo.Context context, Geometry.Rectangle target_bounds, double scale) {
+        if (is_visible == false) {
+            return;
+        }
+
         if (canvas == null || nobs == null || !nobs.any_active ()) {
             return;
         }
