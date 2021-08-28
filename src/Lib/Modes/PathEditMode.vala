@@ -83,6 +83,7 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
             first_point = point;
             var coords = view_canvas.selection_manager.selection.coordinates ();
             path_layer.set_reference_point ( Geometry.Point (coords.center_x, coords.center_y));
+            path_layer.update_path_data (instance.components.path.data);
             return false;
         }
 
