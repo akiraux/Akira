@@ -117,11 +117,11 @@ public class Akira.Widgets.LinkedInput : Gtk.Grid {
         }
 
         if (event.type == Gdk.EventType.ENTER_NOTIFY) {
-            set_cursor_from_name ("ew-resize");
+            // set_cursor_from_name ("ew-resize");
         }
 
         if (event.type == Gdk.EventType.LEAVE_NOTIFY) {
-            set_cursor (Gdk.CursorType.ARROW);
+            // set_cursor (Gdk.CursorType.ARROW);
         }
 
         if (event.type == Gdk.EventType.BUTTON_PRESS) {
@@ -150,13 +150,13 @@ public class Akira.Widgets.LinkedInput : Gtk.Grid {
         return false;
     }
 
-    private void set_cursor (Gdk.CursorType cursor_type) {
-        var cursor = new Gdk.Cursor.for_display (Gdk.Display.get_default (), cursor_type);
-        get_window ().set_cursor (cursor);
-    }
+    // private void set_cursor (Gdk.CursorType cursor_type) {
+    //     var cursor = new Gdk.Cursor.for_display (Gdk.Display.get_default (), cursor_type);
+    //     get_window ().set_cursor (cursor);
+    // }
 
-    private void set_cursor_from_name (string name) {
-        var cursor = new Gdk.Cursor.from_name (Gdk.Display.get_default (), name);
-        get_window ().set_cursor (cursor);
-    }
+    // private void set_cursor_from_name (string name) {
+    //     var cursor = new Gdk.Cursor.from_name (Gdk.Display.get_default (), name);
+    //     get_window ().set_cursor (cursor);
+    // }
 }

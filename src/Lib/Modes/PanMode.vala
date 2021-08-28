@@ -39,9 +39,9 @@ public class Akira.Lib.Modes.PanMode : AbstractInteractionMode {
     public override AbstractInteractionMode.ModeType mode_type () { return AbstractInteractionMode.ModeType.PAN; }
 
 
-    public override Gdk.CursorType? cursor_type () {
-        return panning ? Gdk.CursorType.HAND2 : Gdk.CursorType.HAND1;
-    }
+    // public override Gdk.CursorType? cursor_type () {
+    //     return panning ? Gdk.CursorType.HAND2 : Gdk.CursorType.HAND1;
+    // }
 
     public override bool key_press_event (Gdk.KeyEvent event) {
         uint uppercase_keyval = Gdk.keyval_to_upper (event.keyval);

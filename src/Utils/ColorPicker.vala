@@ -135,106 +135,105 @@ public class Akira.Utils.ColorPicker : Gtk.Window {
     }
 
     public void set_magnifier_cursor () {
-        var manager = Gdk.Display.get_default ().get_default_seat ();
+        // var manager = Gdk.Display.get_default ().get_default_seat ();
 
-        // get cursor position
-         int px, py;
-         get_window ().get_device_position (manager.get_pointer (), out px, out py, null);
+        // // get cursor position
+        //  int px, py;
+        //  get_window ().get_device_position (manager.get_pointer (), out px, out py, null);
 
-         var radius = snapsize * zoomlevel / 2;
+        //  var radius = snapsize * zoomlevel / 2;
 
-         // get a small area (snap) meant to be zoomed
-         var snapped_pixbuf = snap (px - snapsize / 2, py - snapsize / 2, snapsize, snapsize);
+        //  // get a small area (snap) meant to be zoomed
+        //  var snapped_pixbuf = snap (px - snapsize / 2, py - snapsize / 2, snapsize, snapsize);
 
-         // Zoom that screenshot up, and grab a snapsize-sized piece from the middle
-         var scaled_pb = snapped_pixbuf.scale_simple (
-            snapsize * zoomlevel + shadow_width * 2 ,
-            snapsize * zoomlevel + shadow_width * 2 ,
-            Gdk.InterpType.NEAREST
-        );
-
-
-         // Create the base surface for our cursor
-         var base_surface = new Cairo.ImageSurface (
-            Cairo.Format.ARGB32,
-            snapsize * zoomlevel + shadow_width * 2 ,
-            snapsize * zoomlevel + shadow_width * 2
-        );
-
-         var base_context = new Cairo.Context (base_surface);
+        //  // Zoom that screenshot up, and grab a snapsize-sized piece from the middle
+        //  var scaled_pb = snapped_pixbuf.scale_simple (
+        //     snapsize * zoomlevel + shadow_width * 2 ,
+        //     snapsize * zoomlevel + shadow_width * 2 ,
+        //     Gdk.InterpType.NEAREST
+        // );
 
 
-         // Create the circular path on our base surface
-         base_context.arc (radius + shadow_width, radius + shadow_width, radius, 0, 2 * Math.PI);
+        //  // Create the base surface for our cursor
+        //  var base_surface = new Cairo.ImageSurface (
+        //     Cairo.Format.ARGB32,
+        //     snapsize * zoomlevel + shadow_width * 2 ,
+        //     snapsize * zoomlevel + shadow_width * 2
+        // );
 
-         // Paste in the screenshot
-         Gdk.cairo_set_source_pixbuf (base_context, scaled_pb, 0, 0);
-
-         // Clip to that circular path, keeping the path around for later, and paint the pasted screenshot
-         base_context.save ();
-         base_context.clip_preserve ();
-         base_context.paint ();
-         base_context.restore ();
+        //  var base_context = new Cairo.Context (base_surface);
 
 
-         // Draw a shadow as outside magnifier border
-         double shadow_alpha = 0.6;
-         base_context.set_line_width (1);
+        //  // Create the circular path on our base surface
+        //  base_context.arc (radius + shadow_width, radius + shadow_width, radius, 0, 2 * Math.PI);
 
-         for (int i = 0; i <= shadow_width; i++) {
-             base_context.arc (
-                radius + shadow_width, radius + shadow_width,
-                radius + shadow_width - i, 0, 2 * Math.PI
-            );
-             Gdk.RGBA shadow_color = Gdk.RGBA ();
-             shadow_color.parse (DARK_BORDER_COLOR_STRING);
-             shadow_color.alpha = shadow_alpha / ((shadow_width - i + 1) * (shadow_width - i + 1));
-             Gdk.cairo_set_source_rgba (base_context, shadow_color);
-             base_context.stroke ();
-         }
+        //  // Paste in the screenshot
+        //  Gdk.cairo_set_source_pixbuf (base_context, scaled_pb, 0, 0);
+
+        //  // Clip to that circular path, keeping the path around for later, and paint the pasted screenshot
+        //  base_context.save ();
+        //  base_context.clip_preserve ();
+        //  base_context.paint ();
+        //  base_context.restore ();
 
 
-        // Draw an outside bright magnifier border
-        Gdk.cairo_set_source_rgba (base_context, bright_border_color);
-        base_context.arc (radius + shadow_width, radius + shadow_width, radius - 1, 0, 2 * Math.PI);
-        base_context.stroke ();
+        //  // Draw a shadow as outside magnifier border
+        //  double shadow_alpha = 0.6;
+        //  base_context.set_line_width (1);
+
+        //  for (int i = 0; i <= shadow_width; i++) {
+        //      base_context.arc (
+        //         radius + shadow_width, radius + shadow_width,
+        //         radius + shadow_width - i, 0, 2 * Math.PI
+        //     );
+        //      Gdk.RGBA shadow_color = Gdk.RGBA ();
+        //      shadow_color.parse (DARK_BORDER_COLOR_STRING);
+        //      shadow_color.alpha = shadow_alpha / ((shadow_width - i + 1) * (shadow_width - i + 1));
+        //      Gdk.cairo_set_source_rgba (base_context, shadow_color);
+        //      base_context.stroke ();
+        //  }
 
 
-        // Draw inside square
-        base_context.set_line_width (1);
-
-        Gdk.cairo_set_source_rgba (base_context, dark_border_color);
-        base_context.move_to (radius + shadow_width - zoomlevel, radius + shadow_width - zoomlevel);
-        base_context.line_to (radius + shadow_width + zoomlevel, radius + shadow_width - zoomlevel);
-        base_context.line_to (radius + shadow_width + zoomlevel, radius + shadow_width + zoomlevel);
-        base_context.line_to (radius + shadow_width - zoomlevel, radius + shadow_width + zoomlevel);
-        base_context.close_path ();
-        base_context.stroke ();
-
-        Gdk.cairo_set_source_rgba (base_context, bright_border_color);
-        base_context.move_to (radius + shadow_width - zoomlevel + 1, radius + shadow_width - zoomlevel + 1);
-        base_context.line_to (radius + shadow_width + zoomlevel - 1, radius + shadow_width - zoomlevel + 1);
-        base_context.line_to (radius + shadow_width + zoomlevel - 1, radius + shadow_width + zoomlevel - 1);
-        base_context.line_to (radius + shadow_width - zoomlevel + 1, radius + shadow_width + zoomlevel - 1);
-        base_context.close_path ();
-        base_context.stroke ();
+        // // Draw an outside bright magnifier border
+        // Gdk.cairo_set_source_rgba (base_context, bright_border_color);
+        // base_context.arc (radius + shadow_width, radius + shadow_width, radius - 1, 0, 2 * Math.PI);
+        // base_context.stroke ();
 
 
-        magnifier = new Gdk.Cursor.from_surface (
-            get_screen ().get_display (),
-            base_surface,
-            base_surface.get_width () / 2,
-            base_surface.get_height () / 2);
+        // // Draw inside square
+        // base_context.set_line_width (1);
 
-        // Set the cursor
-        manager.grab (
-            get_window (),
-            Gdk.SeatCapabilities.ALL,
-            true,
-            magnifier,
-            new Gdk.Event (Gdk.EventType.BUTTON_PRESS | Gdk.EventType.MOTION_NOTIFY | Gdk.EventType.SCROLL),
-            null);
+        // Gdk.cairo_set_source_rgba (base_context, dark_border_color);
+        // base_context.move_to (radius + shadow_width - zoomlevel, radius + shadow_width - zoomlevel);
+        // base_context.line_to (radius + shadow_width + zoomlevel, radius + shadow_width - zoomlevel);
+        // base_context.line_to (radius + shadow_width + zoomlevel, radius + shadow_width + zoomlevel);
+        // base_context.line_to (radius + shadow_width - zoomlevel, radius + shadow_width + zoomlevel);
+        // base_context.close_path ();
+        // base_context.stroke ();
 
+        // Gdk.cairo_set_source_rgba (base_context, bright_border_color);
+        // base_context.move_to (radius + shadow_width - zoomlevel + 1, radius + shadow_width - zoomlevel + 1);
+        // base_context.line_to (radius + shadow_width + zoomlevel - 1, radius + shadow_width - zoomlevel + 1);
+        // base_context.line_to (radius + shadow_width + zoomlevel - 1, radius + shadow_width + zoomlevel - 1);
+        // base_context.line_to (radius + shadow_width - zoomlevel + 1, radius + shadow_width + zoomlevel - 1);
+        // base_context.close_path ();
+        // base_context.stroke ();
+
+
+        // magnifier = new Gdk.Cursor.from_surface (
+        //     get_screen ().get_display (),
+        //     base_surface,
+        //     base_surface.get_width () / 2,
+        //     base_surface.get_height () / 2);
+
+        // // Set the cursor
+        // manager.grab (
+        //     get_window (),
+        //     Gdk.SeatCapabilities.ALL,
+        //     true,
+        //     magnifier,
+        //     new Gdk.Event (Gdk.EventType.BUTTON_PRESS | Gdk.EventType.MOTION_NOTIFY | Gdk.EventType.SCROLL),
+        //     null);
     }
 
 
@@ -312,20 +311,20 @@ public class Akira.Utils.ColorPicker : Gtk.Window {
     public override void show_all () {
         base.show_all ();
 
-        var manager = Gdk.Display.get_default ().get_default_seat ();
-        var window = get_window ();
+        // var manager = Gdk.Display.get_default ().get_default_seat ();
+        // var window = get_window ();
 
-        var status = manager.grab (
-            window,
-            Gdk.SeatCapabilities.ALL,
-            false,
-            new Gdk.Cursor.for_display (window.get_display (), Gdk.CursorType.CROSSHAIR),
-            new Gdk.Event (Gdk.EventType.BUTTON_PRESS | Gdk.EventType.BUTTON_RELEASE | Gdk.EventType.MOTION_NOTIFY),
-            null);
+        // var status = manager.grab (
+        //     window,
+        //     Gdk.SeatCapabilities.ALL,
+        //     false,
+        //     new Gdk.Cursor.for_display (window.get_display (), Gdk.CursorType.CROSSHAIR),
+        //     new Gdk.Event (Gdk.EventType.BUTTON_PRESS | Gdk.EventType.BUTTON_RELEASE | Gdk.EventType.MOTION_NOTIFY),
+        //     null);
 
-        if (status != Gdk.GrabStatus.SUCCESS) {
-            manager.ungrab ();
-        }
+        // if (status != Gdk.GrabStatus.SUCCESS) {
+        //     manager.ungrab ();
+        // }
 
         // show magnifier
         set_magnifier_cursor ();

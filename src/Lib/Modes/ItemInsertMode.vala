@@ -52,13 +52,13 @@ public class Akira.Lib.Modes.ItemInsertMode : AbstractInteractionMode {
         }
     }
 
-    public override Gdk.CursorType? cursor_type () {
-        if (transform_mode != null) {
-            return transform_mode.cursor_type ();
-        }
+    // public override Gdk.CursorType? cursor_type () {
+    //     if (transform_mode != null) {
+    //         return transform_mode.cursor_type ();
+    //     }
 
-        return Gdk.CursorType.CROSSHAIR;
-    }
+    //     return Gdk.CursorType.CROSSHAIR;
+    // }
 
     public override bool key_press_event (Gdk.KeyEvent event) {
         if (transform_mode != null) {

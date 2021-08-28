@@ -172,43 +172,43 @@ public class Akira.Utils.Nobs : Object {
     /*
      * Return a cursor type based of the type of nob.
      */
-    public static Gdk.CursorType? cursor_from_nob (Nob nob_id) {
-        Gdk.CursorType? result = null;
-        switch (nob_id) {
-            case Nob.NONE:
-                result = null;
-                break;
-            case Nob.TOP_LEFT:
-                result = Gdk.CursorType.TOP_LEFT_CORNER;
-                break;
-            case Nob.TOP_CENTER:
-                result = Gdk.CursorType.TOP_SIDE;
-                break;
-            case Nob.TOP_RIGHT:
-                result = Gdk.CursorType.TOP_RIGHT_CORNER;
-                break;
-            case Nob.RIGHT_CENTER:
-                result = Gdk.CursorType.RIGHT_SIDE;
-                break;
-            case Nob.BOTTOM_RIGHT:
-                result = Gdk.CursorType.BOTTOM_RIGHT_CORNER;
-                break;
-            case Nob.BOTTOM_CENTER:
-                result = Gdk.CursorType.BOTTOM_SIDE;
-                break;
-            case Nob.BOTTOM_LEFT:
-                result = Gdk.CursorType.BOTTOM_LEFT_CORNER;
-                break;
-            case Nob.LEFT_CENTER:
-                result = Gdk.CursorType.LEFT_SIDE;
-                break;
-            case Nob.ROTATE:
-                result = Gdk.CursorType.EXCHANGE;
-                break;
-        }
+    // public static Gdk.CursorType? cursor_from_nob (Nob nob_id) {
+    //     Gdk.CursorType? result = null;
+    //     switch (nob_id) {
+    //         case Nob.NONE:
+    //             result = null;
+    //             break;
+    //         case Nob.TOP_LEFT:
+    //             result = Gdk.CursorType.TOP_LEFT_CORNER;
+    //             break;
+    //         case Nob.TOP_CENTER:
+    //             result = Gdk.CursorType.TOP_SIDE;
+    //             break;
+    //         case Nob.TOP_RIGHT:
+    //             result = Gdk.CursorType.TOP_RIGHT_CORNER;
+    //             break;
+    //         case Nob.RIGHT_CENTER:
+    //             result = Gdk.CursorType.RIGHT_SIDE;
+    //             break;
+    //         case Nob.BOTTOM_RIGHT:
+    //             result = Gdk.CursorType.BOTTOM_RIGHT_CORNER;
+    //             break;
+    //         case Nob.BOTTOM_CENTER:
+    //             result = Gdk.CursorType.BOTTOM_SIDE;
+    //             break;
+    //         case Nob.BOTTOM_LEFT:
+    //             result = Gdk.CursorType.BOTTOM_LEFT_CORNER;
+    //             break;
+    //         case Nob.LEFT_CENTER:
+    //             result = Gdk.CursorType.LEFT_SIDE;
+    //             break;
+    //         case Nob.ROTATE:
+    //             result = Gdk.CursorType.EXCHANGE;
+    //             break;
+    //     }
 
-        return result;
-    }
+    //     return result;
+    // }
 
     public static Nob opposite_nob (Nob nob_id) {
         switch (nob_id) {

@@ -80,9 +80,9 @@ public abstract class Akira.Lib.Modes.AbstractInteractionMode : Object {
     /*
      * Override to define cursor associated to mode.
      */
-    public virtual Gdk.CursorType? cursor_type () {
-        return Gdk.CursorType.ARROW;
-    }
+    // public virtual Gdk.CursorType? cursor_type () {
+    //     return Gdk.CursorType.ARROW;
+    // }
 
     /*
      * Override to define key press event. Return true to absorb.

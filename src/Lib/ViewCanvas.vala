@@ -49,7 +49,7 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
     public bool holding = false;
 
     private Utils.Nobs.Nob hovered_nob = Utils.Nobs.Nob.NONE;
-    private Gdk.CursorType current_cursor = Gdk.CursorType.ARROW;
+    // private Gdk.CursorType current_cursor = Gdk.CursorType.ARROW;
 
     private ViewLayers.ViewLayerGrid grid_layout;
 
@@ -128,18 +128,18 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
     }
 
     public void set_cursor_by_interaction_mode () {
-        hover_manager.remove_hover_effect ();
-        Gdk.CursorType? new_cursor = mode_manager.active_cursor_type ();
+        // hover_manager.remove_hover_effect ();
+        // Gdk.CursorType? new_cursor = mode_manager.active_cursor_type ();
 
-        if (new_cursor == null) {
-            var hover_cursor = Utils.Nobs.cursor_from_nob (hovered_nob);
-            new_cursor = (hover_cursor == null) ? Gdk.CursorType.ARROW : hover_cursor;
-        }
+        // if (new_cursor == null) {
+        //     var hover_cursor = Utils.Nobs.cursor_from_nob (hovered_nob);
+        //     new_cursor = (hover_cursor == null) ? Gdk.CursorType.ARROW : hover_cursor;
+        // }
 
-        if (current_cursor != new_cursor) {
-            // debug (@"Changing cursor. $new_cursor");
-            set_cursor (new_cursor);
-        }
+        // if (current_cursor != new_cursor) {
+        //     // debug (@"Changing cursor. $new_cursor");
+        //     set_cursor (new_cursor);
+        // }
     }
 
     private void trigger_adjust_zoom (double new_scale, bool absolute, Geometry.Point? reference) {
@@ -374,11 +374,11 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
         return false;
     }
 
-    private void set_cursor (Gdk.CursorType? cursor_type) {
-        current_cursor = (cursor_type == null ? Gdk.CursorType.ARROW : cursor_type);
-        var cursor = new Gdk.Cursor.for_display (Gdk.Display.get_default (), current_cursor);
-        get_window ().set_cursor (cursor);
-    }
+    // private void set_cursor (Gdk.CursorType? cursor_type) {
+    //     current_cursor = (cursor_type == null ? Gdk.CursorType.ARROW : cursor_type);
+    //     var cursor = new Gdk.Cursor.for_display (Gdk.Display.get_default (), current_cursor);
+    //     get_window ().set_cursor (cursor);
+    // }
 
     // #TODO temporary
     public override bool draw (Cairo.Context ctx) {

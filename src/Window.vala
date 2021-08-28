@@ -32,7 +32,7 @@ public class Akira.Window : Gtk.ApplicationWindow {
     public Akira.Utils.Dialogs dialogs;
 
     public SimpleActionGroup actions { get; construct; }
-    public Gtk.AccelGroup accel_group { get; construct; }
+    // public Gtk.AccelGroup accel_group { get; construct; }
 
     public bool edited { get; set; default = false; }
 
@@ -45,8 +45,8 @@ public class Akira.Window : Gtk.ApplicationWindow {
     }
 
     construct {
-        accel_group = new Gtk.AccelGroup ();
-        add_accel_group (accel_group);
+        // accel_group = new Gtk.AccelGroup ();
+        // add_accel_group (accel_group);
 
         event_bus = new Akira.Services.EventBus ();
         action_manager = new Akira.Services.ActionManager (app, this);

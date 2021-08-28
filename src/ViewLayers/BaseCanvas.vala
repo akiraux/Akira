@@ -46,7 +46,7 @@ public class Akira.ViewLayers.BaseCanvas : Gtk.Widget , Gtk.Scrollable {
     public bool pause_redraw = false;
 
     // The main window that gets scrolled around
-    private Gdk.Window canvas_window;
+    private X.Window canvas_window;
 
     private unowned Lib.Items.Model? model_to_render = null;
 

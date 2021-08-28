@@ -158,13 +158,13 @@ public class Akira.Lib.Managers.ModeManager : Object {
     /*
      * Returns cursor that should be used based on active modes.
      */
-    public Gdk.CursorType? active_cursor_type () {
-        if (pan_mode != null) {
-            return pan_mode.cursor_type ();
-        }
+    // public Gdk.CursorType? active_cursor_type () {
+    //     if (pan_mode != null) {
+    //         return pan_mode.cursor_type ();
+    //     }
 
-        return active_mode != null ? active_mode.cursor_type () : null;
-    }
+    //     return active_mode != null ? active_mode.cursor_type () : null;
+    // }
 
     public bool key_press_event (Gdk.KeyEvent event) {
         if (pan_mode != null && pan_mode.key_press_event (event)) {

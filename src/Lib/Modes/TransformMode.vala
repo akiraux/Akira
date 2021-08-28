@@ -123,9 +123,9 @@ public class Akira.Lib.Modes.TransformMode : AbstractInteractionMode {
         return effective_nob;
     }
 
-    public override Gdk.CursorType? cursor_type () {
-        return Utils.Nobs.cursor_from_nob (nob);
-    }
+    // public override Gdk.CursorType? cursor_type () {
+    //     return Utils.Nobs.cursor_from_nob (nob);
+    // }
 
     public override bool key_press_event (Gdk.KeyEvent event) {
         return true;
