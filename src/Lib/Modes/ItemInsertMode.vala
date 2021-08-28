@@ -37,10 +37,10 @@ public class Akira.Lib.Modes.ItemInsertMode : AbstractInteractionMode {
     public ItemInsertMode (Lib.ViewCanvas canvas, string item_type) {
         Object (view_canvas: canvas);
         item_insert_type = item_type;
-        
+
         // if PathEditMode is active, it must deregisterd with user presses escape
         view_canvas.window.event_bus.request_escape.connect (() => {
-            if(path_edit_mode != null) {
+            if (path_edit_mode != null) {
                 path_edit_mode.mode_end ();
                 request_deregistration (mode_type ());
             }
@@ -114,7 +114,7 @@ public class Akira.Lib.Modes.ItemInsertMode : AbstractInteractionMode {
             // if a path is being inserted, then start the PathEditMode
             if (item_insert_type == "path") {
                 path_edit_mode = new Akira.Lib.Modes.PathEditMode (view_canvas, true, instance);
-                path_edit_mode.mode_begin();
+                path_edit_mode.mode_begin ();
                 path_edit_mode.button_press_event (event);
 
                 // Defer the print of the layer UI after all items have been created.
@@ -231,7 +231,7 @@ public class Akira.Lib.Modes.ItemInsertMode : AbstractInteractionMode {
             case "path":
                 new_item = Lib.Items.ModelTypePath.default_path (
                     coordinates,
-                    borders_from_settings(),
+                    borders_from_settings (),
                     null
                 );
                 var test_path = new Geometry.Point[1];

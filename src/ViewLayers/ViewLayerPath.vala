@@ -64,7 +64,7 @@ public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
         double radius = UI_NOB_SIZE / canvas.scale;
         double line_width = UI_LINE_WIDTH / canvas.scale;
 
-        context.save();
+        context.save ();
 
         context.new_path ();
         context.set_source_rgba (0.1568, 0.4745, 0.9823, 1);
@@ -73,12 +73,12 @@ public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
         foreach (var pt in points) {
             context.move_to (pt.x + first_point.x, pt.y + first_point.y);
             context.arc (pt.x + first_point.x, pt.y + first_point.y, radius, 0, Math.PI * 2);
-            context.fill();
+            context.fill ();
         }
 
-        context.stroke();
-        context.new_path();
-        context.restore();
+        context.stroke ();
+        context.new_path ();
+        context.restore ();
     }
 
     private void recalculate_extents () {

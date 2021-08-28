@@ -26,18 +26,18 @@ public class Akira.Lib.Components.Path : Component, Copyable<Path> {
     public bool close = false;
 
     public Path (bool close = false) {
-        data = new Gee.ArrayList<Geometry.Point?>();
+        data = new Gee.ArrayList<Geometry.Point?> ();
         this.close = close;
     }
 
     public Path.from_single_point (Geometry.Point pt, bool close = false) {
-        data = new Gee.ArrayList<Geometry.Point?>();
+        data = new Gee.ArrayList<Geometry.Point?> ();
         data.add (pt);
         this.close = close;
     }
 
     public Path.from_points (Geometry.Point[] data, bool close = false) {
-        this.data = new Gee.ArrayList<Geometry.Point?>();
+        this.data = new Gee.ArrayList<Geometry.Point?> ();
         foreach (var item in data) {
             this.data.add (item);
         }
@@ -47,7 +47,7 @@ public class Akira.Lib.Components.Path : Component, Copyable<Path> {
 
     public Path.deserialized (Json.Object obj) {
         var arr = obj.get_array_member ("path_data").get_elements ();
-        data = new Gee.ArrayList<Geometry.Point?>();
+        data = new Gee.ArrayList<Geometry.Point?> ();
         foreach (unowned var pt in arr) {
             data.add (Geometry.Point.deserialized (pt.get_object ()));
         }
@@ -74,7 +74,7 @@ public class Akira.Lib.Components.Path : Component, Copyable<Path> {
     public void add_point (Geometry.Point point, int index = -1) {
         index = (index == -1) ? data.size : index;
 
-        data.insert(index, point);
+        data.insert (index, point);
     }
 
     public Geometry.Rectangle calculate_extents () {

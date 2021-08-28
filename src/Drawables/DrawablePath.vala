@@ -70,7 +70,7 @@ public class Akira.Drawables.DrawablePath : Drawable {
             }
         }
 
-        Gee.ArrayList <Geometry.Point?> translated_points = new Gee.ArrayList<Geometry.Point?>();
+        Gee.ArrayList <Geometry.Point?> translated_points = new Gee.ArrayList<Geometry.Point?> ();
         foreach (var pt in points) {
             translated_points.add (Geometry.Point (pt.x - min_x, pt.y - min_y));
         }

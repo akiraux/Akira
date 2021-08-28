@@ -30,13 +30,13 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
 
 
     public PathEditMode (Lib.ViewCanvas canvas, bool is_insert, Lib.Items.ModelInstance instance) {
-        Object(
+        Object (
             view_canvas: canvas,
             is_insert: is_insert,
             instance: instance
         );
 
-        first_point = Geometry.Point(-1, -1);
+        first_point = Geometry.Point (-1, -1);
 
         // layer to show when editing paths
         path_layer = new ViewLayers.ViewLayerPath ();
@@ -52,7 +52,6 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
     }
 
     public override void mode_begin () {
-        print("begin mode\n");
         // hide the nobs and show the path layer
         view_canvas.toggle_layer_visibility (ViewLayers.ViewLayer.NOBS_LAYER_ID, false);
         view_canvas.toggle_layer_visibility (ViewLayers.ViewLayer.PATH_LAYER_ID, true);
@@ -82,7 +81,7 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
 
         if (first_point.x == -1) {
             first_point = point;
-            var coords = view_canvas.selection_manager.selection.coordinates();
+            var coords = view_canvas.selection_manager.selection.coordinates ();
             path_layer.set_reference_point ( Geometry.Point (coords.center_x, coords.center_y));
             return false;
         }
