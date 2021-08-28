@@ -24,23 +24,19 @@
  * PanMode handles panning. This will handle space or middle click panning. This mode should
  * be used as a secondary mode that overrides masks other modes. See ModeManager.
  */
-public class Akira.Lib.Modes.PanMode : InteractionMode {
-    public weak Akira.Lib.Canvas canvas { get; construct; }
-    public weak Akira.Lib.Managers.ModeManager mode_manager { get; construct; }
+public class Akira.Lib.Modes.PanMode : AbstractInteractionMode {
+    public unowned Akira.Lib.ViewCanvas canvas { get; construct; }
 
     private bool space_held = false;
     private bool panning = false;
     private double origin_x = 0;
     private double origin_y = 0;
 
-    public PanMode (Akira.Lib.Canvas canvas, Akira.Lib.Managers.ModeManager mode_manager) {
-        Object (
-            canvas: canvas,
-            mode_manager : mode_manager
-        );
+    public PanMode (Akira.Lib.ViewCanvas canvas) {
+        Object (canvas: canvas);
     }
 
-    public override InteractionMode.ModeType mode_type () { return InteractionMode.ModeType.PAN; }
+    public override AbstractInteractionMode.ModeType mode_type () { return AbstractInteractionMode.ModeType.PAN; }
 
 
     public override Gdk.CursorType? cursor_type () {
@@ -61,7 +57,7 @@ public class Akira.Lib.Modes.PanMode : InteractionMode {
             space_held = false;
 
             if (!panning) {
-                mode_manager.deregister_mode (mode_type ());
+                request_deregistration (mode_type ());
             }
         }
         return true;
@@ -82,8 +78,9 @@ public class Akira.Lib.Modes.PanMode : InteractionMode {
         toggle_panning (false);
 
         if (!space_held) {
-            mode_manager.deregister_mode (mode_type ());
+            request_deregistration (mode_type ());
         }
+
         return true;
     }
 

@@ -16,76 +16,37 @@
  * You should have received a copy of the GNU General Public License
  * along with Akira. If not, see <https://www.gnu.org/licenses/>.
  *
- * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
+ * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
  */
 
-/**
- * Name component to handle generating an ID and a unique name on creation.
- */
-public class Akira.Lib.Components.Name : Component {
-    public string id { get; set; }
-    public string name { get; set; }
-    public string icon { get; set; }
+public class Akira.Lib.Components.Name : Component, Copyable<Name> {
+    private string _id;
+    private string _name;
 
-    public Name (Lib.Items.CanvasItem _item) {
-        item = _item;
-
-        set_properties ();
-        update_name ();
+    public string id {
+        get { return _id; }
     }
 
-    private void set_properties () {
-        // Assign the proper icon for the layers panel.
-        // We can't use a switch () method here because the typeof () method is not supported.
-        if (item is Items.CanvasArtboard) {
-            icon = null;
-            name = _("Artboard");
-        }
-
-        if (item is Items.CanvasRect) {
-            icon = "shape-rectangle-symbolic";
-            name = _("Rectangle");
-        }
-
-        if (item is Items.CanvasEllipse) {
-            icon = "shape-circle-symbolic";
-            name = _("Ellipse");
-        }
-
-        if (item is Items.CanvasText) {
-            icon = "shape-text-symbolic";
-            name = _("Text");
-        }
-
-        if (item is Items.CanvasImage) {
-            icon = "shape-image-symbolic";
-            name = _("Image");
-        }
+    public string name {
+        get { return _name; }
     }
 
-    private void update_name () {
-        var type = item.get_type ();
+    public Name (string name, string id) {
+        _id = id;
+        _name = name;
+    }
 
-        // Make sure the initial ID includes the current count of the total amount
-        // of items with the same item type in the same artboard.
-        int count = 0;
-        var items = ((Lib.Canvas) item.canvas).window.items_manager.free_items;
+    public Name.deserialized (Json.Object obj) {
+        _id = obj.get_string_member ("name");
+        _name = obj.get_string_member ("id");
+    }
 
-        if (item.artboard != null) {
-            items = item.artboard.items;
-        }
+    protected override void serialize_details (ref Json.Object obj) {
+        obj.set_string_member ("name", _name);
+        obj.set_string_member ("id", _id);
+    }
 
-        if (item is Lib.Items.CanvasArtboard) {
-            items = ((Lib.Canvas) item.canvas).window.items_manager.artboards;
-        }
-
-        foreach (var _item in items) {
-            if (_item.get_type () == type) {
-                count++;
-            }
-        }
-
-        id = name + " " + count.to_string ();
-        name = id;
+    public Name copy () {
+        return new Name (_name, _id);
     }
 }

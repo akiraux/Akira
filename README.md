@@ -31,8 +31,8 @@ Feel free to download the Alpha and help us testing it.
 
 ## 📦 Install
 
-| elementaryOS AppCenter 	| FlatHub       	| Snapcraft Store 	|
-|------------------------	|---------------	|-----------------	|
+| elementaryOS AppCenter 	| FlatHub       	|
+|------------------------	|---------------	|
 |[![Get it on AppCenter](https://appcenter.elementary.io/badge.svg)](https://appcenter.elementary.io/com.github.akiraux.akira/)|<a href="#flathub-beta"><img src="https://flathub.org/assets/badges/flathub-badge-i-en.svg" width="160px" alt="Get it from Flathub!"></a>
 
 ### Flathub Beta
@@ -48,14 +48,12 @@ You can install Akira by compiling it from the source
 ### Install Dependencies
 
  - `gtk+-3.0>=3.18`
- - `granite>=5.3.0`
+ - `granite>=6.0.0`
  - `glib-2.0`
  - `gee-0.8`
  - `gobject-2.0`
  - `libxml-2.0`
- - `gtksourceview-3.0`
  - `libjson-glib-1.0`
- - `goocanvas-3.0`
  - `libarchive`
  - `gettext`
  - `cairo`

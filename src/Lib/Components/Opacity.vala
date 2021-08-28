@@ -16,30 +16,34 @@
  * You should have received a copy of the GNU General Public License
  * along with Akira. If not, see <https://www.gnu.org/licenses/>.
  *
- * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
+ * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
  */
 
-/**
- * Opacity component to keep track of the item global opacity, which has to account
- * for all fills and borders colors.
- */
-public class Akira.Lib.Components.Opacity : Component {
-    public double opacity { get; set; }
+public class Akira.Lib.Components.Opacity : Component, Copyable<Opacity> {
+    private double _opacity;
 
-    public Opacity (Items.CanvasItem _item) {
-        item = _item;
-        // Set opacity to 100% (fully visible) when the item is first created.
-        opacity = 100.0;
+    public double opacity {
+        get { return _opacity; }
+    }
 
-        this.notify["opacity"].connect (() => {
-            // Reload the item's colors only if it uses those components.
-            if (item.fills != null) {
-                item.fills.reload ();
-            }
+    public Opacity (double opacity) {
+        if (opacity < 0.0) {
+            _opacity = 0.0;
+            return;
+        }
 
-            if (item.borders != null) {
-                item.borders.reload ();
-            }
-        });
+        _opacity = opacity <= 100.0 ? opacity : 100.0;
+    }
+
+    public Opacity.deserialized (Json.Object obj) {
+        _opacity = obj.get_double_member ("opacity");
+    }
+
+    protected override void serialize_details (ref Json.Object obj) {
+        obj.set_double_member ("opacity", _opacity);
+    }
+
+    public Opacity copy () {
+        return new Opacity (_opacity);
     }
 }

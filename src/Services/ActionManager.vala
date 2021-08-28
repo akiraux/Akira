@@ -278,6 +278,11 @@ public class Akira.Services.ActionManager : Object {
     }
 
     private void action_preferences () {
+        // Since the settings dialog was opened with the `CTRL+.` shortcut, we
+        // need to reset the boolean variable in the canvas to avoid affecting
+        // items resize and rotation.
+        window.main_window.main_view_canvas.canvas.ctrl_is_pressed = false;
+
         var settings_dialog = new Akira.Dialogs.SettingsDialog (window);
         settings_dialog.show_all ();
         settings_dialog.present ();
@@ -287,14 +292,14 @@ public class Akira.Services.ActionManager : Object {
     }
 
     private void action_export_selection () {
-        weak Akira.Lib.Canvas canvas = window.main_window.main_canvas.canvas;
-        if (canvas.selected_bound_manager.selected_items.length () == 0) {
-            // Check if an element is currently selected.
-            window.event_bus.canvas_notification (_("Nothing selected to export!"));
-            return;
-        }
+        // weak Akira.Lib.Canvas canvas = window.main_window.main_canvas.canvas;
+        // if (canvas.selected_bound_manager.selected_items.length () == 0) {
+        //     // Check if an element is currently selected.
+        //     window.event_bus.canvas_notification (_("Nothing selected to export!"));
+        //     return;
+        // }
 
-        canvas.export_manager.create_selection_snapshot ();
+        // canvas.export_manager.create_selection_snapshot ();
     }
 
     private void action_export_artboards () {
@@ -304,8 +309,8 @@ public class Akira.Services.ActionManager : Object {
     }
 
     private void action_export_grab () {
-        weak Akira.Lib.Canvas canvas = window.main_window.main_canvas.canvas;
-        canvas.start_export_area_selection ();
+        // weak Akira.Lib.Canvas canvas = window.main_window.main_canvas.canvas;
+        // canvas.start_export_area_selection ();
     }
 
     private void action_zoom_in () {
@@ -435,23 +440,23 @@ public class Akira.Services.ActionManager : Object {
     }
 
     private void on_choose_image_response (Gtk.FileChooserNative dialog, int response_id) {
-        switch (response_id) {
-            case Gtk.ResponseType.ACCEPT:
-            case Gtk.ResponseType.OK:
-                SList<File> files = dialog.get_files ();
-                files.@foreach ((file) => {
-                    if (!Akira.Utils.Image.is_valid_image (file)) {
-                        window.event_bus.canvas_notification (
-                            _("Error! .%s files are not supported!"
-                        ).printf (Akira.Utils.Image.get_extension (file)));
-                        return;
-                    }
+        // switch (response_id) {
+        //     case Gtk.ResponseType.ACCEPT:
+        //     case Gtk.ResponseType.OK:
+        //         SList<File> files = dialog.get_files ();
+        //         files.@foreach ((file) => {
+        //             if (!Akira.Utils.Image.is_valid_image (file)) {
+        //                 window.event_bus.canvas_notification (
+        //                     _("Error! .%s files are not supported!"
+        //                 ).printf (Akira.Utils.Image.get_extension (file)));
+        //                 return;
+        //             }
 
-                    var manager = new Akira.Lib.Managers.ImageManager (file, files.index (file));
-                    window.items_manager.insert_image (manager);
-                });
-                break;
-        }
+        //             var manager = new Akira.Lib.Managers.ImageManager (file, files.index (file));
+        //             window.items_manager.insert_image (manager);
+        //         });
+        //         break;
+        // }
         dialog.destroy ();
     }
 
@@ -471,54 +476,54 @@ public class Akira.Services.ActionManager : Object {
     }
 
     private void action_pick_color () {
-        weak Akira.Lib.Canvas canvas = window.main_window.main_canvas.canvas;
+        // weak Akira.Lib.Canvas canvas = window.main_window.main_canvas.canvas;
 
-        // Interrupt if no item is selected.
-        if (canvas.selected_bound_manager.selected_items.length () == 0) {
-            return;
-        }
+        // // Interrupt if no item is selected.
+        // if (canvas.selected_bound_manager.selected_items.length () == 0) {
+        //     return;
+        // }
 
-        // Hide the ghost bound manager.
-        canvas.toggle_item_ghost (false);
+        // // Hide the ghost bound manager.
+        // canvas.toggle_item_ghost (false);
 
-        bool is_holding_shift = false;
-        var color_picker = new Akira.Utils.ColorPicker ();
-        color_picker.show_all ();
+        // bool is_holding_shift = false;
+        // var color_picker = new Akira.Utils.ColorPicker ();
+        // color_picker.show_all ();
 
-        color_picker.key_pressed.connect (e => {
-            is_holding_shift = e.keyval == Gdk.Key.Shift_L;
-        });
+        // color_picker.key_pressed.connect (e => {
+        //     is_holding_shift = e.keyval == Gdk.Key.Shift_L;
+        // });
 
-        color_picker.key_released.connect (e => {
-            is_holding_shift = e.keyval == Gdk.Key.Shift_L;
-        });
+        // color_picker.key_released.connect (e => {
+        //     is_holding_shift = e.keyval == Gdk.Key.Shift_L;
+        // });
 
-        color_picker.cancelled.connect (() => {
-            color_picker.close ();
-        });
+        // color_picker.cancelled.connect (() => {
+        //     color_picker.close ();
+        // });
 
-        color_picker.picked.connect (color => {
-            foreach (var item in canvas.selected_bound_manager.selected_items) {
-                // Ignore the item if it doesn't have a fills or border component
-                // based on the shift key pressed by the user.
-                if ((item.fills == null && !is_holding_shift) || (item.borders == null && is_holding_shift)) {
-                    continue;
-                }
+        // color_picker.picked.connect (color => {
+        //     foreach (var item in canvas.selected_bound_manager.selected_items) {
+        //         // Ignore the item if it doesn't have a fills or border component
+        //         // based on the shift key pressed by the user.
+        //         if ((item.fills == null && !is_holding_shift) || (item.borders == null && is_holding_shift)) {
+        //             continue;
+        //         }
 
-                if (is_holding_shift) {
-                    item.borders.update_color_from_action (color);
-                    continue;
-                }
+        //         if (is_holding_shift) {
+        //             item.borders.update_color_from_action (color);
+        //             continue;
+        //         }
 
-                item.fills.update_color_from_action (color);
-            }
+        //         item.fills.update_color_from_action (color);
+        //     }
 
-            color_picker.close ();
+        //     color_picker.close ();
 
-            // Force a UI reload of the fills and borders panel since some items
-            // had their properties changed.
-            canvas.window.event_bus.selected_items_list_changed (canvas.selected_bound_manager.selected_items);
-        });
+        //     // Force a UI reload of the fills and borders panel since some items
+        //     // had their properties changed.
+        //     canvas.window.event_bus.selected_items_list_changed (canvas.selected_bound_manager.selected_items);
+        // });
     }
 
     private void action_copy () {

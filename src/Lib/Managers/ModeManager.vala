@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2021 Alecaddd (https://alecaddd.com)
+ * Copyright (c) 2019-2021 Alecaddd (https://alecaddd.com)
  *
  * This file is part of Akira.
  *
@@ -17,6 +17,7 @@
  * along with Akira. If not, see <https://www.gnu.org/licenses/>.
  *
  * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
+ * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
  */
 
 /**
@@ -33,28 +34,41 @@
  * See InteractionMode.vala for more details on how to create modes.
  */
 public class Akira.Lib.Managers.ModeManager : Object {
-    public weak Akira.Lib.Canvas canvas { get; construct; }
+    public unowned Lib.ViewCanvas view_canvas { get; construct; }
 
-    private Akira.Lib.Modes.PanMode pan_mode;
-    private Akira.Lib.Modes.InteractionMode active_mode;
+    private Lib.Modes.PanMode pan_mode;
+    private Lib.Modes.AbstractInteractionMode active_mode;
 
-    public ModeManager (Akira.Lib.Canvas canvas) {
-        Object (
-            canvas: canvas
-        );
+    public Lib.Modes.AbstractInteractionMode.ModeType active_mode_type {
+        get {
+            return (active_mode == null) ? Lib.Modes.AbstractInteractionMode.ModeType.NONE : active_mode.mode_type ();
+        }
     }
+
+    public Utils.Nobs.Nob active_mode_nob {
+        get {
+            return (active_mode == null) ? Utils.Nobs.Nob.ALL : active_mode.active_nob ();
+        }
+    }
+
+    public ModeManager (Akira.Lib.ViewCanvas canvas) {
+        Object (view_canvas: canvas);
+    }
+
+    public signal void mode_changed ();
 
     /*
      * Register a new mode as the active mode. Any prior mode will be deregistered.
      */
-    public void register_mode (Akira.Lib.Modes.InteractionMode new_mode) {
+    public void register_mode (Akira.Lib.Modes.AbstractInteractionMode new_mode) {
         if (active_mode != null) {
             inner_deregister_active_mode (false);
         }
 
         active_mode = new_mode;
+        active_mode.request_deregistration.connect (on_deregistration_request);
         active_mode.mode_begin ();
-        canvas.interaction_mode_changed ();
+        mode_changed ();
     }
 
     /*
@@ -62,7 +76,7 @@ public class Akira.Lib.Managers.ModeManager : Object {
      * This should generally be used for safety since a new mode may already have been
      * registered by the time this method is called.
      */
-    public void deregister_mode (Akira.Lib.Modes.InteractionMode.ModeType mode_type) {
+    public void deregister_mode (Akira.Lib.Modes.AbstractInteractionMode.ModeType mode_type) {
         if (active_mode != null && active_mode.mode_type () == mode_type) {
             inner_deregister_active_mode (true);
         } else if (pan_mode != null && pan_mode.mode_type () == mode_type) {
@@ -88,10 +102,11 @@ public class Akira.Lib.Managers.ModeManager : Object {
             return;
         }
 
-        pan_mode = new Akira.Lib.Modes.PanMode (canvas, this);
+        pan_mode = new Akira.Lib.Modes.PanMode (view_canvas);
+        pan_mode.request_deregistration.connect (on_deregistration_request);
         pan_mode.mode_begin ();
 
-        canvas.interaction_mode_changed ();
+        mode_changed ();
     }
 
     /*
@@ -107,11 +122,12 @@ public class Akira.Lib.Managers.ModeManager : Object {
      * Inner panning mode stop method with optional notification to canvas.
      */
     private void inner_stop_panning_mode (bool notify) {
+        pan_mode.request_deregistration.disconnect (on_deregistration_request);
         pan_mode.mode_end ();
         pan_mode = null;
 
         if (notify) {
-            canvas.interaction_mode_changed ();
+            mode_changed ();
         }
     }
 
@@ -119,11 +135,12 @@ public class Akira.Lib.Managers.ModeManager : Object {
      * Inner mode deregistration method with optional notification to canvas.
      */
     private void inner_deregister_active_mode (bool notify) {
+        active_mode.request_deregistration.disconnect (on_deregistration_request);
         active_mode.mode_end ();
         active_mode = null;
 
         if (notify) {
-            canvas.interaction_mode_changed ();
+            mode_changed ();
         }
     }
 
@@ -189,4 +206,7 @@ public class Akira.Lib.Managers.ModeManager : Object {
         return (active_mode != null) ? active_mode.motion_notify_event (event) : false;
     }
 
+    private void on_deregistration_request (Lib.Modes.AbstractInteractionMode.ModeType type) {
+        deregister_mode (type);
+    }
 }

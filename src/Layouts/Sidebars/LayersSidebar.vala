@@ -23,7 +23,7 @@
  * Layout component containing the layers and pages containers.
  */
 public class Akira.Layouts.Sidebars.LayersSidebar : Gtk.Grid {
-    public unowned Lib2.ViewCanvas view_canvas { get; construct; }
+    public unowned Lib.ViewCanvas view_canvas { get; construct; }
 
     /*
      * Boolean attribute to show/hide the layers sidebar when requested for the
@@ -50,7 +50,7 @@ public class Akira.Layouts.Sidebars.LayersSidebar : Gtk.Grid {
     public Layouts.Sidebars.Partials.LayersPanel layers_panel;
     public Gtk.ScrolledWindow layers_scroll;
 
-    public LayersSidebar (Lib2.ViewCanvas canvas) {
+    public LayersSidebar (Lib.ViewCanvas canvas) {
         Object (
             orientation: Gtk.Orientation.VERTICAL,
             view_canvas: canvas

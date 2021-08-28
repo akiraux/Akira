@@ -1,151 +1,76 @@
-/*
-* Copyright (c) 2019 Alecaddd (http://alecaddd.com)
-*
-* This file is part of Akira.
-*
-* Akira is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
+/**
+ * Copyright (c) 2019-2021 Alecaddd (https://alecaddd.com)
+ *
+ * This file is part of Akira.
+ *
+ * Akira is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
 
-* Akira is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
+ * Akira is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
 
-* You should have received a copy of the GNU General Public License
-* along with Akira.  If not, see <https://www.gnu.org/licenses/>.
-*
-* Authored by: Giacomo Alberini <giacomoalbe@gmail.com>
-*/
+ * You should have received a copy of the GNU General Public License
+ * along with Akira. If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
+ * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
+ */
 
 public class Akira.Lib.Managers.HoverManager : Object {
-    private const string STROKE_COLOR = "#41c9fd";
-    private const double LINE_WIDTH = 2.0;
+    public unowned ViewCanvas view_canvas { get; construct; }
 
-    public weak Akira.Lib.Canvas canvas { get; construct; }
+    private int current_hovered_id = -1;
+    private ViewLayers.ViewLayerHover hover_layer;
 
-    private Goo.CanvasItem hover_effect;
-    private Lib.Items.CanvasItem current_hover_item;
-
-    public HoverManager (Akira.Lib.Canvas canvas) {
-        Object (
-            canvas: canvas
-        );
+    public HoverManager (ViewCanvas canvas) {
+        Object (view_canvas : canvas);
     }
 
     construct {
-        canvas.window.event_bus.hover_over_layer.connect (on_layer_hovered);
+        hover_layer = new ViewLayers.ViewLayerHover ();
+        hover_layer.add_to_canvas (ViewLayers.ViewLayer.HOVER_LAYER_ID, view_canvas);
     }
 
-    public void on_mouse_over (double event_x, double event_y, Utils.Nobs.Nob nob) {
-        if (nob != Utils.Nobs.Nob.NONE) {
-            current_hover_item = null;
+    public void on_mouse_over (double event_x, double event_y) {
+        var target = view_canvas.items_manager.node_at_canvas_position (
+            event_x,
+            event_y,
+            Drawables.Drawable.HitTestType.SELECT
+        );
+
+        // Remove the hover effect is no item is hovered
+        // TODO: artboard
+        if (target == null) {
             remove_hover_effect ();
             return;
         }
 
-        var target = canvas.get_item_at (event_x, event_y, true);
-
-        // Remove the hover effect is no item is hovered, or the item is the
-        // white background of the CanvasArtboard, which is a GooCanvasRect item.
-        if (target == null || (target is Goo.CanvasRect && !(target is Items.CanvasItem))) {
-            current_hover_item = null;
-            remove_hover_effect ();
-            return;
-        }
-
-        // If we're hovering over the Artboard's label, change the target to the Artboard.
-        if (
-            target is Goo.CanvasText &&
-            target.parent is Items.CanvasArtboard &&
-            !(target is Items.CanvasItem)
-        ) {
-            target = target.parent as Items.CanvasItem;
-        }
-
-        if (!(target is Items.CanvasItem)) {
-            return;
-        }
-
-        var item = target as Items.CanvasItem;
-
-        if (current_hover_item != null && item.name.id == current_hover_item.name.id) {
-            // We already have the hover effect rendered correctly.
-            return;
-        }
-
-        // We need to recreate it.
-        remove_hover_effect ();
-        current_hover_item = item;
-
-        create_hover_effect (item);
-
-        if (!item.layer.selected) {
-            canvas.window.event_bus.hover_over_item (item);
-        }
-
+        maybe_create_hover_effect (target);
         return;
     }
 
-    private void on_layer_hovered (Items.CanvasItem? item) {
-        if (item == null) {
-            remove_hover_effect ();
-            return;
-        }
-
-        remove_hover_effect ();
-        create_hover_effect (item);
-    }
-
-    private void create_hover_effect (Items.CanvasItem item) {
-        if (item.layer.selected) {
-            return;
-        }
-
-        hover_effect = new Goo.CanvasRect (
-            null,
-            0, 0,
-            item.size.width, item.size.height,
-            "line-width", LINE_WIDTH / canvas.current_scale,
-            "stroke-color", STROKE_COLOR,
-            null
-        );
-
-        Cairo.Matrix matrix;
-        item.get_transform (out matrix);
-
-        // If the item is inside an artboard, we need to convert
-        // its coordinates from the artboard space.
-        if (item.artboard != null) {
-            item.canvas.convert_from_item_space (item.artboard, ref matrix.x0, ref matrix.y0);
-        }
-
-        hover_effect.set_transform (matrix);
-
-        hover_effect.set ("parent", canvas.get_root_item ());
-        hover_effect.can_focus = false;
-        hover_effect.pointer_events = Goo.CanvasPointerEvents.NONE;
-    }
-
     public void remove_hover_effect () {
-        if (hover_effect == null) {
-            return;
-        }
-
-        hover_effect.remove ();
-        hover_effect = null;
-
-        canvas.window.event_bus.hover_over_item (null);
+        hover_layer.add_drawable (null);
+        hover_layer.set_visible (false);
+        current_hovered_id = -1;
     }
 
-    private void on_canvas_zoom () {
-        // Interrupt if we don't have any hover effect currently visible.
-        if (hover_effect == null) {
+    private void maybe_create_hover_effect (Lib.Items.ModelNode node) {
+        if (view_canvas.selection_manager.item_selected (node.id)) {
             return;
         }
 
-        // Update the line width of the hover effect based on the canvas scale.
-        hover_effect.set ("line-width", LINE_WIDTH / canvas.current_scale);
+        if (current_hovered_id == node.id) {
+            return;
+        }
+        else {
+            remove_hover_effect ();
+        }
+
+        hover_layer.add_drawable (node.instance.drawable);
     }
 }

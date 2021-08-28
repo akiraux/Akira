@@ -56,6 +56,10 @@ public class Akira.Services.Settings : GLib.Settings {
         get { return get_boolean ("dark-theme"); }
         set { set_boolean ("dark-theme", value); }
     }
+    public bool follow_system_theme {
+        get { return get_boolean ("follow-system-theme"); }
+        set { set_boolean ("follow-system-theme", value); }
+    }
     public bool show_label {
         get { return get_boolean ("show-label"); }
         set { set_boolean ("show-label", value); }

@@ -25,15 +25,11 @@ public class Akira.Window : Gtk.ApplicationWindow {
 
     public weak Akira.Application app { get; construct; }
     public Akira.Services.EventBus event_bus;
-    public Akira.Lib.Managers.ItemsManager items_manager;
 
     public Akira.Services.ActionManager action_manager;
     public Akira.Layouts.HeaderBar headerbar;
     public Akira.Layouts.MainWindow main_window;
     public Akira.Utils.Dialogs dialogs;
-
-    public Akira.StateManagers.CoordinatesMiddleware coords_middleware;
-    public Akira.StateManagers.SizeMiddleware size_middleware;
 
     public SimpleActionGroup actions { get; construct; }
     public Gtk.AccelGroup accel_group { get; construct; }
@@ -56,12 +52,8 @@ public class Akira.Window : Gtk.ApplicationWindow {
         action_manager = new Akira.Services.ActionManager (app, this);
 
         headerbar = new Akira.Layouts.HeaderBar (this);
-        // items_manager = new Akira.Lib.Managers.ItemsManager (this);
         file_manager = new Akira.FileFormat.FileManager (this);
         main_window = new Akira.Layouts.MainWindow (this);
-        // coords_middleware = new Akira.StateManagers.CoordinatesMiddleware (this);
-        // size_middleware = new Akira.StateManagers.SizeMiddleware (this);
-        // dialogs = new Akira.Utils.Dialogs (this);
 
         build_ui ();
 
@@ -90,16 +82,10 @@ public class Akira.Window : Gtk.ApplicationWindow {
         add (main_window);
     }
 
+    /*
+     * Restore previously saved size and panels positions.
+     */
     private void apply_user_settings () {
-        Gtk.Settings.get_default ().gtk_application_prefer_dark_theme = settings.dark_theme;
-
-        var css_provider = new Gtk.CssProvider ();
-        css_provider.load_from_resource ("/com/github/akiraux/akira/stylesheet.css");
-
-        Gtk.StyleContext.add_provider_for_screen (
-            Gdk.Screen.get_default (), css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
-        );
-
         resize (settings.window_width, settings.window_height);
         main_window.pane.position = settings.left_paned;
         main_window.pane2.position = settings.right_paned;

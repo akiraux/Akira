@@ -1,10 +1,6 @@
-name: "CI"
+name: CI
 
-on:
-  push:
-    branches:
-      - "master"
-  pull_request:
+on: [pull_request]
 
 jobs:
   build:
@@ -17,48 +13,30 @@ jobs:
         run: |
           apt update
           apt install -y libarchive-dev valac meson appstream-util xvfb at-spi2-core git build-essential autoconf autoconf-archive autopoint automake pkg-config libtool m4 autoconf-archive gtk-doc-tools libxml2-utils gobject-introspection libgirepository1.0-dev libglib2.0-dev libjson-glib-dev gettext libcairo2-dev libgtk-3-dev
-      - name: goocanvas-3.0 from source
-        run: |
-          git clone https://gitlab.gnome.org/GNOME/goocanvas
-          cd goocanvas
-          git checkout goocanvas-3.0
-          git revert --no-commit 9103e2f
-          mkdir build
-          cd build
-          ../autogen.sh
-          ../configure --prefix /usr
-          make
-          make install
       - name: Build
-        # env:
-        #   DESTDIR: out
         run: |
           meson build
           ninja -C build
           ninja -C build install
-          xvfb-run -a -s "-screen 0 1024x768x24" \
-            dbus-run-session meson test -C build --no-rebuild -v --no-stdsplit --wrap catchsegv
-      - name: cleanup xvfb
-        run: |
-          xvfb_pids=`ps aux | grep tmp/xvfb-run | grep -v grep | awk '{print $2}'`
-          if [ "$xvfb_pids" != "" ]; then
-            echo "Killing the following xvfb processes: $xvfb_pids"
-            sudo kill $xvfb_pids
-          else
-            echo "No xvfb processes to kill"
-          fi
 
   flatpak:
-    name: "Flatpak"
+    name: Flatpak
     runs-on: ubuntu-latest
+
     container:
-      image: bilelmoussaoui/flatpak-github-actions:elementary-juno
+      image: ghcr.io/elementary/flatpak-platform/runtime:6
       options: --privileged
+
     steps:
-      - uses: actions/checkout@v2
-      - uses: bilelmoussaoui/flatpak-github-actions/flatpak-builder@master
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Build
+        uses: bilelmoussaoui/flatpak-github-actions/flatpak-builder@v3
         with:
-          bundle: "akira-dev.flatpak"
-          manifest-path: "build-aux/flatpak/com.github.akiraux.akira.json"
-          cache-key: flatpak-builder-${{ github.sha }}
-          run-tests: "true"
+          bundle: akira-dev.flatpak
+          manifest-path: com.github.akiraux.akira.yml
+          run-tests: true
+          repository-name: appcenter
+          repository-url: https://flatpak.elementary.io/repo.flatpakrepo
+          cache-key: "flatpak-builder-${{ github.sha }}"

@@ -16,14 +16,77 @@
  * You should have received a copy of the GNU General Public License
  * along with Akira. If not, see <https://www.gnu.org/licenses/>.
  *
- * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
+ * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
  */
 
-public class Akira.Lib.Components.Component : Object {
-    /**
-     * This is the base Component class other components will extend.
-     * It doesn't do anything other than setting the CanvasItem during construct.
-     * It might be removed in the future if deemed unnecessary.
+
+/*
+ * Defines a copyable interface for components
+ */
+public interface Akira.Lib.Components.Copyable<T> {
+
+    public abstract T copy ();
+}
+
+/*
+ * For now this is used as a namespace to hold some introspection.
+ */
+public class Akira.Lib.Components.Component {
+    /*
+     * Serialize the details of a component to an existing component
+     * object. This does not create a standalone node.
      */
-    public unowned Lib.Items.CanvasItem item { get; set; }
+    public virtual void serialize_details (ref Json.Object obj) {}
+
+    public Json.Node serialize_component (string cname) {
+        var obj = new Json.Object ();
+        obj.set_string_member ("cname", cname);
+        serialize_details (ref obj);
+        var res = new Json.Node (Json.NodeType.OBJECT);
+        res.set_object (obj);
+        return res;
+    }
+
+    /*
+     * Type of component.
+     * For now this is only used for marking components dirty. It is technically
+     * not necessary to have all components have anenum Type. Only the ones
+     * that need respective View updates.
+     */
+    public enum Type {
+        COMPILED_BORDER,
+        COMPILED_FILL,
+        COMPILED_GEOMETRY
+    }
+
+    public struct RegisteredType {
+        public Type type;
+        public bool dirty;
+
+        public RegisteredType (Type t) {
+            type = t;
+            dirty = false;
+        }
+    }
+
+    public struct RegisteredTypes {
+        RegisteredType[] types;
+
+        public RegisteredTypes () {
+            types = new RegisteredType[3];
+            types[0] = RegisteredType (Type.COMPILED_BORDER);
+            types[1] = RegisteredType (Type.COMPILED_FILL);
+            types[2] = RegisteredType (Type.COMPILED_GEOMETRY);
+        }
+
+        public void mark_dirty (Type type, bool new_state) {
+            for (var i = 0; i < types.length; ++i) {
+                if (types[i].type == type) {
+                    types[i].dirty = new_state;
+                }
+            }
+        }
+    }
+
+
 }

@@ -20,9 +20,6 @@
  * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
  */
 
-using Akira.Lib.Items;
-using Akira.Lib.Managers;
-
 public class Akira.Utils.AffineTransform : Object {
     private const int MIN_SIZE = 1;
     private const int MIN_POS = 10;
@@ -31,9 +28,9 @@ public class Akira.Utils.AffineTransform : Object {
      * Scales a node and its children relative to a reference frame.
      */
     public static void scale_node (
-        Lib2.Items.Model item_model,
-        Lib2.Items.ModelNode node,
-        Lib2.Modes.TransformMode.InitialDragState initial_drag_state,
+        Lib.Items.Model item_model,
+        Lib.Items.ModelNode node,
+        Lib.Modes.TransformMode.InitialDragState initial_drag_state,
         Cairo.Matrix inverse_reference_matrix,
         double global_offset_x,
         double global_offset_y,
@@ -77,10 +74,10 @@ public class Akira.Utils.AffineTransform : Object {
             var d_x = initial_drag_state.area.center_x + global_offset_x + center_offset_x;
             var d_y = initial_drag_state.area.center_y + global_offset_y + center_offset_y;
 
-            item.components.center = new Lib2.Components.Coordinates (d_x, d_y);
-            item.components.transform = new Lib2.Components.Transform (angle, 1.0, 1.0, shear_x, 0);
+            item.components.center = new Lib.Components.Coordinates (d_x, d_y);
+            item.components.transform = new Lib.Components.Transform (angle, 1.0, 1.0, shear_x, 0);
 
-            item.components.size = new Lib2.Components.Size (new_width, new_height, false);
+            item.components.size = new Lib.Components.Size (new_width, new_height, false);
 
             item_model.mark_node_geometry_dirty (node);
         }
@@ -454,19 +451,19 @@ public class Akira.Utils.AffineTransform : Object {
         inc_y += adj_y;
     }
 
-    public static void adjust_size (Lib.Items.CanvasItem item, double adj_x, double adj_y) {
-        var new_width = item.size.width + adj_x;
-        var new_height = item.size.height + adj_y;
+    // public static void adjust_size (Lib.Items.CanvasItem item, double adj_x, double adj_y) {
+    //     var new_width = item.size.width + adj_x;
+    //     var new_height = item.size.height + adj_y;
 
-        // Prevent accidental negative values.
-        if (new_width > 0) {
-            item.size.width = new_width;
-        }
+    //     // Prevent accidental negative values.
+    //     if (new_width > 0) {
+    //         item.size.width = new_width;
+    //     }
 
-        if (new_height > 0) {
-            item.size.height = new_height;
-        }
-    }
+    //     if (new_height > 0) {
+    //         item.size.height = new_height;
+    //     }
+    // }
 
     public static double fix_size (double size) {
         return GLib.Math.round (size);

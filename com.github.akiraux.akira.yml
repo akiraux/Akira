@@ -1,0 +1,23 @@
+app-id: com.github.akiraux.akira
+runtime: io.elementary.Platform
+runtime-version: '6'
+sdk: io.elementary.Sdk
+command: com.github.akiraux.akira
+
+finish-args:
+  - '--share=ipc'
+  - '--socket=fallback-x11'
+  - '--socket=wayland'
+
+  # needed for perfers-color-scheme
+  - '--system-talk-name=org.freedesktop.Accounts'
+
+  - '--filesystem=home'
+  - '--device=dri'
+
+modules:
+  - name: akira
+    buildsystem: meson
+    sources:
+      - type: dir
+        path: .

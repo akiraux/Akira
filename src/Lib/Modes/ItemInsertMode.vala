@@ -26,28 +26,43 @@
  *
  * In the future, this mode can be kept alive during multiple clicks when inserting items like polylines.
  */
-public class Akira.Lib.Modes.ItemInsertMode : InteractionMode {
-    public weak Akira.Lib.Canvas canvas { get; construct; }
-    public weak Akira.Lib.Managers.ModeManager mode_manager { get; construct; }
+public class Akira.Lib.Modes.ItemInsertMode : AbstractInteractionMode {
+    public weak Lib.ViewCanvas view_canvas { get; construct; }
 
-    private Akira.Lib.Modes.TransformMode transform_mode;
+    private string item_insert_type;
 
-    public ItemInsertMode (Akira.Lib.Canvas canvas, Akira.Lib.Managers.ModeManager mode_manager) {
-        Object (
-            canvas: canvas,
-            mode_manager : mode_manager
-        );
+    private Lib.Modes.TransformMode transform_mode;
+    private Lib.Modes.PathEditMode path_edit_mode;
+
+    public ItemInsertMode (Lib.ViewCanvas canvas, string item_type) {
+        Object (view_canvas: canvas);
+        item_insert_type = item_type;
+        
+        // if PathEditMode is active, it must deregisterd with user presses escape
+        view_canvas.window.event_bus.request_escape.connect (() => {
+            if(path_edit_mode != null) {
+                path_edit_mode.mode_end ();
+                request_deregistration (mode_type ());
+            }
+        });
     }
 
     construct {
         transform_mode = null;
+        path_edit_mode = null;
     }
 
-    public override InteractionMode.ModeType mode_type () { return InteractionMode.ModeType.ITEM_INSERT; }
+    public override AbstractInteractionMode.ModeType mode_type () {
+        return AbstractInteractionMode.ModeType.ITEM_INSERT;
+    }
 
     public override void mode_end () {
         if (transform_mode != null) {
             transform_mode.mode_end ();
+        }
+
+        if (path_edit_mode != null) {
+            path_edit_mode.mode_end ();
         }
     }
 
@@ -78,20 +93,40 @@ public class Akira.Lib.Modes.ItemInsertMode : InteractionMode {
             return transform_mode.button_press_event (event);
         }
 
+        if (path_edit_mode != null) {
+            return path_edit_mode.button_press_event (event);
+        }
+
         if (event.button == Gdk.BUTTON_PRIMARY) {
-            var sel_manager = canvas.selected_bound_manager;
-            sel_manager.reset_selection ();
+            bool is_artboard;
+            var instance = construct_item (item_insert_type, event.x, event.y, out is_artboard);
 
-            var new_item = canvas.window.items_manager.insert_item (event.x, event.y);
+            var group_id = Lib.Items.Model.ORIGIN_ID;
+            if (!is_artboard) {
+                group_id = view_canvas.items_manager.first_group_at (event.x, event.y).id;
+            }
 
-            sel_manager.add_item_to_selection (new_item);
+            view_canvas.items_manager.add_item_to_group (group_id, instance, false);
 
-            canvas.nob_manager.selected_nob = Utils.Nobs.Nob.BOTTOM_RIGHT;
-            canvas.update_canvas ();
+            view_canvas.selection_manager.reset_selection ();
+            view_canvas.selection_manager.add_to_selection (instance.id);
 
-            transform_mode = new Akira.Lib.Modes.TransformMode (canvas, null);
+            // if a path is being inserted, then start the PathEditMode
+            if (item_insert_type == "path") {
+                path_edit_mode = new Akira.Lib.Modes.PathEditMode (view_canvas, true, instance);
+                path_edit_mode.mode_begin();
+                path_edit_mode.button_press_event (event);
+
+                // Defer the print of the layer UI after all items have been created.
+                view_canvas.window.main_window.show_added_layers ();
+                return true;
+            }
+
+            transform_mode = new Akira.Lib.Modes.TransformMode (view_canvas, Utils.Nobs.Nob.BOTTOM_LEFT);
             transform_mode.mode_begin ();
             transform_mode.button_press_event (event);
+            // Defer the print of the layer UI after all items have been created.
+            view_canvas.window.main_window.show_added_layers ();
 
             return true;
         }
@@ -102,7 +137,7 @@ public class Akira.Lib.Modes.ItemInsertMode : InteractionMode {
     public override bool button_release_event (Gdk.EventButton event) {
         if (transform_mode != null) {
             transform_mode.button_release_event (event);
-            mode_manager.deregister_mode (mode_type ());
+            request_deregistration (mode_type ());
         }
 
         return true;
@@ -124,4 +159,116 @@ public class Akira.Lib.Modes.ItemInsertMode : InteractionMode {
         return null;
     }
 
+    private static Lib.Items.ModelInstance construct_item (string from_type, double x, double y, out bool is_artboard) {
+        double center_x = 0.0;
+        double center_y = 0.0;
+        double width = 1.0;
+        double height = 1.0;
+        is_artboard = false;
+
+        // We use floor to align to the pixel that is clicked.
+        Utils.AffineTransform.geometry_from_top_left (
+            GLib.Math.floor (x),
+            GLib.Math.floor (y),
+            ref center_x,
+            ref center_y,
+            ref width,
+            ref height
+        );
+
+        var coordinates = new Lib.Components.Coordinates (center_x, center_y);
+        var size = new Lib.Components.Size (width, height, false);
+
+        Lib.Items.ModelInstance new_item = null;
+        switch (from_type) {
+            case "rectangle":
+                new_item = Lib.Items.ModelTypeRect.default_rect (
+                    coordinates,
+                    size,
+                    borders_from_settings (),
+                    fills_from_settings ()
+                );
+                break;
+
+            case "ellipse":
+                new_item = Lib.Items.ModelTypeEllipse.default_ellipse (
+                    coordinates,
+                    size,
+                    borders_from_settings (),
+                    fills_from_settings ()
+                );
+                break;
+
+            case "text":
+                new_item = Lib.Items.ModelTypePath.default_path (
+                    coordinates,
+                    borders_from_settings (),
+                    fills_from_settings ()
+                );
+
+                var test_path = new Geometry.Point[6];
+                test_path[0] = Geometry.Point (0, 0);
+                test_path[1] = Geometry.Point (10, 40);
+                test_path[2] = Geometry.Point (50, 200);
+                test_path[3] = Geometry.Point (100, 40);
+                test_path[4] = Geometry.Point (30, 40);
+                test_path[5] = Geometry.Point (10, 10);
+
+                new_item.components.path = new Lib.Components.Path.from_points (test_path, false);
+                break;
+
+            case "artboard":
+                is_artboard = true;
+                new_item = Lib.Items.ModelTypeArtboard.default_artboard (
+                    coordinates,
+                    size
+                );
+                break;
+
+            case "image":
+                break;
+
+            case "path":
+                new_item = Lib.Items.ModelTypePath.default_path (
+                    coordinates,
+                    borders_from_settings(),
+                    null
+                );
+                var test_path = new Geometry.Point[1];
+                test_path[0] = Geometry.Point (0, 0);
+
+                new_item.components.path = new Lib.Components.Path.from_points (test_path, false);
+                break;
+        }
+
+        if (new_item == null) {
+            new_item = Lib.Items.ModelTypeRect.default_rect (
+                coordinates,
+                size,
+                borders_from_settings (),
+                fills_from_settings ()
+            );
+        }
+
+        return new_item;
+    }
+
+    private static Lib.Components.Fills fills_from_settings () {
+        var fill_rgba = Gdk.RGBA ();
+        fill_rgba.parse (settings.fill_color);
+        return new Lib.Components.Fills.single_color (Lib.Components.Color.from_rgba (fill_rgba));
+    }
+
+    private static Lib.Components.Borders? borders_from_settings () {
+        if (!settings.set_border) {
+            return null;
+        }
+
+        var border_rgba = Gdk.RGBA ();
+        border_rgba.parse (settings.border_color);
+        return new Lib.Components.Borders.single_color (
+            Lib.Components.Color.from_rgba (border_rgba),
+            settings.border_size
+        );
+    }
 }

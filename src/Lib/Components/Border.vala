@@ -16,50 +16,67 @@
  * You should have received a copy of the GNU General Public License
  * along with Akira. If not, see <https://www.gnu.org/licenses/>.
  *
- * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
+ * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
  */
 
-/**
- * Border component to keep track of a single border, which includes different attributes.
- */
-public class Akira.Lib.Components.Border : Component {
-    public unowned Borders borders { get; set; }
-    // Since items can have multiple border colors, we need to keep track of each
-    // with a unique identifier in order to properly update them.
-    public int id { get; set; }
+public class Akira.Lib.Components.Border {
+    public struct BorderData {
+        public int _id;
+        public Color _color;
+        public int _size;
 
-    public Gdk.RGBA color { get; set; }
+        public BorderData (int id = -1, Color color = Color (), int size = 0) {
+            _id = id;
+            _color = color;
+            _size = size;
+        }
 
-    // Store the hexadecimal string version of the color (E.g.: #FF00CC)
-    public string hex { get; set; }
-    public int size { get; set; }
-    public int alpha { get; set; }
-    public bool hidden { get; set; }
+        public BorderData.deserialized (int id, Json.Object obj) {
+            _id = id;
+            _color = Color.deserialized (obj.get_object_member ("color"));
+            _size = (int)obj.get_int_member ("size");
+        }
 
-    public Border (Borders _borders, Items.CanvasItem _item, Gdk.RGBA init_color, int init_size, int border_id) {
-        borders = _borders;
-        item = _item;
-        id = border_id;
-        color = init_color;
-        size = init_size;
-        alpha = 255;
+        public Json.Node serialize () {
+            var obj = new Json.Object ();
+            obj.set_int_member ("id", _id);
+            obj.set_member ("color", _color.serialize ());
+            obj.set_int_member ("size", _size);
+            var node = new Json.Node (Json.NodeType.OBJECT);
+            node.set_object (obj);
+            return node;
+        }
 
-        // Listen for changed to the border attributes to properly trigger the color generation.
-        this.notify["color"].connect (() => {
-            hex = Utils.Color.rgba_to_hex (color.to_string ());
-            borders.reload ();
-        });
+        // Recommended accessors
 
-        this.notify["size"].connect (() => {
-            borders.reload ();
-        });
+        public int id () { return _id; }
+        public Gdk.RGBA color () { return _color.rgba; }
+        public bool is_color_hidden () { return _color.hidden; }
+        public int size () { return _size; }
 
-        this.notify["hidden"].connect (() => {
-            borders.reload ();
-        });
+        // Mutators
+
+        public BorderData with_color (Color new_color) {
+            return BorderData (_id, new_color, _size);
+        }
+
+        public BorderData with_size (int new_size) {
+            return BorderData (_id, _color, new_size);
+        }
     }
 
-    public void remove () {
-        borders.remove_border (this);
+    // main data for boxed Border
+    private BorderData _data;
+
+    public Border (BorderData data) {
+        _data = data;
     }
+
+    // Recommended accessors
+
+    public int id () { return _data._id; }
+    public Gdk.RGBA color () { return _data._color.rgba; }
+    public bool is_color_hidden () { return _data._color.hidden; }
+    public int size () { return _data._size; }
+
 }

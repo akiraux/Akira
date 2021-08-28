@@ -25,13 +25,6 @@
  * Drawable for rects.
  */
 public class Akira.Drawables.DrawableRect : Drawable {
-    public double radius_tr { get; set; default = 0; }
-    public double radius_tl { get; set; default = 0; }
-    public double radius_br { get; set; default = 0; }
-    public double radius_bl { get; set; default = 0; }
-
-    public bool has_radius { get { return (radius_tr + radius_tl + radius_br + radius_bl) > 0; } }
-
     public DrawableRect (double tl_x, double tl_y, double width, double height) {
        this.center_x = tl_x + width / 2.0;
        this.center_y = tl_y + height / 2.0;
@@ -39,76 +32,34 @@ public class Akira.Drawables.DrawableRect : Drawable {
        this.height = height;
     }
 
-    public override void simple_create_path (Cairo.Context cr) {
-        if (has_radius) {
+    public override void simple_create_path (Cairo.Context context) {
+        rect_path (context, this);
+    }
+
+    public static void rect_path (Cairo.Context context, Drawable drawable) {
+        if (drawable.has_radius) {
             //path_impl1 (cr);
-            path_impl2 (cr);
+            rounded_rect_path (context, drawable);
             return;
         }
 
-        var x = center_x - width / 2.0;
-        var y = center_y - height / 2.0;
-        cr.rectangle (x, y, width, height);
+        var w = drawable.width;
+        var h = drawable.height;
+        var x = drawable.center_x - w / 2.0;
+        var y = drawable.center_y - h / 2.0;
+        context.rectangle (x, y, w, h);
     }
 
-    public void path_impl1 (Cairo.Context cr) {
-        var x = center_x - width / 2.0;
-        var y = center_y - height / 2.0;
-        /* The radii can't be more than half the size of the rect. */
-        double rx = double.min (radius_tr, width / 2);
-        double ry = double.min (radius_bl, height / 2);
-
-        /* Draw the top-right arc. */
-        cr.save ();
-        cr.translate (x + width - rx, y + ry);
-        cr.scale (rx, ry);
-        cr.arc (0.0, 0.0, 1.0, 1.5 * GLib.Math.PI, 2.0 * GLib.Math.PI);
-        cr.restore ();
-
-        /* Draw the line down the right side. */
-        cr.line_to (x + width, y + height - ry);
-
-        /* Draw the bottom-right arc. */
-        cr.save ();
-        cr.translate (x + width - rx, y + height - ry);
-        cr.scale (rx, ry);
-        cr.arc (0.0, 0.0, 1.0, 0.0, 0.5 * GLib.Math.PI);
-        cr.restore ();
-
-        /* Draw the line left across the bottom. */
-        cr.line_to (x + rx, y + height);
-
-        /* Draw the bottom-left arc. */
-        cr.save ();
-        cr.translate (x + rx, y + height - y);
-        cr.scale (rx, ry);
-        cr.arc (0.0, 0.0, 1.0, 0.5 * GLib.Math.PI, GLib.Math.PI);
-        cr.restore ();
-
-        /* Draw the line up the left side. */
-        cr.line_to (x, y + ry);
-
-        /* Draw the top-left arc. */
-        cr.save ();
-        cr.translate (x + rx, y + ry);
-        cr.scale (rx, ry);
-        cr.arc (0.0, 0.0, 1.0, GLib.Math.PI, 1.5 * GLib.Math.PI);
-        cr.restore ();
-
-        /* Close the path across the top. */
-        cr.close_path ();
-    }
-
-    public void path_impl2 (Cairo.Context cr) {
-        var w = width;
-        var h = height;
+    public static void rounded_rect_path (Cairo.Context context, Drawable drawable) {
+        var w = drawable.width;
+        var h = drawable.height;
 
         // aspect_ratio yet unused
         var aspect_ratio = 1.0;
-        double rtl = radius_tl / aspect_ratio;
-        double rtr = radius_tr / aspect_ratio;
-        double rbl = radius_bl / aspect_ratio;
-        double rbr = radius_br / aspect_ratio;
+        double rtl = drawable.radius_tl / aspect_ratio;
+        double rtr = drawable.radius_tr / aspect_ratio;
+        double rbl = drawable.radius_bl / aspect_ratio;
+        double rbr = drawable.radius_br / aspect_ratio;
 
         double r_top = rtl + rtr;
         double r_bot = rbl + rbr;
@@ -136,38 +87,39 @@ public class Akira.Drawables.DrawableRect : Drawable {
         }
 
 
-        var x = center_x - w / 2.0;
-        var y = center_y - h / 2.0;
+        var x = drawable.center_x - w / 2.0;
+        var y = drawable.center_y - h / 2.0;
         var degrees = GLib.Math.PI / 180.0;
 
         // Add top-right
         if (rtr > 0) {
-            cr.arc (x + w - rtr, y + rtr, rtr, -90 * degrees, 0);
+            context.arc (x + w - rtr, y + rtr, rtr, -90 * degrees, 0);
         } else {
-            cr.move_to (x + w, y);
+            context.move_to (x + w, y);
         }
 
         if (rbr > 0) {
             // Add bottom-right
-            cr.arc (x + w - rbr, y + h - rbr, rbr, 0, 90 * degrees);
+            context.arc (x + w - rbr, y + h - rbr, rbr, 0, 90 * degrees);
         } else {
-            cr.line_to (x + w, y + h);
+            context.line_to (x + w, y + h);
         }
 
         if (rbl > 0) {
             // Add bottom-left
-            cr.arc (x + rbl, y + h - rbl, rbl, 90 * degrees, 180 * degrees);
+            context.arc (x + rbl, y + h - rbl, rbl, 90 * degrees, 180 * degrees);
         } else {
-            cr.line_to (x, y + h);
+            context.line_to (x, y + h);
         }
 
         if (rtl > 0) {
             // Add top-left
-            cr.arc (x + rtl, y + rtl, rtl, 180 * degrees, 270 * degrees);
+            context.arc (x + rtl, y + rtl, rtl, 180 * degrees, 270 * degrees);
         } else {
-            cr.line_to (x, y);
+            context.line_to (x, y);
         }
-        cr.close_path ();
+
+        context.close_path ();
     }
 
     //public override void simple_update (Cairo.Context cr) {

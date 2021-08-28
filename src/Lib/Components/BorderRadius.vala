@@ -16,35 +16,66 @@
  * You should have received a copy of the GNU General Public License
  * along with Akira. If not, see <https://www.gnu.org/licenses/>.
  *
- * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
+ * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
  */
 
-/**
- * BorderRadius component to handle the border radius of an item.
- */
-public class Akira.Lib.Components.BorderRadius : Component {
-    public double x { get; set; }
-    public double y { get; set; }
+public class Akira.Lib.Components.BorderRadius : Component, Copyable<BorderRadius> {
+    private int _x;
+    private int _y;
+    private bool _autoscale;
+    private bool _uniform;
 
-    public bool uniform { get; set; }
-    public bool autoscale { get; set; }
+    public BorderRadius (int x, int y, bool autoscale, bool uniform) {
+        _x = x;
+        _y = y;
+        _autoscale = autoscale;
+        _uniform = uniform;
 
-    public BorderRadius (Items.CanvasItem _item) {
-        item = _item;
-        x = y = 0.0;
-
-        uniform = true;
-        autoscale = false;
-
-        this.notify["x"].connect (update);
-        this.notify["y"].connect (update);
+        if (_uniform) {
+            _x = _y;
+        }
     }
 
-    public void update () {
-        // We use the X value for both radii in case the radius is set to uniform.
-        if (uniform) {
-            item.set ("radius-x", x);
-            item.set ("radius-y", x);
-        }
+    public BorderRadius.deserialized (Json.Object obj) {
+        _x = (int)obj.get_int_member ("x");
+        _y = (int)obj.get_int_member ("y");
+        _autoscale = obj.get_boolean_member ("autoscale");
+        _uniform = obj.get_boolean_member ("uniform");
+    }
+
+    public override void serialize_details (ref Json.Object obj) {
+        obj.set_int_member ("x", _x);
+        obj.set_int_member ("y", _y);
+        obj.set_boolean_member ("autoscale", _autoscale);
+        obj.set_boolean_member ("uniform", _uniform);
+    }
+
+    public BorderRadius copy () {
+        return new BorderRadius (_x, _y, _autoscale, _uniform);
+    }
+
+    // Recommended accessors
+
+    public int x () { return _x; }
+    public int y () { return _x; }
+    public bool autoscale () { return _autoscale; }
+    public bool uniform () { return _uniform; }
+
+    // Mutators
+
+    public BorderRadius with_x (int new_x) {
+        return new BorderRadius (_x, _y, _autoscale, _uniform);
+    }
+
+    public BorderRadius with_y (int new_y) {
+        return new BorderRadius (_x, new_y, _autoscale, _uniform);
+    }
+
+    public BorderRadius with_autoscale (bool new_autoscale) {
+        return new BorderRadius (_x, _y, new_autoscale, _uniform);
+    }
+
+    public BorderRadius with_uniform (bool new_uniform) {
+        return new BorderRadius (_x, _y, _autoscale, new_uniform);
     }
 }

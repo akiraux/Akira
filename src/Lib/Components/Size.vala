@@ -16,96 +16,57 @@
  * You should have received a copy of the GNU General Public License
  * along with Akira. If not, see <https://www.gnu.org/licenses/>.
  *
- * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
+ * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
  */
 
-/**
- * Size component to keep track of the item's size ratio attributes.
- */
-public class Akira.Lib.Components.Size : Component {
-    // Keep track of the size changed internally based on the size ratio.
-    private bool auto_resize = false;
-
-    public bool locked { get; set; }
-    public double ratio { get; set; }
+public class Akira.Lib.Components.Size : Component, Copyable<Size> {
+    private double _width;
+    private double _height;
+    private bool _locked;
 
     public double width {
-        get {
-            double w = 0.0;
-            item.get ("width", out w);
-
-            return w;
-        }
-        set {
-            item.set ("width", value);
-
-            if (locked && !auto_resize) {
-                auto_resize = true;
-                var locked_height = Utils.AffineTransform.fix_size (value / ratio);
-                height = item is Items.CanvasImage && locked_height < 1 ? 1 : locked_height;
-                auto_resize = false;
-            }
-
-            if (!auto_resize) {
-                Lib.Canvas canvas = item.canvas as Lib.Canvas;
-                canvas.window.event_bus.item_value_changed ();
-
-                // If the value wasn't changed automatically by the auto resize,
-                // and the image is selected, recalculate the pixbuf quality.
-                if (item is Items.CanvasImage && item.layer.selected && !canvas.holding) {
-                    canvas.window.event_bus.detect_image_size_change ();
-                }
-            }
-        }
+        get { return _width; }
     }
 
     public double height {
-        get {
-            double h = 0.0;
-            item.get ("height", out h);
-
-            return h;
-        }
-        set {
-            item.set ("height", value);
-
-            if (locked && !auto_resize) {
-                auto_resize = true;
-                var locked_width = Utils.AffineTransform.fix_size (value / ratio);
-                height = item is Items.CanvasImage && locked_width < 1 ? 1 : locked_width;
-                auto_resize = false;
-            }
-
-            if (!auto_resize) {
-                Lib.Canvas canvas = item.canvas as Lib.Canvas;
-                canvas.window.event_bus.item_value_changed ();
-
-                // If the value wasn't changed automatically by the auto resize,
-                // and the image is selected, recalculate the pixbuf quality.
-                if (item is Items.CanvasImage && item.layer.selected && !canvas.holding) {
-                    canvas.window.event_bus.detect_image_size_change ();
-                }
-            }
-        }
+        get { return _height; }
     }
 
-    public Size (Items.CanvasItem _item) {
-        item = _item;
-        locked = false;
-        ratio = 1.0;
-
-        this.notify["locked"].connect (update_ratio);
+    public bool locked {
+        get { return _locked; }
     }
 
-    /**
-     * Helper method to update the size ratio of an item.
-     */
-    public void update_ratio () {
-        // Avoid divding by 0.
-        if (width == 0 || height == 0) {
-            return;
-        }
+    public double ratio {
+        get { return _height == 0 ? 0.0 : _width / _height; }
+    }
 
-        ratio = width / height;
+    public Size (double width, double height, bool locked) {
+        _locked = locked;
+        _width = width;
+        _height = height;
+    }
+
+    public Size.deserialized (Json.Object obj) {
+        _width = obj.get_double_member ("width");
+        _height = obj.get_double_member ("height");
+        _locked = obj.get_boolean_member ("locked");
+    }
+
+    protected override void serialize_details (ref Json.Object obj) {
+        obj.set_double_member ("width", _width);
+        obj.set_double_member ("height", _height);
+        obj.set_boolean_member ("locked", _locked);
+    }
+
+    public Size copy () {
+        return new Size (_width, _height, _locked);
+    }
+
+    public Size with_width (double new_width) {
+        return new Size (new_width, _height, _locked);
+    }
+
+    public Size with_height (double new_height) {
+        return new Size (_width, new_height, _locked);
     }
 }

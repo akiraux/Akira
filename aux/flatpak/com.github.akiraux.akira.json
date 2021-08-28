@@ -1,0 +1,106 @@
+{
+  "app-id": "com.github.akiraux.akiraDevel",
+  "runtime": "org.gnome.Platform",
+  "runtime-version": "40",
+  "sdk": "org.gnome.Sdk",
+  "base": "io.elementary.BaseApp",
+  "base-version": "juno-20.08",
+  "command": "com.github.akiraux.akiraDevel",
+  "cleanup": [
+    "/include",
+    "/lib/pkgconfig",
+    "/lib/debug",
+    "/share/vala",
+    "/man",
+    "*.a",
+    "*.la"
+  ],
+  "finish-args": [
+    "--share=ipc",
+    "--socket=fallback-x11",
+    "--socket=wayland",
+    "--talk-name=org.gtk.vfs.*",
+    "--filesystem=xdg-run/gvfs",
+    "--filesystem=xdg-run/gvfsd"
+  ],
+  "modules": [
+    {
+      "name": "elementary-stylesheet",
+      "buildsystem": "meson",
+      "sources": [{
+        "type": "git",
+        "url": "https://github.com/elementary/stylesheet.git",
+        "commit": "3047efbfabe723e0b0f2b8ee3d53bed528be4b14"
+      }],
+      "modules": [{
+        "name": "sassc",
+        "cleanup": [
+          "*"
+        ],
+        "sources": [{
+            "type": "git",
+            "url": "https://github.com/sass/sassc.git",
+            "tag": "3.6.1"
+          },
+          {
+            "type": "script",
+            "dest-filename": "autogen.sh",
+            "commands": [
+              "autoreconf -si"
+            ]
+          }
+        ],
+        "modules": [{
+          "name": "libsass",
+          "cleanup": [
+            "*"
+          ],
+          "sources": [{
+              "type": "git",
+              "url": "https://github.com/sass/libsass.git",
+              "tag": "3.6.4"
+            },
+            {
+              "type": "script",
+              "dest-filename": "autogen.sh",
+              "commands": [
+                "autoreconf -si"
+              ]
+            }
+          ]
+        }]
+      }]
+    },
+    {
+      "name": "elementary-icons",
+      "buildsystem": "meson",
+      "sources": [{
+        "type": "git",
+        "url": "https://github.com/elementary/icons.git",
+        "commit": "9e7ace3d6c1d1e3b5ea64012a371e46039bf044a"
+      }],
+      "modules": [{
+        "name": "xcursorgen",
+        "cleanup": [
+          "*"
+        ],
+        "sources": [{
+          "type": "git",
+          "url": "https://gitlab.freedesktop.org/xorg/app/xcursorgen.git",
+          "tag": "xcursorgen-1.0.7"
+        }]
+      }]
+    },
+    {
+      "name": "akira",
+      "buildsystem": "meson",
+      "config-opts": [
+        "-Dprofile=development"
+      ],
+      "sources": [{
+        "type": "dir",
+        "path": "../../"
+      }]
+    }
+  ]
+}

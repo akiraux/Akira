@@ -22,12 +22,7 @@
 public class Akira.Layouts.MainWindow : Gtk.Grid {
     public weak Akira.Window window { get; construct; }
 
-    // To be removed.
-    public Layouts.MainCanvas main_canvas;
-    public Layouts.MainViewCanvas main_view_canvas;
-    public Layouts.LeftSideBar left_sidebar;
-    // public Layouts.RightSideBar right_sidebar;
-    // end.
+    public Akira.Layouts.MainViewCanvas main_view_canvas;
 
     private Layouts.Sidebars.LayersSidebar layers_sidebar;
 
@@ -44,7 +39,6 @@ public class Akira.Layouts.MainWindow : Gtk.Grid {
 
         pane = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);
         pane2 = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);
-
         pane.pack2 (pane2, true, false);
         pane2.pack1 (main_view_canvas, true, true);
 
@@ -60,10 +54,7 @@ public class Akira.Layouts.MainWindow : Gtk.Grid {
     }
 
     public void focus_canvas () {
-        if (main_view_canvas != null) {
-            main_view_canvas.canvas.focus_canvas ();
-            return;
-        }
+        main_view_canvas.canvas.focus_canvas ();
     }
 
     /*

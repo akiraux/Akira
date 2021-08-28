@@ -24,75 +24,108 @@
  * be used to apply the underlying code on top of other modes that may need to
  * use the functionality.
  */
-public class Akira.Lib.Modes.TransformMode : InteractionMode {
+public class Akira.Lib.Modes.TransformMode : AbstractInteractionMode {
     private const double ROTATION_FIXED_STEP = 15.0;
 
-    public weak Akira.Lib.Canvas canvas { get; construct; }
-    public weak Akira.Lib.Managers.ModeManager mode_manager { get; construct; }
+    public unowned Lib.ViewCanvas view_canvas { get; construct; }
 
-    public class InitialDragState {
-        public double press_x = 0.0;
-        public double press_y = 0.0;
-        public double nob_x = 0.0;
-        public double nob_y = 0.0;
+    public Utils.Nobs.Nob nob = Utils.Nobs.Nob.NONE;
 
-        public double item_x = 0.0;
-        public double item_y = 0.0;
-        public double item_width = 0.0;
-        public double item_height = 0.0;
-        public Cairo.Matrix item_transform;
+    // Keeps track of the currently used nob to quickly change selection when
+    // an item is scaled below its sizing, causing a "flip" in the transformation.
+    public Utils.Nobs.Nob effective_nob = Utils.Nobs.Nob.NONE;
 
-        public double item_scale_x_adj = 0.0;
-        public double item_scale_y_adj = 0.0;
+    public class DragItemData : Object {
+        public Lib.Components.CompiledGeometry item_geometry;
+    }
 
-        public double rotation_center_x = 0.0;
-        public double rotation_center_y = 0.0;
+    public class InitialDragState : Object {
+        public double press_x;
+        public double press_y;
 
-        public bool wants_snapping = true;
+        // initial_selection_data
+        public Geometry.Quad area;
+
+        public Gee.HashMap<int, DragItemData> item_data_map;
+
+        construct {
+            item_data_map = new Gee.HashMap<int, DragItemData> ();
+        }
     }
 
     public class TransformExtraContext : Object {
-        public Akira.Lib.Managers.SnapManager.SnapGuideData snap_guide_data;
+        public Lib.Managers.SnapManager.SnapGuideData snap_guide_data;
     }
 
-    public InitialDragState initial_drag_state;
+    private Lib.Items.NodeSelection selection;
+    private InitialDragState initial_drag_state;
     public TransformExtraContext transform_extra_context;
 
-    public TransformMode (Akira.Lib.Canvas canvas, Akira.Lib.Managers.ModeManager? mode_manager) {
-        Object (
-            canvas: canvas,
-            mode_manager : mode_manager
-        );
+
+    public TransformMode (Akira.Lib.ViewCanvas canvas, Utils.Nobs.Nob selected_nob) {
+        Object (view_canvas: canvas);
+        // Set the effective_nob when the transform mode is first initialized in
+        // order to get the correct first clicked nob to show when scaling.
+        nob = effective_nob = selected_nob;
+        initial_drag_state = new InitialDragState ();
     }
 
     construct {
-        initial_drag_state = new InitialDragState ();
         transform_extra_context = new TransformExtraContext ();
-        transform_extra_context.snap_guide_data = new Akira.Lib.Managers.SnapManager.SnapGuideData ();
+        transform_extra_context.snap_guide_data = new Lib.Managers.SnapManager.SnapGuideData ();
     }
 
     public override void mode_begin () {
-        unowned var selected_items = canvas.selected_bound_manager.selected_items;
-        var success = initialize_items_drag_state (selected_items, ref initial_drag_state);
-
-        if (!success && mode_manager != null) {
-            mode_manager.deregister_mode (mode_type ());
+        if (view_canvas.selection_manager.selection.is_empty ()) {
+            request_deregistration (mode_type ());
             return;
+        }
+
+        view_canvas.toggle_layer_visibility (ViewLayers.ViewLayer.NOBS_LAYER_ID, true);
+        selection = view_canvas.selection_manager.selection;
+        initial_drag_state.area = selection.coordinates ();
+
+        foreach (var node in selection.nodes.values) {
+            collect_geometries (node.node, ref initial_drag_state);
+        }
+    }
+
+    private static void collect_geometries (Lib.Items.ModelNode subtree, ref InitialDragState state) {
+        if (state.item_data_map.has_key (subtree.id)) {
+            return;
+        }
+
+        var data = new DragItemData ();
+        data.item_geometry = subtree.instance.compiled_geometry.copy ();
+        state.item_data_map[subtree.id] = data;
+
+        if (subtree.children == null || subtree.children.length == 0) {
+            return;
+        }
+
+        foreach (unowned var child in subtree.children.data) {
+            collect_geometries (child, ref state);
         }
     }
 
     public override void mode_end () {
         transform_extra_context = null;
-        canvas.nob_manager.set_selected_by_name (Utils.Nobs.Nob.NONE);
-        canvas.window.event_bus.detect_artboard_change ();
-        canvas.window.event_bus.update_snap_decorators ();
+        view_canvas.window.event_bus.update_snap_decorators ();
     }
 
-    public override InteractionMode.ModeType mode_type () { return InteractionMode.ModeType.RESIZE; }
+    public override AbstractInteractionMode.ModeType mode_type () {
+        return AbstractInteractionMode.ModeType.TRANSFORM;
+    }
+
+    /*
+     * Returns the currently active nob the user is holding to resize the item.
+     */
+    public override Utils.Nobs.Nob active_nob () {
+        return effective_nob;
+    }
 
     public override Gdk.CursorType? cursor_type () {
-        var selected_nob = canvas.nob_manager.selected_nob;
-        return Utils.Nobs.cursor_from_nob (selected_nob);
+        return Utils.Nobs.cursor_from_nob (nob);
     }
 
     public override bool key_press_event (Gdk.EventKey event) {
@@ -106,71 +139,46 @@ public class Akira.Lib.Modes.TransformMode : InteractionMode {
     public override bool button_press_event (Gdk.EventButton event) {
         initial_drag_state.press_x = event.x;
         initial_drag_state.press_y = event.y;
-
-        Akira.Lib.Managers.NobManager.nob_position_from_items (
-            canvas.selected_bound_manager.selected_items,
-            canvas.nob_manager.selected_nob,
-            ref initial_drag_state.nob_x,
-            ref initial_drag_state.nob_y
-        );
-
         return true;
     }
 
     public override bool button_release_event (Gdk.EventButton event) {
-        if (mode_manager != null) {
-            mode_manager.deregister_mode (mode_type ());
-        }
+        request_deregistration (mode_type ());
         return true;
     }
 
     public override bool motion_notify_event (Gdk.EventMotion event) {
-        var selected_nob = canvas.nob_manager.selected_nob;
-
-        unowned var selected_items = canvas.selected_bound_manager.selected_items;
-
-        if (selected_items.length () != 1) {
-            return false;
-        }
-
-        switch (selected_nob) {
+        switch (nob) {
             case Utils.Nobs.Nob.NONE:
                 move_from_event (
-                    canvas,
-                    selected_items,
+                    view_canvas,
+                    selection,
                     initial_drag_state,
                     event.x,
                     event.y,
                     ref transform_extra_context.snap_guide_data
                 );
                 break;
-
             case Utils.Nobs.Nob.ROTATE:
                 rotate_from_event (
-                    canvas,
-                    selected_items,
+                    view_canvas,
+                    selection,
                     initial_drag_state,
                     event.x,
-                    event.y,
-                    ref transform_extra_context.snap_guide_data
+                    event.y
                 );
                 break;
-
             default:
-                scale_from_event (
-                    canvas,
-                    selected_items,
+                effective_nob = scale_from_event (
+                    view_canvas,
+                    selection,
                     initial_drag_state,
-                    selected_nob,
+                    nob,
                     event.x,
-                    event.y,
-                    ref transform_extra_context.snap_guide_data
+                    event.y
                 );
                 break;
         }
-
-        // Notify the X & Y values in the state manager.
-        canvas.window.event_bus.reset_state_coords ();
 
         return true;
     }
@@ -179,228 +187,337 @@ public class Akira.Lib.Modes.TransformMode : InteractionMode {
         return transform_extra_context;
     }
 
-    /*
-     * Initialize the initial drag state of an item. Return true on success.
-     */
-    public static bool initialize_items_drag_state (
-        GLib.List<Akira.Lib.Items.CanvasItem> selected_items,
-        ref InitialDragState drag_state
-    ) {
-        if (selected_items.length () != 1) {
-            return false;
-        }
-
-        var item = selected_items.nth_data (0);
-
-        drag_state.item_x = item.coordinates.x;
-        drag_state.item_y = item.coordinates.y;
-
-        item.get_transform (out drag_state.item_transform);
-
-        if (selected_items.length () == 1) {
-            drag_state.item_width = item.size.width;
-            drag_state.item_height = item.size.height;
-        } else {
-            // TODO there should probably be a nice method to get a bounding box
-            // from a list of items.
-        }
-
-        drag_state.item_scale_x_adj = 0;
-        drag_state.item_scale_y_adj = 0;
-
-        // If rotation is multiple of 90, then snap to pixel grid before scale.
-        if (item.rotation != null && GLib.Math.fmod (item.rotation.rotation, 90) == 0) {
-            drag_state.item_scale_x_adj = Utils.AffineTransform.fix_size (drag_state.item_x) - drag_state.item_x;
-            drag_state.item_scale_y_adj = Utils.AffineTransform.fix_size (drag_state.item_y) - drag_state.item_y;
-            drag_state.item_width = Utils.AffineTransform.fix_size (drag_state.item_width);
-            drag_state.item_height = Utils.AffineTransform.fix_size (drag_state.item_height);
-        }
-
-        drag_state.rotation_center_x = (item.coordinates.x1 + item.coordinates.x2) / 2.0;
-        drag_state.rotation_center_y = (item.coordinates.y1 + item.coordinates.y2) / 2.0;
-
-        return true;
-    }
-
     public static void move_from_event (
-        Akira.Lib.Canvas canvas,
-        GLib.List<Akira.Lib.Items.CanvasItem> selected_items,
+        ViewCanvas view_canvas,
+        Lib.Items.NodeSelection selection,
         InitialDragState initial_drag_state,
         double event_x,
         double event_y,
-        ref Akira.Lib.Managers.SnapManager.SnapGuideData guide_data
+        ref Lib.Managers.SnapManager.SnapGuideData guide_data
     ) {
-        if (selected_items.length () != 1) {
-            return;
-        }
+        var blocker = new Lib.Managers.SelectionManager.ChangeSignalBlocker (view_canvas.selection_manager);
+        (void) blocker;
 
-        // for now we only transform one item
-        Akira.Lib.Items.CanvasItem item = selected_items.nth_data (0);
-
-        // Keep reset and delta values for future adjustments.
-
-        // Calculate values needed to reset to the original position.
-        var reset_x = item.coordinates.x - initial_drag_state.item_x;
-        var reset_y = item.coordinates.y - initial_drag_state.item_y;
-
-        // Calculate the change based on the event.
         var delta_x = event_x - initial_drag_state.press_x;
         var delta_y = event_y - initial_drag_state.press_y;
 
-        // Keep reset and delta values for future adjustments.
-        // fix_size should be called right before a transform.
-        var first_move_x = Utils.AffineTransform.fix_size (delta_x - reset_x);
-        var first_move_y = Utils.AffineTransform.fix_size (delta_y - reset_y);
+        double top = 0.0;
+        double left = 0.0;
+        double bottom = 0.0;
+        double right = 0.0;
+        initial_drag_state.area.top_bottom (ref top, ref bottom);
+        initial_drag_state.area.left_right (ref left, ref right);
 
-        Cairo.Matrix matrix;
-        item.get_transform (out matrix);
-
-        // Increment the cairo matrix coordinates so we can ignore the item's rotation.
-        matrix.x0 += first_move_x;
-        matrix.y0 += first_move_y;
-        item.set_transform (matrix);
-
-        // Interrupt if the user disabled the snapping or we don't have any
-        // adjacent item to snap to.
-        if (!settings.enable_snaps) {
-            return;
-        }
-
-        // Make adjustment basted on snaps.
-        // Double the sensitivity to allow for reuse of grid after snap.
-        var sensitivity = Utils.Snapping.adjusted_sensitivity (canvas.current_scale);
-        var snap_grid = Utils.Snapping.generate_best_snap_grid (
-                            canvas,
-                            selected_items,
-                            sensitivity
-                        );
-
-        // Interrupt if we don't have any snap to use.
-        if (snap_grid.is_empty ()) {
-            return;
-        }
+        Utils.AffineTransform.add_grid_snap_delta (top, left, ref delta_x, ref delta_y);
 
         int snap_offset_x = 0;
         int snap_offset_y = 0;
-        var matches = Utils.Snapping.generate_snap_matches (snap_grid, selected_items, sensitivity);
 
-        // Don't force the offset translation on items. This is mostly
-        // used when moving items from the Transform Panel where we want to show
-        // the snapping guides but ignore the magnetic effect.
-        if (initial_drag_state.wants_snapping) {
-            if (matches.h_data.snap_found ()) {
-                snap_offset_x = matches.h_data.snap_offset ();
-                matrix.x0 += snap_offset_x;
+        if (settings.enable_snaps) {
+            guide_data.type = Akira.Lib.Managers.SnapManager.SnapGuideType.NONE;
+            var sensitivity = Utils.Snapping2.adjusted_sensitivity (view_canvas.current_scale);
+            var selection_area = Geometry.Rectangle () {
+                    left = left + delta_x,
+                    top = top + delta_y,
+                    right = right + delta_x,
+                    bottom = bottom + delta_y
+            };
+
+            var snap_grid = Utils.Snapping2.generate_best_snap_grid (
+                view_canvas,
+                selection,
+                selection_area,
+                sensitivity
+            );
+
+            if (!snap_grid.is_empty ()) {
+                var matches = Utils.Snapping2.generate_snap_matches (
+                    snap_grid,
+                    selection,
+                    selection_area,
+                    sensitivity
+                );
+
+
+                if (matches.h_data.snap_found ()) {
+                    snap_offset_x = matches.h_data.snap_offset ();
+                    guide_data.type = Akira.Lib.Managers.SnapManager.SnapGuideType.SELECTION;
+                }
+
+                if (matches.v_data.snap_found ()) {
+                    snap_offset_y = matches.v_data.snap_offset ();
+                    guide_data.type = Akira.Lib.Managers.SnapManager.SnapGuideType.SELECTION;
+                }
             }
-
-            if (matches.v_data.snap_found ()) {
-                snap_offset_y = matches.v_data.snap_offset ();
-                matrix.y0 += snap_offset_y;
-            }
-
-            item.set_transform (matrix);
         }
 
-        guide_data.type = Akira.Lib.Managers.SnapManager.SnapGuideType.SELECTION;
-        canvas.window.event_bus.update_snap_decorators ();
+        unowned var items_manager = view_canvas.items_manager;
+        foreach (var sel_node in selection.nodes.values) {
+            unowned var item = sel_node.node.instance;
+
+            if (item.is_group) {
+                translate_group (
+                    view_canvas,
+                    sel_node.node,
+                    initial_drag_state,
+                    delta_x, delta_y,
+                    snap_offset_x,
+                    snap_offset_y
+                );
+
+                if (item.components.center == null) {
+                    continue;
+                }
+            }
+
+            var item_drag_data = initial_drag_state.item_data_map[sel_node.node.id];
+            var new_center_x = item_drag_data.item_geometry.area.center_x + delta_x + snap_offset_x;
+            var new_center_y = item_drag_data.item_geometry.area.center_y + delta_y + snap_offset_y;
+            item.components.center = new Lib.Components.Coordinates (new_center_x, new_center_y);
+            items_manager.item_model.mark_node_geometry_dirty (sel_node.node);
+        }
+
+        items_manager.compile_model ();
+        view_canvas.window.event_bus.update_snap_decorators ();
     }
 
-    private static void scale_from_event (
-        Akira.Lib.Canvas canvas,
-        GLib.List<Akira.Lib.Items.CanvasItem> selected_items,
+    private static void translate_group (
+        ViewCanvas view_canvas,
+        Lib.Items.ModelNode group,
         InitialDragState initial_drag_state,
-        Utils.Nobs.Nob selected_nob,
-        double event_x,
-        double event_y,
-        ref Akira.Lib.Managers.SnapManager.SnapGuideData guide_data
+        double delta_x,
+        double delta_y,
+        double snap_offset_x,
+        double snap_offset_y
     ) {
-        if (selected_items.length () != 1) {
+        if (group.children == null) {
             return;
         }
 
-        // for now we only transform one item
-        Akira.Lib.Items.CanvasItem item = selected_items.nth_data (0);
+        unowned var model = view_canvas.items_manager.item_model;
 
-        event_x = Akira.Utils.AffineTransform.fix_size (event_x);
-        event_y = Akira.Utils.AffineTransform.fix_size (event_y);
+        foreach (unowned var child in group.children.data) {
+            if (child.instance.is_group) {
+                translate_group (
+                    view_canvas,
+                    group,
+                    initial_drag_state,
+                    delta_x,
+                    delta_y,
+                    snap_offset_x,
+                    snap_offset_y
+                );
+                continue;
+            }
 
-        double rel_event_x = event_x;
-        double rel_event_y = event_y;
-        double rel_press_x = initial_drag_state.nob_x;
-        double rel_press_y = initial_drag_state.nob_y;
+            unowned var item = child.instance;
+            var item_drag_data = initial_drag_state.item_data_map[child.id];
+            var new_center_x = item_drag_data.item_geometry.area.center_x + delta_x + snap_offset_x;
+            var new_center_y = item_drag_data.item_geometry.area.center_y + delta_y + snap_offset_y;
+            item.components.center = new Lib.Components.Coordinates (new_center_x, new_center_y);
+            model.mark_node_geometry_dirty (child);
+        }
+    }
 
-        // Convert the coordinates from the canvas to the item so we know the real
-        // values even if the item is rotated.
-        canvas.convert_to_item_space (item, ref rel_event_x, ref rel_event_y);
-        canvas.convert_to_item_space (item, ref rel_press_x, ref rel_press_y);
+    public static Utils.Nobs.Nob scale_from_event (
+        ViewCanvas view_canvas,
+        Lib.Items.NodeSelection selection,
+        InitialDragState initial_drag_state,
+        Utils.Nobs.Nob nob,
+        double event_x,
+        double event_y
+    ) {
+        // TODO WIP
+        var blocker = new Lib.Managers.SelectionManager.ChangeSignalBlocker (view_canvas.selection_manager);
+        (void) blocker;
 
-        // Calculate the change based on the event.
-        var delta_x = rel_event_x - rel_press_x;
-        var delta_y = rel_event_y - rel_press_y;
+        double rot_center_x = initial_drag_state.area.center_x;
+        double rot_center_y = initial_drag_state.area.center_y;
 
-        bool ratio_locked = canvas.ctrl_is_pressed || item.size.locked;
+        var itr = initial_drag_state.area.transformation;
+        itr.invert ();
 
-        // These values will be populated.
+        var local_area = initial_drag_state.area;
+        Utils.GeometryMath.transform_quad (itr, ref local_area);
+
+        var adjusted_event_x = event_x - rot_center_x;
+        var adjusted_event_y = event_y - rot_center_y;
+        itr.transform_distance (ref adjusted_event_x, ref adjusted_event_y);
+        adjusted_event_x += rot_center_x;
+        adjusted_event_y += rot_center_y;
+
+        var start_width = double.max (1.0, local_area.width);
+        var start_height = double.max (1.0, local_area.height);
+
+        double nob_x = 0.0;
+        double nob_y = 0.0;
+
+        Utils.Nobs.nob_xy_from_coordinates (
+            nob,
+            local_area,
+            1.0,
+            ref nob_x,
+            ref nob_y
+        );
+
         double inc_width = 0;
         double inc_height = 0;
         double inc_x = 0;
         double inc_y = 0;
 
-        Utils.AffineTransform.calculate_size_adjustments (
-            selected_nob,
-            initial_drag_state.item_width,
-            initial_drag_state.item_height,
-            delta_x,
-            delta_y,
-            initial_drag_state.item_width / initial_drag_state.item_height,
-            ratio_locked,
-            canvas.shift_is_pressed,
-            initial_drag_state.item_transform,
+        var tr = Cairo.Matrix.identity ();
+        var updated_nob = Utils.AffineTransform.calculate_size_adjustments2 (
+            nob,
+            start_width,
+            start_height,
+            adjusted_event_x - nob_x,
+            adjusted_event_y - nob_y,
+            start_width / start_height,
+            view_canvas.ctrl_is_pressed,
+            view_canvas.shift_is_pressed,
+            tr,
             ref inc_x,
             ref inc_y,
             ref inc_width,
             ref inc_height
         );
 
-        var reset_width = item.size.width - initial_drag_state.item_width;
-        var reset_height = item.size.height - initial_drag_state.item_height;
+        double size_off_x = inc_width / 2.0;
+        double size_off_y = inc_height / 2.0;
+        tr.transform_distance (ref size_off_x, ref size_off_y);
 
-        Cairo.Matrix new_matrix;
-        item.get_transform (out new_matrix);
-        new_matrix.x0 = initial_drag_state.item_transform.x0 + inc_x + initial_drag_state.item_scale_x_adj;
-        new_matrix.y0 = initial_drag_state.item_transform.y0 + inc_y + initial_drag_state.item_scale_y_adj;
-        item.set_transform (new_matrix);
+        var local_offset_x = inc_x + size_off_x;
+        var local_offset_y = inc_y + size_off_y;
 
-        Utils.AffineTransform.adjust_size (item, inc_width - reset_width, inc_height - reset_height);
-    }
-
-    private static void rotate_from_event (
-        Akira.Lib.Canvas canvas,
-        GLib.List<Akira.Lib.Items.CanvasItem> selected_items,
-        InitialDragState initial_drag_state,
-        double event_x,
-        double event_y,
-        ref Akira.Lib.Managers.SnapManager.SnapGuideData guide_data
-    ) {
-        if (selected_items.length () != 1) {
-            return;
-        }
-
-        var radians = GLib.Math.atan2 (
-            event_x - initial_drag_state.rotation_center_x,
-            initial_drag_state.rotation_center_y - event_y
+        var new_area = Geometry.Quad.from_components (
+            rot_center_x + local_offset_x,
+            rot_center_y + local_offset_y,
+            start_width + inc_width,
+            start_height + inc_height,
+            tr
         );
 
-        var new_rotation = radians * (180 / Math.PI) + 360;
+        var global_offset_x = local_offset_x;
+        var global_offset_y = local_offset_y;
+        initial_drag_state.area.transformation.transform_distance (ref global_offset_x, ref global_offset_y);
 
-        if (canvas.ctrl_is_pressed) {
-            var step_num = GLib.Math.round (new_rotation / 15.0);
-            new_rotation = 15.0 * step_num;
+        var local_sx = new_area.bounding_box.width / local_area.bounding_box.width;
+        var local_sy = new_area.bounding_box.height / local_area.bounding_box.height;
+
+        unowned var item_model = view_canvas.items_manager.item_model;
+        foreach (var node in selection.nodes.values) {
+            node.node.instance.type.apply_scale_transform (
+                item_model,
+                node.node,
+                initial_drag_state,
+                itr,
+                global_offset_x,
+                global_offset_y,
+                local_sx,
+                local_sy
+            );
         }
 
-        Akira.Lib.Items.CanvasItem item = selected_items.nth_data (0);
-        // Cap new_rotation to the [0, 360] range.
-        new_rotation = GLib.Math.fmod (new_rotation + 360, 360);
-        item.rotation.rotation = Akira.Utils.AffineTransform.fix_size (new_rotation);
+        view_canvas.items_manager.compile_model ();
+
+        return updated_nob;
+    }
+
+    public static void rotate_from_event (
+        ViewCanvas view_canvas,
+        Lib.Items.NodeSelection selection,
+        InitialDragState initial_drag_state,
+        double event_x,
+        double event_y
+    ) {
+        var blocker = new Lib.Managers.SelectionManager.ChangeSignalBlocker (view_canvas.selection_manager);
+        (void) blocker;
+
+        double original_center_x = initial_drag_state.area.center_x;
+        double original_center_y = initial_drag_state.area.center_y;
+
+        var radians = GLib.Math.atan2 (
+            event_x - original_center_x,
+            original_center_y - event_y
+        );
+
+        var added_rotation = radians * (180 / Math.PI);
+
+        if (view_canvas.ctrl_is_pressed) {
+            var step_num = GLib.Math.round (added_rotation / 15.0);
+            added_rotation = 15.0 * step_num;
+        }
+
+        var rot = Utils.GeometryMath.matrix_rotation_component (initial_drag_state.area.transformation);
+
+        foreach (var node in selection.nodes.values) {
+            rotate_node (
+                view_canvas,
+                node.node,
+                initial_drag_state,
+                added_rotation * Math.PI / 180 - rot,
+                original_center_x,
+                original_center_y
+            );
+        }
+
+        view_canvas.items_manager.compile_model ();
+    }
+
+    private static void rotate_node (
+        ViewCanvas view_canvas,
+        Lib.Items.ModelNode node,
+        InitialDragState initial_drag_state,
+        double added_rotation,
+        double rotation_center_x,
+        double rotation_center_y
+    ) {
+        unowned var item = node.instance;
+        if (item.components.transform != null) {
+            var item_drag_data = initial_drag_state.item_data_map[item.id];
+
+            var old_center_x = item_drag_data.item_geometry.area.center_x;
+            var old_center_y = item_drag_data.item_geometry.area.center_y;
+
+            var new_transform = item_drag_data.item_geometry.transformation_matrix;
+
+            var tr = Cairo.Matrix.identity ();
+            tr.rotate (added_rotation);
+
+            if (old_center_x != rotation_center_x || old_center_y != rotation_center_y) {
+                var new_center_delta_x = old_center_x - rotation_center_x;
+                var new_center_delta_y = old_center_y - rotation_center_y;
+                tr.transform_point (ref new_center_delta_x, ref new_center_delta_y);
+
+                item.components.center = new Lib.Components.Coordinates (
+                    rotation_center_x + new_center_delta_x,
+                    rotation_center_y + new_center_delta_y
+                );
+            }
+
+            new_transform = Utils.GeometryMath.multiply_matrices (new_transform, tr);
+
+            double new_rotation = Utils.GeometryMath.matrix_rotation_component (new_transform);
+
+            if (item.components.transform != null) {
+                new_rotation = GLib.Math.fmod (new_rotation + GLib.Math.PI * 2, GLib.Math.PI * 2);
+                item.components.transform = item.components.transform.with_main_rotation (new_rotation);
+            }
+
+            view_canvas.items_manager.item_model.mark_node_geometry_dirty (node);
+        }
+
+        if (node.children != null && node.children.length > 0) {
+            foreach (unowned var child in node.children.data) {
+                rotate_node (
+                    view_canvas,
+                    child,
+                    initial_drag_state,
+                    added_rotation,
+                    rotation_center_x,
+                    rotation_center_y
+                );
+            }
+        }
     }
 }

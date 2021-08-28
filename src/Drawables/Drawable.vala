@@ -25,6 +25,11 @@
  * 2. Add a clipping quad to make clipping more efficient.
  */
 public class Akira.Drawables.Drawable {
+    public enum HitTestType {
+        SELECT,
+        GROUP_REGION
+    }
+
     public enum BorderType {
         CENTER,
         INSIDE,
@@ -35,199 +40,203 @@ public class Akira.Drawables.Drawable {
     public double line_width { get; set; default = 0; }
     public Gdk.RGBA fill_rgba { get; set; default = Gdk.RGBA (); }
     public Gdk.RGBA stroke_rgba { get; set; default = Gdk.RGBA (); }
+    public BorderType border_type { get; set; default = BorderType.CENTER; }
+    public double radius_tr { get; set; default = 0; }
+    public double radius_tl { get; set; default = 0; }
+    public double radius_br { get; set; default = 0; }
+    public double radius_bl { get; set; default = 0; }
 
     public int parent_id { get; set; default = -1; }
     public double center_x { get; set; default = 0; }
     public double center_y { get; set; default = 0; }
     public double width { get; set; default = 0; }
     public double height { get; set; default = 0; }
-    public BorderType border_type { get; set; default = BorderType.CENTER; }
-
     public Cairo.Matrix transform { get; set; default = Cairo.Matrix.identity (); }
+
     public Geometry.Rectangle bounds { get; set; default = Geometry.Rectangle (); }
 
     // Clipping path in global reference frame
     public Geometry.Quad? clipping_path = null;
 
-    public bool new_hit_test (
+    // Convenience getters
+    public bool has_radius { get { return (radius_tr + radius_tl + radius_br + radius_bl) > 0; } }
+
+    public bool is_drawn = false;
+
+    /*
+     * Return true if the position x,y in local coordinates is inside of the selectable
+     * area of a drawable.
+     */
+    public virtual bool hit_test (
         double x,
         double y,
-        Cairo.Context cr,
-        bool is_pointer_event,
-        bool parent_visible
+        Cairo.Context context,
+        double scale,
+        HitTestType hit_test_type
     ) {
+        if (hit_test_type == GROUP_REGION) {
+            return false;
+        }
+
         double user_x = x, user_y = y;
         bool add_item = false;
 
         // Ignore if out of bounds
-        if (bounds.left > x || bounds.right < x || bounds.top > y || bounds.bottom < y) {
-          return false;
+        if (bounds.does_not_contain (x, y)) {
+            return false;
         }
 
-        Cairo.Matrix global_transform = cr.get_matrix ();
-        cr.save ();
+        Cairo.Matrix global_transform = context.get_matrix ();
+        context.save ();
 
         Cairo.Matrix tr = transform;
-        cr.transform (tr);
+        context.transform (tr);
 
         // Account for clipping path first, since they should be in the global reference
         if (clipping_path != null) {
-            cr.move_to (clipping_path.tl_x, clipping_path.tl_y);
-            cr.line_to (clipping_path.tr_x, clipping_path.tr_y);
-            cr.line_to (clipping_path.br_x, clipping_path.br_y);
-            cr.line_to (clipping_path.bl_x, clipping_path.bl_y);
-            cr.close_path ();
+            context.move_to (clipping_path.tl_x, clipping_path.tl_y);
+            context.line_to (clipping_path.tr_x, clipping_path.tr_y);
+            context.line_to (clipping_path.br_x, clipping_path.br_y);
+            context.line_to (clipping_path.bl_x, clipping_path.bl_y);
+            context.close_path ();
 
-            cr.set_fill_rule (Cairo.FillRule.WINDING);
-            if (!cr.in_fill (user_x, user_y)) {
-                cr.restore ();
-                cr.new_path ();
+            context.set_fill_rule (Cairo.FillRule.WINDING);
+            if (!context.in_fill (user_x, user_y)) {
+                context.restore ();
+                context.new_path ();
                 return false;
             }
         }
 
-        cr.device_to_user (ref user_x, ref user_y);
+        context.device_to_user (ref user_x, ref user_y);
 
         /* Remove any current translation, to avoid the 16-bit cairo limit. */
-        var tmp = cr.get_matrix ();
+        var tmp = context.get_matrix ();
         tmp.x0 = 0.0;
         tmp.y0 = 0.0;
-        cr.set_matrix (tmp);
+        context.set_matrix (tmp);
 
-        simple_create_path (cr);
+        simple_create_path (context);
 
         /* Check the filled path, if required. */
-        if (set_fill_options (cr)) {
-            if (cr.in_fill (user_x, user_y)) {
+        if (set_fill_options (context)) {
+            if (context.in_fill (user_x, user_y)) {
                 add_item = true;
             }
         }
 
         /* Check the stroke, if required. */
-        if (set_stroke_options (cr)) {
-            cr.set_matrix (global_transform);
+        if (set_stroke_options (context)) {
+            context.set_matrix (global_transform);
             user_x = x - tr.x0;
             user_y = y - tr.y0;
 
-            if (cr.in_stroke (user_x, user_y)) {
+            if (context.in_stroke (user_x, user_y)) {
                 add_item = true;
             }
         }
 
-        cr.restore ();
-        cr.new_path ();
+        context.restore ();
+        context.new_path ();
 
         return add_item;
     }
 
-
-    public unowned GLib.List<Drawable> get_items_at (
-        double x,
-        double y,
-        Cairo.Context cr,
-        bool is_pointer_event,
-        bool parent_visible,
-        GLib.List<Drawable> found_items
-    ) {
-        if (new_hit_test (x, y, cr, is_pointer_event, parent_visible)) {
-            found_items.prepend (this);
-        }
-
-        return found_items;
-    }
-
-    public bool set_fill_options (Cairo.Context context) {
-        context.set_source_rgba (fill_rgba.red, fill_rgba.green, fill_rgba.blue, fill_rgba.alpha);
-        context.set_antialias (Cairo.Antialias.GRAY);
-        return true;
-    }
-
-    public bool set_stroke_options (Cairo.Context context) {
-        context.set_source_rgba (stroke_rgba.red, stroke_rgba.green, stroke_rgba.blue, stroke_rgba.alpha);
-        context.set_line_width (line_width);
-        context.set_antialias (Cairo.Antialias.GRAY);
-        return line_width > 0;
-    }
-
+    /*
+     * Create the path for an drawable, used in other methods.
+     */
     public virtual void simple_create_path (Cairo.Context context) {}
 
-    public void paint (Cairo.Context cr, Geometry.Rectangle target_bounds, double scale) {
+    /*
+     * Main paint method.
+     */
+    public virtual void paint (Cairo.Context context, Geometry.Rectangle target_bounds, double scale) {
         // Simple bounds check
         if (bounds.left > target_bounds.right || bounds.right < target_bounds.left
             || bounds.top > target_bounds.bottom || bounds.bottom < target_bounds.top) {
           return;
         }
 
-        cr.save ();
-        Cairo.Matrix global_transform = cr.get_matrix ();
+        context.save ();
+        Cairo.Matrix global_transform = context.get_matrix ();
 
         // The clipping path is in global coordinates, so we can ignore the transformation.
         if (clipping_path != null) {
-            cr.move_to (clipping_path.tl_x, clipping_path.tl_y);
-            cr.line_to (clipping_path.tr_x, clipping_path.tr_y);
-            cr.line_to (clipping_path.br_x, clipping_path.br_y);
-            cr.line_to (clipping_path.bl_x, clipping_path.bl_y);
-            cr.close_path ();
-            cr.set_fill_rule (Cairo.FillRule.WINDING);
-            cr.clip ();
+            context.move_to (clipping_path.tl_x, clipping_path.tl_y);
+            context.line_to (clipping_path.tr_x, clipping_path.tr_y);
+            context.line_to (clipping_path.br_x, clipping_path.br_y);
+            context.line_to (clipping_path.bl_x, clipping_path.bl_y);
+            context.close_path ();
+            context.set_fill_rule (Cairo.FillRule.WINDING);
+            context.clip ();
         }
 
         // We apply the item transform before creating the path
         Cairo.Matrix tr = transform;
-        cr.transform (tr);
+        context.transform (tr);
 
-        simple_create_path (cr);
+        simple_create_path (context);
 
-        if (set_fill_options (cr)) {
-            cr.fill_preserve ();
+        if (set_fill_options (context)) {
+            context.fill_preserve ();
         }
 
         // We restore the global transformation to draw strokes with uniform width. Changing
         // the matrix does not affect the path already generated.
-        cr.set_matrix (global_transform);
+        context.set_matrix (global_transform);
 
-        if (set_stroke_options (cr)) {
-            cr.stroke ();
+        if (set_stroke_options (context)) {
+            context.stroke ();
         }
 
-        cr.restore ();
+        context.restore ();
 
         // Very important to initialize new path
-        cr.new_path ();
+        context.new_path ();
+
+        is_drawn = true;
     }
 
-    public void paint_hover (
-        Cairo.Context cr,
+    /*
+     * Hover paint method for the drawable.
+     */
+    public virtual void paint_hover (
+        Cairo.Context context,
         Gdk.RGBA color,
         double line_width,
         Geometry.Rectangle target_bounds,
         double scale
     ) {
-        cr.save ();
+        context.save ();
+        Cairo.Matrix global_transform = context.get_matrix ();
+
         // We apply the item transform before creating the path
         Cairo.Matrix tr = transform;
-        cr.transform (tr);
+        context.transform (tr);
 
-        simple_create_path (cr);
+        simple_create_path (context);
 
-        cr.set_line_width (line_width / scale);
-        cr.set_source_rgba (color.red, color.green, color.blue, color.alpha);
-        cr.set_matrix (Cairo.Matrix.identity ());
-        cr.stroke ();
+        context.set_line_width (line_width / scale);
+        context.set_source_rgba (color.red, color.green, color.blue, color.alpha);
+        context.set_matrix (global_transform);
+        context.stroke ();
 
-        cr.restore ();
+        context.restore ();
 
         // Very important to initialize new path
-        cr.new_path ();
+        context.new_path ();
     }
 
-    public Geometry.Rectangle generate_bounding_box () {
+    /*
+     * Generates the bounding box for the drawable.
+    */
+    public virtual Geometry.Rectangle generate_bounding_box () {
         double x1 = 0;
         double x2 = 0;
         double y1 = 0;
         double y2 = 0;
 
-        Cairo.ImageSurface surface = new Cairo.ImageSurface (Cairo.Format.ARGB32, 1, 1);
+        Cairo.ImageSurface surface = new Cairo.ImageSurface (Cairo.Format.A1, 1, 1);
         Cairo.Context context = new Cairo.Context (surface);
 
         context.set_antialias (Cairo.Antialias.GRAY);
@@ -304,4 +313,30 @@ public class Akira.Drawables.Drawable {
             y2 + translate_y
         );
     }
+
+    public virtual void request_redraw (ViewLayers.BaseCanvas canvas, bool recalculate_bounds) {
+        if (recalculate_bounds) {
+            bounds = generate_bounding_box ();
+        }
+        else if (!is_drawn) {
+            // This request is to clear the old draw, but since it was never drawn, we can ignore.
+            return;
+        }
+
+        canvas.request_redraw (bounds);
+    }
+
+    public bool set_fill_options (Cairo.Context context) {
+        context.set_source_rgba (fill_rgba.red, fill_rgba.green, fill_rgba.blue, fill_rgba.alpha);
+        context.set_antialias (Cairo.Antialias.GRAY);
+        return true;
+    }
+
+    public bool set_stroke_options (Cairo.Context context) {
+        context.set_source_rgba (stroke_rgba.red, stroke_rgba.green, stroke_rgba.blue, stroke_rgba.alpha);
+        context.set_line_width (line_width);
+        context.set_antialias (Cairo.Antialias.GRAY);
+        return line_width > 0;
+    }
+
 }

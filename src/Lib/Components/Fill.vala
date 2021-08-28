@@ -16,52 +16,56 @@
  * You should have received a copy of the GNU General Public License
  * along with Akira. If not, see <https://www.gnu.org/licenses/>.
  *
- * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
+ * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
  */
 
-/**
- * Fill component to keep track of a single filling, which includes different attributes.
- */
-public class Akira.Lib.Components.Fill : Component {
-    public unowned Fills fills { get; set; }
-    // Since items can have multiple filling colors, we need to keep track of each
-    // with a unique identifier in order to properly update them.
-    public int id { get; set; }
+public class Akira.Lib.Components.Fill {
+    public struct FillData {
+        public int _id;
+        public Color _color;
 
-    public Gdk.RGBA color { get; set; }
+        public FillData (int id = -1, Color color = Color ()) {
+            _id = id;
+            _color = color;
+        }
 
-    // Store the hexadecimal string version of the color (E.g.: #FF00CC)
-    public string hex { get; set; }
-    public int alpha { get; set; }
-    public bool hidden { get; set; }
+        public FillData.deserialized (int id, Json.Object obj) {
+            _id = id;
+            _color = Color.deserialized (obj.get_object_member ("color"));
+        }
 
-    public Fill (Fills _fills, Items.CanvasItem _item, Gdk.RGBA init_color, int fill_id) {
-        fills = _fills;
-        item = _item;
-        id = fill_id;
-        color = init_color;
-        hex = color.to_string ();
-        alpha = 255;
+        // Recommended accessors
 
-        // Listen for changed to the fill attributes to properly trigger the color generation.
-        this.notify["color"].connect (() => {
-            hex = Utils.Color.rgba_to_hex (color.to_string ());
-            fills.reload ();
-        });
+        public int id () { return _id; }
+        public Gdk.RGBA color () { return _color.rgba; }
+        public bool is_color_hidden () { return _color.hidden; }
 
-        this.notify["hidden"].connect (() => {
-            fills.reload ();
-        });
+        // Mutators
 
-        this.notify["alpha"].connect (() => {
-            var rgba = Gdk.RGBA ();
-            rgba = color;
-            rgba.alpha = ((double) alpha) / 255;
-            color = rgba;
-        });
+        public FillData with_color (Color new_color) {
+            return FillData (_id, new_color);
+        }
+
+        public Json.Node serialize () {
+            var obj = new Json.Object ();
+            obj.set_int_member ("id", _id);
+            obj.set_member ("color", _color.serialize ());
+            var node = new Json.Node (Json.NodeType.OBJECT);
+            node.set_object (obj);
+            return node;
+        }
     }
 
-    public void remove () {
-        fills.remove_fill (this);
+    // main data for boxed Fill
+    private FillData _data;
+
+    public Fill (FillData data) {
+        _data = data;
     }
+
+    // Recommended accessors
+
+    public int id () { return _data._id; }
+    public Gdk.RGBA color () { return _data._color.rgba; }
+    public bool is_color_hidden () { return _data._color.hidden; }
 }
