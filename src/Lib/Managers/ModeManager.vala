@@ -53,6 +53,11 @@ public class Akira.Lib.Managers.ModeManager : Object {
 
     public ModeManager (Akira.Lib.ViewCanvas canvas) {
         Object (view_canvas: canvas);
+
+        // any active mode must be ended when user presses Esc.
+        view_canvas.window.event_bus.request_escape.connect (() => {
+            deregister_active_mode ();
+        });
     }
 
     public signal void mode_changed ();

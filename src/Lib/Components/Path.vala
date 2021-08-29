@@ -22,41 +22,40 @@
 public class Akira.Lib.Components.Path : Component, Copyable<Path> {
     // Control points relative to a top-left of 0,0.
     // In the future we will probably want control points with more data.
-    public Gee.ArrayList<Geometry.Point?> data;
+    public Geometry.Point[] data;
     public bool close = false;
 
     public Path (bool close = false) {
-        data = new Gee.ArrayList<Geometry.Point?> ();
+        data = new Geometry.Point[0];
         this.close = close;
     }
 
     public Path.from_single_point (Geometry.Point pt, bool close = false) {
-        data = new Gee.ArrayList<Geometry.Point?> ();
-        data.add (pt);
+        data = new Geometry.Point[1];
+        data[0] = pt;
         this.close = close;
     }
 
     public Path.from_points (Geometry.Point[] data, bool close = false) {
-        this.data = new Gee.ArrayList<Geometry.Point?> ();
-        foreach (var item in data) {
-            this.data.add (item);
-        }
-
+        this.data = data;
         this.close = close;
     }
 
     public Path.deserialized (Json.Object obj) {
         var arr = obj.get_array_member ("path_data").get_elements ();
-        data = new Gee.ArrayList<Geometry.Point?> ();
+        data = new Geometry.Point[0];
+        var idx = 0;
         foreach (unowned var pt in arr) {
-            data.add (Geometry.Point.deserialized (pt.get_object ()));
+            data.resize (data.length + 1);
+            data[idx] = Geometry.Point.deserialized (pt.get_object ());
+            ++idx;
         }
     }
 
     protected override void serialize_details (ref Json.Object obj) {
         var array = new Json.Array ();
 
-        foreach (var d in data) {
+        foreach (unowned var d in data) {
             array.add_element (d.serialize ());
         }
 
@@ -69,12 +68,6 @@ public class Akira.Lib.Components.Path : Component, Copyable<Path> {
         var cln = new Path ();
         cln.data = data;
         return cln;
-    }
-
-    public void add_point (Geometry.Point point, int index = -1) {
-        index = (index == -1) ? data.size : index;
-
-        data.insert (index, point);
     }
 
     public Geometry.Rectangle calculate_extents () {

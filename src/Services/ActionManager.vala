@@ -154,7 +154,7 @@ public class Akira.Services.ActionManager : Object {
         typing_accelerators.set (ACTION_ELLIPSE_TOOL, "e");
         typing_accelerators.set (ACTION_TEXT_TOOL, "t");
         typing_accelerators.set (ACTION_IMAGE_TOOL, "i");
-        typing_accelerators.set (ACTION_PATH_TOOL, "p");
+        typing_accelerators.set (ACTION_PATH_TOOL, "v");
         typing_accelerators.set (ACTION_DELETE, "Delete");
         typing_accelerators.set (ACTION_DELETE, "BackSpace");
         typing_accelerators.set (ACTION_TOGGLE_PIXEL_GRID, "<Shift>Tab");

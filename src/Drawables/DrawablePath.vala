@@ -20,24 +20,24 @@
  */
 
 /*
- * Drawable for ellipses.
+ * Drawable for paths.
  */
 public class Akira.Drawables.DrawablePath : Drawable {
     // In the future we will probably want control points with more data.
-    public Gee.ArrayList<Geometry.Point?>? points = null;
+    public Geometry.Point[]? points = null;
 
-    public DrawablePath (Gee.ArrayList<Geometry.Point?>? points = null) {
+    public DrawablePath (Geometry.Point[]? points = null) {
        if (points != null) {
            this.points = points;
        }
     }
 
     public override void simple_create_path (Cairo.Context cr) {
-        if (points == null || points.size < 2) {
+        if (points == null || points.length < 2) {
             return;
         }
 
-        Gee.ArrayList <Geometry.Point?> translated_points = recalculate_points ();
+        Geometry.Point[] translated_points = recalculate_points ();
 
         cr.save ();
         cr.translate (center_x, center_y);
@@ -58,7 +58,7 @@ public class Akira.Drawables.DrawablePath : Drawable {
     /*
      * This function shifts all points so that none of them are in negative space.
      */
-    private Gee.ArrayList <Geometry.Point?> recalculate_points () {
+    private Geometry.Point[] recalculate_points () {
         double min_x = 0, min_y = 0;
 
         foreach (var pt in points) {
@@ -70,9 +70,10 @@ public class Akira.Drawables.DrawablePath : Drawable {
             }
         }
 
-        Gee.ArrayList <Geometry.Point?> translated_points = new Gee.ArrayList<Geometry.Point?> ();
-        foreach (var pt in points) {
-            translated_points.add (Geometry.Point (pt.x - min_x, pt.y - min_y));
+        Geometry.Point[] translated_points = new Geometry.Point[points.length];
+
+        for (int i = 0; i < points.length; ++i) {
+            translated_points[i] = Geometry.Point (points[i].x - min_x, points[i].y - min_y);
         }
 
         return translated_points;

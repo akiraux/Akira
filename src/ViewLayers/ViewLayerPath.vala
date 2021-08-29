@@ -23,18 +23,12 @@ public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
     public const double UI_NOB_SIZE = 4;
     public const double UI_LINE_WIDTH = 1.01;
 
-    private Gee.ArrayList<Geometry.Point?>? points = null;
+    private Geometry.Point[]? points = null;
     private Geometry.Rectangle extents;
-    private Geometry.Point first_point;
 
-    public void set_reference_point (Geometry.Point reference_point) {
-        first_point = reference_point;
-        canvas.request_redraw (extents);
-    }
-
-    public void update_path_data (Gee.ArrayList<Geometry.Point?> _points) {
-        points = _points;
-        recalculate_extents ();
+    public void update_path_data (Geometry.Point[]? _points, Geometry.Rectangle _extents) {
+        points = recalculate_points (_points);
+        extents = _extents;
         canvas.request_redraw (extents);
     }
 
@@ -70,9 +64,11 @@ public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
         context.set_source_rgba (0.1568, 0.4745, 0.9823, 1);
         context.set_line_width (line_width);
 
+        var reference_point = Geometry.Point (extents.left, extents.top);
+
         foreach (var pt in points) {
-            context.move_to (pt.x + first_point.x, pt.y + first_point.y);
-            context.arc (pt.x + first_point.x, pt.y + first_point.y, radius, 0, Math.PI * 2);
+            context.move_to (pt.x + reference_point.x, pt.y + reference_point.y);
+            context.arc (pt.x + reference_point.x, pt.y + reference_point.y, radius, 0, Math.PI * 2);
             context.fill ();
         }
 
@@ -81,31 +77,24 @@ public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
         context.restore ();
     }
 
-    private void recalculate_extents () {
-        extents = Geometry.Rectangle.empty ();
+    private Geometry.Point[] recalculate_points (Geometry.Point[] points) {
+        double min_x = 0, min_y = 0;
 
         foreach (var pt in points) {
-            if (pt.x < extents.left) {
-                extents.left = pt.x;
+            if (pt.x < min_x) {
+                min_x = pt.x;
             }
-            if (pt.x > extents.right) {
-                extents.right = pt.x;
-            }
-            if (pt.y < extents.top) {
-                extents.top = pt.y;
-            }
-            if (pt.y > extents.left) {
-                extents.bottom = pt.y;
+            if (pt.y < min_y) {
+                min_y = pt.y;
             }
         }
 
-        // compensation for size of nobs.
-        double radius = UI_NOB_SIZE / canvas.scale;
-        extents.left -= radius;
-        extents.right += radius;
-        extents.top -= radius;
-        extents.bottom += radius;
+        Geometry.Point[] translated_points = new Geometry.Point[points.length];
 
-        extents.translate (first_point.x, first_point.y);
+        for (int i = 0; i < points.length; ++i) {
+            translated_points[i] = Geometry.Point (points[i].x - min_x, points[i].y - min_y);
+        }
+
+        return translated_points;
     }
 }

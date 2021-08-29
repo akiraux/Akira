@@ -37,14 +37,6 @@ public class Akira.Lib.Modes.ItemInsertMode : AbstractInteractionMode {
     public ItemInsertMode (Lib.ViewCanvas canvas, string item_type) {
         Object (view_canvas: canvas);
         item_insert_type = item_type;
-
-        // if PathEditMode is active, it must deregisterd with user presses escape
-        view_canvas.window.event_bus.request_escape.connect (() => {
-            if (path_edit_mode != null) {
-                path_edit_mode.mode_end ();
-                request_deregistration (mode_type ());
-            }
-        });
     }
 
     construct {
@@ -111,9 +103,9 @@ public class Akira.Lib.Modes.ItemInsertMode : AbstractInteractionMode {
             view_canvas.selection_manager.reset_selection ();
             view_canvas.selection_manager.add_to_selection (instance.id);
 
-            // if a path is being inserted, then start the PathEditMode
+            // If a path is being inserted, then start the PathEditMode.
             if (item_insert_type == "path") {
-                path_edit_mode = new Akira.Lib.Modes.PathEditMode (view_canvas, true, instance);
+                path_edit_mode = new Lib.Modes.PathEditMode (view_canvas, instance);
                 path_edit_mode.mode_begin ();
                 path_edit_mode.button_press_event (event);
 
@@ -122,7 +114,7 @@ public class Akira.Lib.Modes.ItemInsertMode : AbstractInteractionMode {
                 return true;
             }
 
-            transform_mode = new Akira.Lib.Modes.TransformMode (view_canvas, Utils.Nobs.Nob.BOTTOM_LEFT);
+            transform_mode = new Lib.Modes.TransformMode (view_canvas, Utils.Nobs.Nob.BOTTOM_LEFT);
             transform_mode.mode_begin ();
             transform_mode.button_press_event (event);
             // Defer the print of the layer UI after all items have been created.

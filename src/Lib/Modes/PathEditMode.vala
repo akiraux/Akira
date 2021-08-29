@@ -23,22 +23,20 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
 
     public weak Lib.ViewCanvas view_canvas { get; construct; }
     public Lib.Items.ModelInstance instance { get; construct; }
-    public bool is_insert { get; construct; }
-    // keep track of previous point for calculating relative positions of points
+    // Keep track of previous point for calculating relative positions of points.
     private Geometry.Point first_point;
     private ViewLayers.ViewLayerPath path_layer;
 
 
-    public PathEditMode (Lib.ViewCanvas canvas, bool is_insert, Lib.Items.ModelInstance instance) {
+    public PathEditMode (Lib.ViewCanvas canvas, Lib.Items.ModelInstance instance) {
         Object (
             view_canvas: canvas,
-            is_insert: is_insert,
             instance: instance
         );
 
         first_point = Geometry.Point (-1, -1);
 
-        // layer to show when editing paths
+        // Layer to show when editing paths.
         path_layer = new ViewLayers.ViewLayerPath ();
         path_layer.add_to_canvas (ViewLayers.ViewLayer.PATH_LAYER_ID, view_canvas);
     }
@@ -52,13 +50,13 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
     }
 
     public override void mode_begin () {
-        // hide the nobs and show the path layer
+        // Hide the nobs and show the path layer.
         view_canvas.toggle_layer_visibility (ViewLayers.ViewLayer.NOBS_LAYER_ID, false);
         view_canvas.toggle_layer_visibility (ViewLayers.ViewLayer.PATH_LAYER_ID, true);
     }
 
     public override void mode_end () {
-        // hide the path layer and show nobs
+        // Hide the path layer and show nobs.
         view_canvas.toggle_layer_visibility (ViewLayers.ViewLayer.NOBS_LAYER_ID, true);
         view_canvas.toggle_layer_visibility (ViewLayers.ViewLayer.PATH_LAYER_ID, false);
     }
@@ -76,27 +74,25 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
     }
 
     public override bool button_press_event (Gdk.EventButton event) {
-        // everytime the user presses the mouse button, a new point needs to be created and added to the path.
+        // Everytime the user presses the mouse button, a new point needs to be created and added to the path.
         Akira.Geometry.Point point = Akira.Geometry.Point (event.x, event.y);
 
         if (first_point.x == -1) {
             first_point = point;
-            var coords = view_canvas.selection_manager.selection.coordinates ();
-            path_layer.set_reference_point ( Geometry.Point (coords.center_x, coords.center_y));
-            path_layer.update_path_data (instance.components.path.data);
+            update_view ();
             return false;
         }
 
-        // this calculates the position of the new point relative to the first point.
+        // This calculates the position of the new point relative to the first point.
         point.x -= first_point.x;
         point.y -= first_point.y;
 
-        // add the new points to the drawable and path
-        instance.components.path.add_point (point, -1);
+        // Add the new points to the drawable and path
+        add_point_to_path (point);
 
         // To calculate the new center of bounds of rectangle,
-        // move the center to point where user placed first point. This is represented as (0,0) internally
-        // then translate it to the relative center of bounding box of path.
+        // Move the center to point where user placed first point. This is represented as (0,0) internally.
+        // Then translate it to the relative center of bounding box of path.
         var bounds = instance.components.path.calculate_extents ();
         double center_x = first_point.x + bounds.center_x;
         double center_y = first_point.y + bounds.center_y;
@@ -104,13 +100,50 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
         instance.components.center = new Lib.Components.Coordinates (center_x, center_y);
         instance.components.size = new Lib.Components.Size (bounds.width, bounds.height, false);
 
-        // update the component
-        view_canvas.items_manager.item_model.mark_node_geometry_dirty (view_canvas.items_manager.node_from_id (instance.id));
+        // Update the component.
+        view_canvas.items_manager.item_model.mark_node_geometry_dirty_by_id (instance.id);
         view_canvas.items_manager.compile_model ();
 
-        path_layer.update_path_data (instance.components.path.data);
+        update_view ();
 
         return true;
+    }
+
+    private void add_point_to_path (Geometry.Point point, int index = -1) {
+
+        var old_path_points = instance.components.path.data;
+        Geometry.Point[] new_path_points = new Geometry.Point[old_path_points.length + 1];
+
+        index = (index == -1) ? index = old_path_points.length : index;
+
+        for (int i = 0; i < index; ++i) {
+            new_path_points[i] = old_path_points[i];
+        }
+
+        new_path_points[index] = point;
+
+        for (int i = index + 1; i < old_path_points.length + 1; ++i) {
+            new_path_points[i] = old_path_points[i - 1];
+        }
+
+        instance.components.path = new Lib.Components.Path.from_points (new_path_points);
+    }
+
+    /*
+     * Recalculates the extents and updates the ViewLayerPath
+     */
+    private void update_view () {
+        var points = instance.components.path.data;
+
+        var coordinates = view_canvas.selection_manager.selection.coordinates ();
+
+        Geometry.Rectangle extents = Geometry.Rectangle.empty ();
+        extents.left = coordinates.center_x - coordinates.width / 2.0;
+        extents.right = coordinates.center_x + coordinates.width / 2.0;
+        extents.top = coordinates.center_y - coordinates.height / 2.0;
+        extents.bottom = coordinates.center_y + coordinates.height / 2.0;
+
+        path_layer.update_path_data (points, extents);
     }
 
     public override bool button_release_event (Gdk.EventButton event) {
