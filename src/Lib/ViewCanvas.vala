@@ -19,7 +19,7 @@
  * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
  */
 
- public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
+public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
     private const int SIZE = 30;
     public const double MIN_SCALE = 0.02;
     public const double MAX_SCALE = 50.0;
