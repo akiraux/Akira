@@ -126,7 +126,38 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
             new_path_points[i] = old_path_points[i - 1];
         }
 
-        instance.components.path = new Lib.Components.Path.from_points (new_path_points);
+        var recalculated_points = recalculate_points (new_path_points);
+
+        instance.components.path = new Lib.Components.Path.from_points (recalculated_points);
+    }
+
+    /*
+     * This method shift all points in path such that none of them are in negative space.
+     */
+    private Geometry.Point[] recalculate_points (Geometry.Point[] points) {
+        double min_x = 0, min_y = 0;
+
+        foreach (var pt in points) {
+            if (pt.x < min_x) {
+                min_x = pt.x;
+            }
+            if (pt.y < min_y) {
+                min_y = pt.y;
+            }
+        }
+
+        Geometry.Point[] recalculated_points = new Geometry.Point[points.length];
+
+        // Shift all the points.
+        for (int i = 0; i < points.length; ++i) {
+            recalculated_points[i] = Geometry.Point (points[i].x - min_x, points[i].y - min_y);
+        }
+
+        // Then shift the reference point.
+        first_point.x += min_x;
+        first_point.y += min_y;
+
+        return recalculated_points;
     }
 
     /*

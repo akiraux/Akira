@@ -21,15 +21,15 @@
 
 public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
     public const double UI_NOB_SIZE = 4;
-    public const double UI_LINE_WIDTH = 1.01;
 
     private Geometry.Point[]? points = null;
     private Geometry.Rectangle extents;
 
     public void update_path_data (Geometry.Point[]? _points, Geometry.Rectangle _extents) {
-        points = recalculate_points (_points);
+        points = _points;
         extents = _extents;
-        canvas.request_redraw (extents);
+
+        update ();
     }
 
     public override void draw_layer (Cairo.Context context, Geometry.Rectangle target_bounds, double scale) {
@@ -50,24 +50,29 @@ public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
         context.new_path ();
     }
 
+    public override void update () {
+        if (canvas == null || points == null) {
+            return;
+        }
+
+        canvas.request_redraw (extents);
+    }
+
     private void draw_points (Cairo.Context context) {
         if (points == null) {
             return;
         }
 
         double radius = UI_NOB_SIZE / canvas.scale;
-        double line_width = UI_LINE_WIDTH / canvas.scale;
 
         context.save ();
 
         context.new_path ();
         context.set_source_rgba (0.1568, 0.4745, 0.9823, 1);
-        context.set_line_width (line_width);
 
         var reference_point = Geometry.Point (extents.left, extents.top);
 
         foreach (var pt in points) {
-            context.move_to (pt.x + reference_point.x, pt.y + reference_point.y);
             context.arc (pt.x + reference_point.x, pt.y + reference_point.y, radius, 0, Math.PI * 2);
             context.fill ();
         }
@@ -75,26 +80,5 @@ public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
         context.stroke ();
         context.new_path ();
         context.restore ();
-    }
-
-    private Geometry.Point[] recalculate_points (Geometry.Point[] points) {
-        double min_x = 0, min_y = 0;
-
-        foreach (var pt in points) {
-            if (pt.x < min_x) {
-                min_x = pt.x;
-            }
-            if (pt.y < min_y) {
-                min_y = pt.y;
-            }
-        }
-
-        Geometry.Point[] translated_points = new Geometry.Point[points.length];
-
-        for (int i = 0; i < points.length; ++i) {
-            translated_points[i] = Geometry.Point (points[i].x - min_x, points[i].y - min_y);
-        }
-
-        return translated_points;
     }
 }

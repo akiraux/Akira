@@ -93,7 +93,6 @@ public class Akira.Lib.Items.ModelTypePath : ModelType {
                 drawable.center_y = -instance.compiled_geometry.source_height / 2.0;
                 drawable.transform = instance.compiled_geometry.transformation_matrix;
                 drawable.points = instance.components.path.data;
-                instance.drawable = drawable;
                 break;
         }
     }
