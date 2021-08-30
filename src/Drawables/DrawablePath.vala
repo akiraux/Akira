@@ -20,7 +20,7 @@
  */
 
 /*
- * Drawable for ellipses.
+ * Drawable for paths.
  */
 public class Akira.Drawables.DrawablePath : Drawable {
     // In the future we will probably want control points with more data.
@@ -41,6 +41,7 @@ public class Akira.Drawables.DrawablePath : Drawable {
         cr.translate (center_x, center_y);
         cr.new_path ();
         var ct = 0;
+
         foreach (var p in points) {
             if (ct == 0) {
                 cr.move_to (p.x, p.y);

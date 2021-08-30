@@ -44,6 +44,7 @@ public class Akira.Lib.Items.ModelTypePath : ModelType {
             Akira.Geometry.Point (center.x, center.y),
             false
         );
+        new_item.components.size = new Lib.Components.Size (1, 1, false);
         return new_item;
     }
 
@@ -85,9 +86,13 @@ public class Akira.Lib.Items.ModelTypePath : ModelType {
                 instance.drawable.fill_rgba = instance.compiled_fill.color;
                 break;
             case Lib.Components.Component.Type.COMPILED_GEOMETRY:
-                instance.drawable.center_x = -instance.compiled_geometry.source_width / 2.0;
-                instance.drawable.center_y = -instance.compiled_geometry.source_height / 2.0;
-                instance.drawable.transform = instance.compiled_geometry.transformation_matrix;
+                // The points property is only available to DrawablePath, so first typecast it
+                // modify it, then assign to instance.
+                Drawables.DrawablePath drawable = instance.drawable as Drawables.DrawablePath;
+                drawable.center_x = -instance.compiled_geometry.source_width / 2.0;
+                drawable.center_y = -instance.compiled_geometry.source_height / 2.0;
+                drawable.transform = instance.compiled_geometry.transformation_matrix;
+                drawable.points = instance.components.path.data;
                 break;
         }
     }

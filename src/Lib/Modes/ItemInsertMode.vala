@@ -32,6 +32,7 @@ public class Akira.Lib.Modes.ItemInsertMode : AbstractInteractionMode {
     private string item_insert_type;
 
     private Lib.Modes.TransformMode transform_mode;
+    private Lib.Modes.PathEditMode path_edit_mode;
 
     public ItemInsertMode (Lib.ViewCanvas canvas, string item_type) {
         Object (view_canvas: canvas);
@@ -40,6 +41,7 @@ public class Akira.Lib.Modes.ItemInsertMode : AbstractInteractionMode {
 
     construct {
         transform_mode = null;
+        path_edit_mode = null;
     }
 
     public override AbstractInteractionMode.ModeType mode_type () {
@@ -49,6 +51,10 @@ public class Akira.Lib.Modes.ItemInsertMode : AbstractInteractionMode {
     public override void mode_end () {
         if (transform_mode != null) {
             transform_mode.mode_end ();
+        }
+
+        if (path_edit_mode != null) {
+            path_edit_mode.mode_end ();
         }
     }
 
@@ -79,6 +85,10 @@ public class Akira.Lib.Modes.ItemInsertMode : AbstractInteractionMode {
             return transform_mode.button_press_event (event);
         }
 
+        if (path_edit_mode != null) {
+            return path_edit_mode.button_press_event (event);
+        }
+
         if (event.button == Gdk.BUTTON_PRIMARY) {
             bool is_artboard;
             var instance = construct_item (item_insert_type, event.x, event.y, out is_artboard);
@@ -93,7 +103,18 @@ public class Akira.Lib.Modes.ItemInsertMode : AbstractInteractionMode {
             view_canvas.selection_manager.reset_selection ();
             view_canvas.selection_manager.add_to_selection (instance.id);
 
-            transform_mode = new Akira.Lib.Modes.TransformMode (view_canvas, Utils.Nobs.Nob.BOTTOM_LEFT);
+            // If a path is being inserted, then start the PathEditMode.
+            if (item_insert_type == "path") {
+                path_edit_mode = new Lib.Modes.PathEditMode (view_canvas, instance);
+                path_edit_mode.mode_begin ();
+                path_edit_mode.button_press_event (event);
+
+                // Defer the print of the layer UI after all items have been created.
+                view_canvas.window.main_window.show_added_layers ();
+                return true;
+            }
+
+            transform_mode = new Lib.Modes.TransformMode (view_canvas, Utils.Nobs.Nob.BOTTOM_LEFT);
             transform_mode.mode_begin ();
             transform_mode.button_press_event (event);
             // Defer the print of the layer UI after all items have been created.
@@ -197,6 +218,18 @@ public class Akira.Lib.Modes.ItemInsertMode : AbstractInteractionMode {
                 break;
 
             case "image":
+                break;
+
+            case "path":
+                new_item = Lib.Items.ModelTypePath.default_path (
+                    coordinates,
+                    borders_from_settings (),
+                    null
+                );
+                var test_path = new Geometry.Point[1];
+                test_path[0] = Geometry.Point (0, 0);
+
+                new_item.components.path = new Lib.Components.Path.from_points (test_path, false);
                 break;
         }
 
