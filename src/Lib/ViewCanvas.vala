@@ -19,7 +19,7 @@
  * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
  */
 
-public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
+ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
     private const int SIZE = 30;
     public const double MIN_SCALE = 0.02;
     public const double MAX_SCALE = 50.0;
@@ -315,6 +315,9 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
 
             if (target != null) {
                 if (!selection_manager.item_selected (target.id)) {
+                    if (!shift_is_pressed) {
+                        selection_manager.reset_selection ();
+                    }
                     selection_manager.add_to_selection (target.id);
                 }
             }
