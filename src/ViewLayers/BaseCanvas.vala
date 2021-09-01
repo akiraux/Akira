@@ -45,8 +45,8 @@ public class Akira.ViewLayers.BaseCanvas : Gtk.Widget , Gtk.Scrollable {
 
     public bool pause_redraw = false;
 
-    // The main window that gets scrolled around
-    private X.Window canvas_window;
+    // The main surface that gets scrolled around
+    private Gdk.Surface canvas_surface;
 
     private unowned Lib.Items.Model? model_to_render = null;
 
@@ -161,56 +161,58 @@ public class Akira.ViewLayers.BaseCanvas : Gtk.Widget , Gtk.Scrollable {
         Gtk.Allocation allocation;
         get_allocation (out allocation);
 
-        var attributes = Gdk.WindowAttr ();
-        attributes.window_type = Gdk.WindowType.CHILD;
-        attributes.x = allocation.x;
-        attributes.y = allocation.y;
-        attributes.width = allocation.width;
-        attributes.height = allocation.height;
-        attributes.wclass = Gdk.WindowWindowClass.INPUT_OUTPUT;
-        attributes.visual = get_visual ();
-        attributes.event_mask = Gdk.EventMask.VISIBILITY_NOTIFY_MASK;
-        int attributes_mask = Gdk.WindowAttributesType.X | Gdk.WindowAttributesType.Y | Gdk.WindowAttributesType.VISUAL;
+        // var attributes = Gdk.WindowAttr ();
+        // attributes.window_type = Gdk.WindowType.CHILD;
+        // attributes.x = allocation.x;
+        // attributes.y = allocation.y;
+        // attributes.width = allocation.width;
+        // attributes.height = allocation.height;
+        // attributes.wclass = Gdk.WindowWindowClass.INPUT_OUTPUT;
+        // attributes.visual = get_visual ();
+        // attributes.event_mask = Gdk.EventMask.VISIBILITY_NOTIFY_MASK;
+        // int attributes_mask = Gdk.WindowAttributesType.X | Gdk.WindowAttributesType.Y | Gdk.WindowAttributesType.VISUAL;
 
-        var window = new Gdk.Window (get_parent_window (), attributes, (Gdk.WindowAttributesType)attributes_mask);
-        set_window (window);
-        window.set_user_data (this);
+        // var surface = new Gdk.Surface (get_parent_window (), attributes, (Gdk.WindowAttributesType)attributes_mask);
+        var surface = new Gdk.Surface ();
+        set_window (surface);
+        surface.set_user_data (this);
 
-        int width_pixels = (int)((bounds.right - bounds.left) * scale) + 1;
-        int height_pixels = (int)((bounds.bottom - bounds.top) * scale) + 1;
-        attributes.x = (hadjustment == null) ? 0 : (int)hadjustment.get_value ();
-        attributes.y = (vadjustment == null) ? 0 : (int)vadjustment.get_value ();
-        attributes.width = int.max (width_pixels, allocation.width);
-        attributes.height = int.max (height_pixels, allocation.height);
-        attributes.event_mask =
-            Gdk.EventMask.EXPOSURE_MASK
-            | Gdk.EventMask.SCROLL_MASK
-            | Gdk.EventMask.BUTTON_PRESS_MASK
-            | Gdk.EventMask.BUTTON_RELEASE_MASK
-            | Gdk.EventMask.POINTER_MOTION_MASK
-            | Gdk.EventMask.POINTER_MOTION_HINT_MASK
-            | Gdk.EventMask.KEY_PRESS_MASK
-            | Gdk.EventMask.KEY_RELEASE_MASK
-            | Gdk.EventMask.ENTER_NOTIFY_MASK
-            | Gdk.EventMask.LEAVE_NOTIFY_MASK
-            | Gdk.EventMask.FOCUS_CHANGE_MASK
-            | get_events ();
+        // int width_pixels = (int)((bounds.right - bounds.left) * scale) + 1;
+        // int height_pixels = (int)((bounds.bottom - bounds.top) * scale) + 1;
+        // attributes.x = (hadjustment == null) ? 0 : (int)hadjustment.get_value ();
+        // attributes.y = (vadjustment == null) ? 0 : (int)vadjustment.get_value ();
+        // attributes.width = int.max (width_pixels, allocation.width);
+        // attributes.height = int.max (height_pixels, allocation.height);
+        // attributes.event_mask =
+        //     Gdk.EventMask.EXPOSURE_MASK
+        //     | Gdk.EventMask.SCROLL_MASK
+        //     | Gdk.EventMask.BUTTON_PRESS_MASK
+        //     | Gdk.EventMask.BUTTON_RELEASE_MASK
+        //     | Gdk.EventMask.POINTER_MOTION_MASK
+        //     | Gdk.EventMask.POINTER_MOTION_HINT_MASK
+        //     | Gdk.EventMask.KEY_PRESS_MASK
+        //     | Gdk.EventMask.KEY_RELEASE_MASK
+        //     | Gdk.EventMask.ENTER_NOTIFY_MASK
+        //     | Gdk.EventMask.LEAVE_NOTIFY_MASK
+        //     | Gdk.EventMask.FOCUS_CHANGE_MASK
+        //     | get_events ();
 
-        window_x = attributes.x;
-        window_y = attributes.y;
+        // window_x = attributes.x;
+        // window_y = attributes.y;
 
-        canvas_window = new Gdk.Window (window, attributes, (Gdk.WindowAttributesType)attributes_mask);
-        canvas_window.set_user_data (this);
+        // canvas_surface = new Gdk.Surface (window, attributes, (Gdk.WindowAttributesType)attributes_mask);
+        canvas_surface = new Gdk.Surface ();
+        canvas_surface.set_user_data (this);
     }
 
     public override void map () {
         base.map ();
-        canvas_window.show ();
+        canvas_surface.show ();
         get_window ().show ();
     }
 
     public override void unrealize () {
-        canvas_window.set_user_data (null);
+        canvas_surface.set_user_data (null);
         base.unrealize ();
     }
 
@@ -391,7 +393,7 @@ public class Akira.ViewLayers.BaseCanvas : Gtk.Widget , Gtk.Scrollable {
         freeze_count--;
 
         if (get_realized ()) {
-            canvas_window.move_resize (wx, wy, window_width, window_height);
+            canvas_surface.move_resize (wx, wy, window_width, window_height);
         }
     }
 
@@ -513,7 +515,7 @@ public class Akira.ViewLayers.BaseCanvas : Gtk.Widget , Gtk.Scrollable {
             window_x = new_window_x;
             window_y = new_window_y;
 
-            canvas_window.move (new_window_x, new_window_y);
+            canvas_surface.move (new_window_x, new_window_y);
         }
     }
 
@@ -539,11 +541,11 @@ public class Akira.ViewLayers.BaseCanvas : Gtk.Widget , Gtk.Scrollable {
         rect.width = (int) ((b.right - bounds.left) * scale - rect.x + 2 + 1);
         rect.height = (int) ((b.bottom - bounds.top) * scale - rect.y + 2 + 1);
 
-        canvas_window.invalidate_rect (rect, false);
+        canvas_surface.invalidate_rect (rect, false);
     }
 
     public override bool draw (Cairo.Context context) {
-        if (!Gtk.cairo_should_draw_window (context, canvas_window)) {
+        if (!Gtk.cairo_should_draw_window (context, canvas_surface)) {
             return false;
         }
 

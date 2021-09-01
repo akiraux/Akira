@@ -182,7 +182,7 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
         recent_files_grid.width_request = 220;
         recent_files_grid.name = "files-menu";
 
-        var open_recent_button = new Gtk.ModelButton ();
+        var open_recent_button = new Gtk.Button ();
         open_recent_button.text = _("Open Recent");
         open_recent_button.menu_name = "files-menu";
         fetch_recent_files.begin ();
@@ -254,7 +254,7 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
         shapes_grid.width_request = 200;
         shapes_grid.name = "shapes-menu";
 
-        var back_button = new Gtk.ModelButton ();
+        var back_button = new Gtk.Button ();
         back_button.text = _("Add Items");
         back_button.inverted = true;
         back_button.menu_name = "main";
@@ -280,7 +280,7 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
         shapes_grid.add (ellipse);
         shapes_grid.show_all ();
 
-        var shapes_button = new Gtk.ModelButton ();
+        var shapes_button = new Gtk.Button ();
         shapes_button.text = _("Shapes");
         shapes_button.menu_name = "shapes-menu";
 
@@ -421,7 +421,7 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
         });
 
         // Add default buttons.
-        var back_button = new Gtk.ModelButton ();
+        var back_button = new Gtk.Button ();
         back_button.text = _("Main Menu");
         back_button.inverted = true;
         back_button.menu_name = "main";
@@ -466,7 +466,7 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
             string[] split_string = all_files[i].split ("/");
             var file_name = split_string[split_string.length - 1].replace (".akira", "");
 
-            var button = new Gtk.ModelButton ();
+            var button = new Gtk.Button ();
 
             // Add quick accelerators only for the first 3 items.
             string? accels = null;
@@ -574,8 +574,8 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
     //     }
     // }
 
-    private Gtk.ModelButton create_model_button (string text, string? icon, string? accels = null) {
-        var button = new Gtk.ModelButton ();
+    private Gtk.Button create_model_button (string text, string? icon, string? accels = null) {
+        var button = new Gtk.Button ();
         button.get_child ().destroy ();
         var label = new Granite.AccelLabel.from_action_name (text, accels);
 
