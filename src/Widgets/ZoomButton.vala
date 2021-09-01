@@ -33,8 +33,9 @@ public class Akira.Widgets.ZoomButton : Gtk.Grid {
         this.window = window;
 
         // Grid specific attributes.
-        get_style_context ().add_class (Gtk.STYLE_CLASS_LINKED);
-        get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
+        // TODO GTK4: Add missing styling.
+        // get_style_context ().add_class (Gtk.STYLE_CLASS_LINKED);
+        // get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
         valign = Gtk.Align.CENTER;
         column_homogeneous = false;
         width_request = 140;

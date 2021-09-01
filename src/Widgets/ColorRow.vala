@@ -277,7 +277,7 @@ public class Akira.Widgets.ColorRow : Gtk.Grid {
                     border-color: shade (%s, 0.75);
                 }""".printf (new_color, new_color);
 
-            provider.load_from_data (css, css.length);
+            provider.load_from_data (css.data);
 
             context.add_provider (provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
         } catch (Error e) {

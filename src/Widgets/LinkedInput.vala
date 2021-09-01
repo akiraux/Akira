@@ -65,10 +65,8 @@ public class Akira.Widgets.LinkedInput : Gtk.Grid {
     construct {
         valign = Gtk.Align.CENTER;
         hexpand = true;
-        get_style_context ().add_class (Gtk.STYLE_CLASS_LINKED);
-
-        var event_box = new Gtk.EventBox ();
-        event_box.event.connect (handle_event);
+        // TODO GTK4: Add missing styling.
+        // get_style_context ().add_class (Gtk.STYLE_CLASS_LINKED);
 
         var entry_label = new Gtk.Label (label);
         entry_label.get_style_context ().add_class ("entry-label");
@@ -76,6 +74,8 @@ public class Akira.Widgets.LinkedInput : Gtk.Grid {
         entry_label.width_request = 20;
         entry_label.hexpand = false;
         entry_label.tooltip_text = tooltip;
+        // TODO GTK4: We need an EventController for the label.
+        // entry_label.connect (handle_event);
 
         switch (unit) {
             case "#":
@@ -100,13 +100,11 @@ public class Akira.Widgets.LinkedInput : Gtk.Grid {
             "value", input_field.entry, "value",
             BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE);
 
-        event_box.add (entry_label);
-
         if (reversed) {
             attach (input_field, 0, 0);
-            attach (event_box, 1, 0);
+            attach (entry_label, 1, 0);
         } else {
-            attach (event_box, 0, 0);
+            attach (entry_label, 0, 0);
             attach (input_field, 1, 0);
         }
     }
