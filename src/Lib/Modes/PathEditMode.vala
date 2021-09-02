@@ -124,9 +124,12 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
             new_path_points[i] = old_path_points[i];
         }
 
-        var new_point = point_factory.create (Utils.PathPointFactory.Command.LINE) as Utils.PathLine;
-        new_point.add_point (point);
-        new_path_points[index] = new_point;
+        point_factory.create (Utils.PathPointFactory.Command.LINE);
+        point_factory.add_next_point (point);
+
+        if (point_factory.are_all_points_added ()) {
+            new_path_points[index] = point_factory.get_path_item ();
+        }
 
         for (int i = index + 1; i < old_path_points.length + 1; ++i) {
             new_path_points[i] = old_path_points[i - 1];
