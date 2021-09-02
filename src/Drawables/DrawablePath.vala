@@ -24,9 +24,9 @@
  */
 public class Akira.Drawables.DrawablePath : Drawable {
     // In the future we will probably want control points with more data.
-    public Geometry.Point[]? points = null;
+    public Utils.PathItem[]? points = null;
 
-    public DrawablePath (Geometry.Point[]? points = null) {
+    public DrawablePath (Utils.PathItem[]? points = null) {
        if (points != null) {
            this.points = points;
        }
@@ -42,7 +42,9 @@ public class Akira.Drawables.DrawablePath : Drawable {
         cr.new_path ();
         var ct = 0;
 
-        foreach (var p in points) {
+        foreach (var item in points) {
+            // TODO: Handle drawing curves here
+            var p = item.points[0];
             if (ct == 0) {
                 cr.move_to (p.x, p.y);
             } else {

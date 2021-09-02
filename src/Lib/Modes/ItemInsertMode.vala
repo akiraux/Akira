@@ -198,15 +198,15 @@ public class Akira.Lib.Modes.ItemInsertMode : AbstractInteractionMode {
                     fills_from_settings ()
                 );
 
-                var test_path = new Geometry.Point[6];
-                test_path[0] = Geometry.Point (0, 0);
-                test_path[1] = Geometry.Point (10, 40);
-                test_path[2] = Geometry.Point (50, 200);
-                test_path[3] = Geometry.Point (100, 40);
-                test_path[4] = Geometry.Point (30, 40);
-                test_path[5] = Geometry.Point (10, 10);
-
-                new_item.components.path = new Lib.Components.Path.from_points (test_path, false);
+                // var test_path = new Geometry.Point[6];
+                // test_path[0] = Geometry.Point (0, 0);
+                // test_path[1] = Geometry.Point (10, 40);
+                // test_path[2] = Geometry.Point (50, 200);
+                // test_path[3] = Geometry.Point (100, 40);
+                // test_path[4] = Geometry.Point (30, 40);
+                // test_path[5] = Geometry.Point (10, 10);
+                //
+                // new_item.components.path = new Lib.Components.Path.from_points (test_path, false);
                 break;
 
             case "artboard":
@@ -226,9 +226,10 @@ public class Akira.Lib.Modes.ItemInsertMode : AbstractInteractionMode {
                     borders_from_settings (),
                     null
                 );
-                var test_path = new Geometry.Point[1];
-                test_path[0] = Geometry.Point (0, 0);
 
+                var test_path = new Utils.PathItem[1];
+                test_path[0] = new Utils.PathMove ();
+                test_path[0].points[0] = Geometry.Point (0, 0);
                 new_item.components.path = new Lib.Components.Path.from_points (test_path, false);
                 break;
         }

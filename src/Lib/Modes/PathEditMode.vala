@@ -27,6 +27,8 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
     private Geometry.Point first_point;
     private ViewLayers.ViewLayerPath path_layer;
 
+    // Factory to create different types of points.
+    private Utils.PathPointFactory point_factory;
 
     public PathEditMode (Lib.ViewCanvas canvas, Lib.Items.ModelInstance instance) {
         Object (
@@ -39,6 +41,8 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
         // Layer to show when editing paths.
         path_layer = new ViewLayers.ViewLayerPath ();
         path_layer.add_to_canvas (ViewLayers.ViewLayer.PATH_LAYER_ID, view_canvas);
+
+        point_factory = new Utils.PathPointFactory ();
     }
 
     public override AbstractInteractionMode.ModeType mode_type () {
@@ -112,7 +116,7 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
     private void add_point_to_path (Geometry.Point point, int index = -1) {
 
         var old_path_points = instance.components.path.data;
-        Geometry.Point[] new_path_points = new Geometry.Point[old_path_points.length + 1];
+        Utils.PathItem[] new_path_points = new Utils.PathItem[old_path_points.length + 1];
 
         index = (index == -1) ? index = old_path_points.length : index;
 
@@ -120,7 +124,9 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
             new_path_points[i] = old_path_points[i];
         }
 
-        new_path_points[index] = point;
+        var new_point = point_factory.create (Utils.PathPointFactory.Command.LINE) as Utils.PathLine;
+        new_point.add_point (point);
+        new_path_points[index] = new_point;
 
         for (int i = index + 1; i < old_path_points.length + 1; ++i) {
             new_path_points[i] = old_path_points[i - 1];
@@ -134,23 +140,30 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
     /*
      * This method shift all points in path such that none of them are in negative space.
      */
-    private Geometry.Point[] recalculate_points (Geometry.Point[] points) {
+    private Utils.PathItem[] recalculate_points (Utils.PathItem[] items) {
         double min_x = 0, min_y = 0;
 
-        foreach (var pt in points) {
-            if (pt.x < min_x) {
-                min_x = pt.x;
-            }
-            if (pt.y < min_y) {
-                min_y = pt.y;
+        foreach (var item in items) {
+            foreach (var point in item.points) {
+                if (point.x < min_x) {
+                    min_x = point.x;
+                }
+                if (point.y < min_y) {
+                    min_y = point.y;
+                }
             }
         }
 
-        Geometry.Point[] recalculated_points = new Geometry.Point[points.length];
+        Utils.PathItem[] recalculated_points = new Utils.PathItem[items.length];
 
         // Shift all the points.
-        for (int i = 0; i < points.length; ++i) {
-            recalculated_points[i] = Geometry.Point (points[i].x - min_x, points[i].y - min_y);
+        for (int i = 0; i < items.length; ++i) {
+            recalculated_points[i] = items[i].copy ();
+
+            for (int j = 0; j < recalculated_points[i].points.length; ++j) {
+                recalculated_points[i].points[j].x -= min_x;
+                recalculated_points[i].points[j].y -= min_y;
+            }
         }
 
         // Then shift the reference point.
