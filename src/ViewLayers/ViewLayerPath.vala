@@ -24,10 +24,12 @@ public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
 
     private Utils.PathItem[]? points = null;
     private Geometry.Rectangle extents;
+    private double rotation;
 
-    public void update_path_data (Utils.PathItem[]? _points, Geometry.Rectangle _extents) {
+    public void update_path_data (Utils.PathItem[]? _points, Geometry.Rectangle _extents, double _rotation) {
         points = _points;
         extents = _extents;
+        rotation = _rotation;
 
         update ();
     }
@@ -72,9 +74,22 @@ public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
 
         var reference_point = Geometry.Point (extents.left, extents.top);
 
+        double sin_theta = Math.sin (rotation);
+        double cos_theta = Math.cos (rotation);
+
+        // Center around which to rotate points.
+        double origin_x = (extents.right - extents.left) / 2.0;
+        double origin_y = (extents.bottom - extents.top) / 2.0;
+
         foreach (var item in points) {
-            var pt = item.points[0];
-            context.arc (pt.x + reference_point.x, pt.y + reference_point.y, radius, 0, Math.PI * 2);
+            double x = item.points[0].x;
+            double y = item.points[0].y;
+
+            // Rotate the point if there is any rotation.
+            double rot_x = cos_theta * (x - origin_x) - sin_theta * (y - origin_y) + origin_x;
+            double rot_y = sin_theta * (x - origin_x) + cos_theta * (y - origin_y) + origin_y;
+
+            context.arc (rot_x + reference_point.x, rot_y + reference_point.y, radius, 0, Math.PI * 2);
             context.fill ();
         }
 

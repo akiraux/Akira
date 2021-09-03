@@ -232,7 +232,9 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
         extents.top = coordinates.center_y - coordinates.height / 2.0;
         extents.bottom = coordinates.center_y + coordinates.height / 2.0;
 
-        path_layer.update_path_data (points, extents);
+        double rotation = instance.components.transform.rotation;
+
+        path_layer.update_path_data (points, extents, rotation);
     }
 
     public override bool button_release_event (Gdk.EventButton event) {
