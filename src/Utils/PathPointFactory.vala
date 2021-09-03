@@ -26,7 +26,6 @@
  */
 public class Akira.Utils.PathPointFactory {
     public enum Command {
-         MOVE,
          LINE,
          CURVE
     }
@@ -40,9 +39,6 @@ public class Akira.Utils.PathPointFactory {
 
     public void create (Command item_type) {
         switch (item_type) {
-            case Command.MOVE:
-                current_item = new PathMove ();
-                break;
             case Command.LINE:
                 current_item = new PathLine ();
                 break;
@@ -74,6 +70,24 @@ public class Akira.Utils.PathPointFactory {
     public bool are_all_points_added () {
         return all_points_added;
     }
+
+    public void set_current_item (PathItem item) {
+        current_item = item;
+    }
+
+    /*
+     * Checks if last inserted point can be deleted from PathItem.
+     * If yes, deletes it, otherwise returns false.
+     * If this method returns true, we need to delete items from previous PathItem in Path
+     */
+    public bool delete_last_point () {
+        if (item_point_index != 0) {
+            --item_point_index;
+            return false;
+        }
+
+        return true;
+    }
 }
 
 public class Akira.Utils.PathItem {
@@ -85,13 +99,6 @@ public class Akira.Utils.PathItem {
         new_item.command = command;
         new_item.points = points;
         return new_item;
-    }
-}
-
-public class Akira.Utils.PathMove : PathItem {
-    public PathMove () {
-        command = PathPointFactory.Command.MOVE;
-        points = new Geometry.Point[1];
     }
 }
 

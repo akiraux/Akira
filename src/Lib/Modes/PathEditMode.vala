@@ -41,6 +41,7 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
         // Layer to show when editing paths.
         path_layer = new ViewLayers.ViewLayerPath ();
         path_layer.add_to_canvas (ViewLayers.ViewLayer.PATH_LAYER_ID, view_canvas);
+        update_view ();
 
         point_factory = new Utils.PathPointFactory ();
     }
@@ -70,6 +71,12 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
     }
 
     public override bool key_press_event (Gdk.EventKey event) {
+        if (event.keyval == Gdk.Key.BackSpace) {
+            if (point_factory != null) {
+                delete_point ();
+                return true;
+            }
+        }
         return false;
     }
 
@@ -174,6 +181,41 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
         first_point.y += min_y;
 
         return recalculated_points;
+    }
+
+    private void delete_point () {
+        var path_items = instance.components.path.data;
+
+        point_factory.set_current_item (path_items[path_items.length - 1]);
+        path_items = path_items[0 : path_items.length - 1];
+
+        var recalculated_points = recalculate_points (path_items);
+        instance.components.path = new Lib.Components.Path.from_points (recalculated_points);
+
+        // To calculate the new center of bounds of rectangle,
+        // Move the center to point where user placed first point. This is represented as (0,0) internally.
+        // Then translate it to the relative center of bounding box of path.
+        var bounds = instance.components.path.calculate_extents ();
+        double center_x = first_point.x + bounds.center_x;
+        double center_y = first_point.y + bounds.center_y;
+
+        instance.components.center = new Lib.Components.Coordinates (center_x, center_y);
+        instance.components.size = new Lib.Components.Size (bounds.width, bounds.height, false);
+
+        // Update the component.
+        view_canvas.items_manager.item_model.mark_node_geometry_dirty_by_id (instance.id);
+        view_canvas.items_manager.compile_model ();
+
+        update_view ();
+
+        if (path_items.length == 0) {
+            // If there are no more points left in the path,
+            // Delete the CanvasItem, and end the PathMode.
+            view_canvas.window.event_bus.delete_selected_items ();
+            view_canvas.mode_manager.deregister_active_mode ();
+
+            return;
+        }
     }
 
     /*
