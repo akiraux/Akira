@@ -48,28 +48,26 @@ public class Akira.Lib.Components.Path : Component, Copyable<Path> {
     }
 
     public Path.deserialized (Json.Object obj) {
-        // TODO:
-        // var arr = obj.get_array_member ("path_data").get_elements ();
-        // data = new Geometry.Point[0];
-        // var idx = 0;
-        // foreach (unowned var pt in arr) {
-        //     data.resize (data.length + 1);
-        //     data[idx] = Geometry.Point.deserialized (pt.get_object ());
-        //     ++idx;
-        // }
+        var arr = obj.get_array_member ("path_data").get_elements ();
+        data = new Utils.PathItem[0];
+        var idx = 0;
+        foreach (unowned var pt in arr) {
+            data.resize (data.length + 1);
+            data[idx] = new Utils.PathItem.deserialized (pt.get_object ());
+            ++idx;
+        }
     }
 
     protected override void serialize_details (ref Json.Object obj) {
-        // TODO:
-        // var array = new Json.Array ();
-        //
-        // foreach (unowned var d in data) {
-        //     array.add_element (d.serialize ());
-        // }
-        //
-        // var node = new Json.Node (Json.NodeType.ARRAY);
-        // node.set_array (array);
-        // obj.set_member ("path_data", node);
+        var array = new Json.Array ();
+
+        foreach (unowned var d in data) {
+            array.add_element (d.serialize ());
+        }
+
+        var node = new Json.Node (Json.NodeType.ARRAY);
+        node.set_array (array);
+        obj.set_member ("path_data", node);
     }
 
     public Path copy () {

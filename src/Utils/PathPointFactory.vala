@@ -26,7 +26,7 @@
  */
 public class Akira.Utils.PathPointFactory {
     public enum Command {
-         LINE,
+         LINE=0,
          CURVE
     }
 
@@ -99,6 +99,36 @@ public class Akira.Utils.PathItem {
         new_item.command = command;
         new_item.points = points;
         return new_item;
+    }
+
+    public PathItem.deserialized (Json.Object obj) {
+        command = (PathPointFactory.Command) obj.get_int_member ("command");
+        var points_serialized = obj.get_array_member ("points").get_elements ();
+
+        points = new Geometry.Point[0];
+        var idx = 0;
+        foreach (unowned var point in points_serialized) {
+            points.resize (points.length + 1);
+            points[idx] = Geometry.Point.deserialized (point.get_object ());
+            ++idx;
+        }
+    }
+
+    public Json.Node serialize () {
+        var obj = new Json.Object ();
+
+        var points_serialized = new Json.Array ();
+        foreach (unowned var point in points) {
+            points_serialized.add_element (point.serialize ());
+        }
+
+        obj.set_int_member ("command", (int) command);
+
+        var node = new Json.Node (Json.NodeType.ARRAY);
+        node.set_array (points_serialized);
+        obj.set_member ("points", node);
+
+        return node;
     }
 }
 
