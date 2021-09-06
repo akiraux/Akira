@@ -76,6 +76,7 @@ sources = files(
     #'Models/ColorModel.vala',
     #'Models/ExportModel.vala',
     #'Models/ListModel.vala',
+    'Models/PathEditModel.vala',
 
     'Dialogs/ShortcutsDialog.vala',
     'Dialogs/SettingsDialog.vala',

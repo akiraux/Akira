@@ -23,9 +23,7 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
 
     public weak Lib.ViewCanvas view_canvas { get; construct; }
     public Lib.Items.ModelInstance instance { get; construct; }
-    // Keep track of previous point for calculating relative positions of points.
-    private Geometry.Point first_point;
-    private ViewLayers.ViewLayerPath path_layer;
+    private Models.PathEditModel edit_model;
 
 
     public PathEditMode (Lib.ViewCanvas canvas, Lib.Items.ModelInstance instance) {
@@ -33,12 +31,7 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
             view_canvas: canvas,
             instance: instance
         );
-
-        first_point = Geometry.Point (-1, -1);
-
-        // Layer to show when editing paths.
-        path_layer = new ViewLayers.ViewLayerPath ();
-        path_layer.add_to_canvas (ViewLayers.ViewLayer.PATH_LAYER_ID, view_canvas);
+        edit_model = new Models.PathEditModel (instance, view_canvas);
     }
 
     public override AbstractInteractionMode.ModeType mode_type () {
@@ -77,104 +70,19 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
         // Everytime the user presses the mouse button, a new point needs to be created and added to the path.
         Akira.Geometry.Point point = Akira.Geometry.Point (event.x, event.y);
 
-        if (first_point.x == -1) {
-            first_point = point;
-            update_view ();
+        if (edit_model.first_point.x == -1) {
+            edit_model.first_point = point;
             return false;
         }
 
-        // This calculates the position of the new point relative to the first point.
-        point.x -= first_point.x;
-        point.y -= first_point.y;
+        // Add this point to the edit model.
+        edit_model.add_point (point);
 
-        // Add the new points to the drawable and path
-        add_point_to_path (point);
-
-        // To calculate the new center of bounds of rectangle,
-        // Move the center to point where user placed first point. This is represented as (0,0) internally.
-        // Then translate it to the relative center of bounding box of path.
-        var bounds = instance.components.path.calculate_extents ();
-        double center_x = first_point.x + bounds.center_x;
-        double center_y = first_point.y + bounds.center_y;
-
-        instance.components.center = new Lib.Components.Coordinates (center_x, center_y);
-        instance.components.size = new Lib.Components.Size (bounds.width, bounds.height, false);
-
-        // Update the component.
-        view_canvas.items_manager.item_model.mark_node_geometry_dirty_by_id (instance.id);
-        view_canvas.items_manager.compile_model ();
-
-        update_view ();
+        // if (edit_model.last_command_done ()) {
+        //     edit_model.add_point (point);
+        // }
 
         return true;
-    }
-
-    private void add_point_to_path (Geometry.Point point, int index = -1) {
-
-        var old_path_points = instance.components.path.data;
-        Geometry.Point[] new_path_points = new Geometry.Point[old_path_points.length + 1];
-
-        index = (index == -1) ? index = old_path_points.length : index;
-
-        for (int i = 0; i < index; ++i) {
-            new_path_points[i] = old_path_points[i];
-        }
-
-        new_path_points[index] = point;
-
-        for (int i = index + 1; i < old_path_points.length + 1; ++i) {
-            new_path_points[i] = old_path_points[i - 1];
-        }
-
-        var recalculated_points = recalculate_points (new_path_points);
-
-        instance.components.path = new Lib.Components.Path.from_points (recalculated_points);
-    }
-
-    /*
-     * This method shift all points in path such that none of them are in negative space.
-     */
-    private Geometry.Point[] recalculate_points (Geometry.Point[] points) {
-        double min_x = 0, min_y = 0;
-
-        foreach (var pt in points) {
-            if (pt.x < min_x) {
-                min_x = pt.x;
-            }
-            if (pt.y < min_y) {
-                min_y = pt.y;
-            }
-        }
-
-        Geometry.Point[] recalculated_points = new Geometry.Point[points.length];
-
-        // Shift all the points.
-        for (int i = 0; i < points.length; ++i) {
-            recalculated_points[i] = Geometry.Point (points[i].x - min_x, points[i].y - min_y);
-        }
-
-        // Then shift the reference point.
-        first_point.x += min_x;
-        first_point.y += min_y;
-
-        return recalculated_points;
-    }
-
-    /*
-     * Recalculates the extents and updates the ViewLayerPath
-     */
-    private void update_view () {
-        var points = instance.components.path.data;
-
-        var coordinates = view_canvas.selection_manager.selection.coordinates ();
-
-        Geometry.Rectangle extents = Geometry.Rectangle.empty ();
-        extents.left = coordinates.center_x - coordinates.width / 2.0;
-        extents.right = coordinates.center_x + coordinates.width / 2.0;
-        extents.top = coordinates.center_y - coordinates.height / 2.0;
-        extents.bottom = coordinates.center_y + coordinates.height / 2.0;
-
-        path_layer.update_path_data (points, extents);
     }
 
     public override bool button_release_event (Gdk.EventButton event) {
@@ -189,3 +97,22 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
         return null;
     }
 }
+
+/*
+when user clicks, then check if all points of last command were done.
+    If done, then create line command and put the point in it. Mark is_click as true.
+    Else, just add the current point.
+
+In motion, if is_click == true, then there is drag. So mark the last inserted command as CURVE.
+Mark a flag is_click_drag = true to show that there was click and drag.
+
+In release, if is_click_drag == true, it means that the first point of curve was just entered. Take coordinates of release event and put in path.
+Mark flags is_click = false, is_click_drag = false
+
+
+
+When inserting a path, the first point will already be there from the previous path.
+When the user clicks and drags, the point where they click will be the second point.
+When dragging, the line joining the point where user clicked and where they released will be tangent.
+The last point where they click will be the final point.
+*/
