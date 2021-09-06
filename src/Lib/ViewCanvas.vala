@@ -342,11 +342,7 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
 
     private bool handle_double_click_event () {
         if (!selection_manager.is_empty ()) {
-            var instance = selection_manager.selection.first_node ().instance;
-
-            if (instance.type.name_id == "artboard") {
-                return false;
-            }
+            var instance = selection_manager.selection.first_node().instance;
 
             var path_edit_mode = new Lib.Modes.PathEditMode (this, instance);
             mode_manager.register_mode (path_edit_mode);
