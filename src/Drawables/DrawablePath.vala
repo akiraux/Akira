@@ -25,10 +25,12 @@
 public class Akira.Drawables.DrawablePath : Drawable {
     // In the future we will probably want control points with more data.
     public Geometry.Point[]? points = null;
+    public string[]? commands = null;
 
-    public DrawablePath (Geometry.Point[]? points = null) {
-       if (points != null) {
+    public DrawablePath (Geometry.Point[]? points = null, string[]? commands = null) {
+       if (points != null && commands != null) {
            this.points = points;
+           this.commands = commands;
        }
     }
 
@@ -40,16 +42,18 @@ public class Akira.Drawables.DrawablePath : Drawable {
         cr.save ();
         cr.translate (center_x, center_y);
         cr.new_path ();
-        var ct = 0;
+        cr.move_to (points[0].x, points[0].y);
 
-        foreach (var p in points) {
-            if (ct == 0) {
-                cr.move_to (p.x, p.y);
-            } else {
-                cr.line_to (p.x, p.y);
+        int point_idx = 0;
+        for (int i = 0; i < commands.length && point_idx < points.length; ++i) {
+            if (commands[i] == Models.PathEditModel.LINE) {
+                cr.line_to (points[point_idx].x, points[point_idx].y);
+                ++point_idx;
+            } else if (commands[i] == Models.PathEditModel.CURVE) {
+                point_idx += 3;
             }
-            ++ct;
         }
+
         cr.restore ();
     }
 }

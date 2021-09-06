@@ -59,8 +59,8 @@ public class Akira.Models.PathEditModel : Object {
         point.x -= first_point.x;
         point.y -= first_point.y;
 
+        set_command (LINE);
         add_point_to_path (point);
-        // set_command (LINE);
 
         recompute_components ();
     }
@@ -79,7 +79,7 @@ public class Akira.Models.PathEditModel : Object {
     private void set_command (string command, int index = -1) {
         if (index == -1) {
             commands.resize (commands.length + 1);
-            commands[commands.length] = command;
+            commands[commands.length - 1] = command;
         } else {
             commands[index] = command;
         }
@@ -106,7 +106,7 @@ public class Akira.Models.PathEditModel : Object {
 
         var recalculated_points = recalculate_points (new_path_points);
 
-        instance.components.path = new Lib.Components.Path.from_points (recalculated_points);
+        instance.components.path = new Lib.Components.Path.from_points (recalculated_points, commands);
     }
 
     /*

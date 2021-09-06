@@ -206,7 +206,9 @@ public class Akira.Lib.Modes.ItemInsertMode : AbstractInteractionMode {
                 test_path[4] = Geometry.Point (30, 40);
                 test_path[5] = Geometry.Point (10, 10);
 
-                new_item.components.path = new Lib.Components.Path.from_points (test_path, false);
+                string[] commands = {"LINE", "LINE", "LINE", "LINE", "LINE", "LINE"};
+
+                new_item.components.path = new Lib.Components.Path.from_points (test_path, commands, false);
                 break;
 
             case "artboard":
@@ -229,7 +231,9 @@ public class Akira.Lib.Modes.ItemInsertMode : AbstractInteractionMode {
                 var test_path = new Geometry.Point[1];
                 test_path[0] = Geometry.Point (0, 0);
 
-                new_item.components.path = new Lib.Components.Path.from_points (test_path, false);
+                string[] commands = {"LINE"};
+
+                new_item.components.path = new Lib.Components.Path.from_points (test_path, commands, false);
                 break;
         }
 

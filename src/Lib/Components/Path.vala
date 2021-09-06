@@ -23,21 +23,28 @@ public class Akira.Lib.Components.Path : Component, Copyable<Path> {
     // Control points relative to a top-left of 0,0.
     // In the future we will probably want control points with more data.
     public Geometry.Point[] data;
+    public string[] commands;
     public bool close = false;
 
     public Path (bool close = false) {
         data = new Geometry.Point[0];
+        commands = new string[0];
         this.close = close;
     }
 
-    public Path.from_single_point (Geometry.Point pt, bool close = false) {
+    public Path.from_single_point (Geometry.Point pt, string command, bool close = false) {
         data = new Geometry.Point[1];
         data[0] = pt;
+
+        commands = new string[1];
+        commands[0] = command;
+
         this.close = close;
     }
 
-    public Path.from_points (Geometry.Point[] data, bool close = false) {
+    public Path.from_points (Geometry.Point[] data, string[] commands, bool close = false) {
         this.data = data;
+        this.commands = commands;
         this.close = close;
     }
 
