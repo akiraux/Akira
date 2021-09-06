@@ -70,16 +70,12 @@ public class Akira.Lib.Modes.ItemInsertMode : AbstractInteractionMode {
         if (transform_mode != null) {
             return transform_mode.key_press_event (event);
         }
-
-        if (path_edit_mode != null) {
-            return path_edit_mode.key_press_event (event);
-        }
         return false;
     }
 
     public override bool key_release_event (Gdk.EventKey event) {
         if (transform_mode != null) {
-            return transform_mode.key_release_event (event);
+            return transform_mode.key_press_event (event);
         }
         return false;
      }
@@ -202,7 +198,6 @@ public class Akira.Lib.Modes.ItemInsertMode : AbstractInteractionMode {
                     fills_from_settings ()
                 );
 
-                // Commented out temporarily
                 // var test_path = new Geometry.Point[6];
                 // test_path[0] = Geometry.Point (0, 0);
                 // test_path[1] = Geometry.Point (10, 40);
@@ -233,7 +228,7 @@ public class Akira.Lib.Modes.ItemInsertMode : AbstractInteractionMode {
                 );
 
                 var test_path = new Utils.PathItem[1];
-                test_path[0] = new Utils.PathLine ();
+                test_path[0] = new Utils.PathMove ();
                 test_path[0].points[0] = Geometry.Point (0, 0);
                 new_item.components.path = new Lib.Components.Path.from_points (test_path, false);
                 break;
