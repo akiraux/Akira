@@ -22,54 +22,46 @@
 public class Akira.Lib.Components.Path : Component, Copyable<Path> {
     // Control points relative to a top-left of 0,0.
     // In the future we will probably want control points with more data.
-    public Utils.PathItem[] data;
+    public Geometry.Point[] data;
     public bool close = false;
 
     public Path (bool close = false) {
-        data = new Utils.PathItem[0];
+        data = new Geometry.Point[0];
         this.close = close;
     }
 
     public Path.from_single_point (Geometry.Point pt, bool close = false) {
-        data = new Utils.PathItem[1];
-
-        // When user creates a new path from a single point, the first point
-        // is always PathMove.
-        var item = new Utils.PathMove ();
-        item.add_point(pt);
-        data[0] = item;
-
+        data = new Geometry.Point[1];
+        data[0] = pt;
         this.close = close;
     }
 
-    public Path.from_points (Utils.PathItem[] data, bool close = false) {
+    public Path.from_points (Geometry.Point[] data, bool close = false) {
         this.data = data;
         this.close = close;
     }
 
     public Path.deserialized (Json.Object obj) {
-        // TODO:
-        // var arr = obj.get_array_member ("path_data").get_elements ();
-        // data = new Geometry.Point[0];
-        // var idx = 0;
-        // foreach (unowned var pt in arr) {
-        //     data.resize (data.length + 1);
-        //     data[idx] = Geometry.Point.deserialized (pt.get_object ());
-        //     ++idx;
-        // }
+        var arr = obj.get_array_member ("path_data").get_elements ();
+        data = new Geometry.Point[0];
+        var idx = 0;
+        foreach (unowned var pt in arr) {
+            data.resize (data.length + 1);
+            data[idx] = Geometry.Point.deserialized (pt.get_object ());
+            ++idx;
+        }
     }
 
     protected override void serialize_details (ref Json.Object obj) {
-        // TODO:
-        // var array = new Json.Array ();
-        //
-        // foreach (unowned var d in data) {
-        //     array.add_element (d.serialize ());
-        // }
-        //
-        // var node = new Json.Node (Json.NodeType.ARRAY);
-        // node.set_array (array);
-        // obj.set_member ("path_data", node);
+        var array = new Json.Array ();
+
+        foreach (unowned var d in data) {
+            array.add_element (d.serialize ());
+        }
+
+        var node = new Json.Node (Json.NodeType.ARRAY);
+        node.set_array (array);
+        obj.set_member ("path_data", node);
     }
 
     public Path copy () {
@@ -84,26 +76,19 @@ public class Akira.Lib.Components.Path : Component, Copyable<Path> {
         double min_y = 0;
         double max_y = 0;
 
-        foreach (var item in data) {
-            if (item.command != Utils.PathPointFactory.Command.LINE) {
-                // TODO: Temporary until i handle Curves
-                continue;
+        foreach (var pos in data) {
+            if (pos.x < min_x) {
+                min_x = pos.x;
+            }
+            if (pos.x > max_x) {
+                max_x = pos.x;
             }
 
-            foreach (var point in item.points) {
-                if (point.x < min_x) {
-                    min_x = point.x;
-                }
-                if (point.x > max_x) {
-                    max_x = point.x;
-                }
-
-                if (point.y < min_y) {
-                    min_y = point.y;
-                }
-                if (point.y > max_y) {
-                    max_y = point.y;
-                }
+            if (pos.y < min_y) {
+                min_y = pos.y;
+            }
+            if (pos.y > max_y) {
+                max_y = pos.y;
             }
         }
 

@@ -22,10 +22,10 @@
 public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
     public const double UI_NOB_SIZE = 4;
 
-    private Utils.PathItem[]? points = null;
+    private Geometry.Point[]? points = null;
     private Geometry.Rectangle extents;
 
-    public void update_path_data (Utils.PathItem[]? _points, Geometry.Rectangle _extents) {
+    public void update_path_data (Geometry.Point[]? _points, Geometry.Rectangle _extents) {
         points = _points;
         extents = _extents;
 
@@ -72,8 +72,7 @@ public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
 
         var reference_point = Geometry.Point (extents.left, extents.top);
 
-        foreach (var item in points) {
-            var pt = item.points[0];
+        foreach (var pt in points) {
             context.arc (pt.x + reference_point.x, pt.y + reference_point.y, radius, 0, Math.PI * 2);
             context.fill ();
         }

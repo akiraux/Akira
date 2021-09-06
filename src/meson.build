@@ -42,7 +42,6 @@ sources = files(
     'Utils/Snapping2.vala',
     'Utils/SVGUtil.vala',
     'Utils/GeometryMath.vala',
-    'Utils/PathPointFactory.vala',
 
     'Layouts/HeaderBar.vala',
     'Layouts/MainViewCanvas.vala',

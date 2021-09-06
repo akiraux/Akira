@@ -280,10 +280,6 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
         event.x = event.x / current_scale;
         event.y = event.y / current_scale;
 
-        if (event.type == Gdk.EventType.@2BUTTON_PRESS) {
-            return handle_double_click_event ();
-        }
-
         if (mode_manager.button_press_event (event)) {
             return true;
         }
@@ -335,19 +331,6 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
             if (mode_manager.button_press_event (event)) {
                 return true;
             }
-        }
-
-        return false;
-    }
-
-    private bool handle_double_click_event () {
-        if (!selection_manager.is_empty ()) {
-            var instance = selection_manager.selection.first_node().instance;
-
-            var path_edit_mode = new Lib.Modes.PathEditMode (this, instance);
-            mode_manager.register_mode (path_edit_mode);
-
-            return true;
         }
 
         return false;
