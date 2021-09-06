@@ -19,11 +19,6 @@
  * Authored by: Ashish Shevale <shevaleashish@gmail.com>
  */
 
-/*
- * This class is responsible for creating new PathItems.
- * It will also add new points. When all the points have been added, only then
- * will the PathItem be appended to Components.Path
- */
 public class Akira.Utils.PathPointFactory {
     public enum Command {
          MOVE,
@@ -31,48 +26,17 @@ public class Akira.Utils.PathPointFactory {
          CURVE
     }
 
-    // Stores the recently created PathItem. Used for adding new points.
-    private PathItem current_item;
-    // Stores the index of point being added to current_item.
-    private int item_point_index;
-    // Check to see if no of points required by PathItem have been added.
-    public bool all_points_added;
-
-    public void create (Command item_type) {
+    public PathItem create (Command item_type) {
         switch (item_type) {
             case Command.MOVE:
-                current_item = new PathMove ();
-                break;
+                return new PathMove ();
             case Command.LINE:
-                current_item = new PathLine ();
-                break;
+                return new PathLine ();
             case Command.CURVE:
-                current_item = new PathCurve ();
-                break;
+                return new PathCurve ();
             default:
-                current_item = new PathItem ();
-                break;
+                return new PathItem ();
         }
-
-        item_point_index = 0;
-        all_points_added = false;
-    }
-
-    public void add_next_point (Geometry.Point point) {
-        current_item.points[item_point_index] = point;
-        ++item_point_index;
-
-        if (item_point_index == current_item.points.length) {
-            all_points_added = true;
-        }
-    }
-
-    public PathItem get_path_item () {
-        return current_item;
-    }
-
-    public bool are_all_points_added () {
-        return all_points_added;
     }
 }
 
@@ -93,12 +57,20 @@ public class Akira.Utils.PathMove : PathItem {
         command = PathPointFactory.Command.MOVE;
         points = new Geometry.Point[1];
     }
+
+    public void add_point (Geometry.Point point) {
+        points[0] = point;
+    }
 }
 
 public class Akira.Utils.PathLine : PathItem {
     public PathLine () {
         command = PathPointFactory.Command.LINE;
         points = new Geometry.Point[1];
+    }
+
+    public void add_point (Geometry.Point point) {
+        points[0] = point;
     }
 }
 
@@ -107,4 +79,17 @@ public class Akira.Utils.PathCurve : PathItem {
         command = PathPointFactory.Command.CURVE;
         points = new Geometry.Point[3];
     }
+
+    public void add_first_point (Geometry.Point point) {
+        points[0] = point;
+    }
+
+    public void add_second_point (Geometry.Point point) {
+        points[1] = point;
+    }
+
+    public void add_third_point (Geometry.Point point) {
+        points[2] = point;
+    }
+
 }

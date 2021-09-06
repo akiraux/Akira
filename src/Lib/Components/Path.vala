@@ -36,7 +36,7 @@ public class Akira.Lib.Components.Path : Component, Copyable<Path> {
         // When user creates a new path from a single point, the first point
         // is always PathMove.
         var item = new Utils.PathMove ();
-        item.points[0] = pt;
+        item.add_point(pt);
         data[0] = item;
 
         this.close = close;
