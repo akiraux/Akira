@@ -27,7 +27,7 @@ public class Akira.Window : Gtk.ApplicationWindow {
     public Akira.Services.EventBus event_bus;
 
     public Akira.Services.ActionManager action_manager;
-    public Akira.Layouts.HeaderBar headerbar;
+    // public Akira.Layouts.HeaderBar headerbar;
     public Akira.Layouts.MainWindow main_window;
     public Akira.Utils.Dialogs dialogs;
 
@@ -51,7 +51,7 @@ public class Akira.Window : Gtk.ApplicationWindow {
         event_bus = new Akira.Services.EventBus ();
         action_manager = new Akira.Services.ActionManager (app, this);
 
-        headerbar = new Akira.Layouts.HeaderBar (this);
+        // headerbar = new Akira.Layouts.HeaderBar (this);
         file_manager = new Akira.FileFormat.FileManager (this);
         main_window = new Akira.Layouts.MainWindow (this);
 
@@ -69,11 +69,11 @@ public class Akira.Window : Gtk.ApplicationWindow {
     }
 
     private void build_ui () {
-        set_titlebar (headerbar);
+        // set_titlebar (headerbar);
         set_border_width (0);
-        if (Constants.PROFILE == "development") {
-            headerbar.get_style_context ().add_class ("devel");
-        }
+        // if (Constants.PROFILE == "development") {
+        //     headerbar.get_style_context ().add_class ("devel");
+        // }
 
         delete_event.connect ((e) => {
             return before_destroy ();
