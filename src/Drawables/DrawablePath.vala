@@ -50,6 +50,17 @@ public class Akira.Drawables.DrawablePath : Drawable {
                 cr.line_to (points[point_idx].x, points[point_idx].y);
                 ++point_idx;
             } else if (commands[i] == Models.PathEditModel.CURVE) {
+                // print ("draw curve\n");
+                var x0 = points[point_idx].x;
+                var y0 = points[point_idx].y;
+
+                var x1 = points[point_idx + 1].x;
+                var y1 = points[point_idx + 1].y;
+
+                var x2 = points[point_idx + 2].x;
+                var y2 = points[point_idx + 2].y;
+
+                cr.curve_to (x0, y0, x1, y1, x2, y2);
                 point_idx += 3;
             }
         }

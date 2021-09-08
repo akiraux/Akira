@@ -28,10 +28,13 @@ public class Akira.Models.PathEditModel : Object {
 
     private ViewLayers.ViewLayerPath path_layer;
 
-    private Geometry.Point[] points;
+    // The points in live command will be drawn every time user moves cursor.
+    // Also acts as buffer fro curves.
+    public string live_command;
+    public Geometry.Point[] live_points;
+    public int live_idx;
+
     private string[] commands;
-    // Points in the current command. Mostly used for curves.
-    private Geometry.Point[] curr_command_points;
 
     public Geometry.Point first_point;
 
@@ -42,11 +45,12 @@ public class Akira.Models.PathEditModel : Object {
         );
 
         first_point = Geometry.Point (-1, -1);
-        points = new Geometry.Point[1];
-        points[0] = Geometry.Point (0, 0);
 
-        commands = new string[1];
-        commands[0] = LINE;
+        live_command = LINE;
+        live_points = new Geometry.Point[3];
+        live_idx = 0;
+
+        commands = instance.components.path.commands;
 
         // Layer to show when editing paths.
         path_layer = new ViewLayers.ViewLayerPath ();
@@ -55,34 +59,38 @@ public class Akira.Models.PathEditModel : Object {
         update_view ();
     }
 
-    public void add_point (Geometry.Point point) {
-        point.x -= first_point.x;
-        point.y -= first_point.y;
+    public void set_live_point (Geometry.Point point) {
+        if (live_idx == 2) {
+            return;
+        }
 
-        set_command (LINE);
-        add_point_to_path (point);
-
-        recompute_components ();
+        live_points[live_idx] = Geometry.Point (point.x - first_point.x, point.y - first_point.y);
     }
 
-    public bool last_command_done () {
-        // When we create a line, we immediately add the
-        if (commands[commands.length - 1] == LINE) {
+    public bool is_live_command_done () {
+        if (live_command == LINE) {
             return true;
+        } else if (live_command == CURVE) {
+            if (live_idx == 2) {
+                return true;
+            }
         }
+
         return false;
     }
 
-    /*
-     * Sets values of command at given index. If index is -1, appends a new command.
-     */
-    private void set_command (string command, int index = -1) {
-        if (index == -1) {
-            commands.resize (commands.length + 1);
-            commands[commands.length - 1] = command;
-        } else {
-            commands[index] = command;
+    public void add_live_points_to_path () {
+        commands.resize (commands.length + 1);
+        commands[commands.length - 1] = live_command;
+
+        for (int i = 0; i < live_idx + 1; ++i) {
+            add_point_to_path (live_points[i]);
+            recompute_components ();
         }
+
+        live_idx = 0;
+
+        update_view ();
     }
 
     /*

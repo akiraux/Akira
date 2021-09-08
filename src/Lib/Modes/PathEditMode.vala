@@ -25,6 +25,9 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
     public Lib.Items.ModelInstance instance { get; construct; }
     private Models.PathEditModel edit_model;
 
+    // Flag to track click and drag events.
+    private bool is_click = false;
+    private bool is_click_drag = false;
 
     public PathEditMode (Lib.ViewCanvas canvas, Lib.Items.ModelInstance instance) {
         Object (
@@ -75,21 +78,45 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
             return false;
         }
 
-        // Add this point to the edit model.
-        edit_model.add_point (point);
-
+        // // Add this point to the edit model.
+        // edit_model.set_command (Models.PathEditModel.LINE);
+        // edit_model.add_point (point);
+        //
         // if (edit_model.last_command_done ()) {
-        //     edit_model.add_point (point);
+        //
         // }
+
+        if (edit_model.live_command == Models.PathEditModel.LINE) {
+            is_click = true;
+            edit_model.set_live_point (point);
+        } else {
+            edit_model.live_idx = 2;
+            edit_model.set_live_point (point);
+        }
+
+        // ++edit_model.live_idx;
 
         return true;
     }
 
     public override bool button_release_event (Gdk.EventButton event) {
-        return false;
+        if (edit_model.is_live_command_done ()) {
+            edit_model.add_live_points_to_path ();
+            edit_model.live_command = Models.PathEditModel.LINE;
+            is_click = false;
+        }
+
+        return true;
     }
 
     public override bool motion_notify_event (Gdk.EventMotion event) {
+        if (is_click) {
+            edit_model.live_command = Models.PathEditModel.CURVE;
+            edit_model.live_idx = 1;
+            edit_model.set_live_point (Geometry.Point (event.x, event.y));
+
+            return true;
+        }
         return false;
     }
 
@@ -99,6 +126,17 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
 }
 
 /*
+in PathEditModel, create live_command, live_command_point.
+
+when the user clicks, add the current point to curve_points. mark is_click as true.
+
+In motion, if is_click == true, then click and drag. mark is_click_drag as true. Add first point of click and drag to curve_points.
+
+In release, if is_click_drag == true, then this is second point of curve. add to curve_points
+else, it is line. add
+
+
+===========================================================================================
 when user clicks, then check if all points of last command were done.
     If done, then create line command and put the point in it. Mark is_click as true.
     Else, just add the current point.
