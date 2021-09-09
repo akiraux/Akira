@@ -20,21 +20,14 @@
 */
 
 public class Akira.Models.PathEditModel : Object {
-    public const string LINE = "LINE";
-    public const string CURVE = "CURVE";
 
     public Lib.Items.ModelInstance instance { get; construct; }
     public weak Lib.ViewCanvas view_canvas { get; construct; }
 
     private ViewLayers.ViewLayerPath path_layer;
 
-    // The points in live command will be drawn every time user moves cursor.
-    // Also acts as buffer fro curves.
-    public string live_command;
-    public Geometry.Point[] live_points;
-    public int live_idx;
-
     private string[] commands;
+    private Geometry.Point[] points;
 
     public Geometry.Point first_point;
 
@@ -46,11 +39,8 @@ public class Akira.Models.PathEditModel : Object {
 
         first_point = Geometry.Point (-1, -1);
 
-        live_command = LINE;
-        live_points = new Geometry.Point[3];
-        live_idx = 0;
-
         commands = instance.components.path.commands;
+        points = instance.components.path.data;
 
         // Layer to show when editing paths.
         path_layer = new ViewLayers.ViewLayerPath ();
@@ -59,36 +49,16 @@ public class Akira.Models.PathEditModel : Object {
         update_view ();
     }
 
-    public void set_live_point (Geometry.Point point) {
-        if (live_idx == 2) {
-            return;
-        }
-
-        live_points[live_idx] = Geometry.Point (point.x - first_point.x, point.y - first_point.y);
-    }
-
-    public bool is_live_command_done () {
-        if (live_command == LINE) {
-            return true;
-        } else if (live_command == CURVE) {
-            if (live_idx == 2) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    public void add_live_points_to_path () {
+    public void add_live_points_to_path (Geometry.Point[] points, string live_command, int length) {
         commands.resize (commands.length + 1);
         commands[commands.length - 1] = live_command;
 
-        for (int i = 0; i < live_idx + 1; ++i) {
-            add_point_to_path (live_points[i]);
-            recompute_components ();
+        for (int i = 0; i < length; ++i) {
+            var new_pt = Geometry.Point (points[i].x - first_point.x, points[i].y - first_point.y);
+            add_point_to_path (new_pt);
         }
 
-        live_idx = 0;
+        recompute_components ();
 
         update_view ();
     }
@@ -97,24 +67,23 @@ public class Akira.Models.PathEditModel : Object {
      * This method shift all points in path such that none of them are in negative space.
      */
     private void add_point_to_path (Geometry.Point point, int index = -1) {
-        var old_path_points = instance.components.path.data;
-        Geometry.Point[] new_path_points = new Geometry.Point[old_path_points.length + 1];
+        // var old_path_points = instance.components.path.data;
+        Geometry.Point[] new_path_points = new Geometry.Point[points.length + 1];
 
-        index = (index == -1) ? index = old_path_points.length : index;
+        index = (index == -1) ? index = points.length : index;
 
         for (int i = 0; i < index; ++i) {
-            new_path_points[i] = old_path_points[i];
+            new_path_points[i] = points[i];
         }
 
         new_path_points[index] = point;
 
-        for (int i = index + 1; i < old_path_points.length + 1; ++i) {
-            new_path_points[i] = old_path_points[i - 1];
+        for (int i = index + 1; i < points.length + 1; ++i) {
+            new_path_points[i] = points[i - 1];
         }
 
-        var recalculated_points = recalculate_points (new_path_points);
-
-        instance.components.path = new Lib.Components.Path.from_points (recalculated_points, commands);
+        points = recalculate_points (new_path_points);
+        instance.components.path = new Lib.Components.Path.from_points (points, commands);
     }
 
     /*

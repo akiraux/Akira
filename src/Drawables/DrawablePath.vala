@@ -46,10 +46,10 @@ public class Akira.Drawables.DrawablePath : Drawable {
 
         int point_idx = 0;
         for (int i = 0; i < commands.length && point_idx < points.length; ++i) {
-            if (commands[i] == Models.PathEditModel.LINE) {
+            if (commands[i] == Lib.Modes.PathEditMode.LINE) {
                 cr.line_to (points[point_idx].x, points[point_idx].y);
                 ++point_idx;
-            } else if (commands[i] == Models.PathEditModel.CURVE) {
+            } else if (commands[i] == Lib.Modes.PathEditMode.CURVE) {
                 // print ("draw curve\n");
                 var x0 = points[point_idx].x;
                 var y0 = points[point_idx].y;

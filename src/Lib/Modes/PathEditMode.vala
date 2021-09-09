@@ -20,6 +20,8 @@
 */
 
 public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
+    public const string LINE = "LINE";
+    public const string CURVE = "CURVE";
 
     public weak Lib.ViewCanvas view_canvas { get; construct; }
     public Lib.Items.ModelInstance instance { get; construct; }
@@ -27,7 +29,12 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
 
     // Flag to track click and drag events.
     private bool is_click = false;
-    private bool is_click_drag = false;
+
+    // The points in live command will be drawn every time user moves cursor.
+    // Also acts as buffer fro curves.
+    public string live_command;
+    public Geometry.Point[] live_points;
+    public int live_idx;
 
     public PathEditMode (Lib.ViewCanvas canvas, Lib.Items.ModelInstance instance) {
         Object (
@@ -35,6 +42,9 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
             instance: instance
         );
         edit_model = new Models.PathEditModel (instance, view_canvas);
+        live_points = new Geometry.Point[3];
+        live_command = "LINE";
+        live_idx = -1;
     }
 
     public override AbstractInteractionMode.ModeType mode_type () {
@@ -71,38 +81,32 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
 
     public override bool button_press_event (Gdk.EventButton event) {
         // Everytime the user presses the mouse button, a new point needs to be created and added to the path.
-        Akira.Geometry.Point point = Akira.Geometry.Point (event.x, event.y);
 
         if (edit_model.first_point.x == -1) {
-            edit_model.first_point = point;
-            return false;
+            edit_model.first_point = Geometry.Point (event.x, event.y);
+            return true;
         }
 
-        // // Add this point to the edit model.
-        // edit_model.set_command (Models.PathEditModel.LINE);
-        // edit_model.add_point (point);
-        //
-        // if (edit_model.last_command_done ()) {
-        //
-        // }
+        Akira.Geometry.Point point = Akira.Geometry.Point (event.x, event.y);
 
-        if (edit_model.live_command == Models.PathEditModel.LINE) {
+        if (live_command == LINE) {
             is_click = true;
-            edit_model.set_live_point (point);
+            live_points[0] = point;
+            live_idx = 0;
         } else {
-            edit_model.live_idx = 2;
-            edit_model.set_live_point (point);
+            live_idx = 2;
+            live_points[2] = point;
         }
-
-        // ++edit_model.live_idx;
 
         return true;
     }
 
     public override bool button_release_event (Gdk.EventButton event) {
-        if (edit_model.is_live_command_done ()) {
-            edit_model.add_live_points_to_path ();
-            edit_model.live_command = Models.PathEditModel.LINE;
+        if (is_curr_command_done ()) {
+            edit_model.add_live_points_to_path (live_points, live_command, live_idx + 1);
+
+            live_idx = 0;
+            live_command = LINE;
             is_click = false;
         }
 
@@ -111,9 +115,9 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
 
     public override bool motion_notify_event (Gdk.EventMotion event) {
         if (is_click) {
-            edit_model.live_command = Models.PathEditModel.CURVE;
-            edit_model.live_idx = 1;
-            edit_model.set_live_point (Geometry.Point (event.x, event.y));
+            live_command = CURVE;
+            live_idx = 1;
+            live_points[1] = Geometry.Point (event.x, event.y);
 
             return true;
         }
@@ -122,6 +126,18 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
 
     public override Object? extra_context () {
         return null;
+    }
+
+    private bool is_curr_command_done () {
+        if (live_command == LINE && live_idx != -1) {
+            return true;
+        }
+
+        if (live_command == CURVE && live_idx == 2) {
+            return true;
+        }
+
+        return false;
     }
 }
 
