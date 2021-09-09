@@ -150,21 +150,7 @@ In motion, if is_click == true, then click and drag. mark is_click_drag as true.
 
 In release, if is_click_drag == true, then this is second point of curve. add to curve_points
 else, it is line. add
-
-
-===========================================================================================
-when user clicks, then check if all points of last command were done.
-    If done, then create line command and put the point in it. Mark is_click as true.
-    Else, just add the current point.
-
-In motion, if is_click == true, then there is drag. So mark the last inserted command as CURVE.
-Mark a flag is_click_drag = true to show that there was click and drag.
-
-In release, if is_click_drag == true, it means that the first point of curve was just entered. Take coordinates of release event and put in path.
-Mark flags is_click = false, is_click_drag = false
-
-
-
+================================================================================================
 When inserting a path, the first point will already be there from the previous path.
 When the user clicks and drags, the point where they click will be the second point.
 When dragging, the line joining the point where user clicked and where they released will be tangent.
