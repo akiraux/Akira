@@ -31,10 +31,10 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
     private bool is_click = false;
 
     // The points in live command will be drawn every time user moves cursor.
-    // Also acts as buffer fro curves.
-    public string live_command;
-    public Geometry.Point[] live_points;
-    public int live_idx;
+    // Also acts as buffer for curves.
+    private string live_command;
+    private Geometry.Point[] live_points;
+    private int live_idx;
 
     public PathEditMode (Lib.ViewCanvas canvas, Lib.Items.ModelInstance instance) {
         Object (
@@ -43,7 +43,7 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
         );
         edit_model = new Models.PathEditModel (instance, view_canvas);
         live_points = new Geometry.Point[3];
-        live_command = "LINE";
+        live_command = LINE;
         live_idx = -1;
     }
 
@@ -98,6 +98,8 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
             live_points[2] = point;
         }
 
+        edit_model.set_live_points (live_points, live_idx + 1);
+
         return true;
     }
 
@@ -107,21 +109,36 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
 
             live_idx = 0;
             live_command = LINE;
-            is_click = false;
         }
+
+        is_click = false;
 
         return true;
     }
 
     public override bool motion_notify_event (Gdk.EventMotion event) {
+        Geometry.Point point = Geometry.Point (event.x, event.y);
+
+        // If there is click and drag, then this is the second point of curve.
         if (is_click) {
             live_command = CURVE;
             live_idx = 1;
-            live_points[1] = Geometry.Point (event.x, event.y);
+            live_points[1] = point;
 
-            return true;
+            edit_model.set_live_points (live_points, live_idx + 1);
+        } else {
+            // If we are hovering in CURVE mode, current position could be our third curve point.
+            if (live_command == CURVE){
+                live_points[2] = point;
+                edit_model.set_live_points (live_points, 3);
+            } else {
+                // If we are hovering in LINE mode, this could be a potential line point.
+                live_points[0] = point;
+                edit_model.set_live_points (live_points, 1);
+            }
         }
-        return false;
+
+        return true;
     }
 
     public override Object? extra_context () {

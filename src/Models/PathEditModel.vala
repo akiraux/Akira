@@ -30,6 +30,8 @@ public class Akira.Models.PathEditModel : Object {
     private Geometry.Point[] points;
 
     public Geometry.Point first_point;
+    private Geometry.Point[] live_pts;
+    private int live_pts_len;
 
     public PathEditModel (Lib.Items.ModelInstance instance, Lib.ViewCanvas view_canvas) {
         Object (
@@ -58,9 +60,10 @@ public class Akira.Models.PathEditModel : Object {
             add_point_to_path (new_pt);
         }
 
-        recompute_components ();
+        live_pts = new Geometry.Point[0];
+        live_pts_len = 0;
 
-        update_view ();
+        recompute_components ();
     }
 
     /*
@@ -84,6 +87,13 @@ public class Akira.Models.PathEditModel : Object {
 
         points = recalculate_points (new_path_points);
         instance.components.path = new Lib.Components.Path.from_points (points, commands);
+    }
+
+    public void set_live_points (Geometry.Point[] live_pts, int length) {
+        this.live_pts = live_pts;
+        this.live_pts_len = length;
+
+        update_view ();
     }
 
     /*
@@ -142,11 +152,11 @@ public class Akira.Models.PathEditModel : Object {
 
         Geometry.Rectangle extents = Geometry.Rectangle.empty ();
         extents.left = coordinates.center_x - coordinates.width / 2.0;
-        extents.right = coordinates.center_x + coordinates.width / 2.0;
+        extents.right = coordinates.center_x + coordinates.width / 2.0 + 100;
         extents.top = coordinates.center_y - coordinates.height / 2.0;
-        extents.bottom = coordinates.center_y + coordinates.height / 2.0;
+        extents.bottom = coordinates.center_y + coordinates.height / 2.0 + 100;
 
-        path_layer.update_path_data (points, extents);
+        path_layer.update_path_data (points, live_pts, live_pts_len, extents);
     }
 
 }
