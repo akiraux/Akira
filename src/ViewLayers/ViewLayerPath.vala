@@ -23,9 +23,14 @@ public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
     public const double UI_NOB_SIZE = 4;
 
     private Models.PathDataModel path_data;
+    private Geometry.Rectangle old_live_extents;
 
     public void update_path_data (Models.PathDataModel _path_data) {
         path_data = _path_data;
+
+        // Initial values for old extents of live effect will span the entire canvas.
+        old_live_extents.left = old_live_extents.top = 0.0;
+        old_live_extents.right = old_live_extents.bottom = 1000.0;
 
         update ();
     }
@@ -55,7 +60,9 @@ public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
             return;
         }
 
+        canvas.request_redraw (old_live_extents);
         canvas.request_redraw (path_data.live_extents);
+        old_live_extents = path_data.live_extents;
     }
 
     private void draw_points (Cairo.Context context) {
@@ -104,24 +111,31 @@ public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
             case 0: break;
             case 1: context.line_to (live_pts[0].x, live_pts[0].y);
                     break;
-            case 2: var x1 = points[points.length - 1].x + reference_point.x;
-                    var y1 = points[points.length - 1].y + reference_point.y;
-                    var x2 = live_pts[0].x;
-                    var y2 = live_pts[0].y;
-                    var x3 = live_pts[1].x;
-                    var y3 = live_pts[1].y;
+            case 2: break;
+            case 3: var x0 = points[points.length - 1].x + reference_point.x;
+                    var y0 = points[points.length - 1].y + reference_point.y;
+                    var x1 = live_pts[0].x;
+                    var y1 = live_pts[0].y;
+                    var x2 = live_pts[1].x;
+                    var y2 = live_pts[1].y;
 
-                    context.curve_to (x1, y1, x2, y2, x3, y3);
+                    context.curve_to (x0, y0, x2, y2, x1, y1);
                     break;
-            case 3: var x1 = live_pts[0].x;
+            case 4: var x0 = points[points.length - 1].x + reference_point.x;
+                    var y0 = points[points.length - 1].y + reference_point.y;
+                    var x1 = live_pts[0].x;
                     var y1 = live_pts[0].y;
                     var x2 = live_pts[1].x;
                     var y2 = live_pts[1].y;
                     var x3 = live_pts[2].x;
                     var y3 = live_pts[2].y;
+                    var x4 = live_pts[3].x;
+                    var y4 = live_pts[3].y;
 
-                    context.curve_to (x1, y1, x2, y2, x3, y3);
+                    context.curve_to (x0, y0, x2, y2, x1, y1);
+                    context.curve_to (x1, y1, x3, y3, x4, y4);
                     break;
+
             default: break;
         }
 

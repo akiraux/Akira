@@ -42,7 +42,7 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
             instance: instance
         );
         edit_model = new Models.PathEditModel (instance, view_canvas);
-        live_points = new Geometry.Point[3];
+        live_points = new Geometry.Point[4];
         live_command = LINE;
         live_idx = -1;
     }
@@ -94,8 +94,8 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
             live_points[0] = point;
             live_idx = 0;
         } else {
-            live_idx = 2;
-            live_points[2] = point;
+            live_idx = 3;
+            live_points[3] = point;
         }
 
         edit_model.set_live_points (live_points, live_idx + 1);
@@ -122,15 +122,17 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
         // If there is click and drag, then this is the second point of curve.
         if (is_click) {
             live_command = CURVE;
-            live_idx = 1;
-            live_points[1] = point;
+            live_idx = 2;
+            // Points at index 1 and 2 are the two tangents required by the 2 curves.
+            live_points[1] = reflection (point, live_points[0]);
+            live_points[2] = point;
 
-            edit_model.set_live_points (live_points, live_idx + 1);
+            edit_model.set_live_points (live_points, 3);
         } else {
             // If we are hovering in CURVE mode, current position could be our third curve point.
             if (live_command == CURVE) {
-                live_points[2] = point;
-                edit_model.set_live_points (live_points, 3);
+                live_points[3] = point;
+                edit_model.set_live_points (live_points, 4);
             } else {
                 // If we are hovering in LINE mode, this could be a potential line point.
                 live_points[0] = point;
@@ -150,11 +152,18 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
             return true;
         }
 
-        if (live_command == CURVE && live_idx == 2) {
+        if (live_command == CURVE && live_idx == 3) {
             return true;
         }
 
         return false;
+    }
+
+    private Geometry.Point reflection (Geometry.Point pt1, Geometry.Point pt2) {
+        var x = pt2.x + (pt2.x - pt1.x);
+        var y = pt2.y + (pt2.y - pt1.y);
+
+        return Geometry.Point (x, y);
     }
 }
 

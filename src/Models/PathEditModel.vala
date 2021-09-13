@@ -163,31 +163,39 @@ public class Akira.Models.PathEditModel : Object {
         path_data.length = live_pts_len;
         path_data.extents = extents;
 
-        get_extents_using_live_pts (ref extents);
-        path_data.live_extents = extents;
+        path_data.live_extents = get_extents_using_live_pts (extents);
 
         path_layer.update_path_data (path_data);
     }
 
-    private void get_extents_using_live_pts (ref Geometry.Rectangle extents) {
+    private Geometry.Rectangle get_extents_using_live_pts (Geometry.Rectangle extents) {
+        var live_extents = Geometry.Rectangle.empty ();
+
+        live_extents.left = extents.left;
+        live_extents.right = extents.right;
+        live_extents.top = extents.top;
+        live_extents.bottom = extents.bottom;
+
         for (int i = 0; i < live_pts_len; ++i) {
             var temp = live_pts[i];
             temp.x = temp.x - first_point.x + extents.left;
             temp.y = temp.y - first_point.y + extents.top;
 
             if (temp.x < extents.left) {
-                extents.left = temp.x;
+                live_extents.left = temp.x;
             }
             if (temp.x > extents.right) {
-                extents.right = temp.x;
+                live_extents.right = temp.x;
             }
             if (temp.y < extents.top) {
-                extents.top = temp.y;
+                live_extents.top = temp.y;
             }
             if (temp.y > extents.bottom) {
-                extents.bottom = temp.y;
+                live_extents.bottom = temp.y;
             }
         }
+
+        return live_extents;
     }
 
 }
