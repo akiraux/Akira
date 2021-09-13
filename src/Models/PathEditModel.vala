@@ -152,11 +152,53 @@ public class Akira.Models.PathEditModel : Object {
 
         Geometry.Rectangle extents = Geometry.Rectangle.empty ();
         extents.left = coordinates.center_x - coordinates.width / 2.0;
-        extents.right = coordinates.center_x + coordinates.width / 2.0 + 100;
+        extents.right = coordinates.center_x + coordinates.width / 2.0;
         extents.top = coordinates.center_y - coordinates.height / 2.0;
-        extents.bottom = coordinates.center_y + coordinates.height / 2.0 + 100;
+        extents.bottom = coordinates.center_y + coordinates.height / 2.0;
 
-        path_layer.update_path_data (points, live_pts, live_pts_len, extents);
+        PathDataModel path_data = PathDataModel ();
+        path_data.points = points;
+        path_data.commands = commands;
+        path_data.live_pts = live_pts;
+        path_data.length = live_pts_len;
+        path_data.extents = extents;
+
+        get_extents_using_live_pts (ref extents);
+        path_data.live_extents = extents;
+
+        path_layer.update_path_data (path_data);
     }
 
+    private void get_extents_using_live_pts (ref Geometry.Rectangle extents) {
+        for (int i = 0; i < live_pts_len; ++i) {
+            var temp = live_pts[i];
+            temp.x = temp.x - first_point.x + extents.left;
+            temp.y = temp.y - first_point.y + extents.top;
+
+            if (temp.x < extents.left) {
+                extents.left = temp.x;
+            }
+            if (temp.x > extents.right) {
+                extents.right = temp.x;
+            }
+            if (temp.y < extents.top) {
+                extents.top = temp.y;
+            }
+            if (temp.y > extents.bottom) {
+                extents.bottom = temp.y;
+            }
+        }
+    }
+
+}
+
+public struct Akira.Models.PathDataModel {
+    public Geometry.Point[] points;
+    public string[] commands;
+
+    public Geometry.Point[] live_pts;
+    public int length;
+
+    public Geometry.Rectangle extents;
+    public Geometry.Rectangle live_extents;
 }

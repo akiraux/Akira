@@ -128,7 +128,7 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
             edit_model.set_live_points (live_points, live_idx + 1);
         } else {
             // If we are hovering in CURVE mode, current position could be our third curve point.
-            if (live_command == CURVE){
+            if (live_command == CURVE) {
                 live_points[2] = point;
                 edit_model.set_live_points (live_points, 3);
             } else {
