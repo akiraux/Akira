@@ -36,6 +36,9 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
     private Geometry.Point[] live_points;
     private int live_idx;
 
+    // This flag tells if we are adding a path or editing an existing one.
+    private bool is_edit_path = true;
+
     public PathEditMode (Lib.ViewCanvas canvas, Lib.Items.ModelInstance instance) {
         Object (
             view_canvas: canvas,
@@ -45,6 +48,10 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
         live_points = new Geometry.Point[4];
         live_command = LINE;
         live_idx = -1;
+    }
+
+    public void toggle_functionality (bool is_edit_path) {
+        this.is_edit_path = is_edit_path;
     }
 
     public override AbstractInteractionMode.ModeType mode_type () {
@@ -80,6 +87,10 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
     }
 
     public override bool button_press_event (Gdk.EventButton event) {
+        if (!is_edit_path) {
+            return true;
+        }
+
         // Everytime the user presses the mouse button, a new point needs to be created and added to the path.
 
         if (edit_model.first_point.x == -1) {
@@ -104,6 +115,10 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
     }
 
     public override bool button_release_event (Gdk.EventButton event) {
+        if (!is_edit_path) {
+            return true;
+        }
+
         if (is_curr_command_done ()) {
             edit_model.add_live_points_to_path (live_points, live_command, live_idx + 1);
 
@@ -119,10 +134,15 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
     public override bool motion_notify_event (Gdk.EventMotion event) {
         Geometry.Point point = Geometry.Point (event.x, event.y);
 
+        if (!is_edit_path) {
+            return true;
+        }
+
         // If there is click and drag, then this is the second point of curve.
         if (is_click) {
             live_command = CURVE;
             live_idx = 2;
+
             // Points at index 1 and 2 are the two tangents required by the 2 curves.
             live_points[1] = reflection (point, live_points[0]);
             live_points[2] = point;
