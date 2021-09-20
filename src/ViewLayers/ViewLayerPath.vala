@@ -79,10 +79,18 @@ public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
 
         var extents = path_data.extents;
         var reference_point = Geometry.Point (extents.left, extents.top);
+        var origin = Geometry.Point ( (extents.right - extents.left) / 2, (extents.bottom - extents.top) / 2);
+
+        double sin_theta = Math.sin (path_data.rot_angle);
+        double cos_theta = Math.cos (path_data.rot_angle);
 
         context.move_to (extents.left, extents.right);
         foreach (var pt in path_data.points) {
-            context.arc (pt.x + reference_point.x, pt.y + reference_point.y, radius, 0, Math.PI * 2);
+            // Apply the rotation formula and rotate the point by given angle
+            double rot_x = cos_theta * (pt.x - origin.x) - sin_theta * (pt.y - origin.y) + origin.x;
+            double rot_y = sin_theta * (pt.x - origin.x) + cos_theta * (pt.y - origin.y) + origin.y;
+
+            context.arc (rot_x + reference_point.x, rot_y + reference_point.y, radius, 0, Math.PI * 2);
             context.fill ();
         }
 
