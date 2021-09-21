@@ -70,6 +70,11 @@ public class Akira.Lib.Modes.ItemInsertMode : AbstractInteractionMode {
         if (transform_mode != null) {
             return transform_mode.key_press_event (event);
         }
+
+        if (path_edit_mode != null) {
+            return path_edit_mode.key_press_event (event);
+        }
+
         return false;
     }
 

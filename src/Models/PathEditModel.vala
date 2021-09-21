@@ -96,6 +96,33 @@ public class Akira.Models.PathEditModel : Object {
         update_view ();
     }
 
+    public Geometry.Point[] delete_last_point () {
+        if (commands[commands.length - 1] == "LINE") {
+            commands.resize (commands.length - 1);
+            points.resize (points.length - 1);
+
+            points = recalculate_points (points);
+            instance.components.path = new Lib.Components.Path.from_points (points, commands);
+            recompute_components ();
+
+            return new Geometry.Point[0];
+        } else {
+            var new_live_pts = new Geometry.Point[4];
+            new_live_pts[2] = Geometry.Point (points[points.length - 2].x + first_point.x, points[points.length - 2].y + first_point.y);
+            new_live_pts[1] = Geometry.Point (points[points.length - 3].x + first_point.x, points[points.length - 3].y + first_point.y);
+            new_live_pts[0] = Geometry.Point (points[points.length - 4].x + first_point.x, points[points.length - 4].y + first_point.y);
+
+            commands.resize (commands.length - 1);
+            points.resize (points.length - 4);
+
+            points = recalculate_points (points);
+            instance.components.path = new Lib.Components.Path.from_points (points, commands);
+            recompute_components ();
+
+            return new_live_pts;
+        }
+    }
+
     /*
      * This method shift all points in path such that none of them are in negative space.
      */

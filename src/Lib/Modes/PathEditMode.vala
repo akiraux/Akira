@@ -79,6 +79,62 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
     }
 
     public override bool key_press_event (Gdk.EventKey event) {
+        if (!is_edit_path) {
+            // When editing path, we dont know yet what point will be selected.
+            // So don't delete points, but mark this event as handled.
+            return true;
+        }
+
+        uint uppercase_keyval = Gdk.keyval_to_upper (event.keyval);
+
+        if (uppercase_keyval == Gdk.Key.BackSpace) {
+            if (live_idx > 0) {
+                --live_idx;
+
+                // Note that for curve, there are 2 tangent points that depend on each other.
+                // If one of them gets deleted, delete the other too. This leaves only 1 live point.
+                // So the live command becomes LINE.
+                if (live_idx == 1 && live_command == CURVE) {
+                    live_command = LINE;
+                    live_idx = 0;
+                }
+
+                edit_model.set_live_points (live_points, live_idx + 1);
+            } else {
+                var possible_live_pts = edit_model.delete_last_point ();
+
+                if (possible_live_pts == null || possible_live_pts.length == 0) {
+                    live_idx = -1;
+                    live_command = LINE;
+                } else {
+                    live_points[0] = possible_live_pts[0];
+                    live_points[1] = possible_live_pts[1];
+                    live_points[2] = possible_live_pts[2];
+
+                    live_idx = 2;
+                    live_command = CURVE;
+                    edit_model.set_live_points (live_points, 3);
+                }
+            }
+
+            if (instance.components.path.data.length == 0) {
+                // Sometimes the line from live effect rendered in ViewLayerPath remains even after
+                // all points have been deleted. Erase this line.
+                var update_extents = Geometry.Rectangle ();
+                update_extents.left = instance.components.center.x;
+                update_extents.top = instance.components.center.y;
+                update_extents.right = live_points[0].x;
+                update_extents.bottom = live_points[0].y;
+
+                view_canvas.request_redraw (update_extents);
+
+                // If there are no points in the path, no point to stay in PathEditMode.
+                view_canvas.window.event_bus.delete_selected_items ();
+                view_canvas.mode_manager.deregister_active_mode ();
+            }
+
+            return true;
+        }
         return false;
     }
 
@@ -152,6 +208,7 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
             // If we are hovering in CURVE mode, current position could be our third curve point.
             if (live_command == CURVE) {
                 live_points[3] = point;
+                live_idx = 3;
                 edit_model.set_live_points (live_points, 4);
             } else {
                 // If we are hovering in LINE mode, this could be a potential line point.
@@ -186,19 +243,3 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
         return Geometry.Point (x, y);
     }
 }
-
-/*
-in PathEditModel, create live_command, live_command_point.
-
-when the user clicks, add the current point to curve_points. mark is_click as true.
-
-In motion, if is_click == true, then click and drag. mark is_click_drag as true. Add first point of click and drag to curve_points.
-
-In release, if is_click_drag == true, then this is second point of curve. add to curve_points
-else, it is line. add
-================================================================================================
-When inserting a path, the first point will already be there from the previous path.
-When the user clicks and drags, the point where they click will be the second point.
-When dragging, the line joining the point where user clicked and where they released will be tangent.
-The last point where they click will be the final point.
-*/
