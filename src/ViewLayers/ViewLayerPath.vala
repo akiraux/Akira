@@ -76,6 +76,7 @@ public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
 
         context.new_path ();
         context.set_source_rgba (0.1568, 0.4745, 0.9823, 1);
+        context.set_line_width (1.0 / canvas.scale);
 
         var extents = path_data.extents;
         var reference_point = Geometry.Point (extents.left, extents.top);
@@ -85,13 +86,43 @@ public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
         double cos_theta = Math.cos (path_data.rot_angle);
 
         context.move_to (extents.left, extents.right);
-        foreach (var pt in path_data.points) {
-            // Apply the rotation formula and rotate the point by given angle
-            double rot_x = cos_theta * (pt.x - origin.x) - sin_theta * (pt.y - origin.y) + origin.x;
-            double rot_y = sin_theta * (pt.x - origin.x) + cos_theta * (pt.y - origin.y) + origin.y;
 
-            context.arc (rot_x + reference_point.x, rot_y + reference_point.y, radius, 0, Math.PI * 2);
-            context.fill ();
+        int point_idx = 0;
+        var points = path_data.points;
+        var commands = path_data.commands;
+
+        // Draw circles for all points.
+        // foreach (var pt in path_data.points) {
+        for (int i = 0; i < commands.length; ++i) {
+            if (commands[i] == "LINE") {
+                var pt = points[point_idx];
+
+                // Apply the rotation formula and rotate the point by given angle
+                double rot_x = cos_theta * (pt.x - origin.x) - sin_theta * (pt.y - origin.y) + origin.x;
+                double rot_y = sin_theta * (pt.x - origin.x) + cos_theta * (pt.y - origin.y) + origin.y;
+
+                context.arc (rot_x + reference_point.x, rot_y + reference_point.y, radius, 0, Math.PI * 2);
+                context.fill ();
+
+                ++point_idx;
+            } else {
+                for (int j = 0; j < 4; ++j) {
+                    var pt = points[j + point_idx];
+
+                    // Apply the rotation formula and rotate the point by given angle
+                    double rot_x = cos_theta * (pt.x - origin.x) - sin_theta * (pt.y - origin.y) + origin.x;
+                    double rot_y = sin_theta * (pt.x - origin.x) + cos_theta * (pt.y - origin.y) + origin.y;
+
+                    context.arc (rot_x + reference_point.x, rot_y + reference_point.y, radius, 0, Math.PI * 2);
+                    context.fill ();
+                }
+
+                context.move_to (points[point_idx + 1].x + reference_point.x, points[point_idx + 1].y + reference_point.y);
+                context.line_to (points[point_idx + 2].x + reference_point.x, points[point_idx + 2].y + reference_point.y);
+                context.stroke ();
+
+                point_idx += 4;
+            }
         }
 
         context.stroke ();
@@ -100,6 +131,8 @@ public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
     }
 
     private void draw_live_effect (Cairo.Context context) {
+        double radius = UI_NOB_SIZE / canvas.scale;
+
         context.save ();
 
         context.new_path ();
@@ -126,8 +159,24 @@ public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
                     var y1 = live_pts[0].y;
                     var x2 = live_pts[1].x;
                     var y2 = live_pts[1].y;
+                    var x3 = live_pts[2].x;
+                    var y3 = live_pts[2].y;
 
+                    // Draw the actual live curve.
                     context.curve_to (x0, y0, x2, y2, x1, y1);
+
+                    // Draw the first haldf of tangent for curve.
+                    context.line_to (x2, y2);
+                    context.line_to (x3, y3);
+                    context.stroke ();
+
+                    // Draw circles for all concerned points.
+                    context.arc (x0, y0, radius, 0, Math.PI * 2);
+                    context.fill ();
+                    context.arc (x1, y1, radius, 0, Math.PI * 2);
+                    context.fill ();
+                    context.arc (x2, y2, radius, 0, Math.PI * 2);
+                    context.fill ();
                     break;
             case 4: var x0 = points[points.length - 1].x + reference_point.x;
                     var y0 = points[points.length - 1].y + reference_point.y;
@@ -140,8 +189,26 @@ public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
                     var x4 = live_pts[3].x;
                     var y4 = live_pts[3].y;
 
+                    // Draw the actual curves.
                     context.curve_to (x0, y0, x2, y2, x1, y1);
                     context.curve_to (x1, y1, x3, y3, x4, y4);
+
+                    // Draw line for the tangent of the curve.
+                    context.move_to (x2, y2);
+                    context.line_to (x3, y3);
+                    context.stroke ();
+
+                    // Draw circles for all points in the live curve.
+                    context.arc (x0, y0, radius, 0, Math.PI * 2);
+                    context.fill ();
+                    context.arc (x1, y1, radius, 0, Math.PI * 2);
+                    context.fill ();
+                    context.arc (x2, y2, radius, 0, Math.PI * 2);
+                    context.fill ();
+                    context.arc (x3, y3, radius, 0, Math.PI * 2);
+                    context.fill ();
+                    context.arc (x4, y4, radius, 0, Math.PI * 2);
+                    context.fill ();
                     break;
 
             default: break;
