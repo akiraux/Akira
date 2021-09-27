@@ -101,9 +101,9 @@ public class Akira.Drawables.DrawableRect : Drawable {
         var x = center_x - width / 2.0;
         var y = center_y - height / 2.0;
 
-        bounds.x1 = x - half_line_width;
-        bounds.y1 = y - half_line_width;
-        bounds.x2 = x + width + half_line_width;
-        bounds.y2 = y + height + half_line_width;
+        bounds.x1 = x - half_line_width - 8;
+        bounds.y1 = y - half_line_width - 8;
+        bounds.x2 = x + width + half_line_width + 8;
+        bounds.y2 = y + height + half_line_width + 8;
     }
 }

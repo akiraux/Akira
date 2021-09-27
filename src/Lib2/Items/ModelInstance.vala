@@ -119,6 +119,7 @@ public class Akira.Lib2.Items.ModelInstance {
         bounding_box = compiled_geometry.area_bb;
         if (drawable != null) {
             drawable_bounding_box = drawable.bounding_box ();
+            drawable.bb = drawable_bounding_box;
         } else {
             drawable_bounding_box = bounding_box;
         }

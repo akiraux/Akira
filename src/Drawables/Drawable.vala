@@ -30,9 +30,13 @@ public class Akira.Drawables.Drawable : Goo.CanvasItemSimple, Goo.CanvasItem {
     public double center_y { get; set; default = 0; }
     public double width { get; set; default = 0; }
     public double height { get; set; default = 0; }
+    public Geometry.Rectangle bb { get; set; default = Geometry.Rectangle (); }
+    public int async_ct = 0;
 
     /// Clipping path in global reference frame
     public Geometry.Quad? clipping_path = null;
+
+    public Cairo.Surface? cached_shadow = null;
 
     public bool new_hit_test (
         double x,
@@ -182,6 +186,8 @@ public class Akira.Drawables.Drawable : Goo.CanvasItemSimple, Goo.CanvasItem {
             cr.clip ();
         }
 
+        paintShadow (cr, scale);
+
         unowned var style = get_style ();
 
         // We apply the item transform before creating the path
@@ -210,7 +216,116 @@ public class Akira.Drawables.Drawable : Goo.CanvasItemSimple, Goo.CanvasItem {
         cr.new_path ();
     }
 
+    public void paintShadow (Cairo.Context cr, double scale) {
+        if (cached_shadow != null) {
+            int tw = (int) bb.width + 16;
+            int th = (int) bb.height + 16;
+
+            Cairo.Matrix tr;
+            var local_x0 = 0.0;
+            var local_y0 = 0.0;
+
+            if (get_transform (out tr)) {
+                local_x0 = tr.x0;
+                local_y0 = tr.y0;
+            }
+            cr.save ();
+            cr.translate (local_x0 - tw / 2.0 - 8, local_y0 - th / 2.0 - 8);
+            cr.set_operator (Cairo.Operator.OVER);
+            cr.set_source_surface (cached_shadow, 0, 0);
+            cr.paint_with_alpha (1.0);
+
+            cr.restore ();
+            return;
+        }
+
+        var ct = ++async_ct;
+        generateShadow.begin (cr.get_matrix(), (obj, res) => {
+            if (async_ct != ct) {
+                return;
+            }
+            try {
+                this.cached_shadow = this.generateShadow.end(res);
+
+                if (this.cached_shadow != null) {
+                    this.changed (false);
+                }
+            } catch (GLib.ThreadError e) {
+                string msg  = e.message;
+                stderr.printf(@"Thread error: $msg\n");
+            }
+        });
+    }
+
+    public async Cairo.Surface generateShadow (Cairo.Matrix global_transform) throws GLib.ThreadError {
+        GLib.SourceFunc callback = generateShadow.callback;
+        Cairo.Surface output = null;
+
+        GLib.ThreadFunc<bool> run = () => {
+            int tw = (int) bb.width + 16;
+            int th = (int) bb.height + 16;
+            Cairo.ImageSurface shadow_surface = new Cairo.ImageSurface (Cairo.Format.ARGB32, tw, th);
+            Cairo.ImageSurface tmp_surface = new Cairo.ImageSurface (Cairo.Format.ARGB32, tw, th);
+
+            Cairo.Context context = new Cairo.Context (tmp_surface);
+            context.set_antialias (Cairo.Antialias.GRAY);
+
+            Cairo.Context shadow_context = new Cairo.Context (shadow_surface);
+            shadow_context.set_antialias (Cairo.Antialias.GRAY);
+
+            unowned var style = get_style ();
+
+            context.save ();
+
+            // We apply the item transform before creating the path
+            Cairo.Matrix tr;
+            var local_x0 = 0.0;
+            var local_y0 = 0.0;
+
+            if (get_transform (out tr)) {
+            local_x0 = tr.x0;
+            local_y0 = tr.y0;
+            tr.x0 = tw / 2.0 + 8;
+            tr.y0 = th / 2.0 + 8;
+            context.transform (tr);
+            }
+
+            simple_create_path (context);
+
+            if (style.set_fill_options (context)) {
+                context.set_source_rgba (0.0, 0.0, 0.0, 1.0);
+                context.fill_preserve ();
+            }
+
+            // We restore the global transformation to draw strokes with uniform width. Changing
+            // the matrix does not affect the path already generated.
+            context.set_matrix (global_transform);
+
+            if (style.set_stroke_options (context)) {
+                context.set_source_rgba (0.0, 0.0, 0.0, 1.0);
+                context.stroke ();
+            }
+
+            context.restore ();
+
+            shadow_context.paint ();
+
+            // Very important to initialize new path
+            Utils.CairoFilters.stack_blur (tmp_surface, shadow_surface, 4, 4);
+
+            output = shadow_surface;
+            Idle.add((owned) callback);
+            return true;
+        };
+
+        new GLib.Thread<bool>("thread-example", run);
+        // wait for background thread to schedule our callback
+        yield;
+        return output;
+    }
+
     public Geometry.Rectangle bounding_box () {
+        cached_shadow = null;
         double x1 = 0;
         double x2 = 0;
         double y1 = 0;
@@ -286,6 +401,6 @@ public class Akira.Drawables.Drawable : Goo.CanvasItemSimple, Goo.CanvasItem {
           );
         }
 
-        return Geometry.Rectangle.with_coordinates (x1 + translate_x, y1 + translate_y, x2 + translate_x, y2 + translate_y);
+        return Geometry.Rectangle.with_coordinates (x1 + translate_x - 8, y1 + translate_y - 8, x2 + translate_x + 8, y2 + translate_y + 8);
     }
 }

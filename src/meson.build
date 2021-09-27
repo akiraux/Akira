@@ -29,6 +29,7 @@ sources = files(
     'Services/ActionManager.vala',
     'Services/EventBus.vala',
 
+    'Utils/CairoFilters.vala',
     'Utils/Array.vala',
     'Utils/Dialogs.vala',
     'Utils/BlendingMode.vala',
