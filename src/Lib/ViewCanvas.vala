@@ -315,6 +315,9 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
 
             if (target != null) {
                 if (!selection_manager.item_selected (target.id)) {
+                    if (!shift_is_pressed) {
+                        selection_manager.reset_selection ();
+                    }
                     selection_manager.add_to_selection (target.id);
                 }
             }
