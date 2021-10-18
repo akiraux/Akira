@@ -53,6 +53,10 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
 
     private ViewLayers.ViewLayerGrid grid_layout;
 
+    // Keep track of the initial coords of the press event.
+    private double initial_event_x;
+    private double initial_event_y;
+
     public ViewCanvas (Akira.Window window) {
         Object (
             window: window,
@@ -303,31 +307,41 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
      * the event should be abosrbed.
      */
     private bool handle_selection_press_event (Gdk.EventButton event) {
+        Lib.Items.ModelNode? target = null;
         var nob_clicked = nob_manager.hit_test (event.x, event.y);
 
         if (nob_clicked == Utils.Nobs.Nob.NONE) {
             // If no nob is selected, we test for an item.
-            var target = items_manager.node_at_canvas_position (
+            target = items_manager.node_at_canvas_position (
                 event.x,
                 event.y,
                 Drawables.Drawable.HitTestType.SELECT
             );
 
             if (target != null) {
+                // Check if the clicked item is not already selected.
                 if (!selection_manager.item_selected (target.id)) {
+                    // Reset the selection if SHIFT isn't pressed.
                     if (!shift_is_pressed) {
                         selection_manager.reset_selection ();
                     }
+
                     selection_manager.add_to_selection (target.id);
                 }
-            }
-            else if (!selection_manager.selection.bounding_box ().contains (event.x, event.y)) {
+            } else if (!selection_manager.selection.bounding_box ().contains (event.x, event.y)) {
                 // Selection area was not clicked, so we reset the selection
                 selection_manager.reset_selection ();
             }
         }
 
         if (!selection_manager.is_empty ()) {
+            // Register a click on an empty area if we have multiple selected
+            // items, the click didn't select any nob, and no item was clicked.
+            if (nob_clicked == Utils.Nobs.Nob.NONE && target == null) {
+                initial_event_x = event.x;
+                initial_event_y = event.y;
+            }
+
             var new_mode = new Lib.Modes.TransformMode (this, nob_clicked);
             mode_manager.register_mode (new_mode);
 
@@ -340,6 +354,34 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
     }
 
     public override bool button_release_event (Gdk.EventButton event) {
+        // Check if the there's a delta between the pressed and released event.
+        if (initial_event_x == event.x || initial_event_y == event.y) {
+            var count = selection_manager.count ();
+            var target = items_manager.node_at_canvas_position (
+                event.x,
+                event.y,
+                Drawables.Drawable.HitTestType.SELECT
+            );
+
+            // If the click happened on an item, we have multiple selected
+            // items, and the clicked items is part fo the selection, deselect
+            // them all and select the clicked item.
+            if (
+                target != null &&
+                selection_manager.item_selected (target.id) &&
+                count > 1
+            ) {
+                selection_manager.reset_selection ();
+                selection_manager.add_to_selection (target.id);
+            }
+
+            // If the click happened on an empty area and we have multiple
+            // selected items, deselect them all.
+            if (target == null && count > 1) {
+                selection_manager.reset_selection ();
+            }
+        }
+
         event.x = event.x / current_scale;
         event.y = event.y / current_scale;
 
