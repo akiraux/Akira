@@ -47,6 +47,10 @@ sources = files(
     'Layouts/MainViewCanvas.vala',
     'Layouts/MainWindow.vala',
 
+    'Layouts/LayersPanel/LayersListBox.vala',
+    'Layouts/LayersPanel/LayersListBoxRow.vala',
+    'Layouts/LayersPanel/LayersListBoxModel.vala',
+
     'Layouts/Sidebars/LayersSidebar.vala',
     'Layouts/Sidebars/Partials/LayersPanel.vala',
     'Layouts/Sidebars/Partials/LayerElement.vala',
@@ -64,6 +68,10 @@ sources = files(
     'Widgets/PanelSeparator.vala',
     'Widgets/RoundedColorButton.vala',
     'Widgets/ZoomButton.vala',
+
+    'Widgets/VirtualListBox/VirtualListBox.vala',
+    'Widgets/VirtualListBox/VirtualListBoxModel.vala',
+    'Widgets/VirtualListBox/VirtualListBoxRow.vala',
 
     'ViewLayers/BaseCanvas.vala',
     'ViewLayers/ViewLayer.vala',
