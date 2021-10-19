@@ -65,6 +65,10 @@ sources = files(
     'Widgets/RoundedColorButton.vala',
     'Widgets/ZoomButton.vala',
 
+    'Widgets/VirtualListBox/VirtualListBox.vala',
+    'Widgets/VirtualListBox/VirtualListBoxModel.vala',
+    'Widgets/VirtualListBox/VirtualListBoxRow.vala',
+
     'ViewLayers/BaseCanvas.vala',
     'ViewLayers/ViewLayer.vala',
     'ViewLayers/ViewLayerSnaps.vala',
