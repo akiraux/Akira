@@ -142,7 +142,13 @@ public class Akira.Lib.Items.NodeSelection : Object {
         return false;
     }
 
-    public bool is_empty () { return nodes.size == 0; }
+    public bool is_empty () {
+        return nodes.size == 0;
+    }
+
+    public int count () {
+        return nodes.size;
+    }
 
     public Geometry.Quad coordinates () {
         var result = Geometry.Quad ();
