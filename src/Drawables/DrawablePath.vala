@@ -24,10 +24,14 @@
  */
 public class Akira.Drawables.DrawablePath : Drawable {
     // In the future we will probably want control points with more data.
-    public Geometry.Point[]? points = null;
-    public string[]? commands = null;
 
-    public DrawablePath (Geometry.Point[]? points = null, string[]? commands = null) {
+    // This array stores the list of all points required to draw the point.
+    public Geometry.Point[]? points = null;
+    // Control the path edit mode between straight line and curves.
+    // Line requires 1 points whereas, path requires 4 points.
+    public Lib.Modes.PathEditMode.Type[]? commands = null;
+
+    public DrawablePath (Geometry.Point[]? points = null, Lib.Modes.PathEditMode.Type[]? commands = null) {
        if (points != null && commands != null) {
            this.points = points;
            this.commands = commands;
@@ -46,10 +50,10 @@ public class Akira.Drawables.DrawablePath : Drawable {
 
         int point_idx = 0;
         for (int i = 0; i < commands.length && point_idx < points.length; ++i) {
-            if (commands[i] == Lib.Modes.PathEditMode.LINE) {
+            if (commands[i] == Lib.Modes.PathEditMode.Type.LINE) {
                 cr.line_to (points[point_idx].x, points[point_idx].y);
                 ++point_idx;
-            } else if (commands[i] == Lib.Modes.PathEditMode.CURVE) {
+            } else if (commands[i] == Lib.Modes.PathEditMode.Type.CURVE) {
                 var x0 = points[point_idx - 1].x;
                 var y0 = points[point_idx - 1].y;
 

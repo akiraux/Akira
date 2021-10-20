@@ -23,14 +23,16 @@ public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
     public const double UI_NOB_SIZE = 4;
 
     private Models.PathDataModel path_data;
-    private Geometry.Rectangle old_live_extents;
+    private Geometry.Rectangle? old_live_extents = null;
 
     public void update_path_data (Models.PathDataModel _path_data) {
         path_data = _path_data;
 
-        // Initial values for old extents of live effect will span the entire canvas.
-        old_live_extents.left = old_live_extents.top = 0.0;
-        old_live_extents.right = old_live_extents.bottom = 1000.0;
+        if (old_live_extents == null) {
+          // Initial values for old extents of live effect will span the entire canvas.
+          old_live_extents = Geometry.Rectangle.empty ();
+          old_live_extents.right = old_live_extents.bottom = 1000.0;
+        }
 
         update ();
     }
@@ -94,7 +96,7 @@ public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
         // Draw circles for all points.
         // foreach (var pt in path_data.points) {
         for (int i = 0; i < commands.length; ++i) {
-            if (commands[i] == "LINE") {
+            if (commands[i] == Lib.Modes.PathEditMode.Type.LINE) {
                 var pt = points[point_idx];
 
                 // Apply the rotation formula and rotate the point by given angle
@@ -149,69 +151,78 @@ public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
         context.move_to (last_point.x + reference_point.x, last_point.y + reference_point.y);
 
         switch (path_data.length) {
-            case 0: break;
-            case 1: context.line_to (live_pts[0].x, live_pts[0].y);
-                    break;
-            case 2: break;
-            case 3: var x0 = points[points.length - 1].x + reference_point.x;
-                    var y0 = points[points.length - 1].y + reference_point.y;
-                    var x1 = live_pts[0].x;
-                    var y1 = live_pts[0].y;
-                    var x2 = live_pts[1].x;
-                    var y2 = live_pts[1].y;
-                    var x3 = live_pts[2].x;
-                    var y3 = live_pts[2].y;
+            case 0:
+                break;
+            case 1:
+                context.line_to (live_pts[0].x, live_pts[0].y);
+                break;
+            case 2:
+                break;
+            case 3:
+                var x0 = points[points.length - 1].x + reference_point.x;
+                var y0 = points[points.length - 1].y + reference_point.y;
+                var x1 = live_pts[0].x;
+                var y1 = live_pts[0].y;
+                var x2 = live_pts[1].x;
+                var y2 = live_pts[1].y;
+                var x3 = live_pts[2].x;
+                var y3 = live_pts[2].y;
 
-                    // Draw the actual live curve.
-                    context.curve_to (x0, y0, x2, y2, x1, y1);
+                // Draw the actual live curve.
+                context.curve_to (x0, y0, x2, y2, x1, y1);
+                context.stroke ();
 
-                    // Draw the first haldf of tangent for curve.
-                    context.line_to (x2, y2);
-                    context.line_to (x3, y3);
-                    context.stroke ();
+                // Draw the first haldf of tangent for curve.
+                context.line_to (x2, y2);
+                context.line_to (x3, y3);
+                context.stroke ();
 
-                    // Draw circles for all concerned points.
-                    context.arc (x0, y0, radius, 0, Math.PI * 2);
-                    context.fill ();
-                    context.arc (x1, y1, radius, 0, Math.PI * 2);
-                    context.fill ();
-                    context.arc (x2, y2, radius, 0, Math.PI * 2);
-                    context.fill ();
-                    break;
-            case 4: var x0 = points[points.length - 1].x + reference_point.x;
-                    var y0 = points[points.length - 1].y + reference_point.y;
-                    var x1 = live_pts[0].x;
-                    var y1 = live_pts[0].y;
-                    var x2 = live_pts[1].x;
-                    var y2 = live_pts[1].y;
-                    var x3 = live_pts[2].x;
-                    var y3 = live_pts[2].y;
-                    var x4 = live_pts[3].x;
-                    var y4 = live_pts[3].y;
+                // Draw circles for all concerned points.
+                context.arc (x0, y0, radius, 0, Math.PI * 2);
+                context.fill ();
+                context.arc (x1, y1, radius, 0, Math.PI * 2);
+                context.fill ();
+                context.arc (x2, y2, radius, 0, Math.PI * 2);
+                context.fill ();
+                break;
+            case 4:
+                var x0 = points[points.length - 1].x + reference_point.x;
+                var y0 = points[points.length - 1].y + reference_point.y;
+                var x1 = live_pts[0].x;
+                var y1 = live_pts[0].y;
+                var x2 = live_pts[1].x;
+                var y2 = live_pts[1].y;
+                var x3 = live_pts[2].x;
+                var y3 = live_pts[2].y;
+                var x4 = live_pts[3].x;
+                var y4 = live_pts[3].y;
 
-                    // Draw the actual curves.
-                    context.curve_to (x0, y0, x2, y2, x1, y1);
-                    context.curve_to (x1, y1, x3, y3, x4, y4);
+                // Draw the actual curves.
+                context.curve_to (x0, y0, x2, y2, x1, y1);
+                context.stroke ();
+                context.curve_to (x1, y1, x3, y3, x4, y4);
+                context.stroke ();
 
-                    // Draw line for the tangent of the curve.
-                    context.move_to (x2, y2);
-                    context.line_to (x3, y3);
-                    context.stroke ();
+                // Draw line for the tangent of the curve.
+                context.move_to (x2, y2);
+                context.line_to (x3, y3);
+                context.stroke ();
 
-                    // Draw circles for all points in the live curve.
-                    context.arc (x0, y0, radius, 0, Math.PI * 2);
-                    context.fill ();
-                    context.arc (x1, y1, radius, 0, Math.PI * 2);
-                    context.fill ();
-                    context.arc (x2, y2, radius, 0, Math.PI * 2);
-                    context.fill ();
-                    context.arc (x3, y3, radius, 0, Math.PI * 2);
-                    context.fill ();
-                    context.arc (x4, y4, radius, 0, Math.PI * 2);
-                    context.fill ();
-                    break;
+                // Draw circles for all points in the live curve.
+                context.arc (x0, y0, radius, 0, Math.PI * 2);
+                context.fill ();
+                context.arc (x1, y1, radius, 0, Math.PI * 2);
+                context.fill ();
+                context.arc (x2, y2, radius, 0, Math.PI * 2);
+                context.fill ();
+                context.arc (x3, y3, radius, 0, Math.PI * 2);
+                context.fill ();
+                context.arc (x4, y4, radius, 0, Math.PI * 2);
+                context.fill ();
+                break;
 
-            default: break;
+            default:
+                break;
         }
 
         context.stroke ();

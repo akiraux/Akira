@@ -20,8 +20,10 @@
 */
 
 public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
-    public const string LINE = "LINE";
-    public const string CURVE = "CURVE";
+    public enum Type {
+        LINE,
+        CURVE
+    }
 
     public weak Lib.ViewCanvas view_canvas { get; construct; }
     public Lib.Items.ModelInstance instance { get; construct; }
@@ -32,7 +34,7 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
 
     // The points in live command will be drawn every time user moves cursor.
     // Also acts as buffer for curves.
-    private string live_command;
+    private Type live_command;
     private Geometry.Point[] live_points;
     private int live_idx;
 
@@ -46,7 +48,7 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
         );
         edit_model = new Models.PathEditModel (instance, view_canvas);
         live_points = new Geometry.Point[4];
-        live_command = LINE;
+        live_command = Type.LINE;
         live_idx = -1;
     }
 
@@ -95,7 +97,7 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
                 // If one of them gets deleted, delete the other too. This leaves only 1 live point.
                 // So the live command becomes LINE.
                 if (live_idx == 1 && live_command == CURVE) {
-                    live_command = LINE;
+                    live_command = Type.LINE;
                     live_idx = 0;
                 }
 
@@ -105,14 +107,14 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
 
                 if (possible_live_pts == null || possible_live_pts.length == 0) {
                     live_idx = -1;
-                    live_command = LINE;
+                    live_command = Type.LINE;
                 } else {
                     live_points[0] = possible_live_pts[0];
                     live_points[1] = possible_live_pts[1];
                     live_points[2] = possible_live_pts[2];
 
                     live_idx = 2;
-                    live_command = CURVE;
+                    live_command = Type.CURVE;
                     edit_model.set_live_points (live_points, 3);
                 }
             }
@@ -156,7 +158,7 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
 
         Akira.Geometry.Point point = Akira.Geometry.Point (event.x, event.y);
 
-        if (live_command == LINE) {
+        if (live_command == Type.LINE) {
             is_click = true;
             live_points[0] = point;
             live_idx = 0;
@@ -179,7 +181,7 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
             edit_model.add_live_points_to_path (live_points, live_command, live_idx + 1);
 
             live_idx = 0;
-            live_command = LINE;
+            live_command = Type.LINE;
         }
 
         is_click = false;
@@ -196,7 +198,7 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
 
         // If there is click and drag, then this is the second point of curve.
         if (is_click) {
-            live_command = CURVE;
+            live_command = Type.CURVE;
             live_idx = 2;
 
             // Points at index 1 and 2 are the two tangents required by the 2 curves.
@@ -206,7 +208,7 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
             edit_model.set_live_points (live_points, 3);
         } else {
             // If we are hovering in CURVE mode, current position could be our third curve point.
-            if (live_command == CURVE) {
+            if (live_command == Type.CURVE) {
                 live_points[3] = point;
                 live_idx = 3;
                 edit_model.set_live_points (live_points, 4);
@@ -225,11 +227,11 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
     }
 
     private bool is_curr_command_done () {
-        if (live_command == LINE && live_idx != -1) {
+        if (live_command == Type.LINE && live_idx != -1) {
             return true;
         }
 
-        if (live_command == CURVE && live_idx == 3) {
+        if (live_command == Type.CURVE && live_idx == 3) {
             return true;
         }
 

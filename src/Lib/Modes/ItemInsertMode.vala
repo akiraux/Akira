@@ -219,7 +219,14 @@ public class Akira.Lib.Modes.ItemInsertMode : AbstractInteractionMode {
                 test_path[4] = Geometry.Point (30, 40);
                 test_path[5] = Geometry.Point (10, 10);
 
-                string[] commands = {"LINE", "LINE", "LINE", "LINE", "LINE", "LINE"};
+                Lib.Modes.PathEditMode.Type[] commands = {
+                    Lib.Modes.PathEditMode.Type.LINE,
+                    Lib.Modes.PathEditMode.Type.LINE,
+                    Lib.Modes.PathEditMode.Type.LINE,
+                    Lib.Modes.PathEditMode.Type.LINE,
+                    Lib.Modes.PathEditMode.Type.LINE,
+                    Lib.Modes.PathEditMode.Type.LINE
+                };
 
                 new_item.components.path = new Lib.Components.Path.from_points (test_path, commands, false);
                 break;
@@ -244,7 +251,7 @@ public class Akira.Lib.Modes.ItemInsertMode : AbstractInteractionMode {
                 var test_path = new Geometry.Point[1];
                 test_path[0] = Geometry.Point (0, 0);
 
-                string[] commands = {"LINE"};
+                Lib.Modes.PathEditMode.Type[] commands = { Lib.Modes.PathEditMode.Type.LINE };
 
                 new_item.components.path = new Lib.Components.Path.from_points (test_path, commands, false);
                 break;

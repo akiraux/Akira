@@ -22,11 +22,11 @@
 public class Akira.Models.PathEditModel : Object {
 
     public Lib.Items.ModelInstance instance { get; construct; }
-    public weak Lib.ViewCanvas view_canvas { get; construct; }
+    public unowned Lib.ViewCanvas view_canvas { get; construct; }
 
     private ViewLayers.ViewLayerPath path_layer;
 
-    private string[] commands;
+    private Lib.Modes.PathEditMode.Type[] commands;
     private Geometry.Point[] points;
 
     public Geometry.Point first_point;
@@ -51,7 +51,7 @@ public class Akira.Models.PathEditModel : Object {
         update_view ();
     }
 
-    public void add_live_points_to_path (Geometry.Point[] points, string live_command, int length) {
+    public void add_live_points_to_path (Geometry.Point[] points, Lib.Modes.PathEditMode.Type live_command, int length) {
         commands.resize (commands.length + 1);
         commands[commands.length - 1] = live_command;
 
@@ -97,7 +97,7 @@ public class Akira.Models.PathEditModel : Object {
     }
 
     public Geometry.Point[] delete_last_point () {
-        if (commands[commands.length - 1] == "LINE") {
+        if (commands[commands.length - 1] == Lib.Modes.PathEditMode.Type.LINE) {
             commands.resize (commands.length - 1);
             points.resize (points.length - 1);
 
@@ -106,21 +106,21 @@ public class Akira.Models.PathEditModel : Object {
             recompute_components ();
 
             return new Geometry.Point[0];
-        } else {
-            var new_live_pts = new Geometry.Point[4];
-            new_live_pts[2] = Geometry.Point (points[points.length - 2].x + first_point.x, points[points.length - 2].y + first_point.y);
-            new_live_pts[1] = Geometry.Point (points[points.length - 3].x + first_point.x, points[points.length - 3].y + first_point.y);
-            new_live_pts[0] = Geometry.Point (points[points.length - 4].x + first_point.x, points[points.length - 4].y + first_point.y);
-
-            commands.resize (commands.length - 1);
-            points.resize (points.length - 4);
-
-            points = recalculate_points (points);
-            instance.components.path = new Lib.Components.Path.from_points (points, commands);
-            recompute_components ();
-
-            return new_live_pts;
         }
+
+        var new_live_pts = new Geometry.Point[4];
+        new_live_pts[2] = Geometry.Point (points[points.length - 2].x + first_point.x, points[points.length - 2].y + first_point.y);
+        new_live_pts[1] = Geometry.Point (points[points.length - 3].x + first_point.x, points[points.length - 3].y + first_point.y);
+        new_live_pts[0] = Geometry.Point (points[points.length - 4].x + first_point.x, points[points.length - 4].y + first_point.y);
+
+        commands.resize (commands.length - 1);
+        points.resize (points.length - 4);
+
+        points = recalculate_points (points);
+        instance.components.path = new Lib.Components.Path.from_points (points, commands);
+        recompute_components ();
+
+        return new_live_pts;
     }
 
     /*
@@ -230,7 +230,7 @@ public class Akira.Models.PathEditModel : Object {
 
 public struct Akira.Models.PathDataModel {
     public Geometry.Point[] points;
-    public string[] commands;
+    public Lib.Modes.PathEditMode.Type[] commands;
 
     public Geometry.Point[] live_pts;
     public int length;

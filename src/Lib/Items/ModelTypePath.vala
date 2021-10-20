@@ -42,7 +42,7 @@ public class Akira.Lib.Items.ModelTypePath : ModelType {
         new_item.components.border_radius = Lib.Components.Components.default_border_radius ();
         new_item.components.path = new Lib.Components.Path.from_single_point (
             Akira.Geometry.Point (center.x, center.y),
-            "LINE",
+            Lib.Modes.PathEditMode.Type.LINE,
             false
         );
         new_item.components.size = new Lib.Components.Size (1, 1, false);
