@@ -58,6 +58,10 @@ public class Akira.Lib.Managers.SelectionManager : Object {
         return selection.is_empty ();
     }
 
+    public int count () {
+        return selection.count ();
+    }
+
     public void reset_selection () {
         if (is_empty ()) {
             return;
