@@ -20,25 +20,40 @@
 */
 
 public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
+    public enum Type {
+        LINE,
+        CURVE
+    }
 
     public weak Lib.ViewCanvas view_canvas { get; construct; }
     public Lib.Items.ModelInstance instance { get; construct; }
-    // Keep track of previous point for calculating relative positions of points.
-    private Geometry.Point first_point;
-    private ViewLayers.ViewLayerPath path_layer;
+    private Models.PathEditModel edit_model;
 
+    // Flag to track click and drag events.
+    private bool is_click = false;
+
+    // The points in live command will be drawn every time user moves cursor.
+    // Also acts as buffer for curves.
+    private Type live_command;
+    private Geometry.Point[] live_points;
+    private int live_idx;
+
+    // This flag tells if we are adding a path or editing an existing one.
+    private bool is_edit_path = true;
 
     public PathEditMode (Lib.ViewCanvas canvas, Lib.Items.ModelInstance instance) {
         Object (
             view_canvas: canvas,
             instance: instance
         );
+        edit_model = new Models.PathEditModel (instance, view_canvas);
+        live_points = new Geometry.Point[4];
+        live_command = Type.LINE;
+        live_idx = -1;
+    }
 
-        first_point = Geometry.Point (-1, -1);
-
-        // Layer to show when editing paths.
-        path_layer = new ViewLayers.ViewLayerPath ();
-        path_layer.add_to_canvas (ViewLayers.ViewLayer.PATH_LAYER_ID, view_canvas);
+    public void toggle_functionality (bool is_edit_path) {
+        this.is_edit_path = is_edit_path;
     }
 
     public override AbstractInteractionMode.ModeType mode_type () {
@@ -66,6 +81,62 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
     }
 
     public override bool key_press_event (Gdk.EventKey event) {
+        if (!is_edit_path) {
+            // When editing path, we dont know yet what point will be selected.
+            // So don't delete points, but mark this event as handled.
+            return true;
+        }
+
+        uint uppercase_keyval = Gdk.keyval_to_upper (event.keyval);
+
+        if (uppercase_keyval == Gdk.Key.BackSpace) {
+            if (live_idx > 0) {
+                --live_idx;
+
+                // Note that for curve, there are 2 tangent points that depend on each other.
+                // If one of them gets deleted, delete the other too. This leaves only 1 live point.
+                // So the live command becomes LINE.
+                if (live_idx == 1 && live_command == CURVE) {
+                    live_command = Type.LINE;
+                    live_idx = 0;
+                }
+
+                edit_model.set_live_points (live_points, live_idx + 1);
+            } else {
+                var possible_live_pts = edit_model.delete_last_point ();
+
+                if (possible_live_pts == null || possible_live_pts.length == 0) {
+                    live_idx = -1;
+                    live_command = Type.LINE;
+                } else {
+                    live_points[0] = possible_live_pts[0];
+                    live_points[1] = possible_live_pts[1];
+                    live_points[2] = possible_live_pts[2];
+
+                    live_idx = 2;
+                    live_command = Type.CURVE;
+                    edit_model.set_live_points (live_points, 3);
+                }
+            }
+
+            if (instance.components.path.data.length == 0) {
+                // Sometimes the line from live effect rendered in ViewLayerPath remains even after
+                // all points have been deleted. Erase this line.
+                var update_extents = Geometry.Rectangle ();
+                update_extents.left = instance.components.center.x;
+                update_extents.top = instance.components.center.y;
+                update_extents.right = live_points[0].x;
+                update_extents.bottom = live_points[0].y;
+
+                view_canvas.request_redraw (update_extents);
+
+                // If there are no points in the path, no point to stay in PathEditMode.
+                view_canvas.window.event_bus.delete_selected_items ();
+                view_canvas.mode_manager.deregister_active_mode ();
+            }
+
+            return true;
+        }
         return false;
     }
 
@@ -74,118 +145,103 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
     }
 
     public override bool button_press_event (Gdk.EventButton event) {
-        // Everytime the user presses the mouse button, a new point needs to be created and added to the path.
-        Akira.Geometry.Point point = Akira.Geometry.Point (event.x, event.y);
-
-        if (first_point.x == -1) {
-            first_point = point;
-            update_view ();
-            return false;
+        if (!is_edit_path) {
+            return true;
         }
 
-        // This calculates the position of the new point relative to the first point.
-        point.x -= first_point.x;
-        point.y -= first_point.y;
+        // Everytime the user presses the mouse button, a new point needs to be created and added to the path.
 
-        // Add the new points to the drawable and path
-        add_point_to_path (point);
+        if (edit_model.first_point.x == -1) {
+            edit_model.first_point = Geometry.Point (event.x, event.y);
+            return true;
+        }
 
-        // To calculate the new center of bounds of rectangle,
-        // Move the center to point where user placed first point. This is represented as (0,0) internally.
-        // Then translate it to the relative center of bounding box of path.
-        var bounds = instance.components.path.calculate_extents ();
-        double center_x = first_point.x + bounds.center_x;
-        double center_y = first_point.y + bounds.center_y;
+        Akira.Geometry.Point point = Akira.Geometry.Point (event.x, event.y);
 
-        instance.components.center = new Lib.Components.Coordinates (center_x, center_y);
-        instance.components.size = new Lib.Components.Size (bounds.width, bounds.height, false);
+        if (live_command == Type.LINE) {
+            is_click = true;
+            live_points[0] = point;
+            live_idx = 0;
+        } else {
+            live_idx = 3;
+            live_points[3] = point;
+        }
 
-        // Update the component.
-        view_canvas.items_manager.item_model.mark_node_geometry_dirty_by_id (instance.id);
-        view_canvas.items_manager.compile_model ();
-
-        update_view ();
+        edit_model.set_live_points (live_points, live_idx + 1);
 
         return true;
     }
 
-    private void add_point_to_path (Geometry.Point point, int index = -1) {
-
-        var old_path_points = instance.components.path.data;
-        Geometry.Point[] new_path_points = new Geometry.Point[old_path_points.length + 1];
-
-        index = (index == -1) ? index = old_path_points.length : index;
-
-        for (int i = 0; i < index; ++i) {
-            new_path_points[i] = old_path_points[i];
-        }
-
-        new_path_points[index] = point;
-
-        for (int i = index + 1; i < old_path_points.length + 1; ++i) {
-            new_path_points[i] = old_path_points[i - 1];
-        }
-
-        var recalculated_points = recalculate_points (new_path_points);
-
-        instance.components.path = new Lib.Components.Path.from_points (recalculated_points);
-    }
-
-    /*
-     * This method shift all points in path such that none of them are in negative space.
-     */
-    private Geometry.Point[] recalculate_points (Geometry.Point[] points) {
-        double min_x = 0, min_y = 0;
-
-        foreach (var pt in points) {
-            if (pt.x < min_x) {
-                min_x = pt.x;
-            }
-            if (pt.y < min_y) {
-                min_y = pt.y;
-            }
-        }
-
-        Geometry.Point[] recalculated_points = new Geometry.Point[points.length];
-
-        // Shift all the points.
-        for (int i = 0; i < points.length; ++i) {
-            recalculated_points[i] = Geometry.Point (points[i].x - min_x, points[i].y - min_y);
-        }
-
-        // Then shift the reference point.
-        first_point.x += min_x;
-        first_point.y += min_y;
-
-        return recalculated_points;
-    }
-
-    /*
-     * Recalculates the extents and updates the ViewLayerPath
-     */
-    private void update_view () {
-        var points = instance.components.path.data;
-
-        var coordinates = view_canvas.selection_manager.selection.coordinates ();
-
-        Geometry.Rectangle extents = Geometry.Rectangle.empty ();
-        extents.left = coordinates.center_x - coordinates.width / 2.0;
-        extents.right = coordinates.center_x + coordinates.width / 2.0;
-        extents.top = coordinates.center_y - coordinates.height / 2.0;
-        extents.bottom = coordinates.center_y + coordinates.height / 2.0;
-
-        path_layer.update_path_data (points, extents);
-    }
-
     public override bool button_release_event (Gdk.EventButton event) {
-        return false;
+        if (!is_edit_path) {
+            return true;
+        }
+
+        if (is_curr_command_done ()) {
+            edit_model.add_live_points_to_path (live_points, live_command, live_idx + 1);
+
+            live_idx = 0;
+            live_command = Type.LINE;
+        }
+
+        is_click = false;
+
+        return true;
     }
 
     public override bool motion_notify_event (Gdk.EventMotion event) {
-        return false;
+        Geometry.Point point = Geometry.Point (event.x, event.y);
+
+        if (!is_edit_path) {
+            return true;
+        }
+
+        // If there is click and drag, then this is the second point of curve.
+        if (is_click) {
+            live_command = Type.CURVE;
+            live_idx = 2;
+
+            // Points at index 1 and 2 are the two tangents required by the 2 curves.
+            live_points[1] = reflection (point, live_points[0]);
+            live_points[2] = point;
+
+            edit_model.set_live_points (live_points, 3);
+        } else {
+            // If we are hovering in CURVE mode, current position could be our third curve point.
+            if (live_command == Type.CURVE) {
+                live_points[3] = point;
+                live_idx = 3;
+                edit_model.set_live_points (live_points, 4);
+            } else {
+                // If we are hovering in LINE mode, this could be a potential line point.
+                live_points[0] = point;
+                edit_model.set_live_points (live_points, 1);
+            }
+        }
+
+        return true;
     }
 
     public override Object? extra_context () {
         return null;
+    }
+
+    private bool is_curr_command_done () {
+        if (live_command == Type.LINE && live_idx != -1) {
+            return true;
+        }
+
+        if (live_command == Type.CURVE && live_idx == 3) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private Geometry.Point reflection (Geometry.Point pt1, Geometry.Point pt2) {
+        var x = pt2.x + (pt2.x - pt1.x);
+        var y = pt2.y + (pt2.y - pt1.y);
+
+        return Geometry.Point (x, y);
     }
 }

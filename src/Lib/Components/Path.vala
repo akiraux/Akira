@@ -23,21 +23,30 @@ public class Akira.Lib.Components.Path : Component, Copyable<Path> {
     // Control points relative to a top-left of 0,0.
     // In the future we will probably want control points with more data.
     public Geometry.Point[] data;
+    // Control the path edit mode between straight line and curves.
+    // Line requires 1 points whereas, path requires 4 points.
+    public Lib.Modes.PathEditMode.Type[] commands;
     public bool close = false;
 
     public Path (bool close = false) {
         data = new Geometry.Point[0];
+        commands = new Lib.Modes.PathEditMode.Type[0];
         this.close = close;
     }
 
-    public Path.from_single_point (Geometry.Point pt, bool close = false) {
+    public Path.from_single_point (Geometry.Point pt, Lib.Modes.PathEditMode.Type command, bool close = false) {
         data = new Geometry.Point[1];
         data[0] = pt;
+
+        commands = new Lib.Modes.PathEditMode.Type[1];
+        commands[0] = command;
+
         this.close = close;
     }
 
-    public Path.from_points (Geometry.Point[] data, bool close = false) {
+    public Path.from_points (Geometry.Point[] data, Lib.Modes.PathEditMode.Type[] commands, bool close = false) {
         this.data = data;
+        this.commands = commands;
         this.close = close;
     }
 
