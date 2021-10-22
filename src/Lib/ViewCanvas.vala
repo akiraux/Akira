@@ -284,6 +284,12 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
         event.x = event.x / current_scale;
         event.y = event.y / current_scale;
 
+        if (event.type == Gdk.EventType.@2BUTTON_PRESS) {
+            if (handle_double_click_event ()) {
+                return true;
+            }
+        }
+
         if (mode_manager.button_press_event (event)) {
             return true;
         }
@@ -351,6 +357,27 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
         }
 
         return false;
+    }
+
+    private bool handle_double_click_event () {
+        // If the user double clicks on a CanvasItem, the item gets added to selection_manager on the first click.
+        // If double click happened on empty area, no items is selected.
+
+        var selected_item = selection_manager.selection.first_node ();
+
+        if (selected_item == null) {
+            return false;
+        }
+
+        if (selected_item.instance.type.name_id == "artboard") {
+            return false;
+        }
+
+        var path_edit_mode = new Lib.Modes.PathEditMode (this, selected_item.instance);
+        path_edit_mode.toggle_functionality (false);
+        mode_manager.register_mode (path_edit_mode);
+
+        return true;
     }
 
     public override bool button_release_event (Gdk.EventButton event) {
