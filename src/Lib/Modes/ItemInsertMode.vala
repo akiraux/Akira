@@ -205,6 +205,7 @@ public class Akira.Lib.Modes.ItemInsertMode : AbstractInteractionMode {
                 break;
 
             case "text":
+                // TODO: Temporarily draw a path shape. We'll deal with text later.
                 new_item = Lib.Items.ModelTypePath.default_path (
                     coordinates,
                     borders_from_settings (),
@@ -219,14 +220,8 @@ public class Akira.Lib.Modes.ItemInsertMode : AbstractInteractionMode {
                 test_path[4] = Geometry.Point (30, 40);
                 test_path[5] = Geometry.Point (10, 10);
 
-                Lib.Modes.PathEditMode.Type[] commands = {
-                    Lib.Modes.PathEditMode.Type.LINE,
-                    Lib.Modes.PathEditMode.Type.LINE,
-                    Lib.Modes.PathEditMode.Type.LINE,
-                    Lib.Modes.PathEditMode.Type.LINE,
-                    Lib.Modes.PathEditMode.Type.LINE,
-                    Lib.Modes.PathEditMode.Type.LINE
-                };
+                var line = Lib.Modes.PathEditMode.Type.LINE;
+                Lib.Modes.PathEditMode.Type[] commands = { line, line, line, line, line, line };
 
                 new_item.components.path = new Lib.Components.Path.from_points (test_path, commands, false);
                 break;
