@@ -27,10 +27,10 @@
 public class Layouts.LayersPanel.LayersListBoxModel : VirtualListBoxModel {
     public delegate bool RowVisibilityFunc (GLib.Object row);
 
-    private GLib.Sequence<Akira.Lib.Items.ModelInstance> data = new GLib.Sequence<Akira.Lib.Items.ModelInstance> ();
+    private GLib.Sequence<LayersItemModel> data = new GLib.Sequence<LayersItemModel> ();
     private uint last_position = uint.MAX;
-    private GLib.SequenceIter<Akira.Lib.Items.ModelInstance>? last_iter;
-    private unowned GLib.CompareDataFunc<Akira.Lib.Items.ModelInstance> compare_func;
+    private GLib.SequenceIter<LayersItemModel>? last_iter;
+    private unowned GLib.CompareDataFunc<LayersItemModel> compare_func;
     private unowned RowVisibilityFunc filter_func;
 
     public override uint get_n_items () {
@@ -46,7 +46,7 @@ public class Layouts.LayersPanel.LayersListBoxModel : VirtualListBoxModel {
     }
 
     private GLib.Object? get_item_internal (uint index, bool unfiltered = false) {
-        GLib.SequenceIter<Akira.Lib.Items.ModelInstance>? iter = null;
+        GLib.SequenceIter<LayersItemModel>? iter = null;
 
         if (last_position != uint.MAX) {
             if (last_position == index + 1) {
@@ -80,7 +80,7 @@ public class Layouts.LayersPanel.LayersListBoxModel : VirtualListBoxModel {
         }
     }
 
-    public void add (Akira.Lib.Items.ModelInstance data) {
+    public void add (LayersItemModel data) {
         if (compare_func != null) {
             this.data.insert_sorted (data, compare_func);
         } else {
@@ -91,7 +91,7 @@ public class Layouts.LayersPanel.LayersListBoxModel : VirtualListBoxModel {
         last_position = uint.MAX;
     }
 
-    public void remove (Akira.Lib.Items.ModelInstance data) {
+    public void remove (LayersItemModel data) {
         var iter = this.data.get_iter_at_pos (get_index_of_unfiltered (data));
         iter.remove ();
 
@@ -107,7 +107,7 @@ public class Layouts.LayersPanel.LayersListBoxModel : VirtualListBoxModel {
         last_position = uint.MAX;
     }
 
-    public void set_sort_func (GLib.CompareDataFunc<Akira.Lib.Items.ModelInstance> function) {
+    public void set_sort_func (GLib.CompareDataFunc<LayersItemModel> function) {
         this.compare_func = function;
     }
 

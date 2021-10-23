@@ -47,6 +47,7 @@ sources = files(
     'Layouts/MainViewCanvas.vala',
     'Layouts/MainWindow.vala',
 
+    'Layouts/LayersPanel/LayerItemModel.vala',
     'Layouts/LayersPanel/LayersListBox.vala',
     'Layouts/LayersPanel/LayersListBoxRow.vala',
     'Layouts/LayersPanel/LayersListBoxModel.vala',
