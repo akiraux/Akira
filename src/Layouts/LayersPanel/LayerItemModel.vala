@@ -26,5 +26,45 @@
  * the attributes of the Lib.Items.ModelInstance.
  */
 public class Layouts.LayersPanel.LayersItemModel : GLib.Object {
-    Akira.Lib.Items.ModelInstance? model;
+    private unowned Akira.Lib.Items.ModelInstance model;
+
+    public LayersItemModel (Akira.Lib.Items.ModelInstance model) {
+        set_model (model);
+    }
+
+    private void set_model (Akira.Lib.Items.ModelInstance new_model) {
+        model = new_model;
+    }
+
+    /*
+     * Control the name of the item.
+     */
+    public string name {
+        owned get {
+            return model.components.name.name;
+        }
+    }
+
+    /*
+     * Control the hidden/visible state of the item.
+     */
+    // TODO.
+
+    /*
+     * Control the locked/unlocked state of the item.
+     */
+    public bool locked {
+        get {
+            return model.components.layer.locked;
+        }
+    }
+
+    /*
+     * Control the selected state of the item.
+     */
+    public bool selected {
+        get {
+            return model.components.layer.selected;
+        }
+    }
 }
