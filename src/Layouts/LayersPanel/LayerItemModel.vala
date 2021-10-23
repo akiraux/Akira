@@ -25,10 +25,10 @@
  * Simple Object to be handled by the LayersListBoxModel and to give easy access
  * the attributes of the Lib.Items.ModelInstance.
  */
-public class Layouts.LayersPanel.LayersItemModel : GLib.Object {
+public class Akira.Layouts.LayersPanel.LayerItemModel : GLib.Object {
     private unowned Akira.Lib.Items.ModelInstance model;
 
-    public LayersItemModel (Akira.Lib.Items.ModelInstance model) {
+    public LayerItemModel (Akira.Lib.Items.ModelInstance model) {
         set_model (model);
     }
 

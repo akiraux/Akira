@@ -47,7 +47,7 @@ public class Akira.Layouts.Sidebars.LayersSidebar : Gtk.Grid {
         { "LAYER", Gtk.TargetFlags.SAME_APP, 0 }
     };
 
-    public Layouts.Sidebars.Partials.LayersPanel layers_panel;
+    public Layouts.LayersPanel.LayersListBox layers_panel;
     public Gtk.ScrolledWindow layers_scroll;
 
     public LayersSidebar (Lib.ViewCanvas canvas) {
@@ -68,7 +68,7 @@ public class Akira.Layouts.Sidebars.LayersSidebar : Gtk.Grid {
         pane.wide_handle = false;
         pane.position = 600;
 
-        layers_panel = new Layouts.Sidebars.Partials.LayersPanel (view_canvas);
+        layers_panel = new Layouts.LayersPanel.LayersListBox (view_canvas);
         var layers_grid = new Gtk.Grid ();
         layers_grid.vexpand = true;
         layers_grid.add (layers_panel);

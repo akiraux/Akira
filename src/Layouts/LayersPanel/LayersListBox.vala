@@ -24,11 +24,11 @@
 /*
  * The scrollable layers panel.
  */
-public class Layouts.LayersPanel.LayersListBox : VirtualListBox {
+public class Akira.Layouts.LayersPanel.LayersListBox : VirtualListBox {
     public unowned Akira.Lib.ViewCanvas view_canvas { get; construct; }
 
-    private Gee.HashMap<string, Akira.Lib.Items.ModelInstance> nodes_list;
-    // private LayersListBoxModel layers_model;
+    private Gee.HashMap<string, LayerItemModel> layers;
+    private LayersListBoxModel layers_model;
 
     public LayersListBox (Akira.Lib.ViewCanvas canvas) {
         Object (
@@ -36,21 +36,21 @@ public class Layouts.LayersPanel.LayersListBox : VirtualListBox {
         );
 
         activate_on_single_click = true;
-        nodes_list = new Gee.HashMap<string, Akira.Lib.Items.ModelInstance> ();
-        // layers_model = new LayersListBoxModel ();
+        layers = new Gee.HashMap<string, LayerItemModel> ();
+        layers_model = new LayersListBoxModel ();
 
-        // factory_func = (item, old_widget) => {
-        //     LayersListBoxRow? row = null;
-        //     if (old_widget != null) {
-        //         row = old_widget as LayersListBoxRow;
-        //     } else {
-        //         row = new LayersListBoxRow ();
-        //     }
+        factory_func = (item, old_widget) => {
+            LayersListBoxRow? row = null;
+            if (old_widget != null) {
+                row = old_widget as LayersListBoxRow;
+            } else {
+                row = new LayersListBoxRow ();
+            }
 
-        //     row.assign ((Akira.Lib.Items.ModelInstance)item);
-        //     row.show_all ();
+            row.assign ((LayerItemModel)item);
+            row.show_all ();
 
-        //     return row;
-        // };
+            return row;
+        };
     }
 }
