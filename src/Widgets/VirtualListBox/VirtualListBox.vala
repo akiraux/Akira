@@ -129,6 +129,8 @@ public class VirtualListBox : Gtk.Container, Gtk.Scrollable {
     }
 
     construct {
+        get_style_context ().add_class ("layers-panel");
+        expand = true;
         multipress = new Gtk.GestureMultiPress (this);
         multipress.set_propagation_phase (Gtk.PropagationPhase.BUBBLE);
         multipress.touch_only = false;

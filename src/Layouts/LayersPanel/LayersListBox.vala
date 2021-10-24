@@ -27,7 +27,7 @@
 public class Akira.Layouts.LayersPanel.LayersListBox : VirtualListBox {
     public unowned Akira.Lib.ViewCanvas view_canvas { get; construct; }
 
-    private Gee.HashMap<string, LayerItemModel> layers;
+    private Gee.HashMap<int, LayerItemModel> layers;
     private LayersListBoxModel layers_model;
 
     public LayersListBox (Akira.Lib.ViewCanvas canvas) {
@@ -36,7 +36,7 @@ public class Akira.Layouts.LayersPanel.LayersListBox : VirtualListBox {
         );
 
         activate_on_single_click = true;
-        layers = new Gee.HashMap<string, LayerItemModel> ();
+        layers = new Gee.HashMap<int, LayerItemModel> ();
         layers_model = new LayersListBoxModel ();
 
         factory_func = (item, old_widget) => {
@@ -52,5 +52,20 @@ public class Akira.Layouts.LayersPanel.LayersListBox : VirtualListBox {
 
             return row;
         };
+
+        view_canvas.items_manager.item_model.item_added.connect (on_item_added);
+    }
+
+    private void on_item_added (int id) {
+        var node_instance = view_canvas.items_manager.instance_from_id (id);
+        // No need to add any layer if we don't have an instance.
+        if (node_instance == null) {
+            return;
+        }
+
+        var layer = new LayerItemModel (node_instance);
+        // Add the newly created layer to the list map.
+        layers[node_instance.id] = layer;
+        layers_model.add (layer);
     }
 }

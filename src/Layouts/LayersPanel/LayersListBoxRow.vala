@@ -37,6 +37,7 @@ public class Akira.Layouts.LayersPanel.LayersListBoxRow : VirtualListBoxRow {
         add (label);
 
         show_all ();
+        warning ("HERE");
     }
 
     public void assign (LayerItemModel data) {

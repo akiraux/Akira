@@ -69,13 +69,10 @@ public class Akira.Layouts.Sidebars.LayersSidebar : Gtk.Grid {
         pane.position = 600;
 
         layers_panel = new Layouts.LayersPanel.LayersListBox (view_canvas);
-        var layers_grid = new Gtk.Grid ();
-        layers_grid.vexpand = true;
-        layers_grid.add (layers_panel);
 
         layers_scroll = new Gtk.ScrolledWindow (null, null);
         layers_scroll.expand = true;
-        layers_scroll.add (layers_grid);
+        layers_scroll.add (layers_panel);
 
         var scrolled_child = layers_scroll.get_child ();
         if (scrolled_child is Gtk.Container) {
