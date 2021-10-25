@@ -30,7 +30,6 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
 
     public unowned Akira.Lib.ViewCanvas view_canvas { get; construct; }
 
-    private string? current_search_query = null;
     private Gee.HashMap<string, LayerItemModel> layers;
     private LayerListStore list_store;
 
@@ -115,10 +114,7 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
     }
 
     private bool create_context_menu (Gdk.Event e, LayerListItem row) {
-        var item = (LayerItemModel)row.model_item;
-
         var menu = new Gtk.Menu ();
-
         menu.show_all ();
 
         if (e.type == Gdk.EventType.BUTTON_RELEASE) {

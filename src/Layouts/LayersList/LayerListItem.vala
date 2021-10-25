@@ -45,7 +45,6 @@ public class Akira.Layouts.LayersList.LayerListItem : VirtualizingListBoxRow {
         add (grid);
 
         show_all ();
-        warning ("HERE");
     }
 
     public void assign (LayerItemModel data) {
