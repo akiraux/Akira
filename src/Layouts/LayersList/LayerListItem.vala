@@ -22,31 +22,33 @@
  */
 
 /*
- * Widget component to create a simple listbox row.
+ * The single layer row.
  */
-public class VirtualListBoxRow : Gtk.Bin {
-    public bool selectable { get; set; default = true; }
-    public weak GLib.Object model_item { get; set; }
-
-    static construct {
-        set_css_name ("row");
-    }
+public class Akira.Layouts.LayersList.LayerListItem : VirtualizingListBoxRow {
+    private Gtk.Label label;
 
     construct {
-        can_focus = true;
-        set_redraw_on_allocate (true);
+        label = new Gtk.Label ("");
+        label.halign = Gtk.Align.FILL;
+        label.xalign = 0;
+        label.expand = true;
+        label.set_ellipsize (Pango.EllipsizeMode.END);
 
-        get_style_context ().add_class ("activatable");
+        var grid = new Gtk.Grid () {
+            margin = 12,
+            column_spacing = 12,
+            row_spacing = 6
+        };
+
+        grid.attach (label, 0, 0, 1, 1);
+
+        add (grid);
+
+        show_all ();
+        warning ("HERE");
     }
 
-    public override bool draw (Cairo.Context ct) {
-        var sc = this.get_style_context ();
-        Gtk.Allocation alloc;
-        this.get_allocation (out alloc);
-
-        sc.render_background (ct, 0, 0, alloc.width, alloc.height);
-        sc.render_frame (ct, 0, 0, alloc.width, alloc.height);
-
-        return base.draw (ct);
+    public void assign (LayerItemModel data) {
+        label.label = data.name;
     }
 }

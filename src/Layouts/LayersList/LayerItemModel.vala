@@ -25,23 +25,16 @@
  * Simple Object to be handled by the LayersListBoxModel and to give easy access
  * the attributes of the Lib.Items.ModelInstance.
  */
-public class Akira.Layouts.LayersPanel.LayerItemModel : GLib.Object {
-    private unowned Akira.Lib.Items.ModelInstance model;
-
-    public LayerItemModel (Akira.Lib.Items.ModelInstance model) {
-        set_model (model);
-    }
-
-    private void set_model (Akira.Lib.Items.ModelInstance new_model) {
-        model = new_model;
-    }
+public class Akira.Layouts.LayersList.LayerItemModel : GLib.Object {
+    public string service_uid { get; construct; }
+    public unowned Lib.Items.ModelInstance? node;
 
     /*
      * Control the name of the item.
      */
     public string name {
         owned get {
-            return model.components.name.name;
+            return node.components.name.name;
         }
     }
 
@@ -55,7 +48,7 @@ public class Akira.Layouts.LayersPanel.LayerItemModel : GLib.Object {
      */
     public bool locked {
         get {
-            return model.components.layer.locked;
+            return node.components.layer.locked;
         }
     }
 
@@ -64,7 +57,16 @@ public class Akira.Layouts.LayersPanel.LayerItemModel : GLib.Object {
      */
     public bool selected {
         get {
-            return model.components.layer.selected;
+            return node.components.layer.selected;
         }
+    }
+
+    public LayerItemModel (Lib.Items.ModelInstance node, string service_uid) {
+        Object (service_uid: service_uid);
+        update_node (node);
+    }
+
+    private void update_node (Lib.Items.ModelInstance new_node) {
+        node = new_node;
     }
 }

@@ -24,7 +24,7 @@
 /*
  * The model holding the layers panel rows.
  */
-public class Akira.Layouts.LayersPanel.LayersListBoxModel : VirtualListBoxModel {
+public class Akira.Layouts.LayersList.LayerListStore : VirtualizingListBoxModel {
     public delegate bool RowVisibilityFunc (GLib.Object row);
 
     private GLib.Sequence<LayerItemModel> data = new GLib.Sequence<LayerItemModel> ();

@@ -24,7 +24,7 @@
 /*
  * List model to manage all the rows added to the virtual listbox.
  */
-public abstract class VirtualListBoxModel : GLib.ListModel, GLib.Object {
+public abstract class VirtualizingListBoxModel : GLib.ListModel, GLib.Object {
     private Gee.HashSet<weak GLib.Object> selected_rows = new Gee.HashSet<weak GLib.Object> ();
 
     public GLib.Type get_item_type () {
