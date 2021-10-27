@@ -26,7 +26,7 @@
  * the attributes of the Lib.Items.ModelInstance.
  */
 public class Akira.Layouts.LayersList.LayerItemModel : GLib.Object {
-    public string service_uid { get; construct; }
+    public int service_uid { get; construct; }
     public unowned Lib.Items.ModelInstance? node;
 
     /*
@@ -61,7 +61,7 @@ public class Akira.Layouts.LayersList.LayerItemModel : GLib.Object {
         }
     }
 
-    public LayerItemModel (Lib.Items.ModelInstance node, string service_uid) {
+    public LayerItemModel (Lib.Items.ModelInstance node, int service_uid) {
         Object (service_uid: service_uid);
         update_node (node);
     }

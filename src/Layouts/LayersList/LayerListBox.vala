@@ -30,7 +30,7 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
 
     public unowned Akira.Lib.ViewCanvas view_canvas { get; construct; }
 
-    private Gee.HashMap<string, LayerItemModel> layers;
+    private Gee.HashMap<int, LayerItemModel> layers;
     private LayerListStore list_store;
 
     public LayerListBox (Akira.Lib.ViewCanvas canvas) {
@@ -39,7 +39,7 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
         );
 
         activate_on_single_click = true;
-        layers = new Gee.HashMap<string, LayerItemModel> ();
+        layers = new Gee.HashMap<int, LayerItemModel> ();
         list_store = new LayerListStore ();
 
         model = list_store;
@@ -97,9 +97,10 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
         view_canvas.items_manager.item_model.item_added.connect (on_item_added);
     }
 
-    private void add_layer_item (Lib.Items.ModelInstance node, string service_uid) {
+    private void add_layer_item (Lib.Items.ModelInstance node) {
+        var service_uid = node.id;
         var item = new LayerItemModel (node, service_uid);
-        layers[node.id.to_string()] = item;
+        layers[service_uid] = item;
         list_store.add (item);
     }
 
@@ -110,7 +111,7 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
             return;
         }
 
-        add_layer_item (node_instance, "test");
+        add_layer_item (node_instance);
     }
 
     private bool create_context_menu (Gdk.Event e, LayerListItem row) {
@@ -126,5 +127,27 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
         }
 
         return Gdk.EVENT_PROPAGATE;
+    }
+
+    /*
+     * Triggers the update of the list store and refresh of the UI to show the
+     * newly added items that are currently visible.
+     */
+    public void refresh_list () {
+        list_store.items_changed (0, 0, list_store.get_n_items ());
+    }
+
+    public void remove_items (GLib.Array<int> ids) {
+        var removed = 0;
+        foreach (var uid in ids.data) {
+            var item = layers[uid];
+            if (item != null) {
+                layers.unset (uid);
+                list_store.remove (item);
+                removed++;
+            }
+        }
+
+        list_store.items_changed (0, removed, list_store.get_n_items ());
     }
 }

@@ -400,7 +400,7 @@ public class Akira.Lib.Items.Model : Object {
     }
 
     private void add_to_maps (ModelNode node, bool listen) {
-        // TODO create drawable ina nicer way
+        // TODO create drawable in a nicer way.
         node.instance.add_to_canvas ();
 
         if (node.instance.is_group) {

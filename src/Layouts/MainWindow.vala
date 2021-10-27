@@ -62,13 +62,13 @@ public class Akira.Layouts.MainWindow : Gtk.Grid {
      * all items have actually been created.
      */
     public void show_added_layers () {
-        // layers_sidebar.layers_panel.refresh_lists ();
+        layers_sidebar.layers_listbox.refresh_list ();
     }
 
     /*
      * Pass the list of nodes ids to be removed from the layers list.
      */
     public void remove_layers (GLib.Array<int> ids) {
-        // layers_sidebar.layers_panel.delete_selected_layers (ids);
+        layers_sidebar.layers_listbox.remove_items (ids);
     }
 }
