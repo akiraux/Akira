@@ -34,11 +34,7 @@ public class Akira.Layouts.LayersList.LayerListItem : VirtualizingListBoxRow {
         label.expand = true;
         label.set_ellipsize (Pango.EllipsizeMode.END);
 
-        var grid = new Gtk.Grid () {
-            margin = 12,
-            column_spacing = 12,
-            row_spacing = 6
-        };
+        var grid = new Gtk.Grid ();
 
         grid.attach (label, 0, 0, 1, 1);
 
@@ -49,5 +45,28 @@ public class Akira.Layouts.LayersList.LayerListItem : VirtualizingListBoxRow {
 
     public void assign (LayerItemModel data) {
         label.label = data.name;
+
+        // Build a specific UI based on the node instance's type.
+        if (data.is_artboard) {
+            build_artboard_ui ();
+        } else if (data.is_group) {
+            build_group_ui ();
+        } else {
+            build_layer_ui ();
+        }
+    }
+
+    private void build_artboard_ui () {
+        get_style_context ().add_class ("artboard");
+        label.get_style_context ().add_class ("artboard-name");
+    }
+
+    /*
+     * TODO...
+     */
+    private void build_group_ui () {}
+
+    private void build_layer_ui () {
+        get_style_context ().add_class ("layer");
     }
 }

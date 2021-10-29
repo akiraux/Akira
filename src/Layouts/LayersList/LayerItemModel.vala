@@ -61,6 +61,24 @@ public class Akira.Layouts.LayersList.LayerItemModel : GLib.Object {
         }
     }
 
+    /*
+     * If the node type is an Artboard.
+     */
+    public bool is_artboard {
+        get {
+            return node.type is Lib.Items.ModelTypeArtboard;
+        }
+    }
+
+    /*
+     * If the node type is a Group.
+     */
+    public bool is_group {
+        get {
+            return node.type is Lib.Items.ModelTypeGroup;
+        }
+    }
+
     public LayerItemModel (Lib.Items.ModelInstance node, int service_uid) {
         Object (service_uid: service_uid);
         update_node (node);

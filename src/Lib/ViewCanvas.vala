@@ -277,6 +277,10 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
     }
 
     public override bool button_press_event (Gdk.EventButton event) {
+        // Temporarily grab the focus when clicking on the canvas. This is a
+        // workaround fix for the listbox stealing focus. To be removed.
+        focus_canvas ();
+
         base.button_press_event (event);
 
         hover_manager.remove_hover_effect ();
