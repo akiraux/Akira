@@ -113,17 +113,14 @@ public class Akira.Lib.Modes.ItemInsertMode : AbstractInteractionMode {
                 path_edit_mode = new Lib.Modes.PathEditMode (view_canvas, instance);
                 path_edit_mode.mode_begin ();
                 path_edit_mode.button_press_event (event);
-
-                // Defer the print of the layer UI after all items have been created.
-                view_canvas.window.main_window.show_added_layers ();
-                return true;
+            } else {
+                transform_mode = new Lib.Modes.TransformMode (view_canvas, Utils.Nobs.Nob.BOTTOM_LEFT);
+                transform_mode.mode_begin ();
+                transform_mode.button_press_event (event);
             }
 
-            transform_mode = new Lib.Modes.TransformMode (view_canvas, Utils.Nobs.Nob.BOTTOM_LEFT);
-            transform_mode.mode_begin ();
-            transform_mode.button_press_event (event);
             // Defer the print of the layer UI after all items have been created.
-            view_canvas.window.main_window.show_added_layers ();
+            view_canvas.window.main_window.show_added_layers (1);
 
             return true;
         }

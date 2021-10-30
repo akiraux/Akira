@@ -133,8 +133,8 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
      * Triggers the update of the list store and refresh of the UI to show the
      * newly added items that are currently visible.
      */
-    public void refresh_list () {
-        list_store.items_changed (0, 0, list_store.get_n_items ());
+    public void refresh_list (int added) {
+        list_store.items_changed (0, 0, added);
     }
 
     public void remove_items (GLib.Array<int> ids) {
@@ -148,6 +148,6 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
             }
         }
 
-        list_store.items_changed (0, removed, list_store.get_n_items ());
+        list_store.items_changed (0, removed, 0);
     }
 }
