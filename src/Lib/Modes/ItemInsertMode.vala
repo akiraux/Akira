@@ -121,7 +121,6 @@ public class Akira.Lib.Modes.ItemInsertMode : AbstractInteractionMode {
 
             // Defer the print of the layer UI after all items have been created.
             view_canvas.window.main_window.show_added_layers (1);
-
             return true;
         }
 
