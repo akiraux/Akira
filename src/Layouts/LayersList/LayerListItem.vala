@@ -25,11 +25,11 @@
  * The single layer row.
  */
 public class Akira.Layouts.LayersList.LayerListItem : VirtualizingListBoxRow {
-    private Gtk.StyleContext style;
+    private Gtk.StyleContext style_ctx;
     private Gtk.Label label;
 
     construct {
-        style = get_style_context ();
+        style_ctx = get_style_context ();
 
         label = new Gtk.Label ("");
         label.halign = Gtk.Align.FILL;
@@ -60,8 +60,8 @@ public class Akira.Layouts.LayersList.LayerListItem : VirtualizingListBoxRow {
     }
 
     private void build_artboard_ui () {
-        style.remove_class ("layer");
-        style.add_class ("artboard");
+        style_ctx.remove_class ("layer");
+        style_ctx.add_class ("artboard");
         label.get_style_context ().add_class ("artboard-name");
     }
 
@@ -71,8 +71,8 @@ public class Akira.Layouts.LayersList.LayerListItem : VirtualizingListBoxRow {
     private void build_group_ui () {}
 
     private void build_layer_ui () {
-        style.remove_class ("artboard");
-        style.add_class ("layer");
+        style_ctx.remove_class ("artboard");
+        style_ctx.add_class ("layer");
         label.get_style_context ().remove_class ("artboard-name");
     }
 }

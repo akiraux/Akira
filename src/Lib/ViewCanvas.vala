@@ -682,4 +682,14 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
     private void on_items_removed (GLib.Array<int> ids) {
         window.main_window.remove_layers (ids);
     }
+
+    public void on_layer_selected (Lib.Items.ModelInstance? node) {
+        selection_manager.add_to_selection (node.id);
+
+        if (mode_manager.active_mode_type != Lib.Modes.AbstractInteractionMode.ModeType.TRANSFORM) {
+            var new_mode = new Lib.Modes.TransformMode (this, Utils.Nobs.Nob.NONE);
+            mode_manager.register_mode (new_mode);
+            mode_manager.deregister_active_mode ();
+        }
+    }
 }
