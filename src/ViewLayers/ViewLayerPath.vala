@@ -119,8 +119,12 @@ public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
                     context.fill ();
                 }
 
-                context.move_to (points[point_idx + 1].x + reference_point.x, points[point_idx + 1].y + reference_point.y);
+                context.move_to (points[point_idx].x + reference_point.x, points[point_idx].y + reference_point.y);
+                context.line_to (points[point_idx + 1].x + reference_point.x, points[point_idx + 1].y + reference_point.y);
+
+                context.move_to (points[point_idx].x + reference_point.x, points[point_idx].y + reference_point.y);
                 context.line_to (points[point_idx + 2].x + reference_point.x, points[point_idx + 2].y + reference_point.y);
+
                 context.stroke ();
 
                 point_idx += 4;
