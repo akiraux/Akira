@@ -374,7 +374,7 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
         }
 
         var path_edit_mode = new Lib.Modes.PathEditMode (this, selected_item.instance);
-        path_edit_mode.toggle_functionality (false);
+        path_edit_mode.toggle_functionality (true);
         mode_manager.register_mode (path_edit_mode);
 
         return true;

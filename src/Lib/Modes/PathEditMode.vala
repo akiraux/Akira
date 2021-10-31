@@ -39,7 +39,7 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
     private int live_idx;
 
     // This flag tells if we are adding a path or editing an existing one.
-    private bool is_edit_path = true;
+    private bool is_edit_path = false;
 
     public PathEditMode (Lib.ViewCanvas canvas, Lib.Items.ModelInstance instance) {
         Object (
@@ -54,6 +54,18 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
 
     public void toggle_functionality (bool is_edit_path) {
         this.is_edit_path = is_edit_path;
+
+        // If we are editing the path, we need to set the first point in edit_model
+        if (is_edit_path) {
+            double center_x = instance.components.center.x;
+            double center_y = instance.components.center.y;
+            double width = instance.components.size.width;
+            double height = instance.components.size.height;
+            
+            var first_point = Geometry.Point (center_x - width / 2.0, center_y - height / 2.0);
+
+            edit_model.first_point = first_point;
+        }
     }
 
     public override AbstractInteractionMode.ModeType mode_type () {
@@ -81,7 +93,7 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
     }
 
     public override bool key_press_event (Gdk.EventKey event) {
-        if (!is_edit_path) {
+        if (is_edit_path) {
             // When editing path, we dont know yet what point will be selected.
             // So don't delete points, but mark this event as handled.
             return true;
@@ -145,7 +157,17 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
     }
 
     public override bool button_press_event (Gdk.EventButton event) {
-        if (!is_edit_path) {
+        print("click event :: %f %f\n", event.x, event.y);
+        if (is_edit_path) {
+            print("in not edit mode\n");
+            int index = 0;
+            var is_selected = edit_model.hit_test (event.x, event.y, ref index);
+
+            // if (!is_selected) {
+            //     return true;
+            // }
+
+            print("point %d was selected\n", index);
             return true;
         }
 
@@ -173,7 +195,7 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
     }
 
     public override bool button_release_event (Gdk.EventButton event) {
-        if (!is_edit_path) {
+        if (is_edit_path) {
             return true;
         }
 
@@ -192,7 +214,7 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
     public override bool motion_notify_event (Gdk.EventMotion event) {
         Geometry.Point point = Geometry.Point (event.x, event.y);
 
-        if (!is_edit_path) {
+        if (is_edit_path) {
             return true;
         }
 

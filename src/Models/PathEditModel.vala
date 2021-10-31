@@ -124,6 +124,27 @@ public class Akira.Models.PathEditModel : Object {
     }
 
     /*
+     * This method is used to check if user clicked on a point in the path.
+     * Returns true if clicked, false otherwise.
+     * If a point was clicked, index refers to its location.
+     */
+    public bool hit_test (double x, double y, ref int index) {
+        Geometry.Point point = Geometry.Point (x, y);
+
+        for (int i = 0; i < points.length; ++i) {
+            double delta_x = Math.ceil ((points[i].x + first_point.x - point.x).abs ());
+            double delta_y = Math.ceil ((points[i].y + first_point.y - point.y).abs ());
+
+            if (delta_x <= 2 && delta_y <= 2) {
+                index = i;
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /*
      * This method shift all points in path such that none of them are in negative space.
      */
     private Geometry.Point[] recalculate_points (Geometry.Point[] points) {
