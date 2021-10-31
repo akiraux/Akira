@@ -80,9 +80,10 @@ public class Akira.Lib.Components.Path : Component, Copyable<Path> {
     }
 
     public Geometry.Rectangle calculate_extents () {
-        double min_x = 0;
+        // The minimum values need to be large so for finding minimum to work.
+        double min_x = 100000;
         double max_x = 0;
-        double min_y = 0;
+        double min_y = 100000;
         double max_y = 0;
 
         foreach (var pos in data) {

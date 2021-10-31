@@ -31,7 +31,7 @@ public class Akira.Models.PathEditModel : Object {
 
     public Geometry.Point first_point;
     private Geometry.Point[] live_pts;
-    private int live_pts_len;
+    private int live_pts_len = -1;
 
     public PathEditModel (Lib.Items.ModelInstance instance, Lib.ViewCanvas view_canvas) {
         Object (
@@ -197,33 +197,26 @@ public class Akira.Models.PathEditModel : Object {
     }
 
     private Geometry.Rectangle get_extents_using_live_pts (Geometry.Rectangle extents) {
-        var live_extents = Geometry.Rectangle.empty ();
-
-        live_extents.left = extents.left;
-        live_extents.right = extents.right;
-        live_extents.top = extents.top;
-        live_extents.bottom = extents.bottom;
-
-        for (int i = 0; i < live_pts_len; ++i) {
-            var temp = live_pts[i];
-            temp.x = temp.x - first_point.x + extents.left;
-            temp.y = temp.y - first_point.y + extents.top;
-
-            if (temp.x < extents.left) {
-                live_extents.left = temp.x;
-            }
-            if (temp.x > extents.right) {
-                live_extents.right = temp.x;
-            }
-            if (temp.y < extents.top) {
-                live_extents.top = temp.y;
-            }
-            if (temp.y > extents.bottom) {
-                live_extents.bottom = temp.y;
-            }
+        if (points.length == 0 || live_pts_len == -1) {
+            return extents;
         }
 
-        return live_extents;
+        var data = new Geometry.Point[live_pts_len + 1];
+
+        data[0] = Geometry.Point ();
+        data[0].x = points[points.length - 1].x + first_point.x;
+        data[0].y = points[points.length - 1].y + first_point.y;
+
+        for (int i = 0; i < live_pts_len; ++i) {
+            data[i + 1].x = live_pts[i].x;
+            data[i + 1].y = live_pts[i].y;
+        }
+
+        // The array of commands isn't really needed for calculating extents. So just keep it empty.
+        var cmds = new Lib.Modes.PathEditMode.Type[0];
+        var live_path = new Lib.Components.Path.from_points (data, cmds);
+
+        return live_path.calculate_extents ();
     }
 
 }
