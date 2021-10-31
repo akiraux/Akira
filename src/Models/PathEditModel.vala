@@ -145,10 +145,26 @@ public class Akira.Models.PathEditModel : Object {
     }
 
     /*
+     * This method will be used when editing paths to update the position of a point.
+     */
+    public void modify_point_value (int idx, Geometry.Point new_pos) {
+        new_pos.x -= first_point.x;
+        new_pos.y -= first_point.y;
+
+        points[idx] = new_pos;
+
+        // After updating a point, we need to recalculate the first_point,
+        // update the path, and do some other calculations
+        points = recalculate_points (points);
+        instance.components.path = new Lib.Components.Path.from_points (points, commands);
+        recompute_components ();
+    }
+
+    /*
      * This method shift all points in path such that none of them are in negative space.
      */
     private Geometry.Point[] recalculate_points (Geometry.Point[] points) {
-        double min_x = 0, min_y = 0;
+        double min_x = 100000, min_y = 100000;
 
         foreach (var pt in points) {
             if (pt.x < min_x) {

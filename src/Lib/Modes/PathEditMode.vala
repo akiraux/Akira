@@ -40,6 +40,8 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
 
     // This flag tells if we are adding a path or editing an existing one.
     private bool is_edit_path = false;
+    // When editing path, this index denotes which point we are modifying
+    private int selected_idx = -1;
 
     public PathEditMode (Lib.ViewCanvas canvas, Lib.Items.ModelInstance instance) {
         Object (
@@ -61,7 +63,7 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
             double center_y = instance.components.center.y;
             double width = instance.components.size.width;
             double height = instance.components.size.height;
-            
+
             var first_point = Geometry.Point (center_x - width / 2.0, center_y - height / 2.0);
 
             edit_model.first_point = first_point;
@@ -157,17 +159,19 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
     }
 
     public override bool button_press_event (Gdk.EventButton event) {
-        print("click event :: %f %f\n", event.x, event.y);
+        // If button is clicked in edit mode, check if some point was clicked.
         if (is_edit_path) {
-            print("in not edit mode\n");
             int index = 0;
             var is_selected = edit_model.hit_test (event.x, event.y, ref index);
 
-            // if (!is_selected) {
-            //     return true;
-            // }
+            if (!is_selected) {
+                selected_idx = -1;
+                return true;
+            }
 
-            print("point %d was selected\n", index);
+            selected_idx = index;
+            is_click = true;
+
             return true;
         }
 
@@ -196,6 +200,8 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
 
     public override bool button_release_event (Gdk.EventButton event) {
         if (is_edit_path) {
+            selected_idx = -1;
+            is_click = false;
             return true;
         }
 
@@ -215,6 +221,10 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
         Geometry.Point point = Geometry.Point (event.x, event.y);
 
         if (is_edit_path) {
+            if (selected_idx != -1 && is_click) {
+                // If user selected a point and clicked and dragged it, change its position.
+                edit_model.modify_point_value (selected_idx, point);
+            }
             return true;
         }
 
