@@ -131,6 +131,17 @@ public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
             }
         }
 
+        if (path_data.selected_idx != -1) {
+            var idx = path_data.selected_idx;
+            var point = Geometry.Point ();
+            point.x = points[idx].x + reference_point.x;
+            point.y = points[idx].y + reference_point.y;
+
+            context.set_source_rgba (0.7, 0, 0, 1);
+            context.arc (point.x, point.y, radius, 0, Math.PI * 2);
+            context.fill ();
+        }
+
         context.stroke ();
         context.new_path ();
         context.restore ();

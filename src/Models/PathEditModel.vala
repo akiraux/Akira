@@ -33,6 +33,8 @@ public class Akira.Models.PathEditModel : Object {
     private Geometry.Point[] live_pts;
     private int live_pts_len = -1;
 
+    public int selected_idx = -1;
+
     public PathEditModel (Lib.Items.ModelInstance instance, Lib.ViewCanvas view_canvas) {
         Object (
             view_canvas: view_canvas,
@@ -160,6 +162,10 @@ public class Akira.Models.PathEditModel : Object {
         recompute_components ();
     }
 
+    public void set_selected_points (int idx) {
+        this.selected_idx = idx;
+    }
+
     /*
      * This method shift all points in path such that none of them are in negative space.
      */
@@ -227,6 +233,7 @@ public class Akira.Models.PathEditModel : Object {
         path_data.length = live_pts_len;
         path_data.extents = extents;
         path_data.rot_angle = instance.components.transform.rotation;
+        path_data.selected_idx = selected_idx;
 
         path_data.live_extents = get_extents_using_live_pts (extents);
 
@@ -269,4 +276,5 @@ public struct Akira.Models.PathDataModel {
     public Geometry.Rectangle live_extents;
 
     public double rot_angle;
+    public int selected_idx;
 }
