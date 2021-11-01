@@ -161,13 +161,29 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
         if (is_edit_path) {
             int index = 0;
             var is_selected = edit_model.hit_test (event.x, event.y, ref index);
+            bool is_shift = (event.state == Gdk.ModifierType.SHIFT_MASK);
 
-            if (!is_selected) {
-                edit_model.selected_idx = -1;
-                return true;
+            if (is_selected) {
+                if (is_shift) {
+                    // If a point was selected, and shift key was pressed,
+                    // Then append this point to the array of selected points.
+                    edit_model.set_selected_points (index, true);
+                } else {
+                    // If a point was selected, but the shift key was not pressed,
+                    // Then first check if this point already exists in the selected array.
+                    // If it does, it means we are using this point as a reference
+                    // For moving the other points.
+                    if (edit_model.selected_pts.contains (index)) {
+                        edit_model.reference_point = index;
+                    } else {
+                        // Otherwise, clear the array of selected points and then add this point.
+                        edit_model.set_selected_points (index);
+                    }
+                }
+            } else {
+                edit_model.set_selected_points (-1);
             }
 
-            edit_model.selected_idx = index;
             is_click = true;
 
             return true;
@@ -197,12 +213,6 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
     }
 
     public override bool button_release_event (Gdk.EventButton event) {
-        if (is_edit_path) {
-            edit_model.selected_idx = -1;
-            is_click = false;
-            return true;
-        }
-
         if (is_curr_command_done ()) {
             edit_model.add_live_points_to_path (live_points, live_command, live_idx + 1);
 
@@ -219,9 +229,9 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
         Geometry.Point point = Geometry.Point (event.x, event.y);
 
         if (is_edit_path) {
-            if (edit_model.selected_idx != -1 && is_click) {
+            if (!edit_model.selected_pts.is_empty && is_click) {
                 // If user selected a point and clicked and dragged it, change its position.
-                edit_model.modify_point_value (edit_model.selected_idx, point);
+                edit_model.modify_point_value (point);
             }
             return true;
         }

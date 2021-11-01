@@ -131,8 +131,7 @@ public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
             }
         }
 
-        if (path_data.selected_idx != -1) {
-            var idx = path_data.selected_idx;
+        foreach (var idx in path_data.selected_pts) {
             var point = Geometry.Point ();
             point.x = points[idx].x + reference_point.x;
             point.y = points[idx].y + reference_point.y;

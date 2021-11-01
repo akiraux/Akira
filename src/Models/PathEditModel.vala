@@ -33,7 +33,8 @@ public class Akira.Models.PathEditModel : Object {
     private Geometry.Point[] live_pts;
     private int live_pts_len = -1;
 
-    public int selected_idx = -1;
+    public Gee.HashSet<int> selected_pts;
+    public int reference_point;
 
     public PathEditModel (Lib.Items.ModelInstance instance, Lib.ViewCanvas view_canvas) {
         Object (
@@ -49,6 +50,9 @@ public class Akira.Models.PathEditModel : Object {
         // Layer to show when editing paths.
         path_layer = new ViewLayers.ViewLayerPath ();
         path_layer.add_to_canvas (ViewLayers.ViewLayer.PATH_LAYER_ID, view_canvas);
+
+        // The selected_pts will contain the list of all points that we want to modify.
+        selected_pts = new Gee.HashSet<int> ();
 
         update_view ();
     }
@@ -149,21 +153,46 @@ public class Akira.Models.PathEditModel : Object {
     /*
      * This method will be used when editing paths to update the position of a point.
      */
-    public void modify_point_value (int idx, Geometry.Point new_pos) {
+    public void modify_point_value (Geometry.Point new_pos) {
         new_pos.x -= first_point.x;
         new_pos.y -= first_point.y;
 
-        points[idx] = new_pos;
+        if (selected_pts.size == 1) {
+            // If only one point is selected, it will act as reference point.
+            reference_point = selected_pts.to_array ()[0];
+        }
 
-        // After updating a point, we need to recalculate the first_point,
-        // update the path, and do some other calculations
+        Geometry.Point original_ref = Geometry.Point (points[reference_point].x, points[reference_point].y);
+
+        // Calculate by how much the reference point changed, then move other points by this amount.
+        double delta_x = original_ref.x - new_pos.x;
+        double delta_y = original_ref.y - new_pos.y;
+
+        foreach (var item in selected_pts) {
+            points[item].x -= delta_x;
+            points[item].y -= delta_y;
+        }
+
         points = recalculate_points (points);
         instance.components.path = new Lib.Components.Path.from_points (points, commands);
         recompute_components ();
     }
 
-    public void set_selected_points (int idx) {
-        this.selected_idx = idx;
+    /*
+     * This method is used to change the selected points.
+     * idx is index of point to be added to selection. if -1, it is not added.
+     * If append is true, add the item to the list, otherwise, clear the list then add.
+     */
+    public void set_selected_points (int idx, bool append = false) {
+        if (!append) {
+            selected_pts.clear ()
+        }
+
+        if (idx != -1) {
+            selected_pts.add (idx);
+        }
+
+        update_view ();
     }
 
     /*
@@ -233,7 +262,7 @@ public class Akira.Models.PathEditModel : Object {
         path_data.length = live_pts_len;
         path_data.extents = extents;
         path_data.rot_angle = instance.components.transform.rotation;
-        path_data.selected_idx = selected_idx;
+        path_data.selected_pts = selected_pts;
 
         path_data.live_extents = get_extents_using_live_pts (extents);
 
@@ -276,5 +305,5 @@ public struct Akira.Models.PathDataModel {
     public Geometry.Rectangle live_extents;
 
     public double rot_angle;
-    public int selected_idx;
+    public Gee.HashSet<int> selected_pts;
 }
