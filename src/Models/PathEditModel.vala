@@ -134,16 +134,35 @@ public class Akira.Models.PathEditModel : Object {
      * Returns true if clicked, false otherwise.
      * If a point was clicked, index refers to its location.
      */
-    public bool hit_test (double x, double y, ref int index) {
+    public bool hit_test (double x, double y, ref int[] index) {
         Geometry.Point point = Geometry.Point (x, y);
 
-        for (int i = 0; i < points.length; ++i) {
-            double delta_x = Math.ceil ((points[i].x + first_point.x - point.x).abs ());
-            double delta_y = Math.ceil ((points[i].y + first_point.y - point.y).abs ());
+        int j = 0;
+        for (int i = 0; i < commands.length; ++i) {
+            if (commands[i] == Lib.Modes.PathEditMode.Type.LINE) {
+                if (compare_points (points[j], point)) {
+                    index[0] = j;
+                    return true;
+                }
 
-            if (delta_x <= 2 && delta_y <= 2) {
-                index = i;
-                return true;
+                ++j;
+            } else {
+                // We need to check if the middle point of tangent is selected.
+                // If it is selected, then other two points of tangent must also
+                // be selected to keep the curve intact.
+                if (compare_points (points[j], point)) {
+                    index[0] = j;
+                    index[1] = j + 1;
+                    index[2] = j + 2;
+                    return true;
+                }
+
+                for (int k = 1; k < 4; ++k) {
+                    if (compare_points (points[j + k], point)) {
+                        index[0] = j + k;
+                        return true;
+                    }
+                }
             }
         }
 
@@ -185,7 +204,7 @@ public class Akira.Models.PathEditModel : Object {
      */
     public void set_selected_points (int idx, bool append = false) {
         if (!append) {
-            selected_pts.clear ()
+            selected_pts.clear ();
         }
 
         if (idx != -1) {
@@ -193,6 +212,14 @@ public class Akira.Models.PathEditModel : Object {
         }
 
         update_view ();
+    }
+
+    private bool compare_points (Geometry.Point a, Geometry.Point b) {
+        double thresh = 4 / view_canvas.scale;
+        double delta_x = Math.ceil ((a.x + first_point.x - b.x).abs ());
+        double delta_y = Math.ceil ((a.y + first_point.y - b.y).abs ());
+
+        return (delta_x <= 4 && delta_y <= 4);
     }
 
     /*

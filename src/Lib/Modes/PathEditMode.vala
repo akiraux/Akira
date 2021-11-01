@@ -159,7 +159,8 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
     public override bool button_press_event (Gdk.EventButton event) {
         // If button is clicked in edit mode, check if some point was clicked.
         if (is_edit_path) {
-            int index = 0;
+            int[] index = new int[3];
+            index[0] = index[1] = index[2] = -1;
             var is_selected = edit_model.hit_test (event.x, event.y, ref index);
             bool is_shift = (event.state == Gdk.ModifierType.SHIFT_MASK);
 
@@ -167,17 +168,24 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
                 if (is_shift) {
                     // If a point was selected, and shift key was pressed,
                     // Then append this point to the array of selected points.
-                    edit_model.set_selected_points (index, true);
+                    for (int i = 0; i < 3 && index[i] != -1; ++i) {
+                        edit_model.set_selected_points (index[i], true);
+                    }
                 } else {
                     // If a point was selected, but the shift key was not pressed,
                     // Then first check if this point already exists in the selected array.
                     // If it does, it means we are using this point as a reference
                     // For moving the other points.
-                    if (edit_model.selected_pts.contains (index)) {
-                        edit_model.reference_point = index;
+                    if (edit_model.selected_pts.contains (index[0])) {
+                        edit_model.reference_point = index[0];
                     } else {
+                        edit_model.selected_pts.clear ();
+
                         // Otherwise, clear the array of selected points and then add this point.
-                        edit_model.set_selected_points (index);
+                        for (int i = 0; i < 3 && index[i] != -1; ++i) {
+                            edit_model.set_selected_points (index[i], true);
+                            edit_model.reference_point = index[0];
+                        }
                     }
                 }
             } else {
