@@ -30,11 +30,14 @@ public class Akira.Drawables.DrawablePath : Drawable {
     // Control the path edit mode between straight line and curves.
     // Line requires 1 points whereas, path requires 4 points.
     public Lib.Modes.PathEditMode.Type[]? commands = null;
+    // This flag tells us if the first and last point need to be joined.
+    public bool close;
 
-    public DrawablePath (Geometry.Point[]? points = null, Lib.Modes.PathEditMode.Type[]? commands = null) {
+    public DrawablePath (Geometry.Point[]? points = null, Lib.Modes.PathEditMode.Type[]? commands = null, bool close = false) {
        if (points != null && commands != null) {
            this.points = points;
            this.commands = commands;
+           this.close = close;
        }
     }
 
@@ -74,6 +77,10 @@ public class Akira.Drawables.DrawablePath : Drawable {
 
                 point_idx += 4;
             }
+        }
+
+        if (close) {
+            cr.line_to (points[0].x, points[0].y);
         }
 
         cr.restore ();

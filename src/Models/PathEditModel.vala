@@ -214,6 +214,15 @@ public class Akira.Models.PathEditModel : Object {
         update_view ();
     }
 
+    /*
+     * This method is used to join the first and last point of path
+     * to make it a closed curve.
+     */
+    public void make_path_closed () {
+        instance.components.path = new Lib.Components.Path.from_points (points, commands, true);
+        recompute_components ();
+    }
+
     private bool compare_points (Geometry.Point a, Geometry.Point b) {
         double thresh = 4 / view_canvas.scale;
         double delta_x = Math.ceil ((a.x + first_point.x - b.x).abs ());

@@ -95,6 +95,7 @@ public class Akira.Lib.Items.ModelTypePath : ModelType {
                 drawable.transform = instance.compiled_geometry.transformation_matrix;
                 drawable.points = instance.components.path.data;
                 drawable.commands = instance.components.path.commands;
+                drawable.close = instance.components.path.close;
                 break;
         }
     }

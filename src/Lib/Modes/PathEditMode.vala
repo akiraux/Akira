@@ -102,53 +102,17 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
         uint uppercase_keyval = Gdk.keyval_to_upper (event.keyval);
 
         if (uppercase_keyval == Gdk.Key.BackSpace) {
-            if (live_idx > 0) {
-                --live_idx;
+            handle_backspace_event ();
+            return true;
+        } else if (uppercase_keyval == Gdk.Key.Z) {
+            edit_model.make_path_closed ();
 
-                // Note that for curve, there are 2 tangent points that depend on each other.
-                // If one of them gets deleted, delete the other too. This leaves only 1 live point.
-                // So the live command becomes LINE.
-                if (live_idx == 1 && live_command == CURVE) {
-                    live_command = Type.LINE;
-                    live_idx = 0;
-                }
-
-                edit_model.set_live_points (live_points, live_idx + 1);
-            } else {
-                var possible_live_pts = edit_model.delete_last_point ();
-
-                if (possible_live_pts == null || possible_live_pts.length == 0) {
-                    live_idx = -1;
-                    live_command = Type.LINE;
-                } else {
-                    live_points[0] = possible_live_pts[0];
-                    live_points[1] = possible_live_pts[1];
-                    live_points[2] = possible_live_pts[2];
-
-                    live_idx = 2;
-                    live_command = Type.CURVE;
-                    edit_model.set_live_points (live_points, 3);
-                }
-            }
-
-            if (instance.components.path.data.length == 0) {
-                // Sometimes the line from live effect rendered in ViewLayerPath remains even after
-                // all points have been deleted. Erase this line.
-                var update_extents = Geometry.Rectangle ();
-                update_extents.left = instance.components.center.x;
-                update_extents.top = instance.components.center.y;
-                update_extents.right = live_points[0].x;
-                update_extents.bottom = live_points[0].y;
-
-                view_canvas.request_redraw (update_extents);
-
-                // If there are no points in the path, no point to stay in PathEditMode.
-                view_canvas.window.event_bus.delete_selected_items ();
-                view_canvas.mode_manager.deregister_active_mode ();
-            }
-
+            // We are triggering the escape signal because after joining the path,
+            // no more points can be added. So this mode must end.
+            view_canvas.window.event_bus.request_escape ();
             return true;
         }
+
         return false;
     }
 
@@ -292,4 +256,52 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
 
         return Geometry.Point (x, y);
     }
+
+    private void handle_backspace_event () {
+        if (live_idx > 0) {
+            --live_idx;
+
+            // Note that for curve, there are 2 tangent points that depend on each other.
+            // If one of them gets deleted, delete the other too. This leaves only 1 live point.
+            // So the live command becomes LINE.
+            if (live_idx == 1 && live_command == CURVE) {
+                live_command = Type.LINE;
+                live_idx = 0;
+            }
+
+            edit_model.set_live_points (live_points, live_idx + 1);
+        } else {
+            var possible_live_pts = edit_model.delete_last_point ();
+
+            if (possible_live_pts == null || possible_live_pts.length == 0) {
+                live_idx = -1;
+                live_command = Type.LINE;
+            } else {
+                live_points[0] = possible_live_pts[0];
+                live_points[1] = possible_live_pts[1];
+                live_points[2] = possible_live_pts[2];
+
+                live_idx = 2;
+                live_command = Type.CURVE;
+                edit_model.set_live_points (live_points, 3);
+            }
+        }
+
+        if (instance.components.path.data.length == 0) {
+            // Sometimes the line from live effect rendered in ViewLayerPath remains even after
+            // all points have been deleted. Erase this line.
+            var update_extents = Geometry.Rectangle ();
+            update_extents.left = instance.components.center.x;
+            update_extents.top = instance.components.center.y;
+            update_extents.right = live_points[0].x;
+            update_extents.bottom = live_points[0].y;
+
+            view_canvas.request_redraw (update_extents);
+
+            // If there are no points in the path, no point to stay in PathEditMode.
+            view_canvas.window.event_bus.delete_selected_items ();
+            view_canvas.mode_manager.deregister_active_mode ();
+        }
+    }
+
 }
