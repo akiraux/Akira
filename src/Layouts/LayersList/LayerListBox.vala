@@ -72,6 +72,11 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
                 return;
             }
 
+            // TODO: We don't currently support multi selection on layers, so
+            // force the deselection of all current items.
+            layer_selected (null);
+
+            // Now select the clicked layer.
             layer_selected (((LayerItemModel) row).node);
         });
 
@@ -102,6 +107,9 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
         var item = new LayerItemModel (node, service_uid);
         layers[service_uid] = item;
         list_store.add (item);
+
+        // Select the newly created layer.
+        model.set_item_selected (item, true);
     }
 
     private void on_item_added (int id) {
@@ -111,6 +119,8 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
             return;
         }
 
+        // Unselect all layers before adding a new one.
+        model.unselect_all ();
         add_layer_item (node_instance);
     }
 
@@ -133,7 +143,7 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
      * Triggers the update of the list store and refresh of the UI to show the
      * newly added items that are currently visible.
      */
-    public void refresh_list (int added) {
+    public void show_added_layers (int added) {
         list_store.items_changed (0, 0, added);
     }
 

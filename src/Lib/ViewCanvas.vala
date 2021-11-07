@@ -684,6 +684,11 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
     }
 
     public void on_layer_selected (Lib.Items.ModelInstance? node) {
+        if (node == null) {
+            selection_manager.reset_selection ();
+            return;
+        }
+
         selection_manager.add_to_selection (node.id);
 
         if (mode_manager.active_mode_type != Lib.Modes.AbstractInteractionMode.ModeType.TRANSFORM) {
