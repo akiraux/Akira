@@ -25,6 +25,22 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
         CURVE
     }
 
+    // We are using this to check what kind of point was selected.
+    public enum PointType {
+        // This means no point was selected.
+        NONE,
+        // This point signifies a simple line end.
+        LINE_END,
+        // This is the first point you draw in a curve.
+        CURVE_BEGIN,
+        // This denotes one end of the tangent.
+        TANGENT_FIRST,
+        // This is the other end of the tangent.
+        TANGENT_SECOND,
+        // This is the last point of the curve.
+        CURVE_END
+    }
+
     public weak Lib.ViewCanvas view_canvas { get; construct; }
     public Lib.Items.ModelInstance instance { get; construct; }
     private Models.PathEditModel edit_model;
@@ -125,35 +141,88 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
         if (is_edit_path) {
             int[] index = new int[3];
             index[0] = index[1] = index[2] = -1;
-            var is_selected = edit_model.hit_test (event.x, event.y, ref index);
+
+            var sel_type = edit_model.hit_test (event.x, event.y, ref index);
+
             bool is_shift = (event.state == Gdk.ModifierType.SHIFT_MASK);
+            bool is_alt = (event.state == Gdk.ModifierType.MOD1_MASK);
 
-            if (is_selected) {
+            // If no point was selected, then just get out. Don't do anything.
+            if (sel_type == PointType.NONE) {
+                edit_model.set_selected_points (-1);
+                return false;
+            }
+
+            if (sel_type == PointType.LINE_END || 
+                sel_type == PointType.CURVE_BEGIN || 
+                sel_type == PointType.CURVE_END
+            ) {
+                // If the selected point already exists, then set it as the reference point.
+                if (edit_model.selected_pts.contains (index[0])) {
+                    edit_model.reference_point = index[0];
+                    is_click = true;
+                    return true;
+                }
+
+                // If shift was clicked, then append the points to selection
                 if (is_shift) {
-                    // If a point was selected, and shift key was pressed,
-                    // Then append this point to the array of selected points.
-                    for (int i = 0; i < 3 && index[i] != -1; ++i) {
-                        edit_model.set_selected_points (index[i], true);
-                    }
-                } else {
-                    // If a point was selected, but the shift key was not pressed,
-                    // Then first check if this point already exists in the selected array.
-                    // If it does, it means we are using this point as a reference
-                    // For moving the other points.
-                    if (edit_model.selected_pts.contains (index[0])) {
-                        edit_model.reference_point = index[0];
-                    } else {
-                        edit_model.selected_pts.clear ();
-
-                        // Otherwise, clear the array of selected points and then add this point.
-                        for (int i = 0; i < 3 && index[i] != -1; ++i) {
+                    for (int i = 0; i < 3; ++i) {
+                        if (index[i] != -1) {
                             edit_model.set_selected_points (index[i], true);
-                            edit_model.reference_point = index[0];
                         }
                     }
+                } else {
+                    // If shift was not used, the clear the selection, then append the points to selection.
+                    // This is because, with CURVE_BEGIN, we are also adding TANGENT_FIRST and TANGENT_SECOND
+                    edit_model.selected_pts.clear ();
+
+                    for (int i = 0; i < 3; ++i) {
+                        if (index[i] != -1) {
+                            edit_model.set_selected_points (index[i], true);
+                        }
+                    }
+
+                    edit_model.reference_point = index[0];
                 }
-            } else {
-                edit_model.set_selected_points (-1);
+            }
+
+            if (sel_type == PointType.TANGENT_FIRST || sel_type == PointType.TANGENT_SECOND) {
+                if (!is_alt) {
+                    if (sel_type == PointType.TANGENT_FIRST && edit_model.selected_pts.contains (index[0])) {
+                        edit_model.reference_point = index[0];
+                        is_click = true;
+                        return true;
+                    } else if (sel_type == PointType.TANGENT_SECOND && edit_model.selected_pts.contains (index[1])) {
+                        edit_model.reference_point = index[1];
+                        is_click = true;
+                        return true;
+                    }
+                }
+                
+                if (is_shift) {
+                    // Add only the selected point to the selection.
+                    if (sel_type == PointType.TANGENT_FIRST) {
+                        edit_model.set_selected_points (index[0], true);
+                    } else {
+                        edit_model.set_selected_points (index[1], true);
+                    }
+                } else if (is_alt) {
+                    // Add only the selected point to the selection.
+                    if (sel_type == PointType.TANGENT_FIRST) {
+                        edit_model.set_selected_points (index[0], false);
+                        edit_model.reference_point = index[0];
+                    } else {
+                        edit_model.set_selected_points (index[1], false);
+                        edit_model.reference_point = index[1];
+                    }
+                } else {
+                    edit_model.selected_pts.clear ();
+
+                    edit_model.set_selected_points (index[0], true);
+                    edit_model.set_selected_points (index[1], true);
+
+                    edit_model.reference_point = index[0];
+                }
             }
 
             is_click = true;
@@ -303,5 +372,4 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
             view_canvas.mode_manager.deregister_active_mode ();
         }
     }
-
 }

@@ -134,15 +134,15 @@ public class Akira.Models.PathEditModel : Object {
      * Returns true if clicked, false otherwise.
      * If a point was clicked, index refers to its location.
      */
-    public bool hit_test (double x, double y, ref int[] index) {
+    public Lib.Modes.PathEditMode.PointType hit_test (double x, double y, ref int[] index) {
         Geometry.Point point = Geometry.Point (x, y);
 
         int j = 0;
-        for (int i = 0; i < commands.length; ++i) {
+        for (int i = 0; i < commands.length + 1; ++i) {
             if (commands[i] == Lib.Modes.PathEditMode.Type.LINE) {
                 if (compare_points (points[j], point)) {
                     index[0] = j;
-                    return true;
+                    return Lib.Modes.PathEditMode.PointType.LINE_END;
                 }
 
                 ++j;
@@ -154,19 +154,32 @@ public class Akira.Models.PathEditModel : Object {
                     index[0] = j;
                     index[1] = j + 1;
                     index[2] = j + 2;
-                    return true;
+                    return Lib.Modes.PathEditMode.PointType.CURVE_BEGIN;
                 }
 
-                for (int k = 1; k < 4; ++k) {
-                    if (compare_points (points[j + k], point)) {
-                        index[0] = j + k;
-                        return true;
-                    }
+                // If either of the tangent points is selected and moved,
+                // then the other needs to be rotated too.
+                if (compare_points (points[j + 1], point)) {
+                    index[0] = j + 1;
+                    index[1] = j + 2;
+                    return Lib.Modes.PathEditMode.PointType.TANGENT_FIRST;
                 }
+
+                if (compare_points (points[j + 2], point)) {
+                    index[0] = j + 1;
+                    index[1] = j + 2;
+                    return Lib.Modes.PathEditMode.PointType.TANGENT_SECOND;
+                }
+
+                if (compare_points (points[j + 3], point)) {
+                    index[0] = j + 3;
+                    return Lib.Modes.PathEditMode.PointType.CURVE_END;
+                }
+                j += 4;
             }
         }
 
-        return false;
+        return Lib.Modes.PathEditMode.PointType.NONE;
     }
 
     /*
