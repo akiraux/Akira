@@ -77,13 +77,6 @@ public class Akira.Layouts.Sidebars.LayersSidebar : Gtk.Grid {
         };
         layers_scroll.add (layers_listbox);
 
-        var scrolled_child = layers_scroll.get_child ();
-        if (scrolled_child is Gtk.Container) {
-           ((Gtk.Container) scrolled_child).set_focus_vadjustment (
-               new Gtk.Adjustment (0, 0, 0, 0, 0, 0)
-            );
-        }
-
         // Motion revealer for Drag and Drop on the top search bar.
         var motion_grid = new Gtk.Grid ();
         motion_grid.get_style_context ().add_class ("grid-motion");

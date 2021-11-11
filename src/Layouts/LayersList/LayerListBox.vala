@@ -26,7 +26,6 @@
  */
 public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
     public signal void layer_selected (Lib.Items.ModelInstance? node);
-    public signal void layer_focused (Lib.Items.ModelInstance? node);
 
     public unowned Akira.Lib.ViewCanvas view_canvas { get; construct; }
 
@@ -58,14 +57,6 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
 
             return row;
         };
-
-        row_activated.connect ((row) => {
-            if (row == null) {
-                layer_focused (null);
-                return;
-            }
-            layer_focused (((LayerItemModel) row).node);
-        });
 
         row_selected.connect ((row) => {
             // if (row == null) {
@@ -111,9 +102,6 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
             return;
         }
 
-        // Unselect all layers before adding a new one.
-        model.unselect_all ();
-
         var service_uid = node_instance.id;
         var item = new LayerItemModel (node_instance, service_uid);
         layers[service_uid] = item;
@@ -121,6 +109,7 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
     }
 
     private void on_selection_changed () {
+        warning ("on_selection_changed");
         var sm = view_canvas.selection_manager;
         if (sm.is_empty ()) {
             unselect_all ();

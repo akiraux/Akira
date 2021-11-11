@@ -91,6 +91,9 @@ public class VirtualizingListBox : Gtk.Container, Gtk.Scrollable {
         }
     }
 
+    // The default height of a row, used to trigger an initial scroll adjustment.
+    private double? default_widget_height = null;
+
     public VirtualizingListBoxRow? selected_row_widget {
         get {
             var item = selected_row;
@@ -173,9 +176,9 @@ public class VirtualizingListBox : Gtk.Container, Gtk.Scrollable {
 
         if (get_realized ()) {
             get_window ().move_resize (allocation.x,
-                                            allocation.y,
-                                            allocation.width,
-                                            allocation.height);
+                                       allocation.y,
+                                       allocation.width,
+                                       allocation.height);
             update_bin_window ();
         }
 
@@ -265,6 +268,11 @@ public class VirtualizingListBox : Gtk.Container, Gtk.Scrollable {
     private int get_widget_height (Gtk.Widget w) {
         int min;
         w.get_preferred_height_for_width (get_allocated_width (), out min, null);
+
+        // Store the height of a row widget as soon as we fetch the first one.
+        if (default_widget_height == null) {
+            default_widget_height = min;
+        }
         return min;
     }
 
@@ -511,6 +519,8 @@ public class VirtualizingListBox : Gtk.Container, Gtk.Scrollable {
         update_bin_window (bin_height);
         position_children ();
         queue_draw ();
+
+        warning ("ensure_visible_widgets");
     }
 
     private int estimated_widget_height () {
@@ -639,11 +649,10 @@ public class VirtualizingListBox : Gtk.Container, Gtk.Scrollable {
 
     private void on_multipress_released (int n_press, double x, double y) {
         if (active_row != null) {
-            var focus_on_click = active_row.focus_on_click;
             active_row.unset_state_flags (Gtk.StateFlags.ACTIVE);
 
             if (n_press == 1 && activate_on_single_click) {
-                select_and_activate (active_row, focus_on_click);
+                select_and_activate (active_row);
             } else {
                 bool modify, extend;
                 get_current_selection_modifiers (out modify, out extend);
@@ -655,14 +664,12 @@ public class VirtualizingListBox : Gtk.Container, Gtk.Scrollable {
                     modify = !modify;
                 }
 
-                update_selection (active_row, modify, extend, focus_on_click);
+                update_selection (active_row, modify, extend);
             }
         }
     }
 
-    private void update_selection (VirtualizingListBoxRow row, bool modify, bool extend, bool grab_cursor = true) {
-        update_cursor (row.model_item, grab_cursor);
-
+    private void update_selection (VirtualizingListBoxRow row, bool modify, bool extend) {
         if (selection_mode == Gtk.SelectionMode.NONE || !row.selectable) {
             return;
         }
@@ -730,17 +737,9 @@ public class VirtualizingListBox : Gtk.Container, Gtk.Scrollable {
         }
     }
 
-    private void select_and_activate (VirtualizingListBoxRow row, bool grab_focus = true) {
+    private void select_and_activate (VirtualizingListBoxRow row) {
         select_row (row);
-        update_cursor (row.model_item, grab_focus);
         row_activated (row.model_item);
-    }
-
-    public void update_cursor (GLib.Object item, bool grab_focus) {
-        var row = ensure_index_visible (model.get_index_of (item));
-        if (row != null && grab_focus) {
-            row.grab_focus ();
-        }
     }
 
     private VirtualizingListBoxRow? ensure_index_visible (int index) {
@@ -755,6 +754,7 @@ public class VirtualizingListBox : Gtk.Container, Gtk.Scrollable {
         }
 
         if (index == 0) {
+            warning ("TOP INDEX");
             set_value (0.0);
             ensure_visible_widgets ();
             foreach (VirtualizingListBoxRow row in current_widgets) {
@@ -765,6 +765,7 @@ public class VirtualizingListBox : Gtk.Container, Gtk.Scrollable {
         }
 
         if (index == index_max) {
+            warning ("BOTTOM INDEX");
             set_value (vadjustment.upper);
             ensure_visible_widgets ();
             foreach (VirtualizingListBoxRow row in current_widgets) {
@@ -774,14 +775,22 @@ public class VirtualizingListBox : Gtk.Container, Gtk.Scrollable {
             }
         }
 
+        // If the list was never scrolled or is at top position, we need to force
+        // the scroll of at least one row widget to ensure all adjustment calculations
+        // have run. This might happen when loading a saved file, which generates
+        // multiple items at once without actually triggering any scroll.
+        if (vadjustment.value == 0.0) {
+            set_value (default_widget_height);
+        }
+
         while (index <= shown_from) {
             vadjustment.value--;
-            ensure_visible_widgets ();
+            // ensure_visible_widgets ();
         }
 
         while (index + 1 >= shown_to) {
             vadjustment.value++;
-            ensure_visible_widgets ();
+            // ensure_visible_widgets ();
         }
 
         foreach (VirtualizingListBoxRow row in current_widgets) {
