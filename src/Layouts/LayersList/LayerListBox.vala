@@ -41,6 +41,7 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
         activate_on_single_click = true;
         layers = new Gee.HashMap<int, LayerItemModel> ();
         list_store = new LayerListStore ();
+        // list_store.set_sort_func (layers_sort_function);
 
         model = list_store;
 
@@ -67,17 +68,17 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
         });
 
         row_selected.connect ((row) => {
-            if (row == null) {
-                layer_selected (null);
-                return;
-            }
+            // if (row == null) {
+            //     layer_selected (null);
+            //     return;
+            // }
 
             // TODO: We don't currently support multi selection on layers, so
             // force the deselection of all current items.
-            layer_selected (null);
+            // layer_selected (null);
 
             // Now select the clicked layer.
-            layer_selected (((LayerItemModel) row).node);
+            // layer_selected (((LayerItemModel) row).node);
         });
 
         button_release_event.connect ((e) => {
@@ -100,16 +101,7 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
         });
 
         view_canvas.items_manager.item_model.item_added.connect (on_item_added);
-    }
-
-    private void add_layer_item (Lib.Items.ModelInstance node) {
-        var service_uid = node.id;
-        var item = new LayerItemModel (node, service_uid);
-        layers[service_uid] = item;
-        list_store.add (item);
-
-        // Select the newly created layer.
-        model.set_item_selected (item, true);
+        view_canvas.window.event_bus.selection_modified.connect (on_selection_changed);
     }
 
     private void on_item_added (int id) {
@@ -121,7 +113,24 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
 
         // Unselect all layers before adding a new one.
         model.unselect_all ();
-        add_layer_item (node_instance);
+
+        var service_uid = node_instance.id;
+        var item = new LayerItemModel (node_instance, service_uid);
+        layers[service_uid] = item;
+        list_store.add (item);
+    }
+
+    private void on_selection_changed () {
+        var sm = view_canvas.selection_manager;
+        if (sm.is_empty ()) {
+            unselect_all ();
+            return;
+        }
+
+        // TODO: Handle multi selection. For now we're only grabbing the first
+        // item in the selection map.
+        int id = sm.selection.first_node ().id;
+        select_row_at_index (model.get_index_of (layers[id]));
     }
 
     private bool create_context_menu (Gdk.Event e, LayerListItem row) {
@@ -160,4 +169,8 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
 
         list_store.items_changed (0, removed, 0);
     }
+
+    // private static int layers_sort_function (LayerItemModel layer1, LayerItemModel layer2) {
+    //     return (int)(layer2.id - layer1.id);
+    // }
 }

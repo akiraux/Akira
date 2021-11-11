@@ -31,7 +31,6 @@ public class VirtualizingListBox : Gtk.Container, Gtk.Scrollable {
 
     public signal void row_activated (GLib.Object row);
     public signal void row_selected (GLib.Object row);
-    public signal void selected_rows_changed ();
 
     private VirtualizingListBoxModel? _model;
     public VirtualizingListBoxModel? model {
@@ -557,8 +556,9 @@ public class VirtualizingListBox : Gtk.Container, Gtk.Scrollable {
     }
 
     private void set_value (double v) {
-        if (v == vadjustment.value)
+        if (v == vadjustment.value) {
             return;
+        }
 
         block = true;
         vadjustment.value = v;
@@ -807,7 +807,10 @@ public class VirtualizingListBox : Gtk.Container, Gtk.Scrollable {
         selected_row = row.model_item;
 
         row_selected (row.model_item);
-        selected_rows_changed ();
+    }
+
+    protected void unselect_all () {
+        unselect_all_internal ();
     }
 
     private bool unselect_all_internal () {

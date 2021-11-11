@@ -29,6 +29,11 @@ public class Akira.Layouts.LayersList.LayerItemModel : GLib.Object {
     public int service_uid { get; construct; }
     public unowned Lib.Items.ModelInstance? node;
 
+    public int id {
+        get {
+            return node.id;
+        }
+    }
     /*
      * Control the name of the item.
      */
