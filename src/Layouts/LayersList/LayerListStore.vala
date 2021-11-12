@@ -80,11 +80,11 @@ public class Akira.Layouts.LayersList.LayerListStore : VirtualizingListBoxModel 
         }
     }
 
-    public void add (LayerItemModel data) {
+    public void add (LayerItemModel model) {
         if (compare_func != null) {
-            this.data.insert_sorted (data, compare_func);
+            this.data.insert_sorted (model, compare_func);
         } else {
-            this.data.append (data);
+            this.data.append (model);
         }
 
         last_iter = null;

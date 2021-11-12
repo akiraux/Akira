@@ -110,17 +110,24 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
     }
 
     private void on_selection_modified () {
-        // print ("on_selection_modified\n");
-        // var sm = view_canvas.selection_manager;
-        // if (sm.is_empty ()) {
-        //     unselect_all ();
-        //     return;
-        // }
+        print ("on_selection_modified\n");
+        var sm = view_canvas.selection_manager;
+        if (sm.is_empty ()) {
+            unselect_all ();
+            return;
+        }
 
-        // // TODO: Handle multi selection. For now we're only grabbing the first
-        // // item in the selection map.
-        // int id = sm.selection.first_node ().id;
-        // select_row_at_index (model.get_index_of (layers[id]));
+        // A bit hacky but I don't know how to fix this. Since we're adding the
+        // new layer on top, the index is always 0 for newly generated layers.
+        // That means the selection changes happens so fast that it tries to select
+        // the row on index 0 while a new row is being added at index 0. Without
+        // the timeout, the app crashes.
+        Timeout.add (0, () => {
+            foreach (var node in sm.selection.nodes.values) {
+                select_row_at_index (model.get_index_of (layers[node.node.id]));
+            }
+            return false;
+        });
     }
 
     private bool create_context_menu (Gdk.Event e, LayerListItem row) {
