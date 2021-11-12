@@ -40,6 +40,7 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
     public Lib.Managers.NobManager nob_manager;
     public Lib.Managers.SnapManager snap_manager;
     public Lib.Managers.CopyManager copy_manager;
+    public Lib.Managers.GuideManager guide_manager;
 
     public bool ctrl_is_pressed = false;
     public bool shift_is_pressed = false;
@@ -52,6 +53,7 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
     private Gdk.CursorType current_cursor = Gdk.CursorType.ARROW;
 
     private ViewLayers.ViewLayerGrid grid_layout;
+    public ViewLayers.ViewLayerGuide guide_layer;
 
     // Keep track of the initial coords of the press event.
     private double initial_event_x;
@@ -84,6 +86,7 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
         nob_manager = new Lib.Managers.NobManager (this);
         snap_manager = new Lib.Managers.SnapManager (this);
         copy_manager = new Lib.Managers.CopyManager (this);
+        guide_manager = new Lib.Managers.GuideManager (this);
 
         grid_layout = new ViewLayers.ViewLayerGrid (
             0,
@@ -94,6 +97,8 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
 
         grid_layout.add_to_canvas (ViewLayers.ViewLayer.GRID_LAYER_ID, this);
         grid_layout.set_visible (true);
+
+        guide_layer = new ViewLayers.ViewLayerGuide ();
 
         set_model_to_render (items_manager.item_model);
 
@@ -214,6 +219,10 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
         }
 
         if (mode_manager.key_press_event (event)) {
+            return true;
+        }
+
+        if (guide_manager.key_press_event (event)) {
             return true;
         }
 

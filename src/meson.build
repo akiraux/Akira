@@ -72,6 +72,7 @@ sources = files(
     'ViewLayers/ViewLayerHover.vala',
     'ViewLayers/ViewLayerGrid.vala',
     'ViewLayers/ViewLayerPath.vala',
+    'ViewLayers/ViewLayerGuide.vala',
 
     #'Models/ColorModel.vala',
     #'Models/ExportModel.vala',
@@ -128,6 +129,7 @@ sources = files(
     'Lib/Managers/HoverManager.vala',
     'Lib/Managers/SelectionManager.vala',
     'Lib/Managers/SnapManager.vala',
+    'Lib/Managers/GuideManager.vala',
 
     'Lib/Modes/AbstractInteractionMode.vala',
     'Lib/Modes/TransformMode.vala',
