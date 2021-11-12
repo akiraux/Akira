@@ -116,7 +116,7 @@ public class Akira.Layouts.RightSideBar : Gtk.Grid {
         search.focus_out_event.connect (handle_focus_out);
 
         search.activate.connect (() => {
-            warning ("search");
+            print ("search\n");
         });
 
         var search_grid = new Gtk.Grid ();

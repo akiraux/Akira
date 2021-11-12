@@ -520,7 +520,7 @@ public class VirtualizingListBox : Gtk.Container, Gtk.Scrollable {
         position_children ();
         queue_draw ();
 
-        warning ("ensure_visible_widgets");
+        print ("ensure_visible_widgets\n");
     }
 
     private int estimated_widget_height () {
@@ -754,7 +754,7 @@ public class VirtualizingListBox : Gtk.Container, Gtk.Scrollable {
         }
 
         if (index == 0) {
-            warning ("TOP INDEX");
+            print ("TOP INDEX\n");
             set_value (0.0);
             ensure_visible_widgets ();
             foreach (VirtualizingListBoxRow row in current_widgets) {
@@ -765,7 +765,7 @@ public class VirtualizingListBox : Gtk.Container, Gtk.Scrollable {
         }
 
         if (index == index_max) {
-            warning ("BOTTOM INDEX");
+            print ("BOTTOM INDEX\n");
             set_value (vadjustment.upper);
             ensure_visible_widgets ();
             foreach (VirtualizingListBoxRow row in current_widgets) {

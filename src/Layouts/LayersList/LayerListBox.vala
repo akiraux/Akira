@@ -92,10 +92,11 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
         });
 
         view_canvas.items_manager.item_model.item_added.connect (on_item_added);
-        view_canvas.window.event_bus.selection_modified.connect (on_selection_changed);
+        view_canvas.selection_manager.selection_modified.connect (on_selection_modified);
     }
 
     private void on_item_added (int id) {
+        print ("on_item_added\n");
         var node_instance = view_canvas.items_manager.instance_from_id (id);
         // No need to add any layer if we don't have an instance.
         if (node_instance == null) {
@@ -108,8 +109,8 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
         list_store.add (item);
     }
 
-    private void on_selection_changed () {
-        warning ("on_selection_changed");
+    private void on_selection_modified () {
+        print ("on_selection_modified\n");
         var sm = view_canvas.selection_manager;
         if (sm.is_empty ()) {
             unselect_all ();
