@@ -236,6 +236,7 @@ public class VirtualizingListBox : Gtk.Container, Gtk.Scrollable {
     }
 
     private void on_items_changed (uint position, uint removed, uint added) {
+        print ("on_items_changed\n");
         if (position >= shown_to && bin_window_full) {
             if (vadjustment == null) {
                 queue_resize ();

@@ -40,7 +40,7 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
         activate_on_single_click = true;
         layers = new Gee.HashMap<int, LayerItemModel> ();
         list_store = new LayerListStore ();
-        // list_store.set_sort_func (layers_sort_function);
+        list_store.set_sort_func (layers_sort_function);
 
         model = list_store;
 
@@ -96,7 +96,6 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
     }
 
     private void on_item_added (int id) {
-        print ("on_item_added\n");
         var node_instance = view_canvas.items_manager.instance_from_id (id);
         // No need to add any layer if we don't have an instance.
         if (node_instance == null) {
@@ -107,20 +106,21 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
         var item = new LayerItemModel (node_instance, service_uid);
         layers[service_uid] = item;
         list_store.add (item);
+        print ("on_item_added: %i\n", service_uid);
     }
 
     private void on_selection_modified () {
-        print ("on_selection_modified\n");
-        var sm = view_canvas.selection_manager;
-        if (sm.is_empty ()) {
-            unselect_all ();
-            return;
-        }
+        // print ("on_selection_modified\n");
+        // var sm = view_canvas.selection_manager;
+        // if (sm.is_empty ()) {
+        //     unselect_all ();
+        //     return;
+        // }
 
-        // TODO: Handle multi selection. For now we're only grabbing the first
-        // item in the selection map.
-        int id = sm.selection.first_node ().id;
-        select_row_at_index (model.get_index_of (layers[id]));
+        // // TODO: Handle multi selection. For now we're only grabbing the first
+        // // item in the selection map.
+        // int id = sm.selection.first_node ().id;
+        // select_row_at_index (model.get_index_of (layers[id]));
     }
 
     private bool create_context_menu (Gdk.Event e, LayerListItem row) {
@@ -160,7 +160,7 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
         list_store.items_changed (0, removed, 0);
     }
 
-    // private static int layers_sort_function (LayerItemModel layer1, LayerItemModel layer2) {
-    //     return (int)(layer2.id - layer1.id);
-    // }
+    private static int layers_sort_function (LayerItemModel layer1, LayerItemModel layer2) {
+        return (int)(layer2.id - layer1.id);
+    }
 }
