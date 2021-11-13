@@ -59,14 +59,10 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
         };
 
         row_selected.connect ((row) => {
-            // if (row == null) {
-            //     layer_selected (null);
-            //     return;
-            // }
-
-            // TODO: We don't currently support multi selection on layers, so
-            // force the deselection of all current items.
-            // layer_selected (null);
+            if (row == null) {
+                // layer_selected (null);
+                return;
+            }
 
             // Now select the clicked layer.
             // layer_selected (((LayerItemModel) row).node);
@@ -102,6 +98,8 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
             return;
         }
 
+        // FIX TODO: For some reason, a cloned item (copied and pasted) doesn't
+        // trigger the items_changed signal of the list store.
         var service_uid = node_instance.id;
         var item = new LayerItemModel (node_instance, service_uid);
         layers[service_uid] = item;
