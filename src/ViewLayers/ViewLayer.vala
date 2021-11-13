@@ -29,6 +29,7 @@ public class Akira.ViewLayers.ViewLayer : Object {
     // so they have equal priority
     public const string NOBS_LAYER_ID = "66_nobs_layer";
     public const string PATH_LAYER_ID = "66_path_layer";
+    public const string GUIDE_LAYER_ID = "55_guide_layer";
 
 
     private bool _is_visible { get; set; default = false; }

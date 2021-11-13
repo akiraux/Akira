@@ -20,16 +20,73 @@
  */
 
  public class Akira.ViewLayers.ViewLayerGuide : ViewLayer {
-    public void update_guide_data (Lib.Managers.GuideData data) {
+    private Lib.Managers.GuideData guide_data;
 
+    public void update_guide_data (Lib.Managers.GuideData data) {
+        guide_data = data;
         update ();
     }
 
     public override void draw_layer (Cairo.Context context, Geometry.Rectangle target_bounds, double scale) {
+        if (!is_visible || canvas == null) {
+            return;
+        }
 
+        if (guide_data == null) {
+            return;
+        } else {
+            // If neither kind of guides are present, only then exit.
+            if (guide_data.h_guides == null && guide_data.v_guides == null) {
+                return;
+            }
+        }
+
+        if (guide_data.extents.left > target_bounds.right || guide_data.extents.right < target_bounds.left
+            || guide_data.extents.top > target_bounds.bottom || guide_data.extents.bottom < target_bounds.top) {
+            return;
+        }
+
+        draw_lines (context);
     }
 
     public override void update () {
+        if (canvas == null || guide_data == null) {
+            return;
+        } else if (guide_data != null) {
+            if (guide_data.h_guides == null && guide_data.v_guides == null) {
+                return;
+            }
+        }
 
+        // Optimize this part. Update extents for each line individually.
+        //  canvas.request_redraw (old_live_extents);
+        canvas.request_redraw (guide_data.extents);
+    }
+
+    private void draw_lines (Cairo.Context context) {
+
+        context.save ();
+
+        context.new_path ();
+        context.set_source_rgba (0.5, 0.5, 0.5, 1);
+        context.set_line_width (1.0 / canvas.scale);
+        
+        if (guide_data.h_guides != null) {
+            foreach (var line in guide_data.h_guides) {
+                context.move_to (0, line);
+                context.line_to (10000, line);
+            }
+        }
+
+        if (guide_data.v_guides != null) {
+            foreach (var line in guide_data.v_guides) {
+                context.move_to (line, 0);
+                context.line_to (line, 10000);
+            }
+        }
+
+        context.stroke ();
+        context.new_path ();
+        context.restore ();
     }
  }

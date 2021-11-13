@@ -27,7 +27,10 @@
     }
 
     public unowned Lib.ViewCanvas view_canvas { get; construct; }
+
     private GuideData guide_data;
+
+    private Geometry.Point current_cursor;
 
     public GuideManager (Lib.ViewCanvas view_canvas) {
         Object (
@@ -35,26 +38,20 @@
         );
 
         guide_data = new GuideData ();
+
+        view_canvas.scroll_event.connect (on_scroll);
     }
 
      public bool key_press_event (Gdk.EventKey event) {
         uint uppercase_keyval = Gdk.keyval_to_upper (event.keyval);
 
         if (uppercase_keyval == Gdk.Key.Q) {
-            print("press q\n");
-            int x_pos = 0, y_pos = 0;
-            get_current_pointer_position (out x_pos, out y_pos);
-
-            guide_data.add_h_guide (y_pos);
+            guide_data.add_h_guide (current_cursor.y);
             view_canvas.guide_layer.update_guide_data (guide_data);
 
             return true;
         } else if (uppercase_keyval == Gdk.Key.W) {
-            print("press w\n");
-            int x_pos = 0, y_pos = 0;
-            get_current_pointer_position (out x_pos, out y_pos);
-
-            guide_data.add_v_guide (x_pos);
+            guide_data.add_v_guide (current_cursor.x);
             view_canvas.guide_layer.update_guide_data (guide_data);
 
             return true;
@@ -76,16 +73,20 @@
     }
 
     public bool motion_notify_event (Gdk.EventMotion event) {
+        // Here, we just want to get the cursor position,
+        // so we allow the event to propogate further by returning true.
+        current_cursor = Geometry.Point (event.x, event.y);
         return false;
     }
 
-    private void get_current_pointer_position (out int x_pos, out int y_pos) {
-        var display = Gdk.Display.get_default ();
-        var seat = display.get_default_seat ();
-        var mouse = seat.get_pointer ();
+    private bool on_scroll (Gdk.EventScroll event) {
+        double delta_x, delta_y;
+        event.get_scroll_deltas (out delta_x, out delta_y);
 
-        var window = display.get_default_group ();
-        window.get_device_position (mouse, out x_pos, out y_pos, null);
+        current_cursor.x += delta_x * 10;
+        current_cursor.y += delta_y * 10;
+
+        return false;
     }
  }
 
@@ -93,17 +94,36 @@
     // Stores the coordinates of horizontal guides.
     // Since a guideline is a straight line (either horizontal or vertical),
     // we only need one coordinate to store a line.
-    public int[] h_guides;
+    public double[] h_guides;
     // Stores the coordinates of vertical guides.
-    public int[] v_guides;
+    public double[] v_guides;
 
-    public void add_h_guide (int pos) {
-        h_guides.resize (h_guides.length + 1);
-        h_guides[h_guides.length - 1] = pos;
+    // Stores the extents of guidelines.that were updated.
+    // Can't save the extents of all guidelines as they may be spread over a large area.
+    public Geometry.Rectangle extents;
+
+    public GuideData () {
+        h_guides = new double[0];
+        v_guides = new double[0];
+
+        extents = Geometry.Rectangle.empty ();
     }
 
-    public void add_v_guide (int pos) {
+    public void add_h_guide (double pos) {
+        h_guides.resize (h_guides.length + 1);
+        h_guides[h_guides.length - 1] = pos;
+        update_extents ();
+    }
+
+    public void add_v_guide (double pos) {
         v_guides.resize (v_guides.length + 1);
         v_guides[v_guides.length - 1] = pos;
+        update_extents ();
+    }
+
+    private void update_extents () {
+        // TODO: Optimize extents here.
+        extents.left = extents.top = 0;
+        extents.right = extents.bottom = 10000;
     }
  }

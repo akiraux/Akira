@@ -99,6 +99,8 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
         grid_layout.set_visible (true);
 
         guide_layer = new ViewLayers.ViewLayerGuide ();
+        guide_layer.add_to_canvas (ViewLayers.ViewLayer.GUIDE_LAYER_ID, this);
+        guide_layer.set_visible (true);
 
         set_model_to_render (items_manager.item_model);
 
@@ -432,6 +434,10 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
         event.y = event.y / current_scale;
 
         if (mode_manager.motion_notify_event (event)) {
+            return true;
+        }
+
+        if (guide_manager.motion_notify_event (event)) {
             return true;
         }
 
