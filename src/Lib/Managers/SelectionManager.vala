@@ -21,6 +21,11 @@
  */
 
 public class Akira.Lib.Managers.SelectionManager : Object {
+    // Signal triggered only when an item is added or removed from the selection
+    // map. This is mostly used to update the UI widgets when the selection
+    // changes and we don't need to listen to the changes in the selection geometry.
+    public signal void selection_modified ();
+
     public unowned ViewCanvas view_canvas { get; construct; }
 
     /*
@@ -69,6 +74,7 @@ public class Akira.Lib.Managers.SelectionManager : Object {
 
         selection = new Lib.Items.NodeSelection (null);
         on_selection_changed (-1);
+        selection_modified ();
     }
 
     public void add_to_selection (int id) {
@@ -78,12 +84,17 @@ public class Akira.Lib.Managers.SelectionManager : Object {
         }
         selection.add_node (node);
         on_selection_changed (-1);
+        selection_modified ();
     }
 
     public bool item_selected (int id) {
         return selection.has_id (id, true);
     }
 
+    /*
+     * Called whenever the selection is changed, including adding and removing
+     * items, and modifying the selection's geometry.
+     */
     public void on_selection_changed (int id) {
         if (block_change_notifications == 0) {
             if (id < 0 || selection.has_id (id, false)) {

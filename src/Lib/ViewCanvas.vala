@@ -277,6 +277,10 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
     }
 
     public override bool button_press_event (Gdk.EventButton event) {
+        // Temporarily grab the focus when clicking on the canvas. This is a
+        // workaround fix for the listbox stealing focus. To be removed.
+        focus_canvas ();
+
         base.button_press_event (event);
 
         hover_manager.remove_hover_effect ();
@@ -677,5 +681,20 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
      */
     private void on_items_removed (GLib.Array<int> ids) {
         window.main_window.remove_layers (ids);
+    }
+
+    public void on_layer_selected (Lib.Items.ModelInstance? node) {
+        if (node == null) {
+            selection_manager.reset_selection ();
+            return;
+        }
+
+        selection_manager.add_to_selection (node.id);
+
+        if (mode_manager.active_mode_type != Lib.Modes.AbstractInteractionMode.ModeType.TRANSFORM) {
+            var new_mode = new Lib.Modes.TransformMode (this, Utils.Nobs.Nob.NONE);
+            mode_manager.register_mode (new_mode);
+            mode_manager.deregister_active_mode ();
+        }
     }
 }

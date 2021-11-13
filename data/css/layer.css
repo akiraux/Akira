@@ -1,6 +1,6 @@
 /* initial status */
 .layer {
-    transition: all 240ms ease;
+    transition: box-shadow 160ms ease;
 }
 
 .layer.transparent {

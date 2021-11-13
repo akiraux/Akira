@@ -416,8 +416,6 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         );
 
         add_item_to_origin (new_rect);
-        // Defer the print of the layer UI after all items have been created.
-        view_canvas.window.main_window.show_added_layers ();
 
         return new_rect;
     }
@@ -464,14 +462,15 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         }
 
         compile_model ();
-        // Defer the print of the layer UI after all items have been created.
-        view_canvas.window.main_window.show_added_layers ();
 
         if (debug_timer) {
             timer.stop ();
             seconds = timer.elapsed (out microseconds);
             print ("Created %u items in %s s\n", num_of, seconds.to_string ());
         }
+
+        // Defer the print of the layer UI after all items have been created.
+        view_canvas.window.main_window.show_added_layers (num_of++);
 
         return group;
     }
@@ -502,6 +501,9 @@ public class Akira.Lib.Managers.ItemsManager : Object {
 
         view_canvas.pause_redraw = false;
         view_canvas.request_redraw (view_canvas.get_bounds ());
+
+        // Defer the print of the layer UI after all items have been created.
+        view_canvas.window.main_window.show_added_layers ((int) num_of);
     }
 
     public void on_item_geometry_changed (int id) {
