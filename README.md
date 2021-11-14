@@ -69,6 +69,7 @@ Once the above mentioned dependencies are resolved, Akira can be compiled &amp; 
 meson build --prefix=/usr -Dprofile=default
 cd build
 ninja && sudo ninja install
+./src/com.github.akiraux.akira
 ```
 
 > _**Note:** Replace the `-Dprofile=default` with `-Dprofile=development` to compile and install Akira in **development** mode where you can make changes._
