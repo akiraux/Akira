@@ -112,7 +112,7 @@ public class VirtualizingListBox : Gtk.Container, Gtk.Scrollable {
     public Gtk.ScrollablePolicy hscroll_policy { get; set; }
     public Gtk.ScrollablePolicy vscroll_policy { get; set; }
     public bool activate_on_single_click { get; set; }
-    public Gtk.SelectionMode selection_mode { get; set; default = Gtk.SelectionMode.SINGLE; }
+    public Gtk.SelectionMode selection_mode { get; set; default = Gtk.SelectionMode.MULTIPLE; }
     private double bin_y_diff { get; private set; }
     public GLib.Object selected_row { get; private set; }
 
@@ -521,7 +521,7 @@ public class VirtualizingListBox : Gtk.Container, Gtk.Scrollable {
         position_children ();
         queue_draw ();
 
-        print ("ensure_visible_widgets\n");
+        // print ("ensure_visible_widgets\n");
     }
 
     private int estimated_widget_height () {
