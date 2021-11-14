@@ -47,6 +47,7 @@
         }
 
         draw_lines (context);
+        draw_highlighted_guides (context);
     }
 
     public override void update () {
@@ -68,7 +69,7 @@
         context.save ();
 
         context.new_path ();
-        context.set_source_rgba (0.5, 0.5, 0.5, 1);
+        context.set_source_rgba (0.6235, 0.1686, 0.4078, 1);
         context.set_line_width (1.0 / canvas.scale);
 
         if (guide_data.h_guides != null) {
@@ -83,6 +84,28 @@
                 context.move_to (line, 0);
                 context.line_to (line, 10000);
             }
+        }
+
+        context.stroke ();
+        context.new_path ();
+        context.restore ();
+    }
+
+    private void draw_highlighted_guides (Cairo.Context context) {
+        context.save ();
+
+        context.new_path ();
+        context.set_source_rgba (0.8705, 0.1921, 0.3882, 1);
+        context.set_line_width (2.0 / canvas.scale);
+
+        if (guide_data.highlight_direction == Lib.Managers.GuideManager.Direction.HORIZONTAL) {
+            var guide = guide_data.h_guides[guide_data.highlight_guide];
+            context.move_to (0, guide);
+            context.line_to (10000, guide);
+        } else if (guide_data.highlight_direction == Lib.Managers.GuideManager.Direction.VERTICAL) {
+            var guide = guide_data.v_guides[guide_data.highlight_guide];
+            context.move_to (guide, 0);
+            context.line_to (guide, 10000);
         }
 
         context.stroke ();

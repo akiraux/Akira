@@ -95,11 +95,21 @@
         if (sel_direction != Direction.NONE) {
             guide_data.update_guide_position (sel_line, sel_direction, current_cursor);
             view_canvas.guide_layer.update_guide_data (guide_data);
-
             return true;
         }
 
-        return false;
+        int highlight_guide;
+        Direction highlight_direction;
+
+        if (guide_data.does_guide_exist_at (current_cursor, out highlight_guide, out highlight_direction)) {
+            guide_data.set_highlighted_guide (highlight_guide, highlight_direction);
+            view_canvas.guide_layer.update_guide_data (guide_data);
+            return true;
+        } else {
+            guide_data.set_highlighted_guide (-1, Direction.NONE);
+            view_canvas.guide_layer.update_guide_data (guide_data);
+            return false;
+        }
     }
 
     private bool on_scroll (Gdk.EventScroll event) {
@@ -125,6 +135,9 @@
     // Can't save the extents of all guidelines as they may be spread over a large area.
     public Geometry.Rectangle extents;
 
+    public int highlight_guide;
+    public GuideManager.Direction highlight_direction;
+
     public GuideData () {
         h_guides = new Gee.ArrayList<double?> ();
         v_guides = new Gee.ArrayList<double?> ();
@@ -140,6 +153,11 @@
     public void add_v_guide (double pos) {
         v_guides.add (pos);
         update_extents ();
+    }
+
+    public void set_highlighted_guide (int guide, GuideManager.Direction direction) {
+        highlight_guide = guide;
+        highlight_direction = direction;
     }
 
     public bool does_guide_exist_at (Geometry.Point point, out int sel_line, out GuideManager.Direction sel_direction) {
