@@ -30,7 +30,7 @@ public class VirtualizingListBox : Gtk.Container, Gtk.Scrollable {
     public RowFactoryMethod factory_func;
 
     public signal void row_activated (GLib.Object row);
-    public signal void row_selected (GLib.Object row);
+    public signal void row_selected (GLib.Object? row);
 
     private VirtualizingListBoxModel? _model;
     public VirtualizingListBoxModel? model {
@@ -649,24 +649,27 @@ public class VirtualizingListBox : Gtk.Container, Gtk.Scrollable {
     }
 
     private void on_multipress_released (int n_press, double x, double y) {
-        if (active_row != null) {
-            active_row.unset_state_flags (Gtk.StateFlags.ACTIVE);
+        if (active_row == null) {
+            row_selected (null);
+            return;
+        }
 
-            if (n_press == 1 && activate_on_single_click) {
-                select_and_activate (active_row);
-            } else {
-                bool modify, extend;
-                get_current_selection_modifiers (out modify, out extend);
-                var sequence = multipress.get_current_sequence ();
-                var event = multipress.get_last_event (sequence);
-                var source = event.get_source_device ().get_source ();
+        active_row.unset_state_flags (Gtk.StateFlags.ACTIVE);
 
-                if (source == Gdk.InputSource.TOUCHSCREEN) {
-                    modify = !modify;
-                }
+        if (n_press == 1 && activate_on_single_click) {
+            select_and_activate (active_row);
+        } else {
+            bool modify, extend;
+            get_current_selection_modifiers (out modify, out extend);
+            var sequence = multipress.get_current_sequence ();
+            var event = multipress.get_last_event (sequence);
+            var source = event.get_source_device ().get_source ();
 
-                update_selection (active_row, modify, extend);
+            if (source == Gdk.InputSource.TOUCHSCREEN) {
+                modify = !modify;
             }
+
+            update_selection (active_row, modify, extend);
         }
     }
 

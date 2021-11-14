@@ -42,6 +42,9 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
 
         model = list_store;
 
+        // Factory function to reuse the already generated row UI element when
+        // a new layer is created or the layers list scrolls to reveal layers
+        // outside of the viewport.
         factory_func = (item, old_widget) => {
             LayerListItem? row = null;
             if (old_widget != null) {
@@ -57,9 +60,11 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
         };
 
         row_selected.connect ((row) => {
-            layer_selected (((LayerItemModel) row).node);
+            layer_selected (row != null ? ((LayerItemModel) row).node : null);
         });
 
+        // Listed to the button release event only for the secondary click in
+        // order to trigger the context menu.
         button_release_event.connect ((e) => {
             if (e.button != Gdk.BUTTON_SECONDARY) {
                 return Gdk.EVENT_PROPAGATE;
@@ -75,6 +80,7 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
             return create_context_menu (e, (LayerListItem)row);
         });
 
+        // Trigger the context menu when the `menu` key is pressed.
         key_release_event.connect ((e) => {
             if (e.keyval != Gdk.Key.Menu) {
                 return Gdk.EVENT_PROPAGATE;
@@ -94,8 +100,6 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
             return;
         }
 
-        // FIX TODO: For some reason, a cloned item (copied and pasted) doesn't
-        // trigger the items_changed signal of the list store.
         var service_uid = node_instance.id;
         var item = new LayerItemModel (node_instance, service_uid);
         layers[service_uid] = item;
@@ -147,6 +151,10 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
         list_store.items_changed (0, 0, added);
     }
 
+    /*
+     * Remove all the currently selected layers. The list of ids comes from the
+     * selected nodes in the view canvas.
+     */
     public void remove_items (GLib.Array<int> ids) {
         var removed = 0;
         foreach (var uid in ids.data) {
@@ -161,17 +169,22 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
         list_store.items_changed (0, removed, 0);
     }
 
+    /*
+     * Sort function to always add new layers at the top.
+     */
     private static int layers_sort_function (LayerItemModel layer1, LayerItemModel layer2) {
         return (int)(layer2.id - layer1.id);
     }
 
     private void layer_selected (Lib.Items.ModelInstance? node) {
         var sm = view_canvas.selection_manager;
+        // Reset the selection if no node was clicked.
         if (node == null) {
             sm.reset_selection ();
             return;
         }
 
+        // Don't do anything if the item is already part of the selection.
         if (sm.item_selected (node.id)) {
             return;
         }
