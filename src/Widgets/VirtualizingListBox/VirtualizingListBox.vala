@@ -755,7 +755,6 @@ public class VirtualizingListBox : Gtk.Container, Gtk.Scrollable {
         }
 
         if (index == 0) {
-            print ("TOP INDEX\n");
             set_value (0.0);
             ensure_visible_widgets ();
             foreach (VirtualizingListBoxRow row in current_widgets) {
@@ -766,7 +765,6 @@ public class VirtualizingListBox : Gtk.Container, Gtk.Scrollable {
         }
 
         if (index == index_max) {
-            print ("BOTTOM INDEX\n");
             set_value (vadjustment.upper);
             ensure_visible_widgets ();
             foreach (VirtualizingListBoxRow row in current_widgets) {
@@ -774,14 +772,6 @@ public class VirtualizingListBox : Gtk.Container, Gtk.Scrollable {
                     return row;
                 }
             }
-        }
-
-        // If the list was never scrolled or is at top position, we need to force
-        // the scroll of at least one row widget to ensure all adjustment calculations
-        // have run. This might happen when loading a saved file, which generates
-        // multiple items at once without actually triggering any scroll.
-        if (vadjustment.value == 0.0) {
-            set_value (default_widget_height);
         }
 
         while (index <= shown_from) {

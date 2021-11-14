@@ -32,12 +32,12 @@
      * Cloning is recursive, so all dependencies are copied over.
      * Return 0 on success.
      */
-     public static int clone_from_model (
-         Lib.Items.Model source_model,
-         int source_id,
-         Lib.Items.Model target_model,
-         int target_group_id,
-         OnSubtreeCloned? on_subtree_cloned = null
+    public static int clone_from_model (
+        Lib.Items.Model source_model,
+        int source_id,
+        Lib.Items.Model target_model,
+        int target_group_id,
+        OnSubtreeCloned? on_subtree_cloned = null
     ) {
         var target_node = target_model.node_from_id (target_group_id);
         if (target_node == null || !target_node.instance.is_group) {

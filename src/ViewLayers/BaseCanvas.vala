@@ -32,13 +32,13 @@ public class Akira.ViewLayers.BaseCanvas : Gtk.Widget , Gtk.Scrollable {
 
     private int window_x = 0;
     private int window_y = 0;
-    private bool automatic_bounds = false;
-    private bool bounds_from_origin = true;
+    // private bool automatic_bounds = false;
+    // private bool bounds_from_origin = true;
     private bool clear_background = true;
 
     private int freeze_count = 0;
-    private bool need_update = true;
-    private bool need_entire_subtree_update_ = true;
+    // private bool need_update = true;
+    // private bool need_entire_subtree_update_ = true;
     private bool before_initial_draw = true;
     private bool needs_reconfigure = false;
     private Geometry.Rectangle bounds = Geometry.Rectangle.with_coordinates (0, 0, DEFAULT_WIDTH, DEFAULT_HEIGHT);
