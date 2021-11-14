@@ -364,9 +364,9 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
     }
 
     private bool handle_double_click_event () {
-        // If the user double clicks on a CanvasItem, the item gets added to selection_manager on the first click.
-        // If double click happened on empty area, no items is selected.
-
+        // If the user double clicks on a CanvasItem, the item gets added to
+        // selection_manager on the first click. If double click happened on
+        // empty area, no items is selected.
         var selected_item = selection_manager.selection.first_node ();
 
         if (selected_item == null) {
@@ -681,20 +681,5 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
      */
     private void on_items_removed (GLib.Array<int> ids) {
         window.main_window.remove_layers (ids);
-    }
-
-    public void on_layer_selected (Lib.Items.ModelInstance? node) {
-        if (node == null) {
-            selection_manager.reset_selection ();
-            return;
-        }
-
-        selection_manager.add_to_selection (node.id);
-
-        if (mode_manager.active_mode_type != Lib.Modes.AbstractInteractionMode.ModeType.TRANSFORM) {
-            var new_mode = new Lib.Modes.TransformMode (this, Utils.Nobs.Nob.NONE);
-            mode_manager.register_mode (new_mode);
-            mode_manager.deregister_active_mode ();
-        }
     }
 }

@@ -25,8 +25,6 @@
  * The scrollable layers panel.
  */
 public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
-    public signal void layer_selected (Lib.Items.ModelInstance? node);
-
     public unowned Akira.Lib.ViewCanvas view_canvas { get; construct; }
 
     private Gee.HashMap<int, LayerItemModel> layers;
@@ -59,13 +57,7 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
         };
 
         row_selected.connect ((row) => {
-            if (row == null) {
-                // layer_selected (null);
-                return;
-            }
-
-            // Now select the clicked layer.
-            // layer_selected (((LayerItemModel) row).node);
+            layer_selected (((LayerItemModel) row).node);
         });
 
         button_release_event.connect ((e) => {
@@ -73,6 +65,10 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
                 return Gdk.EVENT_PROPAGATE;
             }
             var row = get_row_at_y ((int)e.y);
+            if (row == null) {
+                return Gdk.EVENT_PROPAGATE;
+            }
+
             if (selected_row_widget != row) {
                 select_row (row);
             }
@@ -167,5 +163,29 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
 
     private static int layers_sort_function (LayerItemModel layer1, LayerItemModel layer2) {
         return (int)(layer2.id - layer1.id);
+    }
+
+    private void layer_selected (Lib.Items.ModelInstance? node) {
+        var sm = view_canvas.selection_manager;
+        if (node == null) {
+            sm.reset_selection ();
+            return;
+        }
+
+        if (sm.item_selected (node.id)) {
+            return;
+        }
+
+        sm.add_to_selection (node.id);
+
+        // Trigger the transform mode if is not currently active. This might
+        // happen when no items is selected and the first selection is triggered
+        // from the layers listbox.
+        var mm = view_canvas.mode_manager;
+        if (mm.active_mode_type != Lib.Modes.AbstractInteractionMode.ModeType.TRANSFORM) {
+            var new_mode = new Lib.Modes.TransformMode (view_canvas, Utils.Nobs.Nob.NONE);
+            mm.register_mode (new_mode);
+            mm.deregister_active_mode ();
+        }
     }
 }
