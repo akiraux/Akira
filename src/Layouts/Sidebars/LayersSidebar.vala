@@ -47,7 +47,7 @@ public class Akira.Layouts.Sidebars.LayersSidebar : Gtk.Grid {
         { "LAYER", Gtk.TargetFlags.SAME_APP, 0 }
     };
 
-    public Layouts.Sidebars.Partials.LayersPanel layers_panel;
+    public Layouts.LayersList.LayerListBox layers_listbox;
     public Gtk.ScrolledWindow layers_scroll;
 
     public LayersSidebar (Lib.ViewCanvas canvas) {
@@ -68,21 +68,14 @@ public class Akira.Layouts.Sidebars.LayersSidebar : Gtk.Grid {
         pane.wide_handle = false;
         pane.position = 600;
 
-        layers_panel = new Layouts.Sidebars.Partials.LayersPanel (view_canvas);
-        var layers_grid = new Gtk.Grid ();
-        layers_grid.vexpand = true;
-        layers_grid.add (layers_panel);
+        layers_listbox = new Layouts.LayersList.LayerListBox (view_canvas);
 
-        layers_scroll = new Gtk.ScrolledWindow (null, null);
-        layers_scroll.expand = true;
-        layers_scroll.add (layers_grid);
-
-        var scrolled_child = layers_scroll.get_child ();
-        if (scrolled_child is Gtk.Container) {
-           ((Gtk.Container) scrolled_child).set_focus_vadjustment (
-               new Gtk.Adjustment (0, 0, 0, 0, 0, 0)
-            );
-        }
+        layers_scroll = new Gtk.ScrolledWindow (null, null) {
+            hscrollbar_policy = Gtk.PolicyType.NEVER,
+            width_request = 158,
+            expand = true
+        };
+        layers_scroll.add (layers_listbox);
 
         // Motion revealer for Drag and Drop on the top search bar.
         var motion_grid = new Gtk.Grid ();
@@ -104,6 +97,7 @@ public class Akira.Layouts.Sidebars.LayersSidebar : Gtk.Grid {
 
         // Connect signals.
         view_canvas.window.event_bus.toggle_presentation_mode.connect (toggle);
+        layers_listbox.layer_selected.connect (on_layer_selected);
     }
 
     private Gtk.Grid build_search_bar () {
@@ -130,6 +124,10 @@ public class Akira.Layouts.Sidebars.LayersSidebar : Gtk.Grid {
     private bool handle_focus_out (Gdk.EventFocus event) {
         view_canvas.window.event_bus.connect_typing_accel ();
         return false;
+    }
+
+    private void on_layer_selected (Lib.Items.ModelInstance? node) {
+        view_canvas.on_layer_selected (node);
     }
 
     /*

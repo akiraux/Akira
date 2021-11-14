@@ -1,5 +1,5 @@
 .artboard {
-    transition: all 240ms ease;
+    transition: box-shadow 160ms ease;
     background-color: shade (@bg_color, 1);
 }
 
