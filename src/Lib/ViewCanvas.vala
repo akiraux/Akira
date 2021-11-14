@@ -305,6 +305,10 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
             return true;
         }
 
+        if (guide_manager.button_press_event (event)) {
+            return true;
+        }
+
         if (event.button == Gdk.BUTTON_MIDDLE) {
             mode_manager.start_panning_mode ();
             if (mode_manager.button_press_event (event)) {
@@ -392,6 +396,13 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
     }
 
     public override bool button_release_event (Gdk.EventButton event) {
+
+        // Since guidelines are stacked on top of all elements,
+        // check events for it first.
+        if (guide_manager.button_release_event (event)) {
+            return true;
+        }
+
         // Check if the there's a delta between the pressed and released event.
         if (initial_event_x == event.x || initial_event_y == event.y) {
             var count = selection_manager.count ();

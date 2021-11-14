@@ -70,7 +70,7 @@
         context.new_path ();
         context.set_source_rgba (0.5, 0.5, 0.5, 1);
         context.set_line_width (1.0 / canvas.scale);
-        
+
         if (guide_data.h_guides != null) {
             foreach (var line in guide_data.h_guides) {
                 context.move_to (0, line);

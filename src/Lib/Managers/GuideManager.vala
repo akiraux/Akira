@@ -31,6 +31,8 @@
     private GuideData guide_data;
 
     private Geometry.Point current_cursor;
+    private int sel_line;
+    private Direction sel_direction;
 
     public GuideManager (Lib.ViewCanvas view_canvas) {
         Object (
@@ -65,17 +67,38 @@
     }
 
     public bool button_press_event (Gdk.EventButton event) {
+        Geometry.Point point = Geometry.Point (event.x, event.y);
+
+        if (guide_data.does_guide_exist_at (point, out sel_line, out sel_direction)) {
+            return true;
+        }
+
         return false;
     }
 
     public bool button_release_event (Gdk.EventButton event) {
+        if (sel_direction != Direction.NONE) {
+            sel_direction = Direction.NONE;
+            sel_line = -1;
+
+            return true;
+        }
+
         return false;
     }
 
     public bool motion_notify_event (Gdk.EventMotion event) {
         // Here, we just want to get the cursor position,
-        // so we allow the event to propogate further by returning true.
+        // so we allow the event to propogate further by returning false.
         current_cursor = Geometry.Point (event.x, event.y);
+
+        if (sel_direction != Direction.NONE) {
+            guide_data.update_guide_position (sel_line, sel_direction, current_cursor);
+            view_canvas.guide_layer.update_guide_data (guide_data);
+
+            return true;
+        }
+
         return false;
     }
 
@@ -94,31 +117,63 @@
     // Stores the coordinates of horizontal guides.
     // Since a guideline is a straight line (either horizontal or vertical),
     // we only need one coordinate to store a line.
-    public double[] h_guides;
+    public Gee.ArrayList<double?> h_guides;
     // Stores the coordinates of vertical guides.
-    public double[] v_guides;
+    public Gee.ArrayList<double?> v_guides;
 
     // Stores the extents of guidelines.that were updated.
     // Can't save the extents of all guidelines as they may be spread over a large area.
     public Geometry.Rectangle extents;
 
     public GuideData () {
-        h_guides = new double[0];
-        v_guides = new double[0];
+        h_guides = new Gee.ArrayList<double?> ();
+        v_guides = new Gee.ArrayList<double?> ();
 
         extents = Geometry.Rectangle.empty ();
     }
 
     public void add_h_guide (double pos) {
-        h_guides.resize (h_guides.length + 1);
-        h_guides[h_guides.length - 1] = pos;
+        h_guides.add (pos);
         update_extents ();
     }
 
     public void add_v_guide (double pos) {
-        v_guides.resize (v_guides.length + 1);
-        v_guides[v_guides.length - 1] = pos;
+        v_guides.add (pos);
         update_extents ();
+    }
+
+    public bool does_guide_exist_at (Geometry.Point point, out int sel_line, out GuideManager.Direction sel_direction) {
+        double thresh = 1;
+
+        for (int i = 0; i < h_guides.size; ++i) {
+            if ((h_guides[i] - point.y).abs () < thresh) {
+                sel_line = i;
+                sel_direction = GuideManager.Direction.HORIZONTAL;
+                return true;
+            }
+        }
+
+        for (int i = 0; i < v_guides.size; ++i) {
+            if ((v_guides[i] - point.x).abs () < thresh) {
+                sel_line = i;
+                sel_direction = GuideManager.Direction.VERTICAL;
+                return true;
+            }
+        }
+
+        sel_line = -1;
+        sel_direction = GuideManager.Direction.NONE;
+        
+        return false;
+    }
+
+    public void update_guide_position (int position, GuideManager.Direction direction, Geometry.Point new_pos) {
+        if (direction == GuideManager.Direction.HORIZONTAL) {
+            h_guides[position] = new_pos.y;
+            update_extents ();
+        } else if (direction == GuideManager.Direction.VERTICAL) {
+            v_guides[position] = new_pos.x;
+        }
     }
 
     private void update_extents () {
