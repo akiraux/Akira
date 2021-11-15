@@ -131,28 +131,34 @@
     // Stores the coordinates of vertical guides.
     public Gee.ArrayList<double?> v_guides;
 
-    // Stores the extents of guidelines.that were updated.
-    // Can't save the extents of all guidelines as they may be spread over a large area.
-    public Geometry.Rectangle extents;
-
     public int highlight_guide;
     public GuideManager.Direction highlight_direction;
 
     public GuideData () {
         h_guides = new Gee.ArrayList<double?> ();
         v_guides = new Gee.ArrayList<double?> ();
+    }
 
-        extents = Geometry.Rectangle.empty ();
+    public GuideData copy () {
+        var clone = new GuideData ();
+        
+        clone.h_guides = new Gee.ArrayList<double?> ();
+        clone.h_guides.add_all (h_guides);
+        clone.v_guides = new Gee.ArrayList<double?> ();
+        clone.v_guides.add_all (v_guides);
+
+        clone.highlight_guide = highlight_guide;
+        clone.highlight_direction = highlight_direction;
+
+        return clone;
     }
 
     public void add_h_guide (double pos) {
         h_guides.add (pos);
-        update_extents ();
     }
 
     public void add_v_guide (double pos) {
         v_guides.add (pos);
-        update_extents ();
     }
 
     public void set_highlighted_guide (int guide, GuideManager.Direction direction) {
@@ -188,15 +194,8 @@
     public void update_guide_position (int position, GuideManager.Direction direction, Geometry.Point new_pos) {
         if (direction == GuideManager.Direction.HORIZONTAL) {
             h_guides[position] = new_pos.y;
-            update_extents ();
         } else if (direction == GuideManager.Direction.VERTICAL) {
             v_guides[position] = new_pos.x;
         }
-    }
-
-    private void update_extents () {
-        // TODO: Optimize extents here.
-        extents.left = extents.top = 0;
-        extents.right = extents.bottom = 10000;
     }
  }

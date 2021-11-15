@@ -20,10 +20,15 @@
  */
 
  public class Akira.ViewLayers.ViewLayerGuide : ViewLayer {
-    private Lib.Managers.GuideData guide_data;
+    private Lib.Managers.GuideData? guide_data;
+    private Lib.Managers.GuideData? old_data;
 
+    public ViewLayerGuide () {
+    }
     public void update_guide_data (Lib.Managers.GuideData data) {
-        guide_data = data;
+        old_data = (guide_data == null) ? null : guide_data.copy ();
+        guide_data = data.copy ();
+
         update ();
     }
 
@@ -41,13 +46,37 @@
             }
         }
 
-        if (guide_data.extents.left > target_bounds.right || guide_data.extents.right < target_bounds.left
-            || guide_data.extents.top > target_bounds.bottom || guide_data.extents.bottom < target_bounds.top) {
-            return;
+        foreach (var line in guide_data.h_guides) {
+            var extents = Geometry.Rectangle.empty ();
+            extents.left = 0;
+            extents.right = 10000;
+            extents.top = line - 1;
+            extents.bottom = line + 1;
+
+            if (extents.left > target_bounds.right || extents.right < target_bounds.left
+                || extents.top > target_bounds.bottom || extents.bottom < target_bounds.top) {
+                continue;
+            }
+
+            draw_line (context, line, Lib.Managers.GuideManager.Direction.HORIZONTAL);
         }
 
-        draw_lines (context);
-        draw_highlighted_guides (context);
+        foreach (var line in guide_data.v_guides) {
+            var extents = Geometry.Rectangle.empty ();
+            extents.left = line - 1;
+            extents.right = line + 1;
+            extents.top = 0;
+            extents.bottom = 10000;
+
+            if (extents.left > target_bounds.right || extents.right < target_bounds.left
+                || extents.top > target_bounds.bottom || extents.bottom < target_bounds.top) {
+                continue;
+            }
+
+            draw_line (context, line, Lib.Managers.GuideManager.Direction.VERTICAL);
+        }
+
+        draw_highlighted_guide (context);
     }
 
     public override void update () {
@@ -59,12 +88,39 @@
             }
         }
 
-        // Optimize this part. Update extents for each line individually.
-        //  canvas.request_redraw (old_live_extents);
-        canvas.request_redraw (guide_data.extents);
+        if (old_data != null) {
+            perform_redraw (old_data);
+            old_data = null;
+        }
+
+        if (guide_data != null) {
+            perform_redraw (guide_data);
+        }
     }
 
-    private void draw_lines (Cairo.Context context) {
+    private void perform_redraw (Lib.Managers.GuideData data) {
+        foreach (var line in data.v_guides) {
+            var extents = Geometry.Rectangle.empty ();
+            extents.left = line - 1;
+            extents.right = line + 1;
+            extents.top = 0;
+            extents.bottom = 10000;
+
+            canvas.request_redraw (extents);
+        }
+
+        foreach (var line in data.h_guides) {
+            var extents = Geometry.Rectangle.empty ();
+            extents.top = line - 1;
+            extents.bottom = line + 1;
+            extents.left = 0;
+            extents.right = 10000;
+
+            canvas.request_redraw (extents);
+        }
+    }
+
+    private void draw_line (Cairo.Context context, double pos, Lib.Managers.GuideManager.Direction dir) {
 
         context.save ();
 
@@ -72,18 +128,12 @@
         context.set_source_rgba (0.6235, 0.1686, 0.4078, 1);
         context.set_line_width (1.0 / canvas.scale);
 
-        if (guide_data.h_guides != null) {
-            foreach (var line in guide_data.h_guides) {
-                context.move_to (0, line);
-                context.line_to (10000, line);
-            }
-        }
-
-        if (guide_data.v_guides != null) {
-            foreach (var line in guide_data.v_guides) {
-                context.move_to (line, 0);
-                context.line_to (line, 10000);
-            }
+        if (dir == Lib.Managers.GuideManager.Direction.HORIZONTAL) {
+            context.move_to (0, pos);
+            context.line_to (10000, pos);
+        } else {
+            context.move_to (pos, 0);
+            context.line_to (pos, 10000);
         }
 
         context.stroke ();
@@ -91,7 +141,7 @@
         context.restore ();
     }
 
-    private void draw_highlighted_guides (Cairo.Context context) {
+    private void draw_highlighted_guide (Cairo.Context context) {
         context.save ();
 
         context.new_path ();
