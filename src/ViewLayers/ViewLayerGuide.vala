@@ -20,12 +20,12 @@
  */
 
  public class Akira.ViewLayers.ViewLayerGuide : ViewLayer {
-    private Lib.Managers.GuideData? guide_data;
-    private Lib.Managers.GuideData? old_data;
+    private Models.GuidelineModel? guide_data;
+    private Models.GuidelineModel? old_data;
 
     public ViewLayerGuide () {
     }
-    public void update_guide_data (Lib.Managers.GuideData data) {
+    public void update_guide_data (Models.GuidelineModel data) {
         old_data = (guide_data == null) ? null : guide_data.copy ();
         guide_data = data.copy ();
 
@@ -102,7 +102,7 @@
         }
     }
 
-    private void perform_redraw (Lib.Managers.GuideData data) {
+    private void perform_redraw (Models.GuidelineModel data) {
         var artboard_extents = data.drawable_extents;
 
         foreach (var line in data.v_guides.elements) {
@@ -118,7 +118,7 @@
 
         foreach (var line in data.h_guides.elements) {
             var extents = Geometry.Rectangle.empty ();
-            
+
             extents.top = line - 1;
             extents.bottom = line + 1;
             extents.left = artboard_extents.left;
@@ -187,5 +187,23 @@
         context.stroke ();
         context.new_path ();
         context.restore ();
+    }
+
+    private void draw_distances (Cairo.Context context) {
+        var distance_1 = 1000;
+        var distance_2 = 1000;
+        var artboard_extents = guide_data.drawable_extents;
+
+        context.set_source_rgba (0.8705, 0.1921, 0.3882, 1);
+        context.select_font_face ("monospace", Cairo.FontSlant.NORMAL, Cairo.FontWeight.NORMAL);
+        context.set_font_size (14);
+
+        if (guide_data.highlight_direction == Lib.Managers.GuideManager.Direction.HORIZONTAL) {
+            context.move_to (artboard_extents.left, guide_data.highlight_position);
+            context.show_text (distance_1.to_string ());
+        } else if (guide_data.highlight_direction == Lib.Managers.GuideManager.Direction.VERTICAL) {
+            context.move_to (guide_data.highlight_position, artboard_extents.top);
+            context.show_text (distance_2.to_string ());
+        }
     }
  }

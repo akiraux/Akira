@@ -28,7 +28,7 @@
 
     public unowned Lib.ViewCanvas view_canvas { get; construct; }
 
-    private GuideData guide_data;
+    private Models.GuidelineModel guide_data;
 
     private Geometry.Point current_cursor;
     private int sel_line;
@@ -39,7 +39,7 @@
             view_canvas: view_canvas
         );
 
-        guide_data = new GuideData ();
+        guide_data = new Models.GuidelineModel ();
 
         view_canvas.scroll_event.connect (on_scroll);
     }
@@ -155,106 +155,5 @@
         }
 
         return false;
-    }
- }
-
- public class Akira.Lib.Managers.GuideData {
-    // Stores the coordinates of horizontal guides.
-    // Since a guideline is a straight line (either horizontal or vertical),
-    // we only need one coordinate to store a line.
-    public Utils.SortedArray h_guides;
-    // Stores the coordinates of vertical guides.
-    public Utils.SortedArray v_guides;
-
-    public int highlight_guide;
-    public GuideManager.Direction highlight_direction;
-    public double highlight_position;
-
-    // Stores the extents of the artboard.
-    // The guidelines will only be drawn inside this region.
-    public Geometry.Rectangle drawable_extents;
-
-    public GuideData () {
-        h_guides = new Utils.SortedArray ();
-        v_guides = new Utils.SortedArray ();
-    }
-
-    public GuideData copy () {
-        var clone = new GuideData ();
-        
-        clone.h_guides = h_guides.clone ();
-        clone.v_guides = v_guides.clone ();
-
-        clone.highlight_guide = highlight_guide;
-        clone.highlight_direction = highlight_direction;
-        clone.highlight_position = highlight_position;
-
-        clone.drawable_extents = drawable_extents;
-
-        return clone;
-    }
-
-    public void add_h_guide (double pos) {
-        h_guides.insert (pos);
-    }
-
-    public void add_v_guide (double pos) {
-        v_guides.insert (pos);
-    }
-
-    public void set_highlighted_guide (int guide, GuideManager.Direction direction) {
-        highlight_guide = guide;
-        highlight_direction = direction;
-        
-        if (direction == GuideManager.Direction.HORIZONTAL) {
-            highlight_position = h_guides.elements[guide];
-        } else if (direction == GuideManager.Direction.VERTICAL) {
-            highlight_position = v_guides.elements[guide];
-        }
-    }
-
-    public bool does_guide_exist_at (Geometry.Point point, out int sel_line, out GuideManager.Direction sel_direction) {
-        double thresh = 1;
-
-        for (int i = 0; i < h_guides.length; ++i) {
-            if ((h_guides.elements[i] - point.y).abs () < thresh) {
-                sel_line = i;
-                sel_direction = GuideManager.Direction.HORIZONTAL;
-                return true;
-            }
-        }
-
-        for (int i = 0; i < v_guides.length; ++i) {
-            if ((v_guides.elements[i] - point.x).abs () < thresh) {
-                sel_line = i;
-                sel_direction = GuideManager.Direction.VERTICAL;
-                return true;
-            }
-        }
-
-        sel_line = -1;
-        sel_direction = GuideManager.Direction.NONE;
-        
-        return false;
-    }
-
-    public void move_guide_to_position (int position, GuideManager.Direction direction, Geometry.Point new_pos) {
-        if (direction == GuideManager.Direction.HORIZONTAL) {
-            highlight_position = new_pos.y;
-            highlight_direction = direction;
-            highlight_guide = position;
-        } else if (direction == GuideManager.Direction.VERTICAL) {
-            highlight_position = new_pos.x;
-            highlight_direction = direction;
-            highlight_guide = position;
-        }
-    }
-
-    public void remove_guide (GuideManager.Direction dir, int pos) {
-        if (dir == GuideManager.Direction.HORIZONTAL) {
-            h_guides.remove_at (pos);
-        } else if (dir == GuideManager.Direction.VERTICAL) {
-            v_guides.remove_at (pos);
-        }
     }
  }
