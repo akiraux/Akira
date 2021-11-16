@@ -35,6 +35,7 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
             view_canvas: canvas
         );
 
+        selection_mode = Gtk.SelectionMode.MULTIPLE;
         activate_on_single_click = true;
         layers = new Gee.HashMap<int, LayerItemModel> ();
         list_store = new LayerListStore ();
@@ -60,9 +61,7 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
         };
 
         // When an item is selected from a click on the layers list.
-        row_selection_changed.connect ((clear) => {
-            on_row_selection_changed (clear);
-        });
+        row_selection_changed.connect (on_row_selection_changed);
 
         // Listed to the button release event only for the secondary click in
         // order to trigger the context menu.
