@@ -59,8 +59,9 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
             return row;
         };
 
-        row_selected.connect ((row) => {
-            layer_selected (row != null ? ((LayerItemModel) row).node : null);
+        // When an item is selected from a click on the layers list.
+        row_selection_changed.connect ((clear) => {
+            on_row_selection_changed (clear);
         });
 
         // Listed to the button release event only for the secondary click in
@@ -90,7 +91,7 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
         });
 
         view_canvas.items_manager.item_model.item_added.connect (on_item_added);
-        view_canvas.selection_manager.selection_modified.connect (on_selection_modified);
+        view_canvas.selection_manager.selection_modified_external.connect (on_selection_modified_external);
     }
 
     private void on_item_added (int id) {
@@ -105,27 +106,6 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
         layers[service_uid] = item;
         list_store.add (item);
         print ("on_item_added: %i\n", service_uid);
-    }
-
-    private void on_selection_modified () {
-        print ("on_selection_modified\n");
-        var sm = view_canvas.selection_manager;
-        if (sm.is_empty ()) {
-            unselect_all ();
-            return;
-        }
-
-        // A bit hacky but I don't know how to fix this. Since we're adding the
-        // new layer on top, the index is always 0 for newly generated layers.
-        // That means the selection changes happens so fast that it tries to select
-        // the row on index 0 while a new row is being added at index 0. Without
-        // the timeout, the app crashes.
-        Timeout.add (0, () => {
-            foreach (var node in sm.selection.nodes.values) {
-                select_row_at_index (model.get_index_of (layers[node.node.id]));
-            }
-            return false;
-        });
     }
 
     private bool create_context_menu (Gdk.Event e, LayerListItem row) {
@@ -176,20 +156,26 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
         return (int)(layer2.id - layer1.id);
     }
 
-    private void layer_selected (Lib.Items.ModelInstance? node) {
+    /*
+     * Update the selected items in the canvas when the selection of rows in the
+     * listbox changes.
+     */
+    private void on_row_selection_changed (bool clear) {
         var sm = view_canvas.selection_manager;
-        // Reset the selection if no node was clicked.
-        if (node == null) {
-            sm.reset_selection ();
+        // Always reset the selection.
+        sm.reset_selection ();
+
+        // No need to do anything else if all rows were selected.
+        if (clear) {
             return;
         }
 
-        // Don't do anything if the item is already part of the selection.
-        if (sm.item_selected (node.id)) {
-            return;
+        // Add all currently selected rows to the selection. This won't trigger
+        // a selection changed loop since the selection_modified_external signal
+        // is only triggered from a click on the canvas.
+        foreach (var model in get_selected_rows ()) {
+            sm.add_to_selection (((LayerItemModel) model).node.id);
         }
-
-        sm.add_to_selection (node.id);
 
         // Trigger the transform mode if is not currently active. This might
         // happen when no items is selected and the first selection is triggered
@@ -200,5 +186,31 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
             mm.register_mode (new_mode);
             mm.deregister_active_mode ();
         }
+    }
+
+    /*
+     * When an item in the canvas is selected via click interaction.
+     */
+    private void on_selection_modified_external () {
+        print ("on_selection_modified_external\n");
+        // Always reset the selection of the layers.
+        unselect_all ();
+
+        var sm = view_canvas.selection_manager;
+        if (sm.is_empty ()) {
+            return;
+        }
+
+        // A bit hacky but I don't know how to fix this. Since we're adding the
+        // new layer on top, the index is always 0 for newly generated layers.
+        // That means the selection changes happens so fast that it tries to select
+        // the row on index 0 while a new row is being added at index 0. Without
+        // the timeout, the app crashes.
+        Timeout.add (0, () => {
+            foreach (var node in sm.selection.nodes.values) {
+                select_row_at_index (model.get_index_of (layers[node.node.id]));
+            }
+            return false;
+        });
     }
 }

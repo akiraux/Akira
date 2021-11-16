@@ -21,10 +21,15 @@
  */
 
 public class Akira.Lib.Managers.SelectionManager : Object {
-    // Signal triggered only when an item is added or removed from the selection
-    // map. This is mostly used to update the UI widgets when the selection
-    // changes and we don't need to listen to the changes in the selection geometry.
+    // Signal triggered every time an item is added or removed from the selection
+    // map. Connect this signal when elements of the UI need to be updated based
+    // on the selected items.
     public signal void selection_modified ();
+
+    // Signal triggered only when an item is added or removed from the selection
+    // map exclusively via click event from the ViewCanvas. This is necessary in
+    // order to only update the Layers panel without triggering a selection loop.
+    public signal void selection_modified_external ();
 
     public unowned ViewCanvas view_canvas { get; construct; }
 
