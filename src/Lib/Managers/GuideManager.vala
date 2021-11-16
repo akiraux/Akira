@@ -45,6 +45,10 @@
     }
 
      public bool key_press_event (Gdk.EventKey event) {
+        if (!is_within_artboard ()) {
+            return false;
+        }
+
         uint uppercase_keyval = Gdk.keyval_to_upper (event.keyval);
 
         if (uppercase_keyval == Gdk.Key.Q) {
@@ -67,6 +71,12 @@
     }
 
     public bool button_press_event (Gdk.EventButton event) {
+        if (!is_within_artboard ()) {
+            return false;;
+        } else {
+            view_canvas.guide_layer.update_guide_data (guide_data);
+        }
+
         Geometry.Point point = Geometry.Point (event.x, event.y);
 
         if (guide_data.does_guide_exist_at (point, out sel_line, out sel_direction)) {
@@ -87,16 +97,6 @@
 
             sel_direction = Direction.NONE;
             sel_line = -1;
-
-            print("horizontal are\n");
-            foreach (var it in guide_data.h_guides.elements) {
-                print("%f ", it);
-            }
-            print("\nvertical are\n");
-            foreach (var it in guide_data.v_guides.elements) {
-                print("%f ", it);
-            }
-            print("\n\n");
 
             return true;
         }
@@ -138,6 +138,24 @@
 
         return false;
     }
+
+    private bool is_within_artboard () {
+        var groups = view_canvas.items_manager.item_model.group_nodes;
+
+        foreach (var item in groups) {
+            if (item.key >= Lib.Items.Model.GROUP_START_ID) {
+                var extents = item.value.instance.bounding_box;
+
+                if (extents.contains (current_cursor.x, current_cursor.y)) {
+                    guide_data = item.value.instance.guide_data;
+                    guide_data.drawable_extents = item.value.instance.bounding_box;
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
  }
 
  public class Akira.Lib.Managers.GuideData {
@@ -151,6 +169,10 @@
     public int highlight_guide;
     public GuideManager.Direction highlight_direction;
     public double highlight_position;
+
+    // Stores the extents of the artboard.
+    // The guidelines will only be drawn inside this region.
+    public Geometry.Rectangle drawable_extents;
 
     public GuideData () {
         h_guides = new Utils.SortedArray ();
@@ -166,6 +188,8 @@
         clone.highlight_guide = highlight_guide;
         clone.highlight_direction = highlight_direction;
         clone.highlight_position = highlight_position;
+
+        clone.drawable_extents = drawable_extents;
 
         return clone;
     }

@@ -36,6 +36,8 @@ public class Akira.Lib.Items.ModelInstance {
     public Components.CompiledFill compiled_fill { get { return compiled_components.compiled_fill; } }
     public Components.CompiledBorder compiled_border { get { return compiled_components.compiled_border; } }
 
+    public Lib.Managers.GuideData? guide_data = null;
+
     public bool is_group { get { return type.is_group (); } }
     public bool is_stackable { get { return drawable != null; } }
 
@@ -48,6 +50,10 @@ public class Akira.Lib.Items.ModelInstance {
 
         if (is_group) {
             this.children = new int[0];
+        }
+
+        if (type.name_id == "artboard") {
+            guide_data = new Lib.Managers.GuideData ();
         }
 
         this.id = uid;

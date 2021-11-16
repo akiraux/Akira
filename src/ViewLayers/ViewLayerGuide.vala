@@ -46,10 +46,13 @@
             }
         }
 
+        var artboard_extents = guide_data.drawable_extents;
+
         foreach (var line in guide_data.h_guides.elements) {
             var extents = Geometry.Rectangle.empty ();
-            extents.left = 0;
-            extents.right = 10000;
+
+            extents.left = artboard_extents.left;
+            extents.right = artboard_extents.right;
             extents.top = line - 1;
             extents.bottom = line + 1;
 
@@ -63,10 +66,11 @@
 
         foreach (var line in guide_data.v_guides.elements) {
             var extents = Geometry.Rectangle.empty ();
+
             extents.left = line - 1;
             extents.right = line + 1;
-            extents.top = 0;
-            extents.bottom = 10000;
+            extents.top = artboard_extents.top;
+            extents.bottom = artboard_extents.bottom;
 
             if (extents.left > target_bounds.right || extents.right < target_bounds.left
                 || extents.top > target_bounds.bottom || extents.bottom < target_bounds.top) {
@@ -99,22 +103,26 @@
     }
 
     private void perform_redraw (Lib.Managers.GuideData data) {
+        var artboard_extents = data.drawable_extents;
+
         foreach (var line in data.v_guides.elements) {
             var extents = Geometry.Rectangle.empty ();
+
             extents.left = line - 1;
             extents.right = line + 1;
-            extents.top = 0;
-            extents.bottom = 10000;
+            extents.top = artboard_extents.top;
+            extents.bottom = artboard_extents.bottom;
 
             canvas.request_redraw (extents);
         }
 
         foreach (var line in data.h_guides.elements) {
             var extents = Geometry.Rectangle.empty ();
+            
             extents.top = line - 1;
             extents.bottom = line + 1;
-            extents.left = 0;
-            extents.right = 10000;
+            extents.left = artboard_extents.left;
+            extents.right = artboard_extents.right;
 
             canvas.request_redraw (extents);
         }
@@ -124,13 +132,13 @@
         if (data.highlight_direction == Lib.Managers.GuideManager.Direction.HORIZONTAL) {
             highlight_extents.top = data.highlight_position - 1;
             highlight_extents.bottom = data.highlight_position + 1;
-            highlight_extents.left = 0;
-            highlight_extents.right = 10000;
+            highlight_extents.left = artboard_extents.left;
+            highlight_extents.right = artboard_extents.right;
         } else if (data.highlight_direction == Lib.Managers.GuideManager.Direction.VERTICAL) {
             highlight_extents.left = data.highlight_position - 1;
             highlight_extents.right = data.highlight_position + 1;
-            highlight_extents.top = 0;
-            highlight_extents.bottom = 10000;
+            highlight_extents.top = artboard_extents.top;
+            highlight_extents.bottom = artboard_extents.bottom;
         }
 
         canvas.request_redraw (highlight_extents);
@@ -144,12 +152,14 @@
         context.set_source_rgba (0.6235, 0.1686, 0.4078, 1);
         context.set_line_width (1.0 / canvas.scale);
 
+        var artboard_extents = guide_data.drawable_extents;
+
         if (dir == Lib.Managers.GuideManager.Direction.HORIZONTAL) {
-            context.move_to (0, pos);
-            context.line_to (10000, pos);
+            context.move_to (artboard_extents.left, pos);
+            context.line_to (artboard_extents.right, pos);
         } else {
-            context.move_to (pos, 0);
-            context.line_to (pos, 10000);
+            context.move_to (pos, artboard_extents.top);
+            context.line_to (pos, artboard_extents.bottom);
         }
 
         context.stroke ();
@@ -164,12 +174,14 @@
         context.set_source_rgba (0.8705, 0.1921, 0.3882, 1);
         context.set_line_width (2.0 / canvas.scale);
 
+        var artboard_extents = guide_data.drawable_extents;
+
         if (guide_data.highlight_direction == Lib.Managers.GuideManager.Direction.HORIZONTAL) {
-            context.move_to (0, guide_data.highlight_position);
-            context.line_to (10000, guide_data.highlight_position);
+            context.move_to (artboard_extents.left, guide_data.highlight_position);
+            context.line_to (artboard_extents.right, guide_data.highlight_position);
         } else if (guide_data.highlight_direction == Lib.Managers.GuideManager.Direction.VERTICAL) {
-            context.move_to (guide_data.highlight_position, 0);
-            context.line_to (guide_data.highlight_position, 10000);
+            context.move_to (guide_data.highlight_position, artboard_extents.top);
+            context.line_to (guide_data.highlight_position, artboard_extents.bottom);
         }
 
         context.stroke ();
