@@ -46,7 +46,7 @@
             }
         }
 
-        foreach (var line in guide_data.h_guides) {
+        foreach (var line in guide_data.h_guides.elements) {
             var extents = Geometry.Rectangle.empty ();
             extents.left = 0;
             extents.right = 10000;
@@ -61,7 +61,7 @@
             draw_line (context, line, Lib.Managers.GuideManager.Direction.HORIZONTAL);
         }
 
-        foreach (var line in guide_data.v_guides) {
+        foreach (var line in guide_data.v_guides.elements) {
             var extents = Geometry.Rectangle.empty ();
             extents.left = line - 1;
             extents.right = line + 1;
@@ -99,7 +99,7 @@
     }
 
     private void perform_redraw (Lib.Managers.GuideData data) {
-        foreach (var line in data.v_guides) {
+        foreach (var line in data.v_guides.elements) {
             var extents = Geometry.Rectangle.empty ();
             extents.left = line - 1;
             extents.right = line + 1;
@@ -109,7 +109,7 @@
             canvas.request_redraw (extents);
         }
 
-        foreach (var line in data.h_guides) {
+        foreach (var line in data.h_guides.elements) {
             var extents = Geometry.Rectangle.empty ();
             extents.top = line - 1;
             extents.bottom = line + 1;
@@ -118,6 +118,22 @@
 
             canvas.request_redraw (extents);
         }
+
+        var highlight_extents = Geometry.Rectangle.empty ();
+
+        if (data.highlight_direction == Lib.Managers.GuideManager.Direction.HORIZONTAL) {
+            highlight_extents.top = data.highlight_position - 1;
+            highlight_extents.bottom = data.highlight_position + 1;
+            highlight_extents.left = 0;
+            highlight_extents.right = 10000;
+        } else if (data.highlight_direction == Lib.Managers.GuideManager.Direction.VERTICAL) {
+            highlight_extents.left = data.highlight_position - 1;
+            highlight_extents.right = data.highlight_position + 1;
+            highlight_extents.top = 0;
+            highlight_extents.bottom = 10000;
+        }
+
+        canvas.request_redraw (highlight_extents);
     }
 
     private void draw_line (Cairo.Context context, double pos, Lib.Managers.GuideManager.Direction dir) {
@@ -149,13 +165,11 @@
         context.set_line_width (2.0 / canvas.scale);
 
         if (guide_data.highlight_direction == Lib.Managers.GuideManager.Direction.HORIZONTAL) {
-            var guide = guide_data.h_guides[guide_data.highlight_guide];
-            context.move_to (0, guide);
-            context.line_to (10000, guide);
+            context.move_to (0, guide_data.highlight_position);
+            context.line_to (10000, guide_data.highlight_position);
         } else if (guide_data.highlight_direction == Lib.Managers.GuideManager.Direction.VERTICAL) {
-            var guide = guide_data.v_guides[guide_data.highlight_guide];
-            context.move_to (guide, 0);
-            context.line_to (guide, 10000);
+            context.move_to (guide_data.highlight_position, 0);
+            context.line_to (guide_data.highlight_position, 10000);
         }
 
         context.stroke ();
