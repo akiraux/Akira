@@ -130,7 +130,7 @@
     private int inner_binary_search (int start, int end, double key) {
         if (end >= start) {
             int mid = (start + end) / 2;
-    
+
             if (are_equal (elements[mid], key)) {
                 return mid;
             } else if (elements[mid] < key) {

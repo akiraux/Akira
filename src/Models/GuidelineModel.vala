@@ -50,7 +50,7 @@ public class Akira.Models.GuidelineModel {
 
     public GuidelineModel copy () {
         var clone = new GuidelineModel ();
-        
+
         clone.h_guides = h_guides.clone ();
         clone.v_guides = v_guides.clone ();
 
@@ -76,7 +76,7 @@ public class Akira.Models.GuidelineModel {
     public void set_highlighted_guide (int guide, Lib.Managers.GuideManager.Direction direction) {
         highlight_guide = guide;
         highlight_direction = direction;
-        
+
         if (direction == Lib.Managers.GuideManager.Direction.HORIZONTAL) {
             highlight_position = h_guides.elements[guide];
         } else if (direction == Lib.Managers.GuideManager.Direction.VERTICAL) {
@@ -129,7 +129,7 @@ public class Akira.Models.GuidelineModel {
 
         sel_line = -1;
         sel_direction = Lib.Managers.GuideManager.Direction.NONE;
-        
+
         return false;
     }
 
