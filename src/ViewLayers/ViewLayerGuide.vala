@@ -81,6 +81,8 @@
         }
 
         draw_highlighted_guide (context);
+
+        draw_distances (context);
     }
 
     public override void update () {
@@ -105,6 +107,7 @@
     private void perform_redraw (Models.GuidelineModel data) {
         var artboard_extents = data.drawable_extents;
 
+        // Draw all vertical guidelines.
         foreach (var line in data.v_guides.elements) {
             var extents = Geometry.Rectangle.empty ();
 
@@ -116,6 +119,7 @@
             canvas.request_redraw (extents);
         }
 
+        // Draw all horizontal guidelines.
         foreach (var line in data.h_guides.elements) {
             var extents = Geometry.Rectangle.empty ();
 
@@ -127,6 +131,7 @@
             canvas.request_redraw (extents);
         }
 
+        // Draw the highlighted guideline.
         var highlight_extents = Geometry.Rectangle.empty ();
 
         if (data.highlight_direction == Lib.Managers.GuideManager.Direction.HORIZONTAL) {
@@ -142,6 +147,16 @@
         }
 
         canvas.request_redraw (highlight_extents);
+
+        // Draw the distance text.
+        var distance_extents = Geometry.Rectangle.empty ();
+
+        distance_extents.left = data.cursor_position.x - 90;
+        distance_extents.right = data.cursor_position.x + 90;
+        distance_extents.top = data.cursor_position.y - 14;
+        distance_extents.bottom = data.cursor_position.y + 14;
+
+        canvas.request_redraw (distance_extents);
     }
 
     private void draw_line (Cairo.Context context, double pos, Lib.Managers.GuideManager.Direction dir) {
@@ -190,20 +205,14 @@
     }
 
     private void draw_distances (Cairo.Context context) {
-        var distance_1 = 1000;
-        var distance_2 = 1000;
-        var artboard_extents = guide_data.drawable_extents;
-
         context.set_source_rgba (0.8705, 0.1921, 0.3882, 1);
         context.select_font_face ("monospace", Cairo.FontSlant.NORMAL, Cairo.FontWeight.NORMAL);
         context.set_font_size (14);
 
-        if (guide_data.highlight_direction == Lib.Managers.GuideManager.Direction.HORIZONTAL) {
-            context.move_to (artboard_extents.left, guide_data.highlight_position);
-            context.show_text (distance_1.to_string ());
-        } else if (guide_data.highlight_direction == Lib.Managers.GuideManager.Direction.VERTICAL) {
-            context.move_to (guide_data.highlight_position, artboard_extents.top);
-            context.show_text (distance_2.to_string ());
-        }
+        double x = guide_data.cursor_position.x - 50;
+        double y = guide_data.cursor_position.y - 5;
+
+        context.move_to (x, y);
+        context.show_text (guide_data.distances);
     }
  }

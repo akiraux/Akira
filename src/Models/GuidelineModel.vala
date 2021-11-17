@@ -27,9 +27,17 @@ public class Akira.Models.GuidelineModel {
     // Stores the coordinates of vertical guides.
     public Utils.SortedArray v_guides;
 
+    // Stores index of line in the sorted array.
     public int highlight_guide;
     public Lib.Managers.GuideManager.Direction highlight_direction;
+    // Stores the coordinate of currently highlighted guideline.
     public double highlight_position;
+
+    // The distances between guidelines will be displayed near the current cursor position.
+    public Geometry.Point cursor_position;
+    // This string will contain the distances either from the nearest guidelines or another item.
+    // This string will be draw as is on the canvas.
+    public string distances;
 
     // Stores the extents of the artboard.
     // The guidelines will only be drawn inside this region.
@@ -51,6 +59,8 @@ public class Akira.Models.GuidelineModel {
         clone.highlight_position = highlight_position;
 
         clone.drawable_extents = drawable_extents;
+        clone.cursor_position = cursor_position;
+        clone.distances = distances;
 
         return clone;
     }
@@ -74,10 +84,34 @@ public class Akira.Models.GuidelineModel {
         }
     }
 
-    public bool does_guide_exist_at (Geometry.Point point, out int sel_line, out Lib.Managers.GuideManager.Direction sel_direction) {
+    public void set_drawable_extents (Geometry.Rectangle extents) {
+        drawable_extents = extents;
+
+        // We also need to add the edges of the artboard.
+        // These lines make it easier to measure distances.
+        int index;
+        if (h_guides.contains (extents.left, out index) || h_guides.contains (extents.right, out index)) {
+            return;
+        } else if (v_guides.contains (extents.top, out index) || v_guides.contains (extents.bottom, out index)) {
+            return;
+        }
+
+        v_guides.insert (extents.left);
+        v_guides.insert (extents.right);
+        h_guides.insert (extents.top);
+        h_guides.insert (extents.bottom);
+    }
+
+    public bool does_guide_exist_at (
+        Geometry.Point point,
+        out int sel_line,
+        out Lib.Managers.GuideManager.Direction sel_direction
+    ) {
         double thresh = 1;
 
-        for (int i = 0; i < h_guides.length; ++i) {
+        // We are skipping the first and last lines as those are fixed
+        // and only used for calculating distances.
+        for (int i = 1; i < h_guides.length - 1; ++i) {
             if ((h_guides.elements[i] - point.y).abs () < thresh) {
                 sel_line = i;
                 sel_direction = Lib.Managers.GuideManager.Direction.HORIZONTAL;
@@ -85,7 +119,7 @@ public class Akira.Models.GuidelineModel {
             }
         }
 
-        for (int i = 0; i < v_guides.length; ++i) {
+        for (int i = 1; i < v_guides.length - 1; ++i) {
             if ((v_guides.elements[i] - point.x).abs () < thresh) {
                 sel_line = i;
                 sel_direction = Lib.Managers.GuideManager.Direction.VERTICAL;
@@ -99,7 +133,11 @@ public class Akira.Models.GuidelineModel {
         return false;
     }
 
-    public void move_guide_to_position (int position, Lib.Managers.GuideManager.Direction direction, Geometry.Point new_pos) {
+    public void move_guide_to_position (
+        int position,
+        Lib.Managers.GuideManager.Direction direction,
+        Geometry.Point new_pos
+    ) {
         if (direction == Lib.Managers.GuideManager.Direction.HORIZONTAL) {
             highlight_position = new_pos.y;
             highlight_direction = direction;
@@ -117,5 +155,27 @@ public class Akira.Models.GuidelineModel {
         } else if (dir == Lib.Managers.GuideManager.Direction.VERTICAL) {
             v_guides.remove_at (pos);
         }
+    }
+
+    /*
+     * This method will calculate the distances of selected guideline and its nearest neighbours.
+     * It also calculates the position where this text is to be displayed on canvas.
+     * The distances will always be drawn next to the cursor.
+     */
+    public void calculate_distance_positions (Geometry.Point cursor) {
+        double distance_1 = 0;
+        double distance_2 = 0;
+
+        // Calculate the distance between the highlighted guide and the neareast neighbour on either sides.
+        if (highlight_direction == Lib.Managers.GuideManager.Direction.HORIZONTAL) {
+            distance_1 = highlight_position - h_guides.elements[highlight_guide - 1];
+            distance_2 = h_guides.elements[highlight_guide] - highlight_position;
+        } else if (highlight_direction == Lib.Managers.GuideManager.Direction.VERTICAL) {
+            distance_1 = highlight_position - v_guides.elements[highlight_guide - 1];
+            distance_2 = v_guides.elements[highlight_guide] - highlight_position;
+        }
+
+        cursor_position = cursor;
+        distances = """%.3f, %.3f""".printf (distance_1, distance_2);
     }
  }

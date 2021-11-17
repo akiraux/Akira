@@ -72,7 +72,7 @@
 
     public bool button_press_event (Gdk.EventButton event) {
         if (!is_within_artboard ()) {
-            return false;;
+            return false;
         } else {
             view_canvas.guide_layer.update_guide_data (guide_data);
         }
@@ -81,6 +81,7 @@
 
         if (guide_data.does_guide_exist_at (point, out sel_line, out sel_direction)) {
             guide_data.remove_guide (sel_direction, sel_line);
+            guide_data.calculate_distance_positions (current_cursor);
             return true;
         }
 
@@ -111,6 +112,7 @@
 
         if (sel_direction != Direction.NONE) {
             guide_data.move_guide_to_position (sel_line, sel_direction, current_cursor);
+            guide_data.calculate_distance_positions (current_cursor);
             view_canvas.guide_layer.update_guide_data (guide_data);
             return true;
         }
@@ -148,7 +150,7 @@
 
                 if (extents.contains (current_cursor.x, current_cursor.y)) {
                     guide_data = item.value.instance.guide_data;
-                    guide_data.drawable_extents = item.value.instance.bounding_box;
+                    guide_data.set_drawable_extents (item.value.instance.bounding_box);
                     return true;
                 }
             }
