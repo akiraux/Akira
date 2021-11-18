@@ -124,6 +124,17 @@
         return cln;
     }
 
+    public void get_distance_to_neighbours (double item, out double neigh_1, out double neigh_2) {
+        var array_copy = this.clone ();
+        array_copy.insert (item);
+
+        int position = -1;
+        array_copy.contains (item, out position);
+        neigh_1 = item - array_copy.elements[position - 1];
+        neigh_2 = array_copy.elements[position + 1] - item;
+        print("nearest neigh %f %f\n", neigh_1, neigh_2);
+    }
+
     /*
      * Utility function for binary search.
      */
