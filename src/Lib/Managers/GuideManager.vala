@@ -42,6 +42,7 @@
         guide_data = new Models.GuidelineModel ();
 
         view_canvas.scroll_event.connect (on_scroll);
+        guide_data.changed.connect (on_guide_data_changed);
     }
 
      public bool key_press_event (Gdk.EventKey event) {
@@ -99,6 +100,7 @@
         if (!is_within_artboard ()) {
             return false;
         } else {
+            // In case we clicked on a different artboard, we need to update that data.
             view_canvas.guide_layer.update_guide_data (guide_data);
         }
 
@@ -136,9 +138,17 @@
         current_cursor = Geometry.Point (event.x, event.y);
 
         if (sel_direction != Direction.NONE) {
+            // If while moving a guideline, user takes it out of artboard,
+            // delete it immediately.
+            if (!guide_data.drawable_extents.contains (current_cursor.x, current_cursor.y)) {
+                sel_direction = Lib.Managers.GuideManager.Direction.NONE;
+                sel_line = -1;
+
+                return true;
+            }
+
             guide_data.move_guide_to_position (sel_line, sel_direction, current_cursor);
             guide_data.calculate_distance_positions (current_cursor);
-            view_canvas.guide_layer.update_guide_data (guide_data);
             return true;
         }
 
@@ -147,11 +157,9 @@
 
         if (guide_data.does_guide_exist_at (current_cursor, out highlight_guide, out highlight_direction)) {
             guide_data.set_highlighted_guide (highlight_guide, highlight_direction);
-            view_canvas.guide_layer.update_guide_data (guide_data);
             return true;
         } else {
             guide_data.set_highlighted_guide (-1, Direction.NONE);
-            view_canvas.guide_layer.update_guide_data (guide_data);
             return false;
         }
     }
@@ -166,6 +174,12 @@
         return false;
     }
 
+    private void on_guide_data_changed () {
+        if (view_canvas.guide_layer != null) {
+            view_canvas.guide_layer.update_guide_data (guide_data);
+        }
+    }
+
     private bool is_within_artboard () {
         var groups = view_canvas.items_manager.item_model.group_nodes;
 
@@ -175,8 +189,10 @@
                 var extents = item.value.instance.bounding_box;
 
                 if (extents.contains (current_cursor.x, current_cursor.y)) {
+                    guide_data.changed.disconnect (on_guide_data_changed);
                     guide_data = item.value.instance.guide_data;
                     guide_data.set_drawable_extents (item.value.instance.bounding_box);
+                    guide_data.changed.connect (on_guide_data_changed);
                     return true;
                 }
             }

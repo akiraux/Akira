@@ -36,7 +36,16 @@
         }
     }
 
-    public SortedArray () {
+    // Represent the upper and lower bound that all guidelines must stay in
+    // if they don't want to be deleted. Represent the extents of artboard.
+    // Any guideline outside this limit will be deleted.
+    private double lower_bound;
+    private double upper_bound;
+
+    public SortedArray (double lower_bound, double upper_bound) {
+        this.lower_bound = lower_bound;
+        this.upper_bound = upper_bound;
+
         elements = new double[0];
     }
 
@@ -44,6 +53,10 @@
      * Inserts the given elements in the such that the resultant array remains sorted.
      */
     public void insert (double item) {
+        if ((item > upper_bound) || (item < lower_bound)) {
+            return;
+        }
+
         var new_elements = new double[elements.length + 1];
         int idx = 0;
 
@@ -114,7 +127,7 @@
     }
 
     public SortedArray clone () {
-        var cln = new SortedArray ();
+        var cln = new SortedArray (lower_bound, upper_bound);
         cln.elements = new double[elements.length];
 
         for (int i = 0; i < elements.length; ++i) {
@@ -132,7 +145,11 @@
         array_copy.contains (item, out position);
         neigh_1 = item - array_copy.elements[position - 1];
         neigh_2 = array_copy.elements[position + 1] - item;
-        print("nearest neigh %f %f\n", neigh_1, neigh_2);
+    }
+
+    public void set_bounds (double lower_bound, double upper_bound) {
+        this.lower_bound = lower_bound;
+        this.upper_bound = upper_bound;
     }
 
     /*

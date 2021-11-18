@@ -44,9 +44,13 @@ public class Akira.Models.GuidelineModel {
     // The guidelines will only be drawn inside this region.
     public Geometry.Rectangle drawable_extents;
 
+    public signal void changed ();
+
     public GuidelineModel () {
-        h_guides = new Utils.SortedArray ();
-        v_guides = new Utils.SortedArray ();
+        h_guides = new Utils.SortedArray (0, 0);
+        v_guides = new Utils.SortedArray (0, 0);
+
+        drawable_extents = Geometry.Rectangle.empty ();
     }
 
     public GuidelineModel copy () {
@@ -68,10 +72,12 @@ public class Akira.Models.GuidelineModel {
 
     public void add_h_guide (double pos) {
         h_guides.insert (pos);
+        changed ();
     }
 
     public void add_v_guide (double pos) {
         v_guides.insert (pos);
+        changed ();
     }
 
     public void set_highlighted_guide (int guide, Lib.Managers.GuideManager.Direction direction) {
@@ -83,12 +89,21 @@ public class Akira.Models.GuidelineModel {
         } else if (direction == Lib.Managers.GuideManager.Direction.VERTICAL) {
             highlight_position = v_guides.elements[guide];
         }
+
+        changed ();
     }
 
     public void set_drawable_extents (Geometry.Rectangle extents) {
+        // Remove the guidelines at edges of previous extents if they exist.
+        // Solves bug when artboard gets resized.
+        h_guides.remove_item (drawable_extents.top);
+        h_guides.remove_item (drawable_extents.bottom);
+        v_guides.remove_item (drawable_extents.left);
+        v_guides.remove_item (drawable_extents.right);
+
         drawable_extents = extents;
 
-        // We also need to add the edges of the artboard.
+        // Then add the new edges of artboard.
         // These lines make it easier to measure distances.
         int index;
         if (h_guides.contains (extents.left, out index) || h_guides.contains (extents.right, out index)) {
@@ -101,6 +116,11 @@ public class Akira.Models.GuidelineModel {
         v_guides.insert (extents.right);
         h_guides.insert (extents.top);
         h_guides.insert (extents.bottom);
+
+        h_guides.set_bounds (extents.top, extents.bottom);
+        v_guides.set_bounds (extents.left, extents.right);
+
+        changed ();
     }
 
     public bool does_guide_exist_at (
@@ -134,6 +154,7 @@ public class Akira.Models.GuidelineModel {
 
         sel_line = -1;
         sel_direction = Lib.Managers.GuideManager.Direction.NONE;
+        changed ();
 
         return false;
     }
@@ -147,18 +168,22 @@ public class Akira.Models.GuidelineModel {
             highlight_position = new_pos.y;
             highlight_direction = direction;
             highlight_guide = position;
+            changed ();
         } else if (direction == Lib.Managers.GuideManager.Direction.VERTICAL) {
             highlight_position = new_pos.x;
             highlight_direction = direction;
             highlight_guide = position;
+            changed ();
         }
     }
 
     public void remove_guide (Lib.Managers.GuideManager.Direction dir, int pos) {
         if (dir == Lib.Managers.GuideManager.Direction.HORIZONTAL) {
             h_guides.remove_at (pos);
+            changed ();
         } else if (dir == Lib.Managers.GuideManager.Direction.VERTICAL) {
             v_guides.remove_at (pos);
+            changed ();
         }
     }
 
@@ -184,5 +209,6 @@ public class Akira.Models.GuidelineModel {
 
         cursor_position = cursor;
         distances = """%.3f, %.3f""".printf (distance_1, distance_2);
+        changed ();
     }
  }
