@@ -28,6 +28,7 @@ public class Akira.Models.GuidelineModel {
     public Utils.SortedArray v_guides;
 
     // Stores index of line in the sorted array.
+    // In case we are moving the guide, stores index of next guideline.
     public int highlight_guide;
     public Lib.Managers.GuideManager.Direction highlight_direction;
     // Stores the coordinate of currently highlighted guideline.
@@ -107,21 +108,25 @@ public class Akira.Models.GuidelineModel {
         out int sel_line,
         out Lib.Managers.GuideManager.Direction sel_direction
     ) {
-        double thresh = 1;
-
-        // We are skipping the first and last lines as those are fixed
-        // and only used for calculating distances.
-        for (int i = 1; i < h_guides.length - 1; ++i) {
-            if ((h_guides.elements[i] - point.y).abs () < thresh) {
-                sel_line = i;
+        if (h_guides.contains (point.y, out sel_line)) {
+            // The first and last guidelines are only for calculating distances.
+            // They should not be moved.
+            if (sel_line == 0 || sel_line == h_guides.length) {
+                sel_line = -1;
+                sel_direction = Lib.Managers.GuideManager.Direction.NONE;
+                return false;
+            } else {
                 sel_direction = Lib.Managers.GuideManager.Direction.HORIZONTAL;
                 return true;
             }
         }
 
-        for (int i = 1; i < v_guides.length - 1; ++i) {
-            if ((v_guides.elements[i] - point.x).abs () < thresh) {
-                sel_line = i;
+        if (v_guides.contains (point.x, out sel_line)) {
+            if (sel_line == 0 || sel_line == v_guides.length) {
+                sel_line = -1;
+                sel_direction = Lib.Managers.GuideManager.Direction.NONE;
+                return false;
+            } else {
                 sel_direction = Lib.Managers.GuideManager.Direction.VERTICAL;
                 return true;
             }
@@ -168,11 +173,13 @@ public class Akira.Models.GuidelineModel {
 
         // Calculate the distance between the highlighted guide and the neareast neighbour on either sides.
         if (highlight_direction == Lib.Managers.GuideManager.Direction.HORIZONTAL) {
-            distance_1 = highlight_position - h_guides.elements[highlight_guide - 1];
-            distance_2 = h_guides.elements[highlight_guide] - highlight_position;
+            //  distance_1 = highlight_position - h_guides.elements[highlight_guide - 1];
+            //  distance_2 = h_guides.elements[highlight_guide] - highlight_position;
+            h_guides.get_distance_to_neighbours (highlight_position, out distance_1, out distance_2);
         } else if (highlight_direction == Lib.Managers.GuideManager.Direction.VERTICAL) {
-            distance_1 = highlight_position - v_guides.elements[highlight_guide - 1];
-            distance_2 = v_guides.elements[highlight_guide] - highlight_position;
+            //  distance_1 = highlight_position - v_guides.elements[highlight_guide - 1];
+            //  distance_2 = v_guides.elements[highlight_guide] - highlight_position;
+            v_guides.get_distance_to_neighbours (highlight_position, out distance_1, out distance_2);
         }
 
         cursor_position = cursor;

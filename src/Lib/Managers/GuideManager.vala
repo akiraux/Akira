@@ -71,6 +71,31 @@
     }
 
     public bool button_press_event (Gdk.EventButton event) {
+        /*
+        if (event.type == Gdk.EventType.@2BUTTON_PRESS) {
+            //  The Double Click to Delete Bug/Feature and its patch.
+
+            //  Why double clicking deletes a guideline
+            //      When you click on a guideline, it gets deleted from the SortedArray.
+            //      Then you can drag you anywhere. As soon as you release the button, it gets added to 
+            //      the sorted array at the correct position. 
+
+            //      When you double click, the events occur as follows
+            //          1. click -> delete the guideline.
+            //          2. release -> add the guideline we deleted.
+            //          3. click -> again delete the same guideline.
+            //          4. double click -> should delete the guideline, but none exists coz we just deleted it
+            //              At this point, we also enter the guide_data.does_exist_at method. Since there is not guide,
+            //              we also make the selected guide as none.
+            //          5. release -> no action here. Since there was no selected guide.
+            
+            //  In case you feel like disabling the double click to delete guide feature, just uncomment
+            //  this 'if' block.
+
+            return false;
+        }
+        */
+
         if (!is_within_artboard ()) {
             return false;
         } else {
@@ -144,6 +169,7 @@
     private bool is_within_artboard () {
         var groups = view_canvas.items_manager.item_model.group_nodes;
 
+        // Need to optimize this part.
         foreach (var item in groups) {
             if (item.key >= Lib.Items.Model.GROUP_START_ID) {
                 var extents = item.value.instance.bounding_box;
