@@ -211,12 +211,12 @@
 }
 
  public class Akira.Viewlayers.DistanceContainer {
-    public static double WIDTH = 100;
-    public static double HEIGHT = 80;
-    public static double OFFSET = 10;
-    private double PADDING = 5 + OFFSET;
-    private double FONT_SIZE = 12;
-    private double LINE_HEIGHT = 16;
+    public static double WIDTH = 100; //vala-lint=naming-convention
+    public static double HEIGHT = 80; //vala-lint=naming-convention
+    public static double OFFSET = 10; //vala-lint=naming-convention
+    private double PADDING = 5 + OFFSET; //vala-lint=naming-convention
+    private double FONT_SIZE = 12; //vala-lint=naming-convention
+    private double LINE_HEIGHT = 16; //vala-lint=naming-convention
 
     public void render (Cairo.Context context, Geometry.Point pos, double[] distances) {
         if (distances[0] == -1 && distances[1] == -1 && distances[2] == -1 && distances[3] == -1) {

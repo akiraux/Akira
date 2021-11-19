@@ -152,7 +152,7 @@
         if (neigh_2 < 0) {
             neigh_2 = 0;
         }
-        
+
     }
 
     public void set_bounds (double lower_bound, double upper_bound) {
