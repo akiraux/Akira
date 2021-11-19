@@ -145,6 +145,14 @@
         array_copy.contains (item, out position);
         neigh_1 = item - array_copy.elements[position - 1];
         neigh_2 = array_copy.elements[position + 1] - item;
+
+        if (neigh_1 < 0) {
+            neigh_1 = 0;
+        }
+        if (neigh_2 < 0) {
+            neigh_2 = 0;
+        }
+        
     }
 
     public void set_bounds (double lower_bound, double upper_bound) {

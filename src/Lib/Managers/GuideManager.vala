@@ -126,9 +126,13 @@
             sel_direction = Direction.NONE;
             sel_line = -1;
 
+            guide_data.reset_distances ();
+            
             return true;
         }
 
+        guide_data.reset_distances ();
+        
         return false;
     }
 

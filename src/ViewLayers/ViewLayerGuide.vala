@@ -22,12 +22,14 @@
  public class Akira.ViewLayers.ViewLayerGuide : ViewLayer {
     private Models.GuidelineModel? guide_data;
     private Models.GuidelineModel? old_data;
+    private Viewlayers.DistanceContainer distance_container;
 
     public ViewLayerGuide () {
     }
     public void update_guide_data (Models.GuidelineModel data) {
         old_data = (guide_data == null) ? null : guide_data.copy ();
         guide_data = data.copy ();
+        distance_container = new Viewlayers.DistanceContainer ();
 
         update ();
     }
@@ -82,7 +84,7 @@
 
         draw_highlighted_guide (context);
 
-        draw_distances (context);
+        distance_container.render (context, guide_data.cursor_position, guide_data.distances);
     }
 
     public override void update () {
@@ -150,11 +152,14 @@
 
         // Draw the distance text.
         var distance_extents = Geometry.Rectangle.empty ();
+        var offset = Viewlayers.DistanceContainer.OFFSET;
+        var width = Viewlayers.DistanceContainer.WIDTH;
+        var height = Viewlayers.DistanceContainer.HEIGHT;
 
-        distance_extents.left = data.cursor_position.x - 90;
-        distance_extents.right = data.cursor_position.x + 90;
-        distance_extents.top = data.cursor_position.y - 14;
-        distance_extents.bottom = data.cursor_position.y + 14;
+        distance_extents.left = data.cursor_position.x + offset;
+        distance_extents.right = data.cursor_position.x + width + offset;
+        distance_extents.top = data.cursor_position.y + offset;
+        distance_extents.bottom = data.cursor_position.y + height + offset;
 
         canvas.request_redraw (distance_extents);
     }
@@ -203,16 +208,65 @@
         context.new_path ();
         context.restore ();
     }
+}
 
-    private void draw_distances (Cairo.Context context) {
+ public class Akira.Viewlayers.DistanceContainer {
+    public static double WIDTH = 100;
+    public static double HEIGHT = 80;
+    public static double OFFSET = 10;
+    private double PADDING = 5 + OFFSET;
+    private double FONT_SIZE = 12;
+    private double LINE_HEIGHT = 16;
+
+    public void render (Cairo.Context context, Geometry.Point pos, double[] distances) {
+        if (distances[0] == -1 && distances[1] == -1 && distances[2] == -1 && distances[3] == -1) {
+            return;
+        }
+
+        string left_dist = pretty_string ("L: ", distances[0]);
+        string right_dist = pretty_string ("R: ", distances[1]);
+        string top_dist = pretty_string ("T: ", distances[2]);
+        string bottom_dist = pretty_string ("B: ", distances[3]);
+
+        context.save ();
+        context.new_path ();
+        context.set_source_rgba (0.8, 0.8, 0.8, 1);
+        context.set_line_width (1.0);
+
+        // Draw a rectangle. This rectangle will contain all the distance text.
+        context.move_to (pos.x + OFFSET, pos.y + OFFSET);
+        context.rectangle (pos.x + OFFSET, pos.y + OFFSET, WIDTH, HEIGHT);
+        context.fill ();
+
         context.set_source_rgba (0.8705, 0.1921, 0.3882, 1);
         context.select_font_face ("monospace", Cairo.FontSlant.NORMAL, Cairo.FontWeight.NORMAL);
-        context.set_font_size (14);
+        context.set_font_size (FONT_SIZE);
 
-        double x = guide_data.cursor_position.x - 50;
-        double y = guide_data.cursor_position.y - 5;
+        context.move_to (pos.x + PADDING, pos.y + PADDING + LINE_HEIGHT);
+        context.show_text (left_dist);
 
-        context.move_to (x, y);
-        context.show_text (guide_data.distances);
+        context.move_to (pos.x + PADDING, pos.y + PADDING + 2 * LINE_HEIGHT);
+        context.show_text (right_dist);
+
+        context.move_to (pos.x + PADDING, pos.y + PADDING + 3 * LINE_HEIGHT);
+        context.show_text (top_dist);
+
+        context.move_to (pos.x + PADDING, pos.y + PADDING + 4 * LINE_HEIGHT);
+        context.show_text (bottom_dist);
+
+        context.new_path ();
+        context.restore ();
     }
- }
+
+    private string pretty_string (string prefix, double distance) {
+        string pretty = prefix;
+
+        if (distance == -1) {
+            pretty += "--";
+        } else {
+            pretty += """%.2f""".printf (distance);
+        }
+
+        return pretty;
+    }
+}

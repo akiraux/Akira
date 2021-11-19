@@ -36,9 +36,10 @@ public class Akira.Models.GuidelineModel {
 
     // The distances between guidelines will be displayed near the current cursor position.
     public Geometry.Point cursor_position;
-    // This string will contain the distances either from the nearest guidelines or another item.
-    // This string will be draw as is on the canvas.
-    public string distances;
+    // This array stores the distances from all four sides.
+    // Can be distances from neighbouring guidelines or other canvas items.
+    // Stored as { LEFT, RIGHT, TOP, BOTTOM }
+    public double[] distances;
 
     // Stores the extents of the artboard.
     // The guidelines will only be drawn inside this region.
@@ -51,6 +52,8 @@ public class Akira.Models.GuidelineModel {
         v_guides = new Utils.SortedArray (0, 0);
 
         drawable_extents = Geometry.Rectangle.empty ();
+        distances = new double[4];
+        distances[0] = distances[1] = distances[2] = distances[3] = -1;
     }
 
     public GuidelineModel copy () {
@@ -193,22 +196,21 @@ public class Akira.Models.GuidelineModel {
      * The distances will always be drawn next to the cursor.
      */
     public void calculate_distance_positions (Geometry.Point cursor) {
-        double distance_1 = 0;
-        double distance_2 = 0;
-
         // Calculate the distance between the highlighted guide and the neareast neighbour on either sides.
         if (highlight_direction == Lib.Managers.GuideManager.Direction.HORIZONTAL) {
-            //  distance_1 = highlight_position - h_guides.elements[highlight_guide - 1];
-            //  distance_2 = h_guides.elements[highlight_guide] - highlight_position;
-            h_guides.get_distance_to_neighbours (highlight_position, out distance_1, out distance_2);
+            h_guides.get_distance_to_neighbours (highlight_position, out distances[2], out distances[3]);
+            distances[0] = distances[1] = -1;
         } else if (highlight_direction == Lib.Managers.GuideManager.Direction.VERTICAL) {
-            //  distance_1 = highlight_position - v_guides.elements[highlight_guide - 1];
-            //  distance_2 = v_guides.elements[highlight_guide] - highlight_position;
-            v_guides.get_distance_to_neighbours (highlight_position, out distance_1, out distance_2);
+            v_guides.get_distance_to_neighbours (highlight_position, out distances[0], out distances[1]);
+            distances[2] = distances[3] = -1;
         }
 
         cursor_position = cursor;
-        distances = """%.3f, %.3f""".printf (distance_1, distance_2);
+        changed ();
+    }
+
+    public void reset_distances () {
+        distances[0] = distances[1] = distances[2] = distances[3] = -1;
         changed ();
     }
  }
