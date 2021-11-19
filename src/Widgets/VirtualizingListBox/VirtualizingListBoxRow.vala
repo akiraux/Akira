@@ -41,6 +41,7 @@ public class VirtualizingListBoxRow : Gtk.Bin {
 
     public override bool draw (Cairo.Context ct) {
         var sc = this.get_style_context ();
+        // TODO: Replace this with fixed height and the width of the layers panel.
         Gtk.Allocation alloc;
         this.get_allocation (out alloc);
 

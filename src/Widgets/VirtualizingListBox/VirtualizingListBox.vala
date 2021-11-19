@@ -794,11 +794,11 @@ public class VirtualizingListBox : Gtk.Container, Gtk.Scrollable {
         }
 
         while (index <= shown_from) {
-            vadjustment.value--;
+            vadjustment.value -= vadjustment.page_size;
         }
 
         while (index + 1 >= shown_to) {
-            vadjustment.value++;
+            vadjustment.value += vadjustment.page_size;
         }
 
         foreach (VirtualizingListBoxRow row in current_widgets) {
