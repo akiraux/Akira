@@ -30,7 +30,12 @@ public class VirtualizingListBox : Gtk.Container, Gtk.Scrollable {
     public RowFactoryMethod factory_func;
 
     public signal void row_activated (GLib.Object row);
-    public signal void row_selected (GLib.Object row);
+
+    // Signal triggered when the selection of the rows changes only after a pressed
+    // event. The bool `clear` is set to true only when all rows have been
+    // deselected.It's up to the implementation widget to fetch the currently
+    // selected rows to update the UI.
+    public signal void row_selection_changed (bool clear = false);
 
     private VirtualizingListBoxModel? _model;
     public VirtualizingListBoxModel? model {
@@ -521,7 +526,7 @@ public class VirtualizingListBox : Gtk.Container, Gtk.Scrollable {
         position_children ();
         queue_draw ();
 
-        print ("ensure_visible_widgets\n");
+        // print ("ensure_visible_widgets\n");
     }
 
     private int estimated_widget_height () {
@@ -649,25 +654,26 @@ public class VirtualizingListBox : Gtk.Container, Gtk.Scrollable {
     }
 
     private void on_multipress_released (int n_press, double x, double y) {
-        if (active_row != null) {
-            active_row.unset_state_flags (Gtk.StateFlags.ACTIVE);
-
-            if (n_press == 1 && activate_on_single_click) {
-                select_and_activate (active_row);
-            } else {
-                bool modify, extend;
-                get_current_selection_modifiers (out modify, out extend);
-                var sequence = multipress.get_current_sequence ();
-                var event = multipress.get_last_event (sequence);
-                var source = event.get_source_device ().get_source ();
-
-                if (source == Gdk.InputSource.TOUCHSCREEN) {
-                    modify = !modify;
-                }
-
-                update_selection (active_row, modify, extend);
-            }
+        if (active_row == null) {
+            unselect_all_internal ();
+            row_selection_changed (true);
+            return;
         }
+
+        active_row.unset_state_flags (Gtk.StateFlags.ACTIVE);
+
+        bool modify, extend;
+        get_current_selection_modifiers (out modify, out extend);
+        var sequence = multipress.get_current_sequence ();
+        var event = multipress.get_last_event (sequence);
+        var source = event.get_source_device ().get_source ();
+
+        if (source == Gdk.InputSource.TOUCHSCREEN) {
+            modify = !modify;
+        }
+
+        update_selection (active_row, modify, extend);
+        row_selection_changed ();
     }
 
     private void update_selection (VirtualizingListBoxRow row, bool modify, bool extend) {
@@ -688,8 +694,6 @@ public class VirtualizingListBox : Gtk.Container, Gtk.Scrollable {
             } else {
                 row.unset_state_flags (Gtk.StateFlags.SELECTED);
             }
-
-            row_selected (selected_row);
         } else {
             if (extend) {
                 var selected = selected_row;
@@ -755,7 +759,6 @@ public class VirtualizingListBox : Gtk.Container, Gtk.Scrollable {
         }
 
         if (index == 0) {
-            print ("TOP INDEX\n");
             set_value (0.0);
             ensure_visible_widgets ();
             foreach (VirtualizingListBoxRow row in current_widgets) {
@@ -766,7 +769,6 @@ public class VirtualizingListBox : Gtk.Container, Gtk.Scrollable {
         }
 
         if (index == index_max) {
-            print ("BOTTOM INDEX\n");
             set_value (vadjustment.upper);
             ensure_visible_widgets ();
             foreach (VirtualizingListBoxRow row in current_widgets) {
@@ -774,14 +776,6 @@ public class VirtualizingListBox : Gtk.Container, Gtk.Scrollable {
                     return row;
                 }
             }
-        }
-
-        // If the list was never scrolled or is at top position, we need to force
-        // the scroll of at least one row widget to ensure all adjustment calculations
-        // have run. This might happen when loading a saved file, which generates
-        // multiple items at once without actually triggering any scroll.
-        if (vadjustment.value == 0.0) {
-            set_value (default_widget_height);
         }
 
         while (index <= shown_from) {
@@ -815,8 +809,6 @@ public class VirtualizingListBox : Gtk.Container, Gtk.Scrollable {
         model.set_item_selected (row.model_item, true);
         row.set_state_flags (Gtk.StateFlags.SELECTED, false);
         selected_row = row.model_item;
-
-        row_selected (row.model_item);
     }
 
     protected void unselect_all () {

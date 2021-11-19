@@ -25,8 +25,6 @@
  * The scrollable layers panel.
  */
 public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
-    public signal void layer_selected (Lib.Items.ModelInstance? node);
-
     public unowned Akira.Lib.ViewCanvas view_canvas { get; construct; }
 
     private Gee.HashMap<int, LayerItemModel> layers;
@@ -37,6 +35,7 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
             view_canvas: canvas
         );
 
+        selection_mode = Gtk.SelectionMode.MULTIPLE;
         activate_on_single_click = true;
         layers = new Gee.HashMap<int, LayerItemModel> ();
         list_store = new LayerListStore ();
@@ -44,6 +43,9 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
 
         model = list_store;
 
+        // Factory function to reuse the already generated row UI element when
+        // a new layer is created or the layers list scrolls to reveal layers
+        // outside of the viewport.
         factory_func = (item, old_widget) => {
             LayerListItem? row = null;
             if (old_widget != null) {
@@ -58,27 +60,27 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
             return row;
         };
 
-        row_selected.connect ((row) => {
-            if (row == null) {
-                // layer_selected (null);
-                return;
-            }
+        // When an item is selected from a click on the layers list.
+        row_selection_changed.connect (on_row_selection_changed);
 
-            // Now select the clicked layer.
-            // layer_selected (((LayerItemModel) row).node);
-        });
-
+        // Listed to the button release event only for the secondary click in
+        // order to trigger the context menu.
         button_release_event.connect ((e) => {
             if (e.button != Gdk.BUTTON_SECONDARY) {
                 return Gdk.EVENT_PROPAGATE;
             }
             var row = get_row_at_y ((int)e.y);
+            if (row == null) {
+                return Gdk.EVENT_PROPAGATE;
+            }
+
             if (selected_row_widget != row) {
                 select_row (row);
             }
             return create_context_menu (e, (LayerListItem)row);
         });
 
+        // Trigger the context menu when the `menu` key is pressed.
         key_release_event.connect ((e) => {
             if (e.keyval != Gdk.Key.Menu) {
                 return Gdk.EVENT_PROPAGATE;
@@ -88,7 +90,7 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
         });
 
         view_canvas.items_manager.item_model.item_added.connect (on_item_added);
-        view_canvas.selection_manager.selection_modified.connect (on_selection_modified);
+        view_canvas.selection_manager.selection_modified_external.connect (on_selection_modified_external);
     }
 
     private void on_item_added (int id) {
@@ -98,34 +100,11 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
             return;
         }
 
-        // FIX TODO: For some reason, a cloned item (copied and pasted) doesn't
-        // trigger the items_changed signal of the list store.
         var service_uid = node_instance.id;
         var item = new LayerItemModel (node_instance, service_uid);
         layers[service_uid] = item;
         list_store.add (item);
         print ("on_item_added: %i\n", service_uid);
-    }
-
-    private void on_selection_modified () {
-        print ("on_selection_modified\n");
-        var sm = view_canvas.selection_manager;
-        if (sm.is_empty ()) {
-            unselect_all ();
-            return;
-        }
-
-        // A bit hacky but I don't know how to fix this. Since we're adding the
-        // new layer on top, the index is always 0 for newly generated layers.
-        // That means the selection changes happens so fast that it tries to select
-        // the row on index 0 while a new row is being added at index 0. Without
-        // the timeout, the app crashes.
-        Timeout.add (0, () => {
-            foreach (var node in sm.selection.nodes.values) {
-                select_row_at_index (model.get_index_of (layers[node.node.id]));
-            }
-            return false;
-        });
     }
 
     private bool create_context_menu (Gdk.Event e, LayerListItem row) {
@@ -151,6 +130,10 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
         list_store.items_changed (0, 0, added);
     }
 
+    /*
+     * Remove all the currently selected layers. The list of ids comes from the
+     * selected nodes in the view canvas.
+     */
     public void remove_items (GLib.Array<int> ids) {
         var removed = 0;
         foreach (var uid in ids.data) {
@@ -165,7 +148,68 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
         list_store.items_changed (0, removed, 0);
     }
 
+    /*
+     * Sort function to always add new layers at the top.
+     */
     private static int layers_sort_function (LayerItemModel layer1, LayerItemModel layer2) {
         return (int)(layer2.id - layer1.id);
+    }
+
+    /*
+     * Update the selected items in the canvas when the selection of rows in the
+     * listbox changes.
+     */
+    private void on_row_selection_changed (bool clear) {
+        var sm = view_canvas.selection_manager;
+        // Always reset the selection.
+        sm.reset_selection ();
+
+        // No need to do anything else if all rows were selected.
+        if (clear) {
+            return;
+        }
+
+        // Add all currently selected rows to the selection. This won't trigger
+        // a selection changed loop since the selection_modified_external signal
+        // is only triggered from a click on the canvas.
+        foreach (var model in get_selected_rows ()) {
+            sm.add_to_selection (((LayerItemModel) model).node.id);
+        }
+
+        // Trigger the transform mode if is not currently active. This might
+        // happen when no items is selected and the first selection is triggered
+        // from the layers listbox.
+        var mm = view_canvas.mode_manager;
+        if (mm.active_mode_type != Lib.Modes.AbstractInteractionMode.ModeType.TRANSFORM) {
+            var new_mode = new Lib.Modes.TransformMode (view_canvas, Utils.Nobs.Nob.NONE);
+            mm.register_mode (new_mode);
+            mm.deregister_active_mode ();
+        }
+    }
+
+    /*
+     * When an item in the canvas is selected via click interaction.
+     */
+    private void on_selection_modified_external () {
+        print ("on_selection_modified_external\n");
+        // Always reset the selection of the layers.
+        unselect_all ();
+
+        var sm = view_canvas.selection_manager;
+        if (sm.is_empty ()) {
+            return;
+        }
+
+        // A bit hacky but I don't know how to fix this. Since we're adding the
+        // new layer on top, the index is always 0 for newly generated layers.
+        // That means the selection changes happens so fast that it tries to select
+        // the row on index 0 while a new row is being added at index 0. Without
+        // the timeout, the app crashes.
+        Timeout.add (0, () => {
+            foreach (var node in sm.selection.nodes.values) {
+                select_row_at_index (model.get_index_of (layers[node.node.id]));
+            }
+            return false;
+        });
     }
 }
