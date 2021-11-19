@@ -97,7 +97,6 @@ public class Akira.Layouts.Sidebars.LayersSidebar : Gtk.Grid {
 
         // Connect signals.
         view_canvas.window.event_bus.toggle_presentation_mode.connect (toggle);
-        layers_listbox.layer_selected.connect (on_layer_selected);
     }
 
     private Gtk.Grid build_search_bar () {
@@ -124,10 +123,6 @@ public class Akira.Layouts.Sidebars.LayersSidebar : Gtk.Grid {
     private bool handle_focus_out (Gdk.EventFocus event) {
         view_canvas.window.event_bus.connect_typing_accel ();
         return false;
-    }
-
-    private void on_layer_selected (Lib.Items.ModelInstance? node) {
-        view_canvas.on_layer_selected (node);
     }
 
     /*

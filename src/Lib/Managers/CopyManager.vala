@@ -86,6 +86,10 @@ public class Akira.Lib.Managers.CopyManager : Object {
 
         view_canvas.items_manager.compile_model ();
         assert (res == 0);
+
+        // Defer the print of the layer UI after all items have been created.
+        view_canvas.window.main_window.show_added_layers ((int) children.length);
+        view_canvas.selection_manager.selection_modified_external ();
     }
 
     private void on_subtree_cloned (int id) {

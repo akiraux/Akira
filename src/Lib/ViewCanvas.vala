@@ -337,10 +337,15 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
                     }
 
                     selection_manager.add_to_selection (target.id);
+                    selection_manager.selection_modified_external ();
                 }
-            } else if (!selection_manager.selection.bounding_box ().contains (event.x, event.y)) {
-                // Selection area was not clicked, so we reset the selection
+            } else if (
+                !selection_manager.selection.bounding_box ().contains (event.x, event.y) &&
+                !selection_manager.selection.is_empty ()
+            ) {
+                // Selection area was not clicked, so we reset the selection if we have some.
                 selection_manager.reset_selection ();
+                selection_manager.selection_modified_external ();
             }
         }
 
@@ -364,9 +369,9 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
     }
 
     private bool handle_double_click_event () {
-        // If the user double clicks on a CanvasItem, the item gets added to selection_manager on the first click.
-        // If double click happened on empty area, no items is selected.
-
+        // If the user double clicks on a CanvasItem, the item gets added to
+        // selection_manager on the first click. If double click happened on
+        // empty area, no items is selected.
         var selected_item = selection_manager.selection.first_node ();
 
         if (selected_item == null) {
@@ -385,7 +390,7 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
     }
 
     public override bool button_release_event (Gdk.EventButton event) {
-        // Check if the there's a delta between the pressed and released event.
+        // Check if the there's no delta between the pressed and released event.
         if (initial_event_x == event.x || initial_event_y == event.y) {
             var count = selection_manager.count ();
             var target = items_manager.node_at_canvas_position (
@@ -404,12 +409,14 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
             ) {
                 selection_manager.reset_selection ();
                 selection_manager.add_to_selection (target.id);
+                selection_manager.selection_modified_external ();
             }
 
             // If the click happened on an empty area and we have multiple
             // selected items, deselect them all.
             if (target == null && count > 1) {
                 selection_manager.reset_selection ();
+                selection_manager.selection_modified_external ();
             }
         }
 
@@ -681,20 +688,5 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
      */
     private void on_items_removed (GLib.Array<int> ids) {
         window.main_window.remove_layers (ids);
-    }
-
-    public void on_layer_selected (Lib.Items.ModelInstance? node) {
-        if (node == null) {
-            selection_manager.reset_selection ();
-            return;
-        }
-
-        selection_manager.add_to_selection (node.id);
-
-        if (mode_manager.active_mode_type != Lib.Modes.AbstractInteractionMode.ModeType.TRANSFORM) {
-            var new_mode = new Lib.Modes.TransformMode (this, Utils.Nobs.Nob.NONE);
-            mode_manager.register_mode (new_mode);
-            mode_manager.deregister_active_mode ();
-        }
     }
 }
