@@ -272,6 +272,10 @@ public class VirtualizingListBox : Gtk.Container, Gtk.Scrollable {
     }
 
     private int get_widget_height (Gtk.Widget w) {
+        if (default_widget_height != null) {
+            return (int) default_widget_height;
+        }
+
         int min;
         w.get_preferred_height_for_width (get_allocated_width (), out min, null);
 
@@ -300,10 +304,21 @@ public class VirtualizingListBox : Gtk.Container, Gtk.Scrollable {
             child_allocation.width = 1;
         }
 
+        int? child_width = null;
+        var box_width = get_allocated_width ();
+
         foreach (var child in current_widgets) {
-            child.get_preferred_height_for_width (get_allocated_width (), out child_allocation.height, null);
-            child.get_preferred_width_for_height (child_allocation.height, out child_allocation.width, null);
-            child_allocation.width = int.max (child_allocation.width, get_allocated_width ());
+            // Get the height of the row widget, which we won't fetch every time
+            // if we already did it one.
+            child_allocation.height = get_widget_height (child);
+
+            // If the child_width is not defined, get it the first time. All other
+            // widgets will always have the same width.
+            if (child_width == null) {
+                child.get_preferred_width_for_height (child_allocation.height, out child_width, null);
+            }
+
+            child_allocation.width = int.max (child_width, box_width);
             child_allocation.y = y;
             child.size_allocate (child_allocation);
 
@@ -780,12 +795,10 @@ public class VirtualizingListBox : Gtk.Container, Gtk.Scrollable {
 
         while (index <= shown_from) {
             vadjustment.value--;
-            // ensure_visible_widgets ();
         }
 
         while (index + 1 >= shown_to) {
             vadjustment.value++;
-            // ensure_visible_widgets ();
         }
 
         foreach (VirtualizingListBoxRow row in current_widgets) {
