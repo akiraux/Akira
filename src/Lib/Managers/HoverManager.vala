@@ -73,4 +73,23 @@ public class Akira.Lib.Managers.HoverManager : Object {
 
         hover_layer.add_drawable (node.instance.drawable);
     }
+
+    /*
+     * Create the hover effect from a ModelInstance. This is mostly used by the
+     * layers list box to link the hovering of layers with hovering of canvas items.
+     */
+    public void maybe_create_hover_effect_from_instance (Lib.Items.ModelInstance instance) {
+        if (view_canvas.selection_manager.item_selected (instance.id)) {
+            return;
+        }
+
+        if (current_hovered_id == instance.id) {
+            return;
+        }
+        else {
+            remove_hover_effect ();
+        }
+
+        hover_layer.add_drawable (instance.drawable);
+    }
 }

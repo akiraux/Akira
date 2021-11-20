@@ -54,7 +54,7 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
                 row = new LayerListItem ();
             }
 
-            row.assign ((LayerItemModel)item);
+            row.assign ((LayerItemModel) item);
             row.show_all ();
 
             return row;
@@ -62,6 +62,9 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
 
         // When an item is selected from a click on the layers list.
         row_selection_changed.connect (on_row_selection_changed);
+
+        // When a row is hovered.
+        row_hovered.connect (on_row_hovered);
 
         // Listed to the button release event only for the secondary click in
         // order to trigger the context menu.
@@ -211,5 +214,18 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
             }
             return false;
         });
+    }
+
+    /*
+     * Show the hover effect on a canvas item if available.
+     */
+    private void on_row_hovered (GLib.Object? item) {
+        view_canvas.hover_manager.remove_hover_effect ();
+
+        if (item != null) {
+            view_canvas.hover_manager.maybe_create_hover_effect_from_instance (
+                ((LayerItemModel) item).node
+            );
+        }
     }
 }

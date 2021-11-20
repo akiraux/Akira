@@ -30,6 +30,7 @@ public class VirtualizingListBox : Gtk.Container, Gtk.Scrollable {
     public RowFactoryMethod factory_func;
 
     public signal void row_activated (GLib.Object row);
+    public signal void row_hovered (GLib.Object? row);
 
     // Signal triggered when the selection of the rows changes only after a pressed
     // event. The bool `clear` is set to true only when all rows have been
@@ -130,6 +131,8 @@ public class VirtualizingListBox : Gtk.Container, Gtk.Scrollable {
     private int last_valid_widget_height = 1;
     private VirtualizingListBoxRow? active_row;
     private Gtk.GestureMultiPress multipress;
+    private VirtualizingListBoxRow? hovered_row;
+    private Gtk.EventControllerMotion motion;
 
     static construct {
         set_css_name ("list");
@@ -142,6 +145,11 @@ public class VirtualizingListBox : Gtk.Container, Gtk.Scrollable {
         multipress.button = Gdk.BUTTON_PRIMARY;
         multipress.pressed.connect (on_multipress_pressed);
         multipress.released.connect (on_multipress_released);
+
+        motion = new Gtk.EventControllerMotion (this);
+        motion.set_propagation_phase (Gtk.PropagationPhase.BUBBLE);
+        motion.motion.connect (on_mouse_move);
+        motion.leave.connect (on_mouse_leave);
     }
 
     public override void realize () {
@@ -895,5 +903,29 @@ public class VirtualizingListBox : Gtk.Container, Gtk.Scrollable {
 
     public Gee.HashSet<weak GLib.Object> get_selected_rows () {
         return model.get_selected_rows ();
+    }
+
+    private void on_mouse_move (double x, double y) {
+        if (hovered_row != null) {
+            hovered_row.unset_state_flags (Gtk.StateFlags.PRELIGHT);
+            hovered_row = null;
+            row_hovered (null);
+        }
+
+        var row = get_row_at_y ((int) y);
+        if (row != null) {
+            row.set_state_flags (Gtk.StateFlags.PRELIGHT, false);
+            row_hovered (row.model_item);
+            hovered_row = row;
+        }
+    }
+
+    // TODO: Fix this as it never gets triggered.
+    private void on_mouse_leave () {
+        if (hovered_row != null) {
+            hovered_row.unset_state_flags (Gtk.StateFlags.PRELIGHT);
+            hovered_row = null;
+            row_hovered (null);
+        }
     }
 }
