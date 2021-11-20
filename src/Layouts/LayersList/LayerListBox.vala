@@ -94,6 +94,7 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
 
         view_canvas.items_manager.item_model.item_added.connect (on_item_added);
         view_canvas.selection_manager.selection_modified_external.connect (on_selection_modified_external);
+        view_canvas.hover_manager.hover_changed.connect (on_hover_changed);
     }
 
     private void on_item_added (int id) {
@@ -226,6 +227,14 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
             view_canvas.hover_manager.maybe_create_hover_effect_from_instance (
                 ((LayerItemModel) item).node
             );
+        }
+    }
+
+    private void on_hover_changed (int? id) {
+        on_mouse_leave ();
+
+        if (id != null) {
+            set_hover_on_row_from_model (layers[id]);
         }
     }
 }

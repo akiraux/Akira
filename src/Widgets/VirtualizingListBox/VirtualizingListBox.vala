@@ -920,12 +920,21 @@ public class VirtualizingListBox : Gtk.Container, Gtk.Scrollable {
         }
     }
 
-    // TODO: Fix this as it never gets triggered.
-    private void on_mouse_leave () {
+    // TODO: Fix this as it never gets triggered by the motion leave.
+    protected void on_mouse_leave () {
         if (hovered_row != null) {
             hovered_row.unset_state_flags (Gtk.StateFlags.PRELIGHT);
             hovered_row = null;
             row_hovered (null);
+        }
+    }
+
+    protected void set_hover_on_row_from_model (GLib.Object model) {
+        foreach (VirtualizingListBoxRow row in current_widgets) {
+            if (model == row.model_item) {
+                row.set_state_flags (Gtk.StateFlags.PRELIGHT, false);
+                hovered_row = row;
+            }
         }
     }
 }
