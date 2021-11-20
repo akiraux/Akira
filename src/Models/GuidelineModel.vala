@@ -97,6 +97,22 @@ public class Akira.Models.GuidelineModel {
     }
 
     public void set_drawable_extents (Geometry.Rectangle extents) {
+        // In case the artboard was moved without scaling.
+        if (extents.width == drawable_extents.width && extents.height == drawable_extents.height) {
+            double delta_x = 0;
+            double delta_y = 0;
+
+            delta_x = drawable_extents.left - extents.left;
+            delta_y = drawable_extents.top - extents.top;
+
+            drawable_extents = extents;
+
+            h_guides.translate_all (delta_y);
+            v_guides.translate_all (delta_x);
+            changed ();
+
+            return;
+        }
         // Remove the guidelines at edges of previous extents if they exist.
         // Solves bug when artboard gets resized.
         h_guides.remove_item (drawable_extents.top);

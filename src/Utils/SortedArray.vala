@@ -160,6 +160,12 @@
         this.upper_bound = upper_bound;
     }
 
+    public void translate_all (double delta) {
+        for (int i = 0; i < length; ++i) {
+            elements[i] -= delta;
+        }
+    }
+
     /*
      * Utility function for binary search.
      */
