@@ -147,12 +147,21 @@
 
         if (sel_direction != Direction.NONE) {
             // If while moving a guideline, user takes it out of artboard,
-            // delete it immediately.
+            // dont let guideline outside the bounds.
             if (!guide_data.drawable_extents.contains (current_cursor.x, current_cursor.y)) {
-                sel_direction = Lib.Managers.GuideManager.Direction.NONE;
-                sel_line = -1;
-
-                return true;
+                if (sel_direction == Lib.Managers.GuideManager.Direction.HORIZONTAL) {
+                    current_cursor.y = Utils.GeometryMath.clamp (
+                        current_cursor.y, 
+                        guide_data.drawable_extents.top, 
+                        guide_data.drawable_extents.bottom
+                    );
+                } else if (sel_direction == Lib.Managers.GuideManager.Direction.VERTICAL) {
+                    current_cursor.x = Utils.GeometryMath.clamp (
+                        current_cursor.x, 
+                        guide_data.drawable_extents.left, 
+                        guide_data.drawable_extents.right
+                    );
+                }
             }
 
             guide_data.move_guide_to_position (sel_line, sel_direction, current_cursor);
