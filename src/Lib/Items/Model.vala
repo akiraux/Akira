@@ -40,8 +40,8 @@ public class Akira.Lib.Items.Model : Object {
     public const int GROUP_START_ID = 10;
     public const int ITEM_START_ID = 10000000;
 
-    public int last_group_id = GROUP_START_ID;
-    public int last_item_id = ITEM_START_ID;
+    private int last_group_id = GROUP_START_ID;
+    private int last_item_id = ITEM_START_ID;
 
     public Gee.HashMap<int, ModelInstance> group_map;
     public Gee.HashMap<int, ModelInstance> item_map;

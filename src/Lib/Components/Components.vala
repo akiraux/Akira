@@ -109,6 +109,10 @@ public struct Akira.Lib.Components.Components {
         layout = null;
     }
 
+    public static Name default_name () {
+        return new Name ("item", "-1");
+    }
+
     public static Opacity default_opacity () {
         return new Opacity (100.0);
     }

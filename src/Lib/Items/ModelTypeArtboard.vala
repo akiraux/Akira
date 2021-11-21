@@ -45,6 +45,7 @@ public class Akira.Lib.Items.ModelTypeArtboard : ModelType {
             clips_children = true
         };
         new_item.components.layout = new Components.Layout (layout_data);
+        new_item.components.name = Lib.Components.Components.default_name ();
         return new_item;
     }
 
