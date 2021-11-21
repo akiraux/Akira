@@ -72,6 +72,9 @@ public class Akira.Services.EventBus : Object {
     public signal void request_paste ();
     public signal void delete_selected_items ();
 
+    // Selection align signals
+    public signal void selection_align (Utils.ItemAlignment.AlignmentDirection type);
+
     // Others.
     public signal void disconnect_typing_accel ();
     public signal void connect_typing_accel ();

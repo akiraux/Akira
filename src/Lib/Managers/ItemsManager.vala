@@ -33,6 +33,8 @@ public class Akira.Lib.Managers.ItemsManager : Object {
     construct {
         item_model = new Lib.Items.Model.live_model (view_canvas);
         item_model.item_geometry_changed.connect (on_item_geometry_changed);
+
+        view_canvas.window.event_bus.selection_align.connect (selection_align);
     }
 
     public signal void items_removed (GLib.Array<int> ids);
@@ -509,4 +511,16 @@ public class Akira.Lib.Managers.ItemsManager : Object {
     public void on_item_geometry_changed (int id) {
         view_canvas.selection_manager.on_selection_changed (id);
     }
+
+    public void selection_align (Utils.ItemAlignment.AlignmentDirection direction) {
+        unowned var selection = view_canvas.selection_manager.selection;
+        if (selection.count () <= 1) {
+            return;
+        }
+
+        var type = Utils.ItemAlignment.AlignmentType.FIRST_SELECTED;
+
+        Utils.ItemAlignment.align_selection (selection, direction, type, view_canvas);
+    }
+
 }

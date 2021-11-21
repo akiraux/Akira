@@ -35,6 +35,7 @@ sources = files(
     'Utils/AffineTransform.vala',
     'Utils/Color.vala',
     'Utils/Image.vala',
+    'Utils/ItemAlignment.vala',
     'Utils/ColorPicker.vala',
     'Utils/ModelUtil.vala',
     'Utils/Nobs.vala',
