@@ -324,18 +324,25 @@ public class Akira.Lib.Items.Model : Object {
 
         print (")\n");
 
-
         if (node.children != null) {
             for (var i = 0; i < node.children.length; ++i) {
                 print_dag_recurse (node.children.index (i), level + 1);
             }
         }
-
     }
 
     private int inner_splice_new_item (ModelNode parent_node, uint pos, ModelInstance candidate) {
         var new_id = candidate.is_group ? ++last_group_id : ++last_item_id;
         candidate.id = new_id;
+        // Generate the initial name for the item composed by the type name and
+        // the id. We subtract the starter IDs from what we show the user just
+        // to make it look prettier. The ID saved in the Name component is never
+        // used, maybe we could remove it.
+        var new_name_id = candidate.is_group ? new_id - GROUP_START_ID : new_id - ITEM_START_ID;
+        candidate.components.name = new Lib.Components.Name (
+            "%s %i".printf (candidate.type.name_id, new_name_id),
+            new_id.to_string ()
+        );
         var new_node = new ModelNode (candidate, (int) pos);
 
         add_to_maps (new_node, true);

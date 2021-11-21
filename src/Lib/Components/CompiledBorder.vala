@@ -53,7 +53,6 @@ public class Akira.Lib.Components.CompiledBorder : Copyable<CompiledBorder> {
     }
 
     public static CompiledBorder compile (Components? components, Lib.Items.ModelNode? node) {
-
         var rgba_border = Gdk.RGBA ();
         bool has_colors = false;
         int size = 0;

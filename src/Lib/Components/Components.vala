@@ -23,6 +23,7 @@ public struct Akira.Lib.Components.CompiledComponents {
     public CompiledFill? compiled_fill;
     public CompiledBorder? compiled_border;
     public CompiledGeometry? compiled_geometry;
+    public CompiledName? compiled_name;
 
     public bool is_empty { get {
         return compiled_fill == null && compiled_border == null && compiled_geometry == null;
@@ -74,6 +75,16 @@ public struct Akira.Lib.Components.CompiledComponents {
 
         compiled_geometry = type.compile_geometry (components, node);
         dirty_components.mark_dirty (Component.Type.COMPILED_GEOMETRY, true);
+        return true;
+    }
+
+    public bool maybe_compile_name (Lib.Items.ModelType type, Components? components, Lib.Items.ModelNode? node) {
+        if (compiled_name != null) {
+            return false;
+        }
+
+        compiled_name = type.compile_name (components, node);
+        dirty_components.mark_dirty (Component.Type.COMPILED_NAME, true);
         return true;
     }
 }

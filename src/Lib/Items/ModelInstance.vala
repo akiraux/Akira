@@ -70,7 +70,7 @@ public class Akira.Lib.Items.ModelInstance {
         something_changed = compiled_components.maybe_compile_geometry (type, components, node) || something_changed;
         something_changed = compiled_components.maybe_compile_fill (type, components, node) || something_changed;
         something_changed = compiled_components.maybe_compile_border (type, components, node) || something_changed;
-        // TODO: compile the name.
+        something_changed = node.instance.is_group && compiled_components.maybe_compile_name (type, components, node) || something_changed;
 
         notify_view_of_changes ();
 
