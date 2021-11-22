@@ -37,6 +37,7 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
 
         selection_mode = Gtk.SelectionMode.MULTIPLE;
         activate_on_single_click = true;
+        edit_on_double_click = true;
         layers = new Gee.HashMap<int, LayerItemModel> ();
         list_store = new LayerListStore ();
         list_store.set_sort_func (layers_sort_function);

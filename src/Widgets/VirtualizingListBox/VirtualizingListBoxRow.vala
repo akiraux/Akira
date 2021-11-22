@@ -50,4 +50,10 @@ public class VirtualizingListBoxRow : Gtk.Bin {
 
         return base.draw (ct);
     }
+
+    /*
+     * Virtual method an implementation of this class can override in case it
+     * needs to trigger an edit state and change the UI.
+     */
+    public virtual void edit () {}
 }
