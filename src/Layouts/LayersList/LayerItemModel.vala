@@ -41,6 +41,12 @@ public class Akira.Layouts.LayersList.LayerItemModel : GLib.Object {
         owned get {
             return node.components.name.name;
         }
+        set {
+            if (value == name) {
+                return;
+            }
+            node.components.name = new Lib.Components.Name (value, id.to_string ());
+        }
     }
 
     /*

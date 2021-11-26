@@ -145,6 +145,16 @@ public class Akira.Lib.Items.Model : Object {
         internal_mark_geometry_dirty (node, false);
     }
 
+    public void mark_node_name_dirty_by_id (int id) {
+        var node = node_from_id (id);
+        if (node == null) {
+            assert (false);
+            return;
+        }
+
+        mark_dirty (node);
+    }
+
     public void recalculate_children_stacking (int parent_id) {
         var group = group_nodes.get (parent_id);
         if (group == null) {
@@ -450,8 +460,9 @@ public class Akira.Lib.Items.Model : Object {
     }
 
     /*
-     * Internal operation to mark an instance as dirty. If 'simple' is true, only the instance's geometry is nullified.
-     * Otherwise a recursive dirtying of items occurs.
+     * Internal operation to mark an instance as dirty. If 'simple' is true,
+     * only the instance's geometry is nullified, otherwise a recursive dirtying
+     * of items occurs.
      */
     private void internal_mark_geometry_dirty (Lib.Items.ModelNode node, bool simple) {
         if (dirty_groups.contains (node.id) || dirty_items.contains (node.id)) {
@@ -496,10 +507,12 @@ public class Akira.Lib.Items.Model : Object {
 
     private void internal_compile_geometries () {
         if (!is_live) {
+            warning ("NOT LIVE");
             return;
         }
 
         if (dirty_items.size == 0 && dirty_groups.size == 0) {
+            warning ("NOT DIRTY");
             return;
         }
 

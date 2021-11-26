@@ -25,6 +25,8 @@
  * The single layer row.
  */
 public class Akira.Layouts.LayersList.LayerListItem : VirtualizingListBoxRow {
+    public signal void row_updated (int id);
+
     private Gtk.StyleContext style_ctx;
     private Gtk.Grid grid;
     private Gtk.Label label;
@@ -49,6 +51,7 @@ public class Akira.Layouts.LayersList.LayerListItem : VirtualizingListBoxRow {
     }
 
     public void assign (LayerItemModel data) {
+        model_item = data;
         label.label = data.name;
 
         // Build a specific UI based on the node instance's type.
@@ -79,7 +82,6 @@ public class Akira.Layouts.LayersList.LayerListItem : VirtualizingListBoxRow {
     }
 
     public override void edit () {
-        // TODO: Disable typing accells.
         if (entry != null) {
             show_entry ();
             return;
@@ -91,19 +93,33 @@ public class Akira.Layouts.LayersList.LayerListItem : VirtualizingListBoxRow {
             expand = true
         };
 
-        // TODO: Setup event listeners for the entry.
+        entry.activate.connect (on_activate_entry);
+
         grid.attach (entry, 0, 1, 1, 1);
 
         show_entry ();
     }
 
+    private void on_activate_entry () {
+        var model = (LayerItemModel) model_item;
+        model.name = entry.text;
+        label.label = model.name;
+        row_updated (model.id);
+    }
+
     private void show_entry () {
         entry.text = label.label;
-
         entry.visible = true;
         entry.no_show_all = false;
-
         label.visible = false;
         label.no_show_all = true;
+        entry.grab_focus ();
+    }
+
+    public override void edit_end () {
+        entry.visible = false;
+        entry.no_show_all = true;
+        label.visible = true;
+        label.no_show_all = false;
     }
 }

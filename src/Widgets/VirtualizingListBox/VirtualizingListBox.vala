@@ -31,10 +31,11 @@ public class VirtualizingListBox : Gtk.Container, Gtk.Scrollable {
 
     public signal void row_activated (GLib.Object row);
     public signal void row_hovered (GLib.Object? row);
+    public signal void row_edited (VirtualizingListBoxRow? row);
 
-    // Signal triggered when the selection of the rows changes only after a pressed
-    // event. The bool `clear` is set to true only when all rows have been
-    // deselected.It's up to the implementation widget to fetch the currently
+    // Signal triggered when the selection of the rows changes only after a
+    // click event. The bool `clear` is set to true only when all rows have been
+    // deselected. It's up to the implementation widget to fetch the currently
     // selected rows to update the UI.
     public signal void row_selection_changed (bool clear = false);
 
@@ -121,7 +122,8 @@ public class VirtualizingListBox : Gtk.Container, Gtk.Scrollable {
     public bool edit_on_double_click { get; set; }
     public Gtk.SelectionMode selection_mode { get; set; default = Gtk.SelectionMode.SINGLE; }
     private double bin_y_diff { get; private set; }
-    public GLib.Object selected_row { get; private set; }
+    public GLib.Object? selected_row { get; private set; }
+    public VirtualizingListBoxRow? edited_row { get; set; }
 
     private Gee.ArrayList<VirtualizingListBoxRow> current_widgets = new Gee.ArrayList<VirtualizingListBoxRow> ();
     private Gee.ArrayList<VirtualizingListBoxRow> recycled_widgets = new Gee.ArrayList<VirtualizingListBoxRow> ();
@@ -656,7 +658,7 @@ public class VirtualizingListBox : Gtk.Container, Gtk.Scrollable {
             }
 
             if (n_press == 2 && edit_on_double_click) {
-                row.edit ();
+                row_edited (row);
             }
         }
     }
@@ -702,6 +704,9 @@ public class VirtualizingListBox : Gtk.Container, Gtk.Scrollable {
 
         update_selection (active_row, modify, extend);
         row_selection_changed ();
+        if (edited_row != null && edited_row.model_item != selected_row) {
+            row_edited (null);
+        }
     }
 
     private void update_selection (VirtualizingListBoxRow row, bool modify, bool extend) {

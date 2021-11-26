@@ -53,6 +53,7 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
                 row = old_widget as LayerListItem;
             } else {
                 row = new LayerListItem ();
+                row.row_updated.connect (on_row_updated);
             }
 
             row.assign ((LayerItemModel) item);
@@ -66,6 +67,9 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
 
         // When a row is hovered.
         row_hovered.connect (on_row_hovered);
+
+        // When the name of the layer is being edited.
+        row_edited.connect (on_row_edited);
 
         // Listed to the button release event only for the secondary click in
         // order to trigger the context menu.
@@ -96,6 +100,7 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
         view_canvas.items_manager.item_model.item_added.connect (on_item_added);
         view_canvas.selection_manager.selection_modified_external.connect (on_selection_modified_external);
         view_canvas.hover_manager.hover_changed.connect (on_hover_changed);
+        view_canvas.window.event_bus.request_escape.connect (on_escape_request);
     }
 
     private void on_item_added (int id) {
@@ -165,12 +170,14 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
      * listbox changes.
      */
     private void on_row_selection_changed (bool clear) {
+
         var sm = view_canvas.selection_manager;
         // Always reset the selection.
         sm.reset_selection ();
 
-        // No need to do anything else if all rows were selected.
+        // No need to do anything else if all rows were deselected.
         if (clear) {
+            reset_edited_row ();
             return;
         }
 
@@ -197,6 +204,8 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
      */
     private void on_selection_modified_external () {
         print ("on_selection_modified_external\n");
+        reset_edited_row ();
+
         // Always reset the selection of the layers.
         unselect_all ();
 
@@ -237,5 +246,36 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
         if (id != null) {
             set_hover_on_row_from_model (layers[id]);
         }
+    }
+
+    private void on_row_edited (VirtualizingListBoxRow? item) {
+        reset_edited_row ();
+
+        if (item == null) {
+            return;
+        }
+
+        edited_row = item;
+        ((LayerListItem) item).edit ();
+        view_canvas.window.event_bus.disconnect_typing_accel ();
+    }
+
+    private void reset_edited_row () {
+        if (edited_row != null) {
+            ((LayerListItem) edited_row).edit_end ();
+            edited_row = null;
+            view_canvas.window.event_bus.connect_typing_accel ();
+        }
+    }
+
+    private void on_escape_request () {
+        on_row_edited (null);
+    }
+
+    private void on_row_updated (int id) {
+        on_row_edited (null);
+        // Trigger the redraw of the model.
+        view_canvas.items_manager.item_model.mark_node_name_dirty_by_id (id);
+        view_canvas.items_manager.compile_model ();
     }
 }

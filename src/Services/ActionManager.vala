@@ -147,8 +147,8 @@ public class Akira.Services.ActionManager : Object {
         action_accelerators.set (ACTION_PICK_COLOR, "<Alt>c");
         action_accelerators.set (ACTION_COPY, "<Control>c");
         action_accelerators.set (ACTION_PASTE, "<Control>v");
+        action_accelerators.set (ACTION_ESCAPE, "Escape");
 
-        typing_accelerators.set (ACTION_ESCAPE, "Escape");
         typing_accelerators.set (ACTION_ARTBOARD_TOOL, "a");
         typing_accelerators.set (ACTION_RECT_TOOL, "r");
         typing_accelerators.set (ACTION_ELLIPSE_TOOL, "e");

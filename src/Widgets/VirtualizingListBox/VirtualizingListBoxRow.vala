@@ -52,8 +52,9 @@ public class VirtualizingListBoxRow : Gtk.Bin {
     }
 
     /*
-     * Virtual method an implementation of this class can override in case it
+     * Virtual methods an implementation of this class can override in case it
      * needs to trigger an edit state and change the UI.
      */
     public virtual void edit () {}
+    public virtual void edit_end () {}
 }
