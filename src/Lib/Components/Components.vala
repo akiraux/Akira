@@ -26,7 +26,10 @@ public struct Akira.Lib.Components.CompiledComponents {
     public CompiledName? compiled_name;
 
     public bool is_empty { get {
-        return compiled_fill == null && compiled_border == null && compiled_geometry == null;
+        return compiled_fill == null
+            && compiled_border == null
+            && compiled_geometry == null
+            && compiled_name == null;
     }}
 
     public Lib.Components.Component.RegisteredTypes dirty_components;
@@ -35,6 +38,7 @@ public struct Akira.Lib.Components.CompiledComponents {
         compiled_fill = null;
         compiled_border = null;
         compiled_geometry = null;
+        compiled_name = null;
         dirty_components = Lib.Components.Component.RegisteredTypes ();
     }
 

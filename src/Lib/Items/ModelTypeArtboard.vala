@@ -89,7 +89,7 @@ public class Akira.Lib.Items.ModelTypeArtboard : ModelType {
                 instance.drawable.transform = instance.compiled_geometry.transformation_matrix;
                 break;
             case Lib.Components.Component.Type.COMPILED_NAME:
-                instance.drawable.label = instance.components.name.name;
+                instance.drawable.label = instance.compiled_name.name;
                 break;
         }
     }

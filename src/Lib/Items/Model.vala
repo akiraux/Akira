@@ -146,13 +146,18 @@ public class Akira.Lib.Items.Model : Object {
     }
 
     public void mark_node_name_dirty_by_id (int id) {
+        if (dirty_groups.contains (id) || dirty_items.contains (id)) {
+            return;
+        }
+
         var node = node_from_id (id);
         if (node == null) {
             assert (false);
             return;
         }
 
-        mark_dirty (node);
+        node.instance.compiled_components.compiled_name = null;
+        on_item_geometry_compilation_requested (node);
     }
 
     public void recalculate_children_stacking (int parent_id) {
@@ -431,7 +436,6 @@ public class Akira.Lib.Items.Model : Object {
         }
     }
 
-
     private void remove_from_maps (int id) {
         var target = instance_from_id (id);
         if (target == null) {
@@ -504,15 +508,12 @@ public class Akira.Lib.Items.Model : Object {
         }
     }
 
-
     private void internal_compile_geometries () {
         if (!is_live) {
-            warning ("NOT LIVE");
             return;
         }
 
         if (dirty_items.size == 0 && dirty_groups.size == 0) {
-            warning ("NOT DIRTY");
             return;
         }
 

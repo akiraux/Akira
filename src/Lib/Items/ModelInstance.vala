@@ -35,6 +35,7 @@ public class Akira.Lib.Items.ModelInstance {
     public Components.CompiledGeometry compiled_geometry { get { return compiled_components.compiled_geometry; } }
     public Components.CompiledFill compiled_fill { get { return compiled_components.compiled_fill; } }
     public Components.CompiledBorder compiled_border { get { return compiled_components.compiled_border; } }
+    public Components.CompiledName compiled_name { get { return compiled_components.compiled_name; } }
 
     public bool is_group { get { return type.is_group (); } }
     public bool is_stackable { get { return drawable != null; } }
