@@ -162,7 +162,7 @@ public class Akira.Utils.ItemAlignment : Object {
             unowned var inst = node.node.instance;
             var diff = align_to - inst.bounding_box.left;
             if (diff != 0) {
-                translate_node (node.node, 0, diff, model);
+                translate_node (node.node, diff, 0, model);
                 something_moved = true;
             }
         }
@@ -180,7 +180,7 @@ public class Akira.Utils.ItemAlignment : Object {
             unowned var inst = node.node.instance;
             var diff = align_to - inst.bounding_box.right;
             if (diff != 0) {
-                translate_node (node.node, 0, diff, model);
+                translate_node (node.node, diff, 0, model);
                 something_moved = true;
             }
         }
