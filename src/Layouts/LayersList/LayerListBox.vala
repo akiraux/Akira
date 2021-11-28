@@ -177,7 +177,6 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
      * listbox changes.
      */
     private void on_row_selection_changed (bool clear) {
-
         var sm = view_canvas.selection_manager;
         // Always reset the selection.
         sm.reset_selection ();
@@ -247,6 +246,10 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
         }
     }
 
+    /*
+     * Show the hover effect on a layer row when an item from the canvas is
+     * hovered. Clear the hover effect if no canvas item was hovered.
+     */
     private void on_hover_changed (int? id) {
         on_mouse_leave ();
 
@@ -255,6 +258,9 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
         }
     }
 
+    /*
+     * Toggle the edit state of rows and handle typing accelerators accordingly.
+     */
     private void on_row_edited (VirtualizingListBoxRow? item) {
         reset_edited_row ();
 
@@ -267,6 +273,9 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
         view_canvas.window.event_bus.disconnect_typing_accel ();
     }
 
+    /*
+     * If a layer row is currently being edited, reset it to the default state.
+     */
     private void reset_edited_row () {
         if (edited_row != null) {
             ((LayerListItem) edited_row).edit_end ();
@@ -275,10 +284,18 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
         }
     }
 
+    /*
+     * Be sure to reset any potential leftover edited layer row when the user
+     * presses the `esc` button.
+     */
     private void on_escape_request () {
         on_row_edited (null);
     }
 
+    /*
+     * Handle the `activate` signal triggered by the edited label entry of a
+     * layer row.
+     */
     private void on_row_updated (int id) {
         on_row_edited (null);
         // Trigger the redraw of the model.
