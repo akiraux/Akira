@@ -149,6 +149,7 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
         foreach (var uid in ids.data) {
             var item = layers[uid];
             if (item != null) {
+                removed += inner_remove_items (item);
                 layers.unset (uid);
                 list_store.remove (item);
                 removed++;
@@ -156,6 +157,12 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
         }
 
         list_store.items_changed (0, removed, 0);
+    }
+
+    private int inner_remove_items (LayerItemModel item) {
+        // TODO: If the item model has child items, remove those and return how
+        // many were removed.
+        return 0;
     }
 
     /*
