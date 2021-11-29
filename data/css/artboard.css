@@ -3,8 +3,13 @@
     background-color: shade (@bg_color, 1);
 }
 
-.artboard-name {
+.artboard entry {
+    background-color: @base_color;
+}
+
+.artboard label {
     font-weight: bold;
+    padding: 8px 0;
 }
 
 .artboard:hover:not(:selected) {
@@ -12,9 +17,9 @@
 }
 
 .artboard:hover .actions {
-  opacity: 0.5;
+  opacity: 1;
 }
 
 .artboard:selected {
-    background-color: alpha (@accent_color, 0.3);
+    background-color: alpha (@accent_color, 0.4);
 }

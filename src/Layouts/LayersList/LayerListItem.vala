@@ -34,21 +34,38 @@ public class Akira.Layouts.LayersList.LayerListItem : VirtualizingListBoxRow {
     private Gtk.Grid grid_main;
     // Grid to collect the label and entry widgets.
     private Gtk.Grid grid_entry;
+    // Grid to collect the hide and lock action buttons.
+    private Gtk.Grid grid_action;
 
     private Gtk.Label label;
     private Gtk.Entry entry;
     private Gtk.Image icon;
+    private Gtk.Button btn_lock;
+    private Gtk.Button btn_view;
 
-    public bool is_editing = false;
+    private bool _is_editing = false;
+    public bool is_editing {
+        get {
+            return _is_editing;
+        }
+        set {
+            _is_editing = value;
+            if (value) {
+                grid_action.visible = false;
+                return;
+            }
+
+            grid_action.visible = true;
+        }
+    }
 
     construct {
         style_ctx = get_style_context ();
 
         icon = new Gtk.Image () {
-            margin_start = 12,
             margin_end = 9,
             vexpand = true,
-            valign = Gtk.Align.CENTER,
+            valign = Gtk.Align.CENTER
         };
         icon.get_style_context ().add_class (Gtk.STYLE_CLASS_DIM_LABEL);
 
@@ -59,12 +76,39 @@ public class Akira.Layouts.LayersList.LayerListItem : VirtualizingListBoxRow {
             ellipsize = Pango.EllipsizeMode.END
         };
 
-        grid_main = new Gtk.Grid ();
         grid_entry = new Gtk.Grid ();
         grid_entry.attach (label, 0, 0, 1, 1);
 
+        btn_lock = new Gtk.Button.from_icon_name ("changes-allow-symbolic", Gtk.IconSize.MENU) {
+            tooltip_text = _("Lock layer"),
+            can_focus = false
+        };
+        btn_lock.activate.connect (toggle_lock);
+        btn_lock.get_style_context ().add_class ("flat");
+
+        btn_view = new Gtk.Button.from_icon_name ("layer-visible-symbolic", Gtk.IconSize.MENU) {
+            tooltip_text = _("Hide layer"),
+            can_focus = false
+        };
+        btn_view.activate.connect (toggle_view);
+        btn_view.get_style_context ().add_class ("flat");
+
+        grid_action = new Gtk.Grid () {
+            margin_end = 6,
+            vexpand = true,
+            valign = Gtk.Align.CENTER
+        };
+        grid_action.get_style_context ().add_class ("actions");
+        grid_action.attach (btn_lock, 0, 0, 1, 1);
+        grid_action.attach (btn_view, 1, 0, 1, 1);
+
+        grid_main = new Gtk.Grid () {
+            vexpand = true,
+            valign = Gtk.Align.CENTER
+        };
         grid_main.attach (icon, 0, 0, 1, 1);
         grid_main.attach (grid_entry, 1, 0, 1, 1);
+        grid_main.attach (grid_action, 2, 0, 1, 1);
 
         add (grid_main);
     }
@@ -90,11 +134,9 @@ public class Akira.Layouts.LayersList.LayerListItem : VirtualizingListBoxRow {
         style_ctx.remove_class ("layer");
         style_ctx.add_class ("artboard");
 
-        // Update the label UI.
-        label.get_style_context ().add_class ("artboard-name");
-
         // Update icon.
         icon.clear ();
+        icon.margin_start = 6;
     }
 
     /*
@@ -107,11 +149,9 @@ public class Akira.Layouts.LayersList.LayerListItem : VirtualizingListBoxRow {
         style_ctx.remove_class ("artboard");
         style_ctx.add_class ("layer");
 
-        // Update label styling.
-        label.get_style_context ().remove_class ("artboard-name");
-
         // Update icon.
         icon.set_from_icon_name (model.icon, Gtk.IconSize.MENU);
+        icon.margin_start = 12;
     }
 
     public override void edit () {
@@ -121,7 +161,8 @@ public class Akira.Layouts.LayersList.LayerListItem : VirtualizingListBoxRow {
         }
 
         entry = new Gtk.Entry () {
-            expand = true
+            expand = true,
+            margin_end = 6
         };
         entry.get_style_context ().add_class ("flat");
 
@@ -155,4 +196,10 @@ public class Akira.Layouts.LayersList.LayerListItem : VirtualizingListBoxRow {
         label.no_show_all = false;
         is_editing = false;
     }
+
+    // TODO.
+    private void toggle_lock () {}
+
+    // TODO.
+    private void toggle_view () {}
 }
