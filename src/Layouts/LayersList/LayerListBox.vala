@@ -51,6 +51,9 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
             LayerListItem? row = null;
             if (old_widget != null) {
                 row = old_widget as LayerListItem;
+                if (row.is_editing) {
+                    row.edit_end ();
+                }
             } else {
                 row = new LayerListItem ();
                 row.row_updated.connect (on_row_updated);

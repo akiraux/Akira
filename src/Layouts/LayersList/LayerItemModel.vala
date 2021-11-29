@@ -49,6 +49,21 @@ public class Akira.Layouts.LayersList.LayerItemModel : GLib.Object {
         }
     }
 
+    public string icon {
+        get {
+            if (node.type is Lib.Items.ModelTypeRect) {
+                return "shape-rectangle-symbolic";
+            } else if (node.type is Lib.Items.ModelTypeEllipse) {
+                return "shape-circle-symbolic";
+            } else if (node.type is Lib.Items.ModelTypePath) {
+                return "segment-curve-symbolic";
+            } else if (node.type is Lib.Items.ModelTypeGroup) {
+                return "folder-symbolic";
+            }
+            return "";
+        }
+    }
+
     /*
      * Control the hidden/visible state of the item.
      */

@@ -1,6 +1,6 @@
 /* initial status */
 .layer {
-    transition: box-shadow 160ms ease;
+    transition: box-shadow 160ms ease, background-color 160ms ease;
 }
 
 .layer.transparent {
@@ -9,12 +9,12 @@
 
 /* selected status */
 .layer,
-.layer:selected {
+.layer entry {
     background-color: @base_color;
 }
 
 .layer:selected {
-    box-shadow: inset 4px 0 0 @primary;
+    background-color: alpha (@accent_color, 0.5);
 }
 
 .layer:selected image,
@@ -23,17 +23,9 @@
     color: @fg_color;
 }
 
-/* zebra */
-.layer.even,
-.layer.even:focus,
-.layer.even:selected {
-    background-color: shade (@bg_color, 1);
-}
-
 /* Hovered */
-.layer:hover:not(:selected),
-.layer.even:hover:not(:selected) {
-  box-shadow: inset 0 0 0 2px @highlight;
+.layer:hover:not(:selected) {
+    box-shadow: inset 0 0 0 2px @accent_color;
 }
 
 /* label */
@@ -103,5 +95,5 @@
 
 /* drag and drop */
 .grid-motion {
-    background-color: @primary;
+    background-color: alpha (@accent_color, 0.3);
 }
