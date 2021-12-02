@@ -239,6 +239,8 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         print ("shift item zorder-----\n");
         item_model.print_dag ();
 
+        compile_model();
+
         return 0;
     }
 
