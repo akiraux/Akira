@@ -23,11 +23,11 @@
 
 /*
  * Simple Object to be handled by the LayersListBoxModel and to give easy access
- * the attributes of the Lib.Items.ModelInstance.
+ * the attributes of the Lib.Items.ModelNode.
  */
 public class Akira.Layouts.LayersList.LayerItemModel : GLib.Object {
     public int service_uid { get; construct; }
-    public unowned Lib.Items.ModelInstance? node;
+    public unowned Lib.Items.ModelNode node;
 
     public int id {
         get {
@@ -39,25 +39,25 @@ public class Akira.Layouts.LayersList.LayerItemModel : GLib.Object {
      */
     public string name {
         owned get {
-            return node.components.name.name;
+            return node.instance.components.name.name;
         }
         set {
             if (value == name) {
                 return;
             }
-            node.components.name = new Lib.Components.Name (value, id.to_string ());
+            node.instance.components.name = new Lib.Components.Name (value, id.to_string ());
         }
     }
 
     public string icon {
         get {
-            if (node.type is Lib.Items.ModelTypeRect) {
+            if (node.instance.type is Lib.Items.ModelTypeRect) {
                 return "shape-rectangle-symbolic";
-            } else if (node.type is Lib.Items.ModelTypeEllipse) {
+            } else if (node.instance.type is Lib.Items.ModelTypeEllipse) {
                 return "shape-circle-symbolic";
-            } else if (node.type is Lib.Items.ModelTypePath) {
+            } else if (node.instance.type is Lib.Items.ModelTypePath) {
                 return "segment-curve-symbolic";
-            } else if (node.type is Lib.Items.ModelTypeGroup) {
+            } else if (node.instance.type is Lib.Items.ModelTypeGroup) {
                 return "folder-symbolic";
             }
             return "";
@@ -74,7 +74,7 @@ public class Akira.Layouts.LayersList.LayerItemModel : GLib.Object {
      */
     public bool locked {
         get {
-            return node.components.layer.locked;
+            return node.instance.components.layer.locked;
         }
     }
 
@@ -83,34 +83,34 @@ public class Akira.Layouts.LayersList.LayerItemModel : GLib.Object {
      */
     public bool selected {
         get {
-            return node.components.layer.selected;
+            return node.instance.components.layer.selected;
         }
     }
 
     /*
-     * If the node type is an Artboard.
+     * If the instance type is an Artboard.
      */
     public bool is_artboard {
         get {
-            return node.type is Lib.Items.ModelTypeArtboard;
+            return node.instance.type is Lib.Items.ModelTypeArtboard;
         }
     }
 
     /*
-     * If the node type is a Group.
+     * If the instance type is a Group.
      */
     public bool is_group {
         get {
-            return node.type is Lib.Items.ModelTypeGroup;
+            return node.instance.type is Lib.Items.ModelTypeGroup;
         }
     }
 
-    public LayerItemModel (Lib.Items.ModelInstance node, int service_uid) {
+    public LayerItemModel (Lib.Items.ModelNode node, int service_uid) {
         Object (service_uid: service_uid);
         update_node (node);
     }
 
-    private void update_node (Lib.Items.ModelInstance new_node) {
+    private void update_node (Lib.Items.ModelNode new_node) {
         node = new_node;
     }
 }

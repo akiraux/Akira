@@ -107,14 +107,14 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
     }
 
     private void on_item_added (int id) {
-        var node_instance = view_canvas.items_manager.instance_from_id (id);
+        var node = view_canvas.items_manager.node_from_id (id);
         // No need to add any layer if we don't have an instance.
-        if (node_instance == null) {
+        if (node == null) {
             return;
         }
 
-        var service_uid = node_instance.id;
-        var item = new LayerItemModel (node_instance, service_uid);
+        var service_uid = node.id;
+        var item = new LayerItemModel (node, service_uid);
         layers[service_uid] = item;
         list_store.add (item);
         print ("on_item_added: %i\n", service_uid);
@@ -243,7 +243,7 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
         view_canvas.hover_manager.remove_hover_effect ();
 
         if (item != null) {
-            view_canvas.hover_manager.maybe_create_hover_effect_from_instance (
+            view_canvas.hover_manager.maybe_create_hover_effect (
                 ((LayerItemModel) item).node
             );
         }
