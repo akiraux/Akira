@@ -299,10 +299,10 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
      * Handle the `activate` signal triggered by the edited label entry of a
      * layer row.
      */
-    private void on_row_updated (int id) {
+    private void on_row_updated (Lib.Items.ModelNode node) {
         on_row_edited (null);
         // Trigger the redraw of the model.
-        view_canvas.items_manager.item_model.mark_node_name_dirty_by_id (id);
+        view_canvas.items_manager.item_model.mark_node_name_dirty (node);
         view_canvas.items_manager.compile_model ();
     }
 }
