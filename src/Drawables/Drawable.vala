@@ -47,6 +47,7 @@ public class Akira.Drawables.Drawable {
     public double radius_bl { get; set; default = 0; }
 
     public int parent_id { get; set; default = -1; }
+    public string label { get; set; default = ""; }
     public double center_x { get; set; default = 0; }
     public double center_y { get; set; default = 0; }
     public double width { get; set; default = 0; }

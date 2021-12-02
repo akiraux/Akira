@@ -25,8 +25,12 @@
  * The single layer row.
  */
 public class Akira.Layouts.LayersList.LayerListItem : VirtualizingListBoxRow {
+    public signal void row_updated (int id);
+
     private Gtk.StyleContext style_ctx;
+    private Gtk.Grid grid;
     private Gtk.Label label;
+    private Gtk.Entry entry;
 
     construct {
         style_ctx = get_style_context ();
@@ -37,7 +41,7 @@ public class Akira.Layouts.LayersList.LayerListItem : VirtualizingListBoxRow {
         label.expand = true;
         label.set_ellipsize (Pango.EllipsizeMode.END);
 
-        var grid = new Gtk.Grid ();
+        grid = new Gtk.Grid ();
 
         grid.attach (label, 0, 0, 1, 1);
 
@@ -47,6 +51,7 @@ public class Akira.Layouts.LayersList.LayerListItem : VirtualizingListBoxRow {
     }
 
     public void assign (LayerItemModel data) {
+        model_item = data;
         label.label = data.name;
 
         // Build a specific UI based on the node instance's type.
@@ -74,5 +79,47 @@ public class Akira.Layouts.LayersList.LayerListItem : VirtualizingListBoxRow {
         style_ctx.remove_class ("artboard");
         style_ctx.add_class ("layer");
         label.get_style_context ().remove_class ("artboard-name");
+    }
+
+    public override void edit () {
+        if (entry != null) {
+            show_entry ();
+            return;
+        }
+
+        entry = new Gtk.Entry () {
+            margin_top = margin_bottom = 4,
+            margin_end = 10,
+            expand = true
+        };
+
+        entry.activate.connect (on_activate_entry);
+
+        grid.attach (entry, 0, 1, 1, 1);
+
+        show_entry ();
+    }
+
+    private void on_activate_entry () {
+        var model = (LayerItemModel) model_item;
+        model.name = entry.text;
+        label.label = model.name;
+        row_updated (model.id);
+    }
+
+    private void show_entry () {
+        entry.text = label.label;
+        entry.visible = true;
+        entry.no_show_all = false;
+        label.visible = false;
+        label.no_show_all = true;
+        entry.grab_focus ();
+    }
+
+    public override void edit_end () {
+        entry.visible = false;
+        entry.no_show_all = true;
+        label.visible = true;
+        label.no_show_all = false;
     }
 }

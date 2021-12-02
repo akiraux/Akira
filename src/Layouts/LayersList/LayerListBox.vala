@@ -37,6 +37,7 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
 
         selection_mode = Gtk.SelectionMode.MULTIPLE;
         activate_on_single_click = true;
+        edit_on_double_click = true;
         layers = new Gee.HashMap<int, LayerItemModel> ();
         list_store = new LayerListStore ();
         list_store.set_sort_func (layers_sort_function);
@@ -52,9 +53,10 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
                 row = old_widget as LayerListItem;
             } else {
                 row = new LayerListItem ();
+                row.row_updated.connect (on_row_updated);
             }
 
-            row.assign ((LayerItemModel)item);
+            row.assign ((LayerItemModel) item);
             row.show_all ();
 
             return row;
@@ -62,6 +64,12 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
 
         // When an item is selected from a click on the layers list.
         row_selection_changed.connect (on_row_selection_changed);
+
+        // When a row is hovered.
+        row_hovered.connect (on_row_hovered);
+
+        // When the name of the layer is being edited.
+        row_edited.connect (on_row_edited);
 
         // Listed to the button release event only for the secondary click in
         // order to trigger the context menu.
@@ -91,6 +99,8 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
 
         view_canvas.items_manager.item_model.item_added.connect (on_item_added);
         view_canvas.selection_manager.selection_modified_external.connect (on_selection_modified_external);
+        view_canvas.hover_manager.hover_changed.connect (on_hover_changed);
+        view_canvas.window.event_bus.request_escape.connect (on_escape_request);
     }
 
     private void on_item_added (int id) {
@@ -139,6 +149,7 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
         foreach (var uid in ids.data) {
             var item = layers[uid];
             if (item != null) {
+                removed += inner_remove_items (item);
                 layers.unset (uid);
                 list_store.remove (item);
                 removed++;
@@ -146,6 +157,12 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
         }
 
         list_store.items_changed (0, removed, 0);
+    }
+
+    private int inner_remove_items (LayerItemModel item) {
+        // TODO: If the item model has child items, remove those and return how
+        // many were removed.
+        return 0;
     }
 
     /*
@@ -164,8 +181,9 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
         // Always reset the selection.
         sm.reset_selection ();
 
-        // No need to do anything else if all rows were selected.
+        // No need to do anything else if all rows were deselected.
         if (clear) {
+            reset_edited_row ();
             return;
         }
 
@@ -192,6 +210,8 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
      */
     private void on_selection_modified_external () {
         print ("on_selection_modified_external\n");
+        reset_edited_row ();
+
         // Always reset the selection of the layers.
         unselect_all ();
 
@@ -211,5 +231,75 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
             }
             return false;
         });
+    }
+
+    /*
+     * Show the hover effect on a canvas item if available.
+     */
+    private void on_row_hovered (GLib.Object? item) {
+        view_canvas.hover_manager.remove_hover_effect ();
+
+        if (item != null) {
+            view_canvas.hover_manager.maybe_create_hover_effect_from_instance (
+                ((LayerItemModel) item).node
+            );
+        }
+    }
+
+    /*
+     * Show the hover effect on a layer row when an item from the canvas is
+     * hovered. Clear the hover effect if no canvas item was hovered.
+     */
+    private void on_hover_changed (int? id) {
+        on_mouse_leave ();
+
+        if (id != null) {
+            set_hover_on_row_from_model (layers[id]);
+        }
+    }
+
+    /*
+     * Toggle the edit state of rows and handle typing accelerators accordingly.
+     */
+    private void on_row_edited (VirtualizingListBoxRow? item) {
+        reset_edited_row ();
+
+        if (item == null) {
+            return;
+        }
+
+        edited_row = item;
+        ((LayerListItem) item).edit ();
+        view_canvas.window.event_bus.disconnect_typing_accel ();
+    }
+
+    /*
+     * If a layer row is currently being edited, reset it to the default state.
+     */
+    private void reset_edited_row () {
+        if (edited_row != null) {
+            ((LayerListItem) edited_row).edit_end ();
+            edited_row = null;
+            view_canvas.window.event_bus.connect_typing_accel ();
+        }
+    }
+
+    /*
+     * Be sure to reset any potential leftover edited layer row when the user
+     * presses the `esc` button.
+     */
+    private void on_escape_request () {
+        on_row_edited (null);
+    }
+
+    /*
+     * Handle the `activate` signal triggered by the edited label entry of a
+     * layer row.
+     */
+    private void on_row_updated (int id) {
+        on_row_edited (null);
+        // Trigger the redraw of the model.
+        view_canvas.items_manager.item_model.mark_node_name_dirty_by_id (id);
+        view_canvas.items_manager.compile_model ();
     }
 }

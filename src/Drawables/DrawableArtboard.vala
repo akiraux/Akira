@@ -25,7 +25,6 @@
 public class Akira.Drawables.DrawableArtboard : Drawable {
     private const double LABEL_HEIGHT = 20;
     private const double LABEL_MARGIN = 5;
-    private string label = "Artboard";
 
     public DrawableArtboard (double tl_x, double tl_y, double width, double height) {
        this.center_x = tl_x + width / 2.0;

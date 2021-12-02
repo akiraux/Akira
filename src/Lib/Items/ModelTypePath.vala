@@ -46,6 +46,7 @@ public class Akira.Lib.Items.ModelTypePath : ModelType {
             false
         );
         new_item.components.size = new Lib.Components.Size (1, 1, false);
+        new_item.components.name = Lib.Components.Components.default_name ();
         return new_item;
     }
 

@@ -30,10 +30,12 @@ public class VirtualizingListBox : Gtk.Container, Gtk.Scrollable {
     public RowFactoryMethod factory_func;
 
     public signal void row_activated (GLib.Object row);
+    public signal void row_hovered (GLib.Object? row);
+    public signal void row_edited (VirtualizingListBoxRow? row);
 
-    // Signal triggered when the selection of the rows changes only after a pressed
-    // event. The bool `clear` is set to true only when all rows have been
-    // deselected.It's up to the implementation widget to fetch the currently
+    // Signal triggered when the selection of the rows changes only after a
+    // click event. The bool `clear` is set to true only when all rows have been
+    // deselected. It's up to the implementation widget to fetch the currently
     // selected rows to update the UI.
     public signal void row_selection_changed (bool clear = false);
 
@@ -117,9 +119,11 @@ public class VirtualizingListBox : Gtk.Container, Gtk.Scrollable {
     public Gtk.ScrollablePolicy hscroll_policy { get; set; }
     public Gtk.ScrollablePolicy vscroll_policy { get; set; }
     public bool activate_on_single_click { get; set; }
+    public bool edit_on_double_click { get; set; }
     public Gtk.SelectionMode selection_mode { get; set; default = Gtk.SelectionMode.SINGLE; }
     private double bin_y_diff { get; private set; }
-    public GLib.Object selected_row { get; private set; }
+    public GLib.Object? selected_row { get; private set; }
+    public VirtualizingListBoxRow? edited_row { get; set; }
 
     private Gee.ArrayList<VirtualizingListBoxRow> current_widgets = new Gee.ArrayList<VirtualizingListBoxRow> ();
     private Gee.ArrayList<VirtualizingListBoxRow> recycled_widgets = new Gee.ArrayList<VirtualizingListBoxRow> ();
@@ -130,6 +134,8 @@ public class VirtualizingListBox : Gtk.Container, Gtk.Scrollable {
     private int last_valid_widget_height = 1;
     private VirtualizingListBoxRow? active_row;
     private Gtk.GestureMultiPress multipress;
+    private VirtualizingListBoxRow? hovered_row;
+    private Gtk.EventControllerMotion motion;
 
     static construct {
         set_css_name ("list");
@@ -142,6 +148,11 @@ public class VirtualizingListBox : Gtk.Container, Gtk.Scrollable {
         multipress.button = Gdk.BUTTON_PRIMARY;
         multipress.pressed.connect (on_multipress_pressed);
         multipress.released.connect (on_multipress_released);
+
+        motion = new Gtk.EventControllerMotion (this);
+        motion.set_propagation_phase (Gtk.PropagationPhase.BUBBLE);
+        motion.motion.connect (on_mouse_move);
+        motion.leave.connect (on_mouse_leave);
     }
 
     public override void realize () {
@@ -272,6 +283,10 @@ public class VirtualizingListBox : Gtk.Container, Gtk.Scrollable {
     }
 
     private int get_widget_height (Gtk.Widget w) {
+        if (default_widget_height != null) {
+            return (int) default_widget_height;
+        }
+
         int min;
         w.get_preferred_height_for_width (get_allocated_width (), out min, null);
 
@@ -300,10 +315,21 @@ public class VirtualizingListBox : Gtk.Container, Gtk.Scrollable {
             child_allocation.width = 1;
         }
 
+        int? child_width = null;
+        var box_width = get_allocated_width ();
+
         foreach (var child in current_widgets) {
-            child.get_preferred_height_for_width (get_allocated_width (), out child_allocation.height, null);
-            child.get_preferred_width_for_height (child_allocation.height, out child_allocation.width, null);
-            child_allocation.width = int.max (child_allocation.width, get_allocated_width ());
+            // Get the height of the row widget, which we won't fetch every time
+            // if we already did it one.
+            child_allocation.height = get_widget_height (child);
+
+            // If the child_width is not defined, get it the first time. All other
+            // widgets will always have the same width.
+            if (child_width == null) {
+                child.get_preferred_width_for_height (child_allocation.height, out child_width, null);
+            }
+
+            child_allocation.width = int.max (child_width, box_width);
             child_allocation.y = y;
             child.size_allocate (child_allocation);
 
@@ -630,6 +656,10 @@ public class VirtualizingListBox : Gtk.Container, Gtk.Scrollable {
             if (n_press == 2 && !activate_on_single_click) {
                 row_activated (row.model_item);
             }
+
+            if (n_press == 2 && edit_on_double_click) {
+                row_edited (row);
+            }
         }
     }
 
@@ -674,6 +704,9 @@ public class VirtualizingListBox : Gtk.Container, Gtk.Scrollable {
 
         update_selection (active_row, modify, extend);
         row_selection_changed ();
+        if (edited_row != null && edited_row.model_item != selected_row) {
+            row_edited (null);
+        }
     }
 
     private void update_selection (VirtualizingListBoxRow row, bool modify, bool extend) {
@@ -778,14 +811,12 @@ public class VirtualizingListBox : Gtk.Container, Gtk.Scrollable {
             }
         }
 
-        while (index <= shown_from) {
-            vadjustment.value--;
-            // ensure_visible_widgets ();
-        }
-
-        while (index + 1 >= shown_to) {
-            vadjustment.value++;
-            // ensure_visible_widgets ();
+        if (index <= shown_from) {
+            var diff = ((shown_from - index) + 1) * get_widget_height (current_widgets[0]);
+            vadjustment.value -= diff;
+        } else if (index + 1 >= shown_to) {
+            var diff = ((index - shown_from) - 1) * get_widget_height (current_widgets[0]);
+            vadjustment.value += diff;
         }
 
         foreach (VirtualizingListBoxRow row in current_widgets) {
@@ -882,5 +913,38 @@ public class VirtualizingListBox : Gtk.Container, Gtk.Scrollable {
 
     public Gee.HashSet<weak GLib.Object> get_selected_rows () {
         return model.get_selected_rows ();
+    }
+
+    private void on_mouse_move (double x, double y) {
+        if (hovered_row != null) {
+            hovered_row.unset_state_flags (Gtk.StateFlags.PRELIGHT);
+            hovered_row = null;
+            row_hovered (null);
+        }
+
+        var row = get_row_at_y ((int) y);
+        if (row != null) {
+            row.set_state_flags (Gtk.StateFlags.PRELIGHT, false);
+            row_hovered (row.model_item);
+            hovered_row = row;
+        }
+    }
+
+    // TODO: Fix this as it never gets triggered by the motion leave.
+    protected void on_mouse_leave () {
+        if (hovered_row != null) {
+            hovered_row.unset_state_flags (Gtk.StateFlags.PRELIGHT);
+            hovered_row = null;
+            row_hovered (null);
+        }
+    }
+
+    protected void set_hover_on_row_from_model (GLib.Object model) {
+        foreach (VirtualizingListBoxRow row in current_widgets) {
+            if (model == row.model_item) {
+                row.set_state_flags (Gtk.StateFlags.PRELIGHT, false);
+                hovered_row = row;
+            }
+        }
     }
 }

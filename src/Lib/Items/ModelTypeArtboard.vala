@@ -20,7 +20,6 @@
  */
 
 public class Akira.Lib.Items.ModelTypeArtboard : ModelType {
-    //Goo.CanvasItem background;
 
     public static ModelInstance default_artboard (
         Lib.Components.Coordinates center,
@@ -45,6 +44,7 @@ public class Akira.Lib.Items.ModelTypeArtboard : ModelType {
             clips_children = true
         };
         new_item.components.layout = new Components.Layout (layout_data);
+        new_item.components.name = Lib.Components.Components.default_name ();
         return new_item;
     }
 
@@ -87,6 +87,9 @@ public class Akira.Lib.Items.ModelTypeArtboard : ModelType {
                 instance.drawable.width = instance.components.size.width;
                 instance.drawable.height = instance.components.size.height;
                 instance.drawable.transform = instance.compiled_geometry.transformation_matrix;
+                break;
+            case Lib.Components.Component.Type.COMPILED_NAME:
+                instance.drawable.label = instance.compiled_name.name;
                 break;
         }
     }

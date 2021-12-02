@@ -103,6 +103,7 @@ sources = files(
     'Lib/Components/CompiledBorder.vala',
     'Lib/Components/CompiledFill.vala',
     'Lib/Components/CompiledGeometry.vala',
+    'Lib/Components/CompiledName.vala',
     'Lib/Components/Component.vala',
     'Lib/Components/Components.vala',
     'Lib/Components/Coordinates.vala',

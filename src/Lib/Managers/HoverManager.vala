@@ -21,6 +21,13 @@
  */
 
 public class Akira.Lib.Managers.HoverManager : Object {
+    // Signal used to notify other parts of the UI that the hover effect on a
+    // canvas item has changed. This must be used exclusively from the canvas to
+    // other items, and not viceversa. If a UI element has to trigger the hover
+    // state of an item (like the layers), a dedicated method should be created
+    // that doesn't trigger this signal.
+    public signal void hover_changed (int? id);
+
     public unowned ViewCanvas view_canvas { get; construct; }
 
     private int current_hovered_id = -1;
@@ -42,10 +49,11 @@ public class Akira.Lib.Managers.HoverManager : Object {
             Drawables.Drawable.HitTestType.SELECT
         );
 
-        // Remove the hover effect is no item is hovered
+        // Remove the hover effect if no item is hovered.
         // TODO: artboard
         if (target == null) {
             remove_hover_effect ();
+            hover_changed (null);
             return;
         }
 
@@ -66,11 +74,31 @@ public class Akira.Lib.Managers.HoverManager : Object {
 
         if (current_hovered_id == node.id) {
             return;
-        }
-        else {
+        } else {
             remove_hover_effect ();
         }
 
         hover_layer.add_drawable (node.instance.drawable);
+        current_hovered_id = node.id;
+        hover_changed (node.instance.id);
+    }
+
+    /*
+     * Create the hover effect from a ModelInstance. This is mostly used by the
+     * layers list box to link the hovering of layers with hovering of canvas items.
+     */
+    public void maybe_create_hover_effect_from_instance (Lib.Items.ModelInstance instance) {
+        if (view_canvas.selection_manager.item_selected (instance.id)) {
+            return;
+        }
+
+        if (current_hovered_id == instance.id) {
+            return;
+        } else {
+            remove_hover_effect ();
+        }
+
+        hover_layer.add_drawable (instance.drawable);
+        current_hovered_id = instance.id;
     }
 }

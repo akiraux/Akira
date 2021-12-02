@@ -82,7 +82,6 @@ public class Akira.Utils.AffineTransform : Object {
             item_model.mark_node_geometry_dirty (node);
         }
 
-
         unowned var layout = item.components.layout;
         if ((layout == null || layout.dilated_resize) && node.children != null) {
             foreach (unowned var child in node.children.data) {

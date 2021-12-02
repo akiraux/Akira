@@ -19,12 +19,10 @@
  * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
  */
 
-
 /*
- * Defines a copyable interface for components
+ * Defines a copyable interface for components.
  */
 public interface Akira.Lib.Components.Copyable<T> {
-
     public abstract T copy ();
 }
 
@@ -56,7 +54,8 @@ public class Akira.Lib.Components.Component {
     public enum Type {
         COMPILED_BORDER,
         COMPILED_FILL,
-        COMPILED_GEOMETRY
+        COMPILED_GEOMETRY,
+        COMPILED_NAME
     }
 
     public struct RegisteredType {
@@ -73,10 +72,11 @@ public class Akira.Lib.Components.Component {
         RegisteredType[] types;
 
         public RegisteredTypes () {
-            types = new RegisteredType[3];
+            types = new RegisteredType[4];
             types[0] = RegisteredType (Type.COMPILED_BORDER);
             types[1] = RegisteredType (Type.COMPILED_FILL);
             types[2] = RegisteredType (Type.COMPILED_GEOMETRY);
+            types[3] = RegisteredType (Type.COMPILED_NAME);
         }
 
         public void mark_dirty (Type type, bool new_state) {
@@ -87,6 +87,4 @@ public class Akira.Lib.Components.Component {
             }
         }
     }
-
-
 }

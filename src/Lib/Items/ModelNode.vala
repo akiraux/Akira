@@ -99,7 +99,6 @@ public class Akira.Lib.Items.PositionKey {
             }
 
             return a.pos_in_parent < b.pos_in_parent ? -1 : 1;
-
         }
 
         return a.parent_path < b.parent_path ? -1 : 1;

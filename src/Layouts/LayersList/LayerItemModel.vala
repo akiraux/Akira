@@ -39,7 +39,13 @@ public class Akira.Layouts.LayersList.LayerItemModel : GLib.Object {
      */
     public string name {
         owned get {
-            return node.id.to_string (); // Temporarily use the ID.
+            return node.components.name.name;
+        }
+        set {
+            if (value == name) {
+                return;
+            }
+            node.components.name = new Lib.Components.Name (value, id.to_string ());
         }
     }
 
