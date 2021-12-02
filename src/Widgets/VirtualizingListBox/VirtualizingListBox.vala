@@ -811,12 +811,12 @@ public class VirtualizingListBox : Gtk.Container, Gtk.Scrollable {
             }
         }
 
-        while (index <= shown_from) {
-            vadjustment.value -= vadjustment.page_size;
-        }
-
-        while (index + 1 >= shown_to) {
-            vadjustment.value += vadjustment.page_size;
+        if (index <= shown_from) {
+            var diff = ((shown_from - index) + 1) * get_widget_height (current_widgets[0]);
+            vadjustment.value -= diff;
+        } else if (index + 1 >= shown_to) {
+            var diff = ((index - shown_from) - 1) * get_widget_height (current_widgets[0]);
+            vadjustment.value += diff;
         }
 
         foreach (VirtualizingListBoxRow row in current_widgets) {
