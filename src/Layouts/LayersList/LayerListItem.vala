@@ -25,7 +25,7 @@
  * The single layer row.
  */
 public class Akira.Layouts.LayersList.LayerListItem : VirtualizingListBoxRow {
-    public signal void row_updated (Lib.Items.ModelNode node);
+    public signal void row_updated (int id);
 
     private LayerItemModel model;
 
@@ -176,7 +176,7 @@ public class Akira.Layouts.LayersList.LayerListItem : VirtualizingListBoxRow {
     private void on_activate_entry () {
         model.name = entry.text;
         label.label = model.name;
-        row_updated (model.node);
+        row_updated (model.id);
     }
 
     private void show_entry () {
