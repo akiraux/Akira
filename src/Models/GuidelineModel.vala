@@ -88,9 +88,9 @@ public class Akira.Models.GuidelineModel {
         highlight_direction = direction;
 
         if (direction == Lib.Managers.GuideManager.Direction.HORIZONTAL) {
-            highlight_position = h_guides.elements[guide];
+            highlight_position = h_guides.at(guide);
         } else if (direction == Lib.Managers.GuideManager.Direction.VERTICAL) {
-            highlight_position = v_guides.elements[guide];
+            highlight_position = v_guides.at(guide);
         }
 
         changed ();

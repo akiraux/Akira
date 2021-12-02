@@ -29,10 +29,11 @@
   */
  public class Akira.Utils.SortedArray : Object {
     // Array to store all elements.
-    public double[] elements;
+    public Gee.TreeSet<double?> elements;
+
     public int length {
         get {
-            return elements.length;
+            return elements.size;
         }
     }
 
@@ -46,69 +47,28 @@
         this.lower_bound = lower_bound;
         this.upper_bound = upper_bound;
 
-        elements = new double[0];
+        elements = new Gee.TreeSet<double?> ();
     }
 
     /*
-     * Inserts the given elements in the such that the resultant array remains sorted.
+     * Inserts the given elements in the set such that the resultant array remains sorted.
      */
     public void insert (double item) {
         if ((item > upper_bound) || (item < lower_bound)) {
             return;
         }
 
-        var new_elements = new double[elements.length + 1];
-        int idx = 0;
-
-        for (idx = 0; idx < elements.length; ++idx) {
-            // If this element already exists, no need to insert it.
-            if (are_equal (elements[idx], item)) {
-                return;
-            } else if (elements[idx] > item) {
-                // If elements after current position are greater, then the new element must be inserted first.
-                break;
-            }
-
-            new_elements[idx] = elements[idx];
-        }
-
-        new_elements[idx] = item;
-        ++idx;
-
-        // Copy the remaining elements.
-        for (; idx < elements.length + 1; ++idx) {
-            new_elements[idx] = elements[idx - 1];
-        }
-
-        elements = new_elements;
+        elements.add (item);
     }
 
     public void remove_at (int index) {
-        if (index > elements.length - 1) {
-            return;
-        }
+        double item = elements.to_array ()[index];
 
-        var new_elements = new double[elements.length - 1];
-
-        // Copy all elementss upto the given index.
-        for (int idx = 0; idx < index; ++idx) {
-            new_elements[idx] = elements[idx];
-        }
-
-        // Copy all elements after the given index.
-        for (int idx = index + 1; idx < elements.length; ++idx) {
-            new_elements[idx - 1] = elements[idx];
-        }
-
-        elements = new_elements;
+        remove_item (item);
     }
 
     public void remove_item (double item) {
-        int index = 0;
-
-        if (contains (item, out index)) {
-            remove_at (index);
-        }
+        elements.remove (item);
     }
 
     /*
@@ -117,42 +77,28 @@
      * Returns false if element does not exist.
      */
     public bool contains (double item, out int index) {
-        index = inner_binary_search (0, elements.length - 1, item);
-
-        if (index == -1) {
+        if (!elements.contains (item)) {
+            index = -1;
             return false;
         }
 
+        index = elements.head_set (item).size;
         return true;
     }
 
     public SortedArray clone () {
         var cln = new SortedArray (lower_bound, upper_bound);
-        cln.elements = new double[elements.length];
 
-        for (int i = 0; i < elements.length; ++i) {
-            cln.elements[i] = elements[i];
+        foreach (var item in elements) {
+            cln.insert (item);
         }
 
         return cln;
     }
 
     public void get_distance_to_neighbours (double item, out double neigh_1, out double neigh_2) {
-        var array_copy = this.clone ();
-        array_copy.insert (item);
-
-        int position = -1;
-        array_copy.contains (item, out position);
-        neigh_1 = item - array_copy.elements[position - 1];
-        neigh_2 = array_copy.elements[position + 1] - item;
-
-        if (neigh_1 < 0) {
-            neigh_1 = 0;
-        }
-        if (neigh_2 < 0) {
-            neigh_2 = 0;
-        }
-
+        neigh_1 = elements.lower (item);
+        neigh_2 = elements.higher (item);
     }
 
     public void set_bounds (double lower_bound, double upper_bound) {
@@ -161,40 +107,16 @@
     }
 
     public void translate_all (double delta) {
-        for (int i = 0; i < length; ++i) {
-            elements[i] -= delta;
+        var new_elements = new Gee.TreeSet<double?> ();
+
+        foreach (var item in elements) {
+            new_elements.add (item - delta);
         }
+
+        elements = new_elements;
     }
 
-    /*
-     * Utility function for binary search.
-     */
-    private int inner_binary_search (int start, int end, double key) {
-        if (end >= start) {
-            int mid = (start + end) / 2;
-
-            if (are_equal (elements[mid], key)) {
-                return mid;
-            } else if (elements[mid] < key) {
-                return inner_binary_search (mid + 1, end, key);
-            } else {
-                return inner_binary_search (start, mid - 1, key);
-            }
-        }
-
-        return -1;
-    }
-
-    /*
-     * Checks if two floating point numbers are equal.
-     */
-    private bool are_equal (double a, double b) {
-        int thresh = 1;
-
-        if ((a - b).abs () < thresh) {
-            return true;
-        }
-
-        return false;
+    public double at (int index) {
+        return elements.to_array ()[index];
     }
  }
