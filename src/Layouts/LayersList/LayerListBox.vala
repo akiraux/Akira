@@ -114,7 +114,7 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
         }
 
         var service_uid = node.id;
-        var item = new LayerItemModel (node, service_uid);
+        var item = new LayerItemModel (view_canvas, node, service_uid);
         layers[service_uid] = item;
         list_store.add (item);
         print ("on_item_added: %i\n", service_uid);
@@ -194,7 +194,7 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
         // a selection changed loop since the selection_modified_external signal
         // is only triggered from a click on the canvas.
         foreach (var model in get_selected_rows ()) {
-            sm.add_to_selection (((LayerItemModel) model).node.id);
+            sm.add_to_selection (((LayerItemModel) model).id);
         }
 
         // Trigger the transform mode if is not currently active. This might
@@ -243,8 +243,8 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
         view_canvas.hover_manager.remove_hover_effect ();
 
         if (item != null) {
-            view_canvas.hover_manager.maybe_create_hover_effect (
-                ((LayerItemModel) item).node
+            view_canvas.hover_manager.maybe_create_hover_effect_by_id (
+                ((LayerItemModel) item).id
             );
         }
     }
@@ -299,10 +299,7 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
      * Handle the `activate` signal triggered by the edited label entry of a
      * layer row.
      */
-    private void on_row_updated (Lib.Items.ModelNode node) {
+    private void on_row_updated (int id) {
         on_row_edited (null);
-        // Trigger the redraw of the model.
-        view_canvas.items_manager.item_model.mark_node_name_dirty (node);
-        view_canvas.items_manager.compile_model ();
     }
 }

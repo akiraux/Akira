@@ -67,6 +67,16 @@ public class Akira.Lib.Managers.HoverManager : Object {
         current_hovered_id = -1;
     }
 
+    public void maybe_create_hover_effect_by_id (int id) {
+        var node = view_canvas.items_manager.node_from_id (id);
+        if (node == null) {
+            assert (node != null);
+            return;
+        }
+
+        maybe_create_hover_effect (node);
+    }
+
     public void maybe_create_hover_effect (Lib.Items.ModelNode node) {
         if (view_canvas.selection_manager.item_selected (node.id)) {
             return;

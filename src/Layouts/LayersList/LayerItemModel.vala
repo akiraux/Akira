@@ -26,12 +26,14 @@
  * the attributes of the Lib.Items.ModelNode.
  */
 public class Akira.Layouts.LayersList.LayerItemModel : GLib.Object {
+    private unowned Akira.Lib.ViewCanvas _view_canvas;
+
     public int service_uid { get; construct; }
-    public unowned Lib.Items.ModelNode node;
+    private Lib.Items.ModelInstance _cached_instance;
 
     public int id {
         get {
-            return node.id;
+            return _cached_instance.id;
         }
     }
     /*
@@ -39,25 +41,33 @@ public class Akira.Layouts.LayersList.LayerItemModel : GLib.Object {
      */
     public string name {
         owned get {
-            return node.instance.components.name.name;
+            return _cached_instance.components.name.name;
         }
         set {
-            if (value == name) {
+            if (_cached_instance.components.name.name == value) {
                 return;
             }
+
+            unowned var im = _view_canvas.items_manager;
+            var node = im.item_model.node_from_id (_cached_instance.id);
+            assert (node != null);
+
             node.instance.components.name = new Lib.Components.Name (value, id.to_string ());
+            im.item_model.mark_node_name_dirty (node);
+            im.compile_model ();
         }
     }
 
     public string icon {
         get {
-            if (node.instance.type is Lib.Items.ModelTypeRect) {
+            unowned var type = _cached_instance.type;
+            if (type is Lib.Items.ModelTypeRect) {
                 return "shape-rectangle-symbolic";
-            } else if (node.instance.type is Lib.Items.ModelTypeEllipse) {
+            } else if (type is Lib.Items.ModelTypeEllipse) {
                 return "shape-circle-symbolic";
-            } else if (node.instance.type is Lib.Items.ModelTypePath) {
+            } else if (type is Lib.Items.ModelTypePath) {
                 return "segment-curve-symbolic";
-            } else if (node.instance.type is Lib.Items.ModelTypeGroup) {
+            } else if (type is Lib.Items.ModelTypeGroup) {
                 return "folder-symbolic";
             }
             return "";
@@ -74,7 +84,7 @@ public class Akira.Layouts.LayersList.LayerItemModel : GLib.Object {
      */
     public bool locked {
         get {
-            return node.instance.components.layer.locked;
+            return _cached_instance.components.layer.locked;
         }
     }
 
@@ -83,7 +93,7 @@ public class Akira.Layouts.LayersList.LayerItemModel : GLib.Object {
      */
     public bool selected {
         get {
-            return node.instance.components.layer.selected;
+            return _cached_instance.components.layer.selected;
         }
     }
 
@@ -92,7 +102,7 @@ public class Akira.Layouts.LayersList.LayerItemModel : GLib.Object {
      */
     public bool is_artboard {
         get {
-            return node.instance.type is Lib.Items.ModelTypeArtboard;
+            return _cached_instance.type is Lib.Items.ModelTypeArtboard;
         }
     }
 
@@ -101,16 +111,18 @@ public class Akira.Layouts.LayersList.LayerItemModel : GLib.Object {
      */
     public bool is_group {
         get {
-            return node.instance.type is Lib.Items.ModelTypeGroup;
+            return _cached_instance.type is Lib.Items.ModelTypeGroup;
         }
     }
 
-    public LayerItemModel (Lib.Items.ModelNode node, int service_uid) {
+    public LayerItemModel (Lib.ViewCanvas view_canvas, Lib.Items.ModelNode node, int service_uid) {
         Object (service_uid: service_uid);
         update_node (node);
+        _view_canvas = view_canvas;
     }
 
     private void update_node (Lib.Items.ModelNode new_node) {
-        node = new_node;
+        _cached_instance = new_node.instance;
+        _cached_instance.id = new_node.id;
     }
 }

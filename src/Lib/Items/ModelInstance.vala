@@ -19,6 +19,38 @@
  * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
  */
 
+/*
+ * An instance represents a single item. It contains information needed to represent and handle
+ * an item in the model. If it is a group, it may have children.
+ *
+ * Instances can live in a model or be freestanding.
+ *   - Freestanding instances are generally clones of other instances used for caching or copying
+ *   - Instances in a model are part of the scene and get an associated ModelNode within the Model.
+ *     If there are children, then the corresponding ModelNode will have those children as nodes.
+ *     There is obviously no trivial way to get a child instance without its parent model.
+ *
+ * Components are clonable collection of immutable bits of information about an instance, they
+ * are used to generate the scene or dictate behavior specific to an instance. In general,
+ * components are aspects of an instance that make sense being serialized / deserialized. If this
+ * is not the case for a specific bit of information (e.g., a volatile aspect like selection state),
+ * then that bit of information should NOT be a component
+ * Components should never depend on other nodes in the model.
+ *
+ * CompiledComponents are generated at model compilation from other components. They are volatile
+ * and do NOT get serialized / deserialized. They are always reconstructible from the original
+ * Components. For example, the bounding box of a component depends on it size, transformation, etc;
+ * so it is a compiled component.
+ * Compiled Components can depend on other nodes in the model.
+ * Freestanding items generally don't have or need compiled components.
+ *
+ * Some data is cached in the instance to make some calculations faster. This includes the actual
+ * drawable object and the boundingboxes calculated after compilation.
+ *
+ * Caching an instance is ok. HOWEVER, when modifying an instance, make sure to use the id
+ * and query it back from the Model. Instances can get replaced or deleted without warning,
+ * so it is vital to make sure that modifications occur directly on the model. This should
+ * not be a performance concern in the vast majority of cases.
+ */
 public class Akira.Lib.Items.ModelInstance {
     public int id;
     public int[] children;
