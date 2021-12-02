@@ -25,8 +25,6 @@
  * The single layer row.
  */
 public class Akira.Layouts.LayersList.LayerListItem : VirtualizingListBoxRow {
-    public signal void row_updated (int id);
-
     private LayerItemModel model;
 
     private Gtk.StyleContext style_ctx;
@@ -37,8 +35,8 @@ public class Akira.Layouts.LayersList.LayerListItem : VirtualizingListBoxRow {
     // Grid to collect the hide and lock action buttons.
     private Gtk.Grid grid_action;
 
+    public Gtk.Entry entry;
     private Gtk.Label label;
-    private Gtk.Entry entry;
     private Gtk.Image icon;
     private Gtk.Button btn_lock;
     private Gtk.Button btn_view;
@@ -166,17 +164,21 @@ public class Akira.Layouts.LayersList.LayerListItem : VirtualizingListBoxRow {
         };
         entry.get_style_context ().add_class ("flat");
 
-        entry.activate.connect (on_activate_entry);
-
         grid_entry.attach (entry, 0, 1, 1, 1);
 
         show_entry ();
     }
 
-    private void on_activate_entry () {
+    /*
+     * The user pressed `Enter` on the layer's entry, so we trigger the update
+     * of the layer's name.
+     */
+    public void update_label () {
+        // Trigger the model update.
         model.name = entry.text;
+        // Update the visible label with the new model.name, so we're sure the
+        // update took effect.
         label.label = model.name;
-        row_updated (model.id);
     }
 
     private void show_entry () {

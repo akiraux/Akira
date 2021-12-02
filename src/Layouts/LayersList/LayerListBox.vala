@@ -56,7 +56,6 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
                 }
             } else {
                 row = new LayerListItem ();
-                row.row_updated.connect (on_row_updated);
             }
 
             row.assign ((LayerItemModel) item);
@@ -272,8 +271,19 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
         }
 
         edited_row = item;
-        ((LayerListItem) item).edit ();
+        var layer = (LayerListItem) edited_row;
+        layer.edit ();
+        layer.entry.activate.connect (on_activate_entry);
         view_canvas.window.event_bus.disconnect_typing_accel ();
+    }
+
+    /*
+     * Handle the `activate` signal triggered by the edited label entry of a
+     * layer row.
+     */
+    private void on_activate_entry () {
+        ((LayerListItem) edited_row).update_label ();
+        on_row_edited (null);
     }
 
     /*
@@ -281,7 +291,10 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
      */
     private void reset_edited_row () {
         if (edited_row != null) {
-            ((LayerListItem) edited_row).edit_end ();
+            var layer = (LayerListItem) edited_row;
+            layer.edit_end ();
+            layer.entry.activate.disconnect (on_activate_entry);
+
             edited_row = null;
             view_canvas.window.event_bus.connect_typing_accel ();
         }
@@ -292,14 +305,6 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
      * presses the `esc` button.
      */
     private void on_escape_request () {
-        on_row_edited (null);
-    }
-
-    /*
-     * Handle the `activate` signal triggered by the edited label entry of a
-     * layer row.
-     */
-    private void on_row_updated (int id) {
         on_row_edited (null);
     }
 }
