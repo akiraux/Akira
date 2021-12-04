@@ -47,7 +47,7 @@
         this.lower_bound = lower_bound;
         this.upper_bound = upper_bound;
 
-        elements = new Gee.TreeSet<double?> ();
+        elements = new Gee.TreeSet<double?> (are_equal);
     }
 
     /*
@@ -97,8 +97,17 @@
     }
 
     public void get_distance_to_neighbours (double item, out double neigh_1, out double neigh_2) {
-        neigh_1 = elements.lower (item);
-        neigh_2 = elements.higher (item);
+        if (are_equal (elements.first (), item) <= 0) {
+            neigh_1 = 0;
+        } else {
+            neigh_1 = elements.lower (item);
+        }
+
+        if (are_equal (elements.last (), item) <= 0) {
+            neigh_2 = 0;
+        } else {
+            neigh_2 = elements.higher (item);
+        }
     }
 
     public void set_bounds (double lower_bound, double upper_bound) {
@@ -107,7 +116,7 @@
     }
 
     public void translate_all (double delta) {
-        var new_elements = new Gee.TreeSet<double?> ();
+        var new_elements = new Gee.TreeSet<double?> (are_equal);
 
         foreach (var item in elements) {
             new_elements.add (item - delta);
@@ -118,5 +127,17 @@
 
     public double at (int index) {
         return elements.to_array ()[index];
+    }
+
+    private int are_equal (double? a, double? b) {
+        int thresh = 1;
+
+        if (b - a > thresh) {
+            return -1;
+        } else if (a - b > thresh) {
+            return 1;
+        }
+
+        return 0;
     }
  }
