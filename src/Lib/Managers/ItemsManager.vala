@@ -520,7 +520,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             return;
         }
 
-        var type = Utils.ItemAlignment.AlignmentType.FIRST_SELECTED;
+        var type = Utils.ItemAlignment.AlignmentType.AUTO;
 
         Utils.ItemAlignment.align_selection (selection, direction, type, view_canvas);
     }

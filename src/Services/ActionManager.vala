@@ -171,12 +171,12 @@ public class Akira.Services.ActionManager : Object {
         typing_accelerators.set (ACTION_DELETE, "BackSpace");
         typing_accelerators.set (ACTION_TOGGLE_PIXEL_GRID, "<Shift>Tab");
 
-        typing_accelerators.set (ACTION_ALIGN_LEFT, "<Control>3");
-        typing_accelerators.set (ACTION_ALIGN_HCENTER, "<Control>4");
-        typing_accelerators.set (ACTION_ALIGN_RIGHT, "<Control>5");
-        typing_accelerators.set (ACTION_ALIGN_TOP, "<Control>6");
-        typing_accelerators.set (ACTION_ALIGN_VCENTER, "<Control>7");
-        typing_accelerators.set (ACTION_ALIGN_BOTTOM, "<Control>8");
+        typing_accelerators.set (ACTION_ALIGN_LEFT, "<Alt>1");
+        typing_accelerators.set (ACTION_ALIGN_HCENTER, "<Alt>2");
+        typing_accelerators.set (ACTION_ALIGN_RIGHT, "<Alt>3");
+        typing_accelerators.set (ACTION_ALIGN_TOP, "<Alt>4");
+        typing_accelerators.set (ACTION_ALIGN_VCENTER, "<Alt>5");
+        typing_accelerators.set (ACTION_ALIGN_BOTTOM, "<Alt>6");
     }
 
     construct {
