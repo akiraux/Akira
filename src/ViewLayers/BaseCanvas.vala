@@ -50,18 +50,18 @@ public class Akira.ViewLayers.BaseCanvas : Gtk.Widget , Gtk.Scrollable {
 
     private unowned Lib.Items.Model? model_to_render = null;
 
-    private double _scale { get; set; default = 1.0; }
-    private double _resolution_x { get; set; default = 96.0; }
-    private double _resolution_y { get; set; default = 96.0; }
-    private Gtk.Adjustment _hadjustment { get; set; default = new Gtk.Adjustment (0.0, 0.0, 0.0, 0.0, 0.0, 0.0); }
-    private Gtk.Adjustment _vadjustment { get; set; default = new Gtk.Adjustment (0.0, 0.0, 0.0, 0.0, 0.0, 0.0); }
-    private Gtk.ScrollablePolicy _hscroll_policy { get; set; }
-    private Gtk.ScrollablePolicy _vscroll_policy { get; set; }
+    private double p_scale { get; set; default = 1.0; }
+    private double p_resolution_x { get; set; default = 96.0; }
+    private double p_resolution_y { get; set; default = 96.0; }
+    private Gtk.Adjustment p_hadjustment { get; set; default = new Gtk.Adjustment (0.0, 0.0, 0.0, 0.0, 0.0, 0.0); }
+    private Gtk.Adjustment p_vadjustment { get; set; default = new Gtk.Adjustment (0.0, 0.0, 0.0, 0.0, 0.0, 0.0); }
+    private Gtk.ScrollablePolicy p_hscroll_policy { get; set; }
+    private Gtk.ScrollablePolicy p_vscroll_policy { get; set; }
 
     private Gee.TreeMap<string, ViewLayers.ViewLayer> overlays;
 
     public double scale {
-        get { return _scale; }
+        get { return p_scale; }
         set { this.internal_set_scale (value); }
     }
 
@@ -103,31 +103,31 @@ public class Akira.ViewLayers.BaseCanvas : Gtk.Widget , Gtk.Scrollable {
     }
 
     public double resolution_x {
-        get { return _resolution_x; }
-        set { _resolution_x = value; needs_reconfigure = true; }
+        get { return p_resolution_x; }
+        set { p_resolution_x = value; needs_reconfigure = true; }
     }
     public double resolution_y {
-        get { return _resolution_y; }
-        set { _resolution_y = value; needs_reconfigure = true; }
+        get { return p_resolution_y; }
+        set { p_resolution_y = value; needs_reconfigure = true; }
     }
 
     public Gtk.Adjustment hadjustment {
-        get { return _hadjustment; }
+        get { return p_hadjustment; }
         set construct { internal_set_hadjustment (value); }
     }
     public Gtk.Adjustment vadjustment {
-        get { return _vadjustment; }
+        get { return p_vadjustment; }
         set construct { internal_set_vadjustment (value); }
     }
 
     public Gtk.ScrollablePolicy hscroll_policy {
-        get { return _hscroll_policy; }
-        set { _hscroll_policy = value; queue_resize (); }
+        get { return p_hscroll_policy; }
+        set { p_hscroll_policy = value; queue_resize (); }
     }
 
     public Gtk.ScrollablePolicy vscroll_policy {
-        get { return _vscroll_policy; }
-        set { _vscroll_policy = value; queue_resize (); }
+        get { return p_vscroll_policy; }
+        set { p_vscroll_policy = value; queue_resize (); }
     }
 
     BaseCanvas () {
@@ -323,7 +323,7 @@ public class Akira.ViewLayers.BaseCanvas : Gtk.Widget , Gtk.Scrollable {
 
         freeze_count++;
 
-        _scale = new_scale;
+        p_scale = new_scale;
 
         reconfigure (false);
 
@@ -411,12 +411,12 @@ public class Akira.ViewLayers.BaseCanvas : Gtk.Widget , Gtk.Scrollable {
 
         newadj.value_changed.connect (adjustment_value_changed);
         reconfigure (true);
-        _hadjustment = newadj;
+        p_hadjustment = newadj;
     }
 
     public void internal_set_vadjustment (Gtk.Adjustment? new_vadj) {
 
-        if (new_vadj != null && _vadjustment == new_vadj) {
+        if (new_vadj != null && p_vadjustment == new_vadj) {
             return;
         }
 
@@ -431,7 +431,7 @@ public class Akira.ViewLayers.BaseCanvas : Gtk.Widget , Gtk.Scrollable {
 
         newadj.value_changed.connect (adjustment_value_changed);
         reconfigure (true);
-        _vadjustment = newadj;
+        p_vadjustment = newadj;
     }
 
     private void configure_hadjustment (int window_width) {
