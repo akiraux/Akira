@@ -215,13 +215,19 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
                         edit_model.set_selected_points (index[1], false);
                         edit_model.reference_point = index[1];
                     }
+
+                    edit_model.tangents_inline = false;
                 } else {
                     edit_model.selected_pts.clear ();
 
                     edit_model.set_selected_points (index[0], true);
                     edit_model.set_selected_points (index[1], true);
 
-                    edit_model.reference_point = index[0];
+                    if (sel_type == PointType.TANGENT_FIRST) {
+                        edit_model.reference_point = index[0];
+                    } else {
+                        edit_model.reference_point = index[1];
+                    }
                 }
             }
 
@@ -254,6 +260,10 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
     }
 
     public override bool button_release_event (Gdk.EventButton event) {
+        if (is_edit_path) {
+            edit_model.tangents_inline = false;
+        }
+
         if (is_curr_command_done ()) {
             edit_model.add_live_points_to_path (live_points, live_command, live_idx + 1);
 

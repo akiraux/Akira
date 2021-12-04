@@ -36,6 +36,8 @@ public class Akira.Models.PathEditModel : Object {
     public Gee.HashSet<int> selected_pts;
     public int reference_point;
 
+    public bool tangents_inline = false;
+
     public PathEditModel (Lib.Items.ModelInstance instance, Lib.ViewCanvas view_canvas) {
         Object (
             view_canvas: view_canvas,
@@ -139,12 +141,14 @@ public class Akira.Models.PathEditModel : Object {
      */
     public Lib.Modes.PathEditMode.PointType hit_test (double x, double y, ref int[] index) {
         Geometry.Point point = Geometry.Point (x, y);
+        tangents_inline = false;
 
         int j = 0;
         for (int i = 0; i < commands.length + 1; ++i) {
             if (commands[i] == Lib.Modes.PathEditMode.Type.LINE) {
                 if (compare_points (points[j], point)) {
                     index[0] = j;
+
                     return Lib.Modes.PathEditMode.PointType.LINE_END;
                 }
 
@@ -157,25 +161,37 @@ public class Akira.Models.PathEditModel : Object {
                     index[0] = j;
                     index[1] = j + 1;
                     index[2] = j + 2;
+
                     return Lib.Modes.PathEditMode.PointType.CURVE_BEGIN;
                 }
 
                 // If either of the tangent points is selected and moved,
                 // then the other needs to be rotated too.
                 if (compare_points (points[j + 1], point)) {
-                    index[0] = j + 1;
-                    index[1] = j + 2;
+                    if (are_points_in_line (j + 1, j, j + 2)) {
+                        index[0] = j + 1;
+                        index[1] = j + 2;
+                    } else {
+                        index[0] = j + 1;
+                    }
+
                     return Lib.Modes.PathEditMode.PointType.TANGENT_FIRST;
                 }
 
                 if (compare_points (points[j + 2], point)) {
-                    index[0] = j + 1;
-                    index[1] = j + 2;
+                    if (are_points_in_line (j + 1, j, j + 2)) {
+                        index[0] = j + 1;
+                        index[1] = j + 2;
+                    } else {
+                        index[0] = j + 2;
+                    }
+
                     return Lib.Modes.PathEditMode.PointType.TANGENT_SECOND;
                 }
 
                 if (compare_points (points[j + 3], point)) {
                     index[0] = j + 3;
+
                     return Lib.Modes.PathEditMode.PointType.CURVE_END;
                 }
                 j += 4;
@@ -203,9 +219,16 @@ public class Akira.Models.PathEditModel : Object {
         double delta_x = original_ref.x - new_pos.x;
         double delta_y = original_ref.y - new_pos.y;
 
-        foreach (var item in selected_pts) {
-            points[item].x -= delta_x;
-            points[item].y -= delta_y;
+        if (tangents_inline) {
+            print("tangents inline\n");
+            // If a tangent line was selected and they were inline,
+            // they need to be moved in a special way.
+            move_tangents_rel_to_curve (delta_x, delta_y);
+        } else {
+            foreach (var item in selected_pts) {
+                points[item].x -= delta_x;
+                points[item].y -= delta_y;
+            }
         }
 
         points = recalculate_points (points);
@@ -345,6 +368,35 @@ public class Akira.Models.PathEditModel : Object {
         return live_path.calculate_extents ();
     }
 
+    private bool are_points_in_line (int tangent_1_idx, int curve_begin_idx, int tangent_2_idx) {
+        Geometry.Point first_tangent = points[tangent_1_idx];
+        Geometry.Point second_tangent = points[tangent_2_idx];
+        Geometry.Point curve_begin = points[curve_begin_idx];
+
+        // Slope and intercept of line formed by tangents.
+        double slope_tangents = (second_tangent.y - first_tangent.y) / (second_tangent.x - first_tangent.x);
+        double intercept = first_tangent.y - slope_tangents * first_tangent.x;
+
+        // Check if the curve_begin point lies on this tangent.
+        if (curve_begin.y == (slope_tangents * curve_begin.x + intercept)) {
+            tangents_inline = true;
+            return true;
+        }
+
+        tangents_inline = false;
+        return false;
+    }
+
+    private void move_tangents_rel_to_curve (double delta_x, double delta_y) {
+        points[reference_point].x -= delta_x;
+        points[reference_point].y -= delta_y;
+
+        var sel_pts_array = selected_pts.to_array ();
+        int other_tangent = (sel_pts_array[0] == reference_point) ? sel_pts_array[1] : sel_pts_array[0];
+        points[other_tangent].x += delta_x;
+        points[other_tangent].y += delta_y;
+        
+    }
 }
 
 public struct Akira.Models.PathDataModel {
