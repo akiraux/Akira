@@ -27,13 +27,18 @@ public class Akira.Lib.Items.NodeSelection : Object {
         public uint children_selected_ct = 1;
     }
 
+    // Used to determine first and last added nodes
+    private uint last_added_sid = 0;
+
     public class SelectedNode {
         public ModelNode node;
         public int parent_id;
+        public uint sid;
 
-        public SelectedNode (ModelNode node) {
+        public SelectedNode (ModelNode node, uint sid) {
             this.node = node;
             this.parent_id = node.parent.id;
+            this.sid = sid;
         }
     }
 
@@ -89,7 +94,7 @@ public class Akira.Lib.Items.NodeSelection : Object {
             return;
         }
 
-        var cand = new SelectedNode (to_add);
+        var cand = new SelectedNode (to_add, ++last_added_sid);
         nodes[to_add.id] = cand;
         register_parent (cand.parent_id);
 

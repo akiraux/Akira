@@ -33,6 +33,8 @@ public class Akira.Lib.Managers.ItemsManager : Object {
     construct {
         item_model = new Lib.Items.Model.live_model (view_canvas);
         item_model.item_geometry_changed.connect (on_item_geometry_changed);
+
+        view_canvas.window.event_bus.selection_align.connect (selection_align);
     }
 
     public signal void items_removed (GLib.Array<int> ids);
@@ -237,6 +239,8 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         print ("shift item zorder-----\n");
         item_model.print_dag ();
 
+        compile_model ();
+
         return 0;
     }
 
@@ -416,8 +420,6 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         );
 
         add_item_to_origin (new_rect);
-        // Defer the print of the layer UI after all items have been created.
-        view_canvas.window.main_window.show_added_layers ();
 
         return new_rect;
     }
@@ -464,14 +466,15 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         }
 
         compile_model ();
-        // Defer the print of the layer UI after all items have been created.
-        view_canvas.window.main_window.show_added_layers ();
 
         if (debug_timer) {
             timer.stop ();
             seconds = timer.elapsed (out microseconds);
             print ("Created %u items in %s s\n", num_of, seconds.to_string ());
         }
+
+        // Defer the print of the layer UI after all items have been created.
+        view_canvas.window.main_window.show_added_layers (num_of++);
 
         return group;
     }
@@ -502,9 +505,24 @@ public class Akira.Lib.Managers.ItemsManager : Object {
 
         view_canvas.pause_redraw = false;
         view_canvas.request_redraw (view_canvas.get_bounds ());
+
+        // Defer the print of the layer UI after all items have been created.
+        view_canvas.window.main_window.show_added_layers ((int) num_of);
     }
 
     public void on_item_geometry_changed (int id) {
         view_canvas.selection_manager.on_selection_changed (id);
     }
+
+    public void selection_align (Utils.ItemAlignment.AlignmentDirection direction) {
+        unowned var selection = view_canvas.selection_manager.selection;
+        if (selection.count () <= 1) {
+            return;
+        }
+
+        var type = Utils.ItemAlignment.AlignmentType.AUTO;
+
+        Utils.ItemAlignment.align_selection (selection, direction, type, view_canvas);
+    }
+
 }

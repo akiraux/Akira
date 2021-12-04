@@ -49,4 +49,8 @@ public class Akira.Lib.Components.Coordinates : Component, Copyable<Coordinates>
     public Coordinates copy () {
         return new Coordinates (_x, _y);
     }
+
+    public Coordinates translated (double dx, double dy) {
+        return new Coordinates (_x + dx, _y + dy);
+    }
 }

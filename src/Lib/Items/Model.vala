@@ -40,8 +40,8 @@ public class Akira.Lib.Items.Model : Object {
     public const int GROUP_START_ID = 10;
     public const int ITEM_START_ID = 10000000;
 
-    public int last_group_id = GROUP_START_ID;
-    public int last_item_id = ITEM_START_ID;
+    private int last_group_id = GROUP_START_ID;
+    private int last_item_id = ITEM_START_ID;
 
     public Gee.HashMap<int, ModelInstance> group_map;
     public Gee.HashMap<int, ModelInstance> item_map;
@@ -74,8 +74,6 @@ public class Akira.Lib.Items.Model : Object {
         add_to_maps (new ModelNode (group_instance, 0), false);
     }
 
-    // TODO: Move this signal to the ItemsManager and call it only once for all
-    // newly added items.
     public signal void item_added (int id);
     public signal void item_geometry_changed (int id);
 
@@ -147,6 +145,15 @@ public class Akira.Lib.Items.Model : Object {
         internal_mark_geometry_dirty (node, false);
     }
 
+    public void mark_node_name_dirty (Lib.Items.ModelNode node) {
+        if (dirty_groups.contains (node.id) || dirty_items.contains (node.id)) {
+            return;
+        }
+
+        node.instance.compiled_components.compiled_name = null;
+        on_item_geometry_compilation_requested (node);
+    }
+
     public void recalculate_children_stacking (int parent_id) {
         var group = group_nodes.get (parent_id);
         if (group == null) {
@@ -214,7 +221,7 @@ public class Akira.Lib.Items.Model : Object {
             return -1;
         }
 
-        if (pos >= parent_node.children.length || pos + length >= parent_node.children.length) {
+        if (pos >= parent_node.children.length || pos + length > parent_node.children.length) {
             return -1;
         }
 
@@ -233,7 +240,9 @@ public class Akira.Lib.Items.Model : Object {
         if (restack) {
             var start = int.min ((int)pos, (int)newpos);
             for (var i = start; i < parent_node.children.length; ++i) {
-                parent_node.children.index (i).pos_in_parent = i;
+                unowned var ch = parent_node.children.index (i);
+                ch.pos_in_parent = i;
+                mark_node_geometry_dirty (ch);
             }
         }
 
@@ -326,18 +335,25 @@ public class Akira.Lib.Items.Model : Object {
 
         print (")\n");
 
-
         if (node.children != null) {
             for (var i = 0; i < node.children.length; ++i) {
                 print_dag_recurse (node.children.index (i), level + 1);
             }
         }
-
     }
 
     private int inner_splice_new_item (ModelNode parent_node, uint pos, ModelInstance candidate) {
         var new_id = candidate.is_group ? ++last_group_id : ++last_item_id;
         candidate.id = new_id;
+        // Generate the initial name for the item composed by the type name and
+        // the id. We subtract the starter IDs from what we show the user just
+        // to make it look prettier. The ID saved in the Name component is never
+        // used, maybe we could remove it.
+        var new_name_id = candidate.is_group ? new_id - GROUP_START_ID : new_id - ITEM_START_ID;
+        candidate.components.name = new Lib.Components.Name (
+            "%s %i".printf (candidate.type.name_id, new_name_id),
+            new_id.to_string ()
+        );
         var new_node = new ModelNode (candidate, (int) pos);
 
         add_to_maps (new_node, true);
@@ -400,7 +416,7 @@ public class Akira.Lib.Items.Model : Object {
     }
 
     private void add_to_maps (ModelNode node, bool listen) {
-        // TODO create drawable ina nicer way
+        // TODO create drawable in a nicer way.
         node.instance.add_to_canvas ();
 
         if (node.instance.is_group) {
@@ -415,7 +431,6 @@ public class Akira.Lib.Items.Model : Object {
             item_added (node.id);
         }
     }
-
 
     private void remove_from_maps (int id) {
         var target = instance_from_id (id);
@@ -445,8 +460,9 @@ public class Akira.Lib.Items.Model : Object {
     }
 
     /*
-     * Internal operation to mark an instance as dirty. If 'simple' is true, only the instance's geometry is nullified.
-     * Otherwise a recursive dirtying of items occurs.
+     * Internal operation to mark an instance as dirty. If 'simple' is true,
+     * only the instance's geometry is nullified, otherwise a recursive dirtying
+     * of items occurs.
      */
     private void internal_mark_geometry_dirty (Lib.Items.ModelNode node, bool simple) {
         if (dirty_groups.contains (node.id) || dirty_items.contains (node.id)) {
@@ -487,7 +503,6 @@ public class Akira.Lib.Items.Model : Object {
             child.pos_in_parent = ct++;
         }
     }
-
 
     private void internal_compile_geometries () {
         if (!is_live) {

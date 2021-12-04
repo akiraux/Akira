@@ -61,14 +61,14 @@ public class Akira.Layouts.MainWindow : Gtk.Grid {
      * Force the layers panel to show all its newly added children, only after
      * all items have actually been created.
      */
-    public void show_added_layers () {
-        layers_sidebar.layers_panel.refresh_lists ();
+    public void show_added_layers (int added) {
+        layers_sidebar.layers_listbox.show_added_layers (added);
     }
 
     /*
      * Pass the list of nodes ids to be removed from the layers list.
      */
     public void remove_layers (GLib.Array<int> ids) {
-        layers_sidebar.layers_panel.delete_selected_layers (ids);
+        layers_sidebar.layers_listbox.remove_items (ids);
     }
 }

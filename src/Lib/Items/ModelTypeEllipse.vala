@@ -43,6 +43,7 @@ public class Akira.Lib.Items.ModelTypeEllipse : ModelType {
         new_item.components.transform = Lib.Components.Components.default_transform ();
         new_item.components.flipped = Lib.Components.Components.default_flipped ();
         new_item.components.border_radius = Lib.Components.Components.default_border_radius ();
+        new_item.components.name = Lib.Components.Components.default_name ();
         return new_item;
     }
 
