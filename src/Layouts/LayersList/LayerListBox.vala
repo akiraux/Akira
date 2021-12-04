@@ -161,10 +161,27 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
         list_store.items_changed (0, removed, 0);
     }
 
+    /*
+     * Check if an item has children and recursively loop through them to
+     * remove all the matching layers.
+     */
     private int inner_remove_items (LayerItemModel item) {
-        // TODO: If the item model has child items, remove those and return how
-        // many were removed.
-        return 0;
+        var removed = 0;
+        foreach (var uid in item.children) {
+            if (uid == 0) {
+                continue;
+            }
+
+            var child = layers[uid];
+            if (child != null) {
+                removed += inner_remove_items (child);
+                layers.unset (uid);
+                list_store.remove (child);
+                removed++;
+            }
+        }
+
+        return removed;
     }
 
     /*

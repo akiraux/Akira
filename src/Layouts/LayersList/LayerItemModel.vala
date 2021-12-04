@@ -115,6 +115,12 @@ public class Akira.Layouts.LayersList.LayerItemModel : GLib.Object {
         }
     }
 
+    public int[] children {
+        owned get {
+            return _cached_instance.children;
+        }
+    }
+
     public LayerItemModel (Lib.ViewCanvas view_canvas, Lib.Items.ModelNode node, int service_uid) {
         Object (service_uid: service_uid);
         update_node (node);
