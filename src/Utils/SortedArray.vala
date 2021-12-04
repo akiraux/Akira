@@ -37,16 +37,7 @@
         }
     }
 
-    // Represent the upper and lower bound that all guidelines must stay in
-    // if they don't want to be deleted. Represent the extents of artboard.
-    // Any guideline outside this limit will be deleted.
-    private double lower_bound;
-    private double upper_bound;
-
-    public SortedArray (double lower_bound, double upper_bound) {
-        this.lower_bound = lower_bound;
-        this.upper_bound = upper_bound;
-
+    public SortedArray () {
         elements = new Gee.TreeSet<double?> (are_equal);
     }
 
@@ -54,10 +45,6 @@
      * Inserts the given elements in the set such that the resultant array remains sorted.
      */
     public void insert (double item) {
-        if ((item > upper_bound) || (item < lower_bound)) {
-            return;
-        }
-
         elements.add (item);
     }
 
@@ -87,7 +74,7 @@
     }
 
     public SortedArray clone () {
-        var cln = new SortedArray (lower_bound, upper_bound);
+        var cln = new SortedArray ();
 
         foreach (var item in elements) {
             cln.insert (item);
@@ -97,22 +84,17 @@
     }
 
     public void get_distance_to_neighbours (double item, out double neigh_1, out double neigh_2) {
-        if (are_equal (elements.first (), item) <= 0) {
-            neigh_1 = 0;
+        if (are_equal (elements.first (), item) >= 0) {
+            neigh_1 = (elements.first () - item).abs ();
         } else {
-            neigh_1 = elements.lower (item);
+            neigh_1 = (elements.floor (item) - item).abs ();
         }
 
         if (are_equal (elements.last (), item) <= 0) {
-            neigh_2 = 0;
+            neigh_2 = (elements.last () - item).abs ();
         } else {
-            neigh_2 = elements.higher (item);
+            neigh_2 = (elements.ceil (item) - item).abs ();
         }
-    }
-
-    public void set_bounds (double lower_bound, double upper_bound) {
-        this.lower_bound = lower_bound;
-        this.upper_bound = upper_bound;
     }
 
     public void translate_all (double delta) {

@@ -48,8 +48,8 @@ public class Akira.Models.GuidelineModel {
     public signal void changed ();
 
     public GuidelineModel () {
-        h_guides = new Utils.SortedArray (0, 0);
-        v_guides = new Utils.SortedArray (0, 0);
+        h_guides = new Utils.SortedArray ();
+        v_guides = new Utils.SortedArray ();
 
         drawable_extents = Geometry.Rectangle.empty ();
         distances = new double[4];
@@ -124,20 +124,17 @@ public class Akira.Models.GuidelineModel {
 
         // Then add the new edges of artboard.
         // These lines make it easier to measure distances.
-        int index;
-        if (h_guides.contains (extents.left, out index) || h_guides.contains (extents.right, out index)) {
-            return;
-        } else if (v_guides.contains (extents.top, out index) || v_guides.contains (extents.bottom, out index)) {
-            return;
-        }
+        //  int index;
+        //  if (h_guides.contains (extents.left, out index) || h_guides.contains (extents.right, out index)) {
+        //      return;
+        //  } else if (v_guides.contains (extents.top, out index) || v_guides.contains (extents.bottom, out index)) {
+        //      return;
+        //  }
 
         v_guides.insert (extents.left);
         v_guides.insert (extents.right);
         h_guides.insert (extents.top);
         h_guides.insert (extents.bottom);
-
-        h_guides.set_bounds (extents.top, extents.bottom);
-        v_guides.set_bounds (extents.left, extents.right);
 
         changed ();
     }
