@@ -123,6 +123,5 @@ public class Akira.Layouts.LayersList.LayerItemModel : GLib.Object {
 
     private void update_node (Lib.Items.ModelNode new_node) {
         _cached_instance = new_node.instance;
-        _cached_instance.id = new_node.id;
     }
 }
