@@ -55,6 +55,7 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
     private int live_idx;
 
     // This flag tells if we are adding a path or editing an existing one.
+    // Basically decides is we are in "edit" mode or "create" mode.
     private bool is_edit_path = false;
 
     public PathEditMode (Lib.ViewCanvas canvas, Lib.Items.ModelInstance instance) {
@@ -109,13 +110,17 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
     }
 
     public override bool key_press_event (Gdk.EventKey event) {
-        if (is_edit_path) {
-            // When editing path, we dont know yet what point will be selected.
-            // So don't delete points, but mark this event as handled.
-            return true;
-        }
-
         uint uppercase_keyval = Gdk.keyval_to_upper (event.keyval);
+
+        if (is_edit_path) {
+            if (uppercase_keyval == Gdk.Key.C) {
+                // If C is pressed in edit_mode, we enter back to create mode.
+                is_edit_path = false;
+                return true;
+            }
+
+            return false;
+        }
 
         if (uppercase_keyval == Gdk.Key.BackSpace) {
             handle_backspace_event ();
@@ -258,6 +263,7 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
         if (live_command == Type.LINE) {
             // Check if we are clicking on the first point. If yes, then close the path.
             int[] index = new int[3];
+            index[0] = index[1] = index[2] = -1;
             edit_model.hit_test (event.x, event.y, ref index);
 
             if (index[0] == 0) {

@@ -265,6 +265,10 @@ public class Akira.Models.PathEditModel : Object {
     public bool check_can_path_close () {
         int last = points.length - 1;
 
+        if (last == 0) {
+            return false;
+        }
+
         double delta_x = (points[0].x - points[last].x).abs ();
         double delta_y = (points[0].y - points[last].y).abs ();
 
