@@ -186,7 +186,10 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
                 }
             }
 
+            // Tangents behave in a different way. So we are placing the logic for that seperately.
             if (sel_type == PointType.TANGENT_FIRST || sel_type == PointType.TANGENT_SECOND) {
+                // If alt was not clicked and the selected tangent already exists in the selection,
+                // It means we want to use this point as reference when moving.
                 if (!is_alt) {
                     if (sel_type == PointType.TANGENT_FIRST && edit_model.selected_pts.contains (index[0])) {
                         edit_model.reference_point = index[0];
@@ -199,15 +202,18 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
                     }
                 }
                 
+                // When shift is clicked, we add all the selected points to the selection.
+                // But for tangent, the selected points will also contain the other tangent.
+                // So add only the selected tangent to the selection.
                 if (is_shift) {
-                    // Add only the selected point to the selection.
                     if (sel_type == PointType.TANGENT_FIRST) {
                         edit_model.set_selected_points (index[0], true);
                     } else {
                         edit_model.set_selected_points (index[1], true);
                     }
                 } else if (is_alt) {
-                    // Add only the selected point to the selection.
+                    // When alt is pressed, we want to move the only the selected tangent
+                    // and other one should stay put. So clear the selection and add only selected tangent.
                     if (sel_type == PointType.TANGENT_FIRST) {
                         edit_model.set_selected_points (index[0], false);
                         edit_model.reference_point = index[0];
@@ -218,6 +224,10 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
 
                     edit_model.tangents_inline = false;
                 } else {
+                    // If no modifier was used, move the tangents in the reflected way.
+                    // This means we move the selected tangent with the mouse, but move the other tangent
+                    // in the opposite direction. see PathEditModel.move_tangents_rel_to_curve
+                    // If there are any other points in the selection, remove them first.
                     edit_model.selected_pts.clear ();
 
                     edit_model.set_selected_points (index[0], true);
@@ -236,8 +246,8 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
             return true;
         }
 
-        // Everytime the user presses the mouse button, a new point needs to be created and added to the path.
-
+        // If we are not in edit mode (we are creating the path), then
+        // everytime the user presses the mouse button, a new point needs to be created and added to the path.
         if (edit_model.first_point.x == -1) {
             edit_model.first_point = Geometry.Point (event.x, event.y);
             return true;
@@ -248,17 +258,13 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
         if (live_command == Type.LINE) {
             // Check if we are clicking on the first point. If yes, then close the path.
             int[] index = new int[3];
-            index[0] = index[1] = index[2] = -1;
-
             edit_model.hit_test (event.x, event.y, ref index);
 
             if (index[0] == 0) {
                 edit_model.make_path_closed ();
-
                 // We are triggering the escape signal because after joining the path,
                 // no more points can be added. So this mode must end.
                 view_canvas.window.event_bus.request_escape ();
-
                 return true;
             }
 
