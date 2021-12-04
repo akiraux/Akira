@@ -51,9 +51,11 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
             LayerListItem? row = null;
             if (old_widget != null) {
                 row = old_widget as LayerListItem;
+                if (row.is_editing) {
+                    row.edit_end ();
+                }
             } else {
                 row = new LayerListItem ();
-                row.row_updated.connect (on_row_updated);
             }
 
             row.assign ((LayerItemModel) item);
@@ -104,14 +106,14 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
     }
 
     private void on_item_added (int id) {
-        var node_instance = view_canvas.items_manager.instance_from_id (id);
+        var node = view_canvas.items_manager.node_from_id (id);
         // No need to add any layer if we don't have an instance.
-        if (node_instance == null) {
+        if (node == null) {
             return;
         }
 
-        var service_uid = node_instance.id;
-        var item = new LayerItemModel (node_instance, service_uid);
+        var service_uid = node.id;
+        var item = new LayerItemModel (view_canvas, node, service_uid);
         layers[service_uid] = item;
         list_store.add (item);
         print ("on_item_added: %i\n", service_uid);
@@ -191,7 +193,7 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
         // a selection changed loop since the selection_modified_external signal
         // is only triggered from a click on the canvas.
         foreach (var model in get_selected_rows ()) {
-            sm.add_to_selection (((LayerItemModel) model).node.id);
+            sm.add_to_selection (((LayerItemModel) model).id);
         }
 
         // Trigger the transform mode if is not currently active. This might
@@ -240,8 +242,8 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
         view_canvas.hover_manager.remove_hover_effect ();
 
         if (item != null) {
-            view_canvas.hover_manager.maybe_create_hover_effect_from_instance (
-                ((LayerItemModel) item).node
+            view_canvas.hover_manager.maybe_create_hover_effect_by_id (
+                ((LayerItemModel) item).id
             );
         }
     }
@@ -269,8 +271,19 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
         }
 
         edited_row = item;
-        ((LayerListItem) item).edit ();
+        var layer = (LayerListItem) edited_row;
+        layer.edit ();
+        layer.entry.activate.connect (on_activate_entry);
         view_canvas.window.event_bus.disconnect_typing_accel ();
+    }
+
+    /*
+     * Handle the `activate` signal triggered by the edited label entry of a
+     * layer row.
+     */
+    private void on_activate_entry () {
+        ((LayerListItem) edited_row).update_label ();
+        on_row_edited (null);
     }
 
     /*
@@ -278,7 +291,10 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
      */
     private void reset_edited_row () {
         if (edited_row != null) {
-            ((LayerListItem) edited_row).edit_end ();
+            var layer = (LayerListItem) edited_row;
+            layer.edit_end ();
+            layer.entry.activate.disconnect (on_activate_entry);
+
             edited_row = null;
             view_canvas.window.event_bus.connect_typing_accel ();
         }
@@ -290,16 +306,5 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
      */
     private void on_escape_request () {
         on_row_edited (null);
-    }
-
-    /*
-     * Handle the `activate` signal triggered by the edited label entry of a
-     * layer row.
-     */
-    private void on_row_updated (int id) {
-        on_row_edited (null);
-        // Trigger the redraw of the model.
-        view_canvas.items_manager.item_model.mark_node_name_dirty_by_id (id);
-        view_canvas.items_manager.compile_model ();
     }
 }

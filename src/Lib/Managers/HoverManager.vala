@@ -67,6 +67,16 @@ public class Akira.Lib.Managers.HoverManager : Object {
         current_hovered_id = -1;
     }
 
+    public void maybe_create_hover_effect_by_id (int id) {
+        var node = view_canvas.items_manager.node_from_id (id);
+        if (node == null) {
+            assert (node != null);
+            return;
+        }
+
+        maybe_create_hover_effect (node);
+    }
+
     private void maybe_create_hover_effect (Lib.Items.ModelNode node) {
         if (view_canvas.selection_manager.item_selected (node.id)) {
             return;
@@ -81,24 +91,5 @@ public class Akira.Lib.Managers.HoverManager : Object {
         hover_layer.add_drawable (node.instance.drawable);
         current_hovered_id = node.id;
         hover_changed (node.instance.id);
-    }
-
-    /*
-     * Create the hover effect from a ModelInstance. This is mostly used by the
-     * layers list box to link the hovering of layers with hovering of canvas items.
-     */
-    public void maybe_create_hover_effect_from_instance (Lib.Items.ModelInstance instance) {
-        if (view_canvas.selection_manager.item_selected (instance.id)) {
-            return;
-        }
-
-        if (current_hovered_id == instance.id) {
-            return;
-        } else {
-            remove_hover_effect ();
-        }
-
-        hover_layer.add_drawable (instance.drawable);
-        current_hovered_id = instance.id;
     }
 }

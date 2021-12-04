@@ -145,14 +145,8 @@ public class Akira.Lib.Items.Model : Object {
         internal_mark_geometry_dirty (node, false);
     }
 
-    public void mark_node_name_dirty_by_id (int id) {
-        if (dirty_groups.contains (id) || dirty_items.contains (id)) {
-            return;
-        }
-
-        var node = node_from_id (id);
-        if (node == null) {
-            assert (false);
+    public void mark_node_name_dirty (Lib.Items.ModelNode node) {
+        if (dirty_groups.contains (node.id) || dirty_items.contains (node.id)) {
             return;
         }
 
