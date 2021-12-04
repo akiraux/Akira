@@ -227,7 +227,7 @@ public class Akira.Lib.Items.Model : Object {
             return -1;
         }
 
-        if (pos >= parent_node.children.length || pos + length >= parent_node.children.length) {
+        if (pos >= parent_node.children.length || pos + length > parent_node.children.length) {
             return -1;
         }
 
@@ -246,7 +246,9 @@ public class Akira.Lib.Items.Model : Object {
         if (restack) {
             var start = int.min ((int)pos, (int)newpos);
             for (var i = start; i < parent_node.children.length; ++i) {
-                parent_node.children.index (i).pos_in_parent = i;
+                unowned var ch = parent_node.children.index (i);
+                ch.pos_in_parent = i;
+                mark_node_geometry_dirty (ch);
             }
         }
 
