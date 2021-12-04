@@ -27,7 +27,7 @@
   * placing a guideline over another will automatically delete it.
   *
   */
- public class Akira.Utils.SortedArray : Object {
+ public class Akira.Utils.SortedGuides : Object {
     // Array to store all elements.
     public Gee.TreeSet<double?> elements;
 
@@ -37,7 +37,7 @@
         }
     }
 
-    public SortedArray () {
+    public SortedGuides () {
         elements = new Gee.TreeSet<double?> (are_equal);
     }
 
@@ -73,8 +73,8 @@
         return true;
     }
 
-    public SortedArray clone () {
-        var cln = new SortedArray ();
+    public SortedGuides clone () {
+        var cln = new SortedGuides ();
 
         foreach (var item in elements) {
             cln.insert (item);

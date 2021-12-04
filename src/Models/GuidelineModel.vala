@@ -23,9 +23,9 @@ public class Akira.Models.GuidelineModel {
     // Stores the coordinates of horizontal guides.
     // Since a guideline is a straight line (either horizontal or vertical),
     // we only need one coordinate to store a line.
-    public Utils.SortedArray h_guides;
+    public Utils.SortedGuides h_guides;
     // Stores the coordinates of vertical guides.
-    public Utils.SortedArray v_guides;
+    public Utils.SortedGuides v_guides;
 
     // Stores index of line in the sorted array.
     // In case we are moving the guide, stores index of next guideline.
@@ -48,8 +48,8 @@ public class Akira.Models.GuidelineModel {
     public signal void changed ();
 
     public GuidelineModel () {
-        h_guides = new Utils.SortedArray ();
-        v_guides = new Utils.SortedArray ();
+        h_guides = new Utils.SortedGuides ();
+        v_guides = new Utils.SortedGuides ();
 
         drawable_extents = Geometry.Rectangle.empty ();
         distances = new double[4];
@@ -121,15 +121,6 @@ public class Akira.Models.GuidelineModel {
         v_guides.remove_item (drawable_extents.right);
 
         drawable_extents = extents;
-
-        // Then add the new edges of artboard.
-        // These lines make it easier to measure distances.
-        //  int index;
-        //  if (h_guides.contains (extents.left, out index) || h_guides.contains (extents.right, out index)) {
-        //      return;
-        //  } else if (v_guides.contains (extents.top, out index) || v_guides.contains (extents.bottom, out index)) {
-        //      return;
-        //  }
 
         v_guides.insert (extents.left);
         v_guides.insert (extents.right);
