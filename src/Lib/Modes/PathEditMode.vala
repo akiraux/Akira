@@ -153,8 +153,8 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
                 return false;
             }
 
-            if (sel_type == PointType.LINE_END || 
-                sel_type == PointType.CURVE_BEGIN || 
+            if (sel_type == PointType.LINE_END ||
+                sel_type == PointType.CURVE_BEGIN ||
                 sel_type == PointType.CURVE_END
             ) {
                 // If the selected point already exists, then set it as the reference point.
@@ -201,7 +201,7 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
                         return true;
                     }
                 }
-                
+
                 // When shift is clicked, we add all the selected points to the selection.
                 // But for tangent, the selected points will also contain the other tangent.
                 // So add only the selected tangent to the selection.
@@ -288,7 +288,6 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
             // If the user modified the last point and placed on top of first point,
             // make the path closed.
             if (edit_model.check_can_path_close ()) {
-                print("path can close\n");
                 view_canvas.window.event_bus.request_escape ();
                 return true;
             }

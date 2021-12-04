@@ -220,7 +220,6 @@ public class Akira.Models.PathEditModel : Object {
         double delta_y = original_ref.y - new_pos.y;
 
         if (tangents_inline) {
-            print("tangents inline\n");
             // If a tangent line was selected and they were inline,
             // they need to be moved in a special way.
             move_tangents_rel_to_curve (delta_x, delta_y);
@@ -409,7 +408,6 @@ public class Akira.Models.PathEditModel : Object {
         int other_tangent = (sel_pts_array[0] == reference_point) ? sel_pts_array[1] : sel_pts_array[0];
         points[other_tangent].x += delta_x;
         points[other_tangent].y += delta_y;
-        
     }
 }
 
