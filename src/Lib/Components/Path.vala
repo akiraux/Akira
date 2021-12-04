@@ -76,6 +76,7 @@ public class Akira.Lib.Components.Path : Component, Copyable<Path> {
     public Path copy () {
         var cln = new Path ();
         cln.data = data;
+        cln.close = close;
         return cln;
     }
 

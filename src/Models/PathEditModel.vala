@@ -92,7 +92,8 @@ public class Akira.Models.PathEditModel : Object {
         }
 
         points = recalculate_points (new_path_points);
-        instance.components.path = new Lib.Components.Path.from_points (points, commands);
+        bool close = instance.components.path.close;
+        instance.components.path = new Lib.Components.Path.from_points (points, commands, close);
     }
 
     public void set_live_points (Geometry.Point[] live_pts, int length) {
@@ -103,12 +104,14 @@ public class Akira.Models.PathEditModel : Object {
     }
 
     public Geometry.Point[] delete_last_point () {
+        bool close = instance.components.path.close;
+
         if (commands[commands.length - 1] == Lib.Modes.PathEditMode.Type.LINE) {
             commands.resize (commands.length - 1);
             points.resize (points.length - 1);
 
             points = recalculate_points (points);
-            instance.components.path = new Lib.Components.Path.from_points (points, commands);
+            instance.components.path = new Lib.Components.Path.from_points (points, commands, close);
             recompute_components ();
 
             return new Geometry.Point[0];
@@ -123,7 +126,7 @@ public class Akira.Models.PathEditModel : Object {
         points.resize (points.length - 4);
 
         points = recalculate_points (points);
-        instance.components.path = new Lib.Components.Path.from_points (points, commands);
+        instance.components.path = new Lib.Components.Path.from_points (points, commands, close);
         recompute_components ();
 
         return new_live_pts;
@@ -206,7 +209,8 @@ public class Akira.Models.PathEditModel : Object {
         }
 
         points = recalculate_points (points);
-        instance.components.path = new Lib.Components.Path.from_points (points, commands);
+        bool close = instance.components.path.close;
+        instance.components.path = new Lib.Components.Path.from_points (points, commands, close);
         recompute_components ();
     }
 
@@ -241,7 +245,7 @@ public class Akira.Models.PathEditModel : Object {
         double delta_x = Math.ceil ((a.x + first_point.x - b.x).abs ());
         double delta_y = Math.ceil ((a.y + first_point.y - b.y).abs ());
 
-        return (delta_x <= 4 && delta_y <= 4);
+        return (delta_x <= thresh && delta_y <= thresh);
     }
 
     /*
