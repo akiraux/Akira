@@ -263,6 +263,20 @@ public class Akira.Models.PathEditModel : Object {
         recompute_components ();
     }
 
+    public bool check_can_path_close () {
+        int last = points.length - 1;
+
+        double delta_x = (points[0].x - points[last].x).abs ();
+        double delta_y = (points[0].y - points[last].y).abs ();
+
+        if (delta_x <= 2 && delta_y <= 2) {
+            make_path_closed ();
+            return true;
+        }
+
+        return false;
+    }
+
     private bool compare_points (Geometry.Point a, Geometry.Point b) {
         double thresh = 4 / view_canvas.scale;
         double delta_x = Math.ceil ((a.x + first_point.x - b.x).abs ());

@@ -246,6 +246,22 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
         Akira.Geometry.Point point = Akira.Geometry.Point (event.x, event.y);
 
         if (live_command == Type.LINE) {
+            // Check if we are clicking on the first point. If yes, then close the path.
+            int[] index = new int[3];
+            index[0] = index[1] = index[2] = -1;
+
+            edit_model.hit_test (event.x, event.y, ref index);
+
+            if (index[0] == 0) {
+                edit_model.make_path_closed ();
+
+                // We are triggering the escape signal because after joining the path,
+                // no more points can be added. So this mode must end.
+                view_canvas.window.event_bus.request_escape ();
+
+                return true;
+            }
+
             is_click = true;
             live_points[0] = point;
             live_idx = 0;
@@ -262,6 +278,14 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
     public override bool button_release_event (Gdk.EventButton event) {
         if (is_edit_path) {
             edit_model.tangents_inline = false;
+
+            // If the user modified the last point and placed on top of first point,
+            // make the path closed.
+            if (edit_model.check_can_path_close ()) {
+                print("path can close\n");
+                view_canvas.window.event_bus.request_escape ();
+                return true;
+            }
         }
 
         if (is_curr_command_done ()) {
