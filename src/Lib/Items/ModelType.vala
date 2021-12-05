@@ -43,6 +43,13 @@ public class Akira.Lib.Items.ModelType : Object {
         return new Components.CompiledGeometry.from_components (components, node);
     }
 
+    public virtual Components.CompiledName compile_name (
+        Components.Components? components,
+        Lib.Items.ModelNode? node
+    ) {
+        return new Components.CompiledName (components.name.name);
+    }
+
     public virtual void construct_canvas_item (ModelInstance item) {}
 
     public virtual void component_updated (ModelInstance item, Lib.Components.Component.Type type) {}

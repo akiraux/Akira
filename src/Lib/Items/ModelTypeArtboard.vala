@@ -20,7 +20,6 @@
  */
 
 public class Akira.Lib.Items.ModelTypeArtboard : ModelType {
-    //Goo.CanvasItem background;
 
     public static ModelInstance default_artboard (
         Lib.Components.Coordinates center,
@@ -45,6 +44,7 @@ public class Akira.Lib.Items.ModelTypeArtboard : ModelType {
             clips_children = true
         };
         new_item.components.layout = new Components.Layout (layout_data);
+        new_item.components.name = Lib.Components.Components.default_name ();
         return new_item;
     }
 
@@ -91,6 +91,9 @@ public class Akira.Lib.Items.ModelTypeArtboard : ModelType {
                 // If artboard is resized, we need to update the extents in guide data.
                 instance.guide_data.set_drawable_extents (instance.bounding_box);
                 instance.guide_data.changed ();
+                break;
+            case Lib.Components.Component.Type.COMPILED_NAME:
+                instance.drawable.label = instance.compiled_name.name;
                 break;
         }
     }

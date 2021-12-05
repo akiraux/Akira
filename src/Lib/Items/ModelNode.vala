@@ -19,6 +19,18 @@
  * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
  */
 
+/*
+ * ModelNode is a DAG representation of the model. It populates the information of an ModelInstance
+ * that lives within a Model. This information includes its parent's ModelNode, its children
+ * ModelNodes (may be empty) and the original instance.
+ *
+ * The main purpose of a ModelNode is to ease traversal of the Model without n lookups. It should
+ * NOT be cached. There are few exceptions for performance, and when done, it is very important
+ * that the lifetime of the container of that cache gets notified whenever a node is destructed.
+ * This should very rarely be needed.
+ *
+ * It is recomended that nodes should be queried on demand from a model whenever needed.
+ */
 public class Akira.Lib.Items.ModelNode {
     public int id;
     // This is the position of the node relative to its parent.
@@ -99,7 +111,6 @@ public class Akira.Lib.Items.PositionKey {
             }
 
             return a.pos_in_parent < b.pos_in_parent ? -1 : 1;
-
         }
 
         return a.parent_path < b.parent_path ? -1 : 1;

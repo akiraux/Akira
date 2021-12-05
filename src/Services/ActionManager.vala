@@ -69,6 +69,12 @@ public class Akira.Services.ActionManager : Object {
     public const string ACTION_PICK_COLOR = "action_pick_color";
     public const string ACTION_COPY = "action_copy";
     public const string ACTION_PASTE = "action_paste";
+    public const string ACTION_ALIGN_LEFT = "action_align_left";
+    public const string ACTION_ALIGN_RIGHT = "action_align_right";
+    public const string ACTION_ALIGN_TOP = "action_align_top";
+    public const string ACTION_ALIGN_BOTTOM = "action_align_bottom";
+    public const string ACTION_ALIGN_VCENTER = "action_align_vcenter";
+    public const string ACTION_ALIGN_HCENTER = "action_align_hcenter";
 
     public static Gee.MultiMap<string, string> action_accelerators = new Gee.HashMultiMap<string, string> ();
     public static Gee.MultiMap<string, string> typing_accelerators = new Gee.HashMultiMap<string, string> ();
@@ -110,6 +116,12 @@ public class Akira.Services.ActionManager : Object {
         { ACTION_PICK_COLOR, action_pick_color },
         { ACTION_COPY, action_copy },
         { ACTION_PASTE, action_paste },
+        { ACTION_ALIGN_LEFT, action_align_left },
+        { ACTION_ALIGN_RIGHT, action_align_right },
+        { ACTION_ALIGN_TOP, action_align_top },
+        { ACTION_ALIGN_BOTTOM, action_align_bottom },
+        { ACTION_ALIGN_VCENTER, action_align_vcenter },
+        { ACTION_ALIGN_HCENTER, action_align_hcenter },
     };
 
     public ActionManager (Akira.Application akira_app, Akira.Window window) {
@@ -147,8 +159,8 @@ public class Akira.Services.ActionManager : Object {
         action_accelerators.set (ACTION_PICK_COLOR, "<Alt>c");
         action_accelerators.set (ACTION_COPY, "<Control>c");
         action_accelerators.set (ACTION_PASTE, "<Control>v");
+        action_accelerators.set (ACTION_ESCAPE, "Escape");
 
-        typing_accelerators.set (ACTION_ESCAPE, "Escape");
         typing_accelerators.set (ACTION_ARTBOARD_TOOL, "a");
         typing_accelerators.set (ACTION_RECT_TOOL, "r");
         typing_accelerators.set (ACTION_ELLIPSE_TOOL, "e");
@@ -158,6 +170,13 @@ public class Akira.Services.ActionManager : Object {
         typing_accelerators.set (ACTION_DELETE, "Delete");
         typing_accelerators.set (ACTION_DELETE, "BackSpace");
         typing_accelerators.set (ACTION_TOGGLE_PIXEL_GRID, "<Shift>Tab");
+
+        typing_accelerators.set (ACTION_ALIGN_LEFT, "<Alt>1");
+        typing_accelerators.set (ACTION_ALIGN_HCENTER, "<Alt>2");
+        typing_accelerators.set (ACTION_ALIGN_RIGHT, "<Alt>3");
+        typing_accelerators.set (ACTION_ALIGN_TOP, "<Alt>4");
+        typing_accelerators.set (ACTION_ALIGN_VCENTER, "<Alt>5");
+        typing_accelerators.set (ACTION_ALIGN_BOTTOM, "<Alt>6");
     }
 
     construct {
@@ -532,6 +551,30 @@ public class Akira.Services.ActionManager : Object {
 
     private void action_paste () {
         window.event_bus.request_paste ();
+    }
+
+    private void action_align_left () {
+        window.event_bus.selection_align (Utils.ItemAlignment.AlignmentDirection.LEFT);
+    }
+
+    private void action_align_right () {
+        window.event_bus.selection_align (Utils.ItemAlignment.AlignmentDirection.RIGHT);
+    }
+
+    private void action_align_top () {
+        window.event_bus.selection_align (Utils.ItemAlignment.AlignmentDirection.TOP);
+    }
+
+    private void action_align_bottom () {
+        window.event_bus.selection_align (Utils.ItemAlignment.AlignmentDirection.BOTTOM);
+    }
+
+    private void action_align_vcenter () {
+        window.event_bus.selection_align (Utils.ItemAlignment.AlignmentDirection.VCENTER);
+    }
+
+    private void action_align_hcenter () {
+        window.event_bus.selection_align (Utils.ItemAlignment.AlignmentDirection.HCENTER);
     }
 
     public static void action_from_group (string action_name, ActionGroup? action_group) {

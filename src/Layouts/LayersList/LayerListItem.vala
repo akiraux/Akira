@@ -25,29 +25,97 @@
  * The single layer row.
  */
 public class Akira.Layouts.LayersList.LayerListItem : VirtualizingListBoxRow {
+    private LayerItemModel model;
+
     private Gtk.StyleContext style_ctx;
+    // Main grid to attach all other grid widgets.
+    private Gtk.Grid grid_main;
+    // Grid to collect the label and entry widgets.
+    private Gtk.Grid grid_entry;
+    // Grid to collect the hide and lock action buttons.
+    private Gtk.Grid grid_action;
+
+    public Gtk.Entry entry;
     private Gtk.Label label;
+    private Gtk.Image icon;
+    private Gtk.Button btn_lock;
+    private Gtk.Button btn_view;
+
+    private bool _is_editing = false;
+    public bool is_editing {
+        get {
+            return _is_editing;
+        }
+        set {
+            _is_editing = value;
+            if (value) {
+                grid_action.visible = false;
+                return;
+            }
+
+            grid_action.visible = true;
+        }
+    }
 
     construct {
         style_ctx = get_style_context ();
 
-        label = new Gtk.Label ("");
-        label.halign = Gtk.Align.FILL;
-        label.xalign = 0;
-        label.expand = true;
-        label.set_ellipsize (Pango.EllipsizeMode.END);
+        icon = new Gtk.Image () {
+            margin_end = 9,
+            vexpand = true,
+            valign = Gtk.Align.CENTER
+        };
+        icon.get_style_context ().add_class (Gtk.STYLE_CLASS_DIM_LABEL);
 
-        var grid = new Gtk.Grid ();
+        label = new Gtk.Label ("") {
+            halign = Gtk.Align.FILL,
+            xalign = 0,
+            expand = true,
+            ellipsize = Pango.EllipsizeMode.END
+        };
 
-        grid.attach (label, 0, 0, 1, 1);
+        grid_entry = new Gtk.Grid ();
+        grid_entry.attach (label, 0, 0, 1, 1);
 
-        add (grid);
+        btn_lock = new Gtk.Button.from_icon_name ("changes-allow-symbolic", Gtk.IconSize.MENU) {
+            tooltip_text = _("Lock layer"),
+            can_focus = false
+        };
+        btn_lock.activate.connect (toggle_lock);
+        btn_lock.get_style_context ().add_class ("flat");
 
-        show_all ();
+        btn_view = new Gtk.Button.from_icon_name ("layer-visible-symbolic", Gtk.IconSize.MENU) {
+            tooltip_text = _("Hide layer"),
+            can_focus = false
+        };
+        btn_view.activate.connect (toggle_view);
+        btn_view.get_style_context ().add_class ("flat");
+
+        grid_action = new Gtk.Grid () {
+            margin_end = 6,
+            vexpand = true,
+            valign = Gtk.Align.CENTER
+        };
+        grid_action.get_style_context ().add_class ("actions");
+        grid_action.attach (btn_lock, 0, 0, 1, 1);
+        grid_action.attach (btn_view, 1, 0, 1, 1);
+
+        grid_main = new Gtk.Grid () {
+            vexpand = true,
+            valign = Gtk.Align.CENTER
+        };
+        grid_main.attach (icon, 0, 0, 1, 1);
+        grid_main.attach (grid_entry, 1, 0, 1, 1);
+        grid_main.attach (grid_action, 2, 0, 1, 1);
+
+        add (grid_main);
     }
 
     public void assign (LayerItemModel data) {
-        label.label = data.name;
+        model_item = data;
+        model = (LayerItemModel) model_item;
+
+        label.label = model.name;
 
         // Build a specific UI based on the node instance's type.
         if (data.is_artboard) {
@@ -60,9 +128,13 @@ public class Akira.Layouts.LayersList.LayerListItem : VirtualizingListBoxRow {
     }
 
     private void build_artboard_ui () {
+        // Update the general UI.
         style_ctx.remove_class ("layer");
         style_ctx.add_class ("artboard");
-        label.get_style_context ().add_class ("artboard-name");
+
+        // Update icon.
+        icon.clear ();
+        icon.margin_start = 6;
     }
 
     /*
@@ -71,8 +143,65 @@ public class Akira.Layouts.LayersList.LayerListItem : VirtualizingListBoxRow {
     private void build_group_ui () {}
 
     private void build_layer_ui () {
+        // Update general UI.
         style_ctx.remove_class ("artboard");
         style_ctx.add_class ("layer");
-        label.get_style_context ().remove_class ("artboard-name");
+
+        // Update icon.
+        icon.set_from_icon_name (model.icon, Gtk.IconSize.MENU);
+        icon.margin_start = 12;
     }
+
+    public override void edit () {
+        if (entry != null) {
+            show_entry ();
+            return;
+        }
+
+        entry = new Gtk.Entry () {
+            expand = true,
+            margin_end = 6
+        };
+        entry.get_style_context ().add_class ("flat");
+
+        grid_entry.attach (entry, 0, 1, 1, 1);
+
+        show_entry ();
+    }
+
+    /*
+     * The user pressed `Enter` on the layer's entry, so we trigger the update
+     * of the layer's name.
+     */
+    public void update_label () {
+        // Trigger the model update.
+        model.name = entry.text;
+        // Update the visible label with the new model.name, so we're sure the
+        // update took effect.
+        label.label = model.name;
+    }
+
+    private void show_entry () {
+        entry.text = label.label;
+        entry.visible = true;
+        entry.no_show_all = false;
+        label.visible = false;
+        label.no_show_all = true;
+        entry.grab_focus ();
+        is_editing = true;
+    }
+
+    public override void edit_end () {
+        entry.visible = false;
+        entry.no_show_all = true;
+        label.visible = true;
+        label.no_show_all = false;
+        is_editing = false;
+    }
+
+    // TODO.
+    private void toggle_lock () {}
+
+    // TODO.
+    private void toggle_view () {}
 }

@@ -472,8 +472,7 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
                 set_cursor_by_interaction_mode ();
             }
             return true;
-        }
-        else if (hovered_nob != Utils.Nobs.Nob.NONE) {
+        } else if (hovered_nob != Utils.Nobs.Nob.NONE) {
             hovered_nob = Utils.Nobs.Nob.NONE;
             set_cursor_by_interaction_mode ();
         }
