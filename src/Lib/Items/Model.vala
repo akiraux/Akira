@@ -356,7 +356,7 @@ public class Akira.Lib.Items.Model : Object {
         );
         var new_node = new ModelNode (candidate, (int) pos);
 
-        add_to_maps (new_node, true);
+        // add_to_maps (new_node, true);
 
         if (parent_node.children == null) {
             parent_node.children = new GLib.Array<unowned ModelNode> ();
@@ -380,6 +380,8 @@ public class Akira.Lib.Items.Model : Object {
         }
 
         new_node.parent = parent_node;
+
+        add_to_maps (new_node, true);
 
         internal_mark_geometry_dirty (new_node, false);
 

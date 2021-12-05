@@ -125,6 +125,13 @@ public class Akira.Layouts.LayersList.LayerListItem : VirtualizingListBoxRow {
         } else {
             build_layer_ui ();
         }
+
+        // Temporarily add a class if the parent is not the default Canvas (ID 5).
+        if (model.parent_uid != 5) {
+            style_ctx.add_class ("children");
+        } else {
+            style_ctx.remove_class ("children");
+        }
     }
 
     private void build_artboard_ui () {

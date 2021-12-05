@@ -187,8 +187,21 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
     /*
      * Sort function to always add new layers at the top.
      */
-    private static int layers_sort_function (LayerItemModel layer1, LayerItemModel layer2) {
-        return (int)(layer2.id - layer1.id);
+    private int layers_sort_function (LayerItemModel layer1, LayerItemModel layer2) {
+        var pos1 = layer1.pos_in_parent + get_parent_position (layer1);
+        var pos2 = layer2.pos_in_parent + get_parent_position (layer2);
+
+        return (int)(pos2 - pos1);
+    }
+
+    private int get_parent_position (LayerItemModel layer) {
+        var pos = 0;
+        var parent = layers[layer.parent_uid];
+        if (parent != null) {
+            pos = parent.pos_in_parent + get_parent_position (parent);
+        }
+
+        return pos;
     }
 
     /*
