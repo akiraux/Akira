@@ -116,7 +116,7 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
         var item = new LayerItemModel (view_canvas, node, service_uid);
         layers[service_uid] = item;
         list_store.add (item);
-        print ("on_item_added: %i\n", service_uid);
+        // print ("on_item_added: %i\n", service_uid);
     }
 
     private bool create_context_menu (Gdk.Event e, LayerListItem row) {
@@ -188,13 +188,51 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
      * Sort function to always add new layers at the top.
      */
     private int layers_sort_function (LayerItemModel layer1, LayerItemModel layer2) {
+        // print ("ITEM1: %s - POS: %i - PARENT: %i\n",
+        //     layer1.name, layer1.pos_in_parent, get_parent_position (layer1));
+        // print ("ITEM2: %s - POS: %i - PARENT: %i\n",
+        //     layer2.name, layer2.pos_in_parent, get_parent_position (layer2));
+        // var pos =
+        //     (layer2.pos_in_parent + get_parent_position (layer2))
+        //     - (layer1.pos_in_parent + get_parent_position (layer1));
+        // print ("POS LAYER: %i\n", pos);
+
+        // return pos;
+        // var pos1 = layer1.pos_in_parent + get_parent_position (layer1);
+        // var pos2 = layer2.pos_in_parent + get_parent_position (layer2);
+        // return strcmp (pos2.to_string (), pos1.to_string ());
+
         var pos1 = layer1.pos_in_parent + get_parent_position (layer1);
         var pos2 = layer2.pos_in_parent + get_parent_position (layer2);
 
-        return (int)(pos2 - pos1);
+        print ("ITEM1: %s - POS: %i | INDEX: %i\n",
+            layer1.name, pos1, model.get_index_of_unfiltered (layer1));
+        print ("ITEM2: %s - POS: %i | INDEX: %i\n",
+            layer2.name, pos2, model.get_index_of_unfiltered (layer2));
+
+        return pos2 - pos1;
+        // print ("ITEM1: %s - INDEX: %i\n",
+        //     layer1.name, model.get_index_of_unfiltered (layer1));
+        // print ("ITEM2: %s - POS: %i - PARENT: %i\n",
+        //     layer2.name, layer2.pos_in_parent, get_parent_position (layer2));
+        // return (int)
+        //     (layer2.pos_in_parent + get_parent_position (layer2))
+        //     - model.get_index_of_unfiltered (layer1);
+
+        // if (pos1 < pos2) {
+        //     return 1;
+        // } else if (pos1 > pos2) {
+        //     return -1;
+        // }
+
+        // return 0;
     }
 
     private int get_parent_position (LayerItemModel layer) {
+        if (layer.parent_uid == 5) {
+            return 0;
+        }
+
         var pos = 0;
         var parent = layers[layer.parent_uid];
         if (parent != null) {
@@ -241,7 +279,6 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
      * When an item in the canvas is selected via click interaction.
      */
     private void on_selection_modified_external () {
-        print ("on_selection_modified_external\n");
         reset_edited_row ();
 
         // Always reset the selection of the layers.

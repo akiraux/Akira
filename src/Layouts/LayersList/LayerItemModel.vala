@@ -121,8 +121,25 @@ public class Akira.Layouts.LayersList.LayerItemModel : GLib.Object {
         }
     }
 
-    public int parent_uid;
-    public int pos_in_parent;
+    public int parent_uid {
+        get {
+            unowned var im = _view_canvas.items_manager;
+            var node = im.item_model.node_from_id (_cached_instance.id);
+            assert (node != null);
+
+            return node.parent.id;
+        }
+    }
+
+    public int pos_in_parent {
+        get {
+            unowned var im = _view_canvas.items_manager;
+            var node = im.item_model.node_from_id (_cached_instance.id);
+            assert (node != null);
+
+            return node.pos_in_parent;
+        }
+    }
 
     public LayerItemModel (Lib.ViewCanvas view_canvas, Lib.Items.ModelNode node, int service_uid) {
         Object (service_uid: service_uid);
@@ -132,7 +149,5 @@ public class Akira.Layouts.LayersList.LayerItemModel : GLib.Object {
 
     private void update_node (Lib.Items.ModelNode new_node) {
         _cached_instance = new_node.instance;
-        parent_uid = new_node.parent.id;
-        pos_in_parent = new_node.pos_in_parent;
     }
 }
