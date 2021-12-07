@@ -140,16 +140,6 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
      */
     public void show_added_layers (int added) {
         list_store.items_changed (0, 0, added);
-
-        var length = model.get_n_items ();
-        for (int i = 0; i < length; i++) {
-            var item = (LayerItemModel) model.get_item (i);
-            print ("%s - POS: %i | INDEX: %i\n",
-                item.name,
-                item.pos_in_parent + get_parent_position (item),
-                model.get_index_of_unfiltered (item));
-        }
-        print ("\n");
     }
 
     /*
@@ -195,50 +185,28 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
     }
 
     /*
-     * Sort function to always add new layers at the top.
+     * Sort function to always add new layers at the top unless they belong to a
+     * group or an artboard.
      */
     private int layers_sort_function (LayerItemModel layer1, LayerItemModel layer2) {
-        // print ("ITEM1: %s - POS: %i - PARENT: %i\n",
-        //     layer1.name, layer1.pos_in_parent, get_parent_position (layer1));
-        // print ("ITEM2: %s - POS: %i - PARENT: %i\n",
-        //     layer2.name, layer2.pos_in_parent, get_parent_position (layer2));
-        // var pos =
-        //     (layer2.pos_in_parent + get_parent_position (layer2))
-        //     - (layer1.pos_in_parent + get_parent_position (layer1));
-        // print ("POS LAYER: %i\n", pos);
-
-        // return pos;
-        // var pos1 = layer1.pos_in_parent + get_parent_position (layer1);
-        // var pos2 = layer2.pos_in_parent + get_parent_position (layer2);
-        // return strcmp (pos2.to_string (), pos1.to_string ());
-
-        // var pos1 = layer1.pos_in_parent + get_parent_position (layer1);
-        // var pos2 = layer2.pos_in_parent + get_parent_position (layer2);
-
-        // print ("ITEM1: %s - POS: %i | INDEX: %i\n",
-        //     layer1.name, pos1, model.get_index_of_unfiltered (layer1));
-        // print ("ITEM2: %s - POS: %i | INDEX: %i\n",
-        //     layer2.name, pos2, model.get_index_of_unfiltered (layer2));
-
-        // return pos2 - pos1;
-        // print ("ITEM1: %s - INDEX: %i\n",
-        //     layer1.name, model.get_index_of_unfiltered (layer1));
-        // print ("ITEM2: %s - POS: %i - PARENT: %i\n",
-        //     layer2.name, layer2.pos_in_parent, get_parent_position (layer2));
-        // return (int)
-        //     (layer2.pos_in_parent + get_parent_position (layer2))
-        //     - model.get_index_of_unfiltered (layer1);
-
-        // if (pos1 < pos2) {
-        //     return 1;
-        // } else if (pos1 > pos2) {
-        //     return -1;
-        // }
-
-        // return 1;
         var im = view_canvas.items_manager.item_model;
-        var path1 = im.path_from_id (layer1.id);
-        var path2 = im.path_from_id (layer2.id);
+        var node1 = im.node_from_id (layer1.id);
+        var node2 = im.node_from_id (layer2.id);
+
+        var node1_is_group = node1.instance.is_group;
+        var node2_is_group = node2.instance.is_group;
+
+        if (node1_is_group != node2_is_group) {
+            unowned var group_node = node1_is_group ? node1 : node2;
+            unowned var child_node = node1_is_group ? node2 : node1;
+            if (child_node.has_ancestor (group_node.id)) {
+                return node1_is_group ? -1 : 1;
+            }
+        }
+
+        var path1 = im.path_from_node (node1);
+        var path2 = im.path_from_node (node2);
+
         if (path1 < path2) {
             return 1;
         } else if (path1 > path2) {
@@ -246,20 +214,6 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
         }
 
         return 0;
-    }
-
-    private int get_parent_position (LayerItemModel layer) {
-        if (layer.parent_uid == 5) {
-            return 0;
-        }
-
-        var pos = 0;
-        var parent = layers[layer.parent_uid];
-        if (parent != null) {
-            pos = parent.pos_in_parent + get_parent_position (parent);
-        }
-
-        return pos;
     }
 
     /*
