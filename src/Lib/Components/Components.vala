@@ -106,6 +106,7 @@ public struct Akira.Lib.Components.Components {
     public Size? size;
     public Path? path;
     public Transform? transform;
+    public Text? text;
 
     public Layout? layout;
 
@@ -122,6 +123,7 @@ public struct Akira.Lib.Components.Components {
         path = null;
         transform = null;
         layout = null;
+        text = null;
     }
 
     public static Name default_name () {
@@ -187,6 +189,9 @@ public struct Akira.Lib.Components.Components {
             if (layout != null) {
                 builder.add_value (layout.serialize_component ("layout"));
             }
+            if (text != null) {
+                builder.add_value (text.serialize_component ("text"));
+            }
 
             builder.end_array ();
         }
@@ -227,6 +232,8 @@ public struct Akira.Lib.Components.Components {
                 new_components.transform = new Lib.Components.Transform.deserialized (comp_obj);
             } else if (cname == "layout") {
                 new_components.layout = new Lib.Components.Layout.deserialized (comp_obj);
+            } else if (cname == "text") {
+                new_components.text = new Lib.Components.Text.deserialized (comp_obj);
             }
         }
 

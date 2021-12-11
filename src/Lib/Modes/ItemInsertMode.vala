@@ -203,24 +203,11 @@ public class Akira.Lib.Modes.ItemInsertMode : AbstractInteractionMode {
 
             case "text":
                 // TODO: Temporarily draw a path shape. We'll deal with text later.
-                new_item = Lib.Items.ModelTypePath.default_path (
+                new_item = Lib.Items.ModelTypeText.default_text (
                     coordinates,
-                    borders_from_settings (),
-                    fills_from_settings ()
+                    size,
+                    new Components.Text ("Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.")
                 );
-
-                var test_path = new Geometry.Point[6];
-                test_path[0] = Geometry.Point (0, 0);
-                test_path[1] = Geometry.Point (10, 40);
-                test_path[2] = Geometry.Point (50, 200);
-                test_path[3] = Geometry.Point (100, 40);
-                test_path[4] = Geometry.Point (30, 40);
-                test_path[5] = Geometry.Point (10, 10);
-
-                var line = Lib.Modes.PathEditMode.Type.LINE;
-                Lib.Modes.PathEditMode.Type[] commands = { line, line, line, line, line, line };
-
-                new_item.components.path = new Lib.Components.Path.from_points (test_path, commands, false);
                 break;
 
             case "artboard":
