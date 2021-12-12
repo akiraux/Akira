@@ -31,23 +31,23 @@ public class Akira.ViewLayers.ViewLayer : Object {
     public const string PATH_LAYER_ID = "66_path_layer";
 
 
-    private bool _is_visible { get; set; default = false; }
-    private BaseCanvas? _canvas { get; set; default = null; }
+    private bool p_is_visible { get; set; default = false; }
+    private BaseCanvas? p_canvas { get; set; default = null; }
 
-    public BaseCanvas? canvas { get { return _canvas; } }
-    public bool is_visible { get { return _is_visible; } }
+    public BaseCanvas? canvas { get { return p_canvas; } }
+    public bool is_visible { get { return p_is_visible; } }
 
     public void add_to_canvas (string layer_id, BaseCanvas canvas) {
-        _canvas = canvas;
-        _canvas.add_viewlayer_overlay (layer_id, this);
+        p_canvas = canvas;
+        p_canvas.add_viewlayer_overlay (layer_id, this);
     }
 
     public void set_visible (bool visible) {
-        if (_is_visible == visible) {
+        if (p_is_visible == visible) {
             return;
         }
 
-        _is_visible = visible;
+        p_is_visible = visible;
 
         update ();
     }
