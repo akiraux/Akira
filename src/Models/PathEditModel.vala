@@ -292,7 +292,7 @@ public class Akira.Models.PathEditModel : Object {
      * This method shift all points in path such that none of them are in negative space.
      */
     private Geometry.Point[] recalculate_points (Geometry.Point[] points) {
-        double min_x = 100000, min_y = 100000;
+        double min_x = double.MAX, min_y = double.MAX;
 
         foreach (var pt in points) {
             if (pt.x < min_x) {
