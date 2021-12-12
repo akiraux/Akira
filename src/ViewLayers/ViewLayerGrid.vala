@@ -75,7 +75,7 @@ public class Akira.ViewLayers.ViewLayerGrid : ViewLayer {
         context.set_line_cap (Cairo.LineCap.BUTT);
         context.set_source_rgba (color.red, color.green, color.blue, 0.2);
 
-        var y = viewport_bounds.top;
+        var y = viewport_bounds.top * 0.00001;
 
         if (target_bounds.top - spacing > viewport_bounds.top) {
             y += GLib.Math.floor ((target_bounds.top - viewport_bounds.top) / spacing) * spacing;
