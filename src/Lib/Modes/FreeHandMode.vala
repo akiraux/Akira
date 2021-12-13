@@ -23,7 +23,9 @@ public class Akira.Lib.Modes.FreeHandMode : AbstractInteractionMode {
 
     public weak Lib.ViewCanvas view_canvas { get; construct; }
     public Lib.Items.ModelInstance instance { get; construct; }
-    private Models.PathEditModel edit_model;
+    private Models.FreeHandModel edit_model;
+
+    private bool is_click = false;
 
     public FreeHandMode (Lib.ViewCanvas canvas, Lib.Items.ModelInstance instance) {
         Object (
@@ -31,7 +33,7 @@ public class Akira.Lib.Modes.FreeHandMode : AbstractInteractionMode {
             instance: instance
         );
 
-        edit_model = new Models.PathEditModel (instance, view_canvas);
+        edit_model = new Models.FreeHandModel (instance, view_canvas);
     }
 
     public override AbstractInteractionMode.ModeType mode_type () {
@@ -67,10 +69,16 @@ public class Akira.Lib.Modes.FreeHandMode : AbstractInteractionMode {
     }
 
     public override bool button_press_event (Gdk.EventButton event) {
+        is_click = true;
+
+        if (edit_model.first_point.x == -1) {
+            edit_model.first_point = Geometry.Point (event.x, event.y);
+        }
         return true;
     }
 
     public override bool button_release_event (Gdk.EventButton event) {
+        is_click = false;
         return true;
     }
 

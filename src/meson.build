@@ -85,6 +85,7 @@ sources = files(
     #'Models/ExportModel.vala',
     #'Models/ListModel.vala',
     'Models/PathEditModel.vala',
+    'Models/FreeHandModel.vala',
 
     'Dialogs/ShortcutsDialog.vala',
     'Dialogs/SettingsDialog.vala',
