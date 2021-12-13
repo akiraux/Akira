@@ -293,7 +293,11 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
             Akira.Services.ActionManager.ACTION_PREFIX +
             Akira.Services.ActionManager.ACTION_PATH_TOOL);
 
-        var pencil = create_model_button (_("Pencil"), "edit-symbolic", "P");
+        var pencil = create_model_button (
+            _("Pencil"), 
+            "edit-symbolic", 
+            Akira.Services.ActionManager.ACTION_PREFIX +
+            Akira.Services.ActionManager.ACTION_PENCIL_TOOL);
 
         var text = create_model_button (
             _("Text"),

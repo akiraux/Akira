@@ -30,6 +30,8 @@ public class Akira.Lib.Modes.FreeHandMode : AbstractInteractionMode {
             view_canvas: canvas,
             instance: instance
         );
+
+        edit_model = new Models.PathEditModel (instance, view_canvas);
     }
 
     public override AbstractInteractionMode.ModeType mode_type () {

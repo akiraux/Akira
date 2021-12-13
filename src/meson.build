@@ -144,6 +144,7 @@ sources = files(
     'Lib/Modes/ExportMode.vala',
     'Lib/Modes/PanMode.vala',
     'Lib/Modes/PathEditMode.vala',
+    'Lib/Modes/FreeHandMode.vala',
 
     'Lib/ViewCanvas.vala',
 
