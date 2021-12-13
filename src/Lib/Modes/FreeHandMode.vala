@@ -83,6 +83,11 @@ public class Akira.Lib.Modes.FreeHandMode : AbstractInteractionMode {
     }
 
     public override bool motion_notify_event (Gdk.EventMotion event) {
+        if (is_click) {
+            Geometry.Point point = Geometry.Point (event.x, event.y);
+            //  print("add point %f %f\n", event.x, event.y);
+            edit_model.add_raw_point (point);
+        }
         return true;
     }
 

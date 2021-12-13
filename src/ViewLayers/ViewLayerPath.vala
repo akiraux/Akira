@@ -62,6 +62,7 @@ public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
             return;
         }
 
+        print("requesting redraw\n");
         canvas.request_redraw (old_live_extents);
         canvas.request_redraw (path_data.live_extents);
         old_live_extents = path_data.live_extents;
@@ -222,6 +223,12 @@ public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
                 break;
 
             default:
+                // If there are more than 4 points, we are probably in freehand mode.
+                foreach (var item in live_pts) {
+                    context.line_to (item.x, item.y);
+                }
+
+                context.stroke ();
                 break;
         }
 

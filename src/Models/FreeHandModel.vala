@@ -46,9 +46,18 @@ public class Akira.Models.FreeHandModel : Object {
         commands = instance.components.path.commands;
         points = instance.components.path.data;
 
+        raw_points = new Geometry.Point[0];
+
         // Layer to show when editing paths.
         path_layer = new ViewLayers.ViewLayerPath ();
         path_layer.add_to_canvas (ViewLayers.ViewLayer.PATH_LAYER_ID, view_canvas);
+
+        update_view ();
+    }
+
+    public void add_raw_point (Geometry.Point point) {
+        raw_points.resize (raw_points.length + 1);
+        raw_points[raw_points.length - 1] = Geometry.Point (point.x, point.y);
 
         update_view ();
     }
