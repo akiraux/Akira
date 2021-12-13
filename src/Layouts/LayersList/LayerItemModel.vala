@@ -131,13 +131,13 @@ public class Akira.Layouts.LayersList.LayerItemModel : GLib.Object {
         }
     }
 
-    public int pos_in_parent {
+    public int ancestors_size {
         get {
             unowned var im = _view_canvas.items_manager;
             var node = im.item_model.node_from_id (_cached_instance.id);
             assert (node != null);
 
-            return node.pos_in_parent;
+            return node.get_ancestors_size ();
         }
     }
 

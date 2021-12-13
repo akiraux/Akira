@@ -126,12 +126,8 @@ public class Akira.Layouts.LayersList.LayerListItem : VirtualizingListBoxRow {
             build_layer_ui ();
         }
 
-        // Temporarily add a class if the parent is not the default Canvas (ID 5).
-        if (model.parent_uid != 5) {
-            style_ctx.add_class ("children");
-        } else {
-            style_ctx.remove_class ("children");
-        }
+        // Indent child layers based on the amount of ancestors.
+        grid_main.margin_start = 12 * model.ancestors_size;
     }
 
     private void build_artboard_ui () {

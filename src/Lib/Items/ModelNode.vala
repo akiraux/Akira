@@ -85,6 +85,23 @@ public class Akira.Lib.Items.ModelNode {
         return false;
     }
 
+    /*
+     * Get the number of ancestors the current model belongs to.
+     */
+    public int get_ancestors_size () {
+        // Start with a negative value since all items have a parent, which is
+        // the main canvas, and we want to ignore that.
+        int n = -1;
+        var p = parent;
+
+        while (p != null) {
+            n++;
+            p = p.parent;
+        }
+
+        return n;
+    }
+
     public void items_in_canvas (
         double x,
         double y,

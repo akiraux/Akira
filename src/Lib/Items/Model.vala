@@ -356,8 +356,6 @@ public class Akira.Lib.Items.Model : Object {
         );
         var new_node = new ModelNode (candidate, (int) pos);
 
-        // add_to_maps (new_node, true);
-
         if (parent_node.children == null) {
             parent_node.children = new GLib.Array<unowned ModelNode> ();
         }
