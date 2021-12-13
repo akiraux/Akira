@@ -28,25 +28,33 @@
 
     public unowned Lib.ViewCanvas view_canvas { get; construct; }
 
-    private Models.GuidelineModel guide_data;
-    // Stores the id of currently selected artboard.
-    private int artboard_id;
+    // Stores a map of all artboards and their guide data.
+    private Gee.HashMap<int, Models.GuidelineModel> guide_store;
+    // Stores the guideline data of currently selected artboard.
+    private Models.GuidelineModel? guide_data;
+    // Stores id of selected id.
+    public int sel_artboard;
 
     private Geometry.Point current_cursor;
     private int sel_line;
     private Direction sel_direction;
+
+    // Trigerred when we modify the artboard.
+    // Based on whether we are are done modifying (is_done), we toggle visibility of guides.
+    public signal void artboard_geometry_in_transit (bool is_done);
 
     public GuideManager (Lib.ViewCanvas view_canvas) {
         Object (
             view_canvas: view_canvas
         );
 
+        guide_store = new Gee.HashMap<int, Models.GuidelineModel> ();
         guide_data = new Models.GuidelineModel ();
-        artboard_id = -1;
 
         view_canvas.scroll_event.connect (on_scroll);
         guide_data.changed.connect (on_guide_data_changed);
         view_canvas.items_manager.items_removed.connect (on_item_delete);
+        artboard_geometry_in_transit.connect (on_artboard_geometry_in_transit);
     }
 
      public bool key_press_event (Gdk.EventKey event) {
@@ -207,8 +215,13 @@
 
                 if (extents.contains (current_cursor.x, current_cursor.y)) {
                     guide_data.changed.disconnect (on_guide_data_changed);
-                    guide_data = item.value.instance.guide_data;
-                    artboard_id = item.value.instance.id;
+
+                    sel_artboard = item.value.instance.id;
+                    if (!guide_store.has_key (sel_artboard)) {
+                        guide_store[sel_artboard] = new Models.GuidelineModel ();
+                    }
+
+                    guide_data = guide_store.get (sel_artboard);
                     guide_data.set_drawable_extents (item.value.instance.bounding_box);
                     guide_data.changed.connect (on_guide_data_changed);
                     return true;
@@ -221,13 +234,30 @@
 
     private void on_item_delete (GLib.Array<int> del_ids) {
         foreach (var del_id in del_ids.data) {
-            if (del_id == artboard_id) {
+            if (guide_data == guide_store.get (del_id)) {
                 guide_data.changed.disconnect (on_guide_data_changed);
                 guide_data = new Models.GuidelineModel ();
                 guide_data.changed.connect (on_guide_data_changed);
-                artboard_id = -1;
                 guide_data.changed ();
             }
         }
+    }
+
+    private void on_artboard_geometry_in_transit (bool is_done) {
+        var sel_nodes = view_canvas.selection_manager.selection.nodes;
+
+        if (!sel_nodes.has_key (sel_artboard)) {
+            return;
+        }
+
+        if (is_done) {
+            var ext = view_canvas.items_manager.node_from_id (sel_artboard).instance.bounding_box;
+            guide_data.set_drawable_extents (ext);
+        }
+
+        if (view_canvas.guide_layer != null && view_canvas.guide_layer.is_visible != is_done) {
+            view_canvas.guide_layer.set_visible (is_done);
+        }
+
     }
  }

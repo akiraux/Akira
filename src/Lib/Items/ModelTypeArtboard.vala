@@ -87,10 +87,6 @@ public class Akira.Lib.Items.ModelTypeArtboard : ModelType {
                 instance.drawable.width = instance.components.size.width;
                 instance.drawable.height = instance.components.size.height;
                 instance.drawable.transform = instance.compiled_geometry.transformation_matrix;
-
-                // If artboard is resized, we need to update the extents in guide data.
-                instance.guide_data.set_drawable_extents (instance.bounding_box);
-                instance.guide_data.changed ();
                 break;
             case Lib.Components.Component.Type.COMPILED_NAME:
                 instance.drawable.label = instance.compiled_name.name;

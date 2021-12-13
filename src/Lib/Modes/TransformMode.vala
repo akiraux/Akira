@@ -143,6 +143,7 @@ public class Akira.Lib.Modes.TransformMode : AbstractInteractionMode {
     }
 
     public override bool button_release_event (Gdk.EventButton event) {
+        view_canvas.guide_manager.artboard_geometry_in_transit (true);
         request_deregistration (mode_type ());
         return true;
     }
@@ -180,6 +181,7 @@ public class Akira.Lib.Modes.TransformMode : AbstractInteractionMode {
                 break;
         }
 
+        view_canvas.guide_manager.artboard_geometry_in_transit (false);
         return true;
     }
 
