@@ -167,7 +167,7 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
      */
     private int inner_remove_items (LayerItemModel item) {
         var removed = 0;
-        foreach (var uid in item.children) {
+        foreach (var uid in item.get_children ()) {
             if (uid == 0) {
                 continue;
             }

@@ -115,10 +115,8 @@ public class Akira.Layouts.LayersList.LayerItemModel : GLib.Object {
         }
     }
 
-    public int[] children {
-        owned get {
-            return _cached_instance.children;
-        }
+    public int[] get_children () {
+        return _cached_instance.children;
     }
 
     public int parent_uid {
