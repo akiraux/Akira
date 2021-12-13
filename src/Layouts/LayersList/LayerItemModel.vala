@@ -69,6 +69,8 @@ public class Akira.Layouts.LayersList.LayerItemModel : GLib.Object {
                 return "segment-curve-symbolic";
             } else if (type is Lib.Items.ModelTypeGroup) {
                 return "folder-symbolic";
+            } else if (type is Lib.Items.ModelTypePencil) {
+                return "shape-pencil-symbolic";
             }
             return "";
         }

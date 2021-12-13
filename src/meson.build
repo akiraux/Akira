@@ -129,6 +129,7 @@ sources = files(
     'Lib/Items/ModelTypeGroup.vala',
     'Lib/Items/ModelTypeRect.vala',
     'Lib/Items/ModelTypePath.vala',
+    'Lib/Items/ModelTypePencil.vala',
 
     'Lib/Managers/CopyManager.vala',
     'Lib/Managers/ItemsManager.vala',

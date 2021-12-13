@@ -278,7 +278,7 @@ public class Akira.Lib.Modes.ItemInsertMode : AbstractInteractionMode {
             case "pencil":
                 // A freehand curve is basically a path as we will be approximating
                 // the continuous set of points into the best fitting bezier curve.
-                new_item = Lib.Items.ModelTypePath.default_path (
+                new_item = Lib.Items.ModelTypePencil.default_path (
                     coordinates,
                     borders_from_settings (),
                     null
