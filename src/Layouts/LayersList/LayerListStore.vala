@@ -84,7 +84,7 @@ public class Akira.Layouts.LayersList.LayerListStore : VirtualizingListBoxModel 
         if (compare_func != null) {
             this.data.insert_sorted (model, compare_func);
         } else {
-            this.data.append (model);
+            this.data.prepend (model);
         }
 
         last_iter = null;

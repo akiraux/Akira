@@ -125,6 +125,9 @@ public class Akira.Layouts.LayersList.LayerListItem : VirtualizingListBoxRow {
         } else {
             build_layer_ui ();
         }
+
+        // Indent child layers based on the amount of ancestors.
+        grid_main.margin_start = 12 * model.ancestors_size;
     }
 
     private void build_artboard_ui () {

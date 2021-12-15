@@ -116,7 +116,7 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
         var item = new LayerItemModel (view_canvas, node, service_uid);
         layers[service_uid] = item;
         list_store.add (item);
-        print ("on_item_added: %i\n", service_uid);
+        // print ("on_item_added: %i\n", service_uid);
     }
 
     private bool create_context_menu (Gdk.Event e, LayerListItem row) {
@@ -161,17 +161,59 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
         list_store.items_changed (0, removed, 0);
     }
 
+    /*
+     * Check if an item has children and recursively loop through them to
+     * remove all the matching layers.
+     */
     private int inner_remove_items (LayerItemModel item) {
-        // TODO: If the item model has child items, remove those and return how
-        // many were removed.
-        return 0;
+        var removed = 0;
+        foreach (var uid in item.get_children ()) {
+            if (uid == 0) {
+                continue;
+            }
+
+            var child = layers[uid];
+            if (child != null) {
+                removed += inner_remove_items (child);
+                layers.unset (uid);
+                list_store.remove (child);
+                removed++;
+            }
+        }
+
+        return removed;
     }
 
     /*
-     * Sort function to always add new layers at the top.
+     * Sort function to always add new layers at the top unless they belong to a
+     * group or an artboard.
      */
-    private static int layers_sort_function (LayerItemModel layer1, LayerItemModel layer2) {
-        return (int)(layer2.id - layer1.id);
+    private int layers_sort_function (LayerItemModel layer1, LayerItemModel layer2) {
+        var im = view_canvas.items_manager.item_model;
+        var node1 = im.node_from_id (layer1.id);
+        var node2 = im.node_from_id (layer2.id);
+
+        var node1_is_group = node1.instance.is_group;
+        var node2_is_group = node2.instance.is_group;
+
+        if (node1_is_group != node2_is_group) {
+            unowned var group_node = node1_is_group ? node1 : node2;
+            unowned var child_node = node1_is_group ? node2 : node1;
+            if (child_node.has_ancestor (group_node.id)) {
+                return node1_is_group ? -1 : 1;
+            }
+        }
+
+        var path1 = im.path_from_node (node1);
+        var path2 = im.path_from_node (node2);
+
+        if (path1 < path2) {
+            return 1;
+        } else if (path1 > path2) {
+            return -1;
+        }
+
+        return 0;
     }
 
     /*
@@ -211,7 +253,6 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
      * When an item in the canvas is selected via click interaction.
      */
     private void on_selection_modified_external () {
-        print ("on_selection_modified_external\n");
         reset_edited_row ();
 
         // Always reset the selection of the layers.

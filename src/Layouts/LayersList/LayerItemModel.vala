@@ -115,6 +115,30 @@ public class Akira.Layouts.LayersList.LayerItemModel : GLib.Object {
         }
     }
 
+    public int[] get_children () {
+        return _cached_instance.children;
+    }
+
+    public int parent_uid {
+        get {
+            unowned var im = _view_canvas.items_manager;
+            var node = im.item_model.node_from_id (_cached_instance.id);
+            assert (node != null);
+
+            return node.parent.id;
+        }
+    }
+
+    public int ancestors_size {
+        get {
+            unowned var im = _view_canvas.items_manager;
+            var node = im.item_model.node_from_id (_cached_instance.id);
+            assert (node != null);
+
+            return node.get_ancestors_size ();
+        }
+    }
+
     public LayerItemModel (Lib.ViewCanvas view_canvas, Lib.Items.ModelNode node, int service_uid) {
         Object (service_uid: service_uid);
         update_node (node);
