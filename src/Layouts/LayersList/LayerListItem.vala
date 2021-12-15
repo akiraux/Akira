@@ -40,6 +40,7 @@ public class Akira.Layouts.LayersList.LayerListItem : VirtualizingListBoxRow {
     private Gtk.Image icon;
     private Gtk.Button btn_lock;
     private Gtk.Button btn_view;
+    private Gtk.Button btn_toggle;
 
     private bool _is_editing = false;
     public bool is_editing {
@@ -59,6 +60,14 @@ public class Akira.Layouts.LayersList.LayerListItem : VirtualizingListBoxRow {
 
     construct {
         style_ctx = get_style_context ();
+
+        btn_toggle = new Gtk.Button.from_icon_name ("pan-down-symbolic", Gtk.IconSize.MENU) {
+            tooltip_text = _("Toggle visibility of child layers"),
+            can_focus = false
+        };
+        btn_toggle.activate.connect (toggle_children);
+        btn_toggle.get_style_context ().add_class ("flat");
+        btn_toggle.get_style_context ().add_class (Gtk.STYLE_CLASS_DIM_LABEL);
 
         icon = new Gtk.Image () {
             margin_end = 9,
@@ -105,8 +114,9 @@ public class Akira.Layouts.LayersList.LayerListItem : VirtualizingListBoxRow {
             valign = Gtk.Align.CENTER
         };
         grid_main.attach (icon, 0, 0, 1, 1);
-        grid_main.attach (grid_entry, 1, 0, 1, 1);
-        grid_main.attach (grid_action, 2, 0, 1, 1);
+        grid_main.attach (btn_toggle, 1, 0, 1, 1);
+        grid_main.attach (grid_entry, 2, 0, 1, 1);
+        grid_main.attach (grid_action, 3, 0, 1, 1);
 
         add (grid_main);
     }
@@ -137,7 +147,11 @@ public class Akira.Layouts.LayersList.LayerListItem : VirtualizingListBoxRow {
 
         // Update icon.
         icon.clear ();
-        icon.margin_start = 6;
+        icon.margin_start = 0;
+
+        // Show the toggle button.
+        btn_toggle.no_show_all = false;
+        btn_toggle.visible = true;
     }
 
     /*
@@ -153,6 +167,10 @@ public class Akira.Layouts.LayersList.LayerListItem : VirtualizingListBoxRow {
         // Update icon.
         icon.set_from_icon_name (model.icon, Gtk.IconSize.MENU);
         icon.margin_start = 12;
+
+        // Hide the toggle button.
+        btn_toggle.no_show_all = true;
+        btn_toggle.visible = false;
     }
 
     public override void edit () {
@@ -207,4 +225,7 @@ public class Akira.Layouts.LayersList.LayerListItem : VirtualizingListBoxRow {
 
     // TODO.
     private void toggle_view () {}
+
+    // TODO.
+    private void toggle_children () {}
 }
