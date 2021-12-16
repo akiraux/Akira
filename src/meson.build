@@ -155,5 +155,6 @@ executable(
     'Main.vala',
     asresources,
     dependencies: deps + [akira_dep],
-    install: true
+    install: true,
+    gui_app: true
 )
