@@ -38,6 +38,10 @@ public class Akira.Models.PathEditModel : Object {
 
     public bool tangents_inline = false;
 
+    // This is the diameter of the blue points drawn in ViewLayerPath.
+    // It is used for checking if user clicked withing the region.
+    private static int HIT_SIZE = 4;
+
     public PathEditModel (Lib.Items.ModelInstance instance, Lib.ViewCanvas view_canvas) {
         Object (
             view_canvas: view_canvas,
@@ -140,13 +144,14 @@ public class Akira.Models.PathEditModel : Object {
      * If a point was clicked, index refers to its location.
      */
     public Lib.Modes.PathEditMode.PointType hit_test (double x, double y, ref int[] index) {
-        Geometry.Point point = Geometry.Point (x, y);
+        Geometry.Point point = Geometry.Point (x - first_point.x, y - first_point.y);
         tangents_inline = false;
+        double thresh = HIT_SIZE / view_canvas.scale;
 
         int j = 0;
         for (int i = 0; i < commands.length + 1; ++i) {
             if (commands[i] == Lib.Modes.PathEditMode.Type.LINE) {
-                if (compare_points (points[j], point)) {
+                if (compare_points (points[j], point, thresh)) {
                     index[0] = j;
 
                     return Lib.Modes.PathEditMode.PointType.LINE_END;
@@ -157,7 +162,7 @@ public class Akira.Models.PathEditModel : Object {
                 // We need to check if the middle point of tangent is selected.
                 // If it is selected, then other two points of tangent must also
                 // be selected to keep the curve intact.
-                if (compare_points (points[j], point)) {
+                if (compare_points (points[j], point, thresh)) {
                     index[0] = j;
                     index[1] = j + 1;
                     index[2] = j + 2;
@@ -167,7 +172,7 @@ public class Akira.Models.PathEditModel : Object {
 
                 // If either of the tangent points is selected and moved,
                 // then the other needs to be rotated too.
-                if (compare_points (points[j + 1], point)) {
+                if (compare_points (points[j + 1], point, thresh)) {
                     if (are_points_in_line (j + 1, j, j + 2)) {
                         index[0] = j + 1;
                         index[1] = j + 2;
@@ -178,7 +183,7 @@ public class Akira.Models.PathEditModel : Object {
                     return Lib.Modes.PathEditMode.PointType.TANGENT_FIRST;
                 }
 
-                if (compare_points (points[j + 2], point)) {
+                if (compare_points (points[j + 2], point, thresh)) {
                     if (are_points_in_line (j + 1, j, j + 2)) {
                         index[0] = j + 1;
                         index[1] = j + 2;
@@ -189,7 +194,7 @@ public class Akira.Models.PathEditModel : Object {
                     return Lib.Modes.PathEditMode.PointType.TANGENT_SECOND;
                 }
 
-                if (compare_points (points[j + 3], point)) {
+                if (compare_points (points[j + 3], point, thresh)) {
                     index[0] = j + 3;
 
                     return Lib.Modes.PathEditMode.PointType.CURVE_END;
@@ -280,12 +285,12 @@ public class Akira.Models.PathEditModel : Object {
         return false;
     }
 
-    private bool compare_points (Geometry.Point a, Geometry.Point b) {
-        double thresh = 4 / view_canvas.scale;
-        double delta_x = Math.ceil ((a.x + first_point.x - b.x).abs ());
-        double delta_y = Math.ceil ((a.y + first_point.y - b.y).abs ());
+    private bool compare_points (Geometry.Point a, Geometry.Point b, double thresh) {
+        if (Utils.GeometryMath.distance (a.x, a.y, b.x, b.y) < thresh) {
+            return true;
+        }
 
-        return (delta_x <= thresh && delta_y <= thresh);
+        return false;
     }
 
     /*
