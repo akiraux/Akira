@@ -40,7 +40,7 @@ public class Akira.Models.PathEditModel : Object {
 
     // This is the diameter of the blue points drawn in ViewLayerPath.
     // It is used for checking if user clicked withing the region.
-    private static int HIT_SIZE = 4;
+    private const int HIT_SIZE = 4;
 
     public PathEditModel (Lib.Items.ModelInstance instance, Lib.ViewCanvas view_canvas) {
         Object (

@@ -200,7 +200,7 @@ public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
                 context.fill ();
                 context.arc (x3, y3, radius, 0, Math.PI * 2);
                 context.fill ();
-                
+
                 break;
             case 4:
                 var x0 = points[points.length - 1].x + reference_point.x;
