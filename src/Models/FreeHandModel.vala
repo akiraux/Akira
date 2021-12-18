@@ -127,11 +127,16 @@ public class Akira.Models.FreeHandModel : Object {
      * left_tan => the left tangent vector. Direction is same as line joining first 2 points.
      * right_tan => the right tangent vector. Direction is same as line joining last 2 points.
      */
-    private Geometry.Point[] fit_cubic (Geometry.Point[] pts, int first, int last, Geometry.Point left_tan, Geometry.Point right_tan) {
-        // The maximum error permissible before we try to divide and recurse.
-        var iteration_error = TOLERANCE * TOLERANCE;
+    private Geometry.Point[] fit_cubic (
+        Geometry.Point[] pts,
+        int first, int last,
+        Geometry.Point left_tan,
+        Geometry.Point right_tan
+    ) {
         // Number of times we will make adjustments in the points and try to refit before recursing.
-        var max_iterations = 20;
+        var max_iterations = 4;
+        // The maximum error permissible before we try to divide and recurse.
+        var iteration_error = TOLERANCE * max_iterations;
 
         // In case only 2 points are left, apply heuristics.
         if ((last - first + 1) == 2) {
@@ -173,6 +178,8 @@ public class Akira.Models.FreeHandModel : Object {
                     return bez_curve;
                 }
 
+                // If development of the fitted curve grinds to a halt,
+                // abort this attempt and try a shorter one.
                 if (split == prev_split) {
                     var err_change = (max_error / prev_error);
                     if (err_change > 0.9999 || err_change < 1.0001) {
@@ -185,7 +192,13 @@ public class Akira.Models.FreeHandModel : Object {
             }
         }
 
+        // Since the attempts till now failed, we will try to split our set of points into 2
+        // and try to fit a bezier curve on them separately. 
+        // Inorder to maintain a smooth transition between these two segments,
+        // we use the points before and after the split point to create tangents.
         var center_tan = pts[split - 1].sub (pts[split + 1]);
+        // If the point before and after the center are same, (e.g. self intersecting curve)
+        // use the point before and the center point for tangents.
         if (center_tan.x == 0 && center_tan.y == 0) {
             center_tan = pts[split - 1].sub (pts[split]);
             center_tan.x = -1 * center_tan.y;
@@ -193,8 +206,10 @@ public class Akira.Models.FreeHandModel : Object {
         }
 
         var to_center_tangent = normalize (center_tan);
+        // The tangent for the second curve must point in the opposite direction.
         var from_center_tangent = to_center_tangent.scale (-1);
 
+        // This array will store the result of fitting on both halves.
         var cubic_curve = new Geometry.Point[0];
         foreach (var it in fit_cubic (pts, first, split, left_tan, to_center_tangent)) {
             cubic_curve += it;
@@ -223,8 +238,18 @@ public class Akira.Models.FreeHandModel : Object {
         return u;
     }
 
-    // Uses Least Squares Method to find bezier control points for a region.
-    private Geometry.Point[] generate_bezier (Geometry.Point[] pts, int first, int last, double[] u_prime, Geometry.Point left_tan, Geometry.Point right_tan) {
+    // Approzimate a bezier curve on the given set of points.
+    // Check the book Graphics Gems I for mathematical details on how this is done.
+    // Basically, the first and last point of the points we are fitting will be
+    // the first and last point of the segment. Our sole job is to get the 2 tangents.
+    private Geometry.Point[] generate_bezier (
+        Geometry.Point[] pts,
+        int first,
+        int last,
+        double[] u_prime,
+        Geometry.Point left_tan,
+        Geometry.Point right_tan
+    ) {
         var bez_curve = new Geometry.Point[4];
         bez_curve[0] = pts[first];
         bez_curve[3] = pts[last];
@@ -270,9 +295,6 @@ public class Akira.Models.FreeHandModel : Object {
         var seg_length = pts[last].distance (pts[first]);
         var epsilon = 1.0e-6 * seg_length;
 
-        //If alpha negative, use the Wu/Barsky heuristic.
-        //If alpha is 0, you get coincident control points that lead to
-        //divide by zero in any subsequent new_raphson_root_find() call.
         if (alpha_l < epsilon || alpha_r < epsilon) {
             var dist = seg_length / 3.0;
             //Fall back on standard (probably inaccurate) formula, and subdivide further if needed.
@@ -292,7 +314,16 @@ public class Akira.Models.FreeHandModel : Object {
         return bez_curve;
     }
 
-    private double[] reparameterize (Geometry.Point[] pts, int first, int last, double[] u, Geometry.Point[] bez_curve) {
+    // If the bezier curve we get after fitting may not be the best.
+    // In these cases, we subdivide. But sometimes, we can readjust the 
+    // parameterization to get better results. This is what we do here, using the Newton-Raphson Iteration.
+    private double[] reparameterize (
+        Geometry.Point[] pts,
+        int first,
+        int last,
+        double[] u,
+        Geometry.Point[] bez_curve
+    ) {
 
         var u_prime = new double[u.length];
         for (int i = first; i <= last; ++i) {
@@ -316,7 +347,15 @@ public class Akira.Models.FreeHandModel : Object {
         return (u - (numerator / denominator));
     }
 
-    private double compute_max_error (Geometry.Point[] pts, int first, int last, Geometry.Point[] bez_curve, double[] u, out int split) {
+    // Find the maximum square distance between the points and the bezier curve.
+    private double compute_max_error (
+        Geometry.Point[] pts,
+        int first,
+        int last,
+        Geometry.Point[] bez_curve,
+        double[] u,
+        out int split
+    ) {
         split = (last + first) / 2;
         double max_dist = 0.0;
 
@@ -338,6 +377,7 @@ public class Akira.Models.FreeHandModel : Object {
         return max_dist;
     }
 
+    // Take samples of the bezier curve and map them to relative distances along the curve.
     private double[] map_to_relative_dist (Geometry.Point[] bez_curve, double parts) {
 
         var b_t_dist = new double[1];
@@ -361,6 +401,9 @@ public class Akira.Models.FreeHandModel : Object {
         return b_t_dist;
     }
 
+    // The param value gives the relative distance of the given point on the polyline of raw points.
+    // Here, we calculate a point on the bezier curve that is the same relative distance as param.
+    // The 't' for such a point is returned.
     private double find_t (Geometry.Point[] bez_curve, double param, double[] t_dist, double parts) {
         if (param < 0) {
             return 0;
