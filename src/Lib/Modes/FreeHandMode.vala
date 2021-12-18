@@ -79,6 +79,7 @@ public class Akira.Lib.Modes.FreeHandMode : AbstractInteractionMode {
 
     public override bool button_release_event (Gdk.EventButton event) {
         is_click = false;
+        edit_model.fit_curve ();
         return true;
     }
 

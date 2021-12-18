@@ -184,6 +184,7 @@ public class Akira.Models.PathEditModel : Object {
         extents.bottom = coordinates.center_y + coordinates.height / 2.0;
 
         PathDataModel path_data = PathDataModel ();
+        path_data.source_type = Lib.Modes.AbstractInteractionMode.ModeType.PATH_EDIT;
         path_data.points = points;
         path_data.commands = commands;
         path_data.live_pts = live_pts;
@@ -239,4 +240,7 @@ public struct Akira.Models.PathDataModel {
     public Geometry.Rectangle live_extents;
 
     public double rot_angle;
+
+    // Stores where this path data was recieved from.
+    public Lib.Modes.AbstractInteractionMode.ModeType source_type;
 }

@@ -22,7 +22,8 @@
 public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
     public enum Type {
         LINE,
-        CURVE
+        CURVE,
+        BEZIER
     }
 
     public weak Lib.ViewCanvas view_canvas { get; construct; }

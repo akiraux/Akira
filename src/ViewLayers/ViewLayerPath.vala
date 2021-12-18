@@ -62,7 +62,6 @@ public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
             return;
         }
 
-        print("requesting redraw\n");
         canvas.request_redraw (old_live_extents);
         canvas.request_redraw (path_data.live_extents);
         old_live_extents = path_data.live_extents;
@@ -108,7 +107,7 @@ public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
                 context.fill ();
 
                 ++point_idx;
-            } else {
+            } else if (commands[i] == Lib.Modes.PathEditMode.Type.CURVE) {
                 for (int j = 0; j < 4; ++j) {
                     var pt = points[j + point_idx];
 
@@ -122,6 +121,27 @@ public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
 
                 context.move_to (points[point_idx + 1].x + reference_point.x, points[point_idx + 1].y + reference_point.y);
                 context.line_to (points[point_idx + 2].x + reference_point.x, points[point_idx + 2].y + reference_point.y);
+                context.stroke ();
+
+                point_idx += 4;
+            } else if (commands[i] == Lib.Modes.PathEditMode.Type.BEZIER) {
+                for (int j = 0; j < 4; ++j) {
+                    var pt = points[j + point_idx];
+
+                    // Apply the rotation formula and rotate the point by given angle
+                    double rot_x = cos_theta * (pt.x - origin.x) - sin_theta * (pt.y - origin.y) + origin.x;
+                    double rot_y = sin_theta * (pt.x - origin.x) + cos_theta * (pt.y - origin.y) + origin.y;
+
+                    context.arc (rot_x + reference_point.x, rot_y + reference_point.y, radius, 0, Math.PI * 2);
+                    context.fill ();
+                }
+
+                context.move_to (points[point_idx].x + reference_point.x, points[point_idx].y + reference_point.y);
+                context.line_to (points[point_idx + 1].x + reference_point.x, points[point_idx + 1].y + reference_point.y);
+
+                context.move_to (points[point_idx + 2].x + reference_point.x, points[point_idx + 2].y + reference_point.y);
+                context.line_to (points[point_idx + 3].x + reference_point.x, points[point_idx + 3].y + reference_point.y);
+
                 context.stroke ();
 
                 point_idx += 4;
@@ -150,6 +170,21 @@ public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
 
         var last_point = points[points.length - 1];
         context.move_to (last_point.x + reference_point.x, last_point.y + reference_point.y);
+
+        if (path_data.source_type == Lib.Modes.AbstractInteractionMode.ModeType.FREE_HAND) {
+            print("drae live effeect\n");
+            // If there are more than 4 points, we are probably in freehand mode.
+            var first_point = reference_point;//Geometry.Point (path_data.live_extents.left, path_data.live_extents.top);
+            foreach (var item in live_pts) {
+                context.line_to (item.x + first_point.x, item.y + first_point.y);
+            }
+
+            context.stroke ();
+            context.new_path ();
+            context.restore ();
+
+            return;
+        }
 
         switch (path_data.length) {
             case 0:
@@ -223,12 +258,6 @@ public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
                 break;
 
             default:
-                // If there are more than 4 points, we are probably in freehand mode.
-                foreach (var item in live_pts) {
-                    context.line_to (item.x, item.y);
-                }
-
-                context.stroke ();
                 break;
         }
 
