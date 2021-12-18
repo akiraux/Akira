@@ -38,11 +38,11 @@ public struct Akira.Geometry.Point {
     public Point sub (Point pt) {
         return Geometry.Point (x - pt.x, y - pt.y);
     }
-    
+
     public double dot (Point pt) {
         return x * pt.x + y * pt.y;
     }
-    
+
     public Point scale (double val) {
         return Geometry.Point (x * val, y * val);
     }

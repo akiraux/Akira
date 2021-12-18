@@ -43,22 +43,21 @@ public class Akira.Models.FreeHandModel : Object {
         // Calculates the value of bezier curve at t. Returns that point.
         public static Geometry.Point q (Geometry.Point[] ctrl, double t) {
             var tx = 1.0 - t;
-            var pa = ctrl[0].scale(tx * tx * tx);
-            var pb = ctrl[1].scale(3 * tx * tx * t);
-            var pc = ctrl[2].scale(3 * tx * t * t);
-            var pd = ctrl[3].scale(t * t * t);
-            
+            var pa = ctrl[0].scale (tx * tx * tx);
+            var pb = ctrl[1].scale (3 * tx * tx * t);
+            var pc = ctrl[2].scale (3 * tx * t * t);
+            var pd = ctrl[3].scale (t * t * t);
+
             return pa.add (pb).add (pc).add (pd);
         }
 
         // Calculates value of first derivative of bezier curve at t. Returns that point.
         public static Geometry.Point q_prime (Geometry.Point[] ctrl, double t) {
             var tx = 1.0 - t;
-            var pa = ctrl[1].sub (ctrl[0]).scale(3 * tx * tx);
-            var pb = ctrl[2].sub (ctrl[1]).scale(3 * tx * tx);
-            var pc = ctrl[3].sub (ctrl[2]).scale(3 * tx * tx);
-            
-            
+            var pa = ctrl[1].sub (ctrl[0]).scale (3 * tx * tx);
+            var pb = ctrl[2].sub (ctrl[1]).scale (3 * tx * tx);
+            var pc = ctrl[3].sub (ctrl[2]).scale (3 * tx * tx);
+
             return pa.add (pb).add (pc);
         }
 
@@ -67,7 +66,7 @@ public class Akira.Models.FreeHandModel : Object {
             var tx = 1.0 - t;
             var pa = ctrl[2].sub (ctrl[1].scale (2)).add (ctrl[0]).scale (6 * tx);
             var pb = ctrl[3].sub (ctrl[2].scale (2)).add (ctrl[1]).scale (6 * tx);
-            
+
             return pa.add (pb);
         }
     }
@@ -142,16 +141,16 @@ public class Akira.Models.FreeHandModel : Object {
             bez_curve[1] = bez_curve[0].add (left_tan.scale (dist));
             bez_curve[2] = bez_curve[3].add (right_tan.scale (dist));
             bez_curve[3] = pts[last];
-            
+
             return bez_curve;
         }
 
         var u = chord_length_parameterize (pts, first, last);
         var bez_curve = generate_bezier (pts, first, last, u, left_tan, right_tan);
-        
+
         int split;
         var max_error = compute_max_error (pts, first, last, bez_curve, u, out split);
-        
+
         if (max_error < TOLERANCE) {
             return bez_curve;
         }
@@ -160,7 +159,7 @@ public class Akira.Models.FreeHandModel : Object {
         // If the error exceeds the accepted limit, but is still within the max permissible bound,
         // Reparameterize and try to fit again.
         if (max_error < iteration_error) {
-            
+
             u_prime = u;
             var prev_error = max_error;
             var prev_split = split;
@@ -231,17 +230,17 @@ public class Akira.Models.FreeHandModel : Object {
         bez_curve[3] = pts[last];
         var n_pts = last - first + 1;
 
-        Geometry.Point[,] A = new Geometry.Point[n_pts, 2];
-        
+        Geometry.Point[,] A = new Geometry.Point[n_pts, 2]; //vala-lint=naming-convention
+
         for (int i = 0; i < n_pts; ++i) {
             var u = u_prime[i];
             var ux = 1.0 - u;
             A[i, 0] = left_tan.scale (3 * u * ux * ux);
-            A[i, 1] = right_tan.scale (3* u * u * ux);
+            A[i, 1] = right_tan.scale (3 * u * u * ux);
         }
 
-        double[,] C = new double[2, 2];
-        double[] X = new double[2];
+        double[,] C = new double[2, 2]; //vala-lint=naming-convention
+        double[] X = new double[2]; //vala-lint=naming-convention
         C[0, 0] = C[0, 1] = C[1, 0] = C[1, 1] = 0;
         X[0] = X[1] = 0;
 
@@ -255,15 +254,15 @@ public class Akira.Models.FreeHandModel : Object {
             var last_pt = pts[last];
             Geometry.Point[] ctrl = {first_pt, first_pt, last_pt, last_pt};
             var tmp = pts[i + first].sub (Bezier.q (ctrl, u_prime[i]));
-            
+
             X[0] += A[i, 0].dot (tmp);
             X[1] += A[i, 1].dot (tmp);
         }
 
         // Calculate determinants of C and X.
-        var det_C0_C1 = C[0, 0] * C[1, 1] - C[1, 0] * C[0, 1];
-        var det_C0_X = C[0, 0] * X[1] - C[1, 0] * X[0];
-        var det_X_C1 = X[0] * C[1, 1] - X[1] * C[0, 1];
+        var det_C0_C1 = C[0, 0] * C[1, 1] - C[1, 0] * C[0, 1]; //vala-lint=naming-convention
+        var det_C0_X = C[0, 0] * X[1] - C[1, 0] * X[0]; //vala-lint=naming-convention
+        var det_X_C1 = X[0] * C[1, 1] - X[1] * C[0, 1]; //vala-lint=naming-convention
 
         double alpha_l = (det_C0_C1 == 0) ? 0 : (det_X_C1 / det_C0_C1);
         double alpha_r = (det_C0_C1 == 0) ? 0 : (det_C0_X / det_C0_C1);
@@ -303,8 +302,8 @@ public class Akira.Models.FreeHandModel : Object {
         return u_prime;
     }
 
-    private double newton_raphson_root_find (Geometry.Point[] bez_curve, Geometry.Point P, double u) {
-        var d = Bezier.q (bez_curve, u).sub (P);
+    private double newton_raphson_root_find (Geometry.Point[] bez_curve, Geometry.Point p, double u) {
+        var d = Bezier.q (bez_curve, u).sub (p);
         var q_prime = Bezier.q_prime (bez_curve, u);
 
         double numerator = d.dot (q_prime);
@@ -327,7 +326,7 @@ public class Akira.Models.FreeHandModel : Object {
             var point = pts[i];
             var t = find_t (bez_curve, u[i - first], t_dist, 10);
             var v = Bezier.q (bez_curve, t).sub (point);
-            
+
             var dist = Math.pow (norm (v), 2);
 
             if (dist > max_dist) {
@@ -343,7 +342,7 @@ public class Akira.Models.FreeHandModel : Object {
 
         var b_t_dist = new double[1];
         b_t_dist[0] = 0;
-        
+
         var b_t_prev = bez_curve[0];
         var sum_len = 0.0;
 
@@ -378,7 +377,7 @@ public class Akira.Models.FreeHandModel : Object {
                 var t_max = i / parts;
                 var len_min = t_dist[i - 1];
                 var len_max = t_dist[i];
-                
+
                 var t = (param - len_min) / (len_max - len_min) * (t_max - t_min) + t_min;
                 return t;
             }
@@ -390,7 +389,7 @@ public class Akira.Models.FreeHandModel : Object {
     private double norm (Geometry.Point p) {
         return p.distance (Geometry.Point (0, 0));
     }
-    
+
     private Geometry.Point normalize (Geometry.Point pt) {
             var length = norm (pt);
             return pt.scale (1.0 / length);
@@ -498,8 +497,6 @@ public class Akira.Models.FreeHandModel : Object {
         var cmds = new Lib.Modes.PathEditMode.Type[0];
         var live_path = new Lib.Components.Path.from_points (data, cmds);
 
-        var ext = live_path.calculate_extents ();
-
-        return live_path.calculate_extents ();  
+        return live_path.calculate_extents ();
     }
 }

@@ -172,9 +172,8 @@ public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
         context.move_to (last_point.x + reference_point.x, last_point.y + reference_point.y);
 
         if (path_data.source_type == Lib.Modes.AbstractInteractionMode.ModeType.FREE_HAND) {
-            print("drae live effeect\n");
             // If there are more than 4 points, we are probably in freehand mode.
-            var first_point = reference_point;//Geometry.Point (path_data.live_extents.left, path_data.live_extents.top);
+            var first_point = reference_point;
             foreach (var item in live_pts) {
                 context.line_to (item.x + first_point.x, item.y + first_point.y);
             }
