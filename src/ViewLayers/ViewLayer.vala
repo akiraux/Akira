@@ -81,7 +81,7 @@ public class Akira.ViewLayers.ViewLayer : Object {
     }
 
     public void remove_mask () {
-        p_mask_counter = int.min(p_mask_counter - 1, 0);
+        p_mask_counter = int.min (p_mask_counter - 1, 0);
 
         if (is_visible && !is_masked) {
             update ();

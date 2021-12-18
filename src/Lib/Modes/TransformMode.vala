@@ -330,7 +330,6 @@ public class Akira.Lib.Modes.TransformMode : AbstractInteractionMode {
         double event_x,
         double event_y
     ) {
-        // TODO WIP
         var blocker = new Lib.Managers.SelectionManager.ChangeSignalBlocker (view_canvas.selection_manager);
         (blocker);
 
