@@ -205,6 +205,8 @@ public class Akira.Utils.Nobs : Object {
             case Nob.ROTATE:
                 result = Gdk.CursorType.EXCHANGE;
                 break;
+            default:
+                break;
         }
 
         return result;
@@ -396,6 +398,8 @@ public class Akira.Utils.Nobs : Object {
 
                 x = (rect.tl_x + rect.tr_x) / 2.0 + dx * ROTATION_LINE_HEIGHT / scale;
                 y = (rect.tl_y + rect.tr_y) / 2.0 + dy * ROTATION_LINE_HEIGHT / scale;
+                break;
+            default:
                 break;
         }
     }

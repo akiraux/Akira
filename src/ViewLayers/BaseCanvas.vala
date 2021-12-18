@@ -146,9 +146,17 @@ public class Akira.ViewLayers.BaseCanvas : Gtk.Widget , Gtk.Scrollable {
             overlays = new Gee.TreeMap<string, ViewLayers.ViewLayer> ();
         }
         overlays[id] = layer;
-        if (layer.is_visible) {
+        if (layer.is_visible && !layer.is_masked) {
             layer.update ();
         }
+    }
+
+    public ViewLayer.Mask? mask_viewlayer_overlay (string id) {
+        if (overlays == null) {
+            return null;
+        }
+
+        return overlays.has_key (id) ? new ViewLayer.Mask (overlays[id]) : null;
     }
 
     public bool get_border (out Gtk.Border border) {
