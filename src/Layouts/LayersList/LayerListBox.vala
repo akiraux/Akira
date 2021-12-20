@@ -297,7 +297,7 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
      * hovered. Clear the hover effect if no canvas item was hovered.
      */
     private void on_hover_changed (int? id) {
-        on_mouse_leave ();
+        on_mouse_leave_internal ();
 
         if (id != null) {
             set_hover_on_row_from_model (layers[id]);
