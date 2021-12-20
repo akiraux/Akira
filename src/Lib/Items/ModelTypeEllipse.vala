@@ -83,6 +83,8 @@ public class Akira.Lib.Items.ModelTypeEllipse : ModelType {
                 ellipse.radius_y = instance.components.size.height / 2.0;
                 instance.drawable.transform = instance.compiled_geometry.transformation_matrix;
                 break;
+            default:
+                break;
         }
     }
 }

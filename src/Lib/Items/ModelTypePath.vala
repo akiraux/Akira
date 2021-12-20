@@ -97,6 +97,8 @@ public class Akira.Lib.Items.ModelTypePath : ModelType {
                 drawable.points = instance.components.path.data;
                 drawable.commands = instance.components.path.commands;
                 break;
+            default:
+                break;
         }
     }
 }
