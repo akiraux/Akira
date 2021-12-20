@@ -204,8 +204,8 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
             }
         }
 
-        var path1 = im.path_from_node (node1);
-        var path2 = im.path_from_node (node2);
+        var path1 = im.path_from_node (node1).hash ();
+        var path2 = im.path_from_node (node2).hash ();
 
         if (path1 < path2) {
             return 1;
