@@ -69,7 +69,7 @@ public class Akira.Lib.Managers.CopyManager : Object {
         }
 
         var blocker = new SelectionManager.ChangeSignalBlocker (view_canvas.selection_manager);
-        (void) blocker;
+        (blocker);
 
         view_canvas.selection_manager.reset_selection ();
 

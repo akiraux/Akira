@@ -231,6 +231,9 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
             return;
         }
 
+        var blocker = new Lib.Managers.SelectionManager.ChangeSignalBlocker (view_canvas.selection_manager);
+        (blocker);
+
         // Add all currently selected rows to the selection. This won't trigger
         // a selection changed loop since the selection_modified_external signal
         // is only triggered from a click on the canvas.

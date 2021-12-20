@@ -20,6 +20,24 @@
  */
 
 public class Akira.ViewLayers.ViewLayer : Object {
+    public class Mask {
+        private ViewLayer view_layer;
+
+        // Scoped mask implementation to hide masks temporarily during a scope (RAII)
+        public Mask (ViewLayer layer) {
+            view_layer = layer;
+            if (view_layer != null) {
+                view_layer.add_mask ();
+            }
+        }
+
+        ~Mask () {
+            if (view_layer != null) {
+                view_layer.remove_mask ();
+            }
+        }
+    }
+
     // Higher numbers are higher on the stack
     public const string VSNAPS_LAYER_ID = "99_vsnaps_layer";
     public const string HSNAPS_LAYER_ID = "99_hsnaps_layer";
@@ -33,9 +51,12 @@ public class Akira.ViewLayers.ViewLayer : Object {
 
     private bool p_is_visible { get; set; default = false; }
     private BaseCanvas? p_canvas { get; set; default = null; }
+    private int p_mask_counter { get; set; default = 0; }
 
     public BaseCanvas? canvas { get { return p_canvas; } }
     public bool is_visible { get { return p_is_visible; } }
+    public bool is_masked { get { return p_mask_counter > 0; } }
+
 
     public void add_to_canvas (string layer_id, BaseCanvas canvas) {
         p_canvas = canvas;
@@ -50,6 +71,21 @@ public class Akira.ViewLayers.ViewLayer : Object {
         p_is_visible = visible;
 
         update ();
+    }
+
+    public void add_mask () {
+        p_mask_counter++;
+        if (is_visible && is_masked) {
+            update ();
+        }
+    }
+
+    public void remove_mask () {
+        p_mask_counter = int.min (p_mask_counter - 1, 0);
+
+        if (is_visible && !is_masked) {
+            update ();
+        }
     }
 
     public virtual void draw_layer (Cairo.Context context, Geometry.Rectangle target_bounds, double scale) {}

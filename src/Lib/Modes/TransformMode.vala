@@ -53,6 +53,8 @@ public class Akira.Lib.Modes.TransformMode : AbstractInteractionMode {
         }
     }
 
+    // Simply defines whether the drag threshold was met to start transforming the object
+
     public class TransformExtraContext : Object {
         public Lib.Managers.SnapManager.SnapGuideData snap_guide_data;
     }
@@ -148,6 +150,7 @@ public class Akira.Lib.Modes.TransformMode : AbstractInteractionMode {
     }
 
     public override bool motion_notify_event (Gdk.EventMotion event) {
+
         switch (nob) {
             case Utils.Nobs.Nob.NONE:
                 move_from_event (
@@ -196,7 +199,7 @@ public class Akira.Lib.Modes.TransformMode : AbstractInteractionMode {
         ref Lib.Managers.SnapManager.SnapGuideData guide_data
     ) {
         var blocker = new Lib.Managers.SelectionManager.ChangeSignalBlocker (view_canvas.selection_manager);
-        (void) blocker;
+        (blocker);
 
         var delta_x = event_x - initial_drag_state.press_x;
         var delta_y = event_y - initial_drag_state.press_y;
@@ -327,9 +330,8 @@ public class Akira.Lib.Modes.TransformMode : AbstractInteractionMode {
         double event_x,
         double event_y
     ) {
-        // TODO WIP
         var blocker = new Lib.Managers.SelectionManager.ChangeSignalBlocker (view_canvas.selection_manager);
-        (void) blocker;
+        (blocker);
 
         double rot_center_x = initial_drag_state.area.center_x;
         double rot_center_y = initial_drag_state.area.center_y;
@@ -431,7 +433,7 @@ public class Akira.Lib.Modes.TransformMode : AbstractInteractionMode {
         double event_y
     ) {
         var blocker = new Lib.Managers.SelectionManager.ChangeSignalBlocker (view_canvas.selection_manager);
-        (void) blocker;
+        (blocker);
 
         double original_center_x = initial_drag_state.area.center_x;
         double original_center_y = initial_drag_state.area.center_y;
