@@ -129,6 +129,10 @@ public class Akira.Lib.Managers.ItemsManager : Object {
 
         items_removed (ids_array);
 
+        if (!pause_compile) {
+            compile_model ();
+        }
+
         timer.stop ();
         seconds = timer.elapsed (out microseconds);
         print ("Deleted %u items in %s s\n", to_remove.length, seconds.to_string ());
