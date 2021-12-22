@@ -550,8 +550,6 @@ public class VirtualizingListBox : Gtk.Container, Gtk.Scrollable {
         update_bin_window (bin_height);
         position_children ();
         queue_draw ();
-
-        // print ("ensure_visible_widgets\n");
     }
 
     private int estimated_widget_height () {

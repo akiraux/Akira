@@ -76,11 +76,11 @@
     background: transparent;
 }*/
 
-.revealer-button image {
-    transition: transform 160ms ease-in-out;
+.button-toggle image {
+    transition: transform 160ms ease;
 }
 
-.revealer-button.closed image {
+.button-toggle.collapsed image {
     -gtk-icon-transform: rotate(-90deg);
 }
 

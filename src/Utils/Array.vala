@@ -23,7 +23,6 @@
  * Implements array methods that are useful. Some pertain to raw arrays and some to GLib.Array
  */
 public class Akira.Utils.Array : Object {
-
     /*
      * Insert value in an int array. Return true on sucess.
      */
@@ -61,7 +60,6 @@ public class Akira.Utils.Array : Object {
         a.resize (a.length - length);
         return true;
     }
-
 
     /*
      * Rotates an int array.

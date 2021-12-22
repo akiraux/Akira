@@ -56,6 +56,7 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
                 }
             } else {
                 row = new LayerListItem ();
+                row.toggle_children.connect (on_toggle_children);
             }
 
             row.assign ((LayerItemModel) item);
@@ -73,9 +74,9 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
         // When the name of the layer is being edited.
         row_edited.connect (on_row_edited);
 
-        // Listed to the button release event only for the secondary click in
+        // Listen to the button release event only for the secondary click in
         // order to trigger the context menu.
-        button_release_event.connect ((e) => {
+        button_release_event.connect (e => {
             if (e.button != Gdk.BUTTON_SECONDARY) {
                 return Gdk.EVENT_PROPAGATE;
             }
@@ -351,4 +352,6 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
     private void on_escape_request () {
         on_row_edited (null);
     }
+
+    private void on_toggle_children (LayerItemModel model, bool show) {}
 }

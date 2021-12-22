@@ -25,6 +25,8 @@
  * The single layer row.
  */
 public class Akira.Layouts.LayersList.LayerListItem : VirtualizingListBoxRow {
+    public signal void toggle_children (LayerItemModel model, bool show);
+
     private LayerItemModel model;
 
     private Gtk.StyleContext style_ctx;
@@ -65,8 +67,9 @@ public class Akira.Layouts.LayersList.LayerListItem : VirtualizingListBoxRow {
             tooltip_text = _("Toggle visibility of child layers"),
             can_focus = false
         };
-        btn_toggle.activate.connect (toggle_children);
+        btn_toggle.activate.connect (on_toggle_pressed);
         btn_toggle.get_style_context ().add_class ("flat");
+        btn_toggle.get_style_context ().add_class ("button-toggle");
         btn_toggle.get_style_context ().add_class (Gtk.STYLE_CLASS_DIM_LABEL);
 
         icon = new Gtk.Image () {
@@ -221,11 +224,31 @@ public class Akira.Layouts.LayersList.LayerListItem : VirtualizingListBoxRow {
     }
 
     // TODO.
-    private void toggle_lock () {}
+    private void toggle_lock () {
+        print ("lock pressed\n");
+    }
 
     // TODO.
-    private void toggle_view () {}
+    private void toggle_view () {
+        print ("view pressed\n");
+    }
 
     // TODO.
-    private void toggle_children () {}
+    private void on_toggle_pressed () {
+        print("pressed\n");
+        bool show;
+        var ctx = btn_toggle.get_style_context ();
+
+        if (ctx.has_class ("collapsed")) {
+            ctx.remove_class ("collapsed");
+            show = true;
+            print("remove class\n");
+        } else {
+            ctx.add_class ("collapsed");
+            show = false;
+            print("add class\n");
+        }
+
+        toggle_children (model, show);
+    }
 }
