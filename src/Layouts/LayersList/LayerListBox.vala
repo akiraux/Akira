@@ -112,10 +112,29 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
             return;
         }
 
-        var service_uid = node.id;
-        var item = new LayerItemModel (view_canvas, node, service_uid);
-        layers[service_uid] = item;
+        var node_id = node.id;
+        var item = new LayerItemModel (view_canvas, node, node_id);
+        layers[node_id] = item;
         list_store.add (item);
+
+        // Check if the newly created layer is inside an artboard or a group and
+        // show all its child layers if they were removed.
+        recursive_show_child_layers (node_id);
+    }
+
+    private void recursive_show_child_layers (int node_id) {
+        var item = layers[node_id];
+        if (item == null) {
+            return;
+        }
+
+        var parent = layers[item.parent_uid];
+        if (parent == null) {
+            return;
+        }
+
+        parent.children_visible = true;
+        recursive_show_child_layers (parent.parent_uid);
     }
 
     private bool create_context_menu (Gdk.Event e, LayerListItem row) {
