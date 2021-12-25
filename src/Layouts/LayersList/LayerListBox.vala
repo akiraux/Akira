@@ -160,7 +160,12 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
     public void add_items (GLib.Array<int> ids) {
         var added = 0;
         foreach (var uid in ids.data) {
-            on_item_added (uid);
+            // Don't create a layer if it already exists. This might happen when
+            // revealing the children of a collapsed artboard during the
+            // creation of a new child item.
+            if (layers[uid] == null) {
+                on_item_added (uid);
+            }
             // Check if the layer was actually created.
             if (layers[uid] != null) {
                 added++;
