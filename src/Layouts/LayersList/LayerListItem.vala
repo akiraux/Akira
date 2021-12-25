@@ -25,8 +25,6 @@
  * The single layer row.
  */
 public class Akira.Layouts.LayersList.LayerListItem : VirtualizingListBoxRow {
-    public signal void toggle_children (LayerItemModel model, bool show);
-
     private LayerItemModel model;
 
     private Gtk.StyleContext style_ctx;
@@ -67,7 +65,7 @@ public class Akira.Layouts.LayersList.LayerListItem : VirtualizingListBoxRow {
             tooltip_text = _("Toggle visibility of child layers"),
             can_focus = false
         };
-        btn_toggle.activate.connect (on_toggle_pressed);
+        btn_toggle.clicked.connect (on_toggle_pressed);
         btn_toggle.get_style_context ().add_class ("flat");
         btn_toggle.get_style_context ().add_class ("button-toggle");
         btn_toggle.get_style_context ().add_class (Gtk.STYLE_CLASS_DIM_LABEL);
@@ -93,14 +91,14 @@ public class Akira.Layouts.LayersList.LayerListItem : VirtualizingListBoxRow {
             tooltip_text = _("Lock layer"),
             can_focus = false
         };
-        btn_lock.activate.connect (toggle_lock);
+        btn_lock.clicked.connect (toggle_lock);
         btn_lock.get_style_context ().add_class ("flat");
 
         btn_view = new Gtk.Button.from_icon_name ("layer-visible-symbolic", Gtk.IconSize.MENU) {
             tooltip_text = _("Hide layer"),
             can_focus = false
         };
-        btn_view.activate.connect (toggle_view);
+        btn_view.clicked.connect (toggle_view);
         btn_view.get_style_context ().add_class ("flat");
 
         grid_action = new Gtk.Grid () {
@@ -155,12 +153,15 @@ public class Akira.Layouts.LayersList.LayerListItem : VirtualizingListBoxRow {
         // Show the toggle button.
         btn_toggle.no_show_all = false;
         btn_toggle.visible = true;
+        update_btn_toggle ();
     }
 
     /*
-     * TODO...
+     * TODO.
      */
-    private void build_group_ui () {}
+    private void build_group_ui () {
+        update_btn_toggle ();
+    }
 
     private void build_layer_ui () {
         // Update general UI.
@@ -233,22 +234,23 @@ public class Akira.Layouts.LayersList.LayerListItem : VirtualizingListBoxRow {
         print ("view pressed\n");
     }
 
-    // TODO.
+    /*
+     * Hide or show the child layers of this layer when the user clicks on the
+     * toggle button.
+     */
     private void on_toggle_pressed () {
-        print("pressed\n");
-        bool show;
-        var ctx = btn_toggle.get_style_context ();
+        model.children_visible = !model.children_visible;
+        update_btn_toggle ();
+    }
 
-        if (ctx.has_class ("collapsed")) {
-            ctx.remove_class ("collapsed");
-            show = true;
-            print("remove class\n");
+    /*
+     * Visually update the toggle button.
+     */
+    private void update_btn_toggle () {
+        if (model.children_visible) {
+            btn_toggle.get_style_context ().remove_class ("collapsed");
         } else {
-            ctx.add_class ("collapsed");
-            show = false;
-            print("add class\n");
+            btn_toggle.get_style_context ().add_class ("collapsed");
         }
-
-        toggle_children (model, show);
     }
 }

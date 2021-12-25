@@ -139,6 +139,35 @@ public class Akira.Layouts.LayersList.LayerItemModel : GLib.Object {
         }
     }
 
+    // Always show child layers when a new artboard or group is created.
+    private bool _children_visible = true;
+    public bool children_visible {
+        get {
+            return _children_visible;
+        }
+        set {
+            if (value == _children_visible) {
+                return;
+            }
+            _children_visible = value;
+
+            // No need to update the layers UI if this model is not a group or
+            // an artboard.
+            if (!is_group && !is_artboard) {
+                return;
+            }
+
+            var array = new GLib.Array<int> ();
+            array.data = get_children ();
+            // Trigger the showing or hiding of all child layers.
+            if (_children_visible) {
+                _view_canvas.window.main_window.add_layers (array);
+            } else {
+                _view_canvas.window.main_window.remove_layers (array);
+            }
+        }
+    }
+
     public LayerItemModel (Lib.ViewCanvas view_canvas, Lib.Items.ModelNode node, int service_uid) {
         Object (service_uid: service_uid);
         update_node (node);

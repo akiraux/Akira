@@ -56,7 +56,6 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
                 }
             } else {
                 row = new LayerListItem ();
-                row.toggle_children.connect (on_toggle_children);
             }
 
             row.assign ((LayerItemModel) item);
@@ -117,7 +116,6 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
         var item = new LayerItemModel (view_canvas, node, service_uid);
         layers[service_uid] = item;
         list_store.add (item);
-        // print ("on_item_added: %i\n", service_uid);
     }
 
     private bool create_context_menu (Gdk.Event e, LayerListItem row) {
@@ -133,6 +131,24 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
         }
 
         return Gdk.EVENT_PROPAGATE;
+    }
+
+    /*
+     * Visually create layers from a list of items ids. This method is used to
+     * show layers that have been removed when a parent (artboard or group)
+     * collapses its children.
+     */
+    public void add_items (GLib.Array<int> ids) {
+        var added = 0;
+        foreach (var uid in ids.data) {
+            on_item_added (uid);
+            // Check if the layer was actually created.
+            if (layers[uid] != null) {
+                added++;
+            }
+        }
+        // Refresh the layers list UI.
+        show_added_layers (added);
     }
 
     /*
@@ -300,7 +316,7 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
     private void on_hover_changed (int? id) {
         on_mouse_leave_internal ();
 
-        if (id != null) {
+        if (id != null && layers[id] != null) {
             set_hover_on_row_from_model (layers[id]);
         }
     }
@@ -352,6 +368,4 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
     private void on_escape_request () {
         on_row_edited (null);
     }
-
-    private void on_toggle_children (LayerItemModel model, bool show) {}
 }
