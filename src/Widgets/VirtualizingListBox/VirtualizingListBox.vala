@@ -936,7 +936,7 @@ public class VirtualizingListBox : Gtk.Container, Gtk.Scrollable {
     }
 
     /*
-     * Same as on_mouse_leave, but it doesn't trugger the hovered signal.
+     * Same as on_mouse_leave, but it doesn't trigger the hovered signal.
      */
     protected void on_mouse_leave_internal () {
         if (hovered_row != null) {
