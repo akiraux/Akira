@@ -338,6 +338,8 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
 
                     selection_manager.add_to_selection (target.id);
                     selection_manager.selection_modified_external ();
+                } else {
+                    selection_manager.toggle_alignment_anchor (target.id);
                 }
             } else if (
                 !selection_manager.selection.bounding_box ().contains (event.x, event.y) &&

@@ -43,6 +43,7 @@ public class Akira.Utils.ItemAlignment : Object {
         AUTO,
         FIRST_SELECTED,
         LAST_SELECTED,
+        ANCHOR,
     }
 
     /*
@@ -52,6 +53,7 @@ public class Akira.Utils.ItemAlignment : Object {
         Lib.Items.NodeSelection selection,
         AlignmentDirection direction,
         AlignmentType type,
+        Lib.Items.ModelNode? anchor,
         Lib.ViewCanvas view_canvas
     ) {
         if (selection.count () <= 1) {
@@ -59,7 +61,7 @@ public class Akira.Utils.ItemAlignment : Object {
         }
 
         var align_to = Geometry.Rectangle.empty ();
-        if (!populate_alignment (selection, type, ref align_to)) {
+        if (!populate_alignment (selection, type, anchor, ref align_to)) {
             return;
         }
 
@@ -102,6 +104,7 @@ public class Akira.Utils.ItemAlignment : Object {
     private static bool populate_alignment (
         Lib.Items.NodeSelection selection,
         AlignmentType type,
+        Lib.Items.ModelNode? anchor,
         ref Geometry.Rectangle align_to
     ) {
         bool found_bound = false;
@@ -144,6 +147,15 @@ public class Akira.Utils.ItemAlignment : Object {
                     }
                 }
 
+                break;
+            case AlignmentType.ANCHOR:
+                unowned var bb = anchor.instance.bounding_box;
+
+                align_to.left = bb.left;
+                align_to.right = bb.right;
+                align_to.top = bb.top;
+                align_to.bottom = bb.bottom;
+                found_bound = true;
                 break;
             default:
                 break;

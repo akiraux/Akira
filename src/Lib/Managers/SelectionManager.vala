@@ -51,6 +51,7 @@ public class Akira.Lib.Managers.SelectionManager : Object {
     }
 
     public Lib.Items.NodeSelection selection;
+    public int? alignment_anchor_id;
     protected int block_change_notifications = 0;
 
     public SelectionManager (ViewCanvas canvas) {
@@ -78,6 +79,7 @@ public class Akira.Lib.Managers.SelectionManager : Object {
         }
 
         selection = new Lib.Items.NodeSelection (null);
+        alignment_anchor_id = null;
         on_selection_changed (-1);
         selection_modified ();
     }
@@ -90,6 +92,15 @@ public class Akira.Lib.Managers.SelectionManager : Object {
         selection.add_node (node);
         on_selection_changed (-1);
         selection_modified ();
+    }
+
+    public void toggle_alignment_anchor (int id) {
+        if (alignment_anchor_id == id) {
+            alignment_anchor_id = null;
+            return;
+        }
+
+        alignment_anchor_id = id;
     }
 
     public bool item_selected (int id) {
