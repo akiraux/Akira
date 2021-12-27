@@ -22,15 +22,15 @@
 public class Akira.Widgets.AlignBoxButton : Gtk.Button {
     public signal void triggered (AlignBoxButton emitter);
 
-    public weak Akira.Window window { get; construct; }
+    public unowned Lib.ViewCanvas view_canvas { get; construct; }
 
     public string icon { get; construct; }
     public string action { get; construct; }
     public ButtonImage btn_image;
 
-    public AlignBoxButton (Akira.Window window, string action_name, string icon_name, string tooltip, string[] accels) {
+    public AlignBoxButton (Lib.ViewCanvas view_canvas, string action_name, string icon_name, string tooltip, string[] accels) {
         Object (
-            window: window,
+            view_canvas: view_canvas,
             icon: icon_name,
             action: action_name,
             tooltip_markup: Granite.markup_accel_tooltip (accels, tooltip)
@@ -52,7 +52,7 @@ public class Akira.Widgets.AlignBoxButton : Gtk.Button {
 
     private void connect_signals () {
         clicked.connect (() => {
-            window.event_bus.align_items (action);
+            view_canvas.window.event_bus.align_items (action);
         });
     }
 }
