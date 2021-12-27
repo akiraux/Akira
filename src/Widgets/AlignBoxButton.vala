@@ -25,14 +25,14 @@ public class Akira.Widgets.AlignBoxButton : Gtk.Button {
     public unowned Lib.ViewCanvas view_canvas { get; construct; }
 
     public string icon { get; construct; }
-    public string action { get; construct; }
+    public Utils.ItemAlignment.AlignmentDirection alignment_direction { get; construct; }
     public ButtonImage btn_image;
 
-    public AlignBoxButton (Lib.ViewCanvas view_canvas, string action_name, string icon_name, string tooltip, string[] accels) {
+    public AlignBoxButton (Lib.ViewCanvas view_canvas, Utils.ItemAlignment.AlignmentDirection alignment_direction, string icon_name, string tooltip, string[] accels) {
         Object (
             view_canvas: view_canvas,
             icon: icon_name,
-            action: action_name,
+            alignment_direction: alignment_direction,
             tooltip_markup: Granite.markup_accel_tooltip (accels, tooltip)
         );
     }
@@ -52,12 +52,11 @@ public class Akira.Widgets.AlignBoxButton : Gtk.Button {
 
     private void connect_signals () {
         clicked.connect (() => {
-            view_canvas.window.event_bus.align_items (action);
+            view_canvas.window.event_bus.selection_align (alignment_direction);
         });
 
         view_canvas.window.event_bus.selection_modified.connect (() => {
             unowned var selection = view_canvas.selection_manager.selection;
-
             sensitive = selection.count () > 1;
         });
     }

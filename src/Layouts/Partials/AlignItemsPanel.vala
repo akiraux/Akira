@@ -25,19 +25,19 @@ public class Akira.Layouts.Partials.AlignItemsPanel : Gtk.Grid {
 
     private struct AlignBoxItem {
         public string type;
-        public string? action_name;
+        public Utils.ItemAlignment.AlignmentDirection? alignment_direction;
         public string? icon_name;
         public string? tooltip_text;
         public string[]? accels;
 
         public AlignBoxItem (
             string type,
-            string? action_name = null,
+            Utils.ItemAlignment.AlignmentDirection? alignment_direction = null,
             string? icon_name = null,
             string? tooltip_text = null,
             string[]? accels = null) {
             this.type = type;
-            this.action_name = action_name;
+            this.alignment_direction = alignment_direction;
             this.icon_name = icon_name;
             this.tooltip_text = tooltip_text;
             this.accels = accels;
@@ -45,17 +45,16 @@ public class Akira.Layouts.Partials.AlignItemsPanel : Gtk.Grid {
     }
 
     private AlignBoxItem[] align_items_panel_buttons = {
-        AlignBoxItem ("btn", "even-h", "distribute-horizontal-center", _("Distribute Horizontally"),
-            {"<Ctrl><Shift>1"}),
-        AlignBoxItem ("btn", "even-v", "distribute-vertical-center", _("Distribute Vertically"), {"<Ctrl><Shift>2"}),
+        //AlignBoxItem ("btn", Utils.ItemAlignment.AlignmentDirection.HEVEN, "distribute-horizontal-center", _("Distribute Horizontally"), {"<Ctrl><Shift>1"}),
+        //AlignBoxItem ("btn", Utils.ItemAlignment.AlignemtDirection.VEVEN, "distribute-vertical-center", _("Distribute Vertically"), {"<Ctrl><Shift>2"}),
+        //AlignBoxItem ("sep"),
+        AlignBoxItem ("btn", Utils.ItemAlignment.AlignmentDirection.LEFT, "align-horizontal-left", _("Align Left"), {"<Ctrl><Shift>3"}),
+        AlignBoxItem ("btn", Utils.ItemAlignment.AlignmentDirection.HCENTER, "align-horizontal-center", _("Align Center"), {"<Ctrl><Shift>4"}),
+        AlignBoxItem ("btn", Utils.ItemAlignment.AlignmentDirection.RIGHT, "align-horizontal-right", _("Align Right"), {"<Ctrl><Shift>5"}),
         AlignBoxItem ("sep"),
-        AlignBoxItem ("btn", "alig-h-l", "align-horizontal-left", _("Align Left"), {"<Ctrl><Shift>3"}),
-        AlignBoxItem ("btn", "alig-h-c", "align-horizontal-center", _("Align Center"), {"<Ctrl><Shift>4"}),
-        AlignBoxItem ("btn", "alig-h-r", "align-horizontal-right", _("Align Right"), {"<Ctrl><Shift>5"}),
-        AlignBoxItem ("sep"),
-        AlignBoxItem ("btn", "alig-v-t", "align-vertical-top", _("Align Top"), {"<Ctrl><Shift>6"}),
-        AlignBoxItem ("btn", "alig-v-c", "align-vertical-center", _("Align Middle"), {"<Ctrl><Shift>7"}),
-        AlignBoxItem ("btn", "alig-v-b", "align-vertical-bottom", _("Align Bottom"), {"<Ctrl><Shift>8"})
+        AlignBoxItem ("btn", Utils.ItemAlignment.AlignmentDirection.TOP, "align-vertical-top", _("Align Top"), {"<Ctrl><Shift>6"}),
+        AlignBoxItem ("btn", Utils.ItemAlignment.AlignmentDirection.VCENTER, "align-vertical-center", _("Align Middle"), {"<Ctrl><Shift>7"}),
+        AlignBoxItem ("btn", Utils.ItemAlignment.AlignmentDirection.BOTTOM, "align-vertical-bottom", _("Align Bottom"), {"<Ctrl><Shift>8"})
     };
 
     public AlignItemsPanel (Lib.ViewCanvas view_canvas) {
@@ -84,7 +83,7 @@ public class Akira.Layouts.Partials.AlignItemsPanel : Gtk.Grid {
                     var tmp_align_box_button =
                         new Widgets.AlignBoxButton (
                             view_canvas,
-                            item.action_name,
+                            item.alignment_direction,
                             item.icon_name,
                             item.tooltip_text,
                             item.accels);
