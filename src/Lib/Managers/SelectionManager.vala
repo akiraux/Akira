@@ -54,12 +54,18 @@ public class Akira.Lib.Managers.SelectionManager : Object {
     public int? alignment_anchor_id;
     protected int block_change_notifications = 0;
 
+    private ViewLayers.ViewLayerAnchor anchor_layer;
+
     public SelectionManager (ViewCanvas canvas) {
         Object (view_canvas : canvas);
     }
 
     construct {
         selection = new Lib.Items.NodeSelection (null);
+
+        anchor_layer = new ViewLayers.ViewLayerAnchor ();
+        anchor_layer.add_to_canvas (ViewLayers.ViewLayer.ANCHOR_LAYER_ID, view_canvas);
+
         view_canvas.window.event_bus.flip_item.connect (on_flip_selected);
         view_canvas.window.event_bus.delete_selected_items.connect (delete_selected);
         view_canvas.window.event_bus.change_z_selected.connect (change_z_order);
@@ -80,6 +86,8 @@ public class Akira.Lib.Managers.SelectionManager : Object {
 
         selection = new Lib.Items.NodeSelection (null);
         alignment_anchor_id = null;
+        remove_anchor_effect ();
+
         on_selection_changed (-1);
         selection_modified ();
     }
@@ -95,12 +103,35 @@ public class Akira.Lib.Managers.SelectionManager : Object {
     }
 
     public void toggle_alignment_anchor (int id) {
+        if (selection.count () <= 1) {
+            return;
+        }
+
+        remove_anchor_effect ();
+
         if (alignment_anchor_id == id) {
             alignment_anchor_id = null;
             return;
         }
 
         alignment_anchor_id = id;
+
+        maybe_create_anchor_effect ();
+    }
+
+    private void remove_anchor_effect () {
+        anchor_layer.add_drawable (null);
+        anchor_layer.set_visible (false);
+    }
+
+    private void maybe_create_anchor_effect () {
+        var node = view_canvas.items_manager.node_from_id (alignment_anchor_id);
+        if (node == null) {
+            assert (node != null);
+            return;
+        }
+
+        anchor_layer.add_drawable (node.instance.drawable);
     }
 
     public bool item_selected (int id) {
