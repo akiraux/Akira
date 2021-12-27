@@ -37,60 +37,9 @@
     opacity: 1;
 }
 
-/*.layer-action {
-    border: none;
-    background: transparent;
-    padding: 0 2px;
-    opacity: 0;
-    box-shadow: none;
-}
-
-.layer.hover > grid > .layer-action,
-.layer.hover > grid > grid > .layer-action {
-    opacity: 0.5;
-}
-
-.layer.hover > grid > .layer-action:hover,
-.layer-action:hover {
-    opacity: 1;
-}
-
-.layer-action.show {
-    opacity: 0.5;
-}
-
-.layer-action image,
-.layer-action {
-    color: @fg_color;
-}*/
-
-/*.layer .revealer-button {
-    border-bottom: none;
-}
-
-.revealer-button {
-    padding: 0 8px;
-    border-radius: 0;
-    border: none;
-    box-shadow: none;
-    background: transparent;
-}*/
-
-.button-toggle image {
-    transition: transform 160ms ease;
-}
-
 .button-toggle.collapsed image {
     -gtk-icon-transform: rotate(-90deg);
 }
-
-/*.group-container {
-    background-color: @bg_color;
-}
-
-.group-container .layer {
-    padding-left: 15px;
-}*/
 
 .grid-motion {
     background-color: alpha (@accent_color, 0.3);
