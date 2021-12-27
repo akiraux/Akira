@@ -54,5 +54,11 @@ public class Akira.Widgets.AlignBoxButton : Gtk.Button {
         clicked.connect (() => {
             view_canvas.window.event_bus.align_items (action);
         });
+
+        view_canvas.window.event_bus.selection_modified.connect (() => {
+            unowned var selection = view_canvas.selection_manager.selection;
+
+            sensitive = selection.count () > 1;
+        });
     }
 }
