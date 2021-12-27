@@ -18,6 +18,7 @@
  * along with Akira. If not, see <https://www.gnu.org/licenses/>.
  *
  * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
+ * Authored by: Giacomo "giacomoalbe" Alberini <giacomoalbe@gmail.com>
  */
 
 /**

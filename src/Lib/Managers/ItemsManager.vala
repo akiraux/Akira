@@ -532,7 +532,6 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         if (alignment_anchor_id != null) {
             anchor = node_from_id (alignment_anchor_id);
             type = Utils.ItemAlignment.AlignmentType.ANCHOR;
-            debug (@"Aligment relative to $(anchor.instance.components.name.name)");
         }
 
         Utils.ItemAlignment.align_selection (selection, direction, type, anchor, view_canvas);
