@@ -245,16 +245,10 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
             }
         }
 
-        var path1 = im.path_from_node (node1).hash ();
-        var path2 = im.path_from_node (node2).hash ();
+        var path1 = im.array_path_from_node (node1);
+        var path2 = im.array_path_from_node (node2);
 
-        if (path1 < path2) {
-            return 1;
-        } else if (path1 > path2) {
-            return -1;
-        }
-
-        return 0;
+        return Utils.Array.compare_arrays (path2, path1);
     }
 
     /*

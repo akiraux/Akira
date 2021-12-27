@@ -222,4 +222,17 @@ public class Akira.Utils.Array : Object {
         arr.data[a] = arr.index (b);
         arr.data[b] = tmp;
     }
+
+    public static int compare_arrays (int[] a, int[] b) {
+        int len_a = a.length;
+        int len_b = b.length;
+
+        var res = Posix.memcmp (a, b, (size_t)int.min (len_a, len_b) * sizeof (int));
+
+        if (res == 0 && len_a != len_b) {
+            return len_a < len_b ? -1 : 1;
+        }
+
+        return res;
+    }
 }

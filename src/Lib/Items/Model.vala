@@ -126,6 +126,18 @@ public class Akira.Lib.Items.Model : Object {
         return builder.str;
     }
 
+    /*
+     * Build an array of int representing the path IDs of a node. This path is
+     * unique for each node and changes based on the position relative to its
+     * parent.
+     */
+    public int[] array_path_from_node (ModelNode node) {
+        Array<int> path = new Array<int> ();
+        build_array_path_recursive (node, ref path);
+
+        return path.data;
+    }
+
     public GLib.Array<unowned Lib.Items.ModelNode> children_in_group (int group_id) {
         var group = group_nodes.get (group_id);
         return group == null ? new GLib.Array<unowned Lib.Items.ModelNode> () : group.children;
@@ -457,6 +469,14 @@ public class Akira.Lib.Items.Model : Object {
         }
 
         builder.append ((node.id == ORIGIN_ID) ? node.id.to_string () : node.pos_in_parent.to_string ());
+    }
+
+    private void build_array_path_recursive (ModelNode node, ref Array<int> path) {
+        if (node.parent != null) {
+            build_array_path_recursive (node.parent, ref path);
+        }
+
+        path.append_val (((node.id == ORIGIN_ID) ? node.id : node.pos_in_parent));
     }
 
     /*
