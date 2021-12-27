@@ -28,7 +28,6 @@
 public class Akira.Layouts.LayersList.LayerItemModel : GLib.Object {
     private unowned Akira.Lib.ViewCanvas _view_canvas;
 
-    public int service_uid { get; construct; }
     private Lib.Items.ModelInstance _cached_instance;
 
     public int id {
@@ -159,8 +158,7 @@ public class Akira.Layouts.LayersList.LayerItemModel : GLib.Object {
         }
     }
 
-    public LayerItemModel (Lib.ViewCanvas view_canvas, Lib.Items.ModelNode node, int service_uid) {
-        Object (service_uid: service_uid);
+    public LayerItemModel (Lib.ViewCanvas view_canvas, Lib.Items.ModelNode node) {
         update_node (node);
         _view_canvas = view_canvas;
     }

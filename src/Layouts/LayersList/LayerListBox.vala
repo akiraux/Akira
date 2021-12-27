@@ -113,7 +113,7 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
         }
 
         var node_id = node.id;
-        var item = new LayerItemModel (view_canvas, node, node_id);
+        var item = new LayerItemModel (view_canvas, node);
         layers[node_id] = item;
         list_store.add (item);
 
