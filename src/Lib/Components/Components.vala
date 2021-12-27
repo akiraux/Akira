@@ -145,7 +145,7 @@ public struct Akira.Lib.Components.Components {
     }
 
     public static Layer default_layer () {
-        return new Layer (false, false);
+        return new Layer (false);
     }
 
     public void serialize (ref Json.Builder builder) {

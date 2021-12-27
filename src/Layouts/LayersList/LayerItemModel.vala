@@ -89,15 +89,6 @@ public class Akira.Layouts.LayersList.LayerItemModel : GLib.Object {
     }
 
     /*
-     * Control the selected state of the item.
-     */
-    public bool selected {
-        get {
-            return _cached_instance.components.layer.selected;
-        }
-    }
-
-    /*
      * If the instance type is an Artboard.
      */
     public bool is_artboard {
