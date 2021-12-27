@@ -67,7 +67,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         return instance.id;
     }
 
-    public int remove_items (GLib.Array<int> to_remove) {
+    public int remove_items (GLib.Array<int> to_remove, bool pause_compile = false) {
         ulong microseconds;
         double seconds;
 
