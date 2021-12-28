@@ -85,6 +85,17 @@ public class Akira.Layouts.LayersList.LayerItemModel : GLib.Object {
         get {
             return _cached_instance.components.layer.locked;
         }
+        set {
+            if (_cached_instance.components.layer.locked == value) {
+                return;
+            }
+
+            unowned var im = _view_canvas.items_manager;
+            var node = im.item_model.node_from_id (_cached_instance.id);
+            assert (node != null);
+
+            node.instance.components.layer = new Lib.Components.Layer (value);
+        }
     }
 
     /*

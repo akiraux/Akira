@@ -226,7 +226,20 @@ public class Akira.Layouts.LayersList.LayerListItem : VirtualizingListBoxRow {
 
     // TODO.
     private void toggle_lock () {
-        print ("lock pressed\n");
+        model.locked = !model.locked;
+        update_btn_lock ();
+    }
+
+    private void update_btn_lock () {
+        if (model.locked) {
+            btn_lock.get_style_context ().add_class ("active");
+            btn_lock.image = new Gtk.Image.from_icon_name ("changes-prevent-symbolic", Gtk.IconSize.MENU);
+            btn_lock.tooltip_text = _("Unlock layer");
+        } else {
+            btn_lock.get_style_context ().remove_class ("active");
+            btn_lock.image = new Gtk.Image.from_icon_name ("changes-allow-symbolic", Gtk.IconSize.MENU);
+            btn_lock.tooltip_text = _("Lock layer");
+        }
     }
 
     // TODO.

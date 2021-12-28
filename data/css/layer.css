@@ -19,20 +19,20 @@
     box-shadow: inset 0 0 0 2px @accent_color;
 }
 
-.actions {
+/*.actions {
     transition: opacity 160ms ease;
+    opacity: 0;
+}*/
+.actions button {
     opacity: 0;
 }
 
-.layer:hover .actions {
-    opacity: 1;
-}
-
-.actions button {
+.layer:hover .actions button {
     opacity: 0.5;
 }
 
-.actions button:hover,
+.layer:hover .actions button:hover,
+.layer:hover .actions button.active,
 .actions button.active {
     opacity: 1;
 }

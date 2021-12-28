@@ -45,6 +45,7 @@ public class Akira.Lib.Items.ModelTypeArtboard : ModelType {
         };
         new_item.components.layout = new Components.Layout (layout_data);
         new_item.components.name = Lib.Components.Components.default_name ();
+        new_item.components.layer = Lib.Components.Components.default_layer ();
         return new_item;
     }
 
