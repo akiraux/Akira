@@ -40,6 +40,7 @@ public class Akira.Layouts.LayersList.LayerListItem : VirtualizingListBoxRow {
     private Gtk.Image icon;
     private Gtk.Button btn_lock;
     private Gtk.Button btn_view;
+    private Gtk.Button btn_toggle;
 
     private bool _is_editing = false;
     public bool is_editing {
@@ -59,6 +60,15 @@ public class Akira.Layouts.LayersList.LayerListItem : VirtualizingListBoxRow {
 
     construct {
         style_ctx = get_style_context ();
+
+        btn_toggle = new Gtk.Button.from_icon_name ("pan-down-symbolic", Gtk.IconSize.MENU) {
+            tooltip_text = _("Toggle visibility of child layers"),
+            can_focus = false
+        };
+        btn_toggle.clicked.connect (on_toggle_pressed);
+        btn_toggle.get_style_context ().add_class ("flat");
+        btn_toggle.get_style_context ().add_class ("button-toggle");
+        btn_toggle.get_style_context ().add_class (Gtk.STYLE_CLASS_DIM_LABEL);
 
         icon = new Gtk.Image () {
             margin_end = 9,
@@ -81,14 +91,14 @@ public class Akira.Layouts.LayersList.LayerListItem : VirtualizingListBoxRow {
             tooltip_text = _("Lock layer"),
             can_focus = false
         };
-        btn_lock.activate.connect (toggle_lock);
+        btn_lock.clicked.connect (toggle_lock);
         btn_lock.get_style_context ().add_class ("flat");
 
         btn_view = new Gtk.Button.from_icon_name ("layer-visible-symbolic", Gtk.IconSize.MENU) {
             tooltip_text = _("Hide layer"),
             can_focus = false
         };
-        btn_view.activate.connect (toggle_view);
+        btn_view.clicked.connect (toggle_view);
         btn_view.get_style_context ().add_class ("flat");
 
         grid_action = new Gtk.Grid () {
@@ -105,8 +115,9 @@ public class Akira.Layouts.LayersList.LayerListItem : VirtualizingListBoxRow {
             valign = Gtk.Align.CENTER
         };
         grid_main.attach (icon, 0, 0, 1, 1);
-        grid_main.attach (grid_entry, 1, 0, 1, 1);
-        grid_main.attach (grid_action, 2, 0, 1, 1);
+        grid_main.attach (btn_toggle, 1, 0, 1, 1);
+        grid_main.attach (grid_entry, 2, 0, 1, 1);
+        grid_main.attach (grid_action, 3, 0, 1, 1);
 
         add (grid_main);
     }
@@ -137,13 +148,20 @@ public class Akira.Layouts.LayersList.LayerListItem : VirtualizingListBoxRow {
 
         // Update icon.
         icon.clear ();
-        icon.margin_start = 6;
+        icon.margin_start = 0;
+
+        // Show the toggle button.
+        btn_toggle.no_show_all = false;
+        btn_toggle.visible = true;
+        update_btn_toggle ();
     }
 
     /*
-     * TODO...
+     * TODO.
      */
-    private void build_group_ui () {}
+    private void build_group_ui () {
+        update_btn_toggle ();
+    }
 
     private void build_layer_ui () {
         // Update general UI.
@@ -153,6 +171,10 @@ public class Akira.Layouts.LayersList.LayerListItem : VirtualizingListBoxRow {
         // Update icon.
         icon.set_from_icon_name (model.icon, Gtk.IconSize.MENU);
         icon.margin_start = 12;
+
+        // Hide the toggle button.
+        btn_toggle.no_show_all = true;
+        btn_toggle.visible = false;
     }
 
     public override void edit () {
@@ -203,8 +225,32 @@ public class Akira.Layouts.LayersList.LayerListItem : VirtualizingListBoxRow {
     }
 
     // TODO.
-    private void toggle_lock () {}
+    private void toggle_lock () {
+        print ("lock pressed\n");
+    }
 
     // TODO.
-    private void toggle_view () {}
+    private void toggle_view () {
+        print ("view pressed\n");
+    }
+
+    /*
+     * Hide or show the child layers of this layer when the user clicks on the
+     * toggle button.
+     */
+    private void on_toggle_pressed () {
+        model.children_visible = !model.children_visible;
+        update_btn_toggle ();
+    }
+
+    /*
+     * Visually update the toggle button.
+     */
+    private void update_btn_toggle () {
+        if (model.children_visible) {
+            btn_toggle.get_style_context ().remove_class ("collapsed");
+        } else {
+            btn_toggle.get_style_context ().add_class ("collapsed");
+        }
+    }
 }

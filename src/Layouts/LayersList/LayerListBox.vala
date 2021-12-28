@@ -73,9 +73,9 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
         // When the name of the layer is being edited.
         row_edited.connect (on_row_edited);
 
-        // Listed to the button release event only for the secondary click in
+        // Listen to the button release event only for the secondary click in
         // order to trigger the context menu.
-        button_release_event.connect ((e) => {
+        button_release_event.connect (e => {
             if (e.button != Gdk.BUTTON_SECONDARY) {
                 return Gdk.EVENT_PROPAGATE;
             }
@@ -112,11 +112,29 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
             return;
         }
 
-        var service_uid = node.id;
-        var item = new LayerItemModel (view_canvas, node, service_uid);
-        layers[service_uid] = item;
+        var node_id = node.id;
+        var item = new LayerItemModel (view_canvas, node);
+        layers[node_id] = item;
         list_store.add (item);
-        // print ("on_item_added: %i\n", service_uid);
+
+        // Check if the newly created layer is inside an artboard or a group and
+        // show all its child layers if they were removed.
+        recursive_show_child_layers (node_id);
+    }
+
+    private void recursive_show_child_layers (int node_id) {
+        var item = layers[node_id];
+        if (item == null) {
+            return;
+        }
+
+        var parent = layers[item.parent_uid];
+        if (parent == null) {
+            return;
+        }
+
+        parent.children_visible = true;
+        recursive_show_child_layers (parent.parent_uid);
     }
 
     private bool create_context_menu (Gdk.Event e, LayerListItem row) {
@@ -132,6 +150,29 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
         }
 
         return Gdk.EVENT_PROPAGATE;
+    }
+
+    /*
+     * Visually create layers from a list of items ids. This method is used to
+     * show layers that have been removed when a parent (artboard or group)
+     * collapses its children.
+     */
+    public void add_items (GLib.Array<int> ids) {
+        var added = 0;
+        foreach (var uid in ids.data) {
+            // Don't create a layer if it already exists. This might happen when
+            // revealing the children of a collapsed artboard during the
+            // creation of a new child item.
+            if (layers[uid] == null) {
+                on_item_added (uid);
+            }
+            // Check if the layer was actually created.
+            if (layers[uid] != null) {
+                added++;
+            }
+        }
+        // Refresh the layers list UI.
+        show_added_layers (added);
     }
 
     /*
@@ -204,16 +245,10 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
             }
         }
 
-        var path1 = im.path_from_node (node1);
-        var path2 = im.path_from_node (node2);
+        var path1 = im.array_path_from_node (node1);
+        var path2 = im.array_path_from_node (node2);
 
-        if (path1 < path2) {
-            return 1;
-        } else if (path1 > path2) {
-            return -1;
-        }
-
-        return 0;
+        return Utils.Array.compare_arrays (path2, path1);
     }
 
     /*
@@ -297,9 +332,9 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
      * hovered. Clear the hover effect if no canvas item was hovered.
      */
     private void on_hover_changed (int? id) {
-        on_mouse_leave ();
+        on_mouse_leave_internal ();
 
-        if (id != null) {
+        if (id != null && layers[id] != null) {
             set_hover_on_row_from_model (layers[id]);
         }
     }
