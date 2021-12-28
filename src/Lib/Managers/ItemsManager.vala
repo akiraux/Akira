@@ -327,9 +327,21 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             return found_items;
         }
 
-        foreach (unowned var root in origin.children.data) {
-            if (bound.contains_bound (root.instance.drawable.bounds)) {
-                found_items.add (root);
+        foreach (unowned var node in origin.children.data) {
+            var node_type = node.instance.type.name_id;
+            debug (@"Node: $(node.instance.components.name.name) type: $(node.instance.type.name_id)");
+
+            if (node_type == "artboard") {
+                foreach (unowned var child_node in node.children.data) {
+                    if (bound.contains_bound (child_node.instance.drawable.bounds)) {
+                        found_items.add (child_node);
+                    }
+                }
+                continue;
+            }
+
+            if (bound.contains_bound (node.instance.drawable.bounds)) {
+                found_items.add (node);
             }
         }
 
