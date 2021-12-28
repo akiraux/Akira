@@ -309,6 +309,11 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
             return true;
         }
 
+        var new_mode = new Lib.Modes.MultiSelectMode (this);
+        mode_manager.register_mode (new_mode);
+
+        mode_manager.button_press_event (event);
+
         return false;
     }
 

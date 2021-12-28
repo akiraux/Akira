@@ -316,6 +316,26 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         return found_items.last ();
     }
 
+    public Gee.ArrayList<unowned Lib.Items.ModelNode>  nodes_in_bounded_region (
+        Geometry.Rectangle bound
+    ) {
+        var found_items = new Gee.ArrayList<unowned Lib.Items.ModelNode> ();
+
+        var origin = item_model.node_from_id (Lib.Items.Model.ORIGIN_ID);
+
+        if (origin.children == null) {
+            return found_items;
+        }
+
+        foreach (unowned var root in origin.children.data) {
+            if (bound.contains_bound (root.instance.drawable.bounds)) {
+                found_items.add (root);
+            }
+        }
+
+        return found_items;
+    }
+
     /*
      * Returns the top-most group at position. Origin if no other group found.
      */

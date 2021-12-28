@@ -133,6 +133,7 @@ public class Akira.Lib.Managers.NobManager : Object {
     }
 
     private void update_nob_layer () {
+        nob_layer.set_visible (true);
         nob_layer.update_nob_data (nobs);
     }
 

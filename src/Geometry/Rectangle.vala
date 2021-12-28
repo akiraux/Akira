@@ -63,6 +63,10 @@ public struct Akira.Geometry.Rectangle {
         return (left < x < right) && (top < y < bottom);
     }
 
+    public bool contains_bound (Geometry.Rectangle bound) {
+        return (left <= bound.left) && (top <= bound.top) && (right >= bound.right) && (bottom >= bound.bottom);
+    }
+
     public bool does_not_contain (double x, double y) {
         return x < left || x > right || y < top || y > bottom;
     }
