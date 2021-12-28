@@ -90,6 +90,12 @@ public class Akira.Layouts.LayersList.LayerItemModel : GLib.Object {
                 return;
             }
 
+            if (value) {
+                unowned var sm = _view_canvas.selection_manager;
+                sm.remove_from_selection (id);
+                sm.selection_modified_external ();
+            }
+
             unowned var im = _view_canvas.items_manager;
             var node = im.item_model.node_from_id (_cached_instance.id);
             assert (node != null);
