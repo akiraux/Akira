@@ -109,7 +109,6 @@ public class Akira.Lib.Modes.MultiSelectMode : AbstractInteractionMode {
         var found_items = view_canvas.items_manager.nodes_in_bounded_region (bounds);
 
         foreach (unowned var item in found_items) {
-            debug (@"Item in selection: $(item.instance.components.name.name) type: $(item.instance.type.name_id)");
             view_canvas.selection_manager.add_to_selection (item.instance.id);
         }
 

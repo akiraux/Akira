@@ -329,7 +329,6 @@ public class Akira.Lib.Managers.ItemsManager : Object {
 
         foreach (unowned var node in origin.children.data) {
             var node_type = node.instance.type.name_id;
-            debug (@"Node: $(node.instance.components.name.name) type: $(node.instance.type.name_id)");
 
             if (node_type == "artboard") {
                 foreach (unowned var child_node in node.children.data) {
