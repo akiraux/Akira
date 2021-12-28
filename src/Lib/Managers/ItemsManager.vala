@@ -316,7 +316,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         return found_items.last ();
     }
 
-    public Gee.ArrayList<unowned Lib.Items.ModelNode>  nodes_in_bounded_region (
+    public Gee.ArrayList<unowned Lib.Items.ModelNode> nodes_in_bounded_region (
         Geometry.Rectangle bound
     ) {
         var found_items = new Gee.ArrayList<unowned Lib.Items.ModelNode> ();
