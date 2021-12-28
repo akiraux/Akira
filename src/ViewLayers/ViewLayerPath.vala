@@ -76,34 +76,28 @@ public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
 
         context.save ();
 
+        var global_transform = context.get_matrix ();
+
+        // Apply transform matrix of drawable so we don't have to rotate or scale.
+        Cairo.Matrix tr = path_data.transform;
+        context.transform (tr);
+
+        // For all path points, the origin is in top left corner. Move there.
+        context.translate (-path_data.extents.width / 2, -path_data.extents.height / 2);
+
         context.new_path ();
         context.set_source_rgba (0.1568, 0.4745, 0.9823, 1);
         context.set_line_width (1.0 / canvas.scale);
-
-        var extents = path_data.extents;
-        var reference_point = Geometry.Point (extents.left, extents.top);
-        var origin = Geometry.Point ( (extents.right - extents.left) / 2, (extents.bottom - extents.top) / 2);
-
-        double sin_theta = Math.sin (path_data.rot_angle);
-        double cos_theta = Math.cos (path_data.rot_angle);
-
-        context.move_to (extents.left, extents.right);
 
         int point_idx = 0;
         var points = path_data.points;
         var commands = path_data.commands;
 
         // Draw circles for all points.
-        // foreach (var pt in path_data.points) {
         for (int i = 0; i < commands.length; ++i) {
             if (commands[i] == Lib.Modes.PathEditMode.Type.LINE) {
                 var pt = points[point_idx];
-
-                // Apply the rotation formula and rotate the point by given angle
-                double rot_x = cos_theta * (pt.x - origin.x) - sin_theta * (pt.y - origin.y) + origin.x;
-                double rot_y = sin_theta * (pt.x - origin.x) + cos_theta * (pt.y - origin.y) + origin.y;
-
-                context.arc (rot_x + reference_point.x, rot_y + reference_point.y, radius, 0, Math.PI * 2);
+                context.arc (pt.x, pt.y, radius, 0, Math.PI * 2);
                 context.fill ();
 
                 ++point_idx;
@@ -111,19 +105,15 @@ public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
                 for (int j = 0; j < 4; ++j) {
                     var pt = points[j + point_idx];
 
-                    // Apply the rotation formula and rotate the point by given angle
-                    double rot_x = cos_theta * (pt.x - origin.x) - sin_theta * (pt.y - origin.y) + origin.x;
-                    double rot_y = sin_theta * (pt.x - origin.x) + cos_theta * (pt.y - origin.y) + origin.y;
-
-                    context.arc (rot_x + reference_point.x, rot_y + reference_point.y, radius, 0, Math.PI * 2);
+                    context.arc (pt.x, pt.y, radius, 0, Math.PI * 2);
                     context.fill ();
                 }
 
-                context.move_to (points[point_idx].x + reference_point.x, points[point_idx].y + reference_point.y);
-                context.line_to (points[point_idx + 1].x + reference_point.x, points[point_idx + 1].y + reference_point.y);
+                context.move_to (points[point_idx].x, points[point_idx].y);
+                context.line_to (points[point_idx + 1].x, points[point_idx + 1].y);
 
-                context.move_to (points[point_idx].x + reference_point.x, points[point_idx].y + reference_point.y);
-                context.line_to (points[point_idx + 2].x + reference_point.x, points[point_idx + 2].y + reference_point.y);
+                context.move_to (points[point_idx].x, points[point_idx].y);
+                context.line_to (points[point_idx + 2].x, points[point_idx + 2].y);
 
                 context.stroke ();
 
@@ -132,14 +122,13 @@ public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
         }
 
         foreach (var idx in path_data.selected_pts) {
-            var point = Geometry.Point ();
-            point.x = points[idx].x + reference_point.x;
-            point.y = points[idx].y + reference_point.y;
-
             context.set_source_rgba (0.7, 0, 0, 1);
-            context.arc (point.x, point.y, radius, 0, Math.PI * 2);
+            context.arc (points[idx].x, points[idx].y, radius, 0, Math.PI * 2);
             context.fill ();
         }
+
+        // Reapply the original transform of context.
+        context.set_matrix (global_transform);
 
         context.stroke ();
         context.new_path ();

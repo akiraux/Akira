@@ -359,7 +359,7 @@ public class Akira.Models.PathEditModel : Object {
         path_data.live_pts = live_pts;
         path_data.length = live_pts_len;
         path_data.extents = extents;
-        path_data.rot_angle = instance.components.transform.rotation;
+        path_data.transform = instance.drawable.transform;
         path_data.selected_pts = selected_pts;
 
         path_data.live_extents = get_extents_using_live_pts (extents);
@@ -430,6 +430,6 @@ public struct Akira.Models.PathDataModel {
     public Geometry.Rectangle extents;
     public Geometry.Rectangle live_extents;
 
-    public double rot_angle;
+    public Cairo.Matrix transform;
     public Gee.HashSet<int> selected_pts;
 }
