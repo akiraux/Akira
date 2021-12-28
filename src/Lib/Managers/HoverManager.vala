@@ -78,7 +78,10 @@ public class Akira.Lib.Managers.HoverManager : Object {
     }
 
     private void maybe_create_hover_effect (Lib.Items.ModelNode node) {
-        if (view_canvas.selection_manager.item_selected (node.id)) {
+        if (
+            view_canvas.selection_manager.item_selected (node.id)
+            || node.instance.components.layer.locked
+        ) {
             return;
         }
 
