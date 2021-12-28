@@ -61,6 +61,7 @@ public class Akira.Services.ActionManager : Object {
     public const string ACTION_TEXT_TOOL = "action_text_tool";
     public const string ACTION_IMAGE_TOOL = "action_image_tool";
     public const string ACTION_PATH_TOOL = "action_path_tool";
+    public const string ACTION_PENCIL_TOOL = "action_pencil_tool";
     public const string ACTION_DELETE = "action_delete";
     public const string ACTION_FLIP_H = "action_flip_h";
     public const string ACTION_FLIP_V = "action_flip_v";
@@ -108,6 +109,7 @@ public class Akira.Services.ActionManager : Object {
         { ACTION_TEXT_TOOL, action_text_tool },
         { ACTION_IMAGE_TOOL, action_image_tool },
         { ACTION_PATH_TOOL, action_path_tool },
+        { ACTION_PENCIL_TOOL, action_pencil_tool },
         { ACTION_DELETE, action_delete },
         { ACTION_FLIP_H, action_flip_h },
         { ACTION_FLIP_V, action_flip_v },
@@ -167,6 +169,7 @@ public class Akira.Services.ActionManager : Object {
         typing_accelerators.set (ACTION_TEXT_TOOL, "t");
         typing_accelerators.set (ACTION_IMAGE_TOOL, "i");
         typing_accelerators.set (ACTION_PATH_TOOL, "v");
+        typing_accelerators.set (ACTION_PENCIL_TOOL, "p");
         typing_accelerators.set (ACTION_DELETE, "Delete");
         typing_accelerators.set (ACTION_DELETE, "BackSpace");
         typing_accelerators.set (ACTION_TOGGLE_PIXEL_GRID, "<Shift>Tab");
@@ -409,6 +412,10 @@ public class Akira.Services.ActionManager : Object {
 
     private void action_path_tool () {
         window.event_bus.insert_item ("path");
+    }
+
+    private void action_pencil_tool () {
+        window.event_bus.insert_item ("pencil");
     }
 
     private void on_update_preview () {

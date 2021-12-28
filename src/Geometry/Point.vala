@@ -31,6 +31,26 @@ public struct Akira.Geometry.Point {
         this.y = y;
     }
 
+    public Point add (Point pt) {
+        return Geometry.Point (x + pt.x, y + pt.y);
+    }
+
+    public Point sub (Point pt) {
+        return Geometry.Point (x - pt.x, y - pt.y);
+    }
+
+    public double dot (Point pt) {
+        return x * pt.x + y * pt.y;
+    }
+
+    public Point scale (double val) {
+        return Geometry.Point (x * val, y * val);
+    }
+
+    public double distance (Point pt) {
+        return Utils.GeometryMath.distance (x, y, pt.x, pt.y);
+    }
+
     public Point.deserialized (Json.Object obj) {
         x = obj.get_double_member ("x");
         y = obj.get_double_member ("y");

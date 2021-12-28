@@ -85,6 +85,7 @@ sources = files(
     #'Models/ExportModel.vala',
     #'Models/ListModel.vala',
     'Models/PathEditModel.vala',
+    'Models/FreeHandModel.vala',
 
     'Dialogs/ShortcutsDialog.vala',
     'Dialogs/SettingsDialog.vala',
@@ -129,6 +130,7 @@ sources = files(
     'Lib/Items/ModelTypeGroup.vala',
     'Lib/Items/ModelTypeRect.vala',
     'Lib/Items/ModelTypePath.vala',
+    'Lib/Items/ModelTypePencil.vala',
 
     'Lib/Managers/CopyManager.vala',
     'Lib/Managers/ItemsManager.vala',
@@ -144,6 +146,7 @@ sources = files(
     'Lib/Modes/ExportMode.vala',
     'Lib/Modes/PanMode.vala',
     'Lib/Modes/PathEditMode.vala',
+    'Lib/Modes/FreeHandMode.vala',
 
     'Lib/ViewCanvas.vala',
 

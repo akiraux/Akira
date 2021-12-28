@@ -51,7 +51,8 @@ public abstract class Akira.Lib.Modes.AbstractInteractionMode : Object {
         ITEM_INSERT,
         EXPORT,
         PAN,
-        PATH_EDIT
+        PATH_EDIT,
+        FREE_HAND
     }
 
     public signal void request_deregistration (ModeType type);

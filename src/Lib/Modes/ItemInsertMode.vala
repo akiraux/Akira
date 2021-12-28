@@ -33,6 +33,7 @@ public class Akira.Lib.Modes.ItemInsertMode : AbstractInteractionMode {
 
     private Lib.Modes.TransformMode transform_mode;
     private Lib.Modes.PathEditMode path_edit_mode;
+    private Lib.Modes.FreeHandMode free_hand_mode;
 
     public ItemInsertMode (Lib.ViewCanvas canvas, string item_type) {
         Object (view_canvas: canvas);
@@ -42,6 +43,7 @@ public class Akira.Lib.Modes.ItemInsertMode : AbstractInteractionMode {
     construct {
         transform_mode = null;
         path_edit_mode = null;
+        free_hand_mode = null;
     }
 
     public override AbstractInteractionMode.ModeType mode_type () {
@@ -55,6 +57,10 @@ public class Akira.Lib.Modes.ItemInsertMode : AbstractInteractionMode {
 
         if (path_edit_mode != null) {
             path_edit_mode.mode_end ();
+        }
+
+        if (free_hand_mode != null) {
+            free_hand_mode.mode_end ();
         }
     }
 
@@ -73,6 +79,10 @@ public class Akira.Lib.Modes.ItemInsertMode : AbstractInteractionMode {
 
         if (path_edit_mode != null) {
             return path_edit_mode.key_press_event (event);
+        }
+
+        if (free_hand_mode != null) {
+            return free_hand_mode.key_press_event (event);
         }
 
         return false;
@@ -94,6 +104,10 @@ public class Akira.Lib.Modes.ItemInsertMode : AbstractInteractionMode {
             return path_edit_mode.button_press_event (event);
         }
 
+        if (free_hand_mode != null) {
+            return free_hand_mode.button_press_event (event);
+        }
+
         if (event.button == Gdk.BUTTON_PRIMARY) {
             bool is_artboard;
             var instance = construct_item (item_insert_type, event.x, event.y, out is_artboard);
@@ -113,6 +127,10 @@ public class Akira.Lib.Modes.ItemInsertMode : AbstractInteractionMode {
                 path_edit_mode = new Lib.Modes.PathEditMode (view_canvas, instance);
                 path_edit_mode.mode_begin ();
                 path_edit_mode.button_press_event (event);
+            } else if (item_insert_type == "pencil") {
+                free_hand_mode = new Lib.Modes.FreeHandMode (view_canvas, instance);
+                free_hand_mode.mode_begin ();
+                free_hand_mode.button_press_event (event);
             } else {
                 transform_mode = new Lib.Modes.TransformMode (view_canvas, Utils.Nobs.Nob.BOTTOM_LEFT);
                 transform_mode.mode_begin ();
@@ -138,6 +156,10 @@ public class Akira.Lib.Modes.ItemInsertMode : AbstractInteractionMode {
             return path_edit_mode.button_release_event (event);
         }
 
+        if (free_hand_mode != null) {
+            return free_hand_mode.button_release_event (event);
+        }
+
         return true;
     }
 
@@ -148,6 +170,10 @@ public class Akira.Lib.Modes.ItemInsertMode : AbstractInteractionMode {
 
         if (path_edit_mode != null) {
             return path_edit_mode.motion_notify_event (event);
+        }
+
+        if (free_hand_mode != null) {
+            return free_hand_mode.motion_notify_event (event);
         }
 
         return true;
@@ -242,6 +268,25 @@ public class Akira.Lib.Modes.ItemInsertMode : AbstractInteractionMode {
                 );
                 var test_path = new Geometry.Point[1];
                 test_path[0] = Geometry.Point (0, 0);
+
+
+                Lib.Modes.PathEditMode.Type[] commands = { Lib.Modes.PathEditMode.Type.LINE };
+
+                new_item.components.path = new Lib.Components.Path.from_points (test_path, commands, false);
+                break;
+
+            case "pencil":
+                // A freehand curve is basically a path as we will be approximating
+                // the continuous set of points into the best fitting bezier curve.
+                new_item = Lib.Items.ModelTypePencil.default_path (
+                    coordinates,
+                    borders_from_settings (),
+                    null
+                );
+
+                var test_path = new Geometry.Point[1];
+                test_path[0] = Geometry.Point (0, 0);
+
 
                 Lib.Modes.PathEditMode.Type[] commands = { Lib.Modes.PathEditMode.Type.LINE };
 
