@@ -19,7 +19,7 @@
 * Authored by: Giacomo "giacomoalbe" Alberini <giacomoalbe@gmail.com>
 */
 
-public class Akira.Layouts.Sidebars.PropertiesSidebar : Gtk.Grid {
+public class Akira.Layouts.Sidebars.OptionsSidebar : Gtk.Grid {
     public unowned Lib.ViewCanvas view_canvas { get; construct; }
     //public Akira.Layouts.Partials.TransformPanel transform_panel;
     //public Akira.Layouts.Partials.FillsPanel fills_panel;
@@ -34,7 +34,7 @@ public class Akira.Layouts.Sidebars.PropertiesSidebar : Gtk.Grid {
         }
     }
 
-    public PropertiesSidebar (Lib.ViewCanvas view_canvas) {
+    public OptionsSidebar (Lib.ViewCanvas view_canvas) {
         Object (
             view_canvas: view_canvas,
             orientation: Gtk.Orientation.HORIZONTAL

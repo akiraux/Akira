@@ -25,7 +25,7 @@ public class Akira.Layouts.MainWindow : Gtk.Grid {
     public Akira.Layouts.MainViewCanvas main_view_canvas;
 
     private Layouts.Sidebars.LayersSidebar layers_sidebar;
-    private Layouts.Sidebars.PropertiesSidebar properties_sidebar;
+    private Layouts.Sidebars.OptionsSidebar options_sidebar;
 
     public Gtk.Paned pane;
     public Gtk.Paned pane2;
@@ -37,7 +37,7 @@ public class Akira.Layouts.MainWindow : Gtk.Grid {
     construct {
         main_view_canvas = new Layouts.MainViewCanvas (window);
         layers_sidebar = new Layouts.Sidebars.LayersSidebar (main_view_canvas.canvas);
-        properties_sidebar = new Layouts.Sidebars.PropertiesSidebar (main_view_canvas.canvas);
+        options_sidebar = new Layouts.Sidebars.OptionsSidebar (main_view_canvas.canvas);
 
         pane = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);
         pane2 = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);
@@ -45,11 +45,11 @@ public class Akira.Layouts.MainWindow : Gtk.Grid {
         pane2.pack1 (main_view_canvas, true, true);
 
         if (!settings.get_boolean ("invert-sidebar")) {
-            pane.pack1 (properties_sidebar, false, false);
+            pane.pack1 (options_sidebar, false, false);
             pane2.pack2 (layers_sidebar, false, false);
         } else {
             pane.pack1 (layers_sidebar, false, false);
-            pane2.pack2 (properties_sidebar, false, false);
+            pane2.pack2 (options_sidebar, false, false);
         }
 
         attach (pane, 0, 0, 1, 1);
