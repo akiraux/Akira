@@ -31,6 +31,7 @@ public class Akira.Lib.Managers.NobManager : Object {
 
     private Utils.Nobs.NobSet nobs;
     private ViewLayers.ViewLayerNobs nob_layer = null;
+    public int? sub_selection_node_id;
 
     // Tracks if an artboard is part of the current selection.
     private int last_id = -1;
@@ -57,6 +58,7 @@ public class Akira.Lib.Managers.NobManager : Object {
         var sm = view_canvas.selection_manager;
         if (sm.is_empty ()) {
             remove_select_effect ();
+            remove_sub_selection_effect ();
             return;
         }
 
@@ -134,6 +136,34 @@ public class Akira.Lib.Managers.NobManager : Object {
 
     private void update_nob_layer () {
         nob_layer.update_nob_data (nobs);
+    }
+
+    public void toggle_sub_selection (int id) {
+        remove_sub_selection_effect ();
+
+        if (sub_selection_node_id == id) {
+            sub_selection_node_id = null;
+            return;
+        }
+
+        sub_selection_node_id = id;
+
+        maybe_create_sub_selection_effect ();
+    }
+
+    private void remove_sub_selection_effect () {
+        nob_layer.add_sub_selection (null);
+        sub_selection_node_id = null;
+    }
+
+    private void maybe_create_sub_selection_effect () {
+        var node = view_canvas.items_manager.node_from_id (sub_selection_node_id);
+        if (node == null) {
+            assert (node != null);
+            return;
+        }
+
+        nob_layer.add_sub_selection (node.instance.drawable);
     }
 
 }

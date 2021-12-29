@@ -524,13 +524,13 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             return;
         }
 
-        unowned int? alignment_anchor_id = view_canvas.selection_manager.alignment_anchor_id;
+        unowned int? sub_selection_node_id = view_canvas.nob_manager.sub_selection_node_id;
 
         var type = Utils.ItemAlignment.AlignmentType.AUTO;
         Lib.Items.ModelNode? anchor = null;
 
-        if (alignment_anchor_id != null) {
-            anchor = node_from_id (alignment_anchor_id);
+        if (sub_selection_node_id != null) {
+            anchor = node_from_id (sub_selection_node_id);
             type = Utils.ItemAlignment.AlignmentType.ANCHOR;
         }
 

@@ -340,7 +340,10 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
                     selection_manager.add_to_selection (target.id);
                     selection_manager.selection_modified_external ();
                 } else {
-                    selection_manager.toggle_alignment_anchor (target.id);
+                    if (selection_manager.selection.count () > 1) {
+                        // Don't trigger sub selection when only one item's selected
+                        nob_manager.toggle_sub_selection (target.id);
+                    }
                 }
             } else if (
                 !selection_manager.selection.bounding_box ().contains (event.x, event.y) &&

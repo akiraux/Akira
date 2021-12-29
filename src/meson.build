@@ -83,7 +83,6 @@ sources = files(
     'ViewLayers/ViewLayerHover.vala',
     'ViewLayers/ViewLayerGrid.vala',
     'ViewLayers/ViewLayerPath.vala',
-    'ViewLayers/ViewLayerAnchor.vala',
 
     #'Models/ColorModel.vala',
     #'Models/ExportModel.vala',
