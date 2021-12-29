@@ -330,7 +330,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         foreach (unowned var node in origin.children.data) {
             var node_type = node.instance.type.name_id;
 
-            if (node_type == "artboard") {
+            if (node_type == "artboard" && node.children != null) {
                 foreach (unowned var child_node in node.children.data) {
                     if (bound.contains_bound (child_node.instance.drawable.bounds)) {
                         found_items.add (child_node);
