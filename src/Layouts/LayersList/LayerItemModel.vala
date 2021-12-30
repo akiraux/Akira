@@ -101,6 +101,9 @@ public class Akira.Layouts.LayersList.LayerItemModel : GLib.Object {
             assert (node != null);
 
             node.instance.components.layer = new Lib.Components.Layer (value);
+            if (node.children != null) {
+                _view_canvas.window.main_window.set_children_locked (node.get_children_ids (), value);
+            }
         }
     }
 

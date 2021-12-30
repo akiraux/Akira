@@ -78,4 +78,8 @@ public class Akira.Layouts.MainWindow : Gtk.Grid {
     public void add_layers (GLib.Array<int> ids) {
         layers_sidebar.layers_listbox.add_items (ids);
     }
+
+    public void set_children_locked (int[] nodes, bool is_locked) {
+        layers_sidebar.layers_listbox.set_children_locked (nodes, is_locked);
+    }
 }

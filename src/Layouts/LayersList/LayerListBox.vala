@@ -386,4 +386,13 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
     private void on_escape_request () {
         on_row_edited (null);
     }
+
+    public void set_children_locked (int[] nodes, bool is_locked) {
+        foreach (var uid in nodes) {
+            if (layers[uid] != null) {
+                layers[uid].locked = is_locked;
+            }
+        }
+        list_store.items_changed (0, 0, 0);
+    }
 }
