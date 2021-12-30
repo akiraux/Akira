@@ -106,6 +106,11 @@ public class Akira.Lib.Modes.MultiSelectMode : AbstractInteractionMode {
     private void select_items_inside_region () {
         var bounds = multi_select_layer.get_region_bounds ();
 
+        // Block selection manager while selecting potentially many items
+        var blocker = new Lib.Managers.SelectionManager.ChangeSignalBlocker (view_canvas.selection_manager);
+        // Get rid of unused var warning
+        (blocker);
+
         var found_items = view_canvas.items_manager.nodes_in_bounded_region (bounds);
 
         foreach (unowned var item in found_items) {
