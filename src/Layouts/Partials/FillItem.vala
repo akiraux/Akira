@@ -22,8 +22,8 @@
  */
 
 public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
-    private unowned Akira.Window window;
-    private unowned Lib.Components.Fill fill;
+    public unowned Lib.ViewCanvas view_canvas { get; construct; }
+    public unowned Lib.Components.Fill fill { get; construct; }
 
     private Gtk.Button hidden_button;
     private Gtk.Button delete_button;
@@ -31,9 +31,9 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
 
     private bool hidden {
         owned get {
-            return fill.hidden;
+            return fill.is_color_hidden ();
         } set {
-            fill.hidden = value;
+            fill.set_hidden (value);
             set_hidden_button ();
             toggle_ui_visibility ();
         }
@@ -41,12 +41,17 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
 
     public signal void fill_deleted ();
 
-    public FillItem (Akira.Window window, Lib.Components.Fill fill) {
-        this.window = window;
-        this.fill = fill;
+    public FillItem (Lib.ViewCanvas view_canvas, Lib.Components.Fill fill) {
+        Object(
+            view_canvas: view_canvas,
+            fill: fill
+        );
+    }
 
+    construct {
         create_ui ();
-        hidden = fill.hidden;
+
+        hidden = fill.is_color_hidden ();;
 
         create_event_bindings ();
         show_all ();
@@ -87,7 +92,7 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
     }
 
     private void on_delete_item () {
-        fill.remove ();
+        //fill.remove ();
         fill_deleted ();
     }
 

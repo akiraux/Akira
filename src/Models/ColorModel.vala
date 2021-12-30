@@ -35,14 +35,14 @@ public class Akira.Models.ColorModel : GLib.Object {
 
     public string color {
         owned get {
-            return type == Type.FILL ? fill.color.to_string () : border.color.to_string ();
+            return type == Type.FILL ? fill.color().to_string () : border.color ().to_string ();
         }
         set {
             var new_rgba = Gdk.RGBA ();
             new_rgba.parse (value);
             new_rgba.alpha = (double) alpha / 255;
             if (type == Type.FILL) {
-                fill.color = new_rgba;
+                fill.set_color_rgba (new_rgba);
                 return;
             }
             border.color = new_rgba;

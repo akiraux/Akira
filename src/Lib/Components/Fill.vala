@@ -19,7 +19,7 @@
  * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
  */
 
-public class Akira.Lib.Components.Fill {
+public class Akira.Lib.Components.Fill : GLib.Object {
     public struct FillData {
         public int _id;
         public Color _color;
@@ -68,4 +68,16 @@ public class Akira.Lib.Components.Fill {
     public int id () { return _data._id; }
     public Gdk.RGBA color () { return _data._color.rgba; }
     public bool is_color_hidden () { return _data._color.hidden; }
+
+    public void set_hidden (bool is_hidden) {
+        _data._color.hidden = is_hidden;
+    }
+
+    public void set_color (Color color) {
+        _data._color = color;
+    }
+
+    public void set_color_rgba (Gdk.RGBA rgba) {
+        _data._color.rgba = rgba;
+    }
 }

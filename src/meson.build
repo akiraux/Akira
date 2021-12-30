@@ -54,6 +54,8 @@ sources = files(
     'Layouts/LayersList/LayerListStore.vala',
 
     'Layouts/Partials/AlignItemsPanel.vala',
+    'Layouts/Partials/FillsPanel.vala',
+    'Layouts/Partials/FillItem.vala',
 
     'Layouts/Sidebars/LayersSidebar.vala',
     'Layouts/Sidebars/OptionsSidebar.vala',

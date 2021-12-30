@@ -21,12 +21,12 @@
  */
 
 public class Akira.Layouts.Partials.FillsPanel : Gtk.Grid {
-    private unowned Akira.Window window;
+    public unowned Lib.ViewCanvas view_canvas { get; construct; }
 
     private Gtk.Button add_btn;
     private Gtk.ListBox fills_list_container;
     private GLib.ListStore list;
-    private unowned List<Lib.Items.CanvasItem>? items;
+    //private unowned List<Lib.Items.CanvasItem>? items;
 
     public bool toggled {
         get {
@@ -37,9 +37,13 @@ public class Akira.Layouts.Partials.FillsPanel : Gtk.Grid {
         }
     }
 
-    public FillsPanel (Akira.Window window) {
-        this.window = window;
+    public FillsPanel (Lib.ViewCanvas view_canvas) {
+        Object(
+            view_canvas: view_canvas
+        );
+    }
 
+    construct {
         var title_cont = new Gtk.Grid ();
         title_cont.orientation = Gtk.Orientation.HORIZONTAL;
         title_cont.hexpand = true;
@@ -73,9 +77,9 @@ public class Akira.Layouts.Partials.FillsPanel : Gtk.Grid {
         fills_list_container.get_style_context ().add_class ("fills-list");
 
         fills_list_container.bind_model (list, item => {
-            var fill_item = new Layouts.Partials.FillItem (window, (Lib.Components.Fill) item);
+            var fill_item = new Layouts.Partials.FillItem (view_canvas, (Lib.Components.Fill) item);
             fill_item.fill_deleted.connect (() => {
-                reload_list (items);
+                reload_list ();
             });
             return fill_item;
         });
@@ -89,39 +93,47 @@ public class Akira.Layouts.Partials.FillsPanel : Gtk.Grid {
 
     private void create_event_bindings () {
         toggled = false;
-        window.event_bus.selected_items_list_changed.connect (reload_list);
+        view_canvas.window.event_bus.selection_modified.connect (reload_list);
 
+        /*
         add_btn.clicked.connect (() => {
             var fill_color = Gdk.RGBA ();
             fill_color.parse (settings.fill_color);
 
-            foreach (Lib.Items.CanvasItem item in items) {
-                list.insert (0, item.fills.add_fill_color (fill_color));
+            unowned var selection = view_canvas.selection_manager.selection;
+
+            foreach (var item in selection.nodes.values) {
+                list.insert (0, (GLib.Object) item.node.instance.components.fills.add_fill (Lib.Components.Color.from_rgba (fill_color)));
             }
         });
+        */
 
+        /*
         // Listen to the model changes when adding or removing items.
         list.items_changed.connect ((position, removed, added) => {
             window.main_window.left_sidebar.queue_resize ();
         });
+        */
     }
 
-    private void reload_list (List<Lib.Items.CanvasItem> selected_items) {
+    private void reload_list () {
+        unowned var selection = view_canvas.selection_manager.selection;
+
         // Always clear the list model when a selection changes.
         list.remove_all ();
 
-        if (selected_items.length () == 0) {
-            items = null;
+        if (selection.count() == 0) {
+            //items = null;
             toggled = false;
             return;
         }
 
-        items = selected_items;
+        //items = selected_items;
 
         bool show = false;
-        foreach (Lib.Items.CanvasItem item in selected_items) {
+        foreach (var item in selection.nodes.values) {
             // Skip items that don't have a fill item since there will be nothing to show.
-            if (item.fills == null) {
+            if (item.node.instance.components.fills == null) {
                 continue;
             }
 
@@ -130,7 +142,7 @@ public class Akira.Layouts.Partials.FillsPanel : Gtk.Grid {
 
             // Loops through all the available fills and add them tot he list model.
             // TODO: handle duplicate identical colors.
-            foreach (Lib.Components.Fill fill in item.fills.fills) {
+            foreach (Lib.Components.Fill fill in item.node.instance.components.fills.fills ()) {
                 list.insert (0, fill);
             }
         }

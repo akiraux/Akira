@@ -44,19 +44,6 @@ public class Akira.Layouts.Partials.AlignItemsPanel : Gtk.Grid {
         }
     }
 
-    private AlignBoxItem[] align_items_panel_buttons = {
-        //AlignBoxItem ("btn", Utils.ItemAlignment.AlignmentDirection.HEVEN, "distribute-horizontal-center", _("Distribute Horizontally"), {"<Ctrl><Shift>1"}),
-        //AlignBoxItem ("btn", Utils.ItemAlignment.AlignemtDirection.VEVEN, "distribute-vertical-center", _("Distribute Vertically"), {"<Ctrl><Shift>2"}),
-        //AlignBoxItem ("sep"),
-        AlignBoxItem ("btn", Utils.ItemAlignment.AlignmentDirection.LEFT, "align-horizontal-left", _("Align Left"), {"<Ctrl><Shift>3"}),
-        AlignBoxItem ("btn", Utils.ItemAlignment.AlignmentDirection.HCENTER, "align-horizontal-center", _("Align Center"), {"<Ctrl><Shift>4"}),
-        AlignBoxItem ("btn", Utils.ItemAlignment.AlignmentDirection.RIGHT, "align-horizontal-right", _("Align Right"), {"<Ctrl><Shift>5"}),
-        AlignBoxItem ("sep"),
-        AlignBoxItem ("btn", Utils.ItemAlignment.AlignmentDirection.TOP, "align-vertical-top", _("Align Top"), {"<Ctrl><Shift>6"}),
-        AlignBoxItem ("btn", Utils.ItemAlignment.AlignmentDirection.VCENTER, "align-vertical-center", _("Align Middle"), {"<Ctrl><Shift>7"}),
-        AlignBoxItem ("btn", Utils.ItemAlignment.AlignmentDirection.BOTTOM, "align-vertical-bottom", _("Align Bottom"), {"<Ctrl><Shift>8"})
-    };
-
     public AlignItemsPanel (Lib.ViewCanvas view_canvas) {
         Object (
             view_canvas: view_canvas,
@@ -93,4 +80,17 @@ public class Akira.Layouts.Partials.AlignItemsPanel : Gtk.Grid {
             }
         }
     }
+
+    private AlignBoxItem[] align_items_panel_buttons = {
+        //AlignBoxItem ("btn", Utils.ItemAlignment.AlignmentDirection.HEVEN, "distribute-horizontal-center", _("Distribute Horizontally"), {"<Ctrl><Shift>1"}),
+        //AlignBoxItem ("btn", Utils.ItemAlignment.AlignemtDirection.VEVEN, "distribute-vertical-center", _("Distribute Vertically"), {"<Ctrl><Shift>2"}),
+        //AlignBoxItem ("sep"),
+        AlignBoxItem ("btn", Utils.ItemAlignment.AlignmentDirection.LEFT, "align-horizontal-left", _("Align Left"), {"<Ctrl><Shift>3"}),
+        AlignBoxItem ("btn", Utils.ItemAlignment.AlignmentDirection.HCENTER, "align-horizontal-center", _("Align Center"), {"<Ctrl><Shift>4"}),
+        AlignBoxItem ("btn", Utils.ItemAlignment.AlignmentDirection.RIGHT, "align-horizontal-right", _("Align Right"), {"<Ctrl><Shift>5"}),
+        AlignBoxItem ("sep"),
+        AlignBoxItem ("btn", Utils.ItemAlignment.AlignmentDirection.TOP, "align-vertical-top", _("Align Top"), {"<Ctrl><Shift>6"}),
+        AlignBoxItem ("btn", Utils.ItemAlignment.AlignmentDirection.VCENTER, "align-vertical-center", _("Align Middle"), {"<Ctrl><Shift>7"}),
+        AlignBoxItem ("btn", Utils.ItemAlignment.AlignmentDirection.BOTTOM, "align-vertical-bottom", _("Align Bottom"), {"<Ctrl><Shift>8"})
+    };
 }
