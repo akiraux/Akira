@@ -36,8 +36,7 @@ public class Akira.Layouts.Sidebars.OptionsSidebar : Gtk.Grid {
 
     public OptionsSidebar (Lib.ViewCanvas view_canvas) {
         Object (
-            view_canvas: view_canvas,
-            orientation: Gtk.Orientation.HORIZONTAL
+            view_canvas: view_canvas
         );
     }
 
@@ -76,9 +75,5 @@ public class Akira.Layouts.Sidebars.OptionsSidebar : Gtk.Grid {
 
     private void toggle () {
         toggled = !toggled;
-    }
-
-    private void on_widget_redraw_request () {
-        queue_resize ();
     }
 }
