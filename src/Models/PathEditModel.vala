@@ -407,7 +407,15 @@ public class Akira.Models.PathEditModel : Object {
         var cmds = new Lib.Modes.PathEditMode.Type[0];
         var live_path = new Lib.Components.Path.from_points (data, cmds);
 
-        return live_path.calculate_extents ();
+        var live_extents = live_path.calculate_extents ();
+
+        double radius = ViewLayers.ViewLayerPath.UI_NOB_SIZE / view_canvas.scale;
+        live_extents.left -= radius;
+        live_extents.top -= radius;
+        live_extents.right += radius;
+        live_extents.bottom += radius;
+
+        return live_extents;
     }
 
     private bool are_points_in_line (int tangent_1_idx, int curve_begin_idx, int tangent_2_idx) {
