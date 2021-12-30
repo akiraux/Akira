@@ -59,8 +59,7 @@ public class Akira.Layouts.Alignment.AlignmentPanel : Gtk.Grid {
 
     public AlignmentPanel (Lib.ViewCanvas view_canvas) {
         Object (
-            view_canvas: view_canvas,
-            orientation: Gtk.Orientation.VERTICAL
+            view_canvas: view_canvas
         );
     }
 
