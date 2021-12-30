@@ -18,7 +18,7 @@
  *
  * Authored by: Giacomo "giacomoalbe" Alberini <giacomoalbe@gmail.com>
  */
-public class Akira.Layouts.Partials.AlignItemsPanel : Gtk.Grid {
+public class Akira.Layouts.Alignment.AlignmentPanel : Gtk.Grid {
     public unowned Lib.ViewCanvas view_canvas { get; construct; }
 
     public int current_button_column { get; set; default = 0; }
@@ -57,7 +57,7 @@ public class Akira.Layouts.Partials.AlignItemsPanel : Gtk.Grid {
         AlignBoxItem ("btn", Utils.ItemAlignment.AlignmentDirection.BOTTOM, "align-vertical-bottom", _("Align Bottom"), {"<Ctrl><Shift>8"})
     };
 
-    public AlignItemsPanel (Lib.ViewCanvas view_canvas) {
+    public AlignmentPanel (Lib.ViewCanvas view_canvas) {
         Object (
             view_canvas: view_canvas,
             orientation: Gtk.Orientation.VERTICAL
@@ -81,7 +81,7 @@ public class Akira.Layouts.Partials.AlignItemsPanel : Gtk.Grid {
 
                 case "btn":
                     var tmp_align_box_button =
-                        new Widgets.AlignBoxButton (
+                        new Layouts.Alignment.AlignmentButton (
                             view_canvas,
                             item.alignment_direction,
                             item.icon_name,

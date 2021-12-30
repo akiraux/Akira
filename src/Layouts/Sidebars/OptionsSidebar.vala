@@ -47,7 +47,7 @@ public class Akira.Layouts.Sidebars.OptionsSidebar : Gtk.Grid {
 
         get_style_context ().add_class ("sidebar-l");
 
-        var align_items_panel = new Akira.Layouts.Partials.AlignItemsPanel (view_canvas);
+        var align_items_panel = new Layouts.Alignment.AlignmentPanel (view_canvas);
 
         attach (align_items_panel, 0, 0, 1, 1);
 
