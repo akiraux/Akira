@@ -252,7 +252,6 @@ public class VirtualizingListBox : Gtk.Container, Gtk.Scrollable {
     }
 
     private void on_items_changed (uint position, uint removed, uint added) {
-        print ("on_items_changed\n");
         if (position >= shown_to && bin_window_full) {
             if (vadjustment == null) {
                 queue_resize ();
@@ -551,8 +550,6 @@ public class VirtualizingListBox : Gtk.Container, Gtk.Scrollable {
         update_bin_window (bin_height);
         position_children ();
         queue_draw ();
-
-        // print ("ensure_visible_widgets\n");
     }
 
     private int estimated_widget_height () {
@@ -933,9 +930,18 @@ public class VirtualizingListBox : Gtk.Container, Gtk.Scrollable {
     // TODO: Fix this as it never gets triggered by the motion leave.
     protected void on_mouse_leave () {
         if (hovered_row != null) {
+            on_mouse_leave_internal ();
+            row_hovered (null);
+        }
+    }
+
+    /*
+     * Same as on_mouse_leave, but it doesn't trigger the hovered signal.
+     */
+    protected void on_mouse_leave_internal () {
+        if (hovered_row != null) {
             hovered_row.unset_state_flags (Gtk.StateFlags.PRELIGHT);
             hovered_row = null;
-            row_hovered (null);
         }
     }
 

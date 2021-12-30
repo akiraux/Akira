@@ -67,7 +67,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         return instance.id;
     }
 
-    public int remove_items (GLib.Array<int> to_remove) {
+    public int remove_items (GLib.Array<int> to_remove, bool pause_compile = false) {
         ulong microseconds;
         double seconds;
 
@@ -128,6 +128,10 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         }
 
         items_removed (ids_array);
+
+        if (!pause_compile) {
+            compile_model ();
+        }
 
         timer.stop ();
         seconds = timer.elapsed (out microseconds);
@@ -247,7 +251,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
     public void flip_items (GLib.Array<int> ids, bool vertical) {
         /*
         var blocker = new Lib.Managers.SelectionManager.ChangeSignalBlocker (view_canvas.selection_manager);
-        (void) blocker;
+        (blocker);
 
         foreach (var target_id in ids.data) {
             var target = item_model.instance_from_id (target_id);
@@ -432,7 +436,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         Timer timer = new Timer ();
 
         var blocker = new Lib.Managers.SelectionManager.ChangeSignalBlocker (view_canvas.selection_manager);
-        (void) blocker;
+        (blocker);
 
         var group = Lib.Items.ModelTypeArtboard.default_artboard (
             new Lib.Components.Coordinates (500, 500),
@@ -487,7 +491,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         Timer timer = new Timer ();
 
         var blocker = new SelectionManager.ChangeSignalBlocker (view_canvas.selection_manager);
-        (void) blocker;
+        (blocker);
         view_canvas.pause_redraw = true;
 
         for (var i = 0; i < num_of; ++i) {

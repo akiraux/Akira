@@ -98,6 +98,8 @@ public class Akira.Lib.Items.ModelTypePath : ModelType {
                 drawable.commands = instance.components.path.commands;
                 drawable.close = instance.components.path.close;
                 break;
+            default:
+                break;
         }
     }
 }

@@ -87,6 +87,8 @@ public class Akira.Lib.Items.ModelTypeRect : ModelType {
                 instance.drawable.height = instance.components.size.height;
                 instance.drawable.transform = instance.compiled_geometry.transformation_matrix;
                 break;
+            default:
+                break;
         }
     }
 }

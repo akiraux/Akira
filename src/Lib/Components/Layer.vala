@@ -20,40 +20,29 @@
  */
 
 public class Akira.Lib.Components.Layer : Component, Copyable<Layer> {
-    private bool _selected;
     private bool _locked;
-
-    public bool selected {
-        get { return _selected; }
-    }
 
     public bool locked {
         get { return _locked; }
     }
 
-    public Layer (bool selected, bool locked) {
-        _selected = selected;
+    public Layer (bool locked) {
         _locked = locked;
     }
 
     public Layer.deserialized (Json.Object obj) {
-        _selected = obj.get_boolean_member ("selected");
         _locked = obj.get_boolean_member ("locked");
     }
 
     protected override void serialize_details (ref Json.Object obj) {
-        obj.set_boolean_member ("selected", _selected);
         obj.set_boolean_member ("locked", _locked);
     }
 
     public Layer copy () {
-        return new Layer (_selected, _locked);
+        return new Layer (_locked);
     }
 
-    public Layer with_selected (bool new_selected) {
-        return new Layer (new_selected, _locked);
-    }
     public Layer with_locked (bool new_locked) {
-        return new Layer (_selected, new_locked);
+        return new Layer (new_locked);
     }
 }

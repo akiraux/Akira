@@ -64,7 +64,7 @@ public class Akira.Utils.ItemAlignment : Object {
         }
 
         var blocker = new Lib.Managers.SelectionManager.ChangeSignalBlocker (view_canvas.selection_manager);
-        (void) blocker;
+        (blocker);
 
         unowned var items_manager = view_canvas.items_manager;
         unowned var model = items_manager.item_model;
