@@ -646,7 +646,7 @@ public class VirtualizingListBox : Gtk.Container, Gtk.Scrollable {
     private void on_multipress_pressed (int n_press, double x, double y) {
         active_row = null;
         var row = get_row_at_y ((int)y);
-        if (row != null && row.sensitive) {
+        if (row != null && row.sensitive && row.selectable) {
             active_row = row;
             row.set_state_flags (Gtk.StateFlags.ACTIVE, false);
 
