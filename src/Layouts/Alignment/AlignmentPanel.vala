@@ -48,13 +48,13 @@ public class Akira.Layouts.Alignment.AlignmentPanel : Gtk.Grid {
         //AlignBoxItem ("btn", Utils.ItemAlignment.AlignmentDirection.HEVEN, "distribute-horizontal-center", _("Distribute Horizontally"), {"<Ctrl><Shift>1"}),
         //AlignBoxItem ("btn", Utils.ItemAlignment.AlignemtDirection.VEVEN, "distribute-vertical-center", _("Distribute Vertically"), {"<Ctrl><Shift>2"}),
         //AlignBoxItem ("sep"),
-        AlignBoxItem ("btn", Utils.ItemAlignment.AlignmentDirection.LEFT, "align-horizontal-left", _("Align Left"), {"<Ctrl><Shift>3"}),
-        AlignBoxItem ("btn", Utils.ItemAlignment.AlignmentDirection.HCENTER, "align-horizontal-center", _("Align Center"), {"<Ctrl><Shift>4"}),
-        AlignBoxItem ("btn", Utils.ItemAlignment.AlignmentDirection.RIGHT, "align-horizontal-right", _("Align Right"), {"<Ctrl><Shift>5"}),
+        AlignBoxItem ("btn", Utils.ItemAlignment.AlignmentDirection.LEFT, "align-horizontal-left", _("Align Left"), {"<Alt>1"}),
+        AlignBoxItem ("btn", Utils.ItemAlignment.AlignmentDirection.HCENTER, "align-horizontal-center", _("Align Center"), {"<Alt>2"}),
+        AlignBoxItem ("btn", Utils.ItemAlignment.AlignmentDirection.RIGHT, "align-horizontal-right", _("Align Right"), {"<Alt>3"}),
         AlignBoxItem ("sep"),
-        AlignBoxItem ("btn", Utils.ItemAlignment.AlignmentDirection.TOP, "align-vertical-top", _("Align Top"), {"<Ctrl><Shift>6"}),
-        AlignBoxItem ("btn", Utils.ItemAlignment.AlignmentDirection.VCENTER, "align-vertical-center", _("Align Middle"), {"<Ctrl><Shift>7"}),
-        AlignBoxItem ("btn", Utils.ItemAlignment.AlignmentDirection.BOTTOM, "align-vertical-bottom", _("Align Bottom"), {"<Ctrl><Shift>8"})
+        AlignBoxItem ("btn", Utils.ItemAlignment.AlignmentDirection.TOP, "align-vertical-top", _("Align Top"), {"<Alt>4"}),
+        AlignBoxItem ("btn", Utils.ItemAlignment.AlignmentDirection.VCENTER, "align-vertical-center", _("Align Middle"), {"<Alt>5"}),
+        AlignBoxItem ("btn", Utils.ItemAlignment.AlignmentDirection.BOTTOM, "align-vertical-bottom", _("Align Bottom"), {"<Alt>6"})
     };
 
     public AlignmentPanel (Lib.ViewCanvas view_canvas) {
