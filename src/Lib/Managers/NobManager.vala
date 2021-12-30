@@ -64,6 +64,9 @@ public class Akira.Lib.Managers.NobManager : Object {
         last_id = new_id;
         update_nob_positions (sm.selection);
         update_nob_layer ();
+
+        // Set the nob layer visible after is has been set non-visible by remove_select_effect
+        nob_layer.set_visible (true);
     }
 
     /*
@@ -133,7 +136,6 @@ public class Akira.Lib.Managers.NobManager : Object {
     }
 
     private void update_nob_layer () {
-        nob_layer.set_visible (true);
         nob_layer.update_nob_data (nobs);
     }
 
