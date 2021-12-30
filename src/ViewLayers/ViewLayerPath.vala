@@ -144,14 +144,12 @@ public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
         context.set_source_rgba (0, 0, 0, 1);
         context.set_line_width (1.0 / canvas.scale);
 
-        var extents = path_data.extents;
-        var reference_point = Geometry.Point (extents.left, extents.top);
-
         var points = path_data.points;
         var live_pts = path_data.live_pts;
 
         var last_point = points[points.length - 1];
-        context.move_to (last_point.x + reference_point.x, last_point.y + reference_point.y);
+
+        context.move_to (last_point.x + path_data.extents.left, last_point.y + path_data.extents.top);
 
         switch (path_data.length) {
             case 0:
@@ -162,8 +160,8 @@ public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
             case 2:
                 break;
             case 3:
-                var x0 = points[points.length - 1].x + reference_point.x;
-                var y0 = points[points.length - 1].y + reference_point.y;
+                var x0 = last_point.x;
+                var y0 = last_point.y;
                 var x1 = live_pts[0].x;
                 var y1 = live_pts[0].y;
                 var x2 = live_pts[1].x;
@@ -192,8 +190,8 @@ public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
 
                 break;
             case 4:
-                var x0 = points[points.length - 1].x + reference_point.x;
-                var y0 = points[points.length - 1].y + reference_point.y;
+                var x0 = last_point.x;
+                var y0 = last_point.y;
                 var x1 = live_pts[0].x;
                 var y1 = live_pts[0].y;
                 var x2 = live_pts[1].x;

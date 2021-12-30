@@ -268,4 +268,14 @@ public class Akira.Utils.GeometryMath : Object {
 
         return area;
     }
+
+    public static Geometry.Point rotate_point (Geometry.Point point, double rotation, Geometry.Point origin) {
+        double cos_theta = Math.cos (rotation);
+        double sin_theta = Math.sin (rotation);
+
+        double rot_x = cos_theta * (point.x - origin.x) - sin_theta * (point.y - origin.y) + origin.x;
+        double rot_y = sin_theta * (point.x - origin.x) + cos_theta * (point.y - origin.y) + origin.y;
+
+        return Geometry.Point (rot_x, rot_y);
+    }
 }

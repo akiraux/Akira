@@ -63,16 +63,21 @@ public class Akira.Models.PathEditModel : Object {
         update_view ();
     }
 
-    public void add_live_points_to_path (Geometry.Point[] points, Lib.Modes.PathEditMode.Type live_command, int length) {
+    public void add_live_points_to_path (Geometry.Point[] live_pts, Lib.Modes.PathEditMode.Type live_command, int length) {
         commands.resize (commands.length + 1);
         commands[commands.length - 1] = live_command;
 
         for (int i = 0; i < length; ++i) {
-            var new_pt = Geometry.Point (points[i].x - first_point.x, points[i].y - first_point.y);
+            var new_pt = rotate_point_around_item_origin (live_pts[i], -instance.components.transform.rotation);
+            var orig_first_pt = rotate_point_around_item_origin (first_point, -instance.components.transform.rotation);
+
+            new_pt.x -= orig_first_pt.x;
+            new_pt.y -= orig_first_pt.y;
+
             add_point_to_path (new_pt);
         }
 
-        live_pts = new Geometry.Point[0];
+        this.live_pts = new Geometry.Point[0];
         live_pts_len = 0;
 
         recompute_components ();
@@ -315,23 +320,40 @@ public class Akira.Models.PathEditModel : Object {
             recalculated_points[i] = Geometry.Point (points[i].x - min_x, points[i].y - min_y);
         }
 
-        // Then shift the reference point.
-        first_point.x += min_x;
-        first_point.y += min_y;
+        // The amount by which the first point changed must be rotated before adding to first point.
+        Geometry.Point delta = Geometry.Point (min_x, min_y);
+        double rotation = instance.components.transform.rotation;
+        Geometry.Point rotated_delta = Utils.GeometryMath.rotate_point (delta, rotation, Geometry.Point (0, 0));
+
+        first_point.x += rotated_delta.x;
+        first_point.y += rotated_delta.y;
 
         return recalculated_points;
     }
 
     private void recompute_components () {
-        // To calculate the new center of bounds of rectangle,
-        // Move the center to point where user placed first point. This is represented as (0,0) internally.
-        // Then translate it to the relative center of bounding box of path.
+        // To calculate the new center, we need to rotate the first point around the new center.
+        // Then translate the rotated point by half of width and height.
+        // But the problem is, in order to rotate first point around origin, we need to know the origin. catch 22.
+        // We can form a system of linear equation using this as follows.
+        // Assume (fx, fy) is the first point, (ox, oy) is the origin to be calculated, r is the angle to rotate.
+        // Therefore, (ox, oy) = rotate (fx, fy) by r + (width/2, height/2);
+        // ox = cos(r) (fx - ox) - sin(r) (fy - oy) + ox;
+        // ox = sin(r) (fx - ox) + cos(r) (fy - oy) + oy;
+        // Solving this gives the equation used below.
+
         var bounds = instance.components.path.calculate_extents ();
-        double center_x = first_point.x + bounds.center_x;
-        double center_y = first_point.y + bounds.center_y;
+
+        double rotation = -instance.components.transform.rotation;
+        double sin_theta = Math.sin (rotation);
+        double cos_theta = Math.cos (rotation);
+
+        double center_x = first_point.x + (bounds.width * cos_theta + bounds.height * sin_theta) / 2.0;
+        double center_y = first_point.y + (bounds.height * cos_theta - bounds.width * sin_theta) / 2.0;
 
         instance.components.center = new Lib.Components.Coordinates (center_x, center_y);
         instance.components.size = new Lib.Components.Size (bounds.width, bounds.height, false);
+
         // Update the component.
         view_canvas.items_manager.item_model.mark_node_geometry_dirty_by_id (instance.id);
         view_canvas.items_manager.compile_model ();
@@ -417,6 +439,13 @@ public class Akira.Models.PathEditModel : Object {
         int other_tangent = (sel_pts_array[0] == reference_point) ? sel_pts_array[1] : sel_pts_array[0];
         points[other_tangent].x += delta_x;
         points[other_tangent].y += delta_y;
+    }
+
+    private Geometry.Point rotate_point_around_item_origin (Geometry.Point point, double rotation) {
+        //  var coordinates = view_canvas.selection_manager.selection.coordinates ();
+        //  var item_center = Geometry.Point (coordinates.center_x, coordinates.center_y);
+        var item_center = Geometry.Point (instance.components.center.x, instance.components.center.y);
+        return Utils.GeometryMath.rotate_point (point, rotation, item_center);
     }
 }
 

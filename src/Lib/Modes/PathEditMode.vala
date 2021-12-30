@@ -87,6 +87,11 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
 
             var first_point = Geometry.Point (center_x - width / 2.0, center_y - height / 2.0);
 
+            double rotation = instance.components.transform.rotation;
+            var origin = Geometry.Point (instance.components.center.x, instance.components.center.y);
+
+            first_point = Utils.GeometryMath.rotate_point (first_point, rotation, origin);
+
             edit_model.first_point = first_point;
         }
     }
