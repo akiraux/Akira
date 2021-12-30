@@ -66,6 +66,7 @@ public class Akira.Models.PathEditModel : Object {
     public void add_live_points_to_path (Geometry.Point[] live_pts, Lib.Modes.PathEditMode.Type live_command, int length) {
         commands.resize (commands.length + 1);
         commands[commands.length - 1] = live_command;
+        print("add live point %f %f\n", live_pts[0].x, live_pts[0].y);
 
         for (int i = 0; i < length; ++i) {
             var new_pt = rotate_point_around_item_origin (live_pts[i], -instance.components.transform.rotation);
@@ -383,6 +384,7 @@ public class Akira.Models.PathEditModel : Object {
         path_data.extents = extents;
         path_data.transform = instance.drawable.transform;
         path_data.selected_pts = selected_pts;
+        path_data.last_point = get_last_point_from_path ();
 
         path_data.live_extents = get_extents_using_live_pts (extents);
 
@@ -395,10 +397,7 @@ public class Akira.Models.PathEditModel : Object {
         }
 
         var data = new Geometry.Point[live_pts_len + 1];
-
-        data[0] = Geometry.Point ();
-        data[0].x = points[points.length - 1].x + first_point.x;
-        data[0].y = points[points.length - 1].y + first_point.y;
+        data[0] = get_last_point_from_path ();
 
         for (int i = 0; i < live_pts_len; ++i) {
             data[i + 1].x = live_pts[i].x;
@@ -442,10 +441,19 @@ public class Akira.Models.PathEditModel : Object {
     }
 
     private Geometry.Point rotate_point_around_item_origin (Geometry.Point point, double rotation) {
-        //  var coordinates = view_canvas.selection_manager.selection.coordinates ();
-        //  var item_center = Geometry.Point (coordinates.center_x, coordinates.center_y);
         var item_center = Geometry.Point (instance.components.center.x, instance.components.center.y);
         return Utils.GeometryMath.rotate_point (point, rotation, item_center);
+    }
+
+    private Geometry.Point get_last_point_from_path () {
+        var orig_first_pt = rotate_point_around_item_origin (first_point, -instance.components.transform.rotation);
+
+        var last_point = Geometry.Point ();
+        last_point.x = points[points.length - 1].x + orig_first_pt.x;
+        last_point.y = points[points.length - 1].y + orig_first_pt.y;
+        last_point = rotate_point_around_item_origin (last_point, instance.components.transform.rotation);
+
+        return last_point;
     }
 }
 
@@ -455,6 +463,7 @@ public struct Akira.Models.PathDataModel {
 
     public Geometry.Point[] live_pts;
     public int length;
+    public Geometry.Point last_point;
 
     public Geometry.Rectangle extents;
     public Geometry.Rectangle live_extents;

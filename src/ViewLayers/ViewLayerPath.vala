@@ -48,6 +48,13 @@ public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
 
         if (path_data.extents.left > target_bounds.right || path_data.extents.right < target_bounds.left
             || path_data.extents.top > target_bounds.bottom || path_data.extents.bottom < target_bounds.top) {
+
+            if (path_data.live_extents.left > target_bounds.right || path_data.live_extents.right < target_bounds.left
+            || path_data.live_extents.top > target_bounds.bottom || path_data.live_extents.bottom < target_bounds.top) {
+                return;
+            }
+
+            draw_live_effect (context);
             return;
         }
 
@@ -144,12 +151,10 @@ public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
         context.set_source_rgba (0, 0, 0, 1);
         context.set_line_width (1.0 / canvas.scale);
 
-        var points = path_data.points;
         var live_pts = path_data.live_pts;
+        var last_point = path_data.last_point;
 
-        var last_point = points[points.length - 1];
-
-        context.move_to (last_point.x + path_data.extents.left, last_point.y + path_data.extents.top);
+        context.move_to (last_point.x, last_point.y);
 
         switch (path_data.length) {
             case 0:
