@@ -78,6 +78,8 @@ public class Akira.Lib.Managers.HoverManager : Object {
     }
 
     private void maybe_create_hover_effect (Lib.Items.ModelNode node) {
+        // Prevent the cration of the hover effect if the item is selected or
+        // the layer is currently locked.
         if (
             view_canvas.selection_manager.item_selected (node.id)
             || node.instance.components.layer.locked

@@ -92,6 +92,9 @@ public class Akira.Lib.Managers.SelectionManager : Object {
         selection_modified ();
     }
 
+    /*
+     * Remove a specific node from the current selection, if present.
+     */
     public void remove_from_selection (int id) {
         if (!item_selected (id)) {
             return;

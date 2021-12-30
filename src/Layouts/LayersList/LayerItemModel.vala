@@ -90,6 +90,8 @@ public class Akira.Layouts.LayersList.LayerItemModel : GLib.Object {
                 return;
             }
 
+            // If the layer is being locked we need to remove it from the
+            // current selection if needed.
             if (value) {
                 unowned var sm = _view_canvas.selection_manager;
                 sm.remove_from_selection (id);
@@ -101,6 +103,8 @@ public class Akira.Layouts.LayersList.LayerItemModel : GLib.Object {
             assert (node != null);
 
             node.instance.components.layer = new Lib.Components.Layer (value);
+            // If the layer is a group we need to update the locked state on
+            // all of its children.
             if (node.children != null) {
                 _view_canvas.window.main_window.set_children_locked (node.get_children_ids (), value);
             }

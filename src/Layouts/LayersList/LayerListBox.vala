@@ -387,12 +387,17 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
         on_row_edited (null);
     }
 
+    /*
+     * Loop through the passed nodes and update the locked state.
+     */
     public void set_children_locked (int[] nodes, bool is_locked) {
         foreach (var uid in nodes) {
             if (layers[uid] != null) {
                 layers[uid].locked = is_locked;
             }
         }
+        // Trigger a visual refresh of the visible layers without changing
+        // anything in the list store.
         list_store.items_changed (0, 0, 0);
     }
 }

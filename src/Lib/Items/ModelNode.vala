@@ -72,6 +72,9 @@ public class Akira.Lib.Items.ModelNode {
         return false;
     }
 
+    /*
+     * Return an array of int containing all IDs of the children of this ndoe.
+     */
     public int[] get_children_ids () {
         Array<int> children_ids = new Array<int> ();
 

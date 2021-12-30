@@ -137,7 +137,9 @@ public class Akira.Layouts.LayersList.LayerListItem : VirtualizingListBoxRow {
             build_layer_ui ();
         }
 
+        // Update the state of the action buttons to reflect the model state.
         update_btn_lock ();
+
         // Indent child layers based on the amount of ancestors.
         grid_main.margin_start = 12 * model.ancestors_size;
     }
