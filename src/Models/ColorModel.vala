@@ -35,53 +35,74 @@ public class Akira.Models.ColorModel : GLib.Object {
 
     public string color {
         owned get {
-            return type == Type.FILL ? fill.color().to_string () : border.color ().to_string ();
+            return type == Type.FILL
+                ? fill.color().to_string ()
+                : border.color ().to_string ();
         }
         set {
             var new_rgba = Gdk.RGBA ();
             new_rgba.parse (value);
             new_rgba.alpha = (double) alpha / 255;
+
             if (type == Type.FILL) {
                 fill.set_color_rgba (new_rgba);
                 return;
             }
-            border.color = new_rgba;
+
+            //border.set_color_rgba (new_rgba);
         }
     }
 
     public int alpha {
         get {
-            return type == Type.FILL ? fill.alpha : border.alpha;
+            return type == Type.FILL
+                ? (int) fill.color ().alpha
+                //: border.alpha;
+                : -1;
         }
         set {
             if (type == Type.FILL) {
-                fill.alpha = value;
+                var current_rgba = fill.color ();
+                current_rgba.alpha = value;
+
+                fill.set_color_rgba (current_rgba);
                 return;
             }
-            border.alpha = value;
+
+            //border.alpha = value;
         }
     }
 
     public bool hidden {
         get {
-            return type == Type.FILL ? fill.hidden : border.hidden;
+            return type == Type.FILL
+                ? fill.is_color_hidden ()
+                //: border.is_color_hidden ();
+                : true;
         }
         set {
             if (type == Type.FILL) {
-                fill.hidden = value;
+                fill.set_hidden (value);
                 return;
             }
-            border.hidden = value;
+
+            //border.hidden = value;
         }
     }
 
     public int size {
         get {
-            return border.size;
+            //return border.size;
+            return 0;
+
         }
         set {
-            border.size = value;
+            //border.size = value;
         }
+    }
+
+    public Lib.Components.Fill? get_fill () {
+        return fill;
     }
 
     public ColorModel (Lib.Components.Fill? fill, Lib.Components.Border? border = null) {

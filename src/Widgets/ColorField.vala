@@ -20,10 +20,10 @@
  */
 
 public class Akira.Widgets.ColorField : Gtk.Entry {
-    private unowned Akira.Window window;
+    private unowned Lib.ViewCanvas view_canvas;
 
-    public ColorField (Akira.Window window) {
-        this.window = window;
+    public ColorField (Lib.ViewCanvas view_canvas) {
+        this.view_canvas = view_canvas;
 
         margin_end = margin_start = 10;
         width_chars = 8;
@@ -81,19 +81,19 @@ public class Akira.Widgets.ColorField : Gtk.Entry {
     }
 
     private bool handle_focus_in (Gdk.EventFocus event) {
-        window.event_bus.disconnect_typing_accel ();
+        view_canvas.window.event_bus.disconnect_typing_accel ();
         return false;
     }
 
     private bool handle_focus_out (Gdk.EventFocus event) {
-        window.event_bus.connect_typing_accel ();
+        view_canvas.window.event_bus.connect_typing_accel ();
         return false;
     }
 
     private bool handle_key_press (Gdk.EventKey event) {
         // Enter or Escape
         if (event.keyval == Gdk.Key.Return || event.keyval == Gdk.Key.Escape) {
-            window.event_bus.set_focus_on_canvas ();
+            view_canvas.window.event_bus.set_focus_on_canvas ();
             return true;
         }
 

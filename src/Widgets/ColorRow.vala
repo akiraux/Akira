@@ -24,7 +24,7 @@
  * picker. The color button opens up the GtkColorChooser.
  */
 public class Akira.Widgets.ColorRow : Gtk.Grid {
-    private unowned Akira.Window window;
+    private unowned Lib.ViewCanvas view_canvas;
     private unowned Models.ColorModel model;
 
     private Gtk.Button color_button;
@@ -55,8 +55,8 @@ public class Akira.Widgets.ColorRow : Gtk.Grid {
         DOCUMENT
     }
 
-    public ColorRow (Akira.Window window, Models.ColorModel model) {
-        this.window = window;
+    public ColorRow (Lib.ViewCanvas view_canvas, Models.ColorModel model) {
+        this.view_canvas = view_canvas;
         this.model = model;
 
         old_color = model.color;
@@ -101,7 +101,7 @@ public class Akira.Widgets.ColorRow : Gtk.Grid {
         add (container);
         add (eyedropper_button);
 
-        field = new ColorField (window);
+        field = new ColorField (view_canvas);
         field.text = Utils.Color.rgba_to_hex (model.color);
         field.changed.connect (() => {
             // Don't do anything if the color change came from the chooser.
@@ -167,7 +167,7 @@ public class Akira.Widgets.ColorRow : Gtk.Grid {
         // Show the border field if this widget was generated from the Borders list.
         if (model.type == Models.ColorModel.Type.BORDER) {
             var border = new InputField (InputField.Unit.PIXEL, 7, true, true);
-            border.set_range (0, Layouts.MainCanvas.CANVAS_SIZE / 2);
+            border.set_range (0, Layouts.MainViewCanvas.CANVAS_SIZE / 2);
             border.entry.sensitive = true;
             border.entry.value = model.size;
             border.entry.bind_property ("value", model, "size", BindingFlags.BIDIRECTIONAL);
@@ -324,6 +324,23 @@ public class Akira.Widgets.ColorRow : Gtk.Grid {
 
         // Allow manual edit from the input fields.
         color_set_manually = false;
+
+        update_model_color ();
+    }
+
+    private void update_model_color () {
+        unowned var selection = view_canvas.selection_manager.selection;
+
+        var new_rgba = Gdk.RGBA ();
+        new_rgba.parse (model.color);
+        new_rgba.alpha = (double) model.alpha / 255;
+
+        debug (@"New rgba: $(new_rgba) alpha: $(new_rgba.alpha)");
+
+        foreach (var item in selection.nodes.values) {
+            item.node.instance.components.fills = new Lib.Components.Fills.single_color (Lib.Components.Color.from_rgba (new_rgba));
+            item.node.instance.compiled_components.compiled_fill = null;
+        }
     }
 
     private void on_eyedropper_click () {

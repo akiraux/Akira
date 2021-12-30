@@ -64,7 +64,7 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
         fill_chooser.hexpand = true;
         fill_chooser.margin_end = 5;
 
-        fill_chooser.add (new Widgets.ColorRow (window, new Models.ColorModel (fill)));
+        fill_chooser.add (new Widgets.ColorRow (view_canvas, new Models.ColorModel (fill)));
 
         hidden_button = new Gtk.Button ();
         hidden_button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);

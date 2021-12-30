@@ -64,7 +64,7 @@ sources = files(
     'Widgets/AlignBoxButton.vala',
     'Widgets/ButtonImage.vala',
     'Widgets/ColorField.vala',
-    #'Widgets/ColorRow.vala',
+    'Widgets/ColorRow.vala',
     #'Widgets/ExportWidget.vala',
     'Widgets/HeaderBarButton.vala',
     'Widgets/InputField.vala',
@@ -86,7 +86,7 @@ sources = files(
     'ViewLayers/ViewLayerGrid.vala',
     'ViewLayers/ViewLayerPath.vala',
 
-    #'Models/ColorModel.vala',
+    'Models/ColorModel.vala',
     #'Models/ExportModel.vala',
     #'Models/ListModel.vala',
     'Models/PathEditModel.vala',

@@ -46,6 +46,7 @@ public class Akira.Lib.Components.CompiledFill : Copyable<CompiledFill> {
     }
 
     public static CompiledFill compile (Components? components, Lib.Items.ModelNode? node) {
+        debug (@"Inside compiled fills");
         var rgba_fill = Gdk.RGBA ();
         bool has_colors = false;
         // Set an initial arbitrary color with full transparency.
