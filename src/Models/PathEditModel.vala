@@ -66,7 +66,6 @@ public class Akira.Models.PathEditModel : Object {
     public void add_live_points_to_path (Geometry.Point[] live_pts, Lib.Modes.PathEditMode.Type live_command, int length) {
         commands.resize (commands.length + 1);
         commands[commands.length - 1] = live_command;
-        print("add live point %f %f\n", live_pts[0].x, live_pts[0].y);
 
         for (int i = 0; i < length; ++i) {
             var new_pt = rotate_point_around_item_origin (live_pts[i], -instance.components.transform.rotation);
