@@ -65,7 +65,7 @@ public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
     }
 
     public override void update () {
-        if (canvas == null || path_data.points == null) {
+        if (canvas == null) {
             return;
         }
 

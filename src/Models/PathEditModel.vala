@@ -455,6 +455,10 @@ public class Akira.Models.PathEditModel : Object {
     private Geometry.Point get_last_point_from_path () {
         var orig_first_pt = rotate_point_around_item_origin (first_point, -instance.components.transform.rotation);
 
+        if (instance.components.path.data.length == 0) {
+            return orig_first_pt;
+        }
+
         var last_point = Geometry.Point ();
         last_point.x = points[points.length - 1].x + orig_first_pt.x;
         last_point.y = points[points.length - 1].y + orig_first_pt.y;
