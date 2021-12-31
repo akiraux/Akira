@@ -18,6 +18,7 @@
  * along with Akira. If not, see <https://www.gnu.org/licenses/>.
  *
  * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
+ * Authored by: Giacomo "giacomoalbe" Alberini <giacomoalbe@gmail.com>
  */
 
 /**
@@ -43,6 +44,7 @@ public class Akira.Utils.ItemAlignment : Object {
         AUTO,
         FIRST_SELECTED,
         LAST_SELECTED,
+        ANCHOR,
     }
 
     /*
@@ -52,6 +54,7 @@ public class Akira.Utils.ItemAlignment : Object {
         Lib.Items.NodeSelection selection,
         AlignmentDirection direction,
         AlignmentType type,
+        Lib.Items.ModelNode? anchor,
         Lib.ViewCanvas view_canvas
     ) {
         if (selection.count () <= 1) {
@@ -59,7 +62,7 @@ public class Akira.Utils.ItemAlignment : Object {
         }
 
         var align_to = Geometry.Rectangle.empty ();
-        if (!populate_alignment (selection, type, ref align_to)) {
+        if (!populate_alignment (selection, type, anchor, ref align_to)) {
             return;
         }
 
@@ -102,9 +105,10 @@ public class Akira.Utils.ItemAlignment : Object {
     private static bool populate_alignment (
         Lib.Items.NodeSelection selection,
         AlignmentType type,
+        Lib.Items.ModelNode? anchor,
         ref Geometry.Rectangle align_to
     ) {
-        bool found_bound = false;
+        bool found_bounds = false;
 
         switch (type) {
             case AlignmentType.AUTO:
@@ -119,7 +123,7 @@ public class Akira.Utils.ItemAlignment : Object {
                     align_to.right = double.max (align_to.right, bb.right);
                     align_to.top = double.min (align_to.top, bb.top);
                     align_to.bottom = double.max (align_to.bottom, bb.bottom);
-                    found_bound = true;
+                    found_bounds = true;
                 }
 
                 break;
@@ -129,7 +133,7 @@ public class Akira.Utils.ItemAlignment : Object {
                     if (node.sid < last_sid) {
                         align_to = node.node.instance.bounding_box;
                         last_sid = node.sid;
-                        found_bound = true;
+                        found_bounds = true;
                     }
                 }
 
@@ -140,16 +144,25 @@ public class Akira.Utils.ItemAlignment : Object {
                     if (node.sid > last_sid) {
                         align_to = node.node.instance.bounding_box;
                         last_sid = node.sid;
-                        found_bound = true;
+                        found_bounds = true;
                     }
                 }
 
+                break;
+            case AlignmentType.ANCHOR:
+                unowned var bb = anchor.instance.bounding_box;
+
+                align_to.left = bb.left;
+                align_to.right = bb.right;
+                align_to.top = bb.top;
+                align_to.bottom = bb.bottom;
+                found_bounds = true;
                 break;
             default:
                 break;
         }
 
-        return found_bound;
+        return found_bounds;
     }
 
     private static bool align_selection_to_left (
@@ -271,6 +284,6 @@ public class Akira.Utils.ItemAlignment : Object {
             }
         }
 
-        model.mark_node_geometry_dirty (node);
+        model.alert_node_changed(node, Lib.Components.Component.Type.COMPILED_GEOMETRY);
     }
 }

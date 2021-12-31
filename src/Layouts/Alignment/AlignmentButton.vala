@@ -19,20 +19,20 @@
  * Authored by: Giacomo "giacomoalbe" Alberini <giacomoalbe@gmail.com>
  */
 
-public class Akira.Widgets.AlignBoxButton : Gtk.Button {
-    public signal void triggered (AlignBoxButton emitter);
+public class Akira.Layouts.Alignment.AlignmentButton : Gtk.Button {
+    public signal void triggered (AlignmentButton emitter);
 
-    public weak Akira.Window window { get; construct; }
+    public unowned Lib.ViewCanvas view_canvas { get; construct; }
 
     public string icon { get; construct; }
-    public string action { get; construct; }
-    public ButtonImage btn_image;
+    public Utils.ItemAlignment.AlignmentDirection alignment_direction { get; construct; }
+    public Widgets.ButtonImage btn_image;
 
-    public AlignBoxButton (Akira.Window window, string action_name, string icon_name, string tooltip, string[] accels) {
+    public AlignmentButton (Lib.ViewCanvas view_canvas, Utils.ItemAlignment.AlignmentDirection alignment_direction, string icon_name, string tooltip, string[] accels) {
         Object (
-            window: window,
+            view_canvas: view_canvas,
             icon: icon_name,
-            action: action_name,
+            alignment_direction: alignment_direction,
             tooltip_markup: Granite.markup_accel_tooltip (accels, tooltip)
         );
     }
@@ -45,14 +45,19 @@ public class Akira.Widgets.AlignBoxButton : Gtk.Button {
         can_focus = false;
         sensitive = false;
 
-        btn_image = new ButtonImage (icon, Gtk.IconSize.SMALL_TOOLBAR);
+        btn_image = new Widgets.ButtonImage (icon, Gtk.IconSize.SMALL_TOOLBAR);
         add (btn_image);
         connect_signals ();
     }
 
     private void connect_signals () {
         clicked.connect (() => {
-            window.event_bus.align_items (action);
+            view_canvas.window.event_bus.selection_align (alignment_direction);
+        });
+
+        view_canvas.window.event_bus.selection_modified.connect (() => {
+            unowned var selection = view_canvas.selection_manager.selection;
+            sensitive = selection.count () > 1;
         });
     }
 }

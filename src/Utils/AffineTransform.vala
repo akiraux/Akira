@@ -79,7 +79,7 @@ public class Akira.Utils.AffineTransform : Object {
 
             item.components.size = new Lib.Components.Size (new_width, new_height, false);
 
-            item_model.mark_node_geometry_dirty (node);
+            item_model.alert_node_changed (node, Lib.Components.Component.Type.COMPILED_GEOMETRY);
         }
 
         unowned var layout = item.components.layout;

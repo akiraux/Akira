@@ -42,6 +42,7 @@ public class Akira.ViewLayers.ViewLayer : Object {
     public const string VSNAPS_LAYER_ID = "99_vsnaps_layer";
     public const string HSNAPS_LAYER_ID = "99_hsnaps_layer";
     public const string GRID_LAYER_ID = "88_grid_layer";
+    public const string ANCHOR_LAYER_ID = "78_anchor_layer";
     public const string HOVER_LAYER_ID = "77_hover_layer";
     // at a time, only one of nobs and path layer will be shown.
     // so they have equal priority

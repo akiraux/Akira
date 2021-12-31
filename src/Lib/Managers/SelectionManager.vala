@@ -59,6 +59,7 @@ public class Akira.Lib.Managers.SelectionManager : Object {
 
     construct {
         selection = new Lib.Items.NodeSelection (null);
+
         view_canvas.window.event_bus.flip_item.connect (on_flip_selected);
         view_canvas.window.event_bus.delete_selected_items.connect (delete_selected);
         view_canvas.window.event_bus.change_z_selected.connect (change_z_order);
@@ -78,6 +79,7 @@ public class Akira.Lib.Managers.SelectionManager : Object {
         }
 
         selection = new Lib.Items.NodeSelection (null);
+
         on_selection_changed (-1);
         selection_modified ();
     }

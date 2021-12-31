@@ -70,6 +70,7 @@ public class Akira.Lib.Managers.HoverManager : Object {
     public void maybe_create_hover_effect_by_id (int id) {
         var node = view_canvas.items_manager.node_from_id (id);
         if (node == null) {
+            print ("Failed to create hover effect for %d", id);
             assert (node != null);
             return;
         }
