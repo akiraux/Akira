@@ -52,7 +52,7 @@ public class Akira.Layouts.LayersList.LayerItemModel : GLib.Object {
             assert (node != null);
 
             node.instance.components.name = new Lib.Components.Name (value, id.to_string ());
-            im.item_model.mark_node_name_dirty (node);
+            im.item_model.alert_node_changed (node, Lib.Components.Component.Type.COMPILED_NAME);
             im.compile_model ();
         }
     }

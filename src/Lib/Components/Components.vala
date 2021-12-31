@@ -43,6 +43,46 @@ public struct Akira.Lib.Components.CompiledComponents {
     }
 
     /*
+     * Sets a component null based on passed Type.
+     * Returns false if component was already null.
+     */
+    public bool clear_component (Lib.Components.Component.Type comp_type) {
+        switch (comp_type) {
+            case Component.Type.COMPILED_BORDER: {
+                if (compiled_border != null) {
+                    compiled_border = null;
+                    return true;
+                }
+                break;
+            }
+            case Component.Type.COMPILED_FILL: {
+                if (compiled_fill != null) {
+                    compiled_fill = null;
+                    return true;
+                }
+                break;
+            }
+            case Component.Type.COMPILED_GEOMETRY: {
+                if (compiled_geometry != null) {
+                    compiled_geometry = null;
+                    return true;
+                }
+                break;
+            }
+            case Component.Type.COMPILED_NAME: {
+                if (compiled_name != null) {
+                    compiled_name = null;
+                    return true;
+                }
+                break;
+            }
+            default:
+                break;
+        }
+        return false;
+    }
+
+    /*
      * Return true if new fill color was generated.
      */
     public bool maybe_compile_fill (Lib.Items.ModelType type, Components? components, Lib.Items.ModelNode? node) {
