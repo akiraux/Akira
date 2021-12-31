@@ -17,6 +17,7 @@
  * along with Akira. If not, see <https://www.gnu.org/licenses/>.
  *
  * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
+ * Authored by: Giacomo "giacomoalbe" Alberini <giacomoalbe@gmail.com>
  */
 
 public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
@@ -338,6 +339,11 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
 
                     selection_manager.add_to_selection (target.id);
                     selection_manager.selection_modified_external ();
+                } else {
+                    if (selection_manager.selection.count () > 1) {
+                        // Don't trigger sub selection when only one item's selected
+                        nob_manager.toggle_sub_selection (target.id);
+                    }
                 }
             } else if (
                 !selection_manager.selection.bounding_box ().contains (event.x, event.y) &&
@@ -378,15 +384,15 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
             return false;
         }
 
-        if (selected_item.instance.type.name_id == "artboard") {
-            return false;
+        if (selected_item.instance.type is Lib.Items.ModelTypePath) {
+            var path_edit_mode = new Lib.Modes.PathEditMode (this, selected_item.instance);
+            path_edit_mode.toggle_functionality (false);
+            mode_manager.register_mode (path_edit_mode);
+
+            return true;
         }
 
-        var path_edit_mode = new Lib.Modes.PathEditMode (this, selected_item.instance);
-        path_edit_mode.toggle_functionality (true);
-        mode_manager.register_mode (path_edit_mode);
-
-        return true;
+        return false;
     }
 
     public override bool button_release_event (Gdk.EventButton event) {

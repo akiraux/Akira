@@ -17,14 +17,21 @@
  * along with Akira. If not, see <https://www.gnu.org/licenses/>.
  *
  * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
+ * Authored by: Giacomo "giacomoalbe" Alberini <giacomoalbe@gmail.com>
  */
 
 public class Akira.ViewLayers.ViewLayerNobs : ViewLayer {
     public const double UI_NOB_SIZE = 5;
     public const double UI_LINE_WIDTH = 1.01;
+    public const double UI_SUB_SELECTION_LINE_WIDTH = 4.0;
 
     private Utils.Nobs.NobSet? nobs = null;
     private Utils.Nobs.NobSet? old_nobs = null;
+
+    private Drawables.Drawable? sub_selection_drawable = null;
+    private Drawables.Drawable? old_sub_selection_drawable = null;
+    private Geometry.Rectangle sub_selection_last_bb_drawn = Geometry.Rectangle.empty ();
+    private bool redraw_only_sub_selection = false;
 
     public void update_nob_data (Utils.Nobs.NobSet? new_nobs) {
         if (nobs != null) {
@@ -32,6 +39,17 @@ public class Akira.ViewLayers.ViewLayerNobs : ViewLayer {
         }
 
         nobs = (new_nobs == null) ? null : new Utils.Nobs.NobSet.clone (new_nobs);
+        update ();
+    }
+
+    public void add_sub_selection (Drawables.Drawable? new_sub_selection_drawable) {
+        if (new_sub_selection_drawable == sub_selection_drawable) {
+            return;
+        }
+
+        old_sub_selection_drawable = sub_selection_drawable;
+        sub_selection_drawable = new_sub_selection_drawable;
+
         update ();
     }
 
@@ -56,6 +74,12 @@ public class Akira.ViewLayers.ViewLayerNobs : ViewLayer {
 
         draw_rect (context, nobs, canvas.scale);
         draw_nobs (context, nobs, canvas.scale);
+
+        if (sub_selection_drawable != null) {
+            var color = Gdk.RGBA () { red = 0.25, green = 0.79, blue = 0.98, alpha = 1.0 };
+            sub_selection_drawable.paint_hover (context, color, UI_SUB_SELECTION_LINE_WIDTH, target_bounds, scale);
+            sub_selection_last_bb_drawn = sub_selection_drawable.bounds;
+        }
 
         context.new_path ();
     }
@@ -138,8 +162,24 @@ public class Akira.ViewLayers.ViewLayerNobs : ViewLayer {
         }
         update_nobs (old_nobs);
         update_nobs (nobs);
+        update_sub_selection ();
 
         old_nobs = null;
+    }
+
+    private void update_sub_selection () {
+        if (canvas == null) {
+            return;
+        }
+
+        if (old_sub_selection_drawable != null) {
+            canvas.request_redraw (sub_selection_last_bb_drawn);
+            old_sub_selection_drawable = null;
+        }
+
+        if (sub_selection_drawable != null) {
+            canvas.request_redraw (sub_selection_drawable.bounds);
+        }
     }
 
     private void update_nobs (Utils.Nobs.NobSet? nobs) {
