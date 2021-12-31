@@ -128,10 +128,27 @@ public class Akira.Models.PathEditModel : Object {
             return new Geometry.Point[0];
         }
 
+
+        var orig_first_pt = rotate_point_around_item_origin (first_point, -instance.components.transform.rotation);
+
         var new_live_pts = new Geometry.Point[4];
-        new_live_pts[2] = Geometry.Point (points[points.length - 2].x + first_point.x, points[points.length - 2].y + first_point.y);
-        new_live_pts[1] = Geometry.Point (points[points.length - 3].x + first_point.x, points[points.length - 3].y + first_point.y);
-        new_live_pts[0] = Geometry.Point (points[points.length - 4].x + first_point.x, points[points.length - 4].y + first_point.y);
+        new_live_pts[0] = Geometry.Point (points[points.length - 4].x, points[points.length - 4].y);
+        new_live_pts[1] = Geometry.Point (points[points.length - 3].x, points[points.length - 3].y);
+        new_live_pts[2] = Geometry.Point (points[points.length - 2].x, points[points.length - 2].y);
+
+        new_live_pts[0].x += orig_first_pt.x;
+        new_live_pts[0].y += orig_first_pt.y;
+
+        new_live_pts[1].x += orig_first_pt.x;
+        new_live_pts[1].y += orig_first_pt.y;
+
+        new_live_pts[2].x += orig_first_pt.x;
+        new_live_pts[2].y += orig_first_pt.y;
+
+        double rotation = instance.components.transform.rotation;
+        new_live_pts[2] = rotate_point_around_item_origin (new_live_pts[2], rotation);
+        new_live_pts[1] = rotate_point_around_item_origin (new_live_pts[1], rotation);
+        new_live_pts[0] = rotate_point_around_item_origin (new_live_pts[0], rotation);
 
         commands.resize (commands.length - 1);
         points.resize (points.length - 4);
