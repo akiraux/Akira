@@ -190,6 +190,7 @@ public class Akira.Layouts.Partials.FillsPanel : Gtk.Grid {
                     continue;
                 }
 
+                // Try to look for the "common" fill, by checking if colors are different
                 if (fill.color () != common_fill.color ()) {
                     common_fill_found = false;
                 }
