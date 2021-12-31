@@ -24,6 +24,8 @@
  * picker. The color button opens up the GtkColorChooser.
  */
 public class Akira.Widgets.ColorRow : Gtk.Grid {
+    public signal void color_updated (Gdk.RGBA color);
+
     private unowned Lib.ViewCanvas view_canvas;
     private unowned Models.ColorModel model;
 
@@ -329,18 +331,11 @@ public class Akira.Widgets.ColorRow : Gtk.Grid {
     }
 
     private void update_model_color () {
-        unowned var selection = view_canvas.selection_manager.selection;
-
         var new_rgba = Gdk.RGBA ();
         new_rgba.parse (model.color);
         new_rgba.alpha = (double) model.alpha / 255;
 
-        debug (@"New rgba: $(new_rgba) alpha: $(new_rgba.alpha)");
-
-        foreach (var item in selection.nodes.values) {
-            item.node.instance.components.fills = new Lib.Components.Fills.single_color (Lib.Components.Color.from_rgba (new_rgba));
-            item.node.instance.compiled_components.compiled_fill = null;
-        }
+        color_updated (new_rgba);
     }
 
     private void on_eyedropper_click () {

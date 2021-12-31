@@ -328,7 +328,6 @@ public class Akira.Drawables.Drawable {
     }
 
     public bool set_fill_options (Cairo.Context context) {
-        debug (@"Fill rgba: $(fill_rgba) alhpa: $(fill_rgba.alpha)");
         context.set_source_rgba (fill_rgba.red, fill_rgba.green, fill_rgba.blue, fill_rgba.alpha);
         context.set_antialias (Cairo.Antialias.GRAY);
         return true;

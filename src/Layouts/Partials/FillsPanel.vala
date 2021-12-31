@@ -26,7 +26,7 @@ public class Akira.Layouts.Partials.FillsPanel : Gtk.Grid {
     private Gtk.Button add_btn;
     private Gtk.ListBox fills_list_container;
     private GLib.ListStore list;
-    //private unowned List<Lib.Items.CanvasItem>? items;
+    private bool do_reset_list = true;
 
     public bool toggled {
         get {
@@ -81,6 +81,9 @@ public class Akira.Layouts.Partials.FillsPanel : Gtk.Grid {
             fill_item.fill_deleted.connect (() => {
                 reload_list ();
             });
+
+            fill_item.color_row.color_updated.connect (update_color);
+
             return fill_item;
         });
 
@@ -117,6 +120,11 @@ public class Akira.Layouts.Partials.FillsPanel : Gtk.Grid {
     }
 
     private void reload_list () {
+        if (!do_reset_list) {
+            do_reset_list = true;
+            return;
+        }
+
         unowned var selection = view_canvas.selection_manager.selection;
 
         // Always clear the list model when a selection changes.
@@ -148,5 +156,22 @@ public class Akira.Layouts.Partials.FillsPanel : Gtk.Grid {
         }
 
         toggled = show;
+    }
+
+    private void update_color (Gdk.RGBA new_color) {
+        unowned var selection = view_canvas.selection_manager.selection;
+        unowned var im = view_canvas.items_manager;
+
+        foreach (var item in selection.nodes.values) {
+            item.node.instance.components.fills = new Lib.Components.Fills.single_color (Lib.Components.Color.from_rgba (new_color));
+            im.item_model.alert_node_changed (item.node, Lib.Components.Component.Type.COMPILED_FILL);
+        }
+
+        // Set this variable to false in order to prevent the list from being reloaded
+        // since it.compile_model () will trigger selection_modified which in turn would
+        // reload the list and thus remove the focus from the color popup
+        do_reset_list = false;
+
+        im.compile_model ();
     }
 }

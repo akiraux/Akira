@@ -24,6 +24,7 @@
 public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
     public unowned Lib.ViewCanvas view_canvas { get; construct; }
     public unowned Lib.Components.Fill fill { get; construct; }
+    public Widgets.ColorRow color_row;
 
     private Gtk.Button hidden_button;
     private Gtk.Button delete_button;
@@ -60,11 +61,13 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
     private void create_ui () {
         margin_top = margin_bottom = 5;
 
+        color_row = new Widgets.ColorRow (view_canvas, new Models.ColorModel (fill));
+
         var fill_chooser = new Gtk.Grid ();
         fill_chooser.hexpand = true;
         fill_chooser.margin_end = 5;
 
-        fill_chooser.add (new Widgets.ColorRow (view_canvas, new Models.ColorModel (fill)));
+        fill_chooser.add (color_row);
 
         hidden_button = new Gtk.Button ();
         hidden_button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
