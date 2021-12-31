@@ -308,6 +308,12 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
                 multi = true;
             }
         }
+
+        if (multi) {
+            // Trigger a visual refresh of the visible layers without changing
+            // anything in the list store in order to show the newly selected layers.
+            list_store.items_changed (0, 0, 0);
+        }
     }
 
     /*
