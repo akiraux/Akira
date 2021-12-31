@@ -316,6 +316,37 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         return found_items.last ();
     }
 
+    public Gee.ArrayList<unowned Lib.Items.ModelNode> nodes_in_bounded_region (
+        Geometry.Rectangle bound
+    ) {
+        var found_items = new Gee.ArrayList<unowned Lib.Items.ModelNode> ();
+
+        var origin = item_model.node_from_id (Lib.Items.Model.ORIGIN_ID);
+
+        if (origin.children == null) {
+            return found_items;
+        }
+
+        foreach (unowned var node in origin.children.data) {
+            var node_type = node.instance.type.name_id;
+
+            if (node_type == "artboard" && node.children != null) {
+                foreach (unowned var child_node in node.children.data) {
+                    if (bound.contains_bound (child_node.instance.drawable.bounds)) {
+                        found_items.add (child_node);
+                    }
+                }
+                continue;
+            }
+
+            if (bound.contains_bound (node.instance.drawable.bounds)) {
+                found_items.add (node);
+            }
+        }
+
+        return found_items;
+    }
+
     /*
      * Returns the top-most group at position. Origin if no other group found.
      */

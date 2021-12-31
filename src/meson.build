@@ -83,6 +83,7 @@ sources = files(
     'ViewLayers/ViewLayerHover.vala',
     'ViewLayers/ViewLayerGrid.vala',
     'ViewLayers/ViewLayerPath.vala',
+    'ViewLayers/ViewLayerMultiSelect.vala',
 
     #'Models/ColorModel.vala',
     #'Models/ExportModel.vala',
@@ -150,6 +151,7 @@ sources = files(
     'Lib/Modes/ExportMode.vala',
     'Lib/Modes/PanMode.vala',
     'Lib/Modes/PathEditMode.vala',
+    'Lib/Modes/MultiSelectMode.vala',
 
     'Lib/ViewCanvas.vala',
 
