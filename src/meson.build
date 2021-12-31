@@ -99,6 +99,7 @@ sources = files(
     'Drawables/DrawableEllipse.vala',
     'Drawables/DrawablePath.vala',
     'Drawables/DrawableRect.vala',
+    'Drawables/DrawableText.vala',
 
     'Lib/Components/Border.vala',
     'Lib/Components/Borders.vala',
@@ -120,6 +121,7 @@ sources = files(
     'Lib/Components/Opacity.vala',
     'Lib/Components/Path.vala',
     'Lib/Components/Size.vala',
+    'Lib/Components/Text.vala',
     'Lib/Components/Transform.vala',
 
     'Lib/Items/Model.vala',
@@ -132,6 +134,7 @@ sources = files(
     'Lib/Items/ModelTypeGroup.vala',
     'Lib/Items/ModelTypeRect.vala',
     'Lib/Items/ModelTypePath.vala',
+    'Lib/Items/ModelTypeText.vala',
 
     'Lib/Managers/CopyManager.vala',
     'Lib/Managers/ItemsManager.vala',
