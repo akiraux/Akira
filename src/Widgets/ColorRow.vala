@@ -104,7 +104,6 @@ public class Akira.Widgets.ColorRow : Gtk.Grid {
         add (eyedropper_button);
 
         field = new ColorField (view_canvas);
-        field.text = Utils.Color.rgba_to_hex (model.color);
         field.changed.connect (() => {
             // Don't do anything if the color change came from the chooser.
             if (color_set_manually) {
@@ -141,7 +140,6 @@ public class Akira.Widgets.ColorRow : Gtk.Grid {
         if (model.type == Models.ColorModel.Type.FILL) {
             opacity_field = new InputField (InputField.Unit.PERCENTAGE, 7, true, true);
             opacity_field.entry.sensitive = true;
-            opacity_field.entry.value = Math.round ((double) model.alpha / 255 * 100);
 
             opacity_field.entry.value_changed.connect (() => {
                 // Don't do anything if the color change came from the chooser.
@@ -180,6 +178,29 @@ public class Akira.Widgets.ColorRow : Gtk.Grid {
             border.entry.bind_property ("value", model, "size", BindingFlags.BIDIRECTIONAL);
 
             add (border);
+        }
+
+        update_ui ();
+    }
+
+    private void update_ui () {
+        if (model.is_unkwown) {
+            color_button.set_label ("?");
+            field.text = "";
+
+            if (model.type == Models.ColorModel.Type.FILL) {
+                opacity_field.entry.value = 0;
+            }
+
+            return;
+        }
+
+        // Default values
+        color_button.set_label ("");
+        field.text = Utils.Color.rgba_to_hex (model.color);
+
+        if (model.type == Models.ColorModel.Type.FILL) {
+            opacity_field.entry.value = Math.round ((double) model.alpha / 255 * 100);
         }
     }
 
@@ -343,6 +364,8 @@ public class Akira.Widgets.ColorRow : Gtk.Grid {
         new_rgba.alpha = (double) model.alpha / 255;
 
         color_updated (new_rgba);
+
+        update_ui ();
     }
 
     private void on_eyedropper_click () {

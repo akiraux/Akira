@@ -23,10 +23,12 @@ public class Akira.Lib.Components.Fill : GLib.Object {
     public struct FillData {
         public int _id;
         public Color _color;
+        public bool _is_unkwown;
 
-        public FillData (int id = -1, Color color = Color ()) {
+        public FillData (int id = -1, Color color = Color (), bool is_unkwown = false) {
             _id = id;
             _color = color;
+            _is_unkwown = is_unkwown;
         }
 
         public FillData.deserialized (int id, Json.Object obj) {
@@ -46,6 +48,7 @@ public class Akira.Lib.Components.Fill : GLib.Object {
             return FillData (_id, new_color);
         }
 
+
         public Json.Node serialize () {
             var obj = new Json.Object ();
             obj.set_int_member ("id", _id);
@@ -63,11 +66,17 @@ public class Akira.Lib.Components.Fill : GLib.Object {
         _data = data;
     }
 
+    public Fill.unknown () {
+        var color = Color(0.5, 0.5, 0.5);
+        _data = FillData (-1, color, true);
+    }
+
     // Recommended accessors
 
     public int id () { return _data._id; }
     public Gdk.RGBA color () { return _data._color.rgba; }
     public bool is_color_hidden () { return _data._color.hidden; }
+    public bool is_unkwown () { return _data._is_unkwown; }
 
     public void set_hidden (bool is_hidden) {
         _data._color.hidden = is_hidden;
@@ -79,5 +88,9 @@ public class Akira.Lib.Components.Fill : GLib.Object {
 
     public void set_color_rgba (Gdk.RGBA rgba) {
         _data._color.rgba = rgba;
+    }
+
+    public void set_known () {
+        _data._is_unkwown = false;
     }
 }

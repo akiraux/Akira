@@ -44,6 +44,8 @@ public class Akira.Models.ColorModel : GLib.Object {
             new_rgba.parse (value);
             new_rgba.alpha = (double) alpha / 255;
 
+            fill.set_known ();
+
             if (type == Type.FILL) {
                 fill.set_color_rgba (new_rgba);
                 return;
@@ -78,6 +80,12 @@ public class Akira.Models.ColorModel : GLib.Object {
         }
         set {
             //border.size = value;
+        }
+    }
+
+    public bool is_unkwown {
+        get {
+            return fill.is_unkwown ();
         }
     }
 

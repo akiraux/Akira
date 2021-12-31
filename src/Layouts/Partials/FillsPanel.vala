@@ -27,6 +27,7 @@ public class Akira.Layouts.Partials.FillsPanel : Gtk.Grid {
     private Gtk.ListBox fills_list_container;
     private GLib.ListStore list;
     private bool do_reset_list = true;
+    private int old_selection_count = 0;
 
     public bool toggled {
         get {
@@ -120,42 +121,87 @@ public class Akira.Layouts.Partials.FillsPanel : Gtk.Grid {
     }
 
     private void reload_list () {
-        if (!do_reset_list) {
-            do_reset_list = true;
-            return;
-        }
-
         unowned var selection = view_canvas.selection_manager.selection;
 
-        // Always clear the list model when a selection changes.
-        list.remove_all ();
+        if (selection.count () == 0) {
+            // Remove the toggle variable that prevent unwanted list reloads
+            // when manually changing color from ColorRow
+            do_reset_list = true;
 
-        if (selection.count() == 0) {
-            //items = null;
             toggled = false;
             return;
         }
 
-        //items = selected_items;
+        if (selection.count () != old_selection_count) {
+            do_reset_list = true;
+        }
 
+        if (!do_reset_list) {
+            return;
+        }
+
+        old_selection_count = selection.count ();
+
+        // Always clear the list model when a selection changes.
+        list.remove_all ();
+
+        // Single item
+        if (selection.count () == 1) {
+            var node = selection.first_node ();
+
+            // Skip items that don't have a fill item since there will be nothing to show.
+            if (node.instance.components.fills == null) {
+                toggled = false;
+                return;
+            }
+
+            // At least an item has the fills component, so we can show the
+            toggled = true;
+
+            // Loops through all the available fills and add them tot he list model.
+            // TODO: handle duplicate identical colors.
+            foreach (Lib.Components.Fill fill in node.instance.components.fills.fills ()) {
+                list.insert (0, fill);
+            }
+
+            return;
+        }
+
+        // Multiple items
         bool show = false;
+
+        Lib.Components.Fill? common_fill = null;
+        bool common_fill_found = true;
+
         foreach (var item in selection.nodes.values) {
             // Skip items that don't have a fill item since there will be nothing to show.
             if (item.node.instance.components.fills == null) {
                 continue;
             }
 
-            // At least an item has the fills component, so we can show the
+            // At least an item has the fills component, so we can show the fill item
             show = true;
 
             // Loops through all the available fills and add them tot he list model.
             // TODO: handle duplicate identical colors.
             foreach (Lib.Components.Fill fill in item.node.instance.components.fills.fills ()) {
-                list.insert (0, fill);
+                if (common_fill == null) {
+                    common_fill = fill;
+                    continue;
+                }
+
+                if (fill.color () != common_fill.color ()) {
+                    common_fill_found = false;
+                }
             }
         }
 
         toggled = show;
+
+        // If no common fill, create a new UNKNOWN one
+        common_fill = common_fill_found ? common_fill : new Lib.Components.Fill.unknown ();
+
+        list.insert (0, common_fill);
     }
 
     private void update_color (Gdk.RGBA new_color) {
