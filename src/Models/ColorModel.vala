@@ -53,26 +53,6 @@ public class Akira.Models.ColorModel : GLib.Object {
         }
     }
 
-    public int alpha {
-        get {
-            return type == Type.FILL
-                ? (int) fill.color ().alpha
-                //: border.alpha;
-                : -1;
-        }
-        set {
-            if (type == Type.FILL) {
-                var current_rgba = fill.color ();
-                current_rgba.alpha = value;
-
-                fill.set_color_rgba (current_rgba);
-                return;
-            }
-
-            //border.alpha = value;
-        }
-    }
-
     public bool hidden {
         get {
             return type == Type.FILL
@@ -101,6 +81,8 @@ public class Akira.Models.ColorModel : GLib.Object {
         }
     }
 
+    public int alpha;
+
     public Lib.Components.Fill? get_fill () {
         return fill;
     }
@@ -109,5 +91,7 @@ public class Akira.Models.ColorModel : GLib.Object {
         type = fill != null ? Type.FILL : Type.BORDER;
         this.fill = fill;
         this.border = border;
+
+        this.alpha = (int) (this.fill.color ().alpha * 255);
     }
 }

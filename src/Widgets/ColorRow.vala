@@ -131,6 +131,8 @@ public class Akira.Widgets.ColorRow : Gtk.Grid {
 
             // Reset the bool to allow edits from the color chooser.
             color_set_manually = false;
+
+            update_model_color ();
         });
 
         add (field);
@@ -154,6 +156,7 @@ public class Akira.Widgets.ColorRow : Gtk.Grid {
                 model.alpha = alpha;
                 set_button_color (model.color, alpha);
 
+
                 // Update the chooser widget only if it was already initialized.
                 if (color_chooser_widget != null) {
                     set_chooser_color (model.color, alpha);
@@ -161,6 +164,8 @@ public class Akira.Widgets.ColorRow : Gtk.Grid {
 
                 // Reset the bool to allow edits from the color chooser.
                 color_set_manually = false;
+
+                update_model_color ();
             });
 
             add (opacity_field);
@@ -331,6 +336,8 @@ public class Akira.Widgets.ColorRow : Gtk.Grid {
     }
 
     private void update_model_color () {
+        // Model.alpha is from 0 to 255, int
+
         var new_rgba = Gdk.RGBA ();
         new_rgba.parse (model.color);
         new_rgba.alpha = (double) model.alpha / 255;
