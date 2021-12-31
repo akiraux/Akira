@@ -39,7 +39,7 @@ public class Akira.Layouts.Partials.FillsPanel : Gtk.Grid {
     }
 
     public FillsPanel (Lib.ViewCanvas view_canvas) {
-        Object(
+        Object (
             view_canvas: view_canvas
         );
     }

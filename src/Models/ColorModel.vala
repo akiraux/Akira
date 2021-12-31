@@ -36,7 +36,7 @@ public class Akira.Models.ColorModel : GLib.Object {
     public string color {
         owned get {
             return type == Type.FILL
-                ? fill.color().to_string ()
+                ? fill.color ().to_string ()
                 : border.color ().to_string ();
         }
         set {

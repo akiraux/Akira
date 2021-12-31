@@ -67,7 +67,7 @@ public class Akira.Lib.Components.Fill : GLib.Object {
     }
 
     public Fill.unknown () {
-        var color = Color(0.5, 0.5, 0.5);
+        var color = Color (0.5, 0.5, 0.5);
         _data = FillData (-1, color, true);
     }
 

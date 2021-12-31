@@ -43,7 +43,7 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
     public signal void fill_deleted ();
 
     public FillItem (Lib.ViewCanvas view_canvas, Lib.Components.Fill fill) {
-        Object(
+        Object (
             view_canvas: view_canvas,
             fill: fill
         );
@@ -52,7 +52,7 @@ public class Akira.Layouts.Partials.FillItem : Gtk.Grid {
     construct {
         create_ui ();
 
-        hidden = fill.is_color_hidden ();;
+        hidden = fill.is_color_hidden ();
 
         create_event_bindings ();
         show_all ();
