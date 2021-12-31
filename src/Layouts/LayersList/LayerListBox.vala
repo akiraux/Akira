@@ -256,7 +256,7 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
      * listbox changes.
      */
     private void on_row_selection_changed (bool clear) {
-        var sm = view_canvas.selection_manager;
+        unowned var sm = view_canvas.selection_manager;
         // Always reset the selection.
         sm.reset_selection ();
 
@@ -279,7 +279,7 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
         // Trigger the transform mode if is not currently active. This might
         // happen when no items is selected and the first selection is triggered
         // from the layers listbox.
-        var mm = view_canvas.mode_manager;
+        unowned var mm = view_canvas.mode_manager;
         if (mm.active_mode_type != Lib.Modes.AbstractInteractionMode.ModeType.TRANSFORM) {
             var new_mode = new Lib.Modes.TransformMode (view_canvas, Utils.Nobs.Nob.NONE);
             mm.register_mode (new_mode);
@@ -296,22 +296,16 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
         // Always reset the selection of the layers.
         unselect_all ();
 
-        var sm = view_canvas.selection_manager;
+        unowned var sm = view_canvas.selection_manager;
         if (sm.is_empty ()) {
             return;
         }
 
-        // A bit hacky but I don't know how to fix this. Since we're adding the
-        // new layer on top, the index is always 0 for newly generated layers.
-        // That means the selection changes happens so fast that it tries to select
-        // the row on index 0 while a new row is being added at index 0. Without
-        // the timeout, the app crashes.
-        Timeout.add (0, () => {
-            foreach (var node in sm.selection.nodes.values) {
+        foreach (var node in sm.selection.nodes.values) {
+            if (layers[node.node.id] != null) {
                 select_row_at_index (model.get_index_of (layers[node.node.id]));
             }
-            return false;
-        });
+        }
     }
 
     /*

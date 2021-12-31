@@ -55,7 +55,7 @@ public class Akira.Lib.Managers.NobManager : Object {
     }
 
     private void on_update_select_effect () {
-        var sm = view_canvas.selection_manager;
+        unowned var sm = view_canvas.selection_manager;
         if (sm.is_empty ()) {
             remove_select_effect ();
             remove_sub_selection_effect ();
