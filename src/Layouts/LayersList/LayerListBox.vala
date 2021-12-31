@@ -301,9 +301,11 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
             return;
         }
 
+        bool multi = false;
         foreach (var node in sm.selection.nodes.values) {
             if (layers[node.node.id] != null) {
-                select_row_at_index (model.get_index_of (layers[node.node.id]));
+                select_row_at_index (model.get_index_of (layers[node.node.id]), multi);
+                multi = true;
             }
         }
     }

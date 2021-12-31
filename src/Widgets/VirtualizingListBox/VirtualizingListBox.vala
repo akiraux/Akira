@@ -645,7 +645,7 @@ public class VirtualizingListBox : Gtk.Container, Gtk.Scrollable {
 
     private void on_multipress_pressed (int n_press, double x, double y) {
         active_row = null;
-        var row = get_row_at_y ((int)y);
+        var row = get_row_at_y ((int) y);
         if (row != null && row.sensitive && row.selectable) {
             active_row = row;
             row.set_state_flags (Gtk.StateFlags.ACTIVE, false);
@@ -764,8 +764,10 @@ public class VirtualizingListBox : Gtk.Container, Gtk.Scrollable {
         }
     }
 
-    protected void select_row_at_index (int index) {
-        var row = ensure_index_visible (index);
+    protected void select_row_at_index (int index, bool multiple) {
+        // If multiple rows are being selected, just get the new widget row
+        // without scrolling the listbox and ensure its visibility.
+        var row = multiple ? get_widget (index) : ensure_index_visible (index);
 
         if (row != null) {
             select_and_activate (row);
