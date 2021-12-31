@@ -114,7 +114,7 @@ public class Akira.Lib.Items.NodeSelection : Object {
         }
     }
 
-    public void remove_item (int id) {
+    public void remove_node (int id) {
         if (nodes.has_key (id)) {
             deregister_parent (nodes[id].parent_id);
             nodes.unset (id);

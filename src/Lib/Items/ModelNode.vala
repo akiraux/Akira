@@ -72,6 +72,35 @@ public class Akira.Lib.Items.ModelNode {
         return false;
     }
 
+    /*
+     * Return an array of int containing all IDs of the children of this ndoe.
+     */
+    public int[] get_children_ids () {
+        Array<int> children_ids = new Array<int> ();
+
+        if (children == null) {
+            return children_ids.data;
+        }
+
+        foreach (var child in children.data) {
+            children_ids.append_val (child.id);
+            get_children_ids_recursive (child, ref children_ids);
+        }
+
+        return children_ids.data;
+    }
+
+    private void get_children_ids_recursive (ModelNode node, ref Array<int> children_ids) {
+        if (node.children == null) {
+            return;
+        }
+
+        foreach (var child in node.children.data) {
+            children_ids.append_val (child.id);
+            get_children_ids_recursive (child, ref children_ids);
+        }
+    }
+
     public bool has_ancestor (int id, bool recurse = true) {
         var p = parent;
 

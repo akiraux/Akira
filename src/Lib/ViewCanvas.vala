@@ -330,6 +330,11 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
             );
 
             if (target != null) {
+                // If the item is locked, no selection is allowed.
+                if (target.instance.components.layer.locked) {
+                    return false;
+                }
+
                 // Check if the clicked item is not already selected.
                 if (!selection_manager.item_selected (target.id)) {
                     // Reset the selection if SHIFT isn't pressed.

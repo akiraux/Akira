@@ -31,7 +31,7 @@ public class Akira.ViewLayers.ViewLayerNobs : ViewLayer {
     private Drawables.Drawable? sub_selection_drawable = null;
     private Drawables.Drawable? old_sub_selection_drawable = null;
     private Geometry.Rectangle sub_selection_last_bb_drawn = Geometry.Rectangle.empty ();
-    private bool redraw_only_sub_selection = false;
+    // private bool redraw_only_sub_selection = false;
 
     public void update_nob_data (Utils.Nobs.NobSet? new_nobs) {
         if (nobs != null) {
