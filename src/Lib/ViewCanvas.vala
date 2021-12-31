@@ -41,6 +41,7 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
     public Lib.Managers.NobManager nob_manager;
     public Lib.Managers.SnapManager snap_manager;
     public Lib.Managers.CopyManager copy_manager;
+    public Lib.Managers.GuideManager guide_manager;
 
     public bool ctrl_is_pressed = false;
     public bool shift_is_pressed = false;
@@ -53,6 +54,7 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
     private Gdk.CursorType current_cursor = Gdk.CursorType.ARROW;
 
     private ViewLayers.ViewLayerGrid grid_layout;
+    public ViewLayers.ViewLayerGuide guide_layer;
 
     // Keep track of the initial coords of the press event.
     private double initial_event_x;
@@ -85,6 +87,7 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
         nob_manager = new Lib.Managers.NobManager (this);
         snap_manager = new Lib.Managers.SnapManager (this);
         copy_manager = new Lib.Managers.CopyManager (this);
+        guide_manager = new Lib.Managers.GuideManager (this);
 
         grid_layout = new ViewLayers.ViewLayerGrid (
             0,
@@ -95,6 +98,10 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
 
         grid_layout.add_to_canvas (ViewLayers.ViewLayer.GRID_LAYER_ID, this);
         grid_layout.set_visible (true);
+
+        guide_layer = new ViewLayers.ViewLayerGuide ();
+        guide_layer.add_to_canvas (ViewLayers.ViewLayer.GUIDE_LAYER_ID, this);
+        guide_layer.set_visible (true);
 
         set_model_to_render (items_manager.item_model);
 
@@ -218,6 +225,10 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
             return true;
         }
 
+        if (guide_manager.key_press_event (event)) {
+            return true;
+        }
+
         switch (uppercase_keyval) {
             case Gdk.Key.space:
                 mode_manager.start_panning_mode ();
@@ -296,6 +307,10 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
         }
 
         if (mode_manager.button_press_event (event)) {
+            return true;
+        }
+
+        if (guide_manager.button_press_event (event)) {
             return true;
         }
 
@@ -396,6 +411,13 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
     }
 
     public override bool button_release_event (Gdk.EventButton event) {
+
+        // Since guidelines are stacked on top of all elements,
+        // check events for it first.
+        if (guide_manager.button_release_event (event)) {
+            return true;
+        }
+
         // Check if the there's no delta between the pressed and released event.
         if (initial_event_x == event.x || initial_event_y == event.y) {
             var count = selection_manager.count ();
@@ -440,6 +462,10 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
         event.y = event.y / current_scale;
 
         if (mode_manager.motion_notify_event (event)) {
+            return true;
+        }
+
+        if (guide_manager.motion_notify_event (event)) {
             return true;
         }
 

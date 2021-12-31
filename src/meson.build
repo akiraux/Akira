@@ -43,6 +43,7 @@ sources = files(
     'Utils/Snapping2.vala',
     'Utils/SVGUtil.vala',
     'Utils/GeometryMath.vala',
+    'Utils/SortedGuides.vala',
 
     'Layouts/HeaderBar.vala',
     'Layouts/MainViewCanvas.vala',
@@ -83,11 +84,13 @@ sources = files(
     'ViewLayers/ViewLayerHover.vala',
     'ViewLayers/ViewLayerGrid.vala',
     'ViewLayers/ViewLayerPath.vala',
+    'ViewLayers/ViewLayerGuide.vala',
 
     #'Models/ColorModel.vala',
     #'Models/ExportModel.vala',
     #'Models/ListModel.vala',
     'Models/PathEditModel.vala',
+    'Models/GuidelineModel.vala',
 
     'Dialogs/ShortcutsDialog.vala',
     'Dialogs/SettingsDialog.vala',
@@ -143,6 +146,7 @@ sources = files(
     'Lib/Managers/HoverManager.vala',
     'Lib/Managers/SelectionManager.vala',
     'Lib/Managers/SnapManager.vala',
+    'Lib/Managers/GuideManager.vala',
 
     'Lib/Modes/AbstractInteractionMode.vala',
     'Lib/Modes/TransformMode.vala',
