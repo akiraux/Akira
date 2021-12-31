@@ -320,13 +320,13 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
      * Show the hover effect on a canvas item if available.
      */
     private void on_row_hovered (GLib.Object? item) {
-        view_canvas.hover_manager.remove_hover_effect ();
-
-        if (item != null) {
-            view_canvas.hover_manager.maybe_create_hover_effect_by_id (
-                ((LayerItemModel) item).id
-            );
+        unowned var hm = view_canvas.hover_manager;
+        if (item == null) {
+            hm.remove_hover_effect ();
+            return;
         }
+
+        hm.maybe_create_hover_effect_by_id (((LayerItemModel) item).id);
     }
 
     /*

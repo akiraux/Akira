@@ -915,13 +915,20 @@ public class VirtualizingListBox : Gtk.Container, Gtk.Scrollable {
     }
 
     private void on_mouse_move (double x, double y) {
+        var row = get_row_at_y ((int) y);
+
+        // No need to trigger any update if we're still hovering over the same
+        // row widget.
+        if (row != null && row == hovered_row) {
+            return;
+        }
+
         if (hovered_row != null) {
             hovered_row.unset_state_flags (Gtk.StateFlags.PRELIGHT);
             hovered_row = null;
             row_hovered (null);
         }
 
-        var row = get_row_at_y ((int) y);
         if (row != null) {
             row.set_state_flags (Gtk.StateFlags.PRELIGHT, false);
             row_hovered (row.model_item);
