@@ -49,8 +49,8 @@ public class Akira.Lib.Items.Model : Object {
     public Gee.HashMap<int, ModelNode> group_nodes;
     public Gee.HashMap<int, ModelNode> item_nodes;
 
-    public Gee.HashSet<int> dirty_items;
-    public Gee.HashSet<int> dirty_groups;
+    public Gee.HashSet<int> changed_items;
+    public Gee.HashSet<int> changed_groups;
 
     private bool is_live = false;
 
@@ -67,8 +67,8 @@ public class Akira.Lib.Items.Model : Object {
         item_nodes = new Gee.HashMap<int, ModelNode> ();
         group_nodes = new Gee.HashMap<int, ModelNode> ();
 
-        dirty_items = new Gee.HashSet<int> ();
-        dirty_groups = new Gee.HashSet<int> ();
+        changed_items = new Gee.HashSet<int> ();
+        changed_groups = new Gee.HashSet<int> ();
 
         var group_instance = new ModelInstance (ORIGIN_ID, new ModelTypeGroup ());
         add_to_maps (new ModelNode (group_instance, 0), false);
@@ -126,32 +126,35 @@ public class Akira.Lib.Items.Model : Object {
         return builder.str;
     }
 
+    /*
+     * Build an array of int representing the path IDs of a node. This path is
+     * unique for each node and changes based on the position relative to its
+     * parent.
+     */
+    public int[] array_path_from_node (ModelNode node) {
+        Array<int> path = new Array<int> ();
+        build_array_path_recursive (node, ref path);
+
+        return path.data;
+    }
+
     public GLib.Array<unowned Lib.Items.ModelNode> children_in_group (int group_id) {
         var group = group_nodes.get (group_id);
         return group == null ? new GLib.Array<unowned Lib.Items.ModelNode> () : group.children;
     }
 
-    public void mark_node_geometry_dirty_by_id (int id) {
+    public void alert_item_changed (int id, Components.Component.Type aspect_changed) {
         var node = node_from_id (id);
         if (node == null) {
             assert (false);
             return;
         }
 
-        mark_node_geometry_dirty (node);
+        alert_node_changed (node, aspect_changed);
     }
 
-    public void mark_node_geometry_dirty (Lib.Items.ModelNode node) {
-        internal_mark_geometry_dirty (node, false);
-    }
-
-    public void mark_node_name_dirty (Lib.Items.ModelNode node) {
-        if (dirty_groups.contains (node.id) || dirty_items.contains (node.id)) {
-            return;
-        }
-
-        node.instance.compiled_components.compiled_name = null;
-        on_item_geometry_compilation_requested (node);
+    public void alert_node_changed (Lib.Items.ModelNode node, Components.Component.Type aspect_changed) {
+        internal_alert_item_change (node, false, aspect_changed);
     }
 
     public void recalculate_children_stacking (int parent_id) {
@@ -242,7 +245,7 @@ public class Akira.Lib.Items.Model : Object {
             for (var i = start; i < parent_node.children.length; ++i) {
                 unowned var ch = parent_node.children.index (i);
                 ch.pos_in_parent = i;
-                mark_node_geometry_dirty (ch);
+                alert_node_changed (ch, Components.Component.Type.COMPILED_GEOMETRY);
             }
         }
 
@@ -381,7 +384,7 @@ public class Akira.Lib.Items.Model : Object {
 
         add_to_maps (new_node, true);
 
-        internal_mark_geometry_dirty (new_node, false);
+        internal_alert_item_change (new_node, false, Components.Component.Type.COMPILED_GEOMETRY);
 
         return new_id;
     }
@@ -408,7 +411,7 @@ public class Akira.Lib.Items.Model : Object {
         parent_node.children.remove_index (pos_in_parent);
 
         if (parent_node.id != ORIGIN_ID) {
-            internal_mark_geometry_dirty (parent_node, false);
+            internal_alert_item_change (parent_node, false, Components.Component.Type.COMPILED_GEOMETRY);
         }
 
         remove_from_maps (to_delete.id);
@@ -459,41 +462,47 @@ public class Akira.Lib.Items.Model : Object {
         builder.append ((node.id == ORIGIN_ID) ? node.id.to_string () : node.pos_in_parent.to_string ());
     }
 
+    private void build_array_path_recursive (ModelNode node, ref Array<int> path) {
+        if (node.parent != null) {
+            build_array_path_recursive (node.parent, ref path);
+        }
+
+        path.append_val (((node.id == ORIGIN_ID) ? node.id : node.pos_in_parent));
+    }
+
     /*
      * Internal operation to mark an instance as dirty. If 'simple' is true,
      * only the instance's geometry is nullified, otherwise a recursive dirtying
      * of items occurs.
      */
-    private void internal_mark_geometry_dirty (Lib.Items.ModelNode node, bool simple) {
-        if (dirty_groups.contains (node.id) || dirty_items.contains (node.id)) {
-            return;
-        }
+    private void internal_alert_item_change (
+        Lib.Items.ModelNode node,
+        bool simple,
+        Components.Component.Type aspect
+    ) {
+        node.instance.compiled_components.clear_component (aspect);
 
-        node.instance.compiled_components.compiled_geometry = null;
         if (!simple) {
-            on_item_geometry_compilation_requested (node);
+            mark_changed (node, aspect);
         }
     }
 
-    private void on_item_geometry_compilation_requested (Lib.Items.ModelNode node) {
+    private void mark_changed (Lib.Items.ModelNode node, Components.Component.Type aspect) {
         if (!is_live) {
             return;
         }
-        mark_dirty (node);
+
+        if (node.instance.is_group) {
+            changed_groups.add (node.id);
+        } else {
+            changed_items.add (node.id);
+        }
 
         unowned var parent = node.parent;
         while (parent.id != ORIGIN_ID) {
-            internal_mark_geometry_dirty (parent, true);
-            on_item_geometry_compilation_requested (parent);
+            internal_alert_item_change (parent, true, aspect);
+            mark_changed (parent, aspect);
             parent = parent.parent;
-        }
-    }
-
-    private void mark_dirty (ModelNode node) {
-        if (node.instance.is_group) {
-            dirty_groups.add (node.id);
-        } else {
-            dirty_items.add (node.id);
         }
     }
 
@@ -509,25 +518,25 @@ public class Akira.Lib.Items.Model : Object {
             return;
         }
 
-        if (dirty_items.size == 0 && dirty_groups.size == 0) {
+        if (changed_items.size == 0 && changed_groups.size == 0) {
             return;
         }
 
-        foreach (var leaf in dirty_items) {
+        foreach (var leaf in changed_items) {
             var node = node_from_id (leaf);
             if (node.instance.compile_components (node, canvas)) {
                 item_geometry_changed (node.id);
             }
         }
 
-        dirty_items.clear ();
+        changed_items.clear ();
 
-        if (dirty_groups.size == 0) {
+        if (changed_groups.size == 0) {
             return;
         }
 
         var sorted = new Gee.TreeMap<string, ModelNode> ();
-        foreach (var group_id in dirty_groups) {
+        foreach (var group_id in changed_groups) {
             var group_node = node_from_id (group_id);
             sorted[path_from_node (group_node)] = group_node;
         }
@@ -555,6 +564,6 @@ public class Akira.Lib.Items.Model : Object {
             }
         }
 
-        dirty_groups.clear ();
+        changed_groups.clear ();
     }
 }

@@ -19,16 +19,16 @@
  * Authored by: Giacomo "giacomoalbe" Alberini <giacomoalbe@gmail.com>
  */
 
-public class Akira.Widgets.AlignBoxButton : Gtk.Button {
-    public signal void triggered (AlignBoxButton emitter);
+public class Akira.Layouts.Alignment.AlignmentButton : Gtk.Button {
+    public signal void triggered (AlignmentButton emitter);
 
     public unowned Lib.ViewCanvas view_canvas { get; construct; }
 
     public string icon { get; construct; }
     public Utils.ItemAlignment.AlignmentDirection alignment_direction { get; construct; }
-    public ButtonImage btn_image;
+    public Widgets.ButtonImage btn_image;
 
-    public AlignBoxButton (Lib.ViewCanvas view_canvas, Utils.ItemAlignment.AlignmentDirection alignment_direction, string icon_name, string tooltip, string[] accels) {
+    public AlignmentButton (Lib.ViewCanvas view_canvas, Utils.ItemAlignment.AlignmentDirection alignment_direction, string icon_name, string tooltip, string[] accels) {
         Object (
             view_canvas: view_canvas,
             icon: icon_name,
@@ -45,7 +45,7 @@ public class Akira.Widgets.AlignBoxButton : Gtk.Button {
         can_focus = false;
         sensitive = false;
 
-        btn_image = new ButtonImage (icon, Gtk.IconSize.SMALL_TOOLBAR);
+        btn_image = new Widgets.ButtonImage (icon, Gtk.IconSize.SMALL_TOOLBAR);
         add (btn_image);
         connect_signals ();
     }

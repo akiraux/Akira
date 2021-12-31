@@ -105,6 +105,8 @@ public class Akira.FileFormat.JsonDeserializer {
             new_inst = new Lib.Items.ModelInstance (-1, new Lib.Items.ModelTypeArtboard ());
         } else if (type == "path") {
             new_inst = new Lib.Items.ModelInstance (-1, new Lib.Items.ModelTypePath ());
+        } else if (type == "text") {
+            new_inst = new Lib.Items.ModelInstance (-1, new Lib.Items.ModelTypeText ());
         }
         else {
             // Unknown type

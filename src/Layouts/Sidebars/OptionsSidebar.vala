@@ -36,8 +36,7 @@ public class Akira.Layouts.Sidebars.OptionsSidebar : Gtk.Grid {
 
     public OptionsSidebar (Lib.ViewCanvas view_canvas) {
         Object (
-            view_canvas: view_canvas,
-            orientation: Gtk.Orientation.HORIZONTAL
+            view_canvas: view_canvas
         );
     }
 
@@ -47,9 +46,9 @@ public class Akira.Layouts.Sidebars.OptionsSidebar : Gtk.Grid {
 
         get_style_context ().add_class ("sidebar-l");
 
-        var align_items_panel = new Akira.Layouts.Partials.AlignItemsPanel (view_canvas);
+        var alignment_panel = new Akira.Layouts.Alignment.AlignmentPanel (view_canvas);
 
-        attach (align_items_panel, 0, 0, 1, 1);
+        attach (alignment_panel, 0, 0, 1, 1);
 
         var scrolled_window = new Gtk.ScrolledWindow (null, null);
         scrolled_window.hscrollbar_policy = Gtk.PolicyType.NEVER;
@@ -71,7 +70,6 @@ public class Akira.Layouts.Sidebars.OptionsSidebar : Gtk.Grid {
 
         scrolled_grid.attach (transform_panel, 0, 0, 1, 1);
         scrolled_grid.attach (border_radius_panel, 0, 1, 1, 1);
-
         scrolled_grid.attach (borders_panel, 0, 3, 1, 1);
         */
 
@@ -80,9 +78,5 @@ public class Akira.Layouts.Sidebars.OptionsSidebar : Gtk.Grid {
 
     private void toggle () {
         toggled = !toggled;
-    }
-
-    private void on_widget_redraw_request () {
-        queue_resize ();
     }
 }

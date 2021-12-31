@@ -28,7 +28,6 @@
 public class Akira.Layouts.LayersList.LayerItemModel : GLib.Object {
     private unowned Akira.Lib.ViewCanvas _view_canvas;
 
-    public int service_uid { get; construct; }
     private Lib.Items.ModelInstance _cached_instance;
 
     public int id {
@@ -53,7 +52,7 @@ public class Akira.Layouts.LayersList.LayerItemModel : GLib.Object {
             assert (node != null);
 
             node.instance.components.name = new Lib.Components.Name (value, id.to_string ());
-            im.item_model.mark_node_name_dirty (node);
+            im.item_model.alert_node_changed (node, Lib.Components.Component.Type.COMPILED_NAME);
             im.compile_model ();
         }
     }
@@ -69,6 +68,8 @@ public class Akira.Layouts.LayersList.LayerItemModel : GLib.Object {
                 return "segment-curve-symbolic";
             } else if (type is Lib.Items.ModelTypeGroup) {
                 return "folder-symbolic";
+            } else if (type is Lib.Items.ModelTypeText) {
+                return "shape-text-symbolic";
             }
             return "";
         }
@@ -85,15 +86,6 @@ public class Akira.Layouts.LayersList.LayerItemModel : GLib.Object {
     public bool locked {
         get {
             return _cached_instance.components.layer.locked;
-        }
-    }
-
-    /*
-     * Control the selected state of the item.
-     */
-    public bool selected {
-        get {
-            return _cached_instance.components.layer.selected;
         }
     }
 
@@ -139,8 +131,36 @@ public class Akira.Layouts.LayersList.LayerItemModel : GLib.Object {
         }
     }
 
-    public LayerItemModel (Lib.ViewCanvas view_canvas, Lib.Items.ModelNode node, int service_uid) {
-        Object (service_uid: service_uid);
+    // Always show child layers when a new artboard or group is created.
+    private bool _children_visible = true;
+    public bool children_visible {
+        get {
+            return _children_visible;
+        }
+        set {
+            if (value == _children_visible) {
+                return;
+            }
+            _children_visible = value;
+
+            // No need to update the layers UI if this model is not a group or
+            // an artboard.
+            if (!is_group && !is_artboard) {
+                return;
+            }
+
+            var array = new GLib.Array<int> ();
+            array.data = get_children ();
+            // Trigger the showing or hiding of all child layers.
+            if (_children_visible) {
+                _view_canvas.window.main_window.add_layers (array);
+            } else {
+                _view_canvas.window.main_window.remove_layers (array);
+            }
+        }
+    }
+
+    public LayerItemModel (Lib.ViewCanvas view_canvas, Lib.Items.ModelNode node) {
         update_node (node);
         _view_canvas = view_canvas;
     }

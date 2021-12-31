@@ -19,30 +19,24 @@
  * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
  */
 
-public class Akira.Lib.Components.Layer : Component, Copyable<Layer> {
-    private bool _locked;
+public class Akira.Lib.Components.Text : Component, Copyable<Text> {
+    private string p_text;
 
-    public bool locked {
-        get { return _locked; }
+    public string text { get { return p_text; } }
+
+    public Text (string new_text) {
+        p_text = new_text;
     }
 
-    public Layer (bool locked) {
-        _locked = locked;
-    }
-
-    public Layer.deserialized (Json.Object obj) {
-        _locked = obj.get_boolean_member ("locked");
+    public Text.deserialized (Json.Object obj) {
+        p_text = obj.get_string_member ("text");
     }
 
     protected override void serialize_details (ref Json.Object obj) {
-        obj.set_boolean_member ("locked", _locked);
+        obj.set_string_member ("text", p_text);
     }
 
-    public Layer copy () {
-        return new Layer (_locked);
-    }
-
-    public Layer with_locked (bool new_locked) {
-        return new Layer (new_locked);
+    public Text copy () {
+        return new Text (p_text);
     }
 }

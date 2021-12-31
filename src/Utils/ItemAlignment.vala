@@ -108,7 +108,7 @@ public class Akira.Utils.ItemAlignment : Object {
         Lib.Items.ModelNode? anchor,
         ref Geometry.Rectangle align_to
     ) {
-        bool found_bound = false;
+        bool found_bounds = false;
 
         switch (type) {
             case AlignmentType.AUTO:
@@ -123,7 +123,7 @@ public class Akira.Utils.ItemAlignment : Object {
                     align_to.right = double.max (align_to.right, bb.right);
                     align_to.top = double.min (align_to.top, bb.top);
                     align_to.bottom = double.max (align_to.bottom, bb.bottom);
-                    found_bound = true;
+                    found_bounds = true;
                 }
 
                 break;
@@ -133,7 +133,7 @@ public class Akira.Utils.ItemAlignment : Object {
                     if (node.sid < last_sid) {
                         align_to = node.node.instance.bounding_box;
                         last_sid = node.sid;
-                        found_bound = true;
+                        found_bounds = true;
                     }
                 }
 
@@ -144,7 +144,7 @@ public class Akira.Utils.ItemAlignment : Object {
                     if (node.sid > last_sid) {
                         align_to = node.node.instance.bounding_box;
                         last_sid = node.sid;
-                        found_bound = true;
+                        found_bounds = true;
                     }
                 }
 
@@ -156,13 +156,13 @@ public class Akira.Utils.ItemAlignment : Object {
                 align_to.right = bb.right;
                 align_to.top = bb.top;
                 align_to.bottom = bb.bottom;
-                found_bound = true;
+                found_bounds = true;
                 break;
             default:
                 break;
         }
 
-        return found_bound;
+        return found_bounds;
     }
 
     private static bool align_selection_to_left (
@@ -284,6 +284,6 @@ public class Akira.Utils.ItemAlignment : Object {
             }
         }
 
-        model.mark_node_geometry_dirty (node);
+        model.alert_node_changed(node, Lib.Components.Component.Type.COMPILED_GEOMETRY);
     }
 }

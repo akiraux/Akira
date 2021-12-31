@@ -73,4 +73,11 @@ public class Akira.Layouts.MainWindow : Gtk.Grid {
     public void remove_layers (GLib.Array<int> ids) {
         layers_sidebar.layers_listbox.remove_items (ids);
     }
+
+    /*
+     * Pass the list of nodes ids to be added to the layers list.
+     */
+    public void add_layers (GLib.Array<int> ids) {
+        layers_sidebar.layers_listbox.add_items (ids);
+    }
 }
