@@ -195,7 +195,7 @@ public class Akira.Models.PathEditModel : Object {
                 // If either of the tangent points is selected and moved,
                 // then the other needs to be rotated too.
                 if (compare_points (points[j + 1], point, thresh)) {
-                    if (are_points_in_line (j + 1, j, j + 2)) {
+                    if (are_tangents_inline (points[j + 1], points[j], points[j + 2])) {
                         index[0] = j + 1;
                         index[1] = j + 2;
                     } else {
@@ -206,7 +206,7 @@ public class Akira.Models.PathEditModel : Object {
                 }
 
                 if (compare_points (points[j + 2], point, thresh)) {
-                    if (are_points_in_line (j + 1, j, j + 2)) {
+                    if (are_tangents_inline (points[j + 1], points[j], points[j + 2])) {
                         index[0] = j + 1;
                         index[1] = j + 2;
                     } else {
@@ -436,17 +436,15 @@ public class Akira.Models.PathEditModel : Object {
         return live_extents;
     }
 
-    private bool are_points_in_line (int tangent_1_idx, int curve_begin_idx, int tangent_2_idx) {
-        Geometry.Point first_tangent = points[tangent_1_idx];
-        Geometry.Point second_tangent = points[tangent_2_idx];
-        Geometry.Point curve_begin = points[curve_begin_idx];
-
+    private bool are_tangents_inline (Geometry.Point tangent_1, Geometry.Point tangent_2, Geometry.Point curve_begin) {
         // Slope and intercept of line formed by tangents.
-        double slope_tangents = (second_tangent.y - first_tangent.y) / (second_tangent.x - first_tangent.x);
-        double intercept = first_tangent.y - slope_tangents * first_tangent.x;
+        double slope = (tangent_2.y - tangent_1.y) / (tangent_2.x - tangent_1.x);
+        double intercept = tangent_1.y - slope * tangent_1.x;
 
-        // Check if the curve_begin point lies on this tangent.
-        if (curve_begin.y == (slope_tangents * curve_begin.x + intercept)) {
+        double rhs = slope * curve_begin.x + intercept;
+
+        // Check if the curve_begin point lies on this line.
+        if ((curve_begin.y - rhs).abs () < 1.0) {
             tangents_inline = true;
             return true;
         }

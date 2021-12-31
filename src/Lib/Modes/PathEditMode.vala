@@ -75,8 +75,8 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
         mode = Submode.APPEND;
     }
 
-    public void toggle_functionality (bool is_edit_path) {
-        mode = is_edit_path ? Submode.EDIT : Submode.APPEND;
+    public void toggle_functionality (bool is_append_path) {
+        mode = is_append_path ? Submode.APPEND : Submode.EDIT;
 
         // If we are editing the path, we need to set the first point in edit_model
         if (mode == Submode.EDIT) {
@@ -88,7 +88,7 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
             var first_point = Geometry.Point (center_x - width / 2.0, center_y - height / 2.0);
 
             double rotation = instance.components.transform.rotation;
-            var origin = Geometry.Point (instance.components.center.x, instance.components.center.y);
+            var origin = Geometry.Point (center_x, center_y);
 
             first_point = Utils.GeometryMath.rotate_point (first_point, rotation, origin);
 
