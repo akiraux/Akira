@@ -202,7 +202,6 @@ public class Akira.Lib.Modes.ItemInsertMode : AbstractInteractionMode {
                 break;
 
             case "text":
-                // TODO: Temporarily draw a path shape. We'll deal with text later.
                 new_item = Lib.Items.ModelTypeText.default_text (
                     coordinates,
                     size,

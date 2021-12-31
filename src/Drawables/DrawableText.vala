@@ -80,8 +80,8 @@ public class Akira.Drawables.DrawableText : Drawable {
 
         var layout = create_pango_layout (context, label, w, scale, null);
         context.set_matrix (global_transform);
-        context.rectangle(x, y, w, h);
-        context.clip();
+        context.rectangle (x, y, w, h);
+        context.clip ();
         context.move_to (x, y);
         Pango.cairo_show_layout (context, layout);
     }
