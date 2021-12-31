@@ -163,8 +163,9 @@ public class Akira.Models.PathEditModel : Object {
         instance.components.center = new Lib.Components.Coordinates (center_x, center_y);
         instance.components.size = new Lib.Components.Size (bounds.width, bounds.height, false);
         // Update the component.
-        view_canvas.items_manager.item_model.mark_node_geometry_dirty_by_id (instance.id);
-        view_canvas.items_manager.compile_model ();
+        unowned var im = view_canvas.items_manager;
+        im.item_model.alert_item_changed (instance.id, Lib.Components.Component.Type.COMPILED_GEOMETRY);
+        im.compile_model ();
 
         update_view ();
     }

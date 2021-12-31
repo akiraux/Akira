@@ -271,6 +271,6 @@ public class Akira.Utils.ItemAlignment : Object {
             }
         }
 
-        model.mark_node_geometry_dirty (node);
+        model.alert_node_changed(node, Lib.Components.Component.Type.COMPILED_GEOMETRY);
     }
 }

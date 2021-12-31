@@ -277,7 +277,10 @@ public class Akira.Lib.Modes.TransformMode : AbstractInteractionMode {
             var new_center_x = item_drag_data.item_geometry.area.center_x + delta_x + snap_offset_x;
             var new_center_y = item_drag_data.item_geometry.area.center_y + delta_y + snap_offset_y;
             item.components.center = new Lib.Components.Coordinates (new_center_x, new_center_y);
-            items_manager.item_model.mark_node_geometry_dirty (sel_node.node);
+            items_manager.item_model.alert_node_changed (
+                sel_node.node,
+                Lib.Components.Component.Type.COMPILED_GEOMETRY
+            );
         }
 
         items_manager.compile_model ();
@@ -318,7 +321,7 @@ public class Akira.Lib.Modes.TransformMode : AbstractInteractionMode {
             var new_center_x = item_drag_data.item_geometry.area.center_x + delta_x + snap_offset_x;
             var new_center_y = item_drag_data.item_geometry.area.center_y + delta_y + snap_offset_y;
             item.components.center = new Lib.Components.Coordinates (new_center_x, new_center_y);
-            model.mark_node_geometry_dirty (child);
+            model.alert_node_changed (child, Lib.Components.Component.Type.COMPILED_GEOMETRY);
         }
     }
 
@@ -506,7 +509,10 @@ public class Akira.Lib.Modes.TransformMode : AbstractInteractionMode {
                 item.components.transform = item.components.transform.with_main_rotation (new_rotation);
             }
 
-            view_canvas.items_manager.item_model.mark_node_geometry_dirty (node);
+            view_canvas.items_manager.item_model.alert_node_changed (
+                node,
+                Lib.Components.Component.Type.COMPILED_GEOMETRY
+            );
         }
 
         if (node.children != null && node.children.length > 0) {
