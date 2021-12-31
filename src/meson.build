@@ -53,10 +53,13 @@ sources = files(
     'Layouts/LayersList/LayerListItem.vala',
     'Layouts/LayersList/LayerListStore.vala',
 
+    'Layouts/Alignment/AlignmentPanel.vala',
+    'Layouts/Alignment/AlignmentButton.vala',
+
     'Layouts/Sidebars/LayersSidebar.vala',
+    'Layouts/Sidebars/OptionsSidebar.vala',
 
     'Widgets/AddColorButton.vala',
-    'Widgets/AlignBoxButton.vala',
     'Widgets/ButtonImage.vala',
     'Widgets/ColorField.vala',
     #'Widgets/ColorRow.vala',

@@ -524,9 +524,17 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             return;
         }
 
-        var type = Utils.ItemAlignment.AlignmentType.AUTO;
+        unowned int? sub_selection_node_id = view_canvas.nob_manager.sub_selection_node_id;
 
-        Utils.ItemAlignment.align_selection (selection, direction, type, view_canvas);
+        var type = Utils.ItemAlignment.AlignmentType.AUTO;
+        Lib.Items.ModelNode? anchor = null;
+
+        if (sub_selection_node_id != null) {
+            anchor = node_from_id (sub_selection_node_id);
+            type = Utils.ItemAlignment.AlignmentType.ANCHOR;
+        }
+
+        Utils.ItemAlignment.align_selection (selection, direction, type, anchor, view_canvas);
     }
 
 }
