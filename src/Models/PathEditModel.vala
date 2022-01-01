@@ -166,7 +166,16 @@ public class Akira.Models.PathEditModel : Object {
      * If a point was clicked, index refers to its location.
      */
     public Lib.Modes.PathEditMode.PointType hit_test (double x, double y, ref int[] index) {
-        Geometry.Point point = Geometry.Point (x - first_point.x, y - first_point.y);
+        // In order to check if user clicked on a point, we need to rotate the first point and the event
+        // around the item center. Then the difference between these values gives the location
+        // event in the same coordinate system as the points.
+        double rotation = instance.components.transform.rotation;
+        var orig_first_pt = rotate_point_around_item_origin (first_point, -rotation);
+
+        Geometry.Point point = Geometry.Point (x, y);
+        point = rotate_point_around_item_origin (point, -rotation);
+        point = Geometry.Point (point.x - orig_first_pt.x, point.y - orig_first_pt.y);
+
         tangents_inline = false;
         double thresh = HIT_SIZE / view_canvas.scale;
 
@@ -232,8 +241,12 @@ public class Akira.Models.PathEditModel : Object {
      * This method will be used when editing paths to update the position of a point.
      */
     public void modify_point_value (Geometry.Point new_pos) {
-        new_pos.x -= first_point.x;
-        new_pos.y -= first_point.y;
+        double rotation = instance.components.transform.rotation;
+        var orig_first_pt = rotate_point_around_item_origin (first_point, -rotation);
+        new_pos = rotate_point_around_item_origin (new_pos, -rotation);
+
+        new_pos.x -= orig_first_pt.x;
+        new_pos.y -= orig_first_pt.y;
 
         if (selected_pts.size == 1) {
             // If only one point is selected, it will act as reference point.
