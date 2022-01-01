@@ -470,7 +470,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         (blocker);
 
         var group = Lib.Items.ModelTypeArtboard.default_artboard (
-            new Lib.Components.Coordinates (500, 500),
+            new Lib.Components.Coordinates (520, 520),
             new Lib.Components.Size (1000, 1000, false)
         );
         //var group = Lib.Items.ModelTypeGroup.default_group ();

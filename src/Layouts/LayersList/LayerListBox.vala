@@ -301,10 +301,18 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
             return;
         }
 
+        bool multi = false;
         foreach (var node in sm.selection.nodes.values) {
             if (layers[node.node.id] != null) {
-                select_row_at_index (model.get_index_of (layers[node.node.id]));
+                select_row_at_index (model.get_index_of (layers[node.node.id]), multi);
+                multi = true;
             }
+        }
+
+        if (multi) {
+            // Trigger a visual refresh of the visible layers without changing
+            // anything in the list store in order to show the newly selected layers.
+            list_store.items_changed (0, 0, 0);
         }
     }
 
@@ -312,13 +320,13 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
      * Show the hover effect on a canvas item if available.
      */
     private void on_row_hovered (GLib.Object? item) {
-        view_canvas.hover_manager.remove_hover_effect ();
-
-        if (item != null) {
-            view_canvas.hover_manager.maybe_create_hover_effect_by_id (
-                ((LayerItemModel) item).id
-            );
+        unowned var hm = view_canvas.hover_manager;
+        if (item == null) {
+            hm.remove_hover_effect ();
+            return;
         }
+
+        hm.maybe_create_hover_effect_by_id (((LayerItemModel) item).id);
     }
 
     /*
