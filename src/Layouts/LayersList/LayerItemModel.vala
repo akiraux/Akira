@@ -87,6 +87,30 @@ public class Akira.Layouts.LayersList.LayerItemModel : GLib.Object {
         get {
             return _cached_instance.components.layer.locked;
         }
+        set {
+            if (_cached_instance.components.layer.locked == value) {
+                return;
+            }
+
+            // If the layer is being locked we need to remove it from the
+            // current selection if needed.
+            if (value) {
+                unowned var sm = _view_canvas.selection_manager;
+                sm.remove_from_selection (id);
+                sm.selection_modified_external ();
+            }
+
+            unowned var im = _view_canvas.items_manager;
+            var node = im.item_model.node_from_id (_cached_instance.id);
+            assert (node != null);
+
+            node.instance.components.layer = new Lib.Components.Layer (value);
+            // If the layer is a group we need to update the locked state on
+            // all of its children.
+            if (node.children != null) {
+                _view_canvas.window.main_window.set_children_locked (node.get_children_ids (), value);
+            }
+        }
     }
 
     /*

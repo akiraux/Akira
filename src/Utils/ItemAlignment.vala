@@ -284,6 +284,6 @@ public class Akira.Utils.ItemAlignment : Object {
             }
         }
 
-        model.alert_node_changed(node, Lib.Components.Component.Type.COMPILED_GEOMETRY);
+        model.alert_node_changed (node, Lib.Components.Component.Type.COMPILED_GEOMETRY);
     }
 }

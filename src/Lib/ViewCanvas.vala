@@ -310,6 +310,11 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
             return true;
         }
 
+        var new_mode = new Lib.Modes.MultiSelectMode (this);
+        mode_manager.register_mode (new_mode);
+
+        mode_manager.button_press_event (event);
+
         return false;
     }
 
@@ -330,6 +335,11 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
             );
 
             if (target != null) {
+                // If the item is locked, no selection is allowed.
+                if (target.instance.components.layer.locked) {
+                    return false;
+                }
+
                 // Check if the clicked item is not already selected.
                 if (!selection_manager.item_selected (target.id)) {
                     // Reset the selection if SHIFT isn't pressed.

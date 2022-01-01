@@ -44,6 +44,7 @@ public class Akira.ViewLayers.ViewLayer : Object {
     public const string GRID_LAYER_ID = "88_grid_layer";
     public const string ANCHOR_LAYER_ID = "78_anchor_layer";
     public const string HOVER_LAYER_ID = "77_hover_layer";
+    public const string MULTI_SELECT_LAYER_ID = "76_multiselect_layer";
     // at a time, only one of nobs and path layer will be shown.
     // so they have equal priority
     public const string NOBS_LAYER_ID = "66_nobs_layer";
