@@ -356,7 +356,7 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
                     }
                 }
             } else if (
-                !selection_manager.selection.bounding_box ().contains (event.x, event.y) &&
+                !selection_manager.selection.coordinates ().contains (event.x, event.y) &&
                 !selection_manager.selection.is_empty ()
             ) {
                 // Selection area was not clicked, so we reset the selection if we have some.

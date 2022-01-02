@@ -82,6 +82,25 @@ public class Akira.Utils.GeometryMath : Object {
         y = rot_center_y + dy;
     }
 
+    public static bool points_on_same_side_of_line (
+        double l1_x,
+        double l1_y,
+        double l2_x,
+        double l2_y,
+        double p1_x,
+        double p1_y,
+        double p2_x,
+        double p2_y
+    ) {
+        double delta_x = l2_x - l1_x;
+        double delta_y = l2_y - l1_y;
+
+        double one = delta_x * (p1_y - l1_y) - delta_y * (p1_x - l1_x);
+        double two = delta_x * (p2_y - l2_y) - delta_y * (p2_x - l2_x);
+
+        return (one >= 0 && two >= 0) || (one <= 0 && two <= 0);
+    }
+
     public static bool is_normal_rotation (double rot_in_degrees) {
          return GLib.Math.fmod (rot_in_degrees, 90) == 0;
     }
@@ -268,4 +287,6 @@ public class Akira.Utils.GeometryMath : Object {
 
         return area;
     }
+
+
 }
