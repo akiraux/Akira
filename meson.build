@@ -22,6 +22,7 @@ cairo_dependency = dependency('cairo', version: '>=1.14')
 goocanvas_dependency = dependency('goocanvas-3.0')
 libarchive_dependency = dependency('libarchive')
 json_glib_dependency = dependency('json-glib-1.0')
+libportal_dependency = dependency('libportal')
 
 # Optional dependencies
 desktop_file_validate = find_program('desktop-file-validate', required: false)

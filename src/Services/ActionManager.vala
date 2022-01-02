@@ -470,19 +470,6 @@ public class Akira.Services.ActionManager : Object {
 
         bool is_holding_shift = false;
         var color_picker = new Akira.Utils.ColorPicker ();
-        color_picker.show_all ();
-
-        color_picker.key_pressed.connect (e => {
-            is_holding_shift = e.keyval == Gdk.Key.Shift_L;
-        });
-
-        color_picker.key_released.connect (e => {
-            is_holding_shift = e.keyval == Gdk.Key.Shift_L;
-        });
-
-        color_picker.cancelled.connect (() => {
-            color_picker.close ();
-        });
 
         color_picker.picked.connect (color => {
             foreach (var item in canvas.selected_bound_manager.selected_items) {
@@ -499,8 +486,6 @@ public class Akira.Services.ActionManager : Object {
 
                 item.fills.update_color_from_action (color);
             }
-
-            color_picker.close ();
 
             // Force a UI reload of the fills and borders panel since some items
             // had their properties changed.

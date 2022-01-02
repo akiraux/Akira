@@ -132,6 +132,7 @@ deps = [
     goocanvas_dependency,
     libarchive_dependency,
     json_glib_dependency,
+    libportal_dependency,
     m_dep
 ]
 
