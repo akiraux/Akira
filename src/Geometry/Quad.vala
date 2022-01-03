@@ -120,6 +120,17 @@ public struct Akira.Geometry.Quad {
         bl_y = br_y - woffy;
     }
 
+    public bool contains (double x, double y) {
+        if (!bounding_box.contains (x, y)) {
+            return false;
+        }
+
+        return Utils.GeometryMath.points_on_same_side_of_line (tl_x, tl_y, tr_x, tr_y, br_x, br_y, x, y)
+            && Utils.GeometryMath.points_on_same_side_of_line (tr_x, tr_y, br_x, br_y, bl_x, bl_y, x, y)
+            && Utils.GeometryMath.points_on_same_side_of_line (br_x, br_y, bl_x, bl_y, tl_x, tl_y, x, y)
+            && Utils.GeometryMath.points_on_same_side_of_line (bl_x, bl_y, tl_x, tl_y, tr_x, tr_y, x, y);
+    }
+
     public void translate (double dx, double dy) {
         tl_x += dx;
         tr_x += dx;
