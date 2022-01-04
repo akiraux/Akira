@@ -1,27 +1,29 @@
 /*
- * Copyright (c) 2019 Alecaddd (http://alecaddd.com)
+ * Copyright (c) 2019-2022 Alecaddd (https://alecaddd.com)
  *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * This file is part of Akira.
  *
- * This program is distributed in the hope that it will be useful,
+ * Akira is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+
+ * Akira is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
- *
- * You should have received a copy of the GNU General Public
- * License along with this program; if not, write to the
- * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
- * Boston, MA 02110-1301 USA
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+
+ * You should have received a copy of the GNU General Public License
+ * along with Akira. If not, see <https://www.gnu.org/licenses/>.
  *
  * Authored by: Giacomo "giacomoalbe" Alberini <giacomoalbe@gmail.com>
+ *              Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
  */
 public class Akira.Layouts.Alignment.AlignmentPanel : Gtk.Grid {
     public unowned Lib.ViewCanvas view_canvas { get; construct; }
 
-    public int current_button_column { get; set; default = 0; }
+    private Gee.ArrayList<Gtk.Button> buttons;
+    private int grid_column { get; set; default = 0; }
 
     private struct AlignBoxItem {
         public string type;
@@ -44,7 +46,7 @@ public class Akira.Layouts.Alignment.AlignmentPanel : Gtk.Grid {
         }
     }
 
-    private AlignBoxItem[] align_items_panel_buttons = {
+    private AlignBoxItem[] align_items_buttons = {
         //AlignBoxItem ("btn", Utils.ItemAlignment.AlignmentDirection.HEVEN, "distribute-horizontal-center", _("Distribute Horizontally"), {"<Ctrl><Shift>1"}),
         //AlignBoxItem ("btn", Utils.ItemAlignment.AlignemtDirection.VEVEN, "distribute-vertical-center", _("Distribute Vertically"), {"<Ctrl><Shift>2"}),
         //AlignBoxItem ("sep"),
@@ -58,38 +60,52 @@ public class Akira.Layouts.Alignment.AlignmentPanel : Gtk.Grid {
     };
 
     public AlignmentPanel (Lib.ViewCanvas view_canvas) {
-        Object (
-            view_canvas: view_canvas
-        );
+        Object (view_canvas: view_canvas);
     }
 
     construct {
-        get_style_context ().add_class ("alignment-box");
+        get_style_context ().add_class ("alignment-panel");
         column_homogeneous = true;
         hexpand = true;
+        buttons = new Gee.ArrayList<Gtk.Button> ();
 
-        foreach (var item in align_items_panel_buttons) {
+        foreach (var item in align_items_buttons) {
             switch (item.type) {
                 case "sep":
-                    var separator = new Gtk.Separator (Gtk.Orientation.VERTICAL);
-                    separator.halign = Gtk.Align.CENTER;
-                    separator.margin_top = separator.margin_bottom = 4;
+                    var separator = new Gtk.Separator (Gtk.Orientation.VERTICAL) {
+                        halign = Gtk.Align.CENTER,
+                        margin_top = margin_bottom = 4
+                    };
 
-                    attach (separator, current_button_column++, 0, 1, 1);
+                    attach (separator, grid_column++, 0, 1, 1);
                     break;
 
                 case "btn":
-                    var tmp_align_box_button =
-                        new Layouts.Alignment.AlignmentButton (
-                            view_canvas,
-                            item.alignment_direction,
-                            item.icon_name,
-                            item.tooltip_text,
-                            item.accels);
+                    var button = new Gtk.Button.from_icon_name (item.icon_name, Gtk.IconSize.SMALL_TOOLBAR) {
+                        halign = valign = Gtk.Align.CENTER,
+                        can_focus = false,
+                        sensitive = false,
+                        tooltip_markup = Granite.markup_accel_tooltip (item.accels, item.tooltip_text)
+                    };
+                    button.clicked.connect (() => {
+                        view_canvas.window.event_bus.selection_align (item.alignment_direction);
+                    });
+                    button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
+                    button.get_style_context ().add_class ("button-rounded");
 
-                    attach (tmp_align_box_button, current_button_column++, 0, 1, 1);
+                    attach (button, grid_column++, 0, 1, 1);
+                    buttons.add (button);
                     break;
             }
+        }
+
+        view_canvas.window.event_bus.selection_modified.connect (on_selection_modified);
+    }
+
+    private void on_selection_modified () {
+        unowned var sm = view_canvas.selection_manager;
+        foreach (var button in buttons) {
+            button.sensitive = sm.count () > 1;
         }
     }
 }

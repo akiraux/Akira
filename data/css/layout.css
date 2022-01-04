@@ -59,13 +59,13 @@
     background-color: shade (@base_color, 0.9);
 }
 
-.alignment-box {
+.alignment-panel {
     background-color: alpha (@base_color, 0.7);
     border-bottom: 1px solid shade (@bg_color, 0.8);
     padding: 3px;
 }
 
-.alignment-box separator {
+.alignment-panel separator {
     border-right: none;
 }
 
