@@ -98,6 +98,8 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
 
         set_model_to_render (items_manager.item_model);
 
+        window.event_bus.toggle_presentation_mode.connect (on_toggle_presentation_mode);
+
         window.event_bus.adjust_zoom.connect (trigger_adjust_zoom);
 
         window.event_bus.set_focus_on_canvas.connect (focus_canvas);
@@ -106,6 +108,11 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
 
         mode_manager.mode_changed.connect (interaction_mode_changed);
         items_manager.items_removed.connect (on_items_removed);
+    }
+
+    public bool block_ui = false;
+    private void on_toggle_presentation_mode () {
+        block_ui = !block_ui;
     }
 
     public signal void canvas_moved (double delta_x, double delta_y);
