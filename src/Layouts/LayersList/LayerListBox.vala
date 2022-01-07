@@ -138,12 +138,8 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
 
         list_store.items_changed (0, 0, added);
 
-        GLib.Timeout.add (1, () => {
-            // Restore the current seleciton state.
-            on_selection_modified_external ();
-            return false;
-        });
-
+        // Restore the selected items.
+        on_selection_modified_external ();
 
         timer.stop ();
         seconds = timer.elapsed (out microseconds);
@@ -264,7 +260,7 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
 
         list_store.items_changed (0, 0, added);
         // Restore selected items.
-        // on_selection_modified_external ();
+        on_selection_modified_external ();
     }
 
     /*
@@ -378,7 +374,7 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
     /*
      * When an item in the canvas is selected via click interaction.
      */
-    private void on_selection_modified_external () {
+    private void on_selection_modified_external (bool go_to_layer = false) {
         reset_edited_row ();
 
         // Always reset the selection of the layers.
@@ -389,11 +385,25 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
             return;
         }
 
-        bool multi = false;
-        foreach (var node in sm.selection.nodes.values) {
-            if (layers[node.node.id] != null) {
-                select_row_at_index (model.get_index_of (layers[node.node.id]), multi);
-                multi = true;
+        var it = sm.selection.nodes.map_iterator ();
+
+        // If the selection was modified from a click on the canvas, we need to
+        // move the first selected layer into the viewport of the layers list.
+        if (go_to_layer) {
+            it.next ();
+            var first_node =  it.get_value ().node;
+            if (layers[first_node.id] != null) {
+                select_row_at_index (model.get_index_of (layers[first_node.id]));
+            }
+        }
+
+        // For all other scenarios where a selection is restored dynamically or
+        // multiple items are selected, we don't generate the layer row widgets
+        // but we only update the selection state of the model.
+        while (it.next ()) {
+            var node = it.get_value ().node;
+            if (layers[node.id] != null) {
+                list_store.set_item_selected (layers[node.id], true);
             }
         }
 

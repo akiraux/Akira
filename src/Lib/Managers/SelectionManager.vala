@@ -29,7 +29,7 @@ public class Akira.Lib.Managers.SelectionManager : Object {
     // Signal triggered only when an item is added or removed from the selection
     // map exclusively via click event from the ViewCanvas. This is necessary in
     // order to only update the Layers panel without triggering a selection loop.
-    public signal void selection_modified_external ();
+    public signal void selection_modified_external (bool go_to_layer = false);
 
     public unowned ViewCanvas view_canvas { get; construct; }
 

@@ -355,7 +355,7 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
                     }
 
                     selection_manager.add_to_selection (target.id);
-                    selection_manager.selection_modified_external ();
+                    selection_manager.selection_modified_external (true);
                 } else {
                     if (selection_manager.selection.count () > 1) {
                         // Don't trigger sub selection when only one item's selected
@@ -368,7 +368,7 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
             ) {
                 // Selection area was not clicked, so we reset the selection if we have some.
                 selection_manager.reset_selection ();
-                selection_manager.selection_modified_external ();
+                selection_manager.selection_modified_external (true);
             }
         }
 
@@ -432,14 +432,14 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
             ) {
                 selection_manager.reset_selection ();
                 selection_manager.add_to_selection (target.id);
-                selection_manager.selection_modified_external ();
+                selection_manager.selection_modified_external (true);
             }
 
             // If the click happened on an empty area and we have multiple
             // selected items, deselect them all.
             if (target == null && count > 1) {
                 selection_manager.reset_selection ();
-                selection_manager.selection_modified_external ();
+                selection_manager.selection_modified_external (true);
             }
         }
 
