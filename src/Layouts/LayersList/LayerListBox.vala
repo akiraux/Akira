@@ -391,7 +391,7 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
         // move the first selected layer into the viewport of the layers list.
         if (go_to_layer) {
             it.next ();
-            var first_node =  it.get_value ().node;
+            var first_node = it.get_value ().node;
             if (layers[first_node.id] != null) {
                 select_row_at_index (model.get_index_of (layers[first_node.id]));
             }
