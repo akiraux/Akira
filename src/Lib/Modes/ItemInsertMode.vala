@@ -121,7 +121,7 @@ public class Akira.Lib.Modes.ItemInsertMode : AbstractInteractionMode {
 
             // Defer the print of the layer UI after all items have been created.
             view_canvas.window.main_window.show_added_layers (1);
-            view_canvas.selection_manager.selection_modified_external ();
+            view_canvas.selection_manager.selection_modified_external (true);
             return true;
         }
 

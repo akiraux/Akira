@@ -265,7 +265,7 @@ public class VirtualizingListBox : Gtk.Container, Gtk.Scrollable {
         remove_all_widgets ();
         shown_to = shown_from;
         update_bin_window ();
-        ensure_visible_widgets (true);
+        ensure_visible_widgets (removed > 0 || added > 0);
 
         if (vadjustment == null) {
             queue_resize ();
@@ -764,10 +764,10 @@ public class VirtualizingListBox : Gtk.Container, Gtk.Scrollable {
         }
     }
 
-    protected void select_row_at_index (int index, bool multiple) {
+    protected void select_row_at_index (int index) {
         // If multiple rows are being selected, just get the new widget row
         // without scrolling the listbox and ensure its visibility.
-        var row = multiple ? get_widget (index) : ensure_index_visible (index);
+        var row = ensure_index_visible (index);
 
         if (row != null) {
             select_and_activate (row);

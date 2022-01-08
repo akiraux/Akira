@@ -502,19 +502,22 @@ public class Akira.Lib.Managers.ItemsManager : Object {
 
         compile_model ();
 
+        // Defer the print of the layer UI after all items have been created.
+        view_canvas.window.main_window.show_added_layers (num_of++);
+
         if (debug_timer) {
             timer.stop ();
             seconds = timer.elapsed (out microseconds);
             print ("Created %u items in %s s\n", num_of, seconds.to_string ());
         }
 
-        // Defer the print of the layer UI after all items have been created.
-        view_canvas.window.main_window.show_added_layers (num_of++);
-
         return group;
     }
 
     public void debug_add_rectangles (uint num_of, bool debug_timer = false) {
+        // Always reset the selection before adding a chunk of items.
+        view_canvas.selection_manager.reset_selection ();
+
         ulong microseconds;
         double seconds;
 
@@ -532,17 +535,17 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             view_canvas.selection_manager.add_to_selection (new_item.id);
         }
 
-        if (debug_timer) {
-            timer.stop ();
-            seconds = timer.elapsed (out microseconds);
-            print ("Created %u items in %s s\n", num_of, seconds.to_string ());
-        }
-
         view_canvas.pause_redraw = false;
         view_canvas.request_redraw (view_canvas.get_bounds ());
 
         // Defer the print of the layer UI after all items have been created.
         view_canvas.window.main_window.show_added_layers ((int) num_of);
+
+        if (debug_timer) {
+            timer.stop ();
+            seconds = timer.elapsed (out microseconds);
+            print ("Created %u items in %s s\n", num_of, seconds.to_string ());
+        }
     }
 
     public void on_item_geometry_changed (int id) {

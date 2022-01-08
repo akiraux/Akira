@@ -117,6 +117,6 @@ public class Akira.Lib.Modes.MultiSelectMode : AbstractInteractionMode {
             view_canvas.selection_manager.add_to_selection (item.instance.id);
         }
 
-        view_canvas.selection_manager.selection_modified_external ();
+        view_canvas.selection_manager.selection_modified_external (true);
     }
 }
