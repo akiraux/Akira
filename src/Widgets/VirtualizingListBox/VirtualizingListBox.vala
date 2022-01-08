@@ -265,7 +265,7 @@ public class VirtualizingListBox : Gtk.Container, Gtk.Scrollable {
         remove_all_widgets ();
         shown_to = shown_from;
         update_bin_window ();
-        ensure_visible_widgets (true);
+        ensure_visible_widgets (removed > 0 || added > 0);
 
         if (vadjustment == null) {
             queue_resize ();

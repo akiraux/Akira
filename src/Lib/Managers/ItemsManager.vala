@@ -515,6 +515,9 @@ public class Akira.Lib.Managers.ItemsManager : Object {
     }
 
     public void debug_add_rectangles (uint num_of, bool debug_timer = false) {
+        // Always reset the selection before adding a chunk of items.
+        view_canvas.selection_manager.reset_selection ();
+
         ulong microseconds;
         double seconds;
 

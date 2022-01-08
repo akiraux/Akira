@@ -143,7 +143,7 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
 
         timer.stop ();
         seconds = timer.elapsed (out microseconds);
-        print ("Created %i items in %s s\n", added, seconds.to_string ());
+        print ("Created %i layers in %s s\n", added, seconds.to_string ());
     }
 
     /*
@@ -168,7 +168,7 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
 
         timer.stop ();
         seconds = timer.elapsed (out microseconds);
-        print ("Deleted %i items in %s s\n", removed, seconds.to_string ());
+        print ("Deleted %i layers in %s s\n", removed, seconds.to_string ());
     }
 
     private void on_item_added (int id) {
