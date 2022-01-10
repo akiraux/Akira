@@ -122,8 +122,8 @@ public struct Akira.Geometry.Quad {
         bl_x = br_x - woffx;
         bl_y = br_y - woffy;
 
-        transform.x0 = center_x - hw; 
-        transform.y0 = center_y - hh; 
+        transform.x0 = center_x - hw;
+        transform.y0 = center_y - hh;
     }
 
     public bool contains (double x, double y) {

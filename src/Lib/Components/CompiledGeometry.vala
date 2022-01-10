@@ -120,6 +120,8 @@ public class Akira.Lib.Components.CompiledGeometry : Copyable<CompiledGeometry> 
         double width = 0;
         double height = 0;
 
+        int border_overestimate = 1;
+
         if (size_from_path) {
             if (components.path == null) {
                 _data.area = Geometry.Quad ();
@@ -131,6 +133,7 @@ public class Akira.Lib.Components.CompiledGeometry : Copyable<CompiledGeometry> 
             width = ext.width;
             height = ext.height;
             _data.source_size = new Lib.Components.Size (ext.width, ext.height, false);
+            border_overestimate = 4;
         } else {
             if (components.size == null) {
                 _data.area = Geometry.Quad ();
@@ -148,7 +151,8 @@ public class Akira.Lib.Components.CompiledGeometry : Copyable<CompiledGeometry> 
         _data.area = Geometry.Quad.from_components (center_x, center_y, width, height, _data._transformation_matrix);
 
         if (border_width > 0) {
-            _data.drawable_area = Geometry.Quad.from_components (center_x, center_y, width + border_width * 2, height + border_width * 2, _data._transformation_matrix);
+            var bw = border_width * 2 * border_overestimate;
+            _data.drawable_area = Geometry.Quad.from_components (center_x, center_y, width + bw, height + bw, _data._transformation_matrix);
         }
         else {
             _data.drawable_area = _data.area;
