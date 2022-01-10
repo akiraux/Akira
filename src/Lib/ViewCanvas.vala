@@ -193,8 +193,6 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
     }
 
     public void focus_canvas () {
-        // TODO
-        // grab_focus (get_root_item ());
         grab_focus ();
     }
 
@@ -296,21 +294,22 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
         event.x = event.x / current_scale;
         event.y = event.y / current_scale;
 
+        // Handle a double click event.
         if (event.type == Gdk.EventType.@2BUTTON_PRESS) {
-            if (handle_double_click_event ()) {
+            handle_double_click_event (event);
+            return true;
+        }
+
+        // Handle a mouse wheel/middle button press event.
+        if (event.button == Gdk.BUTTON_MIDDLE) {
+            mode_manager.start_panning_mode ();
+            if (mode_manager.button_press_event (event)) {
                 return true;
             }
         }
 
         if (mode_manager.button_press_event (event)) {
             return true;
-        }
-
-        if (event.button == Gdk.BUTTON_MIDDLE) {
-            mode_manager.start_panning_mode ();
-            if (mode_manager.button_press_event (event)) {
-                return true;
-            }
         }
 
         if (handle_selection_press_event (event)) {
@@ -327,9 +326,13 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
 
     /*
      * Check if a selection exists, and transform it appropriately, return true if
-     * the event should be abosrbed.
+     * the event should be absorbed.
      */
     private bool handle_selection_press_event (Gdk.EventButton event) {
+        // Register the initial click event coordinates.
+        initial_event_x = event.x;
+        initial_event_y = event.y;
+
         Lib.Items.ModelNode? target = null;
         var nob_clicked = nob_manager.hit_test (event.x, event.y);
 
@@ -356,11 +359,6 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
 
                     selection_manager.add_to_selection (target.id);
                     selection_manager.selection_modified_external (true);
-                } else {
-                    if (selection_manager.selection.count () > 1) {
-                        // Don't trigger sub selection when only one item's selected
-                        nob_manager.toggle_sub_selection (target.id);
-                    }
                 }
             } else if (
                 !selection_manager.selection.coordinates ().contains (event.x, event.y) &&
@@ -375,10 +373,10 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
         if (!selection_manager.is_empty ()) {
             // Register a click on an empty area if we have multiple selected
             // items, the click didn't select any nob, and no item was clicked.
-            if (nob_clicked == Utils.Nobs.Nob.NONE && target == null) {
-                initial_event_x = event.x;
-                initial_event_y = event.y;
-            }
+            // if (nob_clicked == Utils.Nobs.Nob.NONE && target == null) {
+            //     initial_event_x = event.x;
+            //     initial_event_y = event.y;
+            // }
 
             var new_mode = new Lib.Modes.TransformMode (this, nob_clicked);
             mode_manager.register_mode (new_mode);
@@ -391,30 +389,45 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
         return false;
     }
 
-    private bool handle_double_click_event () {
-        // If the user double clicks on a CanvasItem, the item gets added to
-        // selection_manager on the first click. If double click happened on
-        // empty area, no items is selected.
-        var selected_item = selection_manager.selection.first_node ();
+    private void handle_double_click_event (Gdk.EventButton event) {
+        Lib.Items.ModelNode? target = null;
+        var nob_clicked = nob_manager.hit_test (event.x, event.y);
 
-        if (selected_item == null) {
-            return false;
+        // Bail out if the double click happened on a nob.
+        if (nob_clicked != Utils.Nobs.Nob.NONE) {
+            return;
         }
 
-        if (selected_item.instance.type is Lib.Items.ModelTypePath) {
-            var path_edit_mode = new Lib.Modes.PathEditMode (this, selected_item.instance);
+        // If no nob is selected, we test for an item.
+        target = items_manager.node_at_canvas_position (
+            event.x,
+            event.y,
+            Drawables.Drawable.HitTestType.SELECT
+        );
+
+        // Bail out if the double click happened on an empty area.
+        if (target == null) {
+            return;
+        }
+
+        if (target.instance.type is Lib.Items.ModelTypePath) {
+            var path_edit_mode = new Lib.Modes.PathEditMode (this, target.instance);
             path_edit_mode.toggle_functionality (false);
             mode_manager.register_mode (path_edit_mode);
-
-            return true;
         }
-
-        return false;
     }
 
     public override bool button_release_event (Gdk.EventButton event) {
-        // Check if the there's no delta between the pressed and released event.
-        if (initial_event_x == event.x || initial_event_y == event.y) {
+        event.x = event.x / current_scale;
+        event.y = event.y / current_scale;
+
+        // Check if the there's no delta between the pressed and released event
+        // and the SHIFT modifier is not pressed. If the SHIFT modifier is pressed
+        // we're adding items to the selection so we don't need to do anything else.
+        if (
+            (initial_event_x == event.x || initial_event_y == event.y) &&
+            !shift_is_pressed
+        ) {
             var count = selection_manager.count ();
             var target = items_manager.node_at_canvas_position (
                 event.x,
@@ -423,16 +436,22 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
             );
 
             // If the click happened on an item, we have multiple selected
-            // items, and the clicked items is part fo the selection, deselect
-            // them all and select the clicked item.
+            // items, and the clicked items is part fo the selection, we need to
+            // handle a few scenarios.
             if (
                 target != null &&
                 selection_manager.item_selected (target.id) &&
                 count > 1
             ) {
-                selection_manager.reset_selection ();
-                selection_manager.add_to_selection (target.id);
-                selection_manager.selection_modified_external (true);
+                if (ctrl_is_pressed) {
+                    // If CTRL is pressed, toggle alignment anchor.
+                    nob_manager.toggle_sub_selection (target.id);
+                } else {
+                    // Deselect them all and select the clicked item.
+                    selection_manager.reset_selection ();
+                    selection_manager.add_to_selection (target.id);
+                    selection_manager.selection_modified_external (true);
+                }
             }
 
             // If the click happened on an empty area and we have multiple
@@ -443,12 +462,10 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
             }
         }
 
-        event.x = event.x / current_scale;
-        event.y = event.y / current_scale;
-
         if (mode_manager.button_release_event (event)) {
             return true;
         }
+
         return false;
     }
 

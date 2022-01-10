@@ -37,7 +37,7 @@ public class Akira.FileFormat.JsonDeserializer {
     public static void json_object_to_world (Json.Object obj, Akira.Window window, bool items_only = false) {
         var view_canvas = window.main_window.main_view_canvas.canvas;
 
-        // Se the canvas to simulate a click + holding state to avoid triggering
+        // Set the canvas to simulate a click + holding state to avoid triggering
         // redrawing methods connected to that state.
         view_canvas.holding = true;
 
