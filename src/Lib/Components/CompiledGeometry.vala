@@ -27,6 +27,7 @@ public class Akira.Lib.Components.CompiledGeometry : Copyable<CompiledGeometry> 
         public Cairo.Matrix _transformation_matrix;
         // These rectangles are in global coordinates.
         public Geometry.Quad area;
+        public Geometry.Quad drawable_area;
 
         // Cached bounding box that contains the rotated area.
         public Geometry.Rectangle area_bb;
@@ -42,6 +43,7 @@ public class Akira.Lib.Components.CompiledGeometry : Copyable<CompiledGeometry> 
 
     public Geometry.Quad area { get { return _data.area; }}
     public Geometry.Rectangle area_bb { get { return _data.area_bb; }}
+    public Geometry.Rectangle drawable_bb { get { return _data.drawable_area.bounding_box; }}
 
     public double source_width {
         get {
@@ -104,6 +106,9 @@ public class Akira.Lib.Components.CompiledGeometry : Copyable<CompiledGeometry> 
         _data.source_center = components.center;
         _data.source_transform = components.transform;
 
+        unowned var compiled_border = node.instance.compiled_border;
+        var border_width = compiled_border == null ? 0 : compiled_border.size;
+
         assert (_data.source_center != null);
 
         if (_data.source_transform == null) {
@@ -112,10 +117,8 @@ public class Akira.Lib.Components.CompiledGeometry : Copyable<CompiledGeometry> 
             _data._transformation_matrix = _data.source_transform.transformation_matrix;
         }
 
-        _data.area.transformation = _data._transformation_matrix;
-
-        double half_width = 0;
-        double half_height = 0;
+        double width = 0;
+        double height = 0;
 
         if (size_from_path) {
             if (components.path == null) {
@@ -125,8 +128,8 @@ public class Akira.Lib.Components.CompiledGeometry : Copyable<CompiledGeometry> 
             }
 
             var ext = components.path.calculate_extents ();
-            half_width = ext.width / 2.0;
-            half_height = ext.height / 2.0;
+            width = ext.width;
+            height = ext.height;
             _data.source_size = new Lib.Components.Size (ext.width, ext.height, false);
         } else {
             if (components.size == null) {
@@ -136,59 +139,25 @@ public class Akira.Lib.Components.CompiledGeometry : Copyable<CompiledGeometry> 
             }
 
             _data.source_size = components.size;
-            half_height = _data.source_size.height / 2.0;
-            half_width = _data.source_size.width / 2.0;
+            height = _data.source_size.height;
+            width = _data.source_size.width;
         }
-
-        var top = -half_height;
-        var bottom = half_height;
-        var left = -half_width;
-        var right = half_width;
-
-        var y0 = top;
-        var x0 = left;
-
-        var y1 = top;
-        var x1 = right;
-
-        var y2 = bottom;
-        var x2 = left;
-
-        var y3 = bottom;
-        var x3 = right;
-
-        _data._transformation_matrix.transform_point (ref x0, ref y0);
-        _data._transformation_matrix.transform_point (ref x1, ref y1);
-        _data._transformation_matrix.transform_point (ref x2, ref y2);
-        _data._transformation_matrix.transform_point (ref x3, ref y3);
 
         var center_x = _data.source_center.x;
         var center_y = _data.source_center.y;
-        _data._transformation_matrix.x0 = center_x;
-        _data._transformation_matrix.y0 = center_y;
+        _data.area = Geometry.Quad.from_components (center_x, center_y, width, height, _data._transformation_matrix);
 
-        y0 += center_y;
-        x0 += center_x;
-
-        y1 += center_y;
-        x1 += center_x;
-
-        y2 += center_y;
-        x2 += center_x;
-
-        y3 += center_y;
-        x3 += center_x;
-
-        _data.area.tl_x = x0;
-        _data.area.tl_y = y0;
-        _data.area.tr_x = x1;
-        _data.area.tr_y = y1;
-        _data.area.bl_x = x2;
-        _data.area.bl_y = y2;
-        _data.area.br_x = x3;
-        _data.area.br_y = y3;
+        if (border_width > 0) {
+            _data.drawable_area = Geometry.Quad.from_components (center_x, center_y, width + border_width * 2, height + border_width * 2, _data._transformation_matrix);
+        }
+        else {
+            _data.drawable_area = _data.area;
+        }
 
         _data.area_bb = _data.area.bounding_box;
+
+        _data._transformation_matrix.x0 = center_x;
+        _data._transformation_matrix.y0 = center_y;
     }
 
     public static CompiledGeometry.from_descendants (Components? components, Lib.Items.ModelNode? node) {

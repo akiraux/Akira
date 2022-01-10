@@ -100,9 +100,9 @@ public class Akira.Lib.Items.ModelInstance {
      */
     public bool compile_components (ModelNode node, ViewLayers.BaseCanvas? canvas) {
         bool something_changed = false;
-        something_changed = compiled_components.maybe_compile_geometry (type, components, node) || something_changed;
         something_changed = compiled_components.maybe_compile_fill (type, components, node) || something_changed;
         something_changed = compiled_components.maybe_compile_border (type, components, node) || something_changed;
+        something_changed = compiled_components.maybe_compile_geometry (type, components, node) || something_changed;
         something_changed = node.instance.type is ModelTypeArtboard
             && compiled_components.maybe_compile_name (type, components, node)
             || something_changed;
@@ -152,11 +152,13 @@ public class Akira.Lib.Items.ModelInstance {
         if (drawable != null) {
             if (canvas != null) {
                 drawable.request_redraw (canvas, false);
-                drawable.request_redraw (canvas, true);
+                drawable.bounds = compiled_geometry.drawable_bb;
+                drawable.request_redraw (canvas, false);
+                drawable_bounding_box = drawable.bounds;
+                return;
             }
-            drawable_bounding_box = drawable.bounds;
-        } else {
-            drawable_bounding_box = bounding_box;
         }
+
+        drawable_bounding_box = bounding_box;
     }
 }
