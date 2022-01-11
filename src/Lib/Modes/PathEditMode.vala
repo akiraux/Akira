@@ -87,9 +87,7 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
             return true;
         }
 
-        uint uppercase_keyval = Gdk.keyval_to_upper (event.keyval);
-
-        if (uppercase_keyval == Gdk.Key.BackSpace) {
+        if (event.keyval == Gdk.Key.BackSpace) {
             if (live_idx > 0) {
                 --live_idx;
 

@@ -44,16 +44,14 @@ public class Akira.Lib.Modes.PanMode : AbstractInteractionMode {
     }
 
     public override bool key_press_event (Gdk.EventKey event) {
-        uint uppercase_keyval = Gdk.keyval_to_upper (event.keyval);
-        if (uppercase_keyval == Gdk.Key.space) {
+        if (event.keyval == Gdk.Key.space) {
             space_held = true;
         }
         return true;
     }
 
     public override bool key_release_event (Gdk.EventKey event) {
-        uint uppercase_keyval = Gdk.keyval_to_upper (event.keyval);
-        if (uppercase_keyval == Gdk.Key.space) {
+        if (event.keyval == Gdk.Key.space) {
             space_held = false;
 
             if (!panning) {

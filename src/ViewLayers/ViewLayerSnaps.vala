@@ -60,8 +60,8 @@ public class Akira.ViewLayers.ViewLayerSnaps : ViewLayers.ViewLayer {
      * It shouldn't be hard to optimize this code.
      */
     public void update_data (
-        Utils.Snapping2.SnapMatch2 match_data,
-        Gee.TreeMap<int, Utils.Snapping2.SnapMeta2> grid_points
+        Utils.Snapping.SnapMatch match_data,
+        Gee.TreeMap<int, Utils.Snapping.SnapMeta> grid_points
     ) {
         line_pos = new double[0];
         dot_x = new double[0];
@@ -104,7 +104,7 @@ public class Akira.ViewLayers.ViewLayerSnaps : ViewLayers.ViewLayer {
      */
     private void add_decorator_line (
         int pos,
-        Utils.Snapping2.SnapMeta2 grid_snap_value
+        Utils.Snapping.SnapMeta grid_snap_value
     ) {
         double actual_pos = (double) pos;
 

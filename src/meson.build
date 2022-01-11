@@ -39,8 +39,7 @@ sources = files(
     'Utils/ColorPicker.vala',
     'Utils/ModelUtil.vala',
     'Utils/Nobs.vala',
-    #'Utils/Snapping.vala',
-    'Utils/Snapping2.vala',
+    'Utils/Snapping.vala',
     'Utils/SVGUtil.vala',
     'Utils/GeometryMath.vala',
 
