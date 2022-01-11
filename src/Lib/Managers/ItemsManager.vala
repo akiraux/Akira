@@ -468,6 +468,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
 
         var blocker = new Lib.Managers.SelectionManager.ChangeSignalBlocker (view_canvas.selection_manager);
         (blocker);
+        view_canvas.pause_redraw = true;
 
         var group = Lib.Items.ModelTypeArtboard.default_artboard (
             new Lib.Components.Coordinates (520, 520),
@@ -501,6 +502,8 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         }
 
         compile_model ();
+        view_canvas.pause_redraw = false;
+        view_canvas.request_redraw (view_canvas.get_bounds ());
 
         // Defer the print of the layer UI after all items have been created.
         view_canvas.window.main_window.show_added_layers (num_of++);

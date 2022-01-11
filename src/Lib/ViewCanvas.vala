@@ -222,8 +222,7 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
             return true;
         }
 
-        uint uppercase_keyval = Gdk.keyval_to_upper (event.keyval);
-        switch (uppercase_keyval) {
+        switch (event.keyval) {
             case Gdk.Key.space:
                 mode_manager.start_panning_mode ();
                 if (mode_manager.key_press_event (event)) {
@@ -242,11 +241,11 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
                 break;
         }
 
+        uint uppercase_keyval = Gdk.keyval_to_upper (event.keyval);
         if (uppercase_keyval == Gdk.Key.J) {
             items_manager.debug_add_rectangles (10000, true);
             return true;
         }
-
         if (uppercase_keyval == Gdk.Key.G) {
             items_manager.add_debug_group (300, 300, true);
             return true;
