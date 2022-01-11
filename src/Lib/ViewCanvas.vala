@@ -42,8 +42,29 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
     public Lib.Managers.SnapManager snap_manager;
     public Lib.Managers.CopyManager copy_manager;
 
-    public bool ctrl_is_pressed = false;
-    public bool shift_is_pressed = false;
+    private bool is_modifier_pressed (Gdk.ModifierIntent type) {
+        Gdk.ModifierType state;
+        Gdk.ModifierType mask;
+
+        if (!Gtk.get_current_event_state (out state)) {
+            return false;
+        }
+
+        mask = get_modifier_mask (type);
+        return (state & mask) == mask;
+    }
+
+    public bool ctrl_is_pressed {
+        get {
+            return is_modifier_pressed (Gdk.ModifierIntent.MODIFY_SELECTION);
+        }
+    }
+    public bool shift_is_pressed {
+        get {
+            return is_modifier_pressed (Gdk.ModifierIntent.EXTEND_SELECTION);
+        }
+    }
+
     public double current_scale = 1.0;
 
     // RAIIify this?
@@ -197,32 +218,11 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
     }
 
     public override bool key_press_event (Gdk.EventKey event) {
-        uint uppercase_keyval = Gdk.keyval_to_upper (event.keyval);
-
-        switch (uppercase_keyval) {
-            case Gdk.Key.Control_L:
-            case Gdk.Key.Control_R:
-                ctrl_is_pressed = true;
-                //toggle_item_ghost (false);
-                break;
-
-            case Gdk.Key.Shift_L:
-            case Gdk.Key.Shift_R:
-                shift_is_pressed = true;
-                break;
-
-            case Gdk.Key.Alt_L:
-            case Gdk.Key.Alt_R:
-                // Show the ghost item only if the CTRL button is not pressed.
-                //toggle_item_ghost (!ctrl_is_pressed);
-                break;
-
-        }
-
         if (mode_manager.key_press_event (event)) {
             return true;
         }
 
+        uint uppercase_keyval = Gdk.keyval_to_upper (event.keyval);
         switch (uppercase_keyval) {
             case Gdk.Key.space:
                 mode_manager.start_panning_mode ();
@@ -256,30 +256,7 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
     }
 
     public override bool key_release_event (Gdk.EventKey event) {
-        uint uppercase_keyval = Gdk.keyval_to_upper (event.keyval);
-
-        switch (uppercase_keyval) {
-            case Gdk.Key.Control_L:
-            case Gdk.Key.Control_R:
-                ctrl_is_pressed = false;
-                break;
-
-            case Gdk.Key.Shift_L:
-            case Gdk.Key.Shift_R:
-                shift_is_pressed = false;
-                break;
-
-            case Gdk.Key.Alt_L:
-            case Gdk.Key.Alt_R:
-                //toggle_item_ghost (false);
-                break;
-        }
-
-        if (mode_manager.key_release_event (event)) {
-            return true;
-        }
-
-        return false;
+        return mode_manager.key_release_event (event);
     }
 
     public override bool button_press_event (Gdk.EventButton event) {
@@ -371,13 +348,6 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
         }
 
         if (!selection_manager.is_empty ()) {
-            // Register a click on an empty area if we have multiple selected
-            // items, the click didn't select any nob, and no item was clicked.
-            // if (nob_clicked == Utils.Nobs.Nob.NONE && target == null) {
-            //     initial_event_x = event.x;
-            //     initial_event_y = event.y;
-            // }
-
             var new_mode = new Lib.Modes.TransformMode (this, nob_clicked);
             mode_manager.register_mode (new_mode);
 

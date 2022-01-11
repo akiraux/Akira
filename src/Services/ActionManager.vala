@@ -297,11 +297,6 @@ public class Akira.Services.ActionManager : Object {
     }
 
     private void action_preferences () {
-        // Since the settings dialog was opened with the `CTRL+.` shortcut, we
-        // need to reset the boolean variable in the canvas to avoid affecting
-        // items resize and rotation.
-        window.main_window.main_view_canvas.canvas.ctrl_is_pressed = false;
-
         var settings_dialog = new Akira.Dialogs.SettingsDialog (window);
         settings_dialog.show_all ();
         settings_dialog.present ();
@@ -501,9 +496,6 @@ public class Akira.Services.ActionManager : Object {
         // if (canvas.selected_bound_manager.selected_items.length () == 0) {
         //     return;
         // }
-
-        // // Hide the ghost bound manager.
-        // canvas.toggle_item_ghost (false);
 
         // bool is_holding_shift = false;
         // var color_picker = new Akira.Utils.ColorPicker ();

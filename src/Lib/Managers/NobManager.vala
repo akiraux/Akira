@@ -59,6 +59,7 @@ public class Akira.Lib.Managers.NobManager : Object {
         if (sm.is_empty ()) {
             remove_select_effect ();
             remove_sub_selection_effect ();
+            sub_selection_node_id = null;
             return;
         }
 
