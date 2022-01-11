@@ -65,17 +65,17 @@ public class Akira.Lib.Managers.SnapManager : Object {
                 break;
             case SnapGuideType.SELECTION:
                 unowned var selection = view_canvas.selection_manager.selection;
-                var sensitivity = Utils.Snapping2.adjusted_sensitivity (view_canvas.current_scale);
+                var sensitivity = Utils.Snapping.adjusted_sensitivity (view_canvas.current_scale);
                 var selection_area = selection.bounding_box ();
 
-                var snap_grid = Utils.Snapping2.generate_best_snap_grid (
+                var snap_grid = Utils.Snapping.generate_best_snap_grid (
                     view_canvas,
                     selection,
                     selection_area,
                     sensitivity
                 );
 
-                var matches = Utils.Snapping2.generate_snap_matches (
+                var matches = Utils.Snapping.generate_snap_matches (
                     snap_grid,
                     selection,
                     selection_area,
@@ -118,7 +118,7 @@ public class Akira.Lib.Managers.SnapManager : Object {
      * Populates decorators (if applicable) based on match data and the snap grid.
      * Reuses decorator Goo.CanvasItems if possible, otherwise constructs new ones.
      */
-    public void populate_decorators_from_data (Utils.Snapping2.SnapMatchData2 data, Utils.Snapping2.SnapGrid2 grid) {
+    public void populate_decorators_from_data (Utils.Snapping.SnapMatchData data, Utils.Snapping.SnapGrid grid) {
         reset_decorators ();
 
         if (data.v_data.snap_found () || data.h_data.snap_found ()) {

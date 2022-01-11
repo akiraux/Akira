@@ -218,7 +218,7 @@ public class Akira.Lib.Modes.TransformMode : AbstractInteractionMode {
 
         if (settings.enable_snaps) {
             guide_data.type = Akira.Lib.Managers.SnapManager.SnapGuideType.NONE;
-            var sensitivity = Utils.Snapping2.adjusted_sensitivity (view_canvas.current_scale);
+            var sensitivity = Utils.Snapping.adjusted_sensitivity (view_canvas.current_scale);
             var selection_area = Geometry.Rectangle () {
                     left = left + delta_x,
                     top = top + delta_y,
@@ -226,7 +226,7 @@ public class Akira.Lib.Modes.TransformMode : AbstractInteractionMode {
                     bottom = bottom + delta_y
             };
 
-            var snap_grid = Utils.Snapping2.generate_best_snap_grid (
+            var snap_grid = Utils.Snapping.generate_best_snap_grid (
                 view_canvas,
                 selection,
                 selection_area,
@@ -234,7 +234,7 @@ public class Akira.Lib.Modes.TransformMode : AbstractInteractionMode {
             );
 
             if (!snap_grid.is_empty ()) {
-                var matches = Utils.Snapping2.generate_snap_matches (
+                var matches = Utils.Snapping.generate_snap_matches (
                     snap_grid,
                     selection,
                     selection_area,
