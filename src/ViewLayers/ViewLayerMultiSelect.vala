@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Alecaddd (https://alecaddd.com)
+ * Copyright (c) 2021-2022 Alecaddd (https://alecaddd.com)
  *
  * This file is part of Akira.
  *
@@ -17,10 +17,19 @@
  * along with Akira. If not, see <https://www.gnu.org/licenses/>.
  *
  * Authored by: Giacomo "giacomoalbe" Alberini <giacomoalbe@gmail.com>
+ *              Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
  */
 
 public class Akira.ViewLayers.ViewLayerMultiSelect : ViewLayer {
-    public Gdk.RGBA color { get; default = Gdk.RGBA () { red = 0.25, green = 0.79, blue = 0.98, alpha = 0.5 }; }
+    private const double UI_LINE_WIDTH = 1.0;
+    private Gdk.RGBA fill { get; default = Gdk.RGBA () { red = 0.25, green = 0.79, blue = 0.98, alpha = 0.4 }; }
+    private Gdk.RGBA stroke {
+        get {
+            var color = fill;
+            color.alpha = 1;
+            return color;
+        }
+    }
 
     private Drawables.Drawable? drawable = null;
     private Drawables.Drawable? old_drawable = null;
@@ -73,7 +82,9 @@ public class Akira.ViewLayers.ViewLayerMultiSelect : ViewLayer {
             return;
         }
 
-        drawable.fill_rgba = color;
+        drawable.fill_rgba = fill;
+        drawable.line_width = UI_LINE_WIDTH / scale;
+        drawable.stroke_rgba = stroke;
         drawable.paint (context, target_bounds, scale);
 
         last_drawn_bb = drawable.bounds;
