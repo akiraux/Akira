@@ -34,6 +34,7 @@ public class Akira.ViewLayers.ViewLayerMultiSelect : ViewLayer {
     private Drawables.Drawable? drawable = null;
     private Drawables.Drawable? old_drawable = null;
     private Geometry.Rectangle last_drawn_bb = Geometry.Rectangle.empty ();
+    private Gee.ArrayList<unowned Drawables.Drawable> found_drawables;
 
     private double initial_press_x;
     private double initial_press_y;
@@ -77,6 +78,11 @@ public class Akira.ViewLayers.ViewLayerMultiSelect : ViewLayer {
         return drawable.bounds;
     }
 
+    public void update_found_drawables (Gee.ArrayList<unowned Drawables.Drawable> drawables) {
+        found_drawables = drawables;
+        update ();
+    }
+
     public override void draw_layer (Cairo.Context context, Geometry.Rectangle target_bounds, double scale) {
         if (canvas == null || drawable == null) {
             return;
@@ -88,6 +94,10 @@ public class Akira.ViewLayers.ViewLayerMultiSelect : ViewLayer {
         drawable.paint (context, target_bounds, scale);
 
         last_drawn_bb = drawable.bounds;
+
+        foreach (unowned var d in found_drawables) {
+            d.paint_hover (context, stroke, UI_LINE_WIDTH, target_bounds, scale);
+        }
     }
 
     public override void update () {
