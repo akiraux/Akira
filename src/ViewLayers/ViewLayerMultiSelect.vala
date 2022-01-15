@@ -39,7 +39,9 @@ public class Akira.ViewLayers.ViewLayerMultiSelect : ViewLayer {
     private double initial_press_x;
     private double initial_press_y;
 
-    public ViewLayerMultiSelect () {}
+    public ViewLayerMultiSelect () {
+        found_drawables = new Gee.ArrayList<unowned Drawables.Drawable> ();
+    }
 
     public void create_region (Gdk.EventButton event) {
         initial_press_x = event.x;
