@@ -23,15 +23,15 @@
 public class Akira.ViewLayers.ViewLayerNobs : ViewLayer {
     public const double UI_NOB_SIZE = 5;
     public const double UI_LINE_WIDTH = 1.01;
-    public const double UI_ANCHOR_LINE_WIDTH = 2.0;
+    public const double UI_ANCHOR_LINE_WIDTH = 1.01;
 
+    private Gdk.RGBA? color = null;
     private Utils.Nobs.NobSet? nobs = null;
     private Utils.Nobs.NobSet? old_nobs = null;
 
     private Drawables.Drawable? sub_selection_drawable = null;
     private Drawables.Drawable? old_sub_selection_drawable = null;
     private Geometry.Rectangle sub_selection_last_bb_drawn = Geometry.Rectangle.empty ();
-    // private bool redraw_only_sub_selection = false;
 
     public void update_nob_data (Utils.Nobs.NobSet? new_nobs) {
         if (nobs != null) {
@@ -47,10 +47,21 @@ public class Akira.ViewLayers.ViewLayerNobs : ViewLayer {
             return;
         }
 
+        if (color == null) {
+            color = Gdk.RGBA ();
+            color.parse (settings.snaps_color);
+        }
+
         old_sub_selection_drawable = sub_selection_drawable;
         sub_selection_drawable = new_sub_selection_drawable;
 
         update ();
+
+        // Nullify the color if the sub selection is removed so we can always
+        // get the updated settings color if the user changes it.
+        if (new_sub_selection_drawable == null) {
+            color = null;
+        }
     }
 
     public override void draw_layer (Cairo.Context context, Geometry.Rectangle target_bounds, double scale) {
@@ -76,7 +87,6 @@ public class Akira.ViewLayers.ViewLayerNobs : ViewLayer {
         draw_nobs (context, nobs, canvas.scale);
 
         if (sub_selection_drawable != null) {
-            var color = Gdk.RGBA () { red = 0.25, green = 0.79, blue = 0.98, alpha = 1.0 };
             sub_selection_drawable.paint_anchor (context, color, UI_ANCHOR_LINE_WIDTH, scale);
             sub_selection_last_bb_drawn = sub_selection_drawable.bounds;
         }
@@ -97,10 +107,6 @@ public class Akira.ViewLayers.ViewLayerNobs : ViewLayer {
             context.new_path ();
             context.set_source_rgba (1, 1, 1, 1);
             context.set_line_width (line_width);
-
-            //apply nob transform here
-
-            // Then translate it
             context.translate (nob.center_x, nob.center_y);
 
             if (nob.handle_id == Utils.Nobs.Nob.ROTATE) {

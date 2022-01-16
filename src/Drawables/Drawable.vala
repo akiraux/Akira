@@ -36,9 +36,6 @@ public class Akira.Drawables.Drawable {
         OUTSIDE
     }
 
-    // Constant styling.
-    private const int TARGET_SCALE = 10;
-
     // Style
     public double line_width { get; set; default = 0; }
     public Gdk.RGBA fill_rgba { get; set; default = Gdk.RGBA (); }
@@ -248,11 +245,9 @@ public class Akira.Drawables.Drawable {
         Cairo.Matrix tr = transform;
         context.transform (tr);
 
-        var t_scale = TARGET_SCALE / scale;
         // context.save ();
         context.new_path ();
-        context.scale (t_scale, t_scale);
-        context.arc (0.0, 0.0, 1.0, 0.0, 2.0 * GLib.Math.PI);
+        context.arc (0.0, 0.0, 5 / scale, 0.0, 2.0 * GLib.Math.PI);
         // context.restore ();
 
         context.set_line_width (line_width / scale);
