@@ -82,20 +82,6 @@ public class Akira.ViewLayers.ViewLayerMultiSelect : ViewLayer {
     }
 
     public void update_found_drawables (Gee.ArrayList<unowned Drawables.Drawable> drawables) {
-        var diff = false;
-        foreach (unowned var d in drawables) {
-            if (!found_drawables.contains (d)) {
-                diff = true;
-                break;
-            }
-        }
-
-        // No need to do anything if the array size of old and new drawables
-        // matches and not a single drawable is different.
-        if (!diff && drawables.size == found_drawables.size) {
-            return;
-        }
-
         found_drawables = drawables;
         update ();
     }
