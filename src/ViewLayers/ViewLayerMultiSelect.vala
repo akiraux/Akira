@@ -22,7 +22,7 @@
 
 public class Akira.ViewLayers.ViewLayerMultiSelect : ViewLayer {
     private const double UI_LINE_WIDTH = 1.0;
-    private Gdk.RGBA fill { get; default = Gdk.RGBA () { red = 0.25, green = 0.79, blue = 0.98, alpha = 0.4 }; }
+    private Gdk.RGBA fill { get; default = Gdk.RGBA () { red = 0.25, green = 0.79, blue = 0.98, alpha = 0.2 }; }
     private Gdk.RGBA stroke {
         get {
             var color = fill;
@@ -74,6 +74,7 @@ public class Akira.ViewLayers.ViewLayerMultiSelect : ViewLayer {
     public void remove_region () {
         update ();
         drawable = null;
+        found_drawables.clear ();
     }
 
     public Geometry.Rectangle? get_region_bounds () {
