@@ -102,6 +102,10 @@ public class Akira.Lib.Modes.MultiSelectMode : AbstractInteractionMode {
             multi_select_layer.get_region_bounds ()
         );
 
+        if (found_items.size == 0) {
+            return true;
+        }
+
         var drawables = new Gee.ArrayList<unowned Drawables.Drawable> ();
         foreach (unowned var item in found_items) {
             drawables.add (item.instance.drawable);
