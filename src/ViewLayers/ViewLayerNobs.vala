@@ -23,7 +23,7 @@
 public class Akira.ViewLayers.ViewLayerNobs : ViewLayer {
     public const double UI_NOB_SIZE = 5;
     public const double UI_LINE_WIDTH = 1.01;
-    public const double UI_SUB_SELECTION_LINE_WIDTH = 4.0;
+    public const double UI_ANCHOR_LINE_WIDTH = 2.0;
 
     private Utils.Nobs.NobSet? nobs = null;
     private Utils.Nobs.NobSet? old_nobs = null;
@@ -77,7 +77,7 @@ public class Akira.ViewLayers.ViewLayerNobs : ViewLayer {
 
         if (sub_selection_drawable != null) {
             var color = Gdk.RGBA () { red = 0.25, green = 0.79, blue = 0.98, alpha = 1.0 };
-            sub_selection_drawable.paint_hover (context, color, UI_SUB_SELECTION_LINE_WIDTH, target_bounds, scale);
+            sub_selection_drawable.paint_anchor (context, color, UI_ANCHOR_LINE_WIDTH, scale);
             sub_selection_last_bb_drawn = sub_selection_drawable.bounds;
         }
 

@@ -36,6 +36,9 @@ public class Akira.Drawables.Drawable {
         OUTSIDE
     }
 
+    // Constant styling.
+    private const int TARGET_SCALE = 10;
+
     // Style
     public double line_width { get; set; default = 0; }
     public Gdk.RGBA fill_rgba { get; set; default = Gdk.RGBA (); }
@@ -216,6 +219,41 @@ public class Akira.Drawables.Drawable {
         context.transform (tr);
 
         simple_create_path (context);
+
+        context.set_line_width (line_width / scale);
+        context.set_source_rgba (color.red, color.green, color.blue, color.alpha);
+        context.set_matrix (global_transform);
+        context.stroke ();
+
+        context.restore ();
+
+        // Very important to initialize new path
+        context.new_path ();
+    }
+
+    /*
+     * Create a target like element on top of the drawable to represent the
+     * current subselection anchor point that will be used as alignment pivot.
+     */
+    public virtual void paint_anchor (
+        Cairo.Context context,
+        Gdk.RGBA color,
+        double line_width,
+        double scale
+    ) {
+        context.save ();
+        Cairo.Matrix global_transform = context.get_matrix ();
+
+        // We apply the item transform before creating the path
+        Cairo.Matrix tr = transform;
+        context.transform (tr);
+
+        var t_scale = TARGET_SCALE / scale;
+        // context.save ();
+        context.new_path ();
+        context.scale (t_scale, t_scale);
+        context.arc (0.0, 0.0, 1.0, 0.0, 2.0 * GLib.Math.PI);
+        // context.restore ();
 
         context.set_line_width (line_width / scale);
         context.set_source_rgba (color.red, color.green, color.blue, color.alpha);
