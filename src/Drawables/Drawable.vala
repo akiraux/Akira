@@ -245,16 +245,32 @@ public class Akira.Drawables.Drawable {
         Cairo.Matrix tr = transform;
         context.transform (tr);
 
-        // context.save ();
-        context.new_path ();
-        context.arc (0.0, 0.0, 5 / scale, 0.0, 2.0 * GLib.Math.PI);
-        // context.restore ();
-
+        // Set the visual properties.
         context.set_line_width (line_width / scale);
         context.set_source_rgba (color.red, color.green, color.blue, color.alpha);
-        context.set_matrix (global_transform);
+
+        // Create the circle.
+        context.new_path ();
+        context.arc (0.0, 0.0, 5 / scale, 0.0, 2.0 * GLib.Math.PI);
+        // Draw the circle and preserve the visual properties.
+        context.stroke_preserve ();
+
+        var lenght = 10 / scale;
+        // Create the horizontal stroke.
+        context.new_path ();
+        context.move_to (-lenght, 0);
+        context.line_to (lenght, 0);
+        context.stroke_preserve ();
+
+        // Create the vertical stroke.
+        context.new_path ();
+        context.move_to (0, -lenght);
+        context.line_to (0, lenght);
         context.stroke ();
 
+        // Apply the matrix transform of the drawable item so the new path is
+        // properly positioned.
+        context.set_matrix (global_transform);
         context.restore ();
 
         // Very important to initialize new path
