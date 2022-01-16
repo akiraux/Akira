@@ -17,10 +17,13 @@
  * along with Akira. If not, see <https://www.gnu.org/licenses/>.
  *
  * Authored by: Giacomo "giacomoalbe" Alberini <giacomoalbe@gmail.com>
+ *              Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
  */
 
 public class Akira.Lib.Modes.MultiSelectMode : AbstractInteractionMode {
     public unowned Lib.ViewCanvas view_canvas { get; construct; }
+
+    private Gee.ArrayList<unowned Lib.Items.ModelNode> found_items;
 
     public class DragItemData : Object {
         public Lib.Components.CompiledGeometry item_geometry;
@@ -51,15 +54,14 @@ public class Akira.Lib.Modes.MultiSelectMode : AbstractInteractionMode {
 
     construct {
         multi_select_layer = new ViewLayers.ViewLayerMultiSelect ();
+        found_items = new Gee.ArrayList<unowned Lib.Items.ModelNode> ();
     }
 
     public override void mode_begin () {
         multi_select_layer.add_to_canvas (ViewLayers.ViewLayer.MULTI_SELECT_LAYER_ID, view_canvas);
     }
 
-    public override void mode_end () {
-
-    }
+    public override void mode_end () {}
 
     public override AbstractInteractionMode.ModeType mode_type () {
         return AbstractInteractionMode.ModeType.MULTI_SELECT;
@@ -96,6 +98,16 @@ public class Akira.Lib.Modes.MultiSelectMode : AbstractInteractionMode {
 
         multi_select_layer.update_region (width, height);
 
+        found_items = view_canvas.items_manager.nodes_in_bounded_region (
+            multi_select_layer.get_region_bounds ()
+        );
+
+        var drawables = new Gee.ArrayList<unowned Drawables.Drawable> ();
+        foreach (unowned var item in found_items) {
+            drawables.add (item.instance.drawable);
+        }
+        multi_select_layer.update_found_drawables (drawables);
+
         return true;
     }
 
@@ -104,14 +116,10 @@ public class Akira.Lib.Modes.MultiSelectMode : AbstractInteractionMode {
     }
 
     private void select_items_inside_region () {
-        var bounds = multi_select_layer.get_region_bounds ();
-
         // Block selection manager while selecting potentially many items
         var blocker = new Lib.Managers.SelectionManager.ChangeSignalBlocker (view_canvas.selection_manager);
         // Get rid of unused var warning
         (blocker);
-
-        var found_items = view_canvas.items_manager.nodes_in_bounded_region (bounds);
 
         foreach (unowned var item in found_items) {
             view_canvas.selection_manager.add_to_selection (item.instance.id);

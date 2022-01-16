@@ -332,14 +332,14 @@ public class Akira.Lib.Managers.ItemsManager : Object {
 
             if (node_type == "artboard" && node.children != null) {
                 foreach (unowned var child_node in node.children.data) {
-                    if (bound.contains_bound (child_node.instance.drawable.bounds)) {
+                    if (bound.contains_bound (child_node.instance.bounding_box)) {
                         found_items.add (child_node);
                     }
                 }
                 continue;
             }
 
-            if (bound.contains_bound (node.instance.drawable.bounds)) {
+            if (bound.contains_bound (node.instance.bounding_box)) {
                 found_items.add (node);
             }
         }
