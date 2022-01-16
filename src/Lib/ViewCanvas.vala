@@ -414,7 +414,7 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
             ) {
                 if (ctrl_is_pressed) {
                     // If CTRL is pressed, toggle alignment anchor.
-                    nob_manager.toggle_sub_selection (target.id);
+                    nob_manager.toggle_anchor_point (target.id);
                 } else {
                     // Deselect them all and select the clicked item.
                     selection_manager.reset_selection ();

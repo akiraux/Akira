@@ -31,7 +31,7 @@ public class Akira.Lib.Managers.NobManager : Object {
 
     private Utils.Nobs.NobSet nobs;
     private ViewLayers.ViewLayerNobs nob_layer = null;
-    public int? sub_selection_node_id;
+    public int? anchor_point_node_id;
 
     // Tracks if an artboard is part of the current selection.
     private int last_id = -1;
@@ -58,8 +58,8 @@ public class Akira.Lib.Managers.NobManager : Object {
         unowned var sm = view_canvas.selection_manager;
         if (sm.is_empty ()) {
             remove_select_effect ();
-            remove_sub_selection_effect ();
-            sub_selection_node_id = null;
+            remove_anchor_point_effect ();
+            anchor_point_node_id = null;
             return;
         }
 
@@ -142,31 +142,31 @@ public class Akira.Lib.Managers.NobManager : Object {
         nob_layer.update_nob_data (nobs);
     }
 
-    public void toggle_sub_selection (int id) {
-        remove_sub_selection_effect ();
+    public void toggle_anchor_point (int id) {
+        remove_anchor_point_effect ();
 
-        if (sub_selection_node_id == id) {
-            sub_selection_node_id = null;
+        if (anchor_point_node_id == id) {
+            anchor_point_node_id = null;
             return;
         }
 
-        sub_selection_node_id = id;
+        anchor_point_node_id = id;
 
-        maybe_create_sub_selection_effect ();
+        maybe_create_anchor_point_effect ();
     }
 
-    private void remove_sub_selection_effect () {
-        nob_layer.add_sub_selection (null);
+    private void remove_anchor_point_effect () {
+        nob_layer.add_anchor_point (null);
     }
 
-    private void maybe_create_sub_selection_effect () {
-        var node = view_canvas.items_manager.node_from_id (sub_selection_node_id);
+    private void maybe_create_anchor_point_effect () {
+        var node = view_canvas.items_manager.node_from_id (anchor_point_node_id);
         if (node == null) {
             assert (node != null);
             return;
         }
 
-        nob_layer.add_sub_selection (node.instance.drawable);
+        nob_layer.add_anchor_point (node.instance.drawable);
     }
 
 }
