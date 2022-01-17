@@ -67,9 +67,11 @@ public class Akira.Models.PathEditModel : Object {
         commands.resize (commands.length + 1);
         commands[commands.length - 1] = live_command;
 
+        var transform_matrix = instance.components.transform.transformation_matrix;
+
         for (int i = 0; i < length; ++i) {
-            var new_pt = rotate_point_around_item_origin (live_pts[i], -instance.components.transform.rotation);
-            var orig_first_pt = rotate_point_around_item_origin (first_point, -instance.components.transform.rotation);
+            var new_pt = rotate_point_around_item_origin (live_pts[i], transform_matrix, true);
+            var orig_first_pt = rotate_point_around_item_origin (first_point, transform_matrix, true);
 
             new_pt.x -= orig_first_pt.x;
             new_pt.y -= orig_first_pt.y;
@@ -129,7 +131,7 @@ public class Akira.Models.PathEditModel : Object {
         }
 
 
-        var orig_first_pt = rotate_point_around_item_origin (first_point, -instance.components.transform.rotation);
+        var orig_first_pt = rotate_point_around_item_origin (first_point, instance.components.transform.transformation_matrix, true);
 
         var new_live_pts = new Geometry.Point[4];
         new_live_pts[0] = Geometry.Point (points[points.length - 4].x, points[points.length - 4].y);
@@ -145,10 +147,10 @@ public class Akira.Models.PathEditModel : Object {
         new_live_pts[2].x += orig_first_pt.x;
         new_live_pts[2].y += orig_first_pt.y;
 
-        double rotation = instance.components.transform.rotation;
-        new_live_pts[2] = rotate_point_around_item_origin (new_live_pts[2], rotation);
-        new_live_pts[1] = rotate_point_around_item_origin (new_live_pts[1], rotation);
-        new_live_pts[0] = rotate_point_around_item_origin (new_live_pts[0], rotation);
+        var transform_matrix = instance.components.transform.transformation_matrix;
+        new_live_pts[2] = rotate_point_around_item_origin (new_live_pts[2], transform_matrix);
+        new_live_pts[1] = rotate_point_around_item_origin (new_live_pts[1], transform_matrix);
+        new_live_pts[0] = rotate_point_around_item_origin (new_live_pts[0], transform_matrix);
 
         commands.resize (commands.length - 1);
         points.resize (points.length - 4);
@@ -169,11 +171,11 @@ public class Akira.Models.PathEditModel : Object {
         // In order to check if user clicked on a point, we need to rotate the first point and the event
         // around the item center. Then the difference between these values gives the location
         // event in the same coordinate system as the points.
-        double rotation = instance.components.transform.rotation;
-        var orig_first_pt = rotate_point_around_item_origin (first_point, -rotation);
+        var transform_matrix = instance.components.transform.transformation_matrix;
+        var orig_first_pt = rotate_point_around_item_origin (first_point, transform_matrix, true);
 
         Geometry.Point point = Geometry.Point (x, y);
-        point = rotate_point_around_item_origin (point, -rotation);
+        point = rotate_point_around_item_origin (point, transform_matrix, true);
         point = Geometry.Point (point.x - orig_first_pt.x, point.y - orig_first_pt.y);
 
         tangents_inline = false;
@@ -241,9 +243,9 @@ public class Akira.Models.PathEditModel : Object {
      * This method will be used when editing paths to update the position of a point.
      */
     public void modify_point_value (Geometry.Point new_pos) {
-        double rotation = instance.components.transform.rotation;
-        var orig_first_pt = rotate_point_around_item_origin (first_point, -rotation);
-        new_pos = rotate_point_around_item_origin (new_pos, -rotation);
+        var transform_matrix = instance.components.transform.transformation_matrix;
+        var orig_first_pt = rotate_point_around_item_origin (first_point, transform_matrix, true);
+        new_pos = rotate_point_around_item_origin (new_pos, transform_matrix, true);
 
         new_pos.x -= orig_first_pt.x;
         new_pos.y -= orig_first_pt.y;
@@ -352,8 +354,10 @@ public class Akira.Models.PathEditModel : Object {
 
         // The amount by which the first point changed must be rotated before adding to first point.
         Geometry.Point delta = Geometry.Point (min_x, min_y);
-        double rotation = instance.components.transform.rotation;
-        Geometry.Point rotated_delta = Utils.GeometryMath.rotate_point (delta, rotation, Geometry.Point (0, 0));
+        //  var rotation = instance.components.transform.rotation;
+        //  Geometry.Point rotated_delta = Utils.GeometryMath.rotate_point (delta, rotation, Geometry.Point (0, 0));
+        var transform_matrix = instance.components.transform.transformation_matrix;
+        var rotated_delta = rotate_point_around_item_origin (delta, transform_matrix);
 
         first_point.x += rotated_delta.x;
         first_point.y += rotated_delta.y;
@@ -476,13 +480,21 @@ public class Akira.Models.PathEditModel : Object {
         points[other_tangent].y += delta_y;
     }
 
-    private Geometry.Point rotate_point_around_item_origin (Geometry.Point point, double rotation) {
-        var item_center = Geometry.Point (instance.components.center.x, instance.components.center.y);
-        return Utils.GeometryMath.rotate_point (point, rotation, item_center);
+    private Geometry.Point rotate_point_around_item_origin (Geometry.Point point, Cairo.Matrix mat, bool invert = false) {
+        var matrix = Utils.GeometryMath.multiply_matrices (Cairo.Matrix.identity (), mat);
+
+        if (invert) {
+            matrix.invert ();
+        }
+
+        var new_point = Geometry.Point (point.x, point.y);
+        matrix.transform_point (ref new_point.x, ref new_point.y);
+        return new_point;
     }
 
     private Geometry.Point get_last_point_from_path () {
-        var orig_first_pt = rotate_point_around_item_origin (first_point, -instance.components.transform.rotation);
+        Cairo.Matrix transform_matrix = instance.components.transform.transformation_matrix;
+        var orig_first_pt = rotate_point_around_item_origin (first_point, transform_matrix, true);
 
         if (instance.components.path.data.length == 0) {
             return orig_first_pt;
@@ -491,7 +503,7 @@ public class Akira.Models.PathEditModel : Object {
         var last_point = Geometry.Point ();
         last_point.x = points[points.length - 1].x + orig_first_pt.x;
         last_point.y = points[points.length - 1].y + orig_first_pt.y;
-        last_point = rotate_point_around_item_origin (last_point, instance.components.transform.rotation);
+        last_point = rotate_point_around_item_origin (last_point, transform_matrix);
 
         return last_point;
     }
