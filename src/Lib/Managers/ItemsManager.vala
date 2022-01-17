@@ -332,14 +332,14 @@ public class Akira.Lib.Managers.ItemsManager : Object {
 
             if (node_type == "artboard" && node.children != null) {
                 foreach (unowned var child_node in node.children.data) {
-                    if (bound.contains_bound (child_node.instance.drawable.bounds)) {
+                    if (bound.contains_bound (child_node.instance.bounding_box)) {
                         found_items.add (child_node);
                     }
                 }
                 continue;
             }
 
-            if (bound.contains_bound (node.instance.drawable.bounds)) {
+            if (bound.contains_bound (node.instance.bounding_box)) {
                 found_items.add (node);
             }
         }
@@ -468,6 +468,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
 
         var blocker = new Lib.Managers.SelectionManager.ChangeSignalBlocker (view_canvas.selection_manager);
         (blocker);
+        view_canvas.pause_redraw = true;
 
         var group = Lib.Items.ModelTypeArtboard.default_artboard (
             new Lib.Components.Coordinates (520, 520),
@@ -501,6 +502,11 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         }
 
         compile_model ();
+        view_canvas.pause_redraw = false;
+        view_canvas.request_redraw (view_canvas.get_bounds ());
+
+        // Defer the print of the layer UI after all items have been created.
+        view_canvas.window.main_window.show_added_layers (num_of++);
 
         if (debug_timer) {
             timer.stop ();
@@ -508,13 +514,13 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             print ("Created %u items in %s s\n", num_of, seconds.to_string ());
         }
 
-        // Defer the print of the layer UI after all items have been created.
-        view_canvas.window.main_window.show_added_layers (num_of++);
-
         return group;
     }
 
     public void debug_add_rectangles (uint num_of, bool debug_timer = false) {
+        // Always reset the selection before adding a chunk of items.
+        view_canvas.selection_manager.reset_selection ();
+
         ulong microseconds;
         double seconds;
 
@@ -532,17 +538,17 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             view_canvas.selection_manager.add_to_selection (new_item.id);
         }
 
-        if (debug_timer) {
-            timer.stop ();
-            seconds = timer.elapsed (out microseconds);
-            print ("Created %u items in %s s\n", num_of, seconds.to_string ());
-        }
-
         view_canvas.pause_redraw = false;
         view_canvas.request_redraw (view_canvas.get_bounds ());
 
         // Defer the print of the layer UI after all items have been created.
         view_canvas.window.main_window.show_added_layers ((int) num_of);
+
+        if (debug_timer) {
+            timer.stop ();
+            seconds = timer.elapsed (out microseconds);
+            print ("Created %u items in %s s\n", num_of, seconds.to_string ());
+        }
     }
 
     public void on_item_geometry_changed (int id) {

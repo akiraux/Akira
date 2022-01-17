@@ -36,6 +36,12 @@ public class Akira.Layouts.Sidebars.LayersSidebar : Gtk.Grid {
         set {
             visible = value;
             no_show_all = !value;
+
+            if (value) {
+                layers_listbox.regenerate_list ();
+            } else {
+                layers_listbox.clear_list ();
+            }
         }
     }
 

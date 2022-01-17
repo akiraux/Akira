@@ -59,7 +59,6 @@ public class Akira.ViewLayers.ViewLayer : Object {
     public bool is_visible { get { return p_is_visible; } }
     public bool is_masked { get { return p_mask_counter > 0; } }
 
-
     public void add_to_canvas (string layer_id, BaseCanvas canvas) {
         p_canvas = canvas;
         p_canvas.add_viewlayer_overlay (layer_id, this);

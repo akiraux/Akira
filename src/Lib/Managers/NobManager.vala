@@ -59,6 +59,7 @@ public class Akira.Lib.Managers.NobManager : Object {
         if (sm.is_empty ()) {
             remove_select_effect ();
             remove_sub_selection_effect ();
+            sub_selection_node_id = null;
             return;
         }
 
@@ -156,7 +157,6 @@ public class Akira.Lib.Managers.NobManager : Object {
 
     private void remove_sub_selection_effect () {
         nob_layer.add_sub_selection (null);
-        sub_selection_node_id = null;
     }
 
     private void maybe_create_sub_selection_effect () {

@@ -97,10 +97,13 @@ public struct Akira.Geometry.Quad {
     ) {
         transformation = transform;
 
-        tl_x = - width / 2.0;
-        tl_y = - height / 2.0;
-        br_x = width / 2.0;
-        br_y = height / 2.0;
+        var hw = width / 2.0;
+        var hh = height / 2.0;
+
+        tl_x = - hw;
+        tl_y = - hh;
+        br_x = hw;
+        br_y = hh;
 
         var woffx = width;
         var woffy = 0.0;
@@ -118,6 +121,9 @@ public struct Akira.Geometry.Quad {
         br_y = center_y + br_y;
         bl_x = br_x - woffx;
         bl_y = br_y - woffy;
+
+        transform.x0 = center_x - hw;
+        transform.y0 = center_y - hh;
     }
 
     public bool contains (double x, double y) {

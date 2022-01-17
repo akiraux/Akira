@@ -105,7 +105,77 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
         view_canvas.window.event_bus.request_escape.connect (on_escape_request);
     }
 
+    /*
+     * Add all existing nodes to the layers list when the UI is revealed.
+     */
+    public void regenerate_list () {
+        ulong microseconds;
+        double seconds;
+        // Create a timer object to track the regeneration of the layers list.
+        Timer timer = new Timer ();
+
+        var added = 0;
+        unowned var im = view_canvas.items_manager;
+
+        foreach (var key in im.item_model.group_nodes.keys) {
+            var node = im.item_model.group_nodes[key];
+            if (node.id == Lib.Items.Model.ORIGIN_ID) {
+                continue;
+            }
+            var item = new LayerItemModel (view_canvas, node);
+            layers[node.id] = item;
+            list_store.add (item);
+            added++;
+        }
+
+        foreach (var key in im.item_model.item_nodes.keys) {
+            var node = im.item_model.item_nodes[key];
+            var item = new LayerItemModel (view_canvas, node);
+            layers[node.id] = item;
+            list_store.add (item);
+            added++;
+        }
+
+        list_store.items_changed (0, 0, added);
+
+        // Restore the selected items.
+        on_selection_modified_external ();
+
+        timer.stop ();
+        seconds = timer.elapsed (out microseconds);
+        print ("Created %i layers in %s s\n", added, seconds.to_string ());
+    }
+
+    /*
+     * Clear the layers list when the UI is hidden.
+     */
+    public void clear_list () {
+        // Interrupt if the layers list is empty.
+        if (layers.size == 0) {
+            return;
+        }
+
+        ulong microseconds;
+        double seconds;
+        // Create a timer object to track the deletion of the layers list.
+        Timer timer = new Timer ();
+
+        // Remove all items.
+        var removed = layers.size;
+        layers.clear ();
+        list_store.remove_all ();
+        list_store.items_changed (0, removed, 0);
+
+        timer.stop ();
+        seconds = timer.elapsed (out microseconds);
+        print ("Deleted %i layers in %s s\n", removed, seconds.to_string ());
+    }
+
     private void on_item_added (int id) {
+        if (view_canvas.block_ui) {
+            return;
+        }
+
         var node = view_canvas.items_manager.node_from_id (id);
         // No need to add any layer if we don't have an instance.
         if (node == null) {
@@ -158,6 +228,10 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
      * collapses its children.
      */
     public void add_items (GLib.Array<int> ids) {
+        if (view_canvas.block_ui) {
+            return;
+        }
+
         var added = 0;
         foreach (var uid in ids.data) {
             // Don't create a layer if it already exists. This might happen when
@@ -180,7 +254,13 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
      * newly added items that are currently visible.
      */
     public void show_added_layers (int added) {
+        if (view_canvas.block_ui) {
+            return;
+        }
+
         list_store.items_changed (0, 0, added);
+        // Restore selected items.
+        on_selection_modified_external ();
     }
 
     /*
@@ -188,6 +268,10 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
      * selected nodes in the view canvas.
      */
     public void remove_items (GLib.Array<int> ids) {
+        if (view_canvas.block_ui) {
+            return;
+        }
+
         var removed = 0;
         foreach (var uid in ids.data) {
             var item = layers[uid];
@@ -290,7 +374,7 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
     /*
      * When an item in the canvas is selected via click interaction.
      */
-    private void on_selection_modified_external () {
+    private void on_selection_modified_external (bool go_to_layer = false) {
         reset_edited_row ();
 
         // Always reset the selection of the layers.
@@ -301,15 +385,29 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
             return;
         }
 
-        bool multi = false;
-        foreach (var node in sm.selection.nodes.values) {
-            if (layers[node.node.id] != null) {
-                select_row_at_index (model.get_index_of (layers[node.node.id]), multi);
-                multi = true;
+        var it = sm.selection.nodes.map_iterator ();
+
+        // If the selection was modified from a click on the canvas, we need to
+        // move the first selected layer into the viewport of the layers list.
+        if (go_to_layer) {
+            it.next ();
+            var first_node = it.get_value ().node;
+            if (layers[first_node.id] != null) {
+                select_row_at_index (model.get_index_of (layers[first_node.id]));
             }
         }
 
-        if (multi) {
+        // For all other scenarios where a selection is restored dynamically or
+        // multiple items are selected, we don't generate the layer row widgets
+        // but we only update the selection state of the model.
+        while (it.next ()) {
+            var node = it.get_value ().node;
+            if (layers[node.id] != null) {
+                list_store.set_item_selected (layers[node.id], true);
+            }
+        }
+
+        if (sm.selection.count () > 1) {
             // Trigger a visual refresh of the visible layers without changing
             // anything in the list store in order to show the newly selected layers.
             list_store.items_changed (0, 0, 0);
