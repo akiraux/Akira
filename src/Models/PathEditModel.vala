@@ -98,6 +98,9 @@ public class Akira.Models.PathEditModel : Object {
             new_path_points[i] = points[i];
         }
 
+        Geometry.Point snapped_point = Geometry.Point (point.x, point.y);
+        snapped_point.x = Math.round (snapped_point.x);
+        snapped_point.y = Math.round (snapped_point.y);
         new_path_points[index] = point;
 
         for (int i = index + 1; i < points.length + 1; ++i) {
@@ -258,8 +261,9 @@ public class Akira.Models.PathEditModel : Object {
         Geometry.Point original_ref = Geometry.Point (points[reference_point].x, points[reference_point].y);
 
         // Calculate by how much the reference point changed, then move other points by this amount.
-        double delta_x = original_ref.x - new_pos.x;
-        double delta_y = original_ref.y - new_pos.y;
+        // We are rounding this value to the nearest integer. This is the spacing used in ViewLayerGrid.
+        double delta_x = Math.round (original_ref.x - new_pos.x);
+        double delta_y = Math.round (original_ref.y - new_pos.y);
 
         if (tangents_inline) {
             // If a tangent line was selected and they were inline,
