@@ -75,6 +75,8 @@ public class Akira.Services.ActionManager : Object {
     public const string ACTION_ALIGN_BOTTOM = "action_align_bottom";
     public const string ACTION_ALIGN_VCENTER = "action_align_vcenter";
     public const string ACTION_ALIGN_HCENTER = "action_align_hcenter";
+    public const string ACTION_UNDO = "action_undo";
+    public const string ACTION_REDO = "action_redo";
 
     public static Gee.MultiMap<string, string> action_accelerators = new Gee.HashMultiMap<string, string> ();
     public static Gee.MultiMap<string, string> typing_accelerators = new Gee.HashMultiMap<string, string> ();
@@ -122,6 +124,8 @@ public class Akira.Services.ActionManager : Object {
         { ACTION_ALIGN_BOTTOM, action_align_bottom },
         { ACTION_ALIGN_VCENTER, action_align_vcenter },
         { ACTION_ALIGN_HCENTER, action_align_hcenter },
+        { ACTION_UNDO, action_undo },
+        { ACTION_REDO, action_redo },
     };
 
     public ActionManager (Akira.Application akira_app, Akira.Window window) {
@@ -177,6 +181,9 @@ public class Akira.Services.ActionManager : Object {
         typing_accelerators.set (ACTION_ALIGN_TOP, "<Alt>4");
         typing_accelerators.set (ACTION_ALIGN_VCENTER, "<Alt>5");
         typing_accelerators.set (ACTION_ALIGN_BOTTOM, "<Alt>6");
+
+        typing_accelerators.set (ACTION_UNDO, "<Control>z");
+        typing_accelerators.set (ACTION_REDO, "<Control><Shift>z");
     }
 
     construct {
@@ -567,6 +574,14 @@ public class Akira.Services.ActionManager : Object {
 
     private void action_align_hcenter () {
         window.event_bus.selection_align (Utils.ItemAlignment.AlignmentDirection.HCENTER);
+    }
+
+    private void action_undo () {
+        window.event_bus.undo ();
+    }
+
+    private void action_redo () {
+        window.event_bus.redo ();
     }
 
     public static void action_from_group (string action_name, ActionGroup? action_group) {

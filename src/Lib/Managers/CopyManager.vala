@@ -73,6 +73,8 @@ public class Akira.Lib.Managers.CopyManager : Object {
 
         view_canvas.selection_manager.reset_selection ();
 
+        view_canvas.window.event_bus.create_model_snapshot ("paste selection");
+
         int res = 0;
         foreach (var child in children.data) {
             res += Utils.ModelUtil.clone_from_model (
