@@ -239,7 +239,6 @@ public class Akira.Drawables.Drawable {
         double scale
     ) {
         context.save ();
-        Cairo.Matrix global_transform = context.get_matrix ();
 
         // We apply the item transform before creating the path
         Cairo.Matrix tr = transform;
@@ -253,24 +252,20 @@ public class Akira.Drawables.Drawable {
         context.new_path ();
         context.arc (0.0, 0.0, 5 / scale, 0.0, 2.0 * GLib.Math.PI);
         // Draw the circle and preserve the visual properties.
-        context.stroke_preserve ();
+        context.stroke ();
 
         var lenght = 10 / scale;
         // Create the horizontal stroke.
         context.new_path ();
         context.move_to (-lenght, 0);
         context.line_to (lenght, 0);
-        context.stroke_preserve ();
+        context.stroke ();
 
         // Create the vertical stroke.
         context.new_path ();
         context.move_to (0, -lenght);
         context.line_to (0, lenght);
         context.stroke ();
-
-        // Apply the matrix transform of the drawable item so the new path is
-        // properly positioned.
-        context.set_matrix (global_transform);
         context.restore ();
 
         // Very important to initialize new path
