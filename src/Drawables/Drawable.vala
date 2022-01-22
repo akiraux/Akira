@@ -229,6 +229,50 @@ public class Akira.Drawables.Drawable {
     }
 
     /*
+     * Create a target like element on top of the drawable to represent the
+     * current subselection anchor point that will be used as alignment pivot.
+     */
+    public virtual void paint_anchor (
+        Cairo.Context context,
+        Gdk.RGBA color,
+        double line_width,
+        double scale
+    ) {
+        context.save ();
+
+        // We apply the item transform before creating the path
+        Cairo.Matrix tr = transform;
+        context.transform (tr);
+
+        // Set the visual properties.
+        context.set_line_width (line_width / scale);
+        context.set_source_rgba (color.red, color.green, color.blue, color.alpha);
+
+        // Create the circle.
+        context.new_path ();
+        context.arc (0.0, 0.0, 5 / scale, 0.0, 2.0 * GLib.Math.PI);
+        // Draw the circle and preserve the visual properties.
+        context.stroke ();
+
+        var lenght = 10 / scale;
+        // Create the horizontal stroke.
+        context.new_path ();
+        context.move_to (-lenght, 0);
+        context.line_to (lenght, 0);
+        context.stroke ();
+
+        // Create the vertical stroke.
+        context.new_path ();
+        context.move_to (0, -lenght);
+        context.line_to (0, lenght);
+        context.stroke ();
+        context.restore ();
+
+        // Very important to initialize new path
+        context.new_path ();
+    }
+
+    /*
      * Generates the bounding box for the drawable.
     */
     public virtual Geometry.Rectangle generate_bounding_box () {
