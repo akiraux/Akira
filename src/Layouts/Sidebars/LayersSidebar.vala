@@ -58,7 +58,6 @@ public class Akira.Layouts.Sidebars.LayersSidebar : Gtk.Grid {
 
     public LayersSidebar (Lib.ViewCanvas canvas) {
         Object (
-            orientation: Gtk.Orientation.VERTICAL,
             view_canvas: canvas
         );
     }
