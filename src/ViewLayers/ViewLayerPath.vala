@@ -90,7 +90,7 @@ public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
         context.transform (tr);
 
         // For all path points, the origin is in top left corner. Move there.
-        context.translate (-path_data.extents.width / 2, -path_data.extents.height / 2);
+        context.translate (path_data.center.x, path_data.center.y);
 
         context.new_path ();
         context.set_source_rgba (0.1568, 0.4745, 0.9823, 1);

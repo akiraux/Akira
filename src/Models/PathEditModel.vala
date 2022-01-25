@@ -185,7 +185,7 @@ public class Akira.Models.PathEditModel : Object {
         double thresh = HIT_SIZE / view_canvas.scale;
 
         int j = 0;
-        for (int i = 0; i < commands.length + 1; ++i) {
+        for (int i = 0; i < commands.length; ++i) {
             if (commands[i] == Lib.Modes.PathEditMode.Type.LINE) {
                 if (compare_points (points[j], point, thresh)) {
                     index[0] = j;
@@ -358,8 +358,7 @@ public class Akira.Models.PathEditModel : Object {
 
         // The amount by which the first point changed must be rotated before adding to first point.
         Geometry.Point delta = Geometry.Point (min_x, min_y);
-        //  var rotation = instance.components.transform.rotation;
-        //  Geometry.Point rotated_delta = Utils.GeometryMath.rotate_point (delta, rotation, Geometry.Point (0, 0));
+
         var transform_matrix = instance.components.transform.transformation_matrix;
         var rotated_delta = transform_point_around_item_origin (delta, transform_matrix);
 
@@ -370,24 +369,16 @@ public class Akira.Models.PathEditModel : Object {
     }
 
     private void recompute_components () {
-        // To calculate the new center, we need to rotate the first point around the new center.
-        // Then translate the rotated point by half of width and height.
-        // But the problem is, in order to rotate first point around origin, we need to know the origin. catch 22.
-        // We can form a system of linear equation using this as follows.
-        // Assume (fx, fy) is the first point, (ox, oy) is the origin to be calculated, r is the angle to rotate.
-        // Therefore, (ox, oy) = rotate (fx, fy) by r + (width/2, height/2);
-        // ox = cos(r) (fx - ox) - sin(r) (fy - oy) + ox;
-        // ox = sin(r) (fx - ox) + cos(r) (fy - oy) + oy;
-        // Solving this gives the equation used below.
-
         var bounds = instance.components.path.calculate_extents ();
 
-        double rotation = -instance.components.transform.rotation;
-        double sin_theta = Math.sin (rotation);
-        double cos_theta = Math.cos (rotation);
+        double center_x = bounds.width / 2.0;
+        double center_y = bounds.height / 2.0;
 
-        double center_x = first_point.x + (bounds.width * cos_theta + bounds.height * sin_theta) / 2.0;
-        double center_y = first_point.y + (bounds.height * cos_theta - bounds.width * sin_theta) / 2.0;
+        var tr = instance.components.transform.transformation_matrix;
+        tr.transform_point (ref center_x, ref center_y);
+
+        center_x += first_point.x;
+        center_y += first_point.y;
 
         instance.components.center = new Lib.Components.Coordinates (center_x, center_y);
         instance.components.size = new Lib.Components.Size (bounds.width, bounds.height, false);
@@ -406,13 +397,7 @@ public class Akira.Models.PathEditModel : Object {
     private void update_view () {
         var points = instance.components.path.data;
 
-        var coordinates = view_canvas.selection_manager.selection.coordinates ();
-
-        Geometry.Rectangle extents = Geometry.Rectangle.empty ();
-        extents.left = coordinates.center_x - coordinates.width / 2.0;
-        extents.right = coordinates.center_x + coordinates.width / 2.0;
-        extents.top = coordinates.center_y - coordinates.height / 2.0;
-        extents.bottom = coordinates.center_y + coordinates.height / 2.0;
+        var extents = instance.bounding_box;
 
         PathDataModel path_data = PathDataModel ();
         path_data.points = points;
@@ -425,6 +410,10 @@ public class Akira.Models.PathEditModel : Object {
         path_data.last_point = get_last_point_from_path ();
 
         path_data.live_extents = get_extents_using_live_pts (extents);
+
+        double center_x = -instance.compiled_geometry.source_width / 2.0;
+        double center_y = -instance.compiled_geometry.source_height / 2.0;
+        path_data.center = Geometry.Point (center_x, center_y);
 
         path_layer.update_path_data (path_data);
     }
@@ -523,6 +512,8 @@ public struct Akira.Models.PathDataModel {
 
     public Geometry.Rectangle extents;
     public Geometry.Rectangle live_extents;
+
+    public Geometry.Point center;
 
     public Cairo.Matrix transform;
     public Gee.HashSet<int> selected_pts;

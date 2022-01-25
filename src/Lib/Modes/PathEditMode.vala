@@ -80,17 +80,12 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
 
         // If we are editing the path, we need to set the first point in edit_model
         if (mode == Submode.EDIT) {
-            double center_x = instance.components.center.x;
-            double center_y = instance.components.center.y;
-            double width = instance.components.size.width;
-            double height = instance.components.size.height;
+            double width = instance.compiled_geometry.source_width;
+            double height = instance.compiled_geometry.source_height;
 
-            var first_point = Geometry.Point (center_x - width / 2.0, center_y - height / 2.0);
-
-            double rotation = instance.components.transform.rotation;
-            var origin = Geometry.Point (center_x, center_y);
-
-            first_point = Utils.GeometryMath.rotate_point (first_point, rotation, origin);
+            var first_point = Geometry.Point (-width / 2.0, -height / 2.0);
+            var tr = instance.drawable.transform;
+            tr.transform_point (ref first_point.x, ref first_point.y);
 
             edit_model.first_point = first_point;
         }
@@ -421,6 +416,7 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
 
         if (live_command == Type.LINE) {
             // Check if we are clicking on the first point. If yes, then close the path.
+            // TODO: fix this. dont need to test all points.
             int[] index = new int[3];
             index[0] = index[1] = index[2] = -1;
             edit_model.hit_test (event.x, event.y, ref index);
