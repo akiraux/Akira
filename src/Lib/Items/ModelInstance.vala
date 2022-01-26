@@ -86,9 +86,19 @@ public class Akira.Lib.Items.ModelInstance {
         this.id = uid;
     }
 
-    public ModelInstance clone () {
-        var cln = new ModelInstance (-1, type);
+    public ModelInstance clone (bool full) {
+        var cln = new ModelInstance (full ? id : -1, type);
         cln.components = components;
+
+        if (full) {
+            cln.children = children;
+            // TODO eventually this should be cachable--for now they break everything.
+            //cln.compiled_components = compiled_components;
+            //cln.drawable = drawable;
+            //cln.bounding_box = bounding_box;
+            //cln.drawable_bounding_box = drawable_bounding_box;
+        }
+
         return cln;
     }
 

@@ -137,6 +137,7 @@ sources = files(
     'Lib/Items/ModelTypeText.vala',
 
     'Lib/Managers/CopyManager.vala',
+    'Lib/Managers/HistoryManager.vala',
     'Lib/Managers/ItemsManager.vala',
     'Lib/Managers/ModeManager.vala',
     'Lib/Managers/NobManager.vala',

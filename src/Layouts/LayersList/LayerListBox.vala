@@ -365,7 +365,7 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
         // from the layers listbox.
         unowned var mm = view_canvas.mode_manager;
         if (mm.active_mode_type != Lib.Modes.AbstractInteractionMode.ModeType.TRANSFORM) {
-            var new_mode = new Lib.Modes.TransformMode (view_canvas, Utils.Nobs.Nob.NONE);
+            var new_mode = new Lib.Modes.TransformMode (view_canvas, Utils.Nobs.Nob.NONE, true);
             mm.register_mode (new_mode);
             mm.deregister_active_mode ();
         }

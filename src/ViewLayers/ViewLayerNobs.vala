@@ -38,7 +38,7 @@ public class Akira.ViewLayers.ViewLayerNobs : ViewLayer {
             old_nobs = new Utils.Nobs.NobSet.clone (nobs);
         }
 
-        nobs = (new_nobs == null) ? null : new Utils.Nobs.NobSet.clone (new_nobs);
+        nobs = (new_nobs == null || !new_nobs.any_active ()) ? null : new Utils.Nobs.NobSet.clone (new_nobs);
         update ();
     }
 

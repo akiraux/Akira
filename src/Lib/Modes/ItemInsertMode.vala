@@ -95,6 +95,8 @@ public class Akira.Lib.Modes.ItemInsertMode : AbstractInteractionMode {
         }
 
         if (event.button == Gdk.BUTTON_PRIMARY) {
+            view_canvas.window.event_bus.create_model_snapshot ("add item");
+
             bool is_artboard;
             var instance = construct_item (item_insert_type, event.x, event.y, out is_artboard);
 
@@ -114,7 +116,7 @@ public class Akira.Lib.Modes.ItemInsertMode : AbstractInteractionMode {
                 path_edit_mode.mode_begin ();
                 path_edit_mode.button_press_event (event);
             } else {
-                transform_mode = new Lib.Modes.TransformMode (view_canvas, Utils.Nobs.Nob.BOTTOM_LEFT);
+                transform_mode = new Lib.Modes.TransformMode (view_canvas, Utils.Nobs.Nob.BOTTOM_LEFT, false);
                 transform_mode.mode_begin ();
                 transform_mode.button_press_event (event);
             }

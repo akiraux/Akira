@@ -130,7 +130,12 @@ public class Akira.Lib.Managers.SelectionManager : Object {
         }
 
         reset_selection ();
-        view_canvas.items_manager.remove_items (to_delete);
+
+        if (to_delete.length > 0) {
+            view_canvas.window.event_bus.create_model_snapshot ("delete items");
+            view_canvas.items_manager.remove_items (to_delete);
+        }
+
     }
 
     public void change_z_order (bool up, bool to_end) {
@@ -140,7 +145,10 @@ public class Akira.Lib.Managers.SelectionManager : Object {
         }
 
         int amount = up ? 1 : -1;
-        view_canvas.items_manager.shift_items (to_shift, amount, to_end);
+        if (to_shift.length > 0 && amount != 0) {
+            view_canvas.window.event_bus.create_model_snapshot ("shift items' z-order");
+            view_canvas.items_manager.shift_items (to_shift, amount, to_end);
+        }
     }
 
     public void on_flip_selected (bool vertical) {
@@ -149,6 +157,9 @@ public class Akira.Lib.Managers.SelectionManager : Object {
             to_flip.append_val (node_id);
         }
 
-        view_canvas.items_manager.flip_items (to_flip, vertical);
+        if (to_flip.length > 0) {
+            view_canvas.window.event_bus.create_model_snapshot ("flip items");
+            view_canvas.items_manager.flip_items (to_flip, vertical);
+        }
     }
 }

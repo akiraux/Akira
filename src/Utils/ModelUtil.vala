@@ -63,7 +63,7 @@
         Lib.Items.ModelNode target_node,
         Lib.Items.Model target_model
     ) {
-        var new_id = target_model.append_new_item (target_node.id, source_node.instance.clone ());
+        var new_id = target_model.append_new_item (target_node.id, source_node.instance.clone (false));
 
         if (source_node.instance.is_group) {
             foreach (var child in source_node.children.data) {

@@ -84,4 +84,10 @@ public class Akira.Services.EventBus : Object {
     public signal void preview_completed ();
     public signal void exporting (string message);
     public signal void export_completed ();
+
+    // History signals
+    public signal void create_model_snapshot (string description);
+    public signal void undo ();
+    public signal void redo ();
+
 }
