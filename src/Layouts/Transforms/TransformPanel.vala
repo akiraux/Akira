@@ -33,11 +33,24 @@ public class Akira.Layouts.Transforms.TransformPanel : Gtk.Grid {
         row_spacing = column_spacing = 6;
         hexpand = true;
 
+        var lock_image = new Gtk.Image.from_icon_name ("changes-allow-symbolic", Gtk.IconSize.BUTTON);
+        var lock_button = new Gtk.ToggleButton () {
+            tooltip_text = _("Lock Ratio"),
+            image = lock_image,
+            can_focus = false,
+            sensitive = false
+        };
+        lock_button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
+        lock_button.get_style_context ().add_class ("label-colors");
+
         attach (group_title (_("Position")), 0, 0, 3);
         attach (new Widgets.LinkedInput (view_canvas, _("X"), _("Horizontal position")), 0, 1, 1);
         attach (new Widgets.LinkedInput (view_canvas, _("Y"), _("Vertical position")), 2, 1, 1);
         attach (separator (), 0, 2, 3);
         attach (group_title (_("Size")), 0, 3, 3);
+        attach (new Widgets.LinkedInput (view_canvas, _("W"), _("Width")), 0, 4, 1);
+        attach (lock_button, 1, 4, 1);
+        attach (new Widgets.LinkedInput (view_canvas, _("H"), _("Height")), 2, 4, 1);
         attach (separator (), 0, 5, 3);
         attach (group_title (_("Transform")), 0, 6, 3);
         attach (separator (), 0, 8, 3);

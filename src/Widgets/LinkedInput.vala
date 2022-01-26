@@ -28,9 +28,6 @@ public class Akira.Widgets.LinkedInput : Gtk.Grid {
 
     public InputField input_field { get; set; }
 
-    /**
-    * Used to avoid to infinitely updating when value is set externally.
-    */
     private bool dragging = false;
     private double dragging_direction = 0;
 
@@ -55,13 +52,17 @@ public class Akira.Widgets.LinkedInput : Gtk.Grid {
         };
         entry_label.get_style_context ().add_class ("entry-label");
 
+        var event_box = new Gtk.EventBox ();
+        event_box.event.connect (handle_event);
+        event_box.add (entry_label);
+
         input_field = new Widgets.InputField (view_canvas, icon, 7, true, false);
 
         if (reversed) {
             attach (input_field, 0, 0);
-            attach (entry_label, 1, 0);
+            attach (event_box, 1, 0);
         } else {
-            attach (entry_label, 0, 0);
+            attach (event_box, 0, 0);
             attach (input_field, 1, 0);
         }
     }

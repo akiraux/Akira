@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 Alecaddd (https://alecaddd.com)
+ * Copyright (c) 2019-2022 Alecaddd (https://alecaddd.com)
  *
  * This file is part of Akira.
  *
@@ -19,7 +19,7 @@
  * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
  */
 
-public class Akira.Widgets.InputField : Gtk.EventBox {
+public class Akira.Widgets.InputField : Gtk.Grid {
     public enum Unit {
         PIXEL,
         HASH,
