@@ -83,14 +83,11 @@ public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
 
         context.save ();
 
-        var global_transform = context.get_matrix ();
-
         // Apply transform matrix of drawable so we don't have to rotate or scale.
-        Cairo.Matrix tr = path_data.transform;
-        context.transform (tr);
-
+        //var tr = Utils.GeometryMath.multiply_matrices (path_data.transform, context.get_matrix ());
+        var tr = path_data.transform;
         // For all path points, the origin is in top left corner. Move there.
-        context.translate (path_data.center.x, path_data.center.y);
+        tr.translate (path_data.center.x, path_data.center.y);
 
         context.new_path ();
         context.set_source_rgba (0.1568, 0.4745, 0.9823, 1);
@@ -102,25 +99,32 @@ public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
 
         // Draw circles for all points.
         for (int i = 0; i < commands.length; ++i) {
+            var pt = points[point_idx];
+            tr.transform_point (ref pt.x, ref pt.y);
+
             if (commands[i] == Lib.Modes.PathEditMode.Type.LINE) {
-                var pt = points[point_idx];
                 context.arc (pt.x, pt.y, radius, 0, Math.PI * 2);
                 context.fill ();
 
                 ++point_idx;
             } else {
                 for (int j = 0; j < 4; ++j) {
-                    var pt = points[j + point_idx];
+                    var pti = points[j + point_idx];
+                    tr.transform_point (ref pti.x, ref pti.y);
 
-                    context.arc (pt.x, pt.y, radius, 0, Math.PI * 2);
+                    context.arc (pti.x, pti.y, radius, 0, Math.PI * 2);
                     context.fill ();
                 }
 
-                context.move_to (points[point_idx].x, points[point_idx].y);
-                context.line_to (points[point_idx + 1].x, points[point_idx + 1].y);
+                var pt1 = points[point_idx + 1];
+                var pt2 = points[point_idx + 2];
+                tr.transform_point (ref pt1.x, ref pt1.y);
+                tr.transform_point (ref pt2.x, ref pt2.y);
+                context.move_to (pt.x, pt.y);
+                context.line_to (pt1.x, pt1.y);
 
-                context.move_to (points[point_idx].x, points[point_idx].y);
-                context.line_to (points[point_idx + 2].x, points[point_idx + 2].y);
+                context.move_to (pt.x, pt.y);
+                context.line_to (pt2.x, pt2.y);
 
                 context.stroke ();
 
@@ -130,14 +134,13 @@ public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
 
         foreach (var idx in path_data.selected_pts) {
             context.set_source_rgba (0.7, 0, 0, 1);
-            context.arc (points[idx].x, points[idx].y, radius, 0, Math.PI * 2);
+
+            var pt = points[idx];
+            tr.transform_point (ref pt.x, ref pt.y);
+            context.arc (pt.x, pt.y, radius, 0, Math.PI * 2);
             context.fill ();
         }
 
-        // Reapply the original transform of context.
-        context.set_matrix (global_transform);
-
-        context.stroke ();
         context.new_path ();
         context.restore ();
     }
