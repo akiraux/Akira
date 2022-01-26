@@ -41,6 +41,7 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
     public Lib.Managers.NobManager nob_manager;
     public Lib.Managers.SnapManager snap_manager;
     public Lib.Managers.CopyManager copy_manager;
+    public Lib.Managers.HistoryManager history_manager;
 
     private bool is_modifier_pressed (Gdk.ModifierIntent type) {
         Gdk.ModifierType state;
@@ -106,6 +107,7 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
         nob_manager = new Lib.Managers.NobManager (this);
         snap_manager = new Lib.Managers.SnapManager (this);
         copy_manager = new Lib.Managers.CopyManager (this);
+        history_manager = new Lib.Managers.HistoryManager (this);
 
         grid_layout = new ViewLayers.ViewLayerGrid (
             0,
@@ -243,10 +245,12 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
 
         uint uppercase_keyval = Gdk.keyval_to_upper (event.keyval);
         if (uppercase_keyval == Gdk.Key.J) {
+            window.event_bus.create_model_snapshot ("add debug items");
             items_manager.debug_add_rectangles (10000, true);
             return true;
         }
         if (uppercase_keyval == Gdk.Key.G) {
+            window.event_bus.create_model_snapshot ("add debug group");
             items_manager.add_debug_group (300, 300, true);
             return true;
         }
@@ -347,7 +351,7 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
         }
 
         if (!selection_manager.is_empty ()) {
-            var new_mode = new Lib.Modes.TransformMode (this, nob_clicked);
+            var new_mode = new Lib.Modes.TransformMode (this, nob_clicked, true);
             mode_manager.register_mode (new_mode);
 
             if (mode_manager.button_press_event (event)) {

@@ -75,9 +75,15 @@ public class Akira.Utils.AffineTransform : Object {
             var d_y = initial_drag_state.area.center_y + global_offset_y + center_offset_y;
 
             item.components.center = new Lib.Components.Coordinates (d_x, d_y);
-            item.components.transform = new Lib.Components.Transform (angle, 1.0, 1.0, shear_x, 0);
 
-            item.components.size = new Lib.Components.Size (new_width, new_height, false);
+
+            if (item.type is Lib.Items.ModelTypePath) {
+                item.components.transform = new Lib.Components.Transform (angle, scale_x, scale_y, shear_x, 0);
+            }
+            else {
+                item.components.transform = new Lib.Components.Transform (angle, 1.0, 1.0, shear_x, 0);
+                item.components.size = new Lib.Components.Size (new_width, new_height, false);
+            }
 
             item_model.alert_node_changed (node, Lib.Components.Component.Type.COMPILED_GEOMETRY);
         }

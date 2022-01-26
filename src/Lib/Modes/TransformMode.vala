@@ -31,6 +31,9 @@ public class Akira.Lib.Modes.TransformMode : AbstractInteractionMode {
 
     public Utils.Nobs.Nob nob = Utils.Nobs.Nob.NONE;
 
+    private bool standalone = false;
+    private bool snapshot_taken = false;
+
     // Keeps track of the currently used nob to quickly change selection when
     // an item is scaled below its sizing, causing a "flip" in the transformation.
     public Utils.Nobs.Nob effective_nob = Utils.Nobs.Nob.NONE;
@@ -64,12 +67,13 @@ public class Akira.Lib.Modes.TransformMode : AbstractInteractionMode {
     public TransformExtraContext transform_extra_context;
 
 
-    public TransformMode (Akira.Lib.ViewCanvas canvas, Utils.Nobs.Nob selected_nob) {
+    public TransformMode (Akira.Lib.ViewCanvas canvas, Utils.Nobs.Nob selected_nob, bool standalone) {
         Object (view_canvas: canvas);
         // Set the effective_nob when the transform mode is first initialized in
         // order to get the correct first clicked nob to show when scaling.
         nob = effective_nob = selected_nob;
         initial_drag_state = new InitialDragState ();
+        this.standalone = standalone;
     }
 
     construct {
@@ -150,6 +154,11 @@ public class Akira.Lib.Modes.TransformMode : AbstractInteractionMode {
     }
 
     public override bool motion_notify_event (Gdk.EventMotion event) {
+
+        if (standalone && !snapshot_taken) {
+            view_canvas.window.event_bus.create_model_snapshot ("transform items");
+            snapshot_taken = true;
+        }
 
         switch (nob) {
             case Utils.Nobs.Nob.NONE:

@@ -56,12 +56,7 @@ public class Akira.Lib.Items.Model : Object {
 
     private unowned ViewLayers.BaseCanvas? canvas = null;
 
-    public Model.live_model (ViewLayers.BaseCanvas? canvas) {
-        is_live = true;
-        this.canvas = canvas;
-    }
-
-    construct {
+    public Model () {
         item_map = new Gee.HashMap<int, ModelInstance> ();
         group_map = new Gee.HashMap<int, ModelInstance> ();
         item_nodes = new Gee.HashMap<int, ModelNode> ();
@@ -74,8 +69,53 @@ public class Akira.Lib.Items.Model : Object {
         add_to_maps (new ModelNode (group_instance, 0), false);
     }
 
+    public Model.live_model (ViewLayers.BaseCanvas? canvas) {
+        this ();
+
+        is_live = true;
+        this.canvas = canvas;
+    }
+
+    public Model.clone (Model other) {
+        this ();
+
+        canvas = other.canvas;
+        is_live = false;
+        last_group_id = other.last_group_id;
+        last_item_id = other.last_item_id;
+
+        foreach (var item in other.item_map) {
+            item_map[item.key] = item.value.clone (true);
+        }
+
+        foreach (var group in other.group_map) {
+            group_map[group.key] = group.value.clone (true);
+        }
+
+    }
+
     public signal void item_added (int id);
     public signal void item_geometry_changed (int id);
+
+    /*
+     * Makes the model not be in a live state.
+     */
+    public void sleep () {
+        is_live = false;
+    }
+
+    /*
+     * Makes the model live.
+     */
+    public void wake (bool regenerate) {
+        is_live = true;
+        if (regenerate) {
+            var origin_node = node_from_id (ORIGIN_ID);
+            var origin_instance = instance_from_id (ORIGIN_ID);
+            origin_node.instance = origin_instance;
+            regenerate_node (origin_node);
+        }
+    }
 
     public void compile_geometries () {
         internal_compile_geometries ();
@@ -422,16 +462,20 @@ public class Akira.Lib.Items.Model : Object {
         // TODO create drawable in a nicer way.
         node.instance.add_to_canvas ();
 
+        naive_add_to_maps (node);
+
+        if (is_live && listen) {
+            item_added (node.id);
+        }
+    }
+
+    private void naive_add_to_maps (ModelNode node) {
         if (node.instance.is_group) {
             group_map[node.id] = node.instance;
             group_nodes[node.id] = node;
         } else {
             item_map[node.id] = node.instance;
             item_nodes[node.id] = node;
-        }
-
-        if (is_live && listen) {
-            item_added (node.id);
         }
     }
 
@@ -510,6 +554,37 @@ public class Akira.Lib.Items.Model : Object {
         int ct = 0;
         foreach (unowned var child in parent_node.children.data) {
             child.pos_in_parent = ct++;
+        }
+    }
+
+    private void regenerate_node (ModelNode node) {
+        var ct = 0;
+
+        foreach (unowned var ch in node.instance.children) {
+            var ch_inst = instance_from_id (ch);
+            var ch_node = new ModelNode (ch_inst, ct);
+            ch_node.parent = node;
+
+            if (node.children == null) {
+                node.children = new GLib.Array<unowned ModelNode> ();
+            }
+
+            node.children.append_val (ch_node);
+
+            naive_add_to_maps (ch_node);
+
+            regenerate_node (ch_node);
+            ++ct;
+        }
+
+        if (node.id != ORIGIN_ID) {
+            if (node.id < ITEM_START_ID) {
+                changed_groups.add (node.id);
+            } else {
+                changed_items.add (node.id);
+            }
+
+            node.instance.add_to_canvas ();
         }
     }
 
