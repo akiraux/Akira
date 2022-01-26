@@ -27,17 +27,15 @@ public class Akira.Layouts.Transforms.TransformPanel : Gtk.Grid {
     public unowned Lib.ViewCanvas view_canvas { get; construct; }
 
     public TransformPanel (Lib.ViewCanvas canvas) {
-        Object (
-            view_canvas: canvas
-        );
-    }
+        Object (view_canvas: canvas);
 
-    construct {
         border_width = 12;
         row_spacing = column_spacing = 6;
         hexpand = true;
 
         attach (group_title (_("Position")), 0, 0, 3);
+        attach (new Widgets.LinkedInput (view_canvas, _("X"), _("Horizontal position")), 0, 1, 1);
+        attach (new Widgets.LinkedInput (view_canvas, _("Y"), _("Vertical position")), 2, 1, 1);
         attach (separator (), 0, 2, 3);
         attach (group_title (_("Size")), 0, 3, 3);
         attach (separator (), 0, 5, 3);

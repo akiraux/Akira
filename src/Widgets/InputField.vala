@@ -20,16 +20,6 @@
  */
 
 public class Akira.Widgets.InputField : Gtk.EventBox {
-    public Gtk.SpinButton entry { get; construct set; }
-
-    public int chars { get; construct set; }
-    public bool rtl { get; construct set; }
-    public bool icon_right { get; construct set; }
-    public Unit unit { get; construct set; }
-    public string? icon { get; set; }
-
-    public double step { get; set; default = 1; }
-
     public enum Unit {
         PIXEL,
         HASH,
@@ -38,32 +28,34 @@ public class Akira.Widgets.InputField : Gtk.EventBox {
         NONE
     }
 
+    public unowned Lib.ViewCanvas view_canvas { get; construct; }
+    public Gtk.SpinButton entry { get; construct set; }
+
+    private double step { get; set; default = 1; }
+
     public InputField (
+        Lib.ViewCanvas canvas,
         Unit unit,
         int chars,
         bool icon_right = false,
-        bool rtl = false) {
-        Object (
-            unit: unit,
-            chars: chars,
-            icon_right: icon_right,
-            rtl: rtl
-        );
-    }
+        bool rtl = false
+    ) {
+        Object (view_canvas: canvas);
 
-    construct {
         valign = Gtk.Align.CENTER;
 
-        entry = new Gtk.SpinButton.with_range (0, 100, step);
-        entry.hexpand = true;
-        entry.width_chars = chars;
-        entry.sensitive = false;
+        entry = new Gtk.SpinButton.with_range (0, 100, step) {
+            hexpand = true,
+            width_chars = chars,
+            sensitive = false
+        };
 
         entry.key_press_event.connect (handle_key_press);
         entry.scroll_event.connect (handle_scroll_event);
         entry.focus_in_event.connect (handle_focus_in);
         entry.focus_out_event.connect (handle_focus_out);
 
+        string? icon = null;
         switch (unit) {
             case Unit.HASH:
                 icon = "input-hash-symbolic";
@@ -76,9 +68,6 @@ public class Akira.Widgets.InputField : Gtk.EventBox {
                 break;
             case Unit.DEGREES:
                 icon = "input-degrees-symbolic";
-                break;
-            default:
-                icon = null;
                 break;
         }
 
@@ -108,22 +97,21 @@ public class Akira.Widgets.InputField : Gtk.EventBox {
     }
 
     private bool handle_key_press (Gdk.EventKey event) {
-        // Arrow UP
+        // Arrow UP.
         if (event.keyval == Gdk.Key.Up && (event.state & Gdk.ModifierType.SHIFT_MASK) > 0) {
             entry.spin (Gtk.SpinType.STEP_FORWARD, 10);
             return true;
         }
 
-        // Arrow DOWN
+        // Arrow DOWN.
         if (event.keyval == Gdk.Key.Down && (event.state & Gdk.ModifierType.SHIFT_MASK) > 0) {
             entry.spin (Gtk.SpinType.STEP_BACKWARD, 10);
             return true;
         }
 
-        // Enter or Escape
+        // Enter or Escape.
         if (event.keyval == Gdk.Key.Return || event.keyval == Gdk.Key.Escape) {
-            Akira.Window window = get_toplevel () as Akira.Window;
-            window.event_bus.set_focus_on_canvas ();
+            view_canvas.window.event_bus.set_focus_on_canvas ();
             return true;
         }
 
@@ -139,22 +127,12 @@ public class Akira.Widgets.InputField : Gtk.EventBox {
     }
 
     private bool handle_focus_in (Gdk.EventFocus event) {
-        Akira.Window window = get_toplevel () as Akira.Window;
-        if (!(window is Akira.Window)) {
-            return true;
-        }
-        window.event_bus.disconnect_typing_accel ();
-
+        view_canvas.window.event_bus.disconnect_typing_accel ();
         return false;
     }
 
     private bool handle_focus_out (Gdk.EventFocus event) {
-        Akira.Window window = get_toplevel () as Akira.Window;
-        if (!(window is Akira.Window)) {
-            return true;
-        }
-        window.event_bus.connect_typing_accel ();
-
+        view_canvas.window.event_bus.connect_typing_accel ();
         return false;
     }
 }
