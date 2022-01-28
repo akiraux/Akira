@@ -71,6 +71,7 @@ public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
 
         canvas.request_redraw (old_live_extents);
         canvas.request_redraw (path_data.live_extents);
+        canvas.request_redraw (path_data.extents);
         old_live_extents = path_data.live_extents;
     }
 

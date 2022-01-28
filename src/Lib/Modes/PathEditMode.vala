@@ -87,7 +87,7 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
             var tr = instance.drawable.transform;
             tr.transform_point (ref first_point.x, ref first_point.y);
 
-            edit_model.first_point = first_point;
+            edit_model.set_first_point (first_point);
         }
     }
 
@@ -416,10 +416,9 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
 
         if (live_command == Type.LINE) {
             // Check if we are clicking on the first point. If yes, then close the path.
-            // TODO: fix this. dont need to test all points.
             int[] index = new int[3];
             index[0] = index[1] = index[2] = -1;
-            edit_model.hit_test (event.x, event.y, ref index);
+            edit_model.hit_test (event.x, event.y, ref index, 0);
 
             if (index[0] == 0) {
                 edit_model.make_path_closed ();

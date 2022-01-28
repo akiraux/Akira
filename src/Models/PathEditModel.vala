@@ -40,7 +40,7 @@ public class Akira.Models.PathEditModel : Object {
 
     // This is the diameter of the blue points drawn in ViewLayerPath.
     // It is used for checking if user clicked withing the region.
-    private const int HIT_SIZE = 4;
+    public const int HIT_SIZE = 4;
 
     public PathEditModel (Lib.Items.ModelInstance instance, Lib.ViewCanvas view_canvas) {
         Object (
@@ -60,6 +60,11 @@ public class Akira.Models.PathEditModel : Object {
         // The selected_pts will contain the list of all points that we want to modify.
         selected_pts = new Gee.HashSet<int> ();
 
+        update_view ();
+    }
+
+    public void set_first_point (Geometry.Point first_point) {
+        this.first_point = first_point;
         update_view ();
     }
 
@@ -169,8 +174,10 @@ public class Akira.Models.PathEditModel : Object {
      * This method is used to check if user clicked on a point in the path.
      * Returns true if clicked, false otherwise.
      * If a point was clicked, index refers to its location.
+     * If check_idx is -1, do hit test with all the points. Otherwise
+     * only with the given point.
      */
-    public Lib.Modes.PathEditMode.PointType hit_test (double x, double y, ref int[] index) {
+    public Lib.Modes.PathEditMode.PointType hit_test (double x, double y, ref int[] index, int check_idx = -1) {
         // In order to check if user clicked on a point, we need to rotate the first point and the event
         // around the item center. Then the difference between these values gives the location
         // event in the same coordinate system as the points.
@@ -184,10 +191,19 @@ public class Akira.Models.PathEditModel : Object {
         tangents_inline = false;
         double thresh = HIT_SIZE / view_canvas.scale;
 
+        if (check_idx != -1) {
+            if (Utils.GeometryMath.compare_points (points[check_idx], point, thresh)) {
+                index[0] = check_idx;
+                return Lib.Modes.PathEditMode.PointType.LINE_END;
+            }
+
+            return Lib.Modes.PathEditMode.PointType.NONE;
+        }
+
         int j = 0;
         for (int i = 0; i < commands.length; ++i) {
             if (commands[i] == Lib.Modes.PathEditMode.Type.LINE) {
-                if (compare_points (points[j], point, thresh)) {
+                if (Utils.GeometryMath.compare_points (points[j], point, thresh)) {
                     index[0] = j;
 
                     return Lib.Modes.PathEditMode.PointType.LINE_END;
@@ -198,7 +214,7 @@ public class Akira.Models.PathEditModel : Object {
                 // We need to check if the middle point of tangent is selected.
                 // If it is selected, then other two points of tangent must also
                 // be selected to keep the curve intact.
-                if (compare_points (points[j], point, thresh)) {
+                if (Utils.GeometryMath.compare_points (points[j], point, thresh)) {
                     index[0] = j;
                     index[1] = j + 1;
                     index[2] = j + 2;
@@ -208,7 +224,7 @@ public class Akira.Models.PathEditModel : Object {
 
                 // If either of the tangent points is selected and moved,
                 // then the other needs to be rotated too.
-                if (compare_points (points[j + 1], point, thresh)) {
+                if (Utils.GeometryMath.compare_points (points[j + 1], point, thresh)) {
                     if (are_tangents_inline (points[j + 1], points[j], points[j + 2])) {
                         index[0] = j + 1;
                         index[1] = j + 2;
@@ -219,7 +235,7 @@ public class Akira.Models.PathEditModel : Object {
                     return Lib.Modes.PathEditMode.PointType.TANGENT_FIRST;
                 }
 
-                if (compare_points (points[j + 2], point, thresh)) {
+                if (Utils.GeometryMath.compare_points (points[j + 2], point, thresh)) {
                     if (are_tangents_inline (points[j + 1], points[j], points[j + 2])) {
                         index[0] = j + 1;
                         index[1] = j + 2;
@@ -230,7 +246,7 @@ public class Akira.Models.PathEditModel : Object {
                     return Lib.Modes.PathEditMode.PointType.TANGENT_SECOND;
                 }
 
-                if (compare_points (points[j + 3], point, thresh)) {
+                if (Utils.GeometryMath.compare_points (points[j + 3], point, thresh)) {
                     index[0] = j + 3;
 
                     return Lib.Modes.PathEditMode.PointType.CURVE_END;
@@ -315,19 +331,9 @@ public class Akira.Models.PathEditModel : Object {
             return false;
         }
 
-        double delta_x = (points[0].x - points[last].x).abs ();
-        double delta_y = (points[0].y - points[last].y).abs ();
-
-        if (delta_x <= 2 && delta_y <= 2) {
+        double thresh = HIT_SIZE / view_canvas.scale;
+        if (Utils.GeometryMath.compare_points (points[0], points[last], thresh)) {
             make_path_closed ();
-            return true;
-        }
-
-        return false;
-    }
-
-    private bool compare_points (Geometry.Point a, Geometry.Point b, double thresh) {
-        if (Utils.GeometryMath.distance (a.x, a.y, b.x, b.y) < thresh) {
             return true;
         }
 
@@ -340,14 +346,11 @@ public class Akira.Models.PathEditModel : Object {
     private Geometry.Point[] recalculate_points (Geometry.Point[] points) {
         double min_x = double.MAX, min_y = double.MAX;
 
-        foreach (var pt in points) {
-            if (pt.x < min_x) {
-                min_x = pt.x;
-            }
-            if (pt.y < min_y) {
-                min_y = pt.y;
-            }
-        }
+        var path = new Lib.Components.Path.from_points (points, commands);
+        var ext = path.calculate_extents ();
+
+        min_x = ext.left;
+        min_y = ext.top;
 
         Geometry.Point[] recalculated_points = new Geometry.Point[points.length];
 
@@ -394,22 +397,39 @@ public class Akira.Models.PathEditModel : Object {
     /*
      * Recalculates the extents and updates the ViewLayerPath
      */
-    private void update_view () {
-        var points = instance.components.path.data;
+    public void update_view () {
+        var tr = instance.components.transform.transformation_matrix;
 
-        var extents = instance.bounding_box;
+        var extents_from_pts = Utils.GeometryMath.bounds_from_points (points);
+        var extents_from_path = instance.components.path.calculate_extents ();
+
+        double offset_x = extents_from_path.center_x - extents_from_pts.center_x;
+        double offset_y = extents_from_path.center_y - extents_from_pts.center_y;
+        tr.transform_point (ref offset_x, ref offset_y);
+
+        double pts_center_x = instance.components.center.x - offset_x;
+        double pts_center_y = instance.components.center.y - offset_y;
+
+        var quad = Geometry.Quad.from_components (pts_center_x, pts_center_y, extents_from_pts.width, extents_from_pts.height, tr);
+        var new_ext = quad.bounding_box;
+
+        double radius = ViewLayers.ViewLayerPath.UI_NOB_SIZE / view_canvas.scale;
+        new_ext.left -= radius;
+        new_ext.top -= radius;
+        new_ext.right += radius;
+        new_ext.bottom += radius;
 
         PathDataModel path_data = PathDataModel ();
         path_data.points = points;
         path_data.commands = commands;
         path_data.live_pts = live_pts;
         path_data.length = live_pts_len;
-        path_data.extents = extents;
+        path_data.extents = new_ext;
         path_data.transform = instance.drawable.transform;
         path_data.selected_pts = selected_pts;
         path_data.last_point = get_last_point_from_path ();
 
-        path_data.live_extents = get_extents_using_live_pts (extents);
+        path_data.live_extents = get_extents_using_live_pts (extents_from_pts);
 
         double center_x = -instance.compiled_geometry.source_width / 2.0;
         double center_y = -instance.compiled_geometry.source_height / 2.0;
@@ -431,8 +451,10 @@ public class Akira.Models.PathEditModel : Object {
             data[i + 1].y = live_pts[i].y;
         }
 
-        // The array of commands isn't really needed for calculating extents. So just keep it empty.
-        var cmds = new Lib.Modes.PathEditMode.Type[0];
+        var cmds = new Lib.Modes.PathEditMode.Type[data.length];
+        for (int i = 0; i < data.length; ++i) {
+            cmds[i] = Lib.Modes.PathEditMode.Type.LINE;
+        }
         var live_path = new Lib.Components.Path.from_points (data, cmds);
 
         var live_extents = live_path.calculate_extents ();

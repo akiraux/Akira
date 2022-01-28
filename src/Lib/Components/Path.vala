@@ -83,23 +83,43 @@ public class Akira.Lib.Components.Path : Component, Copyable<Path> {
     public Geometry.Rectangle calculate_extents () {
         // The minimum values need to be large so for finding minimum to work.
         double min_x = double.MAX;
-        double max_x = 0;
+        double max_x = double.MIN;
         double min_y = double.MAX;
-        double max_y = 0;
+        double max_y = double.MIN;
 
-        foreach (var pos in data) {
-            if (pos.x < min_x) {
-                min_x = pos.x;
-            }
-            if (pos.x > max_x) {
-                max_x = pos.x;
-            }
+        int point_idx = 0;
+        for (int cmd_idx = 0; cmd_idx < commands.length; ++cmd_idx) {
+            if (commands[cmd_idx] == Lib.Modes.PathEditMode.Type.LINE) {
+                var point = data[point_idx];
+                min_x = double.min (min_x, point.x);
+                max_x = double.max (max_x, point.x);
+                min_y = double.min (min_y, point.y);
+                max_y = double.max (max_y, point.y);
 
-            if (pos.y < min_y) {
-                min_y = pos.y;
-            }
-            if (pos.y > max_y) {
-                max_y = pos.y;
+                ++point_idx;
+            } else {
+                var p0 = data[point_idx - 1];
+                var p1 = data[point_idx];
+                var p2 = data[point_idx + 1];
+                var p3 = data[point_idx + 2];
+                var p4 = data[point_idx + 3];
+
+                double[] b1_extremes = Utils.Bezier.get_extremes (p0, p2, p1);
+                double[] b2_extremes = Utils.Bezier.get_extremes (p1, p3, p4);
+
+                double temp = double.min (b1_extremes[0], b2_extremes[0]);
+                min_x = double.min (min_x, temp);
+
+                temp = double.min (b1_extremes[1], b2_extremes[1]);
+                min_y = double.min (min_y, temp);
+
+                temp = double.max (b1_extremes[2], b2_extremes[2]);
+                max_x = double.max (max_x, temp);
+
+                temp = double.max (b1_extremes[3], b2_extremes[3]);
+                max_y = double.max (max_y, temp);
+
+                point_idx += 4;
             }
         }
 

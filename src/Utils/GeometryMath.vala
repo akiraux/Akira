@@ -297,4 +297,29 @@ public class Akira.Utils.GeometryMath : Object {
 
         return Geometry.Point (rot_x, rot_y);
     }
+
+    public static bool compare_points (Geometry.Point a, Geometry.Point b, double thresh) {
+        if (Utils.GeometryMath.distance (a.x, a.y, b.x, b.y) < thresh) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public static Geometry.Rectangle bounds_from_points (Geometry.Point[] points) {
+        Geometry.Rectangle bounds = Geometry.Rectangle();//.with_coordinates (double.MAX, double.MAX, double.MIN, double.MIN);
+        bounds.left = double.MAX;
+        bounds.top = double.MAX;
+        bounds.right = double.MIN;
+        bounds.bottom = double.MIN;
+
+        foreach (var pt in points) {
+            bounds.left = double.min (bounds.left, pt.x);
+            bounds.right = double.max (bounds.right, pt.x);
+            bounds.top = double.min (bounds.top, pt.y);
+            bounds.bottom = double.max (bounds.bottom, pt.y);
+        }
+
+        return bounds;
+    }
 }
