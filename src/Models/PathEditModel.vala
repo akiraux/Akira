@@ -398,6 +398,8 @@ public class Akira.Models.PathEditModel : Object {
      * Recalculates the extents and updates the ViewLayerPath
      */
     public void update_view () {
+        // Since the bounding box for the instance may not include the tangents,
+        // we need to calculate the bounding box for all points.
         var tr = instance.components.transform.transformation_matrix;
 
         var extents_from_pts = Utils.GeometryMath.bounds_from_points (points);

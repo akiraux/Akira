@@ -307,7 +307,7 @@ public class Akira.Utils.GeometryMath : Object {
     }
 
     public static Geometry.Rectangle bounds_from_points (Geometry.Point[] points) {
-        Geometry.Rectangle bounds = Geometry.Rectangle();//.with_coordinates (double.MAX, double.MAX, double.MIN, double.MIN);
+        Geometry.Rectangle bounds = Geometry.Rectangle ();
         bounds.left = double.MAX;
         bounds.top = double.MAX;
         bounds.right = double.MIN;

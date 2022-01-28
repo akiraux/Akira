@@ -23,7 +23,9 @@ public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
     public const double UI_NOB_SIZE = 4;
 
     private Models.PathDataModel path_data;
+
     private Geometry.Rectangle? old_live_extents = null;
+    private Geometry.Rectangle? old_extents = null;
 
     public void update_path_data (Models.PathDataModel _path_data) {
         path_data = _path_data;
@@ -32,6 +34,11 @@ public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
           // Initial values for old extents of live effect will span the entire canvas.
           old_live_extents = Geometry.Rectangle.empty ();
           old_live_extents.right = old_live_extents.bottom = 1000.0;
+        }
+
+        if (old_extents == null) {
+          old_extents = Geometry.Rectangle.empty ();
+          old_extents.right = old_extents.bottom = 1000.0;
         }
 
         update ();
@@ -69,10 +76,14 @@ public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
             return;
         }
 
+        canvas.request_redraw (old_extents);
+        canvas.request_redraw (path_data.extents);
+
         canvas.request_redraw (old_live_extents);
         canvas.request_redraw (path_data.live_extents);
-        canvas.request_redraw (path_data.extents);
+
         old_live_extents = path_data.live_extents;
+        old_extents = path_data.extents;
     }
 
     private void draw_points (Cairo.Context context) {

@@ -43,12 +43,12 @@ public class Akira.Utils.Bezier {
             max_x = double.max (max_x, temp);
         } else {
             // Get the extreme point wrt x axis for the bezier.
-            var ex = point_on_curve(p1, p2, p3, tx);
+            var ex = point_on_curve (p1, p2, p3, tx);
 
-            temp = double.min(p1.x, double.min (p3.x, ex.x));
+            temp = double.min (p1.x, double.min (p3.x, ex.x));
             min_x = double.min (min_x, temp);
 
-            temp = double.max(p1.x, double.max (p3.x, ex.x));
+            temp = double.max (p1.x, double.max (p3.x, ex.x));
             max_x = double.max (max_x, temp);
 
         }
@@ -61,11 +61,11 @@ public class Akira.Utils.Bezier {
             max_y = double.max (max_y, temp);
         } else {
             // Get the extreme point wrt y axis for the bezier.
-            var ey = point_on_curve(p1, p2, p3, ty);
-            temp = double.min(p1.y, double.min (p3.y, ey.y));
+            var ey = point_on_curve (p1, p2, p3, ty);
+            temp = double.min (p1.y, double.min (p3.y, ey.y));
             min_y = double.min (min_y, temp);
 
-            temp = double.max(p1.y, double.max (p3.y, ey.y));
+            temp = double.max (p1.y, double.max (p3.y, ey.y));
             max_y = double.max (max_y, temp);
         }
 

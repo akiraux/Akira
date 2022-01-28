@@ -63,6 +63,8 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
 
     private Submode mode;
 
+    private const int MIN_TANGENT_ALLOWED_LENGTH = 5;
+
     public PathEditMode (Lib.ViewCanvas canvas, Lib.Items.ModelInstance instance) {
         Object (
             view_canvas: canvas,
@@ -197,11 +199,19 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
             live_command = Type.CURVE;
             live_idx = 2;
 
-            // Points at index 1 and 2 are the two tangents required by the 2 curves.
-            live_points[1] = reflection (point, live_points[0]);
-            live_points[2] = point;
+            if (Utils.GeometryMath.compare_points (point, live_points[0], MIN_TANGENT_ALLOWED_LENGTH)) {
+                // Prevent user from drawing really small curves due to mouse glitches.
+                live_command = Type.LINE;
+                live_idx = 0;
+                edit_model.set_live_points (live_points, 1);
+            } else {
+                // Points at index 1 and 2 are the two tangents required by the 2 curves.
+                live_points[1] = reflection (point, live_points[0]);
+                live_points[2] = point;
+                edit_model.set_live_points (live_points, 3);
+            }
 
-            edit_model.set_live_points (live_points, 3);
+
         } else {
             // If we are hovering in CURVE mode, current position could be our third curve point.
             if (live_command == Type.CURVE) {
