@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 Alecaddd (https://alecaddd.com)
+ * Copyright (c) 2019-2022 Alecaddd (https://alecaddd.com)
  *
  * This file is part of Akira.
  *
@@ -24,83 +24,39 @@
  * A digit input with a label next to it.
  */
 public class Akira.Widgets.LinkedInput : Gtk.Grid {
-    public string label { get; construct set; }
-    public string tooltip { get; construct set; }
-    public InputField input_field { get; construct set; }
+    public unowned Lib.ViewCanvas view_canvas { get; construct; }
 
-    /**
-    * Indicates whether the label or the entry should be first
-    */
-    public bool reversed { get; construct set; }
-    public string unit { get; construct set; }
-    public double limit { get; set; }
-    public double value { get; set; }
-    public InputField.Unit icon { get; construct set;}
-    /**
-    * Used to avoid to infinitely updating when value is set externally.
-    */
+    public InputField input_field { get; set; }
+
     private bool dragging = false;
     private double dragging_direction = 0;
-    public bool enabled {
-        get {
-            return input_field.entry.sensitive;
-        }
-        set {
-            input_field.entry.sensitive = value;
-        }
-    }
 
-    public LinkedInput (string label, string tooltip = "", string unit = "",
-                        bool reversed = false, double default_val = 0, double limit = 0.0) {
-        Object (
-            label: label,
-            tooltip: tooltip,
-            reversed: reversed,
-            value: default_val,
-            limit: limit,
-            unit: unit
-        );
-    }
+    public LinkedInput (
+        Lib.ViewCanvas canvas,
+        string label,
+        string tooltip = "",
+        InputField.Unit icon = InputField.Unit.PIXEL,
+        bool reversed = false
+    ) {
+        Object (view_canvas: canvas);
 
-    construct {
         valign = Gtk.Align.CENTER;
         hexpand = true;
         get_style_context ().add_class (Gtk.STYLE_CLASS_LINKED);
 
+        var entry_label = new Gtk.Label (label) {
+            halign = Gtk.Align.CENTER,
+            width_request = 20,
+            hexpand = false,
+            tooltip_text = tooltip
+        };
+        entry_label.get_style_context ().add_class ("entry-label");
+
         var event_box = new Gtk.EventBox ();
         event_box.event.connect (handle_event);
-
-        var entry_label = new Gtk.Label (label);
-        entry_label.get_style_context ().add_class ("entry-label");
-        entry_label.halign = Gtk.Align.CENTER;
-        entry_label.width_request = 20;
-        entry_label.hexpand = false;
-        entry_label.tooltip_text = tooltip;
-
-        switch (unit) {
-            case "#":
-                icon = InputField.Unit.HASH;
-            break;
-            case "%":
-                icon = InputField.Unit.PERCENTAGE;
-            break;
-            case "px":
-                icon = InputField.Unit.PIXEL;
-            break;
-            case "°":
-                icon = InputField.Unit.DEGREES;
-            break;
-            default:
-                icon = InputField.Unit.PIXEL;
-            break;
-        }
-
-        input_field = new Widgets.InputField (icon, 7, true, false);
-        bind_property (
-            "value", input_field.entry, "value",
-            BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE);
-
         event_box.add (entry_label);
+
+        input_field = new Widgets.InputField (view_canvas, icon, 7, true, false);
 
         if (reversed) {
             attach (input_field, 0, 0);
@@ -140,11 +96,10 @@ public class Akira.Widgets.LinkedInput : Gtk.Grid {
 
             if (dragging_direction > event.motion.x || event.motion.x_root == 0) {
                 input_field.entry.spin (Gtk.SpinType.STEP_BACKWARD, 1);
-                dragging_direction = event.motion.x;
             } else {
                 input_field.entry.spin (Gtk.SpinType.STEP_FORWARD, 1);
-                dragging_direction = event.motion.x;
             }
+            dragging_direction = event.motion.x;
         }
 
         return false;

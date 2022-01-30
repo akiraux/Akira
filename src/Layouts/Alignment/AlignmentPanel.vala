@@ -81,12 +81,13 @@ public class Akira.Layouts.Alignment.AlignmentPanel : Gtk.Grid {
                     break;
 
                 case "btn":
-                    var button = new Gtk.Button.from_icon_name (item.icon_name, Gtk.IconSize.SMALL_TOOLBAR) {
+                    var button = new Gtk.Button () {
                         halign = valign = Gtk.Align.CENTER,
                         can_focus = false,
                         sensitive = false,
                         tooltip_markup = Granite.markup_accel_tooltip (item.accels, item.tooltip_text)
                     };
+                    button.add (new Widgets.ButtonImage (item.icon_name, Gtk.IconSize.SMALL_TOOLBAR));
                     button.clicked.connect (() => {
                         view_canvas.window.event_bus.selection_align (item.alignment_direction);
                     });

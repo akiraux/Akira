@@ -58,6 +58,8 @@ sources = files(
     'Layouts/Sidebars/LayersSidebar.vala',
     'Layouts/Sidebars/OptionsSidebar.vala',
 
+    'Layouts/Transforms/TransformPanel.vala',
+
     'Widgets/AddColorButton.vala',
     'Widgets/ButtonImage.vala',
     'Widgets/ColorField.vala',
@@ -67,7 +69,6 @@ sources = files(
     'Widgets/InputField.vala',
     'Widgets/LinkedInput.vala',
     'Widgets/MenuButton.vala',
-    'Widgets/PanelSeparator.vala',
     'Widgets/RoundedColorButton.vala',
     'Widgets/ZoomButton.vala',
 
