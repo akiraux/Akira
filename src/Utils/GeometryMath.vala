@@ -288,5 +288,38 @@ public class Akira.Utils.GeometryMath : Object {
         return area;
     }
 
+    public static Geometry.Point rotate_point (Geometry.Point point, double rotation, Geometry.Point origin) {
+        double cos_theta = Math.cos (rotation);
+        double sin_theta = Math.sin (rotation);
 
+        double rot_x = cos_theta * (point.x - origin.x) - sin_theta * (point.y - origin.y) + origin.x;
+        double rot_y = sin_theta * (point.x - origin.x) + cos_theta * (point.y - origin.y) + origin.y;
+
+        return Geometry.Point (rot_x, rot_y);
+    }
+
+    public static bool compare_points (Geometry.Point a, Geometry.Point b, double thresh) {
+        if (Utils.GeometryMath.distance (a.x, a.y, b.x, b.y) < thresh) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public static Geometry.Rectangle bounds_from_points (Geometry.Point[] points) {
+        Geometry.Rectangle bounds = Geometry.Rectangle ();
+        bounds.left = double.MAX;
+        bounds.top = double.MAX;
+        bounds.right = double.MIN;
+        bounds.bottom = double.MIN;
+
+        foreach (var pt in points) {
+            bounds.left = double.min (bounds.left, pt.x);
+            bounds.right = double.max (bounds.right, pt.x);
+            bounds.top = double.min (bounds.top, pt.y);
+            bounds.bottom = double.max (bounds.bottom, pt.y);
+        }
+
+        return bounds;
+    }
 }

@@ -31,7 +31,16 @@ public class Akira.Models.PathEditModel : Object {
 
     public Geometry.Point first_point;
     private Geometry.Point[] live_pts;
-    private int live_pts_len;
+    private int live_pts_len = -1;
+
+    public Gee.HashSet<int> selected_pts;
+    public int reference_point;
+
+    public bool tangents_inline = false;
+
+    // This is the diameter of the blue points drawn in ViewLayerPath.
+    // It is used for checking if user clicked withing the region.
+    public const int HIT_SIZE = 4;
 
     public PathEditModel (Lib.Items.ModelInstance instance, Lib.ViewCanvas view_canvas) {
         Object (
@@ -48,19 +57,34 @@ public class Akira.Models.PathEditModel : Object {
         path_layer = new ViewLayers.ViewLayerPath ();
         path_layer.add_to_canvas (ViewLayers.ViewLayer.PATH_LAYER_ID, view_canvas);
 
+        // The selected_pts will contain the list of all points that we want to modify.
+        selected_pts = new Gee.HashSet<int> ();
+
         update_view ();
     }
 
-    public void add_live_points_to_path (Geometry.Point[] points, Lib.Modes.PathEditMode.Type live_command, int length) {
+    public void set_first_point (Geometry.Point first_point) {
+        this.first_point = first_point;
+        update_view ();
+    }
+
+    public void add_live_points_to_path (Geometry.Point[] live_pts, Lib.Modes.PathEditMode.Type live_command, int length) {
         commands.resize (commands.length + 1);
         commands[commands.length - 1] = live_command;
 
+        var transform_matrix = instance.components.transform.transformation_matrix;
+
         for (int i = 0; i < length; ++i) {
-            var new_pt = Geometry.Point (points[i].x - first_point.x, points[i].y - first_point.y);
+            var new_pt = transform_point_around_item_origin (live_pts[i], transform_matrix, true);
+            var orig_first_pt = transform_point_around_item_origin (first_point, transform_matrix, true);
+
+            new_pt.x -= orig_first_pt.x;
+            new_pt.y -= orig_first_pt.y;
+
             add_point_to_path (new_pt);
         }
 
-        live_pts = new Geometry.Point[0];
+        this.live_pts = new Geometry.Point[0];
         live_pts_len = 0;
 
         recompute_components ();
@@ -79,6 +103,9 @@ public class Akira.Models.PathEditModel : Object {
             new_path_points[i] = points[i];
         }
 
+        Geometry.Point snapped_point = Geometry.Point (point.x, point.y);
+        snapped_point.x = Math.round (snapped_point.x);
+        snapped_point.y = Math.round (snapped_point.y);
         new_path_points[index] = point;
 
         for (int i = index + 1; i < points.length + 1; ++i) {
@@ -86,7 +113,8 @@ public class Akira.Models.PathEditModel : Object {
         }
 
         points = recalculate_points (new_path_points);
-        instance.components.path = new Lib.Components.Path.from_points (points, commands);
+        bool close = instance.components.path.close;
+        instance.components.path = new Lib.Components.Path.from_points (points, commands, close);
     }
 
     public void set_live_points (Geometry.Point[] live_pts, int length) {
@@ -97,46 +125,232 @@ public class Akira.Models.PathEditModel : Object {
     }
 
     public Geometry.Point[] delete_last_point () {
+        bool close = instance.components.path.close;
+
         if (commands[commands.length - 1] == Lib.Modes.PathEditMode.Type.LINE) {
             commands.resize (commands.length - 1);
             points.resize (points.length - 1);
 
             points = recalculate_points (points);
-            instance.components.path = new Lib.Components.Path.from_points (points, commands);
+            instance.components.path = new Lib.Components.Path.from_points (points, commands, close);
             recompute_components ();
 
             return new Geometry.Point[0];
         }
 
+
+        var orig_first_pt = transform_point_around_item_origin (first_point, instance.components.transform.transformation_matrix, true);
+
         var new_live_pts = new Geometry.Point[4];
-        new_live_pts[2] = Geometry.Point (points[points.length - 2].x + first_point.x, points[points.length - 2].y + first_point.y);
-        new_live_pts[1] = Geometry.Point (points[points.length - 3].x + first_point.x, points[points.length - 3].y + first_point.y);
-        new_live_pts[0] = Geometry.Point (points[points.length - 4].x + first_point.x, points[points.length - 4].y + first_point.y);
+        new_live_pts[0] = Geometry.Point (points[points.length - 4].x, points[points.length - 4].y);
+        new_live_pts[1] = Geometry.Point (points[points.length - 3].x, points[points.length - 3].y);
+        new_live_pts[2] = Geometry.Point (points[points.length - 2].x, points[points.length - 2].y);
+
+        new_live_pts[0].x += orig_first_pt.x;
+        new_live_pts[0].y += orig_first_pt.y;
+
+        new_live_pts[1].x += orig_first_pt.x;
+        new_live_pts[1].y += orig_first_pt.y;
+
+        new_live_pts[2].x += orig_first_pt.x;
+        new_live_pts[2].y += orig_first_pt.y;
+
+        var transform_matrix = instance.components.transform.transformation_matrix;
+        new_live_pts[2] = transform_point_around_item_origin (new_live_pts[2], transform_matrix);
+        new_live_pts[1] = transform_point_around_item_origin (new_live_pts[1], transform_matrix);
+        new_live_pts[0] = transform_point_around_item_origin (new_live_pts[0], transform_matrix);
 
         commands.resize (commands.length - 1);
         points.resize (points.length - 4);
 
         points = recalculate_points (points);
-        instance.components.path = new Lib.Components.Path.from_points (points, commands);
+        instance.components.path = new Lib.Components.Path.from_points (points, commands, close);
         recompute_components ();
 
         return new_live_pts;
     }
 
     /*
+     * This method is used to check if user clicked on a point in the path.
+     * Returns true if clicked, false otherwise.
+     * If a point was clicked, index refers to its location.
+     * If check_idx is -1, do hit test with all the points. Otherwise
+     * only with the given point.
+     */
+    public Lib.Modes.PathEditMode.PointType hit_test (double x, double y, ref int[] index, int check_idx = -1) {
+        // In order to check if user clicked on a point, we need to rotate the first point and the event
+        // around the item center. Then the difference between these values gives the location
+        // event in the same coordinate system as the points.
+        var transform_matrix = instance.components.transform.transformation_matrix;
+        var orig_first_pt = transform_point_around_item_origin (first_point, transform_matrix, true);
+
+        Geometry.Point point = Geometry.Point (x, y);
+        point = transform_point_around_item_origin (point, transform_matrix, true);
+        point = Geometry.Point (point.x - orig_first_pt.x, point.y - orig_first_pt.y);
+
+        tangents_inline = false;
+        double thresh = HIT_SIZE / view_canvas.scale;
+
+        if (check_idx != -1) {
+            if (Utils.GeometryMath.compare_points (points[check_idx], point, thresh)) {
+                index[0] = check_idx;
+                return Lib.Modes.PathEditMode.PointType.LINE_END;
+            }
+
+            return Lib.Modes.PathEditMode.PointType.NONE;
+        }
+
+        int j = 0;
+        for (int i = 0; i < commands.length; ++i) {
+            if (commands[i] == Lib.Modes.PathEditMode.Type.LINE) {
+                if (Utils.GeometryMath.compare_points (points[j], point, thresh)) {
+                    index[0] = j;
+
+                    return Lib.Modes.PathEditMode.PointType.LINE_END;
+                }
+
+                ++j;
+            } else {
+                // We need to check if the middle point of tangent is selected.
+                // If it is selected, then other two points of tangent must also
+                // be selected to keep the curve intact.
+                if (Utils.GeometryMath.compare_points (points[j], point, thresh)) {
+                    index[0] = j;
+                    index[1] = j + 1;
+                    index[2] = j + 2;
+
+                    return Lib.Modes.PathEditMode.PointType.CURVE_BEGIN;
+                }
+
+                // If either of the tangent points is selected and moved,
+                // then the other needs to be rotated too.
+                if (Utils.GeometryMath.compare_points (points[j + 1], point, thresh)) {
+                    if (are_tangents_inline (points[j + 1], points[j], points[j + 2])) {
+                        index[0] = j + 1;
+                        index[1] = j + 2;
+                    } else {
+                        index[0] = j + 1;
+                    }
+
+                    return Lib.Modes.PathEditMode.PointType.TANGENT_FIRST;
+                }
+
+                if (Utils.GeometryMath.compare_points (points[j + 2], point, thresh)) {
+                    if (are_tangents_inline (points[j + 1], points[j], points[j + 2])) {
+                        index[0] = j + 1;
+                        index[1] = j + 2;
+                    } else {
+                        index[0] = j + 2;
+                    }
+
+                    return Lib.Modes.PathEditMode.PointType.TANGENT_SECOND;
+                }
+
+                if (Utils.GeometryMath.compare_points (points[j + 3], point, thresh)) {
+                    index[0] = j + 3;
+
+                    return Lib.Modes.PathEditMode.PointType.CURVE_END;
+                }
+                j += 4;
+            }
+        }
+
+        return Lib.Modes.PathEditMode.PointType.NONE;
+    }
+
+    /*
+     * This method will be used when editing paths to update the position of a point.
+     */
+    public void modify_point_value (Geometry.Point new_pos) {
+        var transform_matrix = instance.components.transform.transformation_matrix;
+        var orig_first_pt = transform_point_around_item_origin (first_point, transform_matrix, true);
+        new_pos = transform_point_around_item_origin (new_pos, transform_matrix, true);
+
+        new_pos.x -= orig_first_pt.x;
+        new_pos.y -= orig_first_pt.y;
+
+        if (selected_pts.size == 1) {
+            // If only one point is selected, it will act as reference point.
+            reference_point = selected_pts.to_array ()[0];
+        }
+
+        Geometry.Point original_ref = Geometry.Point (points[reference_point].x, points[reference_point].y);
+
+        // Calculate by how much the reference point changed, then move other points by this amount.
+        // We are rounding this value to the nearest integer. This is the spacing used in ViewLayerGrid.
+        double delta_x = Math.round (original_ref.x - new_pos.x);
+        double delta_y = Math.round (original_ref.y - new_pos.y);
+
+        if (tangents_inline) {
+            // If a tangent line was selected and they were inline,
+            // they need to be moved in a special way.
+            move_tangents_rel_to_curve (delta_x, delta_y);
+        } else {
+            foreach (var item in selected_pts) {
+                points[item].x -= delta_x;
+                points[item].y -= delta_y;
+            }
+        }
+
+        points = recalculate_points (points);
+        bool close = instance.components.path.close;
+        instance.components.path = new Lib.Components.Path.from_points (points, commands, close);
+        recompute_components ();
+    }
+
+    /*
+     * This method is used to change the selected points.
+     * idx is index of point to be added to selection. if -1, it is not added.
+     * If append is true, add the item to the list, otherwise, clear the list then add.
+     */
+    public void set_selected_points (int idx, bool append = false) {
+        if (!append) {
+            selected_pts.clear ();
+        }
+
+        if (idx != -1) {
+            selected_pts.add (idx);
+        }
+
+        update_view ();
+    }
+
+    /*
+     * This method is used to join the first and last point of path
+     * to make it a closed curve.
+     */
+    public void make_path_closed () {
+        instance.components.path = new Lib.Components.Path.from_points (points, commands, true);
+        recompute_components ();
+    }
+
+    public bool check_can_path_close () {
+        int last = points.length - 1;
+
+        if (last == 0) {
+            return false;
+        }
+
+        double thresh = HIT_SIZE / view_canvas.scale;
+        if (Utils.GeometryMath.compare_points (points[0], points[last], thresh)) {
+            make_path_closed ();
+            return true;
+        }
+
+        return false;
+    }
+
+    /*
      * This method shift all points in path such that none of them are in negative space.
      */
     private Geometry.Point[] recalculate_points (Geometry.Point[] points) {
-        double min_x = 0, min_y = 0;
+        double min_x = double.MAX, min_y = double.MAX;
 
-        foreach (var pt in points) {
-            if (pt.x < min_x) {
-                min_x = pt.x;
-            }
-            if (pt.y < min_y) {
-                min_y = pt.y;
-            }
-        }
+        var path = new Lib.Components.Path.from_points (points, commands);
+        var ext = path.calculate_extents ();
+
+        min_x = ext.left;
+        min_y = ext.top;
 
         Geometry.Point[] recalculated_points = new Geometry.Point[points.length];
 
@@ -145,23 +359,33 @@ public class Akira.Models.PathEditModel : Object {
             recalculated_points[i] = Geometry.Point (points[i].x - min_x, points[i].y - min_y);
         }
 
-        // Then shift the reference point.
-        first_point.x += min_x;
-        first_point.y += min_y;
+        // The amount by which the first point changed must be rotated before adding to first point.
+        Geometry.Point delta = Geometry.Point (min_x, min_y);
+
+        var transform_matrix = instance.components.transform.transformation_matrix;
+        var rotated_delta = transform_point_around_item_origin (delta, transform_matrix);
+
+        first_point.x += rotated_delta.x;
+        first_point.y += rotated_delta.y;
 
         return recalculated_points;
     }
 
     private void recompute_components () {
-        // To calculate the new center of bounds of rectangle,
-        // Move the center to point where user placed first point. This is represented as (0,0) internally.
-        // Then translate it to the relative center of bounding box of path.
         var bounds = instance.components.path.calculate_extents ();
-        double center_x = first_point.x + bounds.center_x;
-        double center_y = first_point.y + bounds.center_y;
+
+        double center_x = bounds.width / 2.0;
+        double center_y = bounds.height / 2.0;
+
+        var tr = instance.components.transform.transformation_matrix;
+        tr.transform_point (ref center_x, ref center_y);
+
+        center_x += first_point.x;
+        center_y += first_point.y;
 
         instance.components.center = new Lib.Components.Coordinates (center_x, center_y);
         instance.components.size = new Lib.Components.Size (bounds.width, bounds.height, false);
+
         // Update the component.
         unowned var im = view_canvas.items_manager;
         im.item_model.alert_item_changed (instance.id, Lib.Components.Component.Type.COMPILED_GEOMETRY);
@@ -173,60 +397,133 @@ public class Akira.Models.PathEditModel : Object {
     /*
      * Recalculates the extents and updates the ViewLayerPath
      */
-    private void update_view () {
-        var points = instance.components.path.data;
+    public void update_view () {
+        // Since the bounding box for the instance may not include the tangents,
+        // we need to calculate the bounding box for all points.
+        var tr = instance.components.transform.transformation_matrix;
 
-        var coordinates = view_canvas.selection_manager.selection.coordinates ();
+        var extents_from_pts = Utils.GeometryMath.bounds_from_points (points);
+        var extents_from_path = instance.components.path.calculate_extents ();
 
-        Geometry.Rectangle extents = Geometry.Rectangle.empty ();
-        extents.left = coordinates.center_x - coordinates.width / 2.0;
-        extents.right = coordinates.center_x + coordinates.width / 2.0;
-        extents.top = coordinates.center_y - coordinates.height / 2.0;
-        extents.bottom = coordinates.center_y + coordinates.height / 2.0;
+        double offset_x = extents_from_path.center_x - extents_from_pts.center_x;
+        double offset_y = extents_from_path.center_y - extents_from_pts.center_y;
+        tr.transform_point (ref offset_x, ref offset_y);
+
+        double pts_center_x = instance.components.center.x - offset_x;
+        double pts_center_y = instance.components.center.y - offset_y;
+
+        var quad = Geometry.Quad.from_components (pts_center_x, pts_center_y, extents_from_pts.width, extents_from_pts.height, tr);
+        var new_ext = quad.bounding_box;
+
+        double radius = ViewLayers.ViewLayerPath.UI_NOB_SIZE / view_canvas.scale;
+        new_ext.left -= radius;
+        new_ext.top -= radius;
+        new_ext.right += radius;
+        new_ext.bottom += radius;
 
         PathDataModel path_data = PathDataModel ();
         path_data.points = points;
         path_data.commands = commands;
         path_data.live_pts = live_pts;
         path_data.length = live_pts_len;
-        path_data.extents = extents;
-        path_data.rot_angle = instance.components.transform.rotation;
+        path_data.extents = new_ext;
+        path_data.transform = instance.drawable.transform;
+        path_data.selected_pts = selected_pts;
+        path_data.last_point = get_last_point_from_path ();
 
-        path_data.live_extents = get_extents_using_live_pts (extents);
+        path_data.live_extents = get_extents_using_live_pts (extents_from_pts);
+
+        double center_x = -instance.compiled_geometry.source_width / 2.0;
+        double center_y = -instance.compiled_geometry.source_height / 2.0;
+        path_data.center = Geometry.Point (center_x, center_y);
 
         path_layer.update_path_data (path_data);
     }
 
     private Geometry.Rectangle get_extents_using_live_pts (Geometry.Rectangle extents) {
-        var live_extents = Geometry.Rectangle.empty ();
+        if (points.length == 0 || live_pts_len == -1) {
+            return extents;
+        }
 
-        live_extents.left = extents.left;
-        live_extents.right = extents.right;
-        live_extents.top = extents.top;
-        live_extents.bottom = extents.bottom;
+        var data = new Geometry.Point[live_pts_len + 1];
+        data[0] = get_last_point_from_path ();
 
         for (int i = 0; i < live_pts_len; ++i) {
-            var temp = live_pts[i];
-            temp.x = temp.x - first_point.x + extents.left;
-            temp.y = temp.y - first_point.y + extents.top;
-
-            if (temp.x < extents.left) {
-                live_extents.left = temp.x;
-            }
-            if (temp.x > extents.right) {
-                live_extents.right = temp.x;
-            }
-            if (temp.y < extents.top) {
-                live_extents.top = temp.y;
-            }
-            if (temp.y > extents.bottom) {
-                live_extents.bottom = temp.y;
-            }
+            data[i + 1].x = live_pts[i].x;
+            data[i + 1].y = live_pts[i].y;
         }
+
+        var cmds = new Lib.Modes.PathEditMode.Type[data.length];
+        for (int i = 0; i < data.length; ++i) {
+            cmds[i] = Lib.Modes.PathEditMode.Type.LINE;
+        }
+        var live_path = new Lib.Components.Path.from_points (data, cmds);
+
+        var live_extents = live_path.calculate_extents ();
+
+        double radius = ViewLayers.ViewLayerPath.UI_NOB_SIZE / view_canvas.scale;
+        live_extents.left -= radius;
+        live_extents.top -= radius;
+        live_extents.right += radius;
+        live_extents.bottom += radius;
 
         return live_extents;
     }
 
+    private bool are_tangents_inline (Geometry.Point tangent_1, Geometry.Point tangent_2, Geometry.Point curve_begin) {
+        // Slope and intercept of line formed by tangents.
+        double slope = (tangent_2.y - tangent_1.y) / (tangent_2.x - tangent_1.x);
+        double intercept = tangent_1.y - slope * tangent_1.x;
+
+        double rhs = slope * curve_begin.x + intercept;
+
+        // Check if the curve_begin point lies on this line.
+        if ((curve_begin.y - rhs).abs () < 1.0) {
+            tangents_inline = true;
+            return true;
+        }
+
+        tangents_inline = false;
+        return false;
+    }
+
+    private void move_tangents_rel_to_curve (double delta_x, double delta_y) {
+        points[reference_point].x -= delta_x;
+        points[reference_point].y -= delta_y;
+
+        var sel_pts_array = selected_pts.to_array ();
+        int other_tangent = (sel_pts_array[0] == reference_point) ? sel_pts_array[1] : sel_pts_array[0];
+        points[other_tangent].x += delta_x;
+        points[other_tangent].y += delta_y;
+    }
+
+    private Geometry.Point transform_point_around_item_origin (Geometry.Point point, Cairo.Matrix mat, bool invert = false) {
+        var matrix = Utils.GeometryMath.multiply_matrices (Cairo.Matrix.identity (), mat);
+
+        if (invert) {
+            matrix.invert ();
+        }
+
+        var new_point = Geometry.Point (point.x, point.y);
+        matrix.transform_point (ref new_point.x, ref new_point.y);
+        return new_point;
+    }
+
+    private Geometry.Point get_last_point_from_path () {
+        Cairo.Matrix transform_matrix = instance.components.transform.transformation_matrix;
+        var orig_first_pt = transform_point_around_item_origin (first_point, transform_matrix, true);
+
+        if (instance.components.path.data.length == 0) {
+            return orig_first_pt;
+        }
+
+        var last_point = Geometry.Point ();
+        last_point.x = points[points.length - 1].x + orig_first_pt.x;
+        last_point.y = points[points.length - 1].y + orig_first_pt.y;
+        last_point = transform_point_around_item_origin (last_point, transform_matrix);
+
+        return last_point;
+    }
 }
 
 public struct Akira.Models.PathDataModel {
@@ -235,9 +532,13 @@ public struct Akira.Models.PathDataModel {
 
     public Geometry.Point[] live_pts;
     public int length;
+    public Geometry.Point last_point;
 
     public Geometry.Rectangle extents;
     public Geometry.Rectangle live_extents;
 
-    public double rot_angle;
+    public Geometry.Point center;
+
+    public Cairo.Matrix transform;
+    public Gee.HashSet<int> selected_pts;
 }
