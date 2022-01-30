@@ -43,6 +43,53 @@ public class Akira.Layouts.Transforms.TransformPanel : Gtk.Grid {
         lock_button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
         lock_button.get_style_context ().add_class ("label-colors");
 
+        var hflip_button = new Gtk.ToggleButton () {
+            hexpand = false,
+            can_focus = false,
+            sensitive = false,
+            halign = valign = Gtk.Align.CENTER,
+            tooltip_markup = Granite.markup_accel_tooltip ({"<Ctrl>bracketleft"}, _("Flip Horizontally"))
+        };
+        hflip_button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
+        hflip_button.add (new Widgets.ButtonImage ("object-flip-horizontal"));
+
+        var vflip_button = new Gtk.ToggleButton () {
+            hexpand = false,
+            can_focus = false,
+            sensitive = false,
+            halign = valign = Gtk.Align.CENTER,
+            tooltip_markup = Granite.markup_accel_tooltip ({"<Ctrl>bracketright"}, _("Flip Vertically"))
+        };
+        vflip_button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
+        vflip_button.add (new Widgets.ButtonImage ("object-flip-vertical"));
+
+        var align_grid = new Gtk.Grid ();
+        align_grid.hexpand = true;
+        align_grid.column_homogeneous = true;
+        align_grid.attach (hflip_button, 0, 0, 1, 1);
+        align_grid.attach (vflip_button, 1, 0, 1, 1);
+
+        var scale = new Gtk.Scale (
+            Gtk.Orientation.HORIZONTAL,
+            new Gtk.Adjustment (100.0, 0, 100.0, 0, 0, 0)
+        ) {
+            hexpand = true,
+            sensitive = false,
+            draw_value = false,
+            digits = 0,
+            margin_end = 20
+        };
+
+        var opacity_entry = new Widgets.InputField (
+            view_canvas, Widgets.InputField.Unit.PERCENTAGE, 7, true, true);
+        opacity_entry.entry.hexpand = false;
+        opacity_entry.entry.width_request = 64;
+
+        var opacity_grid = new Gtk.Grid ();
+        opacity_grid.hexpand = true;
+        opacity_grid.attach (scale, 0, 0, 1);
+        opacity_grid.attach (opacity_entry, 1, 0, 1);
+
         attach (group_title (_("Position")), 0, 0, 3);
         attach (new Widgets.LinkedInput (view_canvas, _("X"), _("Horizontal position")), 0, 1, 1);
         attach (new Widgets.LinkedInput (view_canvas, _("Y"), _("Vertical position")), 2, 1, 1);
@@ -53,8 +100,11 @@ public class Akira.Layouts.Transforms.TransformPanel : Gtk.Grid {
         attach (new Widgets.LinkedInput (view_canvas, _("H"), _("Height")), 2, 4, 1);
         attach (separator (), 0, 5, 3);
         attach (group_title (_("Transform")), 0, 6, 3);
+        attach (new Widgets.LinkedInput (view_canvas, _("R"), _("Rotation degrees"), Widgets.InputField.Unit.DEGREES), 0, 7, 1);
+        attach (align_grid, 2, 7, 1);
         attach (separator (), 0, 8, 3);
         attach (group_title (_("Opacity")), 0, 9, 3);
+        attach (opacity_grid, 0, 10, 3);
     }
 
     private Gtk.Label group_title (string title) {
