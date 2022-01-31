@@ -89,6 +89,9 @@ public class Akira.Lib.Managers.HistoryManager : Object {
         im.item_model.wake (true);
         view_canvas.set_model_to_render (im.item_model);
         im.compile_model ();
+
+        // Regenerate the layers list.
+        view_canvas.window.main_window.regenerate_list ();
     }
 
 }
