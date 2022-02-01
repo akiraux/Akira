@@ -85,10 +85,7 @@ public class Akira.Lib.Managers.HistoryManager : Object {
         other.add (new Snapshot (last_stack.description, new Lib.Items.Model.clone (im.item_model)));
 
         // replace model
-        im.item_model = last_stack.model;
-        im.item_model.wake (true);
-        view_canvas.set_model_to_render (im.item_model);
-        im.compile_model ();
+        im.replace_model (last_stack.model);
 
         // Regenerate the layers list.
         view_canvas.window.main_window.regenerate_list ();
