@@ -22,41 +22,60 @@
 public class Akira.Lib.Components.Path : Component, Copyable<Path> {
     // Control points relative to a top-left of 0,0.
     // In the future we will probably want control points with more data.
-    public Geometry.Point[] data;
+    //  public Geometry.Point[] data;
     // Control the path edit mode between straight line and curves.
     // Line requires 1 points whereas, path requires 4 points.
-    public Lib.Modes.PathEditMode.Type[] commands;
+    //  public Lib.Modes.PathEditMode.Type[] commands;
+    public Utils.PathSegment[] data;
     public bool close = false;
 
     public Path (bool close = false) {
-        data = new Geometry.Point[0];
-        commands = new Lib.Modes.PathEditMode.Type[0];
+        //  data = new Geometry.Point[0];
+        //  commands = new Lib.Modes.PathEditMode.Type[0];
+        data = new Utils.PathSegment[0];
         this.close = close;
     }
 
-    public Path.from_single_point (Geometry.Point pt, Lib.Modes.PathEditMode.Type command, bool close = false) {
-        data = new Geometry.Point[1];
-        data[0] = pt;
+    public Path.from_single_point (Geometry.Point pt, bool close = false) {
+        //  data = new Geometry.Point[1];
+        //  data[0] = pt;
 
-        commands = new Lib.Modes.PathEditMode.Type[1];
-        commands[0] = command;
+        //  commands = new Lib.Modes.PathEditMode.Type[1];
+        //  commands[0] = command;
+        data = new Utils.PathSegment[1];
+
+        // Only a line can be created from a single point. No need to check command.
+        data[0] = Utils.PathSegment.line (pt);
 
         this.close = close;
     }
 
-    public Path.from_points (Geometry.Point[] data, Lib.Modes.PathEditMode.Type[] commands, bool close = false) {
+    public Path.from_points (Utils.PathSegment[] data, bool close = false) {
+        //  this.data = data;
+        //  this.commands = commands;
         this.data = data;
-        this.commands = commands;
+        print("POINTS\n");
+        foreach (var pt in data) {
+            print("\tType: %s\n", pt.type.to_string());
+            print("\tPoints (%f %f) (%f %f) (%f %f) (%f %f)\n",
+                pt.curve_begin.x, pt.curve_begin.y,
+                pt.tangent_1.x, pt.tangent_1.y,
+                pt.tangent_2.x,pt.tangent_2.y,
+                pt.curve_end.x,pt.curve_end.y
+            );
+        }
+        print("\n");
         this.close = close;
     }
 
     public Path.deserialized (Json.Object obj) {
         var arr = obj.get_array_member ("path_data").get_elements ();
-        data = new Geometry.Point[0];
+        data = new Utils.PathSegment[0];
         var idx = 0;
         foreach (unowned var pt in arr) {
             data.resize (data.length + 1);
-            data[idx] = Geometry.Point.deserialized (pt.get_object ());
+            //  data[idx] = Geometry.Point.deserialized (pt.get_object ());
+            data[idx] = Utils.PathSegment.deserialized (pt.get_object ());
             ++idx;
         }
     }
@@ -88,21 +107,24 @@ public class Akira.Lib.Components.Path : Component, Copyable<Path> {
         double max_y = double.MIN;
 
         int point_idx = 0;
-        for (int cmd_idx = 0; cmd_idx < commands.length; ++cmd_idx) {
-            if (commands[cmd_idx] == Lib.Modes.PathEditMode.Type.LINE) {
-                var point = data[point_idx];
+        //  for (int cmd_idx = 0; cmd_idx < commands.length; ++cmd_idx) {
+        for (int i = 0; i < data.length; ++i) {
+            var segment = data[i];
+
+            if (segment.type == Lib.Modes.PathEditMode.Type.LINE) {
+                var point = segment.line_end;//data[point_idx];
                 min_x = double.min (min_x, point.x);
                 max_x = double.max (max_x, point.x);
                 min_y = double.min (min_y, point.y);
                 max_y = double.max (max_y, point.y);
 
                 ++point_idx;
-            } else {
-                var p0 = data[point_idx - 1];
-                var p1 = data[point_idx];
-                var p2 = data[point_idx + 1];
-                var p3 = data[point_idx + 2];
-                var p4 = data[point_idx + 3];
+            } else if (segment.type == Lib.Modes.PathEditMode.Type.CUBIC) {
+                var p0 = data[i - 1].last_point;//data[point_idx - 1];
+                var p1 = segment.curve_begin;//data[point_idx];
+                var p2 = segment.tangent_1;//data[point_idx + 1];
+                var p3 = segment.tangent_2;//data[point_idx + 2];
+                var p4 = segment.curve_end;//data[point_idx + 3];
 
                 double[] b1_extremes = Utils.Bezier.get_extremes (p0, p2, p1);
                 double[] b2_extremes = Utils.Bezier.get_extremes (p1, p3, p4);

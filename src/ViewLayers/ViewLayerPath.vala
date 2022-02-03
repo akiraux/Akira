@@ -105,150 +105,181 @@ public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
         context.set_source_rgba (0.1568, 0.4745, 0.9823, 1);
         context.set_line_width (1.0 / canvas.scale);
 
-        int point_idx = 0;
         var points = path_data.points;
-        var commands = path_data.commands;
 
         // Draw circles for all points.
-        for (int i = 0; i < commands.length; ++i) {
-            var pt = points[point_idx];
-            tr.transform_point (ref pt.x, ref pt.y);
+        for (int i = 0; i < points.length; ++i) {
+            var line_end = points[i].line_end;
 
-            if (commands[i] == Lib.Modes.PathEditMode.Type.LINE) {
-                context.arc (pt.x, pt.y, radius, 0, Math.PI * 2);
+            var curve_begin = points[i].curve_begin;
+            var tangent_1 = points[i].tangent_1;
+            var tangent_2 = points[i].tangent_2;
+            var curve_end = points[i].curve_end;
+
+            if (points[i].type == Lib.Modes.PathEditMode.Type.LINE) {
+                //  var pt = points[point_idx].line_end;
+                tr.transform_point (ref line_end.x, ref line_end.y);
+
+                context.arc (line_end.x, line_end.y, radius, 0, Math.PI * 2);
+                context.fill ();
+            } else if (points[i].type == Lib.Modes.PathEditMode.Type.QUADRATIC) {
+                tr.transform_point (ref curve_begin.x, ref curve_begin.y);
+                tr.transform_point (ref tangent_1.x, ref tangent_1.y);
+                tr.transform_point (ref curve_end.x, ref curve_end.y);
+
+                // Draw control point for curve begin.
+                context.arc (curve_begin.x, curve_begin.y, radius, 0, Math.PI * 2);
                 context.fill ();
 
-                ++point_idx;
-            } else {
-                for (int j = 0; j < 4; ++j) {
-                    var pti = points[j + point_idx];
-                    tr.transform_point (ref pti.x, ref pti.y);
+                // Draw control point for first tangent.
+                context.arc (tangent_1.x, tangent_1.y, radius, 0, Math.PI * 2);
+                context.fill ();
 
-                    context.arc (pti.x, pti.y, radius, 0, Math.PI * 2);
-                    context.fill ();
-                }
+                // Draw control point for curve end.
+                context.arc (curve_end.x, curve_end.y, radius, 0, Math.PI * 2);
+                context.fill ();
 
-                var pt1 = points[point_idx + 1];
-                var pt2 = points[point_idx + 2];
-                tr.transform_point (ref pt1.x, ref pt1.y);
-                tr.transform_point (ref pt2.x, ref pt2.y);
-                context.move_to (pt.x, pt.y);
-                context.line_to (pt1.x, pt1.y);
-
-                context.move_to (pt.x, pt.y);
-                context.line_to (pt2.x, pt2.y);
+                context.move_to (tangent_1.x, tangent_1.y);
+                context.line_to (curve_begin.x, curve_begin.y);
 
                 context.stroke ();
+            } else if (points[i].type == Lib.Modes.PathEditMode.Type.CUBIC) {
+                tr.transform_point (ref curve_begin.x, ref curve_begin.y);
+                tr.transform_point (ref tangent_1.x, ref tangent_1.y);
+                tr.transform_point (ref tangent_2.x, ref tangent_2.y);
+                tr.transform_point (ref curve_end.x, ref curve_end.y);
 
-                point_idx += 4;
+                // Draw control point for curve begin.
+                context.arc (curve_begin.x, curve_begin.y, radius, 0, Math.PI * 2);
+                context.fill ();
+
+                // Draw control point for first tangent.
+                context.arc (tangent_1.x, tangent_1.y, radius, 0, Math.PI * 2);
+                context.fill ();
+
+                // Draw control point for second tangent.
+                context.arc (tangent_2.x, tangent_2.y, radius, 0, Math.PI * 2);
+                context.fill ();
+
+                // Draw control point for curve end.
+                context.arc (curve_end.x, curve_end.y, radius, 0, Math.PI * 2);
+                context.fill ();
+
+                context.move_to (tangent_1.x, tangent_1.y);
+                context.line_to (curve_begin.x, curve_begin.y);
+
+                context.move_to (curve_begin.x, curve_begin.y);
+                context.line_to (tangent_2.x, tangent_2.y);
+
+                context.stroke ();
             }
         }
 
-        foreach (var idx in path_data.selected_pts) {
-            context.set_source_rgba (0.7, 0, 0, 1);
+        //  foreach (var idx in path_data.selected_pts) {
+        //      context.set_source_rgba (0.7, 0, 0, 1);
 
-            var pt = points[idx];
-            tr.transform_point (ref pt.x, ref pt.y);
-            context.arc (pt.x, pt.y, radius, 0, Math.PI * 2);
-            context.fill ();
-        }
+        //      var pt = points[idx];
+        //      tr.transform_point (ref pt.x, ref pt.y);
+        //      context.arc (pt.x, pt.y, radius, 0, Math.PI * 2);
+        //      context.fill ();
+        //  }
 
         context.new_path ();
         context.restore ();
     }
 
     private void draw_live_effect (Cairo.Context context) {
-        double radius = UI_NOB_SIZE / canvas.scale;
+        //  double radius = UI_NOB_SIZE / canvas.scale;
 
-        context.save ();
+        //  context.save ();
 
-        context.new_path ();
-        context.set_source_rgba (0, 0, 0, 1);
-        context.set_line_width (1.0 / canvas.scale);
+        //  context.new_path ();
+        //  context.set_source_rgba (0, 0, 0, 1);
+        //  context.set_line_width (1.0 / canvas.scale);
 
-        var live_pts = path_data.live_pts;
-        var last_point = path_data.last_point;
+        //  var live_pts = path_data.live_pts;
+        //  var last_point = path_data.last_point;
 
-        context.move_to (last_point.x, last_point.y);
+        //  context.move_to (last_point.x, last_point.y);
 
-        switch (path_data.length) {
-            case 0:
-                break;
-            case 1:
-                context.line_to (live_pts[0].x, live_pts[0].y);
-                break;
-            case 2:
-                break;
-            case 3:
-                var x0 = last_point.x;
-                var y0 = last_point.y;
-                var x1 = live_pts[0].x;
-                var y1 = live_pts[0].y;
-                var x2 = live_pts[1].x;
-                var y2 = live_pts[1].y;
-                var x3 = live_pts[2].x;
-                var y3 = live_pts[2].y;
+        //  switch (path_data.length) {
+        //      case 0:
+        //          break;
+        //      case 1:
+        //          context.line_to (live_pts[0].x, live_pts[0].y);
+        //          break;
+        //      case 2:
+        //          break;
+        //      case 3:
+        //          var x0 = last_point.x;
+        //          var y0 = last_point.y;
+        //          var x1 = live_pts[0].x;
+        //          var y1 = live_pts[0].y;
+        //          var x2 = live_pts[1].x;
+        //          var y2 = live_pts[1].y;
+        //          var x3 = live_pts[2].x;
+        //          var y3 = live_pts[2].y;
 
-                // Draw the actual live curve.
-                context.curve_to (x0, y0, x2, y2, x1, y1);
-                context.stroke ();
+        //          // Draw the actual live curve.
+        //          context.curve_to (x0, y0, x2, y2, x1, y1);
+        //          context.stroke ();
 
-                // Draw the first haldf of tangent for curve.
-                context.line_to (x2, y2);
-                context.line_to (x3, y3);
-                context.stroke ();
+        //          // Draw the first haldf of tangent for curve.
+        //          context.line_to (x2, y2);
+        //          context.line_to (x3, y3);
+        //          context.stroke ();
 
-                // Draw circles for all concerned points.
-                context.arc (x0, y0, radius, 0, Math.PI * 2);
-                context.fill ();
-                context.arc (x1, y1, radius, 0, Math.PI * 2);
-                context.fill ();
-                context.arc (x2, y2, radius, 0, Math.PI * 2);
-                context.fill ();
-                context.arc (x3, y3, radius, 0, Math.PI * 2);
-                context.fill ();
+        //          // Draw circles for all concerned points.
+        //          context.arc (x0, y0, radius, 0, Math.PI * 2);
+        //          context.fill ();
+        //          context.arc (x1, y1, radius, 0, Math.PI * 2);
+        //          context.fill ();
+        //          context.arc (x2, y2, radius, 0, Math.PI * 2);
+        //          context.fill ();
+        //          context.arc (x3, y3, radius, 0, Math.PI * 2);
+        //          context.fill ();
 
-                break;
-            case 4:
-                var x0 = last_point.x;
-                var y0 = last_point.y;
-                var x1 = live_pts[0].x;
-                var y1 = live_pts[0].y;
-                var x2 = live_pts[1].x;
-                var y2 = live_pts[1].y;
-                var x3 = live_pts[2].x;
-                var y3 = live_pts[2].y;
-                var x4 = live_pts[3].x;
-                var y4 = live_pts[3].y;
+        //          break;
+        //      case 4:
+        //          var x0 = last_point.x;
+        //          var y0 = last_point.y;
+        //          var x1 = live_pts[0].x;
+        //          var y1 = live_pts[0].y;
+        //          var x2 = live_pts[1].x;
+        //          var y2 = live_pts[1].y;
+        //          var x3 = live_pts[2].x;
+        //          var y3 = live_pts[2].y;
+        //          var x4 = live_pts[3].x;
+        //          var y4 = live_pts[3].y;
 
-                // Draw the actual curves.
-                context.curve_to (x0, y0, x2, y2, x1, y1);
-                context.stroke ();
-                context.curve_to (x1, y1, x3, y3, x4, y4);
-                context.stroke ();
+        //          // Draw the actual curves.
+        //          context.curve_to (x0, y0, x2, y2, x1, y1);
+        //          context.stroke ();
+        //          context.curve_to (x1, y1, x3, y3, x4, y4);
+        //          context.stroke ();
 
-                // Draw line for the tangent of the curve.
-                context.move_to (x2, y2);
-                context.line_to (x3, y3);
-                context.stroke ();
+        //          // Draw line for the tangent of the curve.
+        //          context.move_to (x2, y2);
+        //          context.line_to (x3, y3);
+        //          context.stroke ();
 
-                // Draw circles for all points in the live curve.
-                context.arc (x0, y0, radius, 0, Math.PI * 2);
-                context.fill ();
-                context.arc (x1, y1, radius, 0, Math.PI * 2);
-                context.fill ();
-                context.arc (x2, y2, radius, 0, Math.PI * 2);
-                context.fill ();
-                context.arc (x3, y3, radius, 0, Math.PI * 2);
-                context.fill ();
-                break;
+        //          // Draw circles for all points in the live curve.
+        //          context.arc (x0, y0, radius, 0, Math.PI * 2);
+        //          context.fill ();
+        //          context.arc (x1, y1, radius, 0, Math.PI * 2);
+        //          context.fill ();
+        //          context.arc (x2, y2, radius, 0, Math.PI * 2);
+        //          context.fill ();
+        //          context.arc (x3, y3, radius, 0, Math.PI * 2);
+        //          context.fill ();
+        //          break;
 
-            default:
-                break;
-        }
+        //      default:
+        //          break;
+        //  }
 
-        context.stroke ();
-        context.new_path ();
-        context.restore ();
+        //  context.stroke ();
+        //  context.new_path ();
+        //  context.restore ();
     }
 }

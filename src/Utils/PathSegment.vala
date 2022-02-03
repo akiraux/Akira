@@ -19,12 +19,6 @@
  * Authored by: Ashish Shevale <shevaleashish@gmail.com>
 */
 
-public enum Akira.Utils.Type {
-    LINE,
-    QUADRATIC,
-    CUBIC
-}
-
 /*
  * Following is a generic structure used for storing all types of segments
  * is a path.
@@ -40,7 +34,7 @@ public enum Akira.Utils.Type {
  * 4. Line (pretty obvious)
  */
 public struct Akira.Utils.PathSegment {
-    public Type type;
+    public Lib.Modes.PathEditMode.Type type;
 
     // This point is used for drawing lines.
     // Store point in segment_begin to save space, but use the alias to make code readable.
@@ -53,6 +47,16 @@ public struct Akira.Utils.PathSegment {
         }
     }
 
+    public Geometry.Point last_point {
+        get {
+            if (type == Lib.Modes.PathEditMode.Type.LINE) {
+                return line_end;
+            }
+
+            return curve_end;
+        }
+    }
+
     // These points are used for drawing curves.
     public Geometry.Point curve_begin;
     public Geometry.Point tangent_1;
@@ -61,7 +65,7 @@ public struct Akira.Utils.PathSegment {
 
     // Creates new line segment.
     public PathSegment.line (Geometry.Point point) {
-        type = Type.CUBIC;
+        type = Lib.Modes.PathEditMode.Type.LINE;
         line_end = point;
     }
 
@@ -72,7 +76,7 @@ public struct Akira.Utils.PathSegment {
         Geometry.Point control_point_2,
         Geometry.Point curve_end
     ) {
-        type = Type.CUBIC;
+        type = Lib.Modes.PathEditMode.Type.CUBIC;
 
         this.curve_begin = curve_begin;
         this.tangent_1 = control_point_1;
@@ -86,7 +90,7 @@ public struct Akira.Utils.PathSegment {
         Geometry.Point control_point,
         Geometry.Point curve_end
     ) {
-        type = Type.QUADRATIC;
+        type = Lib.Modes.PathEditMode.Type.QUADRATIC;
 
         this.curve_begin = curve_begin;
         this.curve_end = curve_end;
@@ -101,11 +105,73 @@ public struct Akira.Utils.PathSegment {
         Geometry.Point point_before,
         Geometry.Point? point_after = null
     ) {
-        type = Type.CUBIC;
+        type = Lib.Modes.PathEditMode.Type.CUBIC;
     }
 
     // Use for converting a curve segment to a line.
     public void curve_to_line () {
-        type = Type.LINE;
+        type = Lib.Modes.PathEditMode.Type.LINE;
+    }
+
+    public Lib.Modes.PathEditMode.PointType hit_test (Geometry.Point point, double thresh, ref int[] index) {
+        if (type == Lib.Modes.PathEditMode.Type.LINE) {
+            if (Utils.GeometryMath.compare_points (line_end, point, thresh)) {
+                return Lib.Modes.PathEditMode.PointType.LINE_END;
+            }
+        } else if (type == Lib.Modes.PathEditMode.Type.QUADRATIC) {
+            if (Utils.GeometryMath.compare_points (curve_begin, point, thresh)) {
+                return Lib.Modes.PathEditMode.PointType.CURVE_BEGIN;
+            }
+
+            if (Utils.GeometryMath.compare_points (tangent_1, point, thresh)) {
+                return Lib.Modes.PathEditMode.PointType.TANGENT_FIRST;
+            }
+
+            if (Utils.GeometryMath.compare_points (curve_end, point, thresh)) {
+                return Lib.Modes.PathEditMode.PointType.CURVE_END;
+            }
+        } else if (type == Lib.Modes.PathEditMode.Type.CUBIC) {
+            if (Utils.GeometryMath.compare_points (curve_begin, point, thresh)) {
+                return Lib.Modes.PathEditMode.PointType.CURVE_BEGIN;
+            }
+
+            if (Utils.GeometryMath.compare_points (tangent_1, point, thresh)) {
+                return Lib.Modes.PathEditMode.PointType.TANGENT_FIRST;
+            }
+
+            if (Utils.GeometryMath.compare_points (tangent_2, point, thresh)) {
+                return Lib.Modes.PathEditMode.PointType.TANGENT_SECOND;
+            }
+
+            if (Utils.GeometryMath.compare_points (curve_end, point, thresh)) {
+                return Lib.Modes.PathEditMode.PointType.CURVE_END;
+            }
+        }
+
+        return Lib.Modes.PathEditMode.PointType.NONE;
+    }
+
+    public void translate (double dx, double dy) {
+        if (type == Lib.Modes.PathEditMode.Type.LINE) {
+            line_end = Geometry.Point (line_end.x - dx, line_end.y - dy);
+        } else if (type == Lib.Modes.PathEditMode.Type.QUADRATIC) {
+            curve_begin = Geometry.Point (curve_begin.x - dx, curve_begin.y - dy);
+            tangent_1 = Geometry.Point (tangent_1.x - dx, tangent_1.y - dy);
+            curve_end = Geometry.Point (curve_end.x - dx, curve_end.y - dy);
+        } else if (type == Lib.Modes.PathEditMode.Type.CUBIC) {
+            curve_begin = Geometry.Point (curve_begin.x - dx, curve_begin.y - dy);
+            tangent_1 = Geometry.Point (tangent_1.x - dx, tangent_1.y - dy);
+            tangent_2 = Geometry.Point (tangent_2.x - dx, tangent_2.y - dy);
+            curve_end = Geometry.Point (curve_end.x - dx, curve_end.y - dy);
+        }
+    }
+
+    public PathSegment.deserialized (Json.Object obj) {
+        // TODO:
+    }
+
+    public Json.Node PathSegment.serialize () {
+        var node = new Json.Node (Json.NodeType.OBJECT);
+        return node;
     }
 }

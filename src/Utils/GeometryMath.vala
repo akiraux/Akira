@@ -306,7 +306,7 @@ public class Akira.Utils.GeometryMath : Object {
         return false;
     }
 
-    public static Geometry.Rectangle bounds_from_points (Geometry.Point[] points) {
+    public static Geometry.Rectangle bounds_from_points (Utils.PathSegment[] points) {
         Geometry.Rectangle bounds = Geometry.Rectangle ();
         bounds.left = double.MAX;
         bounds.top = double.MAX;
@@ -314,10 +314,47 @@ public class Akira.Utils.GeometryMath : Object {
         bounds.bottom = double.MIN;
 
         foreach (var pt in points) {
-            bounds.left = double.min (bounds.left, pt.x);
-            bounds.right = double.max (bounds.right, pt.x);
-            bounds.top = double.min (bounds.top, pt.y);
-            bounds.bottom = double.max (bounds.bottom, pt.y);
+            if (pt.type == Lib.Modes.PathEditMode.Type.LINE) {
+                bounds.left = double.min (bounds.left, pt.line_end.x);
+                bounds.right = double.max (bounds.right, pt.line_end.x);
+                bounds.top = double.min (bounds.top, pt.line_end.y);
+                bounds.bottom = double.max (bounds.bottom, pt.line_end.y);
+            } else if (pt.type == Lib.Modes.PathEditMode.Type.QUADRATIC) {
+                bounds.left = double.min (bounds.left, pt.curve_begin.x);
+                bounds.right = double.max (bounds.right, pt.curve_begin.x);
+                bounds.top = double.min (bounds.top, pt.curve_begin.y);
+                bounds.bottom = double.max (bounds.bottom, pt.curve_begin.y);
+
+                bounds.left = double.min (bounds.left, pt.tangent_1.x);
+                bounds.right = double.max (bounds.right, pt.tangent_1.x);
+                bounds.top = double.min (bounds.top, pt.tangent_1.y);
+                bounds.bottom = double.max (bounds.bottom, pt.tangent_1.y);
+
+                bounds.left = double.min (bounds.left, pt.curve_end.x);
+                bounds.right = double.max (bounds.right, pt.curve_end.x);
+                bounds.top = double.min (bounds.top, pt.curve_end.y);
+                bounds.bottom = double.max (bounds.bottom, pt.curve_end.y);
+            } else if (pt.type == Lib.Modes.PathEditMode.Type.CUBIC) {
+                bounds.left = double.min (bounds.left, pt.curve_begin.x);
+                bounds.right = double.max (bounds.right, pt.curve_begin.x);
+                bounds.top = double.min (bounds.top, pt.curve_begin.y);
+                bounds.bottom = double.max (bounds.bottom, pt.curve_begin.y);
+
+                bounds.left = double.min (bounds.left, pt.tangent_1.x);
+                bounds.right = double.max (bounds.right, pt.tangent_1.x);
+                bounds.top = double.min (bounds.top, pt.tangent_1.y);
+                bounds.bottom = double.max (bounds.bottom, pt.tangent_1.y);
+
+                bounds.left = double.min (bounds.left, pt.tangent_2.x);
+                bounds.right = double.max (bounds.right, pt.tangent_2.x);
+                bounds.top = double.min (bounds.top, pt.tangent_2.y);
+                bounds.bottom = double.max (bounds.bottom, pt.tangent_2.y);
+
+                bounds.left = double.min (bounds.left, pt.curve_end.x);
+                bounds.right = double.max (bounds.right, pt.curve_end.x);
+                bounds.top = double.min (bounds.top, pt.curve_end.y);
+                bounds.bottom = double.max (bounds.bottom, pt.curve_end.y);
+            }
         }
 
         return bounds;

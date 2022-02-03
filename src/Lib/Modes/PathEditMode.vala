@@ -22,7 +22,8 @@
 public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
     public enum Type {
         LINE,
-        CURVE
+        QUADRATIC,
+        CUBIC
     }
 
     // We are using this to check what kind of point was selected.
@@ -196,7 +197,7 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
 
         // If there is click and drag, then this is the second point of curve.
         if (is_click) {
-            live_command = Type.CURVE;
+            live_command = Type.CUBIC;
             live_idx = 2;
 
             if (Utils.GeometryMath.compare_points (point, live_points[0], MIN_TANGENT_ALLOWED_LENGTH)) {
@@ -214,7 +215,7 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
 
         } else {
             // If we are hovering in CURVE mode, current position could be our third curve point.
-            if (live_command == Type.CURVE) {
+            if (live_command == Type.CUBIC) {
                 live_points[3] = point;
                 live_idx = 3;
                 edit_model.set_live_points (live_points, 4);
@@ -237,7 +238,7 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
             return true;
         }
 
-        if (live_command == Type.CURVE && live_idx == 3) {
+        if (live_command == Type.CUBIC && live_idx == 3) {
             return true;
         }
 
@@ -258,7 +259,7 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
             // Note that for curve, there are 2 tangent points that depend on each other.
             // If one of them gets deleted, delete the other too. This leaves only 1 live point.
             // So the live command becomes LINE.
-            if (live_idx == 1 && live_command == CURVE) {
+            if (live_idx == 1 && live_command == CUBIC) {
                 live_command = Type.LINE;
                 live_idx = 0;
             }
@@ -276,7 +277,7 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
                 live_points[2] = possible_live_pts[2];
 
                 live_idx = 2;
-                live_command = Type.CURVE;
+                live_command = Type.CUBIC;
                 edit_model.set_live_points (live_points, 3);
             }
         }
