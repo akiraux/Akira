@@ -108,7 +108,7 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
     /*
      * Add all existing nodes to the layers list when the UI is revealed.
      */
-    public void regenerate_list () {
+    public void regenerate_list (bool go_to_layer) {
         unowned var im = view_canvas.items_manager;
 
         // Bail out if we don't have anything to add.
@@ -144,7 +144,7 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
         list_store.items_changed (0, 0, added);
 
         // Restore the selected items.
-        on_selection_modified_external ();
+        on_selection_modified_external (go_to_layer);
 
         timer.stop ();
         seconds = timer.elapsed (out microseconds);

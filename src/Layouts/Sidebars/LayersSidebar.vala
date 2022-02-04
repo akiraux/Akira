@@ -38,7 +38,7 @@ public class Akira.Layouts.Sidebars.LayersSidebar : Gtk.Grid {
             no_show_all = !value;
 
             if (value) {
-                layers_listbox.regenerate_list ();
+                layers_listbox.regenerate_list (true);
             } else {
                 layers_listbox.clear_list ();
             }
