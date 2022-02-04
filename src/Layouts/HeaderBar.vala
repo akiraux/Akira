@@ -22,8 +22,6 @@
 public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
     public weak Akira.Window window { get; construct; }
 
-    // private Lib.Items.CanvasItem selected_item;
-
     public Widgets.HeaderBarButton new_document;
     public Widgets.HeaderBarButton save_file;
     public Widgets.HeaderBarButton save_file_as;
@@ -402,8 +400,7 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
         window.event_bus.toggle_presentation_mode.connect (toggle);
         window.event_bus.file_edited.connect (on_file_edited);
         window.event_bus.file_saved.connect (on_file_saved);
-        // window.event_bus.selected_items_list_changed.connect (on_selected_items_changed);
-        // window.event_bus.selected_items_changed.connect (on_selected_items_changed);
+        window.event_bus.selection_modified.connect (on_selection_modified);
         // window.event_bus.z_selected_changed.connect (update_button_sensitivity);
         window.event_bus.update_recent_files_list.connect (fetch_recent_files);
     }
@@ -539,44 +536,31 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
         title = file_name.has_suffix (".akira") ? file_name.replace (".akira", "") : file_name;
     }
 
-    // private void on_selected_items_changed (List<Lib.Items.CanvasItem> selected_items) {
-    //     if (selected_items.length () == 0) {
-    //         selected_item = null;
-    //         update_button_sensitivity ();
-    //         return;
-    //     }
+    private void on_selection_modified () {
+        unowned var sm = window.main_window.main_view_canvas.canvas.selection_manager;
+        var count = sm.count ();
 
-    //     if (selected_item == null || selected_item != selected_items.nth_data (0)) {
-    //         selected_item = selected_items.nth_data (0);
-    //         update_button_sensitivity ();
-    //     }
-    // }
+        if (count == 0) {
+            move_up.sensitive = false;
+            move_down.sensitive = false;
+            move_top.sensitive = false;
+            move_bottom.sensitive = false;
+        } else if (count > 1) {
+            move_up.sensitive = true;
+            move_down.sensitive = true;
+            move_top.sensitive = true;
+            move_bottom.sensitive = true;
+        } else {
+            var node = sm.selection.first_node ();
+            bool is_top = node.parent.children.length - 1 == node.pos_in_parent;
+            bool is_bottom = node.pos_in_parent == 0;
 
-    // private void update_button_sensitivity () {
-    //     var z_buttons_sensitive = selected_item != null && !(selected_item is Lib.Items.CanvasArtboard);
-
-    //     move_up.sensitive = z_buttons_sensitive;
-    //     move_down.sensitive = z_buttons_sensitive;
-    //     move_top.sensitive = z_buttons_sensitive;
-    //     move_bottom.sensitive = z_buttons_sensitive;
-
-    //     if (!z_buttons_sensitive || selected_item.get_canvas () == null) {
-    //         return;
-    //     }
-
-    //     var item_position = window.items_manager.get_item_z_index (selected_item);
-
-    //     if (item_position == 0) {
-    //         move_down.sensitive = false;
-    //         move_bottom.sensitive = false;
-    //     }
-
-    //     // Account for nobs and select effect.
-    //     if (item_position == window.items_manager.get_item_top_position (selected_item)) {
-    //         move_up.sensitive = false;
-    //         move_top.sensitive = false;
-    //     }
-    // }
+            move_up.sensitive = !is_top;
+            move_down.sensitive = !is_bottom;
+            move_top.sensitive = !is_top;
+            move_bottom.sensitive = !is_bottom;
+        }
+    }
 
     private Gtk.ModelButton create_model_button (string text, string? icon, string? accels = null) {
         var button = new Gtk.ModelButton ();
