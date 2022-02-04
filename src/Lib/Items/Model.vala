@@ -19,6 +19,12 @@
  * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
  */
 
+ public interface Akira.Lib.Items.ModelListener : Object {
+     public abstract void on_item_added (int id);
+     public abstract void on_item_geometry_changed (int id);
+     public abstract void on_items_deleted (GLib.Array<int> ids);
+ }
+
 /*
  * Holds maps to instances that define connectivity between items and groups.
  * Holds a dag based on nodes (starting from an origin node with `origin_id`.
@@ -52,7 +58,7 @@ public class Akira.Lib.Items.Model : Object {
     public Gee.HashSet<int> changed_items;
     public Gee.HashSet<int> changed_groups;
 
-    private bool is_live = false;
+    private ModelListener listener = null;
 
     private unowned ViewLayers.BaseCanvas? canvas = null;
 
@@ -69,10 +75,10 @@ public class Akira.Lib.Items.Model : Object {
         add_to_maps (new ModelNode (group_instance, 0), false);
     }
 
-    public Model.live_model (ViewLayers.BaseCanvas? canvas) {
+    public Model.live_model (ModelListener listener, ViewLayers.BaseCanvas? canvas) {
         this ();
 
-        is_live = true;
+        this.listener = listener;
         this.canvas = canvas;
     }
 
@@ -80,7 +86,7 @@ public class Akira.Lib.Items.Model : Object {
         this ();
 
         canvas = other.canvas;
-        is_live = false;
+        this.listener = null;
         last_group_id = other.last_group_id;
         last_item_id = other.last_item_id;
 
@@ -94,21 +100,18 @@ public class Akira.Lib.Items.Model : Object {
 
     }
 
-    public signal void item_added (int id);
-    public signal void item_geometry_changed (int id);
-
     /*
      * Makes the model not be in a live state.
      */
     public void sleep () {
-        is_live = false;
+        listener = null;
     }
 
     /*
      * Makes the model live.
      */
-    public void wake (bool regenerate) {
-        is_live = true;
+    public void wake (ModelListener listener, bool regenerate) {
+        this.listener = listener;
         if (regenerate) {
             var origin_node = node_from_id (ORIGIN_ID);
             var origin_instance = instance_from_id (ORIGIN_ID);
@@ -464,8 +467,8 @@ public class Akira.Lib.Items.Model : Object {
 
         naive_add_to_maps (node);
 
-        if (is_live && listen) {
-            item_added (node.id);
+        if (listener != null && listen) {
+            listener.on_item_added (node.id);
         }
     }
 
@@ -532,7 +535,7 @@ public class Akira.Lib.Items.Model : Object {
     }
 
     private void mark_changed (Lib.Items.ModelNode node, Components.Component.Type aspect) {
-        if (!is_live) {
+        if (listener == null) {
             return;
         }
 
@@ -589,7 +592,7 @@ public class Akira.Lib.Items.Model : Object {
     }
 
     private void internal_compile_geometries () {
-        if (!is_live) {
+        if (listener == null) {
             return;
         }
 
@@ -600,7 +603,9 @@ public class Akira.Lib.Items.Model : Object {
         foreach (var leaf in changed_items) {
             var node = node_from_id (leaf);
             if (node.instance.compile_components (node, canvas)) {
-                item_geometry_changed (node.id);
+                if (listener != null) {
+                    listener.on_item_geometry_changed (node.id);
+                }
             }
         }
 
@@ -620,7 +625,9 @@ public class Akira.Lib.Items.Model : Object {
         for (var has_next = it.last (); has_next; has_next = it.previous ()) {
             var node = it.get_value ();
             if (node.instance.compile_components (node, canvas)) {
-                item_geometry_changed (node.id);
+                if (listener != null) {
+                    listener.on_item_geometry_changed (node.id);
+                }
             }
 
             // #TODO improve this

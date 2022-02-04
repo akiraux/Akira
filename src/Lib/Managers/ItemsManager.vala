@@ -20,24 +20,45 @@
  * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
  */
 
-public class Akira.Lib.Managers.ItemsManager : Object {
+public class Akira.Lib.Managers.ItemsManager : Object, Items.ModelListener {
     private const bool CUSTOM_HITTEST = true;
     public unowned Lib.ViewCanvas view_canvas { get; construct; }
 
-    public Lib.Items.Model item_model;
+    private Lib.Items.Model p_item_model;
+
+    public unowned Lib.Items.Model item_model { get { return p_item_model; } }
 
     public ItemsManager (Lib.ViewCanvas canvas) {
         Object (view_canvas: canvas);
     }
 
     construct {
-        item_model = new Lib.Items.Model.live_model (view_canvas);
-        item_model.item_geometry_changed.connect (on_item_geometry_changed);
+        p_item_model = new Lib.Items.Model.live_model (this, view_canvas);
 
         view_canvas.window.event_bus.selection_align.connect (selection_align);
     }
 
+    public void replace_model (Lib.Items.Model replacement) {
+        p_item_model = replacement;
+        p_item_model.wake (this, true);
+        view_canvas.set_model_to_render (p_item_model);
+        compile_model ();
+    }
+
+    public signal void item_added (int id);
     public signal void items_removed (GLib.Array<int> ids);
+
+    public void on_item_added (int id) {
+        item_added (id);
+    }
+
+    public void on_item_geometry_changed (int id) {
+        view_canvas.selection_manager.on_selection_changed (id);
+    }
+
+    public void on_items_deleted (GLib.Array<int> ids) {
+        items_removed (ids);
+    }
 
     public Lib.Items.ModelInstance? instance_from_id (int id) {
         return item_model.instance_from_id (id);
@@ -127,6 +148,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             item_model.recalculate_children_stacking (gid);
         }
 
+        // TODO: move this to the model, have it collect deleted ids and alert this
         items_removed (ids_array);
 
         if (!pause_compile) {
@@ -549,10 +571,6 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             seconds = timer.elapsed (out microseconds);
             print ("Created %u items in %s s\n", num_of, seconds.to_string ());
         }
-    }
-
-    public void on_item_geometry_changed (int id) {
-        view_canvas.selection_manager.on_selection_changed (id);
     }
 
     public void selection_align (Utils.ItemAlignment.AlignmentDirection direction) {
