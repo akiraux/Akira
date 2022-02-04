@@ -63,6 +63,18 @@ public struct Akira.Utils.PathSegment {
     public Geometry.Point tangent_2;
     public Geometry.Point curve_end;
 
+    public PathSegment () {
+        //  curve_begin = null;
+        //  tangent_1 = null;
+        //  tangent_2 = null;
+        //  curve_end = null;
+        type = Lib.Modes.PathEditMode.Type.NONE;
+        curve_begin = Geometry.Point (double.MAX, double.MAX);
+        tangent_1 = Geometry.Point (double.MAX, double.MAX);
+        tangent_2 = Geometry.Point (double.MAX, double.MAX);
+        curve_end = Geometry.Point (double.MAX, double.MAX);
+    }
+
     // Creates new line segment.
     public PathSegment.line (Geometry.Point point) {
         type = Lib.Modes.PathEditMode.Type.LINE;

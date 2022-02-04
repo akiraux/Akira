@@ -189,97 +189,31 @@ public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
     }
 
     private void draw_live_effect (Cairo.Context context) {
-        //  double radius = UI_NOB_SIZE / canvas.scale;
+        double radius = UI_NOB_SIZE / canvas.scale;
 
-        //  context.save ();
+        context.save ();
 
-        //  context.new_path ();
-        //  context.set_source_rgba (0, 0, 0, 1);
-        //  context.set_line_width (1.0 / canvas.scale);
+        context.new_path ();
+        context.set_source_rgba (0, 0, 0, 1);
+        context.set_line_width (1.0 / canvas.scale);
 
-        //  var live_pts = path_data.live_pts;
-        //  var last_point = path_data.last_point;
+        var live_segment = path_data.live_segment;
+        var live_point_type = path_data.live_point_type;
 
-        //  context.move_to (last_point.x, last_point.y);
+        context.move_to (path_data.last_point.x, path_data.last_point.y);
 
-        //  switch (path_data.length) {
-        //      case 0:
-        //          break;
-        //      case 1:
-        //          context.line_to (live_pts[0].x, live_pts[0].y);
-        //          break;
-        //      case 2:
-        //          break;
-        //      case 3:
-        //          var x0 = last_point.x;
-        //          var y0 = last_point.y;
-        //          var x1 = live_pts[0].x;
-        //          var y1 = live_pts[0].y;
-        //          var x2 = live_pts[1].x;
-        //          var y2 = live_pts[1].y;
-        //          var x3 = live_pts[2].x;
-        //          var y3 = live_pts[2].y;
+        if (live_segment.type == Lib.Modes.PathEditMode.Type.LINE) {
+            if (live_point_type == Lib.Modes.PathEditMode.PointType.LINE_END) {
+                context.line_to (live_segment.line_end.x, live_segment.line_end.y);
+            }
+        } else if (live_segment.type == Lib.Modes.PathEditMode.Type.QUADRATIC) {
 
-        //          // Draw the actual live curve.
-        //          context.curve_to (x0, y0, x2, y2, x1, y1);
-        //          context.stroke ();
+        } else if (live_segment.type == Lib.Modes.PathEditMode.Type.CUBIC) {
+        }
 
-        //          // Draw the first haldf of tangent for curve.
-        //          context.line_to (x2, y2);
-        //          context.line_to (x3, y3);
-        //          context.stroke ();
+        context.stroke ();
 
-        //          // Draw circles for all concerned points.
-        //          context.arc (x0, y0, radius, 0, Math.PI * 2);
-        //          context.fill ();
-        //          context.arc (x1, y1, radius, 0, Math.PI * 2);
-        //          context.fill ();
-        //          context.arc (x2, y2, radius, 0, Math.PI * 2);
-        //          context.fill ();
-        //          context.arc (x3, y3, radius, 0, Math.PI * 2);
-        //          context.fill ();
-
-        //          break;
-        //      case 4:
-        //          var x0 = last_point.x;
-        //          var y0 = last_point.y;
-        //          var x1 = live_pts[0].x;
-        //          var y1 = live_pts[0].y;
-        //          var x2 = live_pts[1].x;
-        //          var y2 = live_pts[1].y;
-        //          var x3 = live_pts[2].x;
-        //          var y3 = live_pts[2].y;
-        //          var x4 = live_pts[3].x;
-        //          var y4 = live_pts[3].y;
-
-        //          // Draw the actual curves.
-        //          context.curve_to (x0, y0, x2, y2, x1, y1);
-        //          context.stroke ();
-        //          context.curve_to (x1, y1, x3, y3, x4, y4);
-        //          context.stroke ();
-
-        //          // Draw line for the tangent of the curve.
-        //          context.move_to (x2, y2);
-        //          context.line_to (x3, y3);
-        //          context.stroke ();
-
-        //          // Draw circles for all points in the live curve.
-        //          context.arc (x0, y0, radius, 0, Math.PI * 2);
-        //          context.fill ();
-        //          context.arc (x1, y1, radius, 0, Math.PI * 2);
-        //          context.fill ();
-        //          context.arc (x2, y2, radius, 0, Math.PI * 2);
-        //          context.fill ();
-        //          context.arc (x3, y3, radius, 0, Math.PI * 2);
-        //          context.fill ();
-        //          break;
-
-        //      default:
-        //          break;
-        //  }
-
-        //  context.stroke ();
-        //  context.new_path ();
-        //  context.restore ();
+        context.new_path ();
+        context.restore ();
     }
 }

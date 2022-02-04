@@ -97,7 +97,7 @@ public class Akira.Drawables.DrawablePath : Drawable {
         //  }
 
         if (close) {
-            cr.line_to (points[0].last_point.x, points[0].last_point.y);
+            cr.line_to (points[0].line_end.x, points[0].line_end.y);
         }
 
         cr.restore ();

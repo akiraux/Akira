@@ -54,17 +54,6 @@ public class Akira.Lib.Components.Path : Component, Copyable<Path> {
         //  this.data = data;
         //  this.commands = commands;
         this.data = data;
-        print("POINTS\n");
-        foreach (var pt in data) {
-            print("\tType: %s\n", pt.type.to_string());
-            print("\tPoints (%f %f) (%f %f) (%f %f) (%f %f)\n",
-                pt.curve_begin.x, pt.curve_begin.y,
-                pt.tangent_1.x, pt.tangent_1.y,
-                pt.tangent_2.x,pt.tangent_2.y,
-                pt.curve_end.x,pt.curve_end.y
-            );
-        }
-        print("\n");
         this.close = close;
     }
 
