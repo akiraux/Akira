@@ -62,7 +62,6 @@ public class Akira.Services.EventBus : Object {
     // Item signals.
     public signal void change_z_selected (bool raise, bool total);
     public signal void flip_item (bool vertical = false);
-    public signal void z_selected_changed ();
     public signal void detect_artboard_change ();
     public signal void detect_image_size_change ();
 
