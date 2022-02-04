@@ -401,7 +401,6 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
         window.event_bus.file_edited.connect (on_file_edited);
         window.event_bus.file_saved.connect (on_file_saved);
         window.event_bus.selection_modified.connect (on_selection_modified);
-        // window.event_bus.z_selected_changed.connect (update_button_sensitivity);
         window.event_bus.update_recent_files_list.connect (fetch_recent_files);
     }
 
