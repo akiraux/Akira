@@ -47,6 +47,18 @@ public class Akira.Utils.ItemAlignment : Object {
         ANCHOR,
     }
 
+    private class AlignOp {
+        public Lib.Items.ModelNode node;
+        public double dx;
+        public double dy;
+
+        public AlignOp (Lib.Items.ModelNode n, double dx, double dy) {
+            this.node = n;
+            this.dx = dx;
+            this.dy = dy;
+        }
+    }
+
     /*
      * Align a selection based on a direction and the type of alignment.
      */
@@ -55,7 +67,8 @@ public class Akira.Utils.ItemAlignment : Object {
         AlignmentDirection direction,
         AlignmentType type,
         Lib.Items.ModelNode? anchor,
-        Lib.ViewCanvas view_canvas
+        Lib.ViewCanvas view_canvas,
+        Utils.TrivialDelegate? prep_for_op
     ) {
         if (selection.count () <= 1) {
             return;
@@ -72,34 +85,45 @@ public class Akira.Utils.ItemAlignment : Object {
         unowned var items_manager = view_canvas.items_manager;
         unowned var model = items_manager.item_model;
 
-        bool something_moved = false;
+        var operations = new Gee.ArrayList<AlignOp> ();
+
         switch (direction) {
             case Utils.ItemAlignment.AlignmentDirection.LEFT:
-                something_moved = align_selection_to_left (selection, align_to.left, model);
+                align_selection_to_left (selection, align_to.left, operations);
                 break;
             case Utils.ItemAlignment.AlignmentDirection.RIGHT:
-                something_moved = align_selection_to_right (selection, align_to.right, model);
+                align_selection_to_right (selection, align_to.right, operations);
                 break;
             case Utils.ItemAlignment.AlignmentDirection.TOP:
-                something_moved = align_selection_to_top (selection, align_to.top, model);
+                align_selection_to_top (selection, align_to.top, operations);
                 break;
             case Utils.ItemAlignment.AlignmentDirection.BOTTOM:
-                something_moved = align_selection_to_bottom (selection, align_to.bottom, model);
+                align_selection_to_bottom (selection, align_to.bottom, operations);
                 break;
             case Utils.ItemAlignment.AlignmentDirection.VCENTER:
-                something_moved = align_selection_to_vcenter (selection, align_to.center_y, model);
+                align_selection_to_vcenter (selection, align_to.center_y, operations);
                 break;
             case Utils.ItemAlignment.AlignmentDirection.HCENTER:
-                something_moved = align_selection_to_hcenter (selection, align_to.center_x, model);
+                align_selection_to_hcenter (selection, align_to.center_x, operations);
                 break;
             default:
                 break;
         }
 
-        if (something_moved) {
-            items_manager.compile_model ();
-            view_canvas.window.event_bus.update_snap_decorators ();
+        if (operations.size == 0) {
+            return;
         }
+
+        if (prep_for_op != null) {
+            prep_for_op ();
+        }
+
+        foreach (var op in operations) {
+            translate_node (op.node, op.dx, op.dy, model);
+        }
+
+        items_manager.compile_model ();
+        view_canvas.window.event_bus.update_snap_decorators ();
     }
 
     private static bool populate_alignment (
@@ -165,112 +189,88 @@ public class Akira.Utils.ItemAlignment : Object {
         return found_bounds;
     }
 
-    private static bool align_selection_to_left (
+    private static void align_selection_to_left (
         Lib.Items.NodeSelection selection,
         double align_to,
-        Lib.Items.Model model
+        Gee.ArrayList<AlignOp> operations
     ) {
-        bool something_moved = false;
         foreach (var node in selection.nodes.values) {
             unowned var inst = node.node.instance;
             var diff = align_to - inst.bounding_box.left;
             if (diff != 0) {
-                translate_node (node.node, diff, 0, model);
-                something_moved = true;
+                operations.add (new AlignOp (node.node, diff, 0));
             }
         }
-
-        return something_moved;
     }
 
-    private static bool align_selection_to_right (
+    private static void align_selection_to_right (
         Lib.Items.NodeSelection selection,
         double align_to,
-        Lib.Items.Model model
+        Gee.ArrayList<AlignOp> operations
     ) {
-        bool something_moved = false;
         foreach (var node in selection.nodes.values) {
             unowned var inst = node.node.instance;
             var diff = align_to - inst.bounding_box.right;
             if (diff != 0) {
-                translate_node (node.node, diff, 0, model);
-                something_moved = true;
+                operations.add (new AlignOp (node.node, diff, 0));
             }
         }
-
-        return something_moved;
     }
 
-    private static bool align_selection_to_top (
+    private static void align_selection_to_top (
         Lib.Items.NodeSelection selection,
         double align_to,
-        Lib.Items.Model model
+        Gee.ArrayList<AlignOp> operations
     ) {
-        bool something_moved = false;
         foreach (var node in selection.nodes.values) {
             unowned var inst = node.node.instance;
             var diff = align_to - inst.bounding_box.top;
             if (diff != 0) {
-                translate_node (node.node, 0, diff, model);
-                something_moved = true;
+                operations.add (new AlignOp (node.node, 0, diff));
             }
         }
-
-        return something_moved;
     }
 
-    private static bool align_selection_to_bottom (
+    private static void align_selection_to_bottom (
         Lib.Items.NodeSelection selection,
         double align_to,
-        Lib.Items.Model model
+        Gee.ArrayList<AlignOp> operations
     ) {
-        bool something_moved = false;
         foreach (var node in selection.nodes.values) {
             unowned var inst = node.node.instance;
             var diff = align_to - inst.bounding_box.bottom;
             if (diff != 0) {
-                translate_node (node.node, 0, diff, model);
-                something_moved = true;
+                operations.add (new AlignOp (node.node, 0, diff));
             }
         }
-
-        return something_moved;
     }
 
-    private static bool align_selection_to_vcenter (
+    private static void align_selection_to_vcenter (
         Lib.Items.NodeSelection selection,
         double align_to,
-        Lib.Items.Model model
+        Gee.ArrayList<AlignOp> operations
     ) {
-        bool something_moved = false;
         foreach (var node in selection.nodes.values) {
             unowned var inst = node.node.instance;
             var diff = align_to - inst.bounding_box.center_y;
             if (diff != 0) {
-                translate_node (node.node, 0, diff, model);
-                something_moved = true;
+                operations.add (new AlignOp (node.node, 0, diff));
             }
         }
-
-        return something_moved;
     }
 
-    private static bool align_selection_to_hcenter (
+    private static void align_selection_to_hcenter (
         Lib.Items.NodeSelection selection,
         double align_to,
-        Lib.Items.Model model
+        Gee.ArrayList<AlignOp> operations
     ) {
-        bool something_moved = false;
         foreach (var node in selection.nodes.values) {
             unowned var inst = node.node.instance;
             var diff = align_to - inst.bounding_box.center_x;
             if (diff != 0) {
-                translate_node (node.node, diff, 0, model);
-                something_moved = true;
+                operations.add (new AlignOp (node.node, diff, 0));
             }
         }
-
-        return something_moved;
     }
 
     // Maybe move this and combine with TransformMode's

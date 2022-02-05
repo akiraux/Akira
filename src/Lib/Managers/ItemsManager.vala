@@ -224,6 +224,13 @@ public class Akira.Lib.Managers.ItemsManager : Object, Items.ModelListener {
             current_set.length++;
         }
 
+        bool no_operation_yet = true;
+        Utils.TrivialDelegate prep = () => {
+            view_canvas.window.event_bus.create_model_snapshot ("shift items' z-order");
+            // run only once
+            no_operation_yet = false;
+        };
+
         foreach (var cs in shift_groups) {
             var pos = cs.first_child;
 
@@ -247,23 +254,12 @@ public class Akira.Lib.Managers.ItemsManager : Object, Items.ModelListener {
                 continue;
             }
 
-            if (0 >= item_model.move_items (cs.parent_node.id, pos, newpos, cs.length, true)) {
+            if (0 >= item_model.move_items (cs.parent_node.id, pos, newpos, cs.length, true, prep)) {
                 // no items were shifted
                 cs = null;
                 continue;
             }
         }
-
-
-        //print ("ref: %d\n", reference.id);
-        //foreach (var cs in shift_groups) {
-        //    if (cs != null) {
-        //        view_restack (cs, amount > 0, reference);
-        //    }
-        //}
-
-        print ("shift item zorder-----\n");
-        item_model.print_dag ();
 
         compile_model ();
 
@@ -589,7 +585,11 @@ public class Akira.Lib.Managers.ItemsManager : Object, Items.ModelListener {
             type = Utils.ItemAlignment.AlignmentType.ANCHOR;
         }
 
-        Utils.ItemAlignment.align_selection (selection, direction, type, anchor, view_canvas);
+        Utils.TrivialDelegate prep = () => {
+            view_canvas.window.event_bus.create_model_snapshot ("autoalign items");
+        };
+
+        Utils.ItemAlignment.align_selection (selection, direction, type, anchor, view_canvas, prep);
     }
 
 }

@@ -43,6 +43,7 @@ sources = files(
     'Utils/SVGUtil.vala',
     'Utils/GeometryMath.vala',
     'Utils/Bezier.vala',
+    'Utils/Delegates.vala',
 
     'Layouts/HeaderBar.vala',
     'Layouts/MainViewCanvas.vala',

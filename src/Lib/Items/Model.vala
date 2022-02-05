@@ -257,7 +257,25 @@ public class Akira.Lib.Items.Model : Object {
         return inner_splice_new_item (parent_node, pos, candidate);
     }
 
-    public int move_items (int parent_id, uint pos, uint newpos, int length, bool restack) {
+    /*
+     * Move items within a parent to change their z-order.
+     * 
+     * Set restack to false if several move operations will be executed, which could make
+     * later restacking more efficient. Make sure to call recalculate_children_stacking
+     * after all operations.
+     * 
+     * prep_for_op is an optional lambda that will get called only if the move ends up
+     * in an actual change to the model. it serves as a way to have side-effects that
+     * don't trigger on no-ops. For example, only add to the undo stack if a change happens.
+     */
+    public int move_items (
+        int parent_id,
+        uint pos,
+        uint newpos,
+        int length,
+        bool restack,
+        Utils.TrivialDelegate? prep_for_op = null
+    ) {
         if (pos == newpos || length <= 0) {
             return 0;
         }
@@ -273,6 +291,10 @@ public class Akira.Lib.Items.Model : Object {
 
         if (newpos + length > parent_node.children.length) {
             return 0;
+        }
+
+        if (prep_for_op != null) {
+            prep_for_op ();
         }
 
         // convert to rotation parameters
