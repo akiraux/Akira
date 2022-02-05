@@ -20,22 +20,70 @@
  */
 
 public class Akira.Lib.Components.Fills : Component, Copyable<Fills> {
-    public Fill.FillData[] data;
+    public struct Fill {
+        public int _id;
+        public Color _color;
 
-    public Fills () {}
+        public Fill (int id = -1, Color color = Color ()) {
+            _id = id;
+            _color = color;
+        }
 
-    public Fills.single_color (Color color) {
-        data = new Fill.FillData[1];
-        data[0] = Fill.FillData (0, color);
+        public Fill.deserialized (int id, Json.Object obj) {
+            _id = id;
+            _color = Color.deserialized (obj.get_object_member ("color"));
+        }
+
+        // Recommended accessors.
+        public int id {
+            get {
+                return _id;
+            }
+        }
+        public Gdk.RGBA color {
+            get {
+                return _color.rgba;
+            }
+        }
+        public bool is_color_hidden {
+            get {
+                return _color.hidden;
+            }
+        }
+
+        // Mutators.
+        public Fill with_color (Color new_color) {
+            return Fill (_id, new_color);
+        }
+
+        public Json.Node serialize () {
+            var obj = new Json.Object ();
+            obj.set_int_member ("id", _id);
+            obj.set_member ("color", _color.serialize ());
+            var node = new Json.Node (Json.NodeType.OBJECT);
+            node.set_object (obj);
+            return node;
+        }
+    }
+
+    public Fill[] data;
+
+    public Fills () {
+        data = new Fill[1];
+    }
+
+    public Fills.with_color (Color color) {
+        data = new Fill[1];
+        data[0] = Fill(0, color);
     }
 
     public Fills.deserialized (Json.Object obj) {
         var arr = obj.get_array_member ("fill_data").get_elements ();
-        data = new Fill.FillData[0];
+        data = new Fill[0];
         var idx = 0;
         foreach (unowned var fill in arr) {
             data.resize (data.length + 1);
-            data[idx] = Fill.FillData.deserialized (idx, fill.get_object ());
+            data[idx] = Fill.deserialized (idx, fill.get_object ());
             ++idx;
         }
     }
@@ -58,20 +106,50 @@ public class Akira.Lib.Components.Fills : Component, Copyable<Fills> {
         return cln;
     }
 
-    // Recommended accessors
-
-    public Gee.ArrayList<Fill> fills () {
-        var tmp = new Gee.ArrayList<Fill> ();
-        for (var i = 0; i < data.length; ++i) {
-            tmp.add (new Fill (data[i]));
+    // Recommended accessors.
+    public Fill? fill_from_id (int id) {
+        foreach (unowned var fill in data) {
+            if (fill.id == id) {
+                return fill.with_color (fill._color);
+            }
         }
-        return tmp;
+        return null;
     }
 
-    public void prep_fills (uint number_to_prep) {
-        data = new Fill.FillData[number_to_prep];
-        for (var i = 0; i < number_to_prep; ++i) {
-            data[i]._id = i;
+    public bool replace (Fill fill) {
+        for (var i = 0; i < data.length; ++i) {
+            if (data[i].id == fill.id) {
+                data[i] = fill;
+                return true;
+            }
         }
+        return false;
+    }
+
+    public void append (Fill fill) {
+        data.resize (data.length + 1);
+        data[data.length - 1] = fill;
+    }
+
+    public int remove (uint id) {
+        var ct = 0;
+        foreach (unowned var fill in data) {
+            if (fill.id == id) {
+                return remove_at (ct) ? 1 : -1;
+            }
+            ++ct;
+        }
+        return -1;
+    }
+
+    private bool remove_at (int pos) {
+        if (pos >= data.length || pos < 0) {
+            assert (false);
+            return false;
+        }
+
+        data.move (pos + 1, pos, data.length - pos - 1);
+        data.resize (data.length - 1);
+        return true;
     }
  }

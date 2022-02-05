@@ -19,6 +19,10 @@
  * Authored by: Bilal Elmoussaoui <bilal.elmoussaoui@gnome.org>
  */
 
+/*
+ * Helper class to create a Gtk.Image that is aware of the symbolic preference
+ * change and updates itself.
+ */
 public class Akira.Widgets.ButtonImage: Gtk.Image {
     private string icon;
     private Gtk.IconSize size;

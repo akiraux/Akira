@@ -49,12 +49,15 @@ sources = files(
     'Layouts/MainViewCanvas.vala',
     'Layouts/MainWindow.vala',
 
+    'Layouts/Alignment/AlignmentPanel.vala',
+
+    'Layouts/FillsList/FillItemModel.vala',
+    'Layouts/FillsList/FillListStore.vala',
+
     'Layouts/LayersList/LayerItemModel.vala',
     'Layouts/LayersList/LayerListBox.vala',
     'Layouts/LayersList/LayerListItem.vala',
     'Layouts/LayersList/LayerListStore.vala',
-
-    'Layouts/Alignment/AlignmentPanel.vala',
 
     'Layouts/Sidebars/LayersSidebar.vala',
     'Layouts/Sidebars/OptionsSidebar.vala',
@@ -114,7 +117,6 @@ sources = files(
     'Lib/Components/Component.vala',
     'Lib/Components/Components.vala',
     'Lib/Components/Coordinates.vala',
-    'Lib/Components/Fill.vala',
     'Lib/Components/Fills.vala',
     'Lib/Components/Flipped.vala',
     'Lib/Components/Layer.vala',

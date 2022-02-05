@@ -36,7 +36,7 @@ public class Akira.Lib.Items.ModelTypeArtboard : ModelType {
             2
         );
 
-        new_item.components.fills = new Lib.Components.Fills.single_color (Lib.Components.Color (1.0, 1.0, 1.0, 1.0));
+        new_item.components.fills = new Lib.Components.Fills.with_color (Lib.Components.Color (1.0, 1.0, 1.0, 1.0));
 
         var layout_data = Components.Layout.LayoutData () {
             can_rotate = true,
