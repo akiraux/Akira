@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Alecaddd (https://alecaddd.com)
+ * Copyright (c) 2022 Alecaddd (https://alecaddd.com)
  *
  * This file is part of Akira.
  *
@@ -17,8 +17,6 @@
  * along with Akira. If not, see <https://www.gnu.org/licenses/>.
  *
  * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
- * Adapted from the elementary OS Mail's VirtualizingListBox source code created
- * by David Hewitt <davidmhewitt@gmail.com>
  */
 
 /*

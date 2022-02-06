@@ -21,11 +21,6 @@
  */
 
 public class Akira.Lib.Managers.SelectionManager : Object {
-    // Signal triggered every time an item is added or removed from the selection
-    // map. Connect this signal when elements of the UI need to be updated based
-    // on the selected items.
-    public signal void selection_modified ();
-
     // Signal triggered only when an item is added or removed from the selection
     // map exclusively via click event from the ViewCanvas. This is necessary in
     // order to only update the Layers panel without triggering a selection loop.
@@ -81,7 +76,7 @@ public class Akira.Lib.Managers.SelectionManager : Object {
         selection = new Lib.Items.NodeSelection (null);
 
         on_selection_changed (-1);
-        selection_modified ();
+        view_canvas.window.event_bus.selection_modified ();
     }
 
     public void add_to_selection (int id) {
@@ -91,7 +86,7 @@ public class Akira.Lib.Managers.SelectionManager : Object {
         }
         selection.add_node (node);
         on_selection_changed (-1);
-        selection_modified ();
+        view_canvas.window.event_bus.selection_modified ();
     }
 
     /*
@@ -104,7 +99,7 @@ public class Akira.Lib.Managers.SelectionManager : Object {
 
         selection.remove_node (id);
         on_selection_changed (-1);
-        selection_modified ();
+        view_canvas.window.event_bus.selection_modified ();
     }
 
     public bool item_selected (int id) {
@@ -118,7 +113,7 @@ public class Akira.Lib.Managers.SelectionManager : Object {
     public void on_selection_changed (int id) {
         if (block_change_notifications == 0) {
             if (id < 0 || selection.has_id (id, false)) {
-                view_canvas.window.event_bus.selection_modified ();
+                view_canvas.window.event_bus.geometry_modified ();
             }
         }
     }

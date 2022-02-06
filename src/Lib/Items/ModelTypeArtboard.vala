@@ -31,11 +31,6 @@ public class Akira.Lib.Items.ModelTypeArtboard : ModelType {
         new_item.components.transform = Lib.Components.Components.default_transform ();
         new_item.components.flipped = Lib.Components.Components.default_flipped ();
 
-        new_item.components.borders = new Lib.Components.Borders.single_color (
-            Lib.Components.Color (0.0, 0.0, 0.0, 1.0),
-            2
-        );
-
         new_item.components.fills = new Lib.Components.Fills.with_color (Lib.Components.Color (1.0, 1.0, 1.0, 1.0));
 
         var layout_data = Components.Layout.LayoutData () {
@@ -64,18 +59,6 @@ public class Akira.Lib.Items.ModelTypeArtboard : ModelType {
 
     public override void component_updated (ModelInstance instance, Lib.Components.Component.Type type) {
         switch (type) {
-            case Lib.Components.Component.Type.COMPILED_BORDER:
-                if (!instance.compiled_border.is_visible) {
-                    instance.drawable.line_width = 0;
-                    instance.drawable.stroke_rgba = Gdk.RGBA () { alpha = 0 };
-                    break;
-                }
-
-                // The "line-width" property expects a DOUBLE type, but we don't support subpixels
-                // so we always handle the border size as INT, therefore we need to type cast it here.
-                instance.drawable.line_width = (double) instance.compiled_border.size;
-                instance.drawable.stroke_rgba = instance.compiled_border.color;
-                break;
             case Lib.Components.Component.Type.COMPILED_FILL:
                 if (!instance.compiled_fill.is_visible) {
                     instance.drawable.fill_rgba = Gdk.RGBA () { alpha = 0 };

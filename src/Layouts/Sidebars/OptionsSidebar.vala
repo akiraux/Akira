@@ -43,11 +43,12 @@ public class Akira.Layouts.Sidebars.OptionsSidebar : Gtk.Grid {
         var align_items_panel = new Layouts.Alignment.AlignmentPanel (view_canvas);
         attach (align_items_panel, 0, 0, 1, 1);
 
-
         var scrolled_grid = new Gtk.Grid () {
             expand = true
         };
         scrolled_grid.attach (new Akira.Layouts.Transforms.TransformPanel (view_canvas), 0, 0, 1, 1);
+
+        scrolled_grid.attach (new Akira.Layouts.FillsList.FillsPanel (view_canvas), 0, 1, 1, 1);
 
         var scrolled_window = new Gtk.ScrolledWindow (null, null) {
             hscrollbar_policy = Gtk.PolicyType.NEVER,

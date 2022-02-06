@@ -52,6 +52,9 @@ sources = files(
     'Layouts/Alignment/AlignmentPanel.vala',
 
     'Layouts/FillsList/FillItemModel.vala',
+    'Layouts/FillsList/FillListBox.vala',
+    'Layouts/FillsList/FillListItem.vala',
+    'Layouts/FillsList/FillsPanel.vala',
     'Layouts/FillsList/FillListStore.vala',
 
     'Layouts/LayersList/LayerItemModel.vala',

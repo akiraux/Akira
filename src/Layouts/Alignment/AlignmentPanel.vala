@@ -105,8 +105,9 @@ public class Akira.Layouts.Alignment.AlignmentPanel : Gtk.Grid {
 
     private void on_selection_modified () {
         unowned var sm = view_canvas.selection_manager;
+        bool is_sensitive = sm.count () > 1;
         foreach (var button in buttons) {
-            button.sensitive = sm.count () > 1;
+            button.sensitive = is_sensitive;
         }
     }
 }
