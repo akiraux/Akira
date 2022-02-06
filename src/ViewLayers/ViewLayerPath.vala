@@ -207,8 +207,34 @@ public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
                 context.line_to (live_segment.line_end.x, live_segment.line_end.y);
             }
         } else if (live_segment.type == Lib.Modes.PathEditMode.Type.QUADRATIC) {
-
         } else if (live_segment.type == Lib.Modes.PathEditMode.Type.CUBIC) {
+            if (live_point_type == Lib.Modes.PathEditMode.PointType.TANGENT_SECOND) {
+                context.curve_to (
+                    path_data.last_point.x,
+                    path_data.last_point.y,
+                    live_segment.tangent_1.x,
+                    live_segment.tangent_1.y,
+                    live_segment.curve_begin.x,
+                    live_segment.curve_begin.y
+                );
+            } else if (live_point_type == Lib.Modes.PathEditMode.PointType.CURVE_END) {
+                context.curve_to (
+                    path_data.last_point.x,
+                    path_data.last_point.y,
+                    live_segment.tangent_1.x,
+                    live_segment.tangent_1.y,
+                    live_segment.curve_begin.x,
+                    live_segment.curve_begin.y
+                );
+                context.curve_to (
+                    live_segment.curve_begin.x,
+                    live_segment.curve_begin.y,
+                    live_segment.tangent_2.x,
+                    live_segment.tangent_2.y,
+                    live_segment.curve_end.x,
+                    live_segment.curve_end.y
+                );
+            }
         }
 
         context.stroke ();

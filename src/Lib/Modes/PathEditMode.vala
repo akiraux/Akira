@@ -56,6 +56,7 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
     //  private Geometry.Point[] live_points;
     //  private int live_idx;
     private Utils.PathSegment live_segment;
+    private PointType live_pnt_type;
 
     // This flag tells if we are adding a path or editing an existing one.
     // Basically decides is we are in "edit" mode or "append" mode.
@@ -78,6 +79,7 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
         //  live_command = Type.LINE;
         //  live_idx = -1;
         live_segment = Utils.PathSegment ();
+        live_pnt_type = PointType.NONE;
         mode = Submode.APPEND;
     }
 
@@ -178,8 +180,7 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
         if (is_curr_command_done ()) {
             edit_model.add_live_points_to_path (live_segment);
             live_segment = Utils.PathSegment ();
-            //  live_idx = 0;
-            //  live_command = Type.LINE;
+            live_pnt_type = PointType.NONE;
         }
 
         is_click = false;
@@ -200,39 +201,34 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
 
         // If there is click and drag, then this is the second point of curve.
         if (is_click) {
-            //  live_command = Type.CUBIC;
-            //  live_idx = 2;
             live_segment.type = Type.CUBIC;
 
             if (Utils.GeometryMath.compare_points (point, live_segment.curve_begin, MIN_TANGENT_ALLOWED_LENGTH)) {
                 // Prevent user from drawing really small curves due to mouse glitches.
-                //  live_command = Type.LINE;
-                //  live_idx = 0;
                 live_segment.type = Type.LINE;
-                edit_model.set_live_points (live_segment, PointType.LINE_END);
+                live_pnt_type = PointType.LINE_END;
             } else {
                 // Points at index 1 and 2 are the two tangents required by the 2 curves.
                 live_segment.tangent_1 = reflection (point, live_segment.curve_begin);
                 live_segment.tangent_2 = point;
-                edit_model.set_live_points (live_segment, PointType.TANGENT_SECOND);
+                live_pnt_type = PointType.TANGENT_SECOND;
             }
 
 
         } else {
             // If we are hovering in CURVE mode, current position could be our third curve point.
             if (live_segment.type == Type.CUBIC) {
-                //  live_points[3] = point;
-                //  live_idx = 3;
                 live_segment.curve_end = point;
-                edit_model.set_live_points (live_segment, PointType.CURVE_END);
+                live_pnt_type = PointType.CURVE_END;
             } else {
                 // If we are hovering in LINE mode, this could be a potential line point.
-                //  live_points[0] = point;
                 live_segment.line_end = point;
                 live_segment.type = Type.LINE;
-                edit_model.set_live_points (live_segment, PointType.LINE_END);
+                live_pnt_type = PointType.LINE_END;
             }
         }
+
+        edit_model.set_live_points (live_segment, live_pnt_type);
 
         return true;
     }
@@ -243,6 +239,14 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
 
     private bool is_curr_command_done () {
         if (live_segment.type == Type.NONE) {
+            return false;
+        }
+
+        if (live_segment.type == Type.LINE && live_pnt_type != PointType.LINE_END) {
+            return false;
+        }
+
+        if (live_segment.type == Type.CUBIC && live_pnt_type != PointType.CURVE_END) {
             return false;
         }
 
@@ -447,15 +451,16 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
 
             is_click = true;
             live_segment = Utils.PathSegment.line (point);
-            edit_model.set_live_points (live_segment, PointType.LINE_END);
+            live_pnt_type = PointType.LINE_END;
             //  live_points[0] = point;
             //  live_idx = 0;
         } else {
             //  live_idx = 3;
             //  live_points[3] = point;
             live_segment.curve_end = point;
-            edit_model.set_live_points (live_segment, PointType.CURVE_END);
+            live_pnt_type = PointType.CURVE_END;
         }
 
+        edit_model.set_live_points (live_segment, live_pnt_type);
     }
 }
