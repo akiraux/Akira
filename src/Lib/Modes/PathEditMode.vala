@@ -75,9 +75,6 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
             instance: instance
         );
         edit_model = new Models.PathEditModel (instance, view_canvas);
-        //  live_points = new Geometry.Point[4];
-        //  live_command = Type.LINE;
-        //  live_idx = -1;
         live_segment = Utils.PathSegment ();
         live_pnt_type = PointType.NONE;
         mode = Submode.APPEND;
@@ -308,126 +305,48 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
     }
 
     private bool handle_button_press_in_edit_mode (Gdk.EventButton event) {
-        int[] index = new int[3];
-        index[0] = index[1] = index[2] = -1;
+        is_click = true;
 
-        var sel_type = edit_model.hit_test (event.x, event.y, ref index);
+        var sel_point = Utils.SelectedPoint ();
+        bool is_selected = edit_model.hit_test (event.x, event.y, ref sel_point);
 
         bool is_shift = (event.state == Gdk.ModifierType.SHIFT_MASK);
         bool is_alt = (event.state == Gdk.ModifierType.MOD1_MASK);
 
-        // If no point was selected, then just get out. Don't do anything.
-        if (sel_type == PointType.NONE) {
-            edit_model.set_selected_points (-1);
+        if (!is_selected) {
             return false;
         }
 
-        if (sel_type == PointType.LINE_END ||
-            sel_type == PointType.CURVE_BEGIN ||
-            sel_type == PointType.CURVE_END
-        ) {
-            handle_point_selected (sel_type, index, is_alt, is_shift);
+        // If this point has already been selected before, make it the reference.
+        foreach (var segment in edit_model.selected_pts) {
+            if (segment.sel_index == sel_point.sel_index) {
+                edit_model.reference_point = sel_point;
+                return true;
+            }
         }
 
-        // Tangents behave in a different way. So we are placing the logic for that seperately.
-        if (sel_type == PointType.TANGENT_FIRST || sel_type == PointType.TANGENT_SECOND) {
-            handle_tangent_selected (sel_type, index, is_alt, is_shift);
-        }
-
-        is_click = true;
-
-        return true;
-    }
-
-    private void handle_point_selected (PointType sel_type, int[] index, bool is_alt, bool is_shift) {
-        // If the selected point already exists, then set it as the reference point.
-        if (edit_model.selected_pts.contains (index[0])) {
-            edit_model.reference_point = index[0];
-            is_click = true;
-            return;
-        }
-
-        // If shift was clicked, then append the points to selection
         if (is_shift) {
-            for (int i = 0; i < 3; ++i) {
-                if (index[i] != -1) {
-                    edit_model.set_selected_points (index[i], true);
-                }
-            }
-        } else {
-            // If shift was not used, the clear the selection, then append the points to selection.
-            // This is because, with CURVE_BEGIN, we are also adding TANGENT_FIRST and TANGENT_SECOND
-            edit_model.selected_pts.clear ();
-
-            for (int i = 0; i < 3; ++i) {
-                if (index[i] != -1) {
-                    edit_model.set_selected_points (index[i], true);
-                }
-            }
-
-            edit_model.reference_point = index[0];
-        }
-    }
-
-    private void handle_tangent_selected (PointType sel_type, int[] index, bool is_alt, bool is_shift) {
-        // If alt was not clicked and the selected tangent already exists in the selection,
-        // It means we want to use this point as reference when moving.
-        if (!is_alt) {
-            if (sel_type == PointType.TANGENT_FIRST && edit_model.selected_pts.contains (index[0])) {
-                edit_model.reference_point = index[0];
-                is_click = true;
-                return;
-            } else if (sel_type == PointType.TANGENT_SECOND && edit_model.selected_pts.contains (index[1])) {
-                edit_model.reference_point = index[1];
-                is_click = true;
-                return;
-            }
-        }
-
-        // When shift is clicked, we add all the selected points to the selection.
-        // But for tangent, the selected points will also contain the other tangent.
-        // So add only the selected tangent to the selection.
-        if (is_shift) {
-            if (sel_type == PointType.TANGENT_FIRST) {
-                edit_model.set_selected_points (index[0], true);
-            } else {
-                edit_model.set_selected_points (index[1], true);
+            if (sel_point.sel_type != PointType.TANGENT_FIRST && sel_point.sel_type != PointType.TANGENT_SECOND) {
+                edit_model.set_selected_points (sel_point, true);
+                return true;
             }
         } else if (is_alt) {
-            // When alt is pressed, we want to move the only the selected tangent
-            // and other one should stay put. So clear the selection and add only selected tangent.
-            if (sel_type == PointType.TANGENT_FIRST) {
-                edit_model.set_selected_points (index[0], false);
-                edit_model.reference_point = index[0];
-            } else {
-                edit_model.set_selected_points (index[1], false);
-                edit_model.reference_point = index[1];
+            if (sel_point.sel_type == PointType.TANGENT_FIRST || sel_point.sel_type == PointType.TANGENT_SECOND) {
+                edit_model.set_selected_points (sel_point, false);
+                return true;
             }
-
-            edit_model.tangents_inline = false;
         } else {
-            // If no modifier was used, move the tangents in the reflected way.
-            // This means we move the selected tangent with the mouse, but move the other tangent
-            // in the opposite direction. see PathEditModel.move_tangents_rel_to_curve
-            // If there are any other points in the selection, remove them first.
-            edit_model.selected_pts.clear ();
-
-            edit_model.set_selected_points (index[0], true);
-            edit_model.set_selected_points (index[1], true);
-
-            if (sel_type == PointType.TANGENT_FIRST) {
-                edit_model.reference_point = index[0];
-            } else {
-                edit_model.reference_point = index[1];
-            }
+            edit_model.set_selected_points (sel_point, false);
+            return true;
         }
+
+        return false;
     }
 
     private void handle_button_press_in_append_mode (Gdk.EventButton event) {
         // If we are not in edit mode (we are creating the path), then
         // everytime the user presses the mouse button, a new point needs to be created and added to the path.
         if (edit_model.first_point.x == -1) {
-            //  edit_model.first_point = Geometry.Point (event.x, event.y);
             edit_model.set_first_point (Geometry.Point (event.x, event.y));
             return;
         }
@@ -452,11 +371,7 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
             is_click = true;
             live_segment = Utils.PathSegment.line (point);
             live_pnt_type = PointType.LINE_END;
-            //  live_points[0] = point;
-            //  live_idx = 0;
         } else {
-            //  live_idx = 3;
-            //  live_points[3] = point;
             live_segment.curve_end = point;
             live_pnt_type = PointType.CURVE_END;
         }

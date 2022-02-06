@@ -125,7 +125,31 @@ public struct Akira.Utils.PathSegment {
         type = Lib.Modes.PathEditMode.Type.LINE;
     }
 
-    public Lib.Modes.PathEditMode.PointType hit_test (Geometry.Point point, double thresh, ref int[] index) {
+    public Geometry.Point get_by_type (Lib.Modes.PathEditMode.PointType ptype) {
+        if (ptype == Lib.Modes.PathEditMode.PointType.LINE_END) {
+            return line_end;
+        }
+
+        if (ptype == Lib.Modes.PathEditMode.PointType.CURVE_BEGIN) {
+            return curve_begin;
+        }
+
+        if (ptype == Lib.Modes.PathEditMode.PointType.TANGENT_FIRST) {
+            return tangent_1;
+        }
+
+        if (ptype == Lib.Modes.PathEditMode.PointType.TANGENT_SECOND) {
+            return tangent_2;
+        }
+
+        if (ptype == Lib.Modes.PathEditMode.PointType.CURVE_END) {
+            return curve_end;
+        }
+
+        return Geometry.Point (0, 0);
+    }
+
+    public Lib.Modes.PathEditMode.PointType hit_test (Geometry.Point point, double thresh) {
         if (type == Lib.Modes.PathEditMode.Type.LINE) {
             if (Utils.GeometryMath.compare_points (line_end, point, thresh)) {
                 return Lib.Modes.PathEditMode.PointType.LINE_END;
@@ -186,4 +210,9 @@ public struct Akira.Utils.PathSegment {
         var node = new Json.Node (Json.NodeType.OBJECT);
         return node;
     }
+}
+
+public struct Akira.Utils.SelectedPoint {
+    public int sel_index;
+    public Lib.Modes.PathEditMode.PointType sel_type;
 }

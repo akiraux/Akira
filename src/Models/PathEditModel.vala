@@ -35,8 +35,8 @@ public class Akira.Models.PathEditModel : Object {
     private Lib.Modes.PathEditMode.PointType live_point_type;
     //  private int live_pts_len = -1;
 
-    public Gee.HashSet<int> selected_pts;
-    public int reference_point;
+    public Gee.HashSet<Utils.SelectedPoint?> selected_pts;
+    public Utils.SelectedPoint reference_point;
 
     public bool tangents_inline = false;
 
@@ -59,7 +59,7 @@ public class Akira.Models.PathEditModel : Object {
         path_layer.add_to_canvas (ViewLayers.ViewLayer.PATH_LAYER_ID, view_canvas);
 
         // The selected_pts will contain the list of all points that we want to modify.
-        selected_pts = new Gee.HashSet<int> ();
+        selected_pts = new Gee.HashSet<Utils.SelectedPoint?> ();
 
         live_segment = Utils.PathSegment ();
         live_point_type = Lib.Modes.PathEditMode.PointType.NONE;
@@ -202,7 +202,7 @@ public class Akira.Models.PathEditModel : Object {
      * If check_idx is -1, do hit test with all the points. Otherwise
      * only with the given point.
      */
-    public Lib.Modes.PathEditMode.PointType hit_test (double x, double y, ref int[] index, int check_idx = -1) {
+    public bool hit_test (double x, double y, ref Utils.SelectedPoint sel_pnt, int check_idx = -1) {
         // In order to check if user clicked on a point, we need to rotate the first point and the event
         // around the item center. Then the difference between these values gives the location
         // event in the same coordinate system as the points.
@@ -218,79 +218,30 @@ public class Akira.Models.PathEditModel : Object {
 
         if (check_idx != -1) {
             if (Utils.GeometryMath.compare_points (points[check_idx].last_point, point, thresh)) {
-                // TODO: Put indices here
-                return Lib.Modes.PathEditMode.PointType.LINE_END;
+                sel_pnt.sel_type = Lib.Modes.PathEditMode.PointType.LINE_END;
+                sel_pnt.sel_index = check_idx;
+                return true;
             }
 
-            return Lib.Modes.PathEditMode.PointType.NONE;
+            sel_pnt.sel_type = Lib.Modes.PathEditMode.PointType.NONE;
+            sel_pnt.sel_index = -1;
+            return false;
         }
 
         for (int i = 0; i < points.length; ++i) {
-            var hit_type = points[i].hit_test (point, thresh, ref index);
+            var hit_type = points[i].hit_test (point, thresh);
 
             if (hit_type != Lib.Modes.PathEditMode.PointType.NONE) {
-                return hit_type;
+                sel_pnt.sel_type = hit_type;
+                sel_pnt.sel_index = i;
+                return true;
             }
         }
 
-        return Lib.Modes.PathEditMode.PointType.NONE;
-
-        //  int j = 0;
-        //  for (int i = 0; i < commands.length; ++i) {
-        //      if (commands[i] == Lib.Modes.PathEditMode.Type.LINE) {
-        //          if (Utils.GeometryMath.compare_points (points[j], point, thresh)) {
-        //              index[0] = j;
-
-        //              return Lib.Modes.PathEditMode.PointType.LINE_END;
-        //          }
-
-        //          ++j;
-        //      } else {
-        //          // We need to check if the middle point of tangent is selected.
-        //          // If it is selected, then other two points of tangent must also
-        //          // be selected to keep the curve intact.
-        //          if (Utils.GeometryMath.compare_points (points[j], point, thresh)) {
-        //              index[0] = j;
-        //              index[1] = j + 1;
-        //              index[2] = j + 2;
-
-        //              return Lib.Modes.PathEditMode.PointType.CURVE_BEGIN;
-        //          }
-
-        //          // If either of the tangent points is selected and moved,
-        //          // then the other needs to be rotated too.
-        //          if (Utils.GeometryMath.compare_points (points[j + 1], point, thresh)) {
-        //              if (are_tangents_inline (points[j + 1], points[j], points[j + 2])) {
-        //                  index[0] = j + 1;
-        //                  index[1] = j + 2;
-        //              } else {
-        //                  index[0] = j + 1;
-        //              }
-
-        //              return Lib.Modes.PathEditMode.PointType.TANGENT_FIRST;
-        //          }
-
-        //          if (Utils.GeometryMath.compare_points (points[j + 2], point, thresh)) {
-        //              if (are_tangents_inline (points[j + 1], points[j], points[j + 2])) {
-        //                  index[0] = j + 1;
-        //                  index[1] = j + 2;
-        //              } else {
-        //                  index[0] = j + 2;
-        //              }
-
-        //              return Lib.Modes.PathEditMode.PointType.TANGENT_SECOND;
-        //          }
-
-        //          if (Utils.GeometryMath.compare_points (points[j + 3], point, thresh)) {
-        //              index[0] = j + 3;
-
-        //              return Lib.Modes.PathEditMode.PointType.CURVE_END;
-        //          }
-        //          j += 4;
-        //      }
-        //  }
-
         //  return Lib.Modes.PathEditMode.PointType.NONE;
+        sel_pnt.sel_type = Lib.Modes.PathEditMode.PointType.NONE;
+        sel_pnt.sel_index = -1;
+        return false;
     }
 
     /*
@@ -309,23 +260,19 @@ public class Akira.Models.PathEditModel : Object {
             reference_point = selected_pts.to_array ()[0];
         }
 
-        Geometry.Point original_ref = Geometry.Point (points[reference_point].line_end.x, points[reference_point].line_end.y);
+        Geometry.Point original_ref = Geometry.Point (
+            points[reference_point.sel_index].line_end.x,
+            points[reference_point.sel_index].line_end.y
+        );
 
         // Calculate by how much the reference point changed, then move other points by this amount.
         // We are rounding this value to the nearest integer. This is the spacing used in ViewLayerGrid.
         double delta_x = Math.round (original_ref.x - new_pos.x);
         double delta_y = Math.round (original_ref.y - new_pos.y);
 
-        //  if (tangents_inline) {
-        //      // If a tangent line was selected and they were inline,
-        //      // they need to be moved in a special way.
-        //      move_tangents_rel_to_curve (delta_x, delta_y);
-        //  } else {
-        //      foreach (var item in selected_pts) {
-        //          points[item].x -= delta_x;
-        //          points[item].y -= delta_y;
-        //      }
-        //  }
+        foreach (var sel_pnt in selected_pts) {
+            points[sel_pnt.sel_index].translate (delta_x, delta_y);
+        }
 
         points = recalculate_points (points);
         bool close = instance.components.path.close;
@@ -338,13 +285,13 @@ public class Akira.Models.PathEditModel : Object {
      * idx is index of point to be added to selection. if -1, it is not added.
      * If append is true, add the item to the list, otherwise, clear the list then add.
      */
-    public void set_selected_points (int idx, bool append = false) {
+    public void set_selected_points (Utils.SelectedPoint sel_pnt, bool append = false) {
         if (!append) {
             selected_pts.clear ();
         }
 
-        if (idx != -1) {
-            selected_pts.add (idx);
+        if (sel_pnt.sel_index != -1) {
+            selected_pts.add (sel_pnt);
         }
 
         update_view ();
@@ -566,5 +513,5 @@ public struct Akira.Models.PathDataModel {
     public Geometry.Point center;
 
     public Cairo.Matrix transform;
-    public Gee.HashSet<int> selected_pts;
+    public Gee.HashSet<Utils.SelectedPoint?> selected_pts;
 }

@@ -175,14 +175,15 @@ public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
             }
         }
 
-        //  foreach (var idx in path_data.selected_pts) {
-        //      context.set_source_rgba (0.7, 0, 0, 1);
+        foreach (var sel_pnt in path_data.selected_pts) {
+            context.set_source_rgba (0.7, 0, 0, 1);
 
-        //      var pt = points[idx];
-        //      tr.transform_point (ref pt.x, ref pt.y);
-        //      context.arc (pt.x, pt.y, radius, 0, Math.PI * 2);
-        //      context.fill ();
-        //  }
+            var segment = points[sel_pnt.sel_index];
+            var pt = segment.get_by_type (sel_pnt.sel_type);
+            tr.transform_point (ref pt.x, ref pt.y);
+            context.arc (pt.x, pt.y, radius, 0, Math.PI * 2);
+            context.fill ();
+        }
 
         context.new_path ();
         context.restore ();
