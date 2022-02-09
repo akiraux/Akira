@@ -99,7 +99,7 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
             return create_context_menu (e, (LayerListItem)row);
         });
 
-        view_canvas.items_manager.item_model.item_added.connect (on_item_added);
+        view_canvas.items_manager.item_added.connect (on_item_added);
         view_canvas.selection_manager.selection_modified_external.connect (on_selection_modified_external);
         view_canvas.hover_manager.hover_changed.connect (on_hover_changed);
         view_canvas.window.event_bus.request_escape.connect (on_escape_request);
@@ -108,14 +108,19 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
     /*
      * Add all existing nodes to the layers list when the UI is revealed.
      */
-    public void regenerate_list () {
+    public void regenerate_list (bool go_to_layer) {
+        unowned var im = view_canvas.items_manager;
+
+        // Bail out if we don't have anything to add.
+        if (im.item_model.group_nodes.size == 0 && im.item_model.item_nodes.size == 0) {
+            return;
+        }
+
         ulong microseconds;
         double seconds;
         // Create a timer object to track the regeneration of the layers list.
         Timer timer = new Timer ();
-
         var added = 0;
-        unowned var im = view_canvas.items_manager;
 
         foreach (var key in im.item_model.group_nodes.keys) {
             var node = im.item_model.group_nodes[key];
@@ -139,7 +144,7 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
         list_store.items_changed (0, 0, added);
 
         // Restore the selected items.
-        on_selection_modified_external ();
+        on_selection_modified_external (go_to_layer);
 
         timer.stop ();
         seconds = timer.elapsed (out microseconds);

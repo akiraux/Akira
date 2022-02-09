@@ -20,24 +20,45 @@
  * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
  */
 
-public class Akira.Lib.Managers.ItemsManager : Object {
+public class Akira.Lib.Managers.ItemsManager : Object, Items.ModelListener {
     private const bool CUSTOM_HITTEST = true;
     public unowned Lib.ViewCanvas view_canvas { get; construct; }
 
-    public Lib.Items.Model item_model;
+    private Lib.Items.Model p_item_model;
+
+    public unowned Lib.Items.Model item_model { get { return p_item_model; } }
 
     public ItemsManager (Lib.ViewCanvas canvas) {
         Object (view_canvas: canvas);
     }
 
     construct {
-        item_model = new Lib.Items.Model.live_model (view_canvas);
-        item_model.item_geometry_changed.connect (on_item_geometry_changed);
+        p_item_model = new Lib.Items.Model.live_model (this, view_canvas);
 
         view_canvas.window.event_bus.selection_align.connect (selection_align);
     }
 
+    public void replace_model (Lib.Items.Model replacement) {
+        p_item_model = replacement;
+        p_item_model.wake (this, true);
+        view_canvas.set_model_to_render (p_item_model);
+        compile_model ();
+    }
+
+    public signal void item_added (int id);
     public signal void items_removed (GLib.Array<int> ids);
+
+    public void on_item_added (int id) {
+        item_added (id);
+    }
+
+    public void on_item_geometry_changed (int id) {
+        view_canvas.selection_manager.on_selection_changed (id);
+    }
+
+    public void on_items_deleted (GLib.Array<int> ids) {
+        items_removed (ids);
+    }
 
     public Lib.Items.ModelInstance? instance_from_id (int id) {
         return item_model.instance_from_id (id);
@@ -127,6 +148,7 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             item_model.recalculate_children_stacking (gid);
         }
 
+        // TODO: move this to the model, have it collect deleted ids and alert this
         items_removed (ids_array);
 
         if (!pause_compile) {
@@ -202,6 +224,13 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             current_set.length++;
         }
 
+        bool no_operation_yet = true;
+        Utils.TrivialDelegate prep = () => {
+            view_canvas.window.event_bus.create_model_snapshot ("shift items' z-order");
+            // run only once
+            no_operation_yet = false;
+        };
+
         foreach (var cs in shift_groups) {
             var pos = cs.first_child;
 
@@ -225,23 +254,12 @@ public class Akira.Lib.Managers.ItemsManager : Object {
                 continue;
             }
 
-            if (0 >= item_model.move_items (cs.parent_node.id, pos, newpos, cs.length, true)) {
+            if (0 >= item_model.move_items (cs.parent_node.id, pos, newpos, cs.length, true, prep)) {
                 // no items were shifted
                 cs = null;
                 continue;
             }
         }
-
-
-        //print ("ref: %d\n", reference.id);
-        //foreach (var cs in shift_groups) {
-        //    if (cs != null) {
-        //        view_restack (cs, amount > 0, reference);
-        //    }
-        //}
-
-        print ("shift item zorder-----\n");
-        item_model.print_dag ();
 
         compile_model ();
 
@@ -505,8 +523,8 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         view_canvas.pause_redraw = false;
         view_canvas.request_redraw (view_canvas.get_bounds ());
 
-        // Defer the print of the layer UI after all items have been created.
-        view_canvas.window.main_window.show_added_layers (num_of++);
+        // Regenerate the layers list.
+        view_canvas.window.main_window.regenerate_list ();
 
         if (debug_timer) {
             timer.stop ();
@@ -541,18 +559,14 @@ public class Akira.Lib.Managers.ItemsManager : Object {
         view_canvas.pause_redraw = false;
         view_canvas.request_redraw (view_canvas.get_bounds ());
 
-        // Defer the print of the layer UI after all items have been created.
-        view_canvas.window.main_window.show_added_layers ((int) num_of);
+        // Regenerate the layers list.
+        view_canvas.window.main_window.regenerate_list ();
 
         if (debug_timer) {
             timer.stop ();
             seconds = timer.elapsed (out microseconds);
             print ("Created %u items in %s s\n", num_of, seconds.to_string ());
         }
-    }
-
-    public void on_item_geometry_changed (int id) {
-        view_canvas.selection_manager.on_selection_changed (id);
     }
 
     public void selection_align (Utils.ItemAlignment.AlignmentDirection direction) {
@@ -571,7 +585,11 @@ public class Akira.Lib.Managers.ItemsManager : Object {
             type = Utils.ItemAlignment.AlignmentType.ANCHOR;
         }
 
-        Utils.ItemAlignment.align_selection (selection, direction, type, anchor, view_canvas);
+        Utils.TrivialDelegate prep = () => {
+            view_canvas.window.event_bus.create_model_snapshot ("autoalign items");
+        };
+
+        Utils.ItemAlignment.align_selection (selection, direction, type, anchor, view_canvas, prep);
     }
 
 }

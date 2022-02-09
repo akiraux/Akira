@@ -44,6 +44,7 @@ sources = files(
     'Utils/GeometryMath.vala',
     'Utils/Bezier.vala',
     'Utils/PathSegment.vala',
+    'Utils/Delegates.vala',
 
     'Layouts/HeaderBar.vala',
     'Layouts/MainViewCanvas.vala',

@@ -146,8 +146,9 @@ public class Akira.Lib.Managers.SelectionManager : Object {
 
         int amount = up ? 1 : -1;
         if (to_shift.length > 0 && amount != 0) {
-            view_canvas.window.event_bus.create_model_snapshot ("shift items' z-order");
             view_canvas.items_manager.shift_items (to_shift, amount, to_end);
+            // Regenerate the layers list.
+            view_canvas.window.main_window.regenerate_list (true);
         }
     }
 

@@ -79,10 +79,19 @@ public class Akira.Drawables.DrawableArtboard : Drawable {
 
         context.save ();
 
-        if (settings.dark_theme) {
-            context.set_source_rgba (1, 1, 1, 0.75);
+        if (settings.follow_system_theme) {
+            var granite_settings = Granite.Settings.get_default ();
+            if (granite_settings.prefers_color_scheme == Granite.Settings.ColorScheme.DARK) {
+                context.set_source_rgba (1, 1, 1, 0.75);
+            } else {
+                context.set_source_rgba (0, 0, 0, 0.75);
+            }
         } else {
-            context.set_source_rgba (0, 0, 0, 0.75);
+            if (settings.dark_theme) {
+                context.set_source_rgba (1, 1, 1, 0.75);
+            } else {
+                context.set_source_rgba (0, 0, 0, 0.75);
+            }
         }
 
         var layout = create_pango_layout (context, label, w, scale, null);

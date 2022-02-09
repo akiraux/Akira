@@ -84,4 +84,12 @@ public class Akira.Layouts.MainWindow : Gtk.Grid {
     public void set_children_locked (int[] nodes, bool is_locked) {
         layers_sidebar.layers_listbox.set_children_locked (nodes, is_locked);
     }
+
+    /*
+     * Regenerate the entire layers list. This is used during history navigation.
+     */
+    public void regenerate_list (bool go_to_layer = false) {
+        layers_sidebar.layers_listbox.clear_list ();
+        layers_sidebar.layers_listbox.regenerate_list (go_to_layer);
+    }
 }
