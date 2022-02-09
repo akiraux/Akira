@@ -369,6 +369,36 @@ public class Akira.Models.PathEditModel : Object {
         return false;
     }
 
+    public void toggle_point_type (Utils.SelectedPoint sel_point) {
+        if (points[sel_point.sel_index].type == Lib.Modes.PathEditMode.Type.LINE) {
+            Utils.PathSegment? segment_before = null;
+            Utils.PathSegment? segment_after = null;
+
+            if (sel_point.sel_index != 0) {
+                segment_before = points[sel_point.sel_index - 1];
+            }
+
+            if (sel_point.sel_index != points.length - 1) {
+                segment_after = points[sel_point.sel_index + 1];
+            }
+
+            points[sel_point.sel_index].line_to_curve (segment_before, segment_after);
+        } else {
+            // After converting a curve to a line, the curve_end must be made a line segment,
+            // so that we dont lose a segment.
+            var curr_segment = points[sel_point.sel_index];
+            var segment_after = Utils.PathSegment.line (curr_segment.curve_end);
+            points[sel_point.sel_index].curve_to_line ();
+
+            add_point_to_path (segment_after, sel_point.sel_index + 1);
+        }
+
+        bool close = instance.components.path.close;
+        points = recalculate_points (points);
+        instance.components.path = new Lib.Components.Path.from_points (points, close);
+        recompute_components ();
+    }
+
     /*
      * This method shift all points in path such that none of them are in negative space.
      */

@@ -110,10 +110,49 @@ public struct Akira.Utils.PathSegment {
     // If point_after is not provided, create a quadratic curve
     // If it is provided, create a symmetric cubic bezier curve
     public void line_to_curve (
-        Geometry.Point point_before,
-        Geometry.Point? point_after = null
+        Utils.PathSegment? segment_before,
+        Utils.PathSegment? segment_after
     ) {
         type = Lib.Modes.PathEditMode.Type.CUBIC;
+
+        if (segment_before == null) {
+            // TODO: create quaratic bezier here.
+            return;
+        }
+
+        if (segment_after == null) {
+            // TODO: create quadratic bezier here.
+            return;
+        }
+
+        Geometry.Point point_before, point_after;
+
+        if (segment_before.type == Lib.Modes.PathEditMode.Type.LINE) {
+            point_before = segment_before.line_end;
+        } else {
+            point_before = Geometry.Point (
+                (curve_begin.x + segment_before.curve_begin.x) / 2.0,
+                (curve_begin.y + segment_before.curve_begin.y) / 2.0
+            );
+        }
+
+        if (segment_after.type == Lib.Modes.PathEditMode.Type.LINE) {
+            point_after = segment_after.line_end;
+        } else {
+            point_after = Geometry.Point (
+                (curve_begin.x + segment_after.curve_begin.x) / 2.0,
+                (curve_begin.y + segment_after.curve_begin.y) / 2.0
+            );
+        }
+
+        var mid_vector = Geometry.Point (
+            (point_after.x - point_before.x) / 2.0,
+            (point_after.y - point_before.y) / 2.0
+        );
+
+        tangent_1 = Geometry.Point (curve_begin.x - mid_vector.x, curve_begin.y - mid_vector.y);
+        tangent_2 = Geometry.Point (curve_begin.x + mid_vector.x, curve_begin.y + mid_vector.y);
+        curve_end = point_after;
     }
 
     // Use for converting a curve segment to a line.

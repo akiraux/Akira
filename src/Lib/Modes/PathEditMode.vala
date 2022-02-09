@@ -124,6 +124,7 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
             if (uppercase_keyval == Gdk.Key.C) {
                 // If C is pressed in edit_mode, we enter back to append mode.
                 mode = Submode.APPEND;
+                edit_model.selected_pts.clear ();
                 return true;
             }
 
@@ -297,6 +298,12 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
 
         if (!is_selected) {
             return false;
+        }
+
+        // If user double clicked on a point, it needs to be converted to line/curve.
+        if (event.type == Gdk.EventType.@2BUTTON_PRESS) {
+            edit_model.toggle_point_type (sel_point);
+            return true;
         }
 
         // If this point has already been selected before, make it the reference.

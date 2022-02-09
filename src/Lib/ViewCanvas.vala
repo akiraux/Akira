@@ -384,9 +384,14 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
         }
 
         if (target.instance.type is Lib.Items.ModelTypePath) {
-            var path_edit_mode = new Lib.Modes.PathEditMode (this, target.instance);
-            path_edit_mode.toggle_functionality (false);
-            mode_manager.register_mode (path_edit_mode);
+            // If path edit mode is already active, propogate the event.
+            if (mode_manager.active_mode_type == Modes.AbstractInteractionMode.ModeType.PATH_EDIT) {
+                mode_manager.button_press_event (event);
+            } else {
+                var path_edit_mode = new Lib.Modes.PathEditMode (this, target.instance);
+                path_edit_mode.toggle_functionality (false);
+                mode_manager.register_mode (path_edit_mode);
+            }
         }
     }
 
