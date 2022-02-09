@@ -111,7 +111,25 @@ public class Akira.Models.PathEditModel : Object {
             var segment = Utils.PathSegment.cubic_bezier (curve_begin, tangent_1, tangent_2, curve_end);
             add_point_to_path (segment);
         } else if (live_pts.type == Lib.Modes.PathEditMode.Type.QUADRATIC) {
-            // TODO:
+            var curve_begin = transform_point_around_item_origin (live_pts.curve_begin, transform_matrix, true);
+            var tangent_1 = transform_point_around_item_origin (live_pts.tangent_1, transform_matrix, true);
+            var curve_end = transform_point_around_item_origin (live_pts.curve_end, transform_matrix, true);
+
+            curve_begin.x -= orig_first_pt.x;
+            curve_begin.y -= orig_first_pt.y;
+
+            tangent_1.x -= orig_first_pt.x;
+            tangent_1.y -= orig_first_pt.y;
+
+            curve_end.x -= orig_first_pt.x;
+            curve_end.y -= orig_first_pt.y;
+
+            curve_begin = Geometry.Point (Math.round (curve_begin.x), Math.round (curve_begin.y));
+            tangent_1 = Geometry.Point (Math.round (tangent_1.x), Math.round (tangent_1.y));
+            curve_end = Geometry.Point (Math.round (curve_end.x), Math.round (curve_end.y));
+
+            var segment = Utils.PathSegment.quadratic_bezier (curve_begin, tangent_1, curve_end);
+            add_point_to_path (segment);
         }
 
         live_segment = Utils.PathSegment ();
@@ -246,6 +264,10 @@ public class Akira.Models.PathEditModel : Object {
                 hit_type == Lib.Modes.PathEditMode.PointType.TANGENT_SECOND
             ) {
                 if (!points[i].check_tangents_inline ()) {
+                    sel_pnt.tangents_staggered = true;
+                }
+
+                if (points[i].type == Lib.Modes.PathEditMode.Type.QUADRATIC) {
                     sel_pnt.tangents_staggered = true;
                 }
             }

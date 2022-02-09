@@ -196,6 +196,16 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
 
         // If there is click and drag, then this is the second point of curve.
         if (is_click) {
+            // If user clicked and dragged when inserting the CURVE_END point,
+            // Make it a quadratic curve and insert it into the path.
+            if (live_pnt_type == PointType.CURVE_END && live_segment.type == Type.CUBIC) {
+                live_segment.type = Type.QUADRATIC;
+                edit_model.add_live_points_to_path (live_segment);
+
+                live_segment = Utils.PathSegment.line (point);
+                live_pnt_type = PointType.LINE_END;
+            }
+
             live_segment.type = Type.CUBIC;
 
             if (Utils.GeometryMath.compare_points (point, live_segment.curve_begin, MIN_TANGENT_ALLOWED_LENGTH)) {
@@ -355,7 +365,6 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
                 return;
             }
 
-            is_click = true;
             live_segment = Utils.PathSegment.line (point);
             live_pnt_type = PointType.LINE_END;
         } else {
@@ -363,6 +372,7 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
             live_pnt_type = PointType.CURVE_END;
         }
 
+        is_click = true;
         edit_model.set_live_points (live_segment, live_pnt_type);
     }
 }

@@ -53,10 +53,10 @@ public class Akira.Drawables.DrawablePath : Drawable {
             if (point.type == Lib.Modes.PathEditMode.Type.LINE) {
                 cr.line_to (point.line_end.x, point.line_end.y);
             } else if (point.type == Lib.Modes.PathEditMode.Type.QUADRATIC) {
+                var pb = points[i - 1].last_point;
                 var cb = point.curve_begin;
                 var t1 = point.tangent_1;
-                var ce = point.curve_end;
-                cr.curve_to (cb.x, cb.y, t1.x, t1.y, ce.x, ce.y);
+                cr.curve_to (pb.x, pb.y, t1.x, t1.y, cb.x, cb.y);
             } else if (point.type == Lib.Modes.PathEditMode.Type.CUBIC) {
                 var pb = points[i - 1].last_point;
                 var cb = point.curve_begin;

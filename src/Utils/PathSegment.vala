@@ -51,6 +51,8 @@ public struct Akira.Utils.PathSegment {
         get {
             if (type == Lib.Modes.PathEditMode.Type.LINE) {
                 return line_end;
+            } else if (type == Lib.Modes.PathEditMode.Type.QUADRATIC) {
+                return curve_begin;
             }
 
             return curve_end;
@@ -101,7 +103,7 @@ public struct Akira.Utils.PathSegment {
         type = Lib.Modes.PathEditMode.Type.QUADRATIC;
 
         this.curve_begin = curve_begin;
-        this.curve_end = curve_end;
+        //  this.curve_end = curve_end;
         this.tangent_1 = control_point;
     }
 

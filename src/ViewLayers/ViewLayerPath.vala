@@ -136,8 +136,8 @@ public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
                 context.fill ();
 
                 // Draw control point for curve end.
-                context.arc (curve_end.x, curve_end.y, radius, 0, Math.PI * 2);
-                context.fill ();
+                //  context.arc (curve_end.x, curve_end.y, radius, 0, Math.PI * 2);
+                //  context.fill ();
 
                 context.move_to (tangent_1.x, tangent_1.y);
                 context.line_to (curve_begin.x, curve_begin.y);
@@ -209,6 +209,7 @@ public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
                 context.stroke ();
             }
         } else if (live_segment.type == Lib.Modes.PathEditMode.Type.QUADRATIC) {
+            // TODO: But I dont think this case ever occurs.
         } else if (live_segment.type == Lib.Modes.PathEditMode.Type.CUBIC) {
             if (live_point_type == Lib.Modes.PathEditMode.PointType.TANGENT_SECOND) {
                 context.curve_to (

@@ -83,7 +83,6 @@ public class Akira.Lib.Components.Path : Component, Copyable<Path> {
         double min_y = double.MAX;
         double max_y = double.MIN;
 
-        int point_idx = 0;
         for (int i = 0; i < data.length; ++i) {
             var segment = data[i];
 
@@ -93,8 +92,6 @@ public class Akira.Lib.Components.Path : Component, Copyable<Path> {
                 max_x = double.max (max_x, point.x);
                 min_y = double.min (min_y, point.y);
                 max_y = double.max (max_y, point.y);
-
-                ++point_idx;
             } else if (segment.type == Lib.Modes.PathEditMode.Type.CUBIC) {
                 var p0 = data[i - 1].last_point;
                 var p1 = segment.curve_begin;
@@ -116,8 +113,17 @@ public class Akira.Lib.Components.Path : Component, Copyable<Path> {
 
                 temp = double.max (b1_extremes[3], b2_extremes[3]);
                 max_y = double.max (max_y, temp);
+            } else if (segment.type == Lib.Modes.PathEditMode.Type.QUADRATIC) {
+                var p0 = data[i - 1].last_point;
+                var p1 = segment.curve_begin;
+                var p2 = segment.tangent_1;
 
-                point_idx += 4;
+                double[] b_extremes = Utils.Bezier.get_extremes (p0, p2, p1);
+
+                min_x = double.min (b_extremes[0], min_x);
+                min_y = double.min (b_extremes[1], min_y);
+                max_x = double.max (b_extremes[2], max_x);
+                max_y = double.max (b_extremes[3], max_y);
             }
         }
 
