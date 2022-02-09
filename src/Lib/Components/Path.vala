@@ -17,31 +17,24 @@
  * along with Akira. If not, see <https://www.gnu.org/licenses/>.
  *
  * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
+ * Modified by: Ashish Shevale <shevaleashish@gmail.com>
  */
 
 public class Akira.Lib.Components.Path : Component, Copyable<Path> {
     // Control points relative to a top-left of 0,0.
     // In the future we will probably want control points with more data.
-    //  public Geometry.Point[] data;
+    // public Geometry.Point[] data;
     // Control the path edit mode between straight line and curves.
     // Line requires 1 points whereas, path requires 4 points.
-    //  public Lib.Modes.PathEditMode.Type[] commands;
     public Utils.PathSegment[] data;
     public bool close = false;
 
     public Path (bool close = false) {
-        //  data = new Geometry.Point[0];
-        //  commands = new Lib.Modes.PathEditMode.Type[0];
         data = new Utils.PathSegment[0];
         this.close = close;
     }
 
     public Path.from_single_point (Geometry.Point pt, bool close = false) {
-        //  data = new Geometry.Point[1];
-        //  data[0] = pt;
-
-        //  commands = new Lib.Modes.PathEditMode.Type[1];
-        //  commands[0] = command;
         data = new Utils.PathSegment[1];
 
         // Only a line can be created from a single point. No need to check command.
@@ -51,8 +44,6 @@ public class Akira.Lib.Components.Path : Component, Copyable<Path> {
     }
 
     public Path.from_points (Utils.PathSegment[] data, bool close = false) {
-        //  this.data = data;
-        //  this.commands = commands;
         this.data = data;
         this.close = close;
     }
@@ -61,9 +52,9 @@ public class Akira.Lib.Components.Path : Component, Copyable<Path> {
         var arr = obj.get_array_member ("path_data").get_elements ();
         data = new Utils.PathSegment[0];
         var idx = 0;
+
         foreach (unowned var pt in arr) {
             data.resize (data.length + 1);
-            //  data[idx] = Geometry.Point.deserialized (pt.get_object ());
             data[idx] = Utils.PathSegment.deserialized (pt.get_object ());
             ++idx;
         }
@@ -96,12 +87,11 @@ public class Akira.Lib.Components.Path : Component, Copyable<Path> {
         double max_y = double.MIN;
 
         int point_idx = 0;
-        //  for (int cmd_idx = 0; cmd_idx < commands.length; ++cmd_idx) {
         for (int i = 0; i < data.length; ++i) {
             var segment = data[i];
 
             if (segment.type == Lib.Modes.PathEditMode.Type.LINE) {
-                var point = segment.line_end;//data[point_idx];
+                var point = segment.line_end;
                 min_x = double.min (min_x, point.x);
                 max_x = double.max (max_x, point.x);
                 min_y = double.min (min_y, point.y);
@@ -109,11 +99,11 @@ public class Akira.Lib.Components.Path : Component, Copyable<Path> {
 
                 ++point_idx;
             } else if (segment.type == Lib.Modes.PathEditMode.Type.CUBIC) {
-                var p0 = data[i - 1].last_point;//data[point_idx - 1];
-                var p1 = segment.curve_begin;//data[point_idx];
-                var p2 = segment.tangent_1;//data[point_idx + 1];
-                var p3 = segment.tangent_2;//data[point_idx + 2];
-                var p4 = segment.curve_end;//data[point_idx + 3];
+                var p0 = data[i - 1].last_point;
+                var p1 = segment.curve_begin;
+                var p2 = segment.tangent_1;
+                var p3 = segment.tangent_2;
+                var p4 = segment.curve_end;
 
                 double[] b1_extremes = Utils.Bezier.get_extremes (p0, p2, p1);
                 double[] b2_extremes = Utils.Bezier.get_extremes (p1, p3, p4);

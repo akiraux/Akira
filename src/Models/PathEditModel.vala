@@ -231,11 +231,22 @@ public class Akira.Models.PathEditModel : Object {
         for (int i = 0; i < points.length; ++i) {
             var hit_type = points[i].hit_test (point, thresh);
 
-            if (hit_type != Lib.Modes.PathEditMode.PointType.NONE) {
-                sel_pnt.sel_type = hit_type;
-                sel_pnt.sel_index = i;
-                return true;
+            if (hit_type == Lib.Modes.PathEditMode.PointType.NONE) {
+                continue;
             }
+
+            if (
+                hit_type == Lib.Modes.PathEditMode.PointType.TANGENT_FIRST ||
+                hit_type == Lib.Modes.PathEditMode.PointType.TANGENT_SECOND
+            ) {
+                if (!points[i].check_tangents_inline ()) {
+                    sel_pnt.tangents_staggered = true;
+                }
+            }
+
+            sel_pnt.sel_type = hit_type;
+            sel_pnt.sel_index = i;
+            return true;
         }
 
         //  return Lib.Modes.PathEditMode.PointType.NONE;
@@ -260,10 +271,7 @@ public class Akira.Models.PathEditModel : Object {
             reference_point = selected_pts.to_array ()[0];
         }
 
-        Geometry.Point original_ref = Geometry.Point (
-            points[reference_point.sel_index].line_end.x,
-            points[reference_point.sel_index].line_end.y
-        );
+        Geometry.Point original_ref = points[reference_point.sel_index].get_by_type (reference_point.sel_type);
 
         // Calculate by how much the reference point changed, then move other points by this amount.
         // We are rounding this value to the nearest integer. This is the spacing used in ViewLayerGrid.
@@ -271,7 +279,40 @@ public class Akira.Models.PathEditModel : Object {
         double delta_y = Math.round (original_ref.y - new_pos.y);
 
         foreach (var sel_pnt in selected_pts) {
-            points[sel_pnt.sel_index].translate (delta_x, delta_y);
+            switch (sel_pnt.sel_type) {
+                case Lib.Modes.PathEditMode.PointType.LINE_END:
+                    var old = points[sel_pnt.sel_index].line_end;
+                    points[sel_pnt.sel_index].line_end = Geometry.Point (old.x - delta_x, old.y - delta_y);
+                    break;
+                case Lib.Modes.PathEditMode.PointType.CURVE_BEGIN:
+                    // When this points moves, tangents must be moved with it too.
+                    // To make this easier, move the whole segment then return
+                    // CURVE_BEGIN to its original position.
+                    points[sel_pnt.sel_index].translate (delta_x, delta_y);
+                    var old = points[sel_pnt.sel_index].curve_end;
+                    points[sel_pnt.sel_index].curve_end = Geometry.Point (old.x + delta_x, old.y + delta_y);
+                    break;
+                case Lib.Modes.PathEditMode.PointType.TANGENT_FIRST:
+                    if (sel_pnt.tangents_staggered) {
+                        var old = points[sel_pnt.sel_index].tangent_1;
+                        points[sel_pnt.sel_index].tangent_1 = Geometry.Point (old.x - delta_x, old.y - delta_y);
+                    } else {
+                        points[sel_pnt.sel_index].move_tangents (delta_x, delta_y, true);
+                    }
+                    break;
+                case Lib.Modes.PathEditMode.PointType.TANGENT_SECOND:
+                    if (sel_pnt.tangents_staggered) {
+                        var old = points[sel_pnt.sel_index].tangent_2;
+                        points[sel_pnt.sel_index].tangent_2 = Geometry.Point (old.x - delta_x, old.y - delta_y);
+                    } else {
+                        points[sel_pnt.sel_index].move_tangents (delta_x, delta_y, false);
+                    }
+                    break;
+                case Lib.Modes.PathEditMode.PointType.CURVE_END:
+                    var old = points[sel_pnt.sel_index].curve_end;
+                    points[sel_pnt.sel_index].curve_end = Geometry.Point (old.x - delta_x, old.y - delta_y);
+                    break;
+            }
         }
 
         points = recalculate_points (points);
@@ -430,8 +471,7 @@ public class Akira.Models.PathEditModel : Object {
         live_pnts[0] = Utils.PathSegment.line ( get_last_point_from_path ());
         live_pnts[1] = live_segment;
 
-        var live_path = new Lib.Components.Path.from_points (live_pnts);
-        var live_extents = live_path.calculate_extents ();
+        var live_extents = Utils.GeometryMath.bounds_from_points (live_pnts);
 
         double radius = ViewLayers.ViewLayerPath.UI_NOB_SIZE / view_canvas.scale;
         live_extents.left -= radius;
@@ -440,33 +480,6 @@ public class Akira.Models.PathEditModel : Object {
         live_extents.bottom += radius;
 
         return live_extents;
-    }
-
-    private bool are_tangents_inline (Geometry.Point tangent_1, Geometry.Point tangent_2, Geometry.Point curve_begin) {
-        // Slope and intercept of line formed by tangents.
-        double slope = (tangent_2.y - tangent_1.y) / (tangent_2.x - tangent_1.x);
-        double intercept = tangent_1.y - slope * tangent_1.x;
-
-        double rhs = slope * curve_begin.x + intercept;
-
-        // Check if the curve_begin point lies on this line.
-        if ((curve_begin.y - rhs).abs () < 1.0) {
-            tangents_inline = true;
-            return true;
-        }
-
-        tangents_inline = false;
-        return false;
-    }
-
-    private void move_tangents_rel_to_curve (double delta_x, double delta_y) {
-        //  points[reference_point].x -= delta_x;
-        //  points[reference_point].y -= delta_y;
-
-        //  var sel_pts_array = selected_pts.to_array ();
-        //  int other_tangent = (sel_pts_array[0] == reference_point) ? sel_pts_array[1] : sel_pts_array[0];
-        //  points[other_tangent].x += delta_x;
-        //  points[other_tangent].y += delta_y;
     }
 
     private Geometry.Point transform_point_around_item_origin (Geometry.Point point, Cairo.Matrix mat, bool invert = false) {

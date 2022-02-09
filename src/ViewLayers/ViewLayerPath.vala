@@ -236,6 +236,17 @@ public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
                     live_segment.curve_end.y
                 );
             }
+
+            context.move_to (live_segment.tangent_1.x, live_segment.tangent_1.y);
+            context.line_to (live_segment.curve_begin.x, live_segment.curve_begin.y);
+
+            context.line_to (live_segment.tangent_2.x, live_segment.tangent_2.y);
+            context.stroke ();
+
+            context.arc (live_segment.tangent_1.x, live_segment.tangent_1.y, radius, 0, 2 * Math.PI);
+            context.arc (live_segment.tangent_2.x, live_segment.tangent_2.y, radius, 0, 2 * Math.PI);
+            context.arc (live_segment.curve_begin.x, live_segment.curve_begin.y, radius, 0, 2 * Math.PI);
+            context.fill ();
         }
 
         context.stroke ();

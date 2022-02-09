@@ -319,7 +319,7 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
 
         // If this point has already been selected before, make it the reference.
         foreach (var segment in edit_model.selected_pts) {
-            if (segment.sel_index == sel_point.sel_index) {
+            if (segment.sel_index == sel_point.sel_index && segment.sel_type == sel_point.sel_type) {
                 edit_model.reference_point = sel_point;
                 return true;
             }
@@ -332,6 +332,7 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
             }
         } else if (is_alt) {
             if (sel_point.sel_type == PointType.TANGENT_FIRST || sel_point.sel_type == PointType.TANGENT_SECOND) {
+                sel_point.tangents_staggered = true;
                 edit_model.set_selected_points (sel_point, false);
                 return true;
             }
@@ -356,17 +357,14 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
         // If this is the first point we are adding, make it a line.
         if (live_segment.type == Type.LINE) {
             // Check if we are clicking on the first point. If yes, then close the path.
-            //  int[] index = new int[3];
-            //  index[0] = index[1] = index[2] = -1;
-            //  edit_model.hit_test (event.x, event.y, ref index, 0);
-
-            //  if (index[0] == 0) {
-            //      edit_model.make_path_closed ();
-            //      // We are triggering the escape signal because after joining the path,
-            //      // no more points can be added. So this mode must end.
-            //      view_canvas.window.event_bus.request_escape ();
-            //      return;
-            //  }
+            var sel_point = Utils.SelectedPoint ();
+            if (edit_model.hit_test (event.x, event.y, ref sel_point, 0)) {
+                edit_model.make_path_closed ();
+                // We are triggering the escape signal because after joining the path,
+                // no more points can be added. So this mode must end.
+                view_canvas.window.event_bus.request_escape ();
+                return;
+            }
 
             is_click = true;
             live_segment = Utils.PathSegment.line (point);

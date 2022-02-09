@@ -64,10 +64,6 @@ public struct Akira.Utils.PathSegment {
     public Geometry.Point curve_end;
 
     public PathSegment () {
-        //  curve_begin = null;
-        //  tangent_1 = null;
-        //  tangent_2 = null;
-        //  curve_end = null;
         type = Lib.Modes.PathEditMode.Type.NONE;
         curve_begin = Geometry.Point (double.MAX, double.MAX);
         tangent_1 = Geometry.Point (double.MAX, double.MAX);
@@ -187,6 +183,20 @@ public struct Akira.Utils.PathSegment {
         return Lib.Modes.PathEditMode.PointType.NONE;
     }
 
+    public bool check_tangents_inline () {
+        var tangent_mid_x = (tangent_1.x + tangent_2.x) / 2.0;
+        var tangent_mid_y = (tangent_1.y + tangent_2.y) / 2.0;
+
+        double err_x = (tangent_mid_x - curve_begin.x).abs ();
+        double err_y = (tangent_mid_y - curve_begin.y).abs ();
+
+        if (err_x <= double.EPSILON && err_y <= double.EPSILON) {
+            return true;
+        }
+
+        return false;
+    }
+
     public void translate (double dx, double dy) {
         if (type == Lib.Modes.PathEditMode.Type.LINE) {
             line_end = Geometry.Point (line_end.x - dx, line_end.y - dy);
@@ -202,6 +212,22 @@ public struct Akira.Utils.PathSegment {
         }
     }
 
+    public void move_tangents (double delta_x, double delta_y, bool is_tan1_reference) {
+        if (is_tan1_reference) {
+            tangent_1.x -= delta_x;
+            tangent_1.y -= delta_y;
+
+            tangent_2.x += delta_x;
+            tangent_2.y += delta_y;
+        } else {
+            tangent_1.x += delta_x;
+            tangent_1.y += delta_y;
+
+            tangent_2.x -= delta_x;
+            tangent_2.y -= delta_y;
+        }
+    }
+
     public PathSegment.deserialized (Json.Object obj) {
         // TODO:
     }
@@ -210,9 +236,27 @@ public struct Akira.Utils.PathSegment {
         var node = new Json.Node (Json.NodeType.OBJECT);
         return node;
     }
+
+    public void to_string() {
+        if (type == Lib.Modes.PathEditMode.Type.LINE) {
+            print("Type: LINE\n");
+            print("\tPoint %f %f\n", line_end.x, line_end.y);
+        } else if (type == Lib.Modes.PathEditMode.Type.CUBIC) {
+            print("Type: CUBIC\n");
+            print("\tPoint %f %f\n", line_end.x, line_end.y);
+            print("\tPoint %f %f\n", tangent_1.x, tangent_1.y);
+            print("\tPoint %f %f\n", tangent_2.x, tangent_2.y);
+            print("\tPoint %f %f\n", curve_end.x, curve_end.y);
+        }
+    }
 }
 
 public struct Akira.Utils.SelectedPoint {
     public int sel_index;
     public Lib.Modes.PathEditMode.PointType sel_type;
+    public bool tangents_staggered;
+
+    public SelectedPoint () {
+        tangents_staggered = false;
+    }
 }
