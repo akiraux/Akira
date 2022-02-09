@@ -52,9 +52,6 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
 
     // The points in live command will be drawn every time user moves cursor.
     // Also acts as buffer for curves.
-    //  private Type live_command;
-    //  private Geometry.Point[] live_points;
-    //  private int live_idx;
     private Utils.PathSegment live_segment;
     private PointType live_pnt_type;
 
@@ -177,7 +174,7 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
         if (is_curr_command_done ()) {
             edit_model.add_live_points_to_path (live_segment);
             live_segment = Utils.PathSegment ();
-            live_pnt_type = PointType.NONE;
+            live_pnt_type = PointType.LINE_END;
         }
 
         is_click = false;
@@ -258,50 +255,35 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
     }
 
     private void handle_backspace_event () {
-        //  if (live_idx > 0) {
-        //      --live_idx;
 
-        //      // Note that for curve, there are 2 tangent points that depend on each other.
-        //      // If one of them gets deleted, delete the other too. This leaves only 1 live point.
-        //      // So the live command becomes LINE.
-        //      if (live_idx == 1 && live_segment.type == CUBIC) {
-        //          live_segment.type = Type.LINE;
-        //          live_idx = 0;
-        //      }
+        if (live_segment.type == Type.LINE || live_segment.type == Type.NONE) {
+            live_segment = edit_model.delete_last_point ();
 
-        //      edit_model.set_live_points (live_points, live_idx + 1);
-        //  } else {
-        //      var possible_live_pts = edit_model.delete_last_point ();
+            if (live_segment.type == Type.LINE) {
+                live_pnt_type = PointType.LINE_END;
+            } else {
+                live_pnt_type = PointType.CURVE_END;
+            }
+        } else if (live_segment.type == Type.CUBIC) {
+            // Here we dont include the CURVE_BEGIN case because
+            // after both tangents are deleted, we convert segment from curve to line.
+            // And TANGENT_FIRST is not included because it gets deleted
+            // automatically after TANGENT_SECOND is deleted.
+            if (live_pnt_type == PointType.TANGENT_SECOND) {
+                live_segment.type = Type.LINE;
+                live_pnt_type = PointType.LINE_END;
+            } else if (live_pnt_type == PointType.CURVE_END) {
+                live_pnt_type = PointType.TANGENT_SECOND;
+            }
+        }
 
-        //      if (possible_live_pts == null || possible_live_pts.length == 0) {
-        //          live_idx = -1;
-        //          live_command = Type.LINE;
-        //      } else {
-        //          live_points[0] = possible_live_pts[0];
-        //          live_points[1] = possible_live_pts[1];
-        //          live_points[2] = possible_live_pts[2];
+        edit_model.set_live_points (live_segment, live_pnt_type);
 
-        //          live_idx = 2;
-        //          live_command = Type.CUBIC;
-        //          edit_model.set_live_points (live_points, 3);
-        //      }
-        //  }
-
-        //  if (instance.components.path.data.length == 0) {
-        //      // Sometimes the line from live effect rendered in ViewLayerPath remains even after
-        //      // all points have been deleted. Erase this line.
-        //      var update_extents = Geometry.Rectangle ();
-        //      update_extents.left = instance.components.center.x;
-        //      update_extents.top = instance.components.center.y;
-        //      update_extents.right = live_points[0].x;
-        //      update_extents.bottom = live_points[0].y;
-
-        //      view_canvas.request_redraw (update_extents);
-
-        //      // If there are no points in the path, no point to stay in PathEditMode.
-        //      view_canvas.window.event_bus.delete_selected_items ();
-        //      view_canvas.mode_manager.deregister_active_mode ();
-        //  }
+        if (instance.components.path.data.length == 0) {
+            // If there are no points in the path, no point to stay in PathEditMode.
+            view_canvas.window.event_bus.delete_selected_items ();
+            view_canvas.mode_manager.deregister_active_mode ();
+        }
     }
 
     private bool handle_button_press_in_edit_mode (Gdk.EventButton event) {

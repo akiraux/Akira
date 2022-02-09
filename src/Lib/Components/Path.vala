@@ -23,9 +23,6 @@
 public class Akira.Lib.Components.Path : Component, Copyable<Path> {
     // Control points relative to a top-left of 0,0.
     // In the future we will probably want control points with more data.
-    // public Geometry.Point[] data;
-    // Control the path edit mode between straight line and curves.
-    // Line requires 1 points whereas, path requires 4 points.
     public Utils.PathSegment[] data;
     public bool close = false;
 

@@ -236,19 +236,6 @@ public struct Akira.Utils.PathSegment {
         var node = new Json.Node (Json.NodeType.OBJECT);
         return node;
     }
-
-    public void to_string() {
-        if (type == Lib.Modes.PathEditMode.Type.LINE) {
-            print("Type: LINE\n");
-            print("\tPoint %f %f\n", line_end.x, line_end.y);
-        } else if (type == Lib.Modes.PathEditMode.Type.CUBIC) {
-            print("Type: CUBIC\n");
-            print("\tPoint %f %f\n", line_end.x, line_end.y);
-            print("\tPoint %f %f\n", tangent_1.x, tangent_1.y);
-            print("\tPoint %f %f\n", tangent_2.x, tangent_2.y);
-            print("\tPoint %f %f\n", curve_end.x, curve_end.y);
-        }
-    }
 }
 
 public struct Akira.Utils.SelectedPoint {

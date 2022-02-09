@@ -114,8 +114,6 @@ public class Akira.Models.PathEditModel : Object {
             // TODO:
         }
 
-        //  this.live_pts = new Geometry.Point[0];
-        //  live_pts_len = 0;
         live_segment = Utils.PathSegment ();
         live_point_type = Lib.Modes.PathEditMode.PointType.NONE;
 
@@ -145,54 +143,62 @@ public class Akira.Models.PathEditModel : Object {
     public void set_live_points (Utils.PathSegment live_segment, Lib.Modes.PathEditMode.PointType type) {
         this.live_segment = live_segment;
         this.live_point_type = type;
-        //  this.live_pts_len = length;
 
         update_view ();
     }
 
-    public Geometry.Point[] delete_last_point () {
-        return new Geometry.Point[0];
-        //  bool close = instance.components.path.close;
+    public Utils.PathSegment delete_last_point () {
+        var last_segment = points[points.length - 1];
+        var new_live_pts = Utils.PathSegment ();
 
-        //  if (points[points.length - 1].type == Lib.Modes.PathEditMode.Type.LINE) {
-        //      points.resize (points.length - 1);
+        var orig_first_pt = transform_point_around_item_origin (first_point, instance.components.transform.transformation_matrix, true);
+        var transform_matrix = instance.components.transform.transformation_matrix;
 
-        //      points = recalculate_points (points);
-        //      instance.components.path = new Lib.Components.Path.from_points (points, close);
-        //      recompute_components ();
+        // If the last segment from path is a line,
+        if (last_segment.type == Lib.Modes.PathEditMode.Type.LINE) {
+            var line_end = points[points.length - 2].line_end;
+            line_end.x += orig_first_pt.x;
+            line_end.y += orig_first_pt.y;
+            line_end = transform_point_around_item_origin (line_end, transform_matrix);
 
-        //      return new Geometry.Point[0];
-        //  }
+            new_live_pts.line_end = line_end;
+            new_live_pts.type = Lib.Modes.PathEditMode.Type.LINE;
+            points.resize (points.length - 1);
+        } else if (last_segment.type == Lib.Modes.PathEditMode.Type.CUBIC) {
+            var curve_begin = last_segment.curve_begin;
+            curve_begin.x += orig_first_pt.x;
+            curve_begin.y += orig_first_pt.y;
+            curve_begin = transform_point_around_item_origin (curve_begin, transform_matrix);
 
+            var tangent_1 = last_segment.tangent_1;
+            tangent_1.x += orig_first_pt.x;
+            tangent_1.y += orig_first_pt.y;
+            tangent_1 = transform_point_around_item_origin (tangent_1, transform_matrix);
 
-        //  var orig_first_pt = transform_point_around_item_origin (first_point, instance.components.transform.transformation_matrix, true);
+            var tangent_2 = last_segment.tangent_2;
+            tangent_2.x += orig_first_pt.x;
+            tangent_2.y += orig_first_pt.y;
+            tangent_2 = transform_point_around_item_origin (tangent_2, transform_matrix);
 
-        //  var new_live_pts = new Geometry.Point[4];
-        //  new_live_pts[0] = Geometry.Point (points[points.length - 4].tangent_2.x, points[points.length - 4].tangent_2.y);
-        //  new_live_pts[1] = Geometry.Point (points[points.length - 3].tangent_1.x, points[points.length - 3].tangent_1.y);
-        //  new_live_pts[2] = Geometry.Point (points[points.length - 2].curve_begin.x, points[points.length - 2].curve_begin.y);
+            var curve_end = last_segment.curve_end;
+            curve_end.x += orig_first_pt.x;
+            curve_end.y += orig_first_pt.y;
+            curve_end = transform_point_around_item_origin (curve_end, transform_matrix);
 
-        //  new_live_pts[0].x += orig_first_pt.x;
-        //  new_live_pts[0].y += orig_first_pt.y;
+            new_live_pts.type = Lib.Modes.PathEditMode.Type.CUBIC;
+            new_live_pts.curve_begin = curve_begin;
+            new_live_pts.tangent_1 = tangent_1;
+            new_live_pts.tangent_2 = tangent_2;
+            new_live_pts.curve_end = curve_end;
 
-        //  new_live_pts[1].x += orig_first_pt.x;
-        //  new_live_pts[1].y += orig_first_pt.y;
+            points.resize (points.length - 1);
+        }
 
-        //  new_live_pts[2].x += orig_first_pt.x;
-        //  new_live_pts[2].y += orig_first_pt.y;
+        points = recalculate_points (points);
+        instance.components.path = new Lib.Components.Path.from_points (points, false);
+        recompute_components ();
 
-        //  var transform_matrix = instance.components.transform.transformation_matrix;
-        //  new_live_pts[2] = transform_point_around_item_origin (new_live_pts[2], transform_matrix);
-        //  new_live_pts[1] = transform_point_around_item_origin (new_live_pts[1], transform_matrix);
-        //  new_live_pts[0] = transform_point_around_item_origin (new_live_pts[0], transform_matrix);
-
-        //  points.resize (points.length - 1);
-
-        //  points = recalculate_points (points);
-        //  instance.components.path = new Lib.Components.Path.from_points (points, close);
-        //  recompute_components ();
-
-        //  return new_live_pts;
+        return new_live_pts;
     }
 
     /*

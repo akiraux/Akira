@@ -206,6 +206,7 @@ public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
         if (live_segment.type == Lib.Modes.PathEditMode.Type.LINE) {
             if (live_point_type == Lib.Modes.PathEditMode.PointType.LINE_END) {
                 context.line_to (live_segment.line_end.x, live_segment.line_end.y);
+                context.stroke ();
             }
         } else if (live_segment.type == Lib.Modes.PathEditMode.Type.QUADRATIC) {
         } else if (live_segment.type == Lib.Modes.PathEditMode.Type.CUBIC) {
@@ -237,19 +238,20 @@ public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
                 );
             }
 
+            // Lines for tangent in live path.
             context.move_to (live_segment.tangent_1.x, live_segment.tangent_1.y);
             context.line_to (live_segment.curve_begin.x, live_segment.curve_begin.y);
 
             context.line_to (live_segment.tangent_2.x, live_segment.tangent_2.y);
             context.stroke ();
 
+            // Control points in live path.
             context.arc (live_segment.tangent_1.x, live_segment.tangent_1.y, radius, 0, 2 * Math.PI);
             context.arc (live_segment.tangent_2.x, live_segment.tangent_2.y, radius, 0, 2 * Math.PI);
             context.arc (live_segment.curve_begin.x, live_segment.curve_begin.y, radius, 0, 2 * Math.PI);
             context.fill ();
         }
 
-        context.stroke ();
 
         context.new_path ();
         context.restore ();
