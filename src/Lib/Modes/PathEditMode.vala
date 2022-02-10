@@ -268,7 +268,7 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
     private void handle_backspace_event () {
 
         if (live_segment.type == Type.LINE || live_segment.type == Type.NONE) {
-            live_segment = edit_model.delete_last_point ();
+            live_segment = edit_model.delete_point ();
 
             if (live_segment.type == Type.LINE) {
                 live_pnt_type = PointType.LINE_END;

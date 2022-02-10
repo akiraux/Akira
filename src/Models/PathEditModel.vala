@@ -30,10 +30,8 @@ public class Akira.Models.PathEditModel : Object {
 
     public Geometry.Point first_point;
 
-    //  private Geometry.Point[] live_pts;
     private Utils.PathSegment live_segment;
     private Lib.Modes.PathEditMode.PointType live_point_type;
-    //  private int live_pts_len = -1;
 
     public Gee.HashSet<Utils.SelectedPoint?> selected_pts;
     public Utils.SelectedPoint reference_point;
@@ -165,11 +163,20 @@ public class Akira.Models.PathEditModel : Object {
         update_view ();
     }
 
-    public Utils.PathSegment delete_last_point () {
-        var last_segment = points[points.length - 1];
+    public Utils.PathSegment delete_point (int index = -1) {
+        if (index == -1) {
+            index = points.length - 1;
+        }
+
+        var last_segment = points[index];
         var new_live_pts = Utils.PathSegment ();
 
-        var orig_first_pt = transform_point_around_item_origin (first_point, instance.components.transform.transformation_matrix, true);
+        var orig_first_pt = transform_point_around_item_origin (
+            first_point,
+            instance.components.transform.transformation_matrix,
+            true
+        );
+
         var transform_matrix = instance.components.transform.transformation_matrix;
 
         // If the last segment from path is a line,
@@ -181,7 +188,6 @@ public class Akira.Models.PathEditModel : Object {
 
             new_live_pts.line_end = line_end;
             new_live_pts.type = Lib.Modes.PathEditMode.Type.LINE;
-            points.resize (points.length - 1);
         } else if (last_segment.type == Lib.Modes.PathEditMode.Type.CUBIC) {
             var curve_begin = last_segment.curve_begin;
             curve_begin.x += orig_first_pt.x;
@@ -208,11 +214,19 @@ public class Akira.Models.PathEditModel : Object {
             new_live_pts.tangent_1 = tangent_1;
             new_live_pts.tangent_2 = tangent_2;
             new_live_pts.curve_end = curve_end;
-
-            points.resize (points.length - 1);
         }
 
-        points = recalculate_points (points);
+        var new_points = new Utils.PathSegment[points.length - 1];
+        for (int i = 0, seg_idx = 0; i < points.length; ++i) {
+            if (i == index) {
+                continue;
+            }
+
+            new_points[seg_idx] = points[i];
+            ++seg_idx;
+        }
+
+        points = recalculate_points (new_points);
         instance.components.path = new Lib.Components.Path.from_points (points, false);
         recompute_components ();
 
@@ -393,6 +407,7 @@ public class Akira.Models.PathEditModel : Object {
 
     public void toggle_point_type (Utils.SelectedPoint sel_point) {
         if (points[sel_point.sel_index].type == Lib.Modes.PathEditMode.Type.LINE) {
+            // Segment before and after the segment being toggled. Needed for calculating tangents.
             Utils.PathSegment? segment_before = null;
             Utils.PathSegment? segment_after = null;
 
@@ -404,7 +419,20 @@ public class Akira.Models.PathEditModel : Object {
                 segment_after = points[sel_point.sel_index + 1];
             }
 
-            points[sel_point.sel_index].line_to_curve (segment_before, segment_after);
+            // If first segment needs to be toggled, we toggle the segment after that.
+            // This is because of the way quadratics are drawn.
+            if (segment_before == null) {
+                points[sel_point.sel_index + 1].line_to_curve (points[0], null);
+            } else {
+                points[sel_point.sel_index].line_to_curve (segment_before, segment_after);
+
+                // When line is turned to a curve, the segment after line becomes CURVE_END.
+                // So the next segment needs to be deleted.
+                if (segment_after != null) {
+                    delete_point (sel_point.sel_index + 1);
+                }
+            }
+
         } else {
             // After converting a curve to a line, the curve_end must be made a line segment,
             // so that we dont lose a segment.
@@ -412,7 +440,9 @@ public class Akira.Models.PathEditModel : Object {
             var segment_after = Utils.PathSegment.line (curr_segment.curve_end);
             points[sel_point.sel_index].curve_to_line ();
 
-            add_point_to_path (segment_after, sel_point.sel_index + 1);
+            if (curr_segment.type == Lib.Modes.PathEditMode.Type.CUBIC) {
+                add_point_to_path (segment_after, sel_point.sel_index + 1);
+            }
         }
 
         bool close = instance.components.path.close;
@@ -491,7 +521,14 @@ public class Akira.Models.PathEditModel : Object {
         double pts_center_x = instance.components.center.x - offset_x;
         double pts_center_y = instance.components.center.y - offset_y;
 
-        var quad = Geometry.Quad.from_components (pts_center_x, pts_center_y, extents_from_pts.width, extents_from_pts.height, tr);
+        var quad = Geometry.Quad.from_components (
+            pts_center_x,
+            pts_center_y,
+            extents_from_pts.width,
+            extents_from_pts.height,
+            tr
+        );
+
         var new_ext = quad.bounding_box;
 
         double radius = ViewLayers.ViewLayerPath.UI_NOB_SIZE / view_canvas.scale;
@@ -540,7 +577,11 @@ public class Akira.Models.PathEditModel : Object {
         return live_extents;
     }
 
-    private Geometry.Point transform_point_around_item_origin (Geometry.Point point, Cairo.Matrix mat, bool invert = false) {
+    private Geometry.Point transform_point_around_item_origin (
+        Geometry.Point point,
+        Cairo.Matrix mat,
+        bool invert = false
+    ) {
         var matrix = Utils.GeometryMath.multiply_matrices (Cairo.Matrix.identity (), mat);
 
         if (invert) {

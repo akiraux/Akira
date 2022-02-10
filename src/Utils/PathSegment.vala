@@ -115,18 +115,30 @@ public struct Akira.Utils.PathSegment {
         Utils.PathSegment? segment_before,
         Utils.PathSegment? segment_after
     ) {
+        // When converting to quadratic curves, this is the dist. at which tangents are placed.
+        double tangent_length = 100;
         type = Lib.Modes.PathEditMode.Type.CUBIC;
 
+        // If we are converting the first point of the segment,
+        // Make it a quadratic curve. Never occurs, but kept as safeguard.
         if (segment_before == null) {
-            // TODO: create quaratic bezier here.
+            type = Lib.Modes.PathEditMode.Type.QUADRATIC;
+            tangent_1 = Geometry.Point (curve_begin.x - tangent_length, curve_begin.y - tangent_length);
+
             return;
         }
 
+        // If last segment is being converted to curve, make it quadratic.
         if (segment_after == null) {
-            // TODO: create quadratic bezier here.
+            type = Lib.Modes.PathEditMode.Type.QUADRATIC;
+            tangent_1 = Geometry.Point (curve_begin.x + tangent_length, curve_begin.y + tangent_length);
+
             return;
         }
 
+        // For all other segments, we need to find position for tangents.
+        // Following will create tangents that are parallel to CURVE_BEGIN and CURVE_END
+        // to make result more appealing.
         Geometry.Point point_before, point_after;
 
         if (segment_before.type == Lib.Modes.PathEditMode.Type.LINE) {

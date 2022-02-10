@@ -96,7 +96,6 @@ public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
         context.save ();
 
         // Apply transform matrix of drawable so we don't have to rotate or scale.
-        //var tr = Utils.GeometryMath.multiply_matrices (path_data.transform, context.get_matrix ());
         var tr = path_data.transform;
         // For all path points, the origin is in top left corner. Move there.
         tr.translate (path_data.center.x, path_data.center.y);
@@ -117,7 +116,6 @@ public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
             var curve_end = points[i].curve_end;
 
             if (points[i].type == Lib.Modes.PathEditMode.Type.LINE) {
-                //  var pt = points[point_idx].line_end;
                 tr.transform_point (ref line_end.x, ref line_end.y);
 
                 context.arc (line_end.x, line_end.y, radius, 0, Math.PI * 2);
@@ -134,10 +132,6 @@ public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
                 // Draw control point for first tangent.
                 context.arc (tangent_1.x, tangent_1.y, radius, 0, Math.PI * 2);
                 context.fill ();
-
-                // Draw control point for curve end.
-                //  context.arc (curve_end.x, curve_end.y, radius, 0, Math.PI * 2);
-                //  context.fill ();
 
                 context.move_to (tangent_1.x, tangent_1.y);
                 context.line_to (curve_begin.x, curve_begin.y);
