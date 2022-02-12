@@ -74,7 +74,7 @@ public class Akira.Lib.Components.Fills : Component, Copyable<Fills> {
 
     public Fills.with_color (Color color) {
         data = new Fill[1];
-        data[0] = Fill(0, color);
+        data[0] = Fill (0, color);
     }
 
     public Fills.deserialized (Json.Object obj) {
