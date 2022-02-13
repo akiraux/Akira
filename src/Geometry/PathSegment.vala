@@ -65,14 +65,6 @@ public struct Akira.Utils.PathSegment {
     public Geometry.Point tangent_2;
     public Geometry.Point curve_end;
 
-    public PathSegment () {
-        type = Lib.Modes.PathEditMode.Type.NONE;
-        curve_begin = Geometry.Point (double.MAX, double.MAX);
-        tangent_1 = Geometry.Point (double.MAX, double.MAX);
-        tangent_2 = Geometry.Point (double.MAX, double.MAX);
-        curve_end = Geometry.Point (double.MAX, double.MAX);
-    }
-
     // Creates new line segment.
     public PathSegment.line (Geometry.Point point) {
         type = Lib.Modes.PathEditMode.Type.LINE;
@@ -115,6 +107,9 @@ public struct Akira.Utils.PathSegment {
         Utils.PathSegment? segment_before,
         Utils.PathSegment? segment_after
     ) {
+        // Atleast one of the segments must be present inorder to calculate tangents.
+        assert (segment_before != null && segment_after != null);
+
         // When converting to quadratic curves, this is the dist. at which tangents are placed.
         double tangent_length = 100;
         type = Lib.Modes.PathEditMode.Type.CUBIC;
@@ -195,6 +190,7 @@ public struct Akira.Utils.PathSegment {
             return curve_end;
         }
 
+        assert (false);
         return Geometry.Point (0, 0);
     }
 

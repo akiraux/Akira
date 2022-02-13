@@ -43,7 +43,6 @@ sources = files(
     'Utils/SVGUtil.vala',
     'Utils/GeometryMath.vala',
     'Utils/Bezier.vala',
-    'Utils/PathSegment.vala',
     'Utils/Delegates.vala',
 
     'Layouts/HeaderBar.vala',
@@ -161,6 +160,7 @@ sources = files(
     'Geometry/Point.vala',
     'Geometry/Rectangle.vala',
     'Geometry/Quad.vala',
+    'Geometry/PathSegment.vala'
 
 )
 
