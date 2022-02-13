@@ -60,7 +60,8 @@ public class Akira.Layouts.FillsList.FillsPanel : Gtk.Grid {
         var scrolled_window = new Gtk.ScrolledWindow (null, null) {
             hscrollbar_policy = Gtk.PolicyType.NEVER,
             vscrollbar_policy = Gtk.PolicyType.NEVER,
-            expand = true
+            expand = true,
+            margin = 3
         };
         scrolled_window.add (fills_listbox);
         attach (scrolled_window, 0, 1, 1, 1);

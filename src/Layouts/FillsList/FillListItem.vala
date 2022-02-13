@@ -23,11 +23,27 @@
  * The single color fill row.
  */
 public class Akira.Layouts.FillsList.FillListItem : VirtualizingListBoxRow {
+    public unowned Akira.Lib.ViewCanvas view_canvas { get; construct; }
+
     private FillItemModel model;
 
     private Gtk.Button color_button;
+    private Akira.Widgets.ColorField field;
 
-    construct {
+    public FillListItem (Akira.Lib.ViewCanvas canvas) {
+        Object (
+            view_canvas: canvas
+        );
+
+        var grid = new Gtk.Grid () {
+            margin = 3
+        };
+
+        var container = new Gtk.Grid ();
+        var context = container.get_style_context ();
+        context.add_class ("selected-color-container");
+        context.add_class ("bg-pattern");
+
         color_button = new Gtk.Button () {
             vexpand = true,
             width_request = 40,
@@ -35,8 +51,23 @@ public class Akira.Layouts.FillsList.FillListItem : VirtualizingListBoxRow {
             tooltip_text = _("Choose color")
         };
         color_button.get_style_context ().add_class ("selected-color");
+        container.add (color_button);
 
-        add (color_button);
+        var eyedropper_button = new Gtk.Button.from_icon_name ("color-select-symbolic", Gtk.IconSize.SMALL_TOOLBAR) {
+            can_focus = false,
+            valign = Gtk.Align.CENTER,
+            tooltip_text = _("Pick color")
+        };
+        eyedropper_button.get_style_context ().add_class ("color-picker-button");
+        // eyedropper_button.clicked.connect (on_eyedropper_click);
+
+        grid.add (container);
+        grid.add (eyedropper_button);
+
+        field = new Akira.Widgets.ColorField (view_canvas);
+        grid.add (field);
+
+        add (grid);
     }
 
     public void assign (FillItemModel data) {
@@ -44,6 +75,7 @@ public class Akira.Layouts.FillsList.FillListItem : VirtualizingListBoxRow {
         model = (FillItemModel) model_item;
 
         set_button_color (model.color);
+        field.text = Utils.Color.rgba_to_hex_string (model.color);
     }
 
     private void set_button_color (Gdk.RGBA color) {

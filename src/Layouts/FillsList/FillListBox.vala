@@ -48,7 +48,7 @@ public class Akira.Layouts.FillsList.FillListBox : VirtualizingListBox {
             if (old_widget != null) {
                 row = old_widget as FillListItem;
             } else {
-                row = new FillListItem ();
+                row = new FillListItem (view_canvas);
             }
 
             row.assign ((FillItemModel) item);
