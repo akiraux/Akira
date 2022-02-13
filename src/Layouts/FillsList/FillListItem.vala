@@ -25,12 +25,42 @@
 public class Akira.Layouts.FillsList.FillListItem : VirtualizingListBoxRow {
     private FillItemModel model;
 
+    private Gtk.Button color_button;
+
     construct {
-        add (new Gtk.Label ("Test"));
+        color_button = new Gtk.Button () {
+            vexpand = true,
+            width_request = 40,
+            can_focus = false,
+            tooltip_text = _("Choose color")
+        };
+        color_button.get_style_context ().add_class ("selected-color");
+
+        add (color_button);
     }
 
     public void assign (FillItemModel data) {
         model_item = data;
         model = (FillItemModel) model_item;
+
+        set_button_color (model.color);
+    }
+
+    private void set_button_color (Gdk.RGBA color) {
+        try {
+            var provider = new Gtk.CssProvider ();
+            var context = color_button.get_style_context ();
+            var new_color = color.to_string ();
+
+            var css = """.selected-color {
+                    background-color: %s;
+                    border-color: shade (%s, 0.75);
+                }""".printf (new_color, new_color);
+
+            provider.load_from_data (css, css.length);
+            context.add_provider (provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
+        } catch (Error e) {
+            warning ("Style error: %s", e.message);
+        }
     }
 }

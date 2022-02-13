@@ -57,9 +57,6 @@ public class Akira.Layouts.FillsList.FillListBox : VirtualizingListBox {
             return row;
         };
 
-        // When an item is selected from a click on the Fills list.
-        // row_selection_changed.connect (on_row_selection_changed);
-
         // Listen to the button release event only for the secondary click in
         // order to trigger the context menu.
         button_release_event.connect (e => {
@@ -85,6 +82,33 @@ public class Akira.Layouts.FillsList.FillListBox : VirtualizingListBox {
             var row = selected_row_widget;
             return create_context_menu (e, (FillListItem)row);
         });
+    }
+
+    public void refresh_list () {
+        if (fills.size > 0) {
+            var removed = fills.size;
+            fills.clear ();
+            list_store.remove_all ();
+            list_store.items_changed (0, removed, 0);
+        }
+
+        unowned var sm = view_canvas.selection_manager;
+        if (sm.count () == 0) {
+            return;
+        }
+
+        var added = 0;
+        foreach (var selected in sm.selection.nodes.values) {
+            var node = selected.node;
+            foreach (var fill in node.instance.components.fills.data) {
+                var item = new FillItemModel (view_canvas, node, fill.id);
+                fills[node.id] = item;
+                list_store.add (item);
+                added++;
+            }
+        }
+
+        list_store.items_changed (0, 0, added);
     }
 
     private bool create_context_menu (Gdk.Event e, FillListItem row) {

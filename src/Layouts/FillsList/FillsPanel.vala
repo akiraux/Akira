@@ -22,6 +22,8 @@
 public class Akira.Layouts.FillsList.FillsPanel : Gtk.Grid {
     public unowned Akira.Lib.ViewCanvas view_canvas { get; construct; }
 
+    private FillListBox fills_listbox;
+
     public FillsPanel (Akira.Lib.ViewCanvas canvas) {
         Object (
             view_canvas: canvas
@@ -53,12 +55,14 @@ public class Akira.Layouts.FillsList.FillsPanel : Gtk.Grid {
 
         attach (title_cont, 0, 0, 1, 1);
 
+        fills_listbox = new FillListBox (view_canvas);
+
         var scrolled_window = new Gtk.ScrolledWindow (null, null) {
             hscrollbar_policy = Gtk.PolicyType.NEVER,
             vscrollbar_policy = Gtk.PolicyType.NEVER,
             expand = true
         };
-        // scrolled_window.add (new FillListBox (view_canvas));
+        scrolled_window.add (fills_listbox);
         attach (scrolled_window, 0, 1, 1, 1);
 
         // Show the widget by default.
@@ -76,5 +80,7 @@ public class Akira.Layouts.FillsList.FillsPanel : Gtk.Grid {
 
         visible = is_visible;
         no_show_all = !is_visible;
+
+        fills_listbox.refresh_list ();
     }
 }

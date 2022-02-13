@@ -72,12 +72,12 @@ public class Akira.Layouts.FillsList.FillItemModel : GLib.Object {
     }
 
     public FillItemModel (Lib.ViewCanvas view_canvas, Lib.Items.ModelNode node, int fill_id) {
-        update_node (node);
+        update_node (node, fill_id);
         _view_canvas = view_canvas;
-        this.id = fill_id;
     }
 
-    private void update_node (Lib.Items.ModelNode new_node) {
+    private void update_node (Lib.Items.ModelNode new_node, int fill_id) {
         _cached_instance = new_node.instance;
+        this.id = fill_id;
     }
 }
