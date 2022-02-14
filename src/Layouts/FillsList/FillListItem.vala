@@ -28,7 +28,23 @@ public class Akira.Layouts.FillsList.FillListItem : VirtualizingListBoxRow {
     private FillItemModel model;
 
     private Gtk.Button color_button;
-    private Akira.Widgets.ColorField field;
+    private Widgets.ColorField color_field;
+    private Widgets.InputField opacity_field;
+
+    public class SignalBlocker {
+        private unowned FillListItem item;
+
+        public SignalBlocker (FillListItem fill_item) {
+            item = fill_item;
+            item.block_signal += 1;
+        }
+
+        ~SignalBlocker () {
+            item.block_signal -= 1;
+        }
+    }
+
+    protected int block_signal = 0;
 
     public FillListItem (Akira.Lib.ViewCanvas canvas) {
         Object (
@@ -53,29 +69,42 @@ public class Akira.Layouts.FillsList.FillListItem : VirtualizingListBoxRow {
         color_button.get_style_context ().add_class ("selected-color");
         container.add (color_button);
 
-        var eyedropper_button = new Gtk.Button.from_icon_name ("color-select-symbolic", Gtk.IconSize.SMALL_TOOLBAR) {
+        var eyedropper_button = new Gtk.Button () {
             can_focus = false,
             valign = Gtk.Align.CENTER,
             tooltip_text = _("Pick color")
         };
+        eyedropper_button.add (
+            new Gtk.Image.from_icon_name ("color-select-symbolic", Gtk.IconSize.SMALL_TOOLBAR)
+        );
         eyedropper_button.get_style_context ().add_class ("color-picker-button");
         // eyedropper_button.clicked.connect (on_eyedropper_click);
 
         grid.add (container);
         grid.add (eyedropper_button);
 
-        field = new Akira.Widgets.ColorField (view_canvas);
-        grid.add (field);
+        color_field = new Widgets.ColorField (view_canvas);
+        grid.add (color_field);
+
+        opacity_field = new Widgets.InputField (
+            view_canvas, Widgets.InputField.Unit.PERCENTAGE, 5, true, true);
+        opacity_field.entry.sensitive = true;
+        opacity_field.entry.value_changed.connect (on_opacity_changed);
+        grid.add (opacity_field);
 
         add (grid);
     }
 
     public void assign (FillItemModel data) {
+        var blocker = new SignalBlocker (this);
+        (blocker);
+
         model_item = data;
         model = (FillItemModel) model_item;
 
         set_button_color (model.color);
-        field.text = Utils.Color.rgba_to_hex_string (model.color);
+        color_field.text = Utils.Color.rgba_to_hex_string (model.color);
+        opacity_field.entry.value = Math.round (model.alpha * 100);
     }
 
     private void set_button_color (Gdk.RGBA color) {
@@ -94,5 +123,16 @@ public class Akira.Layouts.FillsList.FillListItem : VirtualizingListBoxRow {
         } catch (Error e) {
             warning ("Style error: %s", e.message);
         }
+    }
+
+    private void on_opacity_changed () {
+        if (block_signal > 0) {
+            return;
+        }
+
+        double alpha = opacity_field.entry.value / 100;
+        model.alpha = alpha;
+
+        set_button_color (model.color);
     }
 }

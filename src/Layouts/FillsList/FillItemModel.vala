@@ -45,6 +45,24 @@ public class Akira.Layouts.FillsList.FillItemModel : GLib.Object {
         }
     }
 
+    public double alpha {
+        get {
+            var fill = _cached_instance.components.fills.fill_from_id (id);
+            return fill.color.alpha;
+        }
+        set {
+            var fill = _cached_instance.components.fills.fill_from_id (id);
+            if (fill.color.alpha == value) {
+                return;
+            }
+
+            var new_color = fill.color;
+            new_color.alpha = value;
+
+            update_color (new_color, is_color_hidden);
+        }
+    }
+
     public bool is_color_hidden {
         get {
             var fill = _cached_instance.components.fills.fill_from_id (id);
