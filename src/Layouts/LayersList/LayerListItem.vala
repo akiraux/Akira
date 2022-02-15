@@ -227,7 +227,6 @@ public class Akira.Layouts.LayersList.LayerListItem : VirtualizingListBoxRow {
         is_editing = false;
     }
 
-    // TODO.
     private void toggle_lock () {
         model.locked = !model.locked;
         update_btn_lock ();

@@ -28,6 +28,9 @@ public class Akira.Layouts.FillsList.FillListItem : VirtualizingListBoxRow {
     private FillItemModel model;
 
     private Gtk.Button color_button;
+    private Gtk.Button eyedropper_button;
+    private Gtk.Button hide_button;
+    private Gtk.Button delete_button;
     private Widgets.ColorField color_field;
     private Widgets.InputField opacity_field;
 
@@ -69,7 +72,7 @@ public class Akira.Layouts.FillsList.FillListItem : VirtualizingListBoxRow {
         color_button.get_style_context ().add_class ("selected-color");
         container.add (color_button);
 
-        var eyedropper_button = new Gtk.Button () {
+        eyedropper_button = new Gtk.Button () {
             can_focus = false,
             valign = Gtk.Align.CENTER,
             tooltip_text = _("Pick color")
@@ -92,6 +95,27 @@ public class Akira.Layouts.FillsList.FillListItem : VirtualizingListBoxRow {
         opacity_field.entry.value_changed.connect (on_opacity_changed);
         grid.add (opacity_field);
 
+        hide_button = new Gtk.Button () {
+            valign = Gtk.Align.CENTER,
+            can_focus = false,
+            margin_start = 3
+        };
+        hide_button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
+        hide_button.get_style_context ().add_class ("button-rounded");
+        hide_button.clicked.connect (toggle_color_visibility);
+        grid.add (hide_button);
+
+        delete_button = new Gtk.Button.from_icon_name ("user-trash-symbolic", Gtk.IconSize.SMALL_TOOLBAR) {
+            valign = Gtk.Align.CENTER,
+            can_focus = false,
+            tooltip_text = _("Remove color"),
+            margin_start = 3
+        };
+        delete_button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
+        delete_button.get_style_context ().add_class ("button-rounded");
+        delete_button.clicked.connect (delete_fill);
+        grid.add (delete_button);
+
         add (grid);
     }
 
@@ -105,6 +129,7 @@ public class Akira.Layouts.FillsList.FillListItem : VirtualizingListBoxRow {
         set_button_color (model.color);
         color_field.text = Utils.Color.rgba_to_hex_string (model.color);
         opacity_field.entry.value = Math.round (model.alpha * 100);
+        update_hide_button ();
     }
 
     private void set_button_color (Gdk.RGBA color) {
@@ -134,5 +159,38 @@ public class Akira.Layouts.FillsList.FillListItem : VirtualizingListBoxRow {
         model.alpha = alpha;
 
         set_button_color (model.color);
+    }
+
+    private void toggle_color_visibility () {
+        model.is_color_hidden = !model.is_color_hidden;
+        update_hide_button ();
+    }
+
+    private void update_hide_button () {
+        if (model.is_color_hidden) {
+            hide_button.get_style_context ().add_class ("active");
+            hide_button.image = new Gtk.Image.from_icon_name ("layer-hidden-symbolic", Gtk.IconSize.MENU);
+            hide_button.tooltip_text = _("Show color");
+            get_style_context ().add_class ("disabled");
+            selectable = false;
+            color_button.sensitive = false;
+            eyedropper_button.sensitive = false;
+            color_field.sensitive = false;
+            opacity_field.sensitive = false;
+        } else {
+            hide_button.get_style_context ().remove_class ("active");
+            hide_button.image = new Gtk.Image.from_icon_name ("layer-visible-symbolic", Gtk.IconSize.MENU);
+            hide_button.tooltip_text = _("Hide color");
+            get_style_context ().remove_class ("disabled");
+            selectable = true;
+            color_button.sensitive = true;
+            eyedropper_button.sensitive = true;
+            color_field.sensitive = true;
+            opacity_field.sensitive = true;
+        }
+    }
+
+    private void delete_fill () {
+
     }
 }
