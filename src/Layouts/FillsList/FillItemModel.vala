@@ -28,7 +28,7 @@ public class Akira.Layouts.FillsList.FillItemModel : GLib.Object {
 
     private Lib.Items.ModelInstance _cached_instance;
 
-    private int id;
+    public int id;
 
     public Gdk.RGBA color {
         get {
@@ -85,6 +85,16 @@ public class Akira.Layouts.FillsList.FillItemModel : GLib.Object {
 
         var new_color = Lib.Components.Color.from_rgba (color, hidden);
         node.instance.components.fills.replace (Lib.Components.Fills.Fill (id, new_color));
+        im.item_model.alert_node_changed (node, Lib.Components.Component.Type.COMPILED_FILL);
+        im.compile_model ();
+    }
+
+    public void delete () {
+        unowned var im = _view_canvas.items_manager;
+        var node = im.item_model.node_from_id (_cached_instance.id);
+        assert (node != null);
+
+        node.instance.components.fills.remove (id);
         im.item_model.alert_node_changed (node, Lib.Components.Component.Type.COMPILED_FILL);
         im.compile_model ();
     }

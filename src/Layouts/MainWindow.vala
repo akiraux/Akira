@@ -92,4 +92,8 @@ public class Akira.Layouts.MainWindow : Gtk.Grid {
         layers_sidebar.layers_listbox.clear_list ();
         layers_sidebar.layers_listbox.regenerate_list (go_to_layer);
     }
+
+    public void refresh_fills () {
+        options_sidebar.fills_panel.fills_listbox.refresh_list ();
+    }
 }

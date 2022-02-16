@@ -22,7 +22,7 @@
 public class Akira.Layouts.FillsList.FillsPanel : Gtk.Grid {
     public unowned Akira.Lib.ViewCanvas view_canvas { get; construct; }
 
-    private FillListBox fills_listbox;
+    public FillListBox fills_listbox;
 
     public FillsPanel (Akira.Lib.ViewCanvas canvas) {
         Object (
@@ -48,6 +48,7 @@ public class Akira.Layouts.FillsList.FillsPanel : Gtk.Grid {
             halign = Gtk.Align.CENTER,
             tooltip_text = _("Add fill color")
         };
+        add_btn.clicked.connect (add_fill);
         add_btn.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
 
         title_cont.attach (label, 0, 0, 1, 1);
@@ -82,6 +83,25 @@ public class Akira.Layouts.FillsList.FillsPanel : Gtk.Grid {
         visible = is_visible;
         no_show_all = !is_visible;
 
+        fills_listbox.refresh_list ();
+    }
+
+    private void add_fill () {
+        unowned var sm = view_canvas.selection_manager;
+        if (sm.count () == 0) {
+            return;
+        }
+
+        var fill_rgba = Gdk.RGBA ();
+        fill_rgba.parse (settings.fill_color);
+        var fill = Lib.Components.Fills.Fill (-1, Lib.Components.Color.from_rgba (fill_rgba));
+
+        unowned var im = _view_canvas.items_manager;
+        foreach (var selected in sm.selection.nodes.values) {
+            selected.node.instance.components.fills.append (fill);
+            im.item_model.alert_node_changed (selected.node, Lib.Components.Component.Type.COMPILED_FILL);
+        }
+        im.compile_model ();
         fills_listbox.refresh_list ();
     }
 }

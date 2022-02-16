@@ -191,6 +191,7 @@ public class Akira.Layouts.FillsList.FillListItem : VirtualizingListBoxRow {
     }
 
     private void delete_fill () {
-
+        model.delete ();
+        view_canvas.window.main_window.refresh_fills ();
     }
 }
