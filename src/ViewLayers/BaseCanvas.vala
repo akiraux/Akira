@@ -60,6 +60,8 @@ public class Akira.ViewLayers.BaseCanvas : Gtk.Widget , Gtk.Scrollable {
 
     private Gee.TreeMap<string, ViewLayers.ViewLayer> overlays;
 
+    public Drawables.Drawable.DrawType p_draw_type { get; set; default = Drawables.Drawable.DrawType.NORMAL; }
+
     public double scale {
         get { return p_scale; }
         set { this.internal_set_scale (value); }
@@ -640,7 +642,7 @@ public class Akira.ViewLayers.BaseCanvas : Gtk.Widget , Gtk.Scrollable {
 
     public void draw_model_node (Lib.Items.ModelNode node, Cairo.Context context, Geometry.Rectangle bounds) {
         if (node.instance.drawable != null) {
-            node.instance.drawable.paint (context, bounds, scale);
+            node.instance.drawable.paint (context, bounds, scale, p_draw_type);
         }
 
         if (node.children != null) {

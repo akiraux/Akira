@@ -36,6 +36,11 @@ public class Akira.Drawables.Drawable {
         OUTSIDE
     }
 
+    public enum DrawType {
+        NORMAL,
+        XRAY
+    }
+
     // Style
     public double line_width { get; set; default = 0; }
     public Gdk.RGBA fill_rgba { get; set; default = Gdk.RGBA (); }
@@ -120,14 +125,14 @@ public class Akira.Drawables.Drawable {
         simple_create_path (context);
 
         /* Check the filled path, if required. */
-        if (set_fill_options (context)) {
+        if (set_fill_options (context, DrawType.NORMAL)) {
             if (context.in_fill (user_x, user_y)) {
                 add_item = true;
             }
         }
 
         /* Check the stroke, if required. */
-        if (set_stroke_options (context)) {
+        if (set_stroke_options (context, DrawType.NORMAL)) {
             context.set_matrix (global_transform);
             user_x = x - tr.x0;
             user_y = y - tr.y0;
@@ -151,18 +156,21 @@ public class Akira.Drawables.Drawable {
     /*
      * Main paint method.
      */
-    public virtual void paint (Cairo.Context context, Geometry.Rectangle target_bounds, double scale) {
+    public virtual void paint (Cairo.Context context, Geometry.Rectangle target_bounds, double scale, DrawType draw_type) {
         // Simple bounds check
         if (bounds.left > target_bounds.right || bounds.right < target_bounds.left
             || bounds.top > target_bounds.bottom || bounds.bottom < target_bounds.top) {
           return;
         }
 
-        context.save ();
         Cairo.Matrix global_transform = context.get_matrix ();
 
+        context.save ();
+
+        var normal_draw = draw_type == DrawType.NORMAL;
+
         // The clipping path is in global coordinates, so we can ignore the transformation.
-        if (clipping_path != null) {
+        if (normal_draw && clipping_path != null) {
             context.move_to (clipping_path.tl_x, clipping_path.tl_y);
             context.line_to (clipping_path.tr_x, clipping_path.tr_y);
             context.line_to (clipping_path.br_x, clipping_path.br_y);
@@ -178,7 +186,7 @@ public class Akira.Drawables.Drawable {
 
         simple_create_path (context);
 
-        if (set_fill_options (context)) {
+        if (set_fill_options (context, draw_type)) {
             context.fill_preserve ();
         }
 
@@ -186,7 +194,7 @@ public class Akira.Drawables.Drawable {
         // the matrix does not affect the path already generated.
         context.set_matrix (global_transform);
 
-        if (set_stroke_options (context)) {
+        if (set_stroke_options (context, draw_type)) {
             context.stroke ();
         }
 
@@ -295,7 +303,7 @@ public class Akira.Drawables.Drawable {
         var fill_bounds = Geometry.Rectangle ();
         var stroke_bounds = Geometry.Rectangle ();
 
-        set_fill_options (context);
+        set_fill_options (context, DrawType.NORMAL);
 
         simple_create_path (context);
 
@@ -308,7 +316,7 @@ public class Akira.Drawables.Drawable {
             out fill_bounds.bottom
         );
 
-        set_stroke_options (context);
+        set_stroke_options (context, DrawType.NORMAL);
 
         context.stroke_extents (
             out stroke_bounds.left,
@@ -371,13 +379,23 @@ public class Akira.Drawables.Drawable {
         canvas.request_redraw (bounds);
     }
 
-    public bool set_fill_options (Cairo.Context context) {
+    public bool set_fill_options (Cairo.Context context, DrawType draw_type) {
+        if (draw_type == DrawType.XRAY) {
+            return false;
+        }
         context.set_source_rgba (fill_rgba.red, fill_rgba.green, fill_rgba.blue, fill_rgba.alpha);
         context.set_antialias (Cairo.Antialias.GRAY);
         return true;
     }
 
-    public bool set_stroke_options (Cairo.Context context) {
+    public bool set_stroke_options (Cairo.Context context, DrawType draw_type) {
+        if (draw_type == DrawType.XRAY) {
+            context.set_source_rgba (0.0, 0.0, 0.0, 1.0);
+            context.set_line_width (1);
+            context.set_antialias (Cairo.Antialias.GRAY);
+            return true;
+        }
+
         context.set_source_rgba (stroke_rgba.red, stroke_rgba.green, stroke_rgba.blue, stroke_rgba.alpha);
         context.set_line_width (line_width);
         context.set_antialias (Cairo.Antialias.GRAY);
