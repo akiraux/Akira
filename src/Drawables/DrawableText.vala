@@ -44,7 +44,7 @@ public class Akira.Drawables.DrawableText : Drawable {
         context.rectangle (x, y, w, h);
     }
 
-    public override void paint (Cairo.Context context, Geometry.Rectangle target_bounds, double scale, DrawType draw_type) {
+    public override void paint (Cairo.Context context, Geometry.Rectangle target_bounds, double scale, Drawable.DrawType draw_type) {
         // Simple bounds check
         if (bounds.left > target_bounds.right || bounds.right < target_bounds.left
             || bounds.top > target_bounds.bottom || bounds.bottom < target_bounds.top) {
