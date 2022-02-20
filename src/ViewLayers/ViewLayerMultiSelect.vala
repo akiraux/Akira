@@ -94,7 +94,7 @@ public class Akira.ViewLayers.ViewLayerMultiSelect : ViewLayer {
         drawable.fill_rgba = fill;
         drawable.line_width = UI_LINE_WIDTH / scale;
         drawable.stroke_rgba = stroke;
-        drawable.paint (context, target_bounds, scale);
+        drawable.paint (context, target_bounds, scale, Drawables.Drawable.DrawType.NORMAL);
 
         last_drawn_bb = drawable.bounds;
 
