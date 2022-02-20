@@ -64,8 +64,8 @@ public class Akira.Drawables.DrawableArtboard : Drawable {
         Drawables.DrawableRect.rect_path (context, this);
     }
 
-    public override void paint (Cairo.Context context, Geometry.Rectangle target_bounds, double scale) {
-        base.paint (context, target_bounds, scale);
+    public override void paint (Cairo.Context context, Geometry.Rectangle target_bounds, double scale, Drawable.DrawType draw_type) {
+        base.paint (context, target_bounds, scale, draw_type);
 
         draw_text (context, scale);
     }
