@@ -27,15 +27,15 @@ public class Akira.Layouts.FillsList.FillListItem : VirtualizingListBoxRow {
 
     private FillItemModel model;
 
-    // private Gtk.Popover color_popover;
+    private Gtk.Popover color_popover;
     private Gtk.Button color_button;
     private Gtk.Button eyedropper_button;
     private Gtk.Button hide_button;
     private Gtk.Button delete_button;
     private Widgets.ColorField color_field;
     private Widgets.InputField opacity_field;
-    private Akira.Utils.ColorPicker? eyedropper = null;
-    // private Gtk.ColorChooserWidget? color_chooser = null;
+    private Widgets.ColorPicker? eyedropper = null;
+    private Widgets.ColorChooser? color_chooser = null;
 
     public class SignalBlocker {
         private unowned FillListItem item;
@@ -73,6 +73,11 @@ public class Akira.Layouts.FillsList.FillListItem : VirtualizingListBoxRow {
             tooltip_text = _("Choose color")
         };
         color_button.get_style_context ().add_class ("selected-color");
+
+        color_popover = new Gtk.Popover (color_button) {
+            position = Gtk.PositionType.BOTTOM
+        };
+        color_button.clicked.connect (on_color_button_clicked);
         container.add (color_button);
 
         eyedropper_button = new Gtk.Button () {
@@ -228,11 +233,9 @@ public class Akira.Layouts.FillsList.FillListItem : VirtualizingListBoxRow {
         view_canvas.window.main_window.refresh_fills ();
     }
 
-    private void init_color_chooser () {}
-
     private void on_eyedropper_click () {
         if (eyedropper == null) {
-            eyedropper = new Akira.Utils.ColorPicker ();
+            eyedropper = new Widgets.ColorPicker ();
         }
         eyedropper.show_all ();
 
@@ -240,7 +243,6 @@ public class Akira.Layouts.FillsList.FillListItem : VirtualizingListBoxRow {
             var blocker = new SignalBlocker (this);
             (blocker);
 
-            init_color_chooser ();
             model.color = picked_color;
             set_button_color ();
             set_color_field ();
@@ -251,5 +253,35 @@ public class Akira.Layouts.FillsList.FillListItem : VirtualizingListBoxRow {
         eyedropper.cancelled.connect (() => {
             eyedropper.close ();
         });
+    }
+
+    private void init_color_chooser () {
+        if (color_chooser != null) {
+            return;
+        }
+
+        color_chooser = new Widgets.ColorChooser ();
+
+        color_chooser.color_changed.connect (color => {
+            model.color = color;
+            var blocker = new SignalBlocker (this);
+            (blocker);
+
+            set_button_color ();
+            set_color_field ();
+            set_opacity_field ();
+        });
+        color_popover.add (color_chooser);
+    }
+
+    private void on_color_button_clicked () {
+        if (color_chooser == null) {
+            init_color_chooser ();
+        }
+
+        var blocker = new SignalBlocker (this);
+        (blocker);
+        color_chooser.set_color (model.color);
+        color_popover.popup ();
     }
 }

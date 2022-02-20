@@ -36,7 +36,6 @@ sources = files(
     'Utils/Color.vala',
     'Utils/Image.vala',
     'Utils/ItemAlignment.vala',
-    'Utils/ColorPicker.vala',
     'Utils/ModelUtil.vala',
     'Utils/Nobs.vala',
     'Utils/Snapping.vala',
@@ -69,8 +68,9 @@ sources = files(
 
     'Widgets/AddColorButton.vala',
     'Widgets/ButtonImage.vala',
+    'Widgets/ColorChooser.vala',
     'Widgets/ColorField.vala',
-    #'Widgets/ColorRow.vala',
+    'Widgets/ColorPicker.vala',
     #'Widgets/ExportWidget.vala',
     'Widgets/HeaderBarButton.vala',
     'Widgets/InputField.vala',
