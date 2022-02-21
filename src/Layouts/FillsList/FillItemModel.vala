@@ -23,78 +23,34 @@
  * Simple Object to be handled by the FillsListBoxModel and to give easy access
  * the fill component of the Lib.Items.ModelNode.
  */
-public class Akira.Layouts.FillsList.FillItemModel : GLib.Object {
+public class Akira.Layouts.FillsList.FillItemModel : Models.ColorModel {
     private unowned Akira.Lib.ViewCanvas _view_canvas;
 
     private Lib.Items.ModelInstance _cached_instance;
 
-    public int id;
+    public int fill_id;
 
-    public Gdk.RGBA color {
-        get {
-            var fill = _cached_instance.components.fills.fill_from_id (id);
-            return fill.color;
+    public override void on_value_changed () {
+        if (block_signal > 0) {
+            return;
         }
-        set {
-            var fill = _cached_instance.components.fills.fill_from_id (id);
-            if (fill.color == value) {
-                return;
-            }
 
-            update_color (value, is_color_hidden);
-        }
-    }
-
-    public double alpha {
-        get {
-            var fill = _cached_instance.components.fills.fill_from_id (id);
-            return fill.color.alpha;
-        }
-        set {
-            var fill = _cached_instance.components.fills.fill_from_id (id);
-            if (fill.color.alpha == value) {
-                return;
-            }
-
-            var new_color = fill.color;
-            new_color.alpha = value;
-
-            update_color (new_color, is_color_hidden);
-        }
-    }
-
-    public bool is_color_hidden {
-        get {
-            var fill = _cached_instance.components.fills.fill_from_id (id);
-            return fill.is_color_hidden;
-        }
-        set {
-            var fill = _cached_instance.components.fills.fill_from_id (id);
-            if (fill.is_color_hidden == value) {
-                return;
-            }
-
-            update_color (color, value);
-        }
-    }
-
-    private void update_color (Gdk.RGBA color, bool hidden) {
         unowned var im = _view_canvas.items_manager;
         var node = im.item_model.node_from_id (_cached_instance.id);
         assert (node != null);
 
         var new_color = Lib.Components.Color.from_rgba (color, hidden);
-        node.instance.components.fills.replace (Lib.Components.Fills.Fill (id, new_color));
+        node.instance.components.fills.replace (Lib.Components.Fills.Fill (fill_id, new_color));
         im.item_model.alert_node_changed (node, Lib.Components.Component.Type.COMPILED_FILL);
         im.compile_model ();
     }
 
-    public void delete () {
+    public override void delete () {
         unowned var im = _view_canvas.items_manager;
         var node = im.item_model.node_from_id (_cached_instance.id);
         assert (node != null);
 
-        node.instance.components.fills.remove (id);
+        node.instance.components.fills.remove (fill_id);
         im.item_model.alert_node_changed (node, Lib.Components.Component.Type.COMPILED_FILL);
         im.compile_model ();
     }
@@ -106,6 +62,13 @@ public class Akira.Layouts.FillsList.FillItemModel : GLib.Object {
 
     private void update_node (Lib.Items.ModelNode new_node, int fill_id) {
         _cached_instance = new_node.instance;
-        this.id = fill_id;
+        this.fill_id = fill_id;
+
+        var blocker = new SignalBlocker (this);
+        (blocker);
+
+        var fill = _cached_instance.components.fills.fill_from_id (fill_id);
+        color = fill.color;
+        hidden = fill.hidden;
     }
 }

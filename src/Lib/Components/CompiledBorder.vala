@@ -74,7 +74,7 @@ public class Akira.Lib.Components.CompiledBorder : Copyable<CompiledBorder> {
         // Loop through all the configured borders and reload the color.
         for (var i = 0; i < borders.data.length; ++i) {
             // Skip if the border is hidden as we don't need to blend colors.
-            if (borders.data[i].is_color_hidden ()) {
+            if (borders.data[i].hidden ()) {
                 continue;
             }
 

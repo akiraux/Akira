@@ -68,6 +68,7 @@ sources = files(
 
     'Widgets/AddColorButton.vala',
     'Widgets/ButtonImage.vala',
+    'Widgets/ColorButton.vala',
     'Widgets/ColorChooser.vala',
     'Widgets/ColorField.vala',
     'Widgets/ColorPicker.vala',
@@ -76,6 +77,7 @@ sources = files(
     'Widgets/InputField.vala',
     'Widgets/LinkedInput.vala',
     'Widgets/MenuButton.vala',
+    'Widgets/OpacityField.vala',
     'Widgets/RoundedColorButton.vala',
     'Widgets/ZoomButton.vala',
 
@@ -92,7 +94,7 @@ sources = files(
     'ViewLayers/ViewLayerPath.vala',
     'ViewLayers/ViewLayerMultiSelect.vala',
 
-    #'Models/ColorModel.vala',
+    'Models/ColorModel.vala',
     #'Models/ExportModel.vala',
     #'Models/ListModel.vala',
     'Models/PathEditModel.vala',

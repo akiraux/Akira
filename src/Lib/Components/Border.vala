@@ -51,7 +51,7 @@ public class Akira.Lib.Components.Border {
 
         public int id () { return _id; }
         public Gdk.RGBA color () { return _color.rgba; }
-        public bool is_color_hidden () { return _color.hidden; }
+        public bool hidden () { return _color.hidden; }
         public int size () { return _size; }
 
         // Mutators
@@ -76,7 +76,7 @@ public class Akira.Lib.Components.Border {
 
     public int id () { return _data._id; }
     public Gdk.RGBA color () { return _data._color.rgba; }
-    public bool is_color_hidden () { return _data._color.hidden; }
+    public bool hidden () { return _data._color.hidden; }
     public int size () { return _data._size; }
 
 }

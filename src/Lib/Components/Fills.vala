@@ -45,7 +45,7 @@ public class Akira.Lib.Components.Fills : Component, Copyable<Fills> {
                 return _color.rgba;
             }
         }
-        public bool is_color_hidden {
+        public bool hidden {
             get {
                 return _color.hidden;
             }

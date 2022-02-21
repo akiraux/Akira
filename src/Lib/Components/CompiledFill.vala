@@ -65,7 +65,7 @@ public class Akira.Lib.Components.CompiledFill : Copyable<CompiledFill> {
         // Loop through all the configured fills.
         for (var i = 0; i < fills.data.length; ++i) {
             // Skip if the fill is hidden as we don't need to blend colors.
-            if (fills.data[i].is_color_hidden) {
+            if (fills.data[i].hidden) {
                 continue;
             }
 

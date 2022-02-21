@@ -23,21 +23,6 @@
  * Helper class to create a container for the GtkColorChooser.
  */
 public class Akira.Widgets.ColorChooser : Gtk.Grid {
-    public class SignalBlocker {
-        private unowned ColorChooser chooser;
-
-        public SignalBlocker (ColorChooser fill_chooser) {
-            chooser = fill_chooser;
-            chooser.block_signal += 1;
-        }
-
-        ~SignalBlocker () {
-            chooser.block_signal -= 1;
-        }
-    }
-
-    protected int block_signal = 0;
-
     public signal void color_changed (Gdk.RGBA color);
 
     private Gtk.ColorChooserWidget chooser;
@@ -145,15 +130,10 @@ public class Akira.Widgets.ColorChooser : Gtk.Grid {
     }
 
     public void set_color (Gdk.RGBA color) {
-        var blocker = new SignalBlocker (this);
-        (blocker);
         chooser.set_rgba (color);
     }
 
     private void on_color_changed () {
-        if (block_signal > 0) {
-            return;
-        }
         color_changed (chooser.get_rgba ());
     }
 }
