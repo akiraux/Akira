@@ -74,6 +74,8 @@ public class Akira.Widgets.ColorButton : Gtk.Button {
      * Update the color of the button when the model changed.
      */
     private void on_model_changed () {
+        sensitive = !model.hidden;
+
         var new_color = model.color.to_string ();
         if (new_color == current_color) {
             return;

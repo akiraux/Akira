@@ -85,6 +85,7 @@ public class Akira.Widgets.OpacityField : Gtk.Grid {
      * Update the entry value when the model changed.
      */
     private void on_model_changed () {
+        sensitive = !model.hidden;
         if (field.entry.value / 100 == model.color.alpha) {
             return;
         }

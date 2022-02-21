@@ -73,6 +73,7 @@ public class Akira.Widgets.ColorField : Gtk.Entry {
         (blocker);
 
         text = Utils.Color.rgba_to_hex_string (model.color);
+        sensitive = !model.hidden;
     }
 
     private void on_changed () {

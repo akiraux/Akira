@@ -28,12 +28,13 @@ public class Akira.Layouts.FillsList.FillListItem : VirtualizingListBoxRow {
     private FillItemModel model;
 
     private Widgets.ColorButton color_button;
-    private Gtk.Button eyedropper_button;
-    private Gtk.Button hide_button;
-    private Gtk.Button delete_button;
     private Widgets.ColorField color_field;
     private Widgets.OpacityField opacity_field;
-    private Widgets.ColorPicker? eyedropper = null;
+    private Widgets.EyeDropperButton eyedropper_button;
+    private Widgets.HideButton hide_button;
+    private Gtk.Button delete_button;
+
+    private bool? current_state = null;
 
     public FillListItem (Akira.Lib.ViewCanvas canvas) {
         Object (
@@ -52,17 +53,7 @@ public class Akira.Layouts.FillsList.FillListItem : VirtualizingListBoxRow {
         color_button = new Widgets.ColorButton ();
         container.add (color_button);
 
-        eyedropper_button = new Gtk.Button () {
-            can_focus = false,
-            valign = Gtk.Align.CENTER,
-            tooltip_text = _("Pick color")
-        };
-        eyedropper_button.add (
-            new Gtk.Image.from_icon_name ("color-select-symbolic", Gtk.IconSize.SMALL_TOOLBAR)
-        );
-        eyedropper_button.get_style_context ().add_class ("color-picker-button");
-        eyedropper_button.clicked.connect (on_eyedropper_click);
-
+        eyedropper_button = new Widgets.EyeDropperButton () {};
         grid.add (container);
         grid.add (eyedropper_button);
 
@@ -72,14 +63,7 @@ public class Akira.Layouts.FillsList.FillListItem : VirtualizingListBoxRow {
         opacity_field = new Widgets.OpacityField (view_canvas);
         grid.add (opacity_field);
 
-        hide_button = new Gtk.Button () {
-            valign = Gtk.Align.CENTER,
-            can_focus = false,
-            margin_start = 3
-        };
-        hide_button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
-        hide_button.get_style_context ().add_class ("button-rounded");
-        hide_button.clicked.connect (toggle_color_visibility);
+        hide_button = new Widgets.HideButton () {};
         grid.add (hide_button);
 
         delete_button = new Gtk.Button.from_icon_name ("user-trash-symbolic", Gtk.IconSize.SMALL_TOOLBAR) {
@@ -96,64 +80,41 @@ public class Akira.Layouts.FillsList.FillListItem : VirtualizingListBoxRow {
         add (grid);
     }
 
+    ~FillListItem () {
+        model.value_changed.disconnect (on_model_changed);
+    }
+
     public void assign (FillItemModel data) {
         model_item = data;
         model = (FillItemModel) model_item;
         color_button.assign (model);
         color_field.assign (model);
         opacity_field.assign (model);
+        hide_button.assign (model);
+        eyedropper_button.assign (model);
 
-        update_hide_button ();
+        model.value_changed.connect (on_model_changed);
+        on_model_changed ();
     }
 
-    private void toggle_color_visibility () {
-        model.hidden = !model.hidden;
-        update_hide_button ();
-    }
-
-    private void update_hide_button () {
-        if (model.hidden) {
-            hide_button.get_style_context ().add_class ("active");
-            hide_button.image = new Gtk.Image.from_icon_name ("layer-hidden-symbolic", Gtk.IconSize.MENU);
-            hide_button.tooltip_text = _("Show color");
-            get_style_context ().add_class ("disabled");
-            selectable = false;
-            color_button.sensitive = false;
-            eyedropper_button.sensitive = false;
-            color_field.sensitive = false;
-            opacity_field.sensitive = false;
+    private void on_model_changed () {
+        if (current_state == model.hidden) {
             return;
         }
 
-        hide_button.get_style_context ().remove_class ("active");
-        hide_button.image = new Gtk.Image.from_icon_name ("layer-visible-symbolic", Gtk.IconSize.MENU);
-        hide_button.tooltip_text = _("Hide color");
-        get_style_context ().remove_class ("disabled");
-        selectable = true;
-        color_button.sensitive = true;
-        eyedropper_button.sensitive = true;
-        color_field.sensitive = true;
-        opacity_field.sensitive = true;
+        if (model.hidden) {
+            get_style_context ().add_class ("disabled");
+            selectable = false;
+        } else {
+            get_style_context ().remove_class ("disabled");
+            selectable = true;
+        }
+
+        current_state = model.hidden;
     }
 
     private void delete_fill () {
         model.delete ();
         view_canvas.window.main_window.refresh_fills ();
-    }
-
-    private void on_eyedropper_click () {
-        if (eyedropper == null) {
-            eyedropper = new Widgets.ColorPicker ();
-        }
-        eyedropper.show_all ();
-
-        eyedropper.picked.connect ((picked_color) => {
-            model.color = picked_color;
-            eyedropper.close ();
-        });
-
-        eyedropper.cancelled.connect (() => {
-            eyedropper.close ();
-        });
     }
 }
