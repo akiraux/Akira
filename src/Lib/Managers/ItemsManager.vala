@@ -458,18 +458,12 @@ public class Akira.Lib.Managers.ItemsManager : Object, Items.ModelListener {
     */
 
     public Lib.Items.ModelInstance add_debug_rect (double x, double y) {
-        //var new_rect = Lib.Items.ModelTypeRect.default_rect (
-        //    new Lib.Components.Coordinates (x, y),
-        //    new Lib.Components.Size (50.0, 50.0, false),
-        //    new Lib.Components.Borders.single_color (Lib.Components.Color (0.3, 0.3, 0.3, 1.0), 2),
-        //    new Lib.Components.Fills.single_color (Lib.Components.Color (0.0, 0.0, 0.0, 1.0))
-        //);
         var new_rect = Lib.Items.ModelTypeEllipse.default_ellipse (
             //new Lib.Components.Coordinates (x + i * 60, y),
             new Lib.Components.Coordinates (x, y),
             new Lib.Components.Size (50.0, 50.0, false),
             new Lib.Components.Borders.single_color (Lib.Components.Color (0.3, 0.3, 0.3, 1.0), 2),
-            new Lib.Components.Fills.single_color (Lib.Components.Color (0.0, 0.0, 0.0, 1.0))
+            new Lib.Components.Fills.with_color (Lib.Components.Color (0.0, 0.0, 0.0, 1.0))
         );
 
         add_item_to_origin (new_rect);
@@ -500,20 +494,13 @@ public class Akira.Lib.Managers.ItemsManager : Object, Items.ModelListener {
         for (var i = 0; i < num_of; ++i) {
             x = GLib.Random.double_range (0, 1000);
             y = GLib.Random.double_range (0, 1000);
-            //var new_rect = Lib.Items.ModelTypeRect.default_rect (
-            //    //new Lib.Components.Coordinates (x + i * 60, y),
-            //    new Lib.Components.Coordinates (x, y),
-            //    new Lib.Components.Size (50.0, 50.0, false),
-            //    new Lib.Components.Borders.single_color (Lib.Components.Color (0.3, 0.3, 0.3, 1.0), 2),
-            //    new Lib.Components.Fills.single_color (Lib.Components.Color (0.0, 0.0, 0.0, 1.0))
-            //);
 
             var new_rect = Lib.Items.ModelTypeEllipse.default_ellipse (
                 //new Lib.Components.Coordinates (x + i * 60, y),
                 new Lib.Components.Coordinates (x, y),
                 new Lib.Components.Size (50.0, 50.0, false),
                 new Lib.Components.Borders.single_color (Lib.Components.Color (0.3, 0.3, 0.3, 1.0), 2),
-                new Lib.Components.Fills.single_color (Lib.Components.Color (0.0, 0.0, 0.0, 1.0))
+                new Lib.Components.Fills.with_color (Lib.Components.Color (0.0, 0.0, 0.0, 1.0))
             );
 
             add_item_to_group (group.id, new_rect, true);

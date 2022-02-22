@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 Alecaddd (https://alecaddd.com)
+ * Copyright (c) 2019-2022 Alecaddd (https://alecaddd.com)
  *
  * This file is part of Akira.
  *
@@ -20,30 +20,77 @@
  */
 
 public class Akira.Widgets.ColorField : Gtk.Entry {
-    private unowned Akira.Window window;
+    private unowned Models.ColorModel model;
 
-    public ColorField (Akira.Window window) {
-        this.window = window;
+    public unowned Akira.Lib.ViewCanvas view_canvas { get; construct; }
+
+    public class SignalBlocker {
+        private unowned ColorField item;
+
+        public SignalBlocker (ColorField fill_item) {
+            item = fill_item;
+            item.block_signal += 1;
+        }
+
+        ~SignalBlocker () {
+            item.block_signal -= 1;
+        }
+    }
+
+    protected int block_signal = 0;
+
+    public ColorField (Akira.Lib.ViewCanvas canvas) {
+        Object (view_canvas: canvas);
 
         margin_end = margin_start = 10;
         width_chars = 8;
         max_length = 7;
         hexpand = true;
 
-        focus_in_event.connect (handle_focus_in);
-        focus_out_event.connect (handle_focus_out);
-        insert_text.connect (handle_insert_text);
-        key_press_event.connect (handle_key_press);
+        changed.connect (on_changed);
+        focus_in_event.connect (on_focus_in);
+        focus_out_event.connect (on_focus_out);
+        insert_text.connect (on_insert_text);
+        key_press_event.connect (on_key_press);
     }
 
     ~ColorField () {
-        focus_in_event.disconnect (handle_focus_in);
-        focus_out_event.disconnect (handle_focus_out);
-        insert_text.disconnect (handle_insert_text);
-        key_press_event.disconnect (handle_key_press);
+        focus_in_event.disconnect (on_focus_in);
+        focus_out_event.disconnect (on_focus_out);
+        insert_text.disconnect (on_insert_text);
+        key_press_event.disconnect (on_key_press);
+        model.value_changed.disconnect (on_model_changed);
     }
 
-    private void handle_insert_text (string text, int length, ref int position) {
+    public void assign (Models.ColorModel model) {
+        this.model = model;
+        model.value_changed.connect (on_model_changed);
+        on_model_changed ();
+    }
+
+    private void on_model_changed () {
+        var blocker = new SignalBlocker (this);
+        (blocker);
+
+        text = Utils.Color.rgba_to_hex_string (model.color);
+        sensitive = !model.hidden;
+    }
+
+    private void on_changed () {
+        if (block_signal > 0) {
+            return;
+        }
+
+        // Interrupt if what's written is not a valid color value.
+        if (!Utils.Color.is_valid_hex (text)) {
+            return;
+        }
+
+        var new_rgba = Utils.Color.hex_to_rgba (text);
+        model.color = new_rgba;
+    }
+
+    private void on_insert_text (string text, int length, ref int position) {
         string new_text = text.strip ();
 
         if (new_text.contains ("#")) {
@@ -80,20 +127,20 @@ public class Akira.Widgets.ColorField : Gtk.Entry {
         }
     }
 
-    private bool handle_focus_in (Gdk.EventFocus event) {
-        window.event_bus.disconnect_typing_accel ();
+    private bool on_focus_in (Gdk.EventFocus event) {
+        view_canvas.window.event_bus.disconnect_typing_accel ();
         return false;
     }
 
-    private bool handle_focus_out (Gdk.EventFocus event) {
-        window.event_bus.connect_typing_accel ();
+    private bool on_focus_out (Gdk.EventFocus event) {
+        view_canvas.window.event_bus.connect_typing_accel ();
         return false;
     }
 
-    private bool handle_key_press (Gdk.EventKey event) {
+    private bool on_key_press (Gdk.EventKey event) {
         // Enter or Escape
         if (event.keyval == Gdk.Key.Return || event.keyval == Gdk.Key.Escape) {
-            window.event_bus.set_focus_on_canvas ();
+            view_canvas.window.event_bus.set_focus_on_canvas ();
             return true;
         }
 

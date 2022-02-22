@@ -36,7 +36,6 @@ sources = files(
     'Utils/Color.vala',
     'Utils/Image.vala',
     'Utils/ItemAlignment.vala',
-    'Utils/ColorPicker.vala',
     'Utils/ModelUtil.vala',
     'Utils/Nobs.vala',
     'Utils/Snapping.vala',
@@ -49,12 +48,18 @@ sources = files(
     'Layouts/MainViewCanvas.vala',
     'Layouts/MainWindow.vala',
 
+    'Layouts/Alignment/AlignmentPanel.vala',
+
+    'Layouts/FillsList/FillItemModel.vala',
+    'Layouts/FillsList/FillListBox.vala',
+    'Layouts/FillsList/FillListItem.vala',
+    'Layouts/FillsList/FillsPanel.vala',
+    'Layouts/FillsList/FillListStore.vala',
+
     'Layouts/LayersList/LayerItemModel.vala',
     'Layouts/LayersList/LayerListBox.vala',
     'Layouts/LayersList/LayerListItem.vala',
     'Layouts/LayersList/LayerListStore.vala',
-
-    'Layouts/Alignment/AlignmentPanel.vala',
 
     'Layouts/Sidebars/LayersSidebar.vala',
     'Layouts/Sidebars/OptionsSidebar.vala',
@@ -63,13 +68,18 @@ sources = files(
 
     'Widgets/AddColorButton.vala',
     'Widgets/ButtonImage.vala',
+    'Widgets/ColorButton.vala',
+    'Widgets/ColorChooser.vala',
     'Widgets/ColorField.vala',
-    #'Widgets/ColorRow.vala',
+    'Widgets/ColorPicker.vala',
     #'Widgets/ExportWidget.vala',
+    'Widgets/EyeDropperButton.vala',
     'Widgets/HeaderBarButton.vala',
+    'Widgets/HideButton.vala',
     'Widgets/InputField.vala',
     'Widgets/LinkedInput.vala',
     'Widgets/MenuButton.vala',
+    'Widgets/OpacityField.vala',
     'Widgets/RoundedColorButton.vala',
     'Widgets/ZoomButton.vala',
 
@@ -86,7 +96,7 @@ sources = files(
     'ViewLayers/ViewLayerPath.vala',
     'ViewLayers/ViewLayerMultiSelect.vala',
 
-    #'Models/ColorModel.vala',
+    'Models/ColorModel.vala',
     #'Models/ExportModel.vala',
     #'Models/ListModel.vala',
     'Models/PathEditModel.vala',
@@ -114,7 +124,6 @@ sources = files(
     'Lib/Components/Component.vala',
     'Lib/Components/Components.vala',
     'Lib/Components/Coordinates.vala',
-    'Lib/Components/Fill.vala',
     'Lib/Components/Fills.vala',
     'Lib/Components/Flipped.vala',
     'Lib/Components/Layer.vala',

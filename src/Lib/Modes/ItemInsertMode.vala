@@ -252,7 +252,7 @@ public class Akira.Lib.Modes.ItemInsertMode : AbstractInteractionMode {
     private static Lib.Components.Fills fills_from_settings () {
         var fill_rgba = Gdk.RGBA ();
         fill_rgba.parse (settings.fill_color);
-        return new Lib.Components.Fills.single_color (Lib.Components.Color.from_rgba (fill_rgba));
+        return new Lib.Components.Fills.with_color (Lib.Components.Color.from_rgba (fill_rgba));
     }
 
     private static Lib.Components.Borders? borders_from_settings () {
