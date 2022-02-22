@@ -125,7 +125,7 @@ public class Akira.Widgets.ZoomButton : Gtk.Grid {
     }
 
     /*
-     * Reset the zoom to 100%, or reveal a popover with the numberic
+     * Reset the zoom to 100%, or reveal a popover with the numeric
      * input field for manual inputing if the user pressed the CTRL key
      * while clicking on the button.
      */

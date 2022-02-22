@@ -21,7 +21,7 @@
 
 /*
  * Overrides methods in Goo.CanvasItemSimple to handle a few things differently:
- * 1. Have uniform strokes in transfomed objects.
+ * 1. Have uniform strokes in transformed objects.
  * 2. Add a clipping quad to make clipping more efficient.
  */
 public class Akira.Drawables.Drawable {
@@ -262,17 +262,17 @@ public class Akira.Drawables.Drawable {
         // Draw the circle and preserve the visual properties.
         context.stroke ();
 
-        var lenght = 10 / scale;
+        var length = 10 / scale;
         // Create the horizontal stroke.
         context.new_path ();
-        context.move_to (-lenght, 0);
-        context.line_to (lenght, 0);
+        context.move_to (-length, 0);
+        context.line_to (length, 0);
         context.stroke ();
 
         // Create the vertical stroke.
         context.new_path ();
-        context.move_to (0, -lenght);
-        context.line_to (0, lenght);
+        context.move_to (0, -length);
+        context.line_to (0, length);
         context.stroke ();
         context.restore ();
 
