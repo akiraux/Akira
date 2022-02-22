@@ -40,7 +40,10 @@ public class Akira.Layouts.FillsList.FillItemModel : Models.ColorModel {
         assert (node != null);
 
         var new_color = Lib.Components.Color.from_rgba (color, hidden);
-        node.instance.components.fills.replace (Lib.Components.Fills.Fill (fill_id, new_color));
+        var new_fills = node.instance.components.fills.copy ();
+        new_fills.replace (Lib.Components.Fills.Fill (fill_id, new_color));
+        node.instance.components.fills = new_fills;
+
         im.item_model.alert_node_changed (node, Lib.Components.Component.Type.COMPILED_FILL);
         im.compile_model ();
     }
@@ -50,7 +53,10 @@ public class Akira.Layouts.FillsList.FillItemModel : Models.ColorModel {
         var node = im.item_model.node_from_id (_cached_instance.id);
         assert (node != null);
 
-        node.instance.components.fills.remove (fill_id);
+        var new_fills = node.instance.components.fills.copy ();
+        new_fills.remove (fill_id);
+        node.instance.components.fills = new_fills;
+
         im.item_model.alert_node_changed (node, Lib.Components.Component.Type.COMPILED_FILL);
         im.compile_model ();
     }

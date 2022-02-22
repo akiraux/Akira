@@ -98,7 +98,9 @@ public class Akira.Layouts.FillsList.FillsPanel : Gtk.Grid {
 
         unowned var im = _view_canvas.items_manager;
         foreach (var selected in sm.selection.nodes.values) {
-            selected.node.instance.components.fills.append (fill);
+            var new_fills = selected.node.instance.components.fills.copy ();
+            new_fills.append (fill);
+            selected.node.instance.components.fills = new_fills;
             im.item_model.alert_node_changed (selected.node, Lib.Components.Component.Type.COMPILED_FILL);
         }
         im.compile_model ();
