@@ -94,12 +94,12 @@ public class Akira.Layouts.FillsList.FillsPanel : Gtk.Grid {
 
         var fill_rgba = Gdk.RGBA ();
         fill_rgba.parse (settings.fill_color);
-        var fill = Lib.Components.Fills.Fill (-1, Lib.Components.Color.from_rgba (fill_rgba));
+        var color = Lib.Components.Color.from_rgba (fill_rgba);
 
         unowned var im = _view_canvas.items_manager;
         foreach (var selected in sm.selection.nodes.values) {
             var new_fills = selected.node.instance.components.fills.copy ();
-            new_fills.append (fill);
+            new_fills.append_fill_with_color (color);
             selected.node.instance.components.fills = new_fills;
             im.item_model.alert_node_changed (selected.node, Lib.Components.Component.Type.COMPILED_FILL);
         }

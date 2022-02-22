@@ -126,10 +126,29 @@ public class Akira.Lib.Components.Fills : Component, Copyable<Fills> {
         return false;
     }
 
-    public void append (Fill fill) {
+    /*
+     * Create a new Fill with the passed color and add it to the data structure.
+     * It's up to the code requiring this to then replace the fills component.
+     */
+    public void append_fill_with_color (Color color) {
+        double latest_id = int.MIN;
+        foreach (unowned var fill in data) {
+            latest_id = double.max (latest_id, fill.id);
+        }
+        latest_id++;
+        var fill = Fill ((int) latest_id, color);
         data.resize (data.length + 1);
         data[data.length - 1] = fill;
     }
+
+    // Todo...
+    public void append_fill_with_image () {}
+
+    // Todo...
+    public void append_fill_with_gradient () {}
+
+    // Todo...
+    public void append_fill_with_pattern () {}
 
     public int remove (uint id) {
         var ct = 0;
