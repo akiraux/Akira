@@ -33,7 +33,7 @@
  * 3. Quadratic Curve (single control point)
  * 4. Line (pretty obvious)
  */
-public struct Akira.Utils.PathSegment {
+public struct Akira.Geometry.PathSegment {
     public Lib.Modes.PathEditMode.Type type;
 
     // This point is used for drawing lines.
@@ -104,8 +104,8 @@ public struct Akira.Utils.PathSegment {
     // If point_after is not provided, create a quadratic curve
     // If it is provided, create a symmetric cubic bezier curve
     public void line_to_curve (
-        Utils.PathSegment? segment_before,
-        Utils.PathSegment? segment_after
+        PathSegment? segment_before,
+        PathSegment? segment_after
     ) {
         // Atleast one of the segments must be present inorder to calculate tangents.
         assert (segment_before != null && segment_after != null);
@@ -287,7 +287,7 @@ public struct Akira.Utils.PathSegment {
     }
 }
 
-public struct Akira.Utils.SelectedPoint {
+public struct Akira.Geometry.SelectedPoint {
     public int sel_index;
     public Lib.Modes.PathEditMode.PointType sel_type;
     public bool tangents_staggered;

@@ -229,8 +229,8 @@ public class Akira.Lib.Modes.ItemInsertMode : AbstractInteractionMode {
                     null
                 );
 
-                var test_path = new Utils.PathSegment[1];
-                test_path[0] = Utils.PathSegment.line (Geometry.Point (0, 0));
+                var test_path = new Geometry.PathSegment[1];
+                test_path[0] = Geometry.PathSegment.line (Geometry.Point (0, 0));
 
                 new_item.components.path = new Lib.Components.Path.from_points (test_path, false);
                 break;

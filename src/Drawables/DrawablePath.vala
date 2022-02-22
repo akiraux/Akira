@@ -26,11 +26,11 @@ public class Akira.Drawables.DrawablePath : Drawable {
     // In the future we will probably want control points with more data.
 
     // This array stores the list of all points required to draw the point.
-    public Utils.PathSegment[]? points = null;
+    public Geometry.PathSegment[]? points = null;
     // This flag tells us if the first and last point need to be joined.
     public bool close;
 
-    public DrawablePath (Utils.PathSegment[]? points = null, bool close = false) {
+    public DrawablePath (Geometry.PathSegment[]? points = null, bool close = false) {
        if (points != null) {
            this.points = points;
            this.close = close;

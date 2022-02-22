@@ -52,7 +52,7 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
 
     // The points in live command will be drawn every time user moves cursor.
     // Also acts as buffer for curves.
-    private Utils.PathSegment live_segment;
+    private Geometry.PathSegment live_segment;
     private PointType live_pnt_type;
 
     // This flag tells if we are adding a path or editing an existing one.
@@ -72,7 +72,7 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
             instance: instance
         );
         edit_model = new Models.PathEditModel (instance, view_canvas);
-        live_segment = Utils.PathSegment ();
+        live_segment = Geometry.PathSegment ();
         live_pnt_type = PointType.NONE;
         mode = Submode.APPEND;
     }
@@ -174,7 +174,7 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
 
         if (is_curr_command_done ()) {
             edit_model.add_live_points_to_path (live_segment);
-            live_segment = Utils.PathSegment ();
+            live_segment = Geometry.PathSegment ();
             live_pnt_type = PointType.LINE_END;
         }
 
@@ -199,10 +199,15 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
             // If user clicked and dragged when inserting the CURVE_END point,
             // Make it a quadratic curve and insert it into the path.
             if (live_pnt_type == PointType.CURVE_END && live_segment.type == Type.CUBIC) {
-                live_segment.type = Type.QUADRATIC;
+                //  live_segment.type = Type.QUADRATIC;
                 edit_model.add_live_points_to_path (live_segment);
+                //  var new_segment = Geometry.PathSegment.cubic_bezier (
 
-                live_segment = Utils.PathSegment.line (point);
+                //  );
+
+                //  edit_model.add_live_points_to_path (new_segment);
+
+                live_segment = Geometry.PathSegment.line (point);
                 live_pnt_type = PointType.LINE_END;
             }
 
@@ -300,7 +305,7 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
     private bool handle_button_press_in_edit_mode (Gdk.EventButton event) {
         is_click = true;
 
-        var sel_point = Utils.SelectedPoint ();
+        var sel_point = Geometry.SelectedPoint ();
         bool is_selected = edit_model.hit_test (event.x, event.y, ref sel_point);
 
         bool is_shift = (event.state == Gdk.ModifierType.SHIFT_MASK);
@@ -356,7 +361,7 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
         // If this is the first point we are adding, make it a line.
         if (live_segment.type == Type.LINE) {
             // Check if we are clicking on the first point. If yes, then close the path.
-            var sel_point = Utils.SelectedPoint ();
+            var sel_point = Geometry.SelectedPoint ();
             if (edit_model.hit_test (event.x, event.y, ref sel_point, 0)) {
                 edit_model.make_path_closed ();
                 // We are triggering the escape signal because after joining the path,
@@ -365,7 +370,7 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
                 return;
             }
 
-            live_segment = Utils.PathSegment.line (point);
+            live_segment = Geometry.PathSegment.line (point);
             live_pnt_type = PointType.LINE_END;
         } else {
             live_segment.curve_end = point;

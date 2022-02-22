@@ -23,36 +23,36 @@
 public class Akira.Lib.Components.Path : Component, Copyable<Path> {
     // Control points relative to a top-left of 0,0.
     // In the future we will probably want control points with more data.
-    public Utils.PathSegment[] data;
+    public Geometry.PathSegment[] data;
     public bool close = false;
 
     public Path (bool close = false) {
-        data = new Utils.PathSegment[0];
+        data = new Geometry.PathSegment[0];
         this.close = close;
     }
 
     public Path.from_single_point (Geometry.Point pt, bool close = false) {
-        data = new Utils.PathSegment[1];
+        data = new Geometry.PathSegment[1];
 
         // Only a line can be created from a single point. No need to check command.
-        data[0] = Utils.PathSegment.line (pt);
+        data[0] = Geometry.PathSegment.line (pt);
 
         this.close = close;
     }
 
-    public Path.from_points (Utils.PathSegment[] data, bool close = false) {
+    public Path.from_points (Geometry.PathSegment[] data, bool close = false) {
         this.data = data;
         this.close = close;
     }
 
     public Path.deserialized (Json.Object obj) {
         var arr = obj.get_array_member ("path_data").get_elements ();
-        data = new Utils.PathSegment[0];
+        data = new Geometry.PathSegment[0];
         var idx = 0;
 
         foreach (unowned var pt in arr) {
             data.resize (data.length + 1);
-            data[idx] = Utils.PathSegment.deserialized (pt.get_object ());
+            data[idx] = Geometry.PathSegment.deserialized (pt.get_object ());
             ++idx;
         }
     }

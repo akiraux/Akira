@@ -306,7 +306,7 @@ public class Akira.Utils.GeometryMath : Object {
         return false;
     }
 
-    public static Geometry.Rectangle bounds_from_points (Utils.PathSegment[] points) {
+    public static Geometry.Rectangle bounds_from_points (Geometry.PathSegment[] points) {
         Geometry.Rectangle bounds = Geometry.Rectangle ();
         bounds.left = double.MAX;
         bounds.top = double.MAX;
@@ -360,7 +360,7 @@ public class Akira.Utils.GeometryMath : Object {
         return bounds;
     }
 
-    public static Geometry.Rectangle calculate_bounds_for_curve (Utils.PathSegment segment, Geometry.Point point_before) {
+    public static Geometry.Rectangle calculate_bounds_for_curve (Geometry.PathSegment segment, Geometry.Point point_before) {
         var p1 = segment.curve_begin;
         var p2 = segment.tangent_1;
         var p3 = segment.tangent_2;
