@@ -39,7 +39,7 @@ public class Akira.Models.PathEditModel : Object {
     public bool tangents_inline = false;
 
     // This is the diameter of the blue points drawn in ViewLayerPath.
-    // It is used for checking if user clicked withing the region.
+    // It is used for checking if user clicked within the region.
     public const int HIT_SIZE = 4;
 
     public PathEditModel (Lib.Items.ModelInstance instance, Lib.ViewCanvas view_canvas) {

@@ -409,7 +409,7 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
             );
 
             // If the click happened on an item, we have multiple selected
-            // items, and the clicked items is part fo the selection, we need to
+            // items, and the clicked items is part of the selection, we need to
             // handle a few scenarios.
             if (
                 target != null &&

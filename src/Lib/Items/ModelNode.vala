@@ -29,7 +29,7 @@
  * that the lifetime of the container of that cache gets notified whenever a node is destructed.
  * This should very rarely be needed.
  *
- * It is recomended that nodes should be queried on demand from a model whenever needed.
+ * It is recommended that nodes should be queried on demand from a model whenever needed.
  */
 public class Akira.Lib.Items.ModelNode {
     public int id;
@@ -73,7 +73,7 @@ public class Akira.Lib.Items.ModelNode {
     }
 
     /*
-     * Return an array of int containing all IDs of the children of this ndoe.
+     * Return an array of int containing all IDs of the children of this node.
      */
     public int[] get_children_ids () {
         Array<int> children_ids = new Array<int> ();

@@ -37,7 +37,7 @@ public class Akira.Widgets.ColorPicker : Gtk.Window {
 
     // 1. Snapsize is the amount of pixel going to be magnified by the zoomlevel.
     // 2. The snapsize must be odd to have a 1px magnifier center.
-    // 3. Asure that snapsize*max_zoomlevel+shadow_width*2 is smaller than 2 * get_screen ().get_display ().get_maximal_cursor_size()
+    // 3. Assure that snapsize*max_zoomlevel+shadow_width*2 is smaller than 2 * get_screen ().get_display ().get_maximal_cursor_size()
     //    Valid: snapsize = 31, max_zoomlevel = 7, shadow_width = 15 --> 247px
     //           get_maximal_cursor_size = 128 --> 256px
     //    Otherwise the cursor starts to flicker. See https://github.com/stuartlangridge/ColourPicker/issues/6#issuecomment-277972290

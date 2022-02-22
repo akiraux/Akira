@@ -320,7 +320,7 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
             handle_point_selected (sel_type, index, is_alt, is_shift);
         }
 
-        // Tangents behave in a different way. So we are placing the logic for that seperately.
+        // Tangents behave in a different way. So we are placing the logic for that separately.
         if (sel_type == PointType.TANGENT_FIRST || sel_type == PointType.TANGENT_SECOND) {
             handle_tangent_selected (sel_type, index, is_alt, is_shift);
         }
