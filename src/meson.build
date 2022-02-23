@@ -50,6 +50,11 @@ sources = files(
 
     'Layouts/Alignment/AlignmentPanel.vala',
 
+    'Layouts/BordersList/BorderItemModel.vala',
+    'Layouts/BordersList/BorderListBox.vala',
+    'Layouts/BordersList/BorderListStore.vala',
+    'Layouts/BordersList/BordersPanel.vala',
+
     'Layouts/FillsList/FillItemModel.vala',
     'Layouts/FillsList/FillListBox.vala',
     'Layouts/FillsList/FillListItem.vala',
