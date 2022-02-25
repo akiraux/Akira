@@ -43,7 +43,7 @@ public class Akira.Lib.Managers.NobManager : Object {
     construct {
         nobs = new Utils.Nobs.NobSet ();
 
-        view_canvas.window.event_bus.geometry_modified.connect (on_update_select_effect);
+        view_canvas.window.event_bus.selection_geometry_modified.connect (on_update_select_effect);
         view_canvas.mode_manager.mode_changed.connect (on_update_select_effect);
         nob_layer = new ViewLayers.ViewLayerNobs ();
         nob_layer.add_to_canvas (ViewLayers.ViewLayer.NOBS_LAYER_ID, view_canvas);

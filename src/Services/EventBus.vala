@@ -75,7 +75,7 @@ public class Akira.Services.EventBus : Object {
     // the Nob Manager to properly update the select effect.
     // INFO!!! DO NOT USE THIS to listen for simple selection changes as it's
     // triggered at every geometry change. Use the simple selection_modified ();
-    public signal void geometry_modified ();
+    public signal void selection_geometry_modified ();
     public signal void request_copy ();
     public signal void request_paste ();
     public signal void delete_selected_items ();

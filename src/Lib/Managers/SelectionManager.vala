@@ -28,6 +28,13 @@ public class Akira.Lib.Managers.SelectionManager : Object {
 
     public unowned ViewCanvas view_canvas { get; construct; }
 
+    protected enum ChangeType {
+        NONE = 0,
+        TOPOLOGY = 1,
+        GEOMETRY = 2,
+        ALL = TOPOLOGY | GEOMETRY;
+    }
+
     /*
      * Blocks notifications until class is destructed.
      */
@@ -41,12 +48,13 @@ public class Akira.Lib.Managers.SelectionManager : Object {
 
         ~ChangeSignalBlocker () {
             manager.block_change_notifications -= 1;
-            manager.on_selection_changed (-1);
+            manager.inner_selection_changed (-1, manager.change_blocked);
         }
     }
 
     public Lib.Items.NodeSelection selection;
     protected int block_change_notifications = 0;
+    protected ChangeType change_blocked = ChangeType.NONE;
 
     public SelectionManager (ViewCanvas canvas) {
         Object (view_canvas : canvas);
@@ -74,9 +82,7 @@ public class Akira.Lib.Managers.SelectionManager : Object {
         }
 
         selection = new Lib.Items.NodeSelection (null);
-
-        on_selection_changed (-1);
-        view_canvas.window.event_bus.selection_modified ();
+        inner_selection_changed (-1, ChangeType.TOPOLOGY);
     }
 
     public void add_to_selection (int id) {
@@ -85,8 +91,7 @@ public class Akira.Lib.Managers.SelectionManager : Object {
             return;
         }
         selection.add_node (node);
-        on_selection_changed (-1);
-        view_canvas.window.event_bus.selection_modified ();
+        inner_selection_changed (-1, ChangeType.TOPOLOGY);
     }
 
     /*
@@ -98,8 +103,7 @@ public class Akira.Lib.Managers.SelectionManager : Object {
         }
 
         selection.remove_node (id);
-        on_selection_changed (-1);
-        view_canvas.window.event_bus.selection_modified ();
+        inner_selection_changed (-1, ChangeType.TOPOLOGY);
     }
 
     public bool item_selected (int id) {
@@ -111,11 +115,7 @@ public class Akira.Lib.Managers.SelectionManager : Object {
      * items, and modifying the selection's geometry.
      */
     public void on_selection_changed (int id) {
-        if (block_change_notifications == 0) {
-            if (id < 0 || selection.has_id (id, false)) {
-                view_canvas.window.event_bus.geometry_modified ();
-            }
-        }
+        inner_selection_changed (id, ChangeType.GEOMETRY);
     }
 
     public void delete_selected () {
@@ -158,4 +158,20 @@ public class Akira.Lib.Managers.SelectionManager : Object {
             view_canvas.items_manager.flip_items (to_flip, vertical);
         }
     }
+
+    protected void inner_selection_changed (int id, ChangeType change_type) {
+        if (block_change_notifications == 0) {
+            if (id < 0 || selection.has_id (id, false)) {
+                view_canvas.window.event_bus.selection_geometry_modified ();
+                if (ChangeType.TOPOLOGY in change_type) {
+                    view_canvas.window.event_bus.selection_modified ();
+                }
+            }
+
+            change_blocked = ChangeType.NONE;
+            return;
+        }
+        change_blocked |= change_type;
+    }
+
 }
