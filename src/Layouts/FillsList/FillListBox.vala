@@ -100,6 +100,9 @@ public class Akira.Layouts.FillsList.FillListBox : VirtualizingListBox {
         var added = 0;
         foreach (var selected in sm.selection.nodes.values) {
             var node = selected.node;
+            if (node.instance.components.fills == null) {
+                continue;
+            }
             foreach (var fill in node.instance.components.fills.data) {
                 var item = new FillItemModel (view_canvas, node, fill.id);
                 fills[node.id] = item;
