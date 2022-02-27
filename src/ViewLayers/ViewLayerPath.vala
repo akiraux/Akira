@@ -82,6 +82,8 @@ public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
         canvas.request_redraw (old_live_extents);
         canvas.request_redraw (path_data.live_extents);
 
+        //  print("LIve extents are %f %f %f %f\n", path_data.live_extents.top, path_data.live_extents.left, path_data.live_extents.bottom, path_data.live_extents.right);
+
         old_live_extents = path_data.live_extents;
         old_extents = path_data.extents;
     }
@@ -137,7 +139,10 @@ public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
                 context.line_to (curve_begin.x, curve_begin.y);
 
                 context.stroke ();
-            } else if (points[i].type == Lib.Modes.PathEditMode.Type.CUBIC) {
+            } else if (
+                points[i].type == Lib.Modes.PathEditMode.Type.CUBIC_SINGLE ||
+                points[i].type == Lib.Modes.PathEditMode.Type.CUBIC_DOUBLE
+            ) {
                 tr.transform_point (ref curve_begin.x, ref curve_begin.y);
                 tr.transform_point (ref tangent_1.x, ref tangent_1.y);
                 tr.transform_point (ref tangent_2.x, ref tangent_2.y);
@@ -162,7 +167,12 @@ public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
                 context.move_to (tangent_1.x, tangent_1.y);
                 context.line_to (curve_begin.x, curve_begin.y);
 
-                context.move_to (curve_begin.x, curve_begin.y);
+                if (points[i].type == Lib.Modes.PathEditMode.Type.CUBIC_SINGLE) {
+                    context.move_to (curve_end.x, curve_end.y);
+                } else {
+                    context.move_to (curve_begin.x, curve_begin.y);
+                }
+
                 context.line_to (tangent_2.x, tangent_2.y);
 
                 context.stroke ();
@@ -203,8 +213,60 @@ public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
                 context.stroke ();
             }
         } else if (live_segment.type == Lib.Modes.PathEditMode.Type.QUADRATIC) {
-            // TODO: But I dont think this case ever occurs.
-        } else if (live_segment.type == Lib.Modes.PathEditMode.Type.CUBIC) {
+            context.curve_to (
+                path_data.last_point.x,
+                path_data.last_point.y,
+                live_segment.tangent_1.x,
+                live_segment.tangent_1.y,
+                live_segment.curve_begin.x,
+                live_segment.curve_begin.y
+            );
+            // Lines for tangent in live path.
+            context.move_to (path_data.last_point.x, path_data.last_point.y);
+            context.line_to (live_segment.tangent_1.x, live_segment.tangent_1.y);
+
+            context.stroke ();
+
+            // Control points in live path.
+            context.move_to (path_data.last_point.x, path_data.last_point.y);
+            context.arc (path_data.last_point.x, path_data.last_point.y, radius, 0, 2 * Math.PI);
+
+            context.move_to (live_segment.tangent_1.x, live_segment.tangent_1.y);
+            context.arc (live_segment.tangent_1.x, live_segment.tangent_1.y, radius, 0, 2 * Math.PI);
+
+        } else if (live_segment.type == Lib.Modes.PathEditMode.Type.CUBIC_SINGLE) {
+            context.move_to (live_segment.curve_begin.x, live_segment.curve_begin.y);
+            context.curve_to (
+                live_segment.tangent_1.x,
+                live_segment.tangent_1.y,
+                live_segment.tangent_2.x,
+                live_segment.tangent_2.y,
+                live_segment.curve_end.x,
+                live_segment.curve_end.y
+            );
+
+            // Lines for tangent in live path.
+            context.move_to (live_segment.tangent_1.x, live_segment.tangent_1.y);
+            context.line_to (live_segment.curve_begin.x, live_segment.curve_begin.y);
+
+            context.move_to (live_segment.curve_end.x, live_segment.curve_end.y);
+            context.line_to (live_segment.tangent_2.x, live_segment.tangent_2.y);
+
+            context.stroke ();
+
+            // Control points in live path.
+            context.move_to (live_segment.curve_begin.x, live_segment.curve_begin.y);
+            context.arc (live_segment.curve_begin.x, live_segment.curve_begin.y, radius, 0, 2 * Math.PI);
+
+            context.move_to (live_segment.tangent_1.x, live_segment.tangent_1.y);
+            context.arc (live_segment.tangent_1.x, live_segment.tangent_1.y, radius, 0, 2 * Math.PI);
+
+            context.move_to (live_segment.tangent_2.x, live_segment.tangent_2.y);
+            context.arc (live_segment.tangent_2.x, live_segment.tangent_2.y, radius, 0, 2 * Math.PI);
+
+            context.fill ();
+
+        } else if (live_segment.type == Lib.Modes.PathEditMode.Type.CUBIC_DOUBLE) {
             if (live_point_type == Lib.Modes.PathEditMode.PointType.TANGENT_SECOND) {
                 context.curve_to (
                     path_data.last_point.x,
@@ -246,7 +308,6 @@ public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
             context.arc (live_segment.curve_begin.x, live_segment.curve_begin.y, radius, 0, 2 * Math.PI);
             context.fill ();
         }
-
 
         context.new_path ();
         context.restore ();

@@ -57,7 +57,14 @@ public class Akira.Drawables.DrawablePath : Drawable {
                 var cb = point.curve_begin;
                 var t1 = point.tangent_1;
                 cr.curve_to (pb.x, pb.y, t1.x, t1.y, cb.x, cb.y);
-            } else if (point.type == Lib.Modes.PathEditMode.Type.CUBIC) {
+            } else if (point.type == Lib.Modes.PathEditMode.Type.CUBIC_SINGLE) {
+                var cb = point.curve_begin;
+                var t1 = point.tangent_1;
+                var t2 = point.tangent_2;
+                var ce = point.curve_end;
+                cr.move_to (cb.x, cb.y);
+                cr.curve_to (t1.x, t1.y, t2.x, t2.y, ce.x, ce.y);
+            } else if (point.type == Lib.Modes.PathEditMode.Type.CUBIC_DOUBLE) {
                 var pb = points[i - 1].last_point;
                 var cb = point.curve_begin;
                 var t1 = point.tangent_1;

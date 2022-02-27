@@ -24,7 +24,11 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
         NONE,
         LINE,
         QUADRATIC,
-        CUBIC
+        // Represents cubic curves. These will only be used with compound curves.
+        CUBIC_SINGLE,
+        // Represents curves drawn with 2 seperate cubic beziers.
+        // These are easy to modify for user.
+        CUBIC_DOUBLE,
     }
 
     // We are using this to check what kind of point was selected.
@@ -174,8 +178,16 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
 
         if (is_curr_command_done ()) {
             edit_model.add_live_points_to_path (live_segment);
-            live_segment = Geometry.PathSegment ();
-            live_pnt_type = PointType.LINE_END;
+
+            if (live_segment.type == Type.CUBIC_SINGLE) {
+                live_segment = Geometry.PathSegment.quadratic_bezier (
+                    live_segment.curve_end,
+                    reflection (live_segment.tangent_2, live_segment.curve_end)
+                );
+            } else {
+                live_segment = Geometry.PathSegment ();
+                live_pnt_type = PointType.LINE_END;
+            }
         }
 
         is_click = false;
@@ -198,38 +210,61 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
         if (is_click) {
             // If user clicked and dragged when inserting the CURVE_END point,
             // Make it a quadratic curve and insert it into the path.
-            if (live_pnt_type == PointType.CURVE_END && live_segment.type == Type.CUBIC) {
-                //  live_segment.type = Type.QUADRATIC;
-                edit_model.add_live_points_to_path (live_segment);
-                //  var new_segment = Geometry.PathSegment.cubic_bezier (
+            if (live_pnt_type == PointType.CURVE_END && live_segment.type == Type.CUBIC_DOUBLE) {
+                var new_segment = Geometry.PathSegment.quadratic_bezier (
+                    live_segment.curve_begin,
+                    live_segment.tangent_1
+                );
 
-                //  );
+                edit_model.add_live_points_to_path (new_segment);
 
-                //  edit_model.add_live_points_to_path (new_segment);
+                live_segment = Geometry.PathSegment.cubic_bezier_single (
+                    edit_model.get_last_point_from_path (),
+                    live_segment.tangent_2,
+                    point,
+                    live_segment.curve_end
+                );
 
-                live_segment = Geometry.PathSegment.line (point);
-                live_pnt_type = PointType.LINE_END;
-            }
-
-            live_segment.type = Type.CUBIC;
-
-            if (Utils.GeometryMath.compare_points (point, live_segment.curve_begin, MIN_TANGENT_ALLOWED_LENGTH)) {
-                // Prevent user from drawing really small curves due to mouse glitches.
-                live_segment.type = Type.LINE;
-                live_pnt_type = PointType.LINE_END;
-            } else {
-                // Points at index 1 and 2 are the two tangents required by the 2 curves.
-                live_segment.tangent_1 = reflection (point, live_segment.curve_begin);
-                live_segment.tangent_2 = point;
                 live_pnt_type = PointType.TANGENT_SECOND;
+            } else if (live_pnt_type == PointType.CURVE_END && live_segment.type == Type.QUADRATIC) {
+                live_segment = Geometry.PathSegment.cubic_bezier_single (
+                    edit_model.get_last_point_from_path (),
+                    live_segment.tangent_1,
+                    point,
+                    live_segment.curve_begin
+                );
+
+                live_pnt_type = PointType.TANGENT_SECOND;
+            } else {
+
+                if (live_segment.type == Type.LINE) {
+                    live_segment.type = Type.CUBIC_DOUBLE;
+                }
+
+                if (Utils.GeometryMath.compare_points (point, live_segment.curve_begin, MIN_TANGENT_ALLOWED_LENGTH)) {
+                    // Prevent user from drawing really small curves due to mouse glitches.
+                    live_segment.type = Type.LINE;
+                    live_pnt_type = PointType.LINE_END;
+                } else {
+                    // Points at index 1 and 2 are the two tangents required by the 2 curves.
+                    if (live_segment.type == Type.CUBIC_SINGLE) {
+                        live_segment.tangent_2 = reflection (point, live_segment.curve_end);
+                    } else {
+                        live_segment.tangent_1 = reflection (point, live_segment.curve_begin);
+                        live_segment.tangent_2 = point;
+                    }
+
+                    live_pnt_type = PointType.TANGENT_SECOND;
+                }
             }
-
-
         } else {
             // If we are hovering in CURVE mode, current position could be our third curve point.
-            if (live_segment.type == Type.CUBIC) {
+            if (live_segment.type == Type.CUBIC_DOUBLE) {
                 live_segment.curve_end = point;
                 live_pnt_type = PointType.CURVE_END;
+            } else if (live_segment.type == Type.QUADRATIC) {
+                live_segment.curve_begin = point;
+                live_pnt_type = PointType.TANGENT_SECOND;
             } else {
                 // If we are hovering in LINE mode, this could be a potential line point.
                 live_segment.line_end = point;
@@ -256,7 +291,11 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
             return false;
         }
 
-        if (live_segment.type == Type.CUBIC && live_pnt_type != PointType.CURVE_END) {
+        if (live_segment.type == Type.CUBIC_DOUBLE && live_pnt_type != PointType.CURVE_END) {
+            return false;
+        }
+
+        if (live_segment.type == Type.CUBIC_SINGLE && live_pnt_type != PointType.TANGENT_SECOND) {
             return false;
         }
 
@@ -280,7 +319,7 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
             } else {
                 live_pnt_type = PointType.CURVE_END;
             }
-        } else if (live_segment.type == Type.CUBIC) {
+        } else if (live_segment.type == Type.CUBIC_DOUBLE) {
             // Here we dont include the CURVE_BEGIN case because
             // after both tangents are deleted, we convert segment from curve to line.
             // And TANGENT_FIRST is not included because it gets deleted

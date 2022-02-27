@@ -334,7 +334,10 @@ public class Akira.Utils.GeometryMath : Object {
                 bounds.right = double.max (bounds.right, pt.curve_end.x);
                 bounds.top = double.min (bounds.top, pt.curve_end.y);
                 bounds.bottom = double.max (bounds.bottom, pt.curve_end.y);
-            } else if (pt.type == Lib.Modes.PathEditMode.Type.CUBIC) {
+            } else if (
+                pt.type == Lib.Modes.PathEditMode.Type.CUBIC_SINGLE ||
+                pt.type == Lib.Modes.PathEditMode.Type.CUBIC_DOUBLE
+            ) {
                 bounds.left = double.min (bounds.left, pt.curve_begin.x);
                 bounds.right = double.max (bounds.right, pt.curve_begin.x);
                 bounds.top = double.min (bounds.top, pt.curve_begin.y);
@@ -368,7 +371,10 @@ public class Akira.Utils.GeometryMath : Object {
 
         double min_x = double.MAX, min_y = double.MAX, max_x = double.MIN, max_y = double.MIN;
 
-        if (segment.type == Lib.Modes.PathEditMode.Type.CUBIC) {
+        if (
+            segment.type == Lib.Modes.PathEditMode.Type.CUBIC_SINGLE ||
+            segment.type == Lib.Modes.PathEditMode.Type.CUBIC_DOUBLE
+        ) {
             double[] b1_extremes = Utils.Bezier.get_extremes (point_before, p2, p1);
             double[] b2_extremes = Utils.Bezier.get_extremes (p1, p3, p4);
 
@@ -396,4 +402,20 @@ public class Akira.Utils.GeometryMath : Object {
 
         return Geometry.Rectangle.with_coordinates (min_x, min_y, max_x, max_y);
     }
+    public static Geometry.Point transform_point_around_item_origin (
+        Geometry.Point point,
+        Cairo.Matrix mat,
+        bool invert = false
+    ) {
+        var matrix = Utils.GeometryMath.multiply_matrices (Cairo.Matrix.identity (), mat);
+
+        if (invert) {
+            matrix.invert ();
+        }
+
+        var new_point = Geometry.Point (point.x, point.y);
+        matrix.transform_point (ref new_point.x, ref new_point.y);
+        return new_point;
+    }
+
 }

@@ -72,63 +72,13 @@ public class Akira.Models.PathEditModel : Object {
 
     public void add_live_points_to_path (Geometry.PathSegment live_pts) {
         var transform_matrix = instance.components.transform.transformation_matrix;
-        var orig_first_pt = transform_point_around_item_origin (first_point, transform_matrix, true);
+        var orig_first_pt = Utils.GeometryMath.transform_point_around_item_origin (first_point, transform_matrix, true);
 
-        if (live_pts.type == Lib.Modes.PathEditMode.Type.LINE) {
-            var line_end = transform_point_around_item_origin (live_pts.line_end, transform_matrix, true);
-            line_end.x -= orig_first_pt.x;
-            line_end.y -= orig_first_pt.y;
+        live_pts.transform (transform_matrix, true);
+        live_pts.translate (orig_first_pt.x, orig_first_pt.y);
+        live_pts.snap_points ();
 
-            line_end = Geometry.Point (Math.round (line_end.x), Math.round (line_end.y));
-
-            var segment = Geometry.PathSegment.line (line_end);
-            add_point_to_path (segment);
-        } else if (live_pts.type == Lib.Modes.PathEditMode.Type.CUBIC) {
-            var curve_begin = transform_point_around_item_origin (live_pts.curve_begin, transform_matrix, true);
-            var tangent_1 = transform_point_around_item_origin (live_pts.tangent_1, transform_matrix, true);
-            var tangent_2 = transform_point_around_item_origin (live_pts.tangent_2, transform_matrix, true);
-            var curve_end = transform_point_around_item_origin (live_pts.curve_end, transform_matrix, true);
-
-            curve_begin.x -= orig_first_pt.x;
-            curve_begin.y -= orig_first_pt.y;
-
-            tangent_1.x -= orig_first_pt.x;
-            tangent_1.y -= orig_first_pt.y;
-
-            tangent_2.x -= orig_first_pt.x;
-            tangent_2.y -= orig_first_pt.y;
-
-            curve_end.x -= orig_first_pt.x;
-            curve_end.y -= orig_first_pt.y;
-
-            curve_begin = Geometry.Point (Math.round (curve_begin.x), Math.round (curve_begin.y));
-            tangent_1 = Geometry.Point (Math.round (tangent_1.x), Math.round (tangent_1.y));
-            tangent_2 = Geometry.Point (Math.round (tangent_2.x), Math.round (tangent_2.y));
-            curve_end = Geometry.Point (Math.round (curve_end.x), Math.round (curve_end.y));
-
-            var segment = Geometry.PathSegment.cubic_bezier (curve_begin, tangent_1, tangent_2, curve_end);
-            add_point_to_path (segment);
-        } else if (live_pts.type == Lib.Modes.PathEditMode.Type.QUADRATIC) {
-            var curve_begin = transform_point_around_item_origin (live_pts.curve_begin, transform_matrix, true);
-            var tangent_1 = transform_point_around_item_origin (live_pts.tangent_1, transform_matrix, true);
-            var curve_end = transform_point_around_item_origin (live_pts.curve_end, transform_matrix, true);
-
-            curve_begin.x -= orig_first_pt.x;
-            curve_begin.y -= orig_first_pt.y;
-
-            tangent_1.x -= orig_first_pt.x;
-            tangent_1.y -= orig_first_pt.y;
-
-            curve_end.x -= orig_first_pt.x;
-            curve_end.y -= orig_first_pt.y;
-
-            curve_begin = Geometry.Point (Math.round (curve_begin.x), Math.round (curve_begin.y));
-            tangent_1 = Geometry.Point (Math.round (tangent_1.x), Math.round (tangent_1.y));
-            curve_end = Geometry.Point (Math.round (curve_end.x), Math.round (curve_end.y));
-
-            var segment = Geometry.PathSegment.quadratic_bezier (curve_begin, tangent_1, curve_end);
-            add_point_to_path (segment);
-        }
+        add_point_to_path (live_pts);
 
         live_segment = Geometry.PathSegment ();
         live_point_type = Lib.Modes.PathEditMode.PointType.NONE;
@@ -171,7 +121,7 @@ public class Akira.Models.PathEditModel : Object {
         var last_segment = points[index];
         var new_live_pts = Geometry.PathSegment ();
 
-        var orig_first_pt = transform_point_around_item_origin (
+        var orig_first_pt = Utils.GeometryMath.transform_point_around_item_origin (
             first_point,
             instance.components.transform.transformation_matrix,
             true
@@ -184,36 +134,16 @@ public class Akira.Models.PathEditModel : Object {
             var line_end = points[points.length - 2].line_end;
             line_end.x += orig_first_pt.x;
             line_end.y += orig_first_pt.y;
-            line_end = transform_point_around_item_origin (line_end, transform_matrix);
+            line_end = Utils.GeometryMath.transform_point_around_item_origin (line_end, transform_matrix);
 
             new_live_pts.line_end = line_end;
             new_live_pts.type = Lib.Modes.PathEditMode.Type.LINE;
-        } else if (last_segment.type == Lib.Modes.PathEditMode.Type.CUBIC) {
-            var curve_begin = last_segment.curve_begin;
-            curve_begin.x += orig_first_pt.x;
-            curve_begin.y += orig_first_pt.y;
-            curve_begin = transform_point_around_item_origin (curve_begin, transform_matrix);
-
-            var tangent_1 = last_segment.tangent_1;
-            tangent_1.x += orig_first_pt.x;
-            tangent_1.y += orig_first_pt.y;
-            tangent_1 = transform_point_around_item_origin (tangent_1, transform_matrix);
-
-            var tangent_2 = last_segment.tangent_2;
-            tangent_2.x += orig_first_pt.x;
-            tangent_2.y += orig_first_pt.y;
-            tangent_2 = transform_point_around_item_origin (tangent_2, transform_matrix);
-
-            var curve_end = last_segment.curve_end;
-            curve_end.x += orig_first_pt.x;
-            curve_end.y += orig_first_pt.y;
-            curve_end = transform_point_around_item_origin (curve_end, transform_matrix);
-
-            new_live_pts.type = Lib.Modes.PathEditMode.Type.CUBIC;
-            new_live_pts.curve_begin = curve_begin;
-            new_live_pts.tangent_1 = tangent_1;
-            new_live_pts.tangent_2 = tangent_2;
-            new_live_pts.curve_end = curve_end;
+        } else if (last_segment.type == Lib.Modes.PathEditMode.Type.CUBIC_DOUBLE) {
+            new_live_pts = last_segment.copy ();
+            new_live_pts.translate (-orig_first_pt.x, -orig_first_pt.y);
+            new_live_pts.transform (transform_matrix);
+        } else if (last_segment.type == Lib.Modes.PathEditMode.Type.CUBIC_SINGLE) {
+            assert(false);
         }
 
         var new_points = new Geometry.PathSegment[points.length - 1];
@@ -245,10 +175,10 @@ public class Akira.Models.PathEditModel : Object {
         // around the item center. Then the difference between these values gives the location
         // event in the same coordinate system as the points.
         var transform_matrix = instance.components.transform.transformation_matrix;
-        var orig_first_pt = transform_point_around_item_origin (first_point, transform_matrix, true);
+        var orig_first_pt = Utils.GeometryMath.transform_point_around_item_origin (first_point, transform_matrix, true);
 
         Geometry.Point point = Geometry.Point (x, y);
-        point = transform_point_around_item_origin (point, transform_matrix, true);
+        point = Utils.GeometryMath.transform_point_around_item_origin (point, transform_matrix, true);
         point = Geometry.Point (point.x - orig_first_pt.x, point.y - orig_first_pt.y);
 
         tangents_inline = false;
@@ -281,7 +211,10 @@ public class Akira.Models.PathEditModel : Object {
                     sel_pnt.tangents_staggered = true;
                 }
 
-                if (points[i].type == Lib.Modes.PathEditMode.Type.QUADRATIC) {
+                if (
+                    points[i].type == Lib.Modes.PathEditMode.Type.QUADRATIC ||
+                    points[i].type == Lib.Modes.PathEditMode.Type.CUBIC_SINGLE
+                ) {
                     sel_pnt.tangents_staggered = true;
                 }
             }
@@ -302,8 +235,8 @@ public class Akira.Models.PathEditModel : Object {
      */
     public void modify_point_value (Geometry.Point new_pos) {
         var transform_matrix = instance.components.transform.transformation_matrix;
-        var orig_first_pt = transform_point_around_item_origin (first_point, transform_matrix, true);
-        new_pos = transform_point_around_item_origin (new_pos, transform_matrix, true);
+        var orig_first_pt = Utils.GeometryMath.transform_point_around_item_origin (first_point, transform_matrix, true);
+        new_pos = Utils.GeometryMath.transform_point_around_item_origin (new_pos, transform_matrix, true);
 
         new_pos.x -= orig_first_pt.x;
         new_pos.y -= orig_first_pt.y;
@@ -440,7 +373,7 @@ public class Akira.Models.PathEditModel : Object {
             var segment_after = Geometry.PathSegment.line (curr_segment.curve_end);
             points[sel_point.sel_index].curve_to_line ();
 
-            if (curr_segment.type == Lib.Modes.PathEditMode.Type.CUBIC) {
+            if (curr_segment.type == Lib.Modes.PathEditMode.Type.CUBIC_DOUBLE) {
                 add_point_to_path (segment_after, sel_point.sel_index + 1);
             }
         }
@@ -472,7 +405,7 @@ public class Akira.Models.PathEditModel : Object {
         Geometry.Point delta = Geometry.Point (min_x, min_y);
 
         var transform_matrix = instance.components.transform.transformation_matrix;
-        var rotated_delta = transform_point_around_item_origin (delta, transform_matrix);
+        var rotated_delta = Utils.GeometryMath.transform_point_around_item_origin (delta, transform_matrix);
 
         first_point.x += rotated_delta.x;
         first_point.y += rotated_delta.y;
@@ -539,10 +472,8 @@ public class Akira.Models.PathEditModel : Object {
 
         PathDataModel path_data = PathDataModel ();
         path_data.points = points;
-        //  path_data.live_pts = live_pts;
         path_data.live_segment = live_segment;
         path_data.live_point_type = live_point_type;
-        //  path_data.length = live_pts_len;
         path_data.extents = new_ext;
         path_data.transform = instance.drawable.transform;
         path_data.selected_pts = selected_pts;
@@ -577,25 +508,9 @@ public class Akira.Models.PathEditModel : Object {
         return live_extents;
     }
 
-    private Geometry.Point transform_point_around_item_origin (
-        Geometry.Point point,
-        Cairo.Matrix mat,
-        bool invert = false
-    ) {
-        var matrix = Utils.GeometryMath.multiply_matrices (Cairo.Matrix.identity (), mat);
-
-        if (invert) {
-            matrix.invert ();
-        }
-
-        var new_point = Geometry.Point (point.x, point.y);
-        matrix.transform_point (ref new_point.x, ref new_point.y);
-        return new_point;
-    }
-
     public Geometry.Point get_last_point_from_path () {
         Cairo.Matrix transform_matrix = instance.components.transform.transformation_matrix;
-        var orig_first_pt = transform_point_around_item_origin (first_point, transform_matrix, true);
+        var orig_first_pt = Utils.GeometryMath.transform_point_around_item_origin (first_point, transform_matrix, true);
 
         if (instance.components.path.data.length == 0) {
             return orig_first_pt;
@@ -605,7 +520,7 @@ public class Akira.Models.PathEditModel : Object {
 
         last_point.x += orig_first_pt.x;
         last_point.y += orig_first_pt.y;
-        last_point = transform_point_around_item_origin (last_point, transform_matrix);
+        last_point = Utils.GeometryMath.transform_point_around_item_origin (last_point, transform_matrix);
 
         return last_point;
     }

@@ -69,6 +69,10 @@ public struct Akira.Geometry.PathSegment {
     public PathSegment.line (Geometry.Point point) {
         type = Lib.Modes.PathEditMode.Type.LINE;
         line_end = point;
+
+        tangent_1 = Geometry.Point (0, 0);
+        tangent_2 = Geometry.Point (0, 0);
+        curve_end = Geometry.Point (0, 0);
     }
 
     // Creates new cubic bezier curve.
@@ -78,7 +82,21 @@ public struct Akira.Geometry.PathSegment {
         Geometry.Point control_point_2,
         Geometry.Point curve_end
     ) {
-        type = Lib.Modes.PathEditMode.Type.CUBIC;
+        type = Lib.Modes.PathEditMode.Type.CUBIC_DOUBLE;
+
+        this.curve_begin = curve_begin;
+        this.tangent_1 = control_point_1;
+        this.tangent_2 = control_point_2;
+        this.curve_end = curve_end;
+    }
+
+    public PathSegment.cubic_bezier_single (
+        Geometry.Point curve_begin,
+        Geometry.Point control_point_1,
+        Geometry.Point control_point_2,
+        Geometry.Point curve_end
+    ) {
+        type = Lib.Modes.PathEditMode.Type.CUBIC_SINGLE;
 
         this.curve_begin = curve_begin;
         this.tangent_1 = control_point_1;
@@ -89,20 +107,34 @@ public struct Akira.Geometry.PathSegment {
     // Creates new quadratic bezier curve
     public PathSegment.quadratic_bezier (
         Geometry.Point curve_begin,
-        Geometry.Point control_point,
-        Geometry.Point curve_end
+        Geometry.Point control_point
     ) {
         type = Lib.Modes.PathEditMode.Type.QUADRATIC;
 
         this.curve_begin = curve_begin;
-        //  this.curve_end = curve_end;
         this.tangent_1 = control_point;
+
+        tangent_2 = Geometry.Point (0, 0);
+        curve_end = Geometry.Point (0, 0);
+    }
+
+
+    public PathSegment copy () {
+        var segment = PathSegment ();
+
+        segment.type = type;
+        segment.curve_begin = curve_begin;
+        segment.tangent_1 = tangent_1;
+        segment.tangent_2 = tangent_2;
+        segment.curve_end = curve_end;
+
+        return segment;
     }
 
     // Use for converting a line segment to a curve.
     // point_before and point_after are used for calculating positions of control points.
     // If point_after is not provided, create a quadratic curve
-    // If it is provided, create a symmetric cubic bezier curve
+    // If it is provided, create a symmetric cubic_DOUBLE bezier curve
     public void line_to_curve (
         PathSegment? segment_before,
         PathSegment? segment_after
@@ -112,7 +144,7 @@ public struct Akira.Geometry.PathSegment {
 
         // When converting to quadratic curves, this is the dist. at which tangents are placed.
         double tangent_length = 100;
-        type = Lib.Modes.PathEditMode.Type.CUBIC;
+        type = Lib.Modes.PathEditMode.Type.CUBIC_DOUBLE;
 
         // If we are converting the first point of the segment,
         // Make it a quadratic curve. Never occurs, but kept as safeguard.
@@ -211,7 +243,7 @@ public struct Akira.Geometry.PathSegment {
             if (Utils.GeometryMath.compare_points (curve_end, point, thresh)) {
                 return Lib.Modes.PathEditMode.PointType.CURVE_END;
             }
-        } else if (type == Lib.Modes.PathEditMode.Type.CUBIC) {
+        } else if (type == Lib.Modes.PathEditMode.Type.CUBIC_DOUBLE) {
             if (Utils.GeometryMath.compare_points (curve_begin, point, thresh)) {
                 return Lib.Modes.PathEditMode.PointType.CURVE_BEGIN;
             }
@@ -253,12 +285,22 @@ public struct Akira.Geometry.PathSegment {
             curve_begin = Geometry.Point (curve_begin.x - dx, curve_begin.y - dy);
             tangent_1 = Geometry.Point (tangent_1.x - dx, tangent_1.y - dy);
             curve_end = Geometry.Point (curve_end.x - dx, curve_end.y - dy);
-        } else if (type == Lib.Modes.PathEditMode.Type.CUBIC) {
+        } else if (
+            type == Lib.Modes.PathEditMode.Type.CUBIC_SINGLE ||
+            type == Lib.Modes.PathEditMode.Type.CUBIC_DOUBLE
+        ) {
             curve_begin = Geometry.Point (curve_begin.x - dx, curve_begin.y - dy);
             tangent_1 = Geometry.Point (tangent_1.x - dx, tangent_1.y - dy);
             tangent_2 = Geometry.Point (tangent_2.x - dx, tangent_2.y - dy);
             curve_end = Geometry.Point (curve_end.x - dx, curve_end.y - dy);
         }
+    }
+
+    public void transform (Cairo.Matrix transform, bool invert = false) {
+        curve_begin = Utils.GeometryMath.transform_point_around_item_origin (curve_begin, transform, invert);
+        tangent_1 = Utils.GeometryMath.transform_point_around_item_origin (tangent_1, transform, invert);
+        tangent_2 = Utils.GeometryMath.transform_point_around_item_origin (tangent_2, transform, invert);
+        curve_end = Utils.GeometryMath.transform_point_around_item_origin (curve_end, transform, invert);
     }
 
     public void move_tangents (double delta_x, double delta_y, bool is_tan1_reference) {
@@ -276,6 +318,14 @@ public struct Akira.Geometry.PathSegment {
             tangent_2.y -= delta_y;
         }
     }
+
+    public void snap_points () {
+        curve_begin = Geometry.Point (Math.round (curve_begin.x), Math.round (curve_begin.y));
+        tangent_1 = Geometry.Point (Math.round (tangent_1.x), Math.round (tangent_1.y));
+        tangent_2 = Geometry.Point (Math.round (tangent_2.x), Math.round (tangent_2.y));
+        curve_end = Geometry.Point (Math.round (curve_end.x), Math.round (curve_end.y));
+    }
+
 
     public PathSegment.deserialized (Json.Object obj) {
         // TODO:
