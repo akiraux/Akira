@@ -56,6 +56,7 @@ public class Akira.Drawables.DrawablePath : Drawable {
                 var pb = points[i - 1].last_point;
                 var cb = point.curve_begin;
                 var t1 = point.tangent_1;
+                cr.move_to (pb.x, pb.y);
                 cr.curve_to (pb.x, pb.y, t1.x, t1.y, cb.x, cb.y);
             } else if (point.type == Lib.Modes.PathEditMode.Type.CUBIC_SINGLE) {
                 var cb = point.curve_begin;

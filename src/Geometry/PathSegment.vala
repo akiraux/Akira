@@ -243,7 +243,10 @@ public struct Akira.Geometry.PathSegment {
             if (Utils.GeometryMath.compare_points (curve_end, point, thresh)) {
                 return Lib.Modes.PathEditMode.PointType.CURVE_END;
             }
-        } else if (type == Lib.Modes.PathEditMode.Type.CUBIC_DOUBLE) {
+        } else if (
+            type == Lib.Modes.PathEditMode.Type.CUBIC_DOUBLE ||
+            type == Lib.Modes.PathEditMode.Type.CUBIC_SINGLE
+        ) {
             if (Utils.GeometryMath.compare_points (curve_begin, point, thresh)) {
                 return Lib.Modes.PathEditMode.PointType.CURVE_BEGIN;
             }

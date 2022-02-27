@@ -143,7 +143,15 @@ public class Akira.Models.PathEditModel : Object {
             new_live_pts.translate (-orig_first_pt.x, -orig_first_pt.y);
             new_live_pts.transform (transform_matrix);
         } else if (last_segment.type == Lib.Modes.PathEditMode.Type.CUBIC_SINGLE) {
-            assert(false);
+            //  assert(false);
+            new_live_pts = last_segment.copy ();
+            new_live_pts.translate (-orig_first_pt.x, -orig_first_pt.y);
+            new_live_pts.transform (transform_matrix);
+        } else if (last_segment.type == Lib.Modes.PathEditMode.Type.QUADRATIC) {
+            //  assert(false);
+            new_live_pts = last_segment.copy ();
+            new_live_pts.translate (-orig_first_pt.x, -orig_first_pt.y);
+            new_live_pts.transform (transform_matrix);
         }
 
         var new_points = new Geometry.PathSegment[points.length - 1];
@@ -170,7 +178,13 @@ public class Akira.Models.PathEditModel : Object {
      * If check_idx is -1, do hit test with all the points. Otherwise
      * only with the given point.
      */
-    public bool hit_test (double x, double y, ref Geometry.SelectedPoint sel_pnt, int check_idx = -1) {
+    public bool hit_test (
+        double x,
+        double y,
+        ref Geometry.SelectedPoint sel_pnt,
+        ref Geometry.SelectedPoint underlying_pt,
+        int check_idx = -1
+    ) {
         // In order to check if user clicked on a point, we need to rotate the first point and the event
         // around the item center. Then the difference between these values gives the location
         // event in the same coordinate system as the points.
@@ -216,6 +230,18 @@ public class Akira.Models.PathEditModel : Object {
                     points[i].type == Lib.Modes.PathEditMode.Type.CUBIC_SINGLE
                 ) {
                     sel_pnt.tangents_staggered = true;
+                }
+            }
+
+            if (i != points.length - 1 && points[i].type != Lib.Modes.PathEditMode.Type.LINE) {
+                if (
+                    points[i + 1].type == Lib.Modes.PathEditMode.Type.QUADRATIC ||
+                    points[i + 1].type == Lib.Modes.PathEditMode.Type.CUBIC_SINGLE
+                ) {
+                    if (hit_type == Lib.Modes.PathEditMode.PointType.CURVE_BEGIN) {
+                        underlying_pt.sel_index = i + 1;
+                        underlying_pt.sel_type = Lib.Modes.PathEditMode.PointType.CURVE_BEGIN;
+                    }
                 }
             }
 
@@ -266,6 +292,12 @@ public class Akira.Models.PathEditModel : Object {
                     points[sel_pnt.sel_index].translate (delta_x, delta_y);
                     var old = points[sel_pnt.sel_index].curve_end;
                     points[sel_pnt.sel_index].curve_end = Geometry.Point (old.x + delta_x, old.y + delta_y);
+
+                    if (points[sel_pnt.sel_index].type == Lib.Modes.PathEditMode.Type.CUBIC_SINGLE) {
+                        // For single cubic curve, when CURVE_BEGIN moves, the second tangent should not move with it.
+                        old = points[sel_pnt.sel_index].tangent_2;
+                        points[sel_pnt.sel_index].tangent_2 = Geometry.Point (old.x + delta_x, old.y + delta_y);
+                    }
                     break;
                 case Lib.Modes.PathEditMode.PointType.TANGENT_FIRST:
                     if (sel_pnt.tangents_staggered) {
@@ -286,6 +318,12 @@ public class Akira.Models.PathEditModel : Object {
                 case Lib.Modes.PathEditMode.PointType.CURVE_END:
                     var old = points[sel_pnt.sel_index].curve_end;
                     points[sel_pnt.sel_index].curve_end = Geometry.Point (old.x - delta_x, old.y - delta_y);
+
+                    if (points[sel_pnt.sel_index].type == Lib.Modes.PathEditMode.Type.CUBIC_SINGLE) {
+                        // For single cubic curve, when curve end is moved, move the second tangent too.
+                        old = points[sel_pnt.sel_index].tangent_2;
+                        points[sel_pnt.sel_index].tangent_2 = Geometry.Point (old.x - delta_x, old.y - delta_y);
+                    }
                     break;
             }
         }
