@@ -23,7 +23,7 @@
 public class Akira.Lib.Managers.HoverManager : Object {
     // Signal used to notify other parts of the UI that the hover effect on a
     // canvas item has changed. This must be used exclusively from the canvas to
-    // other items, and not viceversa. If a UI element has to trigger the hover
+    // other items, and not vice-versa. If a UI element has to trigger the hover
     // state of an item (like the layers), a dedicated method should be created
     // that doesn't trigger this signal.
     public signal void hover_changed (int? id);
@@ -79,7 +79,7 @@ public class Akira.Lib.Managers.HoverManager : Object {
     }
 
     private void maybe_create_hover_effect (Lib.Items.ModelNode node) {
-        // Prevent the cration of the hover effect if the item is selected or
+        // Prevent the creation of the hover effect if the item is selected or
         // the layer is currently locked.
         if (
             view_canvas.selection_manager.item_selected (node.id)

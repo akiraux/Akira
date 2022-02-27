@@ -21,72 +21,74 @@
 
 /*
  * Model to keep track of Fills and Borders colors of an item. We use this
- * model to easily bind the GtkListBox UI to the Fills and Borders Components.
+ * model to easily bind the ListBox UI to the Fills and Borders Components.
  */
 public class Akira.Models.ColorModel : GLib.Object {
-    private unowned Lib.Components.Fill? fill;
-    private unowned Lib.Components.Border? border;
+    public signal void value_changed ();
 
-    public Type type;
-    public enum Type {
-        FILL,
-        BORDER
-    }
+    public class SignalBlocker {
+        private unowned ColorModel item;
 
-    public string color {
-        owned get {
-            return type == Type.FILL ? fill.color.to_string () : border.color.to_string ();
+        public SignalBlocker (ColorModel fill_item) {
+            item = fill_item;
+            item.block_signal += 1;
         }
-        set {
-            var new_rgba = Gdk.RGBA ();
-            new_rgba.parse (value);
-            new_rgba.alpha = (double) alpha / 255;
-            if (type == Type.FILL) {
-                fill.color = new_rgba;
-                return;
-            }
-            border.color = new_rgba;
+
+        ~SignalBlocker () {
+            item.block_signal -= 1;
         }
     }
 
-    public int alpha {
+    protected int block_signal = 0;
+
+    private Gdk.RGBA _color;
+    public Gdk.RGBA color {
         get {
-            return type == Type.FILL ? fill.alpha : border.alpha;
+            return _color;
         }
         set {
-            if (type == Type.FILL) {
-                fill.alpha = value;
+            if (value == _color) {
                 return;
             }
-            border.alpha = value;
+
+            _color = value;
+            on_value_changed ();
+            value_changed ();
         }
     }
 
+    private bool _hidden;
     public bool hidden {
         get {
-            return type == Type.FILL ? fill.hidden : border.hidden;
+            return _hidden;
         }
         set {
-            if (type == Type.FILL) {
-                fill.hidden = value;
+            if (value == _hidden) {
                 return;
             }
-            border.hidden = value;
+
+            _hidden = value;
+            on_value_changed ();
+            value_changed ();
         }
     }
 
+    private int _size;
     public int size {
         get {
-            return border.size;
+            return _size;
         }
         set {
-            border.size = value;
+            if (value == _size) {
+                return;
+            }
+
+            _size = value;
+            on_value_changed ();
+            value_changed ();
         }
     }
 
-    public ColorModel (Lib.Components.Fill? fill, Lib.Components.Border? border = null) {
-        type = fill != null ? Type.FILL : Type.BORDER;
-        this.fill = fill;
-        this.border = border;
-    }
+    public virtual void on_value_changed () {}
+    public virtual void delete () {}
 }

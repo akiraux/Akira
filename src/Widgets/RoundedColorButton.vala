@@ -35,7 +35,7 @@ public class Akira.Widgets.RoundedColorButton : Gtk.Grid {
         btn.width_request = btn.height_request = 24;
         btn.valign = btn.halign = Gtk.Align.CENTER;
         btn.can_focus = false;
-        btn.tooltip_text = color;
+        btn.tooltip_text = _("Set color to " + color);
 
         try {
             var provider = new Gtk.CssProvider ();

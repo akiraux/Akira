@@ -24,7 +24,7 @@
  */
 public class Akira.Utils.Array : Object {
     /*
-     * Insert value in an int array. Return true on sucess.
+     * Insert value in an int array. Return true on success.
      */
     public static bool insert_at_iarray (ref int[] a, int pos, int value) {
         if (pos >= a.length || pos < 0) {
@@ -39,7 +39,7 @@ public class Akira.Utils.Array : Object {
     }
 
     /*
-     * Appends value at the end of an int array. Return true on sucess.
+     * Appends value at the end of an int array. Return true on success.
      */
     public static bool append_to_iarray (ref int[] a, int value) {
         a.resize (a.length + 1);

@@ -20,7 +20,7 @@
  */
 
 /*
- * A colleciton of useful delegate definitions
+ * A collection of useful delegate definitions
  */
 
 public delegate void Akira.Utils.TrivialDelegate ();

@@ -22,6 +22,8 @@
 public class Akira.Layouts.Sidebars.OptionsSidebar : Gtk.Grid {
     public unowned Lib.ViewCanvas view_canvas { get; construct; }
 
+    public Layouts.FillsList.FillsPanel fills_panel;
+
     public bool toggled {
         get {
             return visible;
@@ -43,11 +45,13 @@ public class Akira.Layouts.Sidebars.OptionsSidebar : Gtk.Grid {
         var align_items_panel = new Layouts.Alignment.AlignmentPanel (view_canvas);
         attach (align_items_panel, 0, 0, 1, 1);
 
-
         var scrolled_grid = new Gtk.Grid () {
             expand = true
         };
-        scrolled_grid.attach (new Akira.Layouts.Transforms.TransformPanel (view_canvas), 0, 0, 1, 1);
+        scrolled_grid.attach (new Layouts.Transforms.TransformPanel (view_canvas), 0, 0, 1, 1);
+
+        fills_panel = new Layouts.FillsList.FillsPanel (view_canvas);
+        scrolled_grid.attach (fills_panel, 0, 1, 1, 1);
 
         var scrolled_window = new Gtk.ScrolledWindow (null, null) {
             hscrollbar_policy = Gtk.PolicyType.NEVER,
@@ -58,7 +62,6 @@ public class Akira.Layouts.Sidebars.OptionsSidebar : Gtk.Grid {
 
         /*
         var border_radius_panel = new Akira.Layouts.Partials.BorderRadiusPanel (window);
-        fills_panel = new Akira.Layouts.Partials.FillsPanel (window);
         borders_panel = new Akira.Layouts.Partials.BordersPanel (window);
         scrolled_grid.attach (border_radius_panel, 0, 1, 1, 1);
         scrolled_grid.attach (fills_panel, 0, 2, 1, 1);

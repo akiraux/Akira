@@ -32,7 +32,7 @@
  * The dag needs to be rebuilt any time group topologies change. Changes that don't
  * affect groups generally don't need to have the dag rebuilt. Rebuilding a dag
  * repopulates all group nodes, but not item nodes. Item nodes can only have
- * a single parent and no children, and they are populated when an operation chages them.
+ * a single parent and no children, and they are populated when an operation changes them.
  *
  * The reason changes to items (add/remove/restack) don't require the dag to be rebuilt
  * is for performance reasons--and the simplicity of their topology (single parent, no children).

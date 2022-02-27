@@ -65,8 +65,17 @@ public class Akira.Services.EventBus : Object {
     public signal void detect_artboard_change ();
     public signal void detect_image_size_change ();
 
-    // Lib signals
+    // Lib signals.
+    // Signal triggered every time an item is added or removed from the selection
+    // map. Connect this signal when elements of the UI need to be updated based
+    // on the selected items.
     public signal void selection_modified ();
+    // Signal triggered every time an item is added or removed from the selection
+    // map, as well as when a geometry change happens. This is mostly needed by
+    // the Nob Manager to properly update the select effect.
+    // INFO!!! DO NOT USE THIS to listen for simple selection changes as it's
+    // triggered at every geometry change. Use the simple selection_modified ();
+    public signal void selection_geometry_modified ();
     public signal void request_copy ();
     public signal void request_paste ();
     public signal void delete_selected_items ();
@@ -88,5 +97,4 @@ public class Akira.Services.EventBus : Object {
     public signal void create_model_snapshot (string description);
     public signal void undo ();
     public signal void redo ();
-
 }

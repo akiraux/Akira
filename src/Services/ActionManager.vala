@@ -505,7 +505,7 @@ public class Akira.Services.ActionManager : Object {
         // }
 
         // bool is_holding_shift = false;
-        // var color_picker = new Akira.Utils.ColorPicker ();
+        // var color_picker = new Akira.Widgets.ColorPicker ();
         // color_picker.show_all ();
 
         // color_picker.key_pressed.connect (e => {

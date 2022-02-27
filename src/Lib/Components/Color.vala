@@ -42,17 +42,19 @@ public struct Akira.Lib.Components.Color {
     }
 
     public Json.Node serialize () {
-            var obj = new Json.Object ();
-            obj.set_double_member ("r", rgba.red);
-            obj.set_double_member ("g", rgba.green);
-            obj.set_double_member ("b", rgba.blue);
-            obj.set_double_member ("a", rgba.alpha);
-            obj.set_boolean_member ("hidden", hidden);
-            var node = new Json.Node (Json.NodeType.OBJECT);
-            node.set_object (obj);
-            return node;
+        var obj = new Json.Object ();
+        obj.set_double_member ("r", rgba.red);
+        obj.set_double_member ("g", rgba.green);
+        obj.set_double_member ("b", rgba.blue);
+        obj.set_double_member ("a", rgba.alpha);
+        obj.set_boolean_member ("hidden", hidden);
+        var node = new Json.Node (Json.NodeType.OBJECT);
+        node.set_object (obj);
+        return node;
     }
 
     // Mutators
-    public Color with_hidden (bool hidden) { return Color (rgba.red, rgba.green, rgba.blue, rgba.alpha, hidden); }
+    public Color with_hidden (bool hidden) {
+        return Color (rgba.red, rgba.green, rgba.blue, rgba.alpha, hidden);
+    }
 }

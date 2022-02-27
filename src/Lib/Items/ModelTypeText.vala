@@ -41,6 +41,7 @@ public class Akira.Lib.Items.ModelTypeText : ModelType {
         new_item.components.flipped = Lib.Components.Components.default_flipped ();
         new_item.components.border_radius = Lib.Components.Components.default_border_radius ();
         new_item.components.name = Lib.Components.Components.default_name ();
+        new_item.components.layer = Lib.Components.Components.default_layer ();
         return new_item;
     }
 
