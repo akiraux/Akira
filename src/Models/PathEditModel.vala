@@ -241,6 +241,9 @@ public class Akira.Models.PathEditModel : Object {
                     if (hit_type == Lib.Modes.PathEditMode.PointType.CURVE_BEGIN) {
                         underlying_pt.sel_index = i + 1;
                         underlying_pt.sel_type = Lib.Modes.PathEditMode.PointType.CURVE_BEGIN;
+                    } else if (hit_type == Lib.Modes.PathEditMode.PointType.CURVE_END && points[i + 1].type == Lib.Modes.PathEditMode.Type.CUBIC_SINGLE) {
+                        underlying_pt.sel_index = i + 1;
+                        underlying_pt.sel_type = Lib.Modes.PathEditMode.PointType.CURVE_BEGIN;
                     }
                 }
             }

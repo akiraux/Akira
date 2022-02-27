@@ -129,7 +129,17 @@ public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
                 draw_control_point (context, tangent_1, radius);
                 context.fill ();
 
-                draw_line (context, curve_begin, tangent_1);
+                if (
+                    (i != points.length - 1 && points[i + 1].type == Lib.Modes.PathEditMode.Type.CUBIC_SINGLE) ||
+                    i == 1
+                ) {
+                    draw_line (context, curve_begin, tangent_1);
+                } else {
+                    var point_before = points[i - 1].last_point;
+                    tr.transform_point (ref point_before.x, ref point_before.y);
+                    draw_line (context, point_before, tangent_1);
+                }
+
                 context.stroke ();
             } else if (
                 points[i].type == Lib.Modes.PathEditMode.Type.CUBIC_SINGLE ||
