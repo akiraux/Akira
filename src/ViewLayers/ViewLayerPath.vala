@@ -123,22 +123,27 @@ public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
             if (points[i].type == Lib.Modes.PathEditMode.Type.LINE) {
                 draw_control_point (context, curve_begin, radius);
                 context.fill ();
-            } else if (points[i].type == Lib.Modes.PathEditMode.Type.QUADRATIC) {
+            } else if (points[i].type == Lib.Modes.PathEditMode.Type.QUADRATIC_LEFT) {
                 // Draw control point for curve begin and tangent.
                 draw_control_point (context, curve_begin, radius);
                 draw_control_point (context, tangent_1, radius);
                 context.fill ();
 
-                if (
-                    (i != points.length - 1 && points[i + 1].type == Lib.Modes.PathEditMode.Type.CUBIC_SINGLE) ||
-                    i == 1
-                ) {
-                    draw_line (context, curve_begin, tangent_1);
-                } else {
-                    var point_before = points[i - 1].last_point;
-                    tr.transform_point (ref point_before.x, ref point_before.y);
-                    draw_line (context, point_before, tangent_1);
-                }
+                draw_line (context, curve_begin, tangent_1);
+
+                context.stroke ();
+            } else if (points[i].type == Lib.Modes.PathEditMode.Type.QUADRATIC_RIGHT) {
+                var pb = points[i - 1].last_point;
+                tr.transform_point (ref pb.x, ref pb.y);
+
+                // Draw control point for curve begin and tangent.
+                draw_control_point (context, curve_end, radius);
+                draw_control_point (context, tangent_2, radius);
+                context.fill ();
+                draw_control_point (context, pb, radius);
+                context.fill ();
+
+                draw_line (context, pb, tangent_2);
 
                 context.stroke ();
             } else if (
@@ -203,7 +208,7 @@ public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
         if (segment.type == Lib.Modes.PathEditMode.Type.LINE) {
             // Line only contains 1 point so no need to check 'upto'.
             context.line_to (segment.line_end.x, segment.line_end.y);
-        } else if (segment.type == Lib.Modes.PathEditMode.Type.QUADRATIC) {
+        } else if (segment.type == Lib.Modes.PathEditMode.Type.QUADRATIC_LEFT) {
             // Quadratic will always have all 3 points, otherwise it just becomes a line.
             context.curve_to (
                 point_before.x,
@@ -212,6 +217,16 @@ public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
                 segment.tangent_1.y,
                 segment.curve_begin.x,
                 segment.curve_begin.y
+            );
+        } else if (segment.type == Lib.Modes.PathEditMode.Type.QUADRATIC_RIGHT) {
+            context.move_to (point_before.x, point_before.y);
+            context.curve_to (
+                segment.tangent_2.x,
+                segment.tangent_2.y,
+                segment.curve_end.x,
+                segment.curve_end.y,
+                segment.curve_end.x,
+                segment.curve_end.y
             );
         } else if (segment.type == Lib.Modes.PathEditMode.Type.CUBIC_SINGLE) {
             context.move_to (segment.curve_begin.x, segment.curve_begin.y);
@@ -248,12 +263,19 @@ public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
         // Now draw all the control points.
         if (segment.type == Lib.Modes.PathEditMode.Type.LINE) {
             context.stroke ();
-        } else if (segment.type == Lib.Modes.PathEditMode.Type.QUADRATIC) {
+        } else if (segment.type == Lib.Modes.PathEditMode.Type.QUADRATIC_LEFT) {
             draw_line (context, point_before, segment.tangent_1);
             context.stroke ();
 
             draw_control_point (context, point_before, radius);
             draw_control_point (context, segment.tangent_1, radius);
+            context.fill ();
+        } else if (segment.type == Lib.Modes.PathEditMode.Type.QUADRATIC_RIGHT) {
+            draw_line (context, point_before, segment.tangent_2);
+            context.stroke ();
+
+            draw_control_point (context, point_before, radius);
+            draw_control_point (context, segment.tangent_2, radius);
             context.fill ();
         } else if (segment.type == Lib.Modes.PathEditMode.Type.CUBIC_SINGLE) {
             draw_line (context, segment.tangent_1, segment.curve_begin);

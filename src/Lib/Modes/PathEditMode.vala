@@ -23,7 +23,8 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
     public enum Type {
         NONE,
         LINE,
-        QUADRATIC,
+        QUADRATIC_LEFT,
+        QUADRATIC_RIGHT,
         // Represents cubic curves. These will only be used with compound curves.
         CUBIC_SINGLE,
         // Represents curves drawn with 2 seperate cubic beziers.
@@ -180,7 +181,7 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
             edit_model.add_live_points_to_path (live_segment);
 
             if (live_segment.type == Type.CUBIC_SINGLE) {
-                live_segment = Geometry.PathSegment.quadratic_bezier (
+                live_segment = Geometry.PathSegment.quadratic_bezier_right (
                     live_segment.curve_end,
                     reflection (live_segment.tangent_2, live_segment.curve_end)
                 );
@@ -214,8 +215,11 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
             if (live_segment.type == Type.CUBIC_DOUBLE) {
                 live_segment.curve_end = point;
                 live_pnt_type = PointType.CURVE_END;
-            } else if (live_segment.type == Type.QUADRATIC) {
+            } else if (live_segment.type == Type.QUADRATIC_LEFT) {
                 live_segment.curve_begin = point;
+                live_pnt_type = PointType.TANGENT_SECOND;
+            } else if (live_segment.type == Type.QUADRATIC_RIGHT) {
+                live_segment.curve_end = point;
                 live_pnt_type = PointType.TANGENT_SECOND;
             } else {
                 // If we are hovering in LINE mode, this could be a potential line point.
@@ -272,7 +276,7 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
                 live_pnt_type = PointType.CURVE_END;
             }
         } else if (live_segment.type == Type.CUBIC_SINGLE) {
-            live_segment.type = Type.QUADRATIC;
+            live_segment.type = Type.QUADRATIC_LEFT;
             live_pnt_type = PointType.CURVE_END;
         } else if (live_segment.type == Type.CUBIC_DOUBLE) {
             // Here we dont include the CURVE_BEGIN case because
@@ -285,7 +289,7 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
             } else if (live_pnt_type == PointType.CURVE_END) {
                 live_pnt_type = PointType.TANGENT_SECOND;
             }
-        } else if (live_segment.type == Type.QUADRATIC) {
+        } else if (live_segment.type == Type.QUADRATIC_LEFT) {
             live_segment.type = Type.LINE;
             live_pnt_type = PointType.LINE_END;
         }
@@ -393,7 +397,7 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
         // It means we are inserting a compound bezier curve.
         if (live_pnt_type == PointType.CURVE_END && live_segment.type == Type.CUBIC_DOUBLE) {
             // Make the first half of the live segment as a quadratic curve and add to path.
-            var new_segment = Geometry.PathSegment.quadratic_bezier (
+            var new_segment = Geometry.PathSegment.quadratic_bezier_left (
                 live_segment.curve_begin,
                 live_segment.tangent_1
             );
@@ -409,7 +413,7 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
             );
 
             live_pnt_type = PointType.TANGENT_SECOND;
-        } else if (live_pnt_type == PointType.CURVE_END && live_segment.type == Type.QUADRATIC) {
+        } else if (live_pnt_type == PointType.CURVE_END && live_segment.type == Type.QUADRATIC_LEFT) {
             // If we clicked and dragged when inserting a quadratic curve,
             // Turn this quadratic curve into a single bezier curve.
             live_segment = Geometry.PathSegment.cubic_bezier_single (

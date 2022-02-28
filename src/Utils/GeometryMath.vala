@@ -314,49 +314,40 @@ public class Akira.Utils.GeometryMath : Object {
         bounds.bottom = double.MIN;
 
         foreach (var pt in points) {
+            // Create a list of all points we need to calculate bounds for.
+            Geometry.Point[] pts_in_segment = new Geometry.Point[0];
+
             if (pt.type == Lib.Modes.PathEditMode.Type.LINE) {
-                bounds.left = double.min (bounds.left, pt.line_end.x);
-                bounds.right = double.max (bounds.right, pt.line_end.x);
-                bounds.top = double.min (bounds.top, pt.line_end.y);
-                bounds.bottom = double.max (bounds.bottom, pt.line_end.y);
-            } else if (pt.type == Lib.Modes.PathEditMode.Type.QUADRATIC) {
-                bounds.left = double.min (bounds.left, pt.curve_begin.x);
-                bounds.right = double.max (bounds.right, pt.curve_begin.x);
-                bounds.top = double.min (bounds.top, pt.curve_begin.y);
-                bounds.bottom = double.max (bounds.bottom, pt.curve_begin.y);
+                pts_in_segment = new Geometry.Point[1];
+                pts_in_segment[0] = pt.line_end;
+            } else if (pt.type == Lib.Modes.PathEditMode.Type.QUADRATIC_LEFT) {
+                pts_in_segment = new Geometry.Point[2];
+                pts_in_segment[0] = pt.curve_begin;
+                pts_in_segment[1] = pt.tangent_1;
+            } else if (pt.type == Lib.Modes.PathEditMode.Type.QUADRATIC_RIGHT) {
+                pts_in_segment = new Geometry.Point[2];
+                pts_in_segment[0] = pt.curve_end;
+                pts_in_segment[1] = pt.tangent_2;
+            } else if (pt.type == Lib.Modes.PathEditMode.Type.CUBIC_SINGLE) {
+                pts_in_segment = new Geometry.Point[4];
+                pts_in_segment[0] = pt.curve_begin;
+                pts_in_segment[1] = pt.tangent_1;
+                pts_in_segment[2] = pt.tangent_2;
+                pts_in_segment[3] = pt.curve_end;
+            } else if (pt.type == Lib.Modes.PathEditMode.Type.CUBIC_DOUBLE) {
+                pts_in_segment = new Geometry.Point[4];
+                pts_in_segment[0] = pt.curve_begin;
+                pts_in_segment[1] = pt.tangent_1;
+                pts_in_segment[2] = pt.tangent_2;
+                pts_in_segment[3] = pt.curve_end;
+            }
 
-                bounds.left = double.min (bounds.left, pt.tangent_1.x);
-                bounds.right = double.max (bounds.right, pt.tangent_1.x);
-                bounds.top = double.min (bounds.top, pt.tangent_1.y);
-                bounds.bottom = double.max (bounds.bottom, pt.tangent_1.y);
-
-                bounds.left = double.min (bounds.left, pt.curve_end.x);
-                bounds.right = double.max (bounds.right, pt.curve_end.x);
-                bounds.top = double.min (bounds.top, pt.curve_end.y);
-                bounds.bottom = double.max (bounds.bottom, pt.curve_end.y);
-            } else if (
-                pt.type == Lib.Modes.PathEditMode.Type.CUBIC_SINGLE ||
-                pt.type == Lib.Modes.PathEditMode.Type.CUBIC_DOUBLE
-            ) {
-                bounds.left = double.min (bounds.left, pt.curve_begin.x);
-                bounds.right = double.max (bounds.right, pt.curve_begin.x);
-                bounds.top = double.min (bounds.top, pt.curve_begin.y);
-                bounds.bottom = double.max (bounds.bottom, pt.curve_begin.y);
-
-                bounds.left = double.min (bounds.left, pt.tangent_1.x);
-                bounds.right = double.max (bounds.right, pt.tangent_1.x);
-                bounds.top = double.min (bounds.top, pt.tangent_1.y);
-                bounds.bottom = double.max (bounds.bottom, pt.tangent_1.y);
-
-                bounds.left = double.min (bounds.left, pt.tangent_2.x);
-                bounds.right = double.max (bounds.right, pt.tangent_2.x);
-                bounds.top = double.min (bounds.top, pt.tangent_2.y);
-                bounds.bottom = double.max (bounds.bottom, pt.tangent_2.y);
-
-                bounds.left = double.min (bounds.left, pt.curve_end.x);
-                bounds.right = double.max (bounds.right, pt.curve_end.x);
-                bounds.top = double.min (bounds.top, pt.curve_end.y);
-                bounds.bottom = double.max (bounds.bottom, pt.curve_end.y);
+            // Update bounds for all these points.
+            foreach (var point in pts_in_segment) {
+                bounds.left = double.min (bounds.left, point.x);
+                bounds.right = double.max (bounds.right, point.x);
+                bounds.top = double.min (bounds.top, point.y);
+                bounds.bottom = double.max (bounds.bottom, point.y);
             }
         }
 
@@ -389,8 +380,15 @@ public class Akira.Utils.GeometryMath : Object {
 
             temp = double.max (b1_extremes[3], b2_extremes[3]);
             max_y = double.max (max_y, temp);
-        } else if (segment.type == Lib.Modes.PathEditMode.Type.QUADRATIC) {
+        } else if (segment.type == Lib.Modes.PathEditMode.Type.QUADRATIC_LEFT) {
             double[] b_extremes = Utils.Bezier.get_extremes (point_before, p2, p1);
+
+            min_x = double.min (b_extremes[0], min_x);
+            min_y = double.min (b_extremes[1], min_y);
+            max_x = double.max (b_extremes[2], max_x);
+            max_y = double.max (b_extremes[3], max_y);
+        } else if (segment.type == Lib.Modes.PathEditMode.Type.QUADRATIC_RIGHT) {
+            double[] b_extremes = Utils.Bezier.get_extremes (point_before, p3, p4);
 
             min_x = double.min (b_extremes[0], min_x);
             min_y = double.min (b_extremes[1], min_y);

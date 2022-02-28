@@ -52,12 +52,18 @@ public class Akira.Drawables.DrawablePath : Drawable {
             var point = points[i];
             if (point.type == Lib.Modes.PathEditMode.Type.LINE) {
                 cr.line_to (point.line_end.x, point.line_end.y);
-            } else if (point.type == Lib.Modes.PathEditMode.Type.QUADRATIC) {
+            } else if (point.type == Lib.Modes.PathEditMode.Type.QUADRATIC_LEFT) {
                 var pb = points[i - 1].last_point;
                 var cb = point.curve_begin;
                 var t1 = point.tangent_1;
                 cr.move_to (pb.x, pb.y);
                 cr.curve_to (pb.x, pb.y, t1.x, t1.y, cb.x, cb.y);
+            } else if (point.type == Lib.Modes.PathEditMode.Type.QUADRATIC_RIGHT) {
+                var pb = points[i - 1].last_point;
+                var ce = point.curve_end;
+                var t2 = point.tangent_2;
+                cr.move_to (pb.x, pb.y);
+                cr.curve_to (t2.x, t2.y, ce.x, ce.y, ce.x, ce.y);
             } else if (point.type == Lib.Modes.PathEditMode.Type.CUBIC_SINGLE) {
                 var cb = point.curve_begin;
                 var t1 = point.tangent_1;

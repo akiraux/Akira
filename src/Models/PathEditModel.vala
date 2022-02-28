@@ -147,7 +147,7 @@ public class Akira.Models.PathEditModel : Object {
             new_live_pts = last_segment.copy ();
             new_live_pts.translate (-orig_first_pt.x, -orig_first_pt.y);
             new_live_pts.transform (transform_matrix);
-        } else if (last_segment.type == Lib.Modes.PathEditMode.Type.QUADRATIC) {
+        } else if (last_segment.type == Lib.Modes.PathEditMode.Type.QUADRATIC_LEFT) {
             //  assert(false);
             new_live_pts = last_segment.copy ();
             new_live_pts.translate (-orig_first_pt.x, -orig_first_pt.y);
@@ -226,7 +226,7 @@ public class Akira.Models.PathEditModel : Object {
                 }
 
                 if (
-                    points[i].type == Lib.Modes.PathEditMode.Type.QUADRATIC ||
+                    points[i].type == Lib.Modes.PathEditMode.Type.QUADRATIC_LEFT ||
                     points[i].type == Lib.Modes.PathEditMode.Type.CUBIC_SINGLE
                 ) {
                     sel_pnt.tangents_staggered = true;
@@ -235,7 +235,7 @@ public class Akira.Models.PathEditModel : Object {
 
             if (i != points.length - 1 && points[i].type != Lib.Modes.PathEditMode.Type.LINE) {
                 if (
-                    points[i + 1].type == Lib.Modes.PathEditMode.Type.QUADRATIC ||
+                    points[i + 1].type == Lib.Modes.PathEditMode.Type.QUADRATIC_LEFT ||
                     points[i + 1].type == Lib.Modes.PathEditMode.Type.CUBIC_SINGLE
                 ) {
                     if (hit_type == Lib.Modes.PathEditMode.PointType.CURVE_BEGIN) {
