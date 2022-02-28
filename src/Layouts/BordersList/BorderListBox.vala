@@ -100,6 +100,9 @@ public class Akira.Layouts.BordersList.BorderListBox : VirtualizingListBox {
         var added = 0;
         foreach (var selected in sm.selection.nodes.values) {
             var node = selected.node;
+            if (node.instance.components.borders == null) {
+                continue;
+            }
             foreach (var border in node.instance.components.borders.data) {
                 var item = new BorderItemModel (view_canvas, node, border.id);
                 borders[node.id] = item;

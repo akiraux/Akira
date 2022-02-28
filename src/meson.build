@@ -52,6 +52,7 @@ sources = files(
 
     'Layouts/BordersList/BorderItemModel.vala',
     'Layouts/BordersList/BorderListBox.vala',
+    'Layouts/BordersList/BorderListItem.vala',
     'Layouts/BordersList/BorderListStore.vala',
     'Layouts/BordersList/BordersPanel.vala',
 
@@ -118,7 +119,6 @@ sources = files(
     'Drawables/DrawableRect.vala',
     'Drawables/DrawableText.vala',
 
-    'Lib/Components/Border.vala',
     'Lib/Components/Borders.vala',
     'Lib/Components/BorderRadius.vala',
     'Lib/Components/Color.vala',
