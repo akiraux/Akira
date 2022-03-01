@@ -60,8 +60,8 @@ public class Akira.Layouts.BordersList.BordersPanel : Gtk.Grid {
 
         var scrolled_window = new Gtk.ScrolledWindow (null, null) {
             hscrollbar_policy = Gtk.PolicyType.NEVER,
-            vscrollbar_policy = Gtk.PolicyType.NEVER,
-            expand = true,
+            vscrollbar_policy = Gtk.PolicyType.AUTOMATIC,
+            expand = false,
             margin = 3
         };
         scrolled_window.add (borders_listbox);

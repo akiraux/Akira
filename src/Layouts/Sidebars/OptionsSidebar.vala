@@ -43,33 +43,24 @@ public class Akira.Layouts.Sidebars.OptionsSidebar : Gtk.Grid {
     construct {
         get_style_context ().add_class ("sidebar-l");
 
-        var align_items_panel = new Layouts.Alignment.AlignmentPanel (view_canvas);
-        attach (align_items_panel, 0, 0);
+        // The alignment panel is the only widget that doesn't scroll.
+        attach (new Layouts.Alignment.AlignmentPanel (view_canvas), 0, 0);
 
-        var scrolled_grid = new Gtk.Grid () {
-            expand = true
-        };
-        scrolled_grid.attach (new Layouts.Transforms.TransformPanel (view_canvas), 0, 0);
-
-        fills_panel = new Layouts.FillsList.FillsPanel (view_canvas);
-        scrolled_grid.attach (fills_panel, 0, 1);
-
-        var fills_scroller = new Gtk.ScrolledWindow (null, null) {
+        var main_scroll = new Gtk.ScrolledWindow (null, null) {
             hscrollbar_policy = Gtk.PolicyType.NEVER,
             expand = true
         };
-        fills_scroller.add (scrolled_grid);
-        attach (fills_scroller, 0, 1);
 
+        fills_panel = new Layouts.FillsList.FillsPanel (view_canvas);
         borders_panel = new Layouts.BordersList.BordersPanel (view_canvas);
-        scrolled_grid.attach (borders_panel, 0, 2);
 
-        // var borders_scroller = new Gtk.ScrolledWindow (null, null) {
-        //     hscrollbar_policy = Gtk.PolicyType.NEVER,
-        //     expand = true
-        // };
-        // borders_scroller.add (scrolled_grid);
-        // attach (borders_scroller, 0, 2);
+        var main_grid = new Gtk.Grid ();
+        main_grid.attach (new Layouts.Transforms.TransformPanel (view_canvas), 0, 0);
+        main_grid.attach (fills_panel, 0, 1);
+        main_grid.attach (borders_panel, 0, 2);
+
+        main_scroll.add (main_grid);
+        attach (main_scroll, 0, 1);
 
         // Connect signals.
         view_canvas.window.event_bus.toggle_presentation_mode.connect (toggle);

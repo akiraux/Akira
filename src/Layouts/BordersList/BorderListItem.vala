@@ -74,7 +74,7 @@ public class Akira.Layouts.BordersList.BorderListItem : VirtualizingListBoxRow {
         };
         delete_button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
         delete_button.get_style_context ().add_class ("button-rounded");
-        delete_button.clicked.connect (delete_fill);
+        delete_button.clicked.connect (delete_border);
         grid.add (delete_button);
 
         add (grid);
@@ -113,8 +113,8 @@ public class Akira.Layouts.BordersList.BorderListItem : VirtualizingListBoxRow {
         current_state = model.hidden;
     }
 
-    private void delete_fill () {
+    private void delete_border () {
         model.delete ();
-        view_canvas.window.main_window.refresh_fills ();
+        view_canvas.window.main_window.refresh_borders ();
     }
 }
