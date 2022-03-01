@@ -143,12 +143,13 @@ public class Akira.Models.PathEditModel : Object {
             new_live_pts.translate (-orig_first_pt.x, -orig_first_pt.y);
             new_live_pts.transform (transform_matrix);
         } else if (last_segment.type == Lib.Modes.PathEditMode.Type.CUBIC_SINGLE) {
-            //  assert(false);
             new_live_pts = last_segment.copy ();
             new_live_pts.translate (-orig_first_pt.x, -orig_first_pt.y);
             new_live_pts.transform (transform_matrix);
-        } else if (last_segment.type == Lib.Modes.PathEditMode.Type.QUADRATIC_LEFT) {
-            //  assert(false);
+        } else if (
+            last_segment.type == Lib.Modes.PathEditMode.Type.QUADRATIC_LEFT ||
+            last_segment.type == Lib.Modes.PathEditMode.Type.QUADRATIC_RIGHT
+        ) {
             new_live_pts = last_segment.copy ();
             new_live_pts.translate (-orig_first_pt.x, -orig_first_pt.y);
             new_live_pts.transform (transform_matrix);
@@ -233,17 +234,23 @@ public class Akira.Models.PathEditModel : Object {
                 }
             }
 
+            // Following code checks the current segment, segment and the hit type to find overlapping points.
             if (i != points.length - 1 && points[i].type != Lib.Modes.PathEditMode.Type.LINE) {
                 if (
-                    points[i + 1].type == Lib.Modes.PathEditMode.Type.QUADRATIC_LEFT ||
-                    points[i + 1].type == Lib.Modes.PathEditMode.Type.CUBIC_SINGLE
+                    points[i + 1].type == Lib.Modes.PathEditMode.Type.CUBIC_SINGLE ||
+                    points[i + 1].type == Lib.Modes.PathEditMode.Type.QUADRATIC_RIGHT
                 ) {
                     if (hit_type == Lib.Modes.PathEditMode.PointType.CURVE_BEGIN) {
                         underlying_pt.sel_index = i + 1;
                         underlying_pt.sel_type = Lib.Modes.PathEditMode.PointType.CURVE_BEGIN;
-                    } else if (hit_type == Lib.Modes.PathEditMode.PointType.CURVE_END && points[i + 1].type == Lib.Modes.PathEditMode.Type.CUBIC_SINGLE) {
+                    } else if (hit_type == Lib.Modes.PathEditMode.PointType.CURVE_END) {
+                        if (points[i + 1].type == Lib.Modes.PathEditMode.Type.CUBIC_SINGLE) {
+                            underlying_pt.sel_type = Lib.Modes.PathEditMode.PointType.CURVE_BEGIN;
+                        } else if (points[i + 1].type == Lib.Modes.PathEditMode.Type.QUADRATIC_RIGHT) {
+                            underlying_pt.sel_type = Lib.Modes.PathEditMode.PointType.CURVE_BEGIN;
+                        }
+
                         underlying_pt.sel_index = i + 1;
-                        underlying_pt.sel_type = Lib.Modes.PathEditMode.PointType.CURVE_BEGIN;
                     }
                 }
             }
@@ -377,52 +384,6 @@ public class Akira.Models.PathEditModel : Object {
         }
 
         return false;
-    }
-
-    public void toggle_point_type (Geometry.SelectedPoint sel_point) {
-        if (points[sel_point.sel_index].type == Lib.Modes.PathEditMode.Type.LINE) {
-            // Segment before and after the segment being toggled. Needed for calculating tangents.
-            Geometry.PathSegment? segment_before = null;
-            Geometry.PathSegment? segment_after = null;
-
-            if (sel_point.sel_index != 0) {
-                segment_before = points[sel_point.sel_index - 1];
-            }
-
-            if (sel_point.sel_index != points.length - 1) {
-                segment_after = points[sel_point.sel_index + 1];
-            }
-
-            // If first segment needs to be toggled, we toggle the segment after that.
-            // This is because of the way quadratics are drawn.
-            if (segment_before == null) {
-                points[sel_point.sel_index + 1].line_to_curve (points[0], null);
-            } else {
-                points[sel_point.sel_index].line_to_curve (segment_before, segment_after);
-
-                // When line is turned to a curve, the segment after line becomes CURVE_END.
-                // So the next segment needs to be deleted.
-                if (segment_after != null) {
-                    delete_point (sel_point.sel_index + 1);
-                }
-            }
-
-        } else {
-            // After converting a curve to a line, the curve_end must be made a line segment,
-            // so that we dont lose a segment.
-            var curr_segment = points[sel_point.sel_index];
-            var segment_after = Geometry.PathSegment.line (curr_segment.curve_end);
-            points[sel_point.sel_index].curve_to_line ();
-
-            if (curr_segment.type == Lib.Modes.PathEditMode.Type.CUBIC_DOUBLE) {
-                add_point_to_path (segment_after, sel_point.sel_index + 1);
-            }
-        }
-
-        bool close = instance.components.path.close;
-        points = recalculate_points (points);
-        instance.components.path = new Lib.Components.Path.from_points (points, close);
-        recompute_components ();
     }
 
     /*

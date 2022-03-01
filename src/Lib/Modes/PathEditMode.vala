@@ -289,7 +289,7 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
             } else if (live_pnt_type == PointType.CURVE_END) {
                 live_pnt_type = PointType.TANGENT_SECOND;
             }
-        } else if (live_segment.type == Type.QUADRATIC_LEFT) {
+        } else if (live_segment.type == Type.QUADRATIC_LEFT || live_segment.type == Type.QUADRATIC_RIGHT) {
             live_segment.type = Type.LINE;
             live_pnt_type = PointType.LINE_END;
         }
@@ -317,12 +317,6 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
 
         if (!is_selected) {
             return false;
-        }
-
-        // If user double clicked on a point, it needs to be converted to line/curve.
-        if (event.type == Gdk.EventType.@2BUTTON_PRESS) {
-            edit_model.toggle_point_type (sel_point);
-            return true;
         }
 
         // If this point has already been selected before, make it the reference.
@@ -413,14 +407,14 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
             );
 
             live_pnt_type = PointType.TANGENT_SECOND;
-        } else if (live_pnt_type == PointType.CURVE_END && live_segment.type == Type.QUADRATIC_LEFT) {
+        } else if (live_pnt_type == PointType.CURVE_END && live_segment.type == Type.QUADRATIC_RIGHT) {
             // If we clicked and dragged when inserting a quadratic curve,
             // Turn this quadratic curve into a single bezier curve.
             live_segment = Geometry.PathSegment.cubic_bezier_single (
                 edit_model.get_last_point_from_path (),
-                live_segment.tangent_1,
+                live_segment.tangent_2,
                 point,
-                live_segment.curve_begin
+                live_segment.curve_end
             );
 
             live_pnt_type = PointType.TANGENT_SECOND;
