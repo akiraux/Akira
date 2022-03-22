@@ -92,6 +92,7 @@ sources = files(
     'Widgets/VirtualizingListBox/VirtualizingListBox.vala',
     'Widgets/VirtualizingListBox/VirtualizingListBoxModel.vala',
     'Widgets/VirtualizingListBox/VirtualizingListBoxRow.vala',
+    'Widgets/VirtualizingListBox/VirtualizingSimpleListBox.vala',
 
     'ViewLayers/BaseCanvas.vala',
     'ViewLayers/ViewLayer.vala',

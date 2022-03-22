@@ -22,7 +22,7 @@
 /*
  * The scrollable fills panel.
  */
-public class Akira.Layouts.FillsList.FillListBox : VirtualizingListBox {
+public class Akira.Layouts.FillsList.FillListBox : VirtualizingSimpleListBox {
     public unowned Akira.Lib.ViewCanvas view_canvas { get; construct; }
 
     private Gee.HashMap<int, FillItemModel> fills;
