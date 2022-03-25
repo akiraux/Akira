@@ -33,7 +33,6 @@ public class Akira.Layouts.FillsList.FillListBox : VirtualizingSimpleListBox {
             view_canvas: canvas
         );
 
-        selection_mode = Gtk.SelectionMode.SINGLE;
         fills = new Gee.HashMap<int, FillItemModel> ();
         list_store = new FillListStore ();
         // list_store.set_sort_func (fills_sort_function);
@@ -56,32 +55,6 @@ public class Akira.Layouts.FillsList.FillListBox : VirtualizingSimpleListBox {
 
             return row;
         };
-
-        // Listen to the button release event only for the secondary click in
-        // order to trigger the context menu.
-        button_release_event.connect (e => {
-            if (e.button != Gdk.BUTTON_SECONDARY) {
-                return Gdk.EVENT_PROPAGATE;
-            }
-            var row = get_row_at_y ((int)e.y);
-            if (row == null) {
-                return Gdk.EVENT_PROPAGATE;
-            }
-
-            if (selected_row_widget != row) {
-                select_row (row);
-            }
-            return create_context_menu (e, (FillListItem)row);
-        });
-
-        // Trigger the context menu when the `menu` key is pressed.
-        key_release_event.connect ((e) => {
-            if (e.keyval != Gdk.Key.Menu) {
-                return Gdk.EVENT_PROPAGATE;
-            }
-            var row = selected_row_widget;
-            return create_context_menu (e, (FillListItem)row);
-        });
     }
 
     public void refresh_list () {
@@ -112,20 +85,5 @@ public class Akira.Layouts.FillsList.FillListBox : VirtualizingSimpleListBox {
         }
 
         list_store.items_changed (0, 0, added);
-    }
-
-    private bool create_context_menu (Gdk.Event e, FillListItem row) {
-        var menu = new Gtk.Menu ();
-        menu.show_all ();
-
-        if (e.type == Gdk.EventType.BUTTON_RELEASE) {
-            menu.popup_at_pointer (e);
-            return Gdk.EVENT_STOP;
-        } else if (e.type == Gdk.EventType.KEY_RELEASE) {
-            menu.popup_at_widget (row, Gdk.Gravity.EAST, Gdk.Gravity.CENTER, e);
-            return Gdk.EVENT_STOP;
-        }
-
-        return Gdk.EVENT_PROPAGATE;
     }
 }
