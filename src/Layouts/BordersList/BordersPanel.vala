@@ -57,15 +57,7 @@ public class Akira.Layouts.BordersList.BordersPanel : Gtk.Grid {
         attach (title_cont, 0, 0, 1, 1);
 
         borders_listbox = new BorderListBox (view_canvas);
-
-        var scrolled_window = new Gtk.ScrolledWindow (null, null) {
-            hscrollbar_policy = Gtk.PolicyType.NEVER,
-            vscrollbar_policy = Gtk.PolicyType.AUTOMATIC,
-            expand = false,
-            margin = 3
-        };
-        scrolled_window.add (borders_listbox);
-        attach (scrolled_window, 0, 1, 1, 1);
+        attach (borders_listbox, 0, 1, 1, 1);
 
         // Show the widget by default.
         show_all ();

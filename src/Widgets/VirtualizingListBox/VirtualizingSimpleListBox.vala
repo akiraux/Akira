@@ -69,6 +69,10 @@ public class VirtualizingSimpleListBox : Gtk.Container {
         set_css_name ("list");
     }
 
+    construct {
+        margin_top = margin_bottom = 6;
+    }
+
     public override void realize () {
         set_realized (true);
         Gtk.Allocation allocation;

@@ -20,9 +20,9 @@
  */
 
 /*
- * The scrollable borders panel.
+ * The borders panel.
  */
-public class Akira.Layouts.BordersList.BorderListBox : VirtualizingListBox {
+public class Akira.Layouts.BordersList.BorderListBox : VirtualizingSimpleListBox {
     public unowned Lib.ViewCanvas view_canvas { get; construct; }
 
     private Gee.HashMap<int, BorderItemModel> borders;
@@ -33,7 +33,6 @@ public class Akira.Layouts.BordersList.BorderListBox : VirtualizingListBox {
             view_canvas: canvas
         );
 
-        selection_mode = Gtk.SelectionMode.SINGLE;
         borders = new Gee.HashMap<int, BorderItemModel> ();
         list_store = new BorderListStore ();
         // list_store.set_sort_func (borders_sort_function);
@@ -56,32 +55,6 @@ public class Akira.Layouts.BordersList.BorderListBox : VirtualizingListBox {
 
             return row;
         };
-
-        // Listen to the button release event only for the secondary click in
-        // order to trigger the context menu.
-        button_release_event.connect (e => {
-            if (e.button != Gdk.BUTTON_SECONDARY) {
-                return Gdk.EVENT_PROPAGATE;
-            }
-            var row = get_row_at_y ((int)e.y);
-            if (row == null) {
-                return Gdk.EVENT_PROPAGATE;
-            }
-
-            if (selected_row_widget != row) {
-                select_row (row);
-            }
-            return create_context_menu (e, (BorderListItem)row);
-        });
-
-        // Trigger the context menu when the `menu` key is pressed.
-        key_release_event.connect ((e) => {
-            if (e.keyval != Gdk.Key.Menu) {
-                return Gdk.EVENT_PROPAGATE;
-            }
-            var row = selected_row_widget;
-            return create_context_menu (e, (BorderListItem)row);
-        });
     }
 
     public void refresh_list () {
@@ -93,12 +66,19 @@ public class Akira.Layouts.BordersList.BorderListBox : VirtualizingListBox {
         }
 
         unowned var sm = view_canvas.selection_manager;
-        if (sm.count () == 0) {
+        var count = sm.count ();
+        if (count == 0) {
             return;
         }
 
         var added = 0;
         foreach (var selected in sm.selection.nodes.values) {
+            // Break out of the look if we have multiple selected items and more
+            // than 4 fills to avoid creating too many widgets at once.
+            if (added > 4 && count > 1) {
+                break;
+            }
+
             var node = selected.node;
             if (node.instance.components.borders == null) {
                 continue;
@@ -112,20 +92,5 @@ public class Akira.Layouts.BordersList.BorderListBox : VirtualizingListBox {
         }
 
         list_store.items_changed (0, 0, added);
-    }
-
-    private bool create_context_menu (Gdk.Event e, BorderListItem row) {
-        var menu = new Gtk.Menu ();
-        menu.show_all ();
-
-        if (e.type == Gdk.EventType.BUTTON_RELEASE) {
-            menu.popup_at_pointer (e);
-            return Gdk.EVENT_STOP;
-        } else if (e.type == Gdk.EventType.KEY_RELEASE) {
-            menu.popup_at_widget (row, Gdk.Gravity.EAST, Gdk.Gravity.CENTER, e);
-            return Gdk.EVENT_STOP;
-        }
-
-        return Gdk.EVENT_PROPAGATE;
     }
 }

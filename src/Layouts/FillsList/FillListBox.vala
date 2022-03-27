@@ -20,7 +20,7 @@
  */
 
 /*
- * The scrollable fills panel.
+ * The fills panel.
  */
 public class Akira.Layouts.FillsList.FillListBox : VirtualizingSimpleListBox {
     public unowned Akira.Lib.ViewCanvas view_canvas { get; construct; }
@@ -66,12 +66,19 @@ public class Akira.Layouts.FillsList.FillListBox : VirtualizingSimpleListBox {
         }
 
         unowned var sm = view_canvas.selection_manager;
-        if (sm.count () == 0) {
+        var count = sm.count ();
+        if (count == 0) {
             return;
         }
 
         var added = 0;
         foreach (var selected in sm.selection.nodes.values) {
+            // Break out of the look if we have multiple selected items and more
+            // than 4 fills to avoid creating too many widgets at once.
+            if (added > 4 && count > 1) {
+                break;
+            }
+
             var node = selected.node;
             if (node.instance.components.fills == null) {
                 continue;
