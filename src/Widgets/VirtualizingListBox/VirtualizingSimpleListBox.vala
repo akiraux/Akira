@@ -91,18 +91,12 @@ public class VirtualizingSimpleListBox : Gtk.Container {
     }
 
     public override void size_allocate (Gtk.Allocation allocation) {
-        bool height_changed = allocation.height != get_allocated_height ();
-        bool width_changed = allocation.width != get_allocated_width ();
         set_allocation (allocation);
         position_children ();
 
         if (get_realized ()) {
             get_window ().move_resize (allocation.x, allocation.y, allocation.width, allocation.height);
             update_bin_window ();
-        }
-
-        if (height_changed || width_changed) {
-            ensure_visible_widgets ();
         }
     }
 
@@ -154,7 +148,7 @@ public class VirtualizingSimpleListBox : Gtk.Container {
         remove_all_widgets ();
         shown = 0;
         update_bin_window ();
-        ensure_visible_widgets (removed > 0 || added > 0);
+        ensure_visible_widgets ();
         queue_resize ();
     }
 
@@ -249,18 +243,17 @@ public class VirtualizingSimpleListBox : Gtk.Container {
 
             int min = get_widget_height (new_widget);
             bin_height += min;
-            shown ++;
+            shown++;
         }
     }
 
-    private void ensure_visible_widgets (bool model_changed = false) {
+    private void ensure_visible_widgets () {
         if (!get_mapped () || model == null) {
             return;
         }
 
         var bin_height = bin_window.get_height ();
         insert_widgets (ref bin_height);
-
         update_bin_window (bin_height);
         position_children ();
         queue_draw ();
