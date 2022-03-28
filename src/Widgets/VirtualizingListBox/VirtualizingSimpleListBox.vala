@@ -44,26 +44,13 @@ public class VirtualizingSimpleListBox : Gtk.Container {
         }
     }
 
-    private bool bin_window_full {
-        get {
-            int bin_height = 0;
-            if (get_realized ()) {
-                bin_height = bin_window.get_height ();
-            }
-
-            var widget_height = get_allocated_height ();
-            return (bin_height > widget_height) || (shown_to - shown_from == model.get_n_items ());
-        }
-    }
-
     // The default height of a row, used to trigger an initial scroll adjustment.
     private double? default_widget_height = null;
 
     private Gee.ArrayList<VirtualizingListBoxRow> current_widgets = new Gee.ArrayList<VirtualizingListBoxRow> ();
     private Gee.ArrayList<VirtualizingListBoxRow> recycled_widgets = new Gee.ArrayList<VirtualizingListBoxRow> ();
     private Gdk.Window bin_window;
-    private uint shown_to;
-    private uint shown_from;
+    private uint shown;
 
     static construct {
         set_css_name ("list");
@@ -164,13 +151,8 @@ public class VirtualizingSimpleListBox : Gtk.Container {
     }
 
     private void on_items_changed (uint position, uint removed, uint added) {
-        if (position >= shown_to && bin_window_full) {
-            queue_resize ();
-            return;
-        }
-
         remove_all_widgets ();
-        shown_to = shown_from;
+        shown = 0;
         update_bin_window ();
         ensure_visible_widgets (removed > 0 || added > 0);
         queue_resize ();
@@ -256,10 +238,10 @@ public class VirtualizingSimpleListBox : Gtk.Container {
     }
 
     private void insert_widgets (ref int bin_height) {
-        while (shown_to < model.get_n_items ()) {
-            var new_widget = get_widget (shown_to);
+        while (shown < model.get_n_items ()) {
+            var new_widget = get_widget (shown);
             if (new_widget == null) {
-                shown_to++;
+                shown++;
                 continue;
             }
 
@@ -267,7 +249,7 @@ public class VirtualizingSimpleListBox : Gtk.Container {
 
             int min = get_widget_height (new_widget);
             bin_height += min;
-            shown_to ++;
+            shown ++;
         }
     }
 
