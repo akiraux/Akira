@@ -56,7 +56,7 @@ public class Akira.Widgets.EyeDropperButton : Gtk.Button {
         eyedropper.show_all ();
 
         eyedropper.picked.connect ((picked_color) => {
-            model.color = picked_color;
+            model.pattern = new Lib.Components.Pattern.solid (picked_color, false);
             eyedropper.close ();
         });
 

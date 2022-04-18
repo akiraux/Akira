@@ -41,17 +41,14 @@ public class Akira.Models.ColorModel : GLib.Object {
 
     protected int block_signal = 0;
 
-    private Gdk.RGBA _color;
-    public Gdk.RGBA color {
+    private Lib.Components.Pattern _pattern;
+    public Lib.Components.Pattern pattern {
         get {
-            return _color;
+            return _pattern;
         }
-        set {
-            if (value == _color) {
-                return;
-            }
 
-            _color = value;
+        set {
+            _pattern = value;
             on_value_changed ();
             value_changed ();
         }

@@ -76,9 +76,9 @@ public class Akira.Widgets.OpacityField : Gtk.Grid {
             return;
         }
 
-        var new_color = model.color;
+        var new_color = model.pattern.get_first_color ();
         new_color.alpha = field.entry.value / 100;
-        model.color = new_color;
+        model.pattern = new Lib.Components.Pattern.solid (new_color, false);
     }
 
     /*
@@ -86,12 +86,13 @@ public class Akira.Widgets.OpacityField : Gtk.Grid {
      */
     private void on_model_changed () {
         sensitive = !model.hidden;
-        if (field.entry.value / 100 == model.color.alpha) {
+        var color = model.pattern.get_first_color ();
+        if (field.entry.value / 100 == color.alpha) {
             return;
         }
 
         var blocker = new SignalBlocker (this);
         (blocker);
-        field.entry.value = Math.round (model.color.alpha * 100);
+        field.entry.value = Math.round (color.alpha * 100);
     }
 }

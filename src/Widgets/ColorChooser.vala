@@ -23,7 +23,7 @@
  * Helper class to create a container for the GtkColorChooser.
  */
 public class Akira.Widgets.ColorChooser : Gtk.Grid {
-    public signal void color_changed (Gdk.RGBA color);
+    public signal void pattern_changed (Lib.Components.Pattern pattern);
 
     private Gtk.ColorChooserWidget chooser;
     private Gtk.FlowBox global_flowbox;
@@ -134,6 +134,7 @@ public class Akira.Widgets.ColorChooser : Gtk.Grid {
     }
 
     private void on_color_changed () {
-        color_changed (chooser.get_rgba ());
+        var pattern = new Lib.Components.Pattern.solid (chooser.get_rgba (), false);
+        pattern_changed (pattern);
     }
 }

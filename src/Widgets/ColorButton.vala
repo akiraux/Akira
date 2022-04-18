@@ -76,7 +76,8 @@ public class Akira.Widgets.ColorButton : Gtk.Button {
     private void on_model_changed () {
         sensitive = !model.hidden;
 
-        var new_color = model.color.to_string ();
+        //  var new_color = model.color.to_string ();
+        var new_color = model.pattern.get_first_color ().to_string ();
         if (new_color == current_color) {
             return;
         }
@@ -104,11 +105,11 @@ public class Akira.Widgets.ColorButton : Gtk.Button {
         }
 
         color_chooser = new ColorChooser ();
-        color_chooser.color_changed.connect (color => {
+        color_chooser.pattern_changed.connect (pattern => {
             if (block_signal > 0) {
                 return;
             }
-            model.color = color;
+            model.pattern = pattern;
         });
         color_popover.add (color_chooser);
     }
@@ -120,7 +121,10 @@ public class Akira.Widgets.ColorButton : Gtk.Button {
 
         var blocker = new SignalBlocker (this);
         (blocker);
-        color_chooser.set_color (model.color);
+        
+        Gdk.RGBA rgba = model.pattern.get_first_color ();
+        
+        color_chooser.set_color (rgba);
         color_popover.popup ();
     }
 }

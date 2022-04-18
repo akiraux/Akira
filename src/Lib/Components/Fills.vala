@@ -22,16 +22,16 @@
 public class Akira.Lib.Components.Fills : Component, Copyable<Fills> {
     public struct Fill {
         public int _id;
-        public Color _color;
+        public Pattern _pattern;
 
-        public Fill (int id = -1, Color color = Color ()) {
+        public Fill (int id = -1, Pattern pattern = new Pattern ()) {
             _id = id;
-            _color = color;
+            _pattern = pattern;
         }
 
         public Fill.deserialized (int id, Json.Object obj) {
             _id = id;
-            _color = Color.deserialized (obj.get_object_member ("color"));
+            _pattern = new Pattern.deserialized (obj.get_object_member ("pattern"));
         }
 
         // Recommended accessors.
@@ -40,26 +40,29 @@ public class Akira.Lib.Components.Fills : Component, Copyable<Fills> {
                 return _id;
             }
         }
-        public Gdk.RGBA color {
+        public Pattern pattern {
             get {
-                return _color.rgba;
+                return _pattern;
             }
         }
         public bool hidden {
             get {
-                return _color.hidden;
+                return _pattern.hidden;
             }
         }
 
         // Mutators.
-        public Fill with_color (Color new_color) {
-            return Fill (_id, new_color);
+        public Fill with_color (Color new_color, int id = 0) {
+            Pattern pattern = new Pattern.solid (new_color.rgba, new_color.hidden);
+            var fill = Fill (id, pattern);
+            fill._id = id;
+            return fill;
         }
 
         public Json.Node serialize () {
             var obj = new Json.Object ();
             obj.set_int_member ("id", _id);
-            obj.set_member ("color", _color.serialize ());
+            obj.set_member ("pattern", _pattern.serialize ());
             var node = new Json.Node (Json.NodeType.OBJECT);
             node.set_object (obj);
             return node;
@@ -74,7 +77,7 @@ public class Akira.Lib.Components.Fills : Component, Copyable<Fills> {
 
     public Fills.with_color (Color color) {
         data = new Fill[1];
-        data[0] = Fill (0, color);
+        data[0] = Fill (0, new Pattern.solid (color.rgba, color.hidden));
     }
 
     public Fills.deserialized (Json.Object obj) {
@@ -110,7 +113,7 @@ public class Akira.Lib.Components.Fills : Component, Copyable<Fills> {
     public Fill? fill_from_id (int id) {
         foreach (unowned var fill in data) {
             if (fill.id == id) {
-                return fill.with_color (fill._color);
+                return Fill (id, fill.pattern);
             }
         }
         return null;
@@ -136,7 +139,8 @@ public class Akira.Lib.Components.Fills : Component, Copyable<Fills> {
             latest_id = double.max (latest_id, fill.id);
         }
         latest_id++;
-        var fill = Fill ((int) latest_id, color);
+        var pattern = new Pattern.solid (color.rgba, color.hidden);
+        var fill = Fill ((int) latest_id, pattern);
         data.resize (data.length + 1);
         data[data.length - 1] = fill;
     }

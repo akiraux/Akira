@@ -50,14 +50,14 @@ public class Akira.Lib.Components.CompiledFill : Copyable<CompiledFill> {
         bool has_colors = false;
         // Set an initial arbitrary color with full transparency.
         rgba_fill.alpha = 0;
-
+        
         if (components == null) {
             return new CompiledFill (rgba_fill, has_colors);
         }
-
+        
         unowned var fills = components.fills;
         unowned var opacity = components.opacity;
-
+        
         if (fills == null) {
             return new CompiledFill (rgba_fill, has_colors);
         }
@@ -68,18 +68,18 @@ public class Akira.Lib.Components.CompiledFill : Copyable<CompiledFill> {
             if (fills.data[i].hidden) {
                 continue;
             }
-
+            
             // Set the new blended color.
-            rgba_fill = Utils.Color.blend_colors (rgba_fill, fills.data[i].color);
+            rgba_fill = Utils.Color.blend_colors (rgba_fill, fills.data[i].pattern.get_first_color ());
             has_colors = true;
         }
-
+        
         // Apply the mixed RGBA value only if we had one.
         if (has_colors && opacity != null) {
             // Keep in consideration the global opacity to properly update the fill color.
             rgba_fill.alpha = rgba_fill.alpha * opacity.opacity / 100;
         }
-
+        
         return new CompiledFill (rgba_fill, has_colors);
     }
 }
