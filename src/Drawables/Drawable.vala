@@ -43,7 +43,7 @@ public class Akira.Drawables.Drawable {
 
     // Style
     public double line_width { get; set; default = 0; }
-    public Gdk.RGBA fill_rgba { get; set; default = Gdk.RGBA (); }
+    public Cairo.Pattern fill_pattern { get; set; default = new Cairo.Pattern.rgba (255, 255, 255, 255); }
     public Gdk.RGBA stroke_rgba { get; set; default = Gdk.RGBA (); }
     public BorderType border_type { get; set; default = BorderType.CENTER; }
     public double radius_tr { get; set; default = 0; }
@@ -383,7 +383,7 @@ public class Akira.Drawables.Drawable {
         if (draw_type == DrawType.XRAY) {
             return false;
         }
-        context.set_source_rgba (fill_rgba.red, fill_rgba.green, fill_rgba.blue, fill_rgba.alpha);
+        context.set_source (fill_pattern);
         context.set_antialias (Cairo.Antialias.GRAY);
         return true;
     }

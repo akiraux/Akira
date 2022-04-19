@@ -76,11 +76,11 @@ public class Akira.Lib.Items.ModelTypeText : ModelType {
                 break;
             case Lib.Components.Component.Type.COMPILED_FILL:
                 if (!instance.compiled_fill.is_visible) {
-                    instance.drawable.fill_rgba = Gdk.RGBA () { alpha = 0 };
+                    instance.drawable.fill_pattern = Utils.Pattern.default_pattern ();
                     break;
                 }
 
-                instance.drawable.fill_rgba = instance.compiled_fill.color;
+                instance.drawable.fill_pattern = Utils.Pattern.convert_to_cairo_pattern (instance.compiled_fill.pattern);
                 break;
             case Lib.Components.Component.Type.COMPILED_GEOMETRY:
                 instance.drawable.width = instance.components.size.width;

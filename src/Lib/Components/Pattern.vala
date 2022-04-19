@@ -37,6 +37,14 @@ public class Akira.Lib.Components.Pattern {
     public Gee.TreeSet<StopColor?> colors;
     public bool hidden;
 
+    // These values denote the position of guide points of gradients.
+    // The values are relative to the canvas item's position.
+    public Geometry.Point start;
+    public Geometry.Point end;
+    // These values are only used for radial gradients to denote radii.
+    public double radius_start;
+    public double radius_end;
+
     public Pattern.solid (Gdk.RGBA color, bool hidden) {
         this.type = PatternType.SOLID;
         this.hidden = hidden;
@@ -45,8 +53,16 @@ public class Akira.Lib.Components.Pattern {
         colors.add (StopColor () {offset = 0, color = color});
     }
 
-    public Pattern.linear () {
-        // TODO:
+    public Pattern.linear (Geometry.Point start, Geometry.Point end, bool hidden) {
+        this.start = start;
+        this.end = end;
+
+        // By default, all linear gradients will be created with black and white colors at start and end.
+        colors.add (StopColor () {offset = 0, color = Gdk.RGBA () {red = 0, green = 0, blue = 0, alpha = 255}});
+        colors.add (StopColor () {offset = 1, color = Gdk.RGBA () {red = 255, green = 255, blue = 255, alpha = 255}});
+
+        this.type = PatternType.LINEAR;
+        this.hidden = hidden;
     }
 
     public Pattern.radial () {
