@@ -22,9 +22,9 @@
 
 public class Akira.Lib.Components.Pattern {
     public enum PatternType {
-        SOLID,
-        LINEAR,
-        RADIAL,
+        SOLID = 0,
+        LINEAR = 1,
+        RADIAL = 2,
     }
 
     public struct StopColor {
@@ -58,6 +58,7 @@ public class Akira.Lib.Components.Pattern {
         this.end = end;
 
         // By default, all linear gradients will be created with black and white colors at start and end.
+        colors = new Gee.TreeSet<StopColor?> (are_equal);
         colors.add (StopColor () {offset = 0, color = Gdk.RGBA () {red = 0, green = 0, blue = 0, alpha = 255}});
         colors.add (StopColor () {offset = 1, color = Gdk.RGBA () {red = 255, green = 255, blue = 255, alpha = 255}});
 

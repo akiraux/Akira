@@ -27,6 +27,8 @@ public class Akira.Widgets.ColorChooser : Gtk.Grid {
 
     private Gtk.ColorChooserWidget chooser;
     private Gtk.FlowBox global_flowbox;
+    private GradientEditor gradient_editor;
+    private PatternChooser pattern_chooser;
 
     /*
      * Type of color containers to add new colors to. We can potentially create
@@ -37,11 +39,21 @@ public class Akira.Widgets.ColorChooser : Gtk.Grid {
         DOCUMENT
     }
 
-    public ColorChooser () {
+    public ColorChooser (Models.ColorModel model) {
         margin_top = margin_bottom = 12;
         margin_start = margin_end = 3;
         row_spacing = 12;
         get_style_context ().add_class ("color-picker");
+        
+        pattern_chooser = new PatternChooser (model);
+        attach (pattern_chooser, 0, 0, 1, 1);
+
+        gradient_editor = new GradientEditor (model.pattern.colors);
+        attach (gradient_editor, 0, 1, 1, 1);
+
+        pattern_chooser.pattern_changed.connect ((pattern) => {
+            gradient_editor.pattern_edited (pattern);
+        });
 
         chooser = new Gtk.ColorChooserWidget () {
             hexpand = true,
@@ -49,13 +61,13 @@ public class Akira.Widgets.ColorChooser : Gtk.Grid {
         };
         chooser.notify["rgba"].connect (on_color_changed);
 
-        attach (chooser, 0, 0, 1, 1);
+        attach (chooser, 0, 2, 1, 1);
 
         var global_label = new Gtk.Label (_("Global colors")) {
             halign = Gtk.Align.START,
             margin_start = margin_end = 6
         };
-        attach (global_label, 0, 1, 1, 1);
+        attach (global_label, 0, 3, 1, 1);
 
         global_flowbox = new Gtk.FlowBox () {
             selection_mode = Gtk.SelectionMode.NONE,
@@ -79,7 +91,7 @@ public class Akira.Widgets.ColorChooser : Gtk.Grid {
             global_flowbox.add (btn);
         }
 
-        attach (global_flowbox, 0, 2, 1, 1);
+        attach (global_flowbox, 0, 4, 1, 1);
         show_all ();
     }
 
@@ -129,12 +141,12 @@ public class Akira.Widgets.ColorChooser : Gtk.Grid {
         return (a is AddColorButton) ? -1 : 1;
     }
 
-    public void set_color (Gdk.RGBA color) {
-        chooser.set_rgba (color);
+    public void set_pattern (Lib.Components.Pattern pattern) {
+        pattern_chooser.pattern_changed (pattern);
+        gradient_editor.pattern_edited (pattern);
     }
 
     private void on_color_changed () {
-        var pattern = new Lib.Components.Pattern.solid (chooser.get_rgba (), false);
-        pattern_changed (pattern);
+        gradient_editor.color_changed (chooser.get_rgba ());
     }
 }

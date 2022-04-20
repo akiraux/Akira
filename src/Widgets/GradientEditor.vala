@@ -35,9 +35,54 @@
 public class Akira.Widgets.GradientEditor : Gtk.DrawingArea {
     // This signal will be triggered when pattern is editor using this editor.
     // The PatternChooser will handle this signal.
-    public signal void pattern_editor (Lib.Components.Pattern pattern);
+    public signal void pattern_edited (Lib.Components.Pattern pattern);
+    public signal void color_changed (Gdk.RGBA color);
 
-    construct {
+    // Dimensions of the widget.
+    private double width;
+    private double height;
+
+    private unowned Gee.TreeSet<Lib.Components.Pattern.StopColor?> stop_colors;
+
+    public GradientEditor (Gee.TreeSet<Lib.Components.Pattern.StopColor?> stop_colors) {
+        hexpand = true;
+        height_request = 40;
+        margin = 5;
+
+        this.stop_colors = stop_colors;
         
+        size_allocate.connect (() => {
+            width = get_allocated_width ();
+            height = get_allocated_height ();
+
+            draw.connect (draw_editor);
+        });
+
+        pattern_edited.connect ((pattern) => {
+            this.stop_colors = pattern.colors;
+            queue_draw ();
+        });
+    }
+
+    private bool draw_editor (Cairo.Context context) {
+        context.set_source_rgba (255, 255, 0, 255);
+        context.move_to (0, 0);
+        context.rectangle (0, 0, width, height);
+        context.stroke ();
+
+        var pattern = new Lib.Components.Pattern.linear (Geometry.Point (0, height / 2.0), Geometry.Point (width, height / 2.0), false);
+        pattern.colors = stop_colors;
+
+        print("Colors\n");
+        foreach (var s in this.stop_colors) {
+            print(": %f\n", s.offset);
+        }
+
+        var converted_pattern = Utils.Pattern.convert_to_cairo_pattern (pattern);
+        context.set_source (converted_pattern);
+        context.rectangle (0, 0, width, height);
+        context.fill ();
+
+        return true;
     }
 }

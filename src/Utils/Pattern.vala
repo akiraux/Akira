@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Alecaddd (https://alecaddd.com)
+ * Copyright (c) 2022 Alecaddd (https://alecaddd.com)
  *
  * This file is part of Akira.
  *
@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Akira. If not, see <https://www.gnu.org/licenses/>.
  *
- * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
+ * Authored by: Ashish Shevale <shevaleashish@gmail.com>
  */
 
 public class Akira.Utils.Pattern {

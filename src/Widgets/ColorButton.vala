@@ -104,7 +104,7 @@ public class Akira.Widgets.ColorButton : Gtk.Button {
             return;
         }
 
-        color_chooser = new ColorChooser ();
+        color_chooser = new ColorChooser (model);
         color_chooser.pattern_changed.connect (pattern => {
             if (block_signal > 0) {
                 return;
@@ -122,9 +122,7 @@ public class Akira.Widgets.ColorButton : Gtk.Button {
         var blocker = new SignalBlocker (this);
         (blocker);
         
-        Gdk.RGBA rgba = model.pattern.get_first_color ();
-        
-        color_chooser.set_color (rgba);
+        color_chooser.set_pattern (model.pattern);
         color_popover.popup ();
     }
 }

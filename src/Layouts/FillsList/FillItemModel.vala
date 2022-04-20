@@ -74,7 +74,12 @@ public class Akira.Layouts.FillsList.FillItemModel : Models.ColorModel {
         (blocker);
 
         var fill = _cached_instance.components.fills.fill_from_id (fill_id);
-        pattern = fill.pattern;
+        active_pattern_type = fill.active_pattern;
+        
+        solid_pattern = fill.solid_pattern;
+        linear_pattern = fill.linear_pattern;
+        radial_pattern = fill.radial_pattern;
+        
         hidden = fill.hidden;
     }
 }

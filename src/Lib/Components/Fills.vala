@@ -22,16 +22,70 @@
 public class Akira.Lib.Components.Fills : Component, Copyable<Fills> {
     public struct Fill {
         public int _id;
-        public Pattern _pattern;
+        public Pattern _pattern {
+            get {
+                switch (active_pattern) {
+                    case Pattern.PatternType.SOLID:
+                        return solid_pattern;
+                    case Pattern.PatternType.LINEAR:
+                        return linear_pattern;
+                    case Pattern.PatternType.RADIAL:
+                        return radial_pattern;
+                    default:
+                        return solid_pattern;
+                }
+            }
+
+            set {
+                switch (active_pattern) {
+                    case Pattern.PatternType.SOLID:
+                        solid_pattern = value;
+                        break;
+                    case Pattern.PatternType.LINEAR:
+                        linear_pattern = value;
+                        break;
+                    case Pattern.PatternType.RADIAL:
+                        radial_pattern = value;
+                        break;
+                    default:
+                        solid_pattern = value;
+                        break;
+                }
+            }
+        }
+
+        // Each fill item will have patterns for all three types,
+        // so that user can easily switch between them.
+        // However, the non active patterns will not be serialized.
+        public Pattern solid_pattern;
+        public Pattern linear_pattern;
+        public Pattern radial_pattern;
+
+        public Pattern.PatternType active_pattern;
 
         public Fill (int id = -1, Pattern pattern = new Pattern ()) {
             _id = id;
-            _pattern = pattern;
+            active_pattern = Pattern.PatternType.SOLID;
+
+            var fill_rgba = Gdk.RGBA ();
+            fill_rgba.parse (settings.fill_color);
+            solid_pattern = new Pattern.solid (fill_rgba, false);
+
+            linear_pattern = new Pattern.linear (Geometry.Point (0, 0), Geometry.Point (100, 100), false);
+            radial_pattern = new Pattern.radial ();
         }
 
         public Fill.deserialized (int id, Json.Object obj) {
             _id = id;
-            _pattern = new Pattern.deserialized (obj.get_object_member ("pattern"));
+            //  active_pattern = Pattern.PatternType.SOLID;
+
+            //  solid_pattern = new Pattern.solid (0, 0, 0, 255);
+
+            //  linear_pattern = new Pattern.linear (Geometry.Point (0, 0), Geometry.Point (100, 100), false);
+            //  linear_pattern.add_stop_color (Gdk.RGBA () {red = 0, green = 0, blue = 0, alpha = 0}, 0);
+            //  linear_pattern.add_stop_color (Gdk.RGBA () {red = 255, green = 255, blue = 255, alpha = 0}, 1);
+            
+            //  radial_pattern = new Pattern.radial ();
         }
 
         // Recommended accessors.

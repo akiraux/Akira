@@ -41,14 +41,44 @@ public class Akira.Models.ColorModel : GLib.Object {
 
     protected int block_signal = 0;
 
-    private Lib.Components.Pattern _pattern;
+    // All three types of patterns will be stored here.
+    // Based on which type is active, update it.
+    public Lib.Components.Pattern solid_pattern;
+    public Lib.Components.Pattern linear_pattern;
+    public Lib.Components.Pattern radial_pattern;
+
+    public Lib.Components.Pattern.PatternType active_pattern_type;
+
     public Lib.Components.Pattern pattern {
         get {
-            return _pattern;
+            switch (active_pattern_type) {
+                case Lib.Components.Pattern.PatternType.SOLID:
+                    return solid_pattern;
+                case Lib.Components.Pattern.PatternType.LINEAR:
+                    return linear_pattern;
+                case Lib.Components.Pattern.PatternType.RADIAL:
+                    return radial_pattern;
+                default:
+                    return solid_pattern;
+            }
         }
 
         set {
-            _pattern = value;
+            switch (active_pattern_type) {
+                case Lib.Components.Pattern.PatternType.SOLID:
+                    solid_pattern = value;
+                    break;
+                case Lib.Components.Pattern.PatternType.LINEAR:
+                    linear_pattern = value;
+                    break;
+                case Lib.Components.Pattern.PatternType.RADIAL:
+                    radial_pattern = value;
+                    break;
+                default:
+                    solid_pattern = value;
+                    break;
+            }
+
             on_value_changed ();
             value_changed ();
         }
