@@ -25,13 +25,13 @@
  * they want to draw.
  * Selecting ony one of the buttons will change the pattern type (SOLID, LINEAR, RADIAL).
  */
-public class Akira.Widgets.PatternChooser : Granite.Widgets.ModeButton {
+public class Akira.Widgets.PatternTypeChooser : Granite.Widgets.ModeButton {
     // Trigger this signal when the active PatternType changes or gradient editor changes.
     public signal void pattern_changed (Lib.Components.Pattern pattern);
 
     private Models.ColorModel model;
 
-    public PatternChooser (Models.ColorModel model) {
+    public PatternTypeChooser (Models.ColorModel model) {
         construct_chooser_widget ();
 
         this.set_active ((int) model.pattern.type);

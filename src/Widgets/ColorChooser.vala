@@ -28,7 +28,7 @@ public class Akira.Widgets.ColorChooser : Gtk.Grid {
     private Gtk.ColorChooserWidget chooser;
     private Gtk.FlowBox global_flowbox;
     private GradientEditor gradient_editor;
-    private PatternChooser pattern_chooser;
+    private PatternTypeChooser pattern_chooser;
 
     /*
      * Type of color containers to add new colors to. We can potentially create
@@ -45,7 +45,7 @@ public class Akira.Widgets.ColorChooser : Gtk.Grid {
         row_spacing = 12;
         get_style_context ().add_class ("color-picker");
         
-        pattern_chooser = new PatternChooser (model);
+        pattern_chooser = new PatternTypeChooser (model);
         attach (pattern_chooser, 0, 0, 1, 1);
 
         gradient_editor = new GradientEditor (model.pattern.colors);

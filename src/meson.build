@@ -84,7 +84,7 @@ sources = files(
     'Widgets/RoundedColorButton.vala',
     'Widgets/ZoomButton.vala',
     'Widgets/GradientEditor.vala',
-    'Widgets/PatternChooser.vala',
+    'Widgets/PatternTypeChooser.vala',
 
     'Widgets/VirtualizingListBox/VirtualizingListBox.vala',
     'Widgets/VirtualizingListBox/VirtualizingListBoxModel.vala',
