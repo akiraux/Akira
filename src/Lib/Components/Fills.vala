@@ -84,7 +84,7 @@ public class Akira.Lib.Components.Fills : Component, Copyable<Fills> {
             //  linear_pattern = new Pattern.linear (Geometry.Point (0, 0), Geometry.Point (100, 100), false);
             //  linear_pattern.add_stop_color (Gdk.RGBA () {red = 0, green = 0, blue = 0, alpha = 0}, 0);
             //  linear_pattern.add_stop_color (Gdk.RGBA () {red = 255, green = 255, blue = 255, alpha = 0}, 1);
-            
+
             //  radial_pattern = new Pattern.radial ();
         }
 
@@ -111,6 +111,18 @@ public class Akira.Lib.Components.Fills : Component, Copyable<Fills> {
             var fill = Fill (id, pattern);
             fill._id = id;
             return fill;
+        }
+
+        public Fill with_replaced_pattern (Pattern new_pattern) {
+            var new_fill = new Fill ();
+
+            new_fill._id = this._id;
+            new_fill.active_pattern = new_pattern.type;
+            new_fill.solid_pattern = this.solid_pattern;
+            new_fill.linear_pattern = this.linear_pattern;
+            new_fill.radial_pattern = this.radial_pattern;
+
+            return new_fill;
         }
 
         public Json.Node serialize () {

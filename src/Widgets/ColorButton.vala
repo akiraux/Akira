@@ -121,7 +121,7 @@ public class Akira.Widgets.ColorButton : Gtk.Button {
 
         var blocker = new SignalBlocker (this);
         (blocker);
-        
+
         color_chooser.set_pattern (model.pattern);
         color_popover.popup ();
     }

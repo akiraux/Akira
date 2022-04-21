@@ -44,7 +44,7 @@ public class Akira.Widgets.ColorChooser : Gtk.Grid {
         margin_start = margin_end = 3;
         row_spacing = 12;
         get_style_context ().add_class ("color-picker");
-        
+
         pattern_chooser = new PatternTypeChooser (model);
         attach (pattern_chooser, 0, 0, 1, 1);
 

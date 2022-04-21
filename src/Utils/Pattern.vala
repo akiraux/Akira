@@ -34,31 +34,31 @@ public class Akira.Utils.Pattern {
                 foreach (var stop_color in pattern.colors) {
                     var color = stop_color.color;
                     converted.add_color_stop_rgba (
-                        stop_color.offset, 
-                        color.red, 
-                        color.green, 
-                        color.blue, 
+                        stop_color.offset,
+                        color.red,
+                        color.green,
+                        color.blue,
                         color.alpha
                     );
                 }
                 break;
             case Lib.Components.Pattern.PatternType.RADIAL:
                 converted = new Cairo.Pattern.radial (
-                    pattern.start.x, 
-                    pattern.start.y, 
-                    pattern.radius_start, 
-                    pattern.end.x, 
-                    pattern.end.y, 
+                    pattern.start.x,
+                    pattern.start.y,
+                    pattern.radius_start,
+                    pattern.end.x,
+                    pattern.end.y,
                     pattern.radius_end
                 );
-                
+
                 foreach (var stop_color in pattern.colors) {
                     var color = stop_color.color;
                     converted.add_color_stop_rgba (
-                        stop_color.offset, 
-                        color.red, 
-                        color.green, 
-                        color.blue, 
+                        stop_color.offset,
+                        color.red,
+                        color.green,
+                        color.blue,
                         color.alpha
                     );
                 }

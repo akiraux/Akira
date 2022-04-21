@@ -48,14 +48,14 @@ public class Akira.Lib.Components.CompiledFill : Copyable<CompiledFill> {
     public static CompiledFill compile (Components? components, Lib.Items.ModelNode? node) {
         var pattern_fill = new Pattern ();
         bool has_colors = false;
-        
+
         if (components == null) {
             return new CompiledFill (pattern_fill, has_colors);
         }
-        
+
         unowned var fills = components.fills;
         unowned var opacity = components.opacity;
-        
+
         if (fills == null) {
             return new CompiledFill (pattern_fill, has_colors);
         }
@@ -66,7 +66,7 @@ public class Akira.Lib.Components.CompiledFill : Copyable<CompiledFill> {
             if (fills.data[i].hidden) {
                 continue;
             }
-            
+
             // Set the new blended color.
             //  rgba_fill = Utils.Color.blend_colors (rgba_fill, fills.data[i].pattern.get_first_color ());
             pattern_fill = fills.data[i].pattern;
@@ -75,14 +75,14 @@ public class Akira.Lib.Components.CompiledFill : Copyable<CompiledFill> {
             // TODO: Temporarily disable blending patterns. Not implemented.
             break;
         }
-        
+
         // Apply the mixed RGBA value only if we had one.
         if (has_colors && opacity != null) {
             // Keep in consideration the global opacity to properly update the fill color.
             // TODO: Disable this too.
             //  rgba_fill.alpha = rgba_fill.alpha * opacity.opacity / 100;
         }
-        
+
         return new CompiledFill (pattern_fill, has_colors);
     }
 }

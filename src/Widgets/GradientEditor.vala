@@ -50,7 +50,7 @@ public class Akira.Widgets.GradientEditor : Gtk.DrawingArea {
         margin = 5;
 
         this.stop_colors = stop_colors;
-        
+
         size_allocate.connect (() => {
             width = get_allocated_width ();
             height = get_allocated_height ();
@@ -70,13 +70,13 @@ public class Akira.Widgets.GradientEditor : Gtk.DrawingArea {
         context.rectangle (0, 0, width, height);
         context.stroke ();
 
-        var pattern = new Lib.Components.Pattern.linear (Geometry.Point (0, height / 2.0), Geometry.Point (width, height / 2.0), false);
-        pattern.colors = stop_colors;
+        var pattern = new Lib.Components.Pattern.linear (
+            Geometry.Point (0, height / 2.0),
+            Geometry.Point (width, height / 2.0),
+            false
+        );
 
-        print("Colors\n");
-        foreach (var s in this.stop_colors) {
-            print(": %f\n", s.offset);
-        }
+        pattern.colors = stop_colors;
 
         var converted_pattern = Utils.Pattern.convert_to_cairo_pattern (pattern);
         context.set_source (converted_pattern);

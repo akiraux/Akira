@@ -47,11 +47,22 @@ public class Akira.Models.ColorModel : GLib.Object {
     public Lib.Components.Pattern linear_pattern;
     public Lib.Components.Pattern radial_pattern;
 
-    public Lib.Components.Pattern.PatternType active_pattern_type;
+    public Lib.Components.Pattern.PatternType _active_pattern_type;
+    public Lib.Components.Pattern.PatternType active_pattern_type {
+        get {
+            return _active_pattern_type;
+        }
+
+        set {
+            _active_pattern_type = value;
+            on_value_changed ();
+            value_changed ();
+        }
+    }
 
     public Lib.Components.Pattern pattern {
         get {
-            switch (active_pattern_type) {
+            switch (_active_pattern_type) {
                 case Lib.Components.Pattern.PatternType.SOLID:
                     return solid_pattern;
                 case Lib.Components.Pattern.PatternType.LINEAR:
@@ -64,7 +75,7 @@ public class Akira.Models.ColorModel : GLib.Object {
         }
 
         set {
-            switch (active_pattern_type) {
+            switch (_active_pattern_type) {
                 case Lib.Components.Pattern.PatternType.SOLID:
                     solid_pattern = value;
                     break;
