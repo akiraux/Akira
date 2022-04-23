@@ -68,17 +68,20 @@ public class Akira.Widgets.PatternTypeChooser : Granite.Widgets.ModeButton {
 
         // Update position of nobs in ViewLayerNobs.
         Geometry.Point hidden_pos = Geometry.Point (0, 0);
-        Geometry.Point start_nob_pos = Geometry.Point (model.pattern.start.x + origin.x, model.pattern.start.y + origin.y);
-        Geometry.Point end_nob_pos = Geometry.Point (model.pattern.end.x + origin.x, model.pattern.end.y + origin.y);
+        var start_nob_pos = Geometry.Point (
+            model.pattern.start.x * size.width / 100.0 + origin.x,
+            model.pattern.start.y * size.height / 100.0 + origin.y
+        );
+        var end_nob_pos = Geometry.Point (
+            model.pattern.end.x * size.width / 100.0 + origin.x,
+            model.pattern.end.y * size.height / 100.0 + origin.y
+        );
 
-        print("Start pos %f %f\n", start_nob_pos.x, start_nob_pos.y);
-        print("End pos %f %f\n", end_nob_pos.x, end_nob_pos.y);
-        
         canvas.nob_manager.set_gradient_nob_position (Utils.Nobs.Nob.GRADIENT_START, hidden_pos);
         canvas.nob_manager.set_gradient_nob_position (Utils.Nobs.Nob.GRADIENT_END, hidden_pos);
         canvas.nob_manager.set_gradient_nob_position (Utils.Nobs.Nob.GRADIENT_RADIUS_START, hidden_pos);
         canvas.nob_manager.set_gradient_nob_position (Utils.Nobs.Nob.GRADIENT_RADIUS_END, hidden_pos);
-        
+
         if (active_mode == Lib.Components.Pattern.PatternType.LINEAR) {
             canvas.nob_manager.set_gradient_nob_position (Utils.Nobs.Nob.GRADIENT_START, start_nob_pos);
             canvas.nob_manager.set_gradient_nob_position (Utils.Nobs.Nob.GRADIENT_END, end_nob_pos);

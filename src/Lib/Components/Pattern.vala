@@ -76,6 +76,10 @@ public class Akira.Lib.Components.Pattern {
         new_pattern.type = this.type;
         new_pattern.colors = this.colors;
         new_pattern.hidden = this.hidden;
+        new_pattern.start = this.start;
+        new_pattern.end = this.end;
+        new_pattern.radius_start = this.radius_start;
+        new_pattern.radius_end = this.radius_end;
 
         return new_pattern;
     }

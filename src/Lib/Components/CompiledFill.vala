@@ -55,6 +55,8 @@ public class Akira.Lib.Components.CompiledFill : Copyable<CompiledFill> {
 
         unowned var fills = components.fills;
         unowned var opacity = components.opacity;
+        unowned var size = components.size;
+        unowned var center = components.center;
 
         if (fills == null) {
             return new CompiledFill (pattern_fill, has_colors);
@@ -69,7 +71,7 @@ public class Akira.Lib.Components.CompiledFill : Copyable<CompiledFill> {
 
             // Set the new blended color.
             //  rgba_fill = Utils.Color.blend_colors (rgba_fill, fills.data[i].pattern.get_first_color ());
-            pattern_fill = fills.data[i].pattern;
+            pattern_fill = Utils.Pattern.create_pattern_with_converted_positions (fills.data[i].pattern, size, center);
             has_colors = true;
 
             // TODO: Temporarily disable blending patterns. Not implemented.

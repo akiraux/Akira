@@ -75,4 +75,22 @@ public class Akira.Utils.Pattern {
     public static Cairo.Pattern default_pattern () {
         return new Cairo.Pattern.rgba (255, 255, 255, 255);
     }
+
+    // In Components.Pattern, the start and end positions of gradients are stored as 
+    // relative positions as percentages of width and height of canvas item.
+    // This method will convert those values to actual values, to be stored in CompiledFill.
+    public static Lib.Components.Pattern create_pattern_with_converted_positions (Lib.Components.Pattern pattern, Lib.Components.Size size, Lib.Components.Coordinates center) {
+        var new_pattern = pattern.copy ();
+
+        new_pattern.start = Geometry.Point (
+            pattern.start.x * size.width / 100.0 - size.width / 2.0,
+            pattern.start.y * size.height / 100.0 - size.height / 2.0
+        );
+        new_pattern.end = Geometry.Point (
+            pattern.end.x * size.width / 100.0 - size.width / 2.0,
+            pattern.end.y * size.height / 100.0 - size.height / 2.0
+        );
+
+        return new_pattern;
+    }
 }

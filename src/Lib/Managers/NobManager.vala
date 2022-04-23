@@ -40,7 +40,13 @@ public class Akira.Lib.Managers.NobManager : Object {
         Object (view_canvas: canvas);
 
         view_canvas.window.event_bus.change_gradient_nobs_visibility.connect ((visible) => {
-            print("Change visibility\n");
+            if (visible) {
+                nob_layer.render_gradient_nobs = false;
+                nob_layer.render_gradient_radii_nobs = false;
+            } else {
+                nob_layer.render_gradient_nobs = true;
+                nob_layer.render_gradient_radii_nobs = true;
+            }
         });
     }
 
