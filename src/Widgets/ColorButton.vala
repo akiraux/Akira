@@ -25,6 +25,7 @@
 */
 public class Akira.Widgets.ColorButton : Gtk.Button {
     private unowned Models.ColorModel model;
+    private unowned Window window;
 
     private Gtk.Popover color_popover;
     private Widgets.ColorChooser? color_chooser = null;
@@ -46,7 +47,9 @@ public class Akira.Widgets.ColorButton : Gtk.Button {
 
     protected int block_signal = 0;
 
-    public ColorButton () {
+    public ColorButton (Window window) {
+        this.window = window;
+
         get_style_context ().add_class ("selected-color");
         vexpand = true;
         width_request = 40;
@@ -58,6 +61,10 @@ public class Akira.Widgets.ColorButton : Gtk.Button {
         };
 
         clicked.connect (on_clicked);
+
+        color_popover.closed.connect (() => {
+            window.event_bus.change_gradient_nobs_visibility (true);
+        });
     }
 
     ~ColorButton () {
@@ -104,7 +111,7 @@ public class Akira.Widgets.ColorButton : Gtk.Button {
             return;
         }
 
-        color_chooser = new ColorChooser (model);
+        color_chooser = new ColorChooser (model, window);
         color_chooser.pattern_changed.connect (pattern => {
             if (block_signal > 0) {
                 return;
@@ -124,5 +131,7 @@ public class Akira.Widgets.ColorButton : Gtk.Button {
 
         color_chooser.set_pattern (model.pattern);
         color_popover.popup ();
+
+        window.event_bus.change_gradient_nobs_visibility (true);
     }
 }

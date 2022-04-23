@@ -43,6 +43,10 @@ public class Akira.Utils.Nobs : Object {
         BOTTOM_LEFT,
         LEFT_CENTER,
         ROTATE,
+        GRADIENT_START,
+        GRADIENT_END,
+        GRADIENT_RADIUS_START,
+        GRADIENT_RADIUS_END,
         ALL
     }
 
@@ -71,15 +75,15 @@ public class Akira.Utils.Nobs : Object {
         public NobData[] data;
 
         public NobSet () {
-            data = new NobData[9];
-            for (var i = 0; i < 9; i++) {
+            data = new NobData[13];
+            for (var i = 0; i < 13; i++) {
                 data[i] = new NobData ((Nob)i, 0, 0, false);
             }
         }
 
         public NobSet.clone (NobSet other) {
-            data = new NobData[9];
-            for (var i = 0; i < 9; i++) {
+            data = new NobData[13];
+            for (var i = 0; i < 13; i++) {
                 data[i] = other.data[i].copy ();
             }
         }
@@ -204,6 +208,18 @@ public class Akira.Utils.Nobs : Object {
                 break;
             case Nob.ROTATE:
                 result = Gdk.CursorType.EXCHANGE;
+                break;
+            case Nob.GRADIENT_START:
+                result = Gdk.CursorType.TCROSS;
+                break;
+            case Nob.GRADIENT_END:
+                result = Gdk.CursorType.TCROSS;
+                break;
+            case Nob.GRADIENT_RADIUS_START:
+                result = Gdk.CursorType.TCROSS;
+                break;
+            case Nob.GRADIENT_RADIUS_END:
+                result = Gdk.CursorType.TCROSS;
                 break;
             default:
                 break;

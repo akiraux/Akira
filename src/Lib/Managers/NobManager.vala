@@ -38,6 +38,10 @@ public class Akira.Lib.Managers.NobManager : Object {
 
     public NobManager (Lib.ViewCanvas canvas) {
         Object (view_canvas: canvas);
+
+        view_canvas.window.event_bus.change_gradient_nobs_visibility.connect ((visible) => {
+            print("Change visibility\n");
+        });
     }
 
     construct {
@@ -153,6 +157,28 @@ public class Akira.Lib.Managers.NobManager : Object {
         anchor_point_node_id = id;
 
         maybe_create_anchor_point_effect ();
+    }
+
+    public void set_gradient_nob_position (Utils.Nobs.Nob nob, Geometry.Point position) {
+        nobs.data[nob].center_x = position.x;
+        nobs.data[nob].center_y = position.y;
+    }
+
+    // This method will set the render flags for ViewLayerNobs and redraw the layer.
+    // It must be called only after positions of all nobs have been set.
+    public void set_layer_flags_from_pattern_type (Lib.Components.Pattern.PatternType ptype) {
+        if (ptype == Lib.Components.Pattern.PatternType.SOLID) {
+            nob_layer.render_gradient_nobs = false;
+            nob_layer.render_gradient_radii_nobs = false;
+        } else if (ptype == Lib.Components.Pattern.PatternType.LINEAR) {
+            nob_layer.render_gradient_nobs = true;
+            nob_layer.render_gradient_radii_nobs = false;
+        } else if (ptype == Lib.Components.Pattern.PatternType.RADIAL) {
+            nob_layer.render_gradient_nobs = true;
+            nob_layer.render_gradient_radii_nobs = true;
+        }
+
+        nob_layer.update_nob_data (nobs);
     }
 
     private void remove_anchor_point_effect () {

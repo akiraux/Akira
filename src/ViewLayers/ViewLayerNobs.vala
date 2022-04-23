@@ -33,6 +33,11 @@ public class Akira.ViewLayers.ViewLayerNobs : ViewLayer {
     private Drawables.Drawable? old_anchor_point_drawable = null;
     private Geometry.Rectangle anchor_point_last_bb_drawn = Geometry.Rectangle.empty ();
 
+    // If this is true, draw the start and end nobs for linear and radial gradients.
+    public bool render_gradient_nobs = false;
+    // If this is true, draw the radius nobs. Only use for radial gradients.
+    public bool render_gradient_radii_nobs = false;
+
     public void update_nob_data (Utils.Nobs.NobSet? new_nobs) {
         if (nobs != null) {
             old_nobs = new Utils.Nobs.NobSet.clone (nobs);
@@ -102,6 +107,26 @@ public class Akira.ViewLayers.ViewLayerNobs : ViewLayer {
             if (!nob.active) {
                 continue;
             }
+
+            // Render gradient nobs only if the proper flags are set.
+            if (
+                nob.handle_id == Utils.Nobs.Nob.GRADIENT_START ||
+                nob.handle_id == Utils.Nobs.Nob.GRADIENT_END
+            ) {
+                if (!render_gradient_nobs) {
+                    continue;
+                }
+            }
+
+            if (
+                nob.handle_id == Utils.Nobs.Nob.GRADIENT_RADIUS_START ||
+                nob.handle_id == Utils.Nobs.Nob.GRADIENT_RADIUS_END
+            ) {
+                if (!render_gradient_radii_nobs) {
+                    continue;
+                }
+            }
+
             context.save ();
 
             context.new_path ();
@@ -109,10 +134,15 @@ public class Akira.ViewLayers.ViewLayerNobs : ViewLayer {
             context.set_line_width (line_width);
             context.translate (nob.center_x, nob.center_y);
 
-            if (nob.handle_id == Utils.Nobs.Nob.ROTATE) {
+            if (
+                nob.handle_id == Utils.Nobs.Nob.ROTATE ||
+                nob.handle_id == Utils.Nobs.Nob.GRADIENT_START ||
+                nob.handle_id == Utils.Nobs.Nob.GRADIENT_END ||
+                nob.handle_id == Utils.Nobs.Nob.GRADIENT_RADIUS_START ||
+                nob.handle_id == Utils.Nobs.Nob.GRADIENT_RADIUS_END
+            ) {
                 context.arc (0, 0, radius, 0, 2.0 * GLib.Math.PI);
-            }
-            else {
+            } else {
                 double x = -radius;
                 double w = radius * 2;
                 double y = -radius;
