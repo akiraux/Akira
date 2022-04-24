@@ -19,12 +19,12 @@
  * Authored by: Alessandro "alecaddd" Castellani <castellani.ale@gmail.com>
  */
 
-public class Akira.Layouts.FillsList.FillsPanel : Gtk.Grid {
-    public unowned Akira.Lib.ViewCanvas view_canvas { get; construct; }
+public class Akira.Layouts.BordersList.BordersPanel : Gtk.Grid {
+    public unowned Lib.ViewCanvas view_canvas { get; construct; }
 
-    public FillListBox fills_listbox;
+    public BorderListBox borders_listbox;
 
-    public FillsPanel (Akira.Lib.ViewCanvas canvas) {
+    public BordersPanel (Lib.ViewCanvas canvas) {
         Object (
             view_canvas: canvas
         );
@@ -35,7 +35,7 @@ public class Akira.Layouts.FillsList.FillsPanel : Gtk.Grid {
         };
         title_cont.get_style_context ().add_class ("option-panel");
 
-        var label = new Gtk.Label (_("Fills")) {
+        var label = new Gtk.Label (_("Borders")) {
             halign = Gtk.Align.FILL,
             xalign = 0,
             hexpand = true,
@@ -46,9 +46,9 @@ public class Akira.Layouts.FillsList.FillsPanel : Gtk.Grid {
             can_focus = false,
             valign = Gtk.Align.CENTER,
             halign = Gtk.Align.CENTER,
-            tooltip_text = _("Add fill color")
+            tooltip_text = _("Add border color")
         };
-        add_btn.clicked.connect (add_fill);
+        add_btn.clicked.connect (add_border);
         add_btn.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
 
         title_cont.attach (label, 0, 0, 1, 1);
@@ -56,8 +56,8 @@ public class Akira.Layouts.FillsList.FillsPanel : Gtk.Grid {
 
         attach (title_cont, 0, 0, 1, 1);
 
-        fills_listbox = new FillListBox (view_canvas);
-        attach (fills_listbox, 0, 1, 1, 1);
+        borders_listbox = new BorderListBox (view_canvas);
+        attach (borders_listbox, 0, 1, 1, 1);
 
         // Show the widget by default.
         show_all ();
@@ -75,27 +75,27 @@ public class Akira.Layouts.FillsList.FillsPanel : Gtk.Grid {
         visible = is_visible;
         no_show_all = !is_visible;
 
-        fills_listbox.refresh_list ();
+        borders_listbox.refresh_list ();
     }
 
-    private void add_fill () {
+    private void add_border () {
         unowned var sm = view_canvas.selection_manager;
         if (sm.count () == 0) {
             return;
         }
 
-        var fill_rgba = Gdk.RGBA ();
-        fill_rgba.parse (settings.fill_color);
-        var color = Lib.Components.Color.from_rgba (fill_rgba);
+        var border_rgba = Gdk.RGBA ();
+        border_rgba.parse (settings.border_color);
+        var color = Lib.Components.Color.from_rgba (border_rgba);
 
         unowned var im = _view_canvas.items_manager;
         foreach (var selected in sm.selection.nodes.values) {
-            var new_fills = selected.node.instance.components.fills.copy ();
-            new_fills.append_fill_with_color (color);
-            selected.node.instance.components.fills = new_fills;
-            im.item_model.alert_node_changed (selected.node, Lib.Components.Component.Type.COMPILED_FILL);
+            var new_borders = selected.node.instance.components.borders.copy ();
+            new_borders.append_border_with_color (color);
+            selected.node.instance.components.borders = new_borders;
+            im.item_model.alert_node_changed (selected.node, Lib.Components.Component.Type.COMPILED_BORDER);
         }
         im.compile_model ();
-        fills_listbox.refresh_list ();
+        borders_listbox.refresh_list ();
     }
 }

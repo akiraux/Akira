@@ -131,9 +131,9 @@ public class Akira.Lib.Components.Fills : Component, Copyable<Fills> {
      * It's up to the code requiring this to then replace the fills component.
      */
     public void append_fill_with_color (Color color) {
-        double latest_id = int.MIN;
+        int latest_id = int.MIN;
         foreach (unowned var fill in data) {
-            latest_id = double.max (latest_id, fill.id);
+            latest_id = int.max (latest_id, fill.id);
         }
         latest_id++;
         var fill = Fill ((int) latest_id, color);

@@ -21,14 +21,14 @@
 
 public class Akira.Lib.Components.CompiledBorder : Copyable<CompiledBorder> {
     private Gdk.RGBA _color;
-    private int _size;
+    private double _size;
     private bool _visible;
 
     public Gdk.RGBA color {
         get { return _color; }
     }
 
-    public int size {
+    public double size {
         get { return _size; }
     }
 
@@ -36,7 +36,7 @@ public class Akira.Lib.Components.CompiledBorder : Copyable<CompiledBorder> {
         get { return _visible; }
     }
 
-    public CompiledBorder (Gdk.RGBA color, int size, bool visible) {
+    public CompiledBorder (Gdk.RGBA color, double size, bool visible) {
         _color = color;
         _size = size;
         _visible = visible;
@@ -55,7 +55,7 @@ public class Akira.Lib.Components.CompiledBorder : Copyable<CompiledBorder> {
     public static CompiledBorder compile (Components? components, Lib.Items.ModelNode? node) {
         var rgba_border = Gdk.RGBA ();
         bool has_colors = false;
-        int size = 0;
+        double size = 0;
 
         if (components == null) {
             return new CompiledBorder (rgba_border, size, has_colors);
@@ -74,13 +74,13 @@ public class Akira.Lib.Components.CompiledBorder : Copyable<CompiledBorder> {
         // Loop through all the configured borders and reload the color.
         for (var i = 0; i < borders.data.length; ++i) {
             // Skip if the border is hidden as we don't need to blend colors.
-            if (borders.data[i].hidden ()) {
+            if (borders.data[i].hidden) {
                 continue;
             }
 
             // Set the new blended color.
-            rgba_border = Utils.Color.blend_colors (rgba_border, borders.data[i].color ());
-            size = int.max (size, borders.data[i].size ());
+            rgba_border = Utils.Color.blend_colors (rgba_border, borders.data[i].color);
+            size = double.max (size, borders.data[i].size);
             has_colors = true;
         }
 
