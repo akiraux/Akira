@@ -75,6 +75,13 @@ public class Akira.Lib.Components.Fills : Component, Copyable<Fills> {
             radial_pattern = new Pattern.radial ();
         }
 
+        public Fill.with_all_patterns (int id, Pattern solid_pattern, Pattern linear_pattern, Pattern radial_pattern, Pattern.PatternType type) {
+            this.solid_pattern = solid_pattern;
+            this.linear_pattern = linear_pattern;
+            this.radial_pattern = radial_pattern;
+            this.active_pattern = type;
+        }
+
         public Fill.deserialized (int id, Json.Object obj) {
             _id = id;
             //  active_pattern = Pattern.PatternType.SOLID;
@@ -179,7 +186,7 @@ public class Akira.Lib.Components.Fills : Component, Copyable<Fills> {
     public Fill? fill_from_id (int id) {
         foreach (unowned var fill in data) {
             if (fill.id == id) {
-                return Fill (id, fill.pattern);
+                return Fill.with_all_patterns (id, fill.solid_pattern, fill.linear_pattern, fill.radial_pattern, fill.active_pattern);
             }
         }
         return null;

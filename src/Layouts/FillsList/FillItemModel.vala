@@ -62,6 +62,39 @@ public class Akira.Layouts.FillsList.FillItemModel : Models.ColorModel {
         im.compile_model ();
     }
 
+    public void move_pattern_position_by_delta (Utils.Nobs.Nob nob, Geometry.Point delta) {
+        Geometry.Point percent_delta = Geometry.Point (
+            delta.x * 100.0 / _cached_instance.components.size.width,
+            delta.y * 100.0 / _cached_instance.components.size.height
+        );
+
+        switch (nob) {
+            case Utils.Nobs.Nob.GRADIENT_START:
+                pattern.start = Geometry.Point (
+                    pattern.start.x - percent_delta.x,
+                    pattern.start.y - percent_delta.y
+                );
+                break;
+            case Utils.Nobs.Nob.GRADIENT_END:
+                pattern.end = Geometry.Point (
+                    pattern.end.x - percent_delta.x,
+                    pattern.end.y - percent_delta.y
+                );
+                break;
+            case Utils.Nobs.Nob.GRADIENT_RADIUS_START:
+                pattern.radius_start = pattern.radius_start + percent_delta.x;
+                break;
+            case Utils.Nobs.Nob.GRADIENT_RADIUS_END:
+                pattern.radius_end = pattern.radius_end + percent_delta.x;
+                break;
+            default:
+                break;
+        }
+
+        on_value_changed ();
+        value_changed ();
+    }
+
     public FillItemModel (Lib.ViewCanvas view_canvas, Lib.Items.ModelNode node, int fill_id) {
         update_node (node, fill_id);
         _view_canvas = view_canvas;

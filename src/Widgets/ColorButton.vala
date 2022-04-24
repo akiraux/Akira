@@ -59,7 +59,7 @@ public class Akira.Widgets.ColorButton : Gtk.Button {
         color_popover = new Gtk.Popover (this) {
             position = Gtk.PositionType.BOTTOM
         };
-        color_popover.modal = true;
+        color_popover.modal = false;
 
         clicked.connect (on_clicked);
 

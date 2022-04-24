@@ -41,12 +41,14 @@ public class Akira.Lib.Managers.NobManager : Object {
 
         view_canvas.window.event_bus.change_gradient_nobs_visibility.connect ((visible) => {
             if (visible) {
-                nob_layer.render_gradient_nobs = false;
-                nob_layer.render_gradient_radii_nobs = false;
-            } else {
                 nob_layer.render_gradient_nobs = true;
                 nob_layer.render_gradient_radii_nobs = true;
+            } else {
+                nob_layer.render_gradient_nobs = false;
+                nob_layer.render_gradient_radii_nobs = false;
             }
+
+            update_nob_layer ();
         });
     }
 
@@ -110,6 +112,11 @@ public class Akira.Lib.Managers.NobManager : Object {
         var active_nob_id = view_canvas.mode_manager.active_mode_nob;
 
         foreach (var nob in nobs.data) {
+            if (Utils.Nobs.is_gradient_nob (nob.handle_id)) {
+                nob.active = true;
+                continue;
+            }
+
             bool set_visible = true;
 
             if (!show_h_centers && Utils.Nobs.is_horizontal_center (nob.handle_id)) {

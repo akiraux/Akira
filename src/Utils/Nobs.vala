@@ -173,6 +173,15 @@ public class Akira.Utils.Nobs : Object {
         return (nob == Utils.Nobs.Nob.TOP_CENTER || nob == Utils.Nobs.Nob.BOTTOM_CENTER);
     }
 
+    public static bool is_gradient_nob (Nob nob) {
+        return (
+            nob == Nob.GRADIENT_START ||
+            nob == Nob.GRADIENT_END ||
+            nob == Nob.GRADIENT_RADIUS_START ||
+            nob == Nob.GRADIENT_RADIUS_END
+        );
+    }
+
     /*
      * Return a cursor type based of the type of nob.
      */

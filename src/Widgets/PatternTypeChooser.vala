@@ -40,9 +40,22 @@ public class Akira.Widgets.PatternTypeChooser : Granite.Widgets.ModeButton {
         this.model = model;
 
         // Connect signals.
-        this.mode_changed.connect (handle_mode_changed);
+        this.mode_changed.connect ((window) => {
+            var active_mode = (Lib.Components.Pattern.PatternType) this.selected;
+
+            model.active_pattern_type = active_mode;
+            pattern_changed (model.pattern);
+
+            handle_pattern_changed ();
+        });
 
         this.canvas = window.main_window.main_view_canvas.canvas;
+
+        window.event_bus.translate_gradient_nob_by_delta.connect ((nob, delta) => {
+            ((Layouts.FillsList.FillItemModel) model).move_pattern_position_by_delta (nob, delta);
+
+            handle_pattern_changed ();
+        });
     }
 
     public void set_pattern_type (Lib.Components.Pattern.PatternType type) {
@@ -55,11 +68,8 @@ public class Akira.Widgets.PatternTypeChooser : Granite.Widgets.ModeButton {
         this.append_text ("Radial");
     }
 
-    private void handle_mode_changed (Gtk.Widget widget) {
+    private void handle_pattern_changed () {
         var active_mode = (Lib.Components.Pattern.PatternType) this.selected;
-
-        model.active_pattern_type = active_mode;
-        pattern_changed (model.pattern);
 
         var coords = canvas.selection_manager.selection.first_node ().instance.components.center;
         var size = canvas.selection_manager.selection.first_node ().instance.components.size;
