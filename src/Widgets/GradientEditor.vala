@@ -54,6 +54,7 @@ public class Akira.Widgets.GradientEditor : Gtk.DrawingArea {
         hexpand = true;
         height_request = 40;
         margin = 5;
+
         set_events (
             Gdk.EventMask.BUTTON_PRESS_MASK |
             Gdk.EventMask.BUTTON_RELEASE_MASK |
@@ -68,6 +69,8 @@ public class Akira.Widgets.GradientEditor : Gtk.DrawingArea {
 
             draw.connect (draw_editor);
         });
+
+        color_changed.connect (handle_color_changed);
 
         this.button_press_event.connect (handle_button_press);
         this.motion_notify_event.connect (handle_motion_notify);
@@ -139,12 +142,21 @@ public class Akira.Widgets.GradientEditor : Gtk.DrawingArea {
 
             context.arc (position, height / 2.0, NOB_RADII, 0, 2 * Math.PI);
             context.fill ();
-            
+
             context.set_source_rgba (1, 1, 1, 1);
             context.set_line_width (2 * STROKE_WIDTH);
             context.arc (position, height / 2.0, NOB_RADII + 1, 0, 2 * Math.PI);
             context.stroke ();
         }
+    }
+
+    private void handle_color_changed (Gdk.RGBA color) {
+        pattern.colors.remove (selected_stop_color);
+        selected_stop_color.color = color;
+        pattern.colors.add (selected_stop_color);
+
+        pattern_edited (pattern);
+        queue_draw ();
     }
 
     private bool handle_button_press (Gdk.EventButton event) {
@@ -174,7 +186,8 @@ public class Akira.Widgets.GradientEditor : Gtk.DrawingArea {
             pattern.colors.add (new_stop_color);
             selected_stop_color = new_stop_color;
         }
-        
+
+        color_changed (selected_stop_color.color);
         pattern_edited (pattern);
         queue_draw ();
 
@@ -207,5 +220,5 @@ public class Akira.Widgets.GradientEditor : Gtk.DrawingArea {
 
         return false;
     }
-    
+
 }

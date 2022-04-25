@@ -86,11 +86,11 @@ public class Akira.Lib.Components.Fills : Component, Copyable<Fills> {
             _id = id;
             //  active_pattern = Pattern.PatternType.SOLID;
 
-            //  solid_pattern = new Pattern.solid (0, 0, 0, 255);
+            //  solid_pattern = new Pattern.solid (0, 0, 0, 1);
 
             //  linear_pattern = new Pattern.linear (Geometry.Point (0, 0), Geometry.Point (100, 100), false);
             //  linear_pattern.add_stop_color (Gdk.RGBA () {red = 0, green = 0, blue = 0, alpha = 0}, 0);
-            //  linear_pattern.add_stop_color (Gdk.RGBA () {red = 255, green = 255, blue = 255, alpha = 0}, 1);
+            //  linear_pattern.add_stop_color (Gdk.RGBA () {red = 1, green = 1, blue = 1, alpha = 0}, 1);
 
             //  radial_pattern = new Pattern.radial ();
         }

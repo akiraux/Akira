@@ -73,7 +73,7 @@ public class Akira.Utils.Pattern {
     }
 
     public static Cairo.Pattern default_pattern () {
-        return new Cairo.Pattern.rgba (255, 255, 255, 255);
+        return new Cairo.Pattern.rgba (1, 1, 1, 1);
     }
 
     // In Components.Pattern, the start and end positions of gradients are stored as 

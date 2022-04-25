@@ -43,7 +43,7 @@ public class Akira.Drawables.Drawable {
 
     // Style
     public double line_width { get; set; default = 0; }
-    public Cairo.Pattern fill_pattern { get; set; default = new Cairo.Pattern.rgba (255, 255, 255, 255); }
+    public Cairo.Pattern fill_pattern { get; set; default = new Cairo.Pattern.rgba (1, 1, 1, 1); }
     public Gdk.RGBA stroke_rgba { get; set; default = Gdk.RGBA (); }
     public BorderType border_type { get; set; default = BorderType.CENTER; }
     public double radius_tr { get; set; default = 0; }

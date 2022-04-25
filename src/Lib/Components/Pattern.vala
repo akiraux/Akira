@@ -59,8 +59,8 @@ public class Akira.Lib.Components.Pattern {
 
         // By default, all linear gradients will be created with black and white colors at start and end.
         colors = new Gee.TreeSet<StopColor?> (are_equal);
-        colors.add (StopColor () {offset = 0, color = Gdk.RGBA () {red = 0, green = 0, blue = 0, alpha = 255}});
-        colors.add (StopColor () {offset = 1, color = Gdk.RGBA () {red = 255, green = 255, blue = 255, alpha = 255}});
+        colors.add (StopColor () {offset = 0, color = Gdk.RGBA () {red = 0, green = 0, blue = 0, alpha = 1}});
+        colors.add (StopColor () {offset = 1, color = Gdk.RGBA () {red = 1, green = 1, blue = 1, alpha = 1}});
 
         this.type = PatternType.LINEAR;
         this.hidden = hidden;

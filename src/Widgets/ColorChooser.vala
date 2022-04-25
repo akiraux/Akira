@@ -65,6 +65,10 @@ public class Akira.Widgets.ColorChooser : Gtk.Grid {
         };
         chooser.notify["rgba"].connect (on_color_changed);
 
+        gradient_editor.color_changed.connect ((color) => {
+            chooser.rgba = color;
+        });
+
         attach (chooser, 0, 2, 1, 1);
 
         var global_label = new Gtk.Label (_("Global colors")) {
