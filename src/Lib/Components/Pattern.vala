@@ -98,11 +98,9 @@ public class Akira.Lib.Components.Pattern {
     }
 
     private int are_equal (StopColor? first, StopColor? second) {
-        double thresh = 0.1;
-
-        if (first.offset - second.offset < thresh) {
+        if (first.offset < second.offset) {
             return -1;
-        } else if (first.offset - second.offset > thresh) {
+        } else if (first.offset > second.offset) {
             return 1;
         }
 

@@ -48,11 +48,15 @@ public class Akira.Widgets.ColorChooser : Gtk.Grid {
         pattern_chooser = new PatternTypeChooser (model, window);
         attach (pattern_chooser, 0, 0, 1, 1);
 
-        gradient_editor = new GradientEditor (model.pattern.colors);
+        gradient_editor = new GradientEditor (model.pattern);
         attach (gradient_editor, 0, 1, 1, 1);
 
         pattern_chooser.pattern_changed.connect ((pattern) => {
-            gradient_editor.pattern_edited (pattern);
+            gradient_editor.set_pattern (pattern);
+        });
+
+        gradient_editor.pattern_edited.connect ((pattern) => {
+            model.pattern = pattern;
         });
 
         chooser = new Gtk.ColorChooserWidget () {

@@ -28,7 +28,7 @@
 public class Akira.Widgets.PatternTypeChooser : Granite.Widgets.ModeButton {
     private unowned Lib.ViewCanvas canvas;
 
-    // Trigger this signal when the active PatternType changes or gradient editor changes.
+    // Trigger this signal when the active PatternType changes.
     public signal void pattern_changed (Lib.Components.Pattern pattern);
 
     private Models.ColorModel model;

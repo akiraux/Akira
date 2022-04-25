@@ -103,7 +103,7 @@ public class Akira.Utils.Pattern {
         string css_result = "linear-gradient(to right";
 
         foreach (var stop_color in pattern.colors) {
-            css_result += """ ,%s %f""".printf(stop_color.color.to_string (), stop_color.offset * 100.0);
+            css_result += """ ,%s %f""".printf (stop_color.color.to_string (), stop_color.offset * 100.0);
             css_result += "%";
         }
 
