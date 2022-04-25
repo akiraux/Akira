@@ -70,7 +70,8 @@ public class Akira.Layouts.BordersList.BordersPanel : Gtk.Grid {
 
     private void on_selection_modified () {
         unowned var sm = view_canvas.selection_manager;
-        bool is_visible = sm.count () > 0;
+        // Check if any of the selected item is an artboard.
+        bool is_visible = sm.count (true) > 0;
 
         visible = is_visible;
         no_show_all = !is_visible;
@@ -90,6 +91,11 @@ public class Akira.Layouts.BordersList.BordersPanel : Gtk.Grid {
 
         unowned var im = _view_canvas.items_manager;
         foreach (var selected in sm.selection.nodes.values) {
+            // Don't add borders for Artboards.
+            if (selected.node.instance.type is Lib.Items.ModelTypeArtboard) {
+                continue;
+            }
+
             var new_borders = selected.node.instance.components.borders.copy ();
             new_borders.append_border_with_color (color);
             selected.node.instance.components.borders = new_borders;

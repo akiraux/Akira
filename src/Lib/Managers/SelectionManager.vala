@@ -72,7 +72,15 @@ public class Akira.Lib.Managers.SelectionManager : Object {
         return selection.is_empty ();
     }
 
-    public int count () {
+    /*
+     * Return the count of currently selected items. If `no_artboards` is true,
+     * remove
+     */
+    public int count (bool no_artboards = false) {
+        if (no_artboards) {
+            return 0;
+        }
+
         return selection.count ();
     }
 

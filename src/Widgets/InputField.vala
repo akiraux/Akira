@@ -69,6 +69,9 @@ public class Akira.Widgets.InputField : Gtk.Grid {
             case Unit.DEGREES:
                 icon = "input-degrees-symbolic";
                 break;
+            case Unit.NONE:
+                icon = null;
+                break;
         }
 
         if (icon != null) {
