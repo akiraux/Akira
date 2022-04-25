@@ -20,37 +20,37 @@
  */
 
 /*
- * The fills panel.
+ * The borders panel.
  */
-public class Akira.Layouts.FillsList.FillListBox : VirtualizingSimpleListBox {
-    public unowned Akira.Lib.ViewCanvas view_canvas { get; construct; }
+public class Akira.Layouts.BordersList.BorderListBox : VirtualizingSimpleListBox {
+    public unowned Lib.ViewCanvas view_canvas { get; construct; }
 
-    private Gee.HashMap<int, FillItemModel> fills;
-    private FillListStore list_store;
+    private Gee.HashMap<int, BorderItemModel> borders;
+    private BorderListStore list_store;
 
-    public FillListBox (Akira.Lib.ViewCanvas canvas) {
+    public BorderListBox (Lib.ViewCanvas canvas) {
         Object (
             view_canvas: canvas
         );
 
-        fills = new Gee.HashMap<int, FillItemModel> ();
-        list_store = new FillListStore ();
-        // list_store.set_sort_func (fills_sort_function);
+        borders = new Gee.HashMap<int, BorderItemModel> ();
+        list_store = new BorderListStore ();
+        // list_store.set_sort_func (borders_sort_function);
 
         model = list_store;
 
         // Factory function to reuse the already generated row UI element when
-        // a new fill is created or the fills list scrolls to reveal fills
+        // a new border is created or the borders list scrolls to reveal borders
         // outside of the viewport.
         factory_func = (item, old_widget) => {
-            FillListItem? row = null;
+            BorderListItem? row = null;
             if (old_widget != null) {
-                row = old_widget as FillListItem;
+                row = old_widget as BorderListItem;
             } else {
-                row = new FillListItem (view_canvas);
+                row = new BorderListItem (view_canvas);
             }
 
-            row.assign ((FillItemModel) item);
+            row.assign ((BorderItemModel) item);
             row.show_all ();
 
             return row;
@@ -58,9 +58,9 @@ public class Akira.Layouts.FillsList.FillListBox : VirtualizingSimpleListBox {
     }
 
     public void refresh_list () {
-        if (fills.size > 0) {
-            var removed = fills.size;
-            fills.clear ();
+        if (borders.size > 0) {
+            var removed = borders.size;
+            borders.clear ();
             list_store.remove_all ();
             list_store.items_changed (0, removed, 0);
         }
@@ -80,12 +80,12 @@ public class Akira.Layouts.FillsList.FillListBox : VirtualizingSimpleListBox {
             }
 
             var node = selected.node;
-            if (node.instance.components.fills == null) {
+            if (node.instance.components.borders == null) {
                 continue;
             }
-            foreach (var fill in node.instance.components.fills.data) {
-                var item = new FillItemModel (view_canvas, node, fill.id);
-                fills[node.id] = item;
+            foreach (var border in node.instance.components.borders.data) {
+                var item = new BorderItemModel (view_canvas, node, border.id);
+                borders[node.id] = item;
                 list_store.add (item);
                 added++;
             }

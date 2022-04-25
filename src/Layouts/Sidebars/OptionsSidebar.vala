@@ -23,6 +23,7 @@ public class Akira.Layouts.Sidebars.OptionsSidebar : Gtk.Grid {
     public unowned Lib.ViewCanvas view_canvas { get; construct; }
 
     public Layouts.FillsList.FillsPanel fills_panel;
+    public Layouts.BordersList.BordersPanel borders_panel;
 
     public bool toggled {
         get {
@@ -42,31 +43,24 @@ public class Akira.Layouts.Sidebars.OptionsSidebar : Gtk.Grid {
     construct {
         get_style_context ().add_class ("sidebar-l");
 
-        var align_items_panel = new Layouts.Alignment.AlignmentPanel (view_canvas);
-        attach (align_items_panel, 0, 0, 1, 1);
+        // The alignment panel is the only widget that doesn't scroll.
+        attach (new Layouts.Alignment.AlignmentPanel (view_canvas), 0, 0);
 
-        var scrolled_grid = new Gtk.Grid () {
-            expand = true
-        };
-        scrolled_grid.attach (new Layouts.Transforms.TransformPanel (view_canvas), 0, 0, 1, 1);
-
-        fills_panel = new Layouts.FillsList.FillsPanel (view_canvas);
-        scrolled_grid.attach (fills_panel, 0, 1, 1, 1);
-
-        var scrolled_window = new Gtk.ScrolledWindow (null, null) {
+        var main_scroll = new Gtk.ScrolledWindow (null, null) {
             hscrollbar_policy = Gtk.PolicyType.NEVER,
             expand = true
         };
-        scrolled_window.add (scrolled_grid);
-        attach (scrolled_window, 0, 1, 1, 1);
 
-        /*
-        var border_radius_panel = new Akira.Layouts.Partials.BorderRadiusPanel (window);
-        borders_panel = new Akira.Layouts.Partials.BordersPanel (window);
-        scrolled_grid.attach (border_radius_panel, 0, 1, 1, 1);
-        scrolled_grid.attach (fills_panel, 0, 2, 1, 1);
-        scrolled_grid.attach (borders_panel, 0, 3, 1, 1);
-        */
+        fills_panel = new Layouts.FillsList.FillsPanel (view_canvas);
+        borders_panel = new Layouts.BordersList.BordersPanel (view_canvas);
+
+        var main_grid = new Gtk.Grid ();
+        main_grid.attach (new Layouts.Transforms.TransformPanel (view_canvas), 0, 0);
+        main_grid.attach (fills_panel, 0, 1);
+        main_grid.attach (borders_panel, 0, 2);
+
+        main_scroll.add (main_grid);
+        attach (main_scroll, 0, 1);
 
         // Connect signals.
         view_canvas.window.event_bus.toggle_presentation_mode.connect (toggle);

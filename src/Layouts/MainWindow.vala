@@ -96,4 +96,8 @@ public class Akira.Layouts.MainWindow : Gtk.Grid {
     public void refresh_fills () {
         options_sidebar.fills_panel.fills_listbox.refresh_list ();
     }
+
+    public void refresh_borders () {
+        options_sidebar.borders_panel.borders_listbox.refresh_list ();
+    }
 }

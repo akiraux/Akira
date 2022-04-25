@@ -51,6 +51,12 @@ sources = files(
 
     'Layouts/Alignment/AlignmentPanel.vala',
 
+    'Layouts/BordersList/BorderItemModel.vala',
+    'Layouts/BordersList/BorderListBox.vala',
+    'Layouts/BordersList/BorderListItem.vala',
+    'Layouts/BordersList/BorderListStore.vala',
+    'Layouts/BordersList/BordersPanel.vala',
+
     'Layouts/FillsList/FillItemModel.vala',
     'Layouts/FillsList/FillListBox.vala',
     'Layouts/FillsList/FillListItem.vala',
@@ -89,6 +95,7 @@ sources = files(
     'Widgets/VirtualizingListBox/VirtualizingListBox.vala',
     'Widgets/VirtualizingListBox/VirtualizingListBoxModel.vala',
     'Widgets/VirtualizingListBox/VirtualizingListBoxRow.vala',
+    'Widgets/VirtualizingListBox/VirtualizingSimpleListBox.vala',
 
     'ViewLayers/BaseCanvas.vala',
     'ViewLayers/ViewLayer.vala',
@@ -116,7 +123,6 @@ sources = files(
     'Drawables/DrawableRect.vala',
     'Drawables/DrawableText.vala',
 
-    'Lib/Components/Border.vala',
     'Lib/Components/Borders.vala',
     'Lib/Components/BorderRadius.vala',
     'Lib/Components/Color.vala',
