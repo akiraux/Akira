@@ -93,4 +93,21 @@ public class Akira.Utils.Pattern {
 
         return new_pattern;
     }
+
+    public static string convert_to_css_linear_gradient (Lib.Components.Pattern pattern) {
+        if (pattern.type == Lib.Components.Pattern.PatternType.SOLID) {
+            var color = pattern.get_first_color ().to_string ();
+            return """linear-gradient(to right, %s, %s)""".printf (color, color);
+        }
+
+        string css_result = "linear-gradient(to right";
+
+        foreach (var stop_color in pattern.colors) {
+            css_result += """ ,%s %f""".printf(stop_color.color.to_string (), stop_color.offset * 100.0);
+            css_result += "%";
+        }
+
+        css_result += ")";
+        return css_result;
+    }
 }

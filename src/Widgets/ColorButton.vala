@@ -30,7 +30,7 @@ public class Akira.Widgets.ColorButton : Gtk.Button {
     private Gtk.Popover color_popover;
     private Widgets.ColorChooser? color_chooser = null;
 
-    private string? current_color = null;
+    private string? current_pattern = null;
 
     public class SignalBlocker {
         private unowned ColorButton item;
@@ -85,8 +85,8 @@ public class Akira.Widgets.ColorButton : Gtk.Button {
         sensitive = !model.hidden;
 
         //  var new_color = model.color.to_string ();
-        var new_color = model.pattern.get_first_color ().to_string ();
-        if (new_color == current_color) {
+        var new_pattern = Utils.Pattern.convert_to_css_linear_gradient (model.pattern);
+        if (new_pattern == current_pattern) {
             return;
         }
 
@@ -95,13 +95,13 @@ public class Akira.Widgets.ColorButton : Gtk.Button {
             var context = get_style_context ();
 
             var css = """.selected-color {
-                    background-color: %s;
-                    border-color: shade (%s, 0.75);
-                }""".printf (new_color, new_color);
+                    background-image: %s;
+                    border: none;
+                }""".printf (new_pattern);
 
             provider.load_from_data (css, css.length);
             context.add_provider (provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
-            current_color = new_color;
+            current_pattern = new_pattern;
         } catch (Error e) {
             warning ("Style error: %s", e.message);
         }
