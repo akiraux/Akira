@@ -41,9 +41,6 @@ public class Akira.Lib.Components.Pattern {
     // The values are relative to the canvas item's position.
     public Geometry.Point start;
     public Geometry.Point end;
-    // These values are only used for radial gradients to denote radii.
-    public double radius_start;
-    public double radius_end;
 
     public Pattern.solid (Gdk.RGBA color, bool hidden) {
         this.type = PatternType.SOLID;
@@ -66,8 +63,17 @@ public class Akira.Lib.Components.Pattern {
         this.hidden = hidden;
     }
 
-    public Pattern.radial () {
-        // TODO:
+    public Pattern.radial (Geometry.Point start, Geometry.Point end, bool hidden) {
+        this.start = start;
+        this.end = end;
+
+        // By default, all linear gradients will be created with black and white colors at start and end.
+        colors = new Gee.TreeSet<StopColor?> (are_equal);
+        colors.add (StopColor () {offset = 0, color = Gdk.RGBA () {red = 0, green = 0, blue = 0, alpha = 1}});
+        colors.add (StopColor () {offset = 1, color = Gdk.RGBA () {red = 1, green = 1, blue = 1, alpha = 1}});
+
+        this.type = PatternType.RADIAL;
+        this.hidden = hidden;
     }
 
     public Pattern copy () {
@@ -78,8 +84,6 @@ public class Akira.Lib.Components.Pattern {
         new_pattern.hidden = this.hidden;
         new_pattern.start = this.start;
         new_pattern.end = this.end;
-        new_pattern.radius_start = this.radius_start;
-        new_pattern.radius_end = this.radius_end;
 
         return new_pattern;
     }

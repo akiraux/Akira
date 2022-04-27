@@ -147,12 +147,6 @@ public class Akira.Models.ColorModel : GLib.Object {
                     pattern.end.y - percent_delta.y
                 );
                 break;
-            case Utils.Nobs.Nob.GRADIENT_RADIUS_START:
-                pattern.radius_start = pattern.radius_start + percent_delta.x;
-                break;
-            case Utils.Nobs.Nob.GRADIENT_RADIUS_END:
-                pattern.radius_end = pattern.radius_end + percent_delta.x;
-                break;
             default:
                 break;
         }

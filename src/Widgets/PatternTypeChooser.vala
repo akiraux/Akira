@@ -45,7 +45,7 @@ public class Akira.Widgets.PatternTypeChooser : Granite.Widgets.ModeButton {
 
             model.active_pattern_type = active_mode;
             pattern_changed (model.pattern);
-            
+
             handle_pattern_changed ();
         });
 
@@ -94,8 +94,6 @@ public class Akira.Widgets.PatternTypeChooser : Granite.Widgets.ModeButton {
 
         canvas.nob_manager.set_gradient_nob_position (Utils.Nobs.Nob.GRADIENT_START, hidden_pos);
         canvas.nob_manager.set_gradient_nob_position (Utils.Nobs.Nob.GRADIENT_END, hidden_pos);
-        canvas.nob_manager.set_gradient_nob_position (Utils.Nobs.Nob.GRADIENT_RADIUS_START, hidden_pos);
-        canvas.nob_manager.set_gradient_nob_position (Utils.Nobs.Nob.GRADIENT_RADIUS_END, hidden_pos);
 
         if (active_mode == Lib.Components.Pattern.PatternType.LINEAR) {
             canvas.nob_manager.set_gradient_nob_position (Utils.Nobs.Nob.GRADIENT_START, start_nob_pos);

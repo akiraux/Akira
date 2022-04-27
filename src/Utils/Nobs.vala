@@ -45,8 +45,6 @@ public class Akira.Utils.Nobs : Object {
         ROTATE,
         GRADIENT_START,
         GRADIENT_END,
-        GRADIENT_RADIUS_START,
-        GRADIENT_RADIUS_END,
         ALL
     }
 
@@ -176,9 +174,7 @@ public class Akira.Utils.Nobs : Object {
     public static bool is_gradient_nob (Nob nob) {
         return (
             nob == Nob.GRADIENT_START ||
-            nob == Nob.GRADIENT_END ||
-            nob == Nob.GRADIENT_RADIUS_START ||
-            nob == Nob.GRADIENT_RADIUS_END
+            nob == Nob.GRADIENT_END
         );
     }
 
@@ -222,12 +218,6 @@ public class Akira.Utils.Nobs : Object {
                 result = Gdk.CursorType.TCROSS;
                 break;
             case Nob.GRADIENT_END:
-                result = Gdk.CursorType.TCROSS;
-                break;
-            case Nob.GRADIENT_RADIUS_START:
-                result = Gdk.CursorType.TCROSS;
-                break;
-            case Nob.GRADIENT_RADIUS_END:
                 result = Gdk.CursorType.TCROSS;
                 break;
             default:

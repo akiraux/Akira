@@ -72,7 +72,7 @@ public class Akira.Lib.Components.Fills : Component, Copyable<Fills> {
             solid_pattern = new Pattern.solid (fill_rgba, false);
 
             linear_pattern = new Pattern.linear (Geometry.Point (5, 5), Geometry.Point (95, 95), false);
-            radial_pattern = new Pattern.radial ();
+            radial_pattern = new Pattern.radial (Geometry.Point (5, 5), Geometry.Point (95, 95), false);
         }
 
         public Fill.with_all_patterns (int id, Pattern solid_pattern, Pattern linear_pattern, Pattern radial_pattern, Pattern.PatternType type) {

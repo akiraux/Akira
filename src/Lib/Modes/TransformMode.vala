@@ -182,8 +182,6 @@ public class Akira.Lib.Modes.TransformMode : AbstractInteractionMode {
                 break;
             case Utils.Nobs.Nob.GRADIENT_START:
             case Utils.Nobs.Nob.GRADIENT_END:
-            case Utils.Nobs.Nob.GRADIENT_RADIUS_START:
-            case Utils.Nobs.Nob.GRADIENT_RADIUS_END:
                 move_gradient_nob (
                     view_canvas,
                     nob,

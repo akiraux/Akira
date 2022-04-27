@@ -74,7 +74,7 @@ public class Akira.Lib.Components.Borders : Component, Copyable<Borders> {
             solid_pattern = new Pattern.solid (border_rgba, false);
 
             linear_pattern = new Pattern.linear (Geometry.Point (5, 5), Geometry.Point (95, 95), false);
-            radial_pattern = new Pattern.radial ();
+            radial_pattern = new Pattern.radial (Geometry.Point (5, 5), Geometry.Point (95, 95), false);
 
             _size = size != null ? size : settings.border_size;
         }

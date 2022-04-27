@@ -42,10 +42,8 @@ public class Akira.Lib.Managers.NobManager : Object {
         view_canvas.window.event_bus.change_gradient_nobs_visibility.connect ((visible) => {
             if (visible) {
                 nob_layer.render_gradient_nobs = true;
-                nob_layer.render_gradient_radii_nobs = true;
             } else {
                 nob_layer.render_gradient_nobs = false;
-                nob_layer.render_gradient_radii_nobs = false;
             }
 
             update_nob_layer ();
@@ -182,13 +180,10 @@ public class Akira.Lib.Managers.NobManager : Object {
     public void set_layer_flags_from_pattern_type (Lib.Components.Pattern.PatternType ptype) {
         if (ptype == Lib.Components.Pattern.PatternType.SOLID) {
             nob_layer.render_gradient_nobs = false;
-            nob_layer.render_gradient_radii_nobs = false;
         } else if (ptype == Lib.Components.Pattern.PatternType.LINEAR) {
             nob_layer.render_gradient_nobs = true;
-            nob_layer.render_gradient_radii_nobs = false;
         } else if (ptype == Lib.Components.Pattern.PatternType.RADIAL) {
             nob_layer.render_gradient_nobs = true;
-            nob_layer.render_gradient_radii_nobs = true;
         }
 
         nob_layer.update_nob_data (nobs);

@@ -43,13 +43,14 @@ public class Akira.Utils.Pattern {
                 }
                 break;
             case Lib.Components.Pattern.PatternType.RADIAL:
+                double distance = Utils.GeometryMath.distance (pattern.start.x, pattern.start.y, pattern.end.x, pattern.end.y);
                 converted = new Cairo.Pattern.radial (
                     pattern.start.x,
                     pattern.start.y,
-                    pattern.radius_start,
-                    pattern.end.x,
-                    pattern.end.y,
-                    pattern.radius_end
+                    0,
+                    pattern.start.x,
+                    pattern.start.y,
+                    distance
                 );
 
                 foreach (var stop_color in pattern.colors) {

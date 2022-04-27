@@ -35,8 +35,6 @@ public class Akira.ViewLayers.ViewLayerNobs : ViewLayer {
 
     // If this is true, draw the start and end nobs for linear and radial gradients.
     public bool render_gradient_nobs = false;
-    // If this is true, draw the radius nobs. Only use for radial gradients.
-    public bool render_gradient_radii_nobs = false;
 
     public void update_nob_data (Utils.Nobs.NobSet? new_nobs) {
         if (nobs != null) {
@@ -118,15 +116,6 @@ public class Akira.ViewLayers.ViewLayerNobs : ViewLayer {
                 }
             }
 
-            if (
-                nob.handle_id == Utils.Nobs.Nob.GRADIENT_RADIUS_START ||
-                nob.handle_id == Utils.Nobs.Nob.GRADIENT_RADIUS_END
-            ) {
-                if (!render_gradient_radii_nobs) {
-                    continue;
-                }
-            }
-
             context.save ();
 
             context.new_path ();
@@ -137,9 +126,7 @@ public class Akira.ViewLayers.ViewLayerNobs : ViewLayer {
             if (
                 nob.handle_id == Utils.Nobs.Nob.ROTATE ||
                 nob.handle_id == Utils.Nobs.Nob.GRADIENT_START ||
-                nob.handle_id == Utils.Nobs.Nob.GRADIENT_END ||
-                nob.handle_id == Utils.Nobs.Nob.GRADIENT_RADIUS_START ||
-                nob.handle_id == Utils.Nobs.Nob.GRADIENT_RADIUS_END
+                nob.handle_id == Utils.Nobs.Nob.GRADIENT_END
             ) {
                 context.arc (0, 0, radius, 0, 2.0 * GLib.Math.PI);
             } else {
