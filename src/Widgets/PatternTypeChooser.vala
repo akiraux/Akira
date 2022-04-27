@@ -41,12 +41,18 @@ public class Akira.Widgets.PatternTypeChooser : Granite.Widgets.ModeButton {
 
         // Connect signals.
         this.mode_changed.connect ((window) => {
+            print("Mode changed\n");
             var active_mode = (Lib.Components.Pattern.PatternType) this.selected;
+            print("Got active mode as %s\n", active_mode.to_string ());
+            print("Active pattern type is %s\n", model.active_pattern_type.to_string ());
 
             model.active_pattern_type = active_mode;
+            print("Change active mode to %s\n", active_mode.to_string ());
             pattern_changed (model.pattern);
+            print("Done signal\n");
 
             handle_pattern_changed ();
+            print("Handled signal\n");
         });
 
         this.canvas = window.main_window.main_view_canvas.canvas;

@@ -65,14 +65,14 @@ public class Akira.Lib.Items.ModelTypeText : ModelType {
             case Lib.Components.Component.Type.COMPILED_BORDER:
                 if (!instance.compiled_border.is_visible) {
                     instance.drawable.line_width = 0;
-                    instance.drawable.stroke_rgba = Gdk.RGBA () { alpha = 0 };
+                    instance.drawable.border_pattern = Utils.Pattern.default_pattern ();
                     break;
                 }
 
                 // The "line-width" property expects a DOUBLE type, but we don't support subpixels
                 // so we always handle the border size as INT, therefore we need to type cast it here.
                 instance.drawable.line_width = (double) instance.compiled_border.size;
-                instance.drawable.stroke_rgba = instance.compiled_border.color;
+                instance.drawable.border_pattern = Utils.Pattern.convert_to_cairo_pattern (instance.compiled_border.pattern);
                 break;
             case Lib.Components.Component.Type.COMPILED_FILL:
                 if (!instance.compiled_fill.is_visible) {

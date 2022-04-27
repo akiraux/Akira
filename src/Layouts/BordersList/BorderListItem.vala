@@ -50,7 +50,7 @@ public class Akira.Layouts.BordersList.BorderListItem : VirtualizingListBoxRow {
         context.add_class ("selected-color-container");
         context.add_class ("bg-pattern");
 
-        color_button = new Widgets.ColorButton ();
+        color_button = new Widgets.ColorButton (view_canvas.window);
         container.add (color_button);
 
         eyedropper_button = new Widgets.EyeDropperButton () {};

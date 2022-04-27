@@ -20,12 +20,12 @@
  */
 
 public class Akira.Lib.Components.CompiledBorder : Copyable<CompiledBorder> {
-    private Gdk.RGBA _color;
+    private Pattern _pattern;
     private double _size;
     private bool _visible;
 
-    public Gdk.RGBA color {
-        get { return _color; }
+    public Pattern pattern {
+        get { return _pattern; }
     }
 
     public double size {
@@ -36,42 +36,41 @@ public class Akira.Lib.Components.CompiledBorder : Copyable<CompiledBorder> {
         get { return _visible; }
     }
 
-    public CompiledBorder (Gdk.RGBA color, double size, bool visible) {
-        _color = color;
+    public CompiledBorder (Pattern pattern, double size, bool visible) {
+        _pattern = pattern;
         _size = size;
         _visible = visible;
     }
 
     public CompiledBorder.as_empty () {
-        _color = Gdk.RGBA () { red = 0.0, green = 0.0, blue = 0.0, alpha = 0.0};
+        _pattern = new Pattern.solid (Gdk.RGBA () {red = 0, green = 0, blue = 0, alpha = 0}, false);
         _size = 0;
         _visible = false;
     }
 
     public CompiledBorder copy () {
-        return new CompiledBorder (_color, _size, _visible);
+        return new CompiledBorder (_pattern, size, _visible);
     }
 
     public static CompiledBorder compile (Components? components, Lib.Items.ModelNode? node) {
-        var rgba_border = Gdk.RGBA ();
+        var pattern_border = new Pattern ();
         bool has_colors = false;
-        double size = 0;
+        double border_size = 0;
 
         if (components == null) {
-            return new CompiledBorder (rgba_border, size, has_colors);
+            return new CompiledBorder (pattern_border, border_size, has_colors);
         }
 
         unowned var borders = components.borders;
         unowned var opacity = components.opacity;
-
-        // Set an initial arbitrary color with full transparency.
-        rgba_border.alpha = 0;
+        unowned var size = components.size;
+        unowned var center = components.center;
 
         if (borders == null) {
-            return new CompiledBorder (rgba_border, size, false);
+            return new CompiledBorder (pattern_border, border_size, has_colors);
         }
 
-        // Loop through all the configured borders and reload the color.
+        // Loop through all the configured borders.
         for (var i = 0; i < borders.data.length; ++i) {
             // Skip if the border is hidden as we don't need to blend colors.
             if (borders.data[i].hidden) {
@@ -79,17 +78,21 @@ public class Akira.Lib.Components.CompiledBorder : Copyable<CompiledBorder> {
             }
 
             // Set the new blended color.
-            rgba_border = Utils.Color.blend_colors (rgba_border, borders.data[i].color);
-            size = double.max (size, borders.data[i].size);
+            //  rgba_border = Utils.Color.blend_colors (rgba_border, borders.data[i].pattern.get_first_color ());
+            pattern_border = Utils.Pattern.create_pattern_with_converted_positions (borders.data[i].pattern, size, center);
             has_colors = true;
+
+            // TODO: Temporarily disable blending patterns. Not implemented.
+            break;
         }
 
         // Apply the mixed RGBA value only if we had one.
         if (has_colors && opacity != null) {
-            // Keep in consideration the global opacity to properly update the border color.
-            rgba_border.alpha = rgba_border.alpha * opacity.opacity / 100;
+            // Keep in consideration the global opacity to properly update the fill color.
+            // TODO: Disable this too.
+            //  rgba_border.alpha = rgba_border.alpha * opacity.opacity / 100;
         }
 
-        return new CompiledBorder (rgba_border, size, has_colors && size != 0);
+        return new CompiledBorder (pattern_border, border_size, has_colors);
     }
 }

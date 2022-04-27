@@ -96,7 +96,7 @@ public class Akira.ViewLayers.ViewLayerMultiSelect : ViewLayer {
 
         drawable.fill_pattern = Utils.Pattern.convert_to_cairo_pattern (fill_pattern);
         drawable.line_width = UI_LINE_WIDTH / scale;
-        drawable.stroke_rgba = stroke;
+        drawable.border_pattern = Utils.Pattern.convert_to_cairo_pattern (new Lib.Components.Pattern.solid (stroke, false));
         drawable.paint (context, target_bounds, scale, Drawables.Drawable.DrawType.NORMAL);
 
         last_drawn_bb = drawable.bounds;
