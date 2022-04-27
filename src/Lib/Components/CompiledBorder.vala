@@ -79,6 +79,7 @@ public class Akira.Lib.Components.CompiledBorder : Copyable<CompiledBorder> {
 
             // Set the new blended color.
             //  rgba_border = Utils.Color.blend_colors (rgba_border, borders.data[i].pattern.get_first_color ());
+            border_size = borders.data[i].size;
             pattern_border = Utils.Pattern.create_pattern_with_converted_positions (borders.data[i].pattern, size, center);
             has_colors = true;
 

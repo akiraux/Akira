@@ -41,25 +41,24 @@ public class Akira.Widgets.PatternTypeChooser : Granite.Widgets.ModeButton {
 
         // Connect signals.
         this.mode_changed.connect ((window) => {
-            print("Mode changed\n");
             var active_mode = (Lib.Components.Pattern.PatternType) this.selected;
-            print("Got active mode as %s\n", active_mode.to_string ());
-            print("Active pattern type is %s\n", model.active_pattern_type.to_string ());
 
             model.active_pattern_type = active_mode;
-            print("Change active mode to %s\n", active_mode.to_string ());
             pattern_changed (model.pattern);
-            print("Done signal\n");
-
+            
             handle_pattern_changed ();
-            print("Handled signal\n");
         });
 
         this.canvas = window.main_window.main_view_canvas.canvas;
 
         window.event_bus.translate_gradient_nob_by_delta.connect ((nob, delta) => {
-            ((Layouts.FillsList.FillItemModel) model).move_pattern_position_by_delta (nob, delta);
+            // This condition checks if this widget is currently open as there can be multiple instances
+            // if PatternTypeChooser present. And we don't want all of them to handle this signal.
+            if (!is_drawable ()) {
+                return;
+            }
 
+            model.move_pattern_position_by_delta (nob, delta);
             handle_pattern_changed ();
         });
     }
