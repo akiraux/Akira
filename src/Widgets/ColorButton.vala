@@ -66,6 +66,13 @@ public class Akira.Widgets.ColorButton : Gtk.Button {
         color_popover.closed.connect (() => {
             window.event_bus.change_gradient_nobs_visibility (false);
         });
+
+        // This is for preventing a weird bug introduced by making the popover non-modal.
+        // When a item is selected, sometimes the popover would open and close real fast.
+        // Making it invisible after unrealizing prevents this bug.
+        color_popover.unrealize.connect (() => {
+            color_popover.visible = false;
+        });
     }
 
     ~ColorButton () {
