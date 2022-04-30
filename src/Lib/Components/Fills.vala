@@ -76,6 +76,7 @@ public class Akira.Lib.Components.Fills : Component, Copyable<Fills> {
         }
 
         public Fill.with_all_patterns (int id, Pattern solid_pattern, Pattern linear_pattern, Pattern radial_pattern, Pattern.PatternType type) {
+            this._id = id;
             this.solid_pattern = solid_pattern;
             this.linear_pattern = linear_pattern;
             this.radial_pattern = radial_pattern;
@@ -121,13 +122,8 @@ public class Akira.Lib.Components.Fills : Component, Copyable<Fills> {
         }
 
         public Fill with_replaced_pattern (Pattern new_pattern) {
-            var new_fill = Fill ();
-
-            new_fill._id = this._id;
-            new_fill.active_pattern = new_pattern.type;
-            new_fill.solid_pattern = this.solid_pattern;
-            new_fill.linear_pattern = this.linear_pattern;
-            new_fill.radial_pattern = this.radial_pattern;
+            var new_fill = Fill.with_all_patterns (_id, solid_pattern, linear_pattern, radial_pattern, new_pattern.type);
+            new_fill._pattern = new_pattern;
 
             return new_fill;
         }

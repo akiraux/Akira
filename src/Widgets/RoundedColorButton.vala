@@ -21,9 +21,9 @@
  */
 
 public class Akira.Widgets.RoundedColorButton : Gtk.Grid {
-    public signal void set_color (string color);
+    public signal void set_pattern (Lib.Components.Pattern pattern);
 
-    public RoundedColorButton (string color) {
+    public RoundedColorButton (Lib.Components.Pattern pattern) {
         var context = get_style_context ();
         context.add_class ("saved-color-button");
         context.add_class ("bg-pattern");
@@ -35,14 +35,15 @@ public class Akira.Widgets.RoundedColorButton : Gtk.Grid {
         btn.width_request = btn.height_request = 24;
         btn.valign = btn.halign = Gtk.Align.CENTER;
         btn.can_focus = false;
-        btn.tooltip_text = _("Set color to " + color);
+        //  btn.tooltip_text = _("Set color to " + color);
 
         try {
             var provider = new Gtk.CssProvider ();
+            var css_pattern = Utils.Pattern.convert_to_css_linear_gradient (pattern);
             var css = """.color-item {
-                    background-color: %s;
-                    border-color: shade (%s, 0.75);
-                }""".printf (color, color);
+                    background: %s;
+                    border: none;
+                }""".printf (css_pattern);
 
             provider.load_from_data (css, css.length);
             btn_context.add_provider (provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
@@ -52,7 +53,7 @@ public class Akira.Widgets.RoundedColorButton : Gtk.Grid {
 
         // Emit the set_color signal when the button is clicked.
         btn.clicked.connect (() => {
-            set_color (color);
+            set_pattern (pattern);
         });
 
         add (btn);

@@ -31,6 +31,30 @@ public class Akira.Lib.Components.Pattern {
         // Value between 0 and 1. Represents what distance the stop color is located at.
         public double offset;
         public Gdk.RGBA color;
+
+        public StopColor.deserialized (Json.Object obj) {
+            offset = obj.get_double_member ("offset");
+
+            color = Gdk.RGBA ();
+            color.red = obj.get_double_member ("red");
+            color.green = obj.get_double_member ("green");
+            color.blue = obj.get_double_member ("blue");
+            color.alpha = obj.get_double_member ("alpha");
+        }
+
+        public Json.Node serialize () {
+            var obj = new Json.Object ();
+
+            obj.set_double_member ("offset", offset);
+            obj.set_double_member ("red", color.red);
+            obj.set_double_member ("green", color.green);
+            obj.set_double_member ("blue", color.blue);
+            obj.set_double_member ("alpha", color.alpha);
+
+            var node = new Json.Node (Json.NodeType.OBJECT);
+            node.set_object (obj);
+            return node;
+        }
     }
 
     public PatternType type;
@@ -112,18 +136,32 @@ public class Akira.Lib.Components.Pattern {
     }
 
     public Pattern.deserialized (Json.Object obj) {
-        // TODO: 
-        hidden = obj.get_boolean_member ("hidden");
+        this.start = Geometry.Point.deserialized (obj.get_object_member ("start"));
+        this.end = Geometry.Point.deserialized (obj.get_object_member ("end"));
+        this.type = (PatternType) obj.get_int_member ("type");
+        this.hidden = obj.get_boolean_member ("hidden");
+
+        var color_array = obj.get_array_member ("colors");
+        this.colors = new Gee.TreeSet<StopColor?> (are_equal);
+        foreach (var color_item in color_array.get_elements ()) {
+            colors.add (StopColor.deserialized (color_item.get_object ()));
+        }
     }
 
     public Json.Node serialize () {
-        // TODO: 
         var obj = new Json.Object ();
-        //  obj.set_double_member ("r", rgba.red);
-        //  obj.set_double_member ("g", rgba.green);
-        //  obj.set_double_member ("b", rgba.blue);
-        //  obj.set_double_member ("a", rgba.alpha);
-        //  obj.set_boolean_member ("hidden", hidden);
+        obj.set_member ("start", start.serialize ());
+        obj.set_member ("end", end.serialize ());
+        obj.set_int_member ("type", (int) type);
+        obj.set_boolean_member ("hidden", hidden);
+
+        var color_array = new Json.Array ();
+        foreach (var color in colors) {
+            color_array.add_element (color.serialize ());
+        }
+
+        obj.set_array_member ("colors", color_array);
+
         var node = new Json.Node (Json.NodeType.OBJECT);
         node.set_object (obj);
         return node;
