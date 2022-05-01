@@ -73,15 +73,15 @@ public class Akira.Utils.Nobs : Object {
         public NobData[] data;
 
         public NobSet () {
-            data = new NobData[13];
-            for (var i = 0; i < 13; i++) {
+            data = new NobData[11];
+            for (var i = 0; i < 11; i++) {
                 data[i] = new NobData ((Nob)i, 0, 0, false);
             }
         }
 
         public NobSet.clone (NobSet other) {
-            data = new NobData[13];
-            for (var i = 0; i < 13; i++) {
+            data = new NobData[11];
+            for (var i = 0; i < 11; i++) {
                 data[i] = other.data[i].copy ();
             }
         }

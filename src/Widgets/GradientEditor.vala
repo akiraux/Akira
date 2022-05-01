@@ -196,6 +196,11 @@ public class Akira.Widgets.GradientEditor : Gtk.DrawingArea {
 
     // As we used the BUTTON_MOTION_MASK, this method will be called only when mouse is clicked and dragged.
     private bool handle_motion_notify (Gdk.EventMotion event) {
+        if (selected_stop_color.offset == 0 || selected_stop_color.offset == 1) {
+            // First and last stop colors are not allowed to be moved.
+            return true;
+        }
+
         double event_offset = event.x / width;
 
         pattern.colors.remove (selected_stop_color);

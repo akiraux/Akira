@@ -27,20 +27,9 @@ public class Akira.Utils.Pattern {
             case Lib.Components.Pattern.PatternType.SOLID:
                 var color = pattern.colors.first ().color;
                 converted = new Cairo.Pattern.rgba (color.red, color.green, color.blue, color.alpha);
-                break;
+                return converted;
             case Lib.Components.Pattern.PatternType.LINEAR:
                 converted = new Cairo.Pattern.linear (pattern.start.x, pattern.start.y, pattern.end.x, pattern.end.y);
-
-                foreach (var stop_color in pattern.colors) {
-                    var color = stop_color.color;
-                    converted.add_color_stop_rgba (
-                        stop_color.offset,
-                        color.red,
-                        color.green,
-                        color.blue,
-                        color.alpha
-                    );
-                }
                 break;
             case Lib.Components.Pattern.PatternType.RADIAL:
                 double distance = Utils.GeometryMath.distance (pattern.start.x, pattern.start.y, pattern.end.x, pattern.end.y);
@@ -52,22 +41,23 @@ public class Akira.Utils.Pattern {
                     pattern.start.y,
                     distance
                 );
-
-                foreach (var stop_color in pattern.colors) {
-                    var color = stop_color.color;
-                    converted.add_color_stop_rgba (
-                        stop_color.offset,
-                        color.red,
-                        color.green,
-                        color.blue,
-                        color.alpha
-                    );
-                }
                 break;
             default:
                 assert (false);
                 converted = new Cairo.Pattern.rgba (0, 0, 0, 0);
                 break;
+        }
+
+        // If the pattern was linear or radial, add all the stop colors.
+        foreach (var stop_color in pattern.colors) {
+            var color = stop_color.color;
+            converted.add_color_stop_rgba (
+                stop_color.offset,
+                color.red,
+                color.green,
+                color.blue,
+                color.alpha
+            );
         }
 
         return converted;

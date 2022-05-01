@@ -131,13 +131,8 @@ public class Akira.Lib.Components.Borders : Component, Copyable<Borders> {
         }
 
         public Border with_replaced_pattern (Pattern new_pattern) {
-            var new_border = Border ();
-
-            new_border._id = this._id;
-            new_border.active_pattern = new_pattern.type;
-            new_border.solid_pattern = this.solid_pattern;
-            new_border.linear_pattern = this.linear_pattern;
-            new_border.radial_pattern = this.radial_pattern;
+            var new_border = Border.with_all_patterns (_id, solid_pattern, linear_pattern, radial_pattern, new_pattern.type);
+            new_border._pattern = new_pattern;
 
             return new_border;
         }
