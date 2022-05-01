@@ -140,6 +140,27 @@ public class Akira.Widgets.ColorButton : Gtk.Button {
         color_chooser.set_pattern (model.pattern);
         color_popover.popup ();
 
+        var canvas = window.main_window.main_view_canvas.canvas;
+
+        var coords = canvas.selection_manager.selection.first_node ().instance.components.center;
+        var size = canvas.selection_manager.selection.first_node ().instance.components.size;
+
+        Geometry.Point origin = Geometry.Point (coords.x - size.width / 2.0, coords.y - size.height / 2.0);
+
+        // Update position of nobs in ViewLayerNobs.
+        var start_nob_pos = Geometry.Point (
+            model.pattern.start.x * size.width / 100.0 + origin.x,
+            model.pattern.start.y * size.height / 100.0 + origin.y
+        );
+        var end_nob_pos = Geometry.Point (
+            model.pattern.end.x * size.width / 100.0 + origin.x,
+            model.pattern.end.y * size.height / 100.0 + origin.y
+        );
+
+        canvas.nob_manager.set_gradient_nob_position (Utils.Nobs.Nob.GRADIENT_START, start_nob_pos);
+        canvas.nob_manager.set_gradient_nob_position (Utils.Nobs.Nob.GRADIENT_END, end_nob_pos);
+        canvas.nob_manager.set_layer_flags_from_pattern_type (model.pattern.type);
+
         window.event_bus.change_gradient_nobs_visibility (true);
     }
 }
