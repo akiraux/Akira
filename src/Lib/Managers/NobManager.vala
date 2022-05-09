@@ -89,7 +89,7 @@ public class Akira.Lib.Managers.NobManager : Object {
     private void update_nob_positions (Lib.Items.NodeSelection selection) {
         var nob_size = Utils.Nobs.NobData.NOB_SIZE / view_canvas.current_scale;
 
-        var rect = selection.coordinates ();
+        var rect = selection.area ().quad ();
 
         var width = rect.width;
         var height = rect.height;

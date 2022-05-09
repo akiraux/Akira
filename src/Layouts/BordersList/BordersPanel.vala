@@ -90,8 +90,15 @@ public class Akira.Layouts.BordersList.BordersPanel : Gtk.Grid {
 
         unowned var im = _view_canvas.items_manager;
         foreach (var selected in sm.selection.nodes.values) {
-            var new_borders = selected.node.instance.components.borders.copy ();
-            new_borders.append_border_with_color (color);
+            unowned var old_borders = selected.node.instance.components.borders;
+            Lib.Components.Borders? new_borders = (old_borders == null) ? null : old_borders.copy ();
+            double? size = null;
+            if (new_borders == null) {
+                new_borders = new Lib.Components.Borders ();
+                size = settings.border_size;
+            }
+
+            new_borders.append_border_with_color (color, size);
             selected.node.instance.components.borders = new_borders;
             im.item_model.alert_node_changed (selected.node, Lib.Components.Component.Type.COMPILED_BORDER);
         }

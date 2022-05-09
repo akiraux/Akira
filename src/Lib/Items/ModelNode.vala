@@ -131,6 +131,23 @@ public class Akira.Lib.Items.ModelNode {
         return n;
     }
 
+    /*
+     * Get the transform that maps this node's geometry to the world
+     */
+    public Cairo.Matrix get_ancestor_transform () {
+        var result = Cairo.Matrix.identity ();
+        ModelNode? parent = parent;
+        while (parent != null && parent.id != Model.ORIGIN_ID) {
+            unowned var geom = parent.instance.compiled_geometry;
+            if (geom != null) {
+                var tmp = geom.transformation_matrix;
+                result.multiply (tmp, result);
+            }
+            parent = parent.parent;
+        }
+        return result;
+    }
+
     public void items_in_canvas (
         double x,
         double y,
