@@ -341,7 +341,7 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
                     selection_manager.selection_modified_external (true);
                 }
             } else if (
-                !selection_manager.selection.coordinates ().contains (event.x, event.y) &&
+                !selection_manager.selection.area ().contains (event.x, event.y) &&
                 !selection_manager.selection.is_empty ()
             ) {
                 // Selection area was not clicked, so we reset the selection if we have some.

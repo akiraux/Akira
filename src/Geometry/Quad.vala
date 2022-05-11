@@ -149,6 +149,14 @@ public struct Akira.Geometry.Quad {
         br_y += dy;
     }
 
+    public void transform (Cairo.Matrix matrix) {
+        transformation = matrix;
+        matrix.transform_point (ref tl_x, ref tl_y);
+        matrix.transform_point (ref tr_x, ref tr_y);
+        matrix.transform_point (ref bl_x, ref bl_y);
+        matrix.transform_point (ref br_x, ref br_y);
+    }
+
     public string to_string () {
         return "tl: %f %f tr: %f %f br: %f %f bl: %f %f".printf (
         tl_x,
