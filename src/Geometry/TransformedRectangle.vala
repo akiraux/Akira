@@ -27,7 +27,7 @@
       public Rectangle rect;
       public Cairo.Matrix matrix;
 
-      public TransformedRectangle() {}
+      public TransformedRectangle () {}
 
       public TransformedRectangle.with_geometry (Rectangle rectangle, Cairo.Matrix matrix) {
           rect = rectangle;
@@ -39,7 +39,7 @@
           this.matrix = Cairo.Matrix.identity ();
       }
 
-      public Quad quad() {
+      public Quad quad () {
           var quad = Quad.from_rectangle (rect);
           quad.transform (matrix);
           return quad;
@@ -51,7 +51,7 @@
        */
       public void map_to_local (ref double x, ref double y) {
           var inv = matrix;
-          inv.invert();
+          inv.invert ();
           inv.transform_point (ref x, ref y);
       }
 
@@ -62,7 +62,7 @@
           matrix.transform_point (ref x, ref y);
       }
 
-      /* 
+      /*
        * Returns true if the transformed rectangle contains the x, y position
        * in the world coordinates defined by the `matrix` mapping
        */
