@@ -62,7 +62,7 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
 
     construct {
         set_show_close_button (true);
-        set_project_title ("Untitled");
+        set_project_title ( _("Untitled") );
 
         menu = new Widgets.MenuButton ("document-open", _("Menu"), null);
         var menu_popover = build_main_menu_popover ();
