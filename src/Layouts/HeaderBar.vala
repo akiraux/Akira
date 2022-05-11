@@ -62,7 +62,7 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
 
     construct {
         set_show_close_button (true);
-        set_project_title("Untitled");
+        set_project_title ("Untitled");
 
         menu = new Widgets.MenuButton ("document-open", _("Menu"), null);
         var menu_popover = build_main_menu_popover ();
@@ -580,12 +580,12 @@ public class Akira.Layouts.HeaderBar : Gtk.HeaderBar {
         return button;
     }
 
-    private void set_project_title(string title){
+    private void set_project_title (string title) {
         this.title = title;
-        Gtk.Label label = new Gtk.Label(title);
-        label.get_style_context().add_class(Gtk.STYLE_CLASS_TITLE);
-        label.set_hexpand(true);
-        label.set_ellipsize(Pango.EllipsizeMode.END);
+        Gtk.Label label = new Gtk.Label (title);
+        label.get_style_context ().add_class (Gtk.STYLE_CLASS_TITLE);
+        label.set_hexpand (true);
+        label.set_ellipsize (Pango.EllipsizeMode.END);
 
         set_custom_title (label);
     }
