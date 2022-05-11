@@ -82,7 +82,7 @@ public class Akira.Lib.Components.Borders : Component, Copyable<Borders> {
     public Border[] data;
 
     public Borders () {
-        data = new Border[1];
+        data = new Border[0];
     }
 
     public Borders.single_color (Color color, int size) {
@@ -144,13 +144,13 @@ public class Akira.Lib.Components.Borders : Component, Copyable<Borders> {
      * Create a new Border with the passed color and add it to the data structure.
      * It's up to the code requiring this to then replace the borders component.
      */
-    public void append_border_with_color (Color color) {
+    public void append_border_with_color (Color color, double? size = null) {
         int latest_id = int.MIN;
         foreach (unowned var border in data) {
             latest_id = int.max (latest_id, border.id);
         }
         latest_id++;
-        var border = Border ((int) latest_id, color);
+        var border = Border ((int) latest_id, color, size);
         data.resize (data.length + 1);
         data[data.length - 1] = border;
     }

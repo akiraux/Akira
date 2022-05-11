@@ -155,15 +155,18 @@ public class Akira.Lib.Items.NodeSelection : Object {
         return nodes.size;
     }
 
-    public Geometry.Quad coordinates () {
-        var result = Geometry.Quad ();
+    public Geometry.TransformedRectangle area () {
 
         if (nodes.size == 0) {
-            return result;
+            return Geometry.TransformedRectangle.empty ();
         }
 
         if (nodes.size == 1) {
-            return first_node ().instance.compiled_geometry.area;
+            unowned var geom = first_node ().instance.compiled_geometry;
+            return Geometry.TransformedRectangle () {
+                matrix = geom.transformation_matrix,
+                rect = geom.local_bb
+            };
         }
 
         double top = int.MAX;
@@ -179,20 +182,19 @@ public class Akira.Lib.Items.NodeSelection : Object {
             right = double.max (right, inst.bounding_box.right);
         }
 
-        result.transformation = Cairo.Matrix.identity ();
-        result.tl_x = left;
-        result.tl_y = top;
-        result.tr_x = right;
-        result.tr_y = top;
-        result.bl_x = left;
-        result.bl_y = bottom;
-        result.br_x = right;
-        result.br_y = bottom;
-        return result;
+        return Geometry.TransformedRectangle () {
+            matrix = Cairo.Matrix.identity (),
+            rect = Geometry.Rectangle () {
+                top = top,
+                right = right,
+                left = left,
+                bottom = bottom,
+            }
+        };
     }
 
     public void nob_coordinates (Utils.Nobs.Nob nob, double scale, ref double x, ref double y) {
-        Utils.Nobs.nob_xy_from_coordinates (nob, coordinates (), scale, ref x, ref y);
+        Utils.Nobs.nob_xy_from_coordinates (nob, area ().quad (), scale, ref x, ref y);
     }
 
     public Geometry.Rectangle bounding_box () {
