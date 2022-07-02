@@ -242,34 +242,16 @@ public class Akira.Lib.Items.Model : Object {
     public int append_new_item (
         int parent_id,
         Lib.Items.ModelInstance candidate,
-        int candidate_id = 0,
-        bool in_place = false
+        int candidate_pos = -1
     ) {
         var parent_node = group_nodes.get (parent_id);
         if (parent_node == null) {
             return -1;
         }
 
-        var pos = 0;
-        if (parent_node.children != null) {
-            // If this was a paste in place action, append the new node in the same
-            // position of the cloned item.
-            if (in_place) {
-                print ("Children %u\n", parent_node.children.length);
-                print ("Candidate ID %i\n", candidate_id);
-                for (var i = 0; i < parent_node.children.length; ++i) {
-                    unowned var ch = parent_node.children.index (i);
-                    print ("Instance ID %i\n", ch.instance.id);
-                    if (ch.instance.id == candidate_id) {
-                        pos = i;
-                        break;
-                    }
-                }
-                print ("Paste in place %i\n", pos);
-            } else {
-                pos = (int) parent_node.children.length;
-            }
-        }
+        var pos = candidate_pos != -1 ? candidate_pos :
+            parent_node.children == null ? 0 : parent_node.children.length;
+        print ("add to node %u\n", pos);
         return inner_splice_new_item (parent_node, pos, candidate);
     }
 

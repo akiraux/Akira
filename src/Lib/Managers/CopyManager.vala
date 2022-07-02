@@ -31,10 +31,13 @@ public class Akira.Lib.Managers.CopyManager : Object {
     construct {
         view_canvas.window.event_bus.request_copy.connect (do_copy);
         view_canvas.window.event_bus.request_paste.connect (do_paste);
-        view_canvas.window.event_bus.request_paste_in_place.connect (do_paste_in_place);
     }
 
+    /*
+     * Copy the currently selected nodes.
+     */
     public void do_copy () {
+        // Create a new Model to hold all the cloned nodes in memory.
         copy_model = new Lib.Items.Model ();
 
         var sorted_candidates = new Gee.TreeMap<Lib.Items.PositionKey, int> (Lib.Items.PositionKey.compare);
@@ -46,10 +49,11 @@ public class Akira.Lib.Managers.CopyManager : Object {
         }
 
         int res = 0;
-        foreach (var sorted_id in sorted_candidates.values) {
+        // Populate the model with all the currently selected nodes.
+        foreach (var entry in sorted_candidates.entries) {
             res += Utils.ModelUtil.clone_from_model (
                 view_canvas.items_manager.item_model,
-                sorted_id,
+                entry,
                 copy_model,
                 Lib.Items.Model.ORIGIN_ID
             );
@@ -59,9 +63,9 @@ public class Akira.Lib.Managers.CopyManager : Object {
     }
 
     /*
-     * Paste a copied model at the center of the viewport.
+     * Paste a copied node into the item_model.
      */
-    public void do_paste () {
+    public void do_paste (bool in_place = false) {
         if (copy_model == null) {
             return;
         }
@@ -77,56 +81,18 @@ public class Akira.Lib.Managers.CopyManager : Object {
 
         view_canvas.selection_manager.reset_selection ();
 
-        view_canvas.window.event_bus.create_model_snapshot ("paste selection");
+        view_canvas.window.event_bus.create_model_snapshot (
+            in_place ? "paste selection in place" : "paste selection");
 
         int res = 0;
         foreach (var child in children.data) {
-            res += Utils.ModelUtil.clone_from_model (
-                copy_model,
-                child.id,
-                view_canvas.items_manager.item_model,
-                Lib.Items.Model.ORIGIN_ID,
-                on_subtree_cloned
-            );
-        }
-
-        view_canvas.items_manager.compile_model ();
-        assert (res == 0);
-
-        // Regenerate the layers list.
-        view_canvas.window.main_window.regenerate_list (true);
-    }
-
-    /*
-     * Paste a copied model at its original place.
-     */
-    public void do_paste_in_place () {
-        if (copy_model == null) {
-            return;
-        }
-
-        var children = copy_model.node_from_id (Lib.Items.Model.ORIGIN_ID).children;
-
-        if (children == null || children.length == 0) {
-            return;
-        }
-
-        var blocker = new SelectionManager.ChangeSignalBlocker (view_canvas.selection_manager);
-        (blocker);
-
-        view_canvas.selection_manager.reset_selection ();
-
-        view_canvas.window.event_bus.create_model_snapshot ("paste selection in place");
-
-        int res = 0;
-        foreach (var child in children.data) {
-            res += Utils.ModelUtil.clone_from_model (
+            res += Utils.ModelUtil.paste_from_model (
                 copy_model,
                 child.id,
                 view_canvas.items_manager.item_model,
                 Lib.Items.Model.ORIGIN_ID,
                 on_subtree_cloned,
-                true
+                in_place
             );
         }
 

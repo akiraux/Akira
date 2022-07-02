@@ -77,8 +77,7 @@ public class Akira.Services.EventBus : Object {
     // triggered at every geometry change. Use the simple selection_modified ();
     public signal void selection_geometry_modified ();
     public signal void request_copy ();
-    public signal void request_paste ();
-    public signal void request_paste_in_place ();
+    public signal void request_paste (bool in_place = false);
     public signal void delete_selected_items ();
 
     // Selection align signals
