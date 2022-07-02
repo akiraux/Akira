@@ -249,9 +249,11 @@ public class Akira.Lib.Items.Model : Object {
             return -1;
         }
 
+        // If a candidate_pos was passed, we need to respect that to maintain the
+        // pos_in_parent from a duplicated node, otherwise check if we have any
+        // siblings to determine the correct position.
         var pos = candidate_pos != -1 ? candidate_pos :
             parent_node.children == null ? 0 : parent_node.children.length;
-        print ("add to node %u\n", pos);
         return inner_splice_new_item (parent_node, pos, candidate);
     }
 
