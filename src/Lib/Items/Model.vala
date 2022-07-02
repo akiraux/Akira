@@ -239,13 +239,37 @@ public class Akira.Lib.Items.Model : Object {
         return 0;
     }
 
-    public int append_new_item (int parent_id, Lib.Items.ModelInstance candidate) {
+    public int append_new_item (
+        int parent_id,
+        Lib.Items.ModelInstance candidate,
+        int candidate_id = 0,
+        bool in_place = false
+    ) {
         var parent_node = group_nodes.get (parent_id);
         if (parent_node == null) {
             return -1;
         }
 
-        var pos = parent_node.children == null ? 0 : parent_node.children.length;
+        var pos = 0;
+        if (parent_node.children != null) {
+            // If this was a paste in place action, append the new node in the same
+            // position of the cloned item.
+            if (in_place) {
+                print ("Children %u\n", parent_node.children.length);
+                print ("Candidate ID %i\n", candidate_id);
+                for (var i = 0; i < parent_node.children.length; ++i) {
+                    unowned var ch = parent_node.children.index (i);
+                    print ("Instance ID %i\n", ch.instance.id);
+                    if (ch.instance.id == candidate_id) {
+                        pos = i;
+                        break;
+                    }
+                }
+                print ("Paste in place %i\n", pos);
+            } else {
+                pos = (int) parent_node.children.length;
+            }
+        }
         return inner_splice_new_item (parent_node, pos, candidate);
     }
 
@@ -259,11 +283,11 @@ public class Akira.Lib.Items.Model : Object {
 
     /*
      * Move items within a parent to change their z-order.
-     * 
+     *
      * Set restack to false if several move operations will be executed, which could make
      * later restacking more efficient. Make sure to call recalculate_children_stacking
      * after all operations.
-     * 
+     *
      * prep_for_op is an optional lambda that will get called only if the move ends up
      * in an actual change to the model. it serves as a way to have side-effects that
      * don't trigger on no-ops. For example, only add to the undo stack if a change happens.

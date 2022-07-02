@@ -28,7 +28,8 @@
 
     /*
      * Clones an instance with `source_id` from a source model, into a target model into a specific
-     * group with id `tagret_group_id`.
+     * group with id `tagret_group_id`. If the `in_place` is false, the cloned model is appended
+     * at the center of the canvas viewport, otherwise the current model coordinates are kept.
      * Cloning is recursive, so all dependencies are copied over.
      * Return 0 on success.
      */
@@ -37,7 +38,8 @@
         int source_id,
         Lib.Items.Model target_model,
         int target_group_id,
-        OnSubtreeCloned? on_subtree_cloned = null
+        OnSubtreeCloned? on_subtree_cloned = null,
+        bool in_place = false
     ) {
         var target_node = target_model.node_from_id (target_group_id);
         if (target_node == null || !target_node.instance.is_group) {
@@ -49,7 +51,7 @@
             return -1;
         }
 
-        var new_id = recursive_clone (source_node, target_node, target_model);
+        var new_id = recursive_clone (source_node, target_node, target_model, in_place);
 
         if (new_id >= Lib.Items.Model.GROUP_START_ID && on_subtree_cloned != null) {
             on_subtree_cloned (new_id);
@@ -61,13 +63,19 @@
     private static int recursive_clone (
         Lib.Items.ModelNode source_node,
         Lib.Items.ModelNode target_node,
-        Lib.Items.Model target_model
+        Lib.Items.Model target_model,
+        bool in_place
     ) {
-        var new_id = target_model.append_new_item (target_node.id, source_node.instance.clone (false));
+        var new_id = target_model.append_new_item (
+            target_node.id,
+            source_node.instance.clone (false),
+            source_node.id,
+            in_place
+        );
 
         if (source_node.instance.is_group) {
             foreach (var child in source_node.children.data) {
-                recursive_clone (child, target_model.node_from_id (new_id), target_model);
+                recursive_clone (child, target_model.node_from_id (new_id), target_model, in_place);
             }
         }
 

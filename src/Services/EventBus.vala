@@ -78,6 +78,7 @@ public class Akira.Services.EventBus : Object {
     public signal void selection_geometry_modified ();
     public signal void request_copy ();
     public signal void request_paste ();
+    public signal void request_paste_in_place ();
     public signal void delete_selected_items ();
 
     // Selection align signals
