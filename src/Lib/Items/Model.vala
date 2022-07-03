@@ -239,21 +239,13 @@ public class Akira.Lib.Items.Model : Object {
         return 0;
     }
 
-    public int append_new_item (
-        int parent_id,
-        Lib.Items.ModelInstance candidate,
-        int candidate_pos = -1
-    ) {
+    public int append_new_item (int parent_id, Lib.Items.ModelInstance candidate) {
         var parent_node = group_nodes.get (parent_id);
         if (parent_node == null) {
             return -1;
         }
 
-        // If a candidate_pos was passed, we need to respect that to maintain the
-        // pos_in_parent from a duplicated node, otherwise check if we have any
-        // siblings to determine the correct position.
-        var pos = candidate_pos != -1 ? candidate_pos :
-            parent_node.children == null ? 0 : parent_node.children.length;
+        var pos = parent_node.children == null ? 0 : parent_node.children.length;
         return inner_splice_new_item (parent_node, pos, candidate);
     }
 

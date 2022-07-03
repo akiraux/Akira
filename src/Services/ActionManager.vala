@@ -548,8 +548,7 @@ public class Akira.Services.ActionManager : Object {
     }
 
     private void action_duplicate () {
-        window.event_bus.request_copy ();
-        window.event_bus.request_paste (true);
+        window.event_bus.request_duplicate ();
     }
 
     private void action_copy () {
