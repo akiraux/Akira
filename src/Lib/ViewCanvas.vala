@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Alecaddd (https://alecaddd.com)
+ * Copyright (c) 2019-2022 Alecaddd (https://alecaddd.com)
  *
  * This file is part of Akira.
  *
@@ -17,7 +17,8 @@
  * along with Akira. If not, see <https://www.gnu.org/licenses/>.
  *
  * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
- * Authored by: Giacomo "giacomoalbe" Alberini <giacomoalbe@gmail.com>
+ *  Giacomo "giacomoalbe" Alberini <giacomoalbe@gmail.com>
+ *  Alessandro "alecaddd" Castellani <castellani.ale@gmail.com>
  */
 
 public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
@@ -339,10 +340,15 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
 
                     selection_manager.add_to_selection (target.id);
                     selection_manager.selection_modified_external (true);
+                } else if (shift_is_pressed) {
+                    // Remove the item fom the current selection if SHIFT is pressed.
+                    selection_manager.remove_from_selection (target.id);
+                    selection_manager.selection_modified_external (true);
                 }
             } else if (
                 !selection_manager.selection.area ().contains (event.x, event.y) &&
-                !selection_manager.selection.is_empty ()
+                !selection_manager.selection.is_empty () &&
+                !shift_is_pressed
             ) {
                 // Selection area was not clicked, so we reset the selection if we have some.
                 selection_manager.reset_selection ();
@@ -350,7 +356,8 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
             }
         }
 
-        if (!selection_manager.is_empty ()) {
+        // Enter transform mode if we have selected items and SHIFT is not pressed.
+        if (!selection_manager.is_empty () && !shift_is_pressed) {
             var new_mode = new Lib.Modes.TransformMode (this, nob_clicked, true);
             mode_manager.register_mode (new_mode);
 
