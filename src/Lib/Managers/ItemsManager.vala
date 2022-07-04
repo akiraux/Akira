@@ -564,6 +564,33 @@ public class Akira.Lib.Managers.ItemsManager : Object, Items.ModelListener {
         }
     }
 
+    public void create_group_from_selection () {
+        // Don't create a group if we don't have any node selected.
+        unowned var selection = view_canvas.selection_manager.selection;
+        if (selection.count () == 0) {
+            return;
+        }
+        view_canvas.window.event_bus.create_model_snapshot ("create group from selection");
+
+        var blocker = new SelectionManager.ChangeSignalBlocker (view_canvas.selection_manager);
+        (blocker);
+        view_canvas.pause_redraw = true;
+
+        var group = Lib.Items.ModelTypeGroup.default_group ();
+        add_item_to_origin (group);
+
+        foreach (var node in selection.nodes.values) {
+            add_item_to_group (group.id, node.node.instance, true);
+        }
+        view_canvas.selection_manager.add_to_selection (group.id);
+
+        view_canvas.pause_redraw = false;
+        view_canvas.request_redraw (view_canvas.get_bounds ());
+
+        // Regenerate the layers list.
+        view_canvas.window.main_window.regenerate_list ();
+    }
+
     public void selection_align (Utils.ItemAlignment.AlignmentDirection direction) {
         unowned var selection = view_canvas.selection_manager.selection;
         if (selection.count () <= 1) {

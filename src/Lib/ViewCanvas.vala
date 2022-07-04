@@ -240,21 +240,28 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
                 //window.event_bus.move_item_from_canvas (event);
                 //window.event_bus.detect_artboard_change ();
                 return true;
+
+            case Gdk.Key.g:
+                if (ctrl_is_pressed) {
+                    items_manager.create_group_from_selection ();
+                }
+                break;
             default:
                 break;
         }
 
-        uint uppercase_keyval = Gdk.keyval_to_upper (event.keyval);
-        if (uppercase_keyval == Gdk.Key.J) {
-            window.event_bus.create_model_snapshot ("add debug items");
-            items_manager.debug_add_rectangles (10000, true);
-            return true;
-        }
-        if (uppercase_keyval == Gdk.Key.G) {
-            window.event_bus.create_model_snapshot ("add debug group");
-            items_manager.add_debug_group (300, 300, true);
-            return true;
-        }
+        // TODO: Debuggging features, move this behind a pref.
+        //  uint uppercase_keyval = Gdk.keyval_to_upper (event.keyval);
+        //  if (uppercase_keyval == Gdk.Key.J) {
+        //      window.event_bus.create_model_snapshot ("add debug items");
+        //      items_manager.debug_add_rectangles (10000, true);
+        //      return true;
+        //  }
+        //  if (uppercase_keyval == Gdk.Key.G) {
+        //      window.event_bus.create_model_snapshot ("add debug group");
+        //      items_manager.add_debug_group (300, 300, true);
+        //      return true;
+        //  }
 
         return false;
     }
