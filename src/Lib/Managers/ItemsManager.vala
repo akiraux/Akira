@@ -350,14 +350,22 @@ public class Akira.Lib.Managers.ItemsManager : Object, Items.ModelListener {
 
             if (node_type == "artboard" && node.children != null) {
                 foreach (unowned var child_node in node.children.data) {
-                    if (bound.contains_bound (child_node.instance.bounding_box)) {
+                    // Only add items that are not currently selected.
+                    if (
+                        !view_canvas.selection_manager.item_selected (child_node.id) &&
+                        bound.contains_bound (child_node.instance.bounding_box)
+                    ) {
                         found_items.add (child_node);
                     }
                 }
                 continue;
             }
 
-            if (bound.contains_bound (node.instance.bounding_box)) {
+            // Only add items that are not currently selected.
+            if (
+                !view_canvas.selection_manager.item_selected (node.id) &&
+                bound.contains_bound (node.instance.bounding_box)
+            ) {
                 found_items.add (node);
             }
         }
