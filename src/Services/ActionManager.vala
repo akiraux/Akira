@@ -67,6 +67,7 @@ public class Akira.Services.ActionManager : Object {
     public const string ACTION_ESCAPE = "action_escape";
     public const string ACTION_SHORTCUTS = "action_shortcuts";
     public const string ACTION_PICK_COLOR = "action_pick_color";
+    public const string ACTION_DUPLICATE = "action_duplicate";
     public const string ACTION_COPY = "action_copy";
     public const string ACTION_PASTE = "action_paste";
     public const string ACTION_ALIGN_LEFT = "action_align_left";
@@ -116,6 +117,7 @@ public class Akira.Services.ActionManager : Object {
         { ACTION_ESCAPE, action_escape },
         { ACTION_SHORTCUTS, action_shortcuts },
         { ACTION_PICK_COLOR, action_pick_color },
+        { ACTION_DUPLICATE, action_duplicate },
         { ACTION_COPY, action_copy },
         { ACTION_PASTE, action_paste },
         { ACTION_ALIGN_LEFT, action_align_left },
@@ -161,6 +163,7 @@ public class Akira.Services.ActionManager : Object {
         action_accelerators.set (ACTION_FLIP_V, "<Control>bracketright");
         action_accelerators.set (ACTION_SHORTCUTS, "F1");
         action_accelerators.set (ACTION_PICK_COLOR, "<Alt>c");
+        action_accelerators.set (ACTION_DUPLICATE, "<Control>d");
         action_accelerators.set (ACTION_COPY, "<Control>c");
         action_accelerators.set (ACTION_PASTE, "<Control>v");
         action_accelerators.set (ACTION_ESCAPE, "Escape");
@@ -542,6 +545,10 @@ public class Akira.Services.ActionManager : Object {
         //     // had their properties changed.
         //     canvas.window.event_bus.selected_items_list_changed (canvas.selected_bound_manager.selected_items);
         // });
+    }
+
+    private void action_duplicate () {
+        window.event_bus.request_duplicate ();
     }
 
     private void action_copy () {

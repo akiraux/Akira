@@ -259,11 +259,11 @@ public class Akira.Lib.Items.Model : Object {
 
     /*
      * Move items within a parent to change their z-order.
-     * 
+     *
      * Set restack to false if several move operations will be executed, which could make
      * later restacking more efficient. Make sure to call recalculate_children_stacking
      * after all operations.
-     * 
+     *
      * prep_for_op is an optional lambda that will get called only if the move ends up
      * in an actual change to the model. it serves as a way to have side-effects that
      * don't trigger on no-ops. For example, only add to the undo stack if a change happens.
