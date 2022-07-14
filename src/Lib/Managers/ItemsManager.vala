@@ -494,7 +494,6 @@ public class Akira.Lib.Managers.ItemsManager : Object, Items.ModelListener {
             new Lib.Components.Coordinates (520, 520),
             new Lib.Components.Size (1000, 1000, false)
         );
-        //var group = Lib.Items.ModelTypeGroup.default_group ();
         add_item_to_origin (group);
 
         var num_of = 1000;
@@ -576,14 +575,37 @@ public class Akira.Lib.Managers.ItemsManager : Object, Items.ModelListener {
         (blocker);
         view_canvas.pause_redraw = true;
 
+        var sorted_tree = new Gee.TreeMap<Lib.Items.PositionKey, Lib.Items.ModelNode> (
+            Lib.Items.PositionKey.compare,
+            null
+        );
+        foreach (var c_node in selection.nodes.values) {
+            var node = item_model.node_from_id (c_node.node.id);
+            if (node == null) {
+                continue;
+            }
+
+            var key = new Lib.Items.PositionKey ();
+            key.parent_path = node.parent == null ? "" : item_model.path_from_node (node.parent);
+            key.pos_in_parent = node.pos_in_parent;
+
+            sorted_tree[key] = node;
+        }
+
+        view_canvas.selection_manager.reset_selection ();
+
         var group = Lib.Items.ModelTypeGroup.default_group ();
         add_item_to_origin (group);
 
-        foreach (var node in selection.nodes.values) {
-            add_item_to_group (group.id, node.node.instance, true);
+        foreach (var mapit in sorted_tree) {
+            var node = mapit.value;
+            var instance = node.instance.clone (true);
+            item_model.remove (node.id, true);
+            add_item_to_group (group.id, instance, true);
         }
         view_canvas.selection_manager.add_to_selection (group.id);
 
+        compile_model ();
         view_canvas.pause_redraw = false;
         view_canvas.request_redraw (view_canvas.get_bounds ());
 

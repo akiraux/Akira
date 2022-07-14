@@ -323,6 +323,7 @@ public class Akira.Layouts.LayersList.LayerListBox : VirtualizingListBox {
         var node1 = im.node_from_id (layer1.id);
         var node2 = im.node_from_id (layer2.id);
 
+        // Why does this crash?
         var node1_is_group = node1.instance.is_group;
         var node2_is_group = node2.instance.is_group;
 
