@@ -580,19 +580,39 @@ public class Akira.Lib.Managers.ItemsManager : Object, Items.ModelListener {
         (blocker);
         view_canvas.pause_redraw = true;
 
+        // Collect all currently selected nodes, sorted by their position.
         var sorted_candidates = view_canvas.copy_manager.collect_sorted_candidates ();
 
+        // Clear the current selection so we don't stumble upon weird states.
         view_canvas.selection_manager.reset_selection ();
 
+        // Create a new empty group and add it to the main canvas.
         var group = Lib.Items.ModelTypeGroup.default_group ();
         add_item_to_origin (group);
 
+        // Loop through all sorted nodes, clone their ModelInstance and add it
+        // to the newly created group.
+        // TODO: All of this should be done in the Model::transfer() method.
         foreach (var node_id in sorted_candidates.values) {
             var node = item_model.node_from_id (node_id);
-            add_item_to_group (group.id, node.instance.clone (false), true);
-            item_model.remove (node.id, true);
+            var cloned_instance = node.instance.clone (false);
+            var new_id = add_item_to_group (group.id, cloned_instance, true);
+            // TODO: We should find a smarter way to maintain the name of a
+            // transferred element, right now simply update the name to keep
+            // the old one.
+            cloned_instance.components.name = new Lib.Components.Name (
+                node.instance.components.name.name,
+                new_id.to_string ()
+            );
         }
-        view_canvas.selection_manager.add_to_selection (group.id);
+
+        // Loop again through the old nodes and delete them only after the new
+        // nodes are created and set in place. We do this in a separate loop to
+        // avoid segfault of nodes getting deleted while the transfer is still
+        // in process.
+        foreach (var node_id in sorted_candidates.values) {
+            item_model.remove (node_id, true);
+        }
 
         compile_model ();
         view_canvas.pause_redraw = false;
@@ -600,6 +620,8 @@ public class Akira.Lib.Managers.ItemsManager : Object, Items.ModelListener {
 
         // Regenerate the layers list.
         view_canvas.window.main_window.regenerate_list ();
+        // Select the newly created group.
+        view_canvas.selection_manager.add_to_selection (group.id);
     }
 
     public void selection_align (Utils.ItemAlignment.AlignmentDirection direction) {
