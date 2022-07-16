@@ -17,13 +17,18 @@
  * along with Akira. If not, see <https://www.gnu.org/licenses/>.
  *
  * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
+ * Authored by: Alessandro "alecaddd" Castellani <castellani.ale@gmail.com>
+ *
+ * Many of the methods inside this code base come from the Fireloom code base.
+ * https://gitlab.com/mbfraga/fireloom_core
  */
 
- public interface Akira.Lib.Items.ModelListener : Object {
-     public abstract void on_item_added (int id);
-     public abstract void on_item_geometry_changed (int id);
-     public abstract void on_items_deleted (GLib.Array<int> ids);
- }
+public interface Akira.Lib.Items.ModelListener : Object {
+    public abstract void on_item_added (int id);
+    public abstract void on_item_geometry_changed (int id);
+    public abstract void on_items_deleted (GLib.Array<int> ids);
+    public abstract void on_item_transferred (int id);
+}
 
 /*
  * Holds maps to instances that define connectivity between items and groups.
@@ -208,6 +213,59 @@ public class Akira.Lib.Items.Model : Object {
         }
 
         internal_recalculate_children_stacking (group);
+    }
+
+    /*
+    TODO: Finish the transfer method based on
+    https://gitlab.com/mbfraga/fireloom_core/-/blob/main/packages/flmd/flmd_ItemModel.cpp#L148
+    */
+    public int transfer (
+        int source_id,
+        int source_pos,
+        int num_items,
+        int target_id,
+        int target_pos,
+        bool restack = false,
+        bool listen = true
+    ) {
+        if (num_items == 0) {
+            return 0;
+        }
+
+        var source_node = node_from_id (source_id);
+        var target_node = node_from_id (target_id);
+
+        if (!(source_node is Lib.Items.ModelNode) || !(target_node is Lib.Items.ModelNode)) {
+            assert (false);
+            return -1;
+        }
+
+        unowned var source_children = source_node.children;
+        int source_children_size = (int) source_children.length;
+
+        if (source_pos >= source_children_size || source_pos + num_items > source_children_size) {
+            assert (false);
+            return -1;
+        }
+
+        if (source_id == target_id) {
+            // TODO: shift instead
+            assert (false);
+            return -1;
+        }
+
+        unowned var target_children = target_node.children;
+        int target_children_size = (int) target_children.length;
+
+        if (target_pos >= target_children_size) {
+            target_pos = target_children_size;
+        }
+
+        if (listener != null && listen) {
+            //  listener.on_item_transferred (node.id);
+        }
+
+        return 0;
     }
 
     public int remove (int id, bool restack) {

@@ -47,6 +47,7 @@ public class Akira.Lib.Managers.ItemsManager : Object, Items.ModelListener {
 
     public signal void item_added (int id);
     public signal void items_removed (GLib.Array<int> ids);
+    public signal void item_transferred (int id);
 
     public void on_item_added (int id) {
         item_added (id);
@@ -58,6 +59,10 @@ public class Akira.Lib.Managers.ItemsManager : Object, Items.ModelListener {
 
     public void on_items_deleted (GLib.Array<int> ids) {
         items_removed (ids);
+    }
+
+    public void on_item_transferred (int id) {
+        item_transferred (id);
     }
 
     public Lib.Items.ModelInstance? instance_from_id (int id) {
