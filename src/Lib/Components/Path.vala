@@ -17,46 +17,42 @@
  * along with Akira. If not, see <https://www.gnu.org/licenses/>.
  *
  * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
+ * Modified by: Ashish Shevale <shevaleashish@gmail.com>
  */
 
 public class Akira.Lib.Components.Path : Component, Copyable<Path> {
     // Control points relative to a top-left of 0,0.
     // In the future we will probably want control points with more data.
-    public Geometry.Point[] data;
-    // Control the path edit mode between straight line and curves.
-    // Line requires 1 points whereas, path requires 4 points.
-    public Lib.Modes.PathEditMode.Type[] commands;
+    public Geometry.PathSegment[] data;
     public bool close = false;
 
     public Path (bool close = false) {
-        data = new Geometry.Point[0];
-        commands = new Lib.Modes.PathEditMode.Type[0];
+        data = new Geometry.PathSegment[0];
         this.close = close;
     }
 
-    public Path.from_single_point (Geometry.Point pt, Lib.Modes.PathEditMode.Type command, bool close = false) {
-        data = new Geometry.Point[1];
-        data[0] = pt;
+    public Path.from_single_point (Geometry.Point pt, bool close = false) {
+        data = new Geometry.PathSegment[1];
 
-        commands = new Lib.Modes.PathEditMode.Type[1];
-        commands[0] = command;
+        // Only a line can be created from a single point. No need to check command.
+        data[0] = Geometry.PathSegment.line (pt);
 
         this.close = close;
     }
 
-    public Path.from_points (Geometry.Point[] data, Lib.Modes.PathEditMode.Type[] commands, bool close = false) {
+    public Path.from_points (Geometry.PathSegment[] data, bool close = false) {
         this.data = data;
-        this.commands = commands;
         this.close = close;
     }
 
     public Path.deserialized (Json.Object obj) {
         var arr = obj.get_array_member ("path_data").get_elements ();
-        data = new Geometry.Point[0];
+        data = new Geometry.PathSegment[0];
         var idx = 0;
+
         foreach (unowned var pt in arr) {
             data.resize (data.length + 1);
-            data[idx] = Geometry.Point.deserialized (pt.get_object ());
+            data[idx] = Geometry.PathSegment.deserialized (pt.get_object ());
             ++idx;
         }
     }
@@ -81,48 +77,30 @@ public class Akira.Lib.Components.Path : Component, Copyable<Path> {
     }
 
     public Geometry.Rectangle calculate_extents () {
-        // The minimum values need to be large so for finding minimum to work.
-        double min_x = double.MAX;
-        double max_x = double.MIN;
-        double min_y = double.MAX;
-        double max_y = double.MIN;
+        // The minimum values need to be large for finding minimum to work.
+        Geometry.Rectangle extents = Geometry.Rectangle ();
+        extents.top = extents.left = double.MAX;
+        extents.bottom = extents.right = double.MIN;
 
-        int point_idx = 0;
-        for (int cmd_idx = 0; cmd_idx < commands.length; ++cmd_idx) {
-            if (commands[cmd_idx] == Lib.Modes.PathEditMode.Type.LINE) {
-                var point = data[point_idx];
-                min_x = double.min (min_x, point.x);
-                max_x = double.max (max_x, point.x);
-                min_y = double.min (min_y, point.y);
-                max_y = double.max (max_y, point.y);
+        for (int i = 0; i < data.length; ++i) {
+            var segment = data[i];
 
-                ++point_idx;
+            if (segment.type == Lib.Modes.PathEditMode.Type.LINE) {
+                var point = segment.line_end;
+                extents.left = double.min (extents.left, point.x);
+                extents.right = double.max (extents.right, point.x);
+                extents.top = double.min (extents.top, point.y);
+                extents.bottom = double.max (extents.bottom, point.y);
             } else {
-                var p0 = data[point_idx - 1];
-                var p1 = data[point_idx];
-                var p2 = data[point_idx + 1];
-                var p3 = data[point_idx + 2];
-                var p4 = data[point_idx + 3];
+                var seg_extents = Utils.GeometryMath.calculate_bounds_for_curve (segment, data[i - 1].last_point);
 
-                double[] b1_extremes = Utils.Bezier.get_extremes (p0, p2, p1);
-                double[] b2_extremes = Utils.Bezier.get_extremes (p1, p3, p4);
-
-                double temp = double.min (b1_extremes[0], b2_extremes[0]);
-                min_x = double.min (min_x, temp);
-
-                temp = double.min (b1_extremes[1], b2_extremes[1]);
-                min_y = double.min (min_y, temp);
-
-                temp = double.max (b1_extremes[2], b2_extremes[2]);
-                max_x = double.max (max_x, temp);
-
-                temp = double.max (b1_extremes[3], b2_extremes[3]);
-                max_y = double.max (max_y, temp);
-
-                point_idx += 4;
+                extents.left = double.min (extents.left, seg_extents.left);
+                extents.top = double.min (extents.top, seg_extents.top);
+                extents.right = double.max (extents.right, seg_extents.right);
+                extents.bottom = double.max (extents.bottom, seg_extents.bottom);
             }
         }
 
-        return Geometry.Rectangle.with_coordinates (min_x, min_y, max_x, max_y);
+        return extents;
     }
 }

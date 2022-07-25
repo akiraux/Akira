@@ -21,24 +21,31 @@
 
 public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
     public enum Type {
+        NONE,
         LINE,
-        CURVE
+        QUADRATIC_LEFT,
+        QUADRATIC_RIGHT,
+        // Represents cubic curves. These will only be used with compound curves.
+        CUBIC_SINGLE,
+        // Represents curves drawn with 2 seperate cubic beziers.
+        // These are easy to modify for user.
+        CUBIC_DOUBLE,
     }
 
     // We are using this to check what kind of point was selected.
     public enum PointType {
         // This means no point was selected.
-        NONE,
+        NONE=-1,
         // This point signifies a simple line end.
-        LINE_END,
+        LINE_END=0,
         // This is the first point you draw in a curve.
-        CURVE_BEGIN,
+        CURVE_BEGIN=1,
         // This denotes one end of the tangent.
-        TANGENT_FIRST,
+        TANGENT_FIRST=2,
         // This is the other end of the tangent.
-        TANGENT_SECOND,
+        TANGENT_SECOND=3,
         // This is the last point of the curve.
-        CURVE_END
+        CURVE_END=4
     }
 
     public weak Lib.ViewCanvas view_canvas { get; construct; }
@@ -50,9 +57,8 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
 
     // The points in live command will be drawn every time user moves cursor.
     // Also acts as buffer for curves.
-    private Type live_command;
-    private Geometry.Point[] live_points;
-    private int live_idx;
+    private Geometry.PathSegment live_segment;
+    private PointType live_pnt_type;
 
     // This flag tells if we are adding a path or editing an existing one.
     // Basically decides is we are in "edit" mode or "append" mode.
@@ -71,9 +77,8 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
             instance: instance
         );
         edit_model = new Models.PathEditModel (instance, view_canvas);
-        live_points = new Geometry.Point[4];
-        live_command = Type.LINE;
-        live_idx = -1;
+        live_segment = Geometry.PathSegment ();
+        live_pnt_type = PointType.NONE;
         mode = Submode.APPEND;
     }
 
@@ -124,6 +129,7 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
             if (uppercase_keyval == Gdk.Key.C) {
                 // If C is pressed in edit_mode, we enter back to append mode.
                 mode = Submode.APPEND;
+                edit_model.selected_pts.clear ();
                 return true;
             }
 
@@ -172,10 +178,17 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
         }
 
         if (is_curr_command_done ()) {
-            edit_model.add_live_points_to_path (live_points, live_command, live_idx + 1);
+            edit_model.add_live_points_to_path (live_segment);
 
-            live_idx = 0;
-            live_command = Type.LINE;
+            if (live_segment.type == Type.CUBIC_SINGLE) {
+                live_segment = Geometry.PathSegment.quadratic_bezier_right (
+                    live_segment.curve_end,
+                    reflection (live_segment.tangent_2, live_segment.curve_end)
+                );
+            } else {
+                live_segment = Geometry.PathSegment ();
+                live_pnt_type = PointType.LINE_END;
+            }
         }
 
         is_click = false;
@@ -194,36 +207,29 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
             return true;
         }
 
-        // If there is click and drag, then this is the second point of curve.
+        // If there is click and drag, we are dealing with some kind of curve.
         if (is_click) {
-            live_command = Type.CURVE;
-            live_idx = 2;
-
-            if (Utils.GeometryMath.compare_points (point, live_points[0], MIN_TANGENT_ALLOWED_LENGTH)) {
-                // Prevent user from drawing really small curves due to mouse glitches.
-                live_command = Type.LINE;
-                live_idx = 0;
-                edit_model.set_live_points (live_points, 1);
-            } else {
-                // Points at index 1 and 2 are the two tangents required by the 2 curves.
-                live_points[1] = reflection (point, live_points[0]);
-                live_points[2] = point;
-                edit_model.set_live_points (live_points, 3);
-            }
-
-
+            handle_click_and_drag_in_append_mode (point);
         } else {
             // If we are hovering in CURVE mode, current position could be our third curve point.
-            if (live_command == Type.CURVE) {
-                live_points[3] = point;
-                live_idx = 3;
-                edit_model.set_live_points (live_points, 4);
+            if (live_segment.type == Type.CUBIC_DOUBLE) {
+                live_segment.curve_end = point;
+                live_pnt_type = PointType.CURVE_END;
+            } else if (live_segment.type == Type.QUADRATIC_LEFT) {
+                live_segment.curve_begin = point;
+                live_pnt_type = PointType.TANGENT_SECOND;
+            } else if (live_segment.type == Type.QUADRATIC_RIGHT) {
+                live_segment.curve_end = point;
+                live_pnt_type = PointType.TANGENT_SECOND;
             } else {
                 // If we are hovering in LINE mode, this could be a potential line point.
-                live_points[0] = point;
-                edit_model.set_live_points (live_points, 1);
+                live_segment.line_end = point;
+                live_segment.type = Type.LINE;
+                live_pnt_type = PointType.LINE_END;
             }
         }
+
+        edit_model.set_live_points (live_segment, live_pnt_type);
 
         return true;
     }
@@ -233,15 +239,23 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
     }
 
     private bool is_curr_command_done () {
-        if (live_command == Type.LINE && live_idx != -1) {
-            return true;
+        if (live_segment.type == Type.NONE) {
+            return false;
         }
 
-        if (live_command == Type.CURVE && live_idx == 3) {
-            return true;
+        if (live_segment.type == Type.LINE && live_pnt_type != PointType.LINE_END) {
+            return false;
         }
 
-        return false;
+        if (live_segment.type == Type.CUBIC_DOUBLE && live_pnt_type != PointType.CURVE_END) {
+            return false;
+        }
+
+        if (live_segment.type == Type.CUBIC_SINGLE && live_pnt_type != PointType.TANGENT_SECOND) {
+            return false;
+        }
+
+        return true;
     }
 
     private Geometry.Point reflection (Geometry.Point pt1, Geometry.Point pt2) {
@@ -252,46 +266,37 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
     }
 
     private void handle_backspace_event () {
-        if (live_idx > 0) {
-            --live_idx;
 
-            // Note that for curve, there are 2 tangent points that depend on each other.
-            // If one of them gets deleted, delete the other too. This leaves only 1 live point.
-            // So the live command becomes LINE.
-            if (live_idx == 1 && live_command == CURVE) {
-                live_command = Type.LINE;
-                live_idx = 0;
-            }
+        if (live_segment.type == Type.LINE || live_segment.type == Type.NONE) {
+            live_segment = edit_model.delete_point ();
 
-            edit_model.set_live_points (live_points, live_idx + 1);
-        } else {
-            var possible_live_pts = edit_model.delete_last_point ();
-
-            if (possible_live_pts == null || possible_live_pts.length == 0) {
-                live_idx = -1;
-                live_command = Type.LINE;
+            if (live_segment.type == Type.LINE) {
+                live_pnt_type = PointType.LINE_END;
             } else {
-                live_points[0] = possible_live_pts[0];
-                live_points[1] = possible_live_pts[1];
-                live_points[2] = possible_live_pts[2];
-
-                live_idx = 2;
-                live_command = Type.CURVE;
-                edit_model.set_live_points (live_points, 3);
+                live_pnt_type = PointType.CURVE_END;
             }
+        } else if (live_segment.type == Type.CUBIC_SINGLE) {
+            live_segment.type = Type.QUADRATIC_LEFT;
+            live_pnt_type = PointType.CURVE_END;
+        } else if (live_segment.type == Type.CUBIC_DOUBLE) {
+            // Here we dont include the CURVE_BEGIN case because
+            // after both tangents are deleted, we convert segment from curve to line.
+            // And TANGENT_FIRST is not included because it gets deleted
+            // automatically after TANGENT_SECOND is deleted.
+            if (live_pnt_type == PointType.TANGENT_SECOND) {
+                live_segment.type = Type.LINE;
+                live_pnt_type = PointType.LINE_END;
+            } else if (live_pnt_type == PointType.CURVE_END) {
+                live_pnt_type = PointType.TANGENT_SECOND;
+            }
+        } else if (live_segment.type == Type.QUADRATIC_LEFT || live_segment.type == Type.QUADRATIC_RIGHT) {
+            live_segment.type = Type.LINE;
+            live_pnt_type = PointType.LINE_END;
         }
 
+        edit_model.set_live_points (live_segment, live_pnt_type);
+
         if (instance.components.path.data.length == 0) {
-            // Sometimes the line from live effect rendered in ViewLayerPath remains even after
-            // all points have been deleted. Erase this line.
-            var update_extents = Geometry.Rectangle ();
-            update_extents.left = instance.components.center.x;
-            update_extents.top = instance.components.center.y;
-            update_extents.right = live_points[0].x;
-            update_extents.bottom = live_points[0].y;
-
-            view_canvas.request_redraw (update_extents);
-
             // If there are no points in the path, no point to stay in PathEditMode.
             view_canvas.window.event_bus.delete_selected_items ();
             view_canvas.mode_manager.deregister_active_mode ();
@@ -299,138 +304,70 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
     }
 
     private bool handle_button_press_in_edit_mode (Gdk.EventButton event) {
-        int[] index = new int[3];
-        index[0] = index[1] = index[2] = -1;
+        is_click = true;
 
-        var sel_type = edit_model.hit_test (event.x, event.y, ref index);
+        var sel_point = Geometry.SelectedPoint ();
+        var underlying_pt = Geometry.SelectedPoint ();
+        underlying_pt.sel_index = -1;
+
+        bool is_selected = edit_model.hit_test (event.x, event.y, ref sel_point, ref underlying_pt);
 
         bool is_shift = (event.state == Gdk.ModifierType.SHIFT_MASK);
         bool is_alt = (event.state == Gdk.ModifierType.MOD1_MASK);
 
-        // If no point was selected, then just get out. Don't do anything.
-        if (sel_type == PointType.NONE) {
-            edit_model.set_selected_points (-1);
+        if (!is_selected) {
             return false;
         }
 
-        if (sel_type == PointType.LINE_END ||
-            sel_type == PointType.CURVE_BEGIN ||
-            sel_type == PointType.CURVE_END
-        ) {
-            handle_point_selected (sel_type, index, is_alt, is_shift);
+        // If this point has already been selected before, make it the reference.
+        foreach (var segment in edit_model.selected_pts) {
+            if (segment.sel_index == sel_point.sel_index && segment.sel_type == sel_point.sel_type) {
+                edit_model.reference_point = sel_point;
+                return true;
+            }
         }
 
-        // Tangents behave in a different way. So we are placing the logic for that separately.
-        if (sel_type == PointType.TANGENT_FIRST || sel_type == PointType.TANGENT_SECOND) {
-            handle_tangent_selected (sel_type, index, is_alt, is_shift);
-        }
-
-        is_click = true;
-
-        return true;
-    }
-
-    private void handle_point_selected (PointType sel_type, int[] index, bool is_alt, bool is_shift) {
-        // If the selected point already exists, then set it as the reference point.
-        if (edit_model.selected_pts.contains (index[0])) {
-            edit_model.reference_point = index[0];
-            is_click = true;
-            return;
-        }
-
-        // If shift was clicked, then append the points to selection
         if (is_shift) {
-            for (int i = 0; i < 3; ++i) {
-                if (index[i] != -1) {
-                    edit_model.set_selected_points (index[i], true);
-                }
-            }
-        } else {
-            // If shift was not used, the clear the selection, then append the points to selection.
-            // This is because, with CURVE_BEGIN, we are also adding TANGENT_FIRST and TANGENT_SECOND
-            edit_model.selected_pts.clear ();
-
-            for (int i = 0; i < 3; ++i) {
-                if (index[i] != -1) {
-                    edit_model.set_selected_points (index[i], true);
-                }
-            }
-
-            edit_model.reference_point = index[0];
-        }
-    }
-
-    private void handle_tangent_selected (PointType sel_type, int[] index, bool is_alt, bool is_shift) {
-        // If alt was not clicked and the selected tangent already exists in the selection,
-        // It means we want to use this point as reference when moving.
-        if (!is_alt) {
-            if (sel_type == PointType.TANGENT_FIRST && edit_model.selected_pts.contains (index[0])) {
-                edit_model.reference_point = index[0];
-                is_click = true;
-                return;
-            } else if (sel_type == PointType.TANGENT_SECOND && edit_model.selected_pts.contains (index[1])) {
-                edit_model.reference_point = index[1];
-                is_click = true;
-                return;
-            }
-        }
-
-        // When shift is clicked, we add all the selected points to the selection.
-        // But for tangent, the selected points will also contain the other tangent.
-        // So add only the selected tangent to the selection.
-        if (is_shift) {
-            if (sel_type == PointType.TANGENT_FIRST) {
-                edit_model.set_selected_points (index[0], true);
-            } else {
-                edit_model.set_selected_points (index[1], true);
+            if (sel_point.sel_type != PointType.TANGENT_FIRST && sel_point.sel_type != PointType.TANGENT_SECOND) {
+                edit_model.set_selected_points (sel_point, true);
+                return true;
             }
         } else if (is_alt) {
-            // When alt is pressed, we want to move the only the selected tangent
-            // and other one should stay put. So clear the selection and add only selected tangent.
-            if (sel_type == PointType.TANGENT_FIRST) {
-                edit_model.set_selected_points (index[0], false);
-                edit_model.reference_point = index[0];
-            } else {
-                edit_model.set_selected_points (index[1], false);
-                edit_model.reference_point = index[1];
+            if (sel_point.sel_type == PointType.TANGENT_FIRST || sel_point.sel_type == PointType.TANGENT_SECOND) {
+                sel_point.tangents_staggered = true;
+                edit_model.set_selected_points (sel_point, false);
+                return true;
             }
-
-            edit_model.tangents_inline = false;
         } else {
-            // If no modifier was used, move the tangents in the reflected way.
-            // This means we move the selected tangent with the mouse, but move the other tangent
-            // in the opposite direction. see PathEditModel.move_tangents_rel_to_curve
-            // If there are any other points in the selection, remove them first.
-            edit_model.selected_pts.clear ();
+            edit_model.set_selected_points (sel_point, false);
 
-            edit_model.set_selected_points (index[0], true);
-            edit_model.set_selected_points (index[1], true);
-
-            if (sel_type == PointType.TANGENT_FIRST) {
-                edit_model.reference_point = index[0];
-            } else {
-                edit_model.reference_point = index[1];
+            if (underlying_pt.sel_index != -1) {
+                edit_model.set_selected_points (underlying_pt, true);
+                edit_model.reference_point = sel_point;
             }
+
+            return true;
         }
+
+        return false;
     }
 
     private void handle_button_press_in_append_mode (Gdk.EventButton event) {
         // If we are not in edit mode (we are creating the path), then
         // everytime the user presses the mouse button, a new point needs to be created and added to the path.
         if (edit_model.first_point.x == -1) {
-            edit_model.first_point = Geometry.Point (event.x, event.y);
+            edit_model.set_first_point (Geometry.Point (event.x, event.y));
             return;
         }
 
-        Akira.Geometry.Point point = Akira.Geometry.Point (event.x, event.y);
+        Geometry.Point point = Geometry.Point (event.x, event.y);
 
-        if (live_command == Type.LINE) {
+        // If this is the first point we are adding, make it a line.
+        if (live_segment.type == Type.LINE) {
             // Check if we are clicking on the first point. If yes, then close the path.
-            int[] index = new int[3];
-            index[0] = index[1] = index[2] = -1;
-            edit_model.hit_test (event.x, event.y, ref index, 0);
-
-            if (index[0] == 0) {
+            var sel_point = Geometry.SelectedPoint ();
+            var underlying_pt = Geometry.SelectedPoint ();
+            if (edit_model.hit_test (event.x, event.y, ref sel_point, ref underlying_pt, 0)) {
                 edit_model.make_path_closed ();
                 // We are triggering the escape signal because after joining the path,
                 // no more points can be added. So this mode must end.
@@ -438,14 +375,71 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
                 return;
             }
 
-            is_click = true;
-            live_points[0] = point;
-            live_idx = 0;
+            live_segment = Geometry.PathSegment.line (point);
+            live_pnt_type = PointType.LINE_END;
         } else {
-            live_idx = 3;
-            live_points[3] = point;
+            live_segment.curve_end = point;
+            live_pnt_type = PointType.CURVE_END;
         }
 
-        edit_model.set_live_points (live_points, live_idx + 1);
+        is_click = true;
+        edit_model.set_live_points (live_segment, live_pnt_type);
+    }
+
+    private void handle_click_and_drag_in_append_mode (Geometry.Point point) {
+        // If we clicked and dragged when inserting last point of double cubic bezier.
+        // It means we are inserting a compound bezier curve.
+        if (live_pnt_type == PointType.CURVE_END && live_segment.type == Type.CUBIC_DOUBLE) {
+            // Make the first half of the live segment as a quadratic curve and add to path.
+            var new_segment = Geometry.PathSegment.quadratic_bezier_left (
+                live_segment.curve_begin,
+                live_segment.tangent_1
+            );
+
+            edit_model.add_live_points_to_path (new_segment);
+
+            // Use remaining points to make the single cubic bezier.
+            live_segment = Geometry.PathSegment.cubic_bezier_single (
+                edit_model.get_last_point_from_path (),
+                live_segment.tangent_2,
+                point,
+                live_segment.curve_end
+            );
+
+            live_pnt_type = PointType.TANGENT_SECOND;
+        } else if (live_pnt_type == PointType.CURVE_END && live_segment.type == Type.QUADRATIC_RIGHT) {
+            // If we clicked and dragged when inserting a quadratic curve,
+            // Turn this quadratic curve into a single bezier curve.
+            live_segment = Geometry.PathSegment.cubic_bezier_single (
+                edit_model.get_last_point_from_path (),
+                live_segment.tangent_2,
+                point,
+                live_segment.curve_end
+            );
+
+            live_pnt_type = PointType.TANGENT_SECOND;
+        } else {
+
+            if (live_segment.type == Type.LINE) {
+                // Clicking and dragging a line should turn it into a bezier curve.
+                live_segment.type = Type.CUBIC_DOUBLE;
+            }
+
+            if (Utils.GeometryMath.compare_points (point, live_segment.curve_begin, MIN_TANGENT_ALLOWED_LENGTH)) {
+                // Prevent user from drawing really small curves due to mouse glitches.
+                live_segment.type = Type.LINE;
+                live_pnt_type = PointType.LINE_END;
+            } else {
+                // Points at index 1 and 2 are the two tangents required by the 2 curves.
+                if (live_segment.type == Type.CUBIC_SINGLE) {
+                    live_segment.tangent_2 = reflection (point, live_segment.curve_end);
+                } else {
+                    live_segment.tangent_1 = reflection (point, live_segment.curve_begin);
+                    live_segment.tangent_2 = point;
+                }
+
+                live_pnt_type = PointType.TANGENT_SECOND;
+            }
+        }
     }
 }

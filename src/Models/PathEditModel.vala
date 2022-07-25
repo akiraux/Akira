@@ -26,15 +26,15 @@ public class Akira.Models.PathEditModel : Object {
 
     private ViewLayers.ViewLayerPath path_layer;
 
-    private Lib.Modes.PathEditMode.Type[] commands;
-    private Geometry.Point[] points;
+    private Geometry.PathSegment[] points;
 
     public Geometry.Point first_point;
-    private Geometry.Point[] live_pts;
-    private int live_pts_len = -1;
 
-    public Gee.HashSet<int> selected_pts;
-    public int reference_point;
+    private Geometry.PathSegment live_segment;
+    private Lib.Modes.PathEditMode.PointType live_point_type;
+
+    public Gee.HashSet<Geometry.SelectedPoint?> selected_pts;
+    public Geometry.SelectedPoint reference_point;
 
     public bool tangents_inline = false;
 
@@ -50,7 +50,6 @@ public class Akira.Models.PathEditModel : Object {
 
         first_point = Geometry.Point (-1, -1);
 
-        commands = instance.components.path.commands;
         points = instance.components.path.data;
 
         // Layer to show when editing paths.
@@ -58,7 +57,10 @@ public class Akira.Models.PathEditModel : Object {
         path_layer.add_to_canvas (ViewLayers.ViewLayer.PATH_LAYER_ID, view_canvas);
 
         // The selected_pts will contain the list of all points that we want to modify.
-        selected_pts = new Gee.HashSet<int> ();
+        selected_pts = new Gee.HashSet<Geometry.SelectedPoint?> ();
+
+        live_segment = Geometry.PathSegment ();
+        live_point_type = Lib.Modes.PathEditMode.PointType.NONE;
 
         update_view ();
     }
@@ -68,24 +70,18 @@ public class Akira.Models.PathEditModel : Object {
         update_view ();
     }
 
-    public void add_live_points_to_path (Geometry.Point[] live_pts, Lib.Modes.PathEditMode.Type live_command, int length) {
-        commands.resize (commands.length + 1);
-        commands[commands.length - 1] = live_command;
-
+    public void add_live_points_to_path (Geometry.PathSegment live_pts) {
         var transform_matrix = instance.components.transform.transformation_matrix;
+        var orig_first_pt = Utils.GeometryMath.transform_point_around_item_origin (first_point, transform_matrix, true);
 
-        for (int i = 0; i < length; ++i) {
-            var new_pt = transform_point_around_item_origin (live_pts[i], transform_matrix, true);
-            var orig_first_pt = transform_point_around_item_origin (first_point, transform_matrix, true);
+        live_pts.transform (transform_matrix, true);
+        live_pts.translate (orig_first_pt.x, orig_first_pt.y);
+        live_pts.snap_points ();
 
-            new_pt.x -= orig_first_pt.x;
-            new_pt.y -= orig_first_pt.y;
+        add_point_to_path (live_pts);
 
-            add_point_to_path (new_pt);
-        }
-
-        this.live_pts = new Geometry.Point[0];
-        live_pts_len = 0;
+        live_segment = Geometry.PathSegment ();
+        live_point_type = Lib.Modes.PathEditMode.PointType.NONE;
 
         recompute_components ();
     }
@@ -93,78 +89,84 @@ public class Akira.Models.PathEditModel : Object {
     /*
      * This method shift all points in path such that none of them are in negative space.
      */
-    private void add_point_to_path (Geometry.Point point, int index = -1) {
-        // var old_path_points = instance.components.path.data;
-        Geometry.Point[] new_path_points = new Geometry.Point[points.length + 1];
-
+    private void add_point_to_path (Geometry.PathSegment point, int index = -1) {
         index = (index == -1) ? index = points.length : index;
 
-        for (int i = 0; i < index; ++i) {
-            new_path_points[i] = points[i];
+        points.resize (points.length + 1);
+
+        // Add the given segment at the correct position and shift rest of the elements.
+        for (int i = index; i < points.length; ++i) {
+            var temp = points[i];
+            points[i] = point;
+            point = temp;
         }
 
-        Geometry.Point snapped_point = Geometry.Point (point.x, point.y);
-        snapped_point.x = Math.round (snapped_point.x);
-        snapped_point.y = Math.round (snapped_point.y);
-        new_path_points[index] = point;
-
-        for (int i = index + 1; i < points.length + 1; ++i) {
-            new_path_points[i] = points[i - 1];
-        }
-
-        points = recalculate_points (new_path_points);
+        points = recalculate_points (points);
         bool close = instance.components.path.close;
-        instance.components.path = new Lib.Components.Path.from_points (points, commands, close);
+        instance.components.path = new Lib.Components.Path.from_points (points, close);
     }
 
-    public void set_live_points (Geometry.Point[] live_pts, int length) {
-        this.live_pts = live_pts;
-        this.live_pts_len = length;
+    public void set_live_points (Geometry.PathSegment live_segment, Lib.Modes.PathEditMode.PointType type) {
+        this.live_segment = live_segment;
+        this.live_point_type = type;
 
         update_view ();
     }
 
-    public Geometry.Point[] delete_last_point () {
-        bool close = instance.components.path.close;
-
-        if (commands[commands.length - 1] == Lib.Modes.PathEditMode.Type.LINE) {
-            commands.resize (commands.length - 1);
-            points.resize (points.length - 1);
-
-            points = recalculate_points (points);
-            instance.components.path = new Lib.Components.Path.from_points (points, commands, close);
-            recompute_components ();
-
-            return new Geometry.Point[0];
+    public Geometry.PathSegment delete_point (int index = -1) {
+        if (index == -1) {
+            index = points.length - 1;
         }
 
+        var last_segment = points[index];
+        var new_live_pts = Geometry.PathSegment ();
 
-        var orig_first_pt = transform_point_around_item_origin (first_point, instance.components.transform.transformation_matrix, true);
-
-        var new_live_pts = new Geometry.Point[4];
-        new_live_pts[0] = Geometry.Point (points[points.length - 4].x, points[points.length - 4].y);
-        new_live_pts[1] = Geometry.Point (points[points.length - 3].x, points[points.length - 3].y);
-        new_live_pts[2] = Geometry.Point (points[points.length - 2].x, points[points.length - 2].y);
-
-        new_live_pts[0].x += orig_first_pt.x;
-        new_live_pts[0].y += orig_first_pt.y;
-
-        new_live_pts[1].x += orig_first_pt.x;
-        new_live_pts[1].y += orig_first_pt.y;
-
-        new_live_pts[2].x += orig_first_pt.x;
-        new_live_pts[2].y += orig_first_pt.y;
+        var orig_first_pt = Utils.GeometryMath.transform_point_around_item_origin (
+            first_point,
+            instance.components.transform.transformation_matrix,
+            true
+        );
 
         var transform_matrix = instance.components.transform.transformation_matrix;
-        new_live_pts[2] = transform_point_around_item_origin (new_live_pts[2], transform_matrix);
-        new_live_pts[1] = transform_point_around_item_origin (new_live_pts[1], transform_matrix);
-        new_live_pts[0] = transform_point_around_item_origin (new_live_pts[0], transform_matrix);
 
-        commands.resize (commands.length - 1);
-        points.resize (points.length - 4);
+        // If the last segment from path is a line,
+        if (last_segment.type == Lib.Modes.PathEditMode.Type.LINE) {
+            var line_end = points[points.length - 2].line_end;
+            line_end.x += orig_first_pt.x;
+            line_end.y += orig_first_pt.y;
+            line_end = Utils.GeometryMath.transform_point_around_item_origin (line_end, transform_matrix);
 
-        points = recalculate_points (points);
-        instance.components.path = new Lib.Components.Path.from_points (points, commands, close);
+            new_live_pts.line_end = line_end;
+            new_live_pts.type = Lib.Modes.PathEditMode.Type.LINE;
+        } else if (last_segment.type == Lib.Modes.PathEditMode.Type.CUBIC_DOUBLE) {
+            new_live_pts = last_segment.copy ();
+            new_live_pts.translate (-orig_first_pt.x, -orig_first_pt.y);
+            new_live_pts.transform (transform_matrix);
+        } else if (last_segment.type == Lib.Modes.PathEditMode.Type.CUBIC_SINGLE) {
+            new_live_pts = last_segment.copy ();
+            new_live_pts.translate (-orig_first_pt.x, -orig_first_pt.y);
+            new_live_pts.transform (transform_matrix);
+        } else if (
+            last_segment.type == Lib.Modes.PathEditMode.Type.QUADRATIC_LEFT ||
+            last_segment.type == Lib.Modes.PathEditMode.Type.QUADRATIC_RIGHT
+        ) {
+            new_live_pts = last_segment.copy ();
+            new_live_pts.translate (-orig_first_pt.x, -orig_first_pt.y);
+            new_live_pts.transform (transform_matrix);
+        }
+
+        var new_points = new Geometry.PathSegment[points.length - 1];
+        for (int i = 0, seg_idx = 0; i < points.length; ++i) {
+            if (i == index) {
+                continue;
+            }
+
+            new_points[seg_idx] = points[i];
+            ++seg_idx;
+        }
+
+        points = recalculate_points (new_points);
+        instance.components.path = new Lib.Components.Path.from_points (points, false);
         recompute_components ();
 
         return new_live_pts;
@@ -177,85 +179,91 @@ public class Akira.Models.PathEditModel : Object {
      * If check_idx is -1, do hit test with all the points. Otherwise
      * only with the given point.
      */
-    public Lib.Modes.PathEditMode.PointType hit_test (double x, double y, ref int[] index, int check_idx = -1) {
+    public bool hit_test (
+        double x,
+        double y,
+        ref Geometry.SelectedPoint sel_pnt,
+        ref Geometry.SelectedPoint underlying_pt,
+        int check_idx = -1
+    ) {
         // In order to check if user clicked on a point, we need to rotate the first point and the event
         // around the item center. Then the difference between these values gives the location
         // event in the same coordinate system as the points.
         var transform_matrix = instance.components.transform.transformation_matrix;
-        var orig_first_pt = transform_point_around_item_origin (first_point, transform_matrix, true);
+        var orig_first_pt = Utils.GeometryMath.transform_point_around_item_origin (first_point, transform_matrix, true);
 
         Geometry.Point point = Geometry.Point (x, y);
-        point = transform_point_around_item_origin (point, transform_matrix, true);
+        point = Utils.GeometryMath.transform_point_around_item_origin (point, transform_matrix, true);
         point = Geometry.Point (point.x - orig_first_pt.x, point.y - orig_first_pt.y);
 
         tangents_inline = false;
         double thresh = HIT_SIZE / view_canvas.scale;
 
         if (check_idx != -1) {
-            if (Utils.GeometryMath.compare_points (points[check_idx], point, thresh)) {
-                index[0] = check_idx;
-                return Lib.Modes.PathEditMode.PointType.LINE_END;
+            if (Utils.GeometryMath.compare_points (points[check_idx].last_point, point, thresh)) {
+                sel_pnt.sel_type = Lib.Modes.PathEditMode.PointType.LINE_END;
+                sel_pnt.sel_index = check_idx;
+                return true;
             }
 
-            return Lib.Modes.PathEditMode.PointType.NONE;
+            sel_pnt.sel_type = Lib.Modes.PathEditMode.PointType.NONE;
+            sel_pnt.sel_index = -1;
+            return false;
         }
 
-        int j = 0;
-        for (int i = 0; i < commands.length; ++i) {
-            if (commands[i] == Lib.Modes.PathEditMode.Type.LINE) {
-                if (Utils.GeometryMath.compare_points (points[j], point, thresh)) {
-                    index[0] = j;
+        for (int i = 0; i < points.length; ++i) {
+            var hit_type = points[i].hit_test (point, thresh);
 
-                    return Lib.Modes.PathEditMode.PointType.LINE_END;
-                }
-
-                ++j;
-            } else {
-                // We need to check if the middle point of tangent is selected.
-                // If it is selected, then other two points of tangent must also
-                // be selected to keep the curve intact.
-                if (Utils.GeometryMath.compare_points (points[j], point, thresh)) {
-                    index[0] = j;
-                    index[1] = j + 1;
-                    index[2] = j + 2;
-
-                    return Lib.Modes.PathEditMode.PointType.CURVE_BEGIN;
-                }
-
-                // If either of the tangent points is selected and moved,
-                // then the other needs to be rotated too.
-                if (Utils.GeometryMath.compare_points (points[j + 1], point, thresh)) {
-                    if (are_tangents_inline (points[j + 1], points[j], points[j + 2])) {
-                        index[0] = j + 1;
-                        index[1] = j + 2;
-                    } else {
-                        index[0] = j + 1;
-                    }
-
-                    return Lib.Modes.PathEditMode.PointType.TANGENT_FIRST;
-                }
-
-                if (Utils.GeometryMath.compare_points (points[j + 2], point, thresh)) {
-                    if (are_tangents_inline (points[j + 1], points[j], points[j + 2])) {
-                        index[0] = j + 1;
-                        index[1] = j + 2;
-                    } else {
-                        index[0] = j + 2;
-                    }
-
-                    return Lib.Modes.PathEditMode.PointType.TANGENT_SECOND;
-                }
-
-                if (Utils.GeometryMath.compare_points (points[j + 3], point, thresh)) {
-                    index[0] = j + 3;
-
-                    return Lib.Modes.PathEditMode.PointType.CURVE_END;
-                }
-                j += 4;
+            if (hit_type == Lib.Modes.PathEditMode.PointType.NONE) {
+                continue;
             }
+
+            if (
+                hit_type == Lib.Modes.PathEditMode.PointType.TANGENT_FIRST ||
+                hit_type == Lib.Modes.PathEditMode.PointType.TANGENT_SECOND
+            ) {
+                if (!points[i].check_tangents_inline ()) {
+                    sel_pnt.tangents_staggered = true;
+                }
+
+                if (
+                    points[i].type == Lib.Modes.PathEditMode.Type.QUADRATIC_LEFT ||
+                    points[i].type == Lib.Modes.PathEditMode.Type.CUBIC_SINGLE
+                ) {
+                    sel_pnt.tangents_staggered = true;
+                }
+            }
+
+            // Following code checks the current segment, segment and the hit type to find overlapping points.
+            if (i != points.length - 1 && points[i].type != Lib.Modes.PathEditMode.Type.LINE) {
+                if (
+                    points[i + 1].type == Lib.Modes.PathEditMode.Type.CUBIC_SINGLE ||
+                    points[i + 1].type == Lib.Modes.PathEditMode.Type.QUADRATIC_RIGHT
+                ) {
+                    if (hit_type == Lib.Modes.PathEditMode.PointType.CURVE_BEGIN) {
+                        underlying_pt.sel_index = i + 1;
+                        underlying_pt.sel_type = Lib.Modes.PathEditMode.PointType.CURVE_BEGIN;
+                    } else if (hit_type == Lib.Modes.PathEditMode.PointType.CURVE_END) {
+                        if (points[i + 1].type == Lib.Modes.PathEditMode.Type.CUBIC_SINGLE) {
+                            underlying_pt.sel_type = Lib.Modes.PathEditMode.PointType.CURVE_BEGIN;
+                        } else if (points[i + 1].type == Lib.Modes.PathEditMode.Type.QUADRATIC_RIGHT) {
+                            underlying_pt.sel_type = Lib.Modes.PathEditMode.PointType.CURVE_BEGIN;
+                        }
+
+                        underlying_pt.sel_index = i + 1;
+                    }
+                }
+            }
+
+            sel_pnt.sel_type = hit_type;
+            sel_pnt.sel_index = i;
+            return true;
         }
 
-        return Lib.Modes.PathEditMode.PointType.NONE;
+        //  return Lib.Modes.PathEditMode.PointType.NONE;
+        sel_pnt.sel_type = Lib.Modes.PathEditMode.PointType.NONE;
+        sel_pnt.sel_index = -1;
+        return false;
     }
 
     /*
@@ -263,8 +271,8 @@ public class Akira.Models.PathEditModel : Object {
      */
     public void modify_point_value (Geometry.Point new_pos) {
         var transform_matrix = instance.components.transform.transformation_matrix;
-        var orig_first_pt = transform_point_around_item_origin (first_point, transform_matrix, true);
-        new_pos = transform_point_around_item_origin (new_pos, transform_matrix, true);
+        var orig_first_pt = Utils.GeometryMath.transform_point_around_item_origin (first_point, transform_matrix, true);
+        new_pos = Utils.GeometryMath.transform_point_around_item_origin (new_pos, transform_matrix, true);
 
         new_pos.x -= orig_first_pt.x;
         new_pos.y -= orig_first_pt.y;
@@ -274,27 +282,65 @@ public class Akira.Models.PathEditModel : Object {
             reference_point = selected_pts.to_array ()[0];
         }
 
-        Geometry.Point original_ref = Geometry.Point (points[reference_point].x, points[reference_point].y);
+        Geometry.Point original_ref = points[reference_point.sel_index].get_by_type (reference_point.sel_type);
 
         // Calculate by how much the reference point changed, then move other points by this amount.
         // We are rounding this value to the nearest integer. This is the spacing used in ViewLayerGrid.
         double delta_x = Math.round (original_ref.x - new_pos.x);
         double delta_y = Math.round (original_ref.y - new_pos.y);
 
-        if (tangents_inline) {
-            // If a tangent line was selected and they were inline,
-            // they need to be moved in a special way.
-            move_tangents_rel_to_curve (delta_x, delta_y);
-        } else {
-            foreach (var item in selected_pts) {
-                points[item].x -= delta_x;
-                points[item].y -= delta_y;
+        foreach (var sel_pnt in selected_pts) {
+            switch (sel_pnt.sel_type) {
+                case Lib.Modes.PathEditMode.PointType.LINE_END:
+                    var old = points[sel_pnt.sel_index].line_end;
+                    points[sel_pnt.sel_index].line_end = Geometry.Point (old.x - delta_x, old.y - delta_y);
+                    break;
+                case Lib.Modes.PathEditMode.PointType.CURVE_BEGIN:
+                    // When this points moves, tangents must be moved with it too.
+                    // To make this easier, move the whole segment then return
+                    // CURVE_BEGIN to its original position.
+                    points[sel_pnt.sel_index].translate (delta_x, delta_y);
+                    var old = points[sel_pnt.sel_index].curve_end;
+                    points[sel_pnt.sel_index].curve_end = Geometry.Point (old.x + delta_x, old.y + delta_y);
+
+                    if (points[sel_pnt.sel_index].type == Lib.Modes.PathEditMode.Type.CUBIC_SINGLE) {
+                        // For single cubic curve, when CURVE_BEGIN moves, the second tangent should not move with it.
+                        old = points[sel_pnt.sel_index].tangent_2;
+                        points[sel_pnt.sel_index].tangent_2 = Geometry.Point (old.x + delta_x, old.y + delta_y);
+                    }
+                    break;
+                case Lib.Modes.PathEditMode.PointType.TANGENT_FIRST:
+                    if (sel_pnt.tangents_staggered) {
+                        var old = points[sel_pnt.sel_index].tangent_1;
+                        points[sel_pnt.sel_index].tangent_1 = Geometry.Point (old.x - delta_x, old.y - delta_y);
+                    } else {
+                        points[sel_pnt.sel_index].move_tangents (delta_x, delta_y, true);
+                    }
+                    break;
+                case Lib.Modes.PathEditMode.PointType.TANGENT_SECOND:
+                    if (sel_pnt.tangents_staggered) {
+                        var old = points[sel_pnt.sel_index].tangent_2;
+                        points[sel_pnt.sel_index].tangent_2 = Geometry.Point (old.x - delta_x, old.y - delta_y);
+                    } else {
+                        points[sel_pnt.sel_index].move_tangents (delta_x, delta_y, false);
+                    }
+                    break;
+                case Lib.Modes.PathEditMode.PointType.CURVE_END:
+                    var old = points[sel_pnt.sel_index].curve_end;
+                    points[sel_pnt.sel_index].curve_end = Geometry.Point (old.x - delta_x, old.y - delta_y);
+
+                    if (points[sel_pnt.sel_index].type == Lib.Modes.PathEditMode.Type.CUBIC_SINGLE) {
+                        // For single cubic curve, when curve end is moved, move the second tangent too.
+                        old = points[sel_pnt.sel_index].tangent_2;
+                        points[sel_pnt.sel_index].tangent_2 = Geometry.Point (old.x - delta_x, old.y - delta_y);
+                    }
+                    break;
             }
         }
 
         points = recalculate_points (points);
         bool close = instance.components.path.close;
-        instance.components.path = new Lib.Components.Path.from_points (points, commands, close);
+        instance.components.path = new Lib.Components.Path.from_points (points, close);
         recompute_components ();
     }
 
@@ -303,13 +349,13 @@ public class Akira.Models.PathEditModel : Object {
      * idx is index of point to be added to selection. if -1, it is not added.
      * If append is true, add the item to the list, otherwise, clear the list then add.
      */
-    public void set_selected_points (int idx, bool append = false) {
+    public void set_selected_points (Geometry.SelectedPoint sel_pnt, bool append = false) {
         if (!append) {
             selected_pts.clear ();
         }
 
-        if (idx != -1) {
-            selected_pts.add (idx);
+        if (sel_pnt.sel_index != -1) {
+            selected_pts.add (sel_pnt);
         }
 
         update_view ();
@@ -320,7 +366,7 @@ public class Akira.Models.PathEditModel : Object {
      * to make it a closed curve.
      */
     public void make_path_closed () {
-        instance.components.path = new Lib.Components.Path.from_points (points, commands, true);
+        instance.components.path = new Lib.Components.Path.from_points (points, true);
         recompute_components ();
     }
 
@@ -332,7 +378,7 @@ public class Akira.Models.PathEditModel : Object {
         }
 
         double thresh = HIT_SIZE / view_canvas.scale;
-        if (Utils.GeometryMath.compare_points (points[0], points[last], thresh)) {
+        if (Utils.GeometryMath.compare_points (points[0].last_point, points[last].last_point, thresh)) {
             make_path_closed ();
             return true;
         }
@@ -343,32 +389,30 @@ public class Akira.Models.PathEditModel : Object {
     /*
      * This method shift all points in path such that none of them are in negative space.
      */
-    private Geometry.Point[] recalculate_points (Geometry.Point[] points) {
+    private Geometry.PathSegment[] recalculate_points (Geometry.PathSegment[] points) {
         double min_x = double.MAX, min_y = double.MAX;
 
-        var path = new Lib.Components.Path.from_points (points, commands);
+        var path = new Lib.Components.Path.from_points (points);
         var ext = path.calculate_extents ();
 
         min_x = ext.left;
         min_y = ext.top;
 
-        Geometry.Point[] recalculated_points = new Geometry.Point[points.length];
-
         // Shift all the points.
         for (int i = 0; i < points.length; ++i) {
-            recalculated_points[i] = Geometry.Point (points[i].x - min_x, points[i].y - min_y);
+            points[i].translate (min_x, min_y);
         }
 
         // The amount by which the first point changed must be rotated before adding to first point.
         Geometry.Point delta = Geometry.Point (min_x, min_y);
 
         var transform_matrix = instance.components.transform.transformation_matrix;
-        var rotated_delta = transform_point_around_item_origin (delta, transform_matrix);
+        var rotated_delta = Utils.GeometryMath.transform_point_around_item_origin (delta, transform_matrix);
 
         first_point.x += rotated_delta.x;
         first_point.y += rotated_delta.y;
 
-        return recalculated_points;
+        return points;
     }
 
     private void recompute_components () {
@@ -412,7 +456,14 @@ public class Akira.Models.PathEditModel : Object {
         double pts_center_x = instance.components.center.x - offset_x;
         double pts_center_y = instance.components.center.y - offset_y;
 
-        var quad = Geometry.Quad.from_components (pts_center_x, pts_center_y, extents_from_pts.width, extents_from_pts.height, tr);
+        var quad = Geometry.Quad.from_components (
+            pts_center_x,
+            pts_center_y,
+            extents_from_pts.width,
+            extents_from_pts.height,
+            tr
+        );
+
         var new_ext = quad.bounding_box;
 
         double radius = ViewLayers.ViewLayerPath.UI_NOB_SIZE / view_canvas.scale;
@@ -423,9 +474,8 @@ public class Akira.Models.PathEditModel : Object {
 
         PathDataModel path_data = PathDataModel ();
         path_data.points = points;
-        path_data.commands = commands;
-        path_data.live_pts = live_pts;
-        path_data.length = live_pts_len;
+        path_data.live_segment = live_segment;
+        path_data.live_point_type = live_point_type;
         path_data.extents = new_ext;
         path_data.transform = instance.drawable.transform;
         path_data.selected_pts = selected_pts;
@@ -441,25 +491,15 @@ public class Akira.Models.PathEditModel : Object {
     }
 
     private Geometry.Rectangle get_extents_using_live_pts (Geometry.Rectangle extents) {
-        if (points.length == 0 || live_pts_len == -1) {
+        if (points.length == 0 || live_point_type == Lib.Modes.PathEditMode.PointType.NONE) {
             return extents;
         }
 
-        var data = new Geometry.Point[live_pts_len + 1];
-        data[0] = get_last_point_from_path ();
+        var live_pnts = new Geometry.PathSegment[2];
+        live_pnts[0] = Geometry.PathSegment.line ( get_last_point_from_path ());
+        live_pnts[1] = live_segment;
 
-        for (int i = 0; i < live_pts_len; ++i) {
-            data[i + 1].x = live_pts[i].x;
-            data[i + 1].y = live_pts[i].y;
-        }
-
-        var cmds = new Lib.Modes.PathEditMode.Type[data.length];
-        for (int i = 0; i < data.length; ++i) {
-            cmds[i] = Lib.Modes.PathEditMode.Type.LINE;
-        }
-        var live_path = new Lib.Components.Path.from_points (data, cmds);
-
-        var live_extents = live_path.calculate_extents ();
+        var live_extents = Utils.GeometryMath.bounds_from_points (live_pnts);
 
         double radius = ViewLayers.ViewLayerPath.UI_NOB_SIZE / view_canvas.scale;
         live_extents.left -= radius;
@@ -470,68 +510,30 @@ public class Akira.Models.PathEditModel : Object {
         return live_extents;
     }
 
-    private bool are_tangents_inline (Geometry.Point tangent_1, Geometry.Point tangent_2, Geometry.Point curve_begin) {
-        // Slope and intercept of line formed by tangents.
-        double slope = (tangent_2.y - tangent_1.y) / (tangent_2.x - tangent_1.x);
-        double intercept = tangent_1.y - slope * tangent_1.x;
-
-        double rhs = slope * curve_begin.x + intercept;
-
-        // Check if the curve_begin point lies on this line.
-        if ((curve_begin.y - rhs).abs () < 1.0) {
-            tangents_inline = true;
-            return true;
-        }
-
-        tangents_inline = false;
-        return false;
-    }
-
-    private void move_tangents_rel_to_curve (double delta_x, double delta_y) {
-        points[reference_point].x -= delta_x;
-        points[reference_point].y -= delta_y;
-
-        var sel_pts_array = selected_pts.to_array ();
-        int other_tangent = (sel_pts_array[0] == reference_point) ? sel_pts_array[1] : sel_pts_array[0];
-        points[other_tangent].x += delta_x;
-        points[other_tangent].y += delta_y;
-    }
-
-    private Geometry.Point transform_point_around_item_origin (Geometry.Point point, Cairo.Matrix mat, bool invert = false) {
-        var matrix = Utils.GeometryMath.multiply_matrices (Cairo.Matrix.identity (), mat);
-
-        if (invert) {
-            matrix.invert ();
-        }
-
-        var new_point = Geometry.Point (point.x, point.y);
-        matrix.transform_point (ref new_point.x, ref new_point.y);
-        return new_point;
-    }
-
-    private Geometry.Point get_last_point_from_path () {
+    public Geometry.Point get_last_point_from_path () {
         Cairo.Matrix transform_matrix = instance.components.transform.transformation_matrix;
-        var orig_first_pt = transform_point_around_item_origin (first_point, transform_matrix, true);
+        var orig_first_pt = Utils.GeometryMath.transform_point_around_item_origin (first_point, transform_matrix, true);
 
         if (instance.components.path.data.length == 0) {
             return orig_first_pt;
         }
 
-        var last_point = Geometry.Point ();
-        last_point.x = points[points.length - 1].x + orig_first_pt.x;
-        last_point.y = points[points.length - 1].y + orig_first_pt.y;
-        last_point = transform_point_around_item_origin (last_point, transform_matrix);
+        Geometry.Point last_point = points[points.length - 1].last_point;
+
+        last_point.x += orig_first_pt.x;
+        last_point.y += orig_first_pt.y;
+        last_point = Utils.GeometryMath.transform_point_around_item_origin (last_point, transform_matrix);
 
         return last_point;
     }
 }
 
 public struct Akira.Models.PathDataModel {
-    public Geometry.Point[] points;
-    public Lib.Modes.PathEditMode.Type[] commands;
+    public Geometry.PathSegment[] points;
 
-    public Geometry.Point[] live_pts;
-    public int length;
+    public Geometry.PathSegment live_segment;
+    public Lib.Modes.PathEditMode.PointType live_point_type;
+
     public Geometry.Point last_point;
 
     public Geometry.Rectangle extents;
@@ -540,5 +542,5 @@ public struct Akira.Models.PathDataModel {
     public Geometry.Point center;
 
     public Cairo.Matrix transform;
-    public Gee.HashSet<int> selected_pts;
+    public Gee.HashSet<Geometry.SelectedPoint?> selected_pts;
 }
