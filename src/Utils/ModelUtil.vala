@@ -17,14 +17,15 @@
  * along with Akira. If not, see <https://www.gnu.org/licenses/>.
  *
  * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
+ * Authored by: Alessandro "alecaddd" Castellani <castellani.ale@gmail.com>
  */
 
 /*
  * Utility to handle some model operations
  */
  public class Akira.Utils.ModelUtil : Object {
-
     public delegate void OnSubtreeCloned (int id);
+
     public enum State {
         COPY,
         PASTE,
@@ -33,8 +34,8 @@
     }
 
     /*
-     * Clones an instance with `source_id` from a source model, into a target model into a specific
-     * group with id `tagret_group_id`.
+     * Clones an instance with `source_id` from a source model, into a target
+     * model into a specific group with id `tagret_group_id`.
      * Cloning is recursive, so all dependencies are copied over.
      * Return 0 on success.
      */

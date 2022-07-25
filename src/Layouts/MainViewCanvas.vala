@@ -35,7 +35,6 @@ public class Akira.Layouts.MainViewCanvas : Gtk.Grid {
     private double scroll_origin_x = 0;
     private double scroll_origin_y = 0;
 
-
     public MainViewCanvas (Akira.Window window) {
         Object (window: window, orientation: Gtk.Orientation.VERTICAL);
     }

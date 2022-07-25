@@ -147,6 +147,7 @@ public class Akira.Layouts.LayersList.LayerListItem : VirtualizingListBoxRow {
     private void build_artboard_ui () {
         // Update the general UI.
         style_ctx.remove_class ("layer");
+        style_ctx.remove_class ("group");
         style_ctx.add_class ("artboard");
 
         // Update icon.
@@ -159,16 +160,27 @@ public class Akira.Layouts.LayersList.LayerListItem : VirtualizingListBoxRow {
         update_btn_toggle ();
     }
 
-    /*
-     * TODO.
-     */
     private void build_group_ui () {
+        // Update the general UI.
+        style_ctx.remove_class ("layer");
+        style_ctx.remove_class ("artboard");
+        style_ctx.add_class ("group");
+
+        // Update icon.
+        icon.clear ();
+        icon.margin_start = 0;
+
+        // Show the toggle button.
+        btn_toggle.no_show_all = false;
+        btn_toggle.visible = true;
+
         update_btn_toggle ();
     }
 
     private void build_layer_ui () {
         // Update general UI.
         style_ctx.remove_class ("artboard");
+        style_ctx.remove_class ("group");
         style_ctx.add_class ("layer");
 
         // Update icon.

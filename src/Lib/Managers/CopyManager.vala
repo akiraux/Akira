@@ -37,7 +37,7 @@ public class Akira.Lib.Managers.CopyManager : Object {
     /*
      * Return a tree map of the currently selected items, with their sorted position.
      */
-    private Gee.TreeMap<Lib.Items.PositionKey, int> collect_sorted_candidates () {
+    public Gee.TreeMap<Lib.Items.PositionKey, int> collect_sorted_candidates () {
         var candidates = new Gee.TreeMap<Lib.Items.PositionKey, int> (Lib.Items.PositionKey.compare);
         foreach (var to_copy in view_canvas.selection_manager.selection.nodes.values) {
             var key = new Lib.Items.PositionKey ();

@@ -151,7 +151,8 @@ public class Akira.Lib.Items.ModelInstance {
     }
 
     public void remove_from_canvas (ViewLayers.BaseCanvas? canvas) {
-        if (canvas != null) {
+        // A ModelTypeGroup doesn't have a drawable instance.
+        if (canvas != null && drawable != null) {
             drawable.request_redraw (canvas, false);
         }
         drawable = null;
