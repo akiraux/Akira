@@ -110,13 +110,13 @@ public class Akira.Widgets.InputField : Gtk.Grid {
 
     private bool handle_key_press (Gdk.EventKey event) {
         // Arrow UP.
-        if (event.keyval == Gdk.Key.Up && (event.state & Gdk.ModifierType.SHIFT_MASK) > 0) {
+        if (event.keyval == Gdk.Key.Up && view_canvas.shift_is_pressed) {
             entry.spin (Gtk.SpinType.STEP_FORWARD, 10);
             return true;
         }
 
         // Arrow DOWN.
-        if (event.keyval == Gdk.Key.Down && (event.state & Gdk.ModifierType.SHIFT_MASK) > 0) {
+        if (event.keyval == Gdk.Key.Down && view_canvas.shift_is_pressed) {
             entry.spin (Gtk.SpinType.STEP_BACKWARD, 10);
             return true;
         }
