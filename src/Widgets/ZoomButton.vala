@@ -131,7 +131,7 @@ public class Akira.Widgets.ZoomButton : Gtk.Grid {
      */
     public bool zoom_reset (Gdk.EventButton event) {
         // If the CTRL key was pressed, show the popover with the input field.
-        if ((event.state & Gdk.ModifierType.CONTROL_MASK) > 0) {
+        if (window.main_window.main_view_canvas.canvas.ctrl_is_pressed) {
             zoom_popover.popup ();
             return true;
         }
@@ -199,7 +199,7 @@ public class Akira.Widgets.ZoomButton : Gtk.Grid {
         // is not a number, or the CTRL modifier is not pressed.
         if (
             !(event.keyval >= Gdk.Key.@0 && event.keyval <= Gdk.Key.@9) &&
-            (event.state & Gdk.ModifierType.CONTROL_MASK) == 0
+            !window.main_window.main_view_canvas.canvas.ctrl_is_pressed
         ) {
             return true;
         }

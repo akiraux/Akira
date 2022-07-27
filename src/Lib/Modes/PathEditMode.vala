@@ -312,7 +312,6 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
 
         bool is_selected = edit_model.hit_test (event.x, event.y, ref sel_point, ref underlying_pt);
 
-        bool is_shift = (event.state == Gdk.ModifierType.SHIFT_MASK);
         bool is_alt = (event.state == Gdk.ModifierType.MOD1_MASK);
 
         if (!is_selected) {
@@ -327,7 +326,7 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
             }
         }
 
-        if (is_shift) {
+        if (view_canvas.shift_is_pressed) {
             if (sel_point.sel_type != PointType.TANGENT_FIRST && sel_point.sel_type != PointType.TANGENT_SECOND) {
                 edit_model.set_selected_points (sel_point, true);
                 return true;
