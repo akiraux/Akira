@@ -333,6 +333,15 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
             );
 
             if (target != null) {
+                if (
+                    !ctrl_is_pressed &&
+                    target.parent != null &&
+                    target.parent.id != Lib.Items.Model.ORIGIN_ID &&
+                    target.parent.instance.is_group
+                ) {
+                    target = Utils.ModelUtil.recursive_get_parent_target (target.parent);
+                }
+
                 // If the item is locked, no selection is allowed.
                 if (target.instance.components.layer.locked) {
                     return false;

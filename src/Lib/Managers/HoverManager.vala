@@ -57,6 +57,16 @@ public class Akira.Lib.Managers.HoverManager : Object {
             return;
         }
 
+        // Account for groups.
+        if (
+            !view_canvas.ctrl_is_pressed &&
+            target.parent != null &&
+            target.parent.id != Lib.Items.Model.ORIGIN_ID &&
+            target.parent.instance.is_group
+        ) {
+            target = Utils.ModelUtil.recursive_get_parent_target (target.parent);
+        }
+
         maybe_create_hover_effect (target);
         return;
     }
@@ -94,6 +104,7 @@ public class Akira.Lib.Managers.HoverManager : Object {
             remove_hover_effect ();
         }
 
+        // TODO: The group drawable is empty (all values are 0).
         hover_layer.add_drawable (node.instance.drawable);
         current_hovered_id = node.id;
         hover_changed (node.instance.id);
