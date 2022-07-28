@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Alecaddd (https://alecaddd.com)
+ * Copyright (c) 2022 Alecaddd (https://alecaddd.com)
  *
  * This file is part of Akira.
  *
@@ -43,7 +43,7 @@ public class Akira.Drawables.DrawableGroup : Drawable {
         context.save ();
         Cairo.Matrix global_transform = context.get_matrix ();
 
-        // We apply the item transform before creating the path
+        // We apply the item transform before creating the path.
         Cairo.Matrix tr = transform;
         context.transform (tr);
 
@@ -56,8 +56,7 @@ public class Akira.Drawables.DrawableGroup : Drawable {
 
         context.restore ();
 
-        // Very important to initialize new path
+        // Very important to initialize new path.
         context.new_path ();
     }
-
 }
