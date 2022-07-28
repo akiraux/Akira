@@ -209,9 +209,8 @@ public class Akira.Lib.Components.CompiledGeometry : Copyable<CompiledGeometry> 
         _data.area.br_x = right;
         _data.area.br_y = bottom;
 
+        _data.drawable_area = _data.area;
         _data.local_bb = _data.area.bounding_box;
-        _data.area_bb = _data.area_bb;
-        _data._transformation_matrix.x0 = _data.area_bb.center_x;
-        _data._transformation_matrix.y0 = _data.area_bb.center_y;
+        _data.area_bb = _data.area.bounding_box;
     }
 }

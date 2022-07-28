@@ -116,6 +116,7 @@ sources = files(
     'Drawables/Drawable.vala',
     'Drawables/DrawableArtboard.vala',
     'Drawables/DrawableEllipse.vala',
+    'Drawables/DrawableGroup.vala',
     'Drawables/DrawablePath.vala',
     'Drawables/DrawableRect.vala',
     'Drawables/DrawableText.vala',

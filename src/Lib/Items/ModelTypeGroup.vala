@@ -42,5 +42,9 @@ public class Akira.Lib.Items.ModelTypeGroup : ModelType {
         return new Components.CompiledGeometry.from_descendants (components, node);
     }
 
+    public override void construct_canvas_item (ModelInstance instance) {
+        instance.drawable = new Drawables.DrawableGroup ();
+    }
+
     public override bool is_group () { return true; }
 }
