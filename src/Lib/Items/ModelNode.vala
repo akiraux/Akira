@@ -156,6 +156,10 @@ public class Akira.Lib.Items.ModelNode {
         Drawables.Drawable.HitTestType hit_test_type,
         ref Gee.ArrayList<unowned ModelNode> nodes
     ) {
+        if (instance.components.layer.locked) {
+            return;
+        }
+
         unowned var dr = instance.drawable;
         if (dr == null) {
             if (instance.bounding_box.contains (x, y)) {
