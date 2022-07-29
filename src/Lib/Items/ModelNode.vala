@@ -162,8 +162,7 @@ public class Akira.Lib.Items.ModelNode {
 
         unowned var dr = instance.drawable;
         if (dr == null) {
-            if (instance.bounding_box.contains (x, y)) {
-                nodes.add (this);
+            if (!instance.bounding_box.contains (x, y)) {
                 return;
             }
         } else {
