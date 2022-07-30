@@ -58,13 +58,8 @@ public class Akira.Lib.Managers.HoverManager : Object {
         }
 
         // Account for groups.
-        if (
-            !view_canvas.ctrl_is_pressed &&
-            target.parent != null &&
-            target.parent.id != Lib.Items.Model.ORIGIN_ID &&
-            target.parent.instance.is_group
-        ) {
-            target = Utils.ModelUtil.recursive_get_parent_target (target.parent);
+        if (!view_canvas.ctrl_is_pressed) {
+            target = Utils.ModelUtil.recursive_get_parent_target (target);
         }
 
         maybe_create_hover_effect (target);

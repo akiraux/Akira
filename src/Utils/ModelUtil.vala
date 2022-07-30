@@ -107,7 +107,8 @@
         if (
             target.parent != null &&
             target.parent.id != Lib.Items.Model.ORIGIN_ID &&
-            target.parent.instance.is_group
+            target.parent.instance.is_group &&
+            !(target.parent.instance.type is Lib.Items.ModelTypeArtboard)
         ) {
             return recursive_get_parent_target (target.parent);
         }

@@ -333,13 +333,8 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
             );
 
             if (target != null) {
-                if (
-                    !ctrl_is_pressed &&
-                    target.parent != null &&
-                    target.parent.id != Lib.Items.Model.ORIGIN_ID &&
-                    target.parent.instance.is_group
-                ) {
-                    target = Utils.ModelUtil.recursive_get_parent_target (target.parent);
+                if (!ctrl_is_pressed) {
+                    target = Utils.ModelUtil.recursive_get_parent_target (target);
                 }
 
                 // Check if the clicked item is not already selected.
