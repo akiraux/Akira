@@ -318,6 +318,10 @@ public class Akira.Lib.Items.Model : Object {
             internal_alert_item_change (tgt, false, Components.Component.Type.COMPILED_GEOMETRY);
         }
 
+        if (source_node.id != ORIGIN_ID) {
+            internal_alert_item_change (source_node, false, Components.Component.Type.COMPILED_GEOMETRY);
+        }
+
         return 0;
     }
 

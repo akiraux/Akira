@@ -236,6 +236,7 @@ public class Akira.Lib.Managers.ItemsManager : Object, Items.ModelListener {
             no_operation_yet = false;
         };
 
+        view_canvas.pause_redraw = true;
         foreach (var cs in shift_groups) {
             var pos = cs.first_child;
 
@@ -266,7 +267,9 @@ public class Akira.Lib.Managers.ItemsManager : Object, Items.ModelListener {
             }
         }
 
+        view_canvas.pause_redraw = false;
         compile_model ();
+        view_canvas.request_redraw (view_canvas.get_bounds ());
 
         return 0;
     }
