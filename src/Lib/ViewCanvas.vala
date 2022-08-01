@@ -66,6 +66,11 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
             return is_modifier_pressed (Gdk.ModifierIntent.EXTEND_SELECTION);
         }
     }
+    public bool alt_is_pressed {
+        get {
+            return is_modifier_pressed (Gdk.ModifierIntent.SHIFT_GROUP);
+        }
+    }
 
     public double current_scale = 1.0;
 
@@ -333,8 +338,18 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
             );
 
             if (target != null) {
-                if (!ctrl_is_pressed) {
+                if (
+                    (!selection_manager.item_selected (target.id) && !ctrl_is_pressed)
+                ) {
+                    var old_target = target;
                     target = Utils.ModelUtil.recursive_get_parent_target (target);
+
+                    if (
+                        !selection_manager.is_empty () && selection_manager.item_is_sibling (old_target.id)
+                    ) {
+                        target = old_target;
+                    }
+                    old_target = null;
                 }
 
                 // Check if the clicked item is not already selected.
@@ -432,17 +447,11 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
             if (
                 target != null &&
                 selection_manager.item_selected (target.id) &&
-                count > 1
+                count > 1 &&
+                alt_is_pressed &&
+                !ctrl_is_pressed
             ) {
-                if (ctrl_is_pressed) {
-                    // If CTRL is pressed, toggle alignment anchor.
-                    nob_manager.toggle_anchor_point (target.id);
-                } else {
-                    // Deselect them all and select the clicked item.
-                    selection_manager.reset_selection ();
-                    selection_manager.add_to_selection (target.id);
-                    selection_manager.selection_modified_external (true);
-                }
+                nob_manager.toggle_anchor_point (target.id);
             }
 
             // If the click happened on an empty area and we have multiple
