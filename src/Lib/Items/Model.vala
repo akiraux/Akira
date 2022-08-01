@@ -226,7 +226,7 @@ public class Akira.Lib.Items.Model : Object {
         int target_id,
         int target_pos,
         bool restack = false,
-        bool listen = true
+        Utils.TrivialDelegate? prep_for_op = null
     ) {
         if (num_items == 0) {
             return 0;
@@ -261,8 +261,61 @@ public class Akira.Lib.Items.Model : Object {
             target_pos = target_children_size;
         }
 
-        if (listener != null && listen) {
-            //  listener.on_item_transferred (node.id);
+        if (source_id != ORIGIN_ID && target_id != ORIGIN_ID) {
+            // check for cycle
+            for (var i = source_pos; i < source_pos + num_items; ++i) {
+                unowned var node = source_children.index (i);
+                if (node.id == target_id || target_node.has_ancestor (node.id, true)) {
+                    assert (false);
+                    return -1;
+                }
+            }
+        }
+
+        if (prep_for_op != null) {
+            prep_for_op ();
+        }
+
+        var target_start_num_of_children = target_children.length;
+
+        target_children.insert_vals (target_pos, source_children.data[source_pos : source_pos + num_items] , num_items);
+
+        Utils.Array.insert_array_at_iarray (
+            ref target_node.instance.children,
+            target_pos,
+            source_node.instance.children [source_pos : source_pos + num_items]
+        );
+
+        source_children.remove_range (source_pos, num_items);
+        Utils.Array.remove_from_iarray (
+            ref source_node.instance.children,
+            source_pos,
+            num_items
+        );
+
+        if (restack) {
+            for (var i = source_pos; i < source_children.length; ++i) {
+                source_children.index (i).pos_in_parent = source_pos;
+            }
+        }
+
+        var target_count = target_pos >= target_start_num_of_children ? target_start_num_of_children : target_pos;
+
+        var added_count = 0;
+
+        for (var i = target_count; i < target_children.length; ++i) {
+            unowned var tgt = target_children.index (i);
+
+            // Updating the parent is mandatory for nodes within the transfered range.
+            tgt.pos_in_parent = (int)(target_count + added_count++);
+            tgt.parent = target_node;
+
+            if (!restack && added_count > num_items) {
+                // we need to set the new parent regardless. But further restacking is unnecessary
+                break;
+            }
+
+            internal_alert_item_change (tgt, false, Components.Component.Type.COMPILED_GEOMETRY);
         }
 
         return 0;
@@ -368,9 +421,10 @@ public class Akira.Lib.Items.Model : Object {
             for (var i = start; i < parent_node.children.length; ++i) {
                 unowned var ch = parent_node.children.index (i);
                 ch.pos_in_parent = i;
-                alert_node_changed (ch, Components.Component.Type.COMPILED_GEOMETRY);
             }
         }
+
+        alert_node_changed (parent_node, Components.Component.Type.COMPILED_GEOMETRY);
 
         return 1;
     }
@@ -501,6 +555,10 @@ public class Akira.Lib.Items.Model : Object {
             for (var i = ipos; i < parent_node.children.length; ++i) {
                 parent_node.children.index (ipos).pos_in_parent = ipos++;
             }
+        }
+
+        if (candidate.is_group) {
+            new_node.children = new GLib.Array<unowned ModelNode> ();
         }
 
         new_node.parent = parent_node;
