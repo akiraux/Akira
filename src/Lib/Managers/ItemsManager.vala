@@ -600,15 +600,17 @@ public class Akira.Lib.Managers.ItemsManager : Object, Items.ModelListener {
         }
 
         Lib.Items.ChildrenSet current_set = null;
-        int last_group_id = -1;
+        int target_group_id = -1;
+        int target_group_pos = -1;
         int last_pos = -1;
         foreach (var mapit in sorted_tree) {
             var snode = mapit.value;
-            bool is_next = last_group_id == snode.parent.id && snode.pos_in_parent == last_pos + 1;
+            bool is_next = target_group_id == snode.parent.id && snode.pos_in_parent == last_pos + 1;
 
             if (!is_next) {
-                last_group_id = snode.parent.id;
+                target_group_id = snode.parent.id;
                 last_pos = snode.pos_in_parent;
+                target_group_pos = last_pos;
 
                 current_set = new Lib.Items.ChildrenSet ();
                 current_set.parent_node = snode.parent;
@@ -626,6 +628,11 @@ public class Akira.Lib.Managers.ItemsManager : Object, Items.ModelListener {
             current_set.length++;
         }
 
+        if (target_group_id < Lib.Items.Model.ORIGIN_ID) {
+            assert (false);
+            return;
+        }
+
 
         // Clear the current selection so we don't stumble upon weird states.
         view_canvas.selection_manager.reset_selection ();
@@ -636,7 +643,7 @@ public class Akira.Lib.Managers.ItemsManager : Object, Items.ModelListener {
         // Create a new empty group and add it to the main canvas.
         var group = Lib.Items.ModelTypeGroup.default_group ();
 
-        var result_id = model.splice_new_item (Lib.Items.Model.ORIGIN_ID, int.MAX, group);
+        var result_id = model.splice_new_item (target_group_id, int.MAX, group);
         assert (result_id > Lib.Items.Model.ORIGIN_ID);
 
         var it = shift_groups.bidir_list_iterator ();
@@ -655,6 +662,14 @@ public class Akira.Lib.Managers.ItemsManager : Object, Items.ModelListener {
                 assert (false);
                 return;
             }
+        }
+
+
+        var container = model.node_from_id (target_group_id);
+
+        var new_group = model.node_from_id (result_id);
+        if (model.move_items (container.id, new_group.pos_in_parent, target_group_pos, 1, true, null) < 0) {
+            assert (false);
         }
 
         compile_model ();

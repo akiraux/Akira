@@ -295,7 +295,7 @@ public class Akira.Lib.Items.Model : Object {
 
         if (restack) {
             for (var i = source_pos; i < source_children.length; ++i) {
-                source_children.index (i).pos_in_parent = source_pos;
+                source_children.index (i).pos_in_parent = i;
             }
         }
 
@@ -424,7 +424,9 @@ public class Akira.Lib.Items.Model : Object {
             }
         }
 
-        alert_node_changed (parent_node, Components.Component.Type.COMPILED_GEOMETRY);
+        if (parent_node.id != ORIGIN_ID) {
+            alert_node_changed (parent_node, Components.Component.Type.COMPILED_GEOMETRY);
+        }
 
         return 1;
     }
