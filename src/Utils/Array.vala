@@ -27,7 +27,7 @@ public class Akira.Utils.Array : Object {
      * Insert value in an int array. Return true on success.
      */
     public static bool insert_at_iarray (ref int[] a, int pos, int value) {
-        if (pos >= a.length || pos < 0) {
+        if (pos > a.length || pos < 0) {
             assert (false);
             return false;
         }
@@ -35,6 +35,27 @@ public class Akira.Utils.Array : Object {
         a.resize (a.length + 1);
         a.move (pos, pos + 1, a.length - pos - 1);
         a[pos] = value;
+        return true;
+    }
+
+    /*
+     * Insert an array of integers within another array at `pos`.
+     */
+    public static bool insert_array_at_iarray (ref int[] a, int pos, int [] other) {
+        if (pos > a.length || pos < 0) {
+            assert (false);
+            return false;
+        }
+
+        int start_length = a.length;
+
+        a.resize (other.length);
+        a.move (pos, pos + other.length, start_length - pos);
+
+        for (var i = 0; i < other.length; ++i) {
+            a[pos + i] = other[i];
+        }
+
         return true;
     }
 

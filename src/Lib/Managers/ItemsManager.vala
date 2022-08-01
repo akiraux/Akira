@@ -236,6 +236,7 @@ public class Akira.Lib.Managers.ItemsManager : Object, Items.ModelListener {
             no_operation_yet = false;
         };
 
+        view_canvas.pause_redraw = true;
         foreach (var cs in shift_groups) {
             var pos = cs.first_child;
 
@@ -266,7 +267,9 @@ public class Akira.Lib.Managers.ItemsManager : Object, Items.ModelListener {
             }
         }
 
+        view_canvas.pause_redraw = false;
         compile_model ();
+        view_canvas.request_redraw (view_canvas.get_bounds ());
 
         return 0;
     }
@@ -574,44 +577,102 @@ public class Akira.Lib.Managers.ItemsManager : Object, Items.ModelListener {
         if (selection.count () == 0) {
             return;
         }
-        view_canvas.window.event_bus.create_model_snapshot ("create group from selection");
 
         var blocker = new SelectionManager.ChangeSignalBlocker (view_canvas.selection_manager);
         (blocker);
         view_canvas.pause_redraw = true;
 
-        // Collect all currently selected nodes, sorted by their position.
-        var sorted_candidates = view_canvas.copy_manager.collect_sorted_candidates ();
+        var sorted_tree = new Gee.TreeMap<Lib.Items.PositionKey, Lib.Items.ModelNode> (
+            Lib.Items.PositionKey.compare,
+            null
+        );
+
+        var shift_groups = new Gee.ArrayList<Lib.Items.ChildrenSet> ();
+
+        foreach (var node_id in selection.nodes.keys) {
+            var node = item_model.node_from_id (node_id);
+            if (node == null) {
+                continue;
+            }
+
+            var key = new Lib.Items.PositionKey ();
+            key.parent_path = node.parent == null ? "" : item_model.path_from_node (node.parent);
+            key.pos_in_parent = node.pos_in_parent;
+
+            sorted_tree[key] = node;
+        }
+
+        Lib.Items.ChildrenSet current_set = null;
+        int target_group_id = -1;
+        int target_group_pos = -1;
+        int last_pos = -1;
+        foreach (var mapit in sorted_tree) {
+            var snode = mapit.value;
+            bool is_next = target_group_id == snode.parent.id && snode.pos_in_parent == last_pos + 1;
+
+            if (!is_next) {
+                target_group_id = snode.parent.id;
+                last_pos = snode.pos_in_parent;
+                target_group_pos = last_pos;
+
+                current_set = new Lib.Items.ChildrenSet ();
+                current_set.parent_node = snode.parent;
+                current_set.first_child = last_pos;
+                current_set.children_in_set = new GLib.Array<unowned Lib.Items.ModelNode> ();
+                current_set.children_in_set.append_val (snode);
+                current_set.length = 1;
+
+                shift_groups.add (current_set);
+                continue;
+            }
+
+            last_pos = snode.pos_in_parent;
+            current_set.children_in_set.append_val (snode);
+            current_set.length++;
+        }
+
+        if (target_group_id < Lib.Items.Model.ORIGIN_ID) {
+            assert (false);
+            return;
+        }
+
 
         // Clear the current selection so we don't stumble upon weird states.
         view_canvas.selection_manager.reset_selection ();
 
+        view_canvas.window.event_bus.create_model_snapshot ("create group from selection");
+
+        unowned var model = view_canvas.items_manager.item_model;
         // Create a new empty group and add it to the main canvas.
         var group = Lib.Items.ModelTypeGroup.default_group ();
-        add_item_to_origin (group);
 
-        // Loop through all sorted nodes, clone their ModelInstance and add it
-        // to the newly created group.
-        // TODO: All of this should be done in the Model::transfer() method.
-        foreach (var node_id in sorted_candidates.values) {
-            var node = item_model.node_from_id (node_id);
-            var cloned_instance = node.instance.clone (false);
-            var new_id = add_item_to_group (group.id, cloned_instance, true);
-            // TODO: We should find a smarter way to maintain the name of a
-            // transferred element, right now simply update the name to keep
-            // the old one.
-            cloned_instance.components.name = new Lib.Components.Name (
-                node.instance.components.name.name,
-                new_id.to_string ()
-            );
+        var result_id = model.splice_new_item (target_group_id, int.MAX, group);
+        assert (result_id > Lib.Items.Model.ORIGIN_ID);
+
+        var it = shift_groups.bidir_list_iterator ();
+        for (var has_next = it.last (); has_next; has_next = it.previous ()) {
+            var sg = it.get ();
+
+            if (0 != model.transfer (
+                sg.parent_node.id,
+                sg.first_child,
+                sg.length,
+                result_id,
+                int.MAX,
+                true,
+                null
+            )) {
+                assert (false);
+                return;
+            }
         }
 
-        // Loop again through the old nodes and delete them only after the new
-        // nodes are created and set in place. We do this in a separate loop to
-        // avoid segfault of nodes getting deleted while the transfer is still
-        // in process.
-        foreach (var node_id in sorted_candidates.values) {
-            item_model.remove (node_id, true);
+
+        var container = model.node_from_id (target_group_id);
+
+        var new_group = model.node_from_id (result_id);
+        if (model.move_items (container.id, new_group.pos_in_parent, target_group_pos, 1, true, null) < 0) {
+            assert (false);
         }
 
         compile_model ();
