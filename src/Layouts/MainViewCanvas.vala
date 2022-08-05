@@ -35,7 +35,6 @@ public class Akira.Layouts.MainViewCanvas : Gtk.Grid {
     private double scroll_origin_x = 0;
     private double scroll_origin_y = 0;
 
-
     public MainViewCanvas (Akira.Window window) {
         Object (window: window, orientation: Gtk.Orientation.VERTICAL);
     }
@@ -96,20 +95,17 @@ public class Akira.Layouts.MainViewCanvas : Gtk.Grid {
     }
 
     public bool on_scroll (Gdk.EventScroll event) {
-        bool is_shift = (event.state & Gdk.ModifierType.SHIFT_MASK) > 0;
-        bool is_ctrl = (event.state & Gdk.ModifierType.CONTROL_MASK) > 0;
-
         double delta_x, delta_y;
         event.get_scroll_deltas (out delta_x, out delta_y);
 
-        if (is_ctrl) {
+        if (canvas.ctrl_is_pressed) {
             var norm_scale = canvas.scale / Lib.ViewCanvas.MAX_SCALE;
             delta_y *= 1 - (1 - norm_scale) * (1 - norm_scale);
             window.event_bus.adjust_zoom (-delta_y, false, Geometry.Point (event.x, event.y));
             return true;
         }
 
-        if (is_shift) {
+        if (canvas.shift_is_pressed) {
             main_scroll.hadjustment.value += delta_y * 10;
             return true;
         }

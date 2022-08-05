@@ -47,7 +47,7 @@ public class Akira.Lib.Modes.TransformMode : AbstractInteractionMode {
         public double press_y;
 
         // initial_selection_data
-        public Geometry.Quad area;
+        public Geometry.TransformedRectangle start_area;
 
         public Gee.HashMap<int, DragItemData> item_data_map;
 
@@ -89,7 +89,7 @@ public class Akira.Lib.Modes.TransformMode : AbstractInteractionMode {
 
         view_canvas.toggle_layer_visibility (ViewLayers.ViewLayer.NOBS_LAYER_ID, true);
         selection = view_canvas.selection_manager.selection;
-        initial_drag_state.area = selection.coordinates ();
+        initial_drag_state.start_area = selection.area ();
 
         foreach (var node in selection.nodes.values) {
             collect_geometries (node.node, ref initial_drag_state);
@@ -228,8 +228,10 @@ public class Akira.Lib.Modes.TransformMode : AbstractInteractionMode {
         double left = 0.0;
         double bottom = 0.0;
         double right = 0.0;
-        initial_drag_state.area.top_bottom (ref top, ref bottom);
-        initial_drag_state.area.left_right (ref left, ref right);
+
+        var start_quad = initial_drag_state.start_area.quad ();
+        start_quad.top_bottom (ref top, ref bottom);
+        start_quad.left_right (ref left, ref right);
 
         Utils.AffineTransform.add_grid_snap_delta (top, left, ref delta_x, ref delta_y);
 
@@ -356,13 +358,14 @@ public class Akira.Lib.Modes.TransformMode : AbstractInteractionMode {
         var blocker = new Lib.Managers.SelectionManager.ChangeSignalBlocker (view_canvas.selection_manager);
         (blocker);
 
-        double rot_center_x = initial_drag_state.area.center_x;
-        double rot_center_y = initial_drag_state.area.center_y;
+        var start_quad = initial_drag_state.start_area.quad ();
+        double rot_center_x = start_quad.center_x;
+        double rot_center_y = start_quad.center_y;
 
-        var itr = initial_drag_state.area.transformation;
+        var itr = start_quad.transformation;
         itr.invert ();
 
-        var local_area = initial_drag_state.area;
+        var local_area = start_quad;
         Utils.GeometryMath.transform_quad (itr, ref local_area);
 
         var adjusted_event_x = event_x - rot_center_x;
@@ -424,7 +427,7 @@ public class Akira.Lib.Modes.TransformMode : AbstractInteractionMode {
 
         var global_offset_x = local_offset_x;
         var global_offset_y = local_offset_y;
-        initial_drag_state.area.transformation.transform_distance (ref global_offset_x, ref global_offset_y);
+        initial_drag_state.start_area.matrix.transform_distance (ref global_offset_x, ref global_offset_y);
 
         var local_sx = new_area.bounding_box.width / local_area.bounding_box.width;
         var local_sy = new_area.bounding_box.height / local_area.bounding_box.height;
@@ -458,8 +461,9 @@ public class Akira.Lib.Modes.TransformMode : AbstractInteractionMode {
         var blocker = new Lib.Managers.SelectionManager.ChangeSignalBlocker (view_canvas.selection_manager);
         (blocker);
 
-        double original_center_x = initial_drag_state.area.center_x;
-        double original_center_y = initial_drag_state.area.center_y;
+        var start_quad = initial_drag_state.start_area.quad ();
+        double original_center_x = start_quad.center_x;
+        double original_center_y = start_quad.center_y;
 
         var radians = GLib.Math.atan2 (
             event_x - original_center_x,
@@ -473,7 +477,7 @@ public class Akira.Lib.Modes.TransformMode : AbstractInteractionMode {
             added_rotation = 15.0 * step_num;
         }
 
-        var rot = Utils.GeometryMath.matrix_rotation_component (initial_drag_state.area.transformation);
+        var rot = Utils.GeometryMath.matrix_rotation_component (initial_drag_state.start_area.matrix);
 
         foreach (var node in selection.nodes.values) {
             rotate_node (

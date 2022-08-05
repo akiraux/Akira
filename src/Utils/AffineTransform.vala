@@ -43,9 +43,11 @@ public class Akira.Utils.AffineTransform : Object {
         if ((item.components.center != null && item.components.size != null) || item.components.path != null) {
             var item_drag_data = initial_drag_state.item_data_map[node.id];
 
+            var start_quad = initial_drag_state.start_area.quad ();
+
             var strf = Cairo.Matrix (reference_sx, 0, 0, reference_sy, 0, 0);
-            double center_offset_x = item_drag_data.item_geometry.area.center_x - initial_drag_state.area.center_x;
-            double center_offset_y = item_drag_data.item_geometry.area.center_y - initial_drag_state.area.center_y;
+            double center_offset_x = item_drag_data.item_geometry.area.center_x - start_quad.center_x;
+            double center_offset_y = item_drag_data.item_geometry.area.center_y - start_quad.center_y;
 
             var new_transform = Utils.GeometryMath.multiply_matrices (
                 item_drag_data.item_geometry.transformation_matrix,
@@ -55,7 +57,7 @@ public class Akira.Utils.AffineTransform : Object {
             new_transform = Utils.GeometryMath.multiply_matrices (new_transform, strf);
             new_transform = Utils.GeometryMath.multiply_matrices (
                 new_transform,
-                initial_drag_state.area.transformation
+                initial_drag_state.start_area.matrix
             );
 
             var new_width = item_drag_data.item_geometry.source_width;
@@ -71,8 +73,8 @@ public class Akira.Utils.AffineTransform : Object {
             scale_transform.transform_distance (ref new_width, ref new_height);
 
             strf.transform_distance (ref center_offset_x, ref center_offset_y);
-            var d_x = initial_drag_state.area.center_x + global_offset_x + center_offset_x;
-            var d_y = initial_drag_state.area.center_y + global_offset_y + center_offset_y;
+            var d_x = start_quad.center_x + global_offset_x + center_offset_x;
+            var d_y = start_quad.center_y + global_offset_y + center_offset_y;
 
             item.components.center = new Lib.Components.Coordinates (d_x, d_y);
 

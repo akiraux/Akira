@@ -178,7 +178,9 @@ sources = files(
 
     'Geometry/Point.vala',
     'Geometry/Rectangle.vala',
+    'Geometry/TransformedRectangle.vala',
     'Geometry/Quad.vala',
+    'Geometry/PathSegment.vala'
 
 )
 

@@ -25,6 +25,8 @@ public class Akira.Lib.Components.CompiledGeometry : Copyable<CompiledGeometry> 
         public Size? source_size;
         public Transform? source_transform;
         public Cairo.Matrix _transformation_matrix;
+        // Bounding box in local coordinates.
+        public Geometry.Rectangle local_bb;
         // These rectangles are in global coordinates.
         public Geometry.Quad area;
         public Geometry.Quad drawable_area;
@@ -41,6 +43,7 @@ public class Akira.Lib.Components.CompiledGeometry : Copyable<CompiledGeometry> 
 
     public CompiledGeometryData _data;
 
+    public Geometry.Rectangle local_bb { get { return _data.local_bb; }}
     public Geometry.Quad area { get { return _data.area; }}
     public Geometry.Rectangle area_bb { get { return _data.area_bb; }}
     public Geometry.Rectangle drawable_bb { get { return _data.drawable_area.bounding_box; }}
@@ -124,6 +127,7 @@ public class Akira.Lib.Components.CompiledGeometry : Copyable<CompiledGeometry> 
 
         if (size_from_path) {
             if (components.path == null) {
+                _data.local_bb = Geometry.Rectangle ();
                 _data.area = Geometry.Quad ();
                 _data.area_bb = Geometry.Rectangle ();
                 return;
@@ -136,6 +140,7 @@ public class Akira.Lib.Components.CompiledGeometry : Copyable<CompiledGeometry> 
             border_overestimate = 4;
         } else {
             if (components.size == null) {
+                _data.local_bb = Geometry.Rectangle ();
                 _data.area = Geometry.Quad ();
                 _data.area_bb = Geometry.Rectangle ();
                 return;
@@ -148,6 +153,11 @@ public class Akira.Lib.Components.CompiledGeometry : Copyable<CompiledGeometry> 
 
         var center_x = _data.source_center.x;
         var center_y = _data.source_center.y;
+
+        var hw = width / 2.0;
+        var hh = height / 2.0;
+        _data.local_bb = Geometry.Rectangle.with_coordinates (-hw, -hh, hw, hh);
+
         _data.area = Geometry.Quad.from_components (center_x, center_y, width, height, _data._transformation_matrix);
 
         if (border_width > 0) {
@@ -199,7 +209,8 @@ public class Akira.Lib.Components.CompiledGeometry : Copyable<CompiledGeometry> 
         _data.area.br_x = right;
         _data.area.br_y = bottom;
 
-        _data.area_bb = _data.area.bounding_box;
+        _data.local_bb = _data.area.bounding_box;
+        _data.area_bb = _data.area_bb;
         _data._transformation_matrix.x0 = _data.area_bb.center_x;
         _data._transformation_matrix.y0 = _data.area_bb.center_y;
     }

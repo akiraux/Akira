@@ -42,7 +42,6 @@ public class Akira.Lib.Items.ModelTypePath : ModelType {
         new_item.components.border_radius = Lib.Components.Components.default_border_radius ();
         new_item.components.path = new Lib.Components.Path.from_single_point (
             Akira.Geometry.Point (center.x, center.y),
-            Lib.Modes.PathEditMode.Type.LINE,
             false
         );
         new_item.components.size = new Lib.Components.Size (1, 1, false);
@@ -96,7 +95,6 @@ public class Akira.Lib.Items.ModelTypePath : ModelType {
                 drawable.center_y = -instance.compiled_geometry.source_height / 2.0;
                 drawable.transform = instance.compiled_geometry.transformation_matrix;
                 drawable.points = instance.components.path.data;
-                drawable.commands = instance.components.path.commands;
                 drawable.close = instance.components.path.close;
                 break;
             default:

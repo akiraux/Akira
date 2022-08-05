@@ -75,6 +75,9 @@ public class Akira.Lib.Items.ModelTypeArtboard : ModelType {
             case Lib.Components.Component.Type.COMPILED_NAME:
                 instance.drawable.label = instance.compiled_name.name;
                 break;
+            case Lib.Components.Component.Type.COMPILED_BORDER:
+                // Artboards can't have borders, so don't do anything.
+                break;
         }
     }
 

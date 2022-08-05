@@ -26,6 +26,14 @@
 public class Akira.Layouts.Transforms.TransformPanel : Gtk.Grid {
     public unowned Lib.ViewCanvas view_canvas { get; construct; }
 
+    public Widgets.LinkedInput x_input;
+    public Widgets.LinkedInput y_input;
+
+    public Widgets.LinkedInput width_input;
+    public Widgets.LinkedInput height_input;
+
+    public Widgets.LinkedInput rotation_input;
+
     public TransformPanel (Lib.ViewCanvas canvas) {
         Object (view_canvas: canvas);
 
@@ -91,20 +99,37 @@ public class Akira.Layouts.Transforms.TransformPanel : Gtk.Grid {
         opacity_grid.attach (opacity_entry, 1, 0, 1);
 
         attach (group_title (_("Position")), 0, 0, 3);
-        attach (new Widgets.LinkedInput (view_canvas, _("X"), _("Horizontal position")), 0, 1, 1);
-        attach (new Widgets.LinkedInput (view_canvas, _("Y"), _("Vertical position")), 2, 1, 1);
+
+        x_input = new Widgets.LinkedInput (view_canvas, _("X"), _("Horizontal position"));
+        attach (x_input, 0, 1, 1);
+
+        y_input = new Widgets.LinkedInput (view_canvas, _("Y"), _("Vertical position"));
+        attach (y_input, 2, 1, 1);
+
         attach (separator (), 0, 2, 3);
+
         attach (group_title (_("Size")), 0, 3, 3);
-        attach (new Widgets.LinkedInput (view_canvas, _("W"), _("Width")), 0, 4, 1);
+        width_input = new Widgets.LinkedInput (view_canvas, _("W"), _("Width"));
+        attach (width_input, 0, 4, 1);
+
         attach (lock_button, 1, 4, 1);
-        attach (new Widgets.LinkedInput (view_canvas, _("H"), _("Height")), 2, 4, 1);
+
+        height_input = new Widgets.LinkedInput (view_canvas, _("H"), _("Height"));
+        attach (height_input, 2, 4, 1);
+
         attach (separator (), 0, 5, 3);
+
         attach (group_title (_("Transform")), 0, 6, 3);
-        attach (new Widgets.LinkedInput (view_canvas, _("R"), _("Rotation degrees"), Widgets.InputField.Unit.DEGREES), 0, 7, 1);
+
+        rotation_input = new Widgets.LinkedInput (view_canvas, _("R"), _("Rotation degrees"), Widgets.InputField.Unit.DEGREES);
+        attach (rotation_input, 0, 7, 1);
+
         attach (align_grid, 2, 7, 1);
         attach (separator (), 0, 8, 3);
         attach (group_title (_("Opacity")), 0, 9, 3);
         attach (opacity_grid, 0, 10, 3);
+
+        view_canvas.window.event_bus.selection_geometry_modified.connect (on_selection_geometry_modified);
     }
 
     private Gtk.Label group_title (string title) {
@@ -125,5 +150,27 @@ public class Akira.Layouts.Transforms.TransformPanel : Gtk.Grid {
         sep.get_style_context ().add_class ("panel-separator");
 
         return sep;
+    }
+
+    private void on_selection_geometry_modified () {
+        unowned var sm = view_canvas.selection_manager;
+        if (sm.selection == null || sm.selection.is_empty ()) {
+          x_input.input_field.entry.set_value (0);
+          y_input.input_field.entry.set_value (0);
+          width_input.input_field.entry.set_value (0);
+          height_input.input_field.entry.set_value (0);
+          rotation_input.input_field.entry.set_value (0);
+          return;
+        }
+
+        var quad = sm.selection.area (). quad ();
+
+        x_input.input_field.entry.set_value (quad.tl_x);
+        y_input.input_field.entry.set_value (quad.tl_y);
+        width_input.input_field.entry.set_value (quad.width);
+        height_input.input_field.entry.set_value (quad.height);
+
+        double rot = Utils.GeometryMath.matrix_rotation_component (quad.transformation) * 180 / Math.PI;
+        rotation_input.input_field.entry.set_value (rot);
     }
 }

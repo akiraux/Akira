@@ -306,7 +306,7 @@ public class Akira.Utils.GeometryMath : Object {
         return false;
     }
 
-    public static Geometry.Rectangle bounds_from_points (Geometry.Point[] points) {
+    public static Geometry.Rectangle bounds_from_points (Geometry.PathSegment[] points) {
         Geometry.Rectangle bounds = Geometry.Rectangle ();
         bounds.left = double.MAX;
         bounds.top = double.MAX;
@@ -314,12 +314,106 @@ public class Akira.Utils.GeometryMath : Object {
         bounds.bottom = double.MIN;
 
         foreach (var pt in points) {
-            bounds.left = double.min (bounds.left, pt.x);
-            bounds.right = double.max (bounds.right, pt.x);
-            bounds.top = double.min (bounds.top, pt.y);
-            bounds.bottom = double.max (bounds.bottom, pt.y);
+            // Create a list of all points we need to calculate bounds for.
+            Geometry.Point[] pts_in_segment = new Geometry.Point[0];
+
+            if (pt.type == Lib.Modes.PathEditMode.Type.LINE) {
+                pts_in_segment = new Geometry.Point[1];
+                pts_in_segment[0] = pt.line_end;
+            } else if (pt.type == Lib.Modes.PathEditMode.Type.QUADRATIC_LEFT) {
+                pts_in_segment = new Geometry.Point[2];
+                pts_in_segment[0] = pt.curve_begin;
+                pts_in_segment[1] = pt.tangent_1;
+            } else if (pt.type == Lib.Modes.PathEditMode.Type.QUADRATIC_RIGHT) {
+                pts_in_segment = new Geometry.Point[2];
+                pts_in_segment[0] = pt.curve_end;
+                pts_in_segment[1] = pt.tangent_2;
+            } else if (pt.type == Lib.Modes.PathEditMode.Type.CUBIC_SINGLE) {
+                pts_in_segment = new Geometry.Point[4];
+                pts_in_segment[0] = pt.curve_begin;
+                pts_in_segment[1] = pt.tangent_1;
+                pts_in_segment[2] = pt.tangent_2;
+                pts_in_segment[3] = pt.curve_end;
+            } else if (pt.type == Lib.Modes.PathEditMode.Type.CUBIC_DOUBLE) {
+                pts_in_segment = new Geometry.Point[4];
+                pts_in_segment[0] = pt.curve_begin;
+                pts_in_segment[1] = pt.tangent_1;
+                pts_in_segment[2] = pt.tangent_2;
+                pts_in_segment[3] = pt.curve_end;
+            }
+
+            // Update bounds for all these points.
+            foreach (var point in pts_in_segment) {
+                bounds.left = double.min (bounds.left, point.x);
+                bounds.right = double.max (bounds.right, point.x);
+                bounds.top = double.min (bounds.top, point.y);
+                bounds.bottom = double.max (bounds.bottom, point.y);
+            }
         }
 
         return bounds;
     }
+
+    public static Geometry.Rectangle calculate_bounds_for_curve (Geometry.PathSegment segment, Geometry.Point point_before) {
+        var p1 = segment.curve_begin;
+        var p2 = segment.tangent_1;
+        var p3 = segment.tangent_2;
+        var p4 = segment.curve_end;
+
+        double min_x = double.MAX, min_y = double.MAX, max_x = double.MIN, max_y = double.MIN;
+
+        if (
+            segment.type == Lib.Modes.PathEditMode.Type.CUBIC_SINGLE ||
+            segment.type == Lib.Modes.PathEditMode.Type.CUBIC_DOUBLE
+        ) {
+            double[] b1_extremes = Utils.Bezier.get_extremes (point_before, p2, p1);
+            double[] b2_extremes = Utils.Bezier.get_extremes (p1, p3, p4);
+
+            double temp = double.min (b1_extremes[0], b2_extremes[0]);
+            min_x = double.min (min_x, temp);
+
+            temp = double.min (b1_extremes[1], b2_extremes[1]);
+            min_y = double.min (min_y, temp);
+
+            temp = double.max (b1_extremes[2], b2_extremes[2]);
+            max_x = double.max (max_x, temp);
+
+            temp = double.max (b1_extremes[3], b2_extremes[3]);
+            max_y = double.max (max_y, temp);
+        } else if (segment.type == Lib.Modes.PathEditMode.Type.QUADRATIC_LEFT) {
+            double[] b_extremes = Utils.Bezier.get_extremes (point_before, p2, p1);
+
+            min_x = double.min (b_extremes[0], min_x);
+            min_y = double.min (b_extremes[1], min_y);
+            max_x = double.max (b_extremes[2], max_x);
+            max_y = double.max (b_extremes[3], max_y);
+        } else if (segment.type == Lib.Modes.PathEditMode.Type.QUADRATIC_RIGHT) {
+            double[] b_extremes = Utils.Bezier.get_extremes (point_before, p3, p4);
+
+            min_x = double.min (b_extremes[0], min_x);
+            min_y = double.min (b_extremes[1], min_y);
+            max_x = double.max (b_extremes[2], max_x);
+            max_y = double.max (b_extremes[3], max_y);
+        } else {
+            assert (false);
+        }
+
+        return Geometry.Rectangle.with_coordinates (min_x, min_y, max_x, max_y);
+    }
+    public static Geometry.Point transform_point_around_item_origin (
+        Geometry.Point point,
+        Cairo.Matrix mat,
+        bool invert = false
+    ) {
+        var matrix = Utils.GeometryMath.multiply_matrices (Cairo.Matrix.identity (), mat);
+
+        if (invert) {
+            matrix.invert ();
+        }
+
+        var new_point = Geometry.Point (point.x, point.y);
+        matrix.transform_point (ref new_point.x, ref new_point.y);
+        return new_point;
+    }
+
 }

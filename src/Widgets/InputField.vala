@@ -44,7 +44,16 @@ public class Akira.Widgets.InputField : Gtk.Grid {
 
         valign = Gtk.Align.CENTER;
 
-        entry = new Gtk.SpinButton.with_range (0, 100, step) {
+
+        Gtk.Adjustment adj = new Gtk.Adjustment (0, -double.MAX, double.MAX, 0.01, 0.1, 0.0);
+        double climb_rate = 0.01;
+        uint digits = 2;
+        if (unit == Unit.PERCENTAGE) {
+            digits = 0;
+            adj.configure (0, 0, 100, 1.0, 1.0, 0.0);
+        }
+
+        entry = new Gtk.SpinButton (adj, climb_rate, digits) {
             hexpand = true,
             width_chars = chars,
             sensitive = false
@@ -68,6 +77,9 @@ public class Akira.Widgets.InputField : Gtk.Grid {
                 break;
             case Unit.DEGREES:
                 icon = "input-degrees-symbolic";
+                break;
+            case Unit.NONE:
+                // No icon needs to be shown.
                 break;
         }
 
@@ -98,13 +110,13 @@ public class Akira.Widgets.InputField : Gtk.Grid {
 
     private bool handle_key_press (Gdk.EventKey event) {
         // Arrow UP.
-        if (event.keyval == Gdk.Key.Up && (event.state & Gdk.ModifierType.SHIFT_MASK) > 0) {
+        if (event.keyval == Gdk.Key.Up && view_canvas.shift_is_pressed) {
             entry.spin (Gtk.SpinType.STEP_FORWARD, 10);
             return true;
         }
 
         // Arrow DOWN.
-        if (event.keyval == Gdk.Key.Down && (event.state & Gdk.ModifierType.SHIFT_MASK) > 0) {
+        if (event.keyval == Gdk.Key.Down && view_canvas.shift_is_pressed) {
             entry.spin (Gtk.SpinType.STEP_BACKWARD, 10);
             return true;
         }

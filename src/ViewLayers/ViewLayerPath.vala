@@ -82,6 +82,8 @@ public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
         canvas.request_redraw (old_live_extents);
         canvas.request_redraw (path_data.live_extents);
 
+        //  print("LIve extents are %f %f %f %f\n", path_data.live_extents.top, path_data.live_extents.left, path_data.live_extents.bottom, path_data.live_extents.right);
+
         old_live_extents = path_data.live_extents;
         old_extents = path_data.extents;
     }
@@ -96,7 +98,6 @@ public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
         context.save ();
 
         // Apply transform matrix of drawable so we don't have to rotate or scale.
-        //var tr = Utils.GeometryMath.multiply_matrices (path_data.transform, context.get_matrix ());
         var tr = path_data.transform;
         // For all path points, the origin is in top left corner. Move there.
         tr.translate (path_data.center.x, path_data.center.y);
@@ -105,52 +106,77 @@ public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
         context.set_source_rgba (0.1568, 0.4745, 0.9823, 1);
         context.set_line_width (1.0 / canvas.scale);
 
-        int point_idx = 0;
         var points = path_data.points;
-        var commands = path_data.commands;
 
         // Draw circles for all points.
-        for (int i = 0; i < commands.length; ++i) {
-            var pt = points[point_idx];
-            tr.transform_point (ref pt.x, ref pt.y);
+        for (int i = 0; i < points.length; ++i) {
+            var curve_begin = points[i].curve_begin;
+            var tangent_1 = points[i].tangent_1;
+            var tangent_2 = points[i].tangent_2;
+            var curve_end = points[i].curve_end;
 
-            if (commands[i] == Lib.Modes.PathEditMode.Type.LINE) {
-                context.arc (pt.x, pt.y, radius, 0, Math.PI * 2);
+            tr.transform_point (ref curve_begin.x, ref curve_begin.y);
+            tr.transform_point (ref tangent_1.x, ref tangent_1.y);
+            tr.transform_point (ref tangent_2.x, ref tangent_2.y);
+            tr.transform_point (ref curve_end.x, ref curve_end.y);
+
+            if (points[i].type == Lib.Modes.PathEditMode.Type.LINE) {
+                draw_control_point (context, curve_begin, radius);
+                context.fill ();
+            } else if (points[i].type == Lib.Modes.PathEditMode.Type.QUADRATIC_LEFT) {
+                // Draw control point for curve begin and tangent.
+                draw_control_point (context, curve_begin, radius);
+                draw_control_point (context, tangent_1, radius);
                 context.fill ();
 
-                ++point_idx;
-            } else {
-                for (int j = 0; j < 4; ++j) {
-                    var pti = points[j + point_idx];
-                    tr.transform_point (ref pti.x, ref pti.y);
-
-                    context.arc (pti.x, pti.y, radius, 0, Math.PI * 2);
-                    context.fill ();
-                }
-
-                var pt1 = points[point_idx + 1];
-                var pt2 = points[point_idx + 2];
-                tr.transform_point (ref pt1.x, ref pt1.y);
-                tr.transform_point (ref pt2.x, ref pt2.y);
-                context.move_to (pt.x, pt.y);
-                context.line_to (pt1.x, pt1.y);
-
-                context.move_to (pt.x, pt.y);
-                context.line_to (pt2.x, pt2.y);
+                draw_line (context, curve_begin, tangent_1);
 
                 context.stroke ();
+            } else if (points[i].type == Lib.Modes.PathEditMode.Type.QUADRATIC_RIGHT) {
+                var pb = points[i - 1].last_point;
+                tr.transform_point (ref pb.x, ref pb.y);
 
-                point_idx += 4;
+                // Draw control point for curve begin and tangent.
+                draw_control_point (context, curve_end, radius);
+                draw_control_point (context, tangent_2, radius);
+                context.fill ();
+                draw_control_point (context, pb, radius);
+                context.fill ();
+
+                draw_line (context, pb, tangent_2);
+
+                context.stroke ();
+            } else if (
+                points[i].type == Lib.Modes.PathEditMode.Type.CUBIC_SINGLE ||
+                points[i].type == Lib.Modes.PathEditMode.Type.CUBIC_DOUBLE
+            ) {
+                // Draw control points.
+                draw_control_point (context, curve_begin, radius);
+                draw_control_point (context, tangent_1, radius);
+                context.fill ();
+                draw_control_point (context, tangent_2, radius);
+                draw_control_point (context, curve_end, radius);
+                context.fill ();
+
+                draw_line (context, tangent_1, curve_begin);
+
+                if (points[i].type == Lib.Modes.PathEditMode.Type.CUBIC_SINGLE) {
+                    draw_line (context, curve_end, tangent_2);
+                } else {
+                    draw_line (context, curve_begin, tangent_2);
+                }
+
+                context.stroke ();
             }
         }
 
-        foreach (var idx in path_data.selected_pts) {
+        foreach (var sel_pnt in path_data.selected_pts) {
             context.set_source_rgba (0.7, 0, 0, 1);
 
-            var pt = points[idx];
-            tr.transform_point (ref pt.x, ref pt.y);
-            context.arc (pt.x, pt.y, radius, 0, Math.PI * 2);
-            context.fill ();
+            var segment = points[sel_pnt.sel_index];
+            var pt = segment.get_by_type (sel_pnt.sel_type);
+
+            draw_control_point (context, pt, radius);
         }
 
         context.new_path ();
@@ -158,97 +184,129 @@ public class Akira.ViewLayers.ViewLayerPath : ViewLayer {
     }
 
     private void draw_live_effect (Cairo.Context context) {
-        double radius = UI_NOB_SIZE / canvas.scale;
-
         context.save ();
 
         context.new_path ();
         context.set_source_rgba (0, 0, 0, 1);
         context.set_line_width (1.0 / canvas.scale);
 
-        var live_pts = path_data.live_pts;
-        var last_point = path_data.last_point;
+        var live_segment = path_data.live_segment;
+        var live_point_type = path_data.live_point_type;
 
-        context.move_to (last_point.x, last_point.y);
+        context.move_to (path_data.last_point.x, path_data.last_point.y);
 
-        switch (path_data.length) {
-            case 0:
-                break;
-            case 1:
-                context.line_to (live_pts[0].x, live_pts[0].y);
-                break;
-            case 2:
-                break;
-            case 3:
-                var x0 = last_point.x;
-                var y0 = last_point.y;
-                var x1 = live_pts[0].x;
-                var y1 = live_pts[0].y;
-                var x2 = live_pts[1].x;
-                var y2 = live_pts[1].y;
-                var x3 = live_pts[2].x;
-                var y3 = live_pts[2].y;
+        draw_segment (context, live_segment, path_data.last_point, live_point_type);
 
-                // Draw the actual live curve.
-                context.curve_to (x0, y0, x2, y2, x1, y1);
-                context.stroke ();
+        context.new_path ();
+        context.restore ();
+    }
 
-                // Draw the first haldf of tangent for curve.
-                context.line_to (x2, y2);
-                context.line_to (x3, y3);
-                context.stroke ();
+    private void draw_segment (Cairo.Context context, Geometry.PathSegment segment, Geometry.Point point_before, Lib.Modes.PathEditMode.PointType upto) {
+        double radius = UI_NOB_SIZE / canvas.scale;
 
-                // Draw circles for all concerned points.
-                context.arc (x0, y0, radius, 0, Math.PI * 2);
-                context.fill ();
-                context.arc (x1, y1, radius, 0, Math.PI * 2);
-                context.fill ();
-                context.arc (x2, y2, radius, 0, Math.PI * 2);
-                context.fill ();
-                context.arc (x3, y3, radius, 0, Math.PI * 2);
-                context.fill ();
+        // First draw the curve.
+        if (segment.type == Lib.Modes.PathEditMode.Type.LINE) {
+            // Line only contains 1 point so no need to check 'upto'.
+            context.line_to (segment.line_end.x, segment.line_end.y);
+        } else if (segment.type == Lib.Modes.PathEditMode.Type.QUADRATIC_LEFT) {
+            // Quadratic will always have all 3 points, otherwise it just becomes a line.
+            context.curve_to (
+                point_before.x,
+                point_before.y,
+                segment.tangent_1.x,
+                segment.tangent_1.y,
+                segment.curve_begin.x,
+                segment.curve_begin.y
+            );
+        } else if (segment.type == Lib.Modes.PathEditMode.Type.QUADRATIC_RIGHT) {
+            context.move_to (point_before.x, point_before.y);
+            context.curve_to (
+                segment.tangent_2.x,
+                segment.tangent_2.y,
+                segment.curve_end.x,
+                segment.curve_end.y,
+                segment.curve_end.x,
+                segment.curve_end.y
+            );
+        } else if (segment.type == Lib.Modes.PathEditMode.Type.CUBIC_SINGLE) {
+            context.move_to (segment.curve_begin.x, segment.curve_begin.y);
+            context.curve_to (
+                segment.tangent_1.x,
+                segment.tangent_1.y,
+                segment.tangent_2.x,
+                segment.tangent_2.y,
+                segment.curve_end.x,
+                segment.curve_end.y
+            );
+        } else if (segment.type == Lib.Modes.PathEditMode.Type.CUBIC_DOUBLE) {
+            context.curve_to (
+                path_data.last_point.x,
+                path_data.last_point.y,
+                segment.tangent_1.x,
+                segment.tangent_1.y,
+                segment.curve_begin.x,
+                segment.curve_begin.y
+            );
 
-                break;
-            case 4:
-                var x0 = last_point.x;
-                var y0 = last_point.y;
-                var x1 = live_pts[0].x;
-                var y1 = live_pts[0].y;
-                var x2 = live_pts[1].x;
-                var y2 = live_pts[1].y;
-                var x3 = live_pts[2].x;
-                var y3 = live_pts[2].y;
-                var x4 = live_pts[3].x;
-                var y4 = live_pts[3].y;
+            if (upto == Lib.Modes.PathEditMode.PointType.CURVE_END) {
+                context.curve_to (
+                    segment.curve_begin.x,
+                    segment.curve_begin.y,
+                    segment.tangent_2.x,
+                    segment.tangent_2.y,
+                    segment.curve_end.x,
+                    segment.curve_end.y
+                );
+            }
+        }
 
-                // Draw the actual curves.
-                context.curve_to (x0, y0, x2, y2, x1, y1);
-                context.stroke ();
-                context.curve_to (x1, y1, x3, y3, x4, y4);
-                context.stroke ();
+        // Now draw all the control points.
+        if (segment.type == Lib.Modes.PathEditMode.Type.LINE) {
+            context.stroke ();
+        } else if (segment.type == Lib.Modes.PathEditMode.Type.QUADRATIC_LEFT) {
+            draw_line (context, point_before, segment.tangent_1);
+            context.stroke ();
 
-                // Draw line for the tangent of the curve.
-                context.move_to (x2, y2);
-                context.line_to (x3, y3);
-                context.stroke ();
+            draw_control_point (context, point_before, radius);
+            draw_control_point (context, segment.tangent_1, radius);
+            context.fill ();
+        } else if (segment.type == Lib.Modes.PathEditMode.Type.QUADRATIC_RIGHT) {
+            draw_line (context, point_before, segment.tangent_2);
+            context.stroke ();
 
-                // Draw circles for all points in the live curve.
-                context.arc (x0, y0, radius, 0, Math.PI * 2);
-                context.fill ();
-                context.arc (x1, y1, radius, 0, Math.PI * 2);
-                context.fill ();
-                context.arc (x2, y2, radius, 0, Math.PI * 2);
-                context.fill ();
-                context.arc (x3, y3, radius, 0, Math.PI * 2);
-                context.fill ();
-                break;
+            draw_control_point (context, point_before, radius);
+            draw_control_point (context, segment.tangent_2, radius);
+            context.fill ();
+        } else if (segment.type == Lib.Modes.PathEditMode.Type.CUBIC_SINGLE) {
+            draw_line (context, segment.tangent_1, segment.curve_begin);
+            draw_line (context, segment.tangent_2, segment.curve_end);
+            context.stroke ();
 
-            default:
-                break;
+            draw_control_point (context, segment.curve_begin, radius);
+            context.fill ();
+            draw_control_point (context, segment.tangent_1, radius);
+            draw_control_point (context, segment.tangent_2, radius);
+            context.fill ();
+        } else if (segment.type == Lib.Modes.PathEditMode.Type.CUBIC_DOUBLE) {
+            draw_line (context, segment.tangent_1, segment.curve_begin);
+            draw_line (context, segment.tangent_2, segment.curve_begin);
+            context.stroke ();
+
+            draw_control_point (context, segment.curve_begin, radius);
+            draw_control_point (context, segment.tangent_1, radius);
+            draw_control_point (context, segment.tangent_2, radius);
+            context.fill ();
         }
 
         context.stroke ();
-        context.new_path ();
-        context.restore ();
+    }
+
+    private void draw_line (Cairo.Context context, Geometry.Point start, Geometry.Point end) {
+        context.move_to (start.x, start.y);
+        context.line_to (end.x, end.y);
+    }
+
+    private void draw_control_point (Cairo.Context context, Geometry.Point point, double radius) {
+        context.arc (point.x, point.y, radius, 0, Math.PI * 2);
     }
 }

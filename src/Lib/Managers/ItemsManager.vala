@@ -47,6 +47,7 @@ public class Akira.Lib.Managers.ItemsManager : Object, Items.ModelListener {
 
     public signal void item_added (int id);
     public signal void items_removed (GLib.Array<int> ids);
+    public signal void item_transferred (int id);
 
     public void on_item_added (int id) {
         item_added (id);
@@ -58,6 +59,10 @@ public class Akira.Lib.Managers.ItemsManager : Object, Items.ModelListener {
 
     public void on_items_deleted (GLib.Array<int> ids) {
         items_removed (ids);
+    }
+
+    public void on_item_transferred (int id) {
+        item_transferred (id);
     }
 
     public Lib.Items.ModelInstance? instance_from_id (int id) {
@@ -350,14 +355,22 @@ public class Akira.Lib.Managers.ItemsManager : Object, Items.ModelListener {
 
             if (node_type == "artboard" && node.children != null) {
                 foreach (unowned var child_node in node.children.data) {
-                    if (bound.contains_bound (child_node.instance.bounding_box)) {
+                    // Only add items that are not currently selected.
+                    if (
+                        !view_canvas.selection_manager.item_selected (child_node.id) &&
+                        bound.contains_bound (child_node.instance.bounding_box)
+                    ) {
                         found_items.add (child_node);
                     }
                 }
                 continue;
             }
 
-            if (bound.contains_bound (node.instance.bounding_box)) {
+            // Only add items that are not currently selected.
+            if (
+                !view_canvas.selection_manager.item_selected (node.id) &&
+                bound.contains_bound (node.instance.bounding_box)
+            ) {
                 found_items.add (node);
             }
         }
@@ -486,7 +499,6 @@ public class Akira.Lib.Managers.ItemsManager : Object, Items.ModelListener {
             new Lib.Components.Coordinates (520, 520),
             new Lib.Components.Size (1000, 1000, false)
         );
-        //var group = Lib.Items.ModelTypeGroup.default_group ();
         add_item_to_origin (group);
 
         var num_of = 1000;
@@ -554,6 +566,62 @@ public class Akira.Lib.Managers.ItemsManager : Object, Items.ModelListener {
             seconds = timer.elapsed (out microseconds);
             print ("Created %u items in %s s\n", num_of, seconds.to_string ());
         }
+    }
+
+    public void create_group_from_selection () {
+        // Don't create a group if we don't have any node selected.
+        unowned var selection = view_canvas.selection_manager.selection;
+        if (selection.count () == 0) {
+            return;
+        }
+        view_canvas.window.event_bus.create_model_snapshot ("create group from selection");
+
+        var blocker = new SelectionManager.ChangeSignalBlocker (view_canvas.selection_manager);
+        (blocker);
+        view_canvas.pause_redraw = true;
+
+        // Collect all currently selected nodes, sorted by their position.
+        var sorted_candidates = view_canvas.copy_manager.collect_sorted_candidates ();
+
+        // Clear the current selection so we don't stumble upon weird states.
+        view_canvas.selection_manager.reset_selection ();
+
+        // Create a new empty group and add it to the main canvas.
+        var group = Lib.Items.ModelTypeGroup.default_group ();
+        add_item_to_origin (group);
+
+        // Loop through all sorted nodes, clone their ModelInstance and add it
+        // to the newly created group.
+        // TODO: All of this should be done in the Model::transfer() method.
+        foreach (var node_id in sorted_candidates.values) {
+            var node = item_model.node_from_id (node_id);
+            var cloned_instance = node.instance.clone (false);
+            var new_id = add_item_to_group (group.id, cloned_instance, true);
+            // TODO: We should find a smarter way to maintain the name of a
+            // transferred element, right now simply update the name to keep
+            // the old one.
+            cloned_instance.components.name = new Lib.Components.Name (
+                node.instance.components.name.name,
+                new_id.to_string ()
+            );
+        }
+
+        // Loop again through the old nodes and delete them only after the new
+        // nodes are created and set in place. We do this in a separate loop to
+        // avoid segfault of nodes getting deleted while the transfer is still
+        // in process.
+        foreach (var node_id in sorted_candidates.values) {
+            item_model.remove (node_id, true);
+        }
+
+        compile_model ();
+        view_canvas.pause_redraw = false;
+        view_canvas.request_redraw (view_canvas.get_bounds ());
+
+        // Regenerate the layers list.
+        view_canvas.window.main_window.regenerate_list ();
+        // Select the newly created group.
+        view_canvas.selection_manager.add_to_selection (group.id);
     }
 
     public void selection_align (Utils.ItemAlignment.AlignmentDirection direction) {
