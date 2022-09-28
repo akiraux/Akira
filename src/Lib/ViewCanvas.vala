@@ -365,6 +365,13 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
                     // Remove the item fom the current selection if SHIFT is pressed.
                     selection_manager.remove_from_selection (target.id);
                     selection_manager.selection_modified_external (true);
+                } else if (ctrl_is_pressed) {
+                    // If we already have a selection but CTRL is pressed, we should
+                    // reset the selection and allow selecting the targeted element.
+                    // AKA, we ignore a group selection.
+                    selection_manager.reset_selection ();
+                    selection_manager.add_to_selection (target.id);
+                    selection_manager.selection_modified_external (true);
                 }
             } else if (
                 !selection_manager.selection.area ().contains (event.x, event.y) &&
