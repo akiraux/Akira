@@ -1,25 +1,13 @@
-.artboard {
+row.artboard {
     transition: box-shadow 160ms ease, background-color 160ms ease;
     background-color: shade (@bg_color, 1);
 }
 
-.artboard entry {
-    background-color: @base_color;
-}
-
-.artboard label {
+row.artboard label {
     font-weight: bold;
     padding: 8px 0;
 }
 
-.artboard:hover:not(:selected) {
-    box-shadow: inset 0 0 0 2px @accent_color;
-}
-
-.artboard:hover .actions {
+row.artboard:hover .actions {
   opacity: 1;
-}
-
-.artboard:selected {
-    background-color: alpha (@accent_color, 0.4);
 }

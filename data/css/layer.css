@@ -1,21 +1,21 @@
-.layer {
+row {
     transition: box-shadow 160ms ease, background-color 160ms ease;
 }
 
-.layer,
-.layer entry {
+row,
+row entry {
     background-color: @base_color;
 }
 
-.layer label {
+row label {
     padding: 8px 0;
 }
 
-.layer:selected {
+row:selected {
     background-color: alpha (@accent_color, 0.4);
 }
 
-.layer:hover:not(:selected) {
+row:hover:not(:selected) {
     box-shadow: inset 0 0 0 2px @accent_color;
 }
 
