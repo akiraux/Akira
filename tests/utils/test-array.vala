@@ -23,10 +23,10 @@ using Akira.Utils;
 
 public class Akira.ArrayTests : Akira.TestSuite {
     public ArrayTests () {
-        this.add_test("iarray_insert", this.iarray_insert);
-        this.add_test("iarray_append", this.iarray_append);
-        this.add_test("iarray_remove", this.iarray_remove);
-        this.add_test("iarray_rotate", this.iarray_rotate);
+        this.add_test ("iarray_insert", this.iarray_insert);
+        this.add_test ("iarray_append", this.iarray_append);
+        this.add_test ("iarray_remove", this.iarray_remove);
+        this.add_test ("iarray_rotate", this.iarray_rotate);
     }
 
     public override void setup () {}
@@ -34,11 +34,11 @@ public class Akira.ArrayTests : Akira.TestSuite {
     public override void teardown () {}
 
     public void print_iarray (int[] a) {
-        print("array: ");
+        print ("array: ");
         foreach (var v in a) {
             print ("%i ", v);
         }
-        print("\n");
+        print ("\n");
     }
 
     public bool compare_iarrays (int[] a, int[] b) {
@@ -59,17 +59,17 @@ public class Akira.ArrayTests : Akira.TestSuite {
         var test_case = new int[] {1, 2, 3, 4};
 
         // Asserts? not sure how to handle these
-        // assert(Utils.Array.insert_at_iarray (ref test_case, -1, 5) == false);
-        // assert(Utils.Array.insert_at_iarray (ref test_case, 4, 5) == false);
+        // assert (Utils.Array.insert_at_iarray (ref test_case, -1, 5) == false);
+        // assert (Utils.Array.insert_at_iarray (ref test_case, 4, 5) == false);
         // compare_iarrays (test_case, {1, 2, 3, 4});
 
-        assert(Utils.Array.insert_at_iarray (ref test_case, 0, 5) == true);
+        assert (Utils.Array.insert_at_iarray (ref test_case, 0, 5) == true);
         compare_iarrays (test_case, {5, 1, 2, 3, 4});
 
-        assert(Utils.Array.insert_at_iarray (ref test_case, 2, 5) == true);
+        assert (Utils.Array.insert_at_iarray (ref test_case, 2, 5) == true);
         compare_iarrays (test_case, {5, 1, 5, 2, 3, 4});
 
-        assert(Utils.Array.insert_at_iarray (ref test_case, 5, 5) == true);
+        assert (Utils.Array.insert_at_iarray (ref test_case, 5, 5) == true);
         compare_iarrays (test_case, {5, 1, 5, 2, 3, 5, 4});
     }
 
@@ -78,30 +78,30 @@ public class Akira.ArrayTests : Akira.TestSuite {
 
         compare_iarrays (test_case, {});
 
-        assert(Utils.Array.append_to_iarray (ref test_case, 5) == true);
+        assert (Utils.Array.append_to_iarray (ref test_case, 5) == true);
         compare_iarrays (test_case, {5});
 
-        assert(Utils.Array.append_to_iarray (ref test_case, 7) == true);
+        assert (Utils.Array.append_to_iarray (ref test_case, 7) == true);
         compare_iarrays (test_case, {5, 7});
     }
 
     public void iarray_remove () {
         var test_case = new int[] {1, 2, 3, 4, 5};
 
-        assert(Utils.Array.remove_from_iarray (ref test_case, 0, 1) == true);
+        assert (Utils.Array.remove_from_iarray (ref test_case, 0, 1) == true);
         compare_iarrays (test_case, {2, 3, 4, 5});
 
-        assert(Utils.Array.remove_from_iarray (ref test_case, 2, 1) == true);
+        assert (Utils.Array.remove_from_iarray (ref test_case, 2, 1) == true);
         compare_iarrays (test_case, {2, 3, 5});
 
-        assert(Utils.Array.remove_from_iarray (ref test_case, 2, 1) == true);
+        assert (Utils.Array.remove_from_iarray (ref test_case, 2, 1) == true);
         compare_iarrays (test_case, {2, 3});
 
-        assert(Utils.Array.remove_from_iarray (ref test_case, 0, 2) == true);
+        assert (Utils.Array.remove_from_iarray (ref test_case, 0, 2) == true);
         compare_iarrays (test_case, {2, 3});
 
         test_case = new int[] {1, 2, 3, 4, 5};
-        assert(Utils.Array.remove_from_iarray (ref test_case, 0, 5) == true);
+        assert (Utils.Array.remove_from_iarray (ref test_case, 0, 5) == true);
         compare_iarrays (test_case, {});
     }
 
@@ -109,27 +109,26 @@ public class Akira.ArrayTests : Akira.TestSuite {
         var test_case = new int[] {1, 2, 3, 4, 5};
 
         // test no-ops
-        assert(Utils.Array.rotate_iarray (ref test_case, 0, 0, 2) == true);
-        assert(Utils.Array.rotate_iarray (ref test_case, 3, 3, 5) == true);
-        assert(Utils.Array.rotate_iarray (ref test_case, 0, 3, 3) == true);
-        assert(Utils.Array.rotate_iarray (ref test_case, 0, 5, 5) == true);
+        assert (Utils.Array.rotate_iarray (ref test_case, 0, 0, 2) == true);
+        assert (Utils.Array.rotate_iarray (ref test_case, 3, 3, 5) == true);
+        assert (Utils.Array.rotate_iarray (ref test_case, 0, 3, 3) == true);
+        assert (Utils.Array.rotate_iarray (ref test_case, 0, 5, 5) == true);
 
         compare_iarrays (test_case, {1, 2, 3, 4, 5});
 
-        assert(Utils.Array.rotate_iarray (ref test_case, 0, 1, 2) == true);
+        assert (Utils.Array.rotate_iarray (ref test_case, 0, 1, 2) == true);
         compare_iarrays (test_case, {3, 1, 2, 4, 5});
 
-        assert(Utils.Array.rotate_iarray (ref test_case, 0, 1, 2) == true);
+        assert (Utils.Array.rotate_iarray (ref test_case, 0, 1, 2) == true);
         compare_iarrays (test_case, {2, 3, 1, 4, 5});
 
         test_case = new int[] {1, 2, 3, 4, 5};
-        assert(Utils.Array.rotate_iarray (ref test_case, 1, 4, 5) == true);
+        assert (Utils.Array.rotate_iarray (ref test_case, 1, 4, 5) == true);
         compare_iarrays (test_case, {1, 5, 2, 3, 4});
 
         test_case = new int[] {1, 2, 3, 4, 5};
-        assert(Utils.Array.rotate_iarray (ref test_case, 0, 1, 5) == true);
+        assert (Utils.Array.rotate_iarray (ref test_case, 0, 1, 5) == true);
         compare_iarrays (test_case, {2, 3, 4, 5, 1});
     }
 
 }
-
