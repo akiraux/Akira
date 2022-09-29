@@ -27,6 +27,19 @@ canvas_tests = executable (
 
 test ('canvas_tests', canvas_tests, env: test_env)
 
+# Utils Tests ---------------------------------------- #
+utils_tests = executable (
+    'utils_tests',
+    'tests-model.vala',
+
+    'utils/test-array.vala',
+    'utils/test-main.vala',
+    c_args: test_cflags,
+    dependencies: [akira_dep]
+)
+
+test ('utils_tests', utils_tests, env: test_env)
+
 # Settings Tests ---------------------------------------- #
 
 # File Format Tests ---------------------------------------- #
