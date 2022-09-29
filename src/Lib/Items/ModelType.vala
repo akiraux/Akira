@@ -86,4 +86,5 @@ public class Akira.Lib.Items.DummyItemType : ModelType {
 
 public class Akira.Lib.Items.DummyGroupType : ModelType {
     public override string name_id { get { return "dummy_group"; } }
+    public override bool is_group () { return true; }
 }

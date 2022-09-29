@@ -32,6 +32,10 @@ public class Akira.Utils.Array : Object {
             return false;
         }
 
+        if (pos == a.length) {
+            return append_to_iarray (ref a, value);
+        }
+
         a.resize (a.length + 1);
         a.move (pos, pos + 1, a.length - pos - 1);
         a[pos] = value;
@@ -84,16 +88,21 @@ public class Akira.Utils.Array : Object {
 
     /*
      * Rotates an int array.
+
+     * Ranges first->middle and middle->end must be valid index ranges within a
+     * middle will become the first int in the span.
      */
-    public static void rotate_iarray (ref int[] arr, int first, int middle, int end) {
+    public static bool rotate_iarray (ref int[] arr, int first, int middle, int end) {
         if (first < 0 || end > arr.length) {
             assert (first >= 0);
             assert (end < arr.length);
-            return;
+            return false;
         }
 
-        assert (middle >= first);
-        assert (end >= middle);
+        if (first == middle || middle == end) {
+            // no-op
+            return true;
+        }
 
         var next = middle;
 
@@ -105,6 +114,7 @@ public class Akira.Utils.Array : Object {
                 middle = next;
             }
         }
+        return true;
     }
 
     /*
