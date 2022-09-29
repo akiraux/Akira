@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Akira. If not, see <https://www.gnu.org/licenses/>.
  *
- * Authored by: Martin "mbfraga" Fraga <mbfraga@gmail.com>
+ * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
  */
 
 /*
