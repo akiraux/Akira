@@ -49,7 +49,7 @@ public class Akira.Utils.Array : Object {
 
         int start_length = a.length;
 
-        a.resize (other.length);
+        a.resize (start_length + other.length);
         a.move (pos, pos + other.length, start_length - pos);
 
         for (var i = 0; i < other.length; ++i) {
