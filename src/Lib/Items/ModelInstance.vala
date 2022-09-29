@@ -86,7 +86,7 @@ public class Akira.Lib.Items.ModelInstance {
         this.id = uid;
     }
 
-    public ModelInstance clone (bool full) {
+    public ModelInstance clone (bool full = false) {
         var cln = new ModelInstance (full ? id : -1, type);
         cln.components = components;
 
@@ -101,6 +101,21 @@ public class Akira.Lib.Items.ModelInstance {
 
         return cln;
     }
+
+    /*
+     * Creates a dummy item -- useful for unit testing
+     */
+    public static ModelInstance dummy_item () {
+      return new ModelInstance (-1, new DummyItemType ());
+    }
+
+    /*
+     * Creates a dummy group -- useful for unit testing
+     */
+    public static ModelInstance dummy_group () {
+      return new ModelInstance (-1, new DummyGroupType ());
+    }
+
 
     /*
      * Compiles the component for this item. If a corresponding node is passed, that node
