@@ -86,6 +86,10 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
     private double initial_event_x;
     private double initial_event_y;
 
+    // Keep track of a double clicked child item inside a group if we need to
+    // enfoce the selection of a specific target.
+    private int? enforced_target = null;
+
     public ViewCanvas (Akira.Window window) {
         Object (
             window: window,
@@ -398,6 +402,7 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
     }
 
     private void handle_double_click_event (Gdk.EventButton event) {
+        enforced_target = null;
         Lib.Items.ModelNode? target = null;
         var nob_clicked = nob_manager.hit_test (event.x, event.y);
 
@@ -427,10 +432,35 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
                 path_edit_mode.toggle_functionality (false);
                 mode_manager.register_mode (path_edit_mode);
             }
+            return;
+        }
+
+        // If the double click happened on an item that is already selected and
+        // all otehr previous conditions are false, check if this item is part
+        // of a group and enforce its selection, meaning the user wants to access
+        // the group's child nodes.
+        if (selection_manager.item_selected (target.id)) {
+            var old_target = target;
+            target = Utils.ModelUtil.recursive_get_parent_target (target);
+
+            if (target.instance.is_group) {
+                enforced_target = old_target.id;
+            }
         }
     }
 
     public override bool button_release_event (Gdk.EventButton event) {
+        // Enforce the selection of a specific target if it was registered
+        // during the double click event on a group.
+        if (enforced_target != null) {
+            selection_manager.reset_selection ();
+            selection_manager.add_to_selection (enforced_target);
+            enforced_target = null;
+            if (mode_manager.button_release_event (event)) {
+                return true;
+            }
+        }
+
         event.x = event.x / current_scale;
         event.y = event.y / current_scale;
 
