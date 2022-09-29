@@ -129,6 +129,22 @@ public class Akira.Lib.Managers.SelectionManager : Object {
         return false;
     }
 
+    public void ensure_correct_target (ref Items.ModelNode target) {
+        if (
+            (!item_selected (target.id) && !view_canvas.ctrl_is_pressed)
+        ) {
+            var old_target = target;
+            target = Utils.ModelUtil.recursive_get_parent_target (target);
+
+            if (
+                !is_empty () && item_is_sibling (old_target.id)
+            ) {
+                target = old_target;
+            }
+            old_target = null;
+        }
+    }
+
     /*
      * Called whenever the selection is changed, including adding and removing
      * items, and modifying the selection's geometry.

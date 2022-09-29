@@ -342,19 +342,7 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
             );
 
             if (target != null) {
-                if (
-                    (!selection_manager.item_selected (target.id) && !ctrl_is_pressed)
-                ) {
-                    var old_target = target;
-                    target = Utils.ModelUtil.recursive_get_parent_target (target);
-
-                    if (
-                        !selection_manager.is_empty () && selection_manager.item_is_sibling (old_target.id)
-                    ) {
-                        target = old_target;
-                    }
-                    old_target = null;
-                }
+                selection_manager.ensure_correct_target (ref target);
 
                 // Check if the clicked item is not already selected.
                 if (!selection_manager.item_selected (target.id)) {

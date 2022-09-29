@@ -82,4 +82,5 @@ public class Akira.Lib.Items.ModelTypeArtboard : ModelType {
     }
 
     public override bool is_group () { return true; }
+    public override bool is_artboard () { return true; }
 }

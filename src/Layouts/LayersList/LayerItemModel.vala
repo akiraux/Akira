@@ -118,7 +118,7 @@ public class Akira.Layouts.LayersList.LayerItemModel : GLib.Object {
      */
     public bool is_artboard {
         get {
-            return _cached_instance.type is Lib.Items.ModelTypeArtboard;
+            return _cached_instance.is_artboard;
         }
     }
 
@@ -127,7 +127,7 @@ public class Akira.Layouts.LayersList.LayerItemModel : GLib.Object {
      */
     public bool is_group {
         get {
-            return _cached_instance.type is Lib.Items.ModelTypeGroup;
+            return _cached_instance.is_group;
         }
     }
 

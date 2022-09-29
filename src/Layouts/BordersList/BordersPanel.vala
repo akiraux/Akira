@@ -74,7 +74,7 @@ public class Akira.Layouts.BordersList.BordersPanel : Gtk.Grid {
         bool is_visible = false;
         foreach (var selected in sm.selection.nodes.values) {
             // Show the borders panel only if at least one item is not an artboard.
-            if (!(selected.node.instance.type is Lib.Items.ModelTypeArtboard)) {
+            if (!selected.node.instance.is_artboard) {
                 is_visible = true;
                 break;
             }
@@ -101,7 +101,7 @@ public class Akira.Layouts.BordersList.BordersPanel : Gtk.Grid {
         unowned var im = _view_canvas.items_manager;
         foreach (var selected in sm.selection.nodes.values) {
             // Don't add borders for Artboards.
-            if (selected.node.instance.type is Lib.Items.ModelTypeArtboard) {
+            if (selected.node.instance.is_artboard) {
                 continue;
             }
 

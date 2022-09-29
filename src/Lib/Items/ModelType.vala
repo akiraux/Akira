@@ -77,6 +77,7 @@ public class Akira.Lib.Items.ModelType : Object {
     }
 
     public virtual bool is_group () { return false; }
+    public virtual bool is_artboard () { return false; }
 }
 
 public class Akira.Lib.Items.DummyItemType : ModelType {

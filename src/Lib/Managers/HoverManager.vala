@@ -61,20 +61,9 @@ public class Akira.Lib.Managers.HoverManager : Object {
             return;
         }
 
+        unowned var sm = view_canvas.selection_manager;
         // Account for groups.
-        if (!view_canvas.ctrl_is_pressed) {
-            var old_target = target;
-            target = Utils.ModelUtil.recursive_get_parent_target (target);
-
-            unowned var sm = view_canvas.selection_manager;
-            if (
-                !sm.is_empty () &&
-                (target.has_child (old_target.id, true) || sm.item_is_sibling (old_target.id))
-            ) {
-                target = old_target;
-            }
-            old_target = null;
-        }
+        sm.ensure_correct_target (ref target);
 
         maybe_create_hover_effect (target);
         return;

@@ -70,6 +70,7 @@ public class Akira.Lib.Items.ModelInstance {
     public Components.CompiledName compiled_name { get { return compiled_components.compiled_name; } }
 
     public bool is_group { get { return type.is_group (); } }
+    public bool is_artboard { get { return type.is_artboard (); } }
     public bool is_stackable { get { return drawable != null; } }
 
     public ModelInstance (int uid, ModelType type) {
