@@ -114,7 +114,7 @@ public class Akira.Lib.Items.ModelInstance {
         something_changed = compiled_components.maybe_compile_fill (type, components, node) || something_changed;
         something_changed = compiled_components.maybe_compile_border (type, components, node) || something_changed;
         something_changed = compiled_components.maybe_compile_geometry (type, components, node) || something_changed;
-        something_changed = node.instance.type is ModelTypeArtboard
+        something_changed = node.instance.is_artboard
             && compiled_components.maybe_compile_name (type, components, node)
             || something_changed;
 
