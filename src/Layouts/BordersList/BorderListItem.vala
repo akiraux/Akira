@@ -41,6 +41,8 @@ public class Akira.Layouts.BordersList.BorderListItem : VirtualizingListBoxRow {
             view_canvas: canvas
         );
 
+        get_style_context ().add_class ("item-property");
+
         var grid = new Gtk.Grid () {
             margin = 3
         };
