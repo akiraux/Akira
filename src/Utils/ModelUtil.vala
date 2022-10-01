@@ -102,4 +102,17 @@
 
         return new_id;
     }
+
+    public static Lib.Items.ModelNode recursive_get_parent_target (Lib.Items.ModelNode target) {
+        if (
+            target.parent != null &&
+            target.parent.id != Lib.Items.Model.ORIGIN_ID &&
+            target.parent.instance.is_group &&
+            !target.parent.instance.is_artboard
+        ) {
+            return recursive_get_parent_target (target.parent);
+        }
+
+        return target;
+    }
  }

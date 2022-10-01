@@ -57,6 +57,14 @@ public class Akira.Lib.Managers.HoverManager : Object {
             return;
         }
 
+        if (view_canvas.selection_manager.item_selected (target.id)) {
+            return;
+        }
+
+        unowned var sm = view_canvas.selection_manager;
+        // Account for groups.
+        sm.ensure_correct_target (ref target);
+
         maybe_create_hover_effect (target);
         return;
     }
@@ -75,25 +83,19 @@ public class Akira.Lib.Managers.HoverManager : Object {
             return;
         }
 
+        if (view_canvas.selection_manager.item_selected (id)) {
+            return;
+        }
+
         maybe_create_hover_effect (node);
     }
 
     private void maybe_create_hover_effect (Lib.Items.ModelNode node) {
-        // Prevent the creation of the hover effect if the item is selected or
-        // the layer is currently locked.
-        if (
-            view_canvas.selection_manager.item_selected (node.id)
-            || node.instance.components.layer.locked
-        ) {
-            return;
-        }
-
         if (current_hovered_id == node.id) {
             return;
-        } else {
-            remove_hover_effect ();
         }
 
+        remove_hover_effect ();
         hover_layer.add_drawable (node.instance.drawable);
         current_hovered_id = node.id;
         hover_changed (node.instance.id);

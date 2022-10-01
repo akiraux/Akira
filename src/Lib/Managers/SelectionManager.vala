@@ -111,6 +111,41 @@ public class Akira.Lib.Managers.SelectionManager : Object {
     }
 
     /*
+     * Check if a selection or hover actions are triggered on a sibling of
+     * a currently selected item of the same group.
+     */
+    public bool item_is_sibling (int id) {
+        foreach (var node_id in selection.nodes.keys) {
+            var node = view_canvas.items_manager.node_from_id (node_id);
+            if (node == null || node.parent == null || node.parent.id == Lib.Items.Model.ORIGIN_ID) {
+                continue;
+            }
+            node = Utils.ModelUtil.recursive_get_parent_target (node);
+            if (node.has_child (id, true)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public void ensure_correct_target (ref Items.ModelNode target) {
+        if (
+            (!item_selected (target.id) && !view_canvas.ctrl_is_pressed)
+        ) {
+            var old_target = target;
+            target = Utils.ModelUtil.recursive_get_parent_target (target);
+
+            if (
+                !is_empty () && item_is_sibling (old_target.id)
+            ) {
+                target = old_target;
+            }
+            old_target = null;
+        }
+    }
+
+    /*
      * Called whenever the selection is changed, including adding and removing
      * items, and modifying the selection's geometry.
      */
@@ -173,5 +208,4 @@ public class Akira.Lib.Managers.SelectionManager : Object {
         }
         change_blocked |= change_type;
     }
-
 }

@@ -317,7 +317,7 @@ public class Akira.Lib.Modes.TransformMode : AbstractInteractionMode {
             if (child.instance.is_group) {
                 translate_group (
                     view_canvas,
-                    group,
+                    child,
                     initial_drag_state,
                     delta_x,
                     delta_y,

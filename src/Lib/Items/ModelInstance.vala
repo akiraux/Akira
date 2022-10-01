@@ -70,6 +70,7 @@ public class Akira.Lib.Items.ModelInstance {
     public Components.CompiledName compiled_name { get { return compiled_components.compiled_name; } }
 
     public bool is_group { get { return type.is_group (); } }
+    public bool is_artboard { get { return type.is_artboard (); } }
     public bool is_stackable { get { return drawable != null; } }
 
     public ModelInstance (int uid, ModelType type) {
@@ -128,7 +129,7 @@ public class Akira.Lib.Items.ModelInstance {
         something_changed = compiled_components.maybe_compile_fill (type, components, node) || something_changed;
         something_changed = compiled_components.maybe_compile_border (type, components, node) || something_changed;
         something_changed = compiled_components.maybe_compile_geometry (type, components, node) || something_changed;
-        something_changed = node.instance.type is ModelTypeArtboard
+        something_changed = node.instance.is_artboard
             && compiled_components.maybe_compile_name (type, components, node)
             || something_changed;
 

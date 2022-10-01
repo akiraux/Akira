@@ -311,9 +311,6 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
         underlying_pt.sel_index = -1;
 
         bool is_selected = edit_model.hit_test (event.x, event.y, ref sel_point, ref underlying_pt);
-
-        bool is_alt = (event.state == Gdk.ModifierType.MOD1_MASK);
-
         if (!is_selected) {
             return false;
         }
@@ -331,7 +328,7 @@ public class Akira.Lib.Modes.PathEditMode : AbstractInteractionMode {
                 edit_model.set_selected_points (sel_point, true);
                 return true;
             }
-        } else if (is_alt) {
+        } else if (view_canvas.alt_is_pressed && !view_canvas.ctrl_is_pressed) {
             if (sel_point.sel_type == PointType.TANGENT_FIRST || sel_point.sel_type == PointType.TANGENT_SECOND) {
                 sel_point.tangents_staggered = true;
                 edit_model.set_selected_points (sel_point, false);
