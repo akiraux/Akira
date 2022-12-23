@@ -456,7 +456,8 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
         // and the SHIFT modifier is not pressed. If the SHIFT modifier is pressed
         // we're adding items to the selection so we don't need to do anything else.
         if (
-            (initial_event_x == event.x || initial_event_y == event.y) &&
+            initial_event_x == event.x &&
+            initial_event_y == event.y &&
             !shift_is_pressed
         ) {
             var count = selection_manager.count ();
@@ -477,6 +478,32 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
                 !ctrl_is_pressed
             ) {
                 nob_manager.toggle_anchor_point (target.id);
+            }
+
+            // If the target is not null, shift is not pressed and the target is
+            // not an artboard, check if the item belongs to an artboard which is
+            // currently selected, and if so reset the selections and add that item.
+            if (
+                target != null &&
+                !shift_is_pressed &&
+                !target.instance.is_artboard
+            ) {
+                var artboard = Utils.ModelUtil.recursive_get_target_parent_artboard (target);
+                if (artboard != null && selection_manager.item_selected (artboard.id)) {
+                    selection_manager.reset_selection ();
+                    selection_manager.add_to_selection (target.id);
+                    selection_manager.selection_modified_external (true);
+                }
+            }
+
+            // If the target is null and only 1 item is currently selected
+            // check if the selected item is an artboard and deselected it if so.
+            if (target == null && count == 1) {
+                var selected = selection_manager.selection.first_node ();
+                if (selected != null && selected.instance.is_artboard) {
+                    selection_manager.reset_selection ();
+                    selection_manager.selection_modified_external (true);
+                }
             }
 
             // If the click happened on an empty area and we have multiple

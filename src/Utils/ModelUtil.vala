@@ -115,4 +115,20 @@
 
         return target;
     }
+
+    public static Lib.Items.ModelNode? recursive_get_target_parent_artboard (Lib.Items.ModelNode target) {
+        if (
+            target.parent != null &&
+            target.parent.id != Lib.Items.Model.ORIGIN_ID &&
+            !target.parent.instance.is_artboard
+        ) {
+            return recursive_get_target_parent_artboard (target.parent);
+        }
+
+        if (target.parent.instance.is_artboard) {
+            return target.parent;
+        }
+
+        return null;
+    }
  }

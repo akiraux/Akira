@@ -360,6 +360,7 @@ public class Akira.Lib.Managers.ItemsManager : Object, Items.ModelListener {
                 foreach (unowned var child_node in node.children.data) {
                     // Only add items that are not currently selected.
                     if (
+                        !child_node.instance.components.layer.locked &&
                         !view_canvas.selection_manager.item_selected (child_node.id) &&
                         bound.contains_bound (child_node.instance.bounding_box)
                     ) {
@@ -371,6 +372,7 @@ public class Akira.Lib.Managers.ItemsManager : Object, Items.ModelListener {
 
             // Only add items that are not currently selected.
             if (
+                !node.instance.components.layer.locked &&
                 !view_canvas.selection_manager.item_selected (node.id) &&
                 bound.contains_bound (node.instance.bounding_box)
             ) {

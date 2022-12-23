@@ -2,7 +2,7 @@ row {
     transition: box-shadow 160ms ease, background-color 160ms ease;
 }
 
-row,
+row:not(.item-property),
 row entry {
     background-color: @base_color;
 }
