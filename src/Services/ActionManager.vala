@@ -323,7 +323,12 @@ public class Akira.Services.ActionManager : Object {
             return;
         }
 
-        // canvas.export_manager.create_selection_snapshot ();
+        var export_dialog = new Akira.Dialogs.ExportDialog (canvas);
+        export_dialog.show_all ();
+        export_dialog.present ();
+        export_dialog.close.connect (() => {
+            window.event_bus.set_focus_on_canvas ();
+        });
     }
 
     private void action_export_artboards () {
