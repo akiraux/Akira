@@ -317,13 +317,7 @@ public class Akira.Services.ActionManager : Object {
 
     private void action_export_selection () {
         unowned Akira.Lib.ViewCanvas canvas = window.main_window.main_view_canvas.canvas;
-        unowned var sm = canvas.selection_manager;
-        if (sm.selection.is_empty ()) {
-            window.main_window.main_view_canvas.trigger_notification (_("Nothing selected to export!"));
-            return;
-        }
-
-        // canvas.export_manager.create_selection_snapshot ();
+        canvas.export_selection ();
     }
 
     private void action_export_artboards () {

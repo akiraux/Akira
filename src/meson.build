@@ -78,7 +78,7 @@ sources = files(
     'Widgets/ColorChooser.vala',
     'Widgets/ColorField.vala',
     'Widgets/ColorPicker.vala',
-    #'Widgets/ExportWidget.vala',
+    'Widgets/ExportWidget.vala',
     'Widgets/EyeDropperButton.vala',
     'Widgets/HeaderBarButton.vala',
     'Widgets/HideButton.vala',
@@ -104,13 +104,13 @@ sources = files(
     'ViewLayers/ViewLayerMultiSelect.vala',
 
     'Models/ColorModel.vala',
-    #'Models/ExportModel.vala',
+    'Models/ExportModel.vala',
     #'Models/ListModel.vala',
     'Models/PathEditModel.vala',
 
     'Dialogs/ShortcutsDialog.vala',
     'Dialogs/SettingsDialog.vala',
-    #'Dialogs/ExportDialog.vala',
+    'Dialogs/ExportDialog.vala',
     'Dialogs/ReleaseDialog.vala',
 
     'Drawables/Drawable.vala',
@@ -155,6 +155,7 @@ sources = files(
     'Lib/Items/ModelTypeText.vala',
 
     'Lib/Managers/CopyManager.vala',
+    'Lib/Managers/ExportManager.vala',
     'Lib/Managers/HistoryManager.vala',
     'Lib/Managers/ItemsManager.vala',
     'Lib/Managers/ModeManager.vala',
