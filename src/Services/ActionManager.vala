@@ -316,19 +316,19 @@ public class Akira.Services.ActionManager : Object {
     }
 
     private void action_export_selection () {
-        // weak Akira.Lib.Canvas canvas = window.main_window.main_canvas.canvas;
-        // if (canvas.selected_bound_manager.selected_items.length () == 0) {
-        //     // Check if an element is currently selected.
-        //     window.event_bus.canvas_notification (_("Nothing selected to export!"));
-        //     return;
-        // }
+        unowned Akira.Lib.ViewCanvas canvas = window.main_window.main_view_canvas.canvas;
+        unowned var sm = canvas.selection_manager;
+        if (sm.selection.is_empty ()) {
+            window.main_window.main_view_canvas.trigger_notification (_("Nothing selected to export!"));
+            return;
+        }
 
         // canvas.export_manager.create_selection_snapshot ();
     }
 
     private void action_export_artboards () {
         // Check if at least an artboard is present.
-        window.event_bus.canvas_notification (_("Export of Artboards currently unavailable…sorry 😑️"));
+        window.main_window.main_view_canvas.trigger_notification (_("Export of Artboards currently unavailable…sorry 😑️"));
         // TODO: Trigger artboards pixbuf generation.
     }
 
