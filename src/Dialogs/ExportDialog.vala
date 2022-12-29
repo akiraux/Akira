@@ -136,6 +136,7 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
         settings.bind ("export-format", file_format, "active_id", SettingsBindFlags.DEFAULT);
 
         manager.generating_preview.connect (on_generating_preview);
+        manager.show_preview.connect (on_show_preview);
         manager.preview_finished.connect (on_preview_finished);
     }
 
@@ -277,21 +278,23 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
         alpha_switch.visible = (file_format.active_id == "png");
     }
 
-    //  public async void generate_export_preview () {
-    //      if (list_store.get_n_items () > 0) {
-    //          var array = manager.pixbufs.values.to_array ();
-    //          for (int i = 0; i < list_store.get_n_items () ; i++) {
-    //              var model = (Akira.Models.ExportModel) list_store.get_object (i);
-    //              model.pixbuf = array[i];
-    //          }
-    //          return;
-    //      }
+    public async void on_show_preview (Gee.HashMap<int, Gdk.Pixbuf> pixbufs) {
+        //  if (list_store.get_n_items () > 0) {
+        //      var array = manager.pixbufs.values.to_array ();
+        //      for (int i = 0; i < list_store.get_n_items () ; i++) {
+        //          var model = (Akira.Models.ExportModel) list_store.get_object (i);
+        //          model.pixbuf = array[i];
+        //      }
+        //      return;
+        //  }
 
-    //      foreach (var entry in manager.pixbufs.entries) {
-    //          var model = new Akira.Models.ExportModel (entry.value, entry.key);
-    //          list_store.append (model);
-    //      }
-    //  }
+        foreach (var entry in pixbufs.entries) {
+            var model = new Akira.Models.ExportModel (entry.value, entry.key);
+            list_store.append (model);
+        }
+
+        print ("Generated!");
+    }
 
     private Gtk.Label section_title (string title) {
         var title_label = new Gtk.Label (title) {

@@ -21,16 +21,16 @@
 
 public class Akira.Models.ExportModel : GLib.Object {
     public Gdk.Pixbuf pixbuf { get; set construct; }
-    public string filename { get; set construct; }
+    public int node_id { get; set construct; }
 
-    public ExportModel (Gdk.Pixbuf pixbuf, string filename) {
+    public ExportModel (Gdk.Pixbuf pixbuf, int node_id) {
         Object (
             pixbuf: pixbuf,
-            filename: filename
+            node_id: node_id
         );
     }
 
     public string to_string () {
-        return "Filename: %s".printf (filename);
+        return "Node ID: %i".printf (node_id);
     }
 }

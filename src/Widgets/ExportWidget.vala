@@ -69,8 +69,8 @@ public class Akira.Widgets.ExportWidget : Gtk.Grid {
         input.get_style_context ().add_class ("export-filename");
         input.width_chars = 10;
         input.hexpand = true;
-        model.bind_property ("filename", input, "text",
-            BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE);
+        //  model.bind_property ("filename", input, "text",
+        //      BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE);
 
         attach (input, 0, 0);
         attach (info, 1, 0);

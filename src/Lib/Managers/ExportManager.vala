@@ -21,6 +21,7 @@
 
 public class Akira.Lib.Managers.ExportManager : Object {
     public signal void generating_preview (string message);
+    public signal void show_preview (Gee.HashMap<int, Gdk.Pixbuf> pixbufs);
     public signal void preview_finished ();
 
     public enum Type {
@@ -45,9 +46,9 @@ public class Akira.Lib.Managers.ExportManager : Object {
 
     public void export_selection () {
         trigger_export_dialog ();
-        // TODO: Generate the image from the current selection
         generating_preview (_("Generating preview, please wait…"));
         init_generate_preview ();
+        show_preview (pixbufs);
         preview_finished ();
     }
 
@@ -58,6 +59,77 @@ public class Akira.Lib.Managers.ExportManager : Object {
             format = Cairo.Format.ARGB32;
         } else if (settings.export_format == "jpg") {
             format = Cairo.Format.RGB24;
+        }
+
+        // Loop through all items and clone the model.
+        unowned var sm = canvas.selection_manager;
+        foreach (var node_id in sm.selection.nodes.keys) {
+            var node = canvas.items_manager.node_from_id (node_id);
+            // Ignore a node if it doesn't exists, it's not attached to the canvas, or
+            // it's part of a group or artbaord. TODO: handle groups and artboards.
+            if (node == null || node.parent == null || node.parent.id != Lib.Items.Model.ORIGIN_ID) {
+                continue;
+            }
+
+            unowned var inst = node.instance;
+            var top = inst.bounding_box.top;
+            var bottom = inst.bounding_box.bottom;
+            var left = inst.bounding_box.left;
+            var right = inst.bounding_box.right;
+
+            var bounds = Geometry.Rectangle ();
+            bounds.top = top;
+            bounds.bottom = bottom;
+            bounds.left = left;
+            bounds.right = right;
+
+            print("TOP: %f\nBOTTOM: %f\nLEFT: %f\nRIGHT: %f\n", top, bottom, left, right);
+
+            // Create the rendered image with Cairo.
+            surface = new Cairo.ImageSurface (
+                format,
+                (int) Math.round (right - left),
+                (int) Math.round (bottom - top)
+            );
+            context = new Cairo.Context (surface);
+
+            canvas.render (context, bounds, canvas.current_scale);
+
+            // Draw a white background if JPG export.
+            if (settings.export_format == "jpg" || !settings.export_alpha) {
+                context.set_source_rgba (1, 1, 1, 1);
+                context.rectangle (
+                    0, 0,
+                    (int) Math.round (right - left),
+                    (int) Math.round (bottom - top)
+                );
+                context.fill ();
+            }
+
+            // Create pixbuf from stream.
+            try {
+                loader = new Gdk.PixbufLoader.with_mime_type ("image/png");
+            } catch (Error e) {
+                throw (e);
+            }
+
+            surface.write_to_png_stream ((data) => {
+                try {
+                    loader.write ((uint8 []) data);
+                } catch (Error e) {
+                    return Cairo.Status.DEVICE_ERROR;
+                }
+                return Cairo.Status.SUCCESS;
+            });
+            //  var scaled = rescale_image (loader.get_pixbuf (), item);
+
+            try {
+                loader.close ();
+            } catch (Error e) {
+                throw (e);
+            }
+
+            pixbufs.set (node_id, loader.get_pixbuf ());
         }
     }
 

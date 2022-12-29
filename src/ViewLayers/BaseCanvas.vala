@@ -660,6 +660,6 @@ public class Akira.ViewLayers.BaseCanvas : Gtk.Widget , Gtk.Scrollable {
      * Render target bounds to a cairo context.
      */
     public void render (Cairo.Context context, Geometry.Rectangle bounds, double scale) {
-        // TODO
+        // TODO: This is needed for export purpose.
     }
 }
