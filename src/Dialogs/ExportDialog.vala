@@ -289,11 +289,9 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
         //  }
 
         foreach (var entry in pixbufs.entries) {
-            var model = new Akira.Models.ExportModel (entry.value, entry.key);
+            var model = new Models.ExportModel (entry.value, entry.key);
             list_store.append (model);
         }
-
-        print ("Generated!");
     }
 
     private Gtk.Label section_title (string title) {
