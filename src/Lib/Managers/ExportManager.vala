@@ -23,12 +23,14 @@ public class Akira.Lib.Managers.ExportManager : Object {
     public signal void generating_preview (string message);
     public signal void show_preview (Gee.HashMap<int, Gdk.Pixbuf> pixbufs);
     public signal void preview_finished ();
+    public signal void export_finished (string message);
 
     public enum Type {
         AREA,
         SELECTION,
         ARTBOARD
     }
+    private Type export_type;
 
     public unowned Akira.Lib.ViewCanvas canvas { get; construct; }
     public Akira.Dialogs.ExportDialog export_dialog;
@@ -45,7 +47,12 @@ public class Akira.Lib.Managers.ExportManager : Object {
     }
 
     public void export_selection () {
+        export_type = Type.SELECTION;
         trigger_export_dialog ();
+        generate_preview ();
+    }
+
+    public void generate_preview () {
         generating_preview (_("Generating preview, please wait…"));
         try {
             init_generate_preview ();
@@ -76,19 +83,27 @@ public class Akira.Lib.Managers.ExportManager : Object {
             }
 
             unowned var inst = node.instance;
-            var top = inst.bounding_box.top;
-            var bottom = inst.bounding_box.bottom;
-            var left = inst.bounding_box.left;
-            var right = inst.bounding_box.right;
+
+            // Account for the border size to define the export area.
+            double border_size = 0;
+            if (inst.components.borders != null) {
+                var size = inst.components.borders.get_border_width ();
+                // Currently we only support centered border as per SVG specs, but
+                // in the future we will support internal and external border types
+                // so we will need to account for those.
+                border_size = size > 0 ? Math.round (size / 2) : 0;
+            }
+
+            var top = inst.bounding_box.top - border_size;
+            var bottom = inst.bounding_box.bottom + border_size;
+            var left = inst.bounding_box.left - border_size;
+            var right = inst.bounding_box.right + border_size;
 
             var bounds = Geometry.Rectangle ();
             bounds.top = top;
             bounds.bottom = bottom;
             bounds.left = left;
             bounds.right = right;
-
-            // TODO: Check if the node has external or center border and account
-            // for the stroke width when creating the size of the surface.
 
             // Create the rendered image with Cairo.
             surface = new Cairo.ImageSurface (
@@ -130,7 +145,10 @@ public class Akira.Lib.Managers.ExportManager : Object {
                 }
                 return Cairo.Status.SUCCESS;
             });
-            //  var scaled = rescale_image (loader.get_pixbuf (), item);
+            // TODO: Image scaling should happen in the canvas before generating
+            // the pixbufs in order to avoid pixelated previews if we're only
+            // dealing with vector nodes.
+            var scaled = rescale_image (loader.get_pixbuf (), bounds);
 
             try {
                 loader.close ();
@@ -138,8 +156,48 @@ public class Akira.Lib.Managers.ExportManager : Object {
                 throw (e);
             }
 
-            pixbufs.set (node_id, loader.get_pixbuf ());
+            pixbufs.set (node_id, scaled);
         }
+    }
+
+    public Gdk.Pixbuf rescale_image (Gdk.Pixbuf pixbuf, Geometry.Rectangle bounds) {
+        Gdk.Pixbuf scaled_image;
+
+        switch (settings.export_scale) {
+            case 0:
+                scaled_image = pixbuf.scale_simple (
+                    (int) bounds.width / 2,
+                    (int) bounds.height / 2,
+                    Gdk.InterpType.BILINEAR
+                );
+                break;
+
+            case 2:
+                scaled_image = pixbuf.scale_simple (
+                    (int) bounds.width * 2,
+                    (int) bounds.height * 2,
+                    Gdk.InterpType.BILINEAR
+                );
+                break;
+
+            case 3:
+                scaled_image = pixbuf.scale_simple (
+                    (int) bounds.width * 4,
+                    (int) bounds.height * 4,
+                    Gdk.InterpType.BILINEAR
+                );
+                break;
+
+            default:
+                scaled_image = pixbuf.scale_simple (
+                    (int) bounds.width * 1,
+                    (int) bounds.height * 1,
+                    Gdk.InterpType.BILINEAR
+                );
+                break;
+        }
+
+        return scaled_image;
     }
 
     private void trigger_export_dialog () {
@@ -169,5 +227,57 @@ public class Akira.Lib.Managers.ExportManager : Object {
             surface.finish ();
             surface = null;
         });
+    }
+
+    public async void export_images () {
+        /*
+        TODO:
+         - Implement filenames and don't allow exporting without one.
+         - Detect overwriting of existing files.
+         - Handle confirmation message in the dialog.
+         - Handle error messages in the dialog.
+        */
+        generating_preview (_("Exporting images…"));
+
+        SourceFunc callback = export_images.callback;
+
+        new Thread<void*> (null, () => {
+            foreach (var entry in pixbufs.entries) {
+                var pixbuf = entry.value;
+                var node_id = entry.key;
+
+                try {
+                    if (settings.export_format == "png") {
+                        pixbuf.save (
+                            settings.export_folder + "/" + node_id.to_string () + ".png",
+                            "png",
+                            "compression",
+                            settings.export_compression.to_string (),
+                            null);
+                    }
+
+                    if (settings.export_format == "jpg") {
+                        pixbuf.save (
+                            settings.export_folder + "/" + node_id.to_string () + ".jpg",
+                            "jpeg",
+                            "quality",
+                            settings.export_quality.to_string (),
+                            null);
+                    }
+                } catch (Error e) {
+                    error ("Unable to export images: %s", e.message);
+                }
+            }
+
+            Idle.add ((owned) callback);
+            Thread.exit (null);
+
+            return null;
+        });
+
+        yield;
+
+        preview_finished ();
+        export_finished (_("Export successfully completed!"));
     }
 }

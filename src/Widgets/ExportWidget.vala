@@ -23,14 +23,14 @@ public class Akira.Widgets.ExportWidget : Gtk.Grid {
     private const int MB = 1024 * 1024;
     private const int KB = 1024;
 
-    public Akira.Models.ExportModel model { get; set construct; }
+    public Models.ExportModel model { get; set construct; }
 
     private Gtk.Label info;
     private Gtk.Grid image_container;
     private Gtk.Image image;
     private uint8[]? imagedata;
 
-    public ExportWidget (Akira.Models.ExportModel model) {
+    public ExportWidget (Models.ExportModel model) {
         Object (
             orientation: Gtk.Orientation.HORIZONTAL,
             model: model
@@ -44,33 +44,30 @@ public class Akira.Widgets.ExportWidget : Gtk.Grid {
         expand = true;
 
         // Label for image size info. We need to create this before calling get_image ().
-        info = new Gtk.Label ("");
+        info = new Gtk.Label ("") {
+            hexpand = false,
+            halign = Gtk.Align.END
+        };
         info.get_style_context ().add_class ("export-info");
-        info.hexpand = false;
-        info.halign = Gtk.Align.END;
 
         // Image preview container with checker.
-        image_container = new Gtk.Grid ();
-        image_container.halign = Gtk.Align.CENTER;
-        image_container.get_style_context ().add_class (Granite.STYLE_CLASS_CHECKERBOARD);
-        image_container.get_style_context ().add_class (Granite.STYLE_CLASS_CARD);
+        image_container = new Gtk.Grid () {
+            halign = Gtk.Align.CENTER
+        };
+        var image_container_ctx = image_container.get_style_context ();
+        image_container_ctx.add_class (Granite.STYLE_CLASS_CHECKERBOARD);
+        image_container_ctx.add_class (Granite.STYLE_CLASS_CARD);
 
         image = new Gtk.Image ();
         image_container.add (image);
         get_image.begin ();
 
-        model.notify["pixbuf"].connect (() => {
-            image.clear ();
-            get_image.begin ();
-        });
-
         // Filename with editable entry.
-        var input = new Gtk.Entry ();
+        var input = new Gtk.Entry () {
+            width_chars = 10,
+            hexpand = true
+        };
         input.get_style_context ().add_class ("export-filename");
-        input.width_chars = 10;
-        input.hexpand = true;
-        //  model.bind_property ("filename", input, "text",
-        //      BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE);
 
         attach (input, 0, 0);
         attach (info, 1, 0);
@@ -108,33 +105,32 @@ public class Akira.Widgets.ExportWidget : Gtk.Grid {
         yield get_image_buffer_size ();
 
         double bytes = (double) imagedata.length;
-        double full_bytes = imagedata.length > MB
-            ? bytes / MB : bytes / KB;
+        double full_bytes = imagedata.length > MB ? bytes / MB : bytes / KB;
         var size = imagedata.length > MB
             ? ("%0.1fMB").printf (full_bytes)
             : ("%0.1fKB").printf (full_bytes);
 
-        info.label = _("%i × %i px · %s").printf (
-            model.pixbuf.width,
-            model.pixbuf.height,
-            size);
+        info.label = _("%i × %i px · %s").printf (model.pixbuf.width, model.pixbuf.height, size);
     }
 
     private async void get_image_buffer_size () {
+        unowned var image = model.pixbuf;
         info.label = _("Fetching image size…");
         SourceFunc callback = get_image_buffer_size.callback;
 
         new Thread<void*> (null, () => {
             try {
                 if (settings.export_format == "png") {
-                    model.pixbuf.save_to_buffer (
+                    image.save_to_buffer (
                         out imagedata,
                         "png",
                         "compression",
                         settings.export_compression.to_string (),
                         null);
-                } else if (settings.export_format == "jpg") {
-                    model.pixbuf.save_to_buffer (
+                }
+
+                if (settings.export_format == "jpg") {
+                    image.save_to_buffer (
                         out imagedata,
                         "jpeg",
                         "quality",

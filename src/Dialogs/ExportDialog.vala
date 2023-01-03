@@ -174,9 +174,9 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
         file_format.append ("jpg", "JPG");
         file_format.changed.connect (update_format_ui);
         grid.attach (file_format, 1, 2, 1, 1);
-        //  settings.changed["export-format"].connect (() => {
-        //      manager.regenerate_pixbuf (export_type);
-        //  });
+        settings.changed["export-format"].connect (() => {
+            manager.generate_preview ();
+        });
 
         // Quality spinbutton.
         jpg_title = section_title (_("Quality:"));
@@ -189,7 +189,10 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
             digits = 0
         };
         grid.attach (quality_scale, 1, 3, 1, 1);
-        settings.bind ("export-quality", quality_adj, "value", SettingsBindFlags.DEFAULT);
+        quality_scale.button_release_event.connect (() => {
+            settings.export_quality = (int) quality_adj.value;
+            return false;
+        });
 
         // Compression spinbutton.
         png_title = section_title (_("Compression:"));
@@ -205,7 +208,10 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
             compression_scale.add_mark (i, Gtk.PositionType.BOTTOM, null);
         }
         grid.attach (compression_scale, 1, 4, 1, 1);
-        settings.bind ("export-compression", compression_adj, "value", SettingsBindFlags.DEFAULT);
+        compression_scale.button_release_event.connect (() => {
+            settings.export_compression = (int) compression_adj.value;
+            return false;
+        });
 
         alpha_title = section_title (_("Transparency:"));
         grid.attach (alpha_title, 0, 5, 1, 1);
@@ -216,9 +222,9 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
         };
         grid.attach (alpha_switch, 1, 5, 1, 1);
         settings.bind ("export-alpha", alpha_switch, "active", SettingsBindFlags.DEFAULT);
-        //  settings.changed["export-alpha"].connect (() => {
-        //      manager.regenerate_pixbuf (export_type);
-        //  });
+        settings.changed["export-alpha"].connect (() => {
+            manager.generate_preview ();
+        });
 
         // Resolution.
         var size_title = section_title (_("Scale:"));
@@ -234,9 +240,9 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
         scale_button.set_active (settings.export_scale);
         settings.bind ("export-scale", scale_button, "selected", SettingsBindFlags.DEFAULT);
         grid.attach (scale_button, 1, 6, 1, 1);
-        //  settings.changed["export-scale"].connect (() => {
-        //      manager.regenerate_pixbuf (export_type);
-        //  });
+        settings.changed["export-scale"].connect (() => {
+            manager.generate_preview ();
+        });
 
         // Buttons.
         var action_area = new Gtk.Grid () {
@@ -261,8 +267,7 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
         export_button.get_style_context ().add_class (Gtk.STYLE_CLASS_SUGGESTED_ACTION);
         action_area.add (export_button);
         export_button.clicked.connect (() => {
-            //  manager.export_images.begin ();
-            close ();
+            manager.export_images.begin ();
         });
 
         sidebar.add (grid);
@@ -279,17 +284,9 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
     }
 
     public async void on_show_preview (Gee.HashMap<int, Gdk.Pixbuf> pixbufs) {
-        //  if (list_store.get_n_items () > 0) {
-        //      var array = manager.pixbufs.values.to_array ();
-        //      for (int i = 0; i < list_store.get_n_items () ; i++) {
-        //          var model = (Akira.Models.ExportModel) list_store.get_object (i);
-        //          model.pixbuf = array[i];
-        //      }
-        //      return;
-        //  }
-
+        list_store.remove_all ();
         foreach (var entry in pixbufs.entries) {
-            var model = new Models.ExportModel (entry.value, entry.key);
+            var model = new Models.ExportModel (entry.key, entry.value);
             list_store.append (model);
         }
     }
