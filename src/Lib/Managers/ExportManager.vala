@@ -33,7 +33,6 @@ public class Akira.Lib.Managers.ExportManager : Object {
     private Type export_type;
 
     public unowned Akira.Lib.ViewCanvas canvas { get; construct; }
-    public Akira.Dialogs.ExportDialog export_dialog;
 
     private Cairo.Format format;
     private Cairo.ImageSurface? surface = null;
@@ -105,30 +104,36 @@ public class Akira.Lib.Managers.ExportManager : Object {
             bounds.left = left;
             bounds.right = right;
 
+            double width = bounds.width;
+            double height = bounds.height;
+            scale_surface (ref width, ref height);
+
             // Create the rendered image with Cairo.
             surface = new Cairo.ImageSurface (
                 format,
-                (int) Math.round (bounds.width),
-                (int) Math.round (bounds.height)
+                (int) Math.round (width),
+                (int) Math.round (height)
             );
             context = new Cairo.Context (surface);
-
-            // Move the context to the right coordinates.
-            context.translate (-left, -top);
-
-            // Render what's currently on the canvas inside those coordinates.
-            canvas.draw_model (context, bounds);
 
             // Draw a white background if JPG export.
             if (settings.export_format == "jpg" || !settings.export_alpha) {
                 context.set_source_rgba (1, 1, 1, 1);
                 context.rectangle (
                     0, 0,
-                    (int) Math.round (bounds.width),
-                    (int) Math.round (bounds.height)
+                    (int) Math.round (width),
+                    (int) Math.round (height)
                 );
                 context.fill ();
             }
+
+            scale_context (ref context);
+
+            // Move the context to the right coordinates.
+            context.translate (-left, -top);
+
+            // Render what's currently on the canvas inside those coordinates.
+            canvas.draw_model (context, bounds);
 
             // Create pixbuf from stream.
             try {
@@ -145,10 +150,8 @@ public class Akira.Lib.Managers.ExportManager : Object {
                 }
                 return Cairo.Status.SUCCESS;
             });
-            // TODO: Image scaling should happen in the canvas before generating
-            // the pixbufs in order to avoid pixelated previews if we're only
-            // dealing with vector nodes.
-            var scaled = rescale_image (loader.get_pixbuf (), bounds);
+            //  var scaled = rescale_image (loader.get_pixbuf (), bounds);
+            var scaled = loader.get_pixbuf ();
 
             try {
                 loader.close ();
@@ -160,51 +163,55 @@ public class Akira.Lib.Managers.ExportManager : Object {
         }
     }
 
-    public Gdk.Pixbuf rescale_image (Gdk.Pixbuf pixbuf, Geometry.Rectangle bounds) {
-        Gdk.Pixbuf scaled_image;
-
+    private void scale_surface (ref double width, ref double height) {
         switch (settings.export_scale) {
             case 0:
-                scaled_image = pixbuf.scale_simple (
-                    (int) bounds.width / 2,
-                    (int) bounds.height / 2,
-                    Gdk.InterpType.BILINEAR
-                );
+                width = width / 2;
+                height = height / 2;
                 break;
 
             case 2:
-                scaled_image = pixbuf.scale_simple (
-                    (int) bounds.width * 2,
-                    (int) bounds.height * 2,
-                    Gdk.InterpType.BILINEAR
-                );
+                width = width * 2;
+                height = height * 2;
                 break;
 
             case 3:
-                scaled_image = pixbuf.scale_simple (
-                    (int) bounds.width * 4,
-                    (int) bounds.height * 4,
-                    Gdk.InterpType.BILINEAR
-                );
+                width = width * 4;
+                height = height * 4;
                 break;
 
             default:
-                scaled_image = pixbuf.scale_simple (
-                    (int) bounds.width * 1,
-                    (int) bounds.height * 1,
-                    Gdk.InterpType.BILINEAR
-                );
+                width = width * 1;
+                height = height * 1;
                 break;
         }
+    }
 
-        return scaled_image;
+    private void scale_context (ref Cairo.Context context) {
+        switch (settings.export_scale) {
+            case 0:
+                context.scale (0.5, 0.5);
+                break;
+
+            case 2:
+                context.scale (2, 2);
+                break;
+
+            case 3:
+                context.scale (4, 4);
+                break;
+
+            default:
+                context.scale (1, 1);
+                break;
+        }
     }
 
     private void trigger_export_dialog () {
         // Disable all those accels interfering with regular typing.
         canvas.window.event_bus.disconnect_typing_accel ();
 
-        export_dialog = new Akira.Dialogs.ExportDialog (canvas, this);
+        var export_dialog = new Akira.Dialogs.ExportDialog (canvas, this);
         export_dialog.show_all ();
         export_dialog.present ();
 

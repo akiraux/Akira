@@ -133,7 +133,10 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
         });
 
         settings.bind ("export-paned", pane, "position", SettingsBindFlags.DEFAULT);
-        settings.bind ("export-format", file_format, "active_id", SettingsBindFlags.DEFAULT);
+        // GTK issue: combobox need to be added to a parent and be visible before
+        // we can use bind () to prevent a critical error.
+        settings.bind ("export-format", file_format, "active_id",
+            SettingsBindFlags.DEFAULT | GLib.SettingsBindFlags.GET_NO_CHANGES);
 
         manager.generating_preview.connect (on_generating_preview);
         manager.show_preview.connect (on_show_preview);
@@ -221,7 +224,8 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
             halign = Gtk.Align.START
         };
         grid.attach (alpha_switch, 1, 5, 1, 1);
-        settings.bind ("export-alpha", alpha_switch, "active", SettingsBindFlags.DEFAULT);
+        settings.bind ("export-alpha", alpha_switch, "active",
+            SettingsBindFlags.DEFAULT | SettingsBindFlags.GET_NO_CHANGES);
         settings.changed["export-alpha"].connect (() => {
             manager.generate_preview ();
         });
@@ -238,7 +242,8 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
         scale_button.append_text ("2×");
         scale_button.append_text ("4×");
         scale_button.set_active (settings.export_scale);
-        settings.bind ("export-scale", scale_button, "selected", SettingsBindFlags.DEFAULT);
+        settings.bind ("export-scale", scale_button, "selected",
+            SettingsBindFlags.DEFAULT | SettingsBindFlags.GET_NO_CHANGES);
         grid.attach (scale_button, 1, 6, 1, 1);
         settings.changed["export-scale"].connect (() => {
             manager.generate_preview ();
