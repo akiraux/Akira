@@ -39,6 +39,7 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
     public Gtk.Switch alpha_switch;
 
     private Gtk.Overlay main_overlay;
+    private Granite.Widgets.Toast notification;
     private Granite.Widgets.OverlayBar overlaybar;
 
     public ExportDialog (Lib.ViewCanvas view_canvas, Lib.Managers.ExportManager export_manager) {
@@ -89,6 +90,7 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
         build_export_sidebar ();
 
         main_overlay = new Gtk.Overlay ();
+        notification = new Granite.Widgets.Toast (_(""));
         overlaybar = new Granite.Widgets.OverlayBar (main_overlay);
         overlaybar.active = true;
 
@@ -117,6 +119,7 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
         main.add (scrolled);
 
         main_overlay.add (main);
+        main_overlay.add_overlay (notification);
 
         var pane = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);
         pane.pack1 (sidebar, false, false);
@@ -141,6 +144,7 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
         manager.generating_preview.connect (on_generating_preview);
         manager.show_preview.connect (on_show_preview);
         manager.preview_finished.connect (on_preview_finished);
+        manager.export_finished.connect (on_export_finished);
     }
 
     private void build_export_sidebar () {
@@ -317,5 +321,10 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
             child.sensitive = true;
         });
         overlaybar.visible = false;
+    }
+
+    public void on_export_finished (string message) {
+        notification.title = message;
+        notification.send_notification ();
     }
 }

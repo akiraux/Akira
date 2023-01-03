@@ -90,7 +90,7 @@ public class Akira.Lib.Managers.ExportManager : Object {
                 // Currently we only support centered border as per SVG specs, but
                 // in the future we will support internal and external border types
                 // so we will need to account for those.
-                border_size = size > 0 ? Math.round (size / 2) : 0;
+                border_size = size > 0 ? size / 2 : 0;
             }
 
             var top = inst.bounding_box.top - border_size;
@@ -241,7 +241,6 @@ public class Akira.Lib.Managers.ExportManager : Object {
         TODO:
          - Implement filenames and don't allow exporting without one.
          - Detect overwriting of existing files.
-         - Handle confirmation message in the dialog.
          - Handle error messages in the dialog.
         */
         generating_preview (_("Exporting images…"));
