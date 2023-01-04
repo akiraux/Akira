@@ -104,13 +104,10 @@ public class Akira.Widgets.ExportWidget : Gtk.Grid {
     public async void update_file_size () {
         yield get_image_buffer_size ();
 
-        double bytes = (double) imagedata.length;
-        double full_bytes = imagedata.length > MB ? bytes / MB : bytes / KB;
-        var size = imagedata.length > MB
-            ? ("%0.1fMB").printf (full_bytes)
-            : ("%0.1fKB").printf (full_bytes);
-
-        info.label = _("%i × %i px · %s").printf (model.pixbuf.width, model.pixbuf.height, size);
+        info.label = _("%i × %i px · %s").printf (
+            model.pixbuf.width,
+            model.pixbuf.height,
+            format_size (imagedata.length));
     }
 
     private async void get_image_buffer_size () {
