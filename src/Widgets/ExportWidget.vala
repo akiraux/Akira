@@ -44,7 +44,7 @@ public class Akira.Widgets.ExportWidget : Gtk.Grid {
         expand = true;
 
         // Label for image size info. We need to create this before calling get_image ().
-        info = new Gtk.Label ("") {
+        info = new Gtk.Label (null) {
             hexpand = false,
             halign = Gtk.Align.END
         };

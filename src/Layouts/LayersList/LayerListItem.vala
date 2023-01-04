@@ -77,7 +77,7 @@ public class Akira.Layouts.LayersList.LayerListItem : VirtualizingListBoxRow {
         };
         icon.get_style_context ().add_class (Gtk.STYLE_CLASS_DIM_LABEL);
 
-        label = new Gtk.Label ("") {
+        label = new Gtk.Label (null) {
             halign = Gtk.Align.FILL,
             xalign = 0,
             expand = true,

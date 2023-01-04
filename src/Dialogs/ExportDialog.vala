@@ -42,6 +42,8 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
     private Granite.Widgets.Toast notification;
     private Granite.Widgets.OverlayBar overlaybar;
 
+    private GLib.Cancellable? preview_cancellable;
+
     public ExportDialog (Lib.ViewCanvas view_canvas, Lib.Managers.ExportManager export_manager) {
         Object (
             canvas: view_canvas,
@@ -90,7 +92,7 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
         build_export_sidebar ();
 
         main_overlay = new Gtk.Overlay ();
-        notification = new Granite.Widgets.Toast (_(""));
+        notification = new Granite.Widgets.Toast ("");
         overlaybar = new Granite.Widgets.OverlayBar (main_overlay);
         overlaybar.active = true;
 
@@ -184,7 +186,12 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
         file_format.changed.connect (update_format_ui);
         grid.attach (file_format, 1, 2, 1, 1);
         settings.changed["export-format"].connect (() => {
-            manager.generate_preview.begin ();
+            if (preview_cancellable != null) {
+                preview_cancellable.cancel ();
+            }
+
+            preview_cancellable = new GLib.Cancellable ();
+            manager.generate_preview.begin (preview_cancellable);
         });
 
         // Quality spinbutton.
@@ -233,7 +240,12 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
         settings.bind ("export-alpha", alpha_switch, "active",
             SettingsBindFlags.DEFAULT | SettingsBindFlags.GET_NO_CHANGES);
         settings.changed["export-alpha"].connect (() => {
-            manager.generate_preview.begin ();
+            if (preview_cancellable != null) {
+                preview_cancellable.cancel ();
+            }
+
+            preview_cancellable = new GLib.Cancellable ();
+            manager.generate_preview.begin (preview_cancellable);
         });
 
         // Resolution.
@@ -252,7 +264,12 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
             SettingsBindFlags.DEFAULT | SettingsBindFlags.GET_NO_CHANGES);
         grid.attach (scale_button, 1, 6, 1, 1);
         settings.changed["export-scale"].connect (() => {
-            manager.generate_preview.begin ();
+            if (preview_cancellable != null) {
+                preview_cancellable.cancel ();
+            }
+
+            preview_cancellable = new GLib.Cancellable ();
+            manager.generate_preview.begin (preview_cancellable);
         });
 
         // Buttons.

@@ -40,6 +40,8 @@ public class Akira.Lib.Managers.ExportManager : Object {
     private Gdk.PixbufLoader loader;
     private Gee.HashMap<int, Gdk.Pixbuf> pixbufs;
 
+    private GLib.Cancellable? preview_cancellable;
+
     public ExportManager (Lib.ViewCanvas view_canvas) {
         Object (canvas: view_canvas);
         pixbufs = new Gee.HashMap<int, Gdk.Pixbuf> ();
@@ -48,19 +50,24 @@ public class Akira.Lib.Managers.ExportManager : Object {
     public async void export_selection () {
         export_type = Type.SELECTION;
         trigger_export_dialog ();
-        yield generate_preview ();
+        if (preview_cancellable != null) {
+            preview_cancellable.cancel ();
+        }
+
+        preview_cancellable = new GLib.Cancellable ();
+        yield generate_preview (preview_cancellable);
     }
 
-    public async void generate_preview () {
+    public async void generate_preview (GLib.Cancellable cancellable) {
         busy (_("Generating preview, please wait…"));
 
-        yield init_generate_preview ();
+        yield init_generate_preview (cancellable);
         show_preview (pixbufs);
 
         free ();
     }
 
-    private async void init_generate_preview () {
+    private async void init_generate_preview (GLib.Cancellable cancellable) {
         pixbufs.clear ();
 
         if (settings.export_format == "png") {
@@ -239,6 +246,10 @@ public class Akira.Lib.Managers.ExportManager : Object {
         export_dialog.update_format_ui ();
 
         export_dialog.close.connect (() => {
+            if (preview_cancellable != null) {
+                preview_cancellable.cancel ();
+            }
+
             // Store the dialog size into gsettings so users don't get upset.
             int width, height;
             export_dialog.get_size (out width, out height);
@@ -251,7 +262,6 @@ public class Akira.Lib.Managers.ExportManager : Object {
 
             // Clean up.
             context = null;
-            surface.finish ();
             surface = null;
         });
     }
