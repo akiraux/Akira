@@ -790,13 +790,13 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
         }
     }
 
-    public void export_selection () {
+    public async void export_selection () {
         if (selection_manager.selection.is_empty ()) {
             window.main_window.main_view_canvas.trigger_notification (_("Nothing selected to export!"));
             return;
         }
 
         init_export_manager ();
-        export_manager.export_selection ();
+        yield export_manager.export_selection ();
     }
 }

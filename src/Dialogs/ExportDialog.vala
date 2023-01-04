@@ -184,7 +184,7 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
         file_format.changed.connect (update_format_ui);
         grid.attach (file_format, 1, 2, 1, 1);
         settings.changed["export-format"].connect (() => {
-            manager.generate_preview ();
+            manager.generate_preview.begin ();
         });
 
         // Quality spinbutton.
@@ -233,7 +233,7 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
         settings.bind ("export-alpha", alpha_switch, "active",
             SettingsBindFlags.DEFAULT | SettingsBindFlags.GET_NO_CHANGES);
         settings.changed["export-alpha"].connect (() => {
-            manager.generate_preview ();
+            manager.generate_preview.begin ();
         });
 
         // Resolution.
@@ -252,7 +252,7 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
             SettingsBindFlags.DEFAULT | SettingsBindFlags.GET_NO_CHANGES);
         grid.attach (scale_button, 1, 6, 1, 1);
         settings.changed["export-scale"].connect (() => {
-            manager.generate_preview ();
+            manager.generate_preview.begin ();
         });
 
         // Buttons.

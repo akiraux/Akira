@@ -45,24 +45,22 @@ public class Akira.Lib.Managers.ExportManager : Object {
         pixbufs = new Gee.HashMap<int, Gdk.Pixbuf> ();
     }
 
-    public void export_selection () {
+    public async void export_selection () {
         export_type = Type.SELECTION;
         trigger_export_dialog ();
-        generate_preview ();
+        yield generate_preview ();
     }
 
-    public void generate_preview () {
+    public async void generate_preview () {
         busy (_("Generating preview, please wait…"));
-        try {
-            init_generate_preview ();
-            show_preview (pixbufs);
-        } catch (Error e) {
-            error ("Could not generate export preview: %s", e.message);
-        }
+
+        yield init_generate_preview ();
+        show_preview (pixbufs);
+
         free ();
     }
 
-    private void init_generate_preview () throws Error {
+    private async void init_generate_preview () {
         pixbufs.clear ();
 
         if (settings.export_format == "png") {
@@ -128,38 +126,13 @@ public class Akira.Lib.Managers.ExportManager : Object {
             }
 
             scale_context (ref context);
-
             // Move the context to the right coordinates.
             context.translate (-left, -top);
-
             // Render what's currently on the canvas inside those coordinates.
             canvas.draw_model (context, bounds);
 
-            // Create pixbuf from stream.
-            try {
-                loader = new Gdk.PixbufLoader.with_mime_type ("image/png");
-            } catch (Error e) {
-                throw (e);
-            }
-
-            surface.write_to_png_stream ((data) => {
-                try {
-                    loader.write ((uint8 []) data);
-                } catch (Error e) {
-                    return Cairo.Status.DEVICE_ERROR;
-                }
-                return Cairo.Status.SUCCESS;
-            });
-            //  var scaled = rescale_image (loader.get_pixbuf (), bounds);
-            var scaled = loader.get_pixbuf ();
-
-            try {
-                loader.close ();
-            } catch (Error e) {
-                throw (e);
-            }
-
-            pixbufs.set (node_id, scaled);
+            var pixbuf = yield generate_pixbuf (surface);
+            pixbufs.set (node_id, pixbuf);
         }
     }
 
@@ -212,6 +185,46 @@ public class Akira.Lib.Managers.ExportManager : Object {
                 context.scale (1, 1);
                 break;
         }
+    }
+
+    /*
+     * Generate the pixbufs images on a separate async thread in order to now
+     * freeze the UI.
+     */
+    private async Gdk.Pixbuf generate_pixbuf (Cairo.Surface surface) {
+        SourceFunc callback = generate_pixbuf.callback;
+
+        var thread = new Thread<Gdk.Pixbuf> (null, () => {
+            // Create pixbuf from stream.
+            try {
+                loader = new Gdk.PixbufLoader.with_mime_type ("image/png");
+            } catch (Error e) {
+                error ("Could not create pixbuf loader: %s", e.message);
+            }
+
+            surface.write_to_png_stream ((data) => {
+                try {
+                    loader.write ((uint8 []) data);
+                } catch (Error e) {
+                    return Cairo.Status.DEVICE_ERROR;
+                }
+                return Cairo.Status.SUCCESS;
+            });
+            var pixbuf = loader.get_pixbuf ();
+
+            try {
+                loader.close ();
+            } catch (Error e) {
+                error ("Could not close loader: %s", e.message);
+            }
+
+            Idle.add ((owned) callback);
+            return pixbuf;
+        });
+
+        yield;
+
+        return thread.join ();
     }
 
     private void trigger_export_dialog () {

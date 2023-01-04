@@ -317,7 +317,7 @@ public class Akira.Services.ActionManager : Object {
 
     private void action_export_selection () {
         unowned Akira.Lib.ViewCanvas canvas = window.main_window.main_view_canvas.canvas;
-        canvas.export_selection ();
+        canvas.export_selection.begin ();
     }
 
     private void action_export_artboards () {
