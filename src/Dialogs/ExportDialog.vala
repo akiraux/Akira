@@ -103,7 +103,9 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
         export_grid = new Gtk.FlowBox () {
             activate_on_single_click = false,
             max_children_per_line = 1,
-            selection_mode = Gtk.SelectionMode.NONE
+            selection_mode = Gtk.SelectionMode.NONE,
+            column_spacing = 12,
+            row_spacing = 12
         };
         export_grid.get_style_context ().add_class ("export-panel");
 
@@ -141,9 +143,9 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
         settings.bind ("export-format", file_format, "active_id",
             SettingsBindFlags.DEFAULT | GLib.SettingsBindFlags.GET_NO_CHANGES);
 
-        manager.generating_preview.connect (on_generating_preview);
+        manager.busy.connect (on_busy);
         manager.show_preview.connect (on_show_preview);
-        manager.preview_finished.connect (on_preview_finished);
+        manager.free.connect (on_free);
         manager.export_finished.connect (on_export_finished);
     }
 
@@ -308,7 +310,7 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
         return title_label;
     }
 
-    private async void on_generating_preview (string message) {
+    private async void on_busy (string message) {
         overlaybar.label = message;
         overlaybar.visible = true;
         sidebar.@foreach ((child) => {
@@ -316,7 +318,7 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
         });
     }
 
-    private async void on_preview_finished () {
+    private async void on_free () {
         sidebar.@foreach ((child) => {
             child.sensitive = true;
         });

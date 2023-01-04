@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2019 Alecaddd (http://alecaddd.com)
+* Copyright (c) 2019-2023 Alecaddd (https://alecaddd.com)
 *
 * This file is part of Akira.
 *
@@ -10,11 +10,11 @@
 
 * Akira is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 * GNU General Public License for more details.
 
 * You should have received a copy of the GNU General Public License
-* along with Akira.  If not, see <https://www.gnu.org/licenses/>.
+* along with Akira. If not, see <https://www.gnu.org/licenses/>.
 *
 * Authored by: Alessandro "Alecaddd" Castellani <castellani.ale@gmail.com>
 */
@@ -32,7 +32,7 @@ public class Akira.Utils.Dialogs : Object {
         string title,
         string description,
         string icon,
-        string primary_button,
+        string? primary_button = null,
         string? secondary_button = null
     ) {
         var dialog = new Granite.MessageDialog.with_image_from_icon_name (
@@ -45,9 +45,11 @@ public class Akira.Utils.Dialogs : Object {
             dialog.add_action_widget (button2, 2);
         }
 
-        var button = new Gtk.Button.with_label (primary_button);
-        button.get_style_context ().add_class (Gtk.STYLE_CLASS_DESTRUCTIVE_ACTION);
-        dialog.add_action_widget (button, Gtk.ResponseType.ACCEPT);
+        if (primary_button != null) {
+            var button = new Gtk.Button.with_label (primary_button);
+            button.get_style_context ().add_class (Gtk.STYLE_CLASS_DESTRUCTIVE_ACTION);
+            dialog.add_action_widget (button, Gtk.ResponseType.ACCEPT);
+        }
 
         return dialog;
     }

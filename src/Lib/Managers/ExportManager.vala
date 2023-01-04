@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2022 Alecaddd (https://alecaddd.com)
+ * Copyright (c) 2022-2023 Alecaddd (https://alecaddd.com)
  *
  * This file is part of Akira.
  *
@@ -20,9 +20,9 @@
  */
 
 public class Akira.Lib.Managers.ExportManager : Object {
-    public signal void generating_preview (string message);
+    public signal void busy (string message);
     public signal void show_preview (Gee.HashMap<int, Gdk.Pixbuf> pixbufs);
-    public signal void preview_finished ();
+    public signal void free ();
     public signal void export_finished (string message);
 
     public enum Type {
@@ -52,14 +52,14 @@ public class Akira.Lib.Managers.ExportManager : Object {
     }
 
     public void generate_preview () {
-        generating_preview (_("Generating preview, please wait…"));
+        busy (_("Generating preview, please wait…"));
         try {
             init_generate_preview ();
             show_preview (pixbufs);
         } catch (Error e) {
             error ("Could not generate export preview: %s", e.message);
         }
-        preview_finished ();
+        free ();
     }
 
     private void init_generate_preview () throws Error {
@@ -163,6 +163,10 @@ public class Akira.Lib.Managers.ExportManager : Object {
         }
     }
 
+    /*
+     * Scale the cairo surface to match the scaled canvas based on the chosen
+     * resolution from the user. This is to guarantee a sharp preview.
+     */
     private void scale_surface (ref double width, ref double height) {
         switch (settings.export_scale) {
             case 0:
@@ -187,6 +191,9 @@ public class Akira.Lib.Managers.ExportManager : Object {
         }
     }
 
+    /*
+     * Scale the canvas context to match the user's export resolution.
+     */
     private void scale_context (ref Cairo.Context context) {
         switch (settings.export_scale) {
             case 0:
@@ -240,39 +247,143 @@ public class Akira.Lib.Managers.ExportManager : Object {
         /*
         TODO:
          - Implement filenames and don't allow exporting without one.
-         - Detect overwriting of existing files.
-         - Handle error messages in the dialog.
         */
-        generating_preview (_("Exporting images…"));
+        busy (_("Exporting images…"));
 
-        SourceFunc callback = export_images.callback;
+        bool overwrite_all = false;
+        bool skip_all = false;
+
+        // Loop through all generated pixbufs and handle the save to a file.
+        foreach (var entry in pixbufs.entries) {
+            var pixbuf = entry.value;
+            var node_id = entry.key;
+            var file_name = ("%s/%i.%s").printf (settings.export_folder, node_id, settings.export_format);
+
+            // Check for existing files to avoid overwriting them.
+            var image_file = File.new_for_path (file_name);
+            if (image_file.query_exists ()) {
+                // Overwrite them all if the user specified it in the dialog
+                // during the first loop.
+                if (overwrite_all) {
+                    yield do_export (pixbuf, file_name);
+                    continue;
+                }
+
+                // Skip them all if the user specified it in the dialog
+                // during the first loop.
+                if (skip_all) {
+                    free ();
+                    continue;
+                }
+
+                // Ask the user what to do.
+                var results = confirm_overwrite (file_name);
+                switch (results[0]) {
+                    // Overwrite.
+                    case 3:
+                        overwrite_all = results[1] == 1;
+                        yield do_export (pixbuf, file_name);
+                        break;
+                    // Skip.
+                    case 2:
+                        skip_all = results[1] == 1;
+                        free ();
+                        continue;
+                    // Cancel.
+                    case 1:
+                    default:
+                        free ();
+                        return;
+                }
+                continue;
+            }
+
+            // This file doesn't exist, just export it.
+            yield do_export (pixbuf, file_name);
+        }
+
+        free ();
+        export_finished (_("Export completed!"));
+    }
+
+    /*
+     * Trigger a dialog asking the user how to handle an existing file with
+     * the same filename.
+     */
+    private int[] confirm_overwrite (string file_name) {
+        int dont_ask = 0;
+        int clicked = 0;
+        var dialog = canvas.window.dialogs.message_dialog (
+            _("File already exists!"),
+            _("The file at this location already exists: %s.").printf (file_name),
+            "dialog-question",
+            _("Overwrite file"),
+            _("Skip file")
+        );
+
+        // If we're currently exporting more than one image, offer the option
+        // to use the chosen action as default in the current export loop.
+        if (pixbufs.size > 1) {
+            var checkbox = new Gtk.CheckButton.with_label (_("Apply the same action for all other files"));
+            dialog.custom_bin.add (checkbox);
+            checkbox.toggled.connect (() => {
+                dont_ask = checkbox.active ? 1 : 0;
+            });
+        }
+
+        dialog.show_all ();
+
+        dialog.response.connect ((id) => {
+            switch (id) {
+                case Gtk.ResponseType.ACCEPT:
+                    clicked = 3;
+                    dialog.destroy ();
+                    break;
+                case 2:
+                    clicked = 2;
+                    dialog.destroy ();
+                    break;
+                default:
+                    clicked = 1;
+                    dialog.destroy ();
+                    break;
+            }
+        });
+
+        // Use run() to make the UI busy and freeze the loop until we get a response.
+        dialog.run ();
+
+        return new int[] {clicked, dont_ask};
+    }
+
+    /*
+     * Handle the actual export inside another async thread to avoid freezing
+     * the UI while exporting large images.
+     */
+    private async void do_export (Gdk.Pixbuf pixbuf, string file_name) {
+        SourceFunc callback = do_export.callback;
 
         new Thread<void*> (null, () => {
-            foreach (var entry in pixbufs.entries) {
-                var pixbuf = entry.value;
-                var node_id = entry.key;
-
-                try {
-                    if (settings.export_format == "png") {
-                        pixbuf.save (
-                            settings.export_folder + "/" + node_id.to_string () + ".png",
-                            "png",
-                            "compression",
-                            settings.export_compression.to_string (),
-                            null);
-                    }
-
-                    if (settings.export_format == "jpg") {
-                        pixbuf.save (
-                            settings.export_folder + "/" + node_id.to_string () + ".jpg",
-                            "jpeg",
-                            "quality",
-                            settings.export_quality.to_string (),
-                            null);
-                    }
-                } catch (Error e) {
-                    error ("Unable to export images: %s", e.message);
+            try {
+                if (settings.export_format == "png") {
+                    pixbuf.save (
+                        file_name,
+                        "png",
+                        "compression",
+                        settings.export_compression.to_string (),
+                        null);
                 }
+
+                if (settings.export_format == "jpg") {
+                    pixbuf.save (
+                        file_name,
+                        "jpeg",
+                        "quality",
+                        settings.export_quality.to_string (),
+                        null);
+                }
+            } catch (Error e) {
+                error ("Unable to export images: %s", e.message);
             }
 
             Idle.add ((owned) callback);
@@ -282,8 +393,5 @@ public class Akira.Lib.Managers.ExportManager : Object {
         });
 
         yield;
-
-        preview_finished ();
-        export_finished (_("Export successfully completed!"));
     }
 }
