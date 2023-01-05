@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2020 Alecaddd (https://alecaddd.com)
+* Copyright (c) 2020-2022 Alecaddd (https://alecaddd.com)
 *
 * This file is part of Akira.
 *
@@ -20,17 +20,20 @@
 */
 
 public class Akira.Models.ExportModel : GLib.Object {
+    public int node_id { get; set construct; }
     public Gdk.Pixbuf pixbuf { get; set construct; }
-    public string filename { get; set construct; }
 
-    public ExportModel (Gdk.Pixbuf pixbuf, string filename) {
+    public ExportModel (int node_id, Gdk.Pixbuf pixbuf) {
         Object (
             pixbuf: pixbuf,
-            filename: filename
+            node_id: node_id
         );
     }
 
+    /* TODO: Allow udpating the export name of nodes, and also handle the
+    temporary export name for area selection exports. */
+
     public string to_string () {
-        return "Filename: %s".printf (filename);
+        return "Node ID: %i".printf (node_id);
     }
 }

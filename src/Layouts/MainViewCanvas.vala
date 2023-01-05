@@ -31,6 +31,7 @@ public class Akira.Layouts.MainViewCanvas : Gtk.Grid {
     public weak Akira.Window window { get; construct; }
 
     private Gtk.Overlay main_overlay;
+    private Granite.Widgets.Toast notification;
 
     private double scroll_origin_x = 0;
     private double scroll_origin_y = 0;
@@ -43,6 +44,7 @@ public class Akira.Layouts.MainViewCanvas : Gtk.Grid {
         get_style_context ().add_class ("main-canvas");
 
         main_overlay = new Gtk.Overlay ();
+        notification = new Granite.Widgets.Toast ("");
 
         main_scroll = new Gtk.ScrolledWindow (null, null);
         main_scroll.expand = true;
@@ -90,6 +92,7 @@ public class Akira.Layouts.MainViewCanvas : Gtk.Grid {
         main_scroll.add (canvas);
 
         main_overlay.add (main_scroll);
+        main_overlay.add_overlay (notification);
 
         add (main_overlay);
     }
@@ -113,5 +116,14 @@ public class Akira.Layouts.MainViewCanvas : Gtk.Grid {
         main_scroll.hadjustment.value += delta_x * 10;
         main_scroll.vadjustment.value += delta_y * 10;
         return true;
+    }
+
+    /**
+     * Pass a simple string message and trigger the Granite.Toast notification
+     * At the top of the Canvas.
+     */
+    public void trigger_notification (string message) {
+        notification.title = message;
+        notification.send_notification ();
     }
 }

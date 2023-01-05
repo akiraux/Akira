@@ -43,6 +43,7 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
     public Lib.Managers.SnapManager snap_manager;
     public Lib.Managers.CopyManager copy_manager;
     public Lib.Managers.HistoryManager history_manager;
+    private Lib.Managers.ExportManager? export_manager = null;
 
     private bool is_modifier_pressed (Gdk.ModifierIntent type) {
         Gdk.ModifierType state;
@@ -779,5 +780,23 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
      */
     private void on_items_removed (GLib.Array<int> ids) {
         window.main_window.remove_layers (ids);
+    }
+
+    /* EXPORT METHODS */
+
+    private void init_export_manager () {
+        if (export_manager == null) {
+            export_manager = new Lib.Managers.ExportManager (this);
+        }
+    }
+
+    public async void export_selection () {
+        if (selection_manager.selection.is_empty ()) {
+            window.main_window.main_view_canvas.trigger_notification (_("Nothing selected to export!"));
+            return;
+        }
+
+        init_export_manager ();
+        yield export_manager.export_selection ();
     }
 }

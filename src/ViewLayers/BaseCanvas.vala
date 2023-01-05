@@ -655,11 +655,4 @@ public class Akira.ViewLayers.BaseCanvas : Gtk.Widget , Gtk.Scrollable {
     public void toggle_layer_visibility (string layer_id, bool visibility) {
         overlays[layer_id].set_visible (visibility);
     }
-
-    /*
-     * Render target bounds to a cairo context.
-     */
-    public void render (Cairo.Context context, Geometry.Rectangle bounds, double scale) {
-        // TODO
-    }
 }

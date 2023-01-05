@@ -176,4 +176,18 @@ public class Akira.Lib.Components.Borders : Component, Copyable<Borders> {
         data.resize (data.length - 1);
         return true;
     }
+
+    /*
+     * Helper method used to retrieve the size of the thickest visible border.
+     */
+    public double get_border_width () {
+        double size = 0;
+        foreach (unowned var border in data) {
+            if (border.hidden) {
+                continue;
+            }
+            size = double.max (size, border.size);
+        }
+        return size;
+    }
 }
