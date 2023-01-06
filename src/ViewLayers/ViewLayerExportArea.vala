@@ -88,7 +88,7 @@ public class Akira.ViewLayers.ViewLayerExportArea : ViewLayer {
         drawable.fill_rgba = fill;
         drawable.line_width = UI_LINE_WIDTH / scale;
         drawable.stroke_rgba = stroke;
-        context.set_dash ({10, 5}, 10 / scale);
+        context.set_dash ({10 / scale, 5 / scale}, 10 / scale);
         drawable.paint (context, target_bounds, scale, Drawables.Drawable.DrawType.NORMAL);
 
         last_drawn_bb = drawable.bounds;

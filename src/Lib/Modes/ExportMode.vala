@@ -57,7 +57,9 @@ public class Akira.Lib.Modes.ExportMode : AbstractInteractionMode {
         export_area_layer.add_to_canvas (ViewLayers.ViewLayer.EXPORT_AREA_LAYER_ID, view_canvas);
     }
 
-    public override void mode_end () {}
+    public override void mode_end () {
+        export_area_layer.remove_region ();
+    }
 
     public override AbstractInteractionMode.ModeType mode_type () {
         return AbstractInteractionMode.ModeType.EXPORT;
