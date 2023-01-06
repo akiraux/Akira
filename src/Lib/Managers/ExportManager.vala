@@ -31,6 +31,7 @@ public class Akira.Lib.Managers.ExportManager : Object {
         ARTBOARD
     }
     private Type export_type;
+    private Akira.Geometry.Rectangle area;
 
     public unowned Akira.Lib.ViewCanvas canvas { get; construct; }
 
@@ -58,6 +59,18 @@ public class Akira.Lib.Managers.ExportManager : Object {
         yield generate_preview (preview_cancellable);
     }
 
+    public async void export_area (Geometry.Rectangle bounds) {
+        export_type = Type.AREA;
+        area = bounds;
+        trigger_export_dialog ();
+        if (preview_cancellable != null) {
+            preview_cancellable.cancel ();
+        }
+
+        preview_cancellable = new GLib.Cancellable ();
+        yield generate_preview (preview_cancellable);
+    }
+
     public async void generate_preview (GLib.Cancellable cancellable) {
         busy (_("Generating preview, please wait…"));
 
@@ -76,6 +89,24 @@ public class Akira.Lib.Managers.ExportManager : Object {
             format = Cairo.Format.RGB24;
         }
 
+        switch (export_type) {
+            case Type.SELECTION:
+                yield generate_selection_pixbufs (cancellable);
+                break;
+            case Type.AREA:
+                yield generate_area_pixbuf (cancellable);
+                break;
+        }
+    }
+
+    private async void generate_area_pixbuf (GLib.Cancellable cancellable) {
+        yield generate_image_surface (area);
+        var pixbuf = yield generate_pixbuf (surface);
+
+        pixbufs.set (9999, pixbuf);
+    }
+
+    private async void generate_selection_pixbufs (GLib.Cancellable cancellable) {
         // Loop through all items and clone the model.
         unowned var selection = canvas.selection_manager.selection;
         foreach (var node_id in selection.nodes.keys) {
@@ -109,38 +140,42 @@ public class Akira.Lib.Managers.ExportManager : Object {
             bounds.left = left;
             bounds.right = right;
 
-            double width = bounds.width;
-            double height = bounds.height;
-            scale_surface (ref width, ref height);
+            yield generate_image_surface (bounds);
+            var pixbuf = yield generate_pixbuf (surface);
 
-            // Create the rendered image with Cairo.
-            surface = new Cairo.ImageSurface (
-                format,
+            pixbufs.set (node_id, pixbuf);
+        }
+    }
+
+    private async void generate_image_surface (Geometry.Rectangle bounds) {
+        double width = bounds.width;
+        double height = bounds.height;
+        scale_surface (ref width, ref height);
+
+        // Create the rendered image with Cairo.
+        surface = new Cairo.ImageSurface (
+            format,
+            (int) Math.round (width),
+            (int) Math.round (height)
+        );
+        context = new Cairo.Context (surface);
+
+        // Draw a white background if JPG export.
+        if (settings.export_format == "jpg" || !settings.export_alpha) {
+            context.set_source_rgba (1, 1, 1, 1);
+            context.rectangle (
+                0, 0,
                 (int) Math.round (width),
                 (int) Math.round (height)
             );
-            context = new Cairo.Context (surface);
-
-            // Draw a white background if JPG export.
-            if (settings.export_format == "jpg" || !settings.export_alpha) {
-                context.set_source_rgba (1, 1, 1, 1);
-                context.rectangle (
-                    0, 0,
-                    (int) Math.round (width),
-                    (int) Math.round (height)
-                );
-                context.fill ();
-            }
-
-            scale_context (ref context);
-            // Move the context to the right coordinates.
-            context.translate (-left, -top);
-            // Render what's currently on the canvas inside those coordinates.
-            canvas.draw_model (context, bounds);
-
-            var pixbuf = yield generate_pixbuf (surface);
-            pixbufs.set (node_id, pixbuf);
+            context.fill ();
         }
+
+        scale_context (ref context);
+        // Move the context to the right coordinates.
+        context.translate (-bounds.left, -bounds.top);
+        // Render what's currently on the canvas inside those coordinates.
+        canvas.draw_model (context, bounds);
     }
 
     /*

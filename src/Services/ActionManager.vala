@@ -327,8 +327,9 @@ public class Akira.Services.ActionManager : Object {
     }
 
     private void action_export_grab () {
-        // weak Akira.Lib.Canvas canvas = window.main_window.main_canvas.canvas;
-        // canvas.start_export_area_selection ();
+        unowned Akira.Lib.ViewCanvas canvas = window.main_window.main_view_canvas.canvas;
+        var new_mode = new Lib.Modes.ExportMode (canvas);
+        canvas.mode_manager.register_mode (new_mode);
     }
 
     private void action_zoom_in () {
