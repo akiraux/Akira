@@ -799,4 +799,14 @@ public class Akira.Lib.ViewCanvas : ViewLayers.BaseCanvas {
         init_export_manager ();
         yield export_manager.export_selection ();
     }
+
+    public async void export_area (Geometry.Rectangle area) {
+        if (area.width == 0 || area.height == 0) {
+            window.main_window.main_view_canvas.trigger_notification (_("Unable to export the selected area!"));
+            return;
+        }
+
+        init_export_manager ();
+        yield export_manager.export_area (area);
+    }
 }

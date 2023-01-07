@@ -99,6 +99,7 @@ sources = files(
     'ViewLayers/ViewLayerSnaps.vala',
     'ViewLayers/ViewLayerNobs.vala',
     'ViewLayers/ViewLayerHover.vala',
+    'ViewLayers/ViewLayerExportArea.vala',
     'ViewLayers/ViewLayerGrid.vala',
     'ViewLayers/ViewLayerPath.vala',
     'ViewLayers/ViewLayerMultiSelect.vala',
