@@ -93,11 +93,11 @@ public class Akira.Widgets.ExportWidget : Gtk.Grid {
         });
 
         // Trigger the detection of and empty file name filed on creation.
-        //  on_input_changed ();
+        on_input_changed ();
     }
 
     private void on_input_changed () {
-        bool empty = input.text._strip () == "";
+        bool empty = input.text.strip () == "";
         model.toggle_export_button (!empty);
         if (empty) {
             input.set_icon_from_icon_name (Gtk.EntryIconPosition.SECONDARY, "process-error");
