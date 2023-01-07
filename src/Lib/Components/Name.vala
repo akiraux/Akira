@@ -22,6 +22,7 @@
 public class Akira.Lib.Components.Name : Component, Copyable<Name> {
     private string _id;
     private string _name;
+    private string _filename;
 
     public string id {
         get { return _id; }
@@ -31,22 +32,29 @@ public class Akira.Lib.Components.Name : Component, Copyable<Name> {
         get { return _name; }
     }
 
-    public Name (string name, string id) {
+    public string filename {
+        get { return _filename; }
+    }
+
+    public Name (string name, string id, string? filename = null) {
         _id = id;
         _name = name;
+        _filename = filename != null ? filename : name;
     }
 
     public Name.deserialized (Json.Object obj) {
-        _id = obj.get_string_member ("name");
-        _name = obj.get_string_member ("id");
+        _id = obj.get_string_member ("id");
+        _name = obj.get_string_member ("name");
+        _filename = obj.get_string_member ("filename");
     }
 
     protected override void serialize_details (ref Json.Object obj) {
-        obj.set_string_member ("name", _name);
         obj.set_string_member ("id", _id);
+        obj.set_string_member ("name", _name);
+        obj.set_string_member ("filename", _filename);
     }
 
     public Name copy () {
-        return new Name (_name, _id);
+        return new Name (_name, _id, _filename);
     }
 }

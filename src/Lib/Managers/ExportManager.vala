@@ -103,7 +103,7 @@ public class Akira.Lib.Managers.ExportManager : Object {
         yield generate_image_surface (area);
         var pixbuf = yield generate_pixbuf (surface);
 
-        pixbufs.set (9999, pixbuf);
+        pixbufs.set (Lib.Items.Model.ORIGIN_ID, pixbuf);
     }
 
     private async void generate_selection_pixbufs (GLib.Cancellable cancellable) {
@@ -296,26 +296,27 @@ public class Akira.Lib.Managers.ExportManager : Object {
             canvas.window.event_bus.set_focus_on_canvas ();
 
             // Clean up.
+            pixbufs.clear ();
             context = null;
             surface = null;
         });
     }
 
-    public async void export_images () {
-        /*
-        TODO:
-         - Implement filenames and don't allow exporting without one.
-        */
+    public async void export_images (GLib.ListStore list_store) {
         busy (_("Exporting images…"));
 
         bool overwrite_all = false;
         bool skip_all = false;
 
-        // Loop through all generated pixbufs and handle the save to a file.
-        foreach (var entry in pixbufs.entries) {
-            var pixbuf = entry.value;
-            var node_id = entry.key;
-            var file_name = ("%s/%i.%s").printf (settings.export_folder, node_id, settings.export_format);
+        // Loop through all generated models and handle the save to a file.
+        for (int i = 0; i < list_store.get_n_items () ; i++) {
+            var model = (Akira.Models.ExportModel) list_store.get_object (i);
+            var pixbuf = model.pixbuf;
+            var file_name = ("%s/%s.%s").printf (
+                settings.export_folder,
+                model.filename,
+                settings.export_format
+            );
 
             // Check for existing files to avoid overwriting them.
             var image_file = File.new_for_path (file_name);

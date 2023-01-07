@@ -20,20 +20,62 @@
 */
 
 public class Akira.Models.ExportModel : GLib.Object {
-    public int node_id { get; set construct; }
-    public Gdk.Pixbuf pixbuf { get; set construct; }
+    private unowned Akira.Lib.ViewCanvas _view_canvas;
+    private Lib.Items.ModelInstance? _cached_instance = null;
 
-    public ExportModel (int node_id, Gdk.Pixbuf pixbuf) {
-        Object (
-            pixbuf: pixbuf,
-            node_id: node_id
-        );
+    private Gdk.Pixbuf _pixbuf;
+    public Gdk.Pixbuf pixbuf {
+        get { return _pixbuf; }
     }
 
-    /* TODO: Allow udpating the export name of nodes, and also handle the
-    temporary export name for area selection exports. */
+    private int id {
+        get {
+            return _cached_instance.id;
+        }
+    }
 
-    public string to_string () {
-        return "Node ID: %i".printf (node_id);
+    private string name {
+        get {
+            return _cached_instance.components.name.name;
+        }
+    }
+
+    // When exporting an arbitrary area, we don't have a model instance to update
+    // so let's use a temporary string for this model.
+    private string _area_filename = _("Selected area");
+    public string filename {
+        owned get {
+            if (_cached_instance != null) {
+                return _cached_instance.components.name.filename;
+            }
+
+            return _area_filename;
+        }
+        set {
+            if (_cached_instance == null) {
+                _area_filename = value;
+                return;
+            }
+
+            if (_cached_instance.components.name.filename == value) {
+                return;
+            }
+
+            unowned var im = _view_canvas.items_manager;
+            var node = im.item_model.node_from_id (_cached_instance.id);
+            assert (node != null);
+
+            node.instance.components.name = new Lib.Components.Name (name, id.to_string (), value);
+            im.item_model.alert_node_changed (node, Lib.Components.Component.Type.COMPILED_NAME);
+            im.compile_model ();
+        }
+    }
+
+    public ExportModel (Lib.ViewCanvas view_canvas, Lib.Items.ModelNode? node, Gdk.Pixbuf pixbuf) {
+        _view_canvas = view_canvas;
+        _pixbuf = pixbuf;
+        if (node != null) {
+            _cached_instance = node.instance;
+        }
     }
 }

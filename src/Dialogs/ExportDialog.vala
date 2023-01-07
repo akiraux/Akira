@@ -295,7 +295,7 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
         export_button.get_style_context ().add_class (Gtk.STYLE_CLASS_SUGGESTED_ACTION);
         action_area.add (export_button);
         export_button.clicked.connect (() => {
-            manager.export_images.begin ();
+            manager.export_images.begin (list_store);
         });
 
         sidebar.add (grid);
@@ -314,7 +314,9 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
     public async void on_show_preview (Gee.HashMap<int, Gdk.Pixbuf> pixbufs) {
         list_store.remove_all ();
         foreach (var entry in pixbufs.entries) {
-            var model = new Models.ExportModel (entry.key, entry.value);
+            var node = entry.key == Lib.Items.Model.ORIGIN_ID ?
+                null : canvas.items_manager.node_from_id (entry.key);
+            var model = new Models.ExportModel (canvas, node, entry.value);
             list_store.append (model);
         }
     }

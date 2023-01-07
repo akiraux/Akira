@@ -20,9 +20,6 @@
  */
 
 public class Akira.Widgets.ExportWidget : Gtk.Grid {
-    private const int MB = 1024 * 1024;
-    private const int KB = 1024;
-
     public Models.ExportModel model { get; set construct; }
 
     private Gtk.Label info;
@@ -68,6 +65,8 @@ public class Akira.Widgets.ExportWidget : Gtk.Grid {
             hexpand = true
         };
         input.get_style_context ().add_class ("export-filename");
+        model.bind_property ("filename", input, "text",
+            BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE);
 
         attach (input, 0, 0);
         attach (info, 1, 0);
