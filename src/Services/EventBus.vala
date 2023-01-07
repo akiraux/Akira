@@ -89,11 +89,7 @@ public class Akira.Services.EventBus : Object {
     public signal void connect_typing_accel ();
 
     // Export signals.
-    public signal void export_preview (string message);
-    public signal void preview_completed ();
-    public signal void exporting (string message);
-    public signal void export_completed ();
-
+    public signal void toggle_export_button (bool sensitive);
     // History signals
     public signal void create_model_snapshot (string description);
     public signal void undo ();

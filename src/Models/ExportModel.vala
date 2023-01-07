@@ -78,4 +78,8 @@ public class Akira.Models.ExportModel : GLib.Object {
             _cached_instance = node.instance;
         }
     }
+
+    public void toggle_export_button (bool sensitive) {
+        _view_canvas.window.event_bus.toggle_export_button (sensitive);
+    }
 }
