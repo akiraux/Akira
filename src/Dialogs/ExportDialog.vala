@@ -38,6 +38,8 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
     public Gtk.Label alpha_title;
     public Gtk.Switch alpha_switch;
 
+    private Gtk.Button export_button;
+
     private Gtk.Overlay main_overlay;
     private Granite.Widgets.Toast notification;
     private Granite.Widgets.OverlayBar overlaybar;
@@ -149,6 +151,8 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
         manager.show_preview.connect (on_show_preview);
         manager.free.connect (on_free);
         manager.export_finished.connect (on_export_finished);
+
+        canvas.window.event_bus.toggle_export_button.connect (on_toggle_export_button);
     }
 
     private void build_export_sidebar () {
@@ -289,13 +293,13 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
             close ();
         });
 
-        var export_button = new Gtk.Button.with_label (_("Export")) {
+        export_button = new Gtk.Button.with_label (_("Export")) {
             halign = Gtk.Align.END
         };
         export_button.get_style_context ().add_class (Gtk.STYLE_CLASS_SUGGESTED_ACTION);
         action_area.add (export_button);
         export_button.clicked.connect (() => {
-            manager.export_images.begin ();
+            manager.export_images.begin (list_store);
         });
 
         sidebar.add (grid);
@@ -314,7 +318,9 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
     public async void on_show_preview (Gee.HashMap<int, Gdk.Pixbuf> pixbufs) {
         list_store.remove_all ();
         foreach (var entry in pixbufs.entries) {
-            var model = new Models.ExportModel (entry.key, entry.value);
+            var node = entry.key == Lib.Items.Model.ORIGIN_ID ?
+                null : canvas.items_manager.node_from_id (entry.key);
+            var model = new Models.ExportModel (canvas, node, entry.value);
             list_store.append (model);
         }
     }
@@ -345,5 +351,9 @@ public class Akira.Dialogs.ExportDialog : Gtk.Dialog {
     public void on_export_finished (string message) {
         notification.title = message;
         notification.send_notification ();
+    }
+
+    private void on_toggle_export_button (bool sensitive) {
+        export_button.sensitive = sensitive;
     }
 }

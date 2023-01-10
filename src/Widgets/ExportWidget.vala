@@ -20,11 +20,9 @@
  */
 
 public class Akira.Widgets.ExportWidget : Gtk.Grid {
-    private const int MB = 1024 * 1024;
-    private const int KB = 1024;
-
     public Models.ExportModel model { get; set construct; }
 
+    private Gtk.Entry input;
     private Gtk.Label info;
     private Gtk.Grid image_container;
     private Gtk.Image image;
@@ -32,7 +30,7 @@ public class Akira.Widgets.ExportWidget : Gtk.Grid {
 
     public ExportWidget (Models.ExportModel model) {
         Object (
-            orientation: Gtk.Orientation.HORIZONTAL,
+            orientation: Gtk.Orientation.VERTICAL,
             model: model
         );
     }
@@ -40,15 +38,25 @@ public class Akira.Widgets.ExportWidget : Gtk.Grid {
     construct {
         halign = Gtk.Align.CENTER;
         valign = Gtk.Align.CENTER;
-        column_spacing = 6;
+        row_spacing = 9;
+        margin_top = margin_bottom = 6;
         expand = true;
+        var ctx = get_style_context ();
+        ctx.add_class ("export-widget");
+        ctx.add_class (Granite.STYLE_CLASS_CARD);
 
-        // Label for image size info. We need to create this before calling get_image ().
-        info = new Gtk.Label (null) {
-            hexpand = false,
-            halign = Gtk.Align.END
+        // Filename with editable entry.
+        input = new Gtk.Entry () {
+            placeholder_text = _("File name"),
+            width_chars = 10,
+            hexpand = true
         };
-        info.get_style_context ().add_class ("export-info");
+        input.secondary_icon_activatable = false;
+        input.secondary_icon_tooltip_text = _("A file name is required to export this image");
+        input.get_style_context ().add_class ("export-filename");
+        input.changed.connect (on_input_changed);
+        input.text = model.filename;
+        input.bind_property ("text", model, "filename", BindingFlags.DEFAULT);
 
         // Image preview container with checker.
         image_container = new Gtk.Grid () {
@@ -56,22 +64,24 @@ public class Akira.Widgets.ExportWidget : Gtk.Grid {
         };
         var image_container_ctx = image_container.get_style_context ();
         image_container_ctx.add_class (Granite.STYLE_CLASS_CHECKERBOARD);
-        image_container_ctx.add_class (Granite.STYLE_CLASS_CARD);
+        image_container_ctx.add_class ("export-image");
 
         image = new Gtk.Image ();
         image_container.add (image);
+
+        // Label for image size info.
+        info = new Gtk.Label (null) {
+            hexpand = true,
+            halign = Gtk.Align.END
+        };
+        info.get_style_context ().add_class ("export-info");
+
+        // Fetch the image and its info after all the widgets have been created.
         get_image.begin ();
 
-        // Filename with editable entry.
-        var input = new Gtk.Entry () {
-            width_chars = 10,
-            hexpand = true
-        };
-        input.get_style_context ().add_class ("export-filename");
-
         attach (input, 0, 0);
-        attach (info, 1, 0);
-        attach (image_container, 0, 1, 2);
+        attach (image_container, 0, 1);
+        attach (info, 0, 2);
 
         show_all ();
 
@@ -81,6 +91,22 @@ public class Akira.Widgets.ExportWidget : Gtk.Grid {
         settings.changed["export-compression"].connect (() => {
             update_file_size.begin ();
         });
+
+        // Trigger the detection of and empty file name filed on creation.
+        on_input_changed ();
+    }
+
+    private void on_input_changed () {
+        bool empty = input.text.strip () == "";
+        model.toggle_export_button (!empty);
+        if (empty) {
+            input.set_icon_from_icon_name (Gtk.EntryIconPosition.SECONDARY, "process-error");
+            return;
+        }
+
+        if (input.get_icon_name (Gtk.EntryIconPosition.SECONDARY) != null) {
+            input.set_icon_from_icon_name (Gtk.EntryIconPosition.SECONDARY, null);
+        }
     }
 
     /**

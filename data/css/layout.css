@@ -102,19 +102,6 @@
     border: none;
 }
 
-.input-button {
-    padding: 0 2pt;
-    margin: 0;
-}
-
-.input-button.up {
-    margin-bottom: -2pt;
-}
-
-.input-button.down {
-    margin-top: -2pt;
-}
-
 paned > separator {
     min-width: 1px;
     margin-right: 0;
@@ -129,10 +116,14 @@ paned > separator {
     background-color: transparent;
 }
 
-.export-filename {
-    background: none;
-    border: none;
-    box-shadow: none;
+.export-widget {
+    background-color: shade (@bg_color, 0.98);
+    padding: 9px;
+    border-radius: 4px;
+}
+
+.export-image {
+    border: 1px solid shade (@bg_color, 0.85);
 }
 
 .export-info {
