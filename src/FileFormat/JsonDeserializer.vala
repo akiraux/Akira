@@ -95,7 +95,7 @@ public class Akira.FileFormat.JsonDeserializer {
         var components = Lib.Components.Components.deserialize (components_json);
 
         Lib.Items.ModelInstance? new_inst = null;
-        if (type == "rect") {
+        if (type == "rectangle") {
             new_inst = new Lib.Items.ModelInstance (-1, new Lib.Items.ModelTypeRect ());
         } else if (type == "ellipse") {
             new_inst = new Lib.Items.ModelInstance (-1, new Lib.Items.ModelTypeEllipse ());
