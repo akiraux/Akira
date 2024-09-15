@@ -4,3 +4,4 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+gtk = { version = "0.9.1", package = "gtk4" }
