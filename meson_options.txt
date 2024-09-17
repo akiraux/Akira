@@ -1,4 +1,0 @@
-option('profile', type: 'combo', choices: ['default', 'development'], value: 'default')
-
-option('install-tests', type : 'boolean', value : 'false',
-       description : 'install test executables')
