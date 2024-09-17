@@ -4,4 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+gettext-rs = "0.7.1"
+granite = { version = "1.1", package = "granite-rs", features = ["v7_2"] }
 gtk = { version = "0.9.1", package = "gtk4" }
+once_cell = "1.19.0"
