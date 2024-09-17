@@ -54,28 +54,21 @@ mod imp {
                 .bidirectional()
                 .build();
 
-            let headerbar = gtk::HeaderBar::builder().show_title_buttons(true).build();
+            let header_bar = gtk::HeaderBar::builder().show_title_buttons(true).build();
 
-            headerbar.style_context().add_class("default-decoration");
-            headerbar.pack_end(&mode_switch);
+            header_bar.style_context().add_class("default-decoration");
+            header_bar.pack_end(&mode_switch);
 
-            obj.set_titlebar(Some(&headerbar));
+            obj.set_titlebar(Some(&header_bar));
         }
     }
 
     impl WidgetImpl for AppWindow {}
-    impl WindowImpl for AppWindow {
-        fn close_request(&self) -> glib::Propagation {
-            // self.obj()
-            //     .save_window_size()
-            //     .expect("Failed to save window state");
-
-            glib::Propagation::Proceed
-        }
-    }
+    impl WindowImpl for AppWindow {}
     impl ApplicationWindowImpl for AppWindow {}
 }
 
+// Extend and implements the proper classes to make AppWindow and actual GtkObject
 glib::wrapper! {
     pub struct AppWindow(ObjectSubclass<imp::AppWindow>)
         @extends gtk::Widget, gtk::Window, gtk::ApplicationWindow,
@@ -88,43 +81,5 @@ impl AppWindow {
             .property("application", application)
             .property("title", "Akira")
             .build()
-    }
-
-    fn setup_settings(&self) {
-        let settings = Settings::new(super::APP_ID);
-        self.imp()
-            .settings
-            .set(settings)
-            .expect("`settings` should not be set before calling `setup_settings`.");
-    }
-
-    fn settings(&self) -> &Settings {
-        self.imp()
-            .settings
-            .get()
-            .expect("`settings` should be set in `setup_settings`.")
-    }
-
-    pub fn save_window_size(&self) -> Result<(), glib::BoolError> {
-        let size = self.default_size();
-
-        self.settings().set_int("window-width", size.0)?;
-        self.settings().set_int("window-height", size.1)?;
-        self.settings()
-            .set_boolean("is-maximized", self.is_maximized())?;
-
-        Ok(())
-    }
-
-    fn load_window_size(&self) {
-        let width = self.settings().int("window-width");
-        let height = self.settings().int("window-height");
-        let is_maximized = self.settings().boolean("is-maximized");
-
-        self.set_default_size(width, height);
-
-        if is_maximized {
-            self.maximize();
-        }
     }
 }
