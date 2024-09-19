@@ -19,6 +19,8 @@ use gtk::subclass::prelude::*;
 use gtk::{gio, gio::Settings, glib, prelude::*, ApplicationWindow};
 use once_cell::sync::OnceCell;
 
+use crate::config::APP_ID;
+
 mod imp {
     use super::*;
 
@@ -39,6 +41,9 @@ mod imp {
             self.parent_constructed();
 
             let obj = self.obj();
+
+            obj.setup_settings();
+            obj.load_window_size();
 
             let mode_switch = granite::ModeSwitch::builder()
                 .primary_icon_name("display-brightness-symbolic")
@@ -64,7 +69,15 @@ mod imp {
     }
 
     impl WidgetImpl for AppWindow {}
-    impl WindowImpl for AppWindow {}
+    impl WindowImpl for AppWindow {
+        fn close_request(&self) -> glib::Propagation {
+            self.obj()
+                .save_window_size()
+                .expect("Failed to save window state");
+
+            glib::Propagation::Proceed
+        }
+    }
     impl ApplicationWindowImpl for AppWindow {}
 }
 
@@ -81,5 +94,42 @@ impl AppWindow {
             .property("application", application)
             .property("title", "Akira")
             .build()
+    }
+
+    fn setup_settings(&self) {
+        let settings = Settings::new(APP_ID);
+        self.imp()
+            .settings
+            .set(settings)
+            .expect("`settings` should not be set before calling `setup_settings`.");
+    }
+
+    fn settings(&self) -> &Settings {
+        self.imp()
+            .settings
+            .get()
+            .expect("`settings` should be set in `setup_settings`.")
+    }
+
+    fn save_window_size(&self) -> Result<(), glib::BoolError> {
+        let size = self.default_size();
+
+        self.settings().set_int("window-width", size.0)?;
+        self.settings().set_int("window-height", size.1)?;
+        self.settings()
+            .set_boolean("is-maximized", self.is_maximized())?;
+
+        Ok(())
+    }
+
+    fn load_window_size(&self) {
+        let width = self.settings().int("window-width");
+        let height = self.settings().int("window-height");
+        let is_maximized = self.settings().boolean("is-maximized");
+
+        self.set_default_size(width, height);
+        if is_maximized {
+            self.maximize();
+        }
     }
 }

@@ -6,7 +6,6 @@ configure_file(
     configuration: conf
 )
 
-
 # Copy the config.rs output to the source directory.
 run_command(
   'cp',
@@ -45,4 +44,10 @@ cargo_build = custom_target(
         cargo_bin, 'build',
         cargo_opt, '&&', 'cp', 'src' / rust_target / exec_name, '@OUTPUT@',
     ]
+)
+
+test(
+    'Run cargo test',
+    cargo_bin, args: ['test'],
+    timeout: 600
 )

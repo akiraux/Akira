@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=Akira
+GenericName=Akira UX App
+Comment=The Linux Design Tool
+Exec=@EXEC_NAME@
+Icon=@APP_ID_UNQUOTED@
+Terminal=false
+Type=Application
+Categories=Utility;Graphics;
+StartupNotify=true
+MimeType=application/x-akira;
