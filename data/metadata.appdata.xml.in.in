@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop">
+    <id>@APP_ID_UNQUOTED@</id>
+    <name>Akira</name>
+    <summary>The Linux Design Tool</summary>
+    <metadata_license>CC0-1.0</metadata_license>
+    <project_license>GPL-3.0+</project_license>
+    <description>
+        <p>
+        A modern UX Design Application for UI and UX Designers
+        </p>
+        <p>
+        ⚠ WARNING! Akira is still under development and not ready for production. Missing features, random bugs, and black holes opening in your kitchen are to be expected.</p>
+        <p>
+        Akira is a native Linux Design application built in Rust and Gtk. Akira focuses on offering a modern and fast approach to UI and UX Design, mainly targeting web and graphic designers. The main goal is to offer a valid and professional solution for designers who want to use Linux as their main OS.
+        </p>
+        <p>
+        Features Include:
+        </p>
+        <ul>
+        <li>Fully vector canvas for infinite resizing without quality loss</li>
+        <li>Smart option panel that shows the editable features of a selected item</li>
+        <li>Layers panel with easy Drag and Drop and smart ordering</li>
+        <li>Create Artboards to better organize your design iterations and views</li>
+        <li>Control the size and quality of exported images</li>
+        <li>Customizable icon set</li>
+        <li>And so much more…</li>
+        </ul>
+    </description>
+    <provides>
+		<binary>@APP_ID@</binary>
+	</provides>
+  <releases>
+    <release version="0.0.15" date="2021-07-20">
+      <description>
+        <p>Performance improvements and Global colors library</p>
+        <ul>
+          <li>Improved "Modes" detection (insert, select, transform).</li>
+          <li>Fixed Artboard label issues on zoom.</li>
+          <li>Improved Pixel Grid detection and z-index stack with other items.</li>
+          <li>Implemented editable zoom value.</li>
+          <li>Fix application activation when opening a new file.</li>
+          <li>Fix sizing issue when dropping images into the Canvas.</li>
+          <li>Implemented Global colors library.</li>
+          <li>Italian translation.</li>
+        </ul>
+      </description>
+    </release>
+    <release version="0.0.14" date="2021-04-25">
+      <description>
+        <p>New Features and Bug Fixes</p>
+        <ul>
+          <li>Complete rebuild of the Canvas library architecture.</li>
+          <li>Implemented Pixel Grid.</li>
+          <li>Customize color of Pixel Grid.</li>
+          <li>Implemented smart Snapping Guides.</li>
+          <li>Customize color and magnetic threshold of Snapping Guides.</li>
+          <li>Allow items resizing in all directions.</li>
+          <li>Add images via click and drag with the Image Tool.</li>
+          <li>Handle multiple Fills and Border colors for each item.</li>
+          <li>Allow scaling items from the center.</li>
+          <li>Enable dropping images on the canvas.</li>
+          <li>A lot of code improvements and optimization.</li>
+        </ul>
+      </description>
+    </release>
+    <release version="0.0.13" date="2020-09-02">
+      <description>
+        <p>New Features and Bug Fixes</p>
+        <ul>
+          <li>New color picker for Fills and Borders.</li>
+          <li>Zooming with mouse wheel follows the position of the cursor.</li>
+          <li>Fix loading Artboards background color when opening a file.</li>
+          <li>Fix numbering of newly created items.</li>
+          <li>Fix Gtk-CRITICAL warning when opening the Export Dialog.</li>
+          <li>Fix flipping items inside Artboards.</li>
+          <li>Fix crash when dropping flipped items inside Artboards.</li>
+          <li>General code improvements and optimization.</li>
+        </ul>
+      </description>
+    </release>
+    <release version="0.0.12" date="2020-08-12">
+      <description>
+        <p>Bug fixes and Artboards improvements</p>
+        <ul>
+          <li>Control Artboards background color.</li>
+          <li>Hide and Lock Artboards from the Layers panel.</li>
+          <li>Items inside Artboards are masked when extending outside the edges of the Artboard.</li>
+          <li>Fix items reordering with the layers panel drag and drop.</li>
+          <li>Fix random segfault at startup while setting accelerators.</li>
+          <li>Updated goocanvas vapi.</li>
+        </ul>
+      </description>
+    </release>
+    <release version="0.0.11" date="2020-08-04">
+      <description>
+        <p>🚀 Experimental Alpha Release, say Hi to Akira!</p>
+        <ul>
+          <li>Create Artboards and basic shapes</li>
+          <li>Manage the fill and border properties of shapes</li>
+          <li>Import images</li>
+          <li>Export custom areas, selections, and artboards</li>
+          <li>So many crashes and missing features you wouldn't believe, but hey, this is an experimental alpha…</li>
+        </ul>
+      </description>
+    </release>
+    <release version="0.0.1-alpha" date="2020-08-03">
+      <description>
+        <p>🚀 Experimental Alpha Release, say Hi to Akira!</p>
+        <ul>
+          <li>Create Artboards and basic shapes</li>
+          <li>Manage the fill and border properties of shapes</li>
+          <li>Import images</li>
+          <li>Export custom areas, selections, and artboards</li>
+          <li>So many crashes and missing features you wouldn't believe, but hey, this is an experimental alpha…</li>
+        </ul>
+      </description>
+    </release>
+    <release version="0.0.1" date="2020-08-02">
+      <description>
+        <p>🚀 Experimental Alpha Release, say Hi to Akira!</p>
+        <ul>
+          <li>Create Artboards and basic shapes</li>
+          <li>Manage the fill and border properties of shapes</li>
+          <li>Import images</li>
+          <li>Export custom areas, selections, and artboards</li>
+          <li>So many crashes and missing features you wouldn't believe, but hey, this is an experimental alpha…</li>
+        </ul>
+      </description>
+    </release>
+  </releases>
+  <screenshots>
+    <screenshot type="default">
+      <image>https://raw.githubusercontent.com/akiraux/akira/master/data/screenshots/screenshot-1.png</image>
+    </screenshot>
+    <screenshot>
+      <image>https://raw.githubusercontent.com/akiraux/akira/master/data/screenshots/screenshot-2.png</image>
+    </screenshot>
+    <screenshot>
+      <image>https://raw.githubusercontent.com/akiraux/akira/master/data/screenshots/screenshot-3.png</image>
+    </screenshot>
+    <screenshot>
+      <image>https://raw.githubusercontent.com/akiraux/akira/master/data/screenshots/screenshot-4.png</image>
+    </screenshot>
+  </screenshots>
+  <launchable type="desktop-id">@APP_ID@.desktop</launchable>
+  <developer_name>Alessandro Castellani</developer_name>
+  <url type="homepage">https://github.com/akiraux/akira</url>
+  <url type="bugtracker">https://github.com/akiraux/akira/issues</url>
+  <url type="help">https://github.com/akiraux/akira/issues</url>
+  <url type="donation">https://www.paypal.me/alecaddd</url>
+  <update_contact>castellani.ale@gmail.com</update_contact>
+  <translation type="gettext">@GETTEXT_PACKAGE@</translation>
+  <kudos>
+      <!--
+        GNOME Software kudos:
+        https://gitlab.gnome.org/GNOME/gnome-software/blob/master/doc/kudos.md
+      -->
+      <kudo>ModernToolkit</kudo>
+      <kudo>HighContrast</kudo>
+      <kudo>HiDpiIcon</kudo>
+  </kudos>
+  <content_rating type="oars-1.1">
+    <content_attribute id="violence-cartoon">none</content_attribute>
+    <content_attribute id="violence-fantasy">none</content_attribute>
+    <content_attribute id="violence-realistic">none</content_attribute>
+    <content_attribute id="violence-bloodshed">none</content_attribute>
+    <content_attribute id="violence-sexual">none</content_attribute>
+    <content_attribute id="violence-desecration">none</content_attribute>
+    <content_attribute id="violence-slavery">none</content_attribute>
+    <content_attribute id="violence-worship">none</content_attribute>
+    <content_attribute id="drugs-alcohol">none</content_attribute>
+    <content_attribute id="drugs-narcotics">none</content_attribute>
+    <content_attribute id="drugs-tobacco">none</content_attribute>
+    <content_attribute id="sex-nudity">none</content_attribute>
+    <content_attribute id="sex-themes">none</content_attribute>
+    <content_attribute id="sex-homosexuality">none</content_attribute>
+    <content_attribute id="sex-prostitution">none</content_attribute>
+    <content_attribute id="sex-adultery">none</content_attribute>
+    <content_attribute id="sex-appearance">none</content_attribute>
+    <content_attribute id="language-profanity">none</content_attribute>
+    <content_attribute id="language-humor">none</content_attribute>
+    <content_attribute id="language-discrimination">none</content_attribute>
+    <content_attribute id="social-chat">none</content_attribute>
+    <content_attribute id="social-info">none</content_attribute>
+    <content_attribute id="social-audio">none</content_attribute>
+    <content_attribute id="social-location">none</content_attribute>
+    <content_attribute id="social-contacts">none</content_attribute>
+    <content_attribute id="money-purchasing">none</content_attribute>
+    <content_attribute id="money-gambling">none</content_attribute>
+  </content_rating>
+  <custom>
+    <value key="x-appcenter-color-primary">#3f3f3f</value>
+    <value key="x-appcenter-color-primary-text">#ffffff</value>
+    <value key="x-appcenter-suggested-price">15</value>
+    <value key="x-appcenter-stripe">pk_live_515yF9YDvXGakAYGJ74PQwmIwxs6xQrm0q0ULEAYO6vZyzsTIaOI40ZtDYj6qUGq6sjzCgwd25VQ4REbJob6pkB9r00tU1lgu6W</value>
+  </custom>
+</component>

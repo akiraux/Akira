@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+    <schema id=@APP_ID@ path=@SLASHED_APP_ID@ gettext-domain=@GETTEXT_PACKAGE@>
+        <key name="version" type="s">
+            <default>'0.0.0'</default>
+            <summary>The currently installed version.</summary>
+            <description>The currently installed version of Akira, updated only after the user launched the app. This is used to know when to trigger the Release Dialog.</description>
+        </key>
+
+        <key name="pos-x" type="i">
+            <default>360</default>
+            <summary>The saved horizontal position of the window.</summary>
+            <description>The saved horizontal position of the window.</description>
+        </key>
+
+        <key name="pos-y" type="i">
+            <default>360</default>
+            <summary>The vertical position width of the window.</summary>
+            <description>The saved vertical position of the window.</description>
+        </key>
+
+        <key name="window-width" type="i">
+			<default>-1</default>
+			<summary>Default window width</summary>
+		</key>
+		<key name="window-height" type="i">
+			<default>-1</default>
+			<summary>Default window height</summary>
+		</key>
+		<key name="is-maximized" type="b">
+			<default>false</default>
+			<summary>Default window maximized behaviour</summary>
+		</key>
+
+        <key name="right-paned" type="i">
+            <default>804</default>
+            <summary>The saved width of the right panel.</summary>
+            <description>The saved width of the right panel containing the MainCanvas and RightSidebar.</description>
+        </key>
+
+        <key name="left-paned" type="i">
+            <default>220</default>
+            <summary>The saved width of the left panel.</summary>
+            <description>The saved width of the left panel. Must be greater than 220, or it will not take effect.</description>
+        </key>
+
+        <key name="dark-theme" type="b">
+            <default>false</default>
+            <summary>Use dark theme</summary>
+            <description>Switch between Light and Dark theme.</description>
+        </key>
+
+        <key name="follow-system-theme" type="b">
+            <default>true</default>
+            <summary>Follow system theme variation</summary>
+            <description>Follow system theme dark/light variation</description>
+        </key>
+
+        <key name="show-label" type="b">
+            <default>true</default>
+            <summary>Show button labels</summary>
+            <description>Show or Hide the button labels to slim the UI.</description>
+        </key>
+
+        <key name="use-symbolic" type="b">
+            <default>false</default>
+            <summary>Use Symbolic Icons</summary>
+            <description>Allow user to choose between normal and symbolic icons in HeaderBar.</description>
+        </key>
+
+        <key name="invert-sidebar" type="b">
+            <default>false</default>
+            <summary>Invert Panels Order</summary>
+            <description>Allow user to choose between default and inverted panels order.</description>
+        </key>
+
+        <key name="grid-color" type="s">
+            <default>'#888888'</default>
+            <summary>Default Grid Color.</summary>
+            <description>The default color of the pixel grid.</description>
+        </key>
+
+        <key name="enable-snaps" type="b">
+            <default>true</default>
+            <summary>Enable Snapping Guides</summary>
+            <description>Allow user to enable or disable the snapping guides when moving items.</description>
+        </key>
+
+        <key name="snaps-color" type="s">
+            <default>'#ff0000'</default>
+            <summary>Default Snaps Color.</summary>
+            <description>The default color of the snapping guides.</description>
+        </key>
+
+        <key name="snaps-sensitivity" type="i">
+            <default>4</default>
+            <summary>Default Snaps Sensitivity.</summary>
+            <description>The default sensitivity of the snapping threshold.</description>
+        </key>
+
+        <key name="fill-color" type="s">
+            <default>'#CCCCCC'</default>
+            <summary>Default Shape Color.</summary>
+            <description>The default color of a newly created shape.</description>
+        </key>
+
+        <key name="set-border" type="b">
+            <default>true</default>
+            <summary>Add Border on Shape Creation</summary>
+            <description>Enable the addition of the border style when creating a new shape.</description>
+        </key>
+
+        <key name="border-size" type="i">
+            <default>1</default>
+            <summary>Default Border Width.</summary>
+            <description>The default width of the border for a newly created shape.</description>
+        </key>
+
+        <key name="border-color" type="s">
+            <default>'#AAAAAA'</default>
+            <summary>Default Border Color.</summary>
+            <description>The default color of the border for a newly created shape.</description>
+        </key>
+
+        <key name="open-quick" type="b">
+            <default>false</default>
+            <summary>Auto Reopen latest file</summary>
+            <description>Automatically reopen the latest file on startup.</description>
+        </key>
+
+        <key name="recently-opened" type="as">
+            <default>[]</default>
+            <summary>Recently opened files</summary>
+            <description>Keep track of the 10 most recently opened files.</description>
+        </key>
+
+        <key name="export-folder" type="s">
+            <default>''</default>
+            <summary>Default export folder.</summary>
+            <description>The default folder where exported images will be saved.</description>
+        </key>
+
+        <key name="export-width" type="i">
+            <default>1000</default>
+            <summary>The saved width of the export dialog.</summary>
+            <description>The saved width of the export dialog.</description>
+        </key>
+
+        <key name="export-height" type="i">
+            <default>600</default>
+            <summary>The saved height of the export dialog.</summary>
+            <description>The saved height of the export dialog.</description>
+        </key>
+
+        <key name="export-paned" type="i">
+            <default>300</default>
+            <summary>The saved position of the export left panel.</summary>
+            <description>The saved position of the left panel in the export dialog.</description>
+        </key>
+
+        <key name="export-quality" type="i">
+            <default>100</default>
+            <summary>The quality value for exporting JPG images.</summary>
+            <description>The quality value for exporting JPG images in the export dialog.</description>
+        </key>
+
+        <key name="export-compression" type="i">
+            <default>0</default>
+            <summary>The compression value for exporting PNG images.</summary>
+            <description>The compression value for exporting PNG images in the export dialog.</description>
+        </key>
+
+        <key name="export-format" type="s">
+            <default>'png'</default>
+            <summary>The format type for exporting images.</summary>
+            <description>The format type for exporting images in the export dialog.</description>
+        </key>
+
+        <key name="export-scale" type="i">
+            <default>1</default>
+            <summary>The scaled resolution for exporting images.</summary>
+            <description>The scaled resolution for exporting images in the export dialog.</description>
+        </key>
+
+        <key name="export-alpha" type="b">
+            <default>true</default>
+            <summary>The alpha setting for exporting PNG images.</summary>
+            <description>The alpha setting for exporting PNG images in the export dialog.</description>
+        </key>
+
+        <key name="global-colors" type="as">
+            <default>[]</default>
+            <summary>The list of global colors</summary>
+            <description>Keep track of the colors saved by the user and available in every document file.</description>
+        </key>
+    </schema>
+</schemalist>
