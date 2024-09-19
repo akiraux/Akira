@@ -1,0 +1,5 @@
+pub static APP_ID: &str = @APP_ID@;
+pub static SLASHED_APP_ID: &str = @SLASHED_APP_ID@;
+pub static GETTEXT_PACKAGE: &str = @GETTEXT_PACKAGE@;
+pub static LOCALEDIR: &str = @LOCALEDIR@;
+pub static PKGDATADIR: &str = @PKGDATADIR@;

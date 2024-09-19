@@ -14,14 +14,14 @@
  * You should have received a copy of the GNU General Public License along with
  * Akira. If not, see <https://www.gnu.org/ licenses/>.
  */
+mod config;
+mod window;
+
+use config::APP_ID;
 use gtk::prelude::*;
 use gtk::{glib, Application};
 
-mod window;
-
 use self::window::AppWindow;
-
-const APP_ID: &str = "com.github.akiraux.akira";
 
 fn main() -> glib::ExitCode {
     // Create a new application

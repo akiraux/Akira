@@ -10,7 +10,29 @@ Akira is a native Linux Design application built in Rust. Akira focuses on offer
 
 ## 🛠 Compile
 
-You can install Akira by compiling it from the source
+You can install Akira by compiling it from the source directly via `cargo` or with the `meson` build system.
+
+```
+git clone https://github.com/akiraux/Akira
+cd Akira
+```
+
+### Build with meson for release development
+
+```
+meson setup build
+cd build
+ninja
+ninja install
+src/akira
+```
+
+### Build with cargo for quick local development
+
+```
+cargo build
+cargo run
+```
 
 ### Install Dependencies
 
