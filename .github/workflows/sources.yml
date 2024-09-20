@@ -1,4 +1,4 @@
-name: Update cargo sources
+name: "CI: Cargo sources"
 
 concurrency:
   group: ${{ github.workflow }}
