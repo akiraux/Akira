@@ -1,6 +1,6 @@
 .snapcraft
 .vscode
-src/config.vala
+src/config.rs
 build/
 builddir/
 _build/

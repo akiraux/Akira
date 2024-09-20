@@ -133,3 +133,12 @@ impl AppWindow {
         }
     }
 }
+
+#[cfg(test)]
+mod test {
+    #[gtk::test]
+    fn test_main_window() {
+        let success: bool = true;
+        assert!(success);
+    }
+}

@@ -1,42 +1,61 @@
-name: CI
+name: "CI: build"
 
-on: [pull_request]
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "*.json"
+  pull_request:
+    branches: ["main"]
+    paths:
+      - "*.json"
+    types:
+      - opened
+      - reopened
+      - synchronize
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.number }}
+  cancel-in-progress: true
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    container:
-      image: elementary/docker:unstable
-    steps:
-      - uses: actions/checkout@v1
-      - name: Install Dependencies
-        run: |
-          apt update
-          apt install -y libarchive-dev valac meson appstream-util xvfb at-spi2-core git build-essential autoconf autoconf-archive autopoint automake pkg-config libtool m4 autoconf-archive gtk-doc-tools libxml2-utils gobject-introspection libgirepository1.0-dev libglib2.0-dev libjson-glib-dev gettext libcairo2-dev libgtk-3-dev
-      - name: Build
-        run: |
-          meson build
-          ninja -C build
-          ninja -C build install
-
   flatpak:
     name: Flatpak
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        arch: [x86_64, aarch64]
+      # Don't fail the whole workflow if one architecture fails
+      fail-fast: false
+
     container:
-      image: ghcr.io/elementary/flatpak-platform/runtime:6
+      image: ghcr.io/elementary/flatpak-platform/runtime:7.3-${{ matrix.arch }}
       options: --privileged
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
+
+      - name: Install Rust SDK extension
+        run: |
+          flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+          flatpak install -y --arch=${{matrix.arch}} org.freedesktop.Sdk.Extension.rust-stable//23.08
+
+      - name: Set up QEMU for aarch64 emulation
+        if: ${{ matrix.arch != 'x86_64' }}
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: arm64
 
       - name: Build
-        uses: bilelmoussaoui/flatpak-github-actions/flatpak-builder@v3
+        uses: flatpak/flatpak-github-actions/flatpak-builder@v6
         with:
-          bundle: akira-dev.flatpak
-          manifest-path: com.github.akiraux.akira.yml
-          run-tests: true
+          bundle: app.flatpak
+          manifest-path: io.github.davidmhewitt.ElementaryRustExample.json
+          run-tests: ${{ matrix.arch == 'x86_64' }}
           repository-name: appcenter
           repository-url: https://flatpak.elementary.io/repo.flatpakrepo
           cache-key: "flatpak-builder-${{ github.sha }}"
+          branch: daily
+          arch: ${{ matrix.arch }}
