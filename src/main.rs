@@ -14,30 +14,31 @@
  * You should have received a copy of the GNU General Public License along with
  * Akira. If not, see <https://www.gnu.org/ licenses/>.
  */
+mod application;
 mod config;
 mod window;
 
-use config::APP_ID;
+use config::{APP_ID, GETTEXT_PACKAGE, LOCALEDIR};
+use gettextrs::{bind_textdomain_codeset, bindtextdomain, textdomain};
+use gtk::gio;
 use gtk::prelude::*;
-use gtk::{glib, Application};
 
+use self::application::App;
 use self::window::AppWindow;
 
-fn main() -> glib::ExitCode {
-    // Create a new application
-    let app = Application::builder().application_id(APP_ID).build();
+fn main() {
+    // Set up gettext translations
+    bindtextdomain(GETTEXT_PACKAGE, LOCALEDIR).expect("Unable to bind the text domain");
+    bind_textdomain_codeset(GETTEXT_PACKAGE, "UTF-8")
+        .expect("Unable to set the text domain encoding");
+    textdomain(GETTEXT_PACKAGE).expect("Unable to switch to the text domain");
 
-    // Connect to "activate" signal of `app`
-    app.connect_activate(build_ui);
+    // TODO: Load resources once we need to consume custom SVGs
+    // let resources = gio::Resource::load(PKGDATADIR.to_owned() + "/" + APP_ID + ".gresource")
+    //     .expect("Could not load resources");
+    // gio::resources_register(&resources);
 
-    // Run the application
-    app.run()
-}
+    let app = App::new(APP_ID, &gio::ApplicationFlags::empty());
 
-fn build_ui(app: &Application) {
-    // Create a window and set the title
-    let window = AppWindow::new(app);
-
-    // Present window
-    window.present();
+    std::process::exit(app.run().value());
 }
