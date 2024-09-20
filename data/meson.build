@@ -49,3 +49,5 @@ if compile_schemas.found()
         compile_schemas,
         args: ['--strict', '--dry-run', meson.current_source_dir()])
 endif
+
+subdir('icons')
