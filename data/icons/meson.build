@@ -21,7 +21,6 @@ foreach i : icon_sizes
     )
 endforeach
 
-
 install_data(
     'hicolor/128x128/' + meson.project_name() + '.svg',
     install_dir: get_option('datadir') / 'icons' / 'hicolor' / 'scalable' / 'apps',
