@@ -1,0 +1,39 @@
+name: Update cargo sources
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: true
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "Cargo.lock"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: repo
+
+      - uses: actions/checkout@v4
+        with:
+          repository: flatpak/flatpak-builder-tools
+          path: tools
+
+      - name: Update modules
+        run: |
+          sudo apt-get install -y python3-toml python3-aiohttp
+          python3 tools/cargo/flatpak-cargo-generator.py -o repo/cargo-sources.json repo/Cargo.lock
+      - uses: peter-evans/create-pull-request@v6
+        with:
+          path: repo
+          commit-message: Automated update of cargo-sources.json
+          title: Automated update of cargo-sources.json
