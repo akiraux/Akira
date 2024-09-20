@@ -6,7 +6,7 @@ on:
     paths:
       - "*.json"
   pull_request:
-    # branches: ["main"]
+    branches: ["main"]
     paths:
       - "*.json"
     types:
