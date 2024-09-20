@@ -23,7 +23,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Install dependencies
         run: |
-          apt-get update && apt-get install -y curl xvfb
+          apt-get update && apt-get install -y curl xvfb file
       - name: Install stable rust
         run: |
           curl https://sh.rustup.rs -sSf | sh -s -- -y
