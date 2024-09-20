@@ -29,18 +29,12 @@ src/akira
 
 ### Build with cargo for quick local development
 
+Running meson setup prior to this step is required to ensure the correct `config.rs` is generated.
+
 ```
 cargo build
 cargo run
 ```
-
-### Install Dependencies
-
-WIP
-
-### Compile &amp; Run
-
-WIP
 
 ## 🤔 Questions
 
