@@ -44,27 +44,8 @@ mod imp {
 
             obj.setup_settings();
             obj.load_window_size();
-
-            let mode_switch = granite::ModeSwitch::builder()
-                .primary_icon_name("display-brightness-symbolic")
-                .secondary_icon_name("weather-clear-night-symbolic")
-                .primary_icon_tooltip_text(gettext("Light Background"))
-                .secondary_icon_tooltip_text(gettext("Dark Background"))
-                .valign(gtk::Align::Center)
-                .build();
-
-            let gtk_settings = gtk::Settings::default().expect("Unable to get GtkSettings object");
-            mode_switch
-                .bind_property("active", &gtk_settings, "gtk-application-prefer-dark-theme")
-                .bidirectional()
-                .build();
-
-            let header_bar = gtk::HeaderBar::builder().show_title_buttons(true).build();
-
-            header_bar.style_context().add_class("default-decoration");
-            header_bar.pack_end(&mode_switch);
-
-            obj.set_titlebar(Some(&header_bar));
+            obj.build_headerbar();
+            obj.build_body();
         }
     }
 
@@ -131,6 +112,60 @@ impl AppWindow {
         if is_maximized {
             self.maximize();
         }
+    }
+
+    fn build_headerbar(&self) {
+        let mode_switch = granite::ModeSwitch::builder()
+            .primary_icon_name("display-brightness-symbolic")
+            .secondary_icon_name("weather-clear-night-symbolic")
+            .primary_icon_tooltip_text(gettext("Light Background"))
+            .secondary_icon_tooltip_text(gettext("Dark Background"))
+            .valign(gtk::Align::Center)
+            .build();
+
+        let gtk_settings = gtk::Settings::default().expect("Unable to get GtkSettings object");
+        mode_switch
+            .bind_property("active", &gtk_settings, "gtk-application-prefer-dark-theme")
+            .bidirectional()
+            .build();
+
+        let header_bar = gtk::HeaderBar::builder().show_title_buttons(true).build();
+
+        header_bar.style_context().add_class("default-decoration");
+        header_bar.pack_end(&mode_switch);
+
+        self.set_titlebar(Some(&header_bar));
+    }
+
+    fn build_body(&self) {
+        let main_area = gtk::Grid::builder()
+            .orientation(gtk::Orientation::Vertical)
+            .build();
+        let left_sidebar = gtk::Grid::builder().width_request(200).build();
+        let right_sidebar = gtk::Grid::builder().width_request(200).build();
+
+        let pane1 = gtk::Paned::builder()
+            .orientation(gtk::Orientation::Horizontal)
+            .resize_start_child(false)
+            .resize_end_child(true)
+            .shrink_start_child(false)
+            .shrink_end_child(false)
+            .build();
+        let pane2 = gtk::Paned::builder()
+            .orientation(gtk::Orientation::Horizontal)
+            .resize_start_child(true)
+            .resize_end_child(false)
+            .shrink_start_child(true)
+            .shrink_end_child(false)
+            .build();
+
+        pane1.set_end_child(Some(&pane2));
+        pane1.set_start_child(Some(&left_sidebar));
+
+        pane2.set_start_child(Some(&main_area));
+        pane2.set_end_child(Some(&right_sidebar));
+
+        self.set_child(Some(&pane1));
     }
 }
 
