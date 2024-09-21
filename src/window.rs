@@ -20,6 +20,7 @@ use gtk::{gio, gio::Settings, glib, prelude::*, ApplicationWindow};
 use once_cell::sync::OnceCell;
 
 use crate::config::APP_ID;
+use crate::layout::left_sidebar;
 
 mod imp {
     use super::*;
@@ -141,7 +142,7 @@ impl AppWindow {
         let main_area = gtk::Grid::builder()
             .orientation(gtk::Orientation::Vertical)
             .build();
-        let left_sidebar = gtk::Grid::builder().width_request(200).build();
+        let left_sidebar = left_sidebar::LeftSidebar::new();
         let right_sidebar = gtk::Grid::builder().width_request(200).build();
 
         let pane1 = gtk::Paned::builder()

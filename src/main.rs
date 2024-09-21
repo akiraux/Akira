@@ -16,6 +16,7 @@
  */
 mod application;
 mod config;
+mod layout;
 mod window;
 
 use config::{APP_ID, GETTEXT_PACKAGE, LOCALEDIR};
