@@ -15,6 +15,7 @@
  * Akira. If not, see <https://www.gnu.org/ licenses/>.
  */
 mod application;
+mod canvas;
 mod config;
 mod layout;
 mod window;

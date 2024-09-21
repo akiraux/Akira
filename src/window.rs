@@ -20,6 +20,7 @@ use gtk::{gio, gio::Settings, glib, prelude::*, ApplicationWindow};
 use once_cell::sync::OnceCell;
 
 use crate::config::APP_ID;
+use crate::layout::main_area;
 use crate::layout::sidebar::*;
 
 mod imp {
@@ -139,12 +140,6 @@ impl AppWindow {
     }
 
     fn build_body(&self) {
-        let main_area = gtk::Grid::builder()
-            .orientation(gtk::Orientation::Vertical)
-            .build();
-        let options = options::Options::default();
-        let layers = layers::Layers::default();
-
         let pane1 = gtk::Paned::builder()
             .orientation(gtk::Orientation::Horizontal)
             .resize_start_child(false)
@@ -161,10 +156,10 @@ impl AppWindow {
             .build();
 
         pane1.set_end_child(Some(&pane2));
-        pane1.set_start_child(Some(&options));
+        pane1.set_start_child(Some(&options::Options::default()));
 
-        pane2.set_start_child(Some(&main_area));
-        pane2.set_end_child(Some(&layers));
+        pane2.set_start_child(Some(&main_area::MainArea::default()));
+        pane2.set_end_child(Some(&layers::Layers::default()));
 
         self.set_child(Some(&pane1));
     }
