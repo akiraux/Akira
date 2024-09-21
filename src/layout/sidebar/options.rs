@@ -21,32 +21,26 @@ mod imp {
     use super::*;
 
     #[derive(Debug, Default)]
-    pub struct LeftSidebar {}
+    pub struct Options {}
 
     #[glib::object_subclass]
-    impl ObjectSubclass for LeftSidebar {
-        const NAME: &'static str = "LeftSidebar";
-        type Type = super::LeftSidebar;
+    impl ObjectSubclass for Options {
+        const NAME: &'static str = "Options";
+        type Type = super::Options;
         type ParentType = gtk::Grid;
     }
 
-    impl ObjectImpl for LeftSidebar {}
-    impl WidgetImpl for LeftSidebar {}
-    impl GridImpl for LeftSidebar {}
+    impl ObjectImpl for Options {}
+    impl WidgetImpl for Options {}
+    impl GridImpl for Options {}
 }
 
 glib::wrapper! {
-    pub struct LeftSidebar(ObjectSubclass<imp::LeftSidebar>) @extends gtk::Widget, gtk::Grid;
+    pub struct Options(ObjectSubclass<imp::Options>) @extends gtk::Widget, gtk::Grid;
 }
 
-impl Default for LeftSidebar {
+impl Default for Options {
     fn default() -> Self {
-        Self::new()
-    }
-}
-
-impl LeftSidebar {
-    pub fn new() -> Self {
         glib::Object::builder()
             .property("width-request", 200)
             .build()

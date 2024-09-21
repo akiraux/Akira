@@ -14,4 +14,5 @@
  * You should have received a copy of the GNU General Public License along with
  * Akira. If not, see <https://www.gnu.org/ licenses/>.
  */
-pub mod sidebar;
+pub mod layers;
+pub mod options;

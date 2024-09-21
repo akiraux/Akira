@@ -20,7 +20,7 @@ use gtk::{gio, gio::Settings, glib, prelude::*, ApplicationWindow};
 use once_cell::sync::OnceCell;
 
 use crate::config::APP_ID;
-use crate::layout::left_sidebar;
+use crate::layout::sidebar::*;
 
 mod imp {
     use super::*;
@@ -132,7 +132,7 @@ impl AppWindow {
 
         let header_bar = gtk::HeaderBar::builder().show_title_buttons(true).build();
 
-        header_bar.style_context().add_class("default-decoration");
+        header_bar.add_css_class("default-decoration");
         header_bar.pack_end(&mode_switch);
 
         self.set_titlebar(Some(&header_bar));
@@ -142,8 +142,8 @@ impl AppWindow {
         let main_area = gtk::Grid::builder()
             .orientation(gtk::Orientation::Vertical)
             .build();
-        let left_sidebar = left_sidebar::LeftSidebar::new();
-        let right_sidebar = gtk::Grid::builder().width_request(200).build();
+        let options = options::Options::default();
+        let layers = layers::Layers::default();
 
         let pane1 = gtk::Paned::builder()
             .orientation(gtk::Orientation::Horizontal)
@@ -161,10 +161,10 @@ impl AppWindow {
             .build();
 
         pane1.set_end_child(Some(&pane2));
-        pane1.set_start_child(Some(&left_sidebar));
+        pane1.set_start_child(Some(&options));
 
         pane2.set_start_child(Some(&main_area));
-        pane2.set_end_child(Some(&right_sidebar));
+        pane2.set_end_child(Some(&layers));
 
         self.set_child(Some(&pane1));
     }
