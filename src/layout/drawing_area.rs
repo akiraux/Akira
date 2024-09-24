@@ -19,23 +19,24 @@ extern crate skia_safe;
 use crate::canvas::Canvas;
 
 use gtk::glib;
-use gtk::prelude::*;
-use gtk::subclass::prelude::*;
+use gtk::prelude::DrawingAreaExtManual;
+use gtk::{cairo, prelude::*, subclass::prelude::*};
 
 mod imp {
     use super::*;
+    use gtk::glib::clone;
 
     #[derive(Debug, Default)]
-    pub struct MainArea {}
+    pub struct DrawingArea {}
 
     #[glib::object_subclass]
-    impl ObjectSubclass for MainArea {
-        const NAME: &'static str = "MainArea";
-        type Type = super::MainArea;
-        type ParentType = gtk::Grid;
+    impl ObjectSubclass for DrawingArea {
+        const NAME: &'static str = "DrawingArea";
+        type ParentType = gtk::DrawingArea;
+        type Type = super::DrawingArea;
     }
 
-    impl ObjectImpl for MainArea {
+    impl ObjectImpl for DrawingArea {
         fn constructed(&self) {
             self.parent_constructed();
 
@@ -43,23 +44,33 @@ mod imp {
             obj.build_canvas();
         }
     }
-    impl WidgetImpl for MainArea {}
-    impl GridImpl for MainArea {}
+    impl WidgetImpl for DrawingArea {
+        fn realize(&self) {
+            self.parent_realize();
+
+            let obj = self.obj();
+            obj.set_draw_func(clone!(
+                #[weak]
+                obj,
+                move |_, context, _, _| obj.draw(context)
+            ));
+        }
+    }
+    impl DrawingAreaImpl for DrawingArea {}
 }
 
 glib::wrapper! {
-    pub struct MainArea(ObjectSubclass<imp::MainArea>) @extends gtk::Widget, gtk::Grid;
+    pub struct DrawingArea(ObjectSubclass<imp::DrawingArea>)
+    @extends gtk::DrawingArea, gtk::Widget, gtk::Buildable;
 }
 
-impl Default for MainArea {
-    fn default() -> Self {
-        glib::Object::builder()
-            .property("orientation", gtk::Orientation::Vertical)
-            .build()
+impl DrawingArea {
+    pub fn new() -> Self {
+        glib::Object::builder().build()
     }
-}
 
-impl MainArea {
+    fn draw(&self, context: &cairo::Context) {}
+
     fn build_canvas(&self) {
         let mut canvas = Canvas::new(2560, 1280);
         canvas.scale(1.2, 1.2);
@@ -77,7 +88,15 @@ impl MainArea {
         canvas.line_to(270.0, 90.0);
         canvas.fill();
 
-        // How do we plug this into a gtk grid? Do we need a renderer wrapper?
+        // let surface = canvas.surface;
+        // How do we plug skia canvas into the gtk drawing area?
+        // Do we need to pass through cairo context? (yuck)
         // self.attach(&canvas, 1, 1, 1, 1);
+    }
+}
+
+impl Default for DrawingArea {
+    fn default() -> Self {
+        DrawingArea::new()
     }
 }

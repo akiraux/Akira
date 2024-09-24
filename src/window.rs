@@ -20,7 +20,7 @@ use gtk::{gio, gio::Settings, glib, prelude::*, ApplicationWindow};
 use once_cell::sync::OnceCell;
 
 use crate::config::APP_ID;
-use crate::layout::main_area;
+use crate::layout::drawing_area;
 use crate::layout::sidebar::*;
 
 mod imp {
@@ -158,7 +158,7 @@ impl AppWindow {
         pane1.set_end_child(Some(&pane2));
         pane1.set_start_child(Some(&options::Options::default()));
 
-        pane2.set_start_child(Some(&main_area::MainArea::default()));
+        pane2.set_start_child(Some(&drawing_area::DrawingArea::new()));
         pane2.set_end_child(Some(&layers::Layers::default()));
 
         self.set_child(Some(&pane1));
