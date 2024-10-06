@@ -88,6 +88,8 @@ impl DrawingArea {
         canvas.line_to(270.0, 90.0);
         canvas.fill();
 
+        let gl_area = gtk::GLArea::new();
+
         // let surface = canvas.surface;
         // How do we plug skia canvas into the gtk drawing area?
         // Do we need to pass through cairo context? (yuck)
