@@ -1,20 +1,21 @@
-name: "CI: Lint"
+name: Lint
 
 on:
   push:
     branches:
-      - "master"
+      - main
   pull_request:
 
 jobs:
   lint:
-
     runs-on: ubuntu-latest
 
     container:
       image: valalang/lint
 
     steps:
-    - uses: actions/checkout@v1
-    - name: Lint
-      run: io.elementary.vala-lint -d .
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Lint
+        run: io.elementary.vala-lint -d .
