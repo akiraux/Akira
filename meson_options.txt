@@ -11,5 +11,5 @@ option(
   'install-tests',
   type: 'boolean',
   value: true,
-  description : 'install test executables'
+  description: 'install test executables'
 )
