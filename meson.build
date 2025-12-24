@@ -12,14 +12,17 @@ akira_datadir = akira_prefix / get_option('datadir')
 akira_pkgdatadir = akira_datadir / meson.project_name()
 install_tests = get_option('install-tests')
 
+vapi_dir = meson.current_source_dir() / 'vapi'
+add_project_arguments('--vapidir=@0@'.format(vapi_dir), language: 'vala')
+
 # Include the translations module
 i18n = import('i18n')
 # Dependencies
-gtk_dependency = dependency('gtk+-3.0')
-granite_dependency = dependency('granite', version: '>= 6.0.0')
+gtk_dependency = dependency('gtk4')
+granite_dependency = dependency('granite-7')
 gee_dependency = dependency('gee-0.8')
 libxml_dependency = dependency('libxml-2.0')
-cairo_dependency = dependency('cairo', version: '>=1.14')
+cairo_dependency = dependency('cairo')
 libarchive_dependency = dependency('libarchive')
 json_glib_dependency = dependency('json-glib-1.0')
 

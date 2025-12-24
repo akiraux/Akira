@@ -335,6 +335,9 @@ public class Akira.Models.PathEditModel : Object {
                         points[sel_pnt.sel_index].tangent_2 = Geometry.Point (old.x - delta_x, old.y - delta_y);
                     }
                     break;
+                case Lib.Modes.PathEditMode.PointType.NONE:
+                    print ("No point selected");
+                    break;
             }
         }
 

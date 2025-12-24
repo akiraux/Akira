@@ -96,6 +96,9 @@ public class Akira.Lib.Managers.ExportManager : Object {
             case Type.AREA:
                 yield generate_area_pixbuf (cancellable);
                 break;
+            case Type.ARTBOARD:
+                print ("Exporting Artboards not yet supported");
+                break;
         }
     }
 
