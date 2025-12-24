@@ -1,9 +1,9 @@
 # Define environment variables to run tests.
 test_env = [
-    'G_TEST_SRCDIR=@0@'.format(meson.current_source_dir()),
-    'G_TEST_BUILDDIR=@0@'.format(meson.current_build_dir()),
-    'GSETTINGS_BACKEND=memory',
-    'GSETTINGS_SCHEMA_DIR=@0@/data/schemas'.format(meson.build_root()),
+  'G_TEST_SRCDIR=@0@'.format(meson.current_source_dir()),
+  'G_TEST_BUILDDIR=@0@'.format(meson.current_build_dir()),
+  'GSETTINGS_BACKEND=memory',
+  'GSETTINGS_SCHEMA_DIR=@0@/data/schemas'.format(meson.project_build_root()),
 ]
 
 # Set necessary C flags.
@@ -14,31 +14,31 @@ test_cflags = [
 ]
 
 # Canvas Tests ---------------------------------------- #
-canvas_tests = executable (
-    'canvas_tests',
-    'tests-model.vala',
+canvas_tests = executable(
+  'canvas_tests',
+  'tests-model.vala',
 
-    'canvas/test-fills-item.vala',
-    'canvas/test-lib2-model.vala',
-    'canvas/test-main.vala',
-    c_args: test_cflags,
-    dependencies: [akira_dep]
+  'canvas/test-fills-item.vala',
+  'canvas/test-lib2-model.vala',
+  'canvas/test-main.vala',
+  c_args: test_cflags,
+  dependencies: [akira_dep],
 )
 
-test ('canvas_tests', canvas_tests, env: test_env)
+test('canvas_tests', canvas_tests, env: test_env)
 
 # Utils Tests ---------------------------------------- #
-utils_tests = executable (
-    'utils_tests',
-    'tests-model.vala',
+utils_tests = executable(
+  'utils_tests',
+  'tests-model.vala',
 
-    'utils/test-array.vala',
-    'utils/test-main.vala',
-    c_args: test_cflags,
-    dependencies: [akira_dep]
+  'utils/test-array.vala',
+  'utils/test-main.vala',
+  c_args: test_cflags,
+  dependencies: [akira_dep],
 )
 
-test ('utils_tests', utils_tests, env: test_env)
+test('utils_tests', utils_tests, env: test_env)
 
 # Settings Tests ---------------------------------------- #
 
