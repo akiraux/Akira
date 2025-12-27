@@ -38,8 +38,8 @@ These are mostly guidelines, not rules. Use your best judgment, and feel free to
 
     1. Install required dependencies:
 
-        * `gtk+-3.0>=3.18`
-        * `granite>=6.0.0`
+        * `gtk4`
+        * `granite`
         * `glib-2.0`
         * `gee-0.8`
         * `gobject-2.0`
@@ -52,7 +52,7 @@ These are mostly guidelines, not rules. Use your best judgment, and feel free to
     * Debian (Elementary/Ubuntu/Linux Mint)
 
         ```sh
-        sudo apt-get install gtk+-3.0 elementary-sdk glib-2.0 gee-0.8 gobject-2.0 libxml2 libjson-glib-1.0  libarchive-dev libcairo2-dev meson valac
+        sudo apt-get install gtk4 elementary-sdk glib-2.0 gee-0.8 gobject-2.0 libxml2 libjson-glib-1.0  libarchive-dev libcairo2-dev meson valac
         ```
 
     2. Building:

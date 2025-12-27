@@ -24,73 +24,72 @@ namespace Akira {
 }
 
 public class Akira.Application : Gtk.Application {
-    public GLib.List<Window> windows;
+    public GLib.List<Akira.Window> windows;
 
     construct {
+        application_id = Constants.APP_ID;
         flags |= ApplicationFlags.HANDLES_OPEN;
 
         settings = new Akira.Services.Settings ();
-        windows = new GLib.List<Window> ();
-
-        application_id = Constants.APP_ID;
+        windows = new GLib.List<Akira.Window> ();
     }
 
-    public override void open (File[] files, string hint) {
-        // Loop through all selected files.
-        foreach (var file in files) {
-            if (is_file_opened (file)) {
-                // Present active window with currently opened file.
-                // We don't allow opening the same file on multiple windows.
-                var window = get_window_from_file (file);
-                window.show_app ();
-                continue;
-            }
+    // public override void open (File[] files, string hint) {
+    //     // Loop through all selected files.
+    //     foreach (var file in files) {
+    //         if (is_file_opened (file)) {
+    //             // Present active window with currently opened file.
+    //             // We don't allow opening the same file on multiple windows.
+    //             var window = get_window_from_file (file);
+    //             window.show_app ();
+    //             continue;
+    //         }
 
-            // If the current window is empty, load the file in this one.
-            var current_window = active_window as Akira.Window;
-            if (current_window != null && current_window.akira_file == null && !current_window.edited) {
-                current_window.open_file (file);
-                current_window.event_bus.file_saved (file.get_basename ());
-                continue;
-            }
+    //         // If the current window is empty, load the file in this one.
+    //         var current_window = active_window as Akira.Window;
+    //         if (current_window != null && current_window.akira_file == null && !current_window.edited) {
+    //             current_window.open_file (file);
+    //             current_window.event_bus.file_saved (file.get_basename ());
+    //             continue;
+    //         }
 
-            // The application was requested to open some files. Be sure to
-            // initialize the theme in case it wasn't already running.
-            init_theme ();
+    //         // The application was requested to open some files. Be sure to
+    //         // initialize the theme in case it wasn't already running.
+    //         init_theme ();
 
-            // Open a new window.
-            var window = new Akira.Window (this);
-            this.add_window (window);
+    //         // Open a new window.
+    //         var window = new Akira.Window (this);
+    //         this.add_window (window);
 
-            window.open_file (file);
-            window.show_app ();
-            window.event_bus.file_saved (file.get_basename ());
-        }
-    }
+    //         window.open_file (file);
+    //         window.show_app ();
+    //         window.event_bus.file_saved (file.get_basename ());
+    //     }
+    // }
 
-    public Akira.Window? get_window_from_file (File file) {
-        foreach (Akira.Window window in windows) {
-            if (window.akira_file != null && window.akira_file.opened_file.get_path () == file.get_path ()) {
-                return window;
-            }
-        }
+    // public Akira.Window? get_window_from_file (File file) {
+    //     foreach (Akira.Window window in windows) {
+    //         if (window.akira_file != null && window.akira_file.opened_file.get_path () == file.get_path ()) {
+    //             return window;
+    //         }
+    //     }
 
-        return null;
-    }
+    //     return null;
+    // }
 
-    public bool is_file_opened (File file) {
-        foreach (Akira.Window window in windows) {
-            if (window.akira_file != null && window.akira_file.opened_file.get_path () == file.get_path ()) {
-                return true;
-            }
-        }
+    // public bool is_file_opened (File file) {
+    //     foreach (Akira.Window window in windows) {
+    //         if (window.akira_file != null && window.akira_file.opened_file.get_path () == file.get_path ()) {
+    //             return true;
+    //         }
+    //     }
 
-        return false;
-    }
+    //     return false;
+    // }
 
-    public void new_window () {
-        new Akira.Window (this).present ();
-    }
+    // public void new_window () {
+    //     new Akira.Window (this).present ();
+    // }
 
     public override void window_added (Gtk.Window window) {
         windows.append (window as Akira.Window);
@@ -105,31 +104,32 @@ public class Akira.Application : Gtk.Application {
     /**
      * Update the list of recently opened files in all the currently opened Windows.
      */
-    public void update_recent_files_list () {
-        foreach (Akira.Window window in windows) {
-            window.event_bus.update_recent_files_list ();
-        }
-    }
+    // public void update_recent_files_list () {
+    //     foreach (Akira.Window window in windows) {
+    //         window.event_bus.update_recent_files_list ();
+    //     }
+    // }
 
     protected override void activate () {
         init_theme ();
 
         var window = new Akira.Window (this);
         this.add_window (window);
+        window.present ();
 
-        if (settings.version != Constants.VERSION) {
-            var dialog = new Akira.Dialogs.ReleaseDialog (window);
-            dialog.show_all ();
-            dialog.present ();
+        // if (settings.version != Constants.VERSION) {
+        //     var dialog = new Akira.Dialogs.ReleaseDialog (window);
+        //     dialog.show_all ();
+        //     dialog.present ();
 
-            // Update the settings so we don't show the same dialog again.
-            settings.version = Constants.VERSION;
-        }
+        //     // Update the settings so we don't show the same dialog again.
+        //     settings.version = Constants.VERSION;
+        // }
 
-        // Load the most recently opened/saved file.
-        if (settings.open_quick) {
-            window.action_manager.action_load_first ();
-        }
+        // // Load the most recently opened/saved file.
+        // if (settings.open_quick) {
+        //     window.action_manager.action_load_first ();
+        // }
     }
 
     private void init_theme () {
@@ -139,16 +139,18 @@ public class Akira.Application : Gtk.Application {
             return;
         }
 
+        unowned Gdk.Display gdk_display = Gdk.Display.get_default ();
+
         // Add the resource path to load custom icons.
-        weak Gtk.IconTheme default_theme = Gtk.IconTheme.get_default ();
-        default_theme.add_resource_path ("/com/github/akiraux/akira");
+        unowned Gtk.IconTheme icon_theme = Gtk.IconTheme.get_for_display (gdk_display);
+        icon_theme.add_resource_path ("/com/github/akiraux/akira");
 
         // Load the custom CSS.
-        var css_provider = new Gtk.CssProvider ();
-        css_provider.load_from_resource ("/com/github/akiraux/akira/stylesheet.css");
-        Gtk.StyleContext.add_provider_for_screen (
-            Gdk.Screen.get_default (), css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
-        );
+        // var css_provider = new Gtk.CssProvider ();
+        // css_provider.load_from_resource ("/com/github/akiraux/akira/stylesheet.css");
+        // Gtk.StyleContext.add_provider_for_display (
+        //     gdk_display, css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
+        // );
 
         // Force set the elementary OS style and icons for visual consistency.
         // In the future we might support other themes if doable.

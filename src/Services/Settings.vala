@@ -110,10 +110,10 @@ public class Akira.Services.Settings : GLib.Settings {
         get { return get_boolean ("open-quick"); }
         set { set_boolean ("open-quick", value); }
     }
-    public string[] recently_opened {
-        owned get { return get_strv ("recently-opened"); }
-        set { set_strv ("recently-opened", value); }
-    }
+    // public string[] recently_opened {
+    //     owned get { return get_strv ("recently-opened"); }
+    //     set { set_strv ("recently-opened", value); }
+    // }
 
     // Export Settings.
     public string export_folder {
@@ -154,10 +154,10 @@ public class Akira.Services.Settings : GLib.Settings {
     }
 
     // Colors library.
-    public string[] global_colors {
-        owned get { return get_strv ("global-colors"); }
-        set { set_strv ("global-colors", value); }
-    }
+    // public string[] global_colors {
+    //     owned get { return get_strv ("global-colors"); }
+    //     set { set_strv ("global-colors", value); }
+    // }
 
     public Settings () {
         Object (schema_id: Constants.APP_ID);
