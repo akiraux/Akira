@@ -1,38 +1,22 @@
-name: CI
+name: Build
 
 on: [pull_request]
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    container:
-      image: elementary/docker:unstable
-    steps:
-      - uses: actions/checkout@v1
-      - name: Install Dependencies
-        run: |
-          apt update
-          apt install -y libarchive-dev valac meson appstream-util xvfb at-spi2-core git build-essential autoconf autoconf-archive autopoint automake pkg-config libtool m4 autoconf-archive gtk-doc-tools libxml2-utils gobject-introspection libgirepository1.0-dev libglib2.0-dev libjson-glib-dev gettext libcairo2-dev libgtk-3-dev
-      - name: Build
-        run: |
-          meson build
-          ninja -C build
-          ninja -C build install
-
   flatpak:
     name: Flatpak
     runs-on: ubuntu-latest
 
     container:
-      image: ghcr.io/elementary/flatpak-platform/runtime:6
+      image: ghcr.io/elementary/flatpak-platform/runtime:8.2
       options: --privileged
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v6
 
       - name: Build
-        uses: bilelmoussaoui/flatpak-github-actions/flatpak-builder@v3
+        uses: flatpak/flatpak-github-actions/flatpak-builder@v6.6
         with:
           bundle: akira-dev.flatpak
           manifest-path: com.github.akiraux.akira.yml
