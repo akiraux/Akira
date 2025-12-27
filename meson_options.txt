@@ -10,6 +10,6 @@ option(
 option(
   'install-tests',
   type: 'boolean',
-  value: true,
+  value: false,
   description: 'install test executables'
 )
