@@ -34,7 +34,7 @@ public class Akira.Window : Gtk.ApplicationWindow {
     // public SimpleActionGroup actions { get; construct; }
     // public Gtk.AccelGroup accel_group { get; construct; }
 
-    public bool edited { get; set; default = false; }
+    // public bool edited { get; set; default = false; }
 
     public Window (Akira.Application akira_app) {
         Object (
@@ -101,11 +101,13 @@ public class Akira.Window : Gtk.ApplicationWindow {
     public bool before_destroy () {
         update_status ();
 
-        if (!edited) {
-            // close_current_file ();
-            app.get_active_window ().destroy ();
-            on_destroy ();
-        }
+        // if (!edited) {
+        //     close_current_file ();
+        //     app.get_active_window ().destroy ();
+        //     on_destroy ();
+        // }
+        app.get_active_window ().destroy ();
+        on_destroy ();
 
         // if (edited) {
         //     var dialog = dialogs.message_dialog (

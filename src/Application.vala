@@ -155,8 +155,8 @@ public class Akira.Application : Gtk.Application {
         // Force set the elementary OS style and icons for visual consistency.
         // In the future we might support other themes if doable.
         var gtk_settings = Gtk.Settings.get_default ();
-        gtk_settings.set_property ("gtk-icon-theme-name", "elementary");
-        gtk_settings.set_property ("gtk-theme-name", "io.elementary.stylesheet.blueberry");
+        gtk_settings.set_property("gtk-theme-name", "elementary");
+        gtk_settings.set_property("gtk-icon-theme-name", "elementary");
 
         // Use the Granite API to listen for global dark style changes.
         var granite_settings = Granite.Settings.get_default ();
