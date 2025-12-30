@@ -36,7 +36,7 @@ public class Akira.Services.EventBus : Object {
     public signal void coordinate_change (double x, double y);
     public signal void insert_item (string type);
     public signal void item_inserted ();
-    public signal void move_item_from_canvas (Gdk.EventKey event);
+    // public signal void move_item_from_canvas (Gdk.EventKey event);
     public signal void request_escape ();
     public signal void set_focus_on_canvas ();
     public signal void update_nob_size ();
@@ -50,7 +50,7 @@ public class Akira.Services.EventBus : Object {
     public signal void zoom_changed (double new_zoom);
 
     // Canvas triggers.
-    public signal void adjust_zoom (double zoom, bool absolute, Geometry.Point? reference);
+    // public signal void adjust_zoom (double zoom, bool absolute, Geometry.Point? reference);
 
     // Options panel signals.
     public signal void align_items (string align_action);
@@ -82,7 +82,7 @@ public class Akira.Services.EventBus : Object {
     public signal void delete_selected_items ();
 
     // Selection align signals
-    public signal void selection_align (Utils.ItemAlignment.AlignmentDirection type);
+    // public signal void selection_align (Utils.ItemAlignment.AlignmentDirection type);
 
     // Others.
     public signal void disconnect_typing_accel ();
