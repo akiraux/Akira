@@ -87,9 +87,9 @@ public class Akira.Application : Gtk.Application {
     //     return false;
     // }
 
-    // public void new_window () {
-    //     new Akira.Window (this).present ();
-    // }
+    public void new_window () {
+        new Akira.Window (this).present ();
+    }
 
     public override void window_added (Gtk.Window window) {
         windows.append (window as Akira.Window);

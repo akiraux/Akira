@@ -27,8 +27,8 @@ public class Akira.Services.ActionManager : Object {
     private const int PREVIEW_SIZE = 300;
     private const int PREVIEW_PADDING = 3;
 
-    private Gtk.FileChooserNative dialog;
-    private Gtk.Image preview_image;
+    // private Gtk.FileChooserNative dialog;
+    // private Gtk.Image preview_image;
 
     public SimpleActionGroup actions { get; construct; }
 
@@ -234,72 +234,72 @@ public class Akira.Services.ActionManager : Object {
     }
 
     private void action_open () {
-        window.file_manager.open_file ();
+        // window.file_manager.open_file ();
     }
 
     private void action_save () {
-        window.file_manager.save_file ();
+        // window.file_manager.save_file ();
     }
 
     private void action_save_as () {
-        window.file_manager.save_file_as ();
+        // window.file_manager.save_file_as ();
     }
 
     public void action_load_first () {
-        if (settings.recently_opened.length == 0 || settings.recently_opened[0] == null) {
-            window.event_bus.canvas_notification (_("No recently opened file available!"));
-            return;
-        }
+        // if (settings.recently_opened.length == 0 || settings.recently_opened[0] == null) {
+        //     window.event_bus.canvas_notification (_("No recently opened file available!"));
+        //     return;
+        // }
 
-        var file = File.new_for_path (settings.recently_opened[0]);
-        if (!file.query_exists ()) {
-            window.event_bus.canvas_notification (
-                _("Unable to open file at '%s'").printf (settings.recently_opened[0])
-            );
-            return;
-        }
+        // var file = File.new_for_path (settings.recently_opened[0]);
+        // if (!file.query_exists ()) {
+        //     window.event_bus.canvas_notification (
+        //         _("Unable to open file at '%s'").printf (settings.recently_opened[0])
+        //     );
+        //     return;
+        // }
 
-        File[] files = {};
-        files += file;
-        window.app.open (files, "");
+        // File[] files = {};
+        // files += file;
+        // window.app.open (files, "");
     }
 
     private void action_load_second () {
-        if (settings.recently_opened.length < 1 || settings.recently_opened[1] == null) {
-            window.event_bus.canvas_notification (_("No second most recently opened file available!"));
-            return;
-        }
+        // if (settings.recently_opened.length < 1 || settings.recently_opened[1] == null) {
+        //     window.event_bus.canvas_notification (_("No second most recently opened file available!"));
+        //     return;
+        // }
 
-        var file = File.new_for_path (settings.recently_opened[1]);
-        if (!file.query_exists ()) {
-            window.event_bus.canvas_notification (
-                _("Unable to open file at '%s'").printf (settings.recently_opened[1])
-            );
-            return;
-        }
+        // var file = File.new_for_path (settings.recently_opened[1]);
+        // if (!file.query_exists ()) {
+        //     window.event_bus.canvas_notification (
+        //         _("Unable to open file at '%s'").printf (settings.recently_opened[1])
+        //     );
+        //     return;
+        // }
 
-        File[] files = {};
-        files += file;
-        window.app.open (files, "");
+        // File[] files = {};
+        // files += file;
+        // window.app.open (files, "");
     }
 
     private void action_load_third () {
-        if (settings.recently_opened.length < 2 || settings.recently_opened[2] == null) {
-            window.event_bus.canvas_notification (_("No third most recently opened file available!"));
-            return;
-        }
+        // if (settings.recently_opened.length < 2 || settings.recently_opened[2] == null) {
+        //     window.event_bus.canvas_notification (_("No third most recently opened file available!"));
+        //     return;
+        // }
 
-        var file = File.new_for_path (settings.recently_opened[2]);
-        if (!file.query_exists ()) {
-            window.event_bus.canvas_notification (
-                _("Unable to open file at '%s'").printf (settings.recently_opened[2])
-            );
-            return;
-        }
+        // var file = File.new_for_path (settings.recently_opened[2]);
+        // if (!file.query_exists ()) {
+        //     window.event_bus.canvas_notification (
+        //         _("Unable to open file at '%s'").printf (settings.recently_opened[2])
+        //     );
+        //     return;
+        // }
 
-        File[] files = {};
-        files += file;
-        window.app.open (files, "");
+        // File[] files = {};
+        // files += file;
+        // window.app.open (files, "");
     }
 
     private void action_toggle_pixel_grid () {
@@ -307,33 +307,33 @@ public class Akira.Services.ActionManager : Object {
     }
 
     private void action_preferences () {
-        var settings_dialog = new Akira.Dialogs.SettingsDialog (window);
-        settings_dialog.show_all ();
-        settings_dialog.present ();
-        settings_dialog.close.connect (() => {
-            window.event_bus.set_focus_on_canvas ();
-        });
+        // var settings_dialog = new Akira.Dialogs.SettingsDialog (window);
+        // settings_dialog.show_all ();
+        // settings_dialog.present ();
+        // settings_dialog.close.connect (() => {
+        //     window.event_bus.set_focus_on_canvas ();
+        // });
     }
 
     private void action_export_selection () {
-        unowned Akira.Lib.ViewCanvas canvas = window.main_window.main_view_canvas.canvas;
-        canvas.export_selection.begin ();
+        // unowned Akira.Lib.ViewCanvas canvas = window.main_window.main_view_canvas.canvas;
+        // canvas.export_selection.begin ();
     }
 
     private void action_export_artboards () {
         // Check if at least an artboard is present.
-        window.main_window.main_view_canvas.trigger_notification (_("Export of Artboards currently unavailable…sorry 😑️"));
+        // window.main_window.main_view_canvas.trigger_notification (_("Export of Artboards currently unavailable…sorry 😑️"));
         // TODO: Trigger artboards pixbuf generation.
     }
 
     private void action_export_grab () {
-        unowned Akira.Lib.ViewCanvas canvas = window.main_window.main_view_canvas.canvas;
-        var new_mode = new Lib.Modes.ExportMode (canvas);
-        canvas.mode_manager.register_mode (new_mode);
+        // unowned Akira.Lib.ViewCanvas canvas = window.main_window.main_view_canvas.canvas;
+        // var new_mode = new Lib.Modes.ExportMode (canvas);
+        // canvas.mode_manager.register_mode (new_mode);
     }
 
     private void action_zoom_in () {
-        window.event_bus.adjust_zoom (0.1, false, null);
+        // window.event_bus.adjust_zoom (0.1, false, null);
     }
 
     private void action_zoom_in_2 () {
@@ -341,11 +341,11 @@ public class Akira.Services.ActionManager : Object {
     }
 
     private void action_zoom_out () {
-        window.event_bus.adjust_zoom (-0.1, false, null);
+        // window.event_bus.adjust_zoom (-0.1, false, null);
     }
 
     private void action_zoom_reset () {
-        window.event_bus.adjust_zoom (1, true, null);
+        // window.event_bus.adjust_zoom (1, true, null);
     }
 
     private void action_move_up () {
@@ -394,17 +394,17 @@ public class Akira.Services.ActionManager : Object {
     }
 
     private void action_image_tool () {
-        dialog = new Gtk.FileChooserNative (
-            _("Choose image file"), window, Gtk.FileChooserAction.OPEN, _("Select"), _("Close"));
+        // dialog = new Gtk.FileChooserNative (
+        //     _("Choose image file"), window, Gtk.FileChooserAction.OPEN, _("Select"), _("Close"));
 
-        preview_image = new Gtk.Image ();
-        dialog.preview_widget = preview_image;
-        dialog.update_preview.connect (on_update_preview);
+        // preview_image = new Gtk.Image ();
+        // dialog.preview_widget = preview_image;
+        // dialog.update_preview.connect (on_update_preview);
 
-        dialog.select_multiple = true;
+        // dialog.select_multiple = true;
 
-        dialog.response.connect ((response_id) => on_choose_image_response (dialog, response_id));
-        dialog.show ();
+        // dialog.response.connect ((response_id) => on_choose_image_response (dialog, response_id));
+        // dialog.show ();
     }
 
     private void action_path_tool () {
@@ -412,53 +412,53 @@ public class Akira.Services.ActionManager : Object {
     }
 
     private void on_update_preview () {
-        string? filename = dialog.get_preview_filename ();
-        if (filename == null) {
-            dialog.set_preview_widget_active (false);
-            return;
-        }
+        // string? filename = dialog.get_preview_filename ();
+        // if (filename == null) {
+        //     dialog.set_preview_widget_active (false);
+        //     return;
+        // }
 
-        // Read the image format data first.
-        int width = 0;
-        int height = 0;
-        Gdk.PixbufFormat? format = Gdk.Pixbuf.get_file_info (filename, out width, out height);
+        // // Read the image format data first.
+        // int width = 0;
+        // int height = 0;
+        // Gdk.PixbufFormat? format = Gdk.Pixbuf.get_file_info (filename, out width, out height);
 
-        if (format == null) {
-            dialog.set_preview_widget_active (false);
-            return;
-        }
+        // if (format == null) {
+        //     dialog.set_preview_widget_active (false);
+        //     return;
+        // }
 
-        // If the image is too big, resize it.
-        Gdk.Pixbuf pixbuf;
-        try {
-            pixbuf = new Gdk.Pixbuf.from_file_at_scale (filename, PREVIEW_SIZE, PREVIEW_SIZE, true);
-        } catch (Error e) {
-            dialog.set_preview_widget_active (false);
-            return;
-        }
+        // // If the image is too big, resize it.
+        // Gdk.Pixbuf pixbuf;
+        // try {
+        //     pixbuf = new Gdk.Pixbuf.from_file_at_scale (filename, PREVIEW_SIZE, PREVIEW_SIZE, true);
+        // } catch (Error e) {
+        //     dialog.set_preview_widget_active (false);
+        //     return;
+        // }
 
-        if (pixbuf == null) {
-            dialog.set_preview_widget_active (false);
-            return;
-        }
+        // if (pixbuf == null) {
+        //     dialog.set_preview_widget_active (false);
+        //     return;
+        // }
 
-        pixbuf = pixbuf.apply_embedded_orientation ();
+        // pixbuf = pixbuf.apply_embedded_orientation ();
 
-        // Distribute the extra space around the image.
-        int extra_space = PREVIEW_SIZE - pixbuf.width;
-        int smaller_half = extra_space / 2;
-        int larger_half = extra_space - smaller_half;
+        // // Distribute the extra space around the image.
+        // int extra_space = PREVIEW_SIZE - pixbuf.width;
+        // int smaller_half = extra_space / 2;
+        // int larger_half = extra_space - smaller_half;
 
-        // Pad the image manually and avoids rounding errors.
-        preview_image.set_margin_start (PREVIEW_PADDING + smaller_half);
-        preview_image.set_margin_end (PREVIEW_PADDING + larger_half);
+        // // Pad the image manually and avoids rounding errors.
+        // preview_image.set_margin_start (PREVIEW_PADDING + smaller_half);
+        // preview_image.set_margin_end (PREVIEW_PADDING + larger_half);
 
-        // Show the preview.
-        preview_image.set_from_pixbuf (pixbuf);
-        dialog.set_preview_widget_active (true);
+        // // Show the preview.
+        // preview_image.set_from_pixbuf (pixbuf);
+        // dialog.set_preview_widget_active (true);
     }
 
-    private void on_choose_image_response (Gtk.FileChooserNative dialog, int response_id) {
+    // private void on_choose_image_response (Gtk.FileChooserNative dialog, int response_id) {
         // switch (response_id) {
         //     case Gtk.ResponseType.ACCEPT:
         //     case Gtk.ResponseType.OK:
@@ -476,22 +476,21 @@ public class Akira.Services.ActionManager : Object {
         //         });
         //         break;
         // }
-        dialog.destroy ();
-    }
+        // dialog.destroy ();
+    // }
 
     private void action_escape () {
         window.event_bus.request_escape ();
         // If the layout is hidden, allow users to easily get out of presentation mode
         // when they press Escape.
-        if (!window.headerbar.toggled) {
-            action_presentation ();
-        }
+        // if (!window.headerbar.toggled) {
+        //     action_presentation ();
+        // }
     }
 
     private void action_shortcuts () {
-        var dialog = new Akira.Dialogs.ShortcutsDialog (window);
-        dialog.show_all ();
-        dialog.present ();
+        // var dialog = new Akira.Dialogs.ShortcutsDialog (window);
+        // dialog.present ();
     }
 
     private void action_pick_color () {
@@ -555,27 +554,27 @@ public class Akira.Services.ActionManager : Object {
     }
 
     private void action_align_left () {
-        window.event_bus.selection_align (Utils.ItemAlignment.AlignmentDirection.LEFT);
+        // window.event_bus.selection_align (Utils.ItemAlignment.AlignmentDirection.LEFT);
     }
 
     private void action_align_right () {
-        window.event_bus.selection_align (Utils.ItemAlignment.AlignmentDirection.RIGHT);
+        // window.event_bus.selection_align (Utils.ItemAlignment.AlignmentDirection.RIGHT);
     }
 
     private void action_align_top () {
-        window.event_bus.selection_align (Utils.ItemAlignment.AlignmentDirection.TOP);
+        // window.event_bus.selection_align (Utils.ItemAlignment.AlignmentDirection.TOP);
     }
 
     private void action_align_bottom () {
-        window.event_bus.selection_align (Utils.ItemAlignment.AlignmentDirection.BOTTOM);
+        // window.event_bus.selection_align (Utils.ItemAlignment.AlignmentDirection.BOTTOM);
     }
 
     private void action_align_vcenter () {
-        window.event_bus.selection_align (Utils.ItemAlignment.AlignmentDirection.VCENTER);
+        // window.event_bus.selection_align (Utils.ItemAlignment.AlignmentDirection.VCENTER);
     }
 
     private void action_align_hcenter () {
-        window.event_bus.selection_align (Utils.ItemAlignment.AlignmentDirection.HCENTER);
+        // window.event_bus.selection_align (Utils.ItemAlignment.AlignmentDirection.HCENTER);
     }
 
     private void action_undo () {

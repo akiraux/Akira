@@ -11,6 +11,8 @@ conf_data.set('APP_ID', application_id)
 config_header = configure_file(input: 'config.vala.in', output: 'config.vala', configuration: conf_data)
 
 sources = files(
+  'Services/ActionManager.vala',
+  'Services/EventBus.vala',
 
   # 'FileFormat/AkiraFile.vala',
   # 'FileFormat/FileManager.vala',
@@ -20,8 +22,6 @@ sources = files(
   # 'FileFormat/ZipArchiveHandler.vala',
 
   'Services/Settings.vala',
-  # 'Services/ActionManager.vala',
-  # 'Services/EventBus.vala',
 
   # 'Utils/Array.vala',
   # 'Utils/Dialogs.vala',

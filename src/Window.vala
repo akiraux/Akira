@@ -24,15 +24,12 @@ public class Akira.Window : Gtk.ApplicationWindow {
     // public FileFormat.FileManager file_manager;
 
     public weak Akira.Application app { get; construct; }
-    // public Akira.Services.EventBus event_bus;
+    public Akira.Services.EventBus event_bus;
 
-    // public Akira.Services.ActionManager action_manager;
+    public Akira.Services.ActionManager action_manager;
     // public Akira.Layouts.HeaderBar headerbar;
     // public Akira.Layouts.MainWindow main_window;
     // public Akira.Utils.Dialogs dialogs;
-
-    // public SimpleActionGroup actions { get; construct; }
-    // public Gtk.AccelGroup accel_group { get; construct; }
 
     // public bool edited { get; set; default = false; }
 
@@ -45,11 +42,8 @@ public class Akira.Window : Gtk.ApplicationWindow {
     }
 
     construct {
-        // accel_group = new Gtk.AccelGroup ();
-        // add_accel_group (accel_group);
-
-        // event_bus = new Akira.Services.EventBus ();
-        // action_manager = new Akira.Services.ActionManager (app, this);
+        event_bus = new Akira.Services.EventBus ();
+        action_manager = new Akira.Services.ActionManager (app, this);
 
         // headerbar = new Akira.Layouts.HeaderBar (this);
         // file_manager = new Akira.FileFormat.FileManager (this);
