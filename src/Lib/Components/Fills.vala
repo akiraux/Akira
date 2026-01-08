@@ -22,16 +22,78 @@
 public class Akira.Lib.Components.Fills : Component, Copyable<Fills> {
     public struct Fill {
         public int _id;
-        public Color _color;
+        public Pattern _pattern {
+            get {
+                switch (active_pattern) {
+                    case Pattern.PatternType.SOLID:
+                        return solid_pattern;
+                    case Pattern.PatternType.LINEAR:
+                        return linear_pattern;
+                    case Pattern.PatternType.RADIAL:
+                        return radial_pattern;
+                    default:
+                        return solid_pattern;
+                }
+            }
 
-        public Fill (int id = -1, Color color = Color ()) {
+            set {
+                switch (active_pattern) {
+                    case Pattern.PatternType.SOLID:
+                        solid_pattern = value;
+                        break;
+                    case Pattern.PatternType.LINEAR:
+                        linear_pattern = value;
+                        break;
+                    case Pattern.PatternType.RADIAL:
+                        radial_pattern = value;
+                        break;
+                    default:
+                        solid_pattern = value;
+                        break;
+                }
+            }
+        }
+
+        // Each fill item will have patterns for all three types,
+        // so that user can easily switch between them.
+        // However, the non active patterns will not be serialized.
+        public Pattern solid_pattern;
+        public Pattern linear_pattern;
+        public Pattern radial_pattern;
+
+        public Pattern.PatternType active_pattern;
+
+        public Fill (int id = -1, Pattern pattern = new Pattern ()) {
             _id = id;
-            _color = color;
+            active_pattern = Pattern.PatternType.SOLID;
+
+            var fill_rgba = Gdk.RGBA ();
+            fill_rgba.parse (settings.fill_color);
+            solid_pattern = new Pattern.solid (fill_rgba, false);
+
+            linear_pattern = new Pattern.linear (Geometry.Point (5, 5), Geometry.Point (95, 95), false);
+            radial_pattern = new Pattern.radial (Geometry.Point (5, 5), Geometry.Point (95, 95), false);
+        }
+
+        public Fill.with_all_patterns (int id, Pattern solid_pattern, Pattern linear_pattern, Pattern radial_pattern, Pattern.PatternType type) {
+            this._id = id;
+            this.solid_pattern = solid_pattern;
+            this.linear_pattern = linear_pattern;
+            this.radial_pattern = radial_pattern;
+            this.active_pattern = type;
         }
 
         public Fill.deserialized (int id, Json.Object obj) {
             _id = id;
-            _color = Color.deserialized (obj.get_object_member ("color"));
+            //  active_pattern = Pattern.PatternType.SOLID;
+
+            //  solid_pattern = new Pattern.solid (0, 0, 0, 1);
+
+            //  linear_pattern = new Pattern.linear (Geometry.Point (0, 0), Geometry.Point (100, 100), false);
+            //  linear_pattern.add_stop_color (Gdk.RGBA () {red = 0, green = 0, blue = 0, alpha = 0}, 0);
+            //  linear_pattern.add_stop_color (Gdk.RGBA () {red = 1, green = 1, blue = 1, alpha = 0}, 1);
+
+            //  radial_pattern = new Pattern.radial ();
         }
 
         // Recommended accessors.
@@ -40,26 +102,36 @@ public class Akira.Lib.Components.Fills : Component, Copyable<Fills> {
                 return _id;
             }
         }
-        public Gdk.RGBA color {
+        public Pattern pattern {
             get {
-                return _color.rgba;
+                return _pattern;
             }
         }
         public bool hidden {
             get {
-                return _color.hidden;
+                return _pattern.hidden;
             }
         }
 
         // Mutators.
-        public Fill with_color (Color new_color) {
-            return Fill (_id, new_color);
+        public Fill with_color (Color new_color, int id = 0) {
+            Pattern pattern = new Pattern.solid (new_color.rgba, new_color.hidden);
+            var fill = Fill (id, pattern);
+            fill._id = id;
+            return fill;
+        }
+
+        public Fill with_replaced_pattern (Pattern new_pattern) {
+            var new_fill = Fill.with_all_patterns (_id, solid_pattern, linear_pattern, radial_pattern, new_pattern.type);
+            new_fill._pattern = new_pattern;
+
+            return new_fill;
         }
 
         public Json.Node serialize () {
             var obj = new Json.Object ();
             obj.set_int_member ("id", _id);
-            obj.set_member ("color", _color.serialize ());
+            obj.set_member ("pattern", _pattern.serialize ());
             var node = new Json.Node (Json.NodeType.OBJECT);
             node.set_object (obj);
             return node;
@@ -74,7 +146,7 @@ public class Akira.Lib.Components.Fills : Component, Copyable<Fills> {
 
     public Fills.with_color (Color color) {
         data = new Fill[1];
-        data[0] = Fill (0, color);
+        data[0] = Fill (0, new Pattern.solid (color.rgba, color.hidden));
     }
 
     public Fills.deserialized (Json.Object obj) {
@@ -110,7 +182,7 @@ public class Akira.Lib.Components.Fills : Component, Copyable<Fills> {
     public Fill? fill_from_id (int id) {
         foreach (unowned var fill in data) {
             if (fill.id == id) {
-                return fill.with_color (fill._color);
+                return Fill.with_all_patterns (id, fill.solid_pattern, fill.linear_pattern, fill.radial_pattern, fill.active_pattern);
             }
         }
         return null;
@@ -136,7 +208,8 @@ public class Akira.Lib.Components.Fills : Component, Copyable<Fills> {
             latest_id = int.max (latest_id, fill.id);
         }
         latest_id++;
-        var fill = Fill ((int) latest_id, color);
+        var pattern = new Pattern.solid (color.rgba, color.hidden);
+        var fill = Fill ((int) latest_id, pattern);
         data.resize (data.length + 1);
         data[data.length - 1] = fill;
     }

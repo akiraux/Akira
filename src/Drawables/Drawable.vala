@@ -43,8 +43,8 @@ public class Akira.Drawables.Drawable {
 
     // Style
     public double line_width { get; set; default = 0; }
-    public Gdk.RGBA fill_rgba { get; set; default = Gdk.RGBA (); }
-    public Gdk.RGBA stroke_rgba { get; set; default = Gdk.RGBA (); }
+    public Cairo.Pattern fill_pattern { get; set; default = new Cairo.Pattern.rgba (1, 1, 1, 1); }
+    public Cairo.Pattern border_pattern { get; set; default = new Cairo.Pattern.rgba (1, 1, 1, 1); }
     public BorderType border_type { get; set; default = BorderType.CENTER; }
     public double radius_tr { get; set; default = 0; }
     public double radius_tl { get; set; default = 0; }
@@ -383,7 +383,7 @@ public class Akira.Drawables.Drawable {
         if (draw_type == DrawType.XRAY) {
             return false;
         }
-        context.set_source_rgba (fill_rgba.red, fill_rgba.green, fill_rgba.blue, fill_rgba.alpha);
+        context.set_source (fill_pattern);
         context.set_antialias (Cairo.Antialias.GRAY);
         return true;
     }
@@ -396,7 +396,7 @@ public class Akira.Drawables.Drawable {
             return true;
         }
 
-        context.set_source_rgba (stroke_rgba.red, stroke_rgba.green, stroke_rgba.blue, stroke_rgba.alpha);
+        context.set_source (border_pattern);
         context.set_line_width (line_width);
         context.set_antialias (Cairo.Antialias.GRAY);
         return line_width > 0;

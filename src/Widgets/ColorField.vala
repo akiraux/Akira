@@ -72,7 +72,7 @@ public class Akira.Widgets.ColorField : Gtk.Entry {
         var blocker = new SignalBlocker (this);
         (blocker);
 
-        text = Utils.Color.rgba_to_hex_string (model.color);
+        text = Utils.Color.rgba_to_hex_string (model.pattern.get_first_color ());
         sensitive = !model.hidden;
     }
 
@@ -87,7 +87,7 @@ public class Akira.Widgets.ColorField : Gtk.Entry {
         }
 
         var new_rgba = Utils.Color.hex_to_rgba (text);
-        model.color = new_rgba;
+        model.pattern = new Lib.Components.Pattern.solid (new_rgba, false);
     }
 
     private void on_insert_text (string text, int length, ref int position) {

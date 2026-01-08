@@ -180,6 +180,17 @@ public class Akira.Lib.Modes.TransformMode : AbstractInteractionMode {
                     event.y
                 );
                 break;
+            case Utils.Nobs.Nob.GRADIENT_START:
+            case Utils.Nobs.Nob.GRADIENT_END:
+                move_gradient_nob (
+                    view_canvas,
+                    nob,
+                    selection,
+                    initial_drag_state,
+                    event.x,
+                    event.y
+                );
+                break;
             default:
                 effective_nob = scale_from_event (
                     view_canvas,
@@ -540,5 +551,23 @@ public class Akira.Lib.Modes.TransformMode : AbstractInteractionMode {
                 );
             }
         }
+    }
+
+    private static void move_gradient_nob (
+        Lib.ViewCanvas view_canvas,
+        Utils.Nobs.Nob nob,
+        Lib.Items.NodeSelection selection,
+        InitialDragState initial_drag_state,
+        double event_x,
+        double event_y
+    ) {
+        var position = Geometry.Point (
+            initial_drag_state.press_x - event_x,
+            initial_drag_state.press_y - event_y
+        );
+        initial_drag_state.press_x = event_x;
+        initial_drag_state.press_y = event_y;
+
+        view_canvas.window.event_bus.translate_gradient_nob_by_delta (nob, position);
     }
 }

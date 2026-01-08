@@ -43,6 +43,7 @@ sources = files(
     'Utils/GeometryMath.vala',
     'Utils/Bezier.vala',
     'Utils/Delegates.vala',
+    'Utils/Pattern.vala',
 
     'Layouts/HeaderBar.vala',
     'Layouts/MainViewCanvas.vala',
@@ -88,6 +89,8 @@ sources = files(
     'Widgets/OpacityField.vala',
     'Widgets/RoundedColorButton.vala',
     'Widgets/ZoomButton.vala',
+    'Widgets/GradientEditor.vala',
+    'Widgets/PatternTypeChooser.vala',
 
     'Widgets/VirtualizingListBox/VirtualizingListBox.vala',
     'Widgets/VirtualizingListBox/VirtualizingListBoxModel.vala',
@@ -142,6 +145,7 @@ sources = files(
     'Lib/Components/Size.vala',
     'Lib/Components/Text.vala',
     'Lib/Components/Transform.vala',
+    'Lib/Components/Pattern.vala',
 
     'Lib/Items/Model.vala',
     'Lib/Items/ModelInstance.vala',

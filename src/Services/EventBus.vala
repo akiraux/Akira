@@ -48,6 +48,8 @@ public class Akira.Services.EventBus : Object {
     public signal void update_snaps_color ();
     public signal void update_snap_decorators ();
     public signal void zoom_changed (double new_zoom);
+    public signal void change_gradient_nobs_visibility (bool visible);
+    public signal void translate_gradient_nob_by_delta (Utils.Nobs.Nob nob, Geometry.Point delta);
 
     // Canvas triggers.
     public signal void adjust_zoom (double zoom, bool absolute, Geometry.Point? reference);

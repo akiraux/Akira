@@ -23,6 +23,9 @@
 public class Akira.ViewLayers.ViewLayerMultiSelect : ViewLayer {
     private const double UI_LINE_WIDTH = 1.0;
     private Gdk.RGBA fill { get; default = Gdk.RGBA () { red = 0.25, green = 0.79, blue = 0.98, alpha = 0.2 }; }
+    private Lib.Components.Pattern fill_pattern {
+        get;
+        default = new Lib.Components.Pattern.solid (Gdk.RGBA () { red = 0.25, green = 0.79, blue = 0.98, alpha = 0.2 }, false); }
     private Gdk.RGBA stroke {
         get {
             var color = fill;
@@ -91,9 +94,9 @@ public class Akira.ViewLayers.ViewLayerMultiSelect : ViewLayer {
             return;
         }
 
-        drawable.fill_rgba = fill;
+        drawable.fill_pattern = Utils.Pattern.convert_to_cairo_pattern (fill_pattern);
         drawable.line_width = UI_LINE_WIDTH / scale;
-        drawable.stroke_rgba = stroke;
+        drawable.border_pattern = Utils.Pattern.convert_to_cairo_pattern (new Lib.Components.Pattern.solid (stroke, false));
         drawable.paint (context, target_bounds, scale, Drawables.Drawable.DrawType.NORMAL);
 
         last_drawn_bb = drawable.bounds;

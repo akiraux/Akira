@@ -26,7 +26,7 @@
 public class Akira.Layouts.FillsList.FillItemModel : Models.ColorModel {
     private unowned Akira.Lib.ViewCanvas _view_canvas;
 
-    private Lib.Items.ModelInstance _cached_instance;
+    //  private Lib.Items.ModelInstance _cached_instance;
 
     public int fill_id;
 
@@ -39,9 +39,10 @@ public class Akira.Layouts.FillsList.FillItemModel : Models.ColorModel {
         var node = im.item_model.node_from_id (_cached_instance.id);
         assert (node != null);
 
-        var new_color = Lib.Components.Color.from_rgba (color, hidden);
+        var new_pattern = pattern.copy ();
         var new_fills = node.instance.components.fills.copy ();
-        new_fills.replace (Lib.Components.Fills.Fill (fill_id, new_color));
+        var new_fill = new_fills.fill_from_id (fill_id).with_replaced_pattern (new_pattern);
+        new_fills.replace (new_fill);
         node.instance.components.fills = new_fills;
 
         im.item_model.alert_node_changed (node, Lib.Components.Component.Type.COMPILED_FILL);
@@ -74,7 +75,12 @@ public class Akira.Layouts.FillsList.FillItemModel : Models.ColorModel {
         (blocker);
 
         var fill = _cached_instance.components.fills.fill_from_id (fill_id);
-        color = fill.color;
+        active_pattern_type = fill.active_pattern;
+
+        solid_pattern = fill.solid_pattern;
+        linear_pattern = fill.linear_pattern;
+        radial_pattern = fill.radial_pattern;
+
         hidden = fill.hidden;
     }
 }

@@ -40,18 +40,57 @@ public class Akira.Models.ColorModel : GLib.Object {
     }
 
     protected int block_signal = 0;
+    protected Lib.Items.ModelInstance _cached_instance;
 
-    private Gdk.RGBA _color;
-    public Gdk.RGBA color {
+    // All three types of patterns will be stored here.
+    // Based on which type is active, update it.
+    public Lib.Components.Pattern solid_pattern;
+    public Lib.Components.Pattern linear_pattern;
+    public Lib.Components.Pattern radial_pattern;
+
+    public Lib.Components.Pattern.PatternType _active_pattern_type;
+    public Lib.Components.Pattern.PatternType active_pattern_type {
         get {
-            return _color;
+            return _active_pattern_type;
         }
+
         set {
-            if (value == _color) {
-                return;
+            _active_pattern_type = value;
+            on_value_changed ();
+            value_changed ();
+        }
+    }
+
+    public Lib.Components.Pattern pattern {
+        get {
+            switch (_active_pattern_type) {
+                case Lib.Components.Pattern.PatternType.SOLID:
+                    return solid_pattern;
+                case Lib.Components.Pattern.PatternType.LINEAR:
+                    return linear_pattern;
+                case Lib.Components.Pattern.PatternType.RADIAL:
+                    return radial_pattern;
+                default:
+                    return solid_pattern;
+            }
+        }
+
+        set {
+            switch (_active_pattern_type) {
+                case Lib.Components.Pattern.PatternType.SOLID:
+                    solid_pattern = value;
+                    break;
+                case Lib.Components.Pattern.PatternType.LINEAR:
+                    linear_pattern = value;
+                    break;
+                case Lib.Components.Pattern.PatternType.RADIAL:
+                    radial_pattern = value;
+                    break;
+                default:
+                    solid_pattern = value;
+                    break;
             }
 
-            _color = value;
             on_value_changed ();
             value_changed ();
         }
@@ -87,6 +126,33 @@ public class Akira.Models.ColorModel : GLib.Object {
             on_value_changed ();
             value_changed ();
         }
+    }
+
+    public void move_pattern_position_by_delta (Utils.Nobs.Nob nob, Geometry.Point delta) {
+        Geometry.Point percent_delta = Geometry.Point (
+            delta.x * 100.0 / _cached_instance.components.size.width,
+            delta.y * 100.0 / _cached_instance.components.size.height
+        );
+
+        switch (nob) {
+            case Utils.Nobs.Nob.GRADIENT_START:
+                pattern.start = Geometry.Point (
+                    pattern.start.x - percent_delta.x,
+                    pattern.start.y - percent_delta.y
+                );
+                break;
+            case Utils.Nobs.Nob.GRADIENT_END:
+                pattern.end = Geometry.Point (
+                    pattern.end.x - percent_delta.x,
+                    pattern.end.y - percent_delta.y
+                );
+                break;
+            default:
+                break;
+        }
+
+        on_value_changed ();
+        value_changed ();
     }
 
     public virtual void on_value_changed () {}

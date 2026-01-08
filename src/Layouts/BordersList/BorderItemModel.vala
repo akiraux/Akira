@@ -26,7 +26,7 @@
 public class Akira.Layouts.BordersList.BorderItemModel : Models.ColorModel {
     private unowned Lib.ViewCanvas _view_canvas;
 
-    private Lib.Items.ModelInstance _cached_instance;
+    //  private Lib.Items.ModelInstance _cached_instance;
 
     public int border_id;
 
@@ -39,9 +39,10 @@ public class Akira.Layouts.BordersList.BorderItemModel : Models.ColorModel {
         var node = im.item_model.node_from_id (_cached_instance.id);
         assert (node != null);
 
-        var new_color = Lib.Components.Color.from_rgba (color, hidden);
+        var new_pattern = pattern.copy ();
         var new_borders = node.instance.components.borders.copy ();
-        new_borders.replace (Lib.Components.Borders.Border (border_id, new_color));
+        var new_border = new_borders.border_from_id (border_id).with_replaced_pattern (new_pattern);
+        new_borders.replace (new_border);
         node.instance.components.borders = new_borders;
 
         im.item_model.alert_node_changed (node, Lib.Components.Component.Type.COMPILED_BORDER);
@@ -74,7 +75,12 @@ public class Akira.Layouts.BordersList.BorderItemModel : Models.ColorModel {
         (blocker);
 
         var border = _cached_instance.components.borders.border_from_id (border_id);
-        color = border.color;
+        active_pattern_type = border.active_pattern;
+
+        solid_pattern = border.solid_pattern;
+        linear_pattern = border.linear_pattern;
+        radial_pattern = border.radial_pattern;
+
         hidden = border.hidden;
     }
 }

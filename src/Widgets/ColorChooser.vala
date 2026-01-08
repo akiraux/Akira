@@ -23,10 +23,14 @@
  * Helper class to create a container for the GtkColorChooser.
  */
 public class Akira.Widgets.ColorChooser : Gtk.Grid {
-    public signal void color_changed (Gdk.RGBA color);
+    public signal void pattern_changed (Lib.Components.Pattern pattern);
 
     private Gtk.ColorChooserWidget chooser;
     private Gtk.FlowBox global_flowbox;
+    private GradientEditor gradient_editor;
+    private PatternTypeChooser pattern_chooser;
+
+    private Models.ColorModel model;
 
     /*
      * Type of color containers to add new colors to. We can potentially create
@@ -37,11 +41,26 @@ public class Akira.Widgets.ColorChooser : Gtk.Grid {
         DOCUMENT
     }
 
-    public ColorChooser () {
+    public ColorChooser (Models.ColorModel model, Window window) {
         margin_top = margin_bottom = 12;
         margin_start = margin_end = 3;
         row_spacing = 12;
         get_style_context ().add_class ("color-picker");
+        this.model = model;
+
+        pattern_chooser = new PatternTypeChooser (model, window);
+        attach (pattern_chooser, 0, 0, 1, 1);
+
+        gradient_editor = new GradientEditor (model.pattern);
+        attach (gradient_editor, 0, 1, 1, 1);
+
+        pattern_chooser.pattern_changed.connect ((pattern) => {
+            gradient_editor.set_pattern (pattern);
+        });
+
+        gradient_editor.pattern_edited.connect ((pattern) => {
+            model.pattern = pattern;
+        });
 
         chooser = new Gtk.ColorChooserWidget () {
             hexpand = true,
@@ -49,13 +68,17 @@ public class Akira.Widgets.ColorChooser : Gtk.Grid {
         };
         chooser.notify["rgba"].connect (on_color_changed);
 
-        attach (chooser, 0, 0, 1, 1);
+        gradient_editor.color_changed.connect ((color) => {
+            chooser.rgba = color;
+        });
+
+        attach (chooser, 0, 2, 1, 1);
 
         var global_label = new Gtk.Label (_("Global colors")) {
             halign = Gtk.Align.START,
             margin_start = margin_end = 6
         };
-        attach (global_label, 0, 1, 1, 1);
+        attach (global_label, 0, 3, 1, 1);
 
         global_flowbox = new Gtk.FlowBox () {
             selection_mode = Gtk.SelectionMode.NONE,
@@ -75,11 +98,21 @@ public class Akira.Widgets.ColorChooser : Gtk.Grid {
         global_flowbox.add (add_global_color_btn);
 
         foreach (string color in settings.global_colors) {
-            var btn = create_color_button (color);
-            global_flowbox.add (btn);
+            var parser = new Json.Parser ();
+            try {
+                parser.load_from_data (color);
+                var node = parser.get_root ();
+
+                var pattern = new Lib.Components.Pattern.deserialized (node.get_object ());
+
+                var btn = create_color_button (pattern);
+                global_flowbox.add (btn);
+            } catch (Error e) {
+                warning ("Unable to parse pattern. %s\n", e.message);
+            }
         }
 
-        attach (global_flowbox, 0, 2, 1, 1);
+        attach (global_flowbox, 0, 4, 1, 1);
         show_all ();
     }
 
@@ -87,18 +120,18 @@ public class Akira.Widgets.ColorChooser : Gtk.Grid {
      * Add the current color to the parent flowbox.
      */
     private void on_save_color (Container parent) {
-        // Get the currently active color.
-        var color = chooser.rgba.to_string ();
+        // Get the currently active pattern.
+        var pattern = model.pattern;
 
         // Create the new color button and connect to its signal.
-        var btn = create_color_button (color);
+        var btn = create_color_button (pattern);
 
         // Update the colors list and the schema based on the colors container.
         switch (parent) {
             case Container.GLOBAL:
                 global_flowbox.add (btn);
                 var array = settings.global_colors;
-                array += color;
+                array += Json.to_string (pattern.serialize (), false);
                 settings.global_colors = array;
                 break;
 
@@ -108,16 +141,16 @@ public class Akira.Widgets.ColorChooser : Gtk.Grid {
         }
     }
 
-    private Gtk.FlowBoxChild create_color_button (string color) {
+    private Gtk.FlowBoxChild create_color_button (Lib.Components.Pattern pattern) {
         var child = new Gtk.FlowBoxChild () {
             valign = halign = Gtk.Align.CENTER
         };
 
-        var btn = new RoundedColorButton (color);
-        btn.set_color.connect ((color) => {
-            var rgba_color = Gdk.RGBA ();
-            rgba_color.parse (color);
-            chooser.set_rgba (rgba_color);
+        var btn = new RoundedColorButton (pattern);
+        btn.set_pattern.connect ((pattern) => {
+            model.active_pattern_type = pattern.type;
+            model.pattern = pattern;
+            pattern_chooser.set_pattern_type (pattern.type);
         });
 
         child.add (btn);
@@ -129,11 +162,12 @@ public class Akira.Widgets.ColorChooser : Gtk.Grid {
         return (a is AddColorButton) ? -1 : 1;
     }
 
-    public void set_color (Gdk.RGBA color) {
-        chooser.set_rgba (color);
+    public void set_pattern (Lib.Components.Pattern pattern) {
+        pattern_chooser.pattern_changed (pattern);
+        gradient_editor.pattern_edited (pattern);
     }
 
     private void on_color_changed () {
-        color_changed (chooser.get_rgba ());
+        gradient_editor.color_changed (chooser.get_rgba ());
     }
 }
